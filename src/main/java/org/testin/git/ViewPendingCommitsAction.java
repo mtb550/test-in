@@ -157,7 +157,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         // not offered at all; what is offered is the way out of the
                         // rebase, which is the only thing that can happen next (#89).
                         if (git.hasConflicts(path)) {
-                            showConflictActions(path, git.getRemoteName(path), git.syncBranch(path));
+                            showConflictActions(path, git.getRemoteName(path), git.syncBranch(path), git.conflictingPaths(path));
                             return;
                         }
 
@@ -467,8 +467,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         // nothing to push - was then offered back as a conflict
                         // naming no file, and the message with the retry on it
                         // never showed (#312, N9).
-                        if (!git.conflictingPaths(repoPath).isEmpty()) {
-                            showConflictActions(repoPath, remote, branch);
+                        final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
+                        if (!conflicting.isEmpty()) {
+                            showConflictActions(repoPath, remote, branch, conflicting);
                             return;
                         }
 
@@ -482,11 +483,14 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         }
 
         /**
-         * On the background thread that failed, because naming the conflicting files
-         * means asking Git for them.
+         * Offers Resolve, Continue and Abort for the files Git named, which the
+         * caller hands in rather than this asking Git again: the offer also comes
+         * back from {@link ConflictResolution} on the EDT, and a Git command there
+         * is refused by git4idea's own assertion - the same shape the sync's offer
+         * already has.
          */
-        private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
-            GitConflictOffer.show(p, git.conflictingPaths(repoPath),
+        private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final @NotNull List<String> conflicting) {
+            GitConflictOffer.show(p, conflicting,
                     () -> resolveConflicts(repoPath, remote, branch),
                     () -> finishRebase(repoPath, remote, branch, false),
                     () -> finishRebase(repoPath, remote, branch, true));
@@ -512,7 +516,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             ApplicationManager.getApplication().executeOnPooledThread(() ->
                     ConflictResolution.resolveRebase(p, repoPath,
                             () -> pushAfterRebase(repoPath, remote, branch),
-                            leftOver -> showConflictActions(repoPath, remote, branch)));
+                            leftOver -> showConflictActions(repoPath, remote, branch, leftOver)));
         }
 
         /**
@@ -570,7 +574,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         // an abort that failed leaves the rebase directory, which
                         // hasConflicts reads as a conflict, so the failure was
                         // offered back naming no file (#312, A43).
-                        if (!git.conflictingPaths(repoPath).isEmpty()) showConflictActions(repoPath, remote, branch);
+                        final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
+                        if (!conflicting.isEmpty()) showConflictActions(repoPath, remote, branch, conflicting);
                         else
                             Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), FailureText.of(ex));
                     });
