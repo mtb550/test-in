@@ -56,6 +56,27 @@ import java.time.temporal.ChronoUnit;
 public abstract class AbstractMarker implements Marker {
 
     /**
+     * Rule-INTERNAL-090.
+     * <p>
+     * The folder's own id: a uuid stamped when the marker is first written and
+     * never changed afterwards - not by a rename, a move, a status or order
+     * change, or a merge. A copied folder's marker is given a fresh one, because
+     * a copy is another folder (Rule-TREE-PANEL-051).
+     * <p>
+     * Left out of the file while it is empty, which every marker written before
+     * ids is: it is stamped the next time that marker is written, and a marker
+     * that will not parse is left alone until the tester has repaired it
+     * (Rule-INTERNAL-083).
+     * <p>
+     * Nothing in the plugin reads it. It is here so that a tool outside the IDE -
+     * a pipeline, a DevOps plugin - can name one project, set or run by something
+     * no rename can change (#305, D5).
+     */
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @NonNull
+    private String id = "";
+
+    /**
      * Where this node sits among its siblings: a number the tester typed.
      * <p>
      * {@link Marker#NOT_ORDERED} when they have not, which is the largest number

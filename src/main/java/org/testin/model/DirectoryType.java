@@ -21,12 +21,23 @@ import com.intellij.ui.SimpleTextAttributes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.markers.AbstractMarker;
+import org.testin.model.markers.PackageMarker;
+import org.testin.model.markers.TestCasesMainDirectoryMarker;
+import org.testin.model.markers.TestProjectMarker;
+import org.testin.model.markers.TestRunMarker;
+import org.testin.model.markers.TestRunPackageMarker;
+import org.testin.model.markers.TestRunsMainDirectoryMarker;
+import org.testin.model.markers.TestSetMarker;
+import org.testin.model.markers.TestSetPackageMarker;
 import org.testin.util.Bundle;
 import org.testin.util.NameSanitizer;
 
 import javax.swing.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -39,6 +50,7 @@ public enum DirectoryType {
             "",
             AllIcons.Nodes.Project,
             ".tp",
+            TestProjectMarker.class,
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES,
             NodeStatistics.CHILDREN,
             List.of(NodeCount.TEST_SETS, NodeCount.PACKAGES, NodeCount.TEST_CASES, NodeCount.TEST_RUNS)
@@ -49,6 +61,7 @@ public enum DirectoryType {
             "Test Cases",
             AllIcons.Nodes.Bookmark,
             ".tcd",
+            TestCasesMainDirectoryMarker.class,
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES,
             NodeStatistics.CHILDREN,
             List.of(NodeCount.TEST_SETS, NodeCount.PACKAGES, NodeCount.TEST_CASES)
@@ -59,6 +72,7 @@ public enum DirectoryType {
             "Test Runs",
             AllIcons.Nodes.Bookmark,
             ".trd",
+            TestRunsMainDirectoryMarker.class,
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES,
             NodeStatistics.CHILDREN,
             List.of(NodeCount.PACKAGES, NodeCount.TEST_RUNS)
@@ -69,6 +83,7 @@ public enum DirectoryType {
             "",
             AllIcons.Nodes.WebFolder,
             ".tsp",
+            TestSetPackageMarker.class,
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             NodeStatistics.CHILDREN,
             List.of(NodeCount.TEST_SETS, NodeCount.PACKAGES, NodeCount.TEST_CASES)
@@ -79,6 +94,7 @@ public enum DirectoryType {
             "",
             AllIcons.Nodes.WebFolder,
             ".trp",
+            TestRunPackageMarker.class,
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             NodeStatistics.CHILDREN,
             List.of(NodeCount.PACKAGES, NodeCount.TEST_RUNS)
@@ -89,6 +105,7 @@ public enum DirectoryType {
             "",
             AllIcons.Vcs.Changelist,
             ".ts",
+            TestSetMarker.class,
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             NodeStatistics.CHILDREN,
             List.of(NodeCount.TEST_CASES)
@@ -99,6 +116,7 @@ public enum DirectoryType {
             "",
             AllIcons.Toolwindows.ToolWindowRunWithCoverage,
             ".tr",
+            TestRunMarker.class,
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             NodeStatistics.VERDICTS,
             List.of(NodeCount.TOTAL)
@@ -247,6 +265,17 @@ public enum DirectoryType {
      * and the class it parses to: three facts about one thing, spelled out at
      * seven call sites, and nothing checking they belonged together (#173).
      */
+    /**
+     * Rule-INTERNAL-014, Rule-INTERNAL-090.
+     * <p>
+     * The kind of folder a file name is the marker of, and empty when it is not
+     * a marker at all - the one answer, for the scan, the copy and anything that
+     * meets a file and has to say what it is.
+     */
+    public static @NotNull Optional<DirectoryType> byMarker(final @NotNull String fileName) {
+        return Arrays.stream(values()).filter(type -> type.marker.equals(fileName)).findFirst();
+    }
+
     public @NotNull String getMarkerKind() {
         return description.toLowerCase(Locale.ROOT);
     }
@@ -275,6 +304,15 @@ public enum DirectoryType {
     private final @NotNull String folderName;
     private final @NotNull Icon icon;
     private final @NotNull String marker;
+
+    /**
+     * Rule-INTERNAL-014.
+     * <p>
+     * The class that holds this kind of folder's facts, so the kind is all a
+     * reader needs to name: the seven call sites that read a marker used to pass
+     * the class beside the kind, which is the same fact written twice.
+     */
+    private final @NotNull Class<? extends AbstractMarker> markerClass;
 
     private final @NotNull SimpleTextAttributes attributes;
 

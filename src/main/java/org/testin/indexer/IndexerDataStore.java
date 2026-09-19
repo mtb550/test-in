@@ -34,6 +34,7 @@ import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
 import org.testin.model.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.model.markers.AbstractMarker;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -298,8 +299,8 @@ final class IndexerDataStore {
      * A node's marker, read through the one class that owns both halves of that
      * file - see {@link MarkerFiles}.
      */
-    <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass, final @NotNull String name) {
-        return markers.read(dirPath, kind, markerClass, name);
+    <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name) {
+        return markers.read(dirPath, kind, name);
     }
 
     /**
@@ -313,6 +314,14 @@ final class IndexerDataStore {
     /**
      * Whether a directory carries one kind's marker.
      */
+    /**
+     * Rule-INTERNAL-090, Rule-TREE-PANEL-051. The copied folder's marker, under
+     * an id of its own.
+     */
+    boolean giveFreshMarkerId(final @NotNull Path markerFile) {
+        return markers.giveFreshId(markerFile);
+    }
+
     boolean hasMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind) {
         return markers.has(dirPath, kind);
     }

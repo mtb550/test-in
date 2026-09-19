@@ -52,6 +52,14 @@ public interface Marker {
     int NOT_ORDERED = Integer.MAX_VALUE;
 
     /**
+     * The folder's own id, and empty for a marker written before ids existed -
+     * see {@code AbstractMarker.id} for what it is for and when it is stamped.
+     */
+    @NotNull String getId();
+
+    Marker setId(@NotNull String id);
+
+    /**
      * Where the node sits among its siblings, {@link #NOT_ORDERED} when nobody
      * has said - see {@link org.testin.model.dto.dirs.DirectoryDto#getOrder}.
      */

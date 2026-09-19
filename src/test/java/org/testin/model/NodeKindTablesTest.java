@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.JavaCode;
 import org.testin.creator.NodeCreators;
 import org.testin.remove.Removals;
+import org.testin.model.markers.AbstractMarker;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
@@ -52,6 +53,24 @@ public class NodeKindTablesTest {
 
     private static final @NotNull List<String> KINDS =
             Arrays.stream(DirectoryType.values()).map(Enum::name).collect(Collectors.toList());
+
+    /**
+     * Rule-INTERNAL-014, Rule-INTERNAL-090. A marker file name answers with the
+     * one kind it belongs to, and each kind carries the class that reads it - so
+     * a reader names the kind and nothing else.
+     */
+    @Test
+    public void everyMarkerFileNameNamesOneKind() {
+        for (final DirectoryType kind : DirectoryType.values()) {
+            assertEquals(DirectoryType.byMarker(kind.getMarker()).orElseThrow(), kind, kind.getMarker());
+            assertTrue(AbstractMarker.class.isAssignableFrom(kind.getMarkerClass()), kind + " reads " + kind.getMarkerClass());
+        }
+
+        assertTrue(DirectoryType.byMarker("run.json").isEmpty(), "a file that is not a marker belongs to no kind");
+        assertEquals(DirectoryType.values().length,
+                Arrays.stream(DirectoryType.values()).map(DirectoryType::getMarkerClass).distinct().count(),
+                "no two kinds share a marker class");
+    }
 
     @Test
     public void everyKindOfNodeSaysWhatMakesIt() {

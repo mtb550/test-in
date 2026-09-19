@@ -64,6 +64,10 @@ There is no key for this. It starts on its own.
   only the automation code stays off (Rule-CODEGEN-082). When it is there, what
   it says is read in one place, so a missing value means the same thing
   everywhere.
+- **Rule-INTERNAL-090** — Every folder carries an id of its own in its marker:
+  stamped the first time Testin writes that marker, never changed afterwards,
+  and fresh on a copied folder. Nothing in Testin reads it; it names a project,
+  a set or a run for a tool outside the IDE.
 
 ## The budget
 

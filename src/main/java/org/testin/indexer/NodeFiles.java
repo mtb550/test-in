@@ -239,12 +239,19 @@ final class NodeFiles {
      */
     private void reidentifyCopiedCases(final @NotNull Path copiedRoot) {
         final List<Path> caseFiles;
+        final List<Path> markerFiles;
 
         try (Stream<Path> files = Files.walk(copiedRoot)) {
             // Collected before rewriting: the walk is lazy, and creating and
             // deleting files under it while it runs is not its contract.
-            caseFiles = files.filter(Files::isRegularFile)
+            final @NotNull List<Path> all = files.filter(Files::isRegularFile).toList();
+
+            caseFiles = all.stream()
                     .filter(file -> ProjectIndexer.isCaseFile(file, dir -> store.hasMarker(dir, DirectoryType.TS)))
+                    .toList();
+
+            markerFiles = all.stream()
+                    .filter(file -> DirectoryType.byMarker(String.valueOf(file.getFileName())).isPresent())
                     .toList();
 
         } catch (final IOException ex) {
@@ -254,6 +261,11 @@ final class NodeFiles {
 
         final long given = caseFiles.stream().filter(this::reidentify).count();
         Logger.info("Gave " + given + " of " + caseFiles.size() + " copied test case(s) new ids under " + copiedRoot.getFileName());
+
+        // Rule-INTERNAL-090. The folders too: a copied folder's marker arrives
+        // holding the original's id, and an id names one folder (#305, D5).
+        final long folders = markerFiles.stream().filter(store::giveFreshMarkerId).count();
+        Logger.info("Gave " + folders + " of " + markerFiles.size() + " copied folder(s) ids of their own under " + copiedRoot.getFileName());
     }
 
     /**

@@ -42,6 +42,7 @@ import org.testin.services.TestCaseValues;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.BoundTestProject;
 import org.testin.editor.LastOpenEditors;
+import org.testin.model.markers.AbstractMarker;
 import org.testin.util.Bundle;
 
 import java.io.IOException;
@@ -965,8 +966,8 @@ public final class ProjectIndexer {
      * missing or unreadable. The indexer owns both directions of the marker round
      * trip; nothing outside it opens a marker file (#49).
      */
-    public <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass, final @NotNull String name) {
-        return store.readMarker(dirPath, kind, markerClass, name);
+    public <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name) {
+        return store.readMarker(dirPath, kind, name);
     }
 
     /**
