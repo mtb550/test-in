@@ -37,7 +37,7 @@ import java.util.stream.Stream;
  * The scan emptied the project out before the pass that read it back, so for as
  * long as the walk took - a real project is thousands of files - the index had
  * no record of a project that was on disk the whole time. A rescan is a Git
- * pull, a branch switch, an SFTP sync, a hand edit or Refresh, every one of
+ * pull, a branch switch, a hand edit or Refresh, every one of
  * which happens while a tester is working, and in that window the lookups that
  * treat a miss as a mistake in the plugin met one: P or F or B on a row that was
  * not executing raised an internal error, a verdict on the executing row was

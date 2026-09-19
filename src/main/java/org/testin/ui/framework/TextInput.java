@@ -52,10 +52,9 @@ public final class TextInput implements DialogComponent, TextValue {
      *                a field that means a number, a version or an id cannot be
      *                made to hold anything else - there is nothing to validate
      *                on submit and nothing to explain afterward
-     * @param secret  whether what the tester types is shown as dots
      */
-    TextInput(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull String initialValue, final @NotNull String accepts, final boolean secret) {
-        input = new FrameworkTextField(icon, placeHolderText, initialValue, secret);
+    TextInput(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull String initialValue, final @NotNull String accepts) {
+        input = new FrameworkTextField(icon, placeHolderText, initialValue);
         textField = input.component();
 
         if (!ANYTHING.equals(accepts)) accept(Pattern.compile(accepts));

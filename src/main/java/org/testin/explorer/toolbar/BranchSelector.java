@@ -23,7 +23,6 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import org.jetbrains.annotations.NotNull;
-import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.ViewPendingCommitsAction;
@@ -113,20 +112,14 @@ public class BranchSelector {
         currentBranch = "";
 
         // The folder decides: a Git repository has branches, with or without a
-        // testin.yml (Rule-INTERNAL-088). The file can only take them away, by
-        // saying the project lives on an SFTP server - which has no branches,
-        // so nothing here reaches a Git remote for it.
-        final boolean onAServer = TestinYml.connection(p).isSyncsToServer();
-
-        final boolean showable = !onAServer
-                && !path.toString().isEmpty()
-                && !git.isNotRepository(path);
+        // testin.yml (Rule-INTERNAL-088).
+        final boolean showable = !path.toString().isEmpty() && !git.isNotRepository(path);
 
         comboBox.setVisible(showable);
 
         if (!showable) {
             // Still said, for the log and for a project not cloned here yet.
-            showPlaceholder(onAServer ? Bundle.message("branch.not.shared") : Bundle.message("branch.not.a.repository"));
+            showPlaceholder(Bundle.message("branch.not.a.repository"));
             return;
         }
 

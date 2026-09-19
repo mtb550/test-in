@@ -91,7 +91,7 @@ public class ArchitectureTest {
     private static final String @NotNull [] ABOVE_MODEL = {
             "org.testin.indexer..", "org.testin.editor..", "org.testin.view..", "org.testin.codegen..",
             "org.testin.services..", "org.testin.creator..", "org.testin.explorer..",
-            "org.testin.ui..", "org.testin.git..", "org.testin.sftp..", "org.testin.report..",
+            "org.testin.ui..", "org.testin.git..", "org.testin.report..",
             "org.testin.importexport..", "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..",
             "org.testin.search..", "org.testin.undo..", "org.testin.rename..", "org.testin.remove..",
             "org.testin.open..", "org.testin.clipboard..", "org.testin.runner..", "org.testin.notifications..",
@@ -139,7 +139,7 @@ public class ArchitectureTest {
     private static final String @NotNull [] FEATURES = {
             "org.testin.indexer..", "org.testin.editor..", "org.testin.view..", "org.testin.codegen..",
             "org.testin.creator..", "org.testin.explorer..", "org.testin.ui..",
-            "org.testin.git..", "org.testin.sftp..", "org.testin.report..", "org.testin.importexport..",
+            "org.testin.git..", "org.testin.report..", "org.testin.importexport..",
             "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..", "org.testin.search..",
             "org.testin.undo..", "org.testin.rename..", "org.testin.remove..", "org.testin.open..",
             "org.testin.clipboard..", "org.testin.runner..", "org.testin.bug.."
@@ -163,16 +163,12 @@ public class ArchitectureTest {
     private static final @NotNull Set<String> UTIL_EXCEPTIONS = Set.of();
 
     /**
-     * The one class outside the indexer and its exempt list that reads or writes
-     * files directly (#49). Measured 2026-09-04.
-     * <p>
-     * Far fewer than #49 assumed. It reads and writes the sync baseline, which is
-     * transfer bookkeeping rather than test data - the same argument that puts
-     * {@code git} on the exempt list - so this is likely a decision to record on
-     * that list rather than a call to move.
+     * The classes outside the indexer and its exempt list that read or write
+     * files directly (#49), and there are none. The one there was,
+     * {@code sftp.BaselineStore}, went with the SFTP sync, so the next class to
+     * reach a file on its own fails here.
      */
-    private static final @NotNull Set<String> FILE_ACCESS_EXCEPTIONS = Set.of(
-            "org.testin.sftp.BaselineStore");
+    private static final @NotNull Set<String> FILE_ACCESS_EXCEPTIONS = Set.of();
 
     /**
      * Matched on the outermost class, so freezing a name covers the anonymous

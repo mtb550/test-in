@@ -48,13 +48,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -81,15 +79,6 @@ public final class ProjectIndexer {
     private final @NotNull AtomicBoolean indexing = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean restoreEditorsOnComplete = new AtomicBoolean(true);
     private final @NotNull RunWriter runWriter;
-    private final @NotNull SyncFiles syncFiles;
-
-    /**
-     * UC-SHARE-019, Rule-SHARE-003.
-     * <p>
-     * The test projects a sync is writing into right now, each with the run
-     * changes waiting for it to be read again. Guarded by itself.
-     */
-    private final @NotNull Map<Path, List<Runnable>> heldForSync = new HashMap<>();
     private final @NotNull NodeFiles nodeFiles;
     /**
      * Counts the whole indexing pass, not the projects in it.
@@ -105,7 +94,6 @@ public final class ProjectIndexer {
         this.store = new IndexerDataStore(p);
         this.scanCoordinator = new ProjectScanCoordinator(new IndexingScanner(p, store));
         this.runWriter = new RunWriter(p, store);
-        this.syncFiles = new SyncFiles(p, runWriter);
         this.nodeFiles = new NodeFiles(p, this, store);
     }
 
@@ -609,109 +597,38 @@ public final class ProjectIndexer {
      * here rather than there.
      * <p>
      * Private: every write of an existing run goes through {@link #changeRun} or
-     * {@link #saveRun}, which a sync can hold. Written from outside, a run an
-     * editor held put the run from before a sync back over the one that arrived
-     * (#66, finding 152).
+     * {@link #saveRun}, which write the run the index holds rather than one a
+     * caller kept (#66, finding 152).
      */
     private void persistRun(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
         runWriter.persist(runPath, tr);
     }
 
     /**
-     * UC-SHARE-019, Rule-SHARE-003.
-     * <p>
-     * Changes a run as the index holds it when the change is applied, and writes
-     * it.
-     * <p>
-     * <b>Held while a sync of the run's test project is under way</b> - see
-     * {@link #whileSyncing}. Until the sync has read back what it brought, the
-     * index still holds the run as it was, so a change written then put the older
-     * run back over the one that arrived (#66, findings 129 and 144). Held, the
-     * change is applied to the run that arrived once the sync lets go, on the
-     * EDT, where a verdict is recorded. A run the sync took away is not there to
-     * change, and the log says so.
-     * <p>
-     * <b>And shown at once.</b> Meanwhile the change is applied, without being
-     * written, to the run the index holds now, so the grid and the panels show
-     * what the tester just recorded rather than nothing until the sync's refresh
-     * (#66, finding 146). It records the same thing when it is applied again.
+     * Changes a run as the index holds it, and writes it.
      */
     public void changeRun(final @NotNull Path runPath, final @NotNull Consumer<TestRunDto> change) {
-        whenTheSyncLetsGo(runPath,
-                () -> findTestRun(runPath).ifPresentOrElse(run -> {
-                    change.accept(run);
-                    persistRun(runPath, run);
-                }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName())),
-                () -> findTestRun(runPath).ifPresent(change));
+        findTestRun(runPath).ifPresentOrElse(run -> {
+            change.accept(run);
+            persistRun(runPath, run);
+        }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
     }
 
     /**
-     * UC-SHARE-019, Rule-SHARE-003.
-     * <p>
-     * Changes a run's marker as the index holds it when the change is applied,
-     * and writes it - the same discipline as {@link #changeRun}, for the other
-     * half of what a run is.
-     * <p>
-     * It used to take a marker and write it straight through. So completing or
-     * closing a run during a sync of its project wrote the status at once while
-     * the cases it belongs to waited, and the run could sit Completed over cases
-     * still Pending, or keep its old status over cases already turned Untested,
-     * until the sync let the rest through (#312, A4). A status and the results it
-     * describes are one change, and they are held as one now.
-     * <p>
-     * A change rather than a marker, for the reason {@link #changeRun} takes one:
-     * the marker to write is the one the index holds when the write happens, not
-     * the object the caller was looking at before the sync replaced it.
+     * Changes a run's marker as the index holds it, and writes it - the same as
+     * {@link #changeRun}, for the other half of what a run is.
      */
     public void changeRunMarker(final @NotNull Path runPath, final @NotNull Consumer<TestRunMarker> change) {
-        // Both halves ask whether the run is still there. The one shown at once
-        // used the getter that throws by design, so setting a run's status while
-        // a sync removed it was an internal error where the other half wrote a
-        // log line (#66, finding 204).
-        whenTheSyncLetsGo(runPath,
-                () -> store.findTestRunDir(runPath).ifPresentOrElse(dir -> {
-                    final @NotNull TestRunMarker marker = dir.getMarker();
-                    change.accept(marker);
-                    runWriter.persistMarker(runPath, marker);
-                }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + runPath.getFileName())),
-                () -> store.findTestRunDir(runPath).ifPresent(dir -> change.accept(dir.getMarker())));
+        store.findTestRunDir(runPath).ifPresentOrElse(dir -> {
+            final @NotNull TestRunMarker marker = dir.getMarker();
+            change.accept(marker);
+            runWriter.persistMarker(runPath, marker);
+        }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + runPath.getFileName()));
     }
 
     /**
-     * Runs the write now, or queues it behind a sync of the run's test project
-     * and does {@code meanwhile} instead - which is what puts the change on
-     * screen without writing it (#66, finding 146).
-     * <p>
-     * One method for the results and the marker, so the two cannot start being
-     * held differently: half a change through and half of it waiting is exactly
-     * what A4 was.
-     */
-    private void whenTheSyncLetsGo(final @NotNull Path runPath, final @NotNull Runnable apply, final @NotNull Runnable meanwhile) {
-        synchronized (heldForSync) {
-            final @NotNull Optional<List<Runnable>> waiting = heldForSync.entrySet().stream()
-                    .filter(entry -> runPath.startsWith(entry.getKey()))
-                    .map(Map.Entry::getValue)
-                    .findFirst();
-
-            // Written inside the lock when nothing holds it. Decided here and
-            // written after it, a sync that took its hold in between had its run
-            // file overwritten by the change it was meant to hold (#66, finding
-            // 203). The write only queues its bytes, so nothing waits in here.
-            if (waiting.isEmpty()) {
-                apply.run();
-                return;
-            }
-
-            waiting.orElseThrow().add(apply);
-        }
-
-        meanwhile.run();
-    }
-
-    /**
-     * Writes a run as the index holds it, under the same hold as
-     * {@link #changeRun}: for a caller whose change is already on that run, such
-     * as an open editor's execution stamps (#66, finding 152).
+     * Writes a run as the index holds it, for a caller whose change is already
+     * on that run, such as an open editor's execution stamps (#66, finding 152).
      */
     public void saveRun(final @NotNull Path runPath) {
         changeRun(runPath, run -> {
@@ -965,95 +882,16 @@ public final class ProjectIndexer {
     }
 
     /**
-     * Every file in a test project, by the path a server names it with (#94) -
-     * see {@link SyncFiles} for why a sync deals in files rather than nodes.
-     */
-    public @NotNull Map<String, byte[]> filesUnder(final @NotNull Path projectPath) {
-        return syncFiles.under(projectPath);
-    }
-
-    /**
      * UC-INTERNAL-003, Rule-INTERNAL-017.
      * <p>
      * Whether the file belongs to Git rather than to the test project.
      * <p>
      * A repository's own directory is not test data. Its files change on every
-     * command - HEAD, FETCH_HEAD, the index, the logs - so carrying them to a
-     * server means a conflict on every sync forever, and writing one machine's
-     * copy over another's would break the repository rather than share it.
+     * command - HEAD, FETCH_HEAD, the index, the logs - so reading them as test
+     * data would make every pull look like the test project changing.
      */
     public static boolean isGitsOwn(final @NotNull String relative) {
         return relative.equals(".git") || relative.startsWith(".git/");
-    }
-
-    /**
-     * UC-SHARE-019, Rule-SHARE-003.
-     * <p>
-     * Runs one sync of a test project with every change to its runs held, and
-     * applies what was held once the sync is over.
-     * <p>
-     * From before the sync reads the project's files until after its last scan.
-     * The hold started only when the incoming files were accepted, so a verdict
-     * recorded while the sync was still planning or moving files was written at
-     * once, and the file that arrived then replaced it (#66, finding 144). What
-     * was held is applied on the EDT, where a verdict is recorded, ahead of
-     * anything the caller redraws once this returns.
-     */
-    public <T> @NotNull T whileSyncing(final @NotNull Path projectPath, final @NotNull Supplier<@NotNull T> sync) {
-        synchronized (heldForSync) {
-            heldForSync.putIfAbsent(projectPath, new ArrayList<>());
-        }
-
-        try {
-            return sync.get();
-        } finally {
-            final @NotNull List<Runnable> held;
-            synchronized (heldForSync) {
-                held = Optional.ofNullable(heldForSync.remove(projectPath)).orElse(List.of());
-            }
-
-            if (!held.isEmpty()) ApplicationManager.getApplication().invokeLater(() -> held.forEach(Runnable::run));
-        }
-    }
-
-    /**
-     * Writes what arrived from a server into the project, and reads the project
-     * again. A sync calls it inside {@link #whileSyncing}, which holds the run
-     * changes made meanwhile.
-     * <p>
-     * The scan is not optional: these writes are claimed as our own, so the
-     * watcher rightly ignores them, and no other path will ever index what they
-     * put on disk. Without it the next tree refresh repainted the old cache and
-     * the downloaded cases stayed invisible until a manual refresh (#118) - the
-     * mirror {@link #removeIncoming} always scanned.
-     */
-    public @NotNull Set<String> acceptIncoming(final @NotNull Path projectPath, final @NotNull Map<String, byte[]> files) {
-        final @NotNull Map<String, Future<Boolean>> writes = syncFiles.accept(projectPath, files);
-
-        // A run's incoming files went through the run writer's queue; the scan
-        // reads them once they have landed rather than racing them (#66,
-        // finding 121). Every write has answered by then, so which of them did
-        // not land is read afterwards rather than waited for.
-        runWriter.awaitQueued();
-
-        final @NotNull Set<String> notWritten = SyncFiles.notLanded(projectPath, writes);
-        scanSingleProject(projectPath);
-        return notWritten;
-    }
-
-    /**
-     * Removes files the server no longer holds, once the tester has agreed to
-     * it, and reads the project again - the mirror of {@link #acceptIncoming},
-     * scanning for the same reason.
-     */
-    public void removeIncoming(final @NotNull Path projectPath, final @NotNull Collection<String> relatives) {
-        syncFiles.remove(projectPath, relatives);
-
-        // A run's files were removed through the run writer's queue; the scan
-        // reads the project once they are gone (#66, finding 130).
-        runWriter.awaitQueued();
-
-        scanSingleProject(projectPath);
     }
 
     /**

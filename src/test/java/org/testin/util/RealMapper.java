@@ -33,8 +33,8 @@ import java.lang.reflect.Constructor;
  * ships.
  * <p>
  * Here because seven test classes had written this same block - the git ones,
- * the sftp ones and {@code MapperFailureTest} - and a helper copied seven times
- * is seven places to fix when the constructor changes.
+ * the ones for a sync that is gone now, and {@code MapperFailureTest} - and a
+ * helper copied seven times is seven places to fix when the constructor changes.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RealMapper {

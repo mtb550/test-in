@@ -54,8 +54,8 @@ import java.util.Optional;
  * <p>
  * <b>What made it buildable is that the generator does all of it now.</b> A test
  * case arrives without a method every time one comes in as data rather than
- * through the create dialog: a Git pull, an SFTP sync, an imported sheet, a
- * branch switch, a data root edited by hand. Nothing generated for those cases,
+ * through the create dialog: a Git pull, an imported sheet, a branch switch, a
+ * data root edited by hand. Nothing generated for those cases,
  * and nothing could be asked to - Run and Navigate to Code refused for every one
  * of them and only the log said why. {@code CreateTestMethod} already writes the
  * class and its package folders, skips a method that is there, adopts one the

@@ -396,12 +396,10 @@ at all depends on which plugins are installed.
 │  Sync With Remote                (5)   │  Copy               Ctrl+C │      │
 │  View Pending Commits                  │  Cut                Ctrl+X │      │
 │  ──────────────────────────────        │  Paste              Ctrl+V │      │
-│  Sync With SFTP                  (6)   └────────────────────────────┘      │
-│  ──────────────────────────────                                            │
-│  Edit Run                        (7)                                       │
+│  Edit Run                        (6)   └────────────────────────────┘      │
 │  Set Status                                                                │
 │  ──────────────────────────────                                            │
-│  Generate Report          Ctrl+P (8)                                       │
+│  Generate Report          Ctrl+P (7)                                       │
 │  Details                                                                   │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -424,11 +422,9 @@ at all depends on which plugins are installed.
 4. **Export**, **Import** — these belong to reports, export, import and sync.
 5. **Sync With Remote**, **View Pending Commits** — only when the Git plugin is
    present. Otherwise the whole section disappears, dividing line included.
-6. **Sync With SFTP** — always present. Grayed unless the test project is
-   shared over SFTP.
-7. **Edit Run** and **Set Status** — a test run's own two entries. Grayed once
+6. **Edit Run** and **Set Status** — a test run's own two entries. Grayed once
    the test run is signed off.
-8. **Generate Report** and **Details** — last.
+7. **Generate Report** and **Details** — last.
 
 Every entry that changes something confirms itself once. The confirmation is
 one past-tense word. Every entry that only shows something confirms nothing.
@@ -437,7 +433,7 @@ one past-tense word. Every entry that only shows something confirms nothing.
 
 ## Also on this menu
 
-Six items on the tree's menu belong to another part of Testin. They are
+Five items on the tree's menu belong to another part of Testin. They are
 documented there:
 
 | Item | Belongs to |
@@ -445,7 +441,6 @@ documented there:
 | **Export**, **Import** | Reports, export, import and sync |
 | **Generate Report** (`Ctrl+P`) | The same |
 | **Sync With Remote**, **View Pending Commits** | The same, the Git half |
-| **Sync With SFTP** | The same, the SFTP half |
 
 ---
 

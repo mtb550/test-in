@@ -193,7 +193,7 @@ silently does nothing costs more than the setting it was meant to hold.
     for a drag of test cases — AWT's `Transferable` contract is that an
     unsupported flavor throws. Catching it hands the platform a wrong object
     instead of "I do not have that".
-  - `GitTaskWork.run`, `SftpAuth.apply`, `JavaSourceRoot.RootWork.run` and
+  - `GitTaskWork.run`, `JavaSourceRoot.RootWork.run` and
     `JavaSourceRoot.RootFile.from` — functional interfaces whose whole point is to let the lambda fail, so that
     one owner above them catches. Removing the declaration moves the catch into
     every lambda, which is the duplication `JavaSourceRoot` exists to delete.

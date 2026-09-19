@@ -3,7 +3,7 @@
 # The settings page
 
 The settings page is where Testin learns about this machine and this person:
-where the test data lives, who is using it, and how to reach the team's server.
+where the test data lives, and who is using it.
 
 | | |
 |---|---|
@@ -28,8 +28,6 @@ where the test data lives, who is using it, and how to reach the team's server.
 | **UC-SETTING-006** | [Set the folder that files are saved to](setDownloadFolder.md) | Save reports and exports to the same place every time. |
 | **UC-SETTING-007** | [Choose how much Testin writes to its log](setLogLevel.md) | Turn the log up when something goes wrong. |
 | **UC-SETTING-008** | [Turn the shortcut hints off](hideShortcutHints.md) | Make dialogs shorter once the keys are known. |
-| **UC-SETTING-009** | [Name my account on the team's server](setSftpAccount.md) | Let a sync connect as the tester, without asking. |
-| **UC-SETTING-010** | [Name the key file this machine offers](setSftpKeyFile.md) | Prove who this machine is with a key, not a password. |
 | **UC-SETTING-011** | [Change the size of Testin's text](changeTextSize.md) | Make Testin's text bigger or smaller. |
 
 Choosing which test project a code project uses is not on this page. It is
@@ -47,20 +45,18 @@ which test project it is about.
 The two are kept apart on purpose, and the reason is who they belong to.
 
 - **A setting belongs to this machine and this person.** The Testin folder, the
-  tester's name, the server account. None of them is committed, and each one is
+  tester's name, the download folder. None of them is committed, and each one is
   the same in every code project open in this IDE.
 - **The choice of test project belongs to the team.** It is written into a file
   in the code repository, so a colleague who clones the repository gets it too.
   That file names no machine and no person.
 
-**Three words, before the rules use them.**
+**Two words, before the rules use them.**
 
 - The **Testin folder** is the one folder on this machine that holds test
   projects. The page calls it that too.
 - **This machine's settings** are one set of values shared by every code project
   open in this IDE.
-- The **password store** is the IDE's own keychain. Testin puts passwords there
-  and nowhere else.
 
 ---
 
@@ -84,24 +80,20 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 │                                                                            │
 │   Default download folder: [                                     ] [...]   │
 │                                                                            │
-│   SFTP account:            [                                            ]  │
-│                                                                            │
-│   SFTP key file:           [                                     ] [...]   │
-│                                                                            │
 │   [x] Show keyboard shortcuts in dialogs                                   │
 │                                                                            │
 │   Everything here belongs to this machine and this person, and is never     │
 │   committed. Which test project a repository is about is chosen in the      │
 │   Testin tool window and kept on this machine. A repository's testin.yml,   │
 │   when it has one, can name it and say how it is shared - Testin reads it   │
-│   and never writes it.                                                (11)  │
+│   and never writes it.                                                 (9)  │
 │                                                                            │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
 1. **Testin folder** — the folder holding every test project. The only
    field with a gray example in it.
-2. **The browse button** — opens a folder chooser. Three fields have one.
+2. **The browse button** — opens a folder chooser. Two fields have one.
 3. **Open** — opens the Testin folder in the file manager. It is gray until the
    box names a folder that is really there.
 4. **Log level** — how much Testin writes to its own log.
@@ -109,11 +101,9 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 6. **Tester role** — stored, and read by nothing. That is difference 2 below.
 7. **Default download folder** — where saving a report, an export or an import
    starts.
-8. **SFTP account** — who this machine is on the team's server.
-9. **SFTP key file** — the key this machine offers that server.
-10. **Show keyboard shortcuts in dialogs** — the strip of key hints along the
-    bottom of every Testin dialog.
-11. **The gray note** — where a value belongs. It is the
+8. **Show keyboard shortcuts in dialogs** — the strip of key hints along the
+   bottom of every Testin dialog.
+9. **The gray note** — where a value belongs. It is the
     table below, said where a tester is looking for a setting rather than only
     in this document.
 
@@ -135,12 +125,9 @@ highlighted.
 | Tester name | This machine's settings | No |
 | Tester role | This machine's settings | No |
 | Default download folder | This machine's settings | No |
-| SFTP account | This machine's settings | No |
-| SFTP key file | This machine's settings | No |
 | Show keyboard shortcuts | This machine's settings | No |
 | Which test project this repository is about | Chosen in the Testin tool window and kept on this machine; `testin.yml` can name one for everyone | No; the file is, when the team writes one |
-| How to reach the team's server | `testin.yml`, in the code repository, written by hand | **Yes** |
-| A password, or a key file's passphrase | The IDE's password store | No |
+| Where the test project is cloned from | `testin.yml`, in the code repository, written by hand | **Yes** |
 
 Nothing on this page is ever committed. That is the reason the page exists
 rather than putting these values in `testin.yml`.
@@ -156,15 +143,6 @@ setting up - Testin reads it and never writes it. The one thing in between, the
 test project a tester chose for a repository, is kept on their machine and wins
 over the file until the file names a different one (Decision-011).
 
-**The server address is shared, the account is not.** `testin.yml` carries the
-host. If someone writes an account into the host as well, Testin drops it and
-says so in the log. The file is shared with everyone, and an account is one
-person's.
-
-**Passwords are never in a file Testin writes.** They go to the IDE's password
-store, one entry per server and account, so two servers do not overwrite each
-other. Testin never writes a password to the log.
-
 ---
 
 ## Where the plugin breaks its own rules
@@ -174,7 +152,7 @@ bug report yet.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule-SETTING-002 — nothing is checked, so nothing warns | The Testin folder is checked now: refused when it is not a folder (Rule-SETTING-042), and when it is a partial path (Rule-SETTING-013). The rest of the page still is not: a tester name, a download folder, an SFTP account and a key file are all stored exactly as typed. None of them can make the tree empty, which is why the folder went first. |
+| **Difference 1** | Rule-SETTING-002 — nothing is checked, so nothing warns | The Testin folder is checked now: refused when it is not a folder (Rule-SETTING-042), and when it is a partial path (Rule-SETTING-013). The rest of the page still is not: a tester name and a download folder are both stored exactly as typed. None of them can make the tree empty, which is why the folder went first. |
 | **Difference 2** | Rule-SETTING-020 — a value this page stores is read by something | **Tester role** is stored and read by nothing at all. It is on no marker, no report and no message. It is reserved rather than dead: [#14](https://github.com/mtb550/test-in/issues/14) is what will read it. |
 
 **Fixed since this list was written.** The numbers are left out rather than
@@ -185,6 +163,21 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 3** | The Testin folder was stored exactly as typed and trimmed later by the reader, so the stored value changed on its own at the next project open. Every field on the page is trimmed when it is stored now. Fixed 9 September 2026, [#239](https://github.com/mtb550/test-in/issues/239) |
 | **Difference 4** | The export, report and import dialogs each carried a **Set as default folder** tick box that wrote this page's value. The box is gone and this page is the one writer, which retires UC-SHARE-023. Fixed 9 September 2026, [#240](https://github.com/mtb550/test-in/issues/240) |
 | **Difference 5** | It read Rule-SETTING-004 as a promise that every open code project re-reads the disk. That rule is about which *setting* causes a re-read, not which projects; which projects is Rule-SETTING-012, and it says the ones with a panel open. A project without one has read nothing to correct, and the folder is read where it is used, so it answers the new one the first time it asks. Not a defect, closed 9 September 2026, [#241](https://github.com/mtb550/test-in/issues/241) and [#77](https://github.com/mtb550/test-in/issues/77) |
+
+**Retired.** A use case or a rule that is gone keeps its number forever, so an
+issue that quotes one still leads somewhere and nothing is ever renumbered onto
+it.
+
+| Gone | Was | Read instead |
+|---|---|---|
+| **UC-SETTING-009** | *Name my account on the team's server* - the account an SFTP sync connected as. Removed 19 September 2026, when Git became the only way a test project is shared ([#334](https://github.com/mtb550/test-in/issues/334)) | — |
+| **UC-SETTING-010** | *Name the key file this machine offers* - the SSH key an SFTP sync proved this machine with | — |
+| **Rule-SETTING-031** | *The account belongs to this machine and this person. It is never written into the file the team shares.* | — |
+| **Rule-SETTING-032** | *An empty account means the tester has not said. The sync then asks.* | — |
+| **Rule-SETTING-033** | *The sync can write this row too, so a tester who answers the sync's question never has to visit this page.* | — |
+| **Rule-SETTING-034** | *A key file named here is the way this machine proves who it is.* | — |
+| **Rule-SETTING-035** | *An agent already holding identities is tried before the key file itself.* | — |
+| **Rule-SETTING-036** | *Testin never asks for a key file's passphrase.* | — |
 
 ---
 

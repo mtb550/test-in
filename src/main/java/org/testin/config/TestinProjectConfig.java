@@ -25,8 +25,6 @@ import org.testin.util.Bundle;
 
 import java.util.Locale;
 import java.util.Objects;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -42,8 +40,8 @@ import java.util.regex.Pattern;
  * it again.
  * <p>
  * What is deliberately <b>not</b> here is anything about one machine or one
- * person - the Testin root folder, the tester's name, the account used to reach
- * a server, and above all no secret. This file is committed, so a value in it is
+ * person - the Testin root folder, the tester's name, an account, and above all
+ * no secret. This file is committed, so a value in it is
  * shared with everyone who clones and lives in the repository's history forever.
  * <p>
  * <b>{@link #location} is the authority.</b> The file can contradict itself -
@@ -54,29 +52,18 @@ import java.util.regex.Pattern;
  * Every value is empty rather than null when the file leaves it out, so readers
  * are unconditional.
  *
- * @param location      whether this project is shared at all
- * @param connection    how it is reached when it is
- * @param repoUrl       where the test project is cloned from, for {@code git}
- * @param sftpHost      the machine holding it, for {@code sftp}
- * @param sftpPort      its SSH port; 22 unless the file says otherwise
- * @param sftpPath      the folder on it that holds the test projects
- * @param testinProject which test project this repository is about, whichever
- *                      way it is reached. One key rather than one per
- *                      connection: a tester who switches this file from git to
- *                      sftp changes how the project is reached, not which
- *                      project it is
+ * @param location      whether this project is shared at all - through Git, the
+ *                      only way there is
+ * @param repoUrl       where the test project is cloned from, when it is shared
+ * @param testinProject which test project this repository is about, local or
+ *                      shared
  * @param bugRepoUrl    the development repository Report Bug files issues in
  *                      (#28), as the tester wrote it with any credentials taken
  *                      out. Kept even when it names no repository, so what is
  *                      wrong with it can be said - {@link #bugRepository()} is
  *                      the question that answers whether it does
  */
-record TestinProjectConfig(@NotNull TestinLocation location, @NotNull ConnectionType connection, @NotNull String repoUrl, @NotNull String sftpHost, int sftpPort, @NotNull String sftpPath, @NotNull String testinProject, @NotNull String bugRepoUrl) {
-
-    /**
-     * The port an address is assumed to be on when the file does not say.
-     */
-    private static final int DEFAULT_PORT = 22;
+record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String repoUrl, @NotNull String testinProject, @NotNull String bugRepoUrl) {
 
     /**
      * A repository that has said nothing. Every way of failing to read one - no
@@ -84,7 +71,7 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Connection
      * tell the reasons apart.
      */
     public static final @NotNull TestinProjectConfig EMPTY = new TestinProjectConfig(
-            TestinLocation.LOCAL, ConnectionType.NONE, "", "", DEFAULT_PORT, "", "", "");
+            TestinLocation.LOCAL, "", "", "");
 
     /**
      * A repository whose file is there and could not be read.
@@ -107,7 +94,7 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Connection
      * {@link #isUnreadable()} is the one question that can tell.
      */
     public static final @NotNull TestinProjectConfig UNREADABLE = new TestinProjectConfig(
-            TestinLocation.LOCAL, ConnectionType.NONE, "", "", DEFAULT_PORT, "", "", "");
+            TestinLocation.LOCAL, "", "", "");
 
     /**
      * The forms {@code git clone} is given, and nothing else.
@@ -121,48 +108,26 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Connection
     private static final @NotNull Pattern REPO_URL =
             Pattern.compile("^(https://|ssh://|git@)[A-Za-z0-9._~:/?#@%+-]+$");
 
-    /**
-     * A host name or address, and nothing that could be anything else.
-     */
-    private static final @NotNull Pattern HOST = Pattern.compile("^[A-Za-z0-9.-]+$");
-
     public TestinProjectConfig {
         repoUrl = validRepoUrl(repoUrl);
-        sftpHost = validHost(sftpHost);
-        sftpPort = sftpPort <= 0 || sftpPort > 65535 ? DEFAULT_PORT : sftpPort;
 
         // Stripped on the way in, as RepoUrl is, and for the same reason: the
         // file is committed. Not refused when it names no repository - the
         // tester is told what is wrong with it where Report Bug would send.
         bugRepoUrl = withoutCredentials(bugRepoUrl);
 
-        // The mode decides. A project the file calls local is local, whatever
-        // addresses were left in it - so an address commented back in later is
-        // the only thing that changes the answer.
-        connection = location.isRemote() ? connection : ConnectionType.NONE;
-
-        report(location, connection, repoUrl, sftpHost);
+        report(location, repoUrl);
     }
 
     /**
      * Says what does not add up, once, where it can be read.
      * <p>
-     * Not corrected: a file that says {@code sftp} and gives no host has a
+     * Not corrected: a file that says {@code remote} and gives no address has a
      * mistake in it, and quietly behaving as something else would hide the one
      * fact the tester needs.
      */
-    private static void report(final @NotNull TestinLocation location, final @NotNull ConnectionType connection, final @NotNull String repoUrl, final @NotNull String host) {
-        if (!location.isRemote()) return;
-
-        if (connection == ConnectionType.NONE) {
-            Logger.warn(Bundle.message("config.warn.remote.no.connection"));
-        }
-        if (connection == ConnectionType.GIT && repoUrl.isEmpty()) {
-            Logger.warn("testin.yml says connection: git but has no RepoUrl");
-        }
-        if (connection == ConnectionType.SFTP && host.isEmpty()) {
-            Logger.warn("testin.yml says connection: sftp but has no sftpHost");
-        }
+    private static void report(final @NotNull TestinLocation location, final @NotNull String repoUrl) {
+        if (location.isRemote() && repoUrl.isEmpty()) Logger.warn(Bundle.message("config.warn.remote.no.repo.url"));
     }
 
     /**
@@ -170,13 +135,9 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Connection
      * promises.
      */
     @JsonCreator
-    static @NotNull TestinProjectConfig read(@JsonProperty("location") final @Nullable String location, @JsonProperty("connection") final @Nullable String connection, @JsonProperty("RepoUrl") final @Nullable String repoUrl, @JsonProperty("sftpHost") final @Nullable String sftpHost, @JsonProperty("sftpPort") final @Nullable Integer sftpPort, @JsonProperty("sftpPath") final @Nullable String sftpPath, @JsonProperty("testinProject") final @Nullable String testinProject, @JsonProperty("bugRepoUrl") final @Nullable String bugRepoUrl) {
+    static @NotNull TestinProjectConfig read(@JsonProperty("location") final @Nullable String location, @JsonProperty("RepoUrl") final @Nullable String repoUrl, @JsonProperty("testinProject") final @Nullable String testinProject, @JsonProperty("bugRepoUrl") final @Nullable String bugRepoUrl) {
         return new TestinProjectConfig(TestinLocation.of(strip(location)),
-                ConnectionType.of(strip(connection)),
                 strip(repoUrl),
-                strip(sftpHost),
-                Objects.requireNonNullElse(sftpPort, DEFAULT_PORT),
-                strip(sftpPath),
                 strip(testinProject),
                 strip(bugRepoUrl));
     }
@@ -234,24 +195,12 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Connection
         return url.substring(0, start) + authority.substring(at + 1) + (end < 0 ? "" : url.substring(end));
     }
 
-    private static @NotNull String validHost(final @NotNull String value) {
-        if (value.isEmpty() || HOST.matcher(value).matches()) return value;
-
-        Logger.warn(value.contains("@")
-                ? "sftpHost must not carry an account - that belongs in this machine's settings, "
-                + "because this file is shared with everyone. Ignored: " + value
-                : "sftpHost is not a host name and was ignored: " + value);
-        return "";
-    }
-
     /**
      * Which test project this repository is about.
      * <p>
-     * One key, read the same way however the project is reached. There is one
-     * Testin root folder and it holds several projects, so "which one" is a
-     * question local, Git and SFTP all have to answer - none of them can take
-     * it from the root, and a key per connection would have made switching this
-     * file from git to sftp read as switching to a different project.
+     * One key, read the same way whether the project is local or shared. There
+     * is one Testin root folder and it holds several projects, so "which one" is
+     * a question both have to answer - neither can take it from the root.
      * <p>
      * Empty when the file names none. Which project a repository is about then
      * comes from the tester's choice on this machine ({@code BoundTestProject}),
@@ -277,45 +226,13 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Connection
     /**
      * Whether the test project can be fetched when this machine does not have it
      * yet.
+     * <p>
+     * The mode decides. A project the file calls local is local, whatever
+     * address was left in it - so an address commented back in later is the
+     * only thing that changes the answer.
      */
     public boolean hasRepoUrl() {
-        return connection == ConnectionType.GIT && !repoUrl.isEmpty();
-    }
-
-    /**
-     * Whether this project is reachable on a server.
-     */
-    public boolean hasSftp() {
-        return missingForSftp().isEmpty();
-    }
-
-    /**
-     * UC-SHARE-019, Rule-SHARE-085.
-     * <p>
-     * The keys an SFTP sync still needs, as {@code testin.yml} spells them, and
-     * none when it has them all. So a refusal names what is missing: it named
-     * {@code connection} and {@code sftpHost} whatever was (#312, A38). The test
-     * project is not among them: which one is synced is the one selected in the
-     * tree, not something the file has to say (#301).
-     */
-    public @NotNull List<String> missingForSftp() {
-        final @NotNull List<String> missing = new ArrayList<>();
-        if (connection != ConnectionType.SFTP) missing.add("connection: sftp");
-        if (sftpHost.isEmpty()) missing.add("sftpHost");
-
-        return List.copyOf(missing);
-    }
-
-    /**
-     * Where this test project is on that server, and {@link SftpAddress#NONE}
-     * when the file names no server.
-     * <p>
-     * The address points at <b>the project's own folder</b>, not at the root
-     * holding several - composed here and nowhere else, so nothing downstream
-     * joins a project name onto a path a second time.
-     */
-    public @NotNull SftpAddress sftpAddress(final @NotNull String projectName) {
-        return hasSftp() ? new SftpAddress(sftpHost, sftpPort, projectFolder(projectName)) : SftpAddress.NONE;
+        return location.isRemote() && !repoUrl.isEmpty();
     }
 
     /**
@@ -325,31 +242,5 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Connection
      */
     public @NotNull Optional<BugRepository> bugRepository() {
         return BugRepository.of(bugRepoUrl);
-    }
-
-    /**
-     * This project's folder on the server: the root with its name under it.
-     * <p>
-     * A root that already ends in that name is left alone. Writing the whole
-     * path in {@code sftpPath} is the obvious thing for a tester to do, and it
-     * must not be read as asking for the folder twice - {@code /Testin/test-01}
-     * is where the project is, never the parent of another {@code test-01}.
-     */
-    private @NotNull String projectFolder(final @NotNull String name) {
-        final @NotNull String root = trimmed(sftpPath);
-
-        if (root.isEmpty() || root.equals(name)) return name;
-
-        return root.endsWith("/" + name) ? root : root + "/" + name;
-    }
-
-    /**
-     * The folder without a trailing separator, so joining a name onto it needs
-     * no test for one.
-     */
-    private static @NotNull String trimmed(final @NotNull String path) {
-        if (path.isEmpty() || path.equals("/")) return "";
-
-        return path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
     }
 }

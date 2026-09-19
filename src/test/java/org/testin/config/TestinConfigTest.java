@@ -37,7 +37,6 @@ public class TestinConfigTest {
     private static final String FULL = """
             # testin.yml
             location: remote
-            connection: git
             testinProject: checkout-testcases
             RepoUrl: https://github.com/acme/checkout-testcases
             """;
@@ -162,162 +161,69 @@ public class TestinConfigTest {
     /**
      * The mode decides, not the addresses (#94).
      * <p>
-     * The file can contradict itself - say local and still carry a host - so one
+     * The file can contradict itself - say local and still carry an address - so one
      * key is the authority and the rest is read against it. Otherwise something
      * has to choose which half of the file to believe.
      */
     @Test
     public void aProjectIsLocalUntilTheFileSaysOtherwise() {
-        final TestinProjectConfig quiet = TestinYml.parse("connection: git\ntestinProject: cases\nRepoUrl: https://github.com/acme/cases.git\n",
+        final TestinProjectConfig quiet = TestinYml.parse("testinProject: cases\nRepoUrl: https://github.com/acme/cases.git\n",
                 "an address and no location");
 
         assertEquals(quiet.location(), TestinLocation.LOCAL, "left out, it is local");
-        assertEquals(quiet.connection(), ConnectionType.NONE);
-        assertFalse(quiet.hasSftp());
         assertFalse(quiet.hasRepoUrl());
     }
 
     @Test
     public void anAddressAloneDoesNotMakeAProjectRemote() {
         final TestinProjectConfig stillLocal = TestinYml.parse(
-                "location: local\nconnection: sftp\nsftpHost: qa.internal\n", "local with a host left in");
+                "location: local\nRepoUrl: https://github.com/acme/cases.git\n", "local with an address left in");
 
-        assertEquals(stillLocal.connection(), ConnectionType.NONE, "local wins over everything below it");
-        assertFalse(stillLocal.hasSftp());
+        assertFalse(stillLocal.hasRepoUrl(), "local wins over everything below it");
     }
 
     /**
-     * A server path is a root holding several projects, and a root names none of
-     * them - so that side says which one.
+     * Git is the only way a project is shared, so {@code connection} says
+     * nothing any more. A file written when it did still clones: the key is
+     * skipped like any other unknown one, and what the file says around it
+     * still counts.
      */
     @Test
-    public void aProjectIsNamedByTheFile() {
-        final TestinProjectConfig onAServer = TestinYml.parse(
-                "location: remote\nconnection: sftp\nsftpHost: qa.internal\n"
-                        + "sftpPath: /srv/testin\ntestinProject: test-01\n", "sftp");
+    public void aFileThatStillSaysConnectionGitStillClones() {
+        final TestinProjectConfig old = TestinYml.parse(
+                "location: remote\nconnection: git\nRepoUrl: https://github.com/acme/cases.git\ntestinProject: cases\n", "old git");
 
-        assertEquals(onAServer.projectName(), "test-01");
+        assertTrue(old.hasRepoUrl());
+        assertEquals(old.projectName(), "cases");
     }
 
     /**
-     * Which project is synced is the one selected in the tree, so the file needs
-     * no name for a server to be reachable (#301).
+     * A file written for the SFTP server has no clone address, so it is not
+     * shared, and the test project it names is still read.
      */
     @Test
-    public void anSftpServerNeedsNoProjectInTheFile() {
-        final TestinProjectConfig unnamed = TestinYml.parse(
-                "location: remote\nconnection: sftp\nsftpHost: qa.internal\nsftpPath: /srv/testin\n", "no project");
-
-        assertTrue(unnamed.missingForSftp().isEmpty());
-        assertEquals(unnamed.sftpAddress("checkout").path(), "/srv/testin/checkout");
-    }
-
-    @Test
-    public void anSftpProjectIsReadFromItsParts() {
-        final TestinProjectConfig onAServer = TestinYml.parse(
+    public void aFileThatStillSaysSftpIsReadAsNotShared() {
+        final TestinProjectConfig old = TestinYml.parse(
                 "location: remote\nconnection: sftp\nsftpHost: qa.internal\nsftpPort: 2222\n"
                         + "sftpPath: /srv/testin\ntestinProject: test-01\n", "sftp");
 
-        assertTrue(onAServer.hasSftp());
-        assertFalse(onAServer.hasRepoUrl(), "this team shares through a server and has no repository");
-        assertEquals(onAServer.sftpAddress("test-01").host(), "qa.internal");
-        assertEquals(onAServer.sftpAddress("test-01").port(), 2222);
-        assertEquals(onAServer.projectName(), "test-01");
-        assertEquals(onAServer.sftpAddress("test-01").path(), "/srv/testin/test-01", "the root, with the project under it");
-    }
-
-    /**
-     * The address points at the project's folder, composed in one place (#94).
-     * <p>
-     * Two places deciding this is how "/Testin/test-01/test-01" happens: the
-     * file names the project, and whatever syncs names it again.
-     */
-    @Test
-    public void theAddressIsTheProjectsOwnFolder() {
-        assertEquals(sftp("/Testin").sftpAddress("test-01").path(), "/Testin/test-01");
-    }
-
-    /**
-     * Writing the whole path is the obvious thing for a tester to do, and must
-     * not be read as asking for the folder twice.
-     */
-    @Test
-    public void aPathThatAlreadyNamesTheProjectIsLeftAlone() {
-        assertEquals(sftp("/Testin/test-01").sftpAddress("test-01").path(), "/Testin/test-01",
-                "never /Testin/test-01/test-01");
-        assertEquals(sftp("/Testin/test-01/").sftpAddress("test-01").path(), "/Testin/test-01");
-    }
-
-    /**
-     * A file reaching a server called test-01, with the given root.
-     */
-    private static TestinProjectConfig sftp(final String root) {
-        return TestinYml.parse("location: remote\nconnection: sftp\nsftpHost: qa.internal\n"
-                + "sftpPath: " + root + "\ntestinProject: test-01\n", root);
-    }
-
-    @Test
-    public void theSftpPortIsTwentyTwoUnlessSaid() {
-        final TestinProjectConfig onAServer = TestinYml.parse(
-                "location: remote\nconnection: sftp\nsftpHost: qa.internal\ntestinProject: test-01\n", "no port");
-
-        assertEquals(onAServer.sftpAddress("test-01").port(), 22);
+        assertFalse(old.hasRepoUrl());
+        assertEquals(old.projectName(), "test-01", "the server keys must not cost the file its project");
     }
 
     @Test
     public void aGitProjectIsReadFromItsUrl() {
         final TestinProjectConfig inGit = TestinYml.parse(
-                "location: remote\nconnection: git\ntestinProject: cases\nRepoUrl: https://github.com/acme/cases.git\n", "git");
+                "location: remote\ntestinProject: cases\nRepoUrl: https://github.com/acme/cases.git\n", "git");
 
         assertTrue(inGit.hasRepoUrl());
-        assertFalse(inGit.hasSftp());
-        assertFalse(inGit.connection().isSyncsToServer(), "and the sync action is off, not just quiet");
         assertEquals(inGit.projectName(), "cases");
-    }
-
-    /**
-     * A server is the one thing that takes the branch box away: the folder
-     * decides the rest (Rule-TREE-PANEL-108).
-     */
-    @Test
-    public void anSftpProjectSyncsToAServer() {
-        final TestinProjectConfig onAServer = TestinYml.parse(
-                "location: remote\nconnection: sftp\nsftpHost: qa.internal\ntestinProject: test-01\n", "sftp");
-
-        assertTrue(onAServer.connection().isSyncsToServer(),
-                "there is a server to sync to, so there are no branches to choose and nothing may reach a Git remote");
-    }
-
-    /**
-     * The account never travels in the committed file.
-     * <p>
-     * One shared account written here would be everybody's, and a tester's own
-     * would be wrong for everybody else - the same reason the Testin root folder
-     * is kept out of this file.
-     */
-    @Test
-    public void anSftpHostCarryingAnAccountIsRefused() {
-        assertEquals(TestinYml.parse(
-                "location: remote\nconnection: sftp\nsftpHost: muteb@qa.internal\n", "account")
-                .sftpHost(), "");
-    }
-
-    @Test
-    public void refusesAnSftpHostThatIsNotOne() {
-        assertEquals(TestinYml.parse(
-                "location: remote\nconnection: sftp\nsftpHost: \"qa.internal; rm -rf /\"\n",
-                "injected").sftpHost(), "");
-        assertEquals(TestinYml.parse(
-                "location: remote\nconnection: sftp\nsftpHost: sftp://qa.internal\n", "a URL, not a host")
-                .sftpHost(), "");
     }
 
     @Test
     public void aWordNobodyCanReadIsLocalRatherThanAGuess() {
         assertEquals(TestinYml.parse("location: somewhere\n", "nonsense").location(),
                 TestinLocation.LOCAL, "a project nobody can reach is better left on this machine");
-        assertEquals(TestinYml.parse("location: remote\nconnection: ftp\n", "nonsense").connection(),
-                ConnectionType.NONE);
     }
 
     /**
@@ -330,7 +236,7 @@ public class TestinConfigTest {
     @Test
     public void aGitProjectIsNamedByTheKey() {
         final TestinProjectConfig named = TestinYml.parse(
-                "location: remote\nconnection: git\n"
+                "location: remote\n"
                         + "RepoUrl: https://github.com/mtb550/test-01.git\n"
                         + "testinProject: checkout\n", "git");
 
@@ -341,7 +247,7 @@ public class TestinConfigTest {
     @Test
     public void aUrlWithNoNameLeavesTheRepositoryUnbound() {
         final TestinProjectConfig unnamed = TestinYml.parse(
-                "location: remote\nconnection: git\n"
+                "location: remote\n"
                         + "RepoUrl: https://github.com/mtb550/test-01.git\n", "no name");
 
         assertEquals(unnamed.projectName(), "", "the tester picks once, on this machine");
@@ -358,7 +264,6 @@ public class TestinConfigTest {
                 "location: local\ntestinProject: test-01\n", "local");
 
         assertEquals(here.projectName(), "test-01");
-        assertFalse(here.hasSftp());
         assertFalse(here.hasRepoUrl());
     }
 
@@ -377,7 +282,7 @@ public class TestinConfigTest {
                 "https://github.com/mtb550/test-01.git");
 
         assertEquals(TestinYml.parse(
-                "location: remote\nconnection: git\ntestinProject: test-01\n"
+                "location: remote\ntestinProject: test-01\n"
                         + "RepoUrl: https://mtb550:ghp_secret@github.com/mtb550/test-01.git\n", "token")
                 .repoUrl(), "https://github.com/mtb550/test-01.git",
                 "stripped on the way in too, however it got there");

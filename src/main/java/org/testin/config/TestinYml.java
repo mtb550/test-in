@@ -33,7 +33,6 @@ import org.testin.logger.Logger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -138,14 +137,6 @@ public final class TestinYml {
     }
 
     /**
-     * How the file says the test project is shared, {@link ConnectionType#NONE}
-     * when it does not say.
-     */
-    public static @NotNull ConnectionType connection(final @NotNull Project p) {
-        return config(p).connection();
-    }
-
-    /**
      * Where the file says the test project is cloned from, empty when it gives
      * no clone address.
      */
@@ -169,25 +160,6 @@ public final class TestinYml {
     public static boolean isRepoUrl(final @NotNull Project p, final @NotNull String address) {
         final @NotNull String given = repoUrl(p);
         return !given.isEmpty() && given.equals(TestinProjectConfig.withoutCredentials(address.strip()));
-    }
-
-    /**
-     * UC-SHARE-019, Rule-SHARE-085.
-     * <p>
-     * The keys an SFTP sync still needs from the file, and none when it has them
-     * all.
-     */
-    public static @NotNull List<String> missingForSftp(final @NotNull Project p) {
-        return config(p).missingForSftp();
-    }
-
-    /**
-     * Where a test project is on the server the file names, and
-     * {@link SftpAddress#NONE} when it names none. The project's name is the
-     * caller's: which project is being synced does not depend on the file.
-     */
-    public static @NotNull SftpAddress sftpAddress(final @NotNull Project p, final @NotNull String projectName) {
-        return config(p).sftpAddress(projectName);
     }
 
     /**

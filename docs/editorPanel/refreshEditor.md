@@ -96,7 +96,7 @@ one list of the values Testin knows. That list changes only at these moments.
 | Imports test cases | The test set's editor opens again, and their values are added |
 | Removes a test case: Delete, cutting it into another test set, undoing its creation, or reverting it in the pending changes review | The list is rebuilt in the background from the test cases left. A value only that test case used is no longer offered |
 | Undoes or redoes a change | The open editors of the test sets it changed reload, and their values are added. A test case the undo takes out rebuilds the list, as removing one does |
-| Presses Refresh on the tree, syncs with Git or SFTP, or changes a file outside Testin | The open editors reload, and their values are added. Nothing is taken out |
+| Presses Refresh on the tree, syncs with Git, or changes a file outside Testin | The open editors reload, and their values are added. Nothing is taken out |
 | Presses **Refresh** on the editor toolbar | The list is rebuilt in the background from every test case. A value no test case uses any more is no longer offered |
 | Starts the IDE again | The list starts empty, and fills as editors open |
 

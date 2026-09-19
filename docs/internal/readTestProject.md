@@ -101,7 +101,7 @@ bar the tester can cancel (Rule-INTERNAL-013).
 | Opens a code project that has a Testin folder set | Every test project |
 | Presses **Refresh** on the panel toolbar | Every test project, from nothing |
 | Changes a file outside the IDE | The one test project that holds it, see [UC-INTERNAL-003](noticeOutsideChange.md) |
-| Finishes a sync, over Git or over SFTP | The one test project that was synced |
+| Finishes a sync with Git | The one test project that was synced |
 | Switches branch | The one test project in that repository |
 | Clones a test project | The one that was cloned |
 

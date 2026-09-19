@@ -66,9 +66,7 @@ repository.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-108** — The branch box appears when the test project's
-  folder is a Git repository, with or without a `testin.yml`. The file can only
-  take it away, by saying the project is shared through an SFTP server, which
-  has no branches.
+  folder is a Git repository, with or without a `testin.yml`.
 
 ## The Uncommitted Changes dialog
 
@@ -136,9 +134,7 @@ credentials or sit on a host that is not reachable.
 ## What Testin refuses
 
 **If the test project's folder is not a Git repository** — there is no box, and
-*Not a Git repository* is shown in its place. **If `testin.yml` says the project
-is shared through an SFTP server** — there is no box, and *Not shared through
-Git* is shown in its place.
+*Not a Git repository* is shown in its place.
 
 **If Git refuses the checkout** — the box goes back to the branch the tester was
 on. An IDE notification titled *Branch Not Switched* opens. It says *\<branch\>

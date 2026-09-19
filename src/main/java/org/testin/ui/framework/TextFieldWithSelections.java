@@ -83,7 +83,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
 
     TextFieldWithSelections(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull List<SelectionList<T>> shownBeforeAsking, final @NotNull Rows<T> rows, final int visibleRows) {
         this.rows = rows;
-        input = new FrameworkTextField(icon, placeHolderText, "", false);
+        input = new FrameworkTextField(icon, placeHolderText, "");
         textField = input.component();
 
         list = new JBList<>(rowModel);

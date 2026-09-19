@@ -114,19 +114,4 @@ else.
 
 ---
 
-## From an SFTP server: not built
-
-> **A tester cannot do this today.** Testin can sync a test project it
-> already has with an SFTP server, which is part of reports, export, import and
-> sync. It cannot bring a test project down from one that it does not have yet.
-> There is no button, no menu item and no key for it.
->
-> What it would need: a place to type the server, the folder and the account.
-> It would also need a decision about what the test project is called, as
-> Rule-TREE-PANEL-107 makes for a Git address. Until that is built, a tester
-> who keeps test projects on an SFTP server works in three steps. They create
-> the test project, they set up the SFTP account, and then they sync.
-
----
-
 [Documentation](../README.md) › [The tree panel](main.md)

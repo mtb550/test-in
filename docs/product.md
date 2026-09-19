@@ -372,7 +372,6 @@ editor toolbar, or a key. **A capability with no key says so, and says why.**
 | Import | — | CSV, Excel, JSON |
 | Show node details | — | Counts for a container, a verdict breakdown for a run |
 | Sync with Git | — | Needs the Git plugin |
-| Sync over SFTP | — | Passwords live in the IDE's own password store, never in a file |
 
 ### 6.4 Use cases
 
@@ -484,7 +483,7 @@ These are promises already kept, not hopes.
 | Promise | What it means |
 |---|---|
 | **The data stays on your machine** | Everything is files under a folder the tester chose. Nothing is uploaded |
-| **Nothing is sent anywhere** | Testin makes no network calls of its own. The only traffic is the tester's own Git or SFTP sync, which they set up and start |
+| **Nothing is sent anywhere** | Testin makes no network calls of its own. The only traffic is the tester's own Git sync, which they set up and start |
 | **What you typed is what is stored** | Stored data matches what was typed, character for character — **Rule-PRODUCT-003** |
 | **A missing plugin removes a feature, not the product** | Testin withholds the feature and says why. It never shows an error — **Rule-PRODUCT-019** |
 | **The keyboard is enough** | A tester can run a whole test run without the mouse. **True of the list view. The grid view was a gap, tracked as #74, which is now closed, so this needs re-checking** |

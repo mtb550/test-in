@@ -46,7 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * The scan used to write straight into the index, and to empty the project out
  * of it first so that a rescan forgot what had disappeared. Between those two
  * the index held nothing about the project, and a rescan is a pull, a branch
- * switch, an SFTP sync, a hand edit or Refresh - all of which happen while a
+ * switch, a hand edit or Refresh - all of which happen while a
  * tester is working. In that window {@code getTestRunByPath} and
  * {@code getTestSetDirByPath} answer for a node that is on disk and not in the
  * index, which is the one thing they are written to treat as a mistake in the
