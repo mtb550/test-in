@@ -114,7 +114,7 @@ public class CardMouseListener extends MouseAdapter {
             // and learn what it needs - and pressing it says that, rather than
             // doing nothing. The tooltip says the same, but a tooltip is read by
             // whoever waited for it (#312, A16).
-            final @NotNull Optional<String> whyNot = action.whyNotOffered();
+            final @NotNull Optional<String> whyNot = action.whyNotOffered(p);
             if (whyNot.isPresent()) {
                 Services.getInstance(p, Notifier.class).softRefuse(p, whyNot.orElseThrow());
                 e.consume();
@@ -159,7 +159,7 @@ public class CardMouseListener extends MouseAdapter {
 
             // Swing's own contract: a null tooltip is no tooltip, and an empty
             // one is a small empty box that follows the pointer.
-            list.setToolTipText(currentAction.map(CardHoverAction::getHintText).orElse(null));
+            list.setToolTipText(currentAction.map(action -> action.getHintText(p)).orElse(null));
         }
 
         if (needsRepaint)

@@ -23,28 +23,45 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VfsUtilCore;
+import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.util.Bundle;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
- * Rule-INTERNAL-088.
+ * Rule-INTERNAL-089.
  * <p>
  * The one class that reads an automation repository's {@code testin.yml} (#6),
- * and no class writes it (#301). The file is the team's: when it is there, what
- * it says is read from here; when it is not, or it leaves a key out, every
- * answer below is empty and the caller goes on without it - nothing in Testin
- * needs the file to exist.
+ * and the one that writes it - for Save to testin.yml, which is the only thing
+ * that ever does (#335). The file is the team's: when it is there, what it says
+ * is read from here; when it is not, or it leaves a key out, every answer below
+ * is empty and the caller goes on without it. Only the code features need it
+ * (Rule-CODEGEN-082).
  * <p>
  * Nothing else may open it or name what it holds: the values it parses into are
  * package-private ({@link TestinProjectConfig}), and {@code ArchitectureTest}
@@ -178,6 +195,163 @@ public final class TestinYml {
      */
     public static @NotNull Optional<BugRepository> bugRepository(final @NotNull Project p) {
         return config(p).bugRepository();
+    }
+
+    /**
+     * Rule-SHARE-004.
+     * <p>
+     * A clone address with any account and token taken out, as the file's own
+     * is read - so the address Save to testin.yml writes is the one the reader
+     * would keep. The file is committed.
+     */
+    public static @NotNull String withoutCredentials(final @NotNull String address) {
+        return TestinProjectConfig.withoutCredentials(address.strip());
+    }
+
+    /**
+     * UC-TREE-PANEL-029.
+     * <p>
+     * Where Save to testin.yml writes: the file there is, whichever spelling, or
+     * {@code testin.yml} in the code project's folder. Empty for a project with
+     * no folder.
+     */
+    public static @NotNull Optional<Path> savePath(final @NotNull Project p) {
+        return file(p).or(() -> Optional.ofNullable(p.getBasePath()).map(base -> Path.of(base).resolve(FILE_NAMES[0])));
+    }
+
+    /**
+     * UC-TREE-PANEL-029, Rule-TREE-PANEL-113.
+     * <p>
+     * What the file says now for each of these keys, as written, and nothing
+     * for a key it does not have - so the preview can say what a save changes.
+     */
+    public static @NotNull Map<String, String> writtenValues(final @NotNull Project p, final @NotNull Set<String> keys) {
+        return valuesIn(file(p).map(TestinYml::textOf).orElse(""), keys);
+    }
+
+    /**
+     * UC-TREE-PANEL-029, Rule-TREE-PANEL-112, Rule-TREE-PANEL-114.
+     * <p>
+     * Writes these lines into the file, creating it when there is none, and
+     * reads it again. The only writer of {@code testin.yml}: Save to testin.yml
+     * calls it after the tester has seen what it writes.
+     * <p>
+     * A file open in an editor is written through its document, so what the
+     * tester typed there and has not saved is kept around the lines this
+     * changes; any other is written as text. Either way only these lines
+     * change ({@link #withLines}).
+     */
+    public static boolean save(final @NotNull Project p, final @NotNull Map<String, String> owned) {
+        final @NotNull Optional<VirtualFile> folder = Optional.ofNullable(p.getBasePath())
+                .map(path -> LocalFileSystem.getInstance().refreshAndFindFileByNioFile(Path.of(path)));
+        if (folder.isEmpty()) {
+            Logger.warn("No folder to save testin.yml in for " + p.getName());
+            return false;
+        }
+
+        final boolean saved = WriteCommandAction.writeCommandAction(p).withName(Bundle.message("yml.save.command"))
+                .compute(() -> write(folder.orElseThrow(), owned));
+        reload(p);
+        return saved;
+    }
+
+    private static boolean write(final @NotNull VirtualFile folder, final @NotNull Map<String, String> owned) {
+        try {
+            final @NotNull Optional<VirtualFile> existing = Arrays.stream(FILE_NAMES).map(folder::findChild).filter(Objects::nonNull).findFirst();
+            final @NotNull VirtualFile file = existing.isPresent() ? existing.orElseThrow() : folder.createChildData(TestinYml.class, FILE_NAMES[0]);
+            final @NotNull Optional<Document> open = Optional.ofNullable(FileDocumentManager.getInstance().getCachedDocument(file));
+
+            if (open.isPresent()) {
+                open.orElseThrow().setText(withLines(open.orElseThrow().getText(), owned));
+                FileDocumentManager.getInstance().saveDocument(open.orElseThrow());
+            } else {
+                VfsUtil.saveText(file, withLines(VfsUtilCore.loadText(file), owned));
+            }
+
+            Logger.info("Saved " + file.getPath() + ": " + owned);
+            return true;
+        } catch (final IOException ex) {
+            Logger.warn("Could not save testin.yml in " + folder.getPath() + ": " + ex.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Rule-TREE-PANEL-114.
+     * <p>
+     * The file's text with each owned key's line set to its value - in place
+     * where the file has that key at the top level, at the end where it does
+     * not - and every other line as it was, comments and keys Testin does not
+     * know included. A file that ends without a newline keeps that ending unless
+     * a line has to be added. Its line separator is kept.
+     */
+    static @NotNull String withLines(final @NotNull String text, final @NotNull Map<String, String> owned) {
+        final @NotNull String separator = text.contains("\r\n") ? "\r\n" : "\n";
+        final @NotNull List<String> lines = new ArrayList<>(text.isEmpty() ? List.of() : Arrays.asList(text.replace("\r\n", "\n").split("\n", -1)));
+
+        final boolean endedWithNewline = !lines.isEmpty() && lines.getLast().isEmpty();
+        if (endedWithNewline) lines.removeLast();
+
+        final @NotNull Set<String> placed = new HashSet<>();
+        for (int i = 0; i < lines.size(); i++) {
+            final int at = i;
+            keyOf(lines.get(i), owned.keySet()).filter(placed::add).ifPresent(key -> lines.set(at, line(key, owned.get(key))));
+        }
+
+        final int before = lines.size();
+        owned.forEach((key, value) -> {
+            if (!placed.contains(key)) lines.add(line(key, value));
+        });
+
+        return String.join(separator, lines) + (endedWithNewline || lines.size() > before ? separator : "");
+    }
+
+    /**
+     * What each of these keys holds in the text, as written after its colon.
+     */
+    static @NotNull Map<String, String> valuesIn(final @NotNull String text, final @NotNull Set<String> keys) {
+        final @NotNull Map<String, String> values = new LinkedHashMap<>();
+        for (final String line : text.replace("\r\n", "\n").split("\n")) {
+            keyOf(line, keys).ifPresent(key -> values.putIfAbsent(key, line.substring(key.length() + 1).strip()));
+        }
+        return values;
+    }
+
+    /**
+     * The owned key a line sets, when it sets one at the top level: indented
+     * lines belong to something else, and a comment sets nothing.
+     */
+    private static @NotNull Optional<String> keyOf(final @NotNull String line, final @NotNull Set<String> keys) {
+        return keys.stream().filter(key -> line.startsWith(key + ":")).findFirst();
+    }
+
+    private static @NotNull String line(final @NotNull String key, final @NotNull String value) {
+        return key + ": " + scalar(value);
+    }
+
+    /**
+     * The value as YAML reads it back unchanged: plain where plain means the
+     * same text, single-quoted where it would not - a name starting with
+     * {@code #} would be a comment, one holding {@code ": "} a second key, and
+     * {@code null} or {@code true} not a name at all.
+     */
+    private static @NotNull String scalar(final @NotNull String value) {
+        final boolean plain = !value.isEmpty()
+                && value.equals(value.strip())
+                && "-?:,[]{}#&*!|>'\"%@`".indexOf(value.charAt(0)) < 0
+                && !value.contains(": ") && !value.contains(" #") && !value.endsWith(":")
+                && !Set.of("null", "~", "true", "false", "yes", "no", "on", "off").contains(value.toLowerCase(Locale.ROOT));
+
+        return plain ? value : "'" + value.replace("'", "''") + "'";
+    }
+
+    private static @NotNull String textOf(final @NotNull Path file) {
+        try {
+            return Files.readString(file);
+        } catch (final IOException ex) {
+            Logger.warn("Could not read " + file + ": " + ex.getMessage());
+            return "";
+        }
     }
 
     /**

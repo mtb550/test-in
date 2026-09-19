@@ -30,6 +30,11 @@ edited by hand. This is how to ask.
   Java plugin or a missing test folder is a skip, never a failure.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
+- **Rule-CODEGEN-082** — Testin touches a test project's automation code only
+  when `testin.yml` names that test project. Otherwise nothing is generated,
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
+  **Run Tests** are gray and say why, and no gutter icon or automated mark is
+  shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-025** — This writes the same method creating a test case
   writes: the annotation, the declaration and an empty body, in the class the
   test set belongs to, with that class and its folders written if they are not
@@ -89,6 +94,10 @@ Test Source Not Found** appears, and nothing is written.
 
 **If the IDE has no Java plugin** — the entry is still on the menu, grayed,
 reading *(needs the Java plugin)*.
+
+**If testin.yml does not name the open test project** - the entry is still
+on the menu, grayed, reading *Automate Test Case (needs testin.yml)*, and says
+*testin.yml does not name this test project. Save to testin.yml, in the Testin panel, turns code on.* (Rule-CODEGEN-082)
 
 **If the IDE is indexing** — nothing is written, and the tester is told once for
 the whole gesture rather than once per test case.

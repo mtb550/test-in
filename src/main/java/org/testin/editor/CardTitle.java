@@ -16,6 +16,7 @@
 
 package org.testin.editor;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
@@ -98,15 +99,15 @@ public final class CardTitle {
      * Draws the card's action icons: the navigate button, and whichever of the
      * run and stop buttons this card's state offers.
      */
-    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth, final @NotNull String hoveredAction, final @NotNull CardHoverAction runSlot, final @NotNull Automated automation) {
+    public static void drawDescriptionActionIcons(final @NotNull Project p, final @NotNull Component c, final @NotNull Graphics g, final int titleWidth, final @NotNull String hoveredAction, final @NotNull CardHoverAction runSlot, final @NotNull Automated automation) {
         final @NotNull ActionIcons icons = descriptionActionIcons(titleWidth);
 
         // Both under the pointer, as they always were. Drawing the navigate icon
         // on every card was tried and taken back: three shapes down every row is
         // a lot of chrome for a fact most cards share, and the filter answers
         // "which of these are automated" better than eighty small icons do.
-        draw(c, g, CardHoverAction.NAVIGATE_TO_TEST_METHOD, automation.getIcon(), icons.navigate(), hoveredAction);
-        draw(c, g, runSlot, runSlot.getIcon(), icons.run(), hoveredAction);
+        draw(p, c, g, CardHoverAction.NAVIGATE_TO_TEST_METHOD, automation.getIcon(), icons.navigate(), hoveredAction);
+        draw(p, c, g, runSlot, runSlot.getIcon(), icons.run(), hoveredAction);
     }
 
     /**
@@ -121,8 +122,8 @@ public final class CardTitle {
      * does not grow under the pointer either: growing is the promise that
      * pressing does something (#312, A16).
      */
-    private static void draw(final @NotNull Component c, final @NotNull Graphics g, final @NotNull CardHoverAction action, final @NotNull Icon icon, final @NotNull Rectangle at, final @NotNull String hoveredAction) {
-        final boolean offered = action.isOffered();
+    private static void draw(final @NotNull Project p, final @NotNull Component c, final @NotNull Graphics g, final @NotNull CardHoverAction action, final @NotNull Icon icon, final @NotNull Rectangle at, final @NotNull String hoveredAction) {
+        final boolean offered = action.isOffered(p);
 
         drawHoverableIcon(c, g, offered ? icon : IconLoader.getDisabledIcon(icon), at.x, at.y,
                 offered && action.name().equals(hoveredAction));

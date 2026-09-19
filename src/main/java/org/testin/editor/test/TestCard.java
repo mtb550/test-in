@@ -34,14 +34,12 @@ import java.util.*;
 import java.util.List;
 
 public class TestCard extends BaseCard {
-    private final @NotNull Project p;
     private final @NotNull List<Badges.Badge> badges = new ArrayList<>();
     private final @NotNull Map<String, String> details = new LinkedHashMap<>();
     private boolean isPendingCut = false;
 
     public TestCard(final @NotNull Project p) {
-        super();
-        this.p = p;
+        super(p);
     }
 
     // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-021

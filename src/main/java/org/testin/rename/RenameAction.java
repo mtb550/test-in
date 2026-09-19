@@ -16,6 +16,7 @@
 
 package org.testin.rename;
 
+import org.testin.codegen.CodeOn;
 import org.testin.actions.GrayWithReason;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
@@ -33,7 +34,6 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.services.OptionalPlugin;
 import org.testin.codegen.JavaCode;
 import org.testin.codegen.Renamed;
 import org.testin.editor.TestinEditors;
@@ -155,7 +155,7 @@ public class RenameAction extends DumbAwareAction {
 
         // Code the IDE cannot look up while it indexes would stay under the old
         // name while the tree moved on, and a later rename would find nothing.
-        if (DumbService.isDumb(p) && OptionalPlugin.JAVA.isAvailable() && JavaCode.of(dir.getType()).getRenamed().generates()) {
+        if (DumbService.isDumb(p) && CodeOn.isOn(p) && JavaCode.of(dir.getType()).getRenamed().generates()) {
             notifier.softRefuse(p, Refused.WHILE_INDEXING, Bundle.message("dialog.rename.title"));
             return true;
         }

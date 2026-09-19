@@ -2,14 +2,14 @@
 
 # UC-TREE-PANEL-028: Use the buttons at the top of the panel
 
-> **Only one of the seven buttons has a key.** Search is **`Ctrl+Alt+F`**,
+> **Only one of the eight buttons has a key.** Search is **`Ctrl+Alt+F`**,
 > and **`Cmd+Alt+F`** on a Mac.
 
 **As a** tester, **I want** the panel's own buttons within reach of the tree,
 **so that** the things I do to the whole panel are not hidden in a menu
 somewhere else.
 
-These seven buttons act on the whole panel, not on one node.
+These eight buttons act on the whole panel, not on one node.
 
 ## Rules
 
@@ -77,7 +77,7 @@ It is the row along the top of the panel, to the right of the word **Testin**.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  Testin              [1]  [2]  [3]  [4]  [5]  [6]  [7]                     │
+│  Testin              [1]  [2]  [3]  [4]  [5]  [6]  [7]  [8]                │
 ├────────────────────────────────────────────────────────────────────────────┤
 │  [ main            v ]                                                     │
 │                                                                            │
@@ -86,7 +86,7 @@ It is the row along the top of the panel, to the right of the word **Testin**.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Seven buttons, always in this order. The last column is the page that says what
+Eight buttons, always in this order. The last column is the page that says what
 happens when the tester presses one.
 
 | | Button | Hovering says | Where it is written |
@@ -98,6 +98,7 @@ happens when the tester presses one.
 | 5 | **Refresh** | *Re-index and reload tree* | [UC-TREE-PANEL-025](refreshTree.md) |
 | 6 | **Select Test Project** | *Choose the test project this repository exercises* | [UC-TREE-PANEL-004](chooseTestProject.md) |
 | 7 | **New Test Project** | *Create or Clone test project* | [UC-TREE-PANEL-002](createTestProject.md) |
+| 8 | **Save to testin.yml** | *Name this test project in this code project's testin.yml, so its code is generated here and a colleague's clone finds it* | [UC-TREE-PANEL-029](saveTestinYml.md) |
 
 **Only the search button has a key.** It is `Ctrl+Alt+F`, and `Cmd+Alt+F` on a
 Mac. It works anywhere in the IDE. The button is how a tester finds out the

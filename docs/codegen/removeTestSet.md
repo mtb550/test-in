@@ -25,6 +25,11 @@ There is no key for this. It happens when the node is removed, which is
   Java plugin or a missing test folder is a skip, never a failure.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
+- **Rule-CODEGEN-082** — Testin touches a test project's automation code only
+  when `testin.yml` names that test project. Otherwise nothing is generated,
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
+  **Run Tests** are gray and say why, and no gutter icon or automated mark is
+  shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-059** — Removing a test set deletes its class file. Removing a
   package deletes its folder and everything under it.
 - **Rule-CODEGEN-060** — A removal that finds no code to delete says nothing at

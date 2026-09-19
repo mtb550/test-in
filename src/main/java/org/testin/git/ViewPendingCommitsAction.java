@@ -425,7 +425,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             // answer to it - which is also why the old "Push Aborted" balloon is
             // gone, since canceling was the only way to reach it.
             // What was typed becomes the remote and nothing else: testin.yml is
-            // never written (Rule-INTERNAL-088).
+            // never written by the push (Rule-INTERNAL-089).
             new RemoteUrlDialog(p, remoteName, typed -> addRemoteAndPush(repoPath, remoteName, branch, commitId, typed)).show();
         }
 

@@ -112,7 +112,7 @@ public class BranchSelector {
         currentBranch = "";
 
         // The folder decides: a Git repository has branches, with or without a
-        // testin.yml (Rule-INTERNAL-088).
+        // testin.yml (Rule-INTERNAL-089).
         final boolean showable = !path.toString().isEmpty() && !git.isNotRepository(path);
 
         comboBox.setVisible(showable);

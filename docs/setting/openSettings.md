@@ -27,7 +27,8 @@ panel's toolbar.
   a row's name opens the page with that row highlighted.
 - **Rule-SETTING-041** — The page says where a value belongs: this machine's
   settings; the test project chosen for a repository, kept on this machine; or
-  the repository's `testin.yml`, which Testin reads and never writes.
+  the repository's `testin.yml`, which Testin writes only when the tester
+  presses **Save to testin.yml**.
 - **Rule-SETTING-006** — Nothing on this page has a key of its own.
 - **Rule-SETTING-007** — The gear button on the tree panel opens this page
   directly.

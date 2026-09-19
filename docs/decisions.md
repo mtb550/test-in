@@ -326,6 +326,9 @@ set.
 
 ## Decision-011 — Testin reads `testin.yml` and never writes it
 
+*Superseded by Decision-013, 19 September 2026: one button writes the file, and
+the automation code needs it. Left as it was written.*
+
 **Context.** Seven places wrote `testin.yml` - choosing a project, creating one,
 cloning one, drawing the tree, the push prompt - and each created the file when
 it was absent, so a repository ended up carrying a committed file nobody chose
@@ -388,6 +391,40 @@ the way Decision-004 and Decision-007 describe.
 
 ---
 
+## Decision-013 — Code needs `testin.yml`, and one button writes it
+
+**Context.** Decision-011 made `testin.yml` something Testin only reads, and
+nothing needed it. Two things followed that Muteb did not want. Code was
+generated into any code project, for whichever test project was open, whether
+or not that code project was about it. And the only way to make the file name a
+project was to edit it by hand. Muteb, 19 September 2026: *"the codegen
+operation must only work and only if yaml is exist and project name match the
+test project name"*, and *"yaml file can be created or updated by use new button
+shown in explorer toolbar"* (#335).
+
+**Decision.** Testin touches a test project's automation code - generating it,
+Automate Test Case, Navigate to Code, Run Tests, the gutter, the automated
+marks - only when `testin.yml` names that test project (`codegen/CodeOn`,
+Rule-CODEGEN-082). One button, **Save to testin.yml**, writes the file: the open
+test project and where it is cloned from, three lines, after showing them
+(Rule-TREE-PANEL-112 to Rule-TREE-PANEL-114). Nothing else writes it. The test
+project a tester chooses is still kept on this machine and wins until the file
+names another (Rule-TREE-PANEL-106).
+
+**Consequences.** Without the file, Testin works fully - open, clone, commit,
+push - and leaves the code alone; the first write it skips says so once, with
+the button. A rename or a move made while code is off leaves the code under its
+old name. The writer lives beside the reader in `config/TestinYml`, so the file
+still has one class (Rule-INTERNAL-089). Decision-011 is superseded.
+
+**If you are about to reverse it.** Writing the file anywhere but the button -
+on a pick, a clone, a rename - commits one machine's choice into the team's
+file without anyone deciding to, which is what Decision-011 was written
+against. Generating code without the file puts one test project's methods into
+a code project that is about another.
+
+---
+
 ## Superseded decisions
 
 Each is listed here with the number that replaced it, and its section above is
@@ -397,6 +434,7 @@ left exactly as it was written.
 |---|---|---|
 | Decision-004 — SFTP is the maintained JSch fork | Decision-012 | 19 September 2026 |
 | Decision-007 — An unknown SSH host is refused | Decision-012 | 19 September 2026 |
+| Decision-011 — Testin reads `testin.yml` and never writes it | Decision-013 | 19 September 2026 |
 
 ---
 

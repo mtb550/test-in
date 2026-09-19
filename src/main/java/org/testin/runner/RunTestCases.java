@@ -16,6 +16,7 @@
 
 package org.testin.runner;
 
+import org.testin.codegen.CodeOn;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -63,6 +64,10 @@ public final class RunTestCases {
      */
     public static void run(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         if (testCases.isEmpty()) return;
+
+        // Rule-CODEGEN-082. Every Run reaches this, the card's and the menu's, so
+        // the code it runs is asked about here once.
+        if (!CodeOn.isOnOrWarn(p)) return;
         if (!OptionalPlugin.TESTNG.isAvailableOrWarn(p)) return;
 
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);

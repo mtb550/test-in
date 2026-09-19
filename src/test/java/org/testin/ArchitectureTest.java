@@ -243,8 +243,9 @@ public class ArchitectureTest {
     }
 
     /**
-     * Rule-INTERNAL-088: one class reads {@code testin.yml}, and no class writes
-     * it (#301). The values it parses into are package-private, which the
+     * Rule-INTERNAL-089: one class reads {@code testin.yml}, and it is the only
+     * class that writes it, for Save to testin.yml (#301, #335). The values it
+     * parses into are package-private, which the
      * compiler holds; the parser is a library any class could import, which only
      * this can.
      */
@@ -254,7 +255,7 @@ public class ArchitectureTest {
                 .that().doNotHaveFullyQualifiedName("org.testin.config.TestinYml")
                 .should().dependOnClassesThat().resideInAPackage("com.fasterxml.jackson.dataformat.yaml..")
                 .because("testin.yml is read by one class, so a missing value means the same thing everywhere,"
-                        + " and nothing else can open, parse or write the file (Rule-INTERNAL-088)");
+                        + " and nothing else can open, parse or write the file (Rule-INTERNAL-089)");
 
         rule.check(CLASSES);
     }

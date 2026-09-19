@@ -27,7 +27,6 @@ import org.testin.codegen.method.update.NoOpCodeUpdate;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
-import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.Once;
@@ -304,12 +303,13 @@ public enum GenType {
         }
 
         /**
-         * UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-006.
+         * UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-006, Rule-CODEGEN-082.
          * <p>
          * Whether there is anything that can generate right now. Two questions,
-         * and both belong here rather than in the fourteen generators: an IDE
-         * without the Java plugin has nothing to run, and an IDE still building
-         * its index cannot look a class up by name.
+         * and both belong here rather than in the fourteen generators: whether
+         * code is on - the Java plugin, and a {@code testin.yml} naming the open
+         * test project (#335) - and whether the IDE has finished its index, since
+         * a class cannot be looked up by name while it builds.
          * <p>
          * Every generator resolves its target through
          * {@code JavaPsiFacade.findClass}, which raises rather than answering
@@ -319,7 +319,7 @@ public enum GenType {
          * who was creating a test case (#126).
          */
         private boolean canGenerate(final @NotNull Project p) {
-            if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return false;
+            if (!CodeOn.isOnOrWarnOnce(p)) return false;
             if (!DumbService.isDumb(p)) return true;
 
             // Once for the project, the way the missing-Java-plugin half one line

@@ -85,8 +85,8 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 │   Everything here belongs to this machine and this person, and is never     │
 │   committed. Which test project a repository is about is chosen in the      │
 │   Testin tool window and kept on this machine. A repository's testin.yml,   │
-│   when it has one, can name it and say how it is shared - Testin reads it   │
-│   and never writes it.                                                 (9)  │
+│   when it has one, can name it and say how it is shared - Testin writes     │
+│   it only when you press Save to testin.yml in the Testin panel.       (9)  │
 │                                                                            │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -138,10 +138,11 @@ rather than putting these values in `testin.yml`.
 
 **Where a value lives is decided by whose it is.** A value that differs
 between machines goes here, so it cannot be committed by accident. What the
-team agrees on goes in `testin.yml`, written by hand, so a clone needs no
-setting up - Testin reads it and never writes it. The one thing in between, the
-test project a tester chose for a repository, is kept on their machine and wins
-over the file until the file names a different one (Decision-011).
+team agrees on goes in `testin.yml`, so a clone needs no setting up - written
+by hand, or by **Save to testin.yml** in the Testin panel, and by nothing else.
+The one thing in between, the test project a tester chose for a repository, is
+kept on their machine and wins over the file until the file names a different
+one (Decision-013).
 
 ---
 

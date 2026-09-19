@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  * What an automation repository's {@code testin.yml} says (#6), as
  * {@link TestinYml} read it. Package-private: nothing outside {@code config} may
  * hold these values, so no caller can decide on its own what a missing one
- * means - it asks {@link TestinYml} (Rule-INTERNAL-088).
+ * means - it asks {@link TestinYml} (Rule-INTERNAL-089).
  * <p>
  * One test project per automation repository. The repository names it, so the
  * pairing travels with a clone instead of living in one machine's IDE settings,

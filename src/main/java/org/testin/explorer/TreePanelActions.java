@@ -16,6 +16,7 @@
 
 package org.testin.explorer;
 
+import org.testin.explorer.toolbar.SaveTestinYmlAction;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +43,8 @@ public class TreePanelActions {
                 new CollapseAllAction(tp),
                 tp.getRefreshAction(),
                 new SelectTestProjectAction(p, tp),
-                new CreateTestProjectAction(p, tp)
+                new CreateTestProjectAction(p, tp),
+                new SaveTestinYmlAction(p)
         );
     }
 }

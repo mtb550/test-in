@@ -16,6 +16,7 @@
 
 package org.testin.editor;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -83,7 +84,14 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      */
     private int titleColumnWidth = Integer.MAX_VALUE;
 
-    public BaseCard() {
+    /**
+     * The project this card draws for: whether its icons are offered depends on
+     * it, since code is on per project (Rule-CODEGEN-082).
+     */
+    protected final @NotNull Project p;
+
+    public BaseCard(final @NotNull Project p) {
+        this.p = p;
         setLayout(new BorderLayout());
         setOpaque(true);
 
@@ -253,7 +261,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected void paintChildren(final Graphics g) {
         super.paintChildren(g);
         if (isRowHovered) {
-            CardTitle.drawDescriptionActionIcons(this, g, titleWidth(), hoveredAction, runSlot, automation);
+            CardTitle.drawDescriptionActionIcons(p, this, g, titleWidth(), hoveredAction, runSlot, automation);
         }
     }
 

@@ -16,6 +16,7 @@
 
 package org.testin.runner;
 
+import org.testin.codegen.CodeOn;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -74,7 +75,7 @@ public class RunTestsAction extends DumbAwareAction {
         // Both, as the card's Run declares: TestNG starts the run and Java finds
         // the methods it starts. With TestNG alone this was offered, did
         // nothing, and said nothing (#66, finding 222).
-        if (!OptionalPlugin.JAVA.enableOrExplain(this, e.getPresentation())) return;
+        if (!CodeOn.enableOrExplain(this, e)) return;
         if (!OptionalPlugin.TESTNG.enableOrExplain(this, e.getPresentation())) return;
 
         e.getPresentation().setEnabled(runnable(e).isPresent() || selectedRun(e).isPresent());
