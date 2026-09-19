@@ -112,9 +112,10 @@ The account is asked for when this machine cannot prove who it is.
 **If the test project is not reached over a server** — the menu entry is gray.
 
 **If `testin.yml` is missing something a sync needs** — a message titled **No
-SFTP Server Configured** names exactly what: *testin.yml needs sftpHost,
-testinProject to sync with a server*. The three it can name are
-`connection: sftp`, `sftpHost` and `testinProject`.
+SFTP Server Configured** names exactly what: *testin.yml needs sftpHost to sync
+with a server*. The two it can name are `connection: sftp` and `sftpHost`. The
+test project is not one of them: the one synced is the one selected in the
+tree, and the server folder is named after it (Rule-INTERNAL-088).
 
 **If no test project is selected** — a message titled **Nothing to Sync** reads
 *Select a test project in the tree first.*
