@@ -16,7 +16,6 @@
 
 package org.testin.testproject;
 
-import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
@@ -140,9 +139,7 @@ public final class SaveTestinYml {
             return;
         }
 
-        // With a reason: the bare restart() is deprecated, and Build fails on a
-        // deprecated call (#324). The reason only reaches the IDE's diagnostics.
-        DaemonCodeAnalyzer.getInstance(p).restart("Save to testin.yml turned the automation code on");
+        Services.getInstance(p, BoundTestProject.class).refreshGutter();
         Services.getInstance(p, TestinEditors.class).refreshOpen(p);
         notifier.softShow(p, Done.SAVED);
     }

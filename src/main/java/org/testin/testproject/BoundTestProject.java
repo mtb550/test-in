@@ -16,7 +16,9 @@
 
 package org.testin.testproject;
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
@@ -155,6 +157,36 @@ public final class BoundTestProject {
         Logger.info("Chose test project '" + projectName + "' for " + p.getName() + " on this machine");
 
         PropertiesComponent.getInstance(p).setList(CHOICE, List.of(projectName, TestinYml.projectName(p)));
+        refreshGutter();
+    }
+
+    /**
+     * Rule-CODEGEN-082.
+     * <p>
+     * Reads {@code testin.yml} again - Refresh, or Report Bug about to send -
+     * and lets the gutter answer again, since what the file names is half of
+     * whether code is on.
+     */
+    public void reread() {
+        TestinYml.reload(p);
+        refreshGutter();
+    }
+
+    /**
+     * Rule-CODEGEN-082.
+     * <p>
+     * Draws the Java gutter again. Its run icons show only while code is on, and
+     * that is weighed here - the project this repository is about, and whether
+     * {@code testin.yml} names it - so every change to either redraws it. Only
+     * Save to testin.yml used to: after choosing another project, a rename, a
+     * clone or a Refresh, the icons stayed as they were until the file was
+     * edited (#66, finding 312).
+     */
+    public void refreshGutter() {
+        // With a reason: the bare restart() is deprecated, and Build fails on a
+        // deprecated call (#324). The reason only reaches the IDE's diagnostics.
+        ApplicationManager.getApplication().invokeLater(() ->
+                DaemonCodeAnalyzer.getInstance(p).restart("Whether Testin's code is on may have changed"), p.getDisposed());
     }
 
     /**
