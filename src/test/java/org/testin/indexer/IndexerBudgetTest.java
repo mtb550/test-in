@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.testin.model.TestRunItems;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -76,6 +77,21 @@ public class IndexerBudgetTest {
      * no network - a loaded runner makes it slower, not erratic.
      */
     private static final double BUDGET_MICROS_PER_CASE = 40.0;
+
+    /**
+     * The results a budget is stated at: one cycle of two thousand cases, and
+     * fifty of forty - the two shapes a real Testin folder has. A result is its
+     * own file now, so a run of two thousand cases is two thousand parses where
+     * it used to be one (#305, G10).
+     */
+    private static final int RESULTS = 2_000 + 50 * 40;
+
+    /**
+     * Twice the measured cost, as the case budget is. A result is a smaller
+     * document than a test case - no steps, no groups - so it parses faster, and
+     * the budget says so rather than borrowing the case's number.
+     */
+    private static final double BUDGET_MICROS_PER_RESULT = 20.0;
 
     /**
      * How many timed passes to take the fastest of. Five costs a second and
@@ -141,6 +157,89 @@ public class IndexerBudgetTest {
                         + BUDGET_MICROS_PER_CASE + " us budget in docs/internal/readTestProject.md."
                         + " Either the read got slower or the budget needs re-measuring - decide which,"
                         + " and if it is the budget, say why in that document.");
+    }
+
+    /**
+     * The budget for a run's results, which are one file each since #305: four
+     * thousand of them, the shape of a Testin folder holding one cycle of two
+     * thousand cases and fifty of forty.
+     * <p>
+     * In the budget group with the case parse, and for the same reason.
+     */
+    @Test(groups = "budget")
+    public void parsingAProjectsRunResultsStaysInsideTheBudget() {
+        final @NotNull List<String> documents = results(RESULTS);
+
+        // The same warm-up the cases take: Jackson builds a deserializer for
+        // TestRunItems on first use, and timing that measures the first run a
+        // tester opens rather than the cost of a result.
+        parseResults(documents.subList(0, 1_000));
+
+        long fastest = Long.MAX_VALUE;
+        long slowest = 0;
+
+        for (int pass = 0; pass < PASSES; pass++) {
+            final long started = System.nanoTime();
+            final @NotNull List<TestRunItems> parsed = parseResults(documents);
+            final long elapsed = System.nanoTime() - started;
+
+            assertEquals(parsed.size(), RESULTS, "The parse read a different number of results than it was given");
+
+            fastest = Math.min(fastest, elapsed);
+            slowest = Math.max(slowest, elapsed);
+        }
+
+        final double micros = fastest / 1_000.0 / RESULTS;
+
+        System.out.printf(
+                "Indexer budget: parsed %,d run results in %,.0f ms (%.1f us/result), slowest of %d passes %,.0f ms%n",
+                RESULTS, fastest / 1e6, micros, PASSES, slowest / 1e6);
+
+        assertTrue(micros < BUDGET_MICROS_PER_RESULT,
+                "Parsing a run result costs " + String.format("%.1f", micros) + " us, over the "
+                        + BUDGET_MICROS_PER_RESULT + " us budget in docs/internal/readTestProject.md."
+                        + " Either the read got slower or the budget needs re-measuring - decide which,"
+                        + " and if it is the budget, say why in that document.");
+    }
+
+    /**
+     * A result as the run writer writes one: a verdict, what the tester saw, and
+     * the stamps that come with it.
+     */
+    private static @NotNull List<String> results(final int count) {
+        final @NotNull List<String> documents = new ArrayList<>(count);
+
+        for (int i = 0; i < count; i++) {
+            documents.add("""
+                    {
+                      "id" : "%s",
+                      "status" : "%s",
+                      "duration" : 4.125,
+                      "executedBy" : "Muteb Almughyiri",
+                      "executedAt" : "Monday 14-09-2026 At 10:22:05 [Asia/Riyadh]",
+                      "actualResult" : "The dashboard opened and the header showed the account name",
+                      "stacktrace" : "",
+                      "bugSeverity" : "EMPTY",
+                      "bugPriority" : "EMPTY",
+                      "bugIssueUrl" : ""
+                    }""".formatted(UUID.randomUUID(), i % 4 == 0 ? "FAILED" : "PASSED"));
+        }
+
+        return documents;
+    }
+
+    private static @NotNull List<TestRunItems> parseResults(final @NotNull List<String> documents) {
+        final @NotNull List<TestRunItems> parsed = new ArrayList<>(documents.size());
+
+        for (final String document : documents) {
+            try {
+                parsed.add(MAPPER.readValue(document, TestRunItems.class));
+            } catch (final Exception ex) {
+                throw new AssertionError("A result the run writer would write did not parse: " + ex.getMessage(), ex);
+            }
+        }
+
+        return parsed;
     }
 
     /**
@@ -213,7 +312,7 @@ public class IndexerBudgetTest {
 
         try (Stream<Path> walk = Files.walk(project)) {
             for (final Path file : walk.toList()) {
-                if (!file.getFileName().toString().endsWith(".json")) continue;
+                if (!file.getFileName().toString().endsWith(".tc")) continue;
 
                 cases.add(MAPPER.readValue(file.toFile(), TestCaseDto.class));
             }

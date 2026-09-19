@@ -33,7 +33,12 @@ public enum ChangeSubject {
 
     TEST_CASE,
 
-    TEST_RUN,
+    /**
+     * One case's result in one run - a {@code .ri}. A run itself is a folder, so
+     * what the review shows for it is its marker and the results under it: there
+     * is no file that is "the run" any more (#305).
+     */
+    RUN_ITEM,
 
     MARKER,
 

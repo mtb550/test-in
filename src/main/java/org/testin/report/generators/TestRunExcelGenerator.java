@@ -115,11 +115,11 @@ public final class TestRunExcelGenerator {
         }
 
         // Only what the tester wrote - see the PDF generator.
-        if (ResultAnalysis.anyWrittenIn(tr.getResultAnalysis())) {
+        if (ResultAnalysis.anyWrittenIn(trDir.getMarker().getResultAnalysis())) {
             row = heading(ws, row + 1, Bundle.message("report.heading.analysis"));
 
             for (final ResultAnalysis section : ResultAnalysis.values()) {
-                final @NotNull String written = section.writtenIn(tr.getResultAnalysis());
+                final @NotNull String written = section.writtenIn(trDir.getMarker().getResultAnalysis());
                 if (written.isEmpty()) continue;
 
                 caption(ws, row, section.heading(summary), section.getHexColor());

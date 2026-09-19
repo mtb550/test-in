@@ -31,7 +31,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.model.dto.TestCaseDto;
 
 /**
  * Builds the test-case review model from what Git reports as changed. The
@@ -62,9 +66,12 @@ public final class GitDiffProcessor {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
         final @NotNull GitRepositoryService repositories = new GitRepositoryService(p);
 
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+
         return toDiffs(repositories.status(root), root,
                 Services.getInstance(p, Mapper.class),
-                path -> repositories.showAtHead(root, path));
+                path -> repositories.showAtHead(root, path),
+                indexer::findTestCase);
     }
 
     /**
@@ -79,8 +86,11 @@ public final class GitDiffProcessor {
      *
      * @param committedContent the file's content as committed, empty when there
      *                         is none - a new file, or no commits yet
+     * @param cases            the test case an id names, asked of the index: a
+     *                         result is named by the case it is about, and the
+     *                         file holds the verdict rather than the case (#305)
      */
-    static @NotNull List<PendingChange> toDiffs(final @NotNull List<String> statusLines, final @NotNull Path repositoryRoot, final @NotNull Mapper mapper, final @NotNull Function<String, String> committedContent) {
+    static @NotNull List<PendingChange> toDiffs(final @NotNull List<String> statusLines, final @NotNull Path repositoryRoot, final @NotNull Mapper mapper, final @NotNull Function<String, String> committedContent, final @NotNull Function<UUID, Optional<TestCaseDto>> cases) {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
         final @NotNull List<PendingChange> result = new ArrayList<>();
 
@@ -107,7 +117,8 @@ public final class GitDiffProcessor {
                         entry.type() == DiffType.ADDED ? "" : committedContent.apply(entry.path()),
                         workingContent(root, relativePath, entry),
                         relativePath,
-                        mapper));
+                        mapper,
+                        cases));
 
             } catch (final RuntimeException ex) {
                 // One unreadable file does not take the review down with it. Git

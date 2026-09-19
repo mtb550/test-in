@@ -19,6 +19,7 @@ package org.testin.indexer;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import java.io.IOException;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
@@ -41,11 +42,20 @@ import org.testin.util.Mapper;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
+import org.testin.model.FileKind;
+import org.testin.model.TestRunItems;
+import org.testin.model.markers.TestProjectMarker;
+import org.testin.testcase.TestCaseOrder;
 
 @AllArgsConstructor
 final class IndexingScanner {
@@ -69,10 +79,34 @@ final class IndexingScanner {
         }
     }
 
-    // UC-INTERNAL-002, Rule-INTERNAL-005, Rule-INTERNAL-007
+    // UC-INTERNAL-002, Rule-INTERNAL-005, Rule-INTERNAL-007, Rule-INTERNAL-091
     private void scanProjectContents(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
+            // UC-INTERNAL-008, Rule-INTERNAL-091.
+            //
+            // Before the project is read, and where both scan paths meet: a
+            // project opened at startup, one the tester picks, one #301's clone
+            // brings in, and a rescan after a copy or a restore all arrive here
+            // (#305, G14). A project already in this build's format is not
+            // touched.
+            Services.getInstance(Conversions.class).ensure(p, projectPath);
+
             final @NotNull TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).getTestProjectNode(p, projectPath);
+
+            // Rule-INTERNAL-091. Written by an older Testin and not converted -
+            // a conversion that failed - or by a newer one whose format this
+            // build does not know: the project is a node saying why, and nothing
+            // in it is read or written. Reading a format this build does not
+            // understand is how a build deletes what it cannot see (#305, S5).
+            final @NotNull Optional<String> refused = tp.getMarker().whyNotReadable();
+            if (refused.isPresent()) {
+                Logger.warn("Not reading " + projectPath.getFileName() + ": " + refused.orElseThrow());
+
+                store.refuse(projectPath, refused.orElseThrow());
+                store.swapIn(projectPath, scannedNode(projectPath, tp));
+                indicator.setFraction(1.0);
+                return;
+            }
 
             // UC-INTERNAL-003, Rule-INTERNAL-021.
             //
@@ -89,6 +123,7 @@ final class IndexingScanner {
             // what ScannedProject describes and #312's A1 cost.
             final @NotNull ScannedProject scanned = new ScannedProject();
             scanned.getProjects().put(projectPath.toString(), tp);
+            store.readable(projectPath);
 
             // UC-TREE-PANEL-001, Rule-TREE-PANEL-100.
             //
@@ -139,6 +174,7 @@ final class IndexingScanner {
 
             reportUnread(tp.getName(), unread);
             reportDamaged(tp.getName(), Services.getInstance(p, ProjectIndexer.class).takeDamagedMarkers());
+            reportUnreadableResults(tp.getName(), scanned.getUnreadableResults());
             reportClashing(tp.getName(), List.copyOf(scanned.getClashingCases()));
 
         // Nothing is swapped in, for the same reason a canceled pass is not: a
@@ -212,7 +248,7 @@ final class IndexingScanner {
 
             try (Stream<Path> files = Files.list(path)) {
                 files.filter(Files::isRegularFile)
-                        .filter(file -> file.toString().endsWith(".json"))
+                        .filter(file -> FileKind.of(file) == FileKind.TEST_CASE)
                         .parallel()
                         .forEach(filePath -> {
                             try {
@@ -376,6 +412,29 @@ final class IndexingScanner {
      * the list rather than fading: a marker is repaired by hand, and the tester
      * needs the names after the balloon would have gone.
      */
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-011.
+     * <p>
+     * The results that would not parse, once for the project rather than once per
+     * file. The run is shown without them, and nothing writes over them or
+     * removes them, so the tester can repair the file and press Refresh (#305,
+     * S21).
+     */
+    private void reportUnreadableResults(final @NotNull String projectName, final @NotNull Set<String> unreadable) {
+        if (unreadable.isEmpty()) return;
+
+        final @NotNull String named = unreadable.stream().sorted().limit(5).collect(Collectors.joining(", "));
+        final @NotNull String rest = unreadable.size() > 5
+                ? Bundle.message("indexer.more", String.valueOf(unreadable.size() - 5))
+                : "";
+        final @NotNull String count = unreadable.size() == 1
+                ? Bundle.message("indexer.results.unread.one")
+                : Bundle.message("indexer.results.unread.many", String.valueOf(unreadable.size()));
+
+        Services.getInstance(p, Notifier.class).warn(p, Bundle.message("indexer.results.unread.title", projectName),
+                Bundle.message("indexer.results.unread.message", count, named, rest));
+    }
+
     private void reportDamaged(final @NotNull String projectName, final @NotNull List<String> damaged) {
         if (damaged.isEmpty()) return;
 
@@ -425,12 +484,11 @@ final class IndexingScanner {
 
             scanned.getTestRunDirs().put(path.toString(), tr);
 
-            final @NotNull Path jsonPath = TestRunDirectoryDto.resultsFile(path);
-            if (Files.exists(jsonPath)) {
-                final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
-                final @NotNull TestRunDto trr = mapper.readValue(jsonPath.toFile(), TestRunDto.class);
-                scanned.getTestRuns().put(path.toString(), trr);
-            }
+            // Rule-INTERNAL-011. Registered for every {@code .tr}, whatever its
+            // folder holds: a run is a run before its first verdict and after its
+            // last case is unticked, and one registered only when a results file
+            // existed could not be edited again (#305, S21).
+            scanned.getTestRuns().put(path.toString(), new TestRunDto().setResults(resultsIn(path, scanned)));
 
             indicator.setText(Bundle.message("indexer.progress.test.run", path.getFileName()));
 
@@ -451,20 +509,89 @@ final class IndexingScanner {
      * <p>
      * Deliberately not the same question as {@code ProjectIndexer.isCaseFile},
      * which asks whether a file <b>is</b> a test case and answers it by the rule
-     * - a {@code .json} directly inside a test set. The two shared one method
+     * - a {@code .tc} directly inside a test set. The two shared one method
      * until #288, and the sharing is what hid that they were asking different
      * things.
      */
     private static boolean looksLikeACaseFile(final @NotNull Path file) {
-        final @NotNull String name = file.getFileName().toString();
-        if (!name.endsWith(".json")) return false;
+        return FileKind.TEST_CASE.idIn(file).isPresent();
+    }
 
-        try {
-            UUID.fromString(name.substring(0, name.length() - ".json".length()));
-            return true;
-        } catch (final IllegalArgumentException notACase) {
-            return false;
+    /**
+     * Rule-INTERNAL-091.
+     * <p>
+     * The project as a node and nothing else, which is what a refused project is
+     * indexed as - the same shape an inactive one takes, so the tree can say what
+     * it is rather than leaving the tester with an empty panel (#305, S9).
+     */
+    private static @NotNull ScannedProject scannedNode(final @NotNull Path projectPath, final @NotNull TestProjectDirectoryDto tp) {
+        final @NotNull ScannedProject scanned = new ScannedProject();
+        scanned.getProjects().put(projectPath.toString(), tp);
+
+        return scanned;
+    }
+
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-011, Rule-INTERNAL-012.
+     * <p>
+     * A run's results, one {@code <test case id>.ri} each, in the order their
+     * cases sit in their test sets - the order the run editor draws and every
+     * report prints, so a directory listing's own order is never what a tester
+     * sees (#305, S19). A result whose case this project no longer holds keeps
+     * its verdict and comes last.
+     * <p>
+     * The file name is the identity, as it is for a test case
+     * (Rule-INTERNAL-012): the id inside is read back only to be replaced by it.
+     * <p>
+     * A file that will not parse is reported and left where it is - never written
+     * over, never removed, and never read as a case nobody judged (#305, S21).
+     */
+    private @NotNull List<TestRunItems> resultsIn(final @NotNull Path runPath, final @NotNull ScannedProject scanned) {
+        final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
+        final @NotNull List<TestRunItems> read = new ArrayList<>();
+
+        try (Stream<Path> files = Files.list(runPath)) {
+            for (final Path file : files.filter(file -> FileKind.of(file) == FileKind.RUN_ITEM).toList()) {
+                try {
+                    final @NotNull TestRunItems item = mapper.readValue(file.toFile(), TestRunItems.class);
+                    FileKind.RUN_ITEM.idIn(file).ifPresent(item::setId);
+                    read.add(item);
+
+                } catch (final Exception ex) {
+                    Logger.error("Failed to read the result '" + file.toAbsolutePath() + "': " + ex.getMessage());
+                    scanned.getUnreadableResults().add(runPath.getFileName() + "/" + file.getFileName());
+                }
+            }
+        } catch (final IOException ex) {
+            Logger.error("Could not list the results of '" + runPath.getFileName() + "': " + ex.getMessage());
         }
+
+        return inCaseOrder(read, scanned);
+    }
+
+    /**
+     * Rule-INTERNAL-011.
+     * <p>
+     * The results in their cases' own order, and the ones whose case this project
+     * does not hold after them - a run outlives the cases it was made from, and
+     * what it recorded about a removed one is still its record (#305, S19).
+     */
+    private static @NotNull List<TestRunItems> inCaseOrder(final @NotNull List<TestRunItems> results, final @NotNull ScannedProject scanned) {
+        final @NotNull Map<UUID, TestRunItems> byId = new LinkedHashMap<>();
+        results.forEach(item -> byId.put(item.getId(), item));
+
+        final @NotNull List<TestCaseDto> cases = results.stream()
+                .map(item -> scanned.getTestCasesById().get(item.getId()))
+                .filter(Objects::nonNull)
+                .toList();
+
+        final @NotNull List<TestRunItems> ordered = TestCaseOrder.ordered(cases).stream()
+                .map(tc -> byId.remove(tc.getId()))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        ordered.addAll(byId.values());
+        return ordered;
     }
 
     /**
@@ -472,7 +599,7 @@ final class IndexingScanner {
      * <p>
      * Which test case a file is: its name, when the name is a UUID.
      * <p>
-     * The plugin writes a case to {@code <id>.json} and reads it back keyed by
+     * The plugin writes a case to {@code <id>.tc} and reads it back keyed by
      * the id inside, so the two always agree - until a file is copied outside
      * the plugin, which is a thing people do on GitHub. Then two files claim one
      * id, the cache keeps whichever the parallel scan reached last, and the other
@@ -490,19 +617,18 @@ final class IndexingScanner {
      * believing what it says.
      */
     private static @NotNull UUID identityOf(final @NotNull Path filePath, final @NotNull TestCaseDto tc) {
-        final @NotNull String name = filePath.getFileName().toString().replace(".json", "");
+        final @NotNull Optional<UUID> fromTheName = FileKind.TEST_CASE.idIn(filePath);
 
-        try {
-            final @NotNull UUID fromName = UUID.fromString(name);
+        if (fromTheName.isPresent()) {
+            final @NotNull UUID fromName = fromTheName.orElseThrow();
 
             if (!fromName.equals(tc.getId())) {
                 Logger.warn("Test case " + filePath.getFileName() + " says its id is " + tc.getId()
                         + "; the file name is the identity, so it is read as " + fromName);
             }
             return fromName;
-
-        } catch (final IllegalArgumentException ex) {
-            return tc.getId();
         }
+
+        return tc.getId();
     }
 }

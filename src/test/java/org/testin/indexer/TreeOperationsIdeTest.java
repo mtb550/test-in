@@ -145,6 +145,33 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
     }
 
     /**
+     * UC-INTERNAL-002, Rule-INTERNAL-090.
+     * <p>
+     * A folder Testin writes carries an id, and the next write keeps it: the id
+     * names one folder for a tool outside the IDE, so a status change, a rename
+     * or a reorder must not hand out a new one (#305, D5).
+     */
+    public void testAFoldersIdIsWrittenOnceAndKept() {
+        final Path testProject = root.resolve("NAFATH");
+
+        final TestProjectDirectoryDto tp = create(testProject);
+        final String stamped = tp.getMarker().getId();
+
+        assertFalse("a folder Testin wrote carries an id", stamped.isEmpty());
+        assertFalse("and so do the two containers under it",
+                indexer().readMarker(testProject.resolve(DirectoryType.TCD.getFolderName()), DirectoryType.TCD, "Test Cases").getId().isEmpty());
+
+        WriteAction.runAndWait(() -> {
+            tp.getMarker().setStatus(ProjectStatus.INACTIVE);
+            indexer().persistMarker(tp);
+        });
+
+        assertEquals("the id a folder has is the id it keeps",
+                stamped,
+                indexer().readMarker(testProject, DirectoryType.TP, "NAFATH").getId());
+    }
+
+    /**
      * A node the plugin created is on disk, and the cache knows it.
      * <p>
      * Both halves, because either alone is the failure rule 2 is about: a cache

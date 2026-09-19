@@ -88,13 +88,24 @@ Abort. It used to name them under a plain warning when the tester had come from
 Pending Commits, and offer the three links only when they had come from Sync -
 the same situation answered two ways, and the way out on screen only once.
 
-**If the conflicted file is not a test case** — a conflicted test run, a marker
-or anything else is named in that same message and left as it is. Testin merges
-test cases field by field, and a test run's result is a list of verdicts per
-test case: merging one means asking about each of them, which is its own thing
-to design rather than a variation of the case merge. The tester settles those by
-hand, in files the IDE may not draw as conflicted, because a Testin folder is not
-a version control root.
+**A result two testers judged** — kept whole from whoever judged it last. A
+verdict is one tester's account of executing one case: the status, when they
+gave it, what they saw, the stacktrace, the screenshots and the bug they filed.
+Those travel together or they say something nobody recorded, so the later
+`executedAt` takes the file, and the tester is told the choice was made rather
+than asked about it. Two testers judging **different** cases of one run never
+conflict at all: their verdicts are in different files.
+
+**A run two testers executed** — merged by rule, with nothing to answer: the run
+started when the earlier of the two says it started, ended when the later says it
+ended, its status is the one further along, and its audit block takes the later
+edit. What they each wrote - the configuration, the result analysis - merges key
+by key, and only a key both of them changed differently is a question.
+
+**If the conflicted file is none of those** — a folder's marker other than a
+run's, or anything Testin did not write, is named in that same message and left
+as it is. The tester settles those by hand, in files the IDE may not draw as
+conflicted, because a Testin folder is not a version control root.
 
 **If the repository has no remote** — the rebase is carried to the end and the
 push is refused, reading *This repository has no remote, so there is nothing to

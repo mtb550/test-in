@@ -115,7 +115,11 @@ public final class StartupActivity implements ProjectActivity {
         }
 
         if (TestinRoot.isConfigured(testinPath)) {
-            Services.getInstance(p, ProjectIndexer.class).indexWithProgress();
+            // UC-INTERNAL-008, Rule-INTERNAL-091. Every project in the Testin folder,
+        // not only the one this repository is about: one left unconverted would be
+        // refused by the release that deletes the converter (#305, D9).
+        Services.getInstance(p, ProjectIndexer.class).convertEveryProject();
+        Services.getInstance(p, ProjectIndexer.class).indexWithProgress();
         }
 
         TestCaseExecutionTracker.initGlobalListener(p);

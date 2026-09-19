@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.stream.Stream;
+import org.testin.model.FileKind;
 
 /**
  * Where a node's files are: deleting them, moving them, copying them, renaming
@@ -239,12 +240,19 @@ final class NodeFiles {
      */
     private void reidentifyCopiedCases(final @NotNull Path copiedRoot) {
         final List<Path> caseFiles;
+        final List<Path> markerFiles;
 
         try (Stream<Path> files = Files.walk(copiedRoot)) {
             // Collected before rewriting: the walk is lazy, and creating and
             // deleting files under it while it runs is not its contract.
-            caseFiles = files.filter(Files::isRegularFile)
+            final @NotNull List<Path> all = files.filter(Files::isRegularFile).toList();
+
+            caseFiles = all.stream()
                     .filter(file -> ProjectIndexer.isCaseFile(file, dir -> store.hasMarker(dir, DirectoryType.TS)))
+                    .toList();
+
+            markerFiles = all.stream()
+                    .filter(file -> DirectoryType.byMarker(String.valueOf(file.getFileName())).isPresent())
                     .toList();
 
         } catch (final IOException ex) {
@@ -254,6 +262,11 @@ final class NodeFiles {
 
         final long given = caseFiles.stream().filter(this::reidentify).count();
         Logger.info("Gave " + given + " of " + caseFiles.size() + " copied test case(s) new ids under " + copiedRoot.getFileName());
+
+        // Rule-INTERNAL-090. The folders too: a copied folder's marker arrives
+        // holding the original's id, and an id names one folder (#305, D5).
+        final long folders = markerFiles.stream().filter(store::giveFreshMarkerId).count();
+        Logger.info("Gave " + folders + " of " + markerFiles.size() + " copied folder(s) ids of their own under " + copiedRoot.getFileName());
     }
 
     /**
@@ -277,7 +290,7 @@ final class NodeFiles {
             final @NotNull UUID fresh = UUID.randomUUID();
 
             tc.setId(fresh);
-            if (!Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(fresh + ".json"), tc)) return false;
+            if (!Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(FileKind.TEST_CASE.fileName(fresh)), tc)) return false;
 
             // Claimed before it goes, as every other removal is, or the watcher
             // takes Testin's own delete for an outside change and reads the

@@ -143,7 +143,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private static final String HAND_NAMED = "Log in by hand.json";
+    private static final String HAND_NAMED = "Log in by hand.tc";
 
     /**
      * A test set holding one case whose file a tester named by hand, read the
@@ -154,7 +154,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         final Path set = project.resolve("Test Cases").resolve("set-0");
 
         try (var files = Files.list(set)) {
-            final Path caseFile = files.filter(file -> file.getFileName().toString().endsWith(".json")).findFirst().orElseThrow();
+            final Path caseFile = files.filter(file -> file.getFileName().toString().endsWith(".tc")).findFirst().orElseThrow();
             Files.move(caseFile, set.resolve(HAND_NAMED));
         } catch (final java.io.IOException ex) {
             throw new AssertionError("could not name the case file by hand", ex);
@@ -175,7 +175,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
     }
 
     private static Path fileOf(final TestSetDirectoryDto ts, final TestCaseDto tc) {
-        return ts.getPath().resolve(tc.getId() + ".json");
+        return ts.getPath().resolve(tc.getId() + ".tc");
     }
 
     /**
@@ -356,7 +356,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
 
         assertTrue("the save said it failed", indexer().putTestCaseVerbatim(set, tc));
 
-        assertTrue("the case was not filed under its id", Files.isRegularFile(set.resolve(tc.getId() + ".json")));
+        assertTrue("the case was not filed under its id", Files.isRegularFile(set.resolve(tc.getId() + ".tc")));
         assertFalse("the hand-named file was left beside it", Files.exists(set.resolve(HAND_NAMED)));
     }
 
@@ -375,7 +375,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
 
         assertFalse("a save that left the case in two files was reported as saved", indexer().putTestCaseVerbatim(set, tc));
 
-        assertFalse("the file filed under the id was left beside the hand-named one", Files.exists(set.resolve(tc.getId() + ".json")));
+        assertFalse("the file filed under the id was left beside the hand-named one", Files.exists(set.resolve(tc.getId() + ".tc")));
         assertTrue("the hand-named file went although its delete was refused", Files.exists(set.resolve(HAND_NAMED)));
     }
 }

@@ -31,6 +31,7 @@ import org.testin.services.Services;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * IntelliJ tree node whose children are resolved by StructureTreeModel in the background.
@@ -68,6 +69,13 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
             // TreePanel.refreshWhenIndexed draws it again when the index is
             // ready. That wait is on a pooled thread, holding no lock.
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+
+            // Rule-INTERNAL-091. A project this build cannot read has nothing
+            // under it, and the reason goes where the contents would have been -
+            // an empty project and a refused one look the same otherwise (#305).
+            final @NotNull Optional<String> refused = indexer.whyNotRead(directory.getPath());
+            if (refused.isPresent()) return List.of(child(new TreeLoadError(refused.orElseThrow())));
+
             final @NotNull List<TreePanelNode> children = new ArrayList<>();
             for (final DirectoryDto child : indexer.getChildren(directory.getPath())) {
                 children.add(child(child));

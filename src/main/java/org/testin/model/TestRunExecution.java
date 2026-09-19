@@ -19,7 +19,7 @@ package org.testin.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestRunDto;
+import org.testin.model.markers.TestRunMarker;
 import org.testin.model.markers.DetailRow;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
@@ -54,12 +54,12 @@ public enum TestRunExecution {
 
     STARTED(
             Bundle.message("execution.started"),
-            TestRunDto::getExecutionStartedAt
+            TestRunMarker::getExecutionStartedAt
     ),
 
     ENDED(
             Bundle.message("execution.ended"),
-            TestRunDto::getExecutionEndedAt
+            TestRunMarker::getExecutionEndedAt
     );
 
     private final @NotNull String displayName;
@@ -70,14 +70,14 @@ public enum TestRunExecution {
      * what this exists to stop.
      */
     @Getter(lombok.AccessLevel.NONE)
-    private final @NotNull Function<TestRunDto, ZonedDateTime> at;
+    private final @NotNull Function<TestRunMarker, ZonedDateTime> at;
 
     /**
      * This field of that run, formatted, and blank when the run never reached
      * it. Every reader here drops a blank row, so a run nobody executed shows
      * none of these rather than empty ones.
      */
-    public @NotNull String valueIn(final @NotNull TestRunDto run) {
+    public @NotNull String valueIn(final @NotNull TestRunMarker run) {
         return Display.formatDate(at.apply(run));
     }
 
@@ -90,7 +90,7 @@ public enum TestRunExecution {
      * finishing would be reported as three fields changing - started, ended,
      * and the number derived from both.
      */
-    private static @NotNull String tookIn(final @NotNull TestRunDto run) {
+    private static @NotNull String tookIn(final @NotNull TestRunMarker run) {
         final @NotNull ZonedDateTime from = run.getExecutionStartedAt();
         final @NotNull ZonedDateTime to = run.getExecutionEndedAt();
 
@@ -106,7 +106,7 @@ public enum TestRunExecution {
      * Every reader here drops a blank row, so a run nobody executed shows none
      * of these rather than three empty ones.
      */
-    public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunDto run) {
+    public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunMarker run) {
         return Stream.concat(
                         Arrays.stream(values()).map(field -> new DetailRow(field.displayName, field.valueIn(run))),
                         Stream.of(new DetailRow(Bundle.message("execution.time"), tookIn(run))))

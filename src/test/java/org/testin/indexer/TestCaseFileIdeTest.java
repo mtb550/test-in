@@ -108,7 +108,7 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
 
         assertEquals("the case was placed in the wrong test project", tp.getPath(), file.testProject());
         assertEquals("the case's file is not where the store writes it",
-                Path.of(tp.getTestCasesDirectory().getPath().getFileName().toString(), "Login", tc.getId() + ".json"), file.inProject());
+                Path.of(tp.getTestCasesDirectory().getPath().getFileName().toString(), "Login", tc.getId() + ".tc"), file.inProject());
     }
 
     public void testACaseNoIndexedTestProjectHoldsHasNoFile() {

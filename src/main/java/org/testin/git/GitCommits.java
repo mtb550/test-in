@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.testin.model.FileKind;
 
 /**
  * A commit, and the commits moved between here and the remote.
@@ -86,12 +87,12 @@ public final class GitCommits {
      * them (#313).
      * <p>
      * The review lists no screenshot on its own: one only arrives or goes because
-     * its run's file started or stopped naming it, so the run is the one change a
-     * tester needs to select.
+     * a result started or stopped naming it, so the result is the one change a
+     * tester needs to select (#305).
      */
     static @NotNull Set<String> screenshotsAlongside(final @NotNull List<String> statusLines, final @NotNull Set<String> paths) {
         final @NotNull Set<String> runFolders = paths.stream()
-                .filter(path -> String.valueOf(Path.of(path).getFileName()).equals(RESULTS_FILE))
+                .filter(path -> FileKind.of(Path.of(path)) == FileKind.RUN_ITEM)
                 .map(GitCommits::folderOf)
                 .collect(Collectors.toSet());
 
@@ -101,8 +102,6 @@ public final class GitCommits {
                 .filter(path -> runFolders.contains(folderOf(path)))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
-
-    private static final @NotNull String RESULTS_FILE = TestRunDirectoryDto.resultsFile(Path.of("")).toString();
 
     private static @NotNull String folderOf(final @NotNull String path) {
         return Optional.ofNullable(Path.of(path).getParent()).map(Path::toString).orElse("");

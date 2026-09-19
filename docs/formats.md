@@ -30,14 +30,14 @@
     │   │   └── .tsp
     │   └── ts2/                  a test set
     │       ├── .ts
-    │       └── 4fd2a19b-….json   one test case, named by its id
+    │       └── 4fd2a19b-….tc     one test case, named by its id
     └── Test Runs/
         ├── .trd                  the Test Runs directory marker
         ├── Cycles/               a test run package
         │   └── .trp
         └── cycle31/              a test run
             ├── .tr
-            ├── run.json          everything the run recorded
+            ├── 4fd2a19b-….ri     one result, named by the test case it is about
             └── k3f9a.png         a screenshot a failure names
 ```
 
@@ -89,13 +89,13 @@ for it, and what is written back is that answer rather than an invented one.
 
 | File | Node | Adds | Values |
 |---|---|---|---|
-| `.tp` | Test project | `status` | `ACTIVE` `INACTIVE` |
+| `.tp` | Test project | `status`, and `format` - which format this project's files are in, 2 for the one described here | `ACTIVE` `INACTIVE` |
 | `.tcd` | The `Test Cases` directory | — | |
 | `.trd` | The `Test Runs` directory | — | |
 | `.tsp` | Test set package | `status` | `ACTIVE` `ARCHIVED` |
 | `.ts` | Test set | `status` | `ACTIVE` `DEPRECATED` |
 | `.trp` | Test run package | `status` | `ACTIVE` `ARCHIVED` |
-| `.tr` | Test run | `status` | `CREATED` `IN_PROGRESS` `COMPLETED` `ASSIGNED` `CLOSED` |
+| `.tr` | Test run | `status`, and the run's own facts: `configuration`, `resultAnalysis`, `executionStartedAt`, `executionEndedAt` — see below | `CREATED` `IN_PROGRESS` `COMPLETED` `ASSIGNED` `CLOSED` |
 
 **A directory carrying two markers of one family is read as the more specific
 one.** Under `Test Cases` the order is `.ts` then `.tsp`; under `Test Runs` it is
@@ -113,16 +113,42 @@ nothing else may ask in a different order.
 }
 ```
 
+**The test run marker adds four more**, because they are facts about the run
+rather than about any one result — what it was executed against, what the tester
+wrote about the verdicts afterwards, and when execution started and last
+stopped. They are the run's, so they are in the run's own file:
+
+| Field | Type | Required | Meaning |
+|---|---|---|---|
+| `configuration` | map | no, **omitted when empty** | What the run was executed against. Keys are `TEST_TYPE` `CHANGE_LOG` `COMMIT_ID` `PLATFORM` `COMPONENT` `LANGUAGE` `BROWSER` `DEVICE_TYPE`; values are free text |
+| `resultAnalysis` | map | no, **omitted when empty** | What the tester wrote about each group of verdicts. Keys are `PASSED` `FAILED` `BLOCKED` `UNTESTED`; values are free text |
+| `executionStartedAt` | date | no, defaults to the epoch | When Start Execution was first pressed. Kept: a run resumed next week still started when it started |
+| `executionEndedAt` | date | no, defaults to the epoch | When execution last stopped |
+
+```json
+{
+  "createdBy" : "Sara Al-Otaibi",
+  "createdAt" : "Sunday 13-09-2026 At 09:00:00 [Asia/Riyadh]",
+  "modifiedBy" : "Sara Al-Otaibi",
+  "modifiedAt" : "Monday 14-09-2026 At 10:22:05 [Asia/Riyadh]",
+  "status" : "IN_PROGRESS",
+  "configuration" : { "TEST_TYPE" : "Regression", "PLATFORM" : "Web", "BROWSER" : "Chrome" },
+  "executionStartedAt" : "Monday 14-09-2026 At 10:00:12 [Asia/Riyadh]",
+  "executionEndedAt" : "Thursday 01-01-1970 At 00:00:00 [Z]"
+}
+```
+
 ---
 
-## A test case — `<uuid>.json`
+## A test case — `<uuid>.tc`
 
-One file per test case, inside its test set. **Any `.json` file directly inside
-a test set is a test case** (Rule-INTERNAL-011), so `login.json` written by hand
-is read as one and a copy of it is given an id of its own; a `.json` sitting in
-`Test Cases` rather than in a set is not a case at all.
+One file per test case, inside its test set. **Any `.tc` file directly inside
+a test set is a test case** (Rule-INTERNAL-011), so `login.tc` written by hand
+is read as one and a copy of it is given an id of its own; a `.tc` sitting in
+`Test Cases` rather than in a set is not a case at all. The file holds JSON; the
+name says what the JSON is, so nothing has to look inside to find out.
 
-Testin writes the file as `<id>.json`, and a hand-named one is filed under its
+Testin writes the file as `<id>.tc`, and a hand-named one is filed under its
 id the next time anything writes it, the hand-named file going once that write
 has landed (Rule-INTERNAL-084). The two names answer different questions:
 the **file name** is what the tree shows (Rule-INTERNAL-012 — a `name` field
@@ -185,31 +211,32 @@ on each case and nothing else.
 
 ---
 
-## A test run — `run.json`
+## A result — `<test case id>.ri`
 
-One file per test run, beside its `.tr`. It records what was executed, not what
-exists: a case removed from the test set keeps its result here.
+One file per case the run covers, inside the run's folder, beside its `.tr`. A
+case appears in a run once, so the case's id is the file's name and two testers
+adding the same case offline write the same file rather than two.
 
-The screenshots its failures name sit beside it, one PNG each, named by five
-random lowercase letters and digits that no result of the run already holds -
-`k3f9a.png`. Testin writes a screenshot before the result that names it, and
-moves one that no result names to the recycle bin after the next write of this
-file. Any PNG in the folder named that way is taken for a screenshot, so one put
-there by hand under such a name goes too.
+It records what was executed, not what exists: a case removed from the test set
+keeps its result here. What the run itself is - how it was configured, what the
+tester wrote about the verdicts, when it was executed - is in its `.tr`, with its
+status.
 
-| Field | Type | Required | Meaning |
-|---|---|---|---|
-| `configuration` | map | no, **omitted when empty** | What the run was executed against. Keys are `TEST_TYPE` `CHANGE_LOG` `COMMIT_ID` `PLATFORM` `COMPONENT` `LANGUAGE` `BROWSER` `DEVICE_TYPE`; values are free text |
-| `resultAnalysis` | map | no, **omitted when empty** | Keys are `PASSED` `FAILED` `BLOCKED` `UNTESTED`; values are free text |
-| `executionStartedAt` | date | no, defaults to the epoch | |
-| `executionEndedAt` | date | no, defaults to the epoch | |
-| `results` | array | no | One entry per case the run covers, below |
+The results are read in the order their cases sit in their test sets, and a
+result whose case the project no longer holds comes last - so a report prints
+them in the order a tester reads the tree, never in the order a folder listing
+happens to give.
 
-Each entry in `results`:
+The screenshots a failure names sit in the same folder, one PNG each, named by
+five random lowercase letters and digits that no result of the run already holds
+- `k3f9a.png`. Testin writes a screenshot before the result that names it, and
+moves one that no result of the run names any more to the recycle bin after the
+next write. Any PNG in a run folder named that way is taken for a screenshot, so
+one put there by hand under such a name goes too.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `id` | UUID string | The test case this result is about. When absent, the result names no test case and reads as one whose case was removed |
+| `id` | UUID string | The test case this result is about - the same id the file is named by, which is what decides it (Rule-INTERNAL-012). Written so the file says what it is about on its own |
 | `status` | enum | `PASSED` `FAILED` `BLOCKED` as a tester or the automation judged it; `PENDING` until then; `UNTESTED` for a case still pending when the run completed or closed. A case whose test case was deleted since the run keeps its status here and is shown as Removed; `REMOVED` is no longer written, and a file written by 2.11.0-alpha or earlier that holds it is read as removed |
 | `duration` | number, seconds | Nanosecond precision, written as a decimal |
 | `executedBy` | string | |
@@ -271,11 +298,20 @@ has to change, the old one stays readable through `@JsonAlias` — `modifiedBy`
 and `modifiedAt` are read from `updatedBy` and `updatedAt` for exactly this
 reason, and those aliases are permanent.
 
+**The project says which format its files are in**, in its `.tp`: `format`, and
+2 is the format this page describes. A project without the number, or with a
+lower one, is converted once before it is read - test cases moved to `<id>.tc`,
+every marker given an `id`, and its test runs removed
+([UC-INTERNAL-008](internal/convertTestData.md), Rule-INTERNAL-091). A project
+with a **higher** number is not read at all: a format this build does not know is
+refused rather than guessed at, because reading it as format 2 would delete what
+this build cannot see.
+
 **A file whose shape changed structurally is not read at all.** A test run
-written before 3 September 2026 kept its results in `<folder>.json`, which is
-why renaming a run lost them. Runs are `run.json` now, and the old file is not
-read: such a run shows no results, and its old file stays on disk as litter.
-That is a decision, not an oversight, and
+written before 3 September 2026 kept its results in `<folder>.json`, and one
+written before 20 September 2026 kept them all in a `run.json`. Neither is read:
+such a run shows no results, and the conversion removes the run rather than
+carrying it forward. That is a decision, not an oversight, and
 `RunResultsSurviveRenameTest.aRunWrittenByAnOlderBuildIsNotRead` asserts it so
 it cannot be mistaken for one.
 
@@ -290,3 +326,9 @@ fact, which is the thing this page is here to prevent.
 the answer is to delete the old data and start again rather than to ship a
 converter — the trees are small, and a converter is a second reader of a format
 nobody writes any more.
+
+**The one exception is the conversion to format 2**, which 2.13.0-alpha carries
+because the plugin is public: test cases and markers are brought forward, and
+only the test runs are removed (#305, D4). The conversion code is deleted in
+2.14.0-alpha, which is why the number is in the file - from then on a project
+nobody converted is refused, naming the release that can convert it.

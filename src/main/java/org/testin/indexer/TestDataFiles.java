@@ -33,8 +33,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
+import org.testin.model.FileKind;
 
 /**
  * Writes test data to disk. Package-private, and in this package, so that the
@@ -74,6 +76,19 @@ final class TestDataFiles {
     }
 
     /**
+     * The same question for bytes a caller already has in hand - the run writer
+     * snapshots each result on the calling thread and asks here, on its own
+     * (#305, G5).
+     */
+    boolean alreadyHolds(final @NotNull Path path, final byte @NotNull [] bytes) {
+        try {
+            return Arrays.equals(Files.readAllBytes(path), bytes);
+        } catch (final IOException absentOrUnreadable) {
+            return false;
+        }
+    }
+
+    /**
      * @return whether the bytes landed. A caller that updates the cache after
      * the write has to know, because architecture rule 2 makes the write the
      * thing that decides whether the node exists at all (#66, finding 85).
@@ -101,6 +116,21 @@ final class TestDataFiles {
         } catch (final IOException missingOrUnreadable) {
             Logger.warn("Could not read " + path + ": " + missingOrUnreadable.getMessage());
             return new byte[0];
+        }
+    }
+
+    /**
+     * Rule-INTERNAL-011.
+     * <p>
+     * The result files in a run's folder, and none when the folder cannot be
+     * listed - a run whose folder has gone holds nothing (#305).
+     */
+    @NotNull List<Path> resultsIn(final @NotNull Path runPath) {
+        try (Stream<Path> inside = Files.list(runPath)) {
+            return inside.filter(file -> FileKind.of(file) == FileKind.RUN_ITEM).toList();
+        } catch (final IOException ex) {
+            Logger.warn("Could not list the results in " + runPath + ": " + ex.getMessage());
+            return List.of();
         }
     }
 
@@ -147,6 +177,61 @@ final class TestDataFiles {
             return true;
         } catch (final IOException ex) {
             reportWriteFailure(p, path, ex);
+            return false;
+        }
+    }
+
+    /**
+     * UC-INTERNAL-008, Rule-INTERNAL-091.
+     * <p>
+     * Moves a file, claimed at both ends so the watcher takes neither for an
+     * outside change. One operation rather than a write and a delete: a crash
+     * between those two leaves the same content in two files, and the next scan
+     * reads one case twice (#305, S11).
+     *
+     * @return whether the file is at its new path now
+     */
+    boolean move(final @NotNull Project p, final @NotNull Path from, final @NotNull Path to) {
+        try {
+            Services.getInstance(OwnWrites.class).record(from);
+            Services.getInstance(OwnWrites.class).record(to);
+
+            Files.move(from, to);
+            return true;
+        } catch (final IOException ex) {
+            Logger.error("Could not move " + from + " to " + to + ": " + ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", ex.getMessage()));
+            return false;
+        }
+    }
+
+    /**
+     * UC-INTERNAL-008, Rule-INTERNAL-091, Rule-INTERNAL-036.
+     * <p>
+     * A whole folder, to the recycle bin where there is one: what the converter
+     * does with a run written in the old format, whose results this build cannot
+     * read (#305, D4). Every file in it is claimed first, so the watcher reads
+     * none of it as an outside change.
+     *
+     * @return whether the folder is gone
+     */
+    boolean removeTree(final @NotNull Project p, final @NotNull Path folder) {
+        try (Stream<Path> inside = Files.walk(folder)) {
+            inside.forEach(path -> Services.getInstance(OwnWrites.class).record(path));
+        } catch (final IOException ex) {
+            Logger.warn("Could not claim what is inside " + folder + ": " + ex.getMessage());
+        }
+
+        if (Trash.accepted(p, folder)) return true;
+
+        try (Stream<Path> inside = Files.walk(folder)) {
+            for (final Path path : inside.sorted(Comparator.reverseOrder()).toList()) {
+                Files.deleteIfExists(path);
+            }
+            return true;
+        } catch (final IOException ex) {
+            Logger.error("Could not remove " + folder + ": " + ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", ex.getMessage()));
             return false;
         }
     }

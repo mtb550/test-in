@@ -93,7 +93,9 @@ with who created it and when.
 ## What cannot be put back this way
 
 A reordering or a restamp of a test case with no field changed. A change to a
-test run, a marker, or anything Testin did not read as a test case. For those,
+test run, a result, a marker, or anything Testin did not read as a test case.
+A result is a record of work rather than an edit, so putting one back would say
+a case was never executed. For those,
 use Git's own tools.
 
 ---

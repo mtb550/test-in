@@ -69,26 +69,6 @@ public class TestRunDirectoryDto extends DirectoryDto {
         return DirectoryType.TR;
     }
 
-    /**
-     * Where a run's results live: {@code <run folder>/run.json}, whatever the
-     * folder is called.
-     * <p>
-     * The name used to be the folder's own - {@code Cycle-1/Cycle-1.json} - which
-     * made a run the only node in the tree whose contents were named after it, and
-     * so the only node a rename could empty. It did: the write derived that name
-     * and the scan's read derived it again, and neither told the rename, so
-     * renaming a cycle moved the folder, left the results behind under the old
-     * name, and the next index found nothing where a whole cycle had been (#177).
-     * <p>
-     * Fixing the rename would have kept the trap for whatever moved a node next.
-     * A fixed name has nothing to keep in step, so there is no longer a rule to
-     * forget - the run now behaves like every other node, whose contents are named
-     * independently of the folder ({@code <id>.json} for a test case).
-     */
-    public static @NotNull Path resultsFile(final @NotNull Path runPath) {
-        return runPath.resolve("run.json");
-    }
-
     private static final @NotNull String SCREENSHOT_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyz";
 
     private static final int SCREENSHOT_NAME_LENGTH = 5;
@@ -139,7 +119,7 @@ public class TestRunDirectoryDto extends DirectoryDto {
     }
 
     /**
-     * Where a screenshot of this run lives: beside {@code run.json}.
+     * Where a screenshot of this run lives: beside the result that names it.
      */
     public static @NotNull Path screenshotFile(final @NotNull Path runPath, final @NotNull String name) {
         return runPath.resolve(name);

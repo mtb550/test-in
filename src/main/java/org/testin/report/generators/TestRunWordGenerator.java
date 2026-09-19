@@ -81,7 +81,7 @@ public final class TestRunWordGenerator {
 
                 // The project, and the run under it - the same two lines the PDF
                 // prints, for the same reason.
-                addText(doc, ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(tr), TestRunConfiguration.COMPONENT.valueIn(tr))),
+                addText(doc, ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(trDir.getMarker()), TestRunConfiguration.COMPONENT.valueIn(trDir.getMarker()))),
                         ReportFont.SUBTITLE.ptRounded(), false, MEDIUM_BLUE, NO_BORDER, 0);
                 // The rule closes the two names, above the notice.
                 addText(doc, trDir.getName(), ReportFont.LEAD.ptRounded(), false, MEDIUM_BLUE, DARK_NAVY, 1);
@@ -131,13 +131,13 @@ public final class TestRunWordGenerator {
                 }
 
                 // Only what the tester wrote - see the PDF generator.
-                final boolean analyzed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
+                final boolean analyzed = ResultAnalysis.anyWrittenIn(trDir.getMarker().getResultAnalysis());
 
                 if (analyzed) {
                     addHeading(doc, Bundle.message("report.heading.analysis"), 20, 12);
 
                     for (final ResultAnalysis section : ResultAnalysis.values()) {
-                        final @NotNull String written = section.writtenIn(tr.getResultAnalysis());
+                        final @NotNull String written = section.writtenIn(trDir.getMarker().getResultAnalysis());
                         if (written.isEmpty()) continue;
 
                         addColoredCount(doc, section.heading(summary), section.getHexColor());

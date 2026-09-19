@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.testng.Assert.*;
@@ -163,7 +164,7 @@ public class GitWorkflowTest {
 
             final Set<String> paths = new LinkedHashSet<>();
             for (int i = 0; i < 1200; i++) {
-                final String name = UUID.randomUUID() + ".json";
+                final String name = UUID.randomUUID() + ".tc";
                 Files.writeString(set.resolve(name), "{}");
                 paths.add("test-01/Test Cases/pkg1/Login/" + name);
             }
@@ -238,7 +239,7 @@ public class GitWorkflowTest {
         TestCaseOrder.rankAll(cases);
 
         for (final TestCaseDto testCase : cases) {
-            write(work, "Test Cases/login flow/" + testCase.getId() + ".json", testCase);
+            write(work, "Test Cases/login flow/" + testCase.getId() + ".tc", testCase);
         }
         return cases;
     }
@@ -258,7 +259,10 @@ public class GitWorkflowTest {
                 // what production feeds this: GitRepositoryService.showAtHead ends
                 // in orElse(""). Handing it a null here tested a shape the plugin
                 // never produces.
-                path -> git(work, "show", "HEAD:" + path).orElse(""));
+                path -> git(work, "show", "HEAD:" + path).orElse(""),
+                // No index in this test: a result then reads as its file name,
+                // which is the shape a case removed since would take anyway.
+                id -> Optional.empty());
     }
 
     /**
@@ -318,7 +322,7 @@ public class GitWorkflowTest {
 
         final Path colleague = cloneAsColleague();
         for (final TestCaseDto testCase : cases) {
-            assertTrue(Files.exists(colleague.resolve("Test Cases/login flow/" + testCase.getId() + ".json")),
+            assertTrue(Files.exists(colleague.resolve("Test Cases/login flow/" + testCase.getId() + ".tc")),
                     "the colleague received " + testCase.getDescription());
         }
     }
@@ -379,7 +383,7 @@ public class GitWorkflowTest {
         assertEquals(review(), List.of(), "nothing is pending straight after a commit");
 
         final TestCaseDto edited = cases.getFirst().setModule("payments");
-        write(work, "Test Cases/login flow/" + edited.getId() + ".json", edited);
+        write(work, "Test Cases/login flow/" + edited.getId() + ".tc", edited);
 
         final List<PendingChange> pending = review();
 
@@ -397,7 +401,7 @@ public class GitWorkflowTest {
         commit(stagedFor(review()), "the first commit");
 
         final TestCaseDto extra = testCase("a locked account cannot sign in");
-        write(work, "Test Cases/login flow/" + extra.getId() + ".json", extra);
+        write(work, "Test Cases/login flow/" + extra.getId() + ".tc", extra);
 
         final List<PendingChange> pending = review();
 
@@ -412,7 +416,7 @@ public class GitWorkflowTest {
             final List<TestCaseDto> cases = writeTestProject();
             commit(stagedFor(review()), "the first commit");
 
-            Files.delete(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json"));
+            Files.delete(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".tc"));
 
             final List<PendingChange> pending = review();
 
@@ -440,7 +444,7 @@ public class GitWorkflowTest {
         final List<TestCaseDto> cases = writeTestProject();
         commit(stagedFor(review()), "the first commit");
 
-        final String file = cases.getFirst().getId() + ".json";
+        final String file = cases.getFirst().getId() + ".tc";
         mustGit(work, "mv", "Test Cases/login flow/" + file, "Test Cases/" + file);
 
         final List<PendingChange> pending = review();
@@ -475,7 +479,7 @@ public class GitWorkflowTest {
             commit(stagedFor(review()), "the first commit");
             mustGit(work, "push", "-u", "origin", "main");
 
-            final String relativePath = "Test Cases/login flow/" + cases.getFirst().getId() + ".json";
+            final String relativePath = "Test Cases/login flow/" + cases.getFirst().getId() + ".tc";
 
             // The colleague sharpens the expected result.
             final Path colleague = cloneAsColleague();
@@ -513,7 +517,7 @@ public class GitWorkflowTest {
             final String remote = mustGit(work, "show", ":2:" + relativePath);
             final String replayed = mustGit(work, "show", ":3:" + relativePath);
 
-            final TestCaseMerge.Merge merge = TestCaseMerge.of(RealMapper.build(), base, replayed, remote);
+            final Merge merge = TestCaseMerge.of(RealMapper.build(), base, replayed, remote);
             assertTrue(merge.isSettled(), "different fields are not a disagreement");
 
             Files.writeString(myCopy, merge.merged().toPrettyString(), StandardCharsets.UTF_8);
@@ -555,7 +559,7 @@ public class GitWorkflowTest {
             mustGit(colleague, "config", "user.email", "colleague@example.invalid");
 
             final TestCaseDto theirNewCase = testCase("a locked account cannot sign in").setOrder("s");
-            write(colleague, "Test Cases/login flow/" + theirNewCase.getId() + ".json", theirNewCase);
+            write(colleague, "Test Cases/login flow/" + theirNewCase.getId() + ".tc", theirNewCase);
 
             mustGit(colleague, "add", "-A");
             mustGit(colleague, "commit", "-m", "added the locked account case");
@@ -563,7 +567,7 @@ public class GitWorkflowTest {
 
             // This tester appends one too, at the same moment.
             final TestCaseDto myNewCase = testCase("a signed-in user signs out").setOrder("s");
-            write(work, "Test Cases/login flow/" + myNewCase.getId() + ".json", myNewCase);
+            write(work, "Test Cases/login flow/" + myNewCase.getId() + ".tc", myNewCase);
             commit(stagedFor(review()), "added the sign out case");
 
             // No conflict to resolve: the pull rebases straight through.
@@ -572,7 +576,7 @@ public class GitWorkflowTest {
 
             final List<TestCaseDto> after = new ArrayList<>();
             try (Stream<Path> files = Files.list(work.resolve("Test Cases/login flow"))) {
-                for (final Path file : files.filter(f -> f.getFileName().toString().endsWith(".json")).sorted().toList()) {
+                for (final Path file : files.filter(f -> f.getFileName().toString().endsWith(".tc")).sorted().toList()) {
                     after.add(RealMapper.build().readValue(Files.readString(file, StandardCharsets.UTF_8), TestCaseDto.class));
                 }
             }
@@ -607,7 +611,7 @@ public class GitWorkflowTest {
             mustGit(colleague, "config", "user.name", "Colleague");
             mustGit(colleague, "config", "user.email", "colleague@example.invalid");
 
-            final Path theirCopy = colleague.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json");
+            final Path theirCopy = colleague.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".tc");
             final TestCaseDto theirs = RealMapper.build().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
             Files.writeString(theirCopy, RealMapper.build().writeValueAsString(theirs.setExpectedResult("the dashboard opens within two seconds")),
                     StandardCharsets.UTF_8);
@@ -618,7 +622,7 @@ public class GitWorkflowTest {
             mustGit(work, "pull", "--rebase", "--autostash", "origin", "main");
 
             final TestCaseDto pulled = RealMapper.build().readValue(
-                    Files.readString(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json"),
+                    Files.readString(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".tc"),
                             StandardCharsets.UTF_8), TestCaseDto.class);
 
             assertEquals(pulled.getExpectedResult(), "the dashboard opens within two seconds");
@@ -653,6 +657,6 @@ public class GitWorkflowTest {
         assertTrue(status.contains("?? \"Test Cases/login flow/"),
                 "a path with a space comes back quoted: " + status);
         assertEquals(GitRefs.parseStatus(status.lines().toList()).stream()
-                .filter(entry -> entry.path().endsWith(".json")).count(), 2);
+                .filter(entry -> entry.path().endsWith(".tc")).count(), 2);
     }
 }

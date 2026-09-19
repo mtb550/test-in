@@ -99,11 +99,12 @@ public class ReCreateTestRunAction extends DumbAwareAction {
         private void reCreateAt(final @NotNull TreePath path) {
             TreeValues.directoryAt(path)
                     .filter(TestRunDirectoryDto.class::isInstance)
+                    .map(TestRunDirectoryDto.class::cast)
                     .ifPresent(source -> TreeValues.directoryAt(path.getParentPath())
                             .ifPresent(parent -> reCreate(source, parent)));
         }
 
-        private void reCreate(final @NotNull DirectoryDto source, final @NotNull DirectoryDto parent) {
+        private void reCreate(final @NotNull TestRunDirectoryDto source, final @NotNull DirectoryDto parent) {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             final @NotNull TestRunDto run = indexer.getTestRunByPath(source.getPath());
@@ -117,7 +118,7 @@ public class ReCreateTestRunAction extends DumbAwareAction {
             // is not ticked and not carried. Nothing to report and nothing to skip:
             // the tree is built from what exists now.
             Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
-                    tp -> new CreateTestRun(p).configureRun(tp.getTestCasesDirectory(), NextRunName.after(source.getName(), taken), parent, cases, run.getConfiguration()),
+                    tp -> new CreateTestRun(p).configureRun(tp.getTestCasesDirectory(), NextRunName.after(source.getName(), taken), parent, cases, source.getMarker().getConfiguration()),
                     () -> Logger.warn("Re-create test run: no test project is bound to " + p.getName()));
         }
     }

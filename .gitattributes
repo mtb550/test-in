@@ -9,6 +9,18 @@
 *.yml         text eol=lf
 *.yaml        text eol=lf
 
+# The test data's own files: JSON, whatever the name says. The seven markers have
+# no extension to match, so each is named (#305).
+*.tc          text eol=lf
+*.ri          text eol=lf
+.tp           text eol=lf
+.tcd          text eol=lf
+.trd          text eol=lf
+.tsp          text eol=lf
+.trp          text eol=lf
+.ts           text eol=lf
+.tr           text eol=lf
+
 *.jar         binary
 *.png         binary
 *.jpg         binary

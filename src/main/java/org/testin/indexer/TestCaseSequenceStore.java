@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.testin.model.FileKind;
 
 /**
  * Owns test-case lookup and the persisted linked-list sequence for each test set.
@@ -49,7 +50,7 @@ final class TestCaseSequenceStore {
      * <p>
      * The test cases read from a file the plugin did not name, and that file.
      * <p>
-     * A case read from {@code login.json} was saved to {@code <id>.json} and the
+     * A case read from {@code login.tc} was saved to {@code <id>.tc} and the
      * hand-named file was left holding the case as it was, so the next scan read
      * two files claiming one identity and kept whichever it read last - the edit
      * there or gone at random (#66, finding 175). Known here, the save takes the
@@ -200,7 +201,7 @@ final class TestCaseSequenceStore {
      * wrote from one written by hand.
      */
     static @NotNull Path named(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
-        return testSetPath.resolve(testCaseId + ".json");
+        return testSetPath.resolve(FileKind.TEST_CASE.fileName(testCaseId));
     }
 
     /**

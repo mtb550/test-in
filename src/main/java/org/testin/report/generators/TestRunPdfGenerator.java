@@ -128,7 +128,7 @@ public final class TestRunPdfGenerator {
             // SUBTITLE - the project, and the run under it. Two lines rather
             // than one, because they answer different questions: which project
             // this is, and which run of it.
-            document.add(para(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(tr), TestRunConfiguration.COMPONENT.valueIn(tr))))
+            document.add(para(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(trDir.getMarker()), TestRunConfiguration.COMPONENT.valueIn(trDir.getMarker()))))
                     .setFont(regularFont).setFontSize(ReportFont.SUBTITLE.pt()).setFontColor(MEDIUM_BLUE)
                     .setMarginBottom(0));
 
@@ -215,7 +215,7 @@ public final class TestRunPdfGenerator {
             // A verdict they said nothing about prints no heading, and a run
             // nobody analyzed prints no section, so the numbering below starts
             // at 3 instead of 4.
-            final boolean analyzed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
+            final boolean analyzed = ResultAnalysis.anyWrittenIn(trDir.getMarker().getResultAnalysis());
 
             if (analyzed) {
                 document.add(para(Bundle.message("report.heading.analysis"))
@@ -228,7 +228,7 @@ public final class TestRunPdfGenerator {
                         .setMarginTop(20));
 
                 for (final ResultAnalysis section : ResultAnalysis.values()) {
-                    final @NotNull String written = section.writtenIn(tr.getResultAnalysis());
+                    final @NotNull String written = section.writtenIn(trDir.getMarker().getResultAnalysis());
                     if (written.isEmpty()) continue;
 
                     document.add(para(section.heading(summary))

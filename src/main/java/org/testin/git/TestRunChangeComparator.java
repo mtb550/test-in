@@ -20,22 +20,19 @@ import org.testin.model.TestRunConfiguration;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
 import org.testin.model.TestRunExecution;
-import org.testin.model.dto.TestRunDto;
-import org.testin.util.Bundle;
 
 import java.util.*;
+import org.testin.model.markers.TestRunMarker;
 
 /**
- * Compares two revisions of a test run, the way {@link TestCaseChangeComparator}
- * does for a test case.
+ * Compares two revisions of a test run's own facts - how it was configured and
+ * when it was executed, which its {@code .tr} holds beside its status (#305, D6).
  * <p>
- * A run's rows are its results. A tester reviewing a commit wants to know what
- * happened to them, not which of forty fields moved. So the verdicts become one
- * summarized line, and the configuration fields that describe the cycle are
- * compared one by one.
+ * Its results are not here: each is its own file, compared by
+ * {@link RunItemChangeComparator}. A tester reviewing a commit reads one row per
+ * verdict that changed, under the case it is about, rather than one line saying a
+ * run changed somehow.
  * <p>
  * Nothing here reverts. A verdict is a record of work, not an edit: putting it
  * back would say a case was never run.
@@ -43,64 +40,35 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class TestRunChangeComparator {
 
-    // UC-SHARE-010, Rule-SHARE-046
-    static @NotNull List<FieldChange> compare(final @NotNull TestRunDto oldRun, final @NotNull TestRunDto newRun) {
+    /**
+     * UC-SHARE-010, Rule-SHARE-046.
+     * <p>
+     * What changed in a run's own facts - the answers the tester gave when it was
+     * created, and when it was executed - which its {@code .tr} holds beside its
+     * status (#305, D6).
+     * <p>
+     * Through the same enums the Details popup and the reports read, so a change
+     * reads under the heading they show it under and in the format they show it
+     * in. Walked, not listed: a ninth question is compared by being declared
+     * there and nowhere else.
+     */
+    static @NotNull List<FieldChange> compareFacts(final @NotNull TestRunMarker oldMarker, final @NotNull TestRunMarker newMarker) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
 
-        addIfChanged(changes, Bundle.message("git.change.results"), verdictSummary(oldRun), verdictSummary(newRun));
-        // Walked, not listed - the eight were written out here directly above
-        // a loop whose comment explains why walking is right.
         for (final TestRunConfiguration field : TestRunConfiguration.values()) {
-            addIfChanged(changes, field.getDisplayName(), field.valueIn(oldRun), field.valueIn(newRun));
+            addIfChanged(changes, field.getDisplayName(), field.valueIn(oldMarker), field.valueIn(newMarker));
         }
 
-        // Through the same enum the Details popup and the report read, so a
-        // change reads under the heading they show it under and in the format
-        // they show it in. Not as rows: this compares two revisions, and a row
-        // carries one value.
         for (final TestRunExecution field : TestRunExecution.values()) {
-            addIfChanged(changes, field.getDisplayName(), field.valueIn(oldRun), field.valueIn(newRun));
-        }
-
-        // A run file that changed with nothing above different still changed -
-        // an id, a field this comparator does not read - and it has to be
-        // selectable, because the commit stages only what the review lists.
-        if (changes.isEmpty()) {
-            changes.add(new FieldChange(Bundle.message("node.tr"), "", Bundle.message("git.change.changed"), ChangeType.CHANGE_TEST_RUN));
+            addIfChanged(changes, field.getDisplayName(), field.valueIn(oldMarker), field.valueIn(newMarker));
         }
 
         return changes;
     }
 
-    /**
-     * The run's results in one line: how many cases, and how many at each
-     * status that any case holds. "12 cases: 7 Passed, 3 Failed, 2 Pending".
-     */
-    static @NotNull String verdictSummary(final @NotNull TestRunDto run) {
-        final @NotNull List<TestRunItems> results = run.getResults();
-        if (results.isEmpty()) return Bundle.message("git.summary.no.cases");
-
-        final @NotNull Map<TestStatus, Integer> counts = new EnumMap<>(TestStatus.class);
-        for (final TestRunItems item : results) {
-            counts.merge(item.getStatus(), 1, Integer::sum);
-        }
-
-        final @NotNull StringBuilder line = new StringBuilder();
-        boolean first = true;
-        for (final Map.Entry<TestStatus, Integer> entry : counts.entrySet()) {
-            if (!first) line.append(", ");
-            line.append(entry.getValue()).append(' ').append(entry.getKey().getLabel());
-            first = false;
-        }
-
-        return results.size() == 1
-                ? Bundle.message("git.summary.cases.one", line.toString())
-                : Bundle.message("git.summary.cases.many", String.valueOf(results.size()), line.toString());
-    }
-
     private static void addIfChanged(final @NotNull List<FieldChange> changes, final @NotNull String field, final @NotNull String oldValue, final @NotNull String newValue) {
         if (!Objects.equals(oldValue, newValue)) {
-            changes.add(new FieldChange(field, oldValue, newValue, ChangeType.CHANGE_TEST_RUN));
+            changes.add(new FieldChange(field, oldValue, newValue, ChangeType.CHANGE_MARKER));
         }
     }
 }

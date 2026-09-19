@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.testin.model.markers.TestRunMarker;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
@@ -440,11 +441,13 @@ public final class RunStatusService {
                 }
             }
 
-            tr.markExecutionEnded();
-
             if (closed > 0)
                 Logger.info("Run finished with " + closed + " case(s) not executed; marked untested: " + runPath);
         });
+
+        // The end of the execution is the run's own fact, so it goes into the
+        // marker beside the results, through the door markers change by (#305, D6).
+        Services.getInstance(p, ProjectIndexer.class).changeRunMarker(runPath, TestRunMarker::markExecutionEnded);
     }
 
     /**

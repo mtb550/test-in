@@ -28,8 +28,8 @@ There is no key for this. The menu entry is **Export**.
   keys can be changed there.
 - **Rule-SHARE-007** — The rows are written in the order the editor shows them.
 - **Rule-SHARE-008** — Only what the tester ticks is written.
-- **Rule-SHARE-009** — Only files ending in `.json` inside the test set are
-  read, so nothing else in the folder is exported.
+- **Rule-SHARE-009** — Only the test cases inside the test set are read - the
+  files ending in `.tc` - so nothing else in the folder is exported.
 - **Rule-SHARE-010** — The file is written where the tester chose, never under
   the Testin folder.
 - **Rule-SHARE-011** — Exporting changes no test case.

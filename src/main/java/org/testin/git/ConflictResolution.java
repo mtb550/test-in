@@ -34,7 +34,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
+import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
 
 /**
  * Turns a stopped pull into a test case question, or into no question at all
@@ -67,7 +70,7 @@ public final class ConflictResolution {
     /**
      * One conflicted test case the merge could not finish on its own.
      */
-    private record Pending(@NotNull String relativePath, @NotNull String name, @NotNull ObjectNode merged, @NotNull List<TestCaseMerge.Question> questions, @NotNull List<String> settled, @NotNull String theirs) {
+    private record Pending(@NotNull String relativePath, @NotNull String name, @NotNull ObjectNode merged, @NotNull List<Merge.Question> questions, @NotNull List<String> settled, @NotNull String theirs) {
     }
 
     /**
@@ -160,6 +163,34 @@ public final class ConflictResolution {
      * @param onLeftOver  given whatever could not be resolved here - a run, a
      *                    marker, or a file the plugin never wrote
      */
+    @FunctionalInterface
+    private interface Merger {
+
+        @NotNull Merge merge(@NotNull Mapper mapper, @NotNull String base, @NotNull String mine, @NotNull String theirs);
+    }
+
+    /**
+     * UC-SHARE-018, Rule-SHARE-080.
+     * <p>
+     * Which rules settle this file, and nothing for one Testin cannot merge -
+     * a folder's marker other than a run's, or a file the plugin never wrote.
+     * <p>
+     * The name says what the file is, so the routing is a table rather than a
+     * guess (#305): a test case merges field by field, one case's result as one
+     * verdict, and a run's own marker by rule.
+     */
+    private static @NotNull Optional<Merger> mergerFor(final @NotNull String relativePath) {
+        final @NotNull Path file = Path.of(relativePath);
+
+        if (TestCaseMerge.isTestCase(relativePath)) return Optional.of(TestCaseMerge::of);
+        if (FileKind.of(file) == FileKind.RUN_ITEM) return Optional.of(RunItemMerge::of);
+        if (DirectoryType.byMarker(String.valueOf(file.getFileName())).filter(kind -> kind == DirectoryType.TR).isPresent()) {
+            return Optional.of(RunMarkerMerge::of);
+        }
+
+        return Optional.empty();
+    }
+
     public static void resolve(final @NotNull Project p, final @NotNull Path repositoryPath, final @NotNull List<String> conflicting, final @NotNull Runnable onResolved, final @NotNull Consumer<List<String>> onLeftOver) {
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
@@ -168,7 +199,8 @@ public final class ConflictResolution {
         final @NotNull List<Pending> pending = new ArrayList<>();
 
         for (final String relativePath : conflicting) {
-            if (!TestCaseMerge.isTestCase(relativePath)) {
+            final @NotNull Optional<Merger> merger = mergerFor(relativePath);
+            if (merger.isEmpty()) {
                 leftOver.add(relativePath);
                 continue;
             }
@@ -178,14 +210,14 @@ public final class ConflictResolution {
             final @NotNull String theirs = git.stageContent(repositoryPath, relativePath, REMOTE);
 
             if (mine.isBlank() || theirs.isBlank()) {
-                // One side deleted the case and the other edited it. Which of
+                // One side deleted the file and the other changed it. Which of
                 // those a team meant is not a field question, so it stays with
                 // the tester.
                 leftOver.add(relativePath);
                 continue;
             }
 
-            final @NotNull TestCaseMerge.Merge merge = TestCaseMerge.of(mapper, base, mine, theirs);
+            final @NotNull Merge merge = merger.orElseThrow().merge(mapper, base, mine, theirs);
 
             if (!merge.isSettled()) {
                 pending.add(new Pending(relativePath, name(mapper, mine, relativePath), merge.merged(),
@@ -229,9 +261,9 @@ public final class ConflictResolution {
         };
 
         new ResolveConflictDialog(p, next.name(), next.questions(), next.settled(), takeTheirs -> {
-            for (final TestCaseMerge.Question question : next.questions()) {
-                TestCaseMerge.answer(mapper, next.merged(), question, takeTheirs.contains(question.field()),
-                        next.theirs());
+            final @NotNull Merge answered = new Merge(next.merged(), next.questions(), next.settled());
+            for (final Merge.Question question : next.questions()) {
+                answered.answer(mapper, question, takeTheirs.contains(question.field()), next.theirs());
             }
 
             ApplicationManager.getApplication().executeOnPooledThread(() -> {

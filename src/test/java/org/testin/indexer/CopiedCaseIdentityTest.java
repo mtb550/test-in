@@ -31,7 +31,7 @@ import static org.testng.Assert.assertTrue;
  * <p>
  * A copied test case has to become a test case of its own
  * (Rule-TREE-PANEL-051), and the sweep that does that reads the files by the
- * same rule the scan does: a {@code .json} directly inside a test set is a test
+ * same rule the scan does: a {@code .tc} directly inside a test set is a test
  * case (Rule-INTERNAL-011).
  * <p>
  * It used to ask instead whether the file name parsed as a UUID, which is how
@@ -53,12 +53,12 @@ public class CopiedCaseIdentityTest {
 
     @Test
     public void aCaseTestinNamedIsACaseFile() {
-        assertTrue(ProjectIndexer.isCaseFile(TEST_SET.resolve("3f2b9c14-0d5e-4a71-9c33-8e1f4b2a7d60.json"), IS_TEST_SET));
+        assertTrue(ProjectIndexer.isCaseFile(TEST_SET.resolve("3f2b9c14-0d5e-4a71-9c33-8e1f4b2a7d60.tc"), IS_TEST_SET));
     }
 
     @Test
     public void aCaseTheTesterNamedIsACaseFileToo() {
-        assertTrue(ProjectIndexer.isCaseFile(TEST_SET.resolve("login.json"), IS_TEST_SET),
+        assertTrue(ProjectIndexer.isCaseFile(TEST_SET.resolve("login.tc"), IS_TEST_SET),
                 "a hand-named case is still a test case, so a copy of it has to get an id of its own");
     }
 
@@ -75,6 +75,6 @@ public class CopiedCaseIdentityTest {
 
     @Test
     public void jsonOutsideATestSetIsNotACaseFile() {
-        assertFalse(ProjectIndexer.isCaseFile(Path.of("root", "Test Cases", "notes.json"), IS_TEST_SET));
+        assertFalse(ProjectIndexer.isCaseFile(Path.of("root", "Test Cases", "notes.tc"), IS_TEST_SET));
     }
 }

@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.markers.TestRunMarker;
@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Stream;
+import org.testin.model.TestRunItems;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -134,6 +135,18 @@ public class SampleProjectTest {
         }
     }
 
+    /**
+     * Rule-INTERNAL-091. The sample is what a project written by this build looks
+     * like, so it carries the format number this build writes - otherwise opening
+     * it would convert it, and the committed sample would differ from the one a
+     * tester sees (#305).
+     */
+    @Test
+    public void theSampleCarriesThisBuildsFormat() {
+        assertEquals(read(demo().resolve(DirectoryType.TP.getMarker()), TestProjectMarker.class).getFormat(),
+                TestProjectMarker.FORMAT, "The sample says it is in another format than this build writes");
+    }
+
     @Test
     public void everyTestCaseParsesAndCarriesARank() {
         final @NotNull List<Path> cases = caseFiles();
@@ -142,7 +155,7 @@ public class SampleProjectTest {
         for (final Path file : cases) {
             final @NotNull TestCaseDto tc = read(file, TestCaseDto.class);
 
-            assertEquals(tc.getId().toString(), file.getFileName().toString().replace(".json", ""),
+            assertEquals(tc.getId().toString(), file.getFileName().toString().replace(".tc", ""),
                     "A case's file name is its identity, so the sample must agree with itself: " + file);
             assertFalse(tc.getOrder().isEmpty(),
                     "The sample is what a project written by the current build looks like, and that means ranked: " + file);
@@ -159,31 +172,34 @@ public class SampleProjectTest {
      * live rather than repeating the answer - repeating it is what lost them.
      * The name used to be the folder's own, so renaming a cycle moved the folder
      * and left the results behind, emptying the run at the next index (#177). A
-     * sample folder still carrying a {@code <name>.json} is one this rename never
+     * sample folder still carrying a {@code <name>.tc} is one this rename never
      * reached.
      */
     @Test
     public void everyRunParsesAndItsResultsNameCasesThatExist() {
         final @NotNull List<String> caseIds = caseFiles().stream()
-                .map(file -> file.getFileName().toString().replace(".json", ""))
+                .map(file -> file.getFileName().toString().replace(".tc", ""))
                 .toList();
 
         final @NotNull List<Path> runs = runFolders();
         assertEquals(runs.size(), 2, "The sample is meant to carry two runs, and carries " + runs);
 
         for (final Path folder : runs) {
-            final @NotNull Path file = TestRunDirectoryDto.resultsFile(folder);
+            final @NotNull List<Path> results = resultFilesIn(folder);
 
-            assertEquals(jsonFilesIn(folder), List.of(file),
-                    "A run folder holds exactly one .json, and its name does not depend on the folder's. A file named"
-                            + " after the folder is the old format, which no read has looked for since #177: " + folder);
+            assertFalse(results.isEmpty(), "A run with no results shows nothing: " + folder);
+            assertTrue(jsonFilesIn(folder).isEmpty(),
+                    "A run folder holds one file per result, named by its test case, and no results file of its own."
+                            + " A run.json or a file named after the folder is the old format: " + folder);
 
-            final @NotNull TestRunDto run = read(file, TestRunDto.class);
+            for (final Path file : results) {
+                final @NotNull TestRunItems item = read(file, TestRunItems.class);
 
-            assertFalse(run.getResults().isEmpty(), "A run with no results shows nothing: " + file);
-
-            run.getResults().forEach(item -> assertTrue(caseIds.contains(item.getId().toString()),
-                    "A result in " + file.getFileName() + " names a case the sample does not hold: " + item.getId()));
+                assertEquals(item.getId().toString(), file.getFileName().toString().replace(".ri", ""),
+                        "A result's file name is its test case's id, so the sample must agree with itself: " + file);
+                assertTrue(caseIds.contains(item.getId().toString()),
+                        "The result " + file.getFileName() + " names a case the sample does not hold: " + item.getId());
+            }
         }
     }
 
@@ -193,6 +209,17 @@ public class SampleProjectTest {
      */
     private static @NotNull List<Path> runFolders() {
         return filesNamed(demo(), DirectoryType.TR.getMarker()).stream().map(Path::getParent).toList();
+    }
+
+    /**
+     * The run's results, one file per test case (#305).
+     */
+    private static @NotNull List<Path> resultFilesIn(final @NotNull Path folder) {
+        try (Stream<Path> children = Files.list(folder)) {
+            return children.filter(path -> FileKind.of(path) == FileKind.RUN_ITEM).toList();
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not list the run folder " + folder + ": " + ex.getMessage(), ex);
+        }
     }
 
     private static @NotNull List<Path> jsonFilesIn(final @NotNull Path folder) {
@@ -233,7 +260,7 @@ public class SampleProjectTest {
     private static @NotNull List<Path> caseFiles() {
         try (Stream<Path> walk = Files.walk(demo().resolve("Test Cases"))) {
             return walk.filter(Files::isRegularFile)
-                    .filter(path -> path.getFileName().toString().endsWith(".json"))
+                    .filter(path -> FileKind.of(path) == FileKind.TEST_CASE)
                     .toList();
         } catch (final IOException ex) {
             throw new AssertionError("Could not walk the sample's test cases: " + ex.getMessage(), ex);

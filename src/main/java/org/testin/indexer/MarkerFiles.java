@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
+import org.testin.model.markers.AbstractMarker;
 import org.testin.model.markers.Marker;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -31,6 +32,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -68,7 +70,9 @@ final class MarkerFiles {
      * A missing or unreadable marker falls back to a default instance rather
      * than failing - see the class note for why.
      */
-    <M> @NotNull M read(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass, final @NotNull String name) {
+    @SuppressWarnings("unchecked")
+    <M extends AbstractMarker> @NotNull M read(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name) {
+        final @NotNull Class<M> markerClass = (Class<M>) kind.getMarkerClass();
         final @NotNull Path markerFile = dirPath.resolve(kind.getMarker());
 
         // Asked before reading, because a marker that is not there yet is the
@@ -133,7 +137,41 @@ final class MarkerFiles {
             }
         }
 
+        // Rule-INTERNAL-090. Stamped here and nowhere else, so every marker
+        // Testin writes has one and no write changes the one a marker already
+        // has. A marker that would not parse was refused above, which is what
+        // keeps an id out of a file the tester still has to repair (#305, D5).
+        if (marker instanceof Marker m && m.getId().isEmpty()) m.setId(UUID.randomUUID().toString());
+
         return Services.getInstance(p, TestDataFiles.class).write(p, file, marker);
+    }
+
+    /**
+     * Rule-INTERNAL-090, Rule-TREE-PANEL-051.
+     * <p>
+     * Gives the marker in this folder an id of its own, whatever it had: a copied
+     * folder is a new folder, and an id names one folder (#305, D5). The copy's
+     * audit block stays as it is - who made the original and when is what a copy
+     * inherits, as its contents do.
+     *
+     * @return whether the marker now has an id of its own. False for a file that
+     * is not a marker, or one that will not parse, which is left as it is like
+     * every other damaged marker
+     */
+    boolean giveFreshId(final @NotNull Path markerFile) {
+        final @NotNull Optional<DirectoryType> kind = DirectoryType.byMarker(String.valueOf(markerFile.getFileName()));
+        if (kind.isEmpty()) return false;
+
+        try {
+            final @NotNull AbstractMarker marker = Services.getInstance(p, Mapper.class).readValue(markerFile.toFile(), kind.orElseThrow().getMarkerClass());
+            marker.setId(UUID.randomUUID().toString());
+
+            return Services.getInstance(p, TestDataFiles.class).write(p, markerFile, marker);
+
+        } catch (final Exception ex) {
+            Logger.warn("Left the copied marker " + markerFile + " without an id of its own: " + ex.getMessage());
+            return false;
+        }
     }
 
     /**

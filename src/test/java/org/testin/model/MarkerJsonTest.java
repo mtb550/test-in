@@ -51,6 +51,24 @@ public class MarkerJsonTest {
     private final String onDisk = DateTimeFormatter.ofPattern(Config.DATE_FORMAT_PATTERN, Locale.US).format(when);
 
     /**
+     * Rule-INTERNAL-090. The folder's id is written when it has one and left out
+     * while it has none, so a marker written before ids does not gain an empty
+     * key, and one that has an id keeps it through a read and a write.
+     */
+    @Test
+    public void theFoldersIdIsWrittenOnlyOnceItHasOne() {
+        try {
+            assertFalse(mapper.writeValueAsString(new TestSetMarker()).contains("\"id\""), "a marker with no id says nothing about one");
+
+            final String json = mapper.writeValueAsString(new TestSetMarker().setId("0bb7f0de-8a59-4a0c-9a2f-0e2ba6a3b8f1"));
+            assertTrue(json.contains("\"id\":\"0bb7f0de-8a59-4a0c-9a2f-0e2ba6a3b8f1\""), json);
+            assertEquals(mapper.readValue(json, TestSetMarker.class).getId(), "0bb7f0de-8a59-4a0c-9a2f-0e2ba6a3b8f1");
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    /**
      * The audit block and the status are written; the status label is not. The
      * label is derived from the status for the Details popup, so writing it would
      * put a second copy of the same fact in the file - and a stale one the first
