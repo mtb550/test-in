@@ -106,7 +106,9 @@ This changes the name of one node. Nothing inside it moves.
 8. For a test project, the project chosen for this code project follows the new
    name. When `testin.yml` still names the old one, a notification that stays in
    the log says *testin.yml still names \<old\>. Change testinProject to
-   \<new\>.*, with **Open testin.yml**. Testin never writes the file.
+   \<new\> there, or press Save to testin.yml in the Testin panel*, with
+   **Save to testin.yml** and **Open testin.yml**. The rename itself never
+   writes the file; only Save to testin.yml does (Rule-TREE-PANEL-112).
 9. Testin refreshes the tree and shows *Renamed*.
 10. `Ctrl+Z` puts the old name back, and Testin shows *Undone*.
 

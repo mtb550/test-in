@@ -161,7 +161,7 @@ public final class BoundTestProject {
      * UC-TREE-PANEL-011, Rule-TREE-PANEL-110.
      * <p>
      * The project this repository is about was renamed, so the choice follows
-     * it - whatever {@code testin.yml} names, which Testin never writes. Only
+     * it - whatever {@code testin.yml} names, which a rename never writes. Only
      * when it was this repository's project: undoing a rename after choosing
      * another one must not take the tester back to it.
      */
