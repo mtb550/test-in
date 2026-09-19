@@ -42,8 +42,8 @@ import java.util.stream.Stream;
  * second report of the same run a second file rather than a question about
  * whether to overwrite the first.
  * <p>
- * The project is the one testin.yml names, the same name the tree and the report
- * body show.
+ * The project is the one this repository is bound to, the same name the tree and
+ * the report body show.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReportFileName {

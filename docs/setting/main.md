@@ -127,7 +127,7 @@ highlighted.
 | Default download folder | This machine's settings | No |
 | Show keyboard shortcuts | This machine's settings | No |
 | Which test project this repository is about | Chosen in the Testin tool window and kept on this machine; `testin.yml` can name one for everyone | No; the file is, when the team writes one |
-| Where the test project is cloned from | `testin.yml`, in the code repository, written by hand | **Yes** |
+| Where the test project is cloned from | `testin.yml`, in the code repository, written by hand or by **Save to testin.yml** | **Yes** |
 
 Nothing on this page is ever committed. That is the reason the page exists
 rather than putting these values in `testin.yml`.

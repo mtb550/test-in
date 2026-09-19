@@ -210,10 +210,10 @@ public enum CardHoverAction {
     }
 
     /**
-     * UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-197.
+     * UC-EDITOR-PANEL-047, Rule-CODEGEN-082.
      * <p>
-     * Why this IDE does not offer the action, naming the plugin that is
-     * missing - and nothing when it does offer it.
+     * Why this action cannot be used here - the plugin that is missing, or code
+     * off for this project - and nothing when it can.
      * <p>
      * The first one missing, because one sentence is what a tooltip holds and
      * installing either of two missing plugins is a step the tester takes one at
@@ -232,9 +232,9 @@ public enum CardHoverAction {
     }
 
     /**
-     * Whether this IDE offers the action. Asked before the icon is drawn and
-     * before the pointer is asked what it is over, so in PyCharm or GoLand the
-     * icon is absent rather than present and answering with a balloon (#66).
+     * Whether the action can be used here. Asked before the icon is drawn and
+     * before the pointer is asked what it is over, so where it cannot the icon
+     * is drawn gray and a press says why (#66).
      */
     public boolean isOffered(final @NotNull Project p) {
         return whyNotOffered(p).isEmpty();

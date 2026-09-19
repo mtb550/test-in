@@ -103,9 +103,8 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
         if (Objects.equals(before, after)) return GridEdit.UNCHANGED;
 
-        // As a change on the run the indexer holds, so an edit made while a sync
-        // brings the run in waits for it and lands on the run that arrived (#66,
-        // finding 152).
+        // As a change on the run the indexer holds, so the edit lands on the run
+        // as it is now (#66, finding 152).
         Services.getInstance(p, ProjectIndexer.class).changeRun(editor.getParent().getPath(),
                 run -> run.resultOf(onThisRow.getId()).ifPresent(result -> attr.getRunValueSetter().execute(result, typed)));
         onEdited.run();

@@ -96,7 +96,7 @@ public final class TestinEditors {
     }
 
     /**
-     * UC-TREE-PANEL-011, Rule-TREE-PANEL-111.
+     * UC-TREE-PANEL-011, UC-TREE-PANEL-012, Rule-TREE-PANEL-111, Rule-TREE-PANEL-116.
      * <p>
      * Closes every editor showing this node or a node under it - light mode
      * closes with its run editor.

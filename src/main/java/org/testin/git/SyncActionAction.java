@@ -396,8 +396,8 @@ public class SyncActionAction extends DumbAwareAction {
         private void refreshAfterSync(final @NotNull Path repoPath, final @NotNull OptionalInt pushed) {
             RepositoryRefresh.after(p, repoPath);
             ApplicationManager.getApplication().invokeLater(() -> {
-                // It stays in the Notifications log, like the push beside it and
-                // the server sync beside that. This used to fade, on the argument
+                // It stays in the Notifications log, like the push beside it.
+                // This used to fade, on the argument
                 // that the rebuilt tree is what it leaves behind - but a sync runs
                 // in the background and lands on its own time, so a tester reading a
                 // bug report while it finishes had no way to learn it had (#268).

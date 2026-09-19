@@ -41,7 +41,7 @@ import java.util.List;
 public class SetTestCaseStatusGroup extends DefaultActionGroup {
 
     /**
-     * UC-EDITOR-PANEL-032, Rule-EDITOR-PANEL-133.
+     * UC-EDITOR-PANEL-032.
      * <p>
      * The verdicts are added once, when the platform makes the group, rather
      * than built each time it is asked. The grid's key binder reads a group's

@@ -203,9 +203,8 @@ lookup rather than a disk hit.
 
 Test runs in particular are saved and read only through the indexer —
 `putTestRun` to create one, `changeRun` and `saveRun` to change one,
-`persistRunMarker`, `addTestRunDir`, `updateRunMarker`. The sequential run
-writer lives inside it, and a change to a run waits while a sync brings the
-run's project in. A run's screenshots are its files too: `storeScreenshots`
+`changeRunMarker`, `addTestRunDir`. The sequential run
+writer lives inside it. A run's screenshots are its files too: `storeScreenshots`
 writes them, `screenshot` reads one, and the run writer removes those no result
 names.
 
@@ -221,7 +220,8 @@ handle generated source, the automation repository's own `testin.yml`, the Git
 working tree, files outside the tree, generated report output, the IDE settings
 path, the log, and the temporary folder a bug report is sent from. `config` in particular reads a file that lives in the
 automation repository rather than under the Testin folder, and it runs before the
-indexer exists — it is what tells the indexer which project to index.
+indexer exists — the name it reads is one of the two `BoundTestProject` weighs to
+tell the indexer which project to index.
 
 `bug` joined the list with #28. It writes a bug report's body and screenshots
 into a fresh temporary folder, runs `gh` from there, and deletes the folder

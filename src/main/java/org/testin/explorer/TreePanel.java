@@ -366,7 +366,8 @@ public final class TreePanel implements Disposable {
      * <p>
      * The screen for a repository with no project open, and the one step out of
      * it. Which step depends on what is missing: a root to look in, a project to
-     * look at, or the line in {@code testin.yml} that says which one (#8).
+     * look at, or which one - named by {@code testin.yml} or chosen on this
+     * machine (#8, Rule-TREE-PANEL-106).
      */
     private void showWelcome(final @NotNull PanelState state) {
         final @NotNull StatusText emptyText = panel.getEmptyText();

@@ -902,11 +902,11 @@ public final class ProjectIndexer {
      * <p>
      * Reads a test project again after a change on disk, or forgets it when the
      * folder is not one Testin reads: it has no {@code .tp} marker, or it is not
-     * the project {@code testin.yml} binds.
+     * the project this repository is bound to ({@code BoundTestProject}).
      * <p>
      * The watcher knows only a path, and a scan puts whatever folder it is given
      * into the index as a test project - so a folder of notes beside the
-     * projects became one, and a project {@code testin.yml} leaves out was read
+     * projects became one, and a project the binding leaves out was read
      * in although startup had left it out (#66, finding 120). These are the two
      * questions startup asks through {@link #collectValidProjects} and
      * {@link #boundOnly}; a folder that has stopped being a test project, its

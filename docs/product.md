@@ -422,7 +422,7 @@ Numbered so an issue or a commit can cite one.
 | **Rule-PRODUCT-001** | All data is files on the tester's own disk, in a folder they chose. |
 | **Rule-PRODUCT-002** | A test project is one folder. Everything belonging to it lives beneath that folder and nowhere else. |
 | **Rule-PRODUCT-003** | What is stored is exactly what the tester typed, character for character. Showing a value on screen may tidy it up. Saving never does. |
-| **Rule-PRODUCT-004** | Secrets are never written to a file the repository carries. They are held in the IDE's own password store. |
+| **Rule-PRODUCT-004** | Secrets are never written to a file the repository carries, and Testin holds none: a Git remote's credentials are kept by Git's own credential helper. |
 
 ### Structure
 
