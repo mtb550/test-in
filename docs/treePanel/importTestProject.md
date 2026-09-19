@@ -110,8 +110,8 @@ Plugin Not Available*, reading *Git synchronization and cloning require the Git
 plugin, which is not available in this IDE.* Testin checks this before anything
 else.
 
-**If no Testin folder is set** — the **New Test Project** button is gray.
-(Rule-TREE-PANEL-089)
+**If no Testin folder is set** — the **New Test Project** button is gray, and
+says *Set the Testin folder in Settings first.* (Rule-TREE-PANEL-115)
 
 ---
 

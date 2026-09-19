@@ -16,6 +16,7 @@
 
 package org.testin.creator;
 
+import org.testin.actions.GrayWithReason;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -86,7 +87,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
         }).show();
     }
 
-    // UC-TREE-PANEL-028, Rule-TREE-PANEL-089
+    // UC-TREE-PANEL-028, Rule-TREE-PANEL-115
     @Override
     public void update(final @NotNull AnActionEvent e) {
         // Both branches, the way Select Test Project answers the same question.
@@ -94,7 +95,9 @@ public class CreateTestProjectAction extends AbstractProjectAction {
         // whatever it was last told - so once this had been drawn without a
         // Testin folder it stayed gray for the rest of the IDE session, however
         // the setting changed afterwards (#189).
-        e.getPresentation().setEnabled(Services.getInstance(p, TestinRoot.class).isConfigured());
+        // Gray with the reason, as every gray entry is (#301, F7); both
+        // branches, so the reason goes when a folder is set.
+        GrayWithReason.unless(this, e, Services.getInstance(p, TestinRoot.class).isConfigured(), Bundle.message("toolbar.disabled.no.root"));
     }
 
     @Override

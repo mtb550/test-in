@@ -53,8 +53,6 @@ These eight buttons act on the whole panel, not on one node.
   because "Active" on every name is a word read a hundred times and needed
   never. A test run always says its status, because where a cycle stands is what
   the tree is read for.
-- **Rule-TREE-PANEL-089** — **Select Test Project** and **New Test Project** are
-  gray until a Testin folder is set. Nothing else on the toolbar is ever gray.
 - **Rule-TREE-PANEL-090** — Every button says what it does when the tester
   hovers over it.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
@@ -70,6 +68,10 @@ These eight buttons act on the whole panel, not on one node.
   not run the button at all when that component is hidden. **Expand All** and
   **Collapse All** have no tree to act on under the welcome screen, so there
   they are gray, and say why.
+- **Rule-TREE-PANEL-115** — **Select Test Project** and **New Test Project** are
+  gray until a Testin folder is set, and **Save to testin.yml** while no test
+  project is open or `testin.yml` cannot be read. Each says why. Nothing else on
+  the toolbar is ever gray.
 
 ## The toolbar
 

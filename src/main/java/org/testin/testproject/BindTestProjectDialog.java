@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Asks which test project this automation repository exercises, once, and writes
- * the answer into its {@code testin.yml} (#8).
+ * Asks which test project this automation repository exercises, once, and keeps
+ * the answer on this machine (#8, Rule-TREE-PANEL-106).
  * <p>
  * The only screen that lists every test project under the Testin root, and it
  * appears until a project is chosen. What replaced the dropdown is not another

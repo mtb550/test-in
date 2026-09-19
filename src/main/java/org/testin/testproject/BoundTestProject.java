@@ -158,6 +158,21 @@ public final class BoundTestProject {
     }
 
     /**
+     * UC-TREE-PANEL-001, UC-TREE-PANEL-003.
+     * <p>
+     * Where the project this repository is about can be cloned from: the file's
+     * {@code RepoUrl}, and only while the project is the one the file names. The
+     * address is the file's project's, so a tester's own pick of another project
+     * that is missing here is not offered it - that cloned the file's repository
+     * into the pick's folder (#301, R7).
+     */
+    public @NotNull Optional<String> cloneAddress() {
+        if (!TestinYml.hasRepoUrl(p) || !TestinYml.projectName(p).equals(name())) return Optional.empty();
+
+        return Optional.of(TestinYml.repoUrl(p));
+    }
+
+    /**
      * UC-TREE-PANEL-011, Rule-TREE-PANEL-110.
      * <p>
      * The project this repository is about was renamed, so the choice follows
