@@ -81,37 +81,6 @@ public final class TestCaseMerge {
     private static final @NotNull Set<String> SETTLED = Set.of("id", "createdAt", "createdBy");
 
     /**
-     * UC-SHARE-017, Rule-SHARE-109.
-     * <p>
-     * The merged case, and what could not be merged without asking.
-     *
-     * @param merged    every field settled so far - complete when
-     *                  {@code questions} is empty
-     * @param questions the fields both sides changed to different values, in the
-     *                  order the file lists them
-     * @param settled   the fields both sides changed that were decided without
-     *                  asking - reported so a tester knows a choice was made on
-     *                  their behalf, which is the half that was missing (#261)
-     */
-    public record Merge(@NotNull ObjectNode merged, @NotNull List<Question> questions, @NotNull List<String> settled) {
-
-        public boolean isSettled() {
-            return questions.isEmpty();
-        }
-    }
-
-    /**
-     * One field two testers disagreed about.
-     *
-     * @param field  the JSON name, which is the field name a tester reads in the
-     *               editor
-     * @param mine   the value on this machine, as text
-     * @param theirs the value the remote brought, as text
-     */
-    public record Question(@NotNull String field, @NotNull String mine, @NotNull String theirs) {
-    }
-
-    /**
      * Whether this file is something this class can merge at all.
      * <p>
      * Only a test case is: it is JSON with named fields, so two testers editing
@@ -151,7 +120,7 @@ public final class TestCaseMerge {
         final @NotNull ObjectNode theirsNode = mapper.readTree(theirs);
 
         final @NotNull ObjectNode merged = mineNode.deepCopy();
-        final @NotNull List<Question> questions = new ArrayList<>();
+        final @NotNull List<Merge.Question> questions = new ArrayList<>();
 
         // Only what reaches the branches below, which is only what both sides
         // changed from the base: a field one of them left alone is settled by
@@ -190,23 +159,12 @@ public final class TestCaseMerge {
             }
             if (SETTLED.contains(field)) continue;
 
-            questions.add(new Question(field, text(ours), text(yours)));
+            questions.add(new Merge.Question(field, text(ours), text(yours)));
         }
 
         stampTheLaterEdit(merged, mineNode, theirsNode);
 
         return new Merge(merged, List.copyOf(questions), List.copyOf(settled));
-    }
-
-    /**
-     * UC-SHARE-018.
-     * <p>
-     * Takes the tester's answer for one field.
-     */
-    public static void answer(final @NotNull Mapper mapper, final @NotNull ObjectNode merged, final @NotNull Question question, final boolean takeTheirs, final @NotNull String theirs) {
-        if (!takeTheirs) return;
-
-        set(merged, question.field(), mapper.readTree(theirs).path(question.field()));
     }
 
     /**

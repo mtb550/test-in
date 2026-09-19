@@ -517,7 +517,7 @@ public class GitWorkflowTest {
             final String remote = mustGit(work, "show", ":2:" + relativePath);
             final String replayed = mustGit(work, "show", ":3:" + relativePath);
 
-            final TestCaseMerge.Merge merge = TestCaseMerge.of(RealMapper.build(), base, replayed, remote);
+            final Merge merge = TestCaseMerge.of(RealMapper.build(), base, replayed, remote);
             assertTrue(merge.isSettled(), "different fields are not a disagreement");
 
             Files.writeString(myCopy, merge.merged().toPrettyString(), StandardCharsets.UTF_8);
