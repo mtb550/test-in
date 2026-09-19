@@ -38,7 +38,7 @@
         └── cycle31/              a test run
             ├── .tr
             ├── run.json          everything the run recorded
-            └── 9f2c41ab07e3d5c8.png   a screenshot a failure names
+            └── k3f9a.png         a screenshot a failure names
 ```
 
 **A marker is a file whose whole name is the extension.** `.ts`, not `foo.ts`.
