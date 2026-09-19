@@ -289,9 +289,6 @@ public class TestinConfigTest {
     }
 
     /**
-     * The account every SSH clone URL carries is not a secret and stays.
-     */
-    /**
      * Rule-SHARE-004. The form GitHub documents for cloning with a token: the
      * token is the whole user part, with no colon. It passed through into the
      * committed file (#66, finding 164).
@@ -304,6 +301,9 @@ public class TestinConfigTest {
                 "HTTP://intranet/qa/cases.git");
     }
 
+    /**
+     * The account every SSH clone URL carries is not a secret and stays.
+     */
     @Test
     public void anSshAccountSurvives() {
         assertEquals(TestinProjectConfig.withoutCredentials("git@github.com:mtb550/test-01.git"),
