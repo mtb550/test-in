@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Stream;
+import org.testin.model.TestRunItems;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -173,18 +174,21 @@ public class SampleProjectTest {
         assertEquals(runs.size(), 2, "The sample is meant to carry two runs, and carries " + runs);
 
         for (final Path folder : runs) {
-            final @NotNull Path file = TestRunDirectoryDto.resultsFile(folder);
+            final @NotNull List<Path> results = resultFilesIn(folder);
 
-            assertEquals(jsonFilesIn(folder), List.of(file),
-                    "A run folder holds exactly one .json, and its name does not depend on the folder's. A file named"
-                            + " after the folder is the old format, which no read has looked for since #177: " + folder);
+            assertFalse(results.isEmpty(), "A run with no results shows nothing: " + folder);
+            assertTrue(jsonFilesIn(folder).isEmpty(),
+                    "A run folder holds one file per result, named by its test case, and no results file of its own."
+                            + " A run.json or a file named after the folder is the old format: " + folder);
 
-            final @NotNull TestRunDto run = read(file, TestRunDto.class);
+            for (final Path file : results) {
+                final @NotNull TestRunItems item = read(file, TestRunItems.class);
 
-            assertFalse(run.getResults().isEmpty(), "A run with no results shows nothing: " + file);
-
-            run.getResults().forEach(item -> assertTrue(caseIds.contains(item.getId().toString()),
-                    "A result in " + file.getFileName() + " names a case the sample does not hold: " + item.getId()));
+                assertEquals(item.getId().toString(), file.getFileName().toString().replace(".ri", ""),
+                        "A result's file name is its test case's id, so the sample must agree with itself: " + file);
+                assertTrue(caseIds.contains(item.getId().toString()),
+                        "The result " + file.getFileName() + " names a case the sample does not hold: " + item.getId());
+            }
         }
     }
 
@@ -194,6 +198,17 @@ public class SampleProjectTest {
      */
     private static @NotNull List<Path> runFolders() {
         return filesNamed(demo(), DirectoryType.TR.getMarker()).stream().map(Path::getParent).toList();
+    }
+
+    /**
+     * The run's results, one file per test case (#305).
+     */
+    private static @NotNull List<Path> resultFilesIn(final @NotNull Path folder) {
+        try (Stream<Path> children = Files.list(folder)) {
+            return children.filter(path -> FileKind.of(path) == FileKind.RUN_ITEM).toList();
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not list the run folder " + folder + ": " + ex.getMessage(), ex);
+        }
     }
 
     private static @NotNull List<Path> jsonFilesIn(final @NotNull Path folder) {

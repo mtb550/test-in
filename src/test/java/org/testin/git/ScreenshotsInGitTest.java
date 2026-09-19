@@ -29,12 +29,12 @@ import static org.testng.Assert.assertTrue;
 
 /**
  * A run's screenshots in Git (#313, Rule-SHARE-112): the review lists none of
- * them on its own, and committing a run carries the ones its folder gained or
- * lost - and no other run's.
+ * them on its own, and committing a result carries the ones its run's folder
+ * gained or lost - and no other run's.
  */
 public class ScreenshotsInGitTest {
 
-    private static final String RUN = "runs/cycle38/run.json";
+    private static final String RESULT = "runs/cycle38/4fd2a19b-59c7-44df-8cc4-ec5d293b18e9.ri";
     private static final String ADDED = "runs/cycle38/k3f9a.png";
     private static final String REMOVED = "runs/cycle38/q81zd.png";
     private static final String OTHER_RUN = "runs/cycle39/m4x0c.png";
@@ -53,9 +53,10 @@ public class ScreenshotsInGitTest {
 
     @Test
     public void committingARunCarriesTheScreenshotsItsFolderGainedOrLost() {
-        final List<String> status = List.of(" M " + RUN, "?? " + ADDED, " D " + REMOVED, "?? " + OTHER_RUN);
+        final List<String> status = List.of(" M " + RESULT, "?? " + ADDED, " D " + REMOVED, "?? " + OTHER_RUN);
 
-        assertEquals(GitCommits.screenshotsAlongside(status, Set.of(RUN)), Set.of(ADDED, REMOVED));
+        assertEquals(GitCommits.screenshotsAlongside(status, Set.of(RESULT)), Set.of(ADDED, REMOVED),
+                "the screenshots a committed result named, or stopped naming, go with it");
     }
 
     @Test

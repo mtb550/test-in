@@ -37,7 +37,7 @@
         │   └── .trp
         └── cycle31/              a test run
             ├── .tr
-            ├── run.json          everything the run recorded
+            ├── 4fd2a19b-….ri     one result, named by the test case it is about
             └── k3f9a.png         a screenshot a failure names
 ```
 
@@ -211,29 +211,32 @@ on each case and nothing else.
 
 ---
 
-## A test run — `run.json`
+## A result — `<test case id>.ri`
 
-One file per test run, beside its `.tr`. It records what was executed, not what
-exists: a case removed from the test set keeps its result here. What the run
-itself is - how it was configured, what the tester wrote about the verdicts, when
-it was executed - is in its `.tr`, with its status.
+One file per case the run covers, inside the run's folder, beside its `.tr`. A
+case appears in a run once, so the case's id is the file's name and two testers
+adding the same case offline write the same file rather than two.
 
-The screenshots its failures name sit beside it, one PNG each, named by five
-random lowercase letters and digits that no result of the run already holds -
-`k3f9a.png`. Testin writes a screenshot before the result that names it, and
-moves one that no result names to the recycle bin after the next write of this
-file. Any PNG in the folder named that way is taken for a screenshot, so one put
-there by hand under such a name goes too.
+It records what was executed, not what exists: a case removed from the test set
+keeps its result here. What the run itself is - how it was configured, what the
+tester wrote about the verdicts, when it was executed - is in its `.tr`, with its
+status.
 
-| Field | Type | Required | Meaning |
-|---|---|---|---|
-| `results` | array | no | One entry per case the run covers, below. The run's own facts are not here: they are in its `.tr`, above |
+The results are read in the order their cases sit in their test sets, and a
+result whose case the project no longer holds comes last - so a report prints
+them in the order a tester reads the tree, never in the order a folder listing
+happens to give.
 
-Each entry in `results`:
+The screenshots a failure names sit in the same folder, one PNG each, named by
+five random lowercase letters and digits that no result of the run already holds
+- `k3f9a.png`. Testin writes a screenshot before the result that names it, and
+moves one that no result of the run names any more to the recycle bin after the
+next write. Any PNG in a run folder named that way is taken for a screenshot, so
+one put there by hand under such a name goes too.
 
 | Field | Type | Meaning |
 |---|---|---|
-| `id` | UUID string | The test case this result is about. When absent, the result names no test case and reads as one whose case was removed |
+| `id` | UUID string | The test case this result is about - the same id the file is named by, which is what decides it (Rule-INTERNAL-012). Written so the file says what it is about on its own |
 | `status` | enum | `PASSED` `FAILED` `BLOCKED` as a tester or the automation judged it; `PENDING` until then; `UNTESTED` for a case still pending when the run completed or closed. A case whose test case was deleted since the run keeps its status here and is shown as Removed; `REMOVED` is no longer written, and a file written by 2.11.0-alpha or earlier that holds it is read as removed |
 | `duration` | number, seconds | Nanosecond precision, written as a decimal |
 | `executedBy` | string | |

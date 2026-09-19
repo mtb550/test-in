@@ -27,7 +27,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
+import org.testin.model.FileKind;
+import org.testin.model.TestRunItems;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -46,8 +50,8 @@ import static org.testng.Assert.assertTrue;
  * <p>
  * What actually fixes that is not the rename learning to carry the file, but the
  * name having nothing to keep in step with - so what is pinned here is the
- * property rather than the operation: <b>the file a run's results live in is the
- * same whatever the folder is called.</b> That one sentence is the bug and the
+ * property rather than the operation: <b>a result is named by the test case it is
+ * about, so nothing in its name depends on the folder.</b> That one sentence is the bug and the
  * fix. It fails against the old implementation and passes against this one, which
  * is what makes it the regression test.
  * <p>
@@ -64,31 +68,27 @@ public class RunResultsSurviveRenameTest {
      * Enough of a run to be worth losing: one recorded verdict, which is what a
      * tester would not get back.
      */
-    private static final @NotNull String A_RUN = """
+    private static final @NotNull UUID JUDGED_CASE = UUID.fromString("11111111-1111-4111-8111-111111111101");
+
+    private static final @NotNull String A_RESULT = """
             {
-              "results" : [ {
-                "id" : "11111111-1111-4111-8111-111111111101",
-                "status" : "PASSED",
-                "actualResult" : "Signed in and reached the dashboard."
-              } ]
+              "id" : "11111111-1111-4111-8111-111111111101",
+              "status" : "PASSED",
+              "actualResult" : "Signed in and reached the dashboard."
             }""";
 
     @Test
-    public void theResultsFileNameDoesNotDependOnTheFolderName() {
-        final @NotNull Path cycle = Path.of("C:", "Testin", "Demo", "Test Runs", "Cycle-1");
-        final @NotNull Path renamed = cycle.resolveSibling("Smoke, third attempt");
-
-        assertEquals(TestRunDirectoryDto.resultsFile(cycle).getFileName(),
-                TestRunDirectoryDto.resultsFile(renamed).getFileName(),
-                "A run's results are found by a name that does not move when the folder is renamed."
-                        + " The moment those two names differ, renaming a run empties it.");
+    public void aResultIsNamedByItsTestCaseAndNotByItsFolder() {
+        assertEquals(FileKind.RUN_ITEM.fileName(JUDGED_CASE), JUDGED_CASE + ".ri",
+                "A result is named by the case it is about, so there is no folder name in it to keep in step."
+                        + " The moment a result's name is derived from its folder, renaming a run empties it.");
     }
 
     @Test
     public void theResultsLiveInsideTheFolderTheyBelongTo() {
         final @NotNull Path cycle = Path.of("C:", "Testin", "Demo", "Test Runs", "Cycle-1");
 
-        assertEquals(TestRunDirectoryDto.resultsFile(cycle).getParent(), cycle,
+        assertEquals(cycle.resolve(FileKind.RUN_ITEM.fileName(JUDGED_CASE)).getParent(), cycle,
                 "The results sit inside the run's own folder, which is why moving the folder to another"
                         + " package carries them along with no help from the move");
     }
@@ -106,14 +106,12 @@ public class RunResultsSurviveRenameTest {
             final @NotNull Path cycle = createRun(root.resolve("Cycle-1"));
             final @NotNull Path renamed = move(cycle, root.resolve("Cycle-1 (rerun)"));
 
-            final @NotNull Path results = TestRunDirectoryDto.resultsFile(renamed);
-            assertTrue(Files.exists(results),
-                    "After a rename the scan looks for " + results.getFileName() + " and it has to be there,"
+            final @NotNull Path result = renamed.resolve(FileKind.RUN_ITEM.fileName(JUDGED_CASE));
+            assertTrue(Files.exists(result),
+                    "After a rename the scan looks for " + result.getFileName() + " and it has to be there,"
                             + " or every verdict in the run is gone at the next index");
 
-            final @NotNull TestRunDto run = read(results);
-            assertFalse(run.getResults().isEmpty(), "The rename kept the file and lost what was in it");
-            assertEquals(run.getResults().getFirst().getStatus().name(), "PASSED",
+            assertEquals(read(result).getStatus().name(), "PASSED",
                     "The verdict the tester recorded before the rename is the thing this issue was about");
 
             assertTrue(Files.exists(renamed.resolve(".tr")), "The marker moved with the folder, as it always did");
@@ -137,11 +135,13 @@ public class RunResultsSurviveRenameTest {
 
         try {
             final @NotNull Path cycle = root.resolve("Cycle-1");
-            write(cycle.resolve(cycle.getFileName() + ".json"), A_RUN);
+            write(cycle.resolve("run.json"), A_RESULT);
+            write(cycle.resolve(cycle.getFileName() + ".json"), A_RESULT);
 
-            assertFalse(Files.exists(TestRunDirectoryDto.resultsFile(cycle)),
-                    "The old format is not read. A run from before this change shows no results, and its file"
-                            + " stays on disk as litter - expected, not a defect");
+            assertTrue(resultsIn(cycle).isEmpty(),
+                    "Neither old format is read - the one file per run, or the file named after the folder before"
+                            + " it. A run from before this change shows no results, and its files stay on disk as"
+                            + " litter - expected, not a defect");
         } finally {
             deleteTree(root);
         }
@@ -149,8 +149,20 @@ public class RunResultsSurviveRenameTest {
 
     private static @NotNull Path createRun(final @NotNull Path folder) {
         write(folder.resolve(".tr"), "{}");
-        write(TestRunDirectoryDto.resultsFile(folder), A_RUN);
+        write(folder.resolve(FileKind.RUN_ITEM.fileName(JUDGED_CASE)), A_RESULT);
         return folder;
+    }
+
+    /**
+     * The results a folder holds, the way the scan finds them: by what their names
+     * say they are (#305).
+     */
+    private static @NotNull List<Path> resultsIn(final @NotNull Path folder) {
+        try (Stream<Path> children = Files.list(folder)) {
+            return children.filter(file -> FileKind.of(file) == FileKind.RUN_ITEM).toList();
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not list " + folder + ": " + ex.getMessage(), ex);
+        }
     }
 
     private static @NotNull Path tempRoot() {
@@ -182,9 +194,9 @@ public class RunResultsSurviveRenameTest {
      * Read the way the indexer reads it, so a format change fails here too rather
      * than only in the sandbox.
      */
-    private static @NotNull TestRunDto read(final @NotNull Path file) {
+    private static @NotNull TestRunItems read(final @NotNull Path file) {
         try {
-            return new ObjectMapper().registerModule(new JavaTimeModule()).readValue(file.toFile(), TestRunDto.class);
+            return new ObjectMapper().registerModule(new JavaTimeModule()).readValue(file.toFile(), TestRunItems.class);
         } catch (final IOException ex) {
             throw new AssertionError("The run at " + file + " no longer parses: " + ex.getMessage(), ex);
         }

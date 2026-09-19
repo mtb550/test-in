@@ -1,0 +1,11 @@
+{
+  "id" : "22222222-2222-4222-8222-222222222203",
+  "status" : "PASSED",
+  "actualResult" : "The basket still held one item.",
+  "bugSeverity" : "EMPTY",
+  "bugPriority" : "EMPTY",
+  "duration" : 5.226,
+  "executedBy" : "Testin Sample",
+  "executedAt" : "Wednesday 07-01-2026 At 10:12:41 [UTC]",
+  "stacktrace" : ""
+}

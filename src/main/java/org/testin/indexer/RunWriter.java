@@ -38,6 +38,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
+import org.testin.model.FileKind;
+import org.testin.model.TestRunItems;
 
 /**
  * The one writer of a test run's files: its results, its marker and the
@@ -120,18 +122,35 @@ final class RunWriter {
     }
 
     /**
+     * UC-INTERNAL-005, Rule-INTERNAL-011.
+     * <p>
+     * One file per result, {@code <test case id>.ri}, and only the ones whose
+     * bytes the run's folder does not already hold - so recording one verdict
+     * writes one file where it used to rewrite every result of the run, and two
+     * testers judging different cases of one cycle never touch the same file
+     * (#305, G5).
+     * <p>
+     * Each result is serialized on the calling thread, with the screenshot names
+     * the write will keep: the run the index holds is changed on the EDT, and the
+     * queue writes later.
+     * <p>
      * Between the submit and the execution the tester can delete the run, and
-     * the queued task would then recreate {@code run.json} with its parent
+     * the queued task would then recreate its files with their parent
      * directories: a run folder on disk with no marker. So the write asks again
      * whether the run is still indexed, which is the one question that separates
      * a pending write from a resurrection (#66, finding 86).
      */
     private void write(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
-        // Taken with the snapshot, on the calling thread, so the sweep keeps
-        // exactly the screenshots the written file names.
+        // Taken with the snapshots, on the calling thread, so the sweep keeps
+        // exactly the screenshots the written results name.
         final @NotNull Set<String> named = namedScreenshots(tr);
 
-        snapshot(tr, "test run data").ifPresent(bytes -> queue.execute(() -> {
+        final @NotNull Map<Path, byte[]> results = new LinkedHashMap<>();
+        for (final TestRunItems item : tr.getResults()) {
+            snapshot(item, "run item").ifPresent(bytes -> results.put(runPath.resolve(FileKind.RUN_ITEM.fileName(item.getId())), bytes));
+        }
+
+        queue.execute(() -> {
             try {
                 if (store.findTestRun(runPath).isEmpty()) {
                     Logger.info("Test run removed before its results were written, so nothing was written: " + runPath.getFileName());
@@ -139,14 +158,49 @@ final class RunWriter {
                 }
 
                 final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
-                if (!files.write(p, TestRunDirectoryDto.resultsFile(runPath), bytes)) return;
-                Logger.trace("Run results persisted for " + runPath.getFileName());
+                results.forEach((file, bytes) -> {
+                    if (files.alreadyHolds(file, bytes)) return;
 
+                    files.write(p, file, bytes);
+                    Logger.trace("Result written for " + runPath.getFileName() + ": " + file.getFileName());
+                });
+
+                sweepResults(files, runPath, results.keySet());
                 sweepScreenshots(files, runPath, named);
             } catch (final Exception ex) {
                 Logger.error("Failed to persist test run data: " + ex.getMessage());
             }
-        }));
+        });
+    }
+
+    /**
+     * UC-TREE-PANEL-022, Rule-INTERNAL-011.
+     * <p>
+     * Removes the result files of cases the run no longer covers - Edit Test Run
+     * unticking one - with the screenshots they named, which the sweep below then
+     * finds unnamed.
+     * <p>
+     * A result file that will not parse is left alone, whatever the run covers:
+     * the scan has already reported it, and a file Testin cannot read is not a
+     * file Testin removes (#305, S21).
+     */
+    private void sweepResults(final @NotNull TestDataFiles files, final @NotNull Path runPath, final @NotNull Set<Path> written) {
+        for (final Path file : files.resultsIn(runPath)) {
+            if (written.contains(file) || !readsAsAResult(file)) continue;
+
+            Logger.info("Removing the result of a case the run no longer covers: " + file.getFileName());
+            files.delete(p, file);
+        }
+    }
+
+    private boolean readsAsAResult(final @NotNull Path file) {
+        try {
+            Services.getInstance(p, Mapper.class).readValue(file.toFile(), TestRunItems.class);
+            return true;
+        } catch (final Exception unreadable) {
+            Logger.warn("Left the unreadable result " + file.getFileName() + " as it is: " + unreadable.getMessage());
+            return false;
+        }
     }
 
     /**

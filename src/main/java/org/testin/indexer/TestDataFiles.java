@@ -35,6 +35,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import org.testin.model.FileKind;
 
 /**
  * Writes test data to disk. Package-private, and in this package, so that the
@@ -74,6 +75,19 @@ final class TestDataFiles {
     }
 
     /**
+     * The same question for bytes a caller already has in hand - the run writer
+     * snapshots each result on the calling thread and asks here, on its own
+     * (#305, G5).
+     */
+    boolean alreadyHolds(final @NotNull Path path, final byte @NotNull [] bytes) {
+        try {
+            return Arrays.equals(Files.readAllBytes(path), bytes);
+        } catch (final IOException absentOrUnreadable) {
+            return false;
+        }
+    }
+
+    /**
      * @return whether the bytes landed. A caller that updates the cache after
      * the write has to know, because architecture rule 2 makes the write the
      * thing that decides whether the node exists at all (#66, finding 85).
@@ -101,6 +115,21 @@ final class TestDataFiles {
         } catch (final IOException missingOrUnreadable) {
             Logger.warn("Could not read " + path + ": " + missingOrUnreadable.getMessage());
             return new byte[0];
+        }
+    }
+
+    /**
+     * Rule-INTERNAL-011.
+     * <p>
+     * The result files in a run's folder, and none when the folder cannot be
+     * listed - a run whose folder has gone holds nothing (#305).
+     */
+    @NotNull List<Path> resultsIn(final @NotNull Path runPath) {
+        try (Stream<Path> inside = Files.list(runPath)) {
+            return inside.filter(file -> FileKind.of(file) == FileKind.RUN_ITEM).toList();
+        } catch (final IOException ex) {
+            Logger.warn("Could not list the results in " + runPath + ": " + ex.getMessage());
+            return List.of();
         }
     }
 

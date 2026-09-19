@@ -40,6 +40,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.testin.model.FileKind;
 
 /**
  * Recording the issue a bug report became (#28): only on a run and a run item
@@ -167,8 +168,8 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         assertEquals(Optional.empty(), BugFiling.store(getProject(), item, ISSUE));
         assertEquals("the run item the indexer holds did not take the link", ISSUE, storedLink(item));
 
-        final Path results = TestRunDirectoryDto.resultsFile(item.run());
-        assertTrue("the link did not reach the run's results file", awaitFileHolding(results, ISSUE).contains(ISSUE));
+        final Path result = item.run().resolve(FileKind.RUN_ITEM.fileName(item.id()));
+        assertTrue("the link did not reach the case's own result file", awaitFileHolding(result, ISSUE).contains(ISSUE));
     }
 
     public void testARunItemNoLongerFailedIsNotWritten() {
