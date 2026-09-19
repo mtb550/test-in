@@ -38,7 +38,6 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
-import org.testin.notifications.Refused;
 import org.testin.rename.NodeRename;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
@@ -196,10 +195,7 @@ public class EditTestRunAction extends DumbAwareAction {
             // Its own name is not a collision, so a tester who edits the cases without
             // touching the name is not refused for keeping it.
             final @NotNull String oldName = run.getName();
-            if (!name.equals(oldName) && indexer.nodeExists(parent.getPath().resolve(name))) {
-                notifier.softRefuse(p, Refused.ALREADY_EXISTS, name);
-                return false;
-            }
+            if (!name.equals(oldName) && NodeRename.refused(p, run, name)) return false;
 
             final @NotNull Set<UUID> checked = RunForm.checkedCases(selection);
             final @NotNull Set<UUID> offered = RunForm.offeredCases(selection);

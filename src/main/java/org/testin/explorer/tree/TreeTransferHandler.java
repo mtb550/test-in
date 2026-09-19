@@ -16,7 +16,6 @@
 
 package org.testin.explorer.tree;
 
-import org.testin.codegen.CodeOn;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -561,10 +560,10 @@ public class TreeTransferHandler extends TransferHandler {
      * is Java. Unlike a move there is nothing to carry over, so each copied node
      * and everything under it is generated from scratch - which is also why this
      * runs after the copy rather than before it, the opposite of a move (#51).
+     * Whether code is on is the generators' question, so a copied test run is
+     * not told it is off (Rule-CODEGEN-082).
      */
     private void generateForCopies(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
-        if (!CodeOn.isOnOrWarnOnce(p)) return;
-
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         for (final DirectoryDto source : sources) {
@@ -582,11 +581,10 @@ public class TreeTransferHandler extends TransferHandler {
      * dragging twenty test sets takes the write lock once, reparses once and
      * leaves the tester one undo entry beside the tree's own - not twenty to
      * press through, each undoing a class move while the tree stays where it is.
-     * Whether this IDE has Java is asked once here for the same reason (#51).
+     * Whether code is on is each mover's question, said once for the project,
+     * so moving test runs is not told it is off (Rule-CODEGEN-082).
      */
     private void syncCode(final @NotNull List<Path> from, final @NotNull List<Path> to) {
-        if (!CodeOn.isOnOrWarnOnce(p)) return;
-
         WriteCommandAction.runWriteCommandAction(p, Bundle.message("transfer.move.code.command"), null, () -> {
             for (int i = 0; i < from.size(); i++) moveCodeOf(from.get(i), to.get(i));
         });

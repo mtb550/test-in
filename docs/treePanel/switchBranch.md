@@ -136,6 +136,9 @@ credentials or sit on a host that is not reachable.
 **If the test project's folder is not a Git repository** — there is no box, and
 *Not a Git repository* is shown in its place.
 
+**If the Git plugin is not installed** — there is no box, the same as for a
+folder that is not a Git repository: without the plugin no folder is asked.
+
 **If Git refuses the checkout** — the box goes back to the branch the tester was
 on. An IDE notification titled *Branch Not Switched* opens. It says *\<branch\>
 was not checked out. There are uncommitted changes in this test project that
