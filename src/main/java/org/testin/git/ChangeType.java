@@ -88,6 +88,21 @@ public enum ChangeType {
     // work happens, and putting one back is undoing the work rather than undoing
     // an edit. They are listed so they can be seen and committed (#66).
 
+    CREATE_RUN_ITEM(
+            Bundle.message("change.create.run.item"),
+            RevertAction.NONE
+    ),
+
+    CHANGE_RUN_ITEM(
+            Bundle.message("change.change.run.item"),
+            RevertAction.NONE
+    ),
+
+    REMOVE_RUN_ITEM(
+            Bundle.message("change.remove.run.item"),
+            RevertAction.NONE
+    ),
+
     CREATE_TEST_RUN(
             Bundle.message("change.create.test.run"),
             RevertAction.NONE

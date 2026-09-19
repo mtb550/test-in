@@ -33,7 +33,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import org.testin.model.FileKind;
+import org.testin.model.TestRunItems;
+import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 
 /**
@@ -57,9 +60,10 @@ final class PendingChangeFactory {
      * that can offer it - answering null here used to drop a run, a reorder or
      * an audit stamp out of the commit entirely (#66).
      */
-    static @NotNull PendingChange fromFile(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper) {
+    static @NotNull PendingChange fromFile(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper, final @NotNull Function<UUID, Optional<TestCaseDto>> cases) {
         return switch (subjectOf(relativePath, afterJson.isEmpty() ? beforeJson : afterJson, mapper)) {
             case TEST_CASE -> testCase(type, beforeJson, afterJson, relativePath, mapper);
+            case RUN_ITEM -> runItem(type, beforeJson, afterJson, relativePath, mapper, cases);
             case TEST_RUN -> testRun(type, beforeJson, afterJson, relativePath, mapper);
             case MARKER -> marker(type, beforeJson, afterJson, relativePath, mapper);
             case OTHER -> other(type, relativePath);
@@ -85,6 +89,7 @@ final class PendingChangeFactory {
 
         if (FileKind.of(relativePath) == FileKind.MARKER) return ChangeSubject.MARKER;
         if (FileKind.of(relativePath) == FileKind.TEST_CASE) return ChangeSubject.TEST_CASE;
+        if (FileKind.of(relativePath) == FileKind.RUN_ITEM) return ChangeSubject.RUN_ITEM;
         if (!fileName.endsWith(JSON)) return ChangeSubject.OTHER;
 
         return fieldsIn(mapper, json).containsKey("results") ? ChangeSubject.TEST_RUN : ChangeSubject.OTHER;
@@ -145,6 +150,40 @@ final class PendingChangeFactory {
                                 : fieldChanges);
             }
         };
+    }
+
+    /**
+     * UC-SHARE-010, Rule-SHARE-047.
+     * <p>
+     * One case's result in one run, named by the case rather than by the file:
+     * {@code 4fd2a19b-….ri} says nothing to a tester, and the description of the
+     * case it is about says everything (#305, S22). The test set beside it comes
+     * from the same place, so a result reads where its case reads.
+     * <p>
+     * The case is asked of the index, which is the one thing that knows it - a
+     * result holds the verdict, not the case. A case this repository's project
+     * does not hold, or one removed since, leaves the id in its place: a row a
+     * tester can still select and commit says more than no row at all.
+     */
+    private static @NotNull PendingChange runItem(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper, final @NotNull Function<UUID, Optional<TestCaseDto>> cases) {
+        final @NotNull Optional<UUID> caseId = FileKind.RUN_ITEM.idIn(relativePath);
+        final @NotNull Optional<TestCaseDto> tc = caseId.flatMap(cases);
+
+        final @NotNull String name = tc.map(TestCaseDto::getDescription).filter(description -> !description.isBlank())
+                .orElseGet(() -> String.valueOf(relativePath.getFileName()));
+        final @NotNull String testSet = tc.map(TestCaseDto::getParent).map(DirectoryDto::getName).orElse("");
+
+        final @NotNull List<FieldChange> changes = switch (type) {
+            case ADDED -> List.of(new FieldChange(parentName(relativePath), "",
+                    RunItemChangeComparator.summary(read(mapper, afterJson, TestRunItems.class)), ChangeType.CREATE_RUN_ITEM));
+            case DELETED -> List.of(new FieldChange(parentName(relativePath),
+                    RunItemChangeComparator.summary(read(mapper, beforeJson, TestRunItems.class)), "", ChangeType.REMOVE_RUN_ITEM));
+            case MODIFIED -> RunItemChangeComparator.compare(
+                    read(mapper, beforeJson, TestRunItems.class), read(mapper, afterJson, TestRunItems.class));
+        };
+
+        return new PendingChange(ChangeSubject.RUN_ITEM, name, testSet, caseId.map(UUID::toString).orElse(""),
+                relativePath, type, nothingCommitted(), changes);
     }
 
     private static @NotNull PendingChange testRun(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper) {

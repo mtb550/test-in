@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.testng.Assert.assertEquals;
@@ -97,7 +98,7 @@ public class GitDiffProcessorTest {
     }
 
     private List<PendingChange> review(final String... statusLines) {
-        return GitDiffProcessor.toDiffs(List.of(statusLines), root, RealMapper.build(), committed::get);
+        return GitDiffProcessor.toDiffs(List.of(statusLines), root, RealMapper.build(), committed::get, id -> Optional.empty());
     }
 
     /**

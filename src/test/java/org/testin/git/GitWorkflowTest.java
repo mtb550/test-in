@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.testng.Assert.*;
@@ -258,7 +259,10 @@ public class GitWorkflowTest {
                 // what production feeds this: GitRepositoryService.showAtHead ends
                 // in orElse(""). Handing it a null here tested a shape the plugin
                 // never produces.
-                path -> git(work, "show", "HEAD:" + path).orElse(""));
+                path -> git(work, "show", "HEAD:" + path).orElse(""),
+                // No index in this test: a result then reads as its file name,
+                // which is the shape a case removed since would take anyway.
+                id -> Optional.empty());
     }
 
     /**

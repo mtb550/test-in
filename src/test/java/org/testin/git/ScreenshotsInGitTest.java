@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
@@ -44,7 +45,7 @@ public class ScreenshotsInGitTest {
         try {
             final Path root = Files.createTempDirectory("testin-git-screenshots");
 
-            assertTrue(GitDiffProcessor.toDiffs(List.of(" D " + REMOVED), root, RealMapper.build(), path -> "").isEmpty(),
+            assertTrue(GitDiffProcessor.toDiffs(List.of(" D " + REMOVED), root, RealMapper.build(), path -> "", id -> Optional.empty()).isEmpty(),
                     "a screenshot arrives or goes with its run, so it has no row of its own");
         } catch (final Exception e) {
             throw new AssertionError("the review could not be built", e);

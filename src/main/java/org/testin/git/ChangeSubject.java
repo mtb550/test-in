@@ -35,6 +35,13 @@ public enum ChangeSubject {
 
     TEST_RUN,
 
+    /**
+     * One case's result in one run - a {@code .ri}. Its own kind because a run's
+     * results are its own files now: a verdict is a change to that case's result,
+     * not to the whole cycle (#305).
+     */
+    RUN_ITEM,
+
     MARKER,
 
     OTHER
