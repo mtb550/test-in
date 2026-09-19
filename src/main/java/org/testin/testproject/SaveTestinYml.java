@@ -159,7 +159,9 @@ public final class SaveTestinYml {
             return;
         }
 
-        DaemonCodeAnalyzer.getInstance(p).restart();
+        // With a reason: the bare restart() is deprecated, and Build fails on a
+        // deprecated call (#324). The reason only reaches the IDE's diagnostics.
+        DaemonCodeAnalyzer.getInstance(p).restart("Save to testin.yml turned the automation code on");
         Services.getInstance(p, TestinEditors.class).refreshOpen(p);
         notifier.softShow(p, Done.SAVED);
     }
