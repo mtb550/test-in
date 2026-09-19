@@ -42,10 +42,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
+import org.testin.model.FileKind;
 
 @AllArgsConstructor
 final class IndexingScanner {
@@ -212,7 +214,7 @@ final class IndexingScanner {
 
             try (Stream<Path> files = Files.list(path)) {
                 files.filter(Files::isRegularFile)
-                        .filter(file -> file.toString().endsWith(".json"))
+                        .filter(file -> FileKind.of(file) == FileKind.TEST_CASE)
                         .parallel()
                         .forEach(filePath -> {
                             try {
@@ -451,20 +453,12 @@ final class IndexingScanner {
      * <p>
      * Deliberately not the same question as {@code ProjectIndexer.isCaseFile},
      * which asks whether a file <b>is</b> a test case and answers it by the rule
-     * - a {@code .json} directly inside a test set. The two shared one method
+     * - a {@code .tc} directly inside a test set. The two shared one method
      * until #288, and the sharing is what hid that they were asking different
      * things.
      */
     private static boolean looksLikeACaseFile(final @NotNull Path file) {
-        final @NotNull String name = file.getFileName().toString();
-        if (!name.endsWith(".json")) return false;
-
-        try {
-            UUID.fromString(name.substring(0, name.length() - ".json".length()));
-            return true;
-        } catch (final IllegalArgumentException notACase) {
-            return false;
-        }
+        return FileKind.TEST_CASE.idIn(file).isPresent();
     }
 
     /**
@@ -472,7 +466,7 @@ final class IndexingScanner {
      * <p>
      * Which test case a file is: its name, when the name is a UUID.
      * <p>
-     * The plugin writes a case to {@code <id>.json} and reads it back keyed by
+     * The plugin writes a case to {@code <id>.tc} and reads it back keyed by
      * the id inside, so the two always agree - until a file is copied outside
      * the plugin, which is a thing people do on GitHub. Then two files claim one
      * id, the cache keeps whichever the parallel scan reached last, and the other
@@ -490,19 +484,18 @@ final class IndexingScanner {
      * believing what it says.
      */
     private static @NotNull UUID identityOf(final @NotNull Path filePath, final @NotNull TestCaseDto tc) {
-        final @NotNull String name = filePath.getFileName().toString().replace(".json", "");
+        final @NotNull Optional<UUID> fromTheName = FileKind.TEST_CASE.idIn(filePath);
 
-        try {
-            final @NotNull UUID fromName = UUID.fromString(name);
+        if (fromTheName.isPresent()) {
+            final @NotNull UUID fromName = fromTheName.orElseThrow();
 
             if (!fromName.equals(tc.getId())) {
                 Logger.warn("Test case " + filePath.getFileName() + " says its id is " + tc.getId()
                         + "; the file name is the identity, so it is read as " + fromName);
             }
             return fromName;
-
-        } catch (final IllegalArgumentException ex) {
-            return tc.getId();
         }
+
+        return tc.getId();
     }
 }

@@ -197,8 +197,8 @@ public class TestCaseMergeTest {
      */
     @Test
     public void aTestCaseIsWhatThisCanMerge() {
-        assertTrue(TestCaseMerge.isTestCase("Test Cases/Login/6197ec6e.json"));
-        assertTrue(TestCaseMerge.isTestCase("Test Cases\\Login\\6197ec6e.json"),
+        assertTrue(TestCaseMerge.isTestCase("Test Cases/Login/6197ec6e.tc"));
+        assertTrue(TestCaseMerge.isTestCase("Test Cases\\Login\\6197ec6e.tc"),
                 "Git names paths with slashes and Windows names them with backslashes");
     }
 

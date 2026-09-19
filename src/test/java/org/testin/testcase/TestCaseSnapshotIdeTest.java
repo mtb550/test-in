@@ -167,6 +167,6 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
 
         assertTrue("the undo said it could not put the case back", Services.getInstance(getProject(), UndoHistories.class).undo(scope));
         assertTrue("the case is not back in the index", indexer().findTestCase(removed.getId()).isPresent());
-        assertTrue("the case's file is not back on disk", Files.isRegularFile(ts.getPath().resolve(removed.getId() + ".json")));
+        assertTrue("the case's file is not back on disk", Files.isRegularFile(ts.getPath().resolve(removed.getId() + ".tc")));
     }
 }

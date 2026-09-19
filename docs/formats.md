@@ -30,7 +30,7 @@
     │   │   └── .tsp
     │   └── ts2/                  a test set
     │       ├── .ts
-    │       └── 4fd2a19b-….json   one test case, named by its id
+    │       └── 4fd2a19b-….tc     one test case, named by its id
     └── Test Runs/
         ├── .trd                  the Test Runs directory marker
         ├── Cycles/               a test run package
@@ -115,14 +115,15 @@ nothing else may ask in a different order.
 
 ---
 
-## A test case — `<uuid>.json`
+## A test case — `<uuid>.tc`
 
-One file per test case, inside its test set. **Any `.json` file directly inside
-a test set is a test case** (Rule-INTERNAL-011), so `login.json` written by hand
-is read as one and a copy of it is given an id of its own; a `.json` sitting in
-`Test Cases` rather than in a set is not a case at all.
+One file per test case, inside its test set. **Any `.tc` file directly inside
+a test set is a test case** (Rule-INTERNAL-011), so `login.tc` written by hand
+is read as one and a copy of it is given an id of its own; a `.tc` sitting in
+`Test Cases` rather than in a set is not a case at all. The file holds JSON; the
+name says what the JSON is, so nothing has to look inside to find out.
 
-Testin writes the file as `<id>.json`, and a hand-named one is filed under its
+Testin writes the file as `<id>.tc`, and a hand-named one is filed under its
 id the next time anything writes it, the hand-named file going once that write
 has landed (Rule-INTERNAL-084). The two names answer different questions:
 the **file name** is what the tree shows (Rule-INTERNAL-012 — a `name` field

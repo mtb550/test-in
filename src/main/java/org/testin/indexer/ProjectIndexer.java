@@ -57,6 +57,7 @@ import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.testin.model.FileKind;
 
 /**
  * The single owner of file access. No other class may read, write or execute
@@ -771,10 +772,10 @@ public final class ProjectIndexer {
     /**
      * UC-INTERNAL-002, Rule-INTERNAL-011.
      * <p>
-     * A test case is a {@code .json} directly inside a test set, which is the
-     * rule the scan reads by - so the copy and the scan agree about what a test
-     * case is. A run's file is named for its folder and sits inside a test run,
-     * and a marker is not JSON, so neither answers true.
+     * A test case is a {@code .tc} directly inside a test set: {@link FileKind}
+     * answers the first half, the caller the second, so the copy and the scan
+     * agree about what a test case is. A run item is a {@code .ri} inside a test
+     * run and a marker is one of the seven fixed names, so neither answers true.
      * <p>
      * It used to ask whether the file name parsed as a UUID. That is how Testin
      * names the files it writes, but not the only legal name: a case file named
@@ -788,7 +789,7 @@ public final class ProjectIndexer {
      * takes its occupied check as a parameter.
      */
     static boolean isCaseFile(final @NotNull Path file, final @NotNull Predicate<Path> isTestSet) {
-        return file.getFileName().toString().endsWith(".json") && isTestSet.test(file.getParent());
+        return FileKind.of(file) == FileKind.TEST_CASE && isTestSet.test(file.getParent());
     }
 
     /**
@@ -865,7 +866,7 @@ public final class ProjectIndexer {
      * case's test set.
      * <p>
      * Answered here because the file's name is the indexer's to decide; a link
-     * builder spelling {@code <id>.json} itself would be one more copy of it.
+     * builder spelling {@code <id>.tc} itself would be one more copy of it.
      */
     public @NotNull Optional<TestCaseFile> testCaseFile(final @NotNull TestCaseDto tc) {
         final @NotNull Path file = store.testCaseFileOf(tc);

@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.testin.model.FileKind;
 
 /**
  * Turns one changed file into the change the review shows.
@@ -66,34 +67,25 @@ final class PendingChangeFactory {
     /**
      * What the file is, read from what is in it.
      * <p>
-     * A marker is the dotfile that makes a directory a node - {@code .tp},
-     * {@code .ts}, {@code .tr} and the rest - and that is a naming rule the
-     * plugin owns, so the name settles it. For everything else the content
-     * decides: a run carries {@code results}, a test case carries a description
-     * and an expected result. Reading the file rather than trusting its name is
-     * what keeps a renamed or hand-placed file from being taken for something it
-     * is not - which is the mistake this whole class was written to stop.
+     * The name settles it, through {@link FileKind}: a marker is one of the seven
+     * fixed names, a test case is a {@code .tc}. It used to read the file and look
+     * for a field - a run carried {@code results}, a case a description - because
+     * nothing in a name said what a file was, and a hand-placed file could be
+     * taken for something it is not. The names say it now (#305).
      * <p>
-     * When the content cannot be read at all, the name is the fallback: the
-     * indexer writes a test case as {@code <id>.json}. Anything left is a file
-     * nobody planned for, and it is still listed - what the review does not show
-     * cannot be committed.
+     * A run's results are still one file whose name says nothing, so that half
+     * keeps reading the content until the run becomes one file per item. Anything
+     * left is a file nobody planned for, and it is still listed - what the review
+     * does not show cannot be committed.
      */
     private static @NotNull ChangeSubject subjectOf(final @NotNull Path relativePath, final @NotNull String json, final @NotNull Mapper mapper) {
         final @NotNull String fileName = relativePath.getFileName().toString();
 
-        if (fileName.startsWith(".")) return ChangeSubject.MARKER;
+        if (FileKind.of(relativePath) == FileKind.MARKER) return ChangeSubject.MARKER;
+        if (FileKind.of(relativePath) == FileKind.TEST_CASE) return ChangeSubject.TEST_CASE;
         if (!fileName.endsWith(JSON)) return ChangeSubject.OTHER;
 
-        final @NotNull Map<String, Object> fields = fieldsIn(mapper, json);
-        if (fields.containsKey("results")) return ChangeSubject.TEST_RUN;
-        if (fields.containsKey("description") || fields.containsKey("expectedResult")) return ChangeSubject.TEST_CASE;
-
-        if (!fields.isEmpty()) return ChangeSubject.OTHER;
-
-        return isTestCaseId(fileName.substring(0, fileName.length() - JSON.length()))
-                ? ChangeSubject.TEST_CASE
-                : ChangeSubject.OTHER;
+        return fieldsIn(mapper, json).containsKey("results") ? ChangeSubject.TEST_RUN : ChangeSubject.OTHER;
     }
 
     /**

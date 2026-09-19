@@ -28,8 +28,9 @@ There is no key for this. It starts on its own.
 - **Rule-INTERNAL-009** — A folder holding both is read as a test set.
 - **Rule-INTERNAL-010** — A folder inside `Test Runs` is read the same way, from
   a file named `.tr` or a file named `.trp`.
-- **Rule-INTERNAL-011** — Every file ending in `.json` directly inside a test
-  set is a test case.
+- **Rule-INTERNAL-011** — A file's name says what it is: every file ending in
+  `.tc` directly inside a test set is a test case. Nothing looks inside a file to
+  decide what it is.
 - **Rule-INTERNAL-012** — A test case is known by its file name. What the file
   says its own name is does not decide.
 - **Rule-INTERNAL-013** — Each test project is read by its own background job.
@@ -137,7 +138,7 @@ the bottom of the IDE, beside the other background jobs.
 4. Testin starts one background job for each of them.
 5. The bar reads *Indexing*, then the test project's name.
 6. The bar reads the test project's name, then *test sets...*.
-7. Testin walks `Test Cases`. For each test set, it reads every `.json` file
+7. Testin walks `Test Cases`. For each test set, it reads every `.tc` file
    at the same time. It does not read them one after another.
 8. After each test set the bar reads *Test set:*, then its name, then how many
    test cases it holds.

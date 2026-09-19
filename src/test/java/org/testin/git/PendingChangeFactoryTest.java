@@ -39,7 +39,7 @@ import static org.testng.Assert.*;
  */
 public class PendingChangeFactoryTest {
 
-    private static final Path PATH = Path.of("Test Cases", "login", "case.json");
+    private static final Path PATH = Path.of("Test Cases", "login", "case.tc");
 
     /**
      * {@link Mapper} is a project service with a private constructor, so the

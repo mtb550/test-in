@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.stream.Stream;
+import org.testin.model.FileKind;
 
 /**
  * Where a node's files are: deleting them, moving them, copying them, renaming
@@ -289,7 +290,7 @@ final class NodeFiles {
             final @NotNull UUID fresh = UUID.randomUUID();
 
             tc.setId(fresh);
-            if (!Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(fresh + ".json"), tc)) return false;
+            if (!Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(FileKind.TEST_CASE.fileName(fresh)), tc)) return false;
 
             // Claimed before it goes, as every other removal is, or the watcher
             // takes Testin's own delete for an outside change and reads the

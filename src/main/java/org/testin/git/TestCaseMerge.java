@@ -18,6 +18,7 @@ package org.testin.git;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.nio.file.Path;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.testin.model.DirectoryType;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.testin.model.FileKind;
 
 /**
  * Merges the three versions Git keeps of a conflicted test case, field by field
@@ -126,7 +128,7 @@ public final class TestCaseMerge {
         // renaming the folder would have turned every conflict on both channels
         // into "not a test case, ask the tester" with nothing failing (#66,
         // finding 230).
-        return slashed.endsWith(".json") && slashed.contains(DirectoryType.TCD.getFolderName() + "/");
+        return FileKind.of(Path.of(relativePath)) == FileKind.TEST_CASE && slashed.contains(DirectoryType.TCD.getFolderName() + "/");
     }
 
     /**

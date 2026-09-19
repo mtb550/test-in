@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -142,7 +143,7 @@ public class SampleProjectTest {
         for (final Path file : cases) {
             final @NotNull TestCaseDto tc = read(file, TestCaseDto.class);
 
-            assertEquals(tc.getId().toString(), file.getFileName().toString().replace(".json", ""),
+            assertEquals(tc.getId().toString(), file.getFileName().toString().replace(".tc", ""),
                     "A case's file name is its identity, so the sample must agree with itself: " + file);
             assertFalse(tc.getOrder().isEmpty(),
                     "The sample is what a project written by the current build looks like, and that means ranked: " + file);
@@ -159,13 +160,13 @@ public class SampleProjectTest {
      * live rather than repeating the answer - repeating it is what lost them.
      * The name used to be the folder's own, so renaming a cycle moved the folder
      * and left the results behind, emptying the run at the next index (#177). A
-     * sample folder still carrying a {@code <name>.json} is one this rename never
+     * sample folder still carrying a {@code <name>.tc} is one this rename never
      * reached.
      */
     @Test
     public void everyRunParsesAndItsResultsNameCasesThatExist() {
         final @NotNull List<String> caseIds = caseFiles().stream()
-                .map(file -> file.getFileName().toString().replace(".json", ""))
+                .map(file -> file.getFileName().toString().replace(".tc", ""))
                 .toList();
 
         final @NotNull List<Path> runs = runFolders();
@@ -233,7 +234,7 @@ public class SampleProjectTest {
     private static @NotNull List<Path> caseFiles() {
         try (Stream<Path> walk = Files.walk(demo().resolve("Test Cases"))) {
             return walk.filter(Files::isRegularFile)
-                    .filter(path -> path.getFileName().toString().endsWith(".json"))
+                    .filter(path -> FileKind.of(path) == FileKind.TEST_CASE)
                     .toList();
         } catch (final IOException ex) {
             throw new AssertionError("Could not walk the sample's test cases: " + ex.getMessage(), ex);

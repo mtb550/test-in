@@ -34,7 +34,7 @@ import java.util.stream.Stream;
  * project service and this repository has no platform test harness (#107), so a
  * generator that went through it could not run here at all. What it writes is
  * the format {@code docs/formats.md} specifies - the markers, the folder names,
- * and one {@code <uuid>.json} per case - which is the same thing a scan reads.
+ * and one {@code <uuid>.tc} per case - which is the same thing a scan reads.
  * <p>
  * Small on purpose. It exists so a budget can be measured against a real number
  * of real files instead of estimated, and nothing else should grow onto it.
@@ -96,7 +96,7 @@ final class SyntheticTree {
 
             for (int c = 0; c < perSet; c++) {
                 final @NotNull UUID id = UUID.randomUUID();
-                write(set.resolve(id + ".json"), testCase(id, "a" + c));
+                write(set.resolve(id + ".tc"), testCase(id, "a" + c));
             }
         }
 

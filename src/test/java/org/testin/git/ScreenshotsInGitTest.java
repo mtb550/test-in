@@ -60,6 +60,6 @@ public class ScreenshotsInGitTest {
 
     @Test
     public void committingNoRunCarriesNoScreenshot() {
-        assertTrue(GitCommits.screenshotsAlongside(List.of("?? " + ADDED), Set.of("cases/ts2/4fd2a19b.json")).isEmpty());
+        assertTrue(GitCommits.screenshotsAlongside(List.of("?? " + ADDED), Set.of("cases/ts2/4fd2a19b.tc")).isEmpty());
     }
 }
