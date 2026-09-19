@@ -156,8 +156,8 @@ public final class CloneTestProject {
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         // Chosen, for the same reason a new project is: this
-                        // repository asked for it (#8). On this machine only -
-                        // testin.yml is never written (Rule-TREE-PANEL-106).
+                        // repository asked for it (#8). On this machine only; a
+                        // clone never writes testin.yml (Rule-TREE-PANEL-106).
                         Services.getInstance(p, BoundTestProject.class).choose(projectName);
 
                         tp.refresh();

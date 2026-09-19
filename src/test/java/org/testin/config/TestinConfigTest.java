@@ -18,7 +18,6 @@ package org.testin.config;
 
 import org.testng.annotations.Test;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,8 +29,8 @@ import static org.testng.Assert.*;
  * Two of them are the whole reason the feature is built this way. Reading must
  * never fail a startup, whatever the file turns out to contain - a repository
  * with a broken config opens unbound, not broken. And writing must never lose a
- * comment, because the comments are why the binding lives in a YAML file that
- * gets committed instead of in a settings dialog.
+ * comment, because the comments are why the team's config lives in a YAML file
+ * that gets committed instead of in a settings dialog.
  * <p>
  * Both are one careless change away from breaking silently: a Jackson feature
  * flipped, or a writer that serializes the object instead of editing the line.
@@ -319,14 +318,24 @@ public class TestinConfigTest {
     }
 
     /**
-     * The lines Save to testin.yml writes for a test project cloned from Git.
+     * The lines Save to testin.yml writes for a test project cloned from Git -
+     * built by the class that reads them, so a key spelled one way by the
+     * writer and another by the reader fails here.
      */
     private static Map<String, String> savedLines(final String project) {
-        final Map<String, String> lines = new LinkedHashMap<>();
-        lines.put("testinProject", project);
-        lines.put("location", "remote");
-        lines.put("RepoUrl", "https://github.com/acme/nafath-test-cases.git");
-        return lines;
+        return TestinYml.lines(project, "https://github.com/acme/nafath-test-cases.git");
+    }
+
+    /**
+     * Rule-TREE-PANEL-113, Rule-SHARE-004. A folder with no remote is local, a
+     * remote's token never reaches the committed file, and without Git only the
+     * project is written.
+     */
+    @Test
+    public void theLinesSaySharedOnlyWithARemote() {
+        assertEquals(TestinYml.lines("NAFATH", ""), Map.of("testinProject", "NAFATH", "location", "local"));
+        assertEquals(TestinYml.lines("NAFATH", "https://ghp_secret@github.com/acme/nafath.git").get("RepoUrl"), "https://github.com/acme/nafath.git");
+        assertEquals(TestinYml.lines("NAFATH"), Map.of("testinProject", "NAFATH"));
     }
 
     /**
@@ -379,6 +388,41 @@ public class TestinConfigTest {
                 "testinProject: NAFATH\r\nlocation: local\r\n");
         assertEquals(TestinYml.withLines("location: local\ntestinProject: Checkout", Map.of("testinProject", "NAFATH")),
                 "location: local\ntestinProject: NAFATH");
+        assertEquals(TestinYml.withLines("location: local\r\n", Map.of("testinProject", "NAFATH")),
+                "location: local\r\ntestinProject: NAFATH\r\n", "an added line takes the file's ending too");
+    }
+
+    /**
+     * A line added to a file that ended without a newline starts on a line of
+     * its own, and the file then ends with one.
+     */
+    @Test
+    public void aLineIsAddedAfterALastLineWithNoNewline() {
+        assertEquals(TestinYml.withLines("location: remote", Map.of("testinProject", "NAFATH")),
+                "location: remote\ntestinProject: NAFATH\n");
+    }
+
+    /**
+     * Only a top-level key is the key: one nested under something else belongs
+     * to that, and is left alone.
+     */
+    @Test
+    public void aNestedKeyIsNotTheKey() {
+        assertEquals(TestinYml.withLines("report:\n  testinProject: inner\n", Map.of("testinProject", "NAFATH")),
+                "report:\n  testinProject: inner\ntestinProject: NAFATH\n");
+    }
+
+    /**
+     * A key written twice has every line set: YAML reads the last one, so
+     * leaving it would have Save say saved while the reader still found the old
+     * name.
+     */
+    @Test
+    public void aKeyWrittenTwiceIsSetEverywhere() {
+        final String written = TestinYml.withLines("testinProject: Checkout\ntestinProject: Old\n", Map.of("testinProject", "NAFATH"));
+
+        assertEquals(written, "testinProject: NAFATH\ntestinProject: NAFATH\n");
+        assertEquals(TestinYml.parse(written, "twice").projectName(), "NAFATH");
     }
 
     /**
@@ -388,7 +432,7 @@ public class TestinConfigTest {
      */
     @Test
     public void aNameYamlWouldMisreadIsQuoted() {
-        for (final String name : new String[]{"#1 Smoke", "Tests: smoke", "null", "Yes", "- draft", "O'Brien's cases", "@home"}) {
+        for (final String name : new String[]{"#1 Smoke", "Smoke #1", "Smoke:", "#1 O'Brien", "Tests: smoke", "null", "Yes", "- draft", "O'Brien's cases", "@home"}) {
             final String written = TestinYml.withLines("", Map.of("testinProject", name));
             assertEquals(TestinYml.parse(written, name).projectName(), name, "written as " + written.strip());
         }
@@ -396,14 +440,17 @@ public class TestinConfigTest {
     }
 
     /**
-     * UC-TREE-PANEL-029. What the preview compares against: the value after each
-     * owned key, as written, and nothing for a key the file lacks.
+     * UC-TREE-PANEL-029. What the preview compares against: each owned key's
+     * value as the reader reads it - its quotes and a trailing comment are not
+     * the value - and nothing for a key the file lacks, so a line already right
+     * is shown as unchanged.
      */
     @Test
     public void thePreviewReadsWhatIsWritten() {
-        final Map<String, String> values = TestinYml.valuesIn("# testinProject: old\ntestinProject: 'Checkout'\nlocation: local\n",
+        final Map<String, String> values = TestinYml.valuesIn("# testinProject: old\ntestinProject: '#1 O''Brien'\nlocation: local  # for now\n",
                 Set.of("testinProject", "location", "RepoUrl"));
 
-        assertEquals(values, Map.of("testinProject", "'Checkout'", "location", "local"));
+        assertEquals(values, Map.of("testinProject", "#1 O'Brien", "location", "local"));
+        assertEquals(TestinYml.valuesIn("testinProject: [unclosed\n", Set.of("testinProject")), Map.of(), "a file that does not parse has no values");
     }
 }

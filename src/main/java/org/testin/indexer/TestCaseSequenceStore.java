@@ -252,7 +252,7 @@ final class TestCaseSequenceStore {
         // case would be in two files under one id, which the next scan names as
         // a clash for the tester to settle (#66, finding 294).
         if (!leftHandNamedFile(testCase.getId(), file)) {
-            files.delete(p, file, testSetPath);
+            files.delete(p, file);
             return false;
         }
 
@@ -273,7 +273,7 @@ final class TestCaseSequenceStore {
      */
     private boolean leftHandNamedFile(final @NotNull UUID id, final @NotNull Path idFile) {
         final @NotNull Optional<Path> original = Optional.ofNullable(handNamed.get(id)).filter(path -> !path.equals(idFile));
-        if (original.isPresent() && !Services.getInstance(p, TestDataFiles.class).delete(p, original.orElseThrow(), original.orElseThrow().getParent())) return false;
+        if (original.isPresent() && !Services.getInstance(p, TestDataFiles.class).delete(p, original.orElseThrow())) return false;
 
         handNamed.remove(id);
         return true;
@@ -312,7 +312,7 @@ final class TestCaseSequenceStore {
         if (from.equals(to)) return true;
 
         final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
-        if (files.delete(p, from, fromSet)) {
+        if (files.delete(p, from)) {
             if (!fromSet.equals(toSet)) Optional.ofNullable(testSetCaseIds.get(fromSet.toString())).ifPresent(ids -> ids.remove(id));
             return true;
         }
@@ -321,7 +321,7 @@ final class TestCaseSequenceStore {
         // stays where it was. Left as it is, the case would be on disk in two
         // sets under one id, and the next scan would read it twice (#66,
         // finding 292).
-        files.delete(p, to, toSet);
+        files.delete(p, to);
         if (!fromSet.equals(toSet)) Optional.ofNullable(testSetCaseIds.get(toSet.toString())).ifPresent(ids -> ids.remove(id));
         was.ifPresent(original -> testCasesById.put(id, original));
         if (wasHandNamed) handNamed.put(id, from);
@@ -347,9 +347,8 @@ final class TestCaseSequenceStore {
 
         // Through the writer like the write paths beside it, so OwnWrites
         // claims the delete and our own removal is not read as an external
-        // change worth a rescan (#117). stopAt is the set itself: a set
-        // outlives its last case, so nothing above the file is pruned.
-        if (!Services.getInstance(p, TestDataFiles.class).delete(p, file, testSetPath)) return false;
+        // change worth a rescan (#117).
+        if (!Services.getInstance(p, TestDataFiles.class).delete(p, file)) return false;
 
         testCasesById.remove(testCaseId);
         Optional.ofNullable(testSetCaseIds.get(testSetPath.toString()))

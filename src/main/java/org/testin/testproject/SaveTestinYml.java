@@ -34,7 +34,6 @@ import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -48,12 +47,8 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SaveTestinYml {
 
-    private static final @NotNull String PROJECT = "testinProject";
-    private static final @NotNull String LOCATION = "location";
-    private static final @NotNull String REPO_URL = "RepoUrl";
-
     /**
-     * UC-TREE-PANEL-029, Rule-TREE-PANEL-104.
+     * UC-TREE-PANEL-029, Rule-TREE-PANEL-115.
      * <p>
      * Why the button cannot save now, and nothing when it can. A file that
      * cannot be read is not edited: lines written into a broken file could
@@ -69,8 +64,9 @@ public final class SaveTestinYml {
     /**
      * UC-TREE-PANEL-029, Rule-TREE-PANEL-113.
      * <p>
-     * Works out the lines off the EDT - the clone address is a Git command -
-     * then shows them, and writes them only when the tester presses Save.
+     * Works out the lines and what they change off the EDT - the clone address
+     * is a Git command, and the file is read - then shows them, and writes them
+     * only when the tester presses Save.
      */
     public static void start(final @NotNull Project p) {
         final @NotNull Optional<String> why = whyNot(p);
@@ -83,36 +79,25 @@ public final class SaveTestinYml {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Map<String, String> lines = linesFor(p, open);
-            ApplicationManager.getApplication().invokeLater(() -> preview(p, lines), p.getDisposed());
+            final @NotNull String preview = preview(p, open.getName(), lines);
+
+            ApplicationManager.getApplication().invokeLater(() ->
+                    new ConfirmDialog(p, Bundle.message("yml.save.name"), preview, "", "", Bundle.message("yml.save.confirm"), () -> save(p, lines)).show(), p.getDisposed());
         });
     }
 
     /**
      * Rule-TREE-PANEL-113.
      * <p>
-     * The project, and where it is cloned from when Git can say: a remote gives
-     * {@code location: remote} and its address without an account or token, a
-     * folder with none gives {@code location: local}. Without the Git plugin
-     * nothing can be asked, so those two lines are left as they are rather than
-     * calling a Git project local.
+     * The project, and where it is cloned from when Git can say. Without the
+     * Git plugin nothing can be asked, so only the project's line is written.
      */
     private static @NotNull Map<String, String> linesFor(final @NotNull Project p, final @NotNull TestProjectDirectoryDto open) {
-        final @NotNull Map<String, String> lines = new LinkedHashMap<>();
-        lines.put(PROJECT, open.getName());
-
-        if (!OptionalPlugin.GIT.isAvailable()) return lines;
+        if (!OptionalPlugin.GIT.isAvailable()) return TestinYml.lines(open.getName());
 
         final @NotNull Path folder = open.getPath();
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);
-        final @NotNull String remote = git.isNotRepository(folder) ? "" : git.remoteUrl(folder);
-
-        if (remote.isEmpty()) {
-            lines.put(LOCATION, "local");
-        } else {
-            lines.put(LOCATION, "remote");
-            lines.put(REPO_URL, TestinYml.withoutCredentials(remote));
-        }
-        return lines;
+        return TestinYml.lines(open.getName(), git.isNotRepository(folder) ? "" : git.remoteUrl(folder));
     }
 
     /**
@@ -121,29 +106,25 @@ public final class SaveTestinYml {
      * The file, each line as it will be and what that changes, and the reminder
      * that the file is the team's.
      */
-    private static void preview(final @NotNull Project p, final @NotNull Map<String, String> lines) {
+    private static @NotNull String preview(final @NotNull Project p, final @NotNull String projectName, final @NotNull Map<String, String> lines) {
         final @NotNull Map<String, String> written = TestinYml.writtenValues(p, lines.keySet());
         final @NotNull StringBuilder message = new StringBuilder();
 
         TestinYml.savePath(p).ifPresent(path -> message.append(path).append("\n\n"));
-        lines.forEach((key, value) -> message.append(key).append(": ").append(value).append("   ").append(change(written, key, value)).append('\n'));
+        lines.forEach((key, value) -> message.append(key).append(": ").append(value).append("   ").append(change(Optional.ofNullable(written.get(key)), value)).append('\n'));
         message.append('\n').append(Bundle.message("yml.save.rest"))
-                .append('\n').append(Bundle.message("yml.save.shared", lines.get(PROJECT)));
+                .append('\n').append(Bundle.message("yml.save.shared", projectName));
 
-        new ConfirmDialog(p, Bundle.message("yml.save.name"), message.toString(), "", "", Bundle.message("yml.save.confirm"), () -> save(p, lines)).show();
+        return message.toString();
     }
 
-    private static @NotNull String change(final @NotNull Map<String, String> written, final @NotNull String key, final @NotNull String value) {
-        final @NotNull Optional<String> before = Optional.ofNullable(written.get(key)).map(SaveTestinYml::unquoted);
-        if (before.isEmpty()) return Bundle.message("yml.save.new");
-
-        return before.orElseThrow().equals(value) ? Bundle.message("yml.save.same") : Bundle.message("yml.save.was", before.orElseThrow());
-    }
-
-    private static @NotNull String unquoted(final @NotNull String written) {
-        final boolean quoted = written.length() >= 2
-                && (written.startsWith("'") && written.endsWith("'") || written.startsWith("\"") && written.endsWith("\""));
-        return quoted ? written.substring(1, written.length() - 1) : written;
+    /**
+     * What saving does to one line: adds it, leaves it as it is, or replaces the
+     * value it had.
+     */
+    private static @NotNull String change(final @NotNull Optional<String> before, final @NotNull String value) {
+        return before.map(was -> was.equals(value) ? Bundle.message("yml.save.same") : Bundle.message("yml.save.was", was))
+                .orElse(Bundle.message("yml.save.new"));
     }
 
     /**

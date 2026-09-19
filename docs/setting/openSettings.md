@@ -21,8 +21,8 @@ panel's toolbar.
 - **Rule-SETTING-003** — Nothing on this page raises a message when it is saved.
 - **Rule-SETTING-004** — Only a changed Testin folder makes Testin read the disk
   again. Every other setting is read where it is used, when it is used.
-- **Rule-SETTING-005** — A password is never on this page. It is asked for when
-  it is needed and kept in the IDE's password store.
+- **Rule-SETTING-005** — A password is never on this page. Testin asks for none:
+  a Git remote's credentials are kept by Git's own credential helper.
 - **Rule-SETTING-040** — The page answers the IDE's settings search. Typing
   a row's name opens the page with that row highlighted.
 - **Rule-SETTING-041** — The page says where a value belongs: this machine's

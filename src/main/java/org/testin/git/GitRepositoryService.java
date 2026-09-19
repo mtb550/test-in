@@ -21,6 +21,7 @@ import git4idea.GitUtil;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.services.OptionalPlugin;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -83,9 +84,13 @@ public final class GitRepositoryService {
      * three callers wrote {@code if (!isRepository(...))} - and a question read
      * one way at every call site should be named that way. The same rule
      * {@link #couldNotAbortRebase} follows.
+     * <p>
+     * Rule-TREE-PANEL-104. No folder is one without the Git plugin: the answer
+     * is git4idea's, and asking it there failed on every draw of the tree once
+     * the branch box followed the folder's Git (#301).
      */
     public boolean isNotRepository(final @NotNull Path path) {
-        return !GitUtil.isGitRoot(path);
+        return !OptionalPlugin.GIT.isAvailable() || !GitUtil.isGitRoot(path);
     }
 
     /**

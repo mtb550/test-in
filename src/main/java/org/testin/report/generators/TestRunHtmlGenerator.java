@@ -73,7 +73,7 @@ public final class TestRunHtmlGenerator {
         // several lines it would have been titled with all of them.
         final @NotNull String runName = trDir.getName();
 
-        // The project testin.yml names, which is what the tree shows and what
+        // The project this repository is bound to, which is what the tree shows and what
         // the other three generators already print. This one printed the IDE
         // project's name instead - the automation repository's folder, so a
         // report from nafath-test-case was headed nafath-test-case.

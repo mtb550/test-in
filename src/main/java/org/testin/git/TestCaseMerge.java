@@ -116,10 +116,8 @@ public final class TestCaseMerge {
      * different ones is not a conflict. A marker or a run is settled another
      * way, and anything else is not test data.
      * <p>
-     * Here rather than in the channels, because both of them - the Git rebase
-     * and the server sync - have to ask exactly the question this class can
-     * answer, and two spellings of it would mean one channel merging a file the
-     * other refused.
+     * Here rather than in the Git rebase that asks it, beside the merge that
+     * answers for the files it says yes to.
      */
     public static boolean isTestCase(final @NotNull String relativePath) {
         final @NotNull String slashed = relativePath.replace('\\', '/');

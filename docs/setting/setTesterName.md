@@ -19,8 +19,8 @@ There is no key for this. It is the **Tester name** row.
 - **Rule-SETTING-003** — Nothing on this page raises a message when it is saved.
 - **Rule-SETTING-004** — Only a changed Testin folder makes Testin read the disk
   again. Every other setting is read where it is used, when it is used.
-- **Rule-SETTING-005** — A password is never on this page. It is asked for when
-  it is needed and kept in the IDE's password store.
+- **Rule-SETTING-005** — A password is never on this page. Testin asks for none:
+  a Git remote's credentials are kept by Git's own credential helper.
 - **Rule-SETTING-006** — Nothing on this page has a key of its own.
 - **Rule-SETTING-018** — The name is read at the moment it is stamped, not
   remembered from when the IDE started. Changing it takes effect at once.

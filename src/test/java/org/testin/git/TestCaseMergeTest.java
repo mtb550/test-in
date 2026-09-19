@@ -192,10 +192,8 @@ public class TestCaseMergeTest {
     /**
      * Which files this merge can be asked about at all.
      * <p>
-     * Both channels ask it now - the Git rebase and the server sync - and that
-     * is why it lives here rather than in each of them. Two spellings of the
-     * question would mean one channel merging a file the other refused, and a
-     * team meeting the difference on the day it costs the most.
+     * The Git rebase asks it, and it lives here, beside the merge that answers
+     * for the files it says yes to.
      */
     @Test
     public void aTestCaseIsWhatThisCanMerge() {

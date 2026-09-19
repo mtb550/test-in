@@ -16,27 +16,30 @@
 
 package org.testin.rename;
 
-import org.testin.testproject.SaveTestinYml;
-import org.testin.codegen.CodeOn;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.CodeOn;
 import org.testin.codegen.JavaCode;
 import org.testin.codegen.Renamed;
+import org.testin.config.TestinYml;
+import org.testin.editor.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.services.Services;
-import org.testin.editor.TestinEditors;
-import org.testin.config.TestinYml;
 import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
+import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
+import org.testin.testproject.SaveTestinYml;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * Renaming a node, wherever the rename was asked for.
@@ -66,10 +69,10 @@ public final class NodeRename {
         Services.getInstance(p, TestinEditors.class).close(p, dir);
 
         // Before the data rename, while the old name is still what finds the
-        // generated code. Which generator that is belongs to the node, not here.
-        if (CodeOn.isOnOrWarnOnce(p)) {
-            JavaCode.of(dir.getType()).getRenamed().execute(p, new Renamed(dir, newName));
-        }
+        // generated code. Which generator that is belongs to the node, not here,
+        // and so does whether code is on: a test run has no code to be told
+        // about (Rule-CODEGEN-082).
+        JavaCode.of(dir.getType()).getRenamed().execute(p, new Renamed(dir, newName));
 
         final @NotNull String oldName = dir.getName();
         final @NotNull Path oldPath = dir.getPath();
@@ -91,6 +94,41 @@ public final class NodeRename {
     }
 
     /**
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-004, Rule-CODEGEN-080, Rule-CODEGEN-081.
+     * <p>
+     * Every reason a rename is refused, asked before anything moves - by the
+     * tree's rename, its undo and redo, and Edit Test Run alike - and said when
+     * there is one.
+     * <p>
+     * The name is asked of the disk, not the index: only the bound project is
+     * indexed, so a sibling project was invisible, and the code was renamed
+     * before the folder rename failed on it.
+     */
+    public static boolean refused(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
+        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+
+        if (Services.getInstance(p, ProjectIndexer.class).isTaken(dir.getPath().resolveSibling(newName), Optional.of(dir.getPath()))) {
+            notifier.softRefuse(p, Refused.ALREADY_EXISTS, newName);
+            return true;
+        }
+
+        final @NotNull Renamed renamed = new Renamed(dir, newName);
+        if (renamed.packageInTheWay(p)) {
+            notifier.softRefuse(p, Refused.PACKAGE_TAKEN, renamed.newPackage());
+            return true;
+        }
+
+        // Code the IDE cannot look up while it indexes would stay under the old
+        // name while the tree moved on, and a later rename would find nothing.
+        if (DumbService.isDumb(p) && CodeOn.isOn(p) && JavaCode.of(dir.getType()).getRenamed().generates()) {
+            notifier.softRefuse(p, Refused.WHILE_INDEXING, Bundle.message("dialog.rename.title"));
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * UC-TREE-PANEL-011, Rule-TREE-PANEL-110.
      * <p>
      * The project chosen for this repository follows the rename. {@code testin.yml}
@@ -100,7 +138,7 @@ public final class NodeRename {
      */
     private static void projectFollows(final @NotNull Project p, final @NotNull String oldName, final @NotNull String newName) {
         Services.getInstance(p, BoundTestProject.class).follow(oldName, newName);
-        if (!TestinYml.projectName(p).equals(oldName)) return;
+        if (!TestinYml.names(p, oldName)) return;
 
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
         notifier.infoWithActions(p, Bundle.message("rename.config.names.old.title", oldName),

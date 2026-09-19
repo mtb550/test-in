@@ -16,7 +16,6 @@
 
 package org.testin.rename;
 
-import org.testin.codegen.CodeOn;
 import org.testin.actions.GrayWithReason;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
@@ -28,16 +27,11 @@ import org.testin.actions.TestinData;
 import org.testin.explorer.TreePanel;
 import org.testin.undo.UndoScope;
 import org.testin.undo.UndoHistories;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.codegen.JavaCode;
-import org.testin.codegen.Renamed;
 import org.testin.editor.TestinEditors;
-import com.intellij.openapi.project.DumbService;
 import org.testin.util.Bundle;
 
 import java.util.Optional;
@@ -82,7 +76,7 @@ public class RenameAction extends DumbAwareAction {
             return;
         }
 
-        if (refused(p, dir, newName)) return;
+        if (NodeRename.refused(p, dir, newName)) return;
 
         final @NotNull String oldName = dir.getName();
         final @NotNull TreePanel tp = Services.getInstance(p, TreePanel.class);
@@ -122,45 +116,11 @@ public class RenameAction extends DumbAwareAction {
      * nothing came back, so it neither confirms nor spends the press.
      */
     private boolean applyRename(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
-        if (refused(p, dir, newName)) return false;
+        if (NodeRename.refused(p, dir, newName)) return false;
 
         NodeRename.apply(p, Services.getInstance(p, TreePanel.class), dir, newName, () -> {
         });
         return true;
-    }
-
-    /**
-     * UC-TREE-PANEL-011, Rule-TREE-PANEL-004, Rule-CODEGEN-080, Rule-CODEGEN-081.
-     * <p>
-     * Every reason a rename is refused, asked before anything moves - by the
-     * rename and by its undo and redo alike - and said when there is one.
-     * <p>
-     * The name is asked of the disk, not the index: only the bound project is
-     * indexed, so a sibling project was invisible, and the code was renamed
-     * before the folder rename failed on it.
-     */
-    private static boolean refused(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
-        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-
-        if (Services.getInstance(p, ProjectIndexer.class).isTaken(dir.getPath().resolveSibling(newName), Optional.of(dir.getPath()))) {
-            notifier.softRefuse(p, Refused.ALREADY_EXISTS, newName);
-            return true;
-        }
-
-        final @NotNull Renamed renamed = new Renamed(dir, newName);
-        if (renamed.packageInTheWay(p)) {
-            notifier.softRefuse(p, Refused.PACKAGE_TAKEN, renamed.newPackage());
-            return true;
-        }
-
-        // Code the IDE cannot look up while it indexes would stay under the old
-        // name while the tree moved on, and a later rename would find nothing.
-        if (DumbService.isDumb(p) && CodeOn.isOn(p) && JavaCode.of(dir.getType()).getRenamed().generates()) {
-            notifier.softRefuse(p, Refused.WHILE_INDEXING, Bundle.message("dialog.rename.title"));
-            return true;
-        }
-
-        return false;
     }
 
     /**

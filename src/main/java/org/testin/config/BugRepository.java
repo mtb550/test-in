@@ -59,7 +59,7 @@ public record BugRepository(@NotNull String host, @NotNull String owner, @NotNul
      * one.
      */
     public static @NotNull Optional<BugRepository> of(final @NotNull String address) {
-        final @NotNull String value = TestinProjectConfig.withoutCredentials(address.strip());
+        final @NotNull String value = TestinProjectConfig.withoutCredentials(address);
         if (value.isEmpty()) return Optional.empty();
 
         if (value.startsWith(TestinYml.SCP_PREFIX)) {

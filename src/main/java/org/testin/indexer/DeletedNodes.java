@@ -41,8 +41,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * restore it: pushed off the end of that surface's history and it goes, and
  * whatever a run ends still holding is cleared by the next one.
  * <p>
- * Under the IDE's own system directory, beside the sync baselines, rather than
- * anywhere below the Testin root. A folder under the root would be indexed,
+ * Under the IDE's own system directory rather than anywhere below the Testin
+ * root. A folder under the root would be indexed,
  * committed and synced unless three other places learned to skip it, and
  * deleted test data would travel to every machine the tester works on.
  */

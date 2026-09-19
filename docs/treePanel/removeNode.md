@@ -78,6 +78,8 @@ The node goes to the recycle bin, so nothing is lost for good.
   Ctrl+Z, run behind a progress bar and never hold up the IDE. Canceling the
   copy removes nothing and closes no editor. Putting back cannot be canceled,
   because a node half put back is worse than one not put back.
+- **Rule-TREE-PANEL-116** — A removal closes every editor open on a removed node
+  or under it, light mode included, so none is left holding data that has gone.
 
 ## The Confirm Removing dialog
 
@@ -120,7 +122,7 @@ and no path.
 5. Testin keeps a copy of each node for undo, under a progress bar reading
    *Removing*, and then closes every editor open on a removed node or under
    it - a removed package takes its test sets' editors with it
-   (Rule-TREE-PANEL-111).
+   (Rule-TREE-PANEL-116).
 6. The node goes to the desktop's recycle bin, and its automation code goes with
    it. On a desktop with no recycle bin the node is deleted outright.
 7. The tree rebuilds. Testin shows *Removed*, or *Removed N* for several. The

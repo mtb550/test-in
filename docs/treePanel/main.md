@@ -9,7 +9,7 @@ test set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The tree panel |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-029`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-115` |
+| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-029`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-116` |
 | **Retired** | `Rule-TREE-PANEL-018` and `Rule-TREE-PANEL-019` said cloning needed the code project to name the test project first, and named the folder by `testin.yml`, never by the address; read Rule-TREE-PANEL-107 instead. `Rule-TREE-PANEL-020` and `Rule-TREE-PANEL-021` said the choice was written into the code project, and said so when it could not be; read Rule-TREE-PANEL-106 instead. `Rule-TREE-PANEL-084` showed the branch box only when `testin.yml` said the project was shared through Git; read Rule-TREE-PANEL-108 instead. All five retired 19 September 2026, when Testin stopped writing `testin.yml` and stopped needing it (#301). `Rule-TREE-PANEL-035` said the test project and the two containers could not be renamed from the tree; retired the same day, when a test project became renamable (#331) - the containers are Rule-TREE-PANEL-002's. `Rule-TREE-PANEL-109` said a test project shared through an SFTP server keeps its name; written for #331 and retired unused the same day, before it shipped, when the SFTP sync was removed (#334). `Rule-TREE-PANEL-089` said only **Select Test Project** and **New Test Project** are ever gray on the toolbar; retired the same day, when **Save to testin.yml** became a third that can be (#335) - read Rule-TREE-PANEL-115 instead. The numbers are not given to anything else |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-TREE-PANEL-004](chooseTestProject.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. |
@@ -193,7 +193,7 @@ statuses, **Re-create**, **Edit Run**, **Run Tests** and **Details** are menu
 items only. Each one is a decision the tester thinks about, not a reflex, and
 none is used often enough to need a key.
 
-The panel's own seven buttons have no keys either, except search. They are
+The panel's own eight buttons have no keys either, except search. They are
 [UC-TREE-PANEL-028](panelToolbar.md). `F2` renames in the editors, not here.
 
 ---
@@ -287,40 +287,40 @@ along its top are the IDE's own. The branch box and the tree are Testin's.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  Testin              [1] [2] [3] [4] [5] [6] [7]                           │
+│  Testin              [1] [2] [3] [4] [5] [6] [7] [8]                       │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  [ main            v ]                                             (8)     │
+│  [ main            v ]                                             (9)     │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  v Demo                                                            (9)     │
+│  v Demo                                                           (10)     │
 │    v Test Cases                                                            │
-│      v Accounts                                                   (10)     │
+│      v Accounts                                                   (11)     │
 │          Login                                                             │
 │          Registration                                                      │
 │        Checkout                                                            │
-│        Legacy sign-in                            (deprecated: gray) (12)   │
+│        Legacy sign-in                            (deprecated: gray) (13)   │
 │    v Test Runs                                                             │
 │      v Sprint 7                                                            │
-│          + cycle-1  Created                                       (11)     │
+│          + cycle-1  Created                                       (12)     │
 │          @ cycle-2  In Progress                                            │
 │          * cycle-3  Completed                                              │
 │        2025                                        (archived: gray)        │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. to 7. **The toolbar** — seven buttons, left to right: **Search Test
+1. to 8. **The toolbar** — eight buttons, left to right: **Search Test
    Project**, **Settings**, **Expand All**, **Collapse All**, **Refresh**,
-   **Select Test Project** and **New Test Project**. Each one is
-   [UC-TREE-PANEL-028](panelToolbar.md).
-8. **The branch box** — shown only for a test project shared through Git. Its
+   **Select Test Project**, **New Test Project** and **Save to testin.yml**.
+   Each one is [UC-TREE-PANEL-028](panelToolbar.md).
+9. **The branch box** — shown only for a test project shared through Git. Its
    placeholder reads *Loading branches...* until Git answers.
-9. **The test project row** — drawn bold, with the IDE's project icon. The two
+10. **The test project row** — drawn bold, with the IDE's project icon. The two
    folders under it are bold too, and there are always exactly two.
-10. **A package** — a folder icon. **A test set** — the icon the IDE uses for a
+11. **A package** — a folder icon. **A test set** — the icon the IDE uses for a
    changelist. Neither is bold.
-11. **A test run** — draws its **status** as its icon. The status word follows
+12. **A test run** — draws its **status** as its icon. The status word follows
    the name in gray. So the tester reads the status of every test run without
    opening one. A test run never draws a kind icon.
-12. **Gray text** — means retired, or cut and not yet pasted. Both look the
+13. **Gray text** — means retired, or cut and not yet pasted. Both look the
     same on purpose. Both mean the same thing to a tester: not part of the work
     in front of them.
 

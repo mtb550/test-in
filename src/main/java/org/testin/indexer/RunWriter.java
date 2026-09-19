@@ -80,10 +80,9 @@ final class RunWriter {
      * <p>
      * So a screenshot saved a moment ago is read back from here rather than by
      * waiting for the queue to empty. The wait ran on the EDT - the failure
-     * form reads every screenshot of its row as it opens - and the same queue
-     * carries a sync's incoming run files, so a tester who opened a failure
-     * while a sync was writing got a frozen IDE for as long as the queue took
-     * (#66, finding 174). A screenshot's name is never reused, so the bytes
+     * form reads every screenshot of its row as it opens - so a tester who
+     * opened a failure while the queue was busy got a frozen IDE for as long as
+     * it took (#66, finding 174). A screenshot's name is never reused, so the bytes
      * held here are the bytes the file will hold.
      */
     private final @NotNull Map<Path, byte[]> unwritten = new ConcurrentHashMap<>();
@@ -165,7 +164,7 @@ final class RunWriter {
     private void sweepScreenshots(final @NotNull TestDataFiles files, final @NotNull Path runPath, final @NotNull Set<String> named) {
         files.screenshotsIn(runPath).stream()
                 .filter(file -> !named.contains(file.getFileName().toString()))
-                .forEach(file -> files.delete(p, file, runPath));
+                .forEach(file -> files.delete(p, file));
     }
 
     private static @NotNull Set<String> namedScreenshots(final @NotNull TestRunDto tr) {

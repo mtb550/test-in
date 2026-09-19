@@ -38,7 +38,6 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
-import org.testin.notifications.Refused;
 import org.testin.rename.NodeRename;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
@@ -194,12 +193,10 @@ public class EditTestRunAction extends DumbAwareAction {
             }
 
             // Its own name is not a collision, so a tester who edits the cases without
-            // touching the name is not refused for keeping it.
+            // touching the name is not refused for keeping it. A new name is refused
+            // for what the tree's rename refuses it for - the one list.
             final @NotNull String oldName = run.getName();
-            if (!name.equals(oldName) && indexer.nodeExists(parent.getPath().resolve(name))) {
-                notifier.softRefuse(p, Refused.ALREADY_EXISTS, name);
-                return false;
-            }
+            if (!name.equals(oldName) && NodeRename.refused(p, run, name)) return false;
 
             final @NotNull Set<UUID> checked = RunForm.checkedCases(selection);
             final @NotNull Set<UUID> offered = RunForm.offeredCases(selection);
@@ -224,10 +221,10 @@ public class EditTestRunAction extends DumbAwareAction {
             final @NotNull Map<TestRunConfiguration, String> configurationBefore = Map.copyOf(before.getConfiguration());
 
             // Applied to the run the index holds when the write lands, not to the
-            // one this dialog read when it opened. The dialog is not modal, so a
-            // sync can bring in a newer run while it is open, and writing the run it
-            // opened on replaced the verdicts that arrived. Through changeRun, which
-            // a sync holds, like every other change to a run (#312, A10).
+            // one this dialog read when it opened. The dialog is not modal, so the
+            // run can change while it is open - a verdict given in its editor - and
+            // writing the run it opened on replaced it. Through changeRun, like
+            // every other change to a run (#312, A10).
             applyEdit(run, name, runPath -> indexer.changeRun(runPath, held -> held
                     .setResults(held.coverOnly(wanted(held, checked, offered::contains)).getResults())
                     .setConfiguration(configuration)), () -> Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED));
@@ -356,8 +353,8 @@ public class EditTestRunAction extends DumbAwareAction {
          * has to put that back with it. A case covered before and after keeps
          * whatever it holds now, which is the verdict recorded since.
          * <p>
-         * Through {@code changeRun} like the edit itself, so an undo during a
-         * sync waits for it and lands on the run that arrived. And refused on a
+         * Through {@code changeRun} like the edit itself, so an undo lands on the
+         * run as it is now. And refused on a
          * run that has been signed off since, which is the same question Save
          * asks: what a report says must not move underneath it.
          */

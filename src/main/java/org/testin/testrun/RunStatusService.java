@@ -32,7 +32,6 @@ import org.testin.model.TestRunStatus;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
-import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -83,9 +82,8 @@ public final class RunStatusService {
         final @NotNull Optional<TestRunDto> held = heldRun(p, runPath);
         if (held.isEmpty() || liveItem(p, held.orElseThrow(), runPath, currentTc.getId()).isEmpty()) return;
 
-        // As a change on the run the indexer holds, so a verdict given while a
-        // sync brings the run in waits for it and lands on the run that arrived
-        // (#66, finding 152).
+        // As a change on the run the indexer holds, so the verdict lands on the
+        // run as it is now rather than on a copy read earlier (#66, finding 152).
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
         Services.getInstance(p, ProjectIndexer.class).changeRun(runPath,
                 run -> run.resultOf(currentTc.getId()).filter(runItem -> !runItem.isRemoved()).ifPresent(runItem -> runItem.recordVerdict(status, tester)));
@@ -149,9 +147,8 @@ public final class RunStatusService {
 
         if (liveItem(p, run, runPath, caseId).isEmpty()) return false;
 
-        // Through the indexer rather than on the run read above: while a sync is
-        // bringing this run's files in, the change waits for them and lands on
-        // the run that arrived (#66, finding 129).
+        // Through the indexer rather than on the run read above, so the change
+        // lands on the run the index holds when it is made (#66, finding 129).
         Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, current -> current.resultOf(caseId).ifPresentOrElse(item -> {
             // Before the verdict, not after: passing clears everything a failure
             // described, so a message written afterward would survive onto a case
@@ -337,9 +334,8 @@ public final class RunStatusService {
                 }
             }
 
-            // One change on the run the indexer holds, so verdicts given while a
-            // sync brings the run in wait for it and land on the run that arrived
-            // (#66, finding 152).
+            // One change on the run the indexer holds, so the verdicts land on the
+            // run as it is now (#66, finding 152).
             final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
             Services.getInstance(p, ProjectIndexer.class).changeRun(editor.getParent().getPath(), run -> judged.forEach(id ->
                     run.resultOf(id).filter(item -> !item.isRemoved()).ifPresent(item -> item.recordVerdict(status, tester))));
@@ -404,10 +400,8 @@ public final class RunStatusService {
 
         if (status.isTerminal()) finishRun(p, runPath);
 
-        // Through changeRunMarker, so the status waits for a sync of this project
-        // exactly as the cases above it do. Written straight through, the marker
-        // landed while finishRun was still held, and the run sat Completed over
-        // cases still Pending until the sync let the rest of it in (#312, A4).
+        // Through changeRunMarker, as the cases above it go through changeRun:
+        // every change to a run is made on the run the index holds (#312, A4).
         Services.getInstance(p, ProjectIndexer.class).changeRunMarker(runPath, marker -> {
             marker.setStatus(status);
             marker.touch(tester);

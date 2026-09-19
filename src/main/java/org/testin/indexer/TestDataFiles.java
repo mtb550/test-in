@@ -154,20 +154,15 @@ final class TestDataFiles {
     /**
      * UC-INTERNAL-005, Rule-INTERNAL-036.
      * <p>
-     * Removes a file, and the folders it leaves empty behind it, up to but never
-     * including the project.
-     * <p>
-     * A sync that deletes the last case in a test set would otherwise leave the
-     * folder and its marker standing, so the tree keeps showing a set with
-     * nothing in it that nobody can explain. Stops at the project because an
-     * empty project is still a project - somebody made it deliberately.
+     * Removes a file. Its folder stays: a test set outlives its last case, and a
+     * run its last screenshot.
      *
      * @return whether the file is gone now: removed, in the recycle bin, or never
      * there. False when the system refused to delete it, which this has already
      * said. It answered nothing, so a test case whose file would not go was
      * dropped from the index anyway (#66, finding 292)
      */
-    boolean delete(final @NotNull Project p, final @NotNull Path path, final @NotNull Path stopAt) {
+    boolean delete(final @NotNull Project p, final @NotNull Path path) {
         try {
             Services.getInstance(OwnWrites.class).record(path);
 
@@ -181,33 +176,7 @@ final class TestDataFiles {
             return false;
         }
 
-        removeEmptyFolders(path.getParent(), stopAt);
         return true;
-    }
-
-    /**
-     * Walks up from a removed file, dropping every folder it emptied.
-     * <p>
-     * A folder that will not be read is left standing rather than reported: the
-     * file the tester asked to remove is already gone, and a leftover empty
-     * folder is untidy where a failure notification about it would be alarming.
-     */
-    private void removeEmptyFolders(final @NotNull Path folder, final @NotNull Path stopAt) {
-        for (Path at = folder; at != null && at.startsWith(stopAt) && !at.equals(stopAt); at = at.getParent()) {
-            try (Stream<Path> inside = Files.list(at)) {
-                if (inside.findAny().isPresent()) return;
-
-                Services.getInstance(OwnWrites.class).record(at);
-
-                // Deleted outright, not trashed: this folder is empty by the
-                // time it is reached, so there is nothing in the bin to recover
-                // and every removal would leave one there to tidy up.
-                Files.deleteIfExists(at);
-            } catch (final IOException ex) {
-                Logger.warn("Left an empty folder behind at " + at + ": " + ex.getMessage());
-                return;
-            }
-        }
     }
 
     private void reportWriteFailure(final @NotNull Project p, final @NotNull Path path, final @NotNull IOException ex) {

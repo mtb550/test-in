@@ -118,7 +118,8 @@ choice was made (Rule-TREE-PANEL-106).
 
 **If `testin.yml` is edited by hand** — the tree does not notice. Testin reads
 that file when the project opens. After that it reads the file again only when
-the tester presses **Refresh**.
+the tester presses **Refresh** or **Save to testin.yml**, and before **Report
+Bug** sends.
 
 ---
 
