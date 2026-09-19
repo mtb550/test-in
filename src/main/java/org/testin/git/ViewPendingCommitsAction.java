@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 /**
@@ -411,11 +412,14 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         private void configureRemoteAndPush(final @NotNull Path repoPath, final @NotNull String remoteName, final @NotNull String branch, final @NotNull String commitId) {
             // The repository already says where its test project lives, so a clone of
             // it should not have to be told again. Asking is the fallback, not the
-            // first move (#8).
-            final @NotNull String known = TestinYml.repoUrl(p);
+            // first move (#8). Only for the project the file names, and only while
+            // it says that project is shared: the address is that project's, and a
+            // tester's own pick pushed there would put its history in the team's
+            // repository.
+            final @NotNull Optional<String> known = TestinYml.cloneAddress(p, String.valueOf(repoPath.getFileName()));
 
-            if (!known.isEmpty()) {
-                addRemoteAndPush(repoPath, remoteName, branch, commitId, known);
+            if (known.isPresent()) {
+                addRemoteAndPush(repoPath, remoteName, branch, commitId, known.orElseThrow());
                 return;
             }
 
@@ -483,6 +487,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         }
 
         /**
+         * UC-SHARE-017.
+         * <p>
          * Offers Resolve, Continue and Abort for the files Git named, which the
          * caller hands in rather than this asking Git again: the offer also comes
          * back from {@link ConflictResolution} on the EDT, and a Git command there

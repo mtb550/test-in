@@ -34,10 +34,9 @@ import java.util.regex.Pattern;
  * hold these values, so no caller can decide on its own what a missing one
  * means - it asks {@link TestinYml} (Rule-INTERNAL-089).
  * <p>
- * One test project per automation repository. The repository names it, so the
- * pairing travels with a clone instead of living in one machine's IDE settings,
- * and a tester who opens the repository on a second machine is not asked to pick
- * it again.
+ * One test project per automation repository. The repository names it, so a
+ * clone opened on a second machine lands on it without being asked to pick - and
+ * a tester's own pick, kept on their machine, still wins (Rule-TREE-PANEL-106).
  * <p>
  * What is deliberately <b>not</b> here is anything about one machine or one
  * person - the Testin root folder, the tester's name, an account, and above all
@@ -64,6 +63,15 @@ import java.util.regex.Pattern;
  *                      the question that answers whether it does
  */
 record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String repoUrl, @NotNull String testinProject, @NotNull String bugRepoUrl) {
+
+    /**
+     * The keys as the file spells them: read here, and written by
+     * {@link TestinYml#lines} - one spelling for both.
+     */
+    static final @NotNull String PROJECT_KEY = "testinProject";
+    static final @NotNull String LOCATION_KEY = "location";
+    static final @NotNull String REPO_URL_KEY = "RepoUrl";
+    static final @NotNull String BUG_REPO_URL_KEY = "bugRepoUrl";
 
     /**
      * A repository that has said nothing. Every way of failing to read one - no
@@ -106,7 +114,7 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String rep
      * short by one the way a list of forbidden ones can.
      */
     private static final @NotNull Pattern REPO_URL =
-            Pattern.compile("^(https://|ssh://|git@)[A-Za-z0-9._~:/?#@%+-]+$");
+            Pattern.compile("^(https://|ssh://|" + TestinYml.SCP_PREFIX + ")[A-Za-z0-9._~:/?#@%+-]+$");
 
     public TestinProjectConfig {
         repoUrl = validRepoUrl(repoUrl);
@@ -135,7 +143,7 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String rep
      * promises.
      */
     @JsonCreator
-    static @NotNull TestinProjectConfig read(@JsonProperty("location") final @Nullable String location, @JsonProperty("RepoUrl") final @Nullable String repoUrl, @JsonProperty("testinProject") final @Nullable String testinProject, @JsonProperty("bugRepoUrl") final @Nullable String bugRepoUrl) {
+    static @NotNull TestinProjectConfig read(@JsonProperty(LOCATION_KEY) final @Nullable String location, @JsonProperty(REPO_URL_KEY) final @Nullable String repoUrl, @JsonProperty(PROJECT_KEY) final @Nullable String testinProject, @JsonProperty(BUG_REPO_URL_KEY) final @Nullable String bugRepoUrl) {
         return new TestinProjectConfig(TestinLocation.of(strip(location)),
                 strip(repoUrl),
                 strip(testinProject),
@@ -177,7 +185,8 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String rep
      * a secret, and the credential helper asks for whatever it needs, so taking
      * it out costs nothing.
      */
-    static @NotNull String withoutCredentials(final @NotNull String url) {
+    static @NotNull String withoutCredentials(final @NotNull String address) {
+        final @NotNull String url = address.strip();
         final int scheme = url.indexOf("://");
         if (scheme < 0) return url;
 

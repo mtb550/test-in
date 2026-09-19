@@ -19,6 +19,8 @@ package org.testin.config;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
+import java.util.Locale;
+
 /**
  * Whether a test project is shared with anyone, as {@code testin.yml} says it.
  * <p>
@@ -61,5 +63,12 @@ public enum TestinLocation {
 
     public boolean isRemote() {
         return this == REMOTE;
+    }
+
+    /**
+     * The word the file uses for it, which {@link #of} reads back.
+     */
+    public @NotNull String written() {
+        return name().toLowerCase(Locale.ROOT);
     }
 }

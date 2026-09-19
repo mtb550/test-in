@@ -27,7 +27,9 @@ There is no key for this. **Commit & Push** is the face of the split button.
 - **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
   keys can be changed there.
 - **Rule-SHARE-059** — The push happens only after the commit succeeded.
-- **Rule-SHARE-060** — A repository with no remote asks for one, once.
+- **Rule-SHARE-060** — A repository with no remote takes the address
+  `testin.yml` gives, when the file names this test project and says it is
+  shared, and otherwise asks for one, once.
 - **Rule-SHARE-061** — The message about a push stays in the IDE's notification
   list, because a push finishes on its own time.
 - **Rule-SHARE-062** — Any password inside the remote address is taken out of
@@ -54,7 +56,10 @@ something else.
 
 ## What Testin refuses
 
-**If no remote is set** — a window titled **Configure Remote** asks for one. It
+**If no remote is set** — when `testin.yml` names this test project, says
+`location: remote` and gives its `RepoUrl`, that address becomes the remote and
+the push goes on. For any other test project a window titled **Configure
+Remote** asks for one. It
 says the repository has nowhere to push to yet, names the remote the address
 will be added as, and shows an example address in the empty box.
 

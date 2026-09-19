@@ -67,10 +67,10 @@ public final class CodeOn {
      * test project. Compared exactly, as the binding compares names.
      */
     public static @NotNull Optional<String> whyOff(final @NotNull Project p) {
-        final @NotNull String named = TestinYml.projectName(p);
         final @NotNull String open = Services.getInstance(p, BoundTestProject.class).name();
-        if (!named.isEmpty() && named.equals(open)) return Optional.empty();
+        if (TestinYml.names(p, open)) return Optional.empty();
 
+        final @NotNull String named = TestinYml.projectName(p);
         return Optional.of(named.isEmpty() ? Bundle.message("code.off.not.named") : Bundle.message("code.off.names.other", named, open));
     }
 
@@ -107,7 +107,7 @@ public final class CodeOn {
                     notifier.action(Bundle.message("yml.save.name"), () -> SaveTestinYml.start(p)));
         }
 
-        Logger.info("Automation code left as it is: " + why.orElseThrow());
+        Logger.debug("Automation code left as it is: " + why.orElseThrow());
         return false;
     }
 

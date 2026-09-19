@@ -17,6 +17,7 @@
 package org.testin.config;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -131,8 +132,8 @@ public final class TestinYml {
     }
 
     /**
-     * Reads the file again - after a branch switch brought a different revision
-     * of it, or after a tester edited it by hand.
+     * Reads the file again: on Refresh, before Report Bug sends, and after Save
+     * to testin.yml writes it.
      */
     public static void reload(final @NotNull Project p) {
         p.putUserData(READ, load(p));
@@ -156,18 +157,28 @@ public final class TestinYml {
     }
 
     /**
-     * Where the file says the test project is cloned from, empty when it gives
-     * no clone address.
+     * Rule-CODEGEN-082.
+     * <p>
+     * Whether the file names this test project - the one question behind code
+     * being on, a clone address being offered, and a rename being told the file
+     * still names the old name. Never for an empty name: a file that names
+     * nothing names no project.
      */
-    public static @NotNull String repoUrl(final @NotNull Project p) {
-        return config(p).repoUrl();
+    public static boolean names(final @NotNull Project p, final @NotNull String projectName) {
+        return !projectName.isEmpty() && projectName.equals(projectName(p));
     }
 
     /**
-     * Whether the file gives a clone address for the project it names.
+     * UC-TREE-PANEL-001, UC-TREE-PANEL-003, Rule-SHARE-060.
+     * <p>
+     * Where this test project is cloned from, and pushed to when its folder has
+     * no remote yet: the file's {@code RepoUrl}, only while the file names this
+     * project and says it is shared. The address is the named project's, so no
+     * other project is cloned from it or pushed to it (#301, R7).
      */
-    public static boolean hasRepoUrl(final @NotNull Project p) {
-        return config(p).hasRepoUrl();
+    public static @NotNull Optional<String> cloneAddress(final @NotNull Project p, final @NotNull String projectName) {
+        final @NotNull TestinProjectConfig config = config(p);
+        return names(p, projectName) && config.hasRepoUrl() ? Optional.of(config.repoUrl()) : Optional.empty();
     }
 
     /**
@@ -177,8 +188,8 @@ public final class TestinYml {
      * credentials taken out as the file's own is.
      */
     public static boolean isRepoUrl(final @NotNull Project p, final @NotNull String address) {
-        final @NotNull String given = repoUrl(p);
-        return !given.isEmpty() && given.equals(TestinProjectConfig.withoutCredentials(address.strip()));
+        final @NotNull TestinProjectConfig config = config(p);
+        return config.hasRepoUrl() && config.repoUrl().equals(TestinProjectConfig.withoutCredentials(address));
     }
 
     /**
@@ -198,14 +209,31 @@ public final class TestinYml {
     }
 
     /**
-     * Rule-SHARE-004.
+     * UC-TREE-PANEL-029, Rule-TREE-PANEL-113.
      * <p>
-     * A clone address with any account and token taken out, as the file's own
-     * is read - so the address Save to testin.yml writes is the one the reader
-     * would keep. The file is committed.
+     * The line Save to testin.yml writes when Git cannot be asked: the project,
+     * and nothing about where it lives - without the Git plugin, calling a Git
+     * project local would be a guess, so those lines are left as they are.
      */
-    public static @NotNull String withoutCredentials(final @NotNull String address) {
-        return TestinProjectConfig.withoutCredentials(address.strip());
+    public static @NotNull Map<String, String> lines(final @NotNull String projectName) {
+        final @NotNull Map<String, String> lines = new LinkedHashMap<>();
+        lines.put(TestinProjectConfig.PROJECT_KEY, projectName);
+        return lines;
+    }
+
+    /**
+     * UC-TREE-PANEL-029, Rule-TREE-PANEL-113, Rule-SHARE-004.
+     * <p>
+     * The lines Save to testin.yml writes when Git said where the project
+     * lives: a remote gives {@code location: remote} and its address with any
+     * account and token taken out - the file is committed - and a folder with
+     * none gives {@code location: local}.
+     */
+    public static @NotNull Map<String, String> lines(final @NotNull String projectName, final @NotNull String remote) {
+        final @NotNull Map<String, String> lines = lines(projectName);
+        lines.put(TestinProjectConfig.LOCATION_KEY, (remote.isEmpty() ? TestinLocation.LOCAL : TestinLocation.REMOTE).written());
+        if (!remote.isEmpty()) lines.put(TestinProjectConfig.REPO_URL_KEY, TestinProjectConfig.withoutCredentials(remote));
+        return lines;
     }
 
     /**
@@ -242,28 +270,30 @@ public final class TestinYml {
      * change ({@link #withLines}).
      */
     public static boolean save(final @NotNull Project p, final @NotNull Map<String, String> owned) {
-        final @NotNull Optional<VirtualFile> folder = Optional.ofNullable(p.getBasePath())
-                .map(path -> LocalFileSystem.getInstance().refreshAndFindFileByNioFile(Path.of(path)));
+        final @NotNull Optional<Path> path = savePath(p);
+        final @NotNull Optional<VirtualFile> folder = path.map(Path::getParent).map(LocalFileSystem.getInstance()::refreshAndFindFileByNioFile);
         if (folder.isEmpty()) {
             Logger.warn("No folder to save testin.yml in for " + p.getName());
             return false;
         }
 
+        final @NotNull String name = String.valueOf(path.orElseThrow().getFileName());
         final boolean saved = WriteCommandAction.writeCommandAction(p).withName(Bundle.message("yml.save.command"))
-                .compute(() -> write(folder.orElseThrow(), owned));
+                .compute(() -> write(folder.orElseThrow(), name, owned));
         reload(p);
         return saved;
     }
 
-    private static boolean write(final @NotNull VirtualFile folder, final @NotNull Map<String, String> owned) {
+    private static boolean write(final @NotNull VirtualFile folder, final @NotNull String name, final @NotNull Map<String, String> owned) {
         try {
-            final @NotNull Optional<VirtualFile> existing = Arrays.stream(FILE_NAMES).map(folder::findChild).filter(Objects::nonNull).findFirst();
-            final @NotNull VirtualFile file = existing.isPresent() ? existing.orElseThrow() : folder.createChildData(TestinYml.class, FILE_NAMES[0]);
+            final @NotNull Optional<VirtualFile> existing = Optional.ofNullable(folder.findChild(name));
+            final @NotNull VirtualFile file = existing.isPresent() ? existing.orElseThrow() : folder.createChildData(TestinYml.class, name);
             final @NotNull Optional<Document> open = Optional.ofNullable(FileDocumentManager.getInstance().getCachedDocument(file));
 
             if (open.isPresent()) {
-                open.orElseThrow().setText(withLines(open.orElseThrow().getText(), owned));
-                FileDocumentManager.getInstance().saveDocument(open.orElseThrow());
+                final @NotNull Document document = open.orElseThrow();
+                document.setText(withLines(document.getText(), owned));
+                FileDocumentManager.getInstance().saveDocument(document);
             } else {
                 VfsUtil.saveText(file, withLines(VfsUtilCore.loadText(file), owned));
             }
@@ -280,10 +310,11 @@ public final class TestinYml {
      * Rule-TREE-PANEL-114.
      * <p>
      * The file's text with each owned key's line set to its value - in place
-     * where the file has that key at the top level, at the end where it does
-     * not - and every other line as it was, comments and keys Testin does not
-     * know included. A file that ends without a newline keeps that ending unless
-     * a line has to be added. Its line separator is kept.
+     * where the file has that key at the top level, every such line when it has
+     * the key twice so the reader cannot find the old value after it, and at the
+     * end where it has none - and every other line as it was, comments and keys
+     * Testin does not know included. A file that ends without a newline keeps
+     * that ending unless a line has to be added. Its line separator is kept.
      */
     static @NotNull String withLines(final @NotNull String text, final @NotNull Map<String, String> owned) {
         final @NotNull String separator = text.contains("\r\n") ? "\r\n" : "\n";
@@ -295,7 +326,10 @@ public final class TestinYml {
         final @NotNull Set<String> placed = new HashSet<>();
         for (int i = 0; i < lines.size(); i++) {
             final int at = i;
-            keyOf(lines.get(i), owned.keySet()).filter(placed::add).ifPresent(key -> lines.set(at, line(key, owned.get(key))));
+            keyOf(lines.get(i), owned.keySet()).ifPresent(key -> {
+                lines.set(at, line(key, owned.get(key)));
+                placed.add(key);
+            });
         }
 
         final int before = lines.size();
@@ -307,14 +341,24 @@ public final class TestinYml {
     }
 
     /**
-     * What each of these keys holds in the text, as written after its colon.
+     * What each of these keys holds in the text, as the reader reads it - quotes
+     * and a trailing comment are YAML's, not the value's - and nothing for a key
+     * the text does not have, or for text that does not parse.
      */
     static @NotNull Map<String, String> valuesIn(final @NotNull String text, final @NotNull Set<String> keys) {
-        final @NotNull Map<String, String> values = new LinkedHashMap<>();
-        for (final String line : text.replace("\r\n", "\n").split("\n")) {
-            keyOf(line, keys).ifPresent(key -> values.putIfAbsent(key, line.substring(key.length() + 1).strip()));
+        if (text.isBlank()) return Map.of();
+
+        try {
+            final @NotNull Map<String, Object> read = Optional.ofNullable(YAML.readValue(text, new TypeReference<Map<String, Object>>() {
+            })).orElse(Map.of());
+
+            final @NotNull Map<String, String> values = new LinkedHashMap<>();
+            keys.stream().filter(read::containsKey).forEach(key -> values.put(key, Objects.toString(read.get(key), "")));
+            return values;
+        } catch (final IOException ex) {
+            Logger.warn("Could not read the values in testin.yml: " + ex.getMessage());
+            return Map.of();
         }
-        return values;
     }
 
     /**
@@ -357,9 +401,8 @@ public final class TestinYml {
     /**
      * UC-TREE-PANEL-011, Rule-TREE-PANEL-110.
      * <p>
-     * Opens the file in an editor for the tester to change - the one way a
-     * value in it is corrected, because Testin never writes it. Nothing when the
-     * repository has none.
+     * Opens the file in an editor for the tester to change by hand - a rename
+     * never writes it. Nothing when the repository has none.
      */
     public static void openInEditor(final @NotNull Project p) {
         file(p).flatMap(path -> Optional.ofNullable(LocalFileSystem.getInstance().findFileByNioFile(path)))
