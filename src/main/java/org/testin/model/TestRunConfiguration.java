@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import org.testin.model.dto.TestRunDto;
+import org.testin.model.markers.TestRunMarker;
 
 import javax.swing.*;
 import org.testin.model.markers.DetailRow;
@@ -154,7 +154,7 @@ public enum TestRunConfiguration {
      * question that did not apply and a question left empty are the same thing
      * to everything that shows one.
      */
-    public @NotNull String valueIn(final @NotNull TestRunDto run) {
+    public @NotNull String valueIn(final @NotNull TestRunMarker run) {
         return run.getConfiguration().getOrDefault(this, "");
     }
 
@@ -168,7 +168,7 @@ public enum TestRunConfiguration {
      * builder, so a web run does not show an empty Device Type and nothing here
      * has to know that it should not.
      */
-    public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunDto run) {
+    public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunMarker run) {
         return Arrays.stream(values())
                 .map(field -> new DetailRow(field.displayName, field.valueIn(run)))
                 .toList();

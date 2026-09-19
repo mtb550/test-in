@@ -82,6 +82,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import org.testin.model.markers.TestRunMarker;
 
 public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRunDirectoryDto> implements Toolbar {
 
@@ -429,13 +430,18 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     public void onToolBarResultAnalysisClicked() {
         run().ifPresent(runData -> new ResultAnalysisDialog(p,
                 TestRunSummary.of(runData.getResults()),
-                runData.getResultAnalysis(),
+                parent.getMarker().getResultAnalysis(),
                 analysis -> {
                     // Only the sections written in. Four empty strings were
                     // stored for the ones left alone, which every reader then
                     // treated as nothing anyway.
-                    runData.setResultAnalysis(ResultAnalysis.written(analysis));
-                    Services.getInstance(p, ProjectIndexer.class).putTestRun(parent.getPath(), runData);
+                    //
+                    // Through changeRunMarker, the one door a run's own facts are
+                    // changed by: it writes the marker the index holds, where this
+                    // used to go through putTestRun - the door that creates a run
+                    // (#305, S26).
+                    Services.getInstance(p, ProjectIndexer.class).changeRunMarker(parent.getPath(),
+                            marker -> marker.setResultAnalysis(ResultAnalysis.written(analysis)));
                     Services.getInstance(p, Notifier.class).softShow(p, Done.SAVED);
                 }).show());
     }
@@ -723,7 +729,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         final @NotNull TestRunStatus status = parent.getMarker().getStatus();
         if (status == TestRunStatus.IN_PROGRESS || status.isTerminal()) return;
 
-        run().ifPresent(TestRunDto::markExecutionStarted);
+        Services.getInstance(p, ProjectIndexer.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionStarted);
         Services.getInstance(p, TestRunStatusChange.class).apply(parent, TestRunStatus.IN_PROGRESS);
     }
 
@@ -1150,7 +1156,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
      * together.
      */
     public void stopExecution() {
-        tr.ifPresent(TestRunDto::markExecutionEnded);
+        Services.getInstance(p, ProjectIndexer.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionEnded);
 
         haltExecution();
     }
@@ -1218,7 +1224,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         }
 
         // Before the status change, which is what persists the run.
-        run.get().markExecutionStarted();
+        Services.getInstance(p, ProjectIndexer.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionStarted);
         Services.getInstance(p, TestRunStatusChange.class).apply(parent, TestRunStatus.IN_PROGRESS);
         // From the top, not from a row worked out here: where the walk lands is
         // the walk's own question, and it is answered in one place.

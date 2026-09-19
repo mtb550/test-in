@@ -30,6 +30,7 @@ import org.testin.util.Display;
 
 import java.util.List;
 import java.util.UUID;
+import org.testin.model.markers.TestRunMarker;
 
 /**
  * What a bug report is made of, copied off the run item, its test case and its
@@ -56,7 +57,7 @@ public record BugFacts(@NotNull String title, @NotNull BugSeverity severity, @No
      * so they are copied as typed (#28, P35). The screenshots come read already,
      * because their files are the indexer's (#313).
      */
-    public static @NotNull BugFacts of(final @NotNull TestRunItems item, final @NotNull TestCaseDto tc, final @NotNull TestRunDto run, final @NotNull String testRun, final @NotNull List<byte[]> screenshots) {
+    public static @NotNull BugFacts of(final @NotNull TestRunItems item, final @NotNull TestCaseDto tc, final @NotNull TestRunMarker run, final @NotNull String testRun, final @NotNull List<byte[]> screenshots) {
         return new BugFacts(
                 TestEditorAttributes.DESCRIPTION.displayValue(tc),
                 item.getBugSeverity(),

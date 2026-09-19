@@ -95,7 +95,7 @@ for it, and what is written back is that answer rather than an invented one.
 | `.tsp` | Test set package | `status` | `ACTIVE` `ARCHIVED` |
 | `.ts` | Test set | `status` | `ACTIVE` `DEPRECATED` |
 | `.trp` | Test run package | `status` | `ACTIVE` `ARCHIVED` |
-| `.tr` | Test run | `status` | `CREATED` `IN_PROGRESS` `COMPLETED` `ASSIGNED` `CLOSED` |
+| `.tr` | Test run | `status`, and the run's own facts: `configuration`, `resultAnalysis`, `executionStartedAt`, `executionEndedAt` — see below | `CREATED` `IN_PROGRESS` `COMPLETED` `ASSIGNED` `CLOSED` |
 
 **A directory carrying two markers of one family is read as the more specific
 one.** Under `Test Cases` the order is `.ts` then `.tsp`; under `Test Runs` it is
@@ -110,6 +110,31 @@ nothing else may ask in a different order.
   "modifiedBy" : "Sara Al-Otaibi",
   "modifiedAt" : "Wednesday 09-09-2026 At 05:28:11 [Asia/Riyadh]",
   "status" : "ACTIVE"
+}
+```
+
+**The test run marker adds four more**, because they are facts about the run
+rather than about any one result — what it was executed against, what the tester
+wrote about the verdicts afterwards, and when execution started and last
+stopped. They are the run's, so they are in the run's own file:
+
+| Field | Type | Required | Meaning |
+|---|---|---|---|
+| `configuration` | map | no, **omitted when empty** | What the run was executed against. Keys are `TEST_TYPE` `CHANGE_LOG` `COMMIT_ID` `PLATFORM` `COMPONENT` `LANGUAGE` `BROWSER` `DEVICE_TYPE`; values are free text |
+| `resultAnalysis` | map | no, **omitted when empty** | What the tester wrote about each group of verdicts. Keys are `PASSED` `FAILED` `BLOCKED` `UNTESTED`; values are free text |
+| `executionStartedAt` | date | no, defaults to the epoch | When Start Execution was first pressed. Kept: a run resumed next week still started when it started |
+| `executionEndedAt` | date | no, defaults to the epoch | When execution last stopped |
+
+```json
+{
+  "createdBy" : "Sara Al-Otaibi",
+  "createdAt" : "Sunday 13-09-2026 At 09:00:00 [Asia/Riyadh]",
+  "modifiedBy" : "Sara Al-Otaibi",
+  "modifiedAt" : "Monday 14-09-2026 At 10:22:05 [Asia/Riyadh]",
+  "status" : "IN_PROGRESS",
+  "configuration" : { "TEST_TYPE" : "Regression", "PLATFORM" : "Web", "BROWSER" : "Chrome" },
+  "executionStartedAt" : "Monday 14-09-2026 At 10:00:12 [Asia/Riyadh]",
+  "executionEndedAt" : "Thursday 01-01-1970 At 00:00:00 [Z]"
 }
 ```
 
@@ -189,7 +214,9 @@ on each case and nothing else.
 ## A test run — `run.json`
 
 One file per test run, beside its `.tr`. It records what was executed, not what
-exists: a case removed from the test set keeps its result here.
+exists: a case removed from the test set keeps its result here. What the run
+itself is - how it was configured, what the tester wrote about the verdicts, when
+it was executed - is in its `.tr`, with its status.
 
 The screenshots its failures name sit beside it, one PNG each, named by five
 random lowercase letters and digits that no result of the run already holds -
@@ -200,11 +227,7 @@ there by hand under such a name goes too.
 
 | Field | Type | Required | Meaning |
 |---|---|---|---|
-| `configuration` | map | no, **omitted when empty** | What the run was executed against. Keys are `TEST_TYPE` `CHANGE_LOG` `COMMIT_ID` `PLATFORM` `COMPONENT` `LANGUAGE` `BROWSER` `DEVICE_TYPE`; values are free text |
-| `resultAnalysis` | map | no, **omitted when empty** | Keys are `PASSED` `FAILED` `BLOCKED` `UNTESTED`; values are free text |
-| `executionStartedAt` | date | no, defaults to the epoch | |
-| `executionEndedAt` | date | no, defaults to the epoch | |
-| `results` | array | no | One entry per case the run covers, below |
+| `results` | array | no | One entry per case the run covers, below. The run's own facts are not here: they are in its `.tr`, above |
 
 Each entry in `results`:
 

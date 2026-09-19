@@ -141,8 +141,7 @@ public class CreateTestRun implements NodeCreator {
         // Who made it and when is the marker's, which every node carries and the
         // details popup already reads. The run held a second copy that nothing
         // ever read back.
-        final @NotNull TestRunDto tr = new TestRunDto()
-                .setConfiguration(TestRunConfiguration.answered(configuration));
+        final @NotNull TestRunDto tr = new TestRunDto();
 
         final @NotNull List<TestRunItems> items = new ArrayList<>();
         RunForm.checkedCases(selection).forEach(id -> items.add(new TestRunItems().setId(id).setStatus(TestStatus.PENDING)));
@@ -153,7 +152,9 @@ public class CreateTestRun implements NodeCreator {
         BackgroundWork.run(p, Bundle.message("run.task.creating", savePath.getFileName()), Bundle.message("run.create.failed.title"), indicator -> {
             // Defaults are correct (status CREATED); addTestRunDir stamps the
             // tester's audit info before the marker's first write.
-            final @NotNull TestRunMarker marker = new TestRunMarker();
+            // The answers the tester gave are the run's own facts, so they go in
+            // its marker, with its status and its audit block (#305, D6).
+            final @NotNull TestRunMarker marker = new TestRunMarker().setConfiguration(TestRunConfiguration.answered(configuration));
             trDir.setMarker(marker);
 
             // A run whose marker did not land is not opened or confirmed: the

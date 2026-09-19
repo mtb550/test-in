@@ -27,6 +27,7 @@ import org.testng.annotations.Test;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import org.testin.model.TestRunExecution;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -55,10 +56,20 @@ public class MarkerDetailRowsTest {
                 "a test set adds no rows of its own, and must answer that rather than leave the caller to know it");
     }
 
+    /**
+     * Rule-INTERNAL-075. A run's own facts are its marker's, so the marker is what
+     * answers for them - the details dialog asks it rather than asking the index
+     * for the run and naming the two sets itself (#305, S15).
+     */
     @Test
-    public void aRunMarkerNoLongerAnswersForTheRun() {
-        assertTrue(new TestRunMarker().getDetailRows().isEmpty(),
-                "the configuration is the run file's; a marker that still offered it would be the second copy again");
+    public void aRunMarkerAnswersForItsExecutionAndItsConfiguration() {
+        final @NotNull List<DetailRow> rows = new TestRunMarker()
+                .setConfiguration(new EnumMap<>(Map.of(TestRunConfiguration.PLATFORM, "Web")))
+                .getDetailRows();
+
+        assertEquals(rows.size(), TestRunExecution.values().length + 1 + TestRunConfiguration.values().length,
+                "every execution row, how long it took, and every question: " + rows);
+        assertTrue(rows.contains(new DetailRow("Platform", "Web")));
     }
 
     @Test
@@ -67,7 +78,7 @@ public class MarkerDetailRowsTest {
         answers.put(TestRunConfiguration.PLATFORM, "Web");
         answers.put(TestRunConfiguration.BROWSER, "Firefox");
 
-        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(new TestRunDto().setConfiguration(answers));
+        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(new TestRunMarker().setConfiguration(answers));
 
         assertEquals(rows.size(), TestRunConfiguration.values().length,
                 "every question is offered; a blank answer is dropped when the row is drawn, not here");
@@ -82,7 +93,7 @@ public class MarkerDetailRowsTest {
      */
     @Test
     public void theCaptionsAreTheNamesTheFormUsed() {
-        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(new TestRunDto());
+        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(new TestRunMarker());
 
         for (int at = 0; at < TestRunConfiguration.values().length; at++) {
             assertEquals(rows.get(at).caption(), TestRunConfiguration.values()[at].getDisplayName());
@@ -95,7 +106,7 @@ public class MarkerDetailRowsTest {
      */
     @Test
     public void anOlderRunWithNoConfigurationStillAnswers() {
-        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(new TestRunDto());
+        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(new TestRunMarker());
 
         assertEquals(rows.size(), TestRunConfiguration.values().length);
         assertTrue(rows.stream().allMatch(row -> row.value().isEmpty()),

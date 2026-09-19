@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.testin.model.markers.TestRunMarker;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -148,19 +149,24 @@ public class RunCoverageTest {
         assertEquals(coveredBy(after), List.of(EXECUTED));
     }
 
+    /**
+     * The run's own facts are in its marker, not in what it covers, so changing
+     * the scope cannot touch them - there is nothing for coverOnly to carry
+     * across (#305, D6).
+     */
     @Test
-    public void theConfigurationAndTheTimingsRideAlong() {
+    public void whatARunCoversSaysNothingAboutItsOwnFacts() {
         final @NotNull ZonedDateTime started = ZonedDateTime.now().minusHours(2);
 
-        final @NotNull TestRunDto run = aRunOf(executed()).setExecutionStartedAt(started);
-        run.getConfiguration().put(TestRunConfiguration.PLATFORM, "Web");
-        run.getResultAnalysis().put(ResultAnalysis.FAILED, "The lockout counter is the one to chase");
+        final @NotNull TestRunMarker marker = new TestRunMarker().setExecutionStartedAt(started);
+        marker.getConfiguration().put(TestRunConfiguration.PLATFORM, "Web");
+        marker.getResultAnalysis().put(ResultAnalysis.FAILED, "The lockout counter is the one to chase");
 
-        final @NotNull TestRunDto after = run.coverOnly(ids(EXECUTED));
+        aRunOf(executed()).coverOnly(ids(EXECUTED));
 
-        assertEquals(after.getExecutionStartedAt(), started, "Changing what a run covers does not restart it");
-        assertEquals(after.getConfiguration().get(TestRunConfiguration.PLATFORM), "Web");
-        assertEquals(after.getResultAnalysis().get(ResultAnalysis.FAILED), "The lockout counter is the one to chase",
+        assertEquals(marker.getExecutionStartedAt(), started, "Changing what a run covers does not restart it");
+        assertEquals(marker.getConfiguration().get(TestRunConfiguration.PLATFORM), "Web");
+        assertEquals(marker.getResultAnalysis().get(ResultAnalysis.FAILED), "The lockout counter is the one to chase",
                 "What the tester wrote about the verdicts is a fact about this run and survives a change of scope");
     }
 

@@ -27,10 +27,12 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.util.Bundle;
 
 import java.util.*;
+import org.testin.model.markers.TestRunMarker;
 
 /**
  * Compares two revisions of a test run, the way {@link TestCaseChangeComparator}
- * does for a test case.
+ * does for a test case: its results here, and the run's own facts in
+ * {@link #compareFacts}, because the two live in different files now (#305, D6).
  * <p>
  * A run's rows are its results. A tester reviewing a commit wants to know what
  * happened to them, not which of forty fields moved. So the verdicts become one
@@ -48,25 +50,38 @@ final class TestRunChangeComparator {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
 
         addIfChanged(changes, Bundle.message("git.change.results"), verdictSummary(oldRun), verdictSummary(newRun));
-        // Walked, not listed - the eight were written out here directly above
-        // a loop whose comment explains why walking is right.
-        for (final TestRunConfiguration field : TestRunConfiguration.values()) {
-            addIfChanged(changes, field.getDisplayName(), field.valueIn(oldRun), field.valueIn(newRun));
-        }
-
-        // Through the same enum the Details popup and the report read, so a
-        // change reads under the heading they show it under and in the format
-        // they show it in. Not as rows: this compares two revisions, and a row
-        // carries one value.
-        for (final TestRunExecution field : TestRunExecution.values()) {
-            addIfChanged(changes, field.getDisplayName(), field.valueIn(oldRun), field.valueIn(newRun));
-        }
 
         // A run file that changed with nothing above different still changed -
         // an id, a field this comparator does not read - and it has to be
         // selectable, because the commit stages only what the review lists.
         if (changes.isEmpty()) {
             changes.add(new FieldChange(Bundle.message("node.tr"), "", Bundle.message("git.change.changed"), ChangeType.CHANGE_TEST_RUN));
+        }
+
+        return changes;
+    }
+
+    /**
+     * UC-SHARE-010, Rule-SHARE-046.
+     * <p>
+     * What changed in a run's own facts - the answers the tester gave when it was
+     * created, and when it was executed - which its {@code .tr} holds beside its
+     * status (#305, D6).
+     * <p>
+     * Through the same enums the Details popup and the reports read, so a change
+     * reads under the heading they show it under and in the format they show it
+     * in. Walked, not listed: a ninth question is compared by being declared
+     * there and nowhere else.
+     */
+    static @NotNull List<FieldChange> compareFacts(final @NotNull TestRunMarker oldMarker, final @NotNull TestRunMarker newMarker) {
+        final @NotNull List<FieldChange> changes = new ArrayList<>();
+
+        for (final TestRunConfiguration field : TestRunConfiguration.values()) {
+            addIfChanged(changes, field.getDisplayName(), field.valueIn(oldMarker), field.valueIn(newMarker));
+        }
+
+        for (final TestRunExecution field : TestRunExecution.values()) {
+            addIfChanged(changes, field.getDisplayName(), field.valueIn(oldMarker), field.valueIn(newMarker));
         }
 
         return changes;

@@ -83,24 +83,9 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
         // indexer holds every run in memory, so this is a lookup and not a read
         // from disk - the property the marker was put on the node for.
         //
-        // The rows are the run's, not this dialog's. Asking it for them is what
-        // keeps this class from naming a node kind, which is the same reason the
-        // status row and the counts arrive the way they do.
-        //
-        // Unconditional: a node that is not a test run resolves to no run and
-        // adds nothing, and a run that never started answers with two blank rows
-        // that the details builder drops.
-        Services.getInstance(p, ProjectIndexer.class).findTestRun(dto.getPath()).ifPresent(run -> {
-            TestRunExecution.rowsOf(run).forEach(extra -> details.row(extra.caption(), extra.value()));
-
-            // The answers the tester gave when the run was created, from the
-            // same place and for the same reason. The marker held a copy of
-            // them, so the reports read one store and this read the other, and
-            // the two could only agree for as long as nothing edited either.
-            TestRunConfiguration.rowsOf(run).forEach(extra -> details.row(extra.caption(), extra.value()));
-        });
-
-        // Whatever else the marker has to say about itself. Added without asking
+        // Whatever the marker has to say about itself - for a test run, when it
+        // was executed and what the tester answered when it was created, which
+        // the marker holds and answers for (#305, S15). Added without asking
         // what kind of marker this is, the same way the status row is: a marker
         // with nothing to add returns nothing, and a blank value is dropped.
         marker.getDetailRows().forEach(extra -> details.row(extra.caption(), extra.value()));

@@ -30,6 +30,7 @@ import org.testin.util.Bundle;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.testin.model.markers.TestRunMarker;
 
 /**
  * What section one of every report says about the run.
@@ -62,6 +63,7 @@ public final class ReportOverview {
 
     // Rule-REPORT-002
     public static @NotNull List<DetailRow> rowsFor(final @NotNull String projectName, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull TestRunSummary summary) {
+        final @NotNull TestRunMarker marker = trDir.getMarker();
         final @NotNull List<DetailRow> rows = new ArrayList<>();
 
         rows.add(new DetailRow(Bundle.message("report.overview.project"), projectName));
@@ -80,7 +82,7 @@ public final class ReportOverview {
             // a question the report forgot to answer.
             if (field == TestRunConfiguration.COMMIT_ID) {
                 rows.add(new DetailRow(field.getDisplayName(),
-                        field.valueIn(tr).isEmpty() ? NOT_RECORDED : field.valueIn(tr)));
+                        field.valueIn(marker).isEmpty() ? NOT_RECORDED : field.valueIn(marker)));
                 continue;
             }
 
@@ -90,8 +92,8 @@ public final class ReportOverview {
             if (field == TestRunConfiguration.COMPONENT) continue;
 
             if (field == TestRunConfiguration.PLATFORM) {
-                final @NotNull String platform = TestRunConfiguration.PLATFORM.valueIn(tr);
-                final @NotNull String component = TestRunConfiguration.COMPONENT.valueIn(tr);
+                final @NotNull String platform = TestRunConfiguration.PLATFORM.valueIn(marker);
+                final @NotNull String component = TestRunConfiguration.COMPONENT.valueIn(marker);
 
                 add(rows, ReportText.joined(", ",
                                 platform.isEmpty() ? "" : TestRunConfiguration.PLATFORM.getDisplayName(),
@@ -100,7 +102,7 @@ public final class ReportOverview {
                 continue;
             }
 
-            add(rows, field.getDisplayName(), field.valueIn(tr));
+            add(rows, field.getDisplayName(), field.valueIn(marker));
         }
 
         // Through add, like every row above: it is the one place that drops a
@@ -109,8 +111,8 @@ public final class ReportOverview {
         // (#254). TestRunExecution.valueIn already promises every reader does
         // this; the report was the reader that did not.
         add(rows, RunEditorAttributes.EXECUTED_BY.getName(), summary.executedBy());
-        TestRunExecution.rowsOf(tr).forEach(row -> add(rows, row.caption(), row.value()));
-        add(rows, RunEditorAttributes.RUN_STATUS.getName(), trDir.getMarker().getStatus().getLabel());
+        TestRunExecution.rowsOf(marker).forEach(row -> add(rows, row.caption(), row.value()));
+        add(rows, RunEditorAttributes.RUN_STATUS.getName(), marker.getStatus().getLabel());
 
         return List.copyOf(rows);
     }

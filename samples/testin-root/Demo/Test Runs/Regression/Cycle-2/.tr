@@ -3,5 +3,17 @@
   "createdAt" : "Wednesday 07-01-2026 At 14:30:00 [UTC]",
   "modifiedBy" : "Testin Sample",
   "modifiedAt" : "Wednesday 07-01-2026 At 14:30:00 [UTC]",
-  "status" : "IN_PROGRESS"
+  "status" : "IN_PROGRESS",
+  "configuration" : {
+    "TEST_TYPE" : "Retest",
+    "PLATFORM" : "Web",
+    "BROWSER" : "Chrome",
+    "CHANGE_LOG" : "Story-114 (lockout counter)",
+    "COMMIT_ID" : "9f3c1ab"
+  },
+  "resultAnalysis" : {
+    "UNTESTED" : "Checkout is not part of this retest."
+  },
+  "executionStartedAt" : "Thursday 08-01-2026 At 09:15:00 [UTC]",
+  "executionEndedAt" : "Thursday 01-01-1970 At 00:00:00 [UTC]"
 }

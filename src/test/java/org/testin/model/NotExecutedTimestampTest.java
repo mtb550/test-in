@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.UUID;
+import org.testin.model.markers.TestRunMarker;
 
 import static org.testng.Assert.*;
 
@@ -63,7 +64,7 @@ public class NotExecutedTimestampTest {
 
     @Test
     public void aFreshRunHasNeitherStartedNorEnded() {
-        final TestRunDto run = new TestRunDto();
+        final TestRunMarker run = new TestRunMarker();
 
         assertEquals(Display.formatDate(run.getExecutionStartedAt()), "");
         assertEquals(Display.formatDate(run.getExecutionEndedAt()), "");
@@ -71,7 +72,7 @@ public class NotExecutedTimestampTest {
 
     @Test
     public void aRunThatNeverStartedHasNoEndToStamp() {
-        final TestRunDto run = new TestRunDto();
+        final TestRunMarker run = new TestRunMarker();
 
         // Completed from the tree without ever pressing Start.
         run.markExecutionEnded();
@@ -82,7 +83,7 @@ public class NotExecutedTimestampTest {
     @Test
     public void theFirstStartIsKeptAndTheLastEndWins() {
         try {
-            final TestRunDto run = new TestRunDto();
+            final TestRunMarker run = new TestRunMarker();
 
             run.markExecutionStarted();
             final ZonedDateTime firstStart = run.getExecutionStartedAt();

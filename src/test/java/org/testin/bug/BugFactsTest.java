@@ -31,6 +31,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.testin.model.markers.TestRunMarker;
 
 import static org.testng.Assert.assertEquals;
 
@@ -48,10 +49,10 @@ public class BugFactsTest {
         final TestRunItems item = TestRunItems.builder().id(id).status(TestStatus.FAILED).actualResult("Error page")
                 .bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).stacktrace("boom")
                 .executedBy("Muteb").executedAt(ZonedDateTime.of(2026, 9, 13, 14, 14, 0, 0, ZoneId.of("Asia/Riyadh"))).build();
-        final TestRunDto run = TestRunDto.builder().configuration(new EnumMap<>(Map.of(
+        final TestRunMarker run = new TestRunMarker().setConfiguration(new EnumMap<>(Map.of(
                 TestRunConfiguration.PLATFORM, "Web",
                 TestRunConfiguration.BROWSER, "Chrome",
-                TestRunConfiguration.COMMIT_ID, "933a3984"))).build();
+                TestRunConfiguration.COMMIT_ID, "933a3984")));
 
         final BugFacts facts = BugFacts.of(item, tc, run, "Sprint 7", List.of());
 
@@ -75,6 +76,6 @@ public class BugFactsTest {
         final TestCaseDto tc = TestCaseDto.builder().build();
         final TestRunItems item = TestRunItems.builder().id(tc.getId()).build();
 
-        assertEquals(BugFacts.of(item, tc, TestRunDto.builder().build(), "Sprint 7", List.of()).executed(), "");
+        assertEquals(BugFacts.of(item, tc, new TestRunMarker(), "Sprint 7", List.of()).executed(), "");
     }
 }

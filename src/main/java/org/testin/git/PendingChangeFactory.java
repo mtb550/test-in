@@ -27,12 +27,14 @@ import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.testin.model.FileKind;
+import org.testin.model.markers.TestRunMarker;
 
 /**
  * Turns one changed file into the change the review shows.
@@ -175,8 +177,18 @@ final class PendingChangeFactory {
             case MODIFIED -> ChangeType.CHANGE_MARKER;
         };
 
-        return new PendingChange(ChangeSubject.MARKER, node, "", "", relativePath, type, nothingCommitted(),
-                List.of(new FieldChange(relativePath.getFileName().toString(), before, after, changeType)));
+        final @NotNull List<FieldChange> changes = new ArrayList<>();
+        changes.add(new FieldChange(relativePath.getFileName().toString(), before, after, changeType));
+
+        // A test run's own facts live in its marker, so a .tr that changed says
+        // which of them did - the configuration, the execution - the way a test
+        // case's file says which of its fields changed (#305, D6).
+        if (type == DiffType.MODIFIED && DirectoryType.byMarker(relativePath.getFileName().toString()).filter(kind -> kind == DirectoryType.TR).isPresent()) {
+            changes.addAll(TestRunChangeComparator.compareFacts(
+                    read(mapper, beforeJson, TestRunMarker.class), read(mapper, afterJson, TestRunMarker.class)));
+        }
+
+        return new PendingChange(ChangeSubject.MARKER, node, "", "", relativePath, type, nothingCommitted(), changes);
     }
 
     /**

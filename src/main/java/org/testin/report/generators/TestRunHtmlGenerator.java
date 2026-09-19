@@ -98,7 +98,7 @@ public final class TestRunHtmlGenerator {
         // HEADER
         html.append("<div class='report-title'>").append(Bundle.message("report.title")).append("</div>")
                 .append("<div class='report-subtitle'>")
-                .append(StringUtil.escapeXmlEntities(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(tr), TestRunConfiguration.COMPONENT.valueIn(tr))))).append("</div>")
+                .append(StringUtil.escapeXmlEntities(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(trDir.getMarker()), TestRunConfiguration.COMPONENT.valueIn(trDir.getMarker()))))).append("</div>")
                 .append("<div class='report-runname'>").append(StringUtil.escapeXmlEntities(runName)).append("</div>")
                 .append("<div class='report-conf'>").append(Bundle.message("report.confidential")).append("</div>");
 
@@ -135,13 +135,13 @@ public final class TestRunHtmlGenerator {
         // report had no such section at all while the PDF and the Word file both
         // printed one, so the same run read differently depending on the format
         // it was sent in.
-        final boolean analyzed = ResultAnalysis.anyWrittenIn(tr.getResultAnalysis());
+        final boolean analyzed = ResultAnalysis.anyWrittenIn(trDir.getMarker().getResultAnalysis());
 
         if (analyzed) {
             html.append("<div class='section-title-bar'><div class='section-title'>").append(Bundle.message("report.heading.analysis")).append("</div></div>");
 
             for (final ResultAnalysis section : ResultAnalysis.values()) {
-                final @NotNull String written = section.writtenIn(tr.getResultAnalysis());
+                final @NotNull String written = section.writtenIn(trDir.getMarker().getResultAnalysis());
                 if (written.isEmpty()) continue;
 
                 // The token named after the verdict, so the heading follows the

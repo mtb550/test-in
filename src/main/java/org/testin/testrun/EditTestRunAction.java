@@ -156,7 +156,7 @@ public class EditTestRunAction extends DumbAwareAction {
             final @NotNull Set<UUID> covered = current.getResults().stream().map(TestRunItems::getId).collect(Collectors.toSet());
 
             Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
-                    tp -> new RunForm(p).open(tp.getTestCasesDirectory(), run.getName(), covered, current.getConfiguration(), saves(run, parent, current)),
+                    tp -> new RunForm(p).open(tp.getTestCasesDirectory(), run.getName(), covered, run.getMarker().getConfiguration(), saves(run, parent, current)),
                     () -> Logger.warn("Edit test run: no test project is bound to " + p.getName()));
         }
 
@@ -202,8 +202,7 @@ public class EditTestRunAction extends DumbAwareAction {
             final @NotNull Set<UUID> offered = RunForm.offeredCases(selection);
             final @NotNull Map<TestRunConfiguration, String> configuration = TestRunConfiguration.answered(form.configuration());
 
-            final @NotNull TestRunDto after = current.coverOnly(wanted(current, checked, offered::contains))
-                    .setConfiguration(configuration);
+            final @NotNull TestRunDto after = current.coverOnly(wanted(current, checked, offered::contains));
 
             // Copied rather than held: the run in the indexer's cache shares its
             // result objects with this one, and a verdict recorded between now and
@@ -218,16 +217,17 @@ public class EditTestRunAction extends DumbAwareAction {
             final @NotNull Set<UUID> coveredAfter = idsOf(after);
             final @NotNull Map<UUID, TestRunItems> recordedAfter = byId(after);
 
-            final @NotNull Map<TestRunConfiguration, String> configurationBefore = Map.copyOf(before.getConfiguration());
+            final @NotNull Map<TestRunConfiguration, String> configurationBefore = Map.copyOf(run.getMarker().getConfiguration());
 
             // Applied to the run the index holds when the write lands, not to the
             // one this dialog read when it opened. The dialog is not modal, so the
             // run can change while it is open - a verdict given in its editor - and
             // writing the run it opened on replaced it. Through changeRun, like
             // every other change to a run (#312, A10).
-            applyEdit(run, name, runPath -> indexer.changeRun(runPath, held -> held
-                    .setResults(held.coverOnly(wanted(held, checked, offered::contains)).getResults())
-                    .setConfiguration(configuration)), () -> Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED));
+            applyEdit(run, name, runPath -> {
+                indexer.changeRun(runPath, held -> held.setResults(held.coverOnly(wanted(held, checked, offered::contains)).getResults()));
+                indexer.changeRunMarker(runPath, marker -> marker.setConfiguration(configuration));
+            }, () -> Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED));
 
             // One entry for the whole edit - the cases, the name and the
             // configuration together - because the tester made one gesture. The dto
@@ -365,15 +365,21 @@ public class EditTestRunAction extends DumbAwareAction {
                 return;
             }
 
-            applyEdit(run, toName, runPath -> Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, held -> {
-                final @NotNull Set<UUID> holdsNow = idsOf(held);
+            applyEdit(run, toName, runPath -> {
+                Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, held -> {
+                    final @NotNull Set<UUID> holdsNow = idsOf(held);
 
-                final @NotNull List<TestRunItems> items = held.coverOnly(wanted(held, covered, this::isIndexed)).getResults().stream()
-                        .map(item -> holdsNow.contains(item.getId()) ? item : recorded.getOrDefault(item.getId(), item))
-                        .collect(Collectors.toCollection(ArrayList::new));
+                    final @NotNull List<TestRunItems> items = held.coverOnly(wanted(held, covered, this::isIndexed)).getResults().stream()
+                            .map(item -> holdsNow.contains(item.getId()) ? item : recorded.getOrDefault(item.getId(), item))
+                            .collect(Collectors.toCollection(ArrayList::new));
 
-                held.setResults(items).setConfiguration(configuration);
-            }), () -> {
+                    held.setResults(items);
+                });
+
+                // The configuration the edit changed goes back with the cases, and
+                // through the door a run's own facts change by (#305, D6).
+                Services.getInstance(p, ProjectIndexer.class).changeRunMarker(runPath, marker -> marker.setConfiguration(configuration));
+            }, () -> {
             });
         }
 
