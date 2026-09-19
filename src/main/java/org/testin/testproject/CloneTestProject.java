@@ -40,6 +40,7 @@ import org.testin.config.TestinYml;
 import org.testin.model.DirectoryType;
 import org.testin.util.NameSanitizer;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * UC-TREE-PANEL-003.
@@ -74,7 +75,7 @@ public final class CloneTestProject {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         @NotNull String name = base;
-        for (int n = 2; indexer.projectExists(root.resolve(name)); n++) {
+        for (int n = 2; indexer.isTaken(root.resolve(name), Optional.empty()); n++) {
             name = base + n;
         }
         return name;

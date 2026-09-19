@@ -66,6 +66,26 @@ final class TestCaseSequenceStore {
     private final @NotNull Map<String, Set<String>> unreadable = new ConcurrentHashMap<>();
 
     /**
+     * UC-TREE-PANEL-011, Rule-INTERNAL-084.
+     * <p>
+     * A node was renamed, so every hand-named file and unreadable set under it
+     * is somewhere else now. Left on the old paths, saving such a case could not
+     * take its hand-named file away, and the next scan read two files claiming
+     * one identity.
+     */
+    void renamed(final @NotNull Path oldPath, final @NotNull Path newPath) {
+        handNamed.replaceAll((id, file) -> file.startsWith(oldPath) ? newPath.resolve(oldPath.relativize(file)) : file);
+
+        for (final String set : List.copyOf(unreadable.keySet())) {
+            final @NotNull Path setPath = Path.of(set);
+            if (setPath.startsWith(oldPath)) {
+                final @NotNull String moved = newPath.resolve(oldPath.relativize(setPath)).toString();
+                Optional.ofNullable(unreadable.remove(set)).ifPresent(files -> unreadable.put(moved, files));
+            }
+        }
+    }
+
+    /**
      * UC-SHARE-002, Rule-SHARE-001.
      * <p>
      * The test case files in this set that the last scan could not read, by

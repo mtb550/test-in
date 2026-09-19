@@ -40,5 +40,10 @@ public final class NoJavaCode implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         Logger.debug(nodeType + " generates no Java code");
     }
+
+    @Override
+    public boolean generates() {
+        return false;
+    }
 }
 

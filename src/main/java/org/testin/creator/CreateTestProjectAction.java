@@ -36,6 +36,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Refused;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class CreateTestProjectAction extends AbstractProjectAction {
     private final @NotNull TreePanel tp;
@@ -75,7 +76,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
             final @NotNull String projectName = CloneTestProject.nameFor(p, name);
             final @NotNull Path folder = Services.getInstance(p, TestinRoot.class).getPath().resolve(projectName);
 
-            if (Services.getInstance(p, ProjectIndexer.class).projectExists(folder)) {
+            if (Services.getInstance(p, ProjectIndexer.class).isTaken(folder, Optional.empty())) {
                 Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, projectName);
                 return;
             }

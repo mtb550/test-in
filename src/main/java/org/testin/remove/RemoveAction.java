@@ -162,10 +162,11 @@ public class RemoveAction extends DumbAwareAction {
                 return;
             }
 
-            // A node with an editor open has that editor closed with it. The
-            // pair tested for here is exactly the pair that declares one.
+            // Every editor on a removed node or under it closes with it - a
+            // removed package takes its test sets' editors, which were left open
+            // over deleted data (Rule-TREE-PANEL-111).
             for (final DirectoryDto node : nodesToRemove) {
-                if (node.isOpenableInEditor()) Services.getInstance(p, TestinEditors.class).close(p, node);
+                Services.getInstance(p, TestinEditors.class).close(p, node);
             }
 
             removeEach(nodesToRemove, went -> {

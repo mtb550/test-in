@@ -157,6 +157,18 @@ public final class BoundTestProject {
         PropertiesComponent.getInstance(p).setList(CHOICE, List.of(projectName, TestinYml.projectName(p)));
     }
 
+    /**
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-110.
+     * <p>
+     * The project this repository is about was renamed, so the choice follows
+     * it - whatever {@code testin.yml} names, which Testin never writes. Only
+     * when it was this repository's project: undoing a rename after choosing
+     * another one must not take the tester back to it.
+     */
+    public void follow(final @NotNull String oldName, final @NotNull String newName) {
+        if (name().equals(oldName)) choose(newName);
+    }
+
     private @NotNull List<String> choice() {
         return Optional.ofNullable(PropertiesComponent.getInstance(p).getList(CHOICE)).orElse(List.of());
     }

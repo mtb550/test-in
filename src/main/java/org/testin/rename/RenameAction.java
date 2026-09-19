@@ -33,9 +33,13 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
+import org.testin.services.OptionalPlugin;
+import org.testin.codegen.JavaCode;
+import org.testin.codegen.Renamed;
+import org.testin.editor.TestinEditors;
+import com.intellij.openapi.project.DumbService;
 import org.testin.util.Bundle;
 
-import java.nio.file.Path;
 import java.util.Optional;
 
 /**
@@ -62,7 +66,7 @@ public class RenameAction extends DumbAwareAction {
         final @NotNull Project p = project.orElseThrow();
 
         TestinData.singleSelectedNode(e)
-                .filter(DirectoryDto::isRenamable)
+                .filter(dir -> whyNot(p, dir).isEmpty())
                 .ifPresent(dir -> new RenameDialog(p, dir, newName -> renameNode(p, dir, newName)).show());
     }
 
@@ -72,23 +76,13 @@ public class RenameAction extends DumbAwareAction {
 
         // No parent means a filesystem root, which is not a node this tree can
         // rename. Asked first because applyRename resolves the new path against
-        // the parent and would throw on null - the collision check below already
-        // guarded for it while the rename itself did not (#66, F3).
-        final @NotNull Optional<Path> found = Optional.ofNullable(dir.getPath().getParent());
-        if (found.isEmpty()) {
+        // the parent and would throw on null (#66, F3).
+        if (Optional.ofNullable(dir.getPath().getParent()).isEmpty()) {
             Logger.warn("Rename refused, no parent directory: " + dir.getPath());
             return;
         }
 
-        final @NotNull Path parent = found.orElseThrow();
-
-        // A sibling with the new name would make the VFS rename fail with
-        // "already exists" - reject it with a message instead. Existence comes
-        // from the indexer cache - file access is the indexer's alone.
-        if (Services.getInstance(p, ProjectIndexer.class).nodeExists(parent.resolve(newName))) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, newName);
-            return;
-        }
+        if (refused(p, dir, newName)) return;
 
         final @NotNull String oldName = dir.getName();
         final @NotNull TreePanel tp = Services.getInstance(p, TreePanel.class);
@@ -114,25 +108,21 @@ public class RenameAction extends DumbAwareAction {
     }
 
     /**
-     * UC-TREE-PANEL-011, Rule-TREE-PANEL-037, Rule-TREE-PANEL-004.
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-037.
      * <p>
      * The undo and redo reverses pass no {@code onDone}: they are confirmed as
      * "Undone" and "Redone" by their own actions, and a second balloon saying it
      * was renamed would double-report one keystroke (#62).
      * <p>
-     * A name taken since is refused before anything is renamed, as the forward
-     * rename refuses it. The reverse used to go straight to the rename, which
-     * renames the generated code first: the class went back to the old name, the
-     * folder rename then failed on the sibling holding it, and the history said
-     * "Undone" over a tree and code that no longer matched (#312, A63). False
-     * tells the history nothing came back, so it neither confirms nor spends the
-     * press.
+     * Refused for the same reasons as the rename itself, before anything moves.
+     * The reverse used to go straight to the rename, which renames the generated
+     * code first: the class went back to the old name, the folder rename then
+     * failed on the sibling holding it, and the history said "Undone" over a
+     * tree and code that no longer matched (#312, A63). False tells the history
+     * nothing came back, so it neither confirms nor spends the press.
      */
     private boolean applyRename(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
-        if (Services.getInstance(p, ProjectIndexer.class).nodeExists(dir.getPath().resolveSibling(newName))) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, newName);
-            return false;
-        }
+        if (refused(p, dir, newName)) return false;
 
         NodeRename.apply(p, Services.getInstance(p, TreePanel.class), dir, newName, () -> {
         });
@@ -140,20 +130,71 @@ public class RenameAction extends DumbAwareAction {
     }
 
     /**
-     * UC-TREE-PANEL-011, Rule-TREE-PANEL-035.
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-004, Rule-CODEGEN-080, Rule-CODEGEN-081.
+     * <p>
+     * Every reason a rename is refused, asked before anything moves - by the
+     * rename and by its undo and redo alike - and said when there is one.
+     * <p>
+     * The name is asked of the disk, not the index: only the bound project is
+     * indexed, so a sibling project was invisible, and the code was renamed
+     * before the folder rename failed on it.
+     */
+    private static boolean refused(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
+        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+
+        if (Services.getInstance(p, ProjectIndexer.class).isTaken(dir.getPath().resolveSibling(newName), Optional.of(dir.getPath()))) {
+            notifier.softRefuse(p, Refused.ALREADY_EXISTS, newName);
+            return true;
+        }
+
+        final @NotNull Renamed renamed = new Renamed(dir, newName);
+        if (renamed.packageInTheWay(p)) {
+            notifier.softRefuse(p, Refused.PACKAGE_TAKEN, renamed.newPackage());
+            return true;
+        }
+
+        // Code the IDE cannot look up while it indexes would stay under the old
+        // name while the tree moved on, and a later rename would find nothing.
+        if (DumbService.isDumb(p) && OptionalPlugin.JAVA.isAvailable() && JavaCode.of(dir.getType()).getRenamed().generates()) {
+            notifier.softRefuse(p, Refused.WHILE_INDEXING, Bundle.message("dialog.rename.title"));
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-104, Rule-TREE-PANEL-111.
+     * <p>
+     * Why this node cannot be renamed right now, and empty when it can. One
+     * answer for the gray entry and for the keystroke, which the platform sends
+     * whatever the entry looked like.
+     */
+    private static @NotNull Optional<String> whyNot(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+        if (!dir.isRenamable()) return Optional.of(Bundle.message("rename.disabled.description"));
+        if (Services.getInstance(p, TestinEditors.class).busyUnder(p, dir)) return Optional.of(Bundle.message("rename.disabled.busy"));
+
+        return Optional.empty();
+    }
+
+    /**
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-104.
      * <p>
      * Renaming is about one node, so several selected grays it rather than
      * quietly renaming the first (#192).
      * <p>
-     * Now also the guard that keeps a declared key to itself: the answer is
-     * empty when the keystroke arrived anywhere but the Testin tree, so this is
-     * gray in a Java file rather than renaming whatever the tree happens to hold
-     * behind it (#119).
+     * Also the guard that keeps a declared key to itself: the answer is empty
+     * when the keystroke arrived anywhere but the Testin tree, so this is gray in
+     * a Java file rather than renaming whatever the tree happens to hold behind
+     * it (#119).
      */
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        GrayWithReason.unless(this, e, TestinData.singleSelectedNode(e).filter(DirectoryDto::isRenamable).isPresent(),
-                Bundle.message("rename.disabled.description"));
+        final @NotNull Optional<String> why = Optional.ofNullable(e.getProject())
+                .flatMap(p -> TestinData.singleSelectedNode(e).map(dir -> whyNot(p, dir)))
+                .orElse(Optional.of(Bundle.message("rename.disabled.description")));
+
+        GrayWithReason.unless(this, e, why.isEmpty(), why.orElse(""));
     }
 
     @Override

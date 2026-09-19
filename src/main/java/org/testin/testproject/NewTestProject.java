@@ -30,6 +30,7 @@ import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * UC-TREE-PANEL-002.
@@ -51,7 +52,7 @@ public final class NewTestProject {
 
         final @NotNull Path tpPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(tpName);
 
-        if (Services.getInstance(p, ProjectIndexer.class).projectExists(tpPath)) {
+        if (Services.getInstance(p, ProjectIndexer.class).isTaken(tpPath, Optional.empty())) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, tpName);
             return;
         }

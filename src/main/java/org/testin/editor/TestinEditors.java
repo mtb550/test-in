@@ -96,16 +96,44 @@ public final class TestinEditors {
     }
 
     /**
-     * Closes the editor showing this node, if one is open.
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-111.
      * <p>
-     * It took the node's name and closed whichever tab matched, so renaming or
-     * removing one of two same-named test sets closed the other's tab - and
-     * left the affected node's editor open, holding data that had just been
-     * renamed or deleted, for the next save to write back.
+     * Closes every editor showing this node or a node under it - light mode
+     * closes with its run editor.
+     * <p>
+     * By path, which is a node's identity. It took the node's name once and
+     * closed whichever tab matched, so renaming one of two same-named test sets
+     * closed the other's tab. And it matched the node alone, so renaming or
+     * removing a package left the test sets under it open, holding their old
+     * paths, for the next cell edit to write a folder that was gone back into
+     * existence (#331).
      */
     public void close(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        openFileAt(p, dir.getPath()).ifPresent(FileEditorManager.getInstance(p)::closeFile);
+        openFilesUnder(p, dir.getPath()).forEach(FileEditorManager.getInstance(p)::closeFile);
+    }
 
+    /**
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-111.
+     * <p>
+     * Whether an editor on this node or under it is in the middle of something -
+     * a run executing, a cell being edited - that closing it would throw away.
+     */
+    public boolean busyUnder(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+        return openFilesUnder(p, dir.getPath()).stream()
+                .flatMap(open -> Arrays.stream(FileEditorManager.getInstance(p).getAllEditors(open)))
+                .anyMatch(tab -> tab instanceof UnifiedFileEditor unified && unified.getEditor().isBusy());
+    }
+
+    /**
+     * The open files showing this node or a node under it - by path, and
+     * {@link Path#startsWith} compares whole names, so {@code Login} never
+     * matches {@code Login2}. The one lookup for "under", beside
+     * {@link #openFileAt} for "at".
+     */
+    private @NotNull List<VirtualFile> openFilesUnder(final @NotNull Project p, final @NotNull Path path) {
+        return Arrays.stream(FileEditorManager.getInstance(p).getOpenFiles())
+                .filter(open -> open instanceof UnifiedVirtualFile testinFile && testinFile.getDir().getPath().startsWith(path))
+                .toList();
     }
 
     /**

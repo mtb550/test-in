@@ -96,7 +96,8 @@ drawn under [UC-TREE-PANEL-001](reachTheTree.md), and it does the same thing.
    \<name\>...*. It cannot be canceled.
 5. Testin chooses it for this code project on this machine, and the tree
    appears. Nothing is written into the code project (Rule-TREE-PANEL-106).
-6. Testin shows *Project cloned*.
+6. Testin shows *Project cloned*. The name can be changed afterwards with
+   **Rename** ([UC-TREE-PANEL-011](renameNode.md)).
 
 ## What Testin refuses
 

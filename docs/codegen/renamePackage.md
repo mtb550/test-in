@@ -30,6 +30,12 @@ There is no key for this. It happens when a package is renamed or moved.
   folder.
 - **Rule-CODEGEN-058** — A package dropped into itself is not a move, and
   nothing is rewritten.
+- **Rule-CODEGEN-080** — A rename is refused when the automation code already
+  has the package the new name makes, beside the one being renamed. It is
+  refused before anything moves, so neither the folder nor the code changes.
+- **Rule-CODEGEN-081** — A rename that moves automation code - a test project,
+  a package or a test set - waits for the IDE to finish indexing. It is refused
+  while the IDE indexes, so the code and the tree never end up with two names.
 
 ## What this covers
 
@@ -57,6 +63,16 @@ the `package` line at the top of every Java file beneath it has been rewritten.
 5. Testin then renames the package itself in the tree.
 
 ## What Testin refuses
+
+**If the automation code already has the package the new name makes** — for
+example a test project renamed to `Tests` in a code project that has its own
+`tests` package - nothing is renamed, and *Package tests Already Exists* is
+shown in red (Rule-CODEGEN-080). A package whose old folder is gone - a
+colleague's rename already pulled - is not in the way: there is nothing left to
+move, and the tree follows.
+
+**If the IDE is indexing** — nothing is renamed, and *Rename needs the IDE to
+finish indexing first* is shown in red (Rule-CODEGEN-081).
 
 **If the folder cannot be found** — nothing is renamed, and only the log says
 so.

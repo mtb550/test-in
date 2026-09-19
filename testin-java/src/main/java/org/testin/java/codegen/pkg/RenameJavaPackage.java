@@ -27,7 +27,6 @@ import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
 import org.testin.codegen.Renamed;
 import org.testin.logger.Logger;
-import org.testin.util.NameSanitizer;
 
 import java.io.IOException;
 import java.util.List;
@@ -41,17 +40,16 @@ public class RenameJavaPackage implements GenAction {
         if (!(obj instanceof Renamed renamed)) return;
 
         final @NotNull List<String> fqcn = Fqcn.ofPackage(renamed.dir());
-        final @NotNull String newName = renamed.newName();
 
         JavaSourceRoot.find(p).ifPresentOrElse(
-                testSourceRoot -> renameUnder(p, testSourceRoot, fqcn, newName),
+                testSourceRoot -> renameUnder(p, testSourceRoot, fqcn, renamed.newPackage()),
                 () -> Logger.info("Could not find Test Source Root in the project modules."));
     }
 
     /**
      * The rename itself, once the source root is known.
      */
-    private void renameUnder(final @NotNull Project p, final @NotNull VirtualFile testSourceRoot, final @NotNull List<String> fqcn, final @NotNull String newName) {
+    private void renameUnder(final @NotNull Project p, final @NotNull VirtualFile testSourceRoot, final @NotNull List<String> fqcn, final @NotNull String newTop) {
         final @NotNull Optional<VirtualFile> found = JavaSourceRoot.under(testSourceRoot, String.join("/", fqcn))
                 .filter(VirtualFile::isDirectory);
         if (found.isEmpty()) {
@@ -60,7 +58,6 @@ public class RenameJavaPackage implements GenAction {
         }
 
         final @NotNull VirtualFile pkgDir = found.orElseThrow();
-        final @NotNull String newTop = NameSanitizer.packageName(newName);
 
         WriteCommandAction.runWriteCommandAction(p, Bundle.message("codegen.rename.package"), null, () -> {
             try {
@@ -71,7 +68,7 @@ public class RenameJavaPackage implements GenAction {
                 // its own copy, built from the new name and the old parent
                 // package - the same answer the long way round (#312, A60).
                 PackageDeclarations.retarget(p, testSourceRoot, pkgDir);
-                Logger.info("Package renamed to: " + newName);
+                Logger.info("Package renamed to: " + newTop);
             } catch (final IOException ex) {
                 Logger.info("Error renaming package: " + ex.getMessage());
             }

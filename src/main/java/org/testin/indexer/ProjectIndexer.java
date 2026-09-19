@@ -44,6 +44,7 @@ import org.testin.testproject.BoundTestProject;
 import org.testin.editor.LastOpenEditors;
 import org.testin.util.Bundle;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -496,8 +497,31 @@ public final class ProjectIndexer {
         return store.getTestProjectsByPath();
     }
 
-    public boolean projectExists(final @NotNull Path projectPath) {
-        return Files.isDirectory(projectPath);
+    /**
+     * UC-TREE-PANEL-002, UC-TREE-PANEL-003, UC-TREE-PANEL-011, Rule-TREE-PANEL-004.
+     * <p>
+     * Whether something already has this name, asked of the disk: the bound
+     * project's siblings are not indexed, and a folder another program just made
+     * is on disk before anything here knows of it. The one answer for creating a
+     * test project, naming a clone and renaming a node.
+     *
+     * @param renaming the node being renamed, which the disk finds under its new
+     *                 name when a rename only changes case on a file system that
+     *                 ignores case - it is not in its own way
+     */
+    public boolean isTaken(final @NotNull Path wanted, final @NotNull Optional<Path> renaming) {
+        if (!Files.exists(wanted)) return false;
+
+        return renaming.map(self -> !sameFile(self, wanted)).orElse(true);
+    }
+
+    private static boolean sameFile(final @NotNull Path one, final @NotNull Path other) {
+        try {
+            return Files.isSameFile(one, other);
+        } catch (final IOException ex) {
+            Logger.warn("Could not compare " + one + " with " + other + ": " + ex.getMessage());
+            return false;
+        }
     }
 
     public @NotNull List<DirectoryDto> getChildren(final @NotNull Path parentPath) {

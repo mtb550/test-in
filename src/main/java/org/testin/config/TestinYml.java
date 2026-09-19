@@ -23,8 +23,10 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -176,6 +178,19 @@ public final class TestinYml {
      */
     public static @NotNull Optional<BugRepository> bugRepository(final @NotNull Project p) {
         return config(p).bugRepository();
+    }
+
+    /**
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-110.
+     * <p>
+     * Opens the file in an editor for the tester to change - the one way a
+     * value in it is corrected, because Testin never writes it. Nothing when the
+     * repository has none.
+     */
+    public static void openInEditor(final @NotNull Project p) {
+        file(p).flatMap(path -> Optional.ofNullable(LocalFileSystem.getInstance().findFileByNioFile(path)))
+                .ifPresentOrElse(found -> FileEditorManager.getInstance(p).openFile(found, true),
+                        () -> Logger.warn("No testin.yml to open in " + p.getName()));
     }
 
     private static @NotNull TestinProjectConfig config(final @NotNull Project p) {

@@ -22,6 +22,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.markers.TestProjectMarker;
 
+import java.util.List;
+
 
 @Setter
 @Getter
@@ -46,12 +48,13 @@ public class TestProjectDirectoryDto extends DirectoryDto {
 
 
 
-    // The test project node is fixed: not renamed, moved, removed or pasted
-    // into from the tree - it is managed through its own actions.
+    // The test project node is not moved or pasted into from the tree: every
+    // path under it is built from where it is. It is renamed like any node, and
+    // what is named after it follows (#331).
 
     @Override
-    public boolean isRenamable() {
-        return false;
+    public @NotNull List<DirectoryDto> fixedChildren() {
+        return List.of(testCasesDirectory, testRunsDirectory);
     }
 
     @Override

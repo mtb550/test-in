@@ -58,6 +58,16 @@ public enum Refused {
     ),
 
     /**
+     * UC-CODEGEN-017, Rule-CODEGEN-080.
+     * <p>
+     * The automation code already has the package a rename would make, so the
+     * code could not move there and the tree must not rename without it.
+     */
+    PACKAGE_TAKEN(
+            Bundle.message("refused.package.taken")
+    ),
+
+    /**
      * The tester acted on a test case that has no generated method, whichever
      * action they reached it through - running the case, or editing it and
      * expecting the code to follow. Both used to give up in silence, each in its
