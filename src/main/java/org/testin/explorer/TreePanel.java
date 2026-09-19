@@ -16,6 +16,7 @@
 
 package org.testin.explorer;
 
+import org.testin.services.OptionalPlugin;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
@@ -347,7 +348,7 @@ public final class TreePanel implements Disposable {
                 TestinYml.isUnreadable(p),
                 boundProject.isPresent(),
                 Services.getInstance(p, BoundTestProject.class).isMissing(underRoot),
-                TestinYml.hasRepoUrl(p),
+                Services.getInstance(p, BoundTestProject.class).cloneAddress().isPresent(),
                 !underRoot.isEmpty());
     }
 
@@ -437,15 +438,22 @@ public final class TreePanel implements Disposable {
      * out is to clone the one it names rather than to pick a different one.
      */
     private void offerClone(final @NotNull StatusText emptyText, final @NotNull BoundTestProject boundProject) {
-        final @NotNull String url = TestinYml.repoUrl(p);
+        final @NotNull String url = boundProject.cloneAddress().orElse("");
+        final @NotNull String clone = Bundle.message("welcome.clone", boundProject.name());
 
         emptyText.appendLine(Bundle.message("welcome.not.here", boundProject.name()),
                 SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
         emptyText.appendLine("");
-        emptyText.appendLine(
-                AllIcons.Vcs.Clone,
-                Bundle.message("welcome.clone", boundProject.name()),
-                SimpleTextAttributes.LINK_ATTRIBUTES,
+
+        // Rule-TREE-PANEL-104. Shown and gray, with the reason, when the Git
+        // plugin is off: the clone is git4idea's, and building it without the
+        // plugin failed with an IDE error instead of a word (#301, row 6).
+        if (!OptionalPlugin.GIT.isAvailable()) {
+            emptyText.appendLine(AllIcons.Vcs.Clone, OptionalPlugin.GIT.needs(clone), SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
+            return;
+        }
+
+        emptyText.appendLine(AllIcons.Vcs.Clone, clone, SimpleTextAttributes.LINK_ATTRIBUTES,
                 e -> new CloneTestProject(p, url, boundProject.name(), this).execute());
     }
 

@@ -16,6 +16,7 @@
 
 package org.testin.rename;
 
+import org.testin.testproject.SaveTestinYml;
 import org.testin.codegen.CodeOn;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
@@ -93,8 +94,9 @@ public final class NodeRename {
      * UC-TREE-PANEL-011, Rule-TREE-PANEL-110.
      * <p>
      * The project chosen for this repository follows the rename. {@code testin.yml}
-     * is the team's and is never written, so when it still names the old name the
-     * tester is told once, with the file one click away.
+     * is the team's and a rename never writes it, so when it still names the old
+     * name the tester is told once, with Save to testin.yml and the file one click
+     * away (Rule-TREE-PANEL-112).
      */
     private static void projectFollows(final @NotNull Project p, final @NotNull String oldName, final @NotNull String newName) {
         Services.getInstance(p, BoundTestProject.class).follow(oldName, newName);
@@ -103,6 +105,7 @@ public final class NodeRename {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
         notifier.infoWithActions(p, Bundle.message("rename.config.names.old.title", oldName),
                 Bundle.message("rename.config.names.old.message", newName),
+                notifier.action(Bundle.message("yml.save.name"), () -> SaveTestinYml.start(p)),
                 notifier.action(Bundle.message("rename.config.open"), () -> TestinYml.openInEditor(p)));
     }
 }

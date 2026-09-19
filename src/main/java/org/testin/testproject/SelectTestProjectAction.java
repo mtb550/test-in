@@ -16,6 +16,7 @@
 
 package org.testin.testproject;
 
+import org.testin.actions.GrayWithReason;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.application.ApplicationManager;
@@ -76,12 +77,14 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
         });
     }
 
-    // UC-TREE-PANEL-028, Rule-TREE-PANEL-089
+    // UC-TREE-PANEL-028, Rule-TREE-PANEL-115
     @Override
     public void update(final @NotNull AnActionEvent e) {
         // There is nothing to choose from without a root. Both branches, so the
         // button comes back once one is configured.
-        e.getPresentation().setEnabled(Services.getInstance(p, TestinRoot.class).isConfigured());
+        // Gray with the reason, as every gray entry is (#301, F7); both
+        // branches, so the reason goes when a folder is set.
+        GrayWithReason.unless(this, e, Services.getInstance(p, TestinRoot.class).isConfigured(), Bundle.message("toolbar.disabled.no.root"));
     }
 
     @Override

@@ -140,11 +140,20 @@ hold one link each.
 |---|---|
 | No Testin folder is set | *Welcome to Testin* and the link **Configure Testin settings** |
 | The bound test project is found | The tree |
-| This code project names a test project that is not on this machine, and gives its Git address | *\<name\> is not on this machine yet* and the link **Clone \<name\>** |
+| This code project's `testin.yml` names the test project the tree would show, it is not on this machine, and the file gives its Git address | *\<name\> is not on this machine yet* and the link **Clone \<name\>** |
 | No test project exists in the Testin folder | The link **Create your first test project** |
 | Otherwise | One link per test project, showing its name and then **Active** or **Inactive**. With more than six test projects, one link instead: **Select the test project for this repository** |
 
 ## What Testin refuses
+
+**If the Git plugin is not installed** — the clone line still shows, gray,
+reading *Clone \<name\> (needs the Git plugin)*, and clicking it does nothing
+(Rule-TREE-PANEL-104).
+
+**If the tester chose a project the file does not name, and it is missing** -
+no clone is offered: the file's address is for the project it names, not for
+the tester's pick. The panel lists the test projects to choose from instead,
+or offers to create the first one when there are none.
 
 **If the project file cannot be read** — the panel shows, in red, *testin.yml
 names \<name\>, which could not be read*.
@@ -153,8 +162,10 @@ names \<name\>, which could not be read*.
 not be read*, and under it *Fix the file and press Refresh - the reason is in
 the Testin log*.
 
-**Testin never writes `testin.yml`.** It reads it when the code project has
-one, and goes on without it when it does not (Rule-INTERNAL-089).
+**Testin writes `testin.yml` only when the tester presses Save to testin.yml**
+(Rule-TREE-PANEL-112). It reads it when the code project has one, and goes on
+without it when it does not - only the automation code stays off
+(Rule-INTERNAL-089, Rule-CODEGEN-082).
 
 ---
 

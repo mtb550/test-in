@@ -44,7 +44,7 @@ public class SaveTestinYmlAction extends DumbAwareAction {
         this.p = p;
     }
 
-    // UC-TREE-PANEL-029, Rule-TREE-PANEL-104
+    // UC-TREE-PANEL-029, Rule-TREE-PANEL-104, Rule-TREE-PANEL-115
     @Override
     public void update(final @NotNull AnActionEvent e) {
         final @NotNull Optional<String> why = SaveTestinYml.whyNot(p);
