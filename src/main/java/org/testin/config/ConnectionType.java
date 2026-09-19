@@ -36,17 +36,15 @@ public enum ConnectionType {
      * reader has a value rather than a question about whether one was set.
      */
     NONE(
-            false,
             false
     ),
 
     /**
-     * A Git repository. Branches mean something here, so the branch box is
-     * shown and a refresh brings the remote up to date - and there is no server
-     * to sync to, so that action is off.
+     * A Git repository. There is no server to sync to, so that action is off.
+     * Whether the branch box shows is the folder's answer, not this one's: a
+     * Git folder has branches whatever the file says (Rule-TREE-PANEL-108).
      */
     GIT(
-            true,
             false
     ),
 
@@ -55,24 +53,8 @@ public enum ConnectionType {
      * the branch box is not shown and nothing here ever reaches a Git remote.
      */
     SFTP(
-            false,
             true
     );
-
-    /**
-     * Whether branches are this connection's business: the box belongs on screen,
-     * and redrawing the panel brings the remote up to date. A project with no
-     * branches showing a box that says it has none is a row of screen explaining
-     * something that was never true of it.
-     * <p>
-     * There was a second flag beside this one, {@code fetchesOnRefresh}, for the
-     * refresh half. It held the same answer as this one on every constant and
-     * nothing ever read it - the fetch in {@code BranchSelector} is reached only
-     * once this flag has already said yes (#172). Two names for one fact is not
-     * a distinction until something needs them to differ; a connection that shows
-     * branches without fetching them can declare that when it exists.
-     */
-    private final boolean showsBranches;
 
     /**
      * Whether there is a server to send this project to. What the sync action

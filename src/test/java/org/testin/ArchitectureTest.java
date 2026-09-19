@@ -247,6 +247,23 @@ public class ArchitectureTest {
     }
 
     /**
+     * Rule-INTERNAL-088: one class reads {@code testin.yml}, and no class writes
+     * it (#301). The values it parses into are package-private, which the
+     * compiler holds; the parser is a library any class could import, which only
+     * this can.
+     */
+    @Test
+    public void onlyTestinYmlReadsTheConfigFile() {
+        final @NotNull ArchRule rule = noClasses()
+                .that().doNotHaveFullyQualifiedName("org.testin.config.TestinYml")
+                .should().dependOnClassesThat().resideInAPackage("com.fasterxml.jackson.dataformat.yaml..")
+                .because("testin.yml is read by one class, so a missing value means the same thing everywhere,"
+                        + " and nothing else can open, parse or write the file (Rule-INTERNAL-088)");
+
+        rule.check(CLASSES);
+    }
+
+    /**
      * <b>Swing and AWT types only from the UI families is not enforced here, on
      * purpose.</b>
      * <p>

@@ -40,9 +40,10 @@ neither: it opens whatever that sandbox had, pointed wherever its owner pointed
 it.
 
 Both halves move together on purpose. Opening the sample against somebody else's
-Testin root does not resolve `testinProject: Demo`, so Testin rebinds the project
-and writes that root's project name into `testin.yml` - a committed file. That
-happened twice before `SampleProjectTest` started asserting the binding.
+Testin root does not resolve `testinProject: Demo`, so the tester is asked to
+choose a project. Testin no longer writes that choice into `testin.yml` (it did,
+twice, before Decision-011), and `SampleProjectTest` still asserts the file
+names `Demo`.
 
 To get the sample back, delete `.sandbox` and run again, or set the Testin root
 to this folder in **Settings → Testin**.

@@ -9,7 +9,8 @@ test set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The tree panel |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-028`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-105` |
+| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-028`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-108` |
+| **Retired** | `Rule-TREE-PANEL-018` and `Rule-TREE-PANEL-019` said cloning needed the code project to name the test project first, and named the folder by `testin.yml`, never by the address; read Rule-TREE-PANEL-107 instead. `Rule-TREE-PANEL-020` and `Rule-TREE-PANEL-021` said the choice was written into the code project, and said so when it could not be; read Rule-TREE-PANEL-106 instead. `Rule-TREE-PANEL-084` showed the branch box only when `testin.yml` said the project was shared through Git; read Rule-TREE-PANEL-108 instead. All five retired 19 September 2026, when Testin stopped writing `testin.yml` and stopped needing it (#301). The numbers are not given to anything else |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-TREE-PANEL-004](chooseTestProject.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. |
 | **Written to** | [How a document is written](../standard.md) |
@@ -115,9 +116,10 @@ tree. It is always one click away.
   a test run. A test case is not a node, because the tree does not show one.
 - The **Testin folder** is the one folder that holds every test project. The
   settings page and Testin's own messages call it that too.
-- **Bound** means this code project is set to use one test project. The choice
-  is written into the code project, so everyone who opens it gets the same test
-  project.
+- **Bound** means this code project is set to use one test project. The
+  choice is kept on this machine, never written into the code project; a
+  `testin.yml` in the code project can name one for everyone
+  (Rule-TREE-PANEL-106).
 - **Signed off** means a test run is **Completed** or **Closed**. Its test
   cases, verdicts and settings can no longer change, though the tree can still
   rename, move and remove it.
@@ -255,8 +257,6 @@ than feedback on what the tester just typed.
 
 | Message | Means | Use case |
 |---|---|---|
-| *Not Bound* | The choice could not be written into the code project, so it will not be remembered | [UC-TREE-PANEL-004](chooseTestProject.md) |
-| *No Test Project Named* | The code project does not say which test project it is about, so nothing can be cloned | [UC-TREE-PANEL-003](importTestProject.md) |
 | *Clone Failed* | The repository could not be cloned. The reason follows | [UC-TREE-PANEL-003](importTestProject.md) |
 | *Clone Error* | Something needed for the clone was missing | [UC-TREE-PANEL-003](importTestProject.md) |
 | *Rename Failed* | The folder could not be renamed on disk. The reason follows | [UC-TREE-PANEL-011](renameNode.md) |
@@ -274,6 +274,8 @@ than feedback on what the tester just typed.
 | *Could not load '\<folder name\>'*, in red, as a child row | That folder's contents could not be read |
 | *testin.yml names \<name\>, which is not in the Testin folder*, in red | The code project names a test project the Testin folder does not hold. See [UC-TREE-PANEL-001](reachTheTree.md) |
 | *testin.yml names \<name\>, which could not be read*, in red | The test project's folder is there, but Testin could not read it |
+| *\<name\>, chosen on this machine, is not in the Testin folder*, in red | The test project chosen for this code project on this machine is gone from the Testin folder |
+| *\<name\>, chosen on this machine, could not be read*, in red | The chosen test project's folder is there, but Testin could not read it |
 
 ---
 
@@ -459,8 +461,9 @@ about which one is open:
 - the reports
 - the test runs
 
-The choice is written into the code project. So a colleague who copies that
-project down gets the same test project, with no setup.
+The choice is kept on this machine. A code project that wants every colleague
+on the same test project with no setup says so in its `testin.yml`, which
+Testin reads and never writes (Rule-TREE-PANEL-106).
 
 ### A test run shows its status instead of a plain icon
 

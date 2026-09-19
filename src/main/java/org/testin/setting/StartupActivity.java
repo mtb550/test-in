@@ -24,8 +24,6 @@ import com.intellij.openapi.util.Key;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.testin.clipboard.CutState;
-import org.testin.config.TestinConfigService;
-import org.testin.config.TestinProjectConfig;
 import org.testin.indexer.DeletedNodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -33,6 +31,7 @@ import org.testin.notifications.Notifier;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.runner.TestCaseExecutionTracker;
 import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
 import org.testin.util.Bundle;
 import org.testin.util.Once;
 
@@ -93,21 +92,19 @@ public final class StartupActivity implements ProjectActivity {
 
         Logger.info("testin Path: " + testinPath);
 
-        // Before the first index, never after it: the config names the test
-        // project this repository exercises, and an index that started without it
+        // Before the first index, never after it: the name says which test
+        // project the first index is about, and an index started without it
         // would have to be thrown away and run again (#6).
-        final @NotNull TestinProjectConfig config = Services.getInstance(p, TestinConfigService.class).get();
+        final @NotNull BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
 
-        if (config.isBound()) {
-            Logger.info("Bound to test project '" + config.projectName() + "'");
+        if (bound.isNamed()) {
+            Logger.info("Test project for this repository: '" + bound.name() + "'");
         } else {
-            // Said rather than only logged. The name is not optional: it is what
-            // the tree shows, what the reports are headed with, what a cloned
-            // folder is called and what the server path ends in - so a
-            // repository that has not been given one cannot do any of it, and
-            // the tester should hear that when the project opens rather than
-            // discover it at the first report.
-            Logger.warn("No test project named in testin.yml for " + p.getName());
+            // Said rather than only logged. The name is what the tree shows and
+            // what the reports are headed with, so the tester should hear that
+            // none is chosen when the project opens rather than at the first
+            // report. It asks for a pick, never for testin.yml (Rule-INTERNAL-088).
+            Logger.warn("No test project chosen for " + p.getName());
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (p.isDisposed()) return;

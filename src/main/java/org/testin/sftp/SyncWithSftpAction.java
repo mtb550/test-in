@@ -31,8 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.util.FailureText;
 import org.testin.actions.TestinData;
-import org.testin.config.TestinConfigService;
-import org.testin.config.TestinProjectConfig;
+import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.ProjectIndexer;
@@ -99,7 +98,7 @@ public final class SyncWithSftpAction extends DumbAwareAction {
 
         GrayWithReason.unless(this, e, p != null
                         && TestinData.tree(e).isPresent()
-                        && Services.getInstance(p, TestinConfigService.class).get().connection().isSyncsToServer(),
+                        && TestinYml.connection(p).isSyncsToServer(),
                 Bundle.message("sftp.disabled.description"));
     }
 
@@ -121,26 +120,24 @@ public final class SyncWithSftpAction extends DumbAwareAction {
          * {@code testin.yml}, and a test project in the tree to send.
          */
         private void start(final @NotNull Optional<Path> selectedProject) {
-            final @NotNull TestinProjectConfig config = Services.getInstance(p, TestinConfigService.class).get();
-
             // A balloon, not a notification that stays in the log. Nothing is wrong
             // here: a repository reached over Git has no server by design, and the
             // tester found that out by pressing the button, under their own hand. A
             // logged warning would keep saying so afterwards, about a setup that is
             // correct. It names the keys that are missing, not a guess at them.
-            final @NotNull List<String> missing = config.missingForSftp();
+            final @NotNull List<String> missing = TestinYml.missingForSftp(p);
             if (!missing.isEmpty()) {
                 Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("sftp.not.configured.title"),
                         Bundle.message("sftp.not.configured.message", String.join(", ", missing)));
                 return;
             }
 
-            final @NotNull SftpAddress address = config.sftpAddress();
-
             // A balloon for the same reason as above: nothing failed, the tester
             // pressed the button with no test project selected (#66, finding 137).
+            // The server folder is named by the project being synced, the one
+            // selected in the tree, never by testin.yml (Rule-INTERNAL-088).
             selectedProject.ifPresentOrElse(
-                    projectRoot -> askThenSync(address, projectRoot),
+                    projectRoot -> askThenSync(TestinYml.sftpAddress(p, projectRoot.getFileName().toString()), projectRoot),
                     () -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("sftp.nothing.title"),
                             Bundle.message("sftp.nothing.message")));
         }

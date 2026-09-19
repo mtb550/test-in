@@ -31,10 +31,9 @@ going stale (#99).
 The fifth is not in that document, because it is about where a value is kept
 rather than how the plugin is shaped:
 
-### A setting is application level; project config is `testin.yml`
+### A setting is application level; `testin.yml` is read, never written
 
-There are two places configuration lives, and which one a value goes in is
-decided by who it belongs to, not by what it is about.
+Where a value lives is decided by who it belongs to, not by what it is about.
 
 - **The machine's settings are application level.** `AppSettingsState` is
   `@Service(Service.Level.APP)` over one `testinSettings.xml` in the IDE's own
@@ -42,16 +41,23 @@ decided by who it belongs to, not by what it is about.
   and log level. These are facts about this machine and this person — a root
   folder, a download folder, an account — and they are exactly the things that
   must never be committed.
-- **The repository's config is `testin.yml`.** Which test project this
-  repository drives, and how it is shared. It is committed, so a clone needs no
-  setup, and it names no machine and no person.
+- **The repository's config is `testin.yml`, and it is the team's.** Which test
+  project this repository drives, and how it is shared. It is committed, so a
+  clone needs no setup, and it names no machine and no person. **Testin reads it
+  and never writes it**, and everything works without it. One class reads it,
+  `config/TestinYml`; its values are package-private and `ArchitectureTest`
+  keeps the YAML parser there (Rule-INTERNAL-088, Decision-011).
+- **The test project a tester chose is kept on this machine.** One value in the
+  project's `PropertiesComponent` (the workspace, never committed), owned by
+  `BoundTestProject`. It wins over the name `testin.yml` gives until the file
+  names a different one (Rule-TREE-PANEL-106).
 
-**Do not add a project-level `PersistentStateComponent`.** A value that differs
-per project belongs in `testin.yml`, where a colleague who clones the repository
-gets it too; a value that differs per machine belongs in the application
-settings, where it cannot be committed by accident. A third store would be a
-second answer to "where is this configured", and the two that already exist
-would start disagreeing with it.
+**Do not add a project-level `PersistentStateComponent`.** A value the team
+agrees on belongs in `testin.yml`, written by hand; a value that differs per
+machine belongs in the application settings, where it cannot be committed by
+accident. The chosen test project is the one exception, and it is a choice, not
+a setting. Another store would be a second answer to "where is this
+configured", and the ones that exist would start disagreeing with it.
 
 This has been tried and undone. `testin_example/.idea/` was found carrying both
 `testinSettings.xml` and `testinProjectSettings.xml`, each holding a
@@ -85,9 +91,8 @@ silently does nothing costs more than the setting it was meant to hold.
   `TransferHandler`); it is a `@FunctionalInterface` where the suffix *is* the
   job (`RemoveHandler`, `ImportHandler`); the plain noun would collide with a
   platform type (`GitRepositoryService` against git4idea's `GitRepository`); or
-  it distinguishes the reader from the value it serves (`TestinConfigService`
-  answering with `TestinProjectConfig`). A fifth `*Manager` is not a reason, it
-  is a class nobody has read yet.
+  it distinguishes the reader from the value it serves. A fifth `*Manager` is
+  not a reason, it is a class nobody has read yet.
 
 - **Renaming anything is a three-step check, not a find-and-replace.** Persisted
   keys read like code — `@State(name = "testin.settings.AppSettingsState")`,

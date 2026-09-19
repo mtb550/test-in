@@ -16,12 +16,12 @@
 
 package org.testin.testproject;
 
-import org.testin.notifications.Notifier;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.config.TestinConfigService;
+import org.testin.config.TestinYml;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
@@ -29,41 +29,62 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * The one test project this automation repository is about (#8).
  * <p>
  * There used to be a combo box, and ten places read the answer out of it - the
  * tree, the branch box, the run creator, two report generators. The answer never
- * belonged to a Swing component: it belongs to the repository, which says so in
- * its {@code testin.yml} (#6). This is the one place that turns that name into a
- * project, so a caller asks what the repository is about rather than what a
- * dropdown currently shows.
+ * belonged to a Swing component, so a caller asks here what the repository is
+ * about rather than what a dropdown currently shows.
  * <p>
- * Nothing is cached. The name comes from a config read once, and the lookup is
- * over the indexer's own map - so the answer is never stale, and it starts being
- * right the moment indexing puts the project there.
+ * Two things can name it, and this is the one place that weighs them: the
+ * project {@code testin.yml} names, and the one the tester chose on this
+ * machine. Nothing is written into the code project; the choice is kept in the
+ * IDE's own storage for this project, which stays on this machine
+ * (Rule-TREE-PANEL-106).
  */
 @Service(Service.Level.PROJECT)
 @AllArgsConstructor
 public final class BoundTestProject {
 
+    /**
+     * The chosen project and the name {@code testin.yml} gave when it was chosen,
+     * as one value so the two are never read half-written.
+     */
+    private static final @NotNull String CHOICE = "testin.chosenTestProject";
+
     private final @NotNull Project p;
 
     /**
-     * The name the repository gives, empty when it gives none. What the file says,
-     * even when no project by that name is there - which is what the message for a
-     * name that resolves to nothing has to show.
+     * UC-TREE-PANEL-004, Rule-TREE-PANEL-106.
+     * <p>
+     * The name this repository is about, empty when nothing names one. What the
+     * name says, even when no project by that name is there - which is what the
+     * message for a name that resolves to nothing has to show.
      */
     public @NotNull String name() {
-        return Services.getInstance(p, TestinConfigService.class).get().projectName();
+        return resolve(TestinYml.projectName(p), choice());
     }
 
     /**
-     * Whether the repository names a test project at all. False is the state a
-     * tester is guided out of, once, by picking one.
+     * Rule-TREE-PANEL-106.
+     * <p>
+     * The choice wins while {@code testin.yml} still names what it named when the
+     * choice was made; once the file names something else - a pull brought a
+     * colleague's change - the file's name is the answer again. So the tester is
+     * never held by the file, and the team's change still arrives.
+     */
+    static @NotNull String resolve(final @NotNull String inFile, final @NotNull List<String> choice) {
+        return choice.size() == 2 && choice.get(1).equals(inFile) ? choice.getFirst() : inFile;
+    }
+
+    /**
+     * Whether anything names a test project at all. False is the state a tester
+     * is guided out of, once, by picking one.
      */
     public boolean isNamed() {
         return !name().isEmpty();
@@ -73,13 +94,11 @@ public final class BoundTestProject {
      * UC-TREE-PANEL-001, Rule-TREE-PANEL-001.
      * <p>
      * The named project as the indexer holds it, empty when the name matches
-     * nothing there - no file, or a name nobody uses. A project that is not
-     * active resolves like any other: it is indexed as a node, and only its
-     * contents are left unread (#66).
+     * nothing there. A project that is not active resolves like any other: it is
+     * indexed as a node, and only its contents are left unread (#66).
      * <p>
      * Matched on the folder name, which is what a test project is identified by
-     * everywhere else. Renaming the folder breaks the binding, and the tester is
-     * sent back to the picker rather than shown a wrong project.
+     * everywhere else.
      */
     public @NotNull Optional<TestProjectDirectoryDto> get() {
         final @NotNull String name = name();
@@ -93,9 +112,8 @@ public final class BoundTestProject {
     /**
      * Whether the named project is nowhere in the Testin folder.
      * <p>
-     * The case the config file exists for: a machine that has the automation
-     * repository and not the test data. Worth telling apart from every other
-     * reason a binding does not resolve, because it is the one a clone fixes.
+     * The case a clone fixes, and worth telling apart from every other reason a
+     * name does not resolve for that reason.
      *
      * @param underRoot what is in the Testin folder, by name - taken as an
      *                  argument because it is a directory read, and the caller
@@ -107,47 +125,39 @@ public final class BoundTestProject {
     }
 
     /**
-     * UC-TREE-PANEL-001, Rule-TREE-PANEL-064.
+     * UC-TREE-PANEL-001.
      * <p>
      * Why the named project is not showing, in one sentence a tester can act on,
-     * or empty when there is nothing wrong.
-     * <p>
-     * Two causes are left, and being put aside is not one of them: an inactive
-     * project is indexed and drawn in the tree like any other, so it resolves
-     * and never reaches here (#66).
+     * or empty when there is nothing wrong. It says where the name came from -
+     * the file, or this machine's choice - because that is where it is changed.
      */
     public @NotNull String problem(final @NotNull Map<String, ProjectStatus> underRoot) {
         if (!isNamed() || get().isPresent()) return "";
 
         final @NotNull String name = name();
-        final @NotNull Optional<ProjectStatus> status = Optional.ofNullable(underRoot.get(name));
+        final boolean missing = !underRoot.containsKey(name);
+        final boolean fromTheFile = name.equals(TestinYml.projectName(p));
 
-        return status.isEmpty() ? Bundle.message("bound.not.under.root", name) : Bundle.message("bound.unreadable", name);
+        if (fromTheFile) return missing ? Bundle.message("bound.not.under.root", name) : Bundle.message("bound.unreadable", name);
+
+        return missing ? Bundle.message("chosen.not.under.root", name) : Bundle.message("chosen.unreadable", name);
     }
 
     /**
-     * UC-TREE-PANEL-004, Rule-TREE-PANEL-021.
+     * UC-TREE-PANEL-004, Rule-TREE-PANEL-106.
      * <p>
-     * Binds the repository to a project, by writing the name into its
-     * {@code testin.yml}. Answers whether the file now says so - a tester who is
-     * told the binding is done and finds it gone on the next open is worse off
-     * than one who is told it could not be written.
-     * <p>
-     * <b>And says so here, where every path goes through.</b> Four things bind a
-     * repository - the picker, creating a test project, cloning one, and
-     * clicking one on the welcome screen - and only the picker looked at the
-     * answer. The other three reported success without checking, so a write that
-     * failed left the tester told the work was done and the choice gone at the
-     * next open (#188). A caller can still read the answer, and the panel does;
-     * what it can no longer do is forget to.
+     * Makes this the project the repository is about, on this machine - the
+     * picker, the welcome screen, creating a test project and cloning one all
+     * choose through here. Kept with the name {@code testin.yml} gives right
+     * now, which is what lets a later change to the file win again.
      */
-    public boolean bind(final @NotNull String projectName) {
-        Logger.info("Binding " + p.getName() + " to test project '" + projectName + "'");
+    public void choose(final @NotNull String projectName) {
+        Logger.info("Chose test project '" + projectName + "' for " + p.getName() + " on this machine");
 
-        if (Services.getInstance(p, TestinConfigService.class).bind(projectName)) return true;
+        PropertiesComponent.getInstance(p).setList(CHOICE, List.of(projectName, TestinYml.projectName(p)));
+    }
 
-        Services.getInstance(p, Notifier.class).error(p, Bundle.message("bound.not.bound.title"),
-                Bundle.message("bound.not.bound.message", projectName));
-        return false;
+    private @NotNull List<String> choice() {
+        return Optional.ofNullable(PropertiesComponent.getInstance(p).getList(CHOICE)).orElse(List.of());
     }
 }

@@ -298,7 +298,7 @@ public final class ProjectIndexer {
                 .toList();
 
         if (scoped.isEmpty()) {
-            Logger.warn("testin.yml names '" + bound + "', which is not a test project under the root");
+            Logger.warn("This repository's test project '" + bound + "' is not a test project under the root");
             return scoped;
         }
 
@@ -307,8 +307,9 @@ public final class ProjectIndexer {
     }
 
     /**
-     * Whether this is the project {@code testin.yml} binds - or any project,
-     * when it binds none. Asked by startup and by a rescan alike.
+     * Whether this is the project this repository is bound to - by
+     * {@code testin.yml} or on this machine - or any project, when none is
+     * named. Asked by startup and by a rescan alike.
      */
     private boolean isBound(final @NotNull Path projectPath) {
         final @NotNull String bound = Services.getInstance(p, BoundTestProject.class).name();

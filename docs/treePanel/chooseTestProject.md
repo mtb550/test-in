@@ -53,12 +53,6 @@ one.
   because "Active" on every name is a word read a hundred times and needed
   never. A test run always says its status, because where a cycle stands is what
   the tree is read for.
-- **Rule-TREE-PANEL-020** — The choice is written into the code project. A
-  colleague who copies that project down gets the same test project, with no
-  setup.
-- **Rule-TREE-PANEL-021** — If the choice cannot be written, Testin says so.
-  That holds whichever way the choice was made: the picker, creating a test project,
-  cloning one, or the welcome screen. It never reports the choice as saved.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is - drawn with Inactive beside its name like any other status - and its test
@@ -66,6 +60,12 @@ one.
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
+- **Rule-TREE-PANEL-106** — The choice is kept on this machine and never
+  written into the code project. It wins over the test project `testin.yml`
+  names until the file names a different one, so the tester is never held by
+  the file and a colleague's change to it still arrives. That holds whichever
+  way the choice was made: the picker, creating a test project, cloning one, or
+  the welcome screen.
 
 ## The Select Test Project dialog
 
@@ -94,7 +94,8 @@ one.
 2. The **Select Test Project** dialog lists every test project in the Testin
    folder, with its status. The current one is selected.
 3. The tester selects one and presses `Enter`.
-4. Testin writes the choice into this code project.
+4. Testin keeps the choice on this machine. Nothing is written into the code
+   project.
 5. The tree reloads on that test project.
 6. Testin shows *Bound*.
 
@@ -104,9 +105,6 @@ one.
 the message *No Test Projects*, with the line *Create one in the Testin folder
 first*, is shown in red.
 
-**If the code project's configuration file cannot be written** — an error titled
-*Not Bound* says the choice will not be remembered, and the dialog stays open.
-
 **If no row is selected** — `Enter` does nothing, and says nothing. That happens
 when nothing is bound yet, or when the bound name matches no row.
 
@@ -114,9 +112,13 @@ when nothing is bound yet, or when the bound name matches no row.
 all the same, and the tree shows it with **Inactive** beside its name. It holds
 nothing: a project nobody is working on is not read (Rule-TREE-PANEL-100).
 
-**If the project file is edited by hand** — the tree does not notice. Testin
-reads that file when the project opens. After that it reads the file again only
-when the tester presses **Refresh**.
+**If `testin.yml` names a project** — the choice wins over it all the same, and
+keeps winning until the file names a different project than it did when the
+choice was made (Rule-TREE-PANEL-106).
+
+**If `testin.yml` is edited by hand** — the tree does not notice. Testin reads
+that file when the project opens. After that it reads the file again only when
+the tester presses **Refresh**.
 
 ---
 

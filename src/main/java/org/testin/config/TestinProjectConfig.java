@@ -31,8 +31,10 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * What an automation repository declares about the test project it exercises:
- * the contents of its {@code testin.yml} (#6).
+ * What an automation repository's {@code testin.yml} says (#6), as
+ * {@link TestinYml} read it. Package-private: nothing outside {@code config} may
+ * hold these values, so no caller can decide on its own what a missing one
+ * means - it asks {@link TestinYml} (Rule-INTERNAL-088).
  * <p>
  * One test project per automation repository. The repository names it, so the
  * pairing travels with a clone instead of living in one machine's IDE settings,
@@ -69,7 +71,7 @@ import java.util.regex.Pattern;
  *                      wrong with it can be said - {@link #bugRepository()} is
  *                      the question that answers whether it does
  */
-public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull ConnectionType connection, @NotNull String repoUrl, @NotNull String sftpHost, int sftpPort, @NotNull String sftpPath, @NotNull String testinProject, @NotNull String bugRepoUrl) {
+record TestinProjectConfig(@NotNull TestinLocation location, @NotNull ConnectionType connection, @NotNull String repoUrl, @NotNull String sftpHost, int sftpPort, @NotNull String sftpPath, @NotNull String testinProject, @NotNull String bugRepoUrl) {
 
     /**
      * The port an address is assumed to be on when the file does not say.
@@ -101,7 +103,7 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
      * <p>
      * <b>Its own instance, asked for by identity.</b> A record compares by
      * value, so this equals EMPTY and must: two configs that say nothing are the
-     * same config. Only {@link TestinConfigLoader} ever hands this one out, and
+     * same config. Only {@link TestinYml} ever hands this one out, and
      * {@link #isUnreadable()} is the one question that can tell.
      */
     public static final @NotNull TestinProjectConfig UNREADABLE = new TestinProjectConfig(
@@ -118,13 +120,6 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
      */
     private static final @NotNull Pattern REPO_URL =
             Pattern.compile("^(https://|ssh://|git@)[A-Za-z0-9._~:/?#@%+-]+$");
-
-    /**
-     * How an SSH address written without a scheme begins: {@code git@host:owner/repo}.
-     * One owner, because Git's own check and Report Bug's parser both read it
-     * (#66, finding 149).
-     */
-    public static final @NotNull String SCP_PREFIX = "git@";
 
     /**
      * A host name or address, and nothing that could be anything else.
@@ -258,22 +253,12 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
      * it from the root, and a key per connection would have made switching this
      * file from git to sftp read as switching to a different project.
      * <p>
-     * Deliberately not taken from the clone URL when the key is missing. That
-     * would have been a second rule, for one connection type, and the address
-     * naming the project is what this replaced - a repository renamed on GitHub
-     * would silently re-point the binding. A repository that names nothing is
-     * unbound, and the tester picks once.
+     * Empty when the file names none. Which project a repository is about then
+     * comes from the tester's choice on this machine ({@code BoundTestProject}),
+     * and a clone's name from its own address ({@code CloneTestProject}).
      */
     public @NotNull String projectName() {
         return testinProject;
-    }
-
-
-    /**
-     * Whether the repository has said which test project it is about.
-     */
-    public boolean isBound() {
-        return !projectName().isEmpty();
     }
 
     /**
@@ -309,28 +294,28 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
      * <p>
      * The keys an SFTP sync still needs, as {@code testin.yml} spells them, and
      * none when it has them all. So a refusal names what is missing: it named
-     * {@code connection} and {@code sftpHost} whatever was, including when both
-     * were there and only {@code testinProject} was not (#312, A38).
+     * {@code connection} and {@code sftpHost} whatever was (#312, A38). The test
+     * project is not among them: which one is synced is the one selected in the
+     * tree, not something the file has to say (#301).
      */
     public @NotNull List<String> missingForSftp() {
         final @NotNull List<String> missing = new ArrayList<>();
         if (connection != ConnectionType.SFTP) missing.add("connection: sftp");
         if (sftpHost.isEmpty()) missing.add("sftpHost");
-        if (projectName().isEmpty()) missing.add("testinProject");
 
         return List.copyOf(missing);
     }
 
     /**
-     * Where it is on that server, and {@link SftpAddress#NONE} when it is not on
-     * one.
+     * Where this test project is on that server, and {@link SftpAddress#NONE}
+     * when the file names no server.
      * <p>
-     * The address points at <b>this project's own folder</b>, not at the root
+     * The address points at <b>the project's own folder</b>, not at the root
      * holding several - composed here and nowhere else, so nothing downstream
      * joins a project name onto a path a second time.
      */
-    public @NotNull SftpAddress sftpAddress() {
-        return hasSftp() ? new SftpAddress(sftpHost, sftpPort, projectFolder()) : SftpAddress.NONE;
+    public @NotNull SftpAddress sftpAddress(final @NotNull String projectName) {
+        return hasSftp() ? new SftpAddress(sftpHost, sftpPort, projectFolder(projectName)) : SftpAddress.NONE;
     }
 
     /**
@@ -350,9 +335,8 @@ public record TestinProjectConfig(@NotNull TestinLocation location, @NotNull Con
      * must not be read as asking for the folder twice - {@code /Testin/test-01}
      * is where the project is, never the parent of another {@code test-01}.
      */
-    private @NotNull String projectFolder() {
+    private @NotNull String projectFolder(final @NotNull String name) {
         final @NotNull String root = trimmed(sftpPath);
-        final @NotNull String name = projectName();
 
         if (root.isEmpty() || root.equals(name)) return name;
 

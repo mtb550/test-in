@@ -91,8 +91,10 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 │   [x] Show keyboard shortcuts in dialogs                                   │
 │                                                                            │
 │   Everything here belongs to this machine and this person, and is never     │
-│   committed. Which test project a repository is about, and how it is        │
-│   shared, live in that repository's testin.yml.                       (11)  │
+│   committed. Which test project a repository is about is chosen in the      │
+│   Testin tool window and kept on this machine. A repository's testin.yml,   │
+│   when it has one, can name it and say how it is shared - Testin reads it   │
+│   and never writes it.                                                (11)  │
 │                                                                            │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -111,7 +113,7 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 9. **SFTP key file** — the key this machine offers that server.
 10. **Show keyboard shortcuts in dialogs** — the strip of key hints along the
     bottom of every Testin dialog.
-11. **The gray note** — which of the two stores a value belongs to. It is the
+11. **The gray note** — where a value belongs. It is the
     table below, said where a tester is looking for a setting rather than only
     in this document.
 
@@ -136,8 +138,8 @@ highlighted.
 | SFTP account | This machine's settings | No |
 | SFTP key file | This machine's settings | No |
 | Show keyboard shortcuts | This machine's settings | No |
-| Which test project this repository is about | `testin.yml`, in the code repository | **Yes** |
-| How to reach the team's server | `testin.yml`, in the code repository | **Yes** |
+| Which test project this repository is about | Chosen in the Testin tool window and kept on this machine; `testin.yml` can name one for everyone | No; the file is, when the team writes one |
+| How to reach the team's server | `testin.yml`, in the code repository, written by hand | **Yes** |
 | A password, or a key file's passphrase | The IDE's password store | No |
 
 Nothing on this page is ever committed. That is the reason the page exists
@@ -147,10 +149,12 @@ rather than putting these values in `testin.yml`.
 
 ## Why it is built this way
 
-**Two stores, not three.** A value that differs between colleagues goes in
-`testin.yml`, so a clone needs no setting up. A value that differs between
-machines goes here, so it cannot be committed by accident. A third store would
-be a second answer to the same question, and the two would start disagreeing.
+**Where a value lives is decided by whose it is.** A value that differs
+between machines goes here, so it cannot be committed by accident. What the
+team agrees on goes in `testin.yml`, written by hand, so a clone needs no
+setting up - Testin reads it and never writes it. The one thing in between, the
+test project a tester chose for a repository, is kept on their machine and wins
+over the file until the file names a different one (Decision-011).
 
 **The server address is shared, the account is not.** `testin.yml` carries the
 host. If someone writes an account into the host as well, Testin drops it and

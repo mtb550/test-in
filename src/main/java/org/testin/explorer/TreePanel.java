@@ -32,8 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
 import com.intellij.ui.components.JBPanelWithEmptyText;
-import org.testin.git.ClonedFrom;
-import org.testin.config.TestinConfigService;
+import org.testin.config.TestinYml;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.RefreshAction;
 import org.testin.explorer.tree.TreePanelTree;
@@ -283,27 +282,16 @@ public final class TreePanel implements Disposable {
     }
 
     /**
-     * UC-TREE-PANEL-004, Rule-TREE-PANEL-020.
+     * UC-TREE-PANEL-004, Rule-TREE-PANEL-106.
      * <p>
-     * Binds to a project the tester clicked in the welcome screen, off the EDT
-     * because it writes {@code testin.yml}, and redraws either way - a write
-     * that failed has said so, and the screen must not sit there looking as
-     * though the click did nothing.
+     * Chooses the project the tester clicked in the welcome screen, on this
+     * machine. Re-indexed rather than redrawn: indexing is scoped to the chosen
+     * project, so the cache built before the choice is not the one the tree
+     * needs.
      */
     private void bindTo(final @NotNull String name) {
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final boolean bound = Services.getInstance(p, BoundTestProject.class).bind(name);
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-                if (p.isDisposed()) return;
-
-                // Re-indexed rather than redrawn: indexing is scoped to the
-                // bound project, so the cache built before the binding is not
-                // the one the tree needs.
-                if (bound) reindex();
-                else refresh();
-            });
-        });
+        Services.getInstance(p, BoundTestProject.class).choose(name);
+        reindex();
     }
 
     private @NotNull Optional<TestProjectDirectoryDto> bound() {
@@ -313,36 +301,32 @@ public final class TreePanel implements Disposable {
     /**
      * UC-TREE-PANEL-001, Rule-TREE-PANEL-015.
      * <p>
-     * Binds a repository that names no test project to the only one there is,
+     * Chooses the only test project there is for a repository that names none,
      * and says whether it did.
      * <p>
      * A picker with one row is a question with one answer, and a fresh clone of
      * an automation repository beside a Testin root that holds a single project
-     * is the common first run. It writes the binding and the tree opens, rather
-     * than asking a tester who has nothing to choose between.
+     * is the common first run. The tree opens, rather than asking a tester who
+     * has nothing to choose between.
      * <p>
-     * Only when the repository names nothing at all. A name that resolves to
-     * nothing - a renamed folder, a name nobody uses - is a different state with
-     * a different sentence, and silently rebinding it would hide the thing the
+     * Only when nothing names a project at all. A name that resolves to nothing -
+     * a renamed folder, a name nobody uses - is a different state with a
+     * different sentence, and silently choosing past it would hide the thing the
      * tester needs to know (#8).
-     * <p>
-     * On the pooled thread that gathers, because it writes {@code testin.yml};
-     * the listing it decides from is the one that pass already read.
      */
     private boolean bindTheOnlyProject(final @NotNull Map<String, ProjectStatus> projects) {
-        // Never over a file that would not parse. Binding writes a testinProject
-        // line into it, so a mistyped indent used to be answered by writing into
-        // the broken file - on every open, still broken, and never said out loud
-        // (#66, finding 10).
-        if (Services.getInstance(p, TestinConfigService.class).get().isUnreadable()) return false;
+        // Not while testin.yml cannot be read: the panel says that first, and a
+        // file the tester is about to fix may name a different project (#66,
+        // finding 10).
+        if (TestinYml.isUnreadable(p)) return false;
 
         final @NotNull BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
         if (bound.isNamed() || projects.size() != 1) return false;
 
         final @NotNull String only = projects.keySet().iterator().next();
-        if (!bound.bind(only)) return false;
+        bound.choose(only);
 
-        Logger.info("Bound to the only test project under the root: " + only);
+        Logger.info("Chose the only test project under the root: " + only);
         return true;
     }
 
@@ -360,10 +344,10 @@ public final class TreePanel implements Disposable {
 
         return PanelState.of(
                 Services.getInstance(p, TestinRoot.class).isConfigured(),
-                Services.getInstance(p, TestinConfigService.class).get().isUnreadable(),
+                TestinYml.isUnreadable(p),
                 boundProject.isPresent(),
                 Services.getInstance(p, BoundTestProject.class).isMissing(underRoot),
-                Services.getInstance(p, TestinConfigService.class).get().hasRepoUrl(),
+                TestinYml.hasRepoUrl(p),
                 !underRoot.isEmpty());
     }
 
@@ -373,7 +357,6 @@ public final class TreePanel implements Disposable {
 
         projectTree.refresh();
         branchSelector.updateProject(Optional.of(tp));
-        ClonedFrom.record(p, tp.getPath());
     }
 
 
@@ -428,7 +411,7 @@ public final class TreePanel implements Disposable {
      * cannot reach (#66, finding 10).
      */
     private void sayTheFileIsBroken(final @NotNull StatusText emptyText) {
-        emptyText.appendLine(Bundle.message("welcome.config.broken", TestinConfigService.fileName()),
+        emptyText.appendLine(Bundle.message("welcome.config.broken", TestinYml.fileName()),
                 SimpleTextAttributes.ERROR_ATTRIBUTES, null);
         emptyText.appendLine(Bundle.message("welcome.config.broken.detail"),
                 SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
@@ -454,7 +437,7 @@ public final class TreePanel implements Disposable {
      * out is to clone the one it names rather than to pick a different one.
      */
     private void offerClone(final @NotNull StatusText emptyText, final @NotNull BoundTestProject boundProject) {
-        final @NotNull String url = Services.getInstance(p, TestinConfigService.class).get().repoUrl();
+        final @NotNull String url = TestinYml.repoUrl(p);
 
         emptyText.appendLine(Bundle.message("welcome.not.here", boundProject.name()),
                 SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
@@ -525,7 +508,7 @@ public final class TreePanel implements Disposable {
     }
 
     /**
-     * UC-TREE-PANEL-025, Rule-TREE-PANEL-084.
+     * UC-TREE-PANEL-025, Rule-TREE-PANEL-108.
      * <p>
      * Asks the branch box to go to the remote. Refresh and a branch switch both
      * end here; every other rebuild of this panel reads what Git already holds

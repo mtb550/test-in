@@ -63,9 +63,9 @@ public final class NewTestProject {
         if (!Services.getInstance(p, ProjectIndexer.class).addTestProject(created)) return;
 
         // A repository asks for exactly one test project, so the one it just made
-        // is the one it is about. Writing it here is what makes the next clone of
-        // this repository open on it without being asked (#8).
-        Services.getInstance(p, BoundTestProject.class).bind(created.getName());
+        // is the one it is about - chosen on this machine; testin.yml is never
+        // written (#8, Rule-TREE-PANEL-106).
+        Services.getInstance(p, BoundTestProject.class).choose(created.getName());
 
         tp.refresh();
         Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);

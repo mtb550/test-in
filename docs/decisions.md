@@ -2,7 +2,7 @@
 
 # Standing decisions
 
-> Ten decisions in Testin look wrong until you know why they were made. Each
+> Eleven decisions in Testin look wrong until you know why they were made. Each
 > one has been proposed for reversal at least once, and each reversal would have
 > broken something the decision exists to protect. They are written here so a
 > contributor reads the reason before writing the fix.
@@ -315,6 +315,38 @@ Testin's language in a list beside the IDE's own, so a tester can have a French
 Testin inside an English IDE. Every dialog then has to read correctly with two
 languages on screen at once, which is a thing to design rather than a flag to
 set.
+
+---
+
+## Decision-011 — Testin reads `testin.yml` and never writes it
+
+**Context.** Seven places wrote `testin.yml` - choosing a project, creating one,
+cloning one, drawing the tree, the push prompt - and each created the file when
+it was absent, so a repository ended up carrying a committed file nobody chose
+to add. A code project without one could not clone a test project at all. And
+the file's raw values were handed to eight classes, each deciding on its own
+what a missing one meant (#301).
+
+**Decision.** One class, `config/TestinYml`, reads `testin.yml` when it is
+there, and nothing writes it. Which test project a tester chooses for a code
+project is kept in the IDE's own storage for that project on this machine,
+never committed, and wins over the project the file names until the file names
+a different one.
+
+**Consequences.** Every flow works without the file: a clone is named after its
+repository, the branch box follows the folder's Git, and an SFTP sync names the
+server folder after the project being synced. A team that wants every colleague
+on the same test project with no setup writes the file by hand. The file's
+values and parser are package-private, and `ArchitectureTest` keeps the YAML
+parser in the one class. The choice is the second value kept per project on
+this machine, beside the editors that were open (`LastOpenEditors`), and like
+them it is a choice, not a setting.
+
+**If you are about to reverse it.** Writing the file back - to remember a pick,
+a remote, a name - commits one machine's choice into a file the whole team
+shares, which is what Muteb refused twice on 19 September 2026. Reading a value
+of the file anywhere but `TestinYml` brings back a second answer to what a
+missing value means.
 
 ---
 

@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.util.FailureText;
 import org.testin.actions.TestinData;
-import org.testin.config.TestinConfigService;
+import org.testin.config.TestinYml;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.explorer.TreePanel;
@@ -409,12 +409,10 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
         // UC-SHARE-013, Rule-SHARE-060
         private void configureRemoteAndPush(final @NotNull Path repoPath, final @NotNull String remoteName, final @NotNull String branch, final @NotNull String commitId) {
-            final @NotNull TestinConfigService config = Services.getInstance(p, TestinConfigService.class);
-
             // The repository already says where its test project lives, so a clone of
             // it should not have to be told again. Asking is the fallback, not the
             // first move (#8).
-            final @NotNull String known = config.get().repoUrl();
+            final @NotNull String known = TestinYml.repoUrl(p);
 
             if (!known.isEmpty()) {
                 addRemoteAndPush(repoPath, remoteName, branch, commitId, known);
@@ -426,13 +424,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             // shut the dialog on the question, and the push not happening is the
             // answer to it - which is also why the old "Push Aborted" balloon is
             // gone, since canceling was the only way to reach it.
-            new RemoteUrlDialog(p, remoteName, typed -> {
-                // Written back so the next machine that opens this repository
-                // inherits it. Only what the tester typed: a URL that came out of
-                // the file is already in it.
-                config.rememberRepoUrl(typed);
-                addRemoteAndPush(repoPath, remoteName, branch, commitId, typed);
-            }).show();
+            // What was typed becomes the remote and nothing else: testin.yml is
+            // never written (Rule-INTERNAL-088).
+            new RemoteUrlDialog(p, remoteName, typed -> addRemoteAndPush(repoPath, remoteName, branch, commitId, typed)).show();
         }
 
         // UC-SHARE-013, Rule-SHARE-060

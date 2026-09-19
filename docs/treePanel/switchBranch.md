@@ -7,7 +7,8 @@
 **As a** tester, **I want** to switch the test project's branch from the panel,
 **so that** the tree follows the branch I am testing.
 
-The box above the tree appears only for a test project shared through Git.
+The box above the tree appears for a test project whose folder is a Git
+repository.
 
 ## Rules
 
@@ -51,9 +52,6 @@ The box above the tree appears only for a test project shared through Git.
   because "Active" on every name is a word read a hundred times and needed
   never. A test run always says its status, because where a cycle stands is what
   the tree is read for.
-- **Rule-TREE-PANEL-084** — The branch box appears only when the test project's
-  own project file says it is shared through Git **and** its folder really is a
-  Git repository. A Git folder whose project file does not say so has no box.
 - **Rule-TREE-PANEL-085** — Switching with uncommitted changes asks first.
   Switching never loses them.
 - **Rule-TREE-PANEL-086** — A switch that succeeds does a full refresh: it
@@ -67,6 +65,10 @@ The box above the tree appears only for a test project shared through Git.
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
+- **Rule-TREE-PANEL-108** — The branch box appears when the test project's
+  folder is a Git repository, with or without a `testin.yml`. The file can only
+  take it away, by saying the project is shared through an SFTP server, which
+  has no branches.
 
 ## The Uncommitted Changes dialog
 
@@ -98,7 +100,7 @@ The box above the tree appears only for a test project shared through Git.
 
 ## Main flow
 
-1. The test project is shared through Git, and its folder is a Git repository.
+1. The test project's folder is a Git repository.
    A drop-down box above the tree lists its branches in alphabetical order. The
    current branch is selected. Remote branches are listed too, without their
    `remotes/` prefix.
@@ -133,7 +135,10 @@ credentials or sit on a host that is not reachable.
 
 ## What Testin refuses
 
-**If the test project is not shared through Git** — there is no box.
+**If the test project's folder is not a Git repository** — there is no box, and
+*Not a Git repository* is shown in its place. **If `testin.yml` says the project
+is shared through an SFTP server** — there is no box, and *Not shared through
+Git* is shown in its place.
 
 **If Git refuses the checkout** — the box goes back to the branch the tester was
 on. An IDE notification titled *Branch Not Switched* opens. It says *\<branch\>

@@ -95,7 +95,8 @@ first test project**. That link is drawn under
    the welcome link **Create your first test project**.
 2. The tester types a name and presses `Enter`.
 3. Testin creates the test project folder in the Testin folder.
-4. Testin binds this code project to it, and the tree appears.
+4. Testin chooses it for this code project on this machine, and the tree
+   appears. Nothing is written into the code project (Rule-TREE-PANEL-106).
 5. Testin shows *Project created*.
 
 To copy a test project that already exists somewhere else, paste its address
@@ -113,7 +114,8 @@ created, and *\<name\> Already Exists* is shown in red.
 still in the box, and *'\<name\>' cannot name a Java package* is shown in red.
 `New`, `Class` and `Import` are the usual ones: Java keeps those words for
 itself. (Rule-TREE-PANEL-095) A repository address is never asked to be
-one: the folder is named by `testin.yml` rather than by the URL.
+one: the clone is named after its repository, and a repository name Java
+refuses is made into one it accepts (Rule-TREE-PANEL-107).
 
 **If no Testin folder is set** — the **New Test Project** button is gray.
 (Rule-TREE-PANEL-089)

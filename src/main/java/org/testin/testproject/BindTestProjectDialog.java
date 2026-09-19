@@ -17,7 +17,6 @@
 package org.testin.testproject;
 
 import org.testin.model.DirectoryType;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ProjectStatus;
@@ -39,9 +38,9 @@ import java.util.Map;
  * the answer into its {@code testin.yml} (#8).
  * <p>
  * The only screen that lists every test project under the Testin root, and it
- * appears until the repository is bound. What replaced the dropdown is not
- * another dropdown: the pairing is a fact about the repository, so it is chosen
- * once and committed, not re-picked on every machine that opens it.
+ * appears until a project is chosen. What replaced the dropdown is not another
+ * dropdown: the choice is made once and kept on this machine, never written
+ * into the code project (Rule-TREE-PANEL-106).
  * <p>
  * Inactive projects are listed with their status rather than hidden. A tester
  * whose project is inactive would otherwise look at a list that does not contain
@@ -51,12 +50,6 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
 
     private final @NotNull SelectionTable projects;
     private final @NotNull Runnable onBound;
-
-    /**
-     * True while a binding this dialog asked for is being written, so a second
-     * Enter does not ask again.
-     */
-    private boolean binding;
 
     /**
      * @param underRoot the test projects to choose from, by name - handed in
@@ -105,44 +98,20 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
         }
     }
 
-    // UC-TREE-PANEL-004, Rule-TREE-PANEL-020
+    // UC-TREE-PANEL-004, Rule-TREE-PANEL-106
     @Override
     protected void submit() {
         final @NotNull List<Integer> selected = projects.getSelectedRows();
         if (selected.isEmpty()) return;
 
-        final @NotNull String name = projects.getValueAt(selected.getFirst(), 0);
-        if (binding) return;
-        binding = true;
+        Services.getInstance(p, BoundTestProject.class).choose(projects.getValueAt(selected.getFirst(), 0));
+        closeOk();
 
-        // Off the EDT, as the welcome screen binds, because it writes
-        // testin.yml. The same write ran on the EDT here and deliberately off it
-        // there, so one of the two was wrong about the rule (#66, finding 235).
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final boolean bound = Services.getInstance(p, BoundTestProject.class).bind(name);
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-                binding = false;
-
-                // The refusal is the binding's own, said wherever a binding
-                // fails; this only has to stay open on it, because the tester's
-                // choice is still in front of them (#188).
-                if (!bound || p.isDisposed()) return;
-
-                closeOk();
-
-                // Announced after the file is written, not before: what the panel
-                // draws is read back from the file, so it can only be right once
-                // the file says so.
-                //
-                // The outcome and nothing else. It was the name under it as well,
-                // which is the one noun left in a confirmation anywhere in the
-                // plugin - and the tester chose that name from the list they are
-                // looking at, and the tree behind the balloon has already
-                // reloaded onto it (#66, finding 94).
-                Services.getInstance(p, Notifier.class).softShow(p, Done.BOUND);
-                onBound.run();
-            });
-        });
+        // The outcome and nothing else. It was the name under it as well, which
+        // is the one noun left in a confirmation anywhere in the plugin - and the
+        // tester chose that name from the list they are looking at, and the tree
+        // behind the balloon reloads onto it (#66, finding 94).
+        Services.getInstance(p, Notifier.class).softShow(p, Done.BOUND);
+        onBound.run();
     }
 }

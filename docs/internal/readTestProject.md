@@ -18,8 +18,8 @@ There is no key for this. It starts on its own.
   looked at. A test project one level deeper is not found.
 - **Rule-INTERNAL-005** — A test project that is not **Active** is read,
   and nothing inside it is.
-- **Rule-INTERNAL-006** — When `testin.yml` names a test project, only that one
-  is read.
+- **Rule-INTERNAL-006** — When a test project is named for this code project -
+  by `testin.yml`, or chosen on this machine - only that one is read.
 - **Rule-INTERNAL-007** — Inside a test project, Testin reads two folders. They
   are named `Test Cases` and `Test Runs`. Nothing else is read.
 - **Rule-INTERNAL-008** — A folder inside `Test Cases` is read only if it holds
@@ -57,6 +57,11 @@ There is no key for this. It starts on its own.
   first time its marker is written. After that the creation stays as it was,
   even while no tester name is set. A marker file that is there but will not
   parse is never written over, so it is still there to repair.
+- **Rule-INTERNAL-088** — `testin.yml` is read by one class and written by none.
+  Testin never needs it: when a code project has none, or it leaves a value out,
+  nothing refuses, stalls or asks the tester to create it. When it is there, what
+  it says is read in one place, so a missing value means the same thing
+  everywhere.
 
 ## The budget
 
