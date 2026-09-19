@@ -25,6 +25,11 @@ There is no key for this. It happens when the groups are changed, which is
   Java plugin or a missing test folder is a skip, never a failure.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
+- **Rule-CODEGEN-082** — Testin touches a test project's automation code only
+  when `testin.yml` names that test project. Otherwise nothing is generated,
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
+  **Run Tests** are gray and say why, and no gutter icon or automated mark is
+  shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-045** — The groups are written into the annotation as a list,
   each exactly as the tester typed it.
 - **Rule-CODEGEN-046** — A test case belonging to no group has no `groups` in

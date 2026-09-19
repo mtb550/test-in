@@ -31,13 +31,11 @@ import java.util.*;
 import java.util.List;
 
 public class RunCard extends BaseCard {
-    private final @NotNull Project p;
     private final @NotNull List<Badges.Badge> badges = new ArrayList<>();
     private final @NotNull Map<String, String> details = new LinkedHashMap<>();
 
     public RunCard(final @NotNull Project p) {
-        super();
-        this.p = p;
+        super(p);
     }
 
     // UC-EDITOR-PANEL-030

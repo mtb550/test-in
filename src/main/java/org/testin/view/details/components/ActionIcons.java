@@ -105,7 +105,7 @@ public class ActionIcons extends BaseDetails {
         // cannot act on it (#312, A16). It does not grow under the pointer and
         // the pointer stays an arrow: both are the promise that pressing does
         // something.
-        final @NotNull Optional<String> whyNot = action.whyNotOffered();
+        final @NotNull Optional<String> whyNot = action.whyNotOffered(p);
 
         final @NotNull JBLabel label = new JBLabel();
         final @NotNull Icon shown = whyNot.isEmpty() ? drawn : IconLoader.getDisabledIcon(drawn);

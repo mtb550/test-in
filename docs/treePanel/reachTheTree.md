@@ -154,7 +154,7 @@ not be read*, and under it *Fix the file and press Refresh - the reason is in
 the Testin log*.
 
 **Testin never writes `testin.yml`.** It reads it when the code project has
-one, and goes on without it when it does not (Rule-INTERNAL-088).
+one, and goes on without it when it does not (Rule-INTERNAL-089).
 
 ---
 

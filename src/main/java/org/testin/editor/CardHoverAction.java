@@ -16,6 +16,7 @@
 
 package org.testin.editor;
 
+import org.testin.codegen.CodeOn;
 import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -205,8 +206,8 @@ public enum CardHoverAction {
      * The key is asked of the keymap, so this is the tester's own binding rather
      * than the default we shipped (#119).
      */
-    public @NotNull String getHintText() {
-        return whyNotOffered().orElseGet(() -> (tooltip + " " + Declared.shortcutText(actionId)).trim());
+    public @NotNull String getHintText(final @NotNull Project p) {
+        return whyNotOffered(p).orElseGet(() -> (tooltip + " " + Declared.shortcutText(actionId)).trim());
     }
 
     /**
@@ -219,11 +220,16 @@ public enum CardHoverAction {
      * installing either of two missing plugins is a step the tester takes one at
      * a time anyway.
      */
-    public @NotNull Optional<String> whyNotOffered() {
-        return requires.stream()
+    public @NotNull Optional<String> whyNotOffered(final @NotNull Project p) {
+        final @NotNull Optional<String> missing = requires.stream()
                 .filter(plugin -> !plugin.isAvailable())
                 .findFirst()
                 .map(plugin -> plugin.needs(tooltip));
+
+        // Rule-CODEGEN-082. An action that needs the Java plugin needs the code
+        // it reaches, and code is on only while testin.yml names this project.
+        if (missing.isPresent() || !requires.contains(OptionalPlugin.JAVA)) return missing;
+        return CodeOn.whyOff(p);
     }
 
     /**
@@ -231,7 +237,7 @@ public enum CardHoverAction {
      * before the pointer is asked what it is over, so in PyCharm or GoLand the
      * icon is absent rather than present and answering with a balloon (#66).
      */
-    public boolean isOffered() {
-        return requires.stream().allMatch(OptionalPlugin::isAvailable);
+    public boolean isOffered(final @NotNull Project p) {
+        return whyNotOffered(p).isEmpty();
     }
 }

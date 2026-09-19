@@ -103,7 +103,7 @@ public final class StartupActivity implements ProjectActivity {
             // Said rather than only logged. The name is what the tree shows and
             // what the reports are headed with, so the tester should hear that
             // none is chosen when the project opens rather than at the first
-            // report. It asks for a pick, never for testin.yml (Rule-INTERNAL-088).
+            // report. It asks for a pick, never for testin.yml (Rule-INTERNAL-089).
             Logger.warn("No test project chosen for " + p.getName());
 
             ApplicationManager.getApplication().invokeLater(() -> {

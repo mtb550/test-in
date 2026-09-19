@@ -206,7 +206,8 @@ public class SampleProjectTest {
     /**
      * The sample's {@code testin.yml} still names the sample's own project.
      * <p>
-     * The plugin no longer writes the file (Rule-INTERNAL-088), but it once did:
+     * The plugin writes the file only when a tester presses Save to testin.yml
+     * (Rule-INTERNAL-089), but it once wrote it on its own:
      * the first time this sample was opened against another Testin root, the file
      * came back naming a real project on the machine that opened it. A hand edit
      * can do the same, so the name is asserted rather than trusted.

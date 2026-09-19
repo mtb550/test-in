@@ -16,6 +16,7 @@
 
 package org.testin.explorer.tree;
 
+import org.testin.codegen.CodeOn;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -42,7 +43,6 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.ClipboardContents;
 import org.testin.actions.TestinData;
-import org.testin.services.OptionalPlugin;
 import org.testin.ui.framework.ConfirmDialog;
 
 import javax.swing.*;
@@ -563,7 +563,7 @@ public class TreeTransferHandler extends TransferHandler {
      * runs after the copy rather than before it, the opposite of a move (#51).
      */
     private void generateForCopies(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
-        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+        if (!CodeOn.isOnOrWarnOnce(p)) return;
 
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
@@ -585,7 +585,7 @@ public class TreeTransferHandler extends TransferHandler {
      * Whether this IDE has Java is asked once here for the same reason (#51).
      */
     private void syncCode(final @NotNull List<Path> from, final @NotNull List<Path> to) {
-        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+        if (!CodeOn.isOnOrWarnOnce(p)) return;
 
         WriteCommandAction.runWriteCommandAction(p, Bundle.message("transfer.move.code.command"), null, () -> {
             for (int i = 0; i < from.size(); i++) moveCodeOf(from.get(i), to.get(i));

@@ -16,6 +16,7 @@
 
 package org.testin.importexport.imports;
 
+import org.testin.codegen.CodeOn;
 import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -49,7 +50,6 @@ import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 import org.testin.util.NameSanitizer;
-import org.testin.services.OptionalPlugin;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -145,9 +145,10 @@ public class ImportAction extends DumbAwareAction {
 
             final @NotNull Path targetPath = selectedDirDto.getPath();
 
-            // Checked once up front: without the Java plugin the import still runs,
-            // only the test-method generation is skipped (with a one-time notice).
-            final boolean generateCode = OptionalPlugin.JAVA.isAvailableOrWarnOnce(p);
+            // Checked once up front: with code off - no Java plugin, or no
+            // testin.yml naming this test project - the import still runs, only
+            // the test-method generation is skipped (with a one-time notice).
+            final boolean generateCode = CodeOn.isOnOrWarnOnce(p);
 
             final int total = selectedCasesBySheet.values().stream().mapToInt(List::size).sum();
 

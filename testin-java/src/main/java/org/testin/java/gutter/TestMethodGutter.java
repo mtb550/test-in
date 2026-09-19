@@ -16,6 +16,7 @@
 
 package org.testin.java.gutter;
 
+import org.testin.codegen.CodeOn;
 import org.testin.util.FailureText;
 import org.testin.util.Bundle;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
@@ -64,6 +65,11 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         if (!(element instanceof PsiJavaToken token) || token.getTokenType() != JavaTokenType.STRING_LITERAL) {
             return;
         }
+
+        // Rule-CODEGEN-082. No icon while code is off: the method is there, but
+        // this code project's testin.yml does not name the test project open in
+        // the tree, so a click would lead to a case that is not this code's.
+        if (!CodeOn.isOn(p)) return;
 
         // Only mark testin-managed methods: a string that is not the testName
         // of a TestNG @Test is ordinary code, and a handwritten testName like

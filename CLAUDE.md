@@ -31,7 +31,7 @@ going stale (#99).
 The fifth is not in that document, because it is about where a value is kept
 rather than how the plugin is shaped:
 
-### A setting is application level; `testin.yml` is read, never written
+### A setting is application level; `testin.yml` is written by one button
 
 Where a value lives is decided by who it belongs to, not by what it is about.
 
@@ -43,17 +43,20 @@ Where a value lives is decided by who it belongs to, not by what it is about.
   must never be committed.
 - **The repository's config is `testin.yml`, and it is the team's.** Which test
   project this repository drives, and how it is shared. It is committed, so a
-  clone needs no setup, and it names no machine and no person. **Testin reads it
-  and never writes it**, and everything works without it. One class reads it,
-  `config/TestinYml`; its values are package-private and `ArchitectureTest`
-  keeps the YAML parser there (Rule-INTERNAL-088, Decision-011).
+  clone needs no setup, and it names no machine and no person. **Testin writes
+  it only when the tester presses Save to testin.yml** in the panel's title bar,
+  and everything works without it - except the automation code, which stays off
+  until the file names the open test project (Rule-CODEGEN-082, `codegen/CodeOn`).
+  One class reads and writes it, `config/TestinYml`; its values are
+  package-private and `ArchitectureTest` keeps the YAML parser there
+  (Rule-INTERNAL-089, Decision-013).
 - **The test project a tester chose is kept on this machine.** One value in the
   project's `PropertiesComponent` (the workspace, never committed), owned by
   `BoundTestProject`. It wins over the name `testin.yml` gives until the file
   names a different one (Rule-TREE-PANEL-106).
 
 **Do not add a project-level `PersistentStateComponent`.** A value the team
-agrees on belongs in `testin.yml`, written by hand; a value that differs per
+agrees on belongs in `testin.yml`, written by hand or by Save to testin.yml; a value that differs per
 machine belongs in the application settings, where it cannot be committed by
 accident. The chosen test project is the one exception, and it is a choice, not
 a setting. Another store would be a second answer to "where is this

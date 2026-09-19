@@ -34,7 +34,6 @@ import org.testin.model.Automated;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
-import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
@@ -163,9 +162,10 @@ public class AutomateTestCaseAction extends DumbAwareAction {
      */
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        // Grayed with the reason without the Java plugin, rather than left out of
-        // the menu (#248).
-        if (!OptionalPlugin.JAVA.enableOrExplain(this, e.getPresentation())) return;
+        // Grayed with the reason without the Java plugin, or without a
+        // testin.yml naming this test project, rather than left out of the menu
+        // (#248, #335).
+        if (!CodeOn.enableOrExplain(this, e)) return;
 
         final @Nullable Project p = e.getProject();
         if (p == null) {

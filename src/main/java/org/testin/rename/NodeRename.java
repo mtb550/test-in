@@ -16,6 +16,7 @@
 
 package org.testin.rename;
 
+import org.testin.codegen.CodeOn;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -29,7 +30,6 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
 import org.testin.editor.TestinEditors;
-import org.testin.services.OptionalPlugin;
 import org.testin.config.TestinYml;
 import org.testin.notifications.Notifier;
 import org.testin.testproject.BoundTestProject;
@@ -66,7 +66,7 @@ public final class NodeRename {
 
         // Before the data rename, while the old name is still what finds the
         // generated code. Which generator that is belongs to the node, not here.
-        if (OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) {
+        if (CodeOn.isOnOrWarnOnce(p)) {
             JavaCode.of(dir.getType()).getRenamed().execute(p, new Renamed(dir, newName));
         }
 

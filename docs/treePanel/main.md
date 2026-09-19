@@ -9,7 +9,7 @@ test set and test run. Everything in Testin starts here.
 |---|---|
 | **Part of Testin** | The tree panel |
 | **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-028`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-111` |
+| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-029`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-114` |
 | **Retired** | `Rule-TREE-PANEL-018` and `Rule-TREE-PANEL-019` said cloning needed the code project to name the test project first, and named the folder by `testin.yml`, never by the address; read Rule-TREE-PANEL-107 instead. `Rule-TREE-PANEL-020` and `Rule-TREE-PANEL-021` said the choice was written into the code project, and said so when it could not be; read Rule-TREE-PANEL-106 instead. `Rule-TREE-PANEL-084` showed the branch box only when `testin.yml` said the project was shared through Git; read Rule-TREE-PANEL-108 instead. All five retired 19 September 2026, when Testin stopped writing `testin.yml` and stopped needing it (#301). `Rule-TREE-PANEL-035` said the test project and the two containers could not be renamed from the tree; retired the same day, when a test project became renamable (#331) - the containers are Rule-TREE-PANEL-002's. `Rule-TREE-PANEL-109` said a test project shared through an SFTP server keeps its name; written for #331 and retired unused the same day, before it shipped, when the SFTP sync was removed (#334). The numbers are not given to anything else |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-TREE-PANEL-004](chooseTestProject.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. |
@@ -55,6 +55,7 @@ Each one is a page of its own: the story, its rules, its screens and its steps.
 | **UC-TREE-PANEL-026** | [Switch the Git branch of the test project](switchBranch.md) | Follow the Git branch under test. |
 | **UC-TREE-PANEL-027** | [See what a node holds](nodeDetails.md) | See counts, dates and results without opening anything. |
 | **UC-TREE-PANEL-028** | [Use the buttons at the top of the panel](panelToolbar.md) | Reach the things that act on the whole panel. |
+| **UC-TREE-PANEL-029** | [Save the test project to testin.yml](saveTestinYml.md) | Turn the automation code on, and let a colleague's clone find the same test project. |
 
 ---
 
@@ -117,9 +118,9 @@ tree. It is always one click away.
 - The **Testin folder** is the one folder that holds every test project. The
   settings page and Testin's own messages call it that too.
 - **Bound** means this code project is set to use one test project. The
-  choice is kept on this machine, never written into the code project; a
-  `testin.yml` in the code project can name one for everyone
-  (Rule-TREE-PANEL-106).
+  choice is kept on this machine; a `testin.yml` in the code project can name
+  one for everyone, and **Save to testin.yml** writes it there
+  (Rule-TREE-PANEL-106, Rule-TREE-PANEL-112).
 - **Signed off** means a test run is **Completed** or **Closed**. Its test
   cases, verdicts and settings can no longer change, though the tree can still
   rename, move and remove it.
@@ -458,7 +459,8 @@ about which one is open:
 
 The choice is kept on this machine. A code project that wants every colleague
 on the same test project with no setup says so in its `testin.yml`, which
-Testin reads and never writes (Rule-TREE-PANEL-106).
+Testin writes only when the tester presses **Save to testin.yml**
+(Rule-TREE-PANEL-106, Rule-TREE-PANEL-112).
 
 ### A test run shows its status instead of a plain icon
 

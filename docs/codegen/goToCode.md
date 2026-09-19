@@ -23,6 +23,11 @@ This opens the Java method that runs the selected test case.
   Java plugin or a missing test folder is a skip, never a failure.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
+- **Rule-CODEGEN-082** — Testin touches a test project's automation code only
+  when `testin.yml` names that test project. Otherwise nothing is generated,
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
+  **Run Tests** are gray and say why, and no gutter icon or automated mark is
+  shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-026** — The method is found by the identity in `testName`, so a
   test case that has been renamed still finds its method.
 - **Rule-CODEGEN-027** — Without the Java plugin the card and the view panel
@@ -77,6 +82,10 @@ the jump happens when indexing finishes.
 reading *(needs the Java plugin)*, and the class button is not drawn. If it is
 reached anyway, a message titled **Java Plugin Not Available** appears. It
 appears every time, not once.
+
+**If testin.yml does not name the open test project** - the menu entry is
+still there, grayed, and says *testin.yml does not name this test project. Save to testin.yml, in the Testin panel, turns code on.* The card's icon is gray and
+says the same, and pressing it says it (Rule-CODEGEN-082).
 
 ---
 

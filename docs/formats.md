@@ -230,8 +230,10 @@ Each entry in `results`:
 
 The one file that lives in the code repository rather than under the Testin
 folder, and the only one that is **committed**. It is the team's: Testin reads
-it when it is there and **never writes it**, and a code project without one
-works fully (Rule-INTERNAL-088, Decision-011). What it adds is agreement - a
+it when it is there, and **writes it only when the tester presses Save to
+testin.yml** (Rule-TREE-PANEL-112). A code project without one works fully,
+except that its automation code stays off until the file names the open test
+project (Rule-INTERNAL-089, Rule-CODEGEN-082, Decision-013). What it adds is agreement - a
 colleague who clones the repository lands on the same test project with no
 setup. `testin.yaml` is read too.
 

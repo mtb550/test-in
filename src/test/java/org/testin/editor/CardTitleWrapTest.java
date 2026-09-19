@@ -16,10 +16,12 @@
 
 package org.testin.editor;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.testng.annotations.Test;
 
 import javax.swing.*;
+import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +52,15 @@ public class CardTitleWrapTest {
      * in laying out a title.
      */
     private static final class Card extends BaseCard {
+        /**
+         * A project nothing asks anything of: it is read only to draw the hover
+         * icons, and no card here is hovered - as CutStateTest stands in for an
+         * editor.
+         */
+        Card() {
+            super((Project) Proxy.newProxyInstance(CardTitleWrapTest.class.getClassLoader(), new Class<?>[]{Project.class}, (proxy, method, args) -> null));
+        }
+
         void feed(final String title) {
             updateUI(0, title, List.of(), Map.of());
         }

@@ -18,6 +18,10 @@ package org.testin.config;
 
 import org.testng.annotations.Test;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
 import static org.testng.Assert.*;
 
 /**
@@ -312,5 +316,94 @@ public class TestinConfigTest {
                 "ssh://git@host:2222/qa/cases.git");
         assertEquals(TestinProjectConfig.withoutCredentials("https://github.com/mtb550/test-01.git"),
                 "https://github.com/mtb550/test-01.git");
+    }
+
+    /**
+     * The lines Save to testin.yml writes for a test project cloned from Git.
+     */
+    private static Map<String, String> savedLines(final String project) {
+        final Map<String, String> lines = new LinkedHashMap<>();
+        lines.put("testinProject", project);
+        lines.put("location", "remote");
+        lines.put("RepoUrl", "https://github.com/acme/nafath-test-cases.git");
+        return lines;
+    }
+
+    /**
+     * UC-TREE-PANEL-029, Rule-TREE-PANEL-113. With no file, the file is the three
+     * lines, and the reader reads back what was written.
+     */
+    @Test
+    public void aNewFileIsTheThreeLines() {
+        final String written = TestinYml.withLines("", savedLines("NAFATH"));
+
+        assertEquals(written, "testinProject: NAFATH\nlocation: remote\nRepoUrl: https://github.com/acme/nafath-test-cases.git\n");
+        assertEquals(TestinYml.parse(written, "saved").projectName(), "NAFATH");
+        assertTrue(TestinYml.parse(written, "saved").hasRepoUrl(), "and a colleague's first open can clone it");
+    }
+
+    /**
+     * Rule-TREE-PANEL-114. A line the button owns is replaced where it is; a
+     * missing one goes at the end; everything else - a comment, bugRepoUrl, a key
+     * Testin does not know, a commented-out key - stays byte for byte.
+     */
+    @Test
+    public void theRestOfTheFileIsKept() {
+        final String before = """
+                # Which test project this repository drives.
+                testinProject: Checkout
+                bugRepoUrl: https://github.com/acme/app
+                location: local
+                # testinProject: test-01       which test project, local or shared
+                somethingFromALaterBuild: true
+                """;
+
+        assertEquals(TestinYml.withLines(before, savedLines("NAFATH")), """
+                # Which test project this repository drives.
+                testinProject: NAFATH
+                bugRepoUrl: https://github.com/acme/app
+                location: remote
+                # testinProject: test-01       which test project, local or shared
+                somethingFromALaterBuild: true
+                RepoUrl: https://github.com/acme/nafath-test-cases.git
+                """);
+    }
+
+    /**
+     * A file saved on Windows keeps its line endings, and one that ended without
+     * a newline keeps that ending when nothing is added.
+     */
+    @Test
+    public void theFileKeepsItsLineEndings() {
+        assertEquals(TestinYml.withLines("testinProject: Checkout\r\nlocation: local\r\n", Map.of("testinProject", "NAFATH")),
+                "testinProject: NAFATH\r\nlocation: local\r\n");
+        assertEquals(TestinYml.withLines("location: local\ntestinProject: Checkout", Map.of("testinProject", "NAFATH")),
+                "location: local\ntestinProject: NAFATH");
+    }
+
+    /**
+     * A test project's name is a folder name, and YAML reads some of those as
+     * something else - a comment, a second key, a null. Each is quoted, so the
+     * reader gets the name back as it was.
+     */
+    @Test
+    public void aNameYamlWouldMisreadIsQuoted() {
+        for (final String name : new String[]{"#1 Smoke", "Tests: smoke", "null", "Yes", "- draft", "O'Brien's cases", "@home"}) {
+            final String written = TestinYml.withLines("", Map.of("testinProject", name));
+            assertEquals(TestinYml.parse(written, name).projectName(), name, "written as " + written.strip());
+        }
+        assertEquals(TestinYml.withLines("", Map.of("testinProject", "Nafath App")), "testinProject: Nafath App\n", "an ordinary name stays plain");
+    }
+
+    /**
+     * UC-TREE-PANEL-029. What the preview compares against: the value after each
+     * owned key, as written, and nothing for a key the file lacks.
+     */
+    @Test
+    public void thePreviewReadsWhatIsWritten() {
+        final Map<String, String> values = TestinYml.valuesIn("# testinProject: old\ntestinProject: 'Checkout'\nlocation: local\n",
+                Set.of("testinProject", "location", "RepoUrl"));
+
+        assertEquals(values, Map.of("testinProject", "'Checkout'", "location", "local"));
     }
 }

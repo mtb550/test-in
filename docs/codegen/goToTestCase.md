@@ -28,6 +28,11 @@ There is no key for this. The mark is in the gutter beside the method.
   Java plugin or a missing test folder is a skip, never a failure.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
+- **Rule-CODEGEN-082** — Testin touches a test project's automation code only
+  when `testin.yml` names that test project. Otherwise nothing is generated,
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
+  **Run Tests** are gray and say why, and no gutter icon or automated mark is
+  shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-028** — The mark is drawn beside the identity inside the
   method's annotation, on the right of the gutter.
 - **Rule-CODEGEN-029** — The mark is drawn only for a TestNG test whose identity
@@ -82,6 +87,9 @@ case that is gone*. It fades (Rule-CODEGEN-069).
 test case:* and then the reason.
 
 **If the IDE has no Java plugin** — no mark is drawn anywhere.
+
+**If testin.yml does not name the open test project** - no mark is drawn
+(Rule-CODEGEN-082).
 
 ## Where the plugin breaks its own rules
 

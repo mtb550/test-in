@@ -16,6 +16,7 @@
 
 package org.testin.navigate;
 
+import org.testin.codegen.CodeOn;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -25,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
 import org.testin.editor.CardHoverAction;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.OptionalPlugin;
 
 /**
  * UC-CODEGEN-006.
@@ -42,7 +42,7 @@ public class NavigateToCodeAction extends DumbAwareAction {
      * action's shortcut set on the list again on every single click.
      */
     public static void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        if (!OptionalPlugin.JAVA.isAvailableOrWarn(p)) return;
+        if (!CodeOn.isOnOrWarn(p)) return;
 
         CodeNavigation.available().toCode(p, tc);
     }

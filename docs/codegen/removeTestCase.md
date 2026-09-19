@@ -25,6 +25,11 @@ There is no key for this. It happens when a test case is removed, which is
   Java plugin or a missing test folder is a skip, never a failure.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
+- **Rule-CODEGEN-082** — Testin touches a test project's automation code only
+  when `testin.yml` names that test project. Otherwise nothing is generated,
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
+  **Run Tests** are gray and say why, and no gutter icon or automated mark is
+  shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-049** — Removing a test case deletes its method from the class.
   The class itself stays.
 - **Rule-CODEGEN-050** — A test case with no method is skipped without a word.

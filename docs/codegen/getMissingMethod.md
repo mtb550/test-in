@@ -24,6 +24,11 @@ There is no button for this. It happens when the description is filled in.
   Java plugin or a missing test folder is a skip, never a failure.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
+- **Rule-CODEGEN-082** — Testin touches a test project's automation code only
+  when `testin.yml` names that test project. Otherwise nothing is generated,
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
+  **Run Tests** are gray and say why, and no gutter icon or automated mark is
+  shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-019** — Filling in a description on a test case that has no
   method writes the method, rather than reporting that there is nothing to
   change.

@@ -25,7 +25,6 @@ import org.testin.logger.Logger;
 import org.testin.model.Automated;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
-import org.testin.services.OptionalPlugin;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -136,7 +135,20 @@ public final class AutomationState {
      * makes before it navigates.
      */
     public void read(final @NotNull Project p, final @NotNull List<TestCaseDto> cases, final @NotNull Runnable onAnswered) {
-        if (cases.isEmpty() || !OptionalPlugin.JAVA.isAvailable()) return;
+        if (cases.isEmpty()) return;
+
+        // Rule-CODEGEN-082. Code is off - no Java plugin, or no testin.yml naming
+        // this test project: nothing is read, and what was read while
+        // it was on is forgotten, so no case shows a mark it may not have. Said
+        // once; the next read finds nothing to forget.
+        if (!CodeOn.isOn(p)) {
+            if (known.isEmpty() && withAMethod.isEmpty()) return;
+
+            known.clear();
+            withAMethod.clear();
+            ApplicationManager.getApplication().invokeLater(onAnswered);
+            return;
+        }
 
         if (DumbService.isDumb(p)) {
             DumbService.getInstance(p).runWhenSmart(() -> read(p, cases, onAnswered));
