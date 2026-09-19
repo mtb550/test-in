@@ -89,7 +89,7 @@ for it, and what is written back is that answer rather than an invented one.
 
 | File | Node | Adds | Values |
 |---|---|---|---|
-| `.tp` | Test project | `status` | `ACTIVE` `INACTIVE` |
+| `.tp` | Test project | `status`, and `format` - which format this project's files are in, 2 for the one described here | `ACTIVE` `INACTIVE` |
 | `.tcd` | The `Test Cases` directory | — | |
 | `.trd` | The `Test Runs` directory | — | |
 | `.tsp` | Test set package | `status` | `ACTIVE` `ARCHIVED` |
@@ -298,11 +298,20 @@ has to change, the old one stays readable through `@JsonAlias` — `modifiedBy`
 and `modifiedAt` are read from `updatedBy` and `updatedAt` for exactly this
 reason, and those aliases are permanent.
 
+**The project says which format its files are in**, in its `.tp`: `format`, and
+2 is the format this page describes. A project without the number, or with a
+lower one, is converted once before it is read - test cases moved to `<id>.tc`,
+every marker given an `id`, and its test runs removed
+([UC-INTERNAL-008](internal/convertTestData.md), Rule-INTERNAL-091). A project
+with a **higher** number is not read at all: a format this build does not know is
+refused rather than guessed at, because reading it as format 2 would delete what
+this build cannot see.
+
 **A file whose shape changed structurally is not read at all.** A test run
-written before 3 September 2026 kept its results in `<folder>.json`, which is
-why renaming a run lost them. Runs are `run.json` now, and the old file is not
-read: such a run shows no results, and its old file stays on disk as litter.
-That is a decision, not an oversight, and
+written before 3 September 2026 kept its results in `<folder>.json`, and one
+written before 20 September 2026 kept them all in a `run.json`. Neither is read:
+such a run shows no results, and the conversion removes the run rather than
+carrying it forward. That is a decision, not an oversight, and
 `RunResultsSurviveRenameTest.aRunWrittenByAnOlderBuildIsNotRead` asserts it so
 it cannot be mistaken for one.
 
@@ -317,3 +326,9 @@ fact, which is the thing this page is here to prevent.
 the answer is to delete the old data and start again rather than to ship a
 converter — the trees are small, and a converter is a second reader of a format
 nobody writes any more.
+
+**The one exception is the conversion to format 2**, which 2.13.0-alpha carries
+because the plugin is public: test cases and markers are brought forward, and
+only the test runs are removed (#305, D4). The conversion code is deleted in
+2.14.0-alpha, which is why the number is in the file - from then on a project
+nobody converted is refused, naming the release that can convert it.

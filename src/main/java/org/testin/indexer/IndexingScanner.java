@@ -54,6 +54,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import org.testin.model.FileKind;
 import org.testin.model.TestRunItems;
+import org.testin.model.markers.TestProjectMarker;
 import org.testin.testcase.TestCaseOrder;
 
 @AllArgsConstructor
@@ -78,10 +79,34 @@ final class IndexingScanner {
         }
     }
 
-    // UC-INTERNAL-002, Rule-INTERNAL-005, Rule-INTERNAL-007
+    // UC-INTERNAL-002, Rule-INTERNAL-005, Rule-INTERNAL-007, Rule-INTERNAL-091
     private void scanProjectContents(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
+            // UC-INTERNAL-008, Rule-INTERNAL-091.
+            //
+            // Before the project is read, and where both scan paths meet: a
+            // project opened at startup, one the tester picks, one #301's clone
+            // brings in, and a rescan after a copy or a restore all arrive here
+            // (#305, G14). A project already in this build's format is not
+            // touched.
+            Services.getInstance(Conversions.class).ensure(p, projectPath);
+
             final @NotNull TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).getTestProjectNode(p, projectPath);
+
+            // Rule-INTERNAL-091. Written by an older Testin and not converted -
+            // a conversion that failed - or by a newer one whose format this
+            // build does not know: the project is a node saying why, and nothing
+            // in it is read or written. Reading a format this build does not
+            // understand is how a build deletes what it cannot see (#305, S5).
+            final @NotNull Optional<String> refused = tp.getMarker().whyNotReadable();
+            if (refused.isPresent()) {
+                Logger.warn("Not reading " + projectPath.getFileName() + ": " + refused.orElseThrow());
+
+                store.refuse(projectPath, refused.orElseThrow());
+                store.swapIn(projectPath, scannedNode(projectPath, tp));
+                indicator.setFraction(1.0);
+                return;
+            }
 
             // UC-INTERNAL-003, Rule-INTERNAL-021.
             //
@@ -98,6 +123,7 @@ final class IndexingScanner {
             // what ScannedProject describes and #312's A1 cost.
             final @NotNull ScannedProject scanned = new ScannedProject();
             scanned.getProjects().put(projectPath.toString(), tp);
+            store.readable(projectPath);
 
             // UC-TREE-PANEL-001, Rule-TREE-PANEL-100.
             //
@@ -489,6 +515,20 @@ final class IndexingScanner {
      */
     private static boolean looksLikeACaseFile(final @NotNull Path file) {
         return FileKind.TEST_CASE.idIn(file).isPresent();
+    }
+
+    /**
+     * Rule-INTERNAL-091.
+     * <p>
+     * The project as a node and nothing else, which is what a refused project is
+     * indexed as - the same shape an inactive one takes, so the tree can say what
+     * it is rather than leaving the tester with an empty panel (#305, S9).
+     */
+    private static @NotNull ScannedProject scannedNode(final @NotNull Path projectPath, final @NotNull TestProjectDirectoryDto tp) {
+        final @NotNull ScannedProject scanned = new ScannedProject();
+        scanned.getProjects().put(projectPath.toString(), tp);
+
+        return scanned;
     }
 
     /**

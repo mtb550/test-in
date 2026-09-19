@@ -112,7 +112,7 @@ walks one test case from written to reported, in pictures.
 
 Testin has eight parts. Each part gets a folder, and every thing a tester does
 in it gets a page of its own: the story, its rules, its screens, what happens
-step by step, and every way it can be refused. 149 use cases and 736 rules, each
+step by step, and every way it can be refused. 150 use cases and 738 rules, each
 checked against the code it describes.
 
 | Document | Covers |

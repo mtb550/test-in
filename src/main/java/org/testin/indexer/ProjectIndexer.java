@@ -978,6 +978,27 @@ public final class ProjectIndexer {
      * and forgotten in the asking, so the scan that reports them reports each
      * one once.
      */
+    /**
+     * UC-INTERNAL-008, Rule-INTERNAL-091.
+     * <p>
+     * Converts every test project in the Testin folder that is not in this
+     * build's format yet - at every start, and every time the Testin folder
+     * changes (#305, D9).
+     */
+    public void convertEveryProject() {
+        Services.getInstance(Conversions.class).sweep(p);
+    }
+
+    /**
+     * Rule-INTERNAL-091.
+     * <p>
+     * Why this project's contents are not in the index, and nothing when they
+     * are: the tree draws the reason where the contents would have been.
+     */
+    public @NotNull Optional<String> whyNotRead(final @NotNull Path projectPath) {
+        return store.whyNotRead(projectPath);
+    }
+
     public @NotNull List<String> takeDamagedMarkers() {
         return store.takeDamagedMarkers();
     }
