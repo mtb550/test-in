@@ -17,11 +17,8 @@
 package org.testin.testrun;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.TestStatus;
 import org.testin.util.Shortcuts;
 
@@ -43,10 +40,17 @@ import java.util.List;
  */
 public class SetTestCaseStatusGroup extends DefaultActionGroup {
 
-    // UC-EDITOR-PANEL-032, Rule-EDITOR-PANEL-133
-    @Override
-    public AnAction @NotNull [] getChildren(final @Nullable AnActionEvent e) {
-        return verdicts().toArray(AnAction[]::new);
+    /**
+     * UC-EDITOR-PANEL-032, Rule-EDITOR-PANEL-133.
+     * <p>
+     * The verdicts are added once, when the platform makes the group, rather
+     * than built each time it is asked. The grid's key binder reads a group's
+     * entries through the public {@code getChildren(ActionManager)}, which
+     * returns what was added; the form that asks the group is the platform's
+     * alone to call, and calling it failed the Marketplace's verifier (#324).
+     */
+    public SetTestCaseStatusGroup() {
+        super(verdicts());
     }
 
     /**
@@ -82,7 +86,12 @@ public class SetTestCaseStatusGroup extends DefaultActionGroup {
                 .filter(TestStatus::isVerdict)
                 .map(status -> {
                     final @NotNull SetTestCaseStatusAction action = new SetTestCaseStatusAction(status);
-                    action.setShortcutSet(Shortcuts.customShortcut(status.getMenuEntry().shortcut()));
+
+                    // No component: this only gives the action its letter, which
+                    // the menu shows and each binder registers where it belongs.
+                    // setShortcutSet does the same and is internal to the
+                    // platform, so the Marketplace's verifier refuses it (#324).
+                    action.registerCustomShortcutSet(Shortcuts.customShortcut(status.getMenuEntry().shortcut()), null);
                     return action;
                 })
                 .toList();

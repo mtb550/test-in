@@ -16,9 +16,9 @@
 
 package org.testin.editor;
 
+import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import org.testin.actions.Declared;
@@ -130,11 +130,11 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
      * nothing.
      */
     private static void bindGroup(final @NotNull DefaultActionGroup group, final @NotNull JBTable table) {
-        // The group's children as the menu gets them, not as they were added. A
-        // group that builds its entries when asked - the verdicts - added none,
-        // so walking what was added skipped P, F and B on the grid (#66,
-        // finding 201).
-        for (final AnAction action : group.getChildren((AnActionEvent) null)) {
+        // What each group was given. The verdicts are added when their group is
+        // made so that they are here: built only when the menu asked, they were
+        // skipped, and P, F and B did nothing on the grid (#66, finding 201).
+        // The form that asks the group is the platform's alone to call (#324).
+        for (final AnAction action : group.getChildren(ActionManager.getInstance())) {
             if (action instanceof DefaultActionGroup nested) {
                 bindGroup(nested, table);
                 continue;
