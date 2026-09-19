@@ -616,25 +616,17 @@ public final class ProjectIndexer {
     }
 
     /**
-     * The run's results, written by the one writer that owns the file - see
-     * {@link RunWriter} for why there is only one and why the snapshot is taken
-     * here rather than there.
+     * Changes a run as the index holds it, and writes it through the one writer
+     * that owns the file - see {@link RunWriter} for why there is only one.
      * <p>
-     * Private: every write of an existing run goes through {@link #changeRun} or
-     * {@link #saveRun}, which write the run the index holds rather than one a
-     * caller kept (#66, finding 152).
-     */
-    private void persistRun(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
-        runWriter.persist(runPath, tr);
-    }
-
-    /**
-     * Changes a run as the index holds it, and writes it.
+     * Every write of an existing run comes through here or {@link #saveRun},
+     * which write the run the index holds rather than one a caller kept (#66,
+     * finding 152).
      */
     public void changeRun(final @NotNull Path runPath, final @NotNull Consumer<TestRunDto> change) {
         findTestRun(runPath).ifPresentOrElse(run -> {
             change.accept(run);
-            persistRun(runPath, run);
+            runWriter.persist(runPath, run);
         }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
     }
 
@@ -663,7 +655,7 @@ public final class ProjectIndexer {
      * Registers the run and writes it, through the one writer that owns the file.
      * <p>
      * It used to write straight from the calling thread while
-     * {@link #persistRun} queued its writes - so the run JSON had two writers
+     * {@link #changeRun} queued its writes - so the run JSON had two writers
      * and no order between them. Saving Result Analysis took the direct path on
      * the UI thread while a verdict recorded moments earlier could still be
      * queued, holding a snapshot taken before the analysis existed; the queued
@@ -672,7 +664,7 @@ public final class ProjectIndexer {
      * <p>
      * The registration stays immediate. Creating a run needs the index to know
      * about it on the next line, and only the disk write belongs in the queue.
-     * This is the one door that puts a run into the index: {@link #persistRun}
+     * This is the one door that puts a run into the index: {@link #changeRun}
      * refuses a run that is not there (#66, finding 143).
      */
     public void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
@@ -903,19 +895,6 @@ public final class ProjectIndexer {
 
     public boolean addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
         return store.addTestRunPackage(trp);
-    }
-
-    /**
-     * UC-INTERNAL-003, Rule-INTERNAL-017.
-     * <p>
-     * Whether the file belongs to Git rather than to the test project.
-     * <p>
-     * A repository's own directory is not test data. Its files change on every
-     * command - HEAD, FETCH_HEAD, the index, the logs - so reading them as test
-     * data would make every pull look like the test project changing.
-     */
-    public static boolean isGitsOwn(final @NotNull String relative) {
-        return relative.equals(".git") || relative.startsWith(".git/");
     }
 
     /**

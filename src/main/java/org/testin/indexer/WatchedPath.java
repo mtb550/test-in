@@ -80,7 +80,7 @@ public final class WatchedPath {
      */
     private static boolean isGitsOwn(final @NotNull Path relative) {
         for (final Path segment : relative) {
-            if (ProjectIndexer.isGitsOwn(segment.toString())) return true;
+            if (segment.toString().equals(".git")) return true;
         }
 
         return false;

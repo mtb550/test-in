@@ -35,7 +35,6 @@ import org.testin.services.Services;
 import org.testin.actions.Declared;
 import org.testin.services.OptionalPlugin;
 import org.testin.util.Bundle;
-import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.util.List;

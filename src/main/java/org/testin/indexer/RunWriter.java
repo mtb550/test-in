@@ -165,7 +165,7 @@ final class RunWriter {
     private void sweepScreenshots(final @NotNull TestDataFiles files, final @NotNull Path runPath, final @NotNull Set<String> named) {
         files.screenshotsIn(runPath).stream()
                 .filter(file -> !named.contains(file.getFileName().toString()))
-                .forEach(file -> files.delete(p, file, runPath));
+                .forEach(file -> files.delete(p, file));
     }
 
     private static @NotNull Set<String> namedScreenshots(final @NotNull TestRunDto tr) {

@@ -139,10 +139,6 @@ public enum Done {
             Bundle.message("done.reverted")
     ),
 
-    KEPT(
-            Bundle.message("done.kept")
-    ),
-
     STOPPED(
             Bundle.message("done.stopped")
     );
