@@ -72,7 +72,8 @@ There is no key for this. It starts on its own.
 
 ## The budget
 
-A test project of ten thousand test cases, measured rather than estimated.
+A test project of ten thousand test cases, and the results of its test runs,
+measured rather than estimated.
 
 | | Measured | Budget |
 |---|---|---|
@@ -80,9 +81,18 @@ A test project of ten thousand test cases, measured rather than estimated.
 | **Reading ten thousand** | 214 ms | 400 ms |
 | **Held in memory, per case** | 1.5 KB | 4 KB |
 | **Held in memory, ten thousand** | 14.6 MB | 40 MB |
+| **Reading one run result** | 8.8 µs | 20 µs |
+| **Reading four thousand** | 35 ms | 80 ms |
 
-Measured on 9 September 2026, Windows 11 with JBR 25, by
-`IndexerBudgetTest`. CI asserts the budget on every push, on a runner doing
+The results are their own line because they are their own files: since #305 a run
+of two thousand cases is two thousand `.ri` files rather than one `run.json`, so
+the question "what does a big cycle cost to read" is a question about four
+thousand small documents - one cycle of two thousand cases and fifty of forty,
+which is the shape of a real Testin folder. Two thousand of them parse in about
+18 milliseconds.
+
+Measured on 9 September 2026 (the cases) and 20 September 2026 (the results),
+Windows 11 with JBR 25, by `IndexerBudgetTest`. CI asserts the budget on every push, on a runner doing
 nothing else, so a change that doubles the cost fails rather than ships. It is
 its own run - `./gradlew test -Pbudget` - and not part of the ordinary one,
 because a clock on a machine that is also compiling measures the machine.
@@ -143,7 +153,10 @@ the bottom of the IDE, beside the other background jobs.
 8. After each test set the bar reads *Test set:*, then its name, then how many
    test cases it holds.
 9. The bar reads the test project's name, then *test runs...*.
-10. Testin walks `Test Runs`. Each test run reads its recorded results.
+10. Testin walks `Test Runs`. Each test run reads its own facts from its `.tr`
+    - its status, how it was configured, what the tester wrote about the
+    verdicts, when it was executed - and one file per result, `<test case
+    id>.ri`, in the order their cases sit in their test sets.
 11. The bar reads *Done -*, then the test project's name, and closes.
 12. The tree draws itself from memory. Every editor that was open when the IDE
     closed opens again.

@@ -140,46 +140,43 @@ public class PendingChangeFactoryTest {
     }
 
     /**
-     * A test run is not a test case, and reading it as one is what put a
-     * nameless row in the review - and, for a run that was edited rather than
-     * created, no row at all (#66).
+     * A verdict is its own change, named by the case it is about: since #305 a
+     * run's results are one file each, so what a tester reviews is the result
+     * that changed rather than a line saying a run changed somehow.
      */
     @Test
-    public void aTestRunIsItsOwnKindOfChange() {
-        final String runJson = """
-                {"changeLog":"cycle 4","results":[{"id":"%s","status":"PASSED"},{"id":"%s","status":"FAILED"}]}
-                """.formatted(UUID.randomUUID(), UUID.randomUUID());
+    public void aResultIsItsOwnKindOfChange() {
+        final UUID caseId = UUID.randomUUID();
+        final String before = """
+                {"id":"%s","status":"PENDING"}""".formatted(caseId);
+        final String after = """
+                {"id":"%s","status":"PASSED","actualResult":"Signed in"}""".formatted(caseId);
 
-        final PendingChange added = PendingChangeFactory.fromFile(
-                DiffType.ADDED, "", runJson, Path.of("Test Runs", "cycle 4", "cycle 4.json"), RealMapper.build(), id -> Optional.empty());
+        final PendingChange change = PendingChangeFactory.fromFile(
+                DiffType.MODIFIED, before, after, Path.of("Test Runs", "cycle 4", caseId + ".ri"), RealMapper.build(), id -> Optional.empty());
 
-        assertNotNull(added);
-        assertEquals(added.subject(), ChangeSubject.TEST_RUN);
-        assertEquals(added.name(), "cycle 4", "the run's own name, not a blank test case description");
-        assertEquals(added.testSet(), "", "a run belongs to no test set");
-        assertFalse(added.isRevertible(), "a verdict is a record of work, not an edit to undo");
-        assertEquals(added.fieldChanges().getFirst().changeType(), ChangeType.CREATE_TEST_RUN);
-        assertTrue(added.fieldChanges().getFirst().newValue().contains("2 cases"), "the row says what the run holds");
+        assertEquals(change.subject(), ChangeSubject.RUN_ITEM);
+        assertEquals(change.testCaseId(), caseId.toString(), "the result says which case it is about");
+        assertFalse(change.isRevertible(), "a verdict is a record of work, not an edit to undo");
+        assertFalse(change.fieldChanges().isEmpty(), "and the row says what the verdict became");
+        assertEquals(change.fieldChanges().getFirst().newValue(), "Passed");
     }
 
     /**
-     * The case that used to vanish: a run already committed, then executed
-     * further. No test-case field differs because none applies, and the review
-     * showed nothing - so the results could never be committed from it.
+     * A run's own facts are in its marker, so a .tr that changed says which of
+     * them did - what used to be one "the run changed" line (#305, D6).
      */
     @Test
-    public void anEditedTestRunIsStillOfferedForCommit() {
-        final String before = """
-                {"results":[{"id":"%s","status":"PENDING"}]}""".formatted(UUID.randomUUID());
-        final String after = """
-                {"results":[{"id":"%s","status":"PASSED"}]}""".formatted(UUID.randomUUID());
-
+    public void aRunsMarkerSaysWhichOfItsFactsChanged() {
         final PendingChange change = PendingChangeFactory.fromFile(
-                DiffType.MODIFIED, before, after, Path.of("Test Runs", "cycle 4", "cycle 4.json"), RealMapper.build(), id -> Optional.empty());
+                DiffType.MODIFIED,
+                "{\"status\":\"CREATED\",\"createdBy\":\"mtb\",\"configuration\":{\"PLATFORM\":\"Web\"}}",
+                "{\"status\":\"IN_PROGRESS\",\"createdBy\":\"mtb\",\"configuration\":{\"PLATFORM\":\"Mobile\"}}",
+                Path.of("Test Runs", "cycle 4", ".tr"), RealMapper.build(), id -> Optional.empty());
 
-        assertNotNull(change, "an edited run is a change the tester has to be able to commit");
-        assertEquals(change.subject(), ChangeSubject.TEST_RUN);
-        assertFalse(change.fieldChanges().isEmpty());
+        assertEquals(change.subject(), ChangeSubject.MARKER);
+        assertTrue(change.fieldChanges().stream().anyMatch(field -> field.newValue().equals("Mobile")),
+                "the configuration the tester changed is a row: " + change.fieldChanges());
     }
 
     /**

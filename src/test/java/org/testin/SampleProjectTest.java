@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.markers.TestRunMarker;
@@ -134,6 +133,18 @@ public class SampleProjectTest {
         for (final Path marker : filesNamed(demo(), DirectoryType.TR.getMarker())) {
             read(marker, TestRunMarker.class);
         }
+    }
+
+    /**
+     * Rule-INTERNAL-091. The sample is what a project written by this build looks
+     * like, so it carries the format number this build writes - otherwise opening
+     * it would convert it, and the committed sample would differ from the one a
+     * tester sees (#305).
+     */
+    @Test
+    public void theSampleCarriesThisBuildsFormat() {
+        assertEquals(read(demo().resolve(DirectoryType.TP.getMarker()), TestProjectMarker.class).getFormat(),
+                TestProjectMarker.FORMAT, "The sample says it is in another format than this build writes");
     }
 
     @Test

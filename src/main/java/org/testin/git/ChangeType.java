@@ -103,21 +103,6 @@ public enum ChangeType {
             RevertAction.NONE
     ),
 
-    CREATE_TEST_RUN(
-            Bundle.message("change.create.test.run"),
-            RevertAction.NONE
-    ),
-
-    CHANGE_TEST_RUN(
-            Bundle.message("change.change.test.run"),
-            RevertAction.NONE
-    ),
-
-    REMOVE_TEST_RUN(
-            Bundle.message("change.remove.test.run"),
-            RevertAction.NONE
-    ),
-
     CREATE_MARKER(
             Bundle.message("change.create.marker"),
             RevertAction.NONE

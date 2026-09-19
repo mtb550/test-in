@@ -16,15 +16,15 @@ came from a real test project, and nothing here should.
       src/test/java/     where Generate Code writes
 
     testin-root/         what the rootTestinPath setting points at
-      Demo/                                  .tp   the test project
+      Demo/                                  .tp   the test project, format 2
         Test Cases/                          .tcd
-          Login/                             .ts   3 cases
+          Login/                             .ts   3 cases, one .tc each
           Checkout/                          .tsp  a test set package
-            Payment/                         .ts   3 cases
+            Payment/                         .ts   3 cases, one .tc each
         Test Runs/                           .trd
-          Cycle-1/                           .tr   completed, six results
+          Cycle-1/                           .tr   completed; six results, one .ri each
           Regression/                        .trp  a test run package
-            Cycle-2/                         .tr   in progress, two results
+            Cycle-2/                         .tr   in progress; two results
 
 Seven directories, seven marker formats. `.tsp` and `.trp` had no committed
 example anywhere before this — the format documentation (#100) takes its
@@ -52,8 +52,9 @@ to this folder in **Settings → Testin**.
 
 `SampleProjectTest` reads every file here through the same model the plugin
 reads it with, and asserts that all seven markers are present, that each case's
-file name is its id, that each case carries a rank, and that every result in a
-run names a case that exists.
+file name is its id, that each case carries a rank, that a run holds one result
+file per case and no results file of its own, and that every result names a case
+that exists.
 
 So this sample cannot rot quietly. If a format changes, that test fails and names
 the file — which is the entire reason it is worth committing sample data rather

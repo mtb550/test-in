@@ -22,7 +22,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.TestRunDto;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
@@ -50,8 +49,6 @@ import org.testin.model.markers.TestRunMarker;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class PendingChangeFactory {
 
-    private static final @NotNull String JSON = ".json";
-
     /**
      * UC-SHARE-010, Rule-SHARE-047.
      * <p>
@@ -61,10 +58,9 @@ final class PendingChangeFactory {
      * an audit stamp out of the commit entirely (#66).
      */
     static @NotNull PendingChange fromFile(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper, final @NotNull Function<UUID, Optional<TestCaseDto>> cases) {
-        return switch (subjectOf(relativePath, afterJson.isEmpty() ? beforeJson : afterJson, mapper)) {
+        return switch (subjectOf(relativePath)) {
             case TEST_CASE -> testCase(type, beforeJson, afterJson, relativePath, mapper);
             case RUN_ITEM -> runItem(type, beforeJson, afterJson, relativePath, mapper, cases);
-            case TEST_RUN -> testRun(type, beforeJson, afterJson, relativePath, mapper);
             case MARKER -> marker(type, beforeJson, afterJson, relativePath, mapper);
             case OTHER -> other(type, relativePath);
         };
@@ -74,25 +70,22 @@ final class PendingChangeFactory {
      * What the file is, read from what is in it.
      * <p>
      * The name settles it, through {@link FileKind}: a marker is one of the seven
-     * fixed names, a test case is a {@code .tc}. It used to read the file and look
-     * for a field - a run carried {@code results}, a case a description - because
-     * nothing in a name said what a file was, and a hand-placed file could be
-     * taken for something it is not. The names say it now (#305).
+     * fixed names, a test case is a {@code .tc}, one case's result a {@code .ri}.
+     * It used to read the file and look for a field - a run carried
+     * {@code results}, a case a description - because nothing in a name said what
+     * a file was, and a hand-placed file could be taken for something it is not.
+     * The names say it now, and the file is never opened to find out (#305).
      * <p>
-     * A run's results are still one file whose name says nothing, so that half
-     * keeps reading the content until the run becomes one file per item. Anything
-     * left is a file nobody planned for, and it is still listed - what the review
-     * does not show cannot be committed.
+     * Anything else is a file nobody planned for, and it is still listed - what
+     * the review does not show cannot be committed.
      */
-    private static @NotNull ChangeSubject subjectOf(final @NotNull Path relativePath, final @NotNull String json, final @NotNull Mapper mapper) {
-        final @NotNull String fileName = relativePath.getFileName().toString();
-
-        if (FileKind.of(relativePath) == FileKind.MARKER) return ChangeSubject.MARKER;
-        if (FileKind.of(relativePath) == FileKind.TEST_CASE) return ChangeSubject.TEST_CASE;
-        if (FileKind.of(relativePath) == FileKind.RUN_ITEM) return ChangeSubject.RUN_ITEM;
-        if (!fileName.endsWith(JSON)) return ChangeSubject.OTHER;
-
-        return fieldsIn(mapper, json).containsKey("results") ? ChangeSubject.TEST_RUN : ChangeSubject.OTHER;
+    private static @NotNull ChangeSubject subjectOf(final @NotNull Path relativePath) {
+        return switch (FileKind.of(relativePath)) {
+            case MARKER -> ChangeSubject.MARKER;
+            case TEST_CASE -> ChangeSubject.TEST_CASE;
+            case RUN_ITEM -> ChangeSubject.RUN_ITEM;
+            case SCREENSHOT, OTHER -> ChangeSubject.OTHER;
+        };
     }
 
     /**
@@ -186,21 +179,6 @@ final class PendingChangeFactory {
                 relativePath, type, nothingCommitted(), changes);
     }
 
-    private static @NotNull PendingChange testRun(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper) {
-        final @NotNull String runName = parentName(relativePath);
-
-        final @NotNull List<FieldChange> changes = switch (type) {
-            case ADDED -> List.of(new FieldChange(DirectoryType.TR.getDescription(), "", summary(read(mapper, afterJson, TestRunDto.class)),
-                    ChangeType.CREATE_TEST_RUN));
-            case DELETED -> List.of(new FieldChange(DirectoryType.TR.getDescription(), summary(read(mapper, beforeJson, TestRunDto.class)), "",
-                    ChangeType.REMOVE_TEST_RUN));
-            case MODIFIED -> TestRunChangeComparator.compare(
-                    read(mapper, beforeJson, TestRunDto.class), read(mapper, afterJson, TestRunDto.class));
-        };
-
-        return new PendingChange(ChangeSubject.TEST_RUN, runName, "", "", relativePath, type, nothingCommitted(), changes);
-    }
-
     /**
      * A marker change, described by the one thing in it a tester recognizes:
      * its status. Everything else it holds is the audit the plugin fills in.
@@ -251,13 +229,6 @@ final class PendingChangeFactory {
         return new PendingChange(ChangeSubject.OTHER, relativePath.getFileName().toString(), "", "",
                 relativePath, type, nothingCommitted(),
                 List.of(new FieldChange(relativePath.toString(), "", "", changeType)));
-    }
-
-    /**
-     * What a run holds, in one line: how many cases and how they stand.
-     */
-    private static @NotNull String summary(final @NotNull TestRunDto run) {
-        return TestRunChangeComparator.verdictSummary(run);
     }
 
     /**

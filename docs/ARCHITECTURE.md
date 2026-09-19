@@ -203,10 +203,11 @@ lookup rather than a disk hit.
 
 Test runs in particular are saved and read only through the indexer —
 `putTestRun` to create one, `changeRun` and `saveRun` to change one,
-`changeRunMarker`, `addTestRunDir`. The sequential run
-writer lives inside it. A run's screenshots are its files too: `storeScreenshots`
-writes them, `screenshot` reads one, and the run writer removes those no result
-names.
+`changeRunMarker`, `addTestRunDir`. The sequential run writer lives inside it,
+and writes one file per result - `<test case id>.ri` - so recording a verdict
+writes that one file and two testers judging different cases of a run never touch
+the same one. A run's screenshots are its files too: `storeScreenshots` writes
+them, `screenshot` reads one, and the run writer removes those no result names.
 
 The rule is enforced by the compiler rather than by review: `TestDataFiles` and
 `VfsExecutor` are package-private and live in `indexer`, so nothing outside the
