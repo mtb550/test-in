@@ -5,8 +5,6 @@ testng = "7.12.0"
 iText = "9.7.1"
 fastexcel = "0.20.2"
 poi = "5.5.1"
-jsch = "2.28.7"
-sshd = "2.19.0"
 archunit = "1.5.0"
 # BasePlatformTestCase is a JUnit TestCase; the platform test framework brings no
 # JUnit of its own. Only the ideTest task uses it.
@@ -23,8 +21,5 @@ iText-layout = { module = "com.itextpdf:layout", version.ref = "iText" }
 fastexcel = { module = "org.dhatim:fastexcel", version.ref = "fastexcel" }
 poi = { module = "org.apache.poi:poi", version.ref = "poi" }
 poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi" }
-jsch = { module = "com.github.mwiede:jsch", version.ref = "jsch" }
-sshd-core = { module = "org.apache.sshd:sshd-core", version.ref = "sshd" }
-sshd-sftp = { module = "org.apache.sshd:sshd-sftp", version.ref = "sshd" }
 archunit = { module = "com.tngtech.archunit:archunit", version.ref = "archunit" }
 junit = { module = "junit:junit", version.ref = "junit" }

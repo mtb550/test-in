@@ -62,11 +62,11 @@ public record BugRepository(@NotNull String host, @NotNull String owner, @NotNul
         final @NotNull String value = TestinProjectConfig.withoutCredentials(address.strip());
         if (value.isEmpty()) return Optional.empty();
 
-        if (value.startsWith(TestinProjectConfig.SCP_PREFIX)) {
+        if (value.startsWith(TestinYml.SCP_PREFIX)) {
             final int colon = value.indexOf(':');
             if (colon < 0) return Optional.empty();
 
-            return fromParts(value.substring(TestinProjectConfig.SCP_PREFIX.length(), colon), value.substring(colon + 1));
+            return fromParts(value.substring(TestinYml.SCP_PREFIX.length(), colon), value.substring(colon + 1));
         }
 
         final @NotNull Matcher scheme = SCHEME.matcher(value);

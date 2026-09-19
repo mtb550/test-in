@@ -53,14 +53,6 @@ This copies a test project from Git onto this machine.
   because "Active" on every name is a word read a hundred times and needed
   never. A test run always says its status, because where a cycle stands is what
   the tree is read for.
-- **Rule-TREE-PANEL-018** — Cloning needs two things. It needs the Git plugin.
-  It also needs this code project to already name the test project it is
-  cloning.
-- **Rule-TREE-PANEL-019** — The folder is named by the code project, never by
-  the address. A repository called `nafath-test-case` is a place to clone from.
-  The test project's name is written once, in `testin.yml`, which travels with
-  the repository. The tree, the reports and the server path all read it from
-  there.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is - drawn with Inactive beside its name like any other status - and its test
@@ -68,6 +60,13 @@ This copies a test project from Git onto this machine.
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
+- **Rule-TREE-PANEL-107** — Cloning needs the Git plugin, and nothing else: a
+  code project clones a test project whether or not it has a `testin.yml`. The
+  clone is named after its repository - the last part of the address without
+  `.git`, kept as it is when Testin accepts it as a test project's name, made
+  into one otherwise, and numbered when that name is already in the Testin
+  folder. The one exception is the address `testin.yml` gives: that clone takes
+  the name the file gives beside it.
 
 ## What the tester sees
 
@@ -86,46 +85,33 @@ drawn under [UC-TREE-PANEL-001](reachTheTree.md), and it does the same thing.
 
 **From a Git address**
 
-1. The Git plugin is installed, and this code project already names the test
-   project.
+1. The Git plugin is installed. This code project needs no `testin.yml`.
 2. The tester presses the **New Test Project** button in the panel header.
 3. The tester pastes the repository address instead of a name, and presses
    `Enter`.
-4. Testin copies the repository into the Testin folder. The new folder takes
-   the name the code project gives. A progress bar reads *Cloning repository*,
-   with the line *Cloning into \<name\>...*. It cannot be canceled.
-5. Testin binds this code project to it, and the tree appears.
-6. Testin shows *Project cloned*.
+4. Testin copies the repository into the Testin folder. The new folder is
+   named after the repository: `https://github.com/acme/nafath-test-cases.git`
+   becomes `nafath-test-cases`, and a second clone of it `nafath-test-cases2`.
+   A progress bar reads *Cloning repository*, with the line *Cloning into
+   \<name\>...*. It cannot be canceled.
+5. Testin chooses it for this code project on this machine, and the tree
+   appears. Nothing is written into the code project (Rule-TREE-PANEL-106).
+6. Testin shows *Project cloned*. The name can be changed afterwards with
+   **Rename** ([UC-TREE-PANEL-011](renameNode.md)).
 
 ## What Testin refuses
 
-**If this code project names no test project** — nothing is cloned. A warning
-titled *No Test Project Named* opens. It says the project file must name the
-test project first. It also says the tester can set the name there, or pick a
-project with **Select Test Project**.
+**If the address is the one `testin.yml` gives, and a folder of the name it
+gives is already in the Testin folder** — nothing is cloned, and *\<name\>
+Already Exists* is shown in red. That folder is the one the file means.
 
 **If the Git plugin is not installed** — nothing is cloned. Testin shows *Git
 Plugin Not Available*, reading *Git synchronization and cloning require the Git
 plugin, which is not available in this IDE.* Testin checks this before anything
-else. So in an IDE without Git the tester never sees *No Test Project Named*.
+else.
 
 **If no Testin folder is set** — the **New Test Project** button is gray.
 (Rule-TREE-PANEL-089)
-
----
-
-## From an SFTP server: not built
-
-> **A tester cannot do this today.** Testin can sync a test project it
-> already has with an SFTP server, which is part of reports, export, import and
-> sync. It cannot bring a test project down from one that it does not have yet.
-> There is no button, no menu item and no key for it.
->
-> What it would need: a place to type the server, the folder and the account.
-> It would also need the same Rule-TREE-PANEL-019 decision about what the test
-> project is called. Until that is built, a tester who keeps test projects on an
-> SFTP server works in three steps. They create the test project, they set up
-> the SFTP account, and then they sync.
 
 ---
 

@@ -579,7 +579,15 @@ final class IndexerDataStore {
         });
         renameDescendantKeys(testCaseStore.getTestSetCaseIds(), oldPath, newPath);
         renameDescendantKeys(testRunsByPath, oldPath, newPath);
+        testCaseStore.renamed(oldPath, newPath);
         childrenIndex.invalidate();
+
+        // UC-TREE-PANEL-011, Rule-TREE-PANEL-100. A project's two containers go
+        // with it. An inactive project's are in none of the maps above, so they
+        // kept the old path and a node created after reactivating it was written
+        // into a folder that no longer existed.
+        findByPath(newPath).ifPresent(renamed -> renamed.fixedChildren().forEach(child ->
+                updatePathAndParent(child, newPath.resolve(child.getPath().getFileName()), renamed)));
 
         // The renamed/moved node itself was modified - record it in the marker,
         // the persisted home of audit info. Descendants only changed location,

@@ -37,7 +37,7 @@ public enum TestinLocation {
     LOCAL,
 
     /**
-     * Shared, through whatever {@link ConnectionType} names.
+     * Shared through Git, cloned from the file's {@code RepoUrl}.
      */
     REMOTE;
 

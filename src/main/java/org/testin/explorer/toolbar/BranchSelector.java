@@ -23,8 +23,6 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import org.jetbrains.annotations.NotNull;
-import org.testin.config.ConnectionType;
-import org.testin.config.TestinConfigService;
 import org.testin.explorer.TreePanel;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.ViewPendingCommitsAction;
@@ -98,7 +96,7 @@ public class BranchSelector {
         updateProject(testProjectDirectory);
     }
 
-    // UC-TREE-PANEL-026, Rule-TREE-PANEL-084
+    // UC-TREE-PANEL-026, Rule-TREE-PANEL-108
     public void updateProject(final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
         final @NotNull Path path = testProjectDirectory.map(TestProjectDirectoryDto::getPath).orElse(Path.of(""));
 
@@ -113,23 +111,15 @@ public class BranchSelector {
 
         currentBranch = "";
 
-        // What testin.yml says this project is decides whether branches are its
-        // business at all. A server-hosted project has none, so the box is not
-        // shown and nothing here reaches a Git remote - which is the whole point
-        // of asking the channel rather than asking the folder.
-        final @NotNull ConnectionType connection =
-                Services.getInstance(p, TestinConfigService.class).get().connection();
-
-        final boolean showable = connection.isShowsBranches()
-                && !path.toString().isEmpty()
-                && !git.isNotRepository(path);
+        // The folder decides: a Git repository has branches, with or without a
+        // testin.yml (Rule-INTERNAL-088).
+        final boolean showable = !path.toString().isEmpty() && !git.isNotRepository(path);
 
         comboBox.setVisible(showable);
 
         if (!showable) {
-            // Still said, for the log and for a project declared as Git that has
-            // not been cloned here yet.
-            showPlaceholder(connection.isShowsBranches() ? Bundle.message("branch.not.a.repository") : Bundle.message("branch.not.shared"));
+            // Still said, for the log and for a project not cloned here yet.
+            showPlaceholder(Bundle.message("branch.not.a.repository"));
             return;
         }
 
@@ -138,7 +128,7 @@ public class BranchSelector {
     }
 
     /**
-     * UC-TREE-PANEL-026, Rule-TREE-PANEL-084.
+     * UC-TREE-PANEL-026, Rule-TREE-PANEL-108.
      * <p>
      * Reads the branches again and asks the remote for what it has.
      * <p>

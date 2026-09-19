@@ -3,8 +3,8 @@
 # Sharing work with the team
 
 Test data is files on one machine. This part is every way those files get to
-somebody else and back: a spreadsheet handed over, a Git repository the whole
-team pulls, or a server the plugin syncs with.
+somebody else and back: a spreadsheet handed over, or a Git repository the
+whole team pulls.
 
 | | |
 |---|---|
@@ -42,11 +42,6 @@ team pulls, or a server the plugin syncs with.
 | **UC-SHARE-016** | [Send my changes and take the team's](syncWithGit.md) | Give and take work in one gesture. |
 | **UC-SHARE-017** | [Resolve the conflicts a pull stopped on](resolveConflicts.md) | Finish a pull that two people's changes stopped. |
 | **UC-SHARE-018** | [Answer which side wins for a field both changed](answerMergeQuestions.md) | Choose between the tester's wording and a colleague's. |
-| | **Working with a server** | |
-| **UC-SHARE-019** | [Sync with the team's server](syncWithServer.md) | Share test cases with a team that has no Git. |
-| **UC-SHARE-020** | [Have my password kept for next time](keepServerPassword.md) | Type the server password once, not on every sync. |
-| **UC-SHARE-021** | [Answer the conflicts the server sync could not settle](answerServerConflicts.md) | Say which version of a test case wins. |
-| **UC-SHARE-022** | [Agree to remove files the server no longer holds](agreeToRemovals.md) | Approve a deletion before it reaches this machine. |
 
 Cloning a test project from a repository is how a test project first arrives,
 and it is [UC-TREE-PANEL-003](../treePanel/importTestProject.md).
@@ -59,16 +54,15 @@ A test project is a folder of files. That is deliberate, and it is what makes
 all of this possible: the files can be committed, synced, exported and read by
 anything.
 
-There are three ways to share them, and a team picks one.
+There are two ways to share them.
 
 | Way | What it suits |
 |---|---|
 | **Export and import** | Handing a set of test cases to somebody who has no IDE, or bringing in a spreadsheet somebody wrote |
 | **Git** | A team that already uses Git, and wants the test data reviewed and versioned like code |
-| **A server** | A team that wants the test data shared without a repository, over SFTP |
 
-`testin.yml`, in the code repository, says which of the three this test project
-uses. The settings page holds this machine's half of it.
+`testin.yml`, in the code repository, can say that this test project is shared
+through Git, and where it is cloned from.
 
 **Four words, before the rules use them.**
 
@@ -91,7 +85,7 @@ uses. The settings page holds this machine's half of it.
 | Right click | Puts one change back, in the review | [UC-SHARE-011](revertOneChange.md) |
 
 **Nothing has a key** for: **Export**, **Import**, **Sync With Remote**, **View
-Pending Commits**, **Sync With SFTP**, **Commit**, **Commit & Push**, and the
+Pending Commits**, **Commit**, **Commit & Push**, and the
 **Generate**, **Export** and **Import** buttons.
 
 `Enter` does not confirm the export, import or review dialogs. Each has a button
@@ -147,7 +141,6 @@ ignored. A heading Testin does not know is left alone.
 |---|---|
 | Export and import | No |
 | Reports | No |
-| Sync with a server | No |
 | **Sync With Remote**, and everything reached from **View Pending Commits** | **Yes** |
 
 Without the Git plugin those two menu entries are simply not there, and nothing
@@ -168,7 +161,7 @@ bug report yet.
 | | The rule it breaks | What a tester sees |
 |---|---|---|
 | **Difference 1** | No rule covers it — nothing in this part says a refusal must be stated | Fixed. An empty folder, file name or format now turns that box's own placeholder red and puts the cursor in it, the way every dialog on the framework already did. |
-| **Difference 12** | Rule-SHARE-005 — the same | The import bar stops between test cases now, and still says how many were written. The sync bar stops between files, where it used to finish all 2,246 of them before noticing. The report bar offers **Cancel** and nothing inside asks: the four generators are handed the document to write and never the bar, so the press takes effect only once the document is finished. An export has nothing long left to stop, because it reads the tree from memory and writes one file at the end. |
+| **Difference 12** | Rule-SHARE-005 — the same | The import bar stops between test cases now, and still says how many were written. The report bar offers **Cancel** and nothing inside asks: the four generators are handed the document to write and never the bar, so the press takes effect only once the document is finished. An export has nothing long left to stop, because it reads the tree from memory and writes one file at the end. |
 
 | **Difference 16** | Rule-SHARE-003 — the tester is told | A message can still be shown to nobody: with no status bar on the code project's window, the balloon is dropped. It is written to `testin.log` now rather than lost, so an export that finished with nobody told can be told from one that did not finish. Nothing is raised in its place — a notification about a failed notification is noise. |
 | **Difference 19** | Rule-SHARE-006 — a missing feature says so | Fixed. Both Git entries are in the menu in every IDE now, grayed and reading *(needs the Git plugin)* when it is missing, so the menu has one shape everywhere and the reason is on the entry (Rule-SHARE-105). |
@@ -183,6 +176,33 @@ it.
 | **Rule-SHARE-102** | *The tick box is drawn only while no folder has been set yet.* | — |
 | **Rule-SHARE-103** | *One folder is remembered, and every dialog uses it.* Said twice; the settings page owns the folder | [Rule-SETTING-021](../setting/setDownloadFolder.md) |
 | **Rule-SHARE-104** | *The export dialog remembers the folder in its box. The import dialog remembers the folder holding the file that was chosen.* Two dialogs storing two different things under one name was half the defect | — |
+| **UC-SHARE-019** | *Sync with the team's server* - send a test project to an SFTP server and take what is there, in one gesture. Removed 19 September 2026, when Git became the only way a test project is shared ([#334](https://github.com/mtb550/test-in/issues/334)) | [UC-SHARE-016](syncWithGit.md) |
+| **UC-SHARE-020** | *Have my password kept for next time* - the server password, kept in the IDE's password store | — |
+| **UC-SHARE-021** | *Answer the conflicts the server sync could not settle* | [UC-SHARE-018](answerMergeQuestions.md) |
+| **UC-SHARE-022** | *Agree to remove files the server no longer holds* | — |
+| **Rule-SHARE-085** | *The server's address comes from `testin.yml`, which the team shares. The account comes from this machine's settings.* | — |
+| **Rule-SHARE-086** | *An account is never written into the shared file. If one is found there it is ignored, and the log says so.* | — |
+| **Rule-SHARE-087** | *Only one machine syncs a test project at a time. A second is told who is syncing.* | — |
+| **Rule-SHARE-088** | *The server must already be known to this machine. One that is not is refused rather than trusted.* | — |
+| **Rule-SHARE-089** | *The sync sends and takes in one gesture.* | Rule-SHARE-003 |
+| **Rule-SHARE-090** | *A test case both sides changed is merged field by field. What the merge cannot settle is kept as it is here, and nothing is sent for it.* | — |
+| **Rule-SHARE-091** | *Testin reads the test project again itself after a sync, because it ignores its own writes.* | — |
+| **Rule-SHARE-092** | *A password is kept in the IDE's own password store. Never in `testin.yml`, never on a marker file, never in the log.* | — |
+| **Rule-SHARE-093** | *It is kept for one server and one account, so two servers, or two accounts on one, do not overwrite each other.* | — |
+| **Rule-SHARE-094** | *The name it is kept under says which server and which account, and holds no part of the secret.* | — |
+| **Rule-SHARE-095** | *A password the tester has just typed is preferred over one kept from before.* | — |
+| **Rule-SHARE-096** | *What the field merge cannot settle is kept as it is here, and nothing is sent for it until the tester answers.* | — |
+| **Rule-SHARE-097** | *The tester is asked only about the fields that really disagree.* | — |
+| **Rule-SHARE-098** | *The answers are sent on the same sync, if nobody else has taken the lock in the meantime.* | — |
+| **Rule-SHARE-099** | *A sync never deletes anything on this machine on its own. It asks.* | — |
+| **Rule-SHARE-100** | *Only files this machine has not touched since are offered for removal.* | — |
+| **Rule-SHARE-101** | *Keeping them sends them back to the server on the next sync, so the question is asked once.* | — |
+| **Rule-SHARE-111** | *The password box shows dots rather than the characters typed into it.* | — |
+| **Rule-SHARE-113** | *A secret the server refuses is forgotten, and the account window opens again.* | — |
+| **Rule-SHARE-114** | *An answer is about the version of the test case the tester was shown.* | — |
+| **Rule-SHARE-115** | *A file fetched from the server is recorded as agreed only once it is on this machine.* | — |
+| **Rule-SHARE-116** | *When this machine cannot save its record of what it agrees with the server, a notification that stays says so.* | — |
+| **Rule-SHARE-117** | *What moved is recorded even when the sync stops part way.* | — |
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.

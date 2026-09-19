@@ -81,8 +81,8 @@ final class IndexingScanner {
             // not find is dropped by the swap, which is how a rescan forgets what
             // disappeared instead of only learning what arrived: the scan used to
             // put and never remove, and the one path that cleared was Refresh -
-            // so a test set deleted by a Git pull, a branch switch or an SFTP
-            // sync stayed in the tree with its cases still in global search, the
+            // so a test set deleted by a Git pull or a branch switch stayed in
+            // the tree with its cases still in global search, the
             // completion cache and every export, until the tester pressed the
             // button Rule-INTERNAL-021 exists so they do not have to (#66,
             // finding 68). It cleared by emptying the project out first, which is

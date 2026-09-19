@@ -162,10 +162,10 @@ public enum OptionalPlugin {
      * go on deciding for itself.
      * <p>
      * Shown and grayed rather than left out. The two Git entries were simply not
-     * added without the Git plugin, while Sync With SFTP beside them was added
-     * in every IDE - so the menu had a different shape in two IDEs, with nothing
-     * to say why, and a tester could not learn the Git integration existed at
-     * all (#273).
+     * added without the Git plugin, while the entries beside them were added in
+     * every IDE - so the menu had a different shape in two IDEs, with nothing to
+     * say why, and a tester could not learn the Git integration existed at all
+     * (#273).
      * <p>
      * The reason goes in the <b>text</b>, not only the description: a grayed
      * entry in a popup menu is not hovered, so a description nobody sees is the

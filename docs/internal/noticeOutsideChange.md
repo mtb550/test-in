@@ -15,8 +15,8 @@ by hand, and is on [UC-TREE-PANEL-025](../treePanel/refreshTree.md).
 
 - **Rule-INTERNAL-016** — Testin watches every file the IDE watches. A change
   counts only if the file is inside a test project Testin reads: a folder under
-  the Testin folder with a `.tp` marker, and only the one `testin.yml` names when
-  it names one. A changed folder that is not one is dropped from what Testin
+  the Testin folder with a `.tp` marker, and only the one named for this code
+  project when one is named. A changed folder that is not one is dropped from what Testin
   shows.
 - **Rule-INTERNAL-017** — Anything inside a `.git` folder is ignored, however
   deep it is.
@@ -36,8 +36,8 @@ by hand, and is on [UC-TREE-PANEL-025](../treePanel/refreshTree.md).
   next read. Nothing is missed and nothing is read twice at once.
 - **Rule-INTERNAL-023** — A code project whose Testin panel was never opened is
   left alone.
-- **Rule-INTERNAL-024** — `testin.yml` is not watched. Only **Refresh** reads it
-  again.
+- **Rule-INTERNAL-024** — `testin.yml` is not watched. Only **Refresh**, and
+  Report Bug before it sends, read it again.
 - **Rule-INTERNAL-081** — A test project stays readable while it is read again.
   The pass reads into a copy and is put in when it is finished, so everything
   still on disk answers throughout, and a pass that is cancelled or that fails

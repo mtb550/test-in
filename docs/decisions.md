@@ -116,6 +116,9 @@ up.
 
 ## Decision-004 — SFTP is the maintained JSch fork, not JSch and not MINA SSHD
 
+*Superseded by Decision-012, 19 September 2026: there is no SFTP sync any
+more. Left as it was written.*
+
 **Context.** The server sync needs an SFTP client inside the plugin.
 `com.jcraft:jsch` last shipped in 2018 and cannot negotiate `rsa-sha2` against a
 current `sshd`. Apache MINA SSHD is maintained and is the obvious alternative.
@@ -183,6 +186,9 @@ stored setting fail to parse on the next start.
 ---
 
 ## Decision-007 — An unknown SSH host is refused, and trusting one is the tester's step
+
+*Superseded by Decision-012, 19 September 2026: there is no SFTP sync any
+more. Left as it was written.*
 
 **Context.** The first sync against a new server always fails with a host-key
 error, and the fix that removes the error in one line is to accept any key.
@@ -318,14 +324,79 @@ set.
 
 ---
 
+## Decision-011 — Testin reads `testin.yml` and never writes it
+
+**Context.** Seven places wrote `testin.yml` - choosing a project, creating one,
+cloning one, drawing the tree, the push prompt - and each created the file when
+it was absent, so a repository ended up carrying a committed file nobody chose
+to add. A code project without one could not clone a test project at all. And
+the file's raw values were handed to eight classes, each deciding on its own
+what a missing one meant (#301).
+
+**Decision.** One class, `config/TestinYml`, reads `testin.yml` when it is
+there, and nothing writes it. Which test project a tester chooses for a code
+project is kept in the IDE's own storage for that project on this machine,
+never committed, and wins over the project the file names until the file names
+a different one.
+
+**Consequences.** Every flow works without the file: a clone is named after its
+repository, and the branch box follows the folder's Git. A team that wants
+every colleague
+on the same test project with no setup writes the file by hand. The file's
+values and parser are package-private, and `ArchitectureTest` keeps the YAML
+parser in the one class. The choice is the second value kept per project on
+this machine, beside the editors that were open (`LastOpenEditors`), and like
+them it is a choice, not a setting.
+
+**If you are about to reverse it.** Writing the file back - to remember a pick,
+a remote, a name - commits one machine's choice into a file the whole team
+shares, which is what Muteb refused twice on 19 September 2026. Reading a value
+of the file anywhere but `TestinYml` brings back a second answer to what a
+missing value means.
+
+---
+
+## Decision-012 — Git is the only way a test project is shared
+
+**Context.** A test project could be shared two ways: through Git, or by syncing
+it with an SFTP server (#94). The server sync was the larger of the two to
+carry. It had its own SSH client, a field-by-field merge, a lock so one machine
+synced at a time, and a record of what each machine had agreed with the server.
+It kept a password in the IDE's password store and needed two settings. While a
+sync ran, every run write was held back. That came to 5,183 lines in the `sftp`
+package and its tests, for teams without a Git repository. Muteb, 19 September
+2026: *"we have git only now"*.
+
+**Decision.** A test project is shared through Git, or not at all. Export and
+import still hand test cases to somebody without an IDE. The SFTP sync, its
+settings, its dependency and its local test server are removed (#334).
+
+**Consequences.** No SSH client ships in the plugin, and Testin keeps no
+password of its own. A run change is written the moment it is made, with
+nothing held for a sync. `testin.yml` loses the `connection` key, which only
+ever told Git from SFTP: `location: remote` with a `RepoUrl` is a Git project.
+A file that still has `connection` or the server keys has them skipped as
+unknown keys, each named in the log - so an old Git file still clones, an old
+SFTP file is not shared, and the test project either one names is still read. A password kept for a
+server stays in the IDE's password store, where Testin no longer looks.
+Decision-004 and Decision-007 are superseded.
+
+**If you are about to reverse it.** A second sync is a second answer to how a
+test project reaches the team. Its merge would have to agree with the Git
+merge on every field, and its SSH client would have to refuse an unknown host
+the way Decision-004 and Decision-007 describe.
+
+---
+
 ## Superseded decisions
 
-None yet. When the first one is superseded it is listed here with the number
-that replaced it, and its section above is left exactly as it was written.
+Each is listed here with the number that replaced it, and its section above is
+left exactly as it was written.
 
 | Decision | Superseded by | When |
 |---|---|---|
-| — | — | — |
+| Decision-004 — SFTP is the maintained JSch fork | Decision-012 | 19 September 2026 |
+| Decision-007 — An unknown SSH host is refused | Decision-012 | 19 September 2026 |
 
 ---
 

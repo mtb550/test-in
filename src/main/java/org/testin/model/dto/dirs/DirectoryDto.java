@@ -164,6 +164,16 @@ public abstract class DirectoryDto {
     }
 
     /**
+     * The folders that come with this node and go with it - a test project's
+     * Test Cases and Test Runs - and none for every other kind. A rename moves
+     * them with their node even when nothing else under it is indexed, as for an
+     * inactive project (Rule-TREE-PANEL-100).
+     */
+    public @NotNull List<DirectoryDto> fixedChildren() {
+        return List.of();
+    }
+
+    /**
      * True when test cases can be imported into or exported from this node.
      */
     public boolean isTestCaseContainer() {

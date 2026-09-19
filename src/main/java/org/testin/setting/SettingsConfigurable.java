@@ -52,17 +52,6 @@ public final class SettingsConfigurable implements SearchableConfigurable {
     private final @NotNull JBTextField testerRoleField = new JBTextField();
     private final @NotNull TextFieldWithBrowseButton downloadFolderField = new TextFieldWithBrowseButton();
 
-    /**
-     * The account this machine uses on a test project's server (#94).
-     * <p>
-     * Here rather than in {@code testin.yml}, which is committed: the server
-     * address is the team's and belongs in that file, but who connects is the
-     * person's. The password is not here either - it goes to the IDE's
-     * credential store, because this file is plain text on disk.
-     */
-    private final @NotNull JBTextField sftpUserField = new JBTextField();
-
-    private final @NotNull TextFieldWithBrowseButton sftpKeyFileField = new TextFieldWithBrowseButton();
     private final @NotNull ComboBox<String> logLevelComboBox;
 
     /**
@@ -112,12 +101,6 @@ public final class SettingsConfigurable implements SearchableConfigurable {
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         );
 
-        // UC-SETTING-010. The row's browse button did nothing without this: the
-        // field had a button and no chooser behind it (#312, A90).
-        sftpKeyFileField.addBrowseFolderListener(null, FileChooserDescriptorFactory.singleFile(),
-                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
-        );
-
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel(Bundle.message("settings.label.source.root")), testinPathPanel.getComponent(), 1, false)
                 .addVerticalGap(5)
@@ -128,10 +111,6 @@ public final class SettingsConfigurable implements SearchableConfigurable {
                 .addLabeledComponent(new JBLabel(Bundle.message("settings.label.tester.role")), testerRoleField, 1, false)
                 .addVerticalGap(5)
                 .addLabeledComponent(new JBLabel(Bundle.message("settings.label.download.folder")), downloadFolderField, 1, false)
-                .addVerticalGap(5)
-                .addLabeledComponent(new JBLabel(Bundle.message("settings.label.sftp.account")), sftpUserField, 1, false)
-                .addVerticalGap(5)
-                .addLabeledComponent(new JBLabel(Bundle.message("settings.label.sftp.key")), sftpKeyFileField, 1, false)
                 .addVerticalGap(5)
                 .addComponent(showShortcutHintsBox)
                 .addVerticalGap(10)
@@ -167,14 +146,12 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
         boolean modified = !testinPathPanel.getPathText().trim().equals(settings.rootTestinPath);
         modified |= !Objects.equals(logLevelComboBox.getSelectedItem(), settings.logLevel);
-        modified |= !testerNameField.getText().trim().equals(settings.testerName);
-        modified |= !testerRoleField.getText().trim().equals(settings.testerRole);
-        modified |= !downloadFolderField.getText().trim().equals(settings.defaultDownloadFolder);
         // Trimmed, because apply() trims them before storing. Compared as typed,
         // a trailing space was a difference applying could never remove, so Apply
         // stayed enabled for the rest of the dialog's life (#66, finding 87).
-        modified |= !sftpUserField.getText().trim().equals(settings.sftpUser);
-        modified |= !sftpKeyFileField.getText().trim().equals(settings.sftpKeyFile);
+        modified |= !testerNameField.getText().trim().equals(settings.testerName);
+        modified |= !testerRoleField.getText().trim().equals(settings.testerRole);
+        modified |= !downloadFolderField.getText().trim().equals(settings.defaultDownloadFolder);
         modified |= showShortcutHintsBox.isSelected() != settings.showShortcutHints;
         return modified;
     }
@@ -260,7 +237,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         // renamed tester.
         final boolean rootChanged = TestinRoot.isRootChanged(settings.rootTestinPath, testinPathPanel.getPathText());
 
-        // Trimmed here, like the two SFTP fields below. It used to be stored
+        // Trimmed here, like the fields below. It used to be stored
         // exactly as typed and trimmed later by TestinRoot.normalize, so the
         // value in testinSettings.xml changed on its own at the next project
         // open - a stored setting nobody edited, different from yesterday
@@ -271,8 +248,6 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         settings.testerName = testerNameField.getText().trim();
         settings.testerRole = testerRoleField.getText().trim();
         settings.defaultDownloadFolder = downloadFolderField.getText().trim();
-        settings.sftpUser = sftpUserField.getText().trim();
-        settings.sftpKeyFile = sftpKeyFileField.getText().trim();
         settings.showShortcutHints = showShortcutHintsBox.isSelected();
 
         Logger.setLogLevel(Level.valueOf(settings.logLevel));
@@ -309,8 +284,6 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         testerNameField.setText(settings.testerName);
         testerRoleField.setText(settings.testerRole);
         downloadFolderField.setText(settings.defaultDownloadFolder);
-        sftpUserField.setText(settings.sftpUser);
-        sftpKeyFileField.setText(settings.sftpKeyFile);
         showShortcutHintsBox.setSelected(settings.showShortcutHints);
     }
 

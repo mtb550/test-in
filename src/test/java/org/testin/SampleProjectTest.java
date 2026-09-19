@@ -206,14 +206,10 @@ public class SampleProjectTest {
     /**
      * The sample's {@code testin.yml} still names the sample's own project.
      * <p>
-     * Opening it in a sandbox whose Testin root points somewhere else rebinds it,
-     * and the plugin writes the new name straight back into the committed file -
-     * which is correct behaviour and a terrible thing to commit by accident. It
-     * happened the first time this sample was opened: the file came back naming a
-     * real project on the machine that opened it.
-     * <p>
-     * So the binding is asserted rather than trusted. A developer who rebinds the
-     * sample while trying something finds out here instead of in review.
+     * The plugin no longer writes the file (Rule-INTERNAL-088), but it once did:
+     * the first time this sample was opened against another Testin root, the file
+     * came back naming a real project on the machine that opened it. A hand edit
+     * can do the same, so the name is asserted rather than trusted.
      */
     @Test
     public void theSampleStillNamesItsOwnProject() {
@@ -230,7 +226,7 @@ public class SampleProjectTest {
         }
 
         assertEquals(bindings, List.of("testinProject: Demo"),
-                "The sample must stay bound to its own project. Opening it against another Testin root rebinds it and rewrites this file.");
+                "The sample must name its own project.");
     }
 
     private static @NotNull List<Path> caseFiles() {

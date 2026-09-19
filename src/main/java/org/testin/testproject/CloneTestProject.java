@@ -36,11 +36,16 @@ import org.testin.setting.TestinRoot;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
+import org.testin.config.TestinYml;
+import org.testin.model.DirectoryType;
+import org.testin.util.NameSanitizer;
+import java.util.Locale;
+import java.util.Optional;
 
 /**
  * UC-TREE-PANEL-003.
  * <p>
- * Clones a test project's repository and binds this repository to it.
+ * Clones a test project's repository and chooses it for this repository.
  * <p>
  * Not an action, for the reason {@link NewTestProject} is not: nothing
  * registered it, so its AnAction half could never run (#312, A100).
@@ -52,7 +57,58 @@ public final class CloneTestProject {
     private final @NotNull String projectName;
     private final @NotNull TreePanel tp;
 
-    // UC-TREE-PANEL-003, Rule-TREE-PANEL-019
+    /**
+     * UC-TREE-PANEL-003, Rule-TREE-PANEL-107.
+     * <p>
+     * What a clone of this address is called. Named after its repository, so no
+     * {@code testin.yml} is needed to clone one - unless the address is the one
+     * the file gives, which then names it with the name it gives beside it.
+     * A name already in the Testin folder takes the next number; the file's
+     * name never does, because the file means that folder.
+     */
+    public static @NotNull String nameFor(final @NotNull Project p, final @NotNull String url) {
+        final @NotNull String named = TestinYml.projectName(p);
+        if (!named.isEmpty() && TestinYml.isRepoUrl(p, url)) return named;
+
+        final @NotNull String base = repositoryName(url);
+        final @NotNull Path root = Services.getInstance(p, TestinRoot.class).getPath();
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+
+        @NotNull String name = base;
+        for (int n = 2; indexer.isTaken(root.resolve(name), Optional.empty()); n++) {
+            name = base + n;
+        }
+        return name;
+    }
+
+    /**
+     * Rule-TREE-PANEL-107.
+     * <p>
+     * The repository's own name, from any form of address a clone takes:
+     * {@code https://github.com/acme/nafath-test-cases.git},
+     * {@code git@github.com:acme/nafath-test-cases.git} and
+     * {@code https://host/acme/nafath-test-cases/} all give
+     * {@code nafath-test-cases}. Kept as it is when it can name a test project,
+     * and made into one when it cannot - the package it would become has to be
+     * one Java accepts (Rule-TREE-PANEL-095).
+     */
+    static @NotNull String repositoryName(final @NotNull String url) {
+        @NotNull String path = url.strip();
+
+        final int query = path.indexOf('?');
+        if (query >= 0) path = path.substring(0, query);
+
+        final int fragment = path.indexOf('#');
+        if (fragment >= 0) path = path.substring(0, fragment);
+
+        while (path.endsWith("/")) path = path.substring(0, path.length() - 1);
+        if (path.toLowerCase(Locale.ROOT).endsWith(".git")) path = path.substring(0, path.length() - ".git".length());
+
+        final @NotNull String last = path.substring(Math.max(path.lastIndexOf('/'), path.lastIndexOf(':')) + 1);
+        return DirectoryType.TP.canTakeName(last) ? last : NameSanitizer.packageName(last);
+    }
+
+    // UC-TREE-PANEL-003, Rule-TREE-PANEL-107
     public void execute() {
 
         if (gitUrl.trim().isEmpty() || projectName.trim().isEmpty()) {
@@ -99,9 +155,10 @@ public final class CloneTestProject {
                     Services.getInstance(p, ProjectIndexer.class).scanSingleProject(projectPath, indicator);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        // Bound to what was just cloned, for the same reason a new
-                        // project is: this repository asked for it (#8).
-                        Services.getInstance(p, BoundTestProject.class).bind(projectName);
+                        // Chosen, for the same reason a new project is: this
+                        // repository asked for it (#8). On this machine only -
+                        // testin.yml is never written (Rule-TREE-PANEL-106).
+                        Services.getInstance(p, BoundTestProject.class).choose(projectName);
 
                         tp.refresh();
                         Services.getInstance(p, Notifier.class).softShow(p, Done.CLONED);

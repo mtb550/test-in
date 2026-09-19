@@ -44,8 +44,8 @@ explorer          editor           view          lightmode      the surfaces
    model  ..... the vocabulary every layer above speaks
    logger ..... written to by all of them, imports none of them
 
-   side modules, each on the indexer and four pairs on each other:
-   codegen   git   sftp   report   importexport   runner
+   side modules, each on the indexer and three pairs on each other:
+   codegen   git   report   importexport   runner
 ```
 
 Two content modules sit outside this entirely, loaded only where their platform
@@ -63,7 +63,7 @@ modules](#the-two-content-modules).
 | Operations | `testcase`, `testproject`, `testrun`, `bug` | `bug` only, and only the temporary folder a bug report is sent from |
 | Services | `services`, `notifications`, `setting`, `config` | `config` and `setting` only, and neither touches test data |
 | Data | `indexer`, `model` | `indexer` only |
-| Side modules | `codegen`, `git`, `sftp`, `report`, `importexport`, `runner` | See the exempt list below |
+| Side modules | `codegen`, `git`, `report`, `importexport`, `runner` | See the exempt list below |
 | Leaves | `logger`, `util` | `logger` only, and only its own log |
 
 **Four names left this table on 11 September 2026, and the root package emptied.**
@@ -149,11 +149,10 @@ goes stale the same week (#66, findings 61 and 77).
 | `testcase/TestEditorAttributes`, `testrun/RunEditorAttributes` | `ui/Badges` | Deliberate. An enum carries its own presentation and its own action rather than being read by an `instanceof` chain at every call site — see the conventions in [CLAUDE.md](https://github.com/mtb550/test-in/blob/main/CLAUDE.md). What is new is where it points *from*: these two were in `model` until 11 September 2026, so the vocabulary every layer speaks pulled the badge painter in behind it (#111). A field of a test case is a fact about `testcase`. What is left is one import each, for the badge a card draws; the other four - `codegen`, `importexport`, `notifications`, `indexer` - are a feature calling a side module and a service, which points down. |
 
 **Side modules are not quite "none on each other".** The drawing above says they
-are, and four pairs say otherwise:
+are, and three pairs say otherwise:
 
 | | |
 |---|---|
-| `sftp` -> `git` | Both merge an incoming test case against the local one, and `git/TestCaseMerge` is the one that knows how. A copy in `sftp` would be a second answer to "what does a conflict look like", which is the divergence the merge dialog exists to prevent. |
 | `report` -> `importexport` | The report dialog offers four formats and `importexport/FileTypes` is where a format's extension lives. |
 | `importexport` -> `report` | And back: `FileTypes` names the four report generators, one per format. The pair is a cycle, and it is the only one between side modules. |
 | `importexport` -> `codegen` | An import creates test cases, and a created case gets its generated method like any other. |
@@ -230,15 +229,6 @@ afterwards. The test case's own file is asked of the indexer
 (`ProjectIndexer.testCaseFile`), never built. Its other edges point down: `git`
 for the test project's remote and branch, `report` for `ReportText.joined`, and
 `config` for `bugRepoUrl`.
-
-One package not on that list opens a file anyway, and it is worth knowing why
-before you grep and think you have found a violation. `sftp/BaselineStore` reads
-and writes one gzipped document under `PathManager.getSystemPath()`, recording
-what this machine last agreed with the server. It is not test data, it must never
-be committed, and it belongs to this machine's copy of the project rather than to
-the project. Every test file SFTP actually syncs goes through
-`ProjectIndexer.filesUnder`, `acceptIncoming` and `removeIncoming`, exactly as
-Git does.
 
 ### 2. The VFS operation succeeds first, then the cache is updated
 

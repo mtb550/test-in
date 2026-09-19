@@ -149,14 +149,12 @@ hold one link each.
 **If the project file cannot be read** — the panel shows, in red, *testin.yml
 names \<name\>, which could not be read*.
 
-**If the project file is malformed** — Testin reads it as naming nothing. There
-is no red line at all, and the tester gets the plain list of test projects with
-no explanation.
+**If `testin.yml` is malformed** — the panel shows, in red, *testin.yml could
+not be read*, and under it *Fix the file and press Refresh - the reason is in
+the Testin log*.
 
-> **Showing a Git-shared test project writes to the code project.** The first
-> time the panel draws one, Testin asks Git for the remote address. Testin then
-> writes that address into the project file. There is no dialog and no message.
-> That file is one the tester commits.
+**Testin never writes `testin.yml`.** It reads it when the code project has
+one, and goes on without it when it does not (Rule-INTERNAL-088).
 
 ---
 

@@ -530,12 +530,6 @@
              every IDE and grays itself with the reason when Git is missing -
              the same answer the tree menu gives (#273). -->
         <action
-                id="Testin.SyncWithSftp"
-                class="org.testin.sftp.SyncWithSftpAction"
-                icon="AllIcons.Actions.Upload"
-        />
-
-        <action
                 id="Testin.ViewPendingCommits"
                 class="org.testin.git.ViewPendingCommitsAction"
                 icon="AllIcons.Actions.Commit"

@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.util.FailureText;
 import org.testin.actions.TestinData;
-import org.testin.config.TestinConfigService;
+import org.testin.config.TestinYml;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.explorer.TreePanel;
@@ -157,7 +157,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         // not offered at all; what is offered is the way out of the
                         // rebase, which is the only thing that can happen next (#89).
                         if (git.hasConflicts(path)) {
-                            showConflictActions(path, git.getRemoteName(path), git.syncBranch(path));
+                            showConflictActions(path, git.getRemoteName(path), git.syncBranch(path), git.conflictingPaths(path));
                             return;
                         }
 
@@ -409,12 +409,10 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
         // UC-SHARE-013, Rule-SHARE-060
         private void configureRemoteAndPush(final @NotNull Path repoPath, final @NotNull String remoteName, final @NotNull String branch, final @NotNull String commitId) {
-            final @NotNull TestinConfigService config = Services.getInstance(p, TestinConfigService.class);
-
             // The repository already says where its test project lives, so a clone of
             // it should not have to be told again. Asking is the fallback, not the
             // first move (#8).
-            final @NotNull String known = config.get().repoUrl();
+            final @NotNull String known = TestinYml.repoUrl(p);
 
             if (!known.isEmpty()) {
                 addRemoteAndPush(repoPath, remoteName, branch, commitId, known);
@@ -426,13 +424,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             // shut the dialog on the question, and the push not happening is the
             // answer to it - which is also why the old "Push Aborted" balloon is
             // gone, since canceling was the only way to reach it.
-            new RemoteUrlDialog(p, remoteName, typed -> {
-                // Written back so the next machine that opens this repository
-                // inherits it. Only what the tester typed: a URL that came out of
-                // the file is already in it.
-                config.rememberRepoUrl(typed);
-                addRemoteAndPush(repoPath, remoteName, branch, commitId, typed);
-            }).show();
+            // What was typed becomes the remote and nothing else: testin.yml is
+            // never written (Rule-INTERNAL-088).
+            new RemoteUrlDialog(p, remoteName, typed -> addRemoteAndPush(repoPath, remoteName, branch, commitId, typed)).show();
         }
 
         // UC-SHARE-013, Rule-SHARE-060
@@ -473,8 +467,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         // nothing to push - was then offered back as a conflict
                         // naming no file, and the message with the retry on it
                         // never showed (#312, N9).
-                        if (!git.conflictingPaths(repoPath).isEmpty()) {
-                            showConflictActions(repoPath, remote, branch);
+                        final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
+                        if (!conflicting.isEmpty()) {
+                            showConflictActions(repoPath, remote, branch, conflicting);
                             return;
                         }
 
@@ -488,11 +483,14 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         }
 
         /**
-         * On the background thread that failed, because naming the conflicting files
-         * means asking Git for them.
+         * Offers Resolve, Continue and Abort for the files Git named, which the
+         * caller hands in rather than this asking Git again: the offer also comes
+         * back from {@link ConflictResolution} on the EDT, and a Git command there
+         * is refused by git4idea's own assertion - the same shape the sync's offer
+         * already has.
          */
-        private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
-            GitConflictOffer.show(p, git.conflictingPaths(repoPath),
+        private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final @NotNull List<String> conflicting) {
+            GitConflictOffer.show(p, conflicting,
                     () -> resolveConflicts(repoPath, remote, branch),
                     () -> finishRebase(repoPath, remote, branch, false),
                     () -> finishRebase(repoPath, remote, branch, true));
@@ -518,7 +516,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             ApplicationManager.getApplication().executeOnPooledThread(() ->
                     ConflictResolution.resolveRebase(p, repoPath,
                             () -> pushAfterRebase(repoPath, remote, branch),
-                            leftOver -> showConflictActions(repoPath, remote, branch)));
+                            leftOver -> showConflictActions(repoPath, remote, branch, leftOver)));
         }
 
         /**
@@ -576,7 +574,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         // an abort that failed leaves the rebase directory, which
                         // hasConflicts reads as a conflict, so the failure was
                         // offered back naming no file (#312, A43).
-                        if (!git.conflictingPaths(repoPath).isEmpty()) showConflictActions(repoPath, remote, branch);
+                        final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
+                        if (!conflicting.isEmpty()) showConflictActions(repoPath, remote, branch, conflicting);
                         else
                             Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), FailureText.of(ex));
                     });

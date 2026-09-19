@@ -81,11 +81,6 @@ this test case is named at the end with everything else left unresolved.
 **If a value is too long to show** — it is cut at 70 characters on screen. The
 whole value is still what gets written.
 
-## The same window serves both syncs
-
-This window is used for a Git pull and for a server sync. The two reach it in
-different ways. It behaves the same in both.
-
 ---
 
 [Documentation](../README.md) › [Sharing work with the team](main.md)

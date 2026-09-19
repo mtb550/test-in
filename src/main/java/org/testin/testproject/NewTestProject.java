@@ -30,6 +30,7 @@ import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * UC-TREE-PANEL-002.
@@ -51,7 +52,7 @@ public final class NewTestProject {
 
         final @NotNull Path tpPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(tpName);
 
-        if (Services.getInstance(p, ProjectIndexer.class).projectExists(tpPath)) {
+        if (Services.getInstance(p, ProjectIndexer.class).isTaken(tpPath, Optional.empty())) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, tpName);
             return;
         }
@@ -63,9 +64,9 @@ public final class NewTestProject {
         if (!Services.getInstance(p, ProjectIndexer.class).addTestProject(created)) return;
 
         // A repository asks for exactly one test project, so the one it just made
-        // is the one it is about. Writing it here is what makes the next clone of
-        // this repository open on it without being asked (#8).
-        Services.getInstance(p, BoundTestProject.class).bind(created.getName());
+        // is the one it is about - chosen on this machine; testin.yml is never
+        // written (#8, Rule-TREE-PANEL-106).
+        Services.getInstance(p, BoundTestProject.class).choose(created.getName());
 
         tp.refresh();
         Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);

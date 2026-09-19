@@ -23,7 +23,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.config.TestinConfigService;
+import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -113,7 +113,7 @@ public class RefreshAction extends AbstractProjectAction {
                 //
                 // Before the index, exactly as at startup: the file names the test
                 // project, and indexing is scoped to it.
-                Services.getInstance(p, TestinConfigService.class).reload();
+                TestinYml.reload(p);
 
                 final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.resetForReindex();

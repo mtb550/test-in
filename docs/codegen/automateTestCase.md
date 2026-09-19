@@ -8,7 +8,7 @@ the ones I wrote here.
 
 A test case written in the create dialog gets its method as it is saved. A test
 case that arrives any other way does not, because nothing was asked for: a Git
-pull, a sync from the server, an imported sheet, a branch switch, a data folder
+pull, an imported sheet, a branch switch, a data folder
 edited by hand. This is how to ask.
 
 `F12`, or the menu entry **Automate Test Case**.

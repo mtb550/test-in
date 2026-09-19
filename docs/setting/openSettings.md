@@ -25,8 +25,9 @@ panel's toolbar.
   it is needed and kept in the IDE's password store.
 - **Rule-SETTING-040** — The page answers the IDE's settings search. Typing
   a row's name opens the page with that row highlighted.
-- **Rule-SETTING-041** — The page says which of the two stores a value belongs
-  to: this machine's settings, or the repository's `testin.yml`.
+- **Rule-SETTING-041** — The page says where a value belongs: this machine's
+  settings; the test project chosen for a repository, kept on this machine; or
+  the repository's `testin.yml`, which Testin reads and never writes.
 - **Rule-SETTING-006** — Nothing on this page has a key of its own.
 - **Rule-SETTING-007** — The gear button on the tree panel opens this page
   directly.

@@ -79,9 +79,9 @@ public final class CreateProjectDialog extends AbstractFrameworkDialog<TextInput
      * <p>
      * A test project's name becomes the first Java package of everything under
      * it, so it has to be a name Java accepts. A repository address does not: the
-     * folder is named by {@code testin.yml} rather than by the URL, so a URL is
-     * never asked to be a Java name and refusing it for not being one would
-     * refuse the clone this dialog exists to offer.
+     * clone is named after its repository, and a repository name Java refuses is
+     * made into one it accepts (Rule-TREE-PANEL-107) - so refusing an address for
+     * not being a Java name would refuse the clone this dialog exists to offer.
      */
     private static boolean isNameOrUrl(final @NotNull String typed) {
         return GitRefs.isRepositoryUrl(typed) || DirectoryType.TP.canTakeName(typed);

@@ -33,4 +33,15 @@ public interface GenAction {
     default void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
         for (final Object item : items) execute(p, item);
     }
+
+    /**
+     * Rule-CODEGEN-081.
+     * <p>
+     * Whether this touches any code at all. Every generator does;
+     * {@link NoJavaCode} is the one that says no, so a rename can ask whether it
+     * has code to move before it waits for the IDE to finish indexing.
+     */
+    default boolean generates() {
+        return true;
+    }
 }

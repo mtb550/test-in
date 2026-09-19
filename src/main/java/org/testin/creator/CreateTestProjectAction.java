@@ -27,12 +27,16 @@ import org.testin.explorer.TreePanel;
 import org.testin.git.GitRefs;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.testproject.BoundTestProject;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.CloneTestProject;
 import org.testin.testproject.NewTestProject;
 import org.testin.services.OptionalPlugin;
 import org.testin.util.Bundle;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.notifications.Refused;
+
+import java.nio.file.Path;
+import java.util.Optional;
 
 public class CreateTestProjectAction extends AbstractProjectAction {
     private final @NotNull TreePanel tp;
@@ -49,7 +53,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
     }
 
     /**
-     * UC-TREE-PANEL-002, UC-TREE-PANEL-003, Rule-TREE-PANEL-019.
+     * UC-TREE-PANEL-002, UC-TREE-PANEL-003, Rule-TREE-PANEL-107.
      * <p>
      * Direct entry point for the tree panel's empty state — no AnActionEvent required.
      */
@@ -65,16 +69,15 @@ public class CreateTestProjectAction extends AbstractProjectAction {
 
             if (!OptionalPlugin.GIT.isAvailableOrWarn(p)) return;
 
-            // The folder is named by testin.yml, never by the URL. A repository
-            // called nafath-test-case is a place to clone from; what the project
-            // is called is a decision, and it is written down once in the file
-            // that travels with the repository - so the tree, the reports and
-            // the server path all read the same name.
-            final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
+            // Named after its repository, so a code project with no testin.yml
+            // clones as readily as one with it (Rule-TREE-PANEL-107). Only the
+            // name testin.yml gives with its own address is never numbered, so a
+            // folder of that name already here is said rather than cloned over.
+            final @NotNull String projectName = CloneTestProject.nameFor(p, name);
+            final @NotNull Path folder = Services.getInstance(p, TestinRoot.class).getPath().resolve(projectName);
 
-            if (projectName.isEmpty()) {
-                Services.getInstance(p, Notifier.class).warn(p, Bundle.message("project.no.name.title"),
-                        Bundle.message("project.no.name.message"));
+            if (Services.getInstance(p, ProjectIndexer.class).isTaken(folder, Optional.empty())) {
+                Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, projectName);
                 return;
             }
 

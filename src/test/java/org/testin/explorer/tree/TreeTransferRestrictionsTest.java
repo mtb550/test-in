@@ -72,9 +72,9 @@ public class TreeTransferRestrictionsTest {
     }
 
     /**
-     * A test project is fixed in the tree in every way but one: it cannot be
-     * moved and cannot be renamed - its name is the directory every path under
-     * it is built from - and it can be removed.
+     * A test project is not moved in the tree - every path under it is built
+     * from where it is - and it can be removed and renamed. A rename moves what
+     * is named after it, and nothing else holds the old name (#331).
      * <p>
      * Removing it was switched off with the rest of the restrictions in
      * 5f6e0a87 and turned back on deliberately: the tester who made a project
@@ -82,12 +82,12 @@ public class TreeTransferRestrictionsTest {
      * sets, cases and runs going with it.
      */
     @Test
-    public void aTestProjectIsRemovableButNeverMovedOrRenamed() {
+    public void aTestProjectIsRemovableAndRenamableButNeverMoved() {
         final DirectoryDto testProject = new TestProjectDirectoryDto();
 
         assertTrue(testProject.isRemovable(), "a test project is removed by the tester who made it");
         assertFalse(testProject.isTransferable(), "a test project is not cut, copied or dragged");
-        assertFalse(testProject.isRenamable(), "every path under it is built from its name");
+        assertTrue(testProject.isRenamable(), "a clone takes its repository's name, and the tester can change it");
     }
 
     @Test

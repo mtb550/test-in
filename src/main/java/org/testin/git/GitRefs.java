@@ -20,7 +20,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import org.testin.config.TestinProjectConfig;
+import org.testin.config.TestinYml;
 import org.testin.util.Bundle;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -306,7 +306,7 @@ public final class GitRefs {
                 || value.startsWith("https://")
                 || value.startsWith("ssh://")
                 || value.startsWith("git://")
-                || value.startsWith(TestinProjectConfig.SCP_PREFIX)
+                || value.startsWith(TestinYml.SCP_PREFIX)
                 || value.endsWith(".git");
     }
 

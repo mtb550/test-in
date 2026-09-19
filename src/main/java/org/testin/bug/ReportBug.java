@@ -21,8 +21,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.config.TestinConfigService;
-import org.testin.config.TestinProjectConfig;
+import org.testin.config.TestinYml;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCaseFile;
 import org.testin.model.TestRunItems;
@@ -83,17 +82,15 @@ public final class ReportBug {
      * Refresh does, so a {@code bugRepoUrl} added by hand counts without one.
      */
     private static @NotNull PreparedBug prepare(final @NotNull Project p, final @NotNull BugFacts facts, final @NotNull Optional<TestCaseFile> file, final @NotNull ProgressIndicator indicator) {
-        final @NotNull TestinConfigService config = Services.getInstance(p, TestinConfigService.class);
-        config.reload();
-        final @NotNull TestinProjectConfig current = config.get();
+        TestinYml.reload(p);
 
         final @NotNull Optional<String> link = file.flatMap(where -> TestCaseLink.read(p, where));
         indicator.checkCanceled();
 
-        final @NotNull Optional<String> whyNotReady = GitHubCli.onPath(indicator).whyItCannotSend(current.bugRepoUrl());
+        final @NotNull Optional<String> whyNotReady = GitHubCli.onPath(indicator).whyItCannotSend(TestinYml.bugRepoUrl(p));
         indicator.checkCanceled();
 
-        return new PreparedBug(facts, BugTemplate.body(facts, link), current.bugRepository(), whyNotReady);
+        return new PreparedBug(facts, BugTemplate.body(facts, link), TestinYml.bugRepository(p), whyNotReady);
     }
 
     /**

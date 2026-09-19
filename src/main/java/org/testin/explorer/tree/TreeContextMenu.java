@@ -83,14 +83,10 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         // Added in every IDE, and grayed with the reason when Git is missing.
         // Leaving them out gave the menu a different shape in two IDEs with
-        // nothing to say why, while Sync With SFTP below was added in both
-        // (#273).
+        // nothing to say why (#273).
         addSeparator();
         add(Declared.forMenu("Testin.SyncWithRemote"));
         add(Declared.forMenu("Testin.ViewPendingCommits"));
-
-        addSeparator();
-        add(Declared.forMenu("Testin.SyncWithSftp"));
 
         addSeparator();
         add(Declared.forMenu("Testin.EditTestRun"));

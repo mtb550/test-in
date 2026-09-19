@@ -118,7 +118,9 @@ and no path.
    *Remove these N items?*, where N is how many.
 4. The tester presses `Enter`.
 5. Testin keeps a copy of each node for undo, under a progress bar reading
-   *Removing*, and then closes each node's editor.
+   *Removing*, and then closes every editor open on a removed node or under
+   it - a removed package takes its test sets' editors with it
+   (Rule-TREE-PANEL-111).
 6. The node goes to the desktop's recycle bin, and its automation code goes with
    it. On a desktop with no recycle bin the node is deleted outright.
 7. The tree rebuilds. Testin shows *Removed*, or *Removed N* for several. The

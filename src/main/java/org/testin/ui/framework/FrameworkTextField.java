@@ -18,11 +18,8 @@ package org.testin.ui.framework;
 
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.SimpleTextAttributes;
-import com.intellij.ui.components.JBPasswordField;
 import com.intellij.ui.components.TextComponentEmptyText;
 import com.intellij.ui.components.fields.ExtendableTextField;
-import com.intellij.util.ui.ComponentWithEmptyText;
-import com.intellij.util.ui.StatusText;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.intellij.lang.annotations.MagicConstant;
@@ -36,7 +33,6 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.util.function.BiConsumer;
 
 /**
  * The framework's single-line input: its look, its placeholder, and the red cue
@@ -51,22 +47,16 @@ import java.util.function.BiConsumer;
  * The clipboard bindings are here too, and they are the reason this is worth
  * more than tidiness. A popup or a dialog can eat Ctrl+V, Ctrl+C and Ctrl+X on
  * the way to a field, so they have to be bound on the field itself. Only the
- * search field did that; rename, the commit message, the Git name and email and
- * the SFTP fields did not. The multi-line area was the worst of them: it
+ * search field did that; rename, the commit message, and the Git name and email
+ * did not. The multi-line area was the worst of them: it
  * replaces the paste action to insert a pasted screenshot and never bound the
  * key that reaches it, so its whole image-paste feature rested on a binding the
  * class next door documents as unreliable.
  */
 final class FrameworkTextField {
 
-    private final @NotNull JTextField field;
+    private final @NotNull ExtendableTextField field;
     private final @NotNull String placeholder;
-
-    /**
-     * How this field takes what is drawn around its text, decided once by which
-     * kind it is - a password field carries nothing.
-     */
-    private final @NotNull BiConsumer<@NotNull Icon, @NotNull String> decorations;
 
     /**
      * What is drawn around the text right now. Held because the two are set
@@ -77,39 +67,16 @@ final class FrameworkTextField {
 
     private boolean emptyWarningShown;
 
-    /**
-     * @param secret whether what the tester types is shown as dots. A server
-     *               password is typed into a dialog somebody may be projecting,
-     *               screen-sharing or recording, so the field that takes one
-     *               does not echo it (#66, finding 64)
-     */
-    FrameworkTextField(final @NotNull Icon icon, final @NotNull String placeholder, final @NotNull String initialValue, final boolean secret) {
+    FrameworkTextField(final @NotNull Icon icon, final @NotNull String placeholder, final @NotNull String initialValue) {
         this.placeholder = placeholder;
-
-        if (secret) {
-            // A password field carries no extensions, so there is no icon to
-            // put in front of it - now or when a caller asks later. A secret
-            // has nothing worth saying beside it anyway.
-            final @NotNull JBPasswordField dots = new JBPasswordField();
-            dots.setText(initialValue);
-
-            this.field = dots;
-            this.decorations = (ignoredIcon, ignoredNote) -> {
-            };
-        } else {
-            final @NotNull ExtendableTextField plain = new ExtendableTextField(initialValue);
-
-            this.field = plain;
-            this.decorations = (wanted, saying) -> DialogStyle.setDecorations(plain, wanted, saying);
-        }
-
+        this.field = new ExtendableTextField(initialValue);
         this.icon = icon;
-        decorations.accept(icon, note);
+        DialogStyle.setDecorations(field, icon, note);
 
         style(field);
 
         if (!placeholder.isBlank()) {
-            emptyText().setText(placeholder);
+            field.getEmptyText().setText(placeholder);
             TextComponentEmptyText.setupPlaceholderVisibility(field);
 
             // Typing clears a red empty-submit warning back to the normal look.
@@ -143,12 +110,12 @@ final class FrameworkTextField {
     /**
      * The icon drawn before the text, which the field whose icon follows the
      * selection changes after construction. Here rather than at that caller,
-     * because which kind of field this is - and therefore whether it can carry
-     * an icon at all - is this class's own knowledge.
+     * because the icon and the note are drawn together, and this class holds
+     * both.
      */
     void setLeadingIcon(final @NotNull Icon icon) {
         this.icon = icon;
-        decorations.accept(icon, note);
+        DialogStyle.setDecorations(field, icon, note);
     }
 
     /**
@@ -159,7 +126,7 @@ final class FrameworkTextField {
      */
     void setNote(final @NotNull String note) {
         this.note = note;
-        decorations.accept(icon, note);
+        DialogStyle.setDecorations(field, icon, note);
     }
 
     @NotNull JTextField component() {
@@ -185,17 +152,9 @@ final class FrameworkTextField {
     private void showPlaceholder(final @NotNull SimpleTextAttributes attributes) {
         if (placeholder.isBlank()) return;
 
-        emptyText().clear();
-        emptyText().appendText(placeholder, attributes);
+        field.getEmptyText().clear();
+        field.getEmptyText().appendText(placeholder, attributes);
         field.repaint();
-    }
-
-    /**
-     * The placeholder line of whichever field this is. Both kinds draw one, and
-     * asking here is what lets the rest of this class be written once.
-     */
-    private @NotNull StatusText emptyText() {
-        return ((ComponentWithEmptyText) field).getEmptyText();
     }
 
     /**

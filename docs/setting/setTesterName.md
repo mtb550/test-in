@@ -52,7 +52,6 @@ The whole page is drawn on [the settings page](main.md#the-page).
 | Changes a test project's, a test set's or a package's status | Who last changed it |
 | Saves a test case | Who created it, or who last changed it |
 | Records a verdict in a test run | Who ran it |
-| Starts a sync with the team's server | Who is syncing, so others can see |
 
 The name appears on the Details popup of any node, and on the **Created By** and
 **Updated By** rows of the view panel.

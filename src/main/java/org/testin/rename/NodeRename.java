@@ -30,6 +30,10 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
 import org.testin.editor.TestinEditors;
 import org.testin.services.OptionalPlugin;
+import org.testin.config.TestinYml;
+import org.testin.notifications.Notifier;
+import org.testin.testproject.BoundTestProject;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 
@@ -52,7 +56,7 @@ import java.nio.file.Path;
 public final class NodeRename {
 
     /**
-     * UC-TREE-PANEL-011, Rule-TREE-PANEL-036.
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-036, Rule-TREE-PANEL-111.
      * <p>
      * The callback runs when the rename has finished and the tree has caught up,
      * never if it failed - {@code renameNode} reports and swallows that.
@@ -66,21 +70,39 @@ public final class NodeRename {
             JavaCode.of(dir.getType()).getRenamed().execute(p, new Renamed(dir, newName));
         }
 
+        final @NotNull String oldName = dir.getName();
         final @NotNull Path oldPath = dir.getPath();
         final @NotNull Path newPath = oldPath.getParent().resolve(newName);
 
         // The tree refreshes only after the indexer finished the VFS rename
         // and updated its cache - refreshing earlier shows stale state.
         Services.getInstance(p, ProjectIndexer.class).renameNode(oldPath, newPath, () -> {
-            tp.getProjectTree().refresh();
-
             if (dir instanceof TestProjectDirectoryDto) {
+                projectFollows(p, oldName, newName);
                 tp.refresh();
             }
 
+            tp.getProjectTree().refresh();
             Logger.info("Success! Renamed to: " + newName);
 
             onDone.run();
         });
+    }
+
+    /**
+     * UC-TREE-PANEL-011, Rule-TREE-PANEL-110.
+     * <p>
+     * The project chosen for this repository follows the rename. {@code testin.yml}
+     * is the team's and is never written, so when it still names the old name the
+     * tester is told once, with the file one click away.
+     */
+    private static void projectFollows(final @NotNull Project p, final @NotNull String oldName, final @NotNull String newName) {
+        Services.getInstance(p, BoundTestProject.class).follow(oldName, newName);
+        if (!TestinYml.projectName(p).equals(oldName)) return;
+
+        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+        notifier.infoWithActions(p, Bundle.message("rename.config.names.old.title", oldName),
+                Bundle.message("rename.config.names.old.message", newName),
+                notifier.action(Bundle.message("rename.config.open"), () -> TestinYml.openInEditor(p)));
     }
 }

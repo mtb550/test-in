@@ -112,7 +112,7 @@ walks one test case from written to reported, in pictures.
 
 Testin has eight parts. Each part gets a folder, and every thing a tester does
 in it gets a page of its own: the story, its rules, its screens, what happens
-step by step, and every way it can be refused. 154 use cases and 757 rules, each
+step by step, and every way it can be refused. 148 use cases and 730 rules, each
 checked against the code it describes.
 
 | Document | Covers |
@@ -123,7 +123,7 @@ checked against the code it describes.
 | **[The settings page](docs/setting/main.md)** | Everything set once per machine |
 | **[Automation code and the gutter](docs/codegen/main.md)** | The test methods Testin writes |
 | **[Reports](docs/report/main.md)** | A test run written out as a document |
-| **[Sharing work with the team](docs/share/main.md)** | Export, import, Git and a server |
+| **[Sharing work with the team](docs/share/main.md)** | Export, import and Git |
 | **[Inside Testin](docs/internal/main.md)** | The search, and the one thing that owns every file |
 
 Five pages sit outside the eight parts: [First run](docs/firstRun.md), [every

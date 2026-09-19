@@ -2,11 +2,12 @@
 
 # UC-TREE-PANEL-011: Rename a node
 
-> **`Shift+F6`**, with a test set, a package or a test run selected. On the
-> menu: **Actions → Rename**.
+> **`Shift+F6`**, with a test project, a test set, a package or a test run
+> selected. On the menu: **Actions → Rename**.
 
-**As a** tester, **I want** to rename a test set, a package or a test run,
-**so that** the tree says what things are called now.
+**As a** tester, **I want** to rename a test project, a test set, a package or
+a test run, **so that** the tree says what things are called now - a project
+cloned under its repository's name can take the name the team uses.
 
 This changes the name of one node. Nothing inside it moves.
 
@@ -52,10 +53,8 @@ This changes the name of one node. Nothing inside it moves.
   because "Active" on every name is a word read a hundred times and needed
   never. A test run always says its status, because where a cycle stands is what
   the tree is read for.
-- **Rule-TREE-PANEL-035** — The test project and the two containers cannot be
-  renamed from the tree.
-- **Rule-TREE-PANEL-036** — Renaming a test set or a test set package renames
-  its automation code with it, so the test case stays runnable.
+- **Rule-TREE-PANEL-036** — Renaming a test project, a test set or a test set
+  package renames its automation code with it, so the test case stays runnable.
 - **Rule-TREE-PANEL-037** — A rename can be undone.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
@@ -64,6 +63,14 @@ This changes the name of one node. Nothing inside it moves.
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
+- **Rule-TREE-PANEL-110** — Renaming a test project never writes `testin.yml`.
+  The test project chosen for this code project follows the rename. When
+  `testin.yml` still names the old name, Testin says so once and opens the file
+  on request.
+- **Rule-TREE-PANEL-111** — A rename closes every editor open on the node or
+  under it, light mode included, before anything moves. While one of them is
+  busy - a test run executing, a cell being edited - **Rename** is gray and says
+  why.
 
 ## The Rename dialog
 
@@ -86,16 +93,21 @@ This changes the name of one node. Nothing inside it moves.
 
 ## Main flow
 
-1. The tester selects a test set, a package or a test run.
+1. The tester selects a test project, a test set, a package or a test run.
 2. The tester presses `Shift+F6`, or chooses **Actions → Rename**.
 3. The **Rename** dialog opens, with the current name filled in.
 4. The tester types the new name and presses `Enter`.
-5. Testin closes the node's open editor, whatever kind it is.
-6. For a test set or a test set package, and only with the Java plugin
-   installed, Testin renames the automation code next.
+5. Testin closes every open editor on the node or under it, whatever kind it
+   is, and light mode with them.
+6. For a test project, a test set or a test set package, and only with the Java
+   plugin installed, Testin renames the automation code next.
 7. Testin renames the folder.
-8. Testin refreshes the tree and shows *Renamed*.
-9. `Ctrl+Z` puts the old name back, and Testin shows *Undone*.
+8. For a test project, the project chosen for this code project follows the new
+   name. When `testin.yml` still names the old one, a notification that stays in
+   the log says *testin.yml still names \<old\>. Change testinProject to
+   \<new\>.*, with **Open testin.yml**. Testin never writes the file.
+9. Testin refreshes the tree and shows *Renamed*.
+10. `Ctrl+Z` puts the old name back, and Testin shows *Undone*.
 
 ## What Testin refuses
 
@@ -111,7 +123,17 @@ Renaming `Accounts` to `  Accounts  ` counts as unchanged, because the spaces
 are dropped first.
 
 **If a sibling already has the new name** — nothing is renamed, and *\<name\>
-Already Exists* is shown in red.
+Already Exists* is shown in red. For a test project the siblings are the other
+folders in the Testin folder. A rename that only changes the case of the name is
+not in its own way.
+
+**If the automation code already has the package the new name makes** — nothing
+is renamed, neither the folder nor the code, and *Package \<package\> Already
+Exists* is shown in red (Rule-CODEGEN-080).
+
+**If the IDE is indexing** — renaming a test project, a package or a test set is
+refused with *Rename needs the IDE to finish indexing first*, and nothing is
+renamed (Rule-CODEGEN-081). A test run has no code, and renames as usual.
 
 **If the name cannot be a Java package** — the dialog stays open with the name
 still in the box, and *'\<name\>' cannot name a Java package* is shown in red.
@@ -120,8 +142,12 @@ itself. (Rule-TREE-PANEL-095) Only the test project and the test set
 packages are asked: a test set's name becomes the class, which always ends in
 `Test`, and a test run generates no code at all.
 
-**If the test project or a container is selected** — **Rename** is gray, and
-`Shift+F6` does nothing.
+**If a container is selected** — **Rename** is gray, and `Shift+F6` does
+nothing (Rule-TREE-PANEL-002).
+
+**If an editor under the node is busy** — a test run executing, or a cell being
+edited: **Rename** is gray, and says *A test run in it is executing, or a cell
+is being edited. Finish it first* (Rule-TREE-PANEL-111).
 
 **If the folder cannot be renamed on disk** — nothing is renamed and no
 *Renamed* is shown. An IDE notification titled *Rename Failed* stays in the
@@ -129,16 +155,16 @@ notification log, reading *Operation failed:* and the reason, or *Could not find
 path on disk:* and the path. The other refusals above are balloons that fade.
 This one is not.
 
-**If several rows are selected** — **Rename** stays black and renames the first
-of them, saying nothing about the rest.
+**If several rows are selected** — **Rename** is gray.
 
 **If the Java plugin is not installed** — the first rename in the project shows
 *Java Plugin Not Available*, reading *Automation code generation and navigation
 require the Java plugin, which is not available in this IDE.* The rename still
 happens. Testin says this once per project.
 
-> **A rename that failed is still on the undo history.** After *Rename Failed*,
-> **Actions → Undo Rename** is offered and does nothing useful.
+**If the folder cannot be renamed after the automation code was** — the code
+already has the new name. Renaming again once the folder is free finishes the
+job: there is no code left to move, and the folder follows.
 
 ---
 

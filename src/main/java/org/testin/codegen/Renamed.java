@@ -16,8 +16,15 @@
 
 package org.testin.codegen;
 
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.services.OptionalPlugin;
+import org.testin.util.NameSanitizer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A node and the name it is about to take.
@@ -32,4 +39,40 @@ import org.testin.model.dto.dirs.DirectoryDto;
  * Java is renamed first, while the old name is still what finds it.
  */
 public record Renamed(@NotNull DirectoryDto dir, @NotNull String newName) {
+
+    /**
+     * The package the new name makes - the one answer, for the check below and
+     * for the generator that moves the code.
+     */
+    public @NotNull String newPackage() {
+        return NameSanitizer.packageName(newName);
+    }
+
+    /**
+     * UC-CODEGEN-017, Rule-CODEGEN-080.
+     * <p>
+     * Whether the automation code already has the package this rename would make,
+     * beside the one it renames - a test project renamed to {@code Tests} in a
+     * code project that has its own {@code tests} package. Moving the code there
+     * fails, and the tree would rename anyway, leaving every generated method
+     * under a name nothing looks for.
+     * <p>
+     * Only when the old package is there too: a colleague's rename already pulled
+     * leaves the new package and no old one, and following it is not in the way.
+     * Asked of the VFS, in memory, and only where the Java plugin gives the node
+     * code to move.
+     */
+    public boolean packageInTheWay(final @NotNull Project p) {
+        if (!DirectoryType.BECOME_JAVA_PACKAGES.contains(dir.getType()) || !OptionalPlugin.JAVA.isAvailable()) return false;
+
+        final @NotNull List<String> from = Fqcn.ofPackage(dir);
+        final @NotNull List<String> to = new ArrayList<>(from);
+        to.set(to.size() - 1, newPackage());
+        if (to.equals(from)) return false;
+
+        return JavaSourceRoot.find(p)
+                .filter(root -> JavaSourceRoot.under(root, String.join("/", from)).isPresent())
+                .flatMap(root -> JavaSourceRoot.under(root, String.join("/", to)))
+                .isPresent();
+    }
 }

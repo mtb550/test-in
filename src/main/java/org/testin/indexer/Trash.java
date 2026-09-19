@@ -39,9 +39,9 @@ import java.nio.file.Path;
  * <p>
  * Nothing of ours is left under the Testin root, which is the reason it is the
  * desktop's bin and not a folder of our own. A {@code .trash} inside the root
- * would be indexed, committed and synced unless the scanner, Git and the SFTP
- * transfer each learned to skip it, and deleted test data would travel to every
- * machine the tester works on.
+ * would be indexed and committed unless the scanner and Git each learned to
+ * skip it, and deleted test data would travel to every machine the tester works
+ * on.
  * <p>
  * The platform can put things into the trash and cannot take them out, so this
  * is a safety net rather than an undo. Taking a test case change back is

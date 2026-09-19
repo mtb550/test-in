@@ -91,7 +91,7 @@ public class ArchitectureTest {
     private static final String @NotNull [] ABOVE_MODEL = {
             "org.testin.indexer..", "org.testin.editor..", "org.testin.view..", "org.testin.codegen..",
             "org.testin.services..", "org.testin.creator..", "org.testin.explorer..",
-            "org.testin.ui..", "org.testin.git..", "org.testin.sftp..", "org.testin.report..",
+            "org.testin.ui..", "org.testin.git..", "org.testin.report..",
             "org.testin.importexport..", "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..",
             "org.testin.search..", "org.testin.undo..", "org.testin.rename..", "org.testin.remove..",
             "org.testin.open..", "org.testin.clipboard..", "org.testin.runner..", "org.testin.notifications..",
@@ -139,7 +139,7 @@ public class ArchitectureTest {
     private static final String @NotNull [] FEATURES = {
             "org.testin.indexer..", "org.testin.editor..", "org.testin.view..", "org.testin.codegen..",
             "org.testin.creator..", "org.testin.explorer..", "org.testin.ui..",
-            "org.testin.git..", "org.testin.sftp..", "org.testin.report..", "org.testin.importexport..",
+            "org.testin.git..", "org.testin.report..", "org.testin.importexport..",
             "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..", "org.testin.search..",
             "org.testin.undo..", "org.testin.rename..", "org.testin.remove..", "org.testin.open..",
             "org.testin.clipboard..", "org.testin.runner..", "org.testin.bug.."
@@ -163,16 +163,12 @@ public class ArchitectureTest {
     private static final @NotNull Set<String> UTIL_EXCEPTIONS = Set.of();
 
     /**
-     * The one class outside the indexer and its exempt list that reads or writes
-     * files directly (#49). Measured 2026-09-04.
-     * <p>
-     * Far fewer than #49 assumed. It reads and writes the sync baseline, which is
-     * transfer bookkeeping rather than test data - the same argument that puts
-     * {@code git} on the exempt list - so this is likely a decision to record on
-     * that list rather than a call to move.
+     * The classes outside the indexer and its exempt list that read or write
+     * files directly (#49), and there are none. The one there was,
+     * {@code sftp.BaselineStore}, went with the SFTP sync, so the next class to
+     * reach a file on its own fails here.
      */
-    private static final @NotNull Set<String> FILE_ACCESS_EXCEPTIONS = Set.of(
-            "org.testin.sftp.BaselineStore");
+    private static final @NotNull Set<String> FILE_ACCESS_EXCEPTIONS = Set.of();
 
     /**
      * Matched on the outermost class, so freezing a name covers the anonymous
@@ -242,6 +238,23 @@ public class ArchitectureTest {
                 .because("the indexer is the single owner of file access, so its cache stays authoritative over"
                         + " test data and every read is a fast in-memory lookup. The exempt packages are exempt"
                         + " because none of them touches test data (CLAUDE.md, #49)");
+
+        rule.check(CLASSES);
+    }
+
+    /**
+     * Rule-INTERNAL-088: one class reads {@code testin.yml}, and no class writes
+     * it (#301). The values it parses into are package-private, which the
+     * compiler holds; the parser is a library any class could import, which only
+     * this can.
+     */
+    @Test
+    public void onlyTestinYmlReadsTheConfigFile() {
+        final @NotNull ArchRule rule = noClasses()
+                .that().doNotHaveFullyQualifiedName("org.testin.config.TestinYml")
+                .should().dependOnClassesThat().resideInAPackage("com.fasterxml.jackson.dataformat.yaml..")
+                .because("testin.yml is read by one class, so a missing value means the same thing everywhere,"
+                        + " and nothing else can open, parse or write the file (Rule-INTERNAL-088)");
 
         rule.check(CLASSES);
     }

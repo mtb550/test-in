@@ -84,10 +84,7 @@ public class PackagesWithoutTestsTest {
             "an action and a dialog: the number a tester types goes to the marker through the indexer - ideTest",
 
             "rename",
-            "an action, a dialog and the order the three steps run in - close the editor, rewrite the code, rename the node. Only a running IDE has all three - ideTest",
-
-            "testproject",
-            "creating, cloning, binding and selecting a test project: every one of them is a dialog over the indexer - ideTest");
+            "an action, a dialog and the order the three steps run in - close the editor, rewrite the code, rename the node. Only a running IDE has all three - ideTest");
 
     @Test
     public void everyPackageWithoutTestsSaysWhy() {
