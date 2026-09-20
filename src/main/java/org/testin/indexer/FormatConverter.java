@@ -28,6 +28,7 @@ import org.testin.model.markers.TestProjectMarker;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -101,6 +102,10 @@ final class FormatConverter {
         final @NotNull Path markerFile = project.resolve(DirectoryType.TP.getMarker());
         final @NotNull String name = String.valueOf(project.getFileName());
 
+        // A folder that is not a test project at all: nothing to convert, nothing
+        // to report, and above all nothing written into it.
+        if (!Files.exists(markerFile)) return Optional.empty();
+
         final @NotNull Optional<TestProjectMarker> marker = readProjectMarker(markerFile);
         if (marker.isEmpty()) {
             // A .tp that is there and will not parse: nothing in the project is
@@ -162,7 +167,7 @@ final class FormatConverter {
             // id it claimed and its own path - the same on every machine (S1).
             final @NotNull UUID own = taken.add(id.orElseThrow())
                     ? id.orElseThrow()
-                    : derived(id.orElseThrow() + "|" + project.relativize(file));
+                    : derived(id.orElseThrow() + "|" + placeOf(project, file));
 
             if (!own.equals(id.orElseThrow()) && !reidentify(file, own)) return -1;
             if (!move(file, file.resolveSibling(FileKind.TEST_CASE.fileName(own)))) return -1;
@@ -232,7 +237,7 @@ final class FormatConverter {
 
             if (!marker.getId().isEmpty()) continue;
 
-            marker.setId(derived(project.relativize(markerFile) + "|" + marker.getCreatedAt()).toString());
+            marker.setId(derived(placeOf(project, markerFile) + "|" + marker.getCreatedAt()).toString());
             if (!Services.getInstance(p, TestDataFiles.class).write(p, markerFile, marker)) return -1;
 
             stamped++;
@@ -257,12 +262,16 @@ final class FormatConverter {
     }
 
     /**
-     * The project's marker, and empty when the file is there and will not parse.
-     * A project with no {@code .tp} at all is not a test project, and the scan
-     * never asks about one.
+     * The project's marker, and empty when there is none to read: a file that
+     * will not parse, or no file at all.
+     * <p>
+     * A folder with no {@code .tp} is not a test project, and nothing here writes
+     * one into it. The scan is asked to read a folder a tester typed - a clone
+     * address, a repository path - so "no marker" is a folder this conversion has
+     * no business in, not a project at format 0 (#305).
      */
     private @NotNull Optional<TestProjectMarker> readProjectMarker(final @NotNull Path markerFile) {
-        if (!Files.exists(markerFile)) return Optional.of(new TestProjectMarker());
+        if (!Files.exists(markerFile)) return Optional.empty();
 
         try {
             return Optional.of(Services.getInstance(p, Mapper.class).readValue(markerFile.toFile(), TestProjectMarker.class));
@@ -375,6 +384,22 @@ final class FormatConverter {
      */
     private static @NotNull UUID derived(final @NotNull String from) {
         return UUID.nameUUIDFromBytes(from.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * S1, Rule-INTERNAL-082.
+     * <p>
+     * Where a file sits in the project, written the same way on every machine:
+     * with forward slashes, because {@code Path.toString} gives backslashes on
+     * Windows.
+     * <p>
+     * The place is half of what a derived id is derived from, so a tester on
+     * Windows and one on Linux converting the same commit wrote different ids for
+     * the same file - which is exactly the conflict the derivation exists to
+     * prevent, arriving on the next pull instead of on the merge.
+     */
+    private static @NotNull String placeOf(final @NotNull Path project, final @NotNull Path file) {
+        return String.valueOf(project.relativize(file)).replace(File.separatorChar, '/');
     }
 
     private static @NotNull String baseName(final @NotNull Path file) {

@@ -25,13 +25,12 @@ import org.testin.model.Config;
 import org.testin.model.TestRunStatus;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
+import org.testin.util.TestDataParser;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -54,9 +53,7 @@ import java.util.Set;
  * was created and by whom, and where it sits among its siblings.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class RunMarkerMerge {
-
-    private static final @NotNull DateTimeFormatter WRITTEN = DateTimeFormatter.ofPattern(Config.DATE_FORMAT_PATTERN, Locale.US);
+final class RunMarkerMerge {
 
     private static final @NotNull String STARTED = "executionStartedAt";
     private static final @NotNull String ENDED = "executionEndedAt";
@@ -121,15 +118,17 @@ public final class RunMarkerMerge {
     }
 
     /**
-     * The status further along: a run somebody has completed is not created
-     * again, and one somebody closed is not in progress.
+     * The status further along, as the status itself says - by its stage in the
+     * run's life, not by the order the constants happen to be declared in, which
+     * is the order a menu once drew them: a run somebody has completed is not
+     * created again, and one somebody closed is not in progress.
      */
     private static void status(final @NotNull ObjectNode merged, final @NotNull ObjectNode mine, final @NotNull ObjectNode theirs, final @NotNull List<String> settled) {
         final @NotNull TestRunStatus ours = statusIn(mine);
         final @NotNull TestRunStatus yours = statusIn(theirs);
         if (ours == yours) return;
 
-        if (yours.ordinal() > ours.ordinal()) merged.set(STATUS, theirs.path(STATUS).deepCopy());
+        if (yours.isFurtherThan(ours)) merged.set(STATUS, theirs.path(STATUS).deepCopy());
         settled.add(Bundle.message("git.merge.status"));
     }
 
@@ -163,8 +162,8 @@ public final class RunMarkerMerge {
             if (ours.equals(yours)) continue;
 
             if (ours.equals(was)) {
-                merged.with(object).set(key, yours.deepCopy());
-                settled.add(object + "." + key);
+                merged.withObjectProperty(object).set(key, yours.deepCopy());
+                settled.add(Bundle.message("git.merge.written", FieldName.of(object + "." + key)));
                 continue;
             }
             if (yours.equals(was)) continue;
@@ -181,14 +180,12 @@ public final class RunMarkerMerge {
         }
     }
 
+    /**
+     * A stamp the file carries, through the one reader of a written date - which
+     * forgives a weekday edited by hand, where a plain parse would read the whole
+     * value as "never happened" and take the wrong side.
+     */
     private static @NotNull ZonedDateTime stamp(final @NotNull ObjectNode marker, final @NotNull String field) {
-        final @NotNull String written = marker.path(field).asText("");
-        if (written.isBlank()) return Config.NOT_EXECUTED;
-
-        try {
-            return ZonedDateTime.parse(written, WRITTEN);
-        } catch (final RuntimeException notADate) {
-            return Config.NOT_EXECUTED;
-        }
+        return TestDataParser.date(marker.path(field).asText("")).orElse(Config.NOT_EXECUTED);
     }
 }

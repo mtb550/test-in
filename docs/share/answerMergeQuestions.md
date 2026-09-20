@@ -8,6 +8,16 @@
 When two people change the same field, only one value can be kept. This window
 shows both and lets the tester pick.
 
+**Two kinds of file raise a question, and one never does.** A test case asks
+about a field both sides rewrote. A test run's own `.tr` asks about a key both
+sides wrote differently into its configuration or its result analysis, and the
+row is named as the tester already knows that key - **Platform**, or the heading
+the analysis was written under. A result - one case's
+verdict - is never asked about at all: it is kept whole from whoever gave it
+last, because the status, the actual result, the stacktrace and the screenshots
+are one account of one execution and travel together
+([UC-SHARE-017](resolveConflicts.md)).
+
 There is no key that opens this. It opens during a merge.
 
 ## Rules
@@ -26,17 +36,21 @@ There is no key that opens this. It opens during a merge.
   be canceled: none of them leaves anything the tester cannot see.
 - **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
   keys can be changed there.
-- **Rule-SHARE-080** — Only the fields both sides really changed are asked
-  about. Everything else is merged without a question.
-- **Rule-SHARE-081** — One window for each test case, holding one question for
-  each field that disagrees.
+- **Rule-SHARE-080** — Only what both sides really changed is asked about, and
+  only where an answer is the tester's to give. Everything else is merged without
+  a question: a field one side left alone, a run's start and end and status, and
+  a whole result.
+- **Rule-SHARE-081** — One window for each conflicted file, holding one question
+  for each thing that disagrees: a field of a test case, or a key both sides
+  wrote differently into a test run's own marker. A result raises no question,
+  because a verdict is kept whole from whoever gave it last rather than merged
+  piece by piece.
 - **Rule-SHARE-082** — The tester's own value is chosen to start with.
 - **Rule-SHARE-083** — A value is shown on one line, cut at 70 characters. An
   empty one says that it is empty rather than showing nothing.
-- **Rule-SHARE-084** — `Escape` answers nothing for this test case and moves on
-  to the next. The test case is left as the other side has it and is named at
-  the end with everything else that was not resolved. Answers already given
-  are kept.
+- **Rule-SHARE-084** — `Escape` answers nothing for this file and moves on to
+  the next. The file is left as the other side has it and is named at the end
+  with everything else that was not resolved. Answers already given are kept.
 
 ## The screen
 
@@ -58,28 +72,43 @@ There is no key that opens this. It opens during a merge.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The title** — the words **Both Changed**, then the test case's
-   description.
+1. **The title** — the words **Both Changed**, then what the tester calls the
+   thing: a test case's description, and for a test run's marker the run itself,
+   which is the folder it sits in. Neither is ever the file's name: every run
+   holds a marker called `.tr`, so three run conflicts in a row would all be
+   titled the same.
 2. **Each row** — the field, then the two values. **Mine** is chosen to start
-   with.
-3. **Keep Selected** — writes the answers for this test case.
+   with. A run's key is named as the tester already knows it: the question they
+   answered when the run was created, or the heading they wrote their analysis
+   under.
+3. **Keep Selected** — writes the answers for this file.
 
 ## Main flow
 
-1. The merge finds a test case both sides changed.
-2. The window opens with one row for each field that disagrees.
+1. The merge finds a test case, or a test run's own marker, that both sides
+   changed.
+2. The window opens with one row for each field or key that disagrees.
 3. The tester reads both values and picks one for each row.
 4. The tester presses `Enter`.
-5. The merged test case is written, and the merge moves to the next one.
+5. The merged file is written, and the merge moves to the next one.
 
 ## What Testin refuses
 
-**If the tester presses `Escape`** — nothing is written for this test case.
-The sync moves on to the next question. Every answer already given is kept, and
-this test case is named at the end with everything else left unresolved.
+**If the tester presses `Escape`** — nothing is written for this file. The sync
+moves on to the next question. Every answer already given is kept, and this file
+is named at the end with everything else left unresolved.
 
 **If a value is too long to show** — it is cut at 70 characters on screen. The
 whole value is still what gets written.
+
+**If the conflicted file is a result** — no window opens. The side whose
+`executedAt` is later takes the file whole, and the tester is told the choice was
+made rather than asked to make it. Two testers judging *different* cases of one
+run never conflict at all: their verdicts are in different files.
+
+**If two testers only moved a run along** — no window opens either. The start,
+the end, the status and the audit block are settled by rule, and a question comes
+only from a configuration or result analysis key both of them wrote differently.
 
 ---
 

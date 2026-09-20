@@ -19,22 +19,18 @@ package org.testin.indexer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestRunDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.testin.model.FileKind;
 import org.testin.model.TestRunItems;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -61,6 +57,11 @@ import static org.testng.Assert.assertTrue;
  * the part that was ever specific to a run is the naming, and the naming is here.
  * The folder rename below is therefore a real one on disk, standing in for the
  * VFS operation that performs it in the IDE.
+ * <p>
+ * What a run written by an older build does is not here: {@code
+ * FormatConversionIdeTest} asserts it, because since #305 it is the converter's
+ * answer rather than the reader's - the old-format run is removed on the first
+ * open (D4), not left on disk for nothing to read.
  */
 public class RunResultsSurviveRenameTest {
 
@@ -82,15 +83,6 @@ public class RunResultsSurviveRenameTest {
         assertEquals(FileKind.RUN_ITEM.fileName(JUDGED_CASE), JUDGED_CASE + ".ri",
                 "A result is named by the case it is about, so there is no folder name in it to keep in step."
                         + " The moment a result's name is derived from its folder, renaming a run empties it.");
-    }
-
-    @Test
-    public void theResultsLiveInsideTheFolderTheyBelongTo() {
-        final @NotNull Path cycle = Path.of("C:", "Testin", "Demo", "Test Runs", "Cycle-1");
-
-        assertEquals(cycle.resolve(FileKind.RUN_ITEM.fileName(JUDGED_CASE)).getParent(), cycle,
-                "The results sit inside the run's own folder, which is why moving the folder to another"
-                        + " package carries them along with no help from the move");
     }
 
     /**
@@ -120,49 +112,10 @@ public class RunResultsSurviveRenameTest {
         }
     }
 
-    /**
-     * The wipe, asserted rather than assumed.
-     * <p>
-     * A run written by an older build carries {@code <folder>.json} and nothing
-     * reads it - decided on 2026-09-03, following the project's habit of deleting
-     * old test data rather than migrating it. That is a choice, and a choice that
-     * nothing records is indistinguishable from an oversight the next time
-     * somebody wonders why an upgraded run looks empty.
-     */
-    @Test
-    public void aRunWrittenByAnOlderBuildIsNotRead() {
-        final @NotNull Path root = tempRoot();
-
-        try {
-            final @NotNull Path cycle = root.resolve("Cycle-1");
-            write(cycle.resolve("run.json"), A_RESULT);
-            write(cycle.resolve(cycle.getFileName() + ".json"), A_RESULT);
-
-            assertTrue(resultsIn(cycle).isEmpty(),
-                    "Neither old format is read - the one file per run, or the file named after the folder before"
-                            + " it. A run from before this change shows no results, and its files stay on disk as"
-                            + " litter - expected, not a defect");
-        } finally {
-            deleteTree(root);
-        }
-    }
-
     private static @NotNull Path createRun(final @NotNull Path folder) {
         write(folder.resolve(".tr"), "{}");
         write(folder.resolve(FileKind.RUN_ITEM.fileName(JUDGED_CASE)), A_RESULT);
         return folder;
-    }
-
-    /**
-     * The results a folder holds, the way the scan finds them: by what their names
-     * say they are (#305).
-     */
-    private static @NotNull List<Path> resultsIn(final @NotNull Path folder) {
-        try (Stream<Path> children = Files.list(folder)) {
-            return children.filter(file -> FileKind.of(file) == FileKind.RUN_ITEM).toList();
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not list " + folder + ": " + ex.getMessage(), ex);
-        }
     }
 
     private static @NotNull Path tempRoot() {

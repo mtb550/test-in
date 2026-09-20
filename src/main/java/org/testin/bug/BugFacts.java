@@ -23,14 +23,13 @@ import org.testin.model.BugSeverity;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.TestRunDto;
+import org.testin.model.markers.TestRunMarker;
 import org.testin.report.generators.ReportText;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.util.Display;
 
 import java.util.List;
 import java.util.UUID;
-import org.testin.model.markers.TestRunMarker;
 
 /**
  * What a bug report is made of, copied off the run item, its test case and its

@@ -21,13 +21,14 @@ import com.intellij.util.concurrency.AppExecutorUtil;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
+import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -35,11 +36,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
-import org.testin.model.FileKind;
-import org.testin.model.TestRunItems;
 
 /**
  * The one writer of a test run's files: its results, its marker and the
@@ -99,7 +99,7 @@ final class RunWriter {
      */
     void create(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
         store.registerTestRun(runPath, tr);
-        write(runPath, tr);
+        write(runPath, tr, Set.of());
     }
 
     /**
@@ -111,14 +111,14 @@ final class RunWriter {
      * grid edit, an editor closing - put it back and wrote its file again (#66,
      * finding 143).
      */
-    void persist(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
+    void persist(final @NotNull Path runPath, final @NotNull TestRunDto tr, final @NotNull Set<UUID> gone) {
         if (store.findTestRun(runPath).isEmpty()) {
             Logger.info("Test run no longer indexed, so it was not written back: " + runPath.getFileName());
             return;
         }
 
         store.registerTestRun(runPath, tr);
-        write(runPath, tr);
+        write(runPath, tr, gone);
     }
 
     /**
@@ -140,7 +140,7 @@ final class RunWriter {
      * whether the run is still indexed, which is the one question that separates
      * a pending write from a resurrection (#66, finding 86).
      */
-    private void write(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
+    private void write(final @NotNull Path runPath, final @NotNull TestRunDto tr, final @NotNull Set<UUID> gone) {
         // Taken with the snapshots, on the calling thread, so the sweep keeps
         // exactly the screenshots the written results name.
         final @NotNull Set<String> named = namedScreenshots(tr);
@@ -165,7 +165,7 @@ final class RunWriter {
                     Logger.trace("Result written for " + runPath.getFileName() + ": " + file.getFileName());
                 });
 
-                sweepResults(files, runPath, results.keySet());
+                removeResultsOf(files, runPath, gone);
                 sweepScreenshots(files, runPath, named);
             } catch (final Exception ex) {
                 Logger.error("Failed to persist test run data: " + ex.getMessage());
@@ -176,30 +176,24 @@ final class RunWriter {
     /**
      * UC-TREE-PANEL-022, Rule-INTERNAL-011.
      * <p>
-     * Removes the result files of cases the run no longer covers - Edit Test Run
-     * unticking one - with the screenshots they named, which the sweep below then
-     * finds unnamed.
+     * Removes the result files of the cases the change took out of the run - Edit
+     * Test Run unticking one - with the screenshots they named, which the sweep
+     * below then finds unnamed.
      * <p>
-     * A result file that will not parse is left alone, whatever the run covers:
-     * the scan has already reported it, and a file Testin cannot read is not a
-     * file Testin removes (#305, S21).
+     * <b>Those, and nothing else in the folder.</b> A result file the run does
+     * not cover is not evidence that anybody stopped covering it: it can be one a
+     * pull brought a moment ago, or one this very write could not serialize, and
+     * removing either loses a verdict nobody asked to lose. The caller says which
+     * cases went, because the caller is the only one that saw the change (#305,
+     * S21).
      */
-    private void sweepResults(final @NotNull TestDataFiles files, final @NotNull Path runPath, final @NotNull Set<Path> written) {
-        for (final Path file : files.resultsIn(runPath)) {
-            if (written.contains(file) || !readsAsAResult(file)) continue;
+    private void removeResultsOf(final @NotNull TestDataFiles files, final @NotNull Path runPath, final @NotNull Set<UUID> gone) {
+        for (final UUID id : gone) {
+            final @NotNull Path file = runPath.resolve(FileKind.RUN_ITEM.fileName(id));
+            if (!Files.exists(file)) continue;
 
             Logger.info("Removing the result of a case the run no longer covers: " + file.getFileName());
             files.delete(p, file);
-        }
-    }
-
-    private boolean readsAsAResult(final @NotNull Path file) {
-        try {
-            Services.getInstance(p, Mapper.class).readValue(file.toFile(), TestRunItems.class);
-            return true;
-        } catch (final Exception unreadable) {
-            Logger.warn("Left the unreadable result " + file.getFileName() + " as it is: " + unreadable.getMessage());
-            return false;
         }
     }
 
@@ -284,11 +278,28 @@ final class RunWriter {
     }
 
     /**
-     * The run's marker, under the same discipline and in the same queue - so a
-     * status change and the results it belongs to cannot land out of order.
+     * The run's marker, in the same queue as its results - so a status change and
+     * the results it belongs to cannot land out of order.
+     * <p>
+     * <b>Through the marker writer, not into the file.</b> This wrote its own
+     * bytes, which meant it alone skipped the two things every other marker write
+     * does: it refused nothing, so a {@code .tr} that will not parse was replaced
+     * by the defaults the scan fell back to - taking the run's status, its
+     * execution stamps, its configuration and its result analysis with it, in one
+     * status change the tester could not undo (#66, finding 162) - and it stamped
+     * no folder id (Rule-INTERNAL-090). Both live in {@code MarkerFiles}, and one
+     * writer is how they keep applying.
+     * <p>
+     * So this writes the marker the index holds rather than a snapshot, and the
+     * marker is not a parameter for the same reason {@link
+     * ProjectIndexer#changeRun} takes none: there is one marker per run and the
+     * index has it. Ordering still holds - every change queues its own write, the
+     * queue keeps them in order, and the last one writes the final state - and
+     * nothing here is mutated in place: the two maps a tester writes into are
+     * replaced whole by their setters.
      */
-    void persistMarker(final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
-        snapshot(marker, "run marker").ifPresent(bytes -> queue.execute(() -> {
+    void persistMarker(final @NotNull Path runPath) {
+        queue.execute(() -> {
             try {
                 // The same check the results write makes, for the same reason: a
                 // run a sync or a delete took away while this sat in the queue is
@@ -299,12 +310,11 @@ final class RunWriter {
                     return;
                 }
 
-                Services.getInstance(p, TestDataFiles.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), bytes);
-                Logger.trace("Marker persisted -> " + marker.getStatusLabel());
+                if (store.persistRunMarker(runPath)) Logger.trace("Marker persisted for " + runPath.getFileName());
             } catch (final Exception ex) {
                 Logger.error("Failed to persist marker: " + ex.getMessage());
             }
-        }));
+        });
     }
 
     /**

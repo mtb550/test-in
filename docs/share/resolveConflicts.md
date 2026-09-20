@@ -118,18 +118,25 @@ push to*.
 Accepted** names the file and says what to do: resolve that file in Git, then
 sync again. The sync cannot go on without it.
 
-## Two fields are settled without asking, and the dialog says which
+## Some things are settled without asking, and the dialog says which
 
 The order of a test case takes the remote's value. Who changed it last, and
 when, take the later of the two edits. Neither is a question a tester can
 usefully answer about a merge - a position is not something either of them
 chose, and who edited last is already in the two timestamps.
 
-So they are not asked, and the dialog says what was decided:
+So they are not asked, and the dialog lists what was decided, one line and one
+finished sentence for each:
 
-*Both changed Updated At, Updated By and Order, and Testin settled them without
-asking: the later edit for who changed it and when, and the remote's position
-for the order.*
+> **Both changed these, and Testin settled them without asking:**
+> Who changed it last and when, taken from the later edit
+> The position in the test set, taken from the remote
+
+Each entry carries its own reason, because the reasons differ: a run's marker
+settles its status, its execution stamps and every key only one tester wrote, and
+none of those is settled by a rule about positions. The dialog adds nothing to
+them - it used to end the sentence with one explanation for the lot, which was
+true of a test case and of nothing else.
 
 Only when it happened. A field one side never touched is settled by the ordinary
 three-way rule, which is nobody's decision, and nothing is said about it.

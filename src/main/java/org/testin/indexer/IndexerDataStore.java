@@ -312,9 +312,6 @@ final class IndexerDataStore {
     }
 
     /**
-     * Whether a directory carries one kind's marker.
-     */
-    /**
      * Rule-INTERNAL-091.
      * <p>
      * Why a project's contents were not read - written by an older Testin and not
@@ -343,6 +340,9 @@ final class IndexerDataStore {
         return markers.giveFreshId(markerFile);
     }
 
+    /**
+     * Whether a directory carries one kind's marker.
+     */
     boolean hasMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind) {
         return markers.has(dirPath, kind);
     }
@@ -585,6 +585,21 @@ final class IndexerDataStore {
         // read through it - see the change without waiting for something else.
         refreshDir(dto.getPath());
         return written;
+    }
+
+    /**
+     * Rule-INTERNAL-083, Rule-INTERNAL-090.
+     * <p>
+     * A test run's marker, written like every other node's - which is the point:
+     * the refusal over an unreadable file and the folder id are {@code
+     * MarkerFiles}' to apply, and the run writer used to write this one file
+     * itself and get neither (#305).
+     *
+     * @return whether it landed, and false for a run the index does not hold -
+     * which the writer has already checked, and which cannot be marked
+     */
+    boolean persistRunMarker(final @NotNull Path runPath) {
+        return findTestRunDir(runPath).map(this::persistMarker).orElse(false);
     }
 
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {

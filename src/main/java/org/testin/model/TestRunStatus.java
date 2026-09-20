@@ -26,8 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
 import java.awt.event.KeyEvent;
+import javax.swing.*;
 
 /**
  * Lifecycle status of a test run. Constants carry their own icon, keyboard
@@ -136,6 +136,19 @@ public enum TestRunStatus implements MenuItem {
      */
     public boolean canBeSetFrom(final @NotNull TestRunStatus current) {
         return setBy == SetBy.TESTER && stage > current.stage;
+    }
+
+    /**
+     * Rule-TREE-PANEL-092.
+     * <p>
+     * Whether this status is further along the run's life than that one, by the
+     * stage above - never by the declaration order, which is the order the menu
+     * once drew them in. What a merge takes when two testers executed one cycle
+     * (#305, Q-D), and the half of {@link #canBeSetFrom} that is about the run
+     * rather than about who may say so.
+     */
+    public boolean isFurtherThan(final @NotNull TestRunStatus other) {
+        return stage > other.stage;
     }
 
     /**

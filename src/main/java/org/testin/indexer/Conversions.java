@@ -34,6 +34,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
@@ -63,6 +64,21 @@ public final class Conversions {
      * scans two locks for one folder.
      */
     private final @NotNull Map<String, Object> locks = new ConcurrentHashMap<>();
+
+    /**
+     * What has already been said, so the same outcome is reported once.
+     * <p>
+     * A conversion that could not finish leaves the format number out on purpose,
+     * so the next scan tries again - and a project that cannot be converted at all
+     * fails again every time. Without this the tester got the same notification on
+     * every scan and every change to the Testin folder, for something they had
+     * already been told once and can only fix by hand (#305, S3).
+     * <p>
+     * The report is a record, so two identical outcomes are the same value and
+     * this needs nothing but the reports themselves. A retry that got further has
+     * different counts and is said, which is the half worth hearing.
+     */
+    private final @NotNull Set<FormatConverter.Report> said = ConcurrentHashMap.newKeySet();
 
     /**
      * UC-INTERNAL-008, Rule-INTERNAL-091.
@@ -127,15 +143,18 @@ public final class Conversions {
      * lost, and any file left for the tester to repair. A conversion is something
      * that happened to a tester's data while they were opening a project, so it
      * says so once and does not fade (D9).
+     * <p>
+     * Once for each outcome, which {@link #said} is what makes true.
      */
-    private static void report(final @NotNull Project p, final @NotNull List<FormatConverter.Report> reports) {
-        final @NotNull List<FormatConverter.Report> said = reports.stream()
+    private void report(final @NotNull Project p, final @NotNull List<FormatConverter.Report> reports) {
+        final @NotNull List<FormatConverter.Report> worth = reports.stream()
                 .filter(report -> report.changedAnything() || report.failed() || !report.toRepair().isEmpty())
+                .filter(said::add)
                 .toList();
-        if (said.isEmpty()) return;
+        if (worth.isEmpty()) return;
 
         final @NotNull StringBuilder message = new StringBuilder();
-        for (final FormatConverter.Report report : said) {
+        for (final FormatConverter.Report report : worth) {
             message.append(Bundle.message("convert.project", report.project(), String.valueOf(report.cases()), String.valueOf(report.runs())));
 
             if (!report.toRepair().isEmpty()) {

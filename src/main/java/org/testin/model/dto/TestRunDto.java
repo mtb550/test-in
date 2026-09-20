@@ -17,26 +17,18 @@
 package org.testin.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.Config;
-import org.testin.model.ResultAnalysis;
-import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -49,7 +41,6 @@ import java.util.UUID;
 @SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString()
-// todo, put uuid for each test run.
 public class TestRunDto {
 
     @NotNull

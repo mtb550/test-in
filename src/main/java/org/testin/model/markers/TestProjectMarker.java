@@ -46,6 +46,19 @@ public class TestProjectMarker extends AbstractMarker {
      */
     public static final int FORMAT = 2;
 
+    /**
+     * Rule-INTERNAL-091.
+     * <p>
+     * The release that converts a project written before the number existed,
+     * which is what the refusal below tells a tester to install.
+     * <p>
+     * A fixed fact, not this build's own version. 2.14.0-alpha deletes the
+     * converter (#333) and still has to name the one release that can do the
+     * conversion, so reading the running version here would send a tester to the
+     * build that just refused them.
+     */
+    public static final @NotNull String CONVERTING_RELEASE = "2.13.0-alpha";
+
     @NonNull
     private ProjectStatus status = ProjectStatus.ACTIVE;
 
@@ -74,7 +87,7 @@ public class TestProjectMarker extends AbstractMarker {
 
         return Optional.of(format > FORMAT
                 ? Bundle.message("scan.newer.format")
-                : Bundle.message("scan.older.format", "2.13.0-alpha"));
+                : Bundle.message("scan.older.format", CONVERTING_RELEASE));
     }
 
     @Override

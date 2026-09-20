@@ -35,11 +35,10 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 
-import javax.swing.tree.TreePath;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.swing.tree.TreePath;
 
 /**
  * The next cycle, from the one before it.

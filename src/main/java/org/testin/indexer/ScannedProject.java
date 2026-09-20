@@ -113,12 +113,6 @@ final class ScannedProject {
     private final @NotNull Map<UUID, Path> handNamedFiles = new ConcurrentHashMap<>();
 
     /**
-     * UC-SHARE-002, Rule-SHARE-001.
-     * <p>
-     * The test case files this pass could not read, by the test set they are
-     * in - what an export has to say is missing from it.
-     */
-    /**
      * Rule-INTERNAL-011.
      * <p>
      * The result files that would not parse, as {@code <run>/<file>}, for the one
@@ -126,6 +120,12 @@ final class ScannedProject {
      */
     private final @NotNull Set<String> unreadableResults = ConcurrentHashMap.newKeySet();
 
+    /**
+     * UC-SHARE-002, Rule-SHARE-001.
+     * <p>
+     * The test case files this pass could not read, by the test set they are
+     * in - what an export has to say is missing from it.
+     */
     private final @NotNull Map<String, Set<String>> unreadableCases = new ConcurrentHashMap<>();
 
     /**

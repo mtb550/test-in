@@ -23,7 +23,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -36,7 +37,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
-import org.testin.model.FileKind;
 
 /**
  * Writes test data to disk. Package-private, and in this package, so that the
@@ -140,7 +140,7 @@ final class TestDataFiles {
      */
     @NotNull List<Path> screenshotsIn(final @NotNull Path runPath) {
         try (Stream<Path> inside = Files.list(runPath)) {
-            return inside.filter(TestRunDirectoryDto::isScreenshot).toList();
+            return inside.filter(file -> FileKind.of(file, DirectoryType.TR) == FileKind.SCREENSHOT).toList();
         } catch (final IOException ex) {
             Logger.warn("Could not list the screenshots in " + runPath + ": " + ex.getMessage());
             return List.of();

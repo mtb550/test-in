@@ -16,7 +16,6 @@
 
 package org.testin.model;
 
-import org.testin.model.dto.TestRunDto;
 import org.testin.util.Display;
 import org.testng.annotations.Test;
 

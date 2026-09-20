@@ -17,7 +17,6 @@
 package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestRunDto;
 import org.testin.model.markers.DetailRow;
 import org.testin.model.markers.Marker;
 import org.testin.model.markers.TestRunMarker;

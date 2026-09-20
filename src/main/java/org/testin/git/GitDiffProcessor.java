@@ -20,8 +20,11 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
@@ -34,8 +37,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
-import org.testin.indexer.ProjectIndexer;
-import org.testin.model.dto.TestCaseDto;
 
 /**
  * Builds the test-case review model from what Git reports as changed. The
@@ -98,9 +99,14 @@ public final class GitDiffProcessor {
             final @NotNull Path relativePath = Path.of(entry.path());
 
             // A run's screenshot has no row of its own: it only arrives or goes
-            // because its run's file started or stopped naming it, and committing
-            // the run carries it (#313).
-            if (TestRunDirectoryDto.isScreenshot(relativePath)) continue;
+            // because a result started or stopped naming it, and committing that
+            // result carries it (#313).
+            //
+            // Only inside a run folder, which is what the marker beside it says: a
+            // five-character picture a tester keeps in a test set is a file like
+            // any other, and hiding it left them unable to commit it at all
+            // (#305, S29).
+            if (FileKind.of(relativePath, folderKindOf(root, relativePath)) == FileKind.SCREENSHOT) continue;
 
             // An untracked file that is no longer there is not a pending change:
             // Git listed it a moment ago and something removed it since. Listing
@@ -132,6 +138,24 @@ public final class GitDiffProcessor {
             }
         }
         return result;
+    }
+
+    /**
+     * Rule-INTERNAL-011.
+     * <p>
+     * What kind of folder holds this file, as far as the working tree can say: a
+     * run when the folder carries a run's marker, and nothing in particular
+     * otherwise - which is all {@link FileKind} needs to tell a screenshot from a
+     * picture (#305, S29).
+     * <p>
+     * Asked of the disk rather than of the index: the review is about what Git
+     * reports, including a file in a project this window has not indexed.
+     */
+    private static @NotNull DirectoryType folderKindOf(final @NotNull Path repositoryRoot, final @NotNull Path relativePath) {
+        final @NotNull Optional<Path> folder = Optional.ofNullable(repositoryRoot.resolve(relativePath).getParent());
+        final boolean isRun = folder.filter(at -> Files.exists(at.resolve(DirectoryType.TR.getMarker()))).isPresent();
+
+        return isRun ? DirectoryType.TR : DirectoryType.TRD;
     }
 
     /**

@@ -18,21 +18,22 @@ package org.testin.git;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.nio.file.Path;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.testin.model.DirectoryType;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.Mapper;
 import org.testin.model.Config;
+import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
+import org.testin.util.Bundle;
+import org.testin.util.Mapper;
 import org.testin.util.TestDataParser;
 
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.testin.model.FileKind;
 
 /**
  * Merges the three versions Git keeps of a conflicted test case, field by field
@@ -148,12 +149,19 @@ public final class TestCaseMerge {
                 continue;
             }
 
+            // A sentence, not the field's name. Every settled entry says what
+            // was settled and why, in the tester's words, because the reasons
+            // differ from field to field and the dialog only lists them - it
+            // used to carry one explanation for all of them, which stopped
+            // being true the moment a run's marker settled anything (#305).
+            // Once for the pair: who changed the case last and when are one
+            // fact, and the tester does not need to hear it twice.
             if (UPDATED_AT.equals(field) || UPDATED_BY.equals(field)) {
-                settled.add(field);
+                addOnce(settled, Bundle.message("git.merge.audit"));
                 continue;
             }
             if (ORDER.contains(field)) {
-                settled.add(field);
+                addOnce(settled, Bundle.message("git.merge.position"));
                 set(merged, field, yours);
                 continue;
             }
@@ -165,6 +173,10 @@ public final class TestCaseMerge {
         stampTheLaterEdit(merged, mineNode, theirsNode);
 
         return new Merge(merged, List.copyOf(questions), List.copyOf(settled));
+    }
+
+    private static void addOnce(final @NotNull List<String> settled, final @NotNull String said) {
+        if (!settled.contains(said)) settled.add(said);
     }
 
     /**

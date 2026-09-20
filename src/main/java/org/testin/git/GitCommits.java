@@ -19,9 +19,9 @@ package org.testin.git;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.util.Bundle;
 import org.testin.model.DirectoryType;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.FileKind;
+import org.testin.util.Bundle;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.testin.model.FileKind;
 
 /**
  * A commit, and the commits moved between here and the remote.
@@ -98,7 +97,8 @@ public final class GitCommits {
 
         return GitRefs.parseStatus(statusLines).stream()
                 .map(GitRefs.StatusEntry::path)
-                .filter(path -> TestRunDirectoryDto.isScreenshot(Path.of(path)))
+                // In a run folder by the line below, so the kind is known here.
+                .filter(path -> FileKind.of(Path.of(path), DirectoryType.TR) == FileKind.SCREENSHOT)
                 .filter(path -> runFolders.contains(folderOf(path)))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }

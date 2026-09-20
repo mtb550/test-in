@@ -16,6 +16,7 @@
 
 package org.testin.git;
 
+import org.testin.model.DirectoryType;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
@@ -44,11 +45,47 @@ public class ScreenshotsInGitTest {
     public void theReviewListsNoScreenshotRow() {
         try {
             final Path root = Files.createTempDirectory("testin-git-screenshots");
+            markARun(root, "runs/cycle38");
 
             assertTrue(GitDiffProcessor.toDiffs(List.of(" D " + REMOVED), root, RealMapper.build(), path -> "", id -> Optional.empty()).isEmpty(),
                     "a screenshot arrives or goes with its run, so it has no row of its own");
         } catch (final Exception e) {
             throw new AssertionError("the review could not be built", e);
+        }
+    }
+
+    /**
+     * The other half of the rule, and the reason a marker decides it: a picture
+     * is a screenshot because it sits in a run, not because of what it is called.
+     * A five-character PNG a tester keeps beside a test set is a file like any
+     * other, and hiding it left them unable to commit it at all (#305, S29).
+     */
+    @Test
+    public void aPictureOutsideARunIsAFileLikeAnyOther() {
+        try {
+            final Path root = Files.createTempDirectory("testin-git-screenshots");
+            final String beside = "cases/ts2/k3f9a.png";
+            Files.createDirectories(root.resolve("cases/ts2"));
+            Files.writeString(root.resolve(beside), "not really a picture");
+
+            assertEquals(GitDiffProcessor.toDiffs(List.of("?? " + beside), root, RealMapper.build(), path -> "", id -> Optional.empty()).size(), 1,
+                    "a PNG in a test set has no run to travel with, so the review has to list it");
+        } catch (final Exception e) {
+            throw new AssertionError("the review could not be built", e);
+        }
+    }
+
+    /**
+     * Makes the folder a real test run, which is what the marker beside the
+     * picture says.
+     */
+    private static void markARun(final Path root, final String folder) {
+        try {
+            final Path at = root.resolve(folder);
+            Files.createDirectories(at);
+            Files.writeString(at.resolve(DirectoryType.TR.getMarker()), "{}");
+        } catch (final Exception e) {
+            throw new AssertionError("could not write the run's marker", e);
         }
     }
 

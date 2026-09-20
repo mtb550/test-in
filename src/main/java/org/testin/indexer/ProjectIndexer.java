@@ -24,8 +24,10 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.LastOpenEditors;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
 import org.testin.model.ProjectStatus;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
@@ -36,13 +38,12 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.model.markers.AbstractMarker;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.BoundTestProject;
-import org.testin.editor.LastOpenEditors;
-import org.testin.model.markers.AbstractMarker;
 import org.testin.util.Bundle;
 
 import java.io.IOException;
@@ -57,7 +58,6 @@ import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.testin.model.FileKind;
 
 /**
  * The single owner of file access. No other class may read, write or execute
@@ -627,9 +627,28 @@ public final class ProjectIndexer {
      */
     public void changeRun(final @NotNull Path runPath, final @NotNull Consumer<TestRunDto> change) {
         findTestRun(runPath).ifPresentOrElse(run -> {
+            // Rule-INTERNAL-011. Which cases the change took out of the run,
+            // asked here and nowhere else: a result's file goes because this
+            // change stopped covering that case - Edit Test Run unticking it -
+            // and never because a file in the folder is not in the snapshot. The
+            // writer worked it out from the folder listing, which made a result a
+            // pull had just brought, or one whose snapshot failed, look unwanted
+            // (#305).
+            final @NotNull Set<UUID> before = coveredBy(run);
             change.accept(run);
-            runWriter.persist(runPath, run);
+
+            final @NotNull Set<UUID> gone = new LinkedHashSet<>(before);
+            gone.removeAll(coveredBy(run));
+
+            runWriter.persist(runPath, run, gone);
         }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
+    }
+
+    /**
+     * The cases a run covers, by id.
+     */
+    private static @NotNull Set<UUID> coveredBy(final @NotNull TestRunDto run) {
+        return run.getResults().stream().map(TestRunItems::getId).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**
@@ -640,7 +659,7 @@ public final class ProjectIndexer {
         store.findTestRunDir(runPath).ifPresentOrElse(dir -> {
             final @NotNull TestRunMarker marker = dir.getMarker();
             change.accept(marker);
-            runWriter.persistMarker(runPath, marker);
+            runWriter.persistMarker(runPath);
         }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + runPath.getFileName()));
     }
 
@@ -972,21 +991,28 @@ public final class ProjectIndexer {
     }
 
     /**
-     * UC-INTERNAL-002, Rule-INTERNAL-014.
-     * <p>
-     * The nodes drawn with default values because their marker would not parse,
-     * and forgotten in the asking, so the scan that reports them reports each
-     * one once.
-     */
-    /**
      * UC-INTERNAL-008, Rule-INTERNAL-091.
      * <p>
      * Converts every test project in the Testin folder that is not in this
-     * build's format yet - at every start, and every time the Testin folder
-     * changes (#305, D9).
+     * build's format yet, at every start (#305, D9). A project the scan is about
+     * to read is converted by the scan itself, whenever it runs.
+     * <p>
+     * <b>Off the EDT.</b> It reads and rewrites every test case file of every
+     * project in the folder, and startup runs on the EDT - so this froze the IDE
+     * for as long as the conversion took, on the one open where there was
+     * something to convert. A pooled thread rather than a progress bar: it must
+     * not be cancelled half way, and it already says what it did in a
+     * notification that stays.
+     * <p>
+     * Nothing waits for it. The projects the first index reads are converted
+     * inside that index, which is what leaves this pass the ones nobody opened.
      */
     public void convertEveryProject() {
-        Services.getInstance(Conversions.class).sweep(p);
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            if (p.isDisposed()) return;
+
+            Services.getInstance(Conversions.class).sweep(p);
+        });
     }
 
     /**
@@ -999,6 +1025,13 @@ public final class ProjectIndexer {
         return store.whyNotRead(projectPath);
     }
 
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-014.
+     * <p>
+     * The nodes drawn with default values because their marker would not parse,
+     * and forgotten in the asking, so the scan that reports them reports each
+     * one once.
+     */
     public @NotNull List<String> takeDamagedMarkers() {
         return store.takeDamagedMarkers();
     }

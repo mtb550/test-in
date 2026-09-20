@@ -12,7 +12,7 @@ whole team pulls.
 | **Answers** | How test cases leave Testin and come back, and how a test project is kept in step with a team |
 | **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` to `Rule-SHARE-118` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **Checked against** | `main` at `a53922a1`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-SHARE-009](putUnderGit.md), [UC-SHARE-010](reviewChanges.md), [UC-SHARE-011](revertOneChange.md) and [UC-SHARE-016](syncWithGit.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. |
+| **Checked against** | `main` at `a53922a1`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-SHARE-009](putUnderGit.md), [UC-SHARE-010](reviewChanges.md), [UC-SHARE-011](revertOneChange.md) and [UC-SHARE-016](syncWithGit.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. On 20 September 2026, at `e6cbf4f1`, the review and the merge pages were read against the code again for the #305 file structure. |
 | **Written to** | [How a document is written](../standard.md) |
 
 ---

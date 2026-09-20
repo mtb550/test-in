@@ -99,7 +99,7 @@ public enum FileKind {
         final @NotNull FileKind byName = of(file);
         if (byName != OTHER) return byName;
 
-        return folder == DirectoryType.TR && TestRunDirectoryDto.isScreenshot(file) ? SCREENSHOT : OTHER;
+        return folder == DirectoryType.TR && TestRunDirectoryDto.isScreenshotName(String.valueOf(file.getFileName())) ? SCREENSHOT : OTHER;
     }
 
     /**
@@ -109,8 +109,17 @@ public enum FileKind {
      * identity, so this is the only place that spells it - a second speller is
      * how a copied test set came to be written as files nothing reads (#305,
      * S24).
+     * <p>
+     * Only a record is named by an id: a marker's name is fixed per kind of
+     * folder, a screenshot's is random, and asking either for a name by id is a
+     * mistake in the code rather than something a tester can cause - so it says
+     * so rather than answering with a file name nothing reads back.
      */
     public @NotNull String fileName(final @NotNull UUID id) {
+        if (extension.isEmpty()) {
+            throw new IllegalStateException("A " + this + " is not named by an id: its name is fixed, or it is not Testin's file");
+        }
+
         return id + extension;
     }
 

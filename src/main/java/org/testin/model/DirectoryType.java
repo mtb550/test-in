@@ -22,7 +22,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.AbstractMarker;
-import org.testin.model.markers.PackageMarker;
 import org.testin.model.markers.TestCasesMainDirectoryMarker;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.markers.TestRunMarker;
@@ -33,14 +32,14 @@ import org.testin.model.markers.TestSetPackageMarker;
 import org.testin.util.Bundle;
 import org.testin.util.NameSanitizer;
 
-import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Locale;
 import java.util.stream.Collectors;
+import javax.swing.*;
 
 @Getter
 @AllArgsConstructor
@@ -259,13 +258,6 @@ public enum DirectoryType {
     }
 
     /**
-     * What this kind is called in a log line - the description in lower case, so
-     * the word and its capitalized form cannot drift apart. Every reader of a
-     * marker used to be handed this word by hand, beside the marker's file name
-     * and the class it parses to: three facts about one thing, spelled out at
-     * seven call sites, and nothing checking they belonged together (#173).
-     */
-    /**
      * Rule-INTERNAL-014, Rule-INTERNAL-090.
      * <p>
      * The kind of folder a file name is the marker of, and empty when it is not
@@ -276,6 +268,13 @@ public enum DirectoryType {
         return Arrays.stream(values()).filter(type -> type.marker.equals(fileName)).findFirst();
     }
 
+    /**
+     * What this kind is called in a log line - the description in lower case, so
+     * the word and its capitalized form cannot drift apart. Every reader of a
+     * marker used to be handed this word by hand, beside the marker's file name
+     * and the class it parses to: three facts about one thing, spelled out at
+     * seven call sites, and nothing checking they belonged together (#173).
+     */
     public @NotNull String getMarkerKind() {
         return description.toLowerCase(Locale.ROOT);
     }
