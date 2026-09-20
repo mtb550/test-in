@@ -26,9 +26,9 @@ There is no button for this. It happens when the description is filled in.
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
   when `testin.yml` names that test project. Otherwise nothing is generated,
-  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
-  **Run Tests** are gray and say why, and no gutter icon or automated mark is
-  shown. **Save to testin.yml**, in the Testin panel, turns code on.
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Code**
+  and **Run Tests** are gray and say why, and no gutter icon or automated mark
+  is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-019** — Filling in a description on a test case that has no
   method writes the method, rather than reporting that there is nothing to
   change.
@@ -56,8 +56,7 @@ public void cardIsDeclined() {
 ## Main flow
 
 1. A test case exists with no description, so it has no method.
-2. The tester selects it and presses `D`, or opens **Description** from the
-   `F2` menu.
+2. The tester selects it, presses `F2`, then presses `D` for **Description**.
 3. The tester types a description and presses `Enter`.
 4. Testin looks for a method carrying this test case's identity.
 5. There is none, so instead of stopping, Testin writes it.

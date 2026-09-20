@@ -12,7 +12,7 @@ to somebody who does not have the IDE.
 | **Answers** | How a report is made, what it contains, and what each format holds |
 | **Numbering** | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` to `Rule-REPORT-020` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **Checked against** | `main` at `779fe6b4`, 7 September 2026 |
+| **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code |
 | **Written to** | [How a document is written](../standard.md) |
 
 ---
@@ -65,7 +65,7 @@ is not in the IDE's keymap, so it cannot be changed there.
 | **PDF** | The one to attach to a ticket. The starting choice |
 | **Word** | The one to edit before sending |
 | **HTML** | The one to open in a browser. It carries a light and dark switch |
-| **XLSX** | The one to work with in a spreadsheet. Its test cases are one table, to sort and filter |
+| **Excel** | The one to work with in a spreadsheet. Its test cases are one table, to sort and filter |
 
 The first three carry the same content. The spreadsheet carries the same
 overview and analysis on a sheet of their own, and is described below.
@@ -78,9 +78,11 @@ The PDF, the Word document and the web page each hold these, in this order.
    the platform and component, the test run's own name, and a line reading
    *Confidential — QA Test Execution Summary*.
 2. **Report Overview** — a table of two columns. It holds the project, the test
-   run, the commit, the platform and component, the language, the browser, the
-   device type, everyone who recorded a verdict, when execution started and
-   ended, and the run's status. A row nobody answered is left out.
+   run, the test type, the change log, the commit, the platform and component,
+   the language, the browser, the device type, everyone who recorded a verdict,
+   when execution started, when it ended, how long it took, and the run's
+   status. A row nobody answered is left out. The commit is the one row that
+   stays when nobody answered it, and reads *n/a*.
 3. **Execution Summary** — one sentence naming the run and saying how many test
    cases it holds, how many were executed and what share passed. All four
    formats open it with the same sentence. Under it a row of
@@ -133,9 +135,6 @@ per verdict.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | Rule-REPORT-003 — a refusal is stated | Fixed. An empty folder, file name or format turns that box's own placeholder red — *Choose a folder*, *Name the file* — and puts the cursor in it, which is what the commit message box already did. |
-| **Difference 2** | Rule-REPORT-003 — `Enter` confirms a dialog | Fixed. `Enter` generates the report, the same as **Generate**, and the status bar says so. |
-| **Difference 3** | Rule-REPORT-001 — a report is about one test run | Fixed, and the row overstated it: the button could never actually be unavailable, because it is only ever built with a run editor. What it did offer was a report on a run still being written, which it now grays with the reason in the tooltip (Rule-REPORT-016). |
 | **Difference 8** | Rule-REPORT-002 — every format reads the same figures | The PDF drops any text outside Latin-1. An Arabic test case description comes out of the PDF as an empty cell, while the HTML, Word and Excel reports print it. It is no longer silent: a message says what was left out and which formats keep it (Rule-REPORT-018). The three fonts the PDF is built from are the standard Helvetica faces, which carry Western encoding only, so the fix is a Unicode font shipped inside the plugin — a decision about what Testin distributes, not a line to change. [#326](https://github.com/mtb550/test-in/issues/326), *The PDF report prints Latin only, and its library is AGPL inside an Apache 2.0 plugin*. |
 
 **Fixed since this list was written.** The numbers are left out rather than
@@ -143,6 +142,9 @@ closed up, so an issue that quotes one still points at the right thing.
 
 | Gone | Was |
 |---|---|
+| **Difference 1** | An empty folder, file name or format moved the cursor and said nothing, so the dialog read as a button that does not work. The empty box's own hint turns red now and takes the cursor — *Choose a folder*, *Name the file*, *Choose a format*. Fixed 9 September 2026, [#251](https://github.com/mtb550/test-in/issues/251) |
+| **Difference 2** | `Enter` did nothing in the report dialog, so the tester had to press **Generate**. `Enter` generates the report now, and the status bar says so. Fixed 9 September 2026, [#252](https://github.com/mtb550/test-in/issues/252) |
+| **Difference 3** | The report button was offered on a test run still being written, so the document described a state that had already moved on. Every way of asking is gray while a run is **In Progress**, with the reason in the tooltip (Rule-REPORT-016). The row also overstated the defect: the button could never be unavailable, because it is only ever built with a run editor. Fixed 9 September 2026, [#253](https://github.com/mtb550/test-in/issues/253) |
 | **Difference 4** | A test run nobody executed printed **Execution Started** and **Execution Ended** as empty rows, because three rows went round the helper that drops a blank. Fixed 9 September 2026, [#254](https://github.com/mtb550/test-in/issues/254) |
 | **Difference 5** | The message named the format in capitals — *WORD Report Generated*. Formats read as words now, in the message and in the dialog alike. Fixed 9 September 2026, [#255](https://github.com/mtb550/test-in/issues/255) |
 | **Difference 6** | A web page opened in whatever application claimed the file when it was a report, and in the browser when it was an export. Every web page goes to the browser now. Fixed 9 September 2026, [#256](https://github.com/mtb550/test-in/issues/256) |

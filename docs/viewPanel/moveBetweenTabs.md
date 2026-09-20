@@ -49,7 +49,7 @@ marked, and its contents fill the panel.
 │    Details    | History |    Open Bugs                                   │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
-│   No history yet                                                         │
+│   No history available yet                                               │
 │                                                                          │
 └──────────────────────────────────────────────────────────────────────────┘
 ```

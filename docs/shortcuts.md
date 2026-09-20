@@ -11,6 +11,11 @@ paste, undo, redo, find, and select every value. Everything else is `Ctrl` on
 every machine, because it is Testin's own key rather than the operating
 system's.
 
+Three of Testin's own keys are the exception, and each says so where it appears:
+search is `Cmd+Alt+F` on a Mac, creating a test case is `Cmd+M`, and writing the
+automation method is `Cmd+F12`. Those three are the only ones Testin gives a Mac
+key of their own.
+
 Each module's own page carries the same keys in its **Every key, in one place**
 table; this is all of them together.
 
@@ -201,13 +206,14 @@ difference is worth knowing before rebinding one.
 
 **A key in the Keymap.** Testin declares the action to the IDE, so it appears in
 **Find Action** under its own name and in **Settings › Keymap › Plug-ins ›
-Testin**, where any key can be put on it. Thirty-four actions are declared, and
-these carry a default key:
+Testin**, where any key can be put on it. Thirty-one entries are declared: 29
+actions, and two more that each stand for a list and become one entry per
+status. Nine of them carry a default key, on seven keys:
 
 | Key | The action | Where it works |
 |---|---|---|
 | `Ctrl+Alt+F` | Search Test Project | Anywhere in the IDE |
-| `Ctrl+M` | Create Test Case | A test set editor. Create Testin Node is declared with no key - it is in Find Action and the Keymap page, so a tester who wants one can set it |
+| `Ctrl+M`, `Cmd+M` on a Mac | Create Test Case | A test set editor. Create Testin Node is declared with no key - it is in Find Action and the Keymap page, so a tester who wants one can set it |
 | `Shift+F6` | Rename Testin Node | The tree |
 | `F2` | Update Test Case, Failed Test Case Details, Edit Test Run | Both editors, the view panel, and the tree |
 | *none by default* | Copy, Cut and Paste Test Case | Both editors. Declared with no key, so Find Action offers them and a tester who wants one can set it |
@@ -226,6 +232,15 @@ does. It is kept, because it is the right key for the feature and a tester who
 does not refactor Java never meets the other one. `Ctrl+Alt+Shift+F` is free in
 the default keymap if it ever bites, and either action can be rebound in
 **Settings › Keymap**.
+
+**`F12` is also IntelliJ's Jump to Last Window.** It is kept for the same
+reason, and for one more: `Ctrl+F12` is worse, because the IDE's File Structure
+popup owns that and there is no Mac key left for it. Automate Test Case takes
+`Cmd+F12` on a Mac so that generating code is reachable by key there at all.
+
+These two are the only Testin keys the IDE already uses, and each was decided
+rather than inherited. That is difference 7 on
+[the Inside Testin page](internal/main.md#where-the-plugin-breaks-its-own-rules).
 
 **A key on its surface.** The action is still declared, so Find Action offers it
 and the Keymap lists it — with no default key, because the key belongs to the
@@ -264,9 +279,9 @@ particular thing is on screen.
 | `Escape` | The tree, the lists, the grid, the details tab | Steps back one step, and what a step is depends on the surface |
 | `Ctrl+D`, the wheel alone | Light mode | A window with its own keys, always on top |
 
-**Still to declare.** Three actions a tester can reach are not declared yet, so
+**Still to declare.** Four actions a tester can reach are not declared yet, so
 they are not in Find Action and their keys cannot be rebound: **Generate Report**
-(`Ctrl+P`), **Undo** and **Redo** (`Ctrl+Z`, `Ctrl+Y`), and **Set Status** on a
+(`Ctrl+P`), **Undo** (`Ctrl+Z`), **Redo** (`Ctrl+Y`), and **Set Status** on a
 test run. Each of them is one action shown on several surfaces with different
 things behind it, which is the part of [#119](https://github.com/mtb550/test-in/issues/119)
 that is not finished.

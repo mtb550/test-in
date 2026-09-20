@@ -70,6 +70,12 @@ There is no key for this. It starts on its own.
   stamped the first time Testin writes that marker, never changed afterwards,
   and fresh on a copied folder. Nothing in Testin reads it; it names a project,
   a set or a run for a tool outside the IDE.
+- **Rule-INTERNAL-093** — A result file Testin could not read is never written
+  over and never removed. The scan reports it and leaves it out of the run, so
+  the run covers the cases it could read; a later write touches only the results
+  the run holds, and a removal takes only the file whose case a change stopped
+  covering. A verdict nobody can read is still a verdict somebody recorded, and
+  the tester repairs the file and presses Refresh.
 
 ## The budget
 
@@ -184,9 +190,11 @@ marker yet, so Testin uses defaults and the node appears normally.
 
 **If a marker file is there but damaged** — the node still appears, with default
 values, and once the read has finished one message names every node whose
-marker would not parse. Testin never writes over that file: a test case saved
-into the test set leaves its marker exactly as it is, so the number, the status
-and who made it are still there to repair (Rule-INTERNAL-083).
+marker would not parse. Testin never writes over that file, whatever writes it:
+a test case saved into the test set, and a test run's status changed from the
+tree, both leave the marker exactly as it is. So the number, the status, who
+made it, how the run was configured and what the tester wrote about the verdicts
+are all still there to repair (Rule-INTERNAL-083).
 
 **If a folder under `Test Cases` holds no `.ts` and no `.tsp` file** — the
 folder is skipped. Everything inside it is skipped too. When it holds test
@@ -202,9 +210,16 @@ noise.
 test set. The others are read. The set is drawn one row shorter, and nothing
 says which row is missing.
 
+**If one result file cannot be read** — the run is drawn without that result,
+and once the read has finished one message names all of them. It is titled
+**Results not read in \<project\>** and it says the file names, up to five of
+them, then how many more there are. Nothing writes over a result Testin cannot
+read and nothing removes it, so the repair is to fix the file and press
+**Refresh**.
+
 **If two test case files claim the same identity** — the second one read goes
 over the first, and a notification titled **Test cases sharing an identity in
-<project>** names the files. Neither test set can reach its own case while that
+\<project\>** names the files. Neither test set can reach its own case while that
 is true: both resolve the identity to whichever file landed last, so an edit in
 one showed in the other. The file name is the identity, so the repair is to
 rename one of them - which of the two keeps it is the tester's to decide, not

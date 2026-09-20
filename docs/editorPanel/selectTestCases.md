@@ -65,7 +65,7 @@ happens, and no message appears.
 
 | The selection | What it reads |
 |---|---|
-| Nothing | *0 of 12 test cases* |
+| Nothing | *12 test cases*, the count alone |
 | One test case | Its position, then *of 12 test cases* |
 | Several | The count, then *selected of 12 test cases* |
 | Anything, with a filter on | The same, then *(filtered from 120)* |

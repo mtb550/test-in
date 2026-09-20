@@ -53,8 +53,8 @@ The whole page is drawn on [the settings page](main.md#the-page).
 | Saves a test case | Who created it, or who last changed it |
 | Records a verdict in a test run | Who ran it |
 
-The name appears on the Details popup of any node, and on the **Created By** and
-**Updated By** rows of the view panel.
+The name appears on the Details popup of any node, and on the **Created** and
+**Updated** rows of the view panel.
 
 ## Main flow
 

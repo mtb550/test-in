@@ -25,8 +25,9 @@ is genuinely undecided it is listed as undecided rather than invented.
 >
 > Moved here from Notion on 6 September 2026. Its facts are unchanged. Only the
 > wording was made plain, to [the standard](standard.md). **It has not been
-> re-checked against the product since it was written.** `main` has moved
-> **626 commits**: 985 files, 78,652 insertions, 12,408 deletions.
+> re-checked against the product since it was written.** By 20 September 2026
+> `main` had moved **866 commits**: 1,028 files, 90,147 insertions, 19,873
+> deletions.
 >
 > What is known to have changed, and is therefore not reflected below:
 >
@@ -40,6 +41,26 @@ is genuinely undecided it is listed as undecided rather than invented.
 >   live gap tracked by it. That needs re-checking.
 > - **#68 is closed.** Question 2 still calls it open.
 > - **#71 is closed.** Question 3 still calls it open.
+> - **Section 6.1's keys are wrong in three places.** Creating a node has no key
+>   of its own any more; `Ctrl+M` creates a test case and nothing else. Renaming
+>   is `Shift+F6`, not `F2`, and it is one action rather than two. `Ctrl+F` puts
+>   the cursor in an editor's own search box; searching the whole test project is
+>   `Ctrl+Alt+F`. [Every shortcut](shortcuts.md) is the current list.
+> - **The count of bound keys is from 29 August 2026.** So is every number in
+>   section 2 that rests on it.
+> - **Rule-PRODUCT-020 is no longer the whole condition.** Automation code needs
+>   the Java plugin *and* a `testin.yml` naming the open test project. Without
+>   the file, nothing is generated and Testin says so once. See Decision-013 on
+>   [the decisions page](decisions.md).
+> - **A test run's results are one file per test case now**, named by the test
+>   case, beside the run's own file. Section 4's tree is right about what exists
+>   and says nothing about the files. [The formats on disk](formats.md) is the
+>   contract.
+> - **Rule-PRODUCT-018 is not what the product does.** One keystroke carries
+>   three actions today, and it is deliberate: `F2` changes the thing in front of
+>   the tester, and which thing that is depends on where they are standing. The
+>   rule that describes it now is Rule-INTERNAL-071 on
+>   [the search page](internal/globalSearch.md).
 >
 > Nothing above has been corrected in the text below, deliberately: this is
 > Draft 1 as written. The issue that owned correcting it,

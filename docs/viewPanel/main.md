@@ -12,7 +12,7 @@ it.
 | **Answers** | What the panel shows, how a test case gets into it, and what a tester can do from it |
 | **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-082` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **Checked against** | `main` at `779fe6b4`, 7 September 2026. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. |
+| **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code. |
 | **Written to** | [How a document is written](../standard.md) |
 
 ---
@@ -148,8 +148,9 @@ in front of them while they write down what actually happened.
 4. **The identity** — the test case's own identity, with a button that copies
    it.
 5. **The title** — the test case's description.
-6. **The two buttons** — go to the automation code, and run the test case. Each
-   is drawn only where the IDE has the plugin it needs.
+6. **The two buttons** — go to the automation code, and run the test case. Both
+   are always drawn. One that cannot work here is gray, does not grow under the
+   pointer, and says what it is waiting for.
 7. **The badges** — the priority, then one for each group, then the verdict.
 8. **The run rows** — what one test run recorded. They are drawn only when the
    panel was opened from a test run.
@@ -178,19 +179,17 @@ share one panel, so a test case from the first appeared in the second.
 
 ## Where the plugin breaks its own rules
 
-Stated, not hidden. Each one is real and can be met today. None of them has a
-bug report yet.
-
-| | The rule it breaks | What a tester sees |
-|---|---|---|
-| **Difference 2** | Rule-VIEW-PANEL-004 — the tester closes the panel when they want the screen | Fixed. `Escape` is registered on the panel's three tabs, so it closes the panel from inside it as well as from the editor — including straight after `F2`, which is what puts the keyboard there. It takes the same step back as everywhere else: a pending cut first, then the panel. |
-| **Difference 11** | Rule-VIEW-PANEL-008 — the panel redraws when its test case changes | Every result a running test reports redraws the whole panel, whichever test case reported. A test run of 50 test cases rebuilds the panel 50 times, including the two tabs that never change. |
+Stated, not hidden, and there are none today. Every difference this part has
+listed is repaired. Each one is in the table below, with the date it went and
+the issue it was fixed under.
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.
 
 | Gone | Was |
 |---|---|
+| **Difference 2** | `Escape` closed the panel from the editor and did nothing inside it, so a tester who pressed `F2` — which is what puts the keyboard in the panel — could not close the panel with the key that closes everything else. `Escape` is registered on all three tabs now, and takes the same step back as everywhere else: a pending cut first, then the panel. Fixed 9 September 2026, [#226](https://github.com/mtb550/test-in/issues/226) |
+| **Difference 11** | Every result a running test reported redrew the whole panel, whichever test case reported it. A test run of 200 test cases rebuilt the panel 400 times, each rebuild walking every test run in the project for Open Bugs. The report goes through the same filtered refresh every other writer uses now, so the panel redraws only for the test case it is showing. Fixed 18 September 2026, [#66](https://github.com/mtb550/test-in/issues/66) |
 | **Difference 10** | An F2 edit that Testin could find no place to write was dropped in silence. Fixed 7 September 2026, [#234](https://github.com/mtb550/test-in/issues/234) |
 | **Difference 3** | The last step of the path looked for a test set where a test run was, and stopped with an internal error. Fixed 8 September 2026, [#227](https://github.com/mtb550/test-in/issues/227) |
 | **Difference 8** | Run captions had no colon and test case captions did, in one column. The colon was part of the caption; it belongs to the one surface that needs it, which is copied text. Fixed 9 September 2026, [#232](https://github.com/mtb550/test-in/issues/232) |

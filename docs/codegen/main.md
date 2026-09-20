@@ -13,7 +13,7 @@ test case they came from.
 | **Numbering** | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-020`. Rules are `Rule-CODEGEN-001` to `Rule-CODEGEN-082` |
 | **Retired** | `Rule-CODEGEN-015` said what `Rule-CODEGEN-046` says — the groups attribute is written only when the test case belongs to one. Retired 8 September 2026; read Rule-CODEGEN-046 instead. The number is not given to anything else |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **Checked against** | `main` at `779fe6b4`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-CODEGEN-008](runAutomation.md) were read from the code again |
+| **Checked against** | `main` at `1270e599`, 20 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
 
 ---
@@ -30,7 +30,7 @@ test case they came from.
 | **UC-CODEGEN-005** | [Ask for the method a test case never got](automateTestCase.md) | A test case that arrived as data gets the method it should have had. |
 | | **Moving between the two** | |
 | **UC-CODEGEN-006** | [Go to the code from a test case](goToCode.md) | Read or change what a test case really does. |
-| **UC-CODEGEN-007** | [Go to the test case from the code](goToTestCase.md) | See what a method is meant to prove. |
+| **UC-CODEGEN-007** | [See the test case from the code](goToTestCase.md) | See what a method is meant to prove. |
 | | **Running it** | |
 | **UC-CODEGEN-008** | [Run a test case's automation](runAutomation.md) | Run the code and have the verdict recorded. |
 | **UC-CODEGEN-009** | [Stop a running test case](stopAutomation.md) | End a run so something can be changed and tried again. |
@@ -79,7 +79,7 @@ For a test case, one method:
 ```java
 @Test(description = "Log in with a valid user",
       testName = "3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b",
-      groups = {"REGRESSION", "SMOKE"},
+      groups = {"Regression", "Smoke"},
       priority = 3)
 public void logInWithAValidUser() {
     // TODO: Auto-generated test steps for logInWithAValidUser
@@ -144,7 +144,15 @@ by name.
 ## When Testin will not generate
 
 Writing code touches two things the plugin does not own: the IDE's Java support,
-and the IDE's index.
+and the IDE's index. A third is the team's own answer to which test project this
+repository drives.
+
+**Until `testin.yml` names the open test project**, the code is off. Nothing is
+generated, renamed, moved or removed, and no gutter mark is drawn. The tester is
+told once for the code project, with the button that turns it on beside the
+message. **Save to testin.yml**, in the Testin panel's title bar, is that button
+(Rule-CODEGEN-082). Testin reads the file again on **Refresh** as well, so a
+file a colleague changed takes effect without restarting the IDE.
 
 **Without the Java plugin**, nothing is generated at all. A message says so once
 for the whole code project, and every later operation is a silent skip. That is
@@ -178,8 +186,8 @@ bug report yet.
 |---|---|---|
 | **Difference 3** | Rule-CODEGEN-001 — one test case, one method | Two test cases whose descriptions differ only in punctuation share one method, and the second gets none. It can no longer be typed: the create dialog and the update dialog both refuse such a description and say which method it would have named. It can still arrive by the doors that cannot refuse — an import, a paste, a Git merge, a sync, and the bulk description editor — and a test set that already held a clash before the refusal existed still holds it. Those no longer pass in silence: generating says which test cases got no method and why, so the tester learns it then rather than at the first `F5`. |
 | **Difference 6** | Rule-CODEGEN-004 — the tree and the code agree | Moving a test set to a place Testin has not read still leaves the class where it was — guessing a destination the tree has not read is what once moved a whole package into the default package and lost it. The tester is told now, in a notification that stays, naming the class and what to do about it. The tree and the code disagree until they act. |
-| **Difference 7** | Rule-CODEGEN-005 — a missing plugin is a skip | Fixed. **Run Test Case** declares both plugins it needs — TestNG starts the run, Java finds the method it starts — so it is gray in an IDE with only one of them, reading *(needs the Java plugin)*. The three entries are also shown in every IDE now rather than left out, which reverses what difference 66 decided: a menu that changes shape between IDEs teaches a tester nothing. |
-| **Difference 9** | Rule-CODEGEN-011 — one name for one thing | Fixed, and the row cited the wrong rule: Rule-CODEGEN-003 is about the method body. Two test sets whose names come to nothing are named after what they were called, so they no longer share `DefaultTest` — and the package fallback no longer carries a timestamp, so a node names the same package on the call that writes its code and the call that comes looking for it. |
+| **Difference 10** | Rule-CODEGEN-082 — code off means the entries are gray and say why | Two of the four gray themselves and two do not. **Automate Test Case** and **Run Tests** go gray, reading *(needs testin.yml)*. **Navigate to Test Code** and **Run Test Case** stay live: pressing either says *testin.yml does not name this test project* and does nothing. The buttons beside them on a card are gray, so the same gesture answers one way from the card and another from the menu. |
+| **Difference 11** | Rule-CODEGEN-062 — a grayed entry reads *\<entry\> (needs the Java plugin)* | The entry it names is not its own. In an IDE with no Java plugin, **Navigate to Test Code** reads *Navigate to Code (needs the Java plugin)*, because the name comes from the card button's tooltip rather than from the entry. One entry with two names, and the one the tester reads is not the one Find Action lists it under. |
 
 **Settled since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.
@@ -191,6 +199,8 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 1** | `priority` in the generated method carries the position, not the test case's priority. Not a difference: a test method's priority and a test case's priority are different things, and the case's own writes nothing into the code on purpose. Decided 7 September 2026, [#242](https://github.com/mtb550/test-in/issues/242) |
 | **Difference 8** | A removal, a move and a rename all read *Class Name Unknown* from the one place that builds a class name, because only creating one made that news. It goes to the log now, which is what Rule-CODEGEN-006 said all along. Fixed 9 September 2026, [#249](https://github.com/mtb550/test-in/issues/249) |
 | **Difference 4** | Clicking the gutter mark of a removed test case did nothing at all, and generated code outlives its test case, so that was the ordinary case rather than a rare one. It says so now, naming the method (Rule-CODEGEN-069). Rule-CODEGEN-006 is not what it broke: that rule is about what goes wrong while Testin writes code, and this is a tester's click getting no answer. Fixed 9 September 2026, [#245](https://github.com/mtb550/test-in/issues/245) |
+| **Difference 7** | In an IDE with TestNG and no Java, **Run Test Case** was still offered, no test case found a method, and nothing said the Java plugin was the reason. It declares both plugins it needs now — TestNG starts the run, Java finds the method it starts — so it is gray in an IDE with only one of them. The entries are shown in every IDE rather than left out, so a menu does not change shape between IDEs. Fixed under [#248](https://github.com/mtb550/test-in/issues/248); retired from this list 20 September 2026 |
+| **Difference 9** | Two test sets whose names came to nothing once the illegal characters were removed both wrote into one class called `DefaultTest`, so the second set's methods landed in the first set's file. Each is named after what it was called now, and the package fallback no longer carries a timestamp, so a node names the same package on the call that writes its code and the call that comes looking for it (Rule-CODEGEN-011). The row cited Rule-CODEGEN-003, which is about the method body. Fixed under [#250](https://github.com/mtb550/test-in/issues/250); retired from this list 20 September 2026 |
 
 ---
 

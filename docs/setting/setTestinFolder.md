@@ -73,7 +73,7 @@ The whole page is drawn on [the settings page](main.md#the-page).
 Every refusal keeps the window open with the message under the box, so the value
 that cannot work is never stored.
 
-**If the folder is not there** — *\<path\> is not there.*
+**If the folder is not there** — *There is no folder at \<path\>.*
 
 **If the path names a file** — *\<path\> is a file. The Testin folder has to be
 a folder, because test projects are folders inside it.*

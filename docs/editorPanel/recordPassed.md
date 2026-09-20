@@ -41,8 +41,8 @@ duration.
 - **Rule-EDITOR-PANEL-137** — A verdict recorded on the test case the walk is
   timing also records how long it took.
 - **Rule-EDITOR-PANEL-138** — Recording a pass clears the actual result, the
-  error, the bug severity, the bug priority and the bug issue link. A test case
-  that passed has nothing to explain.
+  error, the screenshots, the bug severity, the bug priority and the bug issue
+  link. A test case that passed has nothing to explain.
 - **Rule-EDITOR-PANEL-139** — The walk then moves to the next test case and
   starts timing it.
 - **Rule-EDITOR-PANEL-140** — One test case is one message. Several at once is
@@ -74,7 +74,7 @@ A small message appears at the bottom of the IDE and fades. It reads *Passed*.
 case was removed - the run keeps what it recorded.* Nothing is written.
 
 **If the test case already holds failure detail** — a confirmation opens first,
-because passing it clears four things. That is
+and names which of the six it is about to clear. That is
 [UC-EDITOR-PANEL-038](correctVerdict.md).
 
 **If a grid cell is open for editing** — the key belongs to the cell, and does
@@ -90,8 +90,9 @@ one, still saves it, and still says *Passed*. That is difference 19 on
 **An automated pass destroys a tester's notes without asking.** The confirmation
 in Rule-EDITOR-PANEL-138 is only on the keyboard path. A test case is failed and
 written up by hand. Automation re-runs it later and it passes. The actual
-result, the error, the severity and the priority all go, with no dialog. That is
-difference 26.
+result, the error, the screenshots, the severity, the priority and the bug issue
+link all go, with no dialog. A message titled *Failure detail cleared* names
+them afterwards. That is difference 26.
 
 ---
 

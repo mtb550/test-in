@@ -25,21 +25,21 @@ This opens the Java method that runs the selected test case.
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
   when `testin.yml` names that test project. Otherwise nothing is generated,
-  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
-  **Run Tests** are gray and say why, and no gutter icon or automated mark is
-  shown. **Save to testin.yml**, in the Testin panel, turns code on.
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Code**
+  and **Run Tests** are gray and say why, and no gutter icon or automated mark
+  is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-026** — The method is found by the identity in `testName`, so a
   test case that has been renamed still finds its method.
-- **Rule-CODEGEN-027** — Without the Java plugin the card and the view panel
-  draw no class button, and the menu entry stays, grayed, reading *(needs the
-  Java plugin)*.
+- **Rule-CODEGEN-027** — Without the Java plugin the class button on the card
+  and on the view panel is drawn gray, and the menu entry stays, grayed, reading
+  *(needs the Java plugin)*. Nothing is left out.
 
 ## The three ways in
 
 | The tester does this | Where |
 |---|---|
 | Presses `Shift+F5` | The list of test cases in either editor |
-| Chooses **Navigate to Code** | The menu in either editor |
+| Chooses **Navigate to Test Code** | The menu in either editor |
 | Clicks the class button | A card under the pointer, or the view panel |
 
 ## The screen
@@ -71,21 +71,25 @@ that runs this test case.
 ## What Testin refuses
 
 **If the test case has no method** — nothing opens, and Testin says *\<test
-case\> has no generated code yet*, the same sentence **Run Tests** gives.
+case\> has no generated code yet*, the same sentence running it gives.
 
-**If the IDE is still indexing** — a message reads **Waiting for indexing**, and
+**If the IDE is still indexing** — a message reads *Waiting for indexing*, and
 the jump happens when indexing finishes.
 
 **If the class cannot be found** — nothing opens, and only the log says so.
 
 **If the IDE has no Java plugin** — the menu entry is still there, grayed,
-reading *(needs the Java plugin)*, and the class button is not drawn. If it is
-reached anyway, a message titled **Java Plugin Not Available** appears. It
-appears every time, not once.
+reading *(needs the Java plugin)*, and the class button is drawn gray. It does
+not grow under the pointer, and it says the same sentence when it is hovered. If
+the jump is reached anyway, a message titled **Java Plugin Not Available**
+appears. It appears every time, not once.
 
-**If testin.yml does not name the open test project** - the menu entry is
-still there, grayed, and says *testin.yml does not name this test project. Save to testin.yml, in the Testin panel, turns code on.* The card's icon is gray and
-says the same, and pressing it says it (Rule-CODEGEN-082).
+**If testin.yml does not name the open test project** — the class button is
+drawn gray, and hovering it says *testin.yml does not name this test project.
+Save to testin.yml, in the Testin panel, turns code on.* The menu entry is not
+grayed. It stays live, and pressing it says the same sentence and opens nothing.
+That is difference 10 on
+[the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---
 

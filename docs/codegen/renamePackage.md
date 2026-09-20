@@ -26,9 +26,9 @@ There is no key for this. It happens when a package is renamed or moved.
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
   when `testin.yml` names that test project. Otherwise nothing is generated,
-  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
-  **Run Tests** are gray and say why, and no gutter icon or automated mark is
-  shown. **Save to testin.yml**, in the Testin panel, turns code on.
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Code**
+  and **Run Tests** are gray and say why, and no gutter icon or automated mark
+  is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-056** — Renaming a package renames its folder, then rewrites
   the package line in every Java file beneath it.
 - **Rule-CODEGEN-057** — Moving a package does the same, after moving the

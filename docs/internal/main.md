@@ -13,10 +13,10 @@ up here rather than left to the code.
 |---|---|
 | **Part of Testin** | The parts that belong to no panel |
 | **Answers** | What the search finds, and what Testin does with the files under the Testin folder |
-| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-008`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-092` |
+| **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-008`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-093` |
 | **Retired** | `Rule-INTERNAL-086` said the captions down the left of one dialog share one width, widened to the longest caption so none is cut off. Retired 18 September 2026, when each caption moved onto its own line above its field (#328) and there was no column left to widen; read Rule-INTERNAL-087 instead. `Rule-INTERNAL-088` said `testin.yml` is read by one class and written by none. Retired 19 September 2026, when **Save to testin.yml** became its one writer (#335); read Rule-INTERNAL-089 instead. The numbers are not given to anything else |
 | **State** | **Written** |
-| **Checked against** | `main` at `2cb8c1dc`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-INTERNAL-003](noticeOutsideChange.md) and [UC-INTERNAL-004](numberTestCase.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. On 20 September 2026, at `e6cbf4f1`, the pages the #305 file structure changed were read against the code again. |
+| **Checked against** | `main` at `1270e599`, 20 September 2026. Read again that day against the code: this page's use case table, the file-touching parts, difference 6, [UC-INTERNAL-002](readTestProject.md), [UC-INTERNAL-003](noticeOutsideChange.md), [UC-INTERNAL-007](dialogFramework.md) and [UC-INTERNAL-008](convertTestData.md). [UC-INTERNAL-001](globalSearch.md), [UC-INTERNAL-004](numberTestCase.md), [UC-INTERNAL-005](keepRemovedNode.md) and [UC-INTERNAL-006](countNodeContents.md) were last read at `e6277ddf`, 14 September 2026 |
 | **Written to** | [How a document is written](../standard.md) |
 
 ---
@@ -25,13 +25,13 @@ up here rather than left to the code.
 
 | | What the tester does | Why a tester uses it | Where its rules are |
 |---|---|---|---|
-| **UC-INTERNAL-001** | [Find anything in the test project](globalSearch.md) | Reach one test case without scrolling a big tree. | Rule-INTERNAL-001 to Rule-INTERNAL-002, Rule-INTERNAL-066, Rule-INTERNAL-068 to Rule-INTERNAL-069, Rule-INTERNAL-071 |
+| **UC-INTERNAL-001** | [Find anything in the test project](globalSearch.md) | Reach one test case without scrolling a big tree. | Rule-INTERNAL-001 to Rule-INTERNAL-002, Rule-INTERNAL-066, Rule-INTERNAL-068 to Rule-INTERNAL-069, Rule-INTERNAL-071 to Rule-INTERNAL-074 |
 | **UC-INTERNAL-002** | [Read a test project from disk](readTestProject.md) | Every panel answers at once, with no wait. | Rule-INTERNAL-003 to Rule-INTERNAL-015, Rule-INTERNAL-062, Rule-INTERNAL-070, Rule-INTERNAL-082 to Rule-INTERNAL-083, Rule-INTERNAL-089 to Rule-INTERNAL-090 |
 | **UC-INTERNAL-003** | [Pick up a change made outside the IDE](noticeOutsideChange.md) | See what a pull or a teammate changed. | Rule-INTERNAL-016 to Rule-INTERNAL-024 |
 | **UC-INTERNAL-004** | [Give a test case its number](numberTestCase.md) | Quote one number that means the same everywhere. | Rule-INTERNAL-025 to Rule-INTERNAL-035 |
 | **UC-INTERNAL-005** | [Keep a removed node so it can come back](keepRemovedNode.md) | Get back what a wrong Delete took away. | Rule-INTERNAL-036 to Rule-INTERNAL-045 |
 | **UC-INTERNAL-006** | [Count what a node holds](countNodeContents.md) | See what a node holds before removing it. | Rule-INTERNAL-046 to Rule-INTERNAL-052, Rule-INTERNAL-065 |
-| **UC-INTERNAL-007** | [Answer any Testin dialog](dialogFramework.md) | Learn one dialog and know them all. | Rule-INTERNAL-053 to Rule-INTERNAL-061, Rule-INTERNAL-067, Rule-INTERNAL-075 to Rule-INTERNAL-080 |
+| **UC-INTERNAL-007** | [Answer any Testin dialog](dialogFramework.md) | Learn one dialog and know them all. | Rule-INTERNAL-053 to Rule-INTERNAL-061, Rule-INTERNAL-067, Rule-INTERNAL-075 to Rule-INTERNAL-080, Rule-INTERNAL-085, Rule-INTERNAL-087 |
 | **UC-INTERNAL-008** | [Convert a test project to this build's file format](convertTestData.md) | Upgrade and keep working, with the files brought forward once. | Rule-INTERNAL-091, Rule-INTERNAL-092 |
 
 ---
@@ -76,10 +76,11 @@ second writer cannot be kept honest: two of them once wrote the same test run,
 the older write landed second, and the tester found their failure analysis gone
 after the next reload.
 
-Six other parts of Testin do touch files, and none of them touches test data.
+Eight other parts of Testin do touch files, and none of them touches test data.
 They write generated source code, the code repository's own settings file, the
 Git working folder, files chosen outside the Testin folder, generated reports,
-and the log.
+the settings this machine keeps, the folder a bug report is sent from, and the
+log.
 
 **A write is claimed before it happens, not after.** Testin tells itself which
 file it is about to write, then writes it. The other order looks the same and is
@@ -106,7 +107,8 @@ bug report yet.
 | **Difference 1** | Fixed. Both counts were right and answered different questions - a container is the sum of everything beneath it, and a new test run leaves retired branches out - so the count now names the other one when they differ: *40 (31 for a new test run)*. The second number comes from the very method the run form walks, not from a rule about retirement written twice (Rule-INTERNAL-065). [#274](https://github.com/mtb550/test-in/issues/274) |
 | **Difference 2** | Rule-INTERNAL-040 — one press puts back what one removal took | Fixed. The undo answers whether the whole of it came back, and the press is confirmed only when it did — so a `Ctrl+Z` that could not restore a node says that and nothing else (Rule-INTERNAL-063). 
 | **Difference 5** | Rule-INTERNAL-019 — Testin ignores its own writes for five seconds | Fixed. The five seconds still bound how long a claim is kept, but what decides is whether the file still says what Testin wrote (Rule-INTERNAL-064). A hand edit changes the content, so it is read again whenever it arrives. A write still in flight, and a delete or a rename, have no content to compare and keep the window as their whole answer. |
-| **Difference 6** | Rule-INTERNAL-053 — every dialog has the same three parts | Twenty-three dialogs are built on the shell and six are not: the test case create and update dialogs, light mode's zoom indicator and the shortcut menu. They behave the same way by hand, so each is a copy that can drift. [#69](https://github.com/mtb550/test-in/issues/69) |
+| **Difference 6** | Rule-INTERNAL-053 — every dialog has the same three parts | Thirty-four dialogs are built on the shell and three surfaces are not: light mode's zoom indicator, the button that picks which details a view shows, and the shortcut menu. Each behaves the same way by hand, so each is a copy that can drift. [#69](https://github.com/mtb550/test-in/issues/69) |
+| **Difference 7** | Rule-INTERNAL-069 — Testin never takes a default key the IDE already uses | Two of them do, and both were kept on purpose. `Ctrl+Alt+F` opens search and is also the IDE's Introduce Field, settled by where the cursor is. `F12` writes the automation method and is also the IDE's Jump to Last Window. Each was argued and written down where the key is, and neither has a bug report. A tester who meets one rebinds it in **Settings › Keymap**. [Every shortcut](../shortcuts.md) says what each competes against |
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.

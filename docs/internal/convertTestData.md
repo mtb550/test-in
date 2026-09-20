@@ -34,6 +34,11 @@ converts it while the tree is being read, and a notification titled **Test Data
 Converted** stays in the log afterwards: one line per project, saying how many
 test cases were converted and how many test runs were removed.
 
+**The IDE stays usable throughout.** The conversion runs in the background,
+beside the reading rather than in front of it, and nothing waits for it. There
+is no progress bar and no cancel button, because a conversion stopped half way
+is one the next open has to finish anyway.
+
 ## Main flow
 
 1. Testin reads the project's `.tp`. Format 2 or newer, and there is nothing to
@@ -43,15 +48,16 @@ test cases were converted and how many test runs were removed.
    projects and inactive ones. A file that will not parse keeps its own base name
    - `login.json` becomes `login.tc` - so the scan goes on reporting it.
 3. A second file claiming an id another already took keeps its content and gets
-   an id derived from the one it claimed and its own path, so two machines
-   converting the same commit give it the same one.
+   an id derived from the one it claimed and its own place in the project. The
+   place is written the same way on Windows as on Linux, so two machines
+   converting the same commit give the file the same id.
 4. Every folder Testin marked as a test run, or a run package, that holds a
    `run.json` is removed with its results and its screenshots. **The runs go**;
    nothing else under `Test Runs` is touched.
-5. Every marker that parses and has no `id` is given one, derived from its path
-   inside the project and when the folder was created - the same id on every
-   machine, so a shared project converted twice does not conflict on every
-   marker. The audit block is not touched.
+5. Every marker that parses and has no `id` is given one, derived from its place
+   in the project and when the folder was created. The place is written the same
+   way on every machine, so a shared project converted twice does not conflict
+   on every marker. The audit block is not touched.
 6. `"format": 2` goes into the `.tp`, last, and only when every step above
    succeeded.
 7. One notification says what happened, per project.
@@ -76,6 +82,12 @@ repaired it (Rule-INTERNAL-083).
 again. The tree shows the project with *Written by an older Testin. Install
 2.13.0-alpha once to convert it, then update.* where its contents would be, and
 nothing in it is read or written.
+
+**If the same failure happens again** — it is reported once, not once per try.
+A conversion that could not finish is tried again on every scan and on every
+change to the Testin folder, and a tester who has already been told about a file
+only they can repair does not need telling again. A later try that got further
+has different numbers in it, and that one is said (Rule-INTERNAL-092).
 
 **If the project was written by a newer Testin** — it is not read, and the tree
 says *Written by a newer Testin. Update the plugin to read it.* A format this

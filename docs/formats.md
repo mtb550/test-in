@@ -13,7 +13,7 @@
 | **Part of Testin** | None. This is the shape of the data, not a screen |
 | **Answers** | What is on disk, what may change, and what a version bump promises |
 | **State** | Written |
-| **Checked against** | `main` at `e6cbf4f1`, 20 September 2026 — every marker, the test case, the result and `testin.yml` read field by field against the new file structure (#305). The real tree at `Testin/NAFATH` was read at `f369f1d6`, 9 September 2026, and is still in the format this page replaced |
+| **Checked against** | `main` at `1270e599`, 20 September 2026 — every marker, the test case, the result and `testin.yml` read field by field against the new file structure (#305), and the committed sample under `samples/testin-root` read against this page. The real tree at `Testin/NAFATH` was read at `f369f1d6`, 9 September 2026, and is still in the format this page replaced |
 | **Written to** | [The standard](standard.md), as far as it applies. A format is not a use case, so it has a shape and an example instead of a flow |
 
 ---
@@ -74,7 +74,7 @@ Every marker shares the same six fields, from `AbstractMarker`, and most add a
 
 | Field | Type | Required | Meaning |
 |---|---|---|---|
-| `id` | UUID string | no, **omitted while empty** | The folder's own id. Stamped the first time Testin writes the marker and never changed after — not by a rename, a move, a status or an order change, or a merge — and fresh on a copied folder, because a copy is another folder. A marker written before ids has none and is stamped the next time anything writes it. Nothing in the plugin reads it: it names a project, a set or a run for a tool outside the IDE (Rule-INTERNAL-090) |
+| `id` | UUID string | no, **omitted while empty** | The folder's own id. Stamped the first time Testin writes the marker and never changed after — not by a rename, a move, a status or an order change, or a merge — and fresh on a copied folder, because a copy is another folder. A marker written before ids has none and is stamped the next time anything writes it. One marker writer stamps them, and it refuses to write over a marker file that is there and will not parse, so a damaged marker is left for the tester to repair rather than replaced by defaults with an id on top (Rule-INTERNAL-083). Nothing in the plugin reads the id: it names a project, a set or a run for a tool outside the IDE (Rule-INTERNAL-090) |
 | `order` | integer | no | Where the node sits among its siblings. **Omitted entirely when the node is unordered**, which is `Integer.MAX_VALUE` in memory — an absent `order` is the normal case, not a defect |
 | `createdBy` | string | no, defaults `""` | The tester's name as the settings hold it |
 | `createdAt` | date | no, defaults to now | When the directory was made |
@@ -230,6 +230,14 @@ result whose case the project no longer holds comes last - so a report prints
 them in the order a tester reads the tree, never in the order a folder listing
 happens to give.
 
+**A result file goes only when the run stops covering its case.** Unticking a
+case in Edit Test Run removes that one `.ri`, and nothing else in the folder is
+touched. A `.ri` the run in memory does not cover is left exactly where it is:
+it can be one a pull brought a moment ago, or one a failed write could not
+produce, and removing either would lose a verdict nobody asked to lose. Writing
+a verdict writes the one file it is about, so two testers judging different
+cases of one run never touch the same file.
+
 The screenshots a failure names sit in the same folder, one PNG each, named by
 five random lowercase letters and digits that no result of the run already holds
 - `k3f9a.png`. Testin writes a screenshot before the result that names it, and
@@ -315,8 +323,8 @@ written before 3 September 2026 kept its results in `<folder>.json`, and one
 written before 20 September 2026 kept them all in a `run.json`. Neither is read:
 such a run shows no results, and the conversion removes the run rather than
 carrying it forward. That is a decision, not an oversight, and
-`RunResultsSurviveRenameTest.aRunWrittenByAnOlderBuildIsNotRead` asserts it so
-it cannot be mistaken for one.
+`FormatConversionIdeTest.testAnOldProjectBecomesThisFormat` asserts it so it
+cannot be mistaken for one.
 
 **An unknown enum constant fails that file's read.** It is not defaulted,
 because a status quietly becoming `PENDING` loses a tester's decision without

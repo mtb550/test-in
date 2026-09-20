@@ -41,7 +41,7 @@ set at once, and the status bar says the same thing as a number.
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │  1  Sign in with a correct username and password   [C] [>]   │
-│     High   Regression                                        │
+│     P1   Regression                                          │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -74,7 +74,7 @@ execute much, and the filter is how a tester sees that before starting it.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  1 of 15 test cases        |<  <  1 of 1  >  >|      Automated 10 of 15  [ 50 ]  │
+│  1 of 15 test cases     |<  <  1 of 1  >  >|   Automated 10 of 15  [ 50 ]  │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 

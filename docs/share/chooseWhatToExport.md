@@ -33,6 +33,10 @@ There is no key for this. The table is in the export dialog.
 - **Rule-SHARE-020** — A correction made here changes the file, and never the
   test case itself.
 - **Rule-SHARE-021** — Moving away from a cell saves what was typed in it.
+- **Rule-SHARE-106** — A value Testin cannot read is refused. The test case keeps
+  what it had, and the tester is told once with a count — never once per row.
+  Blank is not unreadable: it clears a date and it clears the groups, and it
+  leaves the priority and the status alone, because those have no empty form.
 
 ## The screen
 
@@ -61,8 +65,9 @@ The table fills the middle of the export dialog.
 
 **Priority** is a list offering **P1**, **P2** and **P3**.
 
-**Group** opens a picker. Clicking the cell opens a window. It lists every
-group, and the test case's own groups are already selected.
+**Group** opens a picker. Clicking the cell opens a window. It lists **<No
+Group>** first, then every group this test project has used, in alphabetical
+order. The test case's own groups are already selected.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -70,17 +75,20 @@ group, and the test case's own groups are already selected.
 ├──────────────────────────────────────────────────────────────┤
 │  Group                                                       │
 │  <No Group>                                                  │
+│  Functional                                                  │
 │  Regression                                                  │
-│  Smoke                                                       │
 │  Sanity                                                      │
 │  Security                                                    │
+│  Smoke                                                       │
 │  UI                                                          │
-│  Functional                                                  │
 │  Validation                                                  │
 ├──────────────────────────────────────────────────────────────┤
 │  [k]  Enter Confirm   Ctrl+Click Add   Escape Cancel         │
 └──────────────────────────────────────────────────────────────┘
 ```
+
+A group is any word, so the list is what the test project already holds rather
+than a fixed set. Only what is on the list can be picked here.
 
 `Ctrl+Click` adds a group. `Enter` confirms and `Escape` cancels. The chosen
 groups are written back into the cell, joined by commas.
@@ -99,16 +107,17 @@ groups are written back into the cell, joined by commas.
 **If nothing is ticked on any tab** — a message titled **Export Empty** reads
 *Select at least one test case to export.*
 
-**A value Testin cannot read is not refused, it is replaced.**
+**A value Testin cannot read is refused, not replaced.**
 
 | The tester types | What is written |
 |---|---|
 | A priority Testin does not know | Refused. The row keeps the priority it had |
 | A status Testin does not know | Refused. The row keeps the status it had |
-| A group Testin does not know | Refused whole. The row keeps the groups it had |
+| A group | Read as typed. A group is any word, so none is refused |
 | A date Testin cannot read | Refused. The row keeps the date it had |
 
-All four say so, once and with a count (Rule-SHARE-106).
+A refusal is said as soon as it happens, because a correction here is one value:
+*Could not read 1 value, so what was there stayed* (Rule-SHARE-106).
 
 **If the priority or the group column cannot be found** — neither picker is
 drawn anywhere in the table. Only the log says so.

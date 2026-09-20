@@ -12,7 +12,7 @@ whole team pulls.
 | **Answers** | How test cases leave Testin and come back, and how a test project is kept in step with a team |
 | **Numbering** | Use cases are `UC-SHARE-001` to `UC-SHARE-023`. Rules are `Rule-SHARE-001` to `Rule-SHARE-118` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **Checked against** | `main` at `a53922a1`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-SHARE-009](putUnderGit.md), [UC-SHARE-010](reviewChanges.md), [UC-SHARE-011](revertOneChange.md) and [UC-SHARE-016](syncWithGit.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. On 20 September 2026, at `e6cbf4f1`, the review and the merge pages were read against the code again for the #305 file structure. |
+| **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code: the messages, the keys, the dialog titles, the button labels and the file names. |
 | **Written to** | [How a document is written](../standard.md) |
 
 ---
@@ -78,18 +78,17 @@ through Git, and where it is cloned from.
 
 | Key | What it does | The page that owns it |
 |---|---|---|
-| `Shift+Enter` | **Review Changes**, on the message about uncommitted work | [UC-SHARE-010](reviewChanges.md) |
-| `Enter` | Confirms the group picker, the Git identity, a merge answer, and a removal | The page that opens each |
-| `Escape` | Cancels every dialog in this part | Everywhere |
+| `Shift+Enter` | **Review Changes**, on the warning about uncommitted work | [UC-SHARE-010](reviewChanges.md) |
+| `Enter` | Presses the dialog's own button: **Export**, **Import**, **Commit & Push**, **Keep Selected** or **Export anyway**. The group picker and the Git identity have no button, and their line reads **Confirm** | The page that opens each |
+| `Escape` | Closes every dialog in this part. On a merge question it answers nothing and moves to the next file | Everywhere |
 | `Ctrl+Click` | Adds a group in the group picker | [UC-SHARE-003](chooseWhatToExport.md) |
 | Right click | Puts one change back, in the review | [UC-SHARE-011](revertOneChange.md) |
 
-**Nothing has a key** for: **Export**, **Import**, **Sync With Remote**, **View
-Pending Commits**, **Commit**, **Commit & Push**, and the
-**Generate**, **Export** and **Import** buttons.
+**Nothing has a key** for the menu entries: **Export**, **Import**, **Sync With
+Remote** and **View Pending Commits**.
 
-`Enter` does not confirm the export, import or review dialogs. Each has a button
-instead.
+Every dialog in this part names its keys along the bottom, so the tester reads
+which button `Enter` presses before they press it.
 
 ---
 
@@ -143,9 +142,11 @@ ignored. A heading Testin does not know is left alone.
 | Reports | No |
 | **Sync With Remote**, and everything reached from **View Pending Commits** | **Yes** |
 
-Without the Git plugin those two menu entries are simply not there, and nothing
-says why. A plugin that is installed but switched off counts as missing, and
-switching it on needs the IDE restarted before Testin notices.
+Without the Git plugin those two menu entries are still in the menu, grayed, and
+each says what it needs: *(needs the Git plugin)*. The menu has the same shape
+in every IDE, and the reason is on the entry (Rule-SHARE-105). A plugin that is
+installed but switched off counts as missing, and switching it on needs the IDE
+restarted before Testin notices.
 
 The Java plugin is needed for one thing here: an import generates test methods
 for what it brought in. Without it the test cases still import, and a message
@@ -156,15 +157,14 @@ says once that the code was not generated.
 ## Where the plugin breaks its own rules
 
 Stated, not hidden. Each one is real and can be met today. None of them has a
-bug report yet.
+bug report yet. The ones that were repaired are in the table under the retired
+rules, with the issue that repaired them.
 
 | | The rule it breaks | What a tester sees |
 |---|---|---|
-| **Difference 1** | No rule covers it — nothing in this part says a refusal must be stated | Fixed. An empty folder, file name or format now turns that box's own placeholder red and puts the cursor in it, the way every dialog on the framework already did. |
-| **Difference 12** | Rule-SHARE-005 — the same | The import bar stops between test cases now, and still says how many were written. The report bar offers **Cancel** and nothing inside asks: the four generators are handed the document to write and never the bar, so the press takes effect only once the document is finished. An export has nothing long left to stop, because it reads the tree from memory and writes one file at the end. |
-
+| **Difference 12** | Rule-SHARE-005 — long work can be canceled | The import bar stops between test cases now, and still says how many were written. The report bar offers **Cancel** and nothing inside asks: the four generators are handed the document to write and never the bar, so the press takes effect only once the document is finished. An export has nothing long left to stop, because it reads the tree from memory and writes one file at the end. |
 | **Difference 16** | Rule-SHARE-003 — the tester is told | A message can still be shown to nobody: with no status bar on the code project's window, the balloon is dropped. It is written to `testin.log` now rather than lost, so an export that finished with nobody told can be told from one that did not finish. Nothing is raised in its place — a notification about a failed notification is noise. |
-| **Difference 19** | Rule-SHARE-006 — a missing feature says so | Fixed. Both Git entries are in the menu in every IDE now, grayed and reading *(needs the Git plugin)* when it is missing, so the menu has one shape everywhere and the reason is on the entry (Rule-SHARE-105). |
+| **Difference 20** | Rule-SHARE-109 — the dialog says what was settled | A merge that settles a whole file says nothing at all. The window is what carries the settled list, and it opens only when a question is left, so a result taken whole from the later verdict, a run's marker merged by rule, and a test case whose only clash was its stamps and its position are all written with no word to the tester. The tester hears what was settled only when something else in the same file still has to be answered. |
 
 **Retired.** A use case or a rule that is gone keeps its number forever, so an
 issue that quotes one still leads somewhere and nothing is ever renumbered onto
@@ -209,6 +209,8 @@ closed up, so an issue that quotes one still points at the right thing.
 
 | Gone | Was |
 |---|---|
+| **Difference 1** | An empty folder, file name or format moved the cursor and said nothing, so the export dialog read as a button that does not work. The empty box's own hint turns red now and takes the cursor, the way every dialog on the framework already did. Fixed 9 September 2026, [#251](https://github.com/mtb550/test-in/issues/251) |
+| **Difference 19** | Both Git entries were left out of the menu when the Git plugin was missing, so the menu had a different shape in two IDEs and nothing said why. They are in the menu in every IDE now, grayed and reading *(needs the Git plugin)*, so the reason is on the entry (Rule-SHARE-105). Fixed 9 September 2026, [#273](https://github.com/mtb550/test-in/issues/273) |
 | **Difference 3** | Escape on a merge question ended the whole sync and threw away every answer already given. Fixed 7 September 2026, [#258](https://github.com/mtb550/test-in/issues/258) |
 | **Difference 4** | A merged file Git would not stage was reported only to the log. Fixed 7 September 2026, [#259](https://github.com/mtb550/test-in/issues/259) |
 | **Difference 5** | An import that failed part way left what it had written and said nothing about how much. Fixed 7 September 2026, [#260](https://github.com/mtb550/test-in/issues/260) |
@@ -229,13 +231,13 @@ closed up, so an issue that quotes one still points at the right thing.
 
 ## Not decided
 
-**Question 1** — Should an export walk the whole subtree rather than one level?
-
 **Question 2** — Should an import be able to update a test case that is already
 there, rather than always adding a new one?
 
-**Question 3** — Two fields are merged without asking. Should the tester be told
-afterwards which ones were settled for them?
+Question 1 asked whether an export should walk the whole subtree. It does
+(Rule-SHARE-013). Question 3 asked whether the tester should be told which
+fields were settled for them in a merge. They are, in the merge window
+(Rule-SHARE-109). Neither number is given to anything else.
 
 ---
 

@@ -9,7 +9,7 @@ declaration myself.
 A test case becomes a Java test method. The tester fills in what it does.
 
 There is no key for this. It happens when a test case is created, which is
-[UC-EDITOR-PANEL-006](../editorPanel/createTestCase.md).
+[UC-EDITOR-PANEL-005](../editorPanel/createTestCase.md).
 
 ## Rules
 
@@ -27,9 +27,9 @@ There is no key for this. It happens when a test case is created, which is
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
   when `testin.yml` names that test project. Otherwise nothing is generated,
-  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
-  **Run Tests** are gray and say why, and no gutter icon or automated mark is
-  shown. **Save to testin.yml**, in the Testin panel, turns code on.
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Code**
+  and **Run Tests** are gray and say why, and no gutter icon or automated mark
+  is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-012** — The method name is the description with everything but
   letters and digits removed, the first word lowercase and later words
   capitalized.
@@ -77,7 +77,7 @@ already there. A test case described as *Log in with a valid user* becomes this.
 ```java
 @Test(description = "Log in with a valid user",
       testName = "3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b",
-      groups = {"REGRESSION"},
+      groups = {"Regression"},
       priority = 1)
 public void logInWithAValidUser() {
     // TODO: Auto-generated test steps for logInWithAValidUser
@@ -111,8 +111,8 @@ has. Typing such a description is refused before the test case is created, and
 so is editing one into it, so what reaches here comes from an import, a paste,
 a Git merge or a sync.
 
-**If the code project has no Java test source folder** — a message titled **Java
-Test Source Not Found** appears, and the test case is still created.
+**If the code project has no Java test source folder** — a message titled **No
+Java Test Source Root** appears, and the test case is still created.
 
 **If the IDE has no Java plugin** — nothing is generated, and a message appears
 once for the whole code project.

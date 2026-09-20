@@ -93,7 +93,7 @@ This is how every test case in Testin begins.
 | Module | `Ctrl+M` | *set module* |
 | Steps | `Ctrl+S` | *set step*, then the number |
 | Priority | `Ctrl+P` | none, it is a list |
-| Group | `Ctrl+G` | *set group*, and it completes what the project uses |
+| Group | `Ctrl+G` | none, and it completes the groups the project uses |
 | Test Data | `Ctrl+T` | *set test data* |
 | Pre Conditions | `Ctrl+B` | *set pre conditions* |
 
@@ -165,8 +165,9 @@ the new case sat in the middle of the set at the next refresh.
 
 ## Where the plugin breaks its own rules
 
-**`Ctrl+M` is not `Cmd+M` on a Mac.** Two other keys on the same screen are
-turned into Mac keys and this one is not. That is difference 9.
+**The empty editor names a key a Mac does not have.** A test set with no test
+cases reads *Press Ctrl+M to add* on every machine, while the key itself is
+`Cmd+M` on a Mac. That is difference 9.
 
 ---
 

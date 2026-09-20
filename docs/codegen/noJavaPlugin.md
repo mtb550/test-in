@@ -26,9 +26,9 @@ Nothing starts this. It is the state of the IDE.
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
   when `testin.yml` names that test project. Otherwise nothing is generated,
-  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
-  **Run Tests** are gray and say why, and no gutter icon or automated mark is
-  shown. **Save to testin.yml**, in the Testin panel, turns code on.
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Code**
+  and **Run Tests** are gray and say why, and no gutter icon or automated mark
+  is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-061** — Test management works in full without the Java plugin.
   Only the code generation and the jumps into code are missing.
 - **Rule-CODEGEN-062** — What is missing is shown and refuses, naming the plugin
@@ -63,7 +63,9 @@ small red message appears near the bottom right of the IDE.
 | Missing | What the tester sees |
 |---|---|
 | **Automate Test Case** | On the menu, gray, reading *Automate Test Case (needs the Java plugin)* |
-| **Navigate to Code** | The same on the menu. Its icon on a card and on the view panel is drawn gray, does not grow under the pointer, and says the Java plugin is what it needs when it is hovered or pressed |
+| **Navigate to Test Code** | The same on the menu, but under a second name: the grayed entry reads *Navigate to Code (needs the Java plugin)*. That is difference 11 on [the automation code page](main.md#where-the-plugin-breaks-its-own-rules). Its icon on a card and on the view panel is drawn gray, does not grow under the pointer, and says the Java plugin is what it needs when it is hovered or pressed |
+| **Run Test Case** | On the menu, gray, reading *Run Test Case (needs the Java plugin)*. Its run icon on a card and on the view panel is drawn gray, the same way |
+| **Run Tests** | On the tree's menu, gray, reading *Run Tests (needs the Java plugin)* |
 | The gutter marks | Not drawn in any editor |
 | Every class and every method | Nothing is written, ever |
 
@@ -92,10 +94,10 @@ look for a class that has already been renamed.
 
 ## Where the plugin breaks its own rules
 
-**TestNG without Java is worse than neither.** In an IDE that has TestNG and not
-Java, **Run Test Case** is still offered. No test case then finds a method. The
-tester gets one *has no generated code yet* message for each of them, and
-nothing says the Java plugin is the reason. That is difference 7 on
+**The grayed entry is not called what the live one is called.** In an IDE with
+the Java plugin the menu reads **Navigate to Test Code**. In an IDE without it
+the same entry reads *Navigate to Code (needs the Java plugin)*, so one entry
+has two names. That is difference 11 on
 [the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---

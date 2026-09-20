@@ -61,11 +61,12 @@ with a count after it for more than one test case.
 
 ## What Testin refuses
 
-**If nothing is selected** — **Copy Node** is gray and the key does nothing.
+**If nothing is selected** — **Copy Test Case** is gray, reading *Select a test
+case first.*
 
-**In a test run editor** — **Copy Node** is gray, saying that a test run records
-what happened to a test case rather than the test case itself, and to copy it in
-its test set. Cut and Paste refuse there for the same reason
+**In a test run editor** — **Copy Test Case** is gray, reading *A test run records
+what happened to a test case, not the test case itself. Copy it in its test
+set.* **Cut Test Case** and **Paste Test Case** refuse there for the same reason
 ([Rule-EDITOR-PANEL-214](keyboardMenu.md)).
 
 **If writing to the clipboard fails** — nothing is said, and only the log

@@ -11,7 +11,7 @@ where the test data lives, and who is using it.
 | **Answers** | What every setting does, where each one is kept, and what happens when one is wrong |
 | **Numbering** | Use cases are `UC-SETTING-001` to `UC-SETTING-011`. Rules are `Rule-SETTING-001` to `Rule-SETTING-042` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **Checked against** | `main` at `779fe6b4`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-SETTING-002](setTestinFolder.md), [UC-SETTING-003](openTestinFolder.md) and this page's first row were read from the code again |
+| **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code |
 | **Written to** | [How a document is written](../standard.md) |
 
 ---

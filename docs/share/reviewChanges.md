@@ -48,6 +48,9 @@ uncommitted work.
   install.
 - **Rule-SHARE-050** — Reading Git happens off the main thread, so the IDE stays
   usable.
+- **Rule-SHARE-112** — A test run's screenshots travel with it. The review lists
+  none of them on its own, and committing the run commits the screenshots its
+  folder gained or lost.
 
 ## The screen
 
@@ -67,7 +70,7 @@ uncommitted work.
 │                                                                            │
 │                                        [ Commit & Push  v ]                │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  [k]  Right click Revert a change       Escape Cancel                      │
+│  [k]  Enter Commit & Push   Right click Revert a change   Escape Cancel     │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -76,12 +79,15 @@ uncommitted work.
 3. **Test Set** — filled for a test case, and for a result: the set its case
    sits in. Blank for a run, a marker, or any other file.
 4. **Name** — the test case's description; for a result, the description of the
-   case it is about; otherwise the file's name.
+   case it is about; for a marker, the folder it sits in; otherwise the file's
+   name.
 5. **Before** and **After** — the two values of the field that changed.
 6. **Branch** — the branch the commit goes onto. It can be typed into, and a
    name that is not a branch yet starts one.
 7. **The message box** — no label. It shows a gray hint instead.
 8. **Commit & Push** — a split button. Its arrow offers **Commit** alone.
+   `Enter` presses whichever of the two is chosen, and the bottom line names
+   it.
 
 ## Main flow
 
@@ -113,6 +119,12 @@ Git said about the file.
 
 **If Git listed a new file that is already gone** — the row is dropped. Only
 the log says so.
+
+**If the changed file is a screenshot inside a test run** — it gets no row of
+its own (Rule-SHARE-112). A screenshot only arrives or goes because a result
+started or stopped naming it, and committing that result carries it. Inside a
+test run only: a picture a tester keeps in a test set gets a row like any other
+file, so it can still be committed.
 
 **If the IDE has no Git plugin** — the menu entry is still there, grayed,
 reading *(needs the Git plugin)*, as Rule-SHARE-105 says.

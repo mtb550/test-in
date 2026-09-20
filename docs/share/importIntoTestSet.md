@@ -63,7 +63,7 @@ There is no key for this. The menu entry is **Import**.
 │                                                              │
 │                                          [ Import ]          │
 ├──────────────────────────────────────────────────────────────┤
-│  [k]  Escape Cancel                                          │
+│  [k]  Enter Import        Escape Cancel                      │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -113,7 +113,8 @@ reads *Select at least one test case to import.*
 
 **If the file is not one Testin can import** — nothing is read, and a message
 titled **Cannot Be Imported** names the file and the kinds Testin reads:
-*report.pdf is not a kind of file Testin can read. It reads .xlsx, .json, .csv.*
+*report.pdf is not a kind of file Testin can read. It reads .xls, .xlsx, .json,
+.csv.*
 
 **If the import fails part way** — a message titled **Import Failed** says how
 many test cases were written before it stopped, and that they are still there.

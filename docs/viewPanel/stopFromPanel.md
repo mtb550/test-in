@@ -68,7 +68,9 @@ gesture does not exist.
 
 **If nothing was actually stopped** — no message is raised.
 
-**If the IDE has no TestNG plugin** — the button is not drawn.
+**If the IDE has no TestNG plugin** — nothing can be running, so the stop
+button never appears. The run button stands there instead, gray, saying it
+needs the TestNG plugin.
 
 ## What the tester should expect
 

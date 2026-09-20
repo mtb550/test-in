@@ -30,9 +30,9 @@ There is no key for this. The mark is in the gutter beside the method.
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
   when `testin.yml` names that test project. Otherwise nothing is generated,
-  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
-  **Run Tests** are gray and say why, and no gutter icon or automated mark is
-  shown. **Save to testin.yml**, in the Testin panel, turns code on.
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Code**
+  and **Run Tests** are gray and say why, and no gutter icon or automated mark
+  is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-028** — The mark is drawn beside the identity inside the
   method's annotation, on the right of the gutter.
 - **Rule-CODEGEN-029** — The mark is drawn only for a TestNG test whose identity
@@ -83,13 +83,15 @@ still does not move (Rule-VIEW-PANEL-063).
 the message names the method: *logInWithAValidUser was generated from a test
 case that is gone*. It fades (Rule-CODEGEN-069).
 
-**If anything else fails** — a message titled **Error** reads *Could not find
-test case:* and then the reason.
+**If anything else fails** — a message titled **Test Case Not Opened** reads
+*Could not find test case:* and then the reason.
 
 **If the IDE has no Java plugin** — no mark is drawn anywhere.
 
-**If testin.yml does not name the open test project** - no mark is drawn
-(Rule-CODEGEN-082).
+**If testin.yml does not name the open test project** — no mark is drawn
+(Rule-CODEGEN-082). The marks come back when Testin reads the file again: after
+**Save to testin.yml**, after **Refresh** in the panel's title bar, and after
+choosing or renaming the test project the panel shows.
 
 ## Where the plugin breaks its own rules
 

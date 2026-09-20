@@ -78,7 +78,9 @@ Select several test cases, then `F2` or the field's own letter.
 │ 9    }                           │ 9    }                                  │
 │10  ]                             │10  ]                                    │
 ├──────────────────────────────────┴─────────────────────────────────────────┤
-│  [k] Enter Save   Tab Next   Ctrl+Shift+A All Carets   Escape Cancel       │
+│  [k] Enter Save   Shift+Enter Save   Tab Next   Shift+Tab Previous         │
+│      Down Next   Up Previous   Ctrl+Shift+A All Carets                     │
+│      Ctrl+Click Multi-Caret   Escape Cancel                                │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -95,8 +97,9 @@ Select several test cases, then `F2` or the field's own letter.
 Modules**, **Bulk Edit Test Data**, **Bulk Edit Pre-Conditions**, **Bulk Edit
 Steps**, **Bulk Edit Priorities**, **Bulk Edit Statuses**, **Bulk Edit Groups**.
 
-**Bulk Edit Steps** and **Bulk Edit Groups** hold lists, so they also answer
-`Ctrl+Enter` to add an item and `Shift+Delete` to drop one.
+**Bulk Edit Steps** and **Bulk Edit Groups** hold lists, so their strip carries
+two keys more: `Ctrl+Enter` **Add** to add an item and `Shift+Delete` **Remove**
+to drop one.
 
 ## Main flow
 

@@ -51,14 +51,15 @@ There is no key for this. The figures are in the status bar.
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  4 of 12 test cases   |< < 1 of 1 > >|   In Progress                       │
-│                       Passed 10 - Failed 2 - Pending 4    00:14:22  [ 50 ] │
+│                       Passed 6 · Failed 2 · Pending 4     00:14:22  [ 50 ] │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
 1. **The run status** — with the same icon the tree draws. Its tooltip reads
    *This run's status. A completed or closed run records no more verdicts*.
 2. **The figures** — one for each verdict any test case carries, each in that
-   verdict's own color. Their tooltip reads *How this run is going*.
+   verdict's own color, separated by a dot. Their tooltip reads *How this run
+   is going*.
 3. **The clock** — how long this test run has been executing. It ticks once a
    second while a test case is being timed. Its tooltip reads *Time spent
    executing this run*.

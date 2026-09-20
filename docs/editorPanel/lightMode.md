@@ -16,7 +16,7 @@ with IntelliJ minimized, and still record a verdict without switching windows.
 | **Answers for** | This one window. The rest of the editor panel is [on its own pages](main.md) |
 | **Answers** | Why this window is shaped the way it is, and what every part of it does |
 | **State** | **Written.** Built and shipped — [#13](https://github.com/mtb550/test-in/issues/13), closed |
-| **Checked against** | `main` at `347921aa`, 9 September 2026 — read class by class against the built code |
+| **Checked against** | `main` at `1270e599`, 20 September 2026 — every message, key, strip and drawn part read against the code again |
 | **Numbering** | `UC-EDITOR-PANEL-046`. Rules `Rule-EDITOR-PANEL-201` to `Rule-EDITOR-PANEL-204` say how the window moves; the rest of this page was written before the part was numbered and its statements are not numbered yet |
 
 This document describes the window as it was built.
@@ -107,7 +107,7 @@ test run is going.
 │      P Passed              F Failed              B Blocked                 │
 │  00:41                                                    00:12:41         │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  Ctrl+D Show/Hide Details  Esc Close  P Passed  F Failed  B Blocked        │
+│  Ctrl+D Show/Hide Details  Escape Close  P Passed  F Failed  B Blocked     │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -122,7 +122,7 @@ test run is going.
 │  [D] Sign in with a correct username and password                          │
 │  [E] The dashboard opens and the account name is shown in the header.      │
 │                                                                            │
-│      [ HIGH ]  [ Accounts ]                                                │
+│      [ P1 ]  [ Accounts ]                                                  │
 │      1. Open the sign-in page.                                             │
 │  [S] 2. Type the username.                                                 │
 │      3. Type the password.                                                 │
@@ -133,7 +133,7 @@ test run is going.
 │      P Passed              F Failed              B Blocked                 │
 │  00:41                                                    00:12:41         │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  Ctrl+D Show/Hide Details  Esc Close  P Passed  F Failed  B Blocked        │
+│  Ctrl+D Show/Hide Details  Escape Close  P Passed  F Failed  B Blocked     │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -242,8 +242,9 @@ being built, for the same reason the description was never on it.
 
 ### 9. Details open and close on the keyboard
 
-`Ctrl+D` shows the four remaining fields: steps, test data, pre-conditions and
-tags. `Ctrl+D` again hides them. There is no button. A control that sits on
+`Ctrl+D` shows the rest of the test case: the priority badge and a badge for
+each group, then the steps, the test data and the pre-conditions. `Ctrl+D` again
+hides them. There is no button. A control that sits on
 screen permanently, to be pressed twice a session, is wasted space. This window
 is built to have none.
 
@@ -391,13 +392,13 @@ back. A failure nobody described is a failure nobody can act on.
 │  │ paste error or exception or screenshot..                             │  │
 │  │                                                                      │  │
 │  └──────────────────────────────────────────────────────────────────────┘  │
-│   ┌────────┐x                                                             │
-│   │ picture│                                                              │
-│   └────────┘                                                              │
+│   ┌────────┐x                                                              │
+│   │ picture│                                                               │
+│   └────────┘                                                               │
 │                                                                            │
 │  00:41                                                    00:12:41         │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  Enter Save & next      Esc Cancel      Alt+Enter Corrections              │
+│  Enter Save & next      Escape Cancel      Alt+Enter Corrections           │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -426,8 +427,8 @@ offers the corrections.
 
 ### 14. Inside the window, in a box it already has
 
-There is no second dialog. `Ctrl+D` fills the details box with steps, test data,
-pre-conditions and tags. While a failure is being written, that same box holds
+There is no second dialog. `Ctrl+D` fills the details box with the badges, the
+steps, the test data and the pre-conditions. While a failure is being written, that same box holds
 these four fields instead. Nothing is added to the window, and nothing is taken
 away. One box swaps what it is showing, and so does the verdict strip below it.
 
@@ -519,8 +520,8 @@ base size.
 - the expected result and every detail are the base size
 - the test set name is two points smaller. The details are named by their
   icons, **S**, **T** and **B**, as the test case form names them, each in the
-  middle of its row's height, and the tags
-  come first with no icon, since their badges say what they are. The captions
+  middle of its row's height, and the badges
+  come first with no icon, since a badge says what it is. The captions
   on the failure form are set in the caption font, JetBrains Mono in capitals,
   as every caption in Testin is (Rule-INTERNAL-087). The icons keep their size
   when the window zooms
@@ -676,8 +677,8 @@ offer verdicts that nothing could take.
 
 [#13](https://github.com/mtb550/test-in/issues/13) asks for a control over which
 test case fields appear. The menu chooses between the things the window itself
-holds instead. The four fields behind Details stay fixed: steps, test data,
-preconditions and tags. Four switches over parts of a window cannot grow into
+holds instead. What sits behind Details stays fixed: the badges, the steps, the
+test data and the pre-conditions. Four switches over parts of a window cannot grow into
 more. A list of 18 switches over test case fields is a settings screen, inside a
 window built to have none. If the wrong four are behind Details, changing those
 four is the fix.

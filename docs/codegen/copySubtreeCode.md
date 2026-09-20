@@ -26,9 +26,9 @@ which is [UC-TREE-PANEL-014](../treePanel/copyNodes.md).
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
   when `testin.yml` names that test project. Otherwise nothing is generated,
-  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
-  **Run Tests** are gray and say why, and no gutter icon or automated mark is
-  shown. **Save to testin.yml**, in the Testin panel, turns code on.
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Code**
+  and **Run Tests** are gray and say why, and no gutter icon or automated mark
+  is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-022** — Copying a package writes the code for everything
   beneath it, at any depth, not only for the node that was dropped.
 - **Rule-CODEGEN-023** — A test set's own test cases are written before its
@@ -63,8 +63,14 @@ packages and test runs write no code, and that is not reported.
 ## What the tester should expect
 
 A copied test case is a new test case with a new identity. So it gets a method
-of its own. Its description gains the word `(Copy)`. That makes the method name
-different too, so the two never collide.
+of its own. Its description is not changed, so the copy's method has the same
+name as the original's. The two do not collide, because the copy is in the new
+class. Only pasting a test case into a test set adds `(Copy)` to its
+description, and that is
+[UC-EDITOR-PANEL-017](../editorPanel/pasteTestCases.md).
+
+The methods a copy gets are empty. The bodies the tester wrote in the originals
+do not come across.
 
 ---
 

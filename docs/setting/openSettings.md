@@ -49,7 +49,7 @@ The gear button sits on the tree panel's toolbar, near the left.
 ┌──────────────────────────────────────────────────────────────────────────┐
 │  Testin                                                                  │
 ├──────────────────────────────────────────────────────────────────────────┤
-│  [ search ] [ gear ] [ expand ] [ collapse ] [ refresh ] [ project ]     │
+│  [search] [gear] [expand] [collapse] [refresh] [select] [new] [save]     │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │   Demo                                                                   │
@@ -59,7 +59,8 @@ The gear button sits on the tree panel's toolbar, near the left.
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The toolbar** — the row of buttons at the top of the tree panel.
+1. **The toolbar** — the row of eight buttons at the top of the tree panel.
+   They are [UC-TREE-PANEL-028](../treePanel/panelToolbar.md).
 2. **The gear** — the second button. Its tooltip reads **Configure Testin
    settings**.
 3. **The tree** — under the toolbar. This gesture does not change it.
@@ -89,7 +90,14 @@ is drawn on [the settings page](main.md#the-page).
 
 ## What Testin refuses
 
-Nothing. No value on this page is checked, and pressing **Apply** never fails.
+**If the Testin folder cannot work** — **Apply** stores nothing at all, not even
+the fields that were fine. The settings window stays open with the reason under
+the box. The three messages are on
+[UC-SETTING-002](setTestinFolder.md#what-testin-refuses) (Rule-SETTING-042).
+
+**Nothing else is checked.** A tester name, a tester role and a download folder
+are stored exactly as typed. That is difference 1 on
+[the settings page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---
 

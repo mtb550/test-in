@@ -56,7 +56,7 @@ The same dialog as [UC-SHARE-001](exportTestSet.md), with more than one tab.
 │                                                              │
 │                                          [ Export ]          │
 ├──────────────────────────────────────────────────────────────┤
-│  [k]  Escape Cancel                                          │
+│  [k]  Enter Export        Escape Cancel                      │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -65,7 +65,7 @@ The same dialog as [UC-SHARE-001](exportTestSet.md), with more than one tab.
 2. **The table** — the test cases of the tab in front. Each tab keeps its own
    ticks.
 3. **File name** — one file is written, however many tabs there are.
-4. **Export** — writes the file. `Enter` does not.
+4. **Export** — writes the file. So does `Enter`.
 
 ## Main flow
 

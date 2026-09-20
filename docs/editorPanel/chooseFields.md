@@ -8,7 +8,7 @@
 A test case carries 18 fields. This is where the tester picks which ones the
 rows show.
 
-There is no key for this. The button's tooltip reads **Details**.
+There is no key for this. The button's tooltip reads **Fields**.
 
 ## Rules
 
@@ -54,8 +54,8 @@ The list opens under the button. It has no title.
 ```
 ┌──────────────────────────────┐
 │ [x] Order            (gray)  │
-│ [x] Description              │
-│ [ ] ID                       │
+│ [x] Description      (gray)  │
+│ [ ] ID               (gray)  │
 │ [x] Expected Result          │
 │ [ ] Steps                    │
 │ [x] Priority                 │
@@ -68,8 +68,8 @@ The list opens under the button. It has no title.
 1. **The list** — every field, one to a line, each with a tick box. The order is
    always the same.
 2. **A ticked box** — that field is shown, on the cards and in the grid.
-3. **Description and ID** — drawn gray. Their boxes do not answer a click or the
-   space bar.
+3. **Order, Description and ID** — drawn gray. Their boxes do not answer a click
+   or the space bar.
 4. **Every tick** — acts at once. The list stays open, so the tester can tick
    several.
 
@@ -98,7 +98,7 @@ The list opens under the button. It has no title.
 
 ## Main flow
 
-1. The tester presses the fields button on the toolbar.
+1. The tester presses the **Fields** button on the toolbar.
 2. A list of every field opens under it, each with a tick box.
 3. The tester ticks **Steps**.
 4. The cards are measured again and drawn with a steps line.
@@ -106,8 +106,8 @@ The list opens under the button. It has no title.
 
 ## What Testin refuses
 
-**If the tester tries to untick Description** — the row is gray and does not
-answer. No message is shown.
+**If the tester tries to untick Order or Description** — the row is gray and
+does not answer. No message is shown.
 
 **If the tester tries to tick ID** — the same.
 

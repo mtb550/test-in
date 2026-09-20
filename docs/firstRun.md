@@ -94,6 +94,13 @@ Demo
 Those two names are fixed. Test cases go in one, records of testing go in the
 other, and nothing else at that level is read.
 
+**Now press Save to testin.yml**, the eighth button on the same toolbar. It
+writes three lines into your repository saying that this code project is about
+`Demo`. Testin works fully without it, with one exception: the automation code
+in step 6 stays off until the file names the open test project. Press it once
+and the rest of this page works.
+[UC-TREE-PANEL-029](treePanel/saveTestinYml.md) draws what it shows first.
+
 ## 4. Create a test set
 
 A test set is a group of test cases that belong together — usually one feature.
@@ -129,9 +136,9 @@ Press `F2` on a card to change one field, or any of `D` `E` `M` `T` `B` `S` `P`
 
 ## 6. Testin has already written the Java
 
-There is nothing to press. Saving the case in step 5 wrote the method — Testin
-writes a TestNG class into your project's `src/test/java`, one `@Test` method
-per test case:
+There is nothing to press. Because `testin.yml` names `Demo`, saving the case in
+step 5 wrote the method — Testin writes a TestNG class into your project's
+`src/test/java`, one `@Test` method per test case:
 
 ```java
 @Test(description = "Log in with a valid user",
@@ -153,6 +160,12 @@ renaming the case renames the method, and removing the case removes the method
 from the class. The class itself stays.
 
 Press `Shift+F5` on a card to jump from a test case to its method.
+
+> **No method, and no class?** `testin.yml` is not naming this test project.
+> Press **Save to testin.yml** on the panel toolbar, then save the case again.
+> Testin touches automation code only where that file names the test project in
+> front of you, so one test project's methods never land in a code project that
+> is about another.
 
 ## 7. Create a test run
 

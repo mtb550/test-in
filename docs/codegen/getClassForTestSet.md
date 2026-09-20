@@ -26,9 +26,9 @@ There is no key for this. It happens when a test set is created, which is
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
   when `testin.yml` names that test project. Otherwise nothing is generated,
-  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
-  **Run Tests** are gray and say why, and no gutter icon or automated mark is
-  shown. **Save to testin.yml**, in the Testin panel, turns code on.
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Code**
+  and **Run Tests** are gray and say why, and no gutter icon or automated mark
+  is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-007** — The class is named after the test set, with everything
   but letters and digits removed, and always ends in `Test`.
 - **Rule-CODEGEN-008** — Each folder above the test set becomes a package,
@@ -61,8 +61,10 @@ public class LoginTest {
 
 No screen opens, and Testin says nothing at all. The new Java file appears in
 the Project tool window, inside the folder that holds the Java tests. Only a
-problem speaks, as a small red message near the bottom right of the IDE, and
-that message fades after about five seconds.
+problem speaks. A missing Java test source folder is a notification that stays
+in the IDE's Notifications log, said once for the code project. A missing Java
+plugin is a small red message near the bottom right that fades after about five
+seconds. Everything else goes to the log alone.
 
 ## Main flow
 
@@ -74,9 +76,11 @@ that message fades after about five seconds.
 
 ## What Testin refuses
 
-**If the code project has no Java test source folder** — a message titled
-**Java Test Source Not Found** reads *Unable to find a Java test source package
-- automation code was not generated.* The test set is still created.
+**If the code project has no Java test source folder** — a message titled **No
+Java Test Source Root** reads *This project has no Java test source folder, so
+creating test class was skipped. Test cases and test runs are read and written
+without one - only the automation code needs it.* It is said once for the code
+project. The test set is still created.
 
 **If there is no name to build a class from** — nothing is written, and only the
 log says so.
@@ -92,12 +96,6 @@ says so.
 **If the IDE has no Java plugin** — a message titled **Java Plugin Not
 Available** appears once for the whole code project. Nothing is generated after
 that, and nothing more is said.
-
-## Where the plugin breaks its own rules
-
-Two test sets whose names come to nothing when the special characters are
-removed both write into one class called `DefaultTest`. That is difference 9 on
-[the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ---
 

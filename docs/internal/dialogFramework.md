@@ -124,13 +124,18 @@ be nothing to put the cursor in.
 
 ## Where the plugin breaks its own rules
 
-**Five surfaces are not built on the shell**, against twenty-four that are: the
-test case create and update dialogs, light mode's zoom indicator, the details
-popup button and the shortcut menu. Rule-INTERNAL-053 to Rule-INTERNAL-061 do
-not reach them. They behave the same way by hand, which is the problem: each is
-a copy that can drift. That is difference 6 on
+**Three surfaces are not built on the shell**, against thirty-four that are:
+light mode's zoom indicator, the button that picks which details a view shows,
+and the shortcut menu. Rule-INTERNAL-053 to Rule-INTERNAL-061 do not reach them.
+They behave the same way by hand, which is the problem: each is a copy that can
+drift. That is difference 6 on
 [the Inside Testin page](main.md#where-the-plugin-breaks-its-own-rules), and
 [#69](https://github.com/mtb550/test-in/issues/69).
+
+**The test case create and update dialogs are built on the shell**, like every
+other. The shell owns the popup, the title, the strip, the sizing and the
+one-at-a-time rule. Each dialog owns its own sections and the keys that reach
+past the editors inside them.
 
 **The shortcut menu is the exception that keeps the promise.** It is still
 hand-built — a menu is rows and nothing else, and each row carries and prints

@@ -31,8 +31,9 @@ that opens the code from a card in the editor.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
-- **Rule-VIEW-PANEL-056** — The button is drawn only where the IDE has the Java
-  plugin.
+- **Rule-VIEW-PANEL-056** — The button is always drawn. Where it cannot work it
+  is gray, it does not grow under the pointer, the pointer stays an arrow, and
+  it says what it is waiting for. Nothing is left out (Rule-CODEGEN-062).
 - **Rule-VIEW-PANEL-057** — The button is the first of the two, before the run
   button.
 
@@ -46,34 +47,59 @@ The two buttons sit between the title and the badges.
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The first button** — this one. Its tooltip reads **Navigate to Code** and
-   names `Shift+F5`.
+1. **The first button** — this one. It names `Shift+F5`, and its shape and its
+   tooltip say what automation is there. The four answers are below.
 2. **The second button** — runs the test case. That is
    [UC-VIEW-PANEL-012](runFromPanel.md).
 3. **Either button** — grows under the pointer, and the pointer becomes a hand.
+   A button that cannot work here does neither.
+
+## What the button says
+
+The same icon and the same words as the card in the editor, which is
+[UC-EDITOR-PANEL-047](../editorPanel/seeWhatIsAutomated.md).
+
+| The tooltip reads | What it means |
+|---|---|
+| **Navigate to Code** | Testin has not read the code yet, or this IDE has no Java plugin |
+| **Automated** | The generated test method has something in it |
+| **No test method** | The test case names a method and there is none |
+| **Not automated** | There is no method, or Testin wrote one and nobody filled it in |
 
 ## Main flow
 
 1. The panel is showing a test case that has automation code.
-2. The tester clicks the first button, whose tooltip reads **Navigate to Code**.
+2. The tester clicks the first button, whose tooltip reads **Automated**.
 3. The Java file opens with the caret on the test method for this test case.
 
 ## What Testin refuses
 
-**If the IDE has no Java plugin** — the button is not drawn.
+**If the IDE has no Java plugin** — the button is gray, it does not grow under
+the pointer, and its tooltip reads *Navigate to Code (needs the Java plugin)*.
+Clicking it says the same thing.
 
-**If the action is reached without the Java plugin** — a message titled **Java
-Plugin Not Available** reads *Automation code generation and navigation require
-the Java plugin, which is not available in this IDE.*
+**If `testin.yml` does not name the open test project** — the button is gray
+the same way, and says why. **Save to testin.yml**, in the Testin panel, turns
+the code on. That is [UC-CODEGEN-019](../codegen/noJavaPlugin.md) and
+Rule-CODEGEN-082.
 
-**If the test case has no automation code** — a message titled **Nothing to
-open** reads *No automation has been generated for*, then the test case's
-description, then *yet*.
+**If the action is reached from the menu without the Java plugin** — a message
+titled **Java Plugin Not Available** reads *Automation code generation and
+navigation require the Java plugin, which is not available in this IDE.*
 
-## Where the plugin breaks its own rules
+**If the test case has no automation code** — a message reads the test case's
+description, then *has no generated code yet*. It is the same sentence running
+the test case gives, because it is the same state.
 
-**The same action has two pictures.** On a menu it is drawn as an arrow. Here,
-and on a card, it is drawn as the icon for a Java class.
+**If the IDE is still indexing** — a message reads *Waiting for indexing*, and
+the code opens once the IDE has finished.
+
+## One action, two pictures
+
+On a menu this action is drawn as an arrow. Here, and on a card, it is drawn as
+the icon for a Java class, because here the picture also has to say what
+automation is there. No rule says an action has one picture, so this is worth
+knowing rather than a difference.
 
 ---
 

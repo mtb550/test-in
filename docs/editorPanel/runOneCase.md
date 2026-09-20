@@ -57,9 +57,11 @@ or `F`.
 This opens no screen of Testin's own. The selected cards turn to running at
 once, and the IDE's own run window opens below the editor.
 
-Each result comes back on its own and its card takes the new verdict. Every one
-raises its own small message at the bottom of the IDE, reading *Passed* or
-*Failed*.
+Each result comes back on its own and its card takes the new verdict. Nothing is
+said per test case. When the last one is in, one small message appears at the
+bottom of the IDE and fades. It reads a figure for each verdict the test run now
+carries, such as *Passed 42, Failed 8*. Those are the status bar's own words, so
+the message and the bar cannot count one test run differently.
 
 ## Main flow
 
@@ -68,7 +70,9 @@ raises its own small message at the bottom of the IDE, reading *Passed* or
 3. The cards turn to running at once.
 4. The three are handed to TestNG as one configuration.
 5. A message reads *Running 3*.
-6. Each result comes back and is written into the test run.
+6. Each result comes back and is written into the test run, silently.
+7. When the last one is in, one message reads the whole test run's figures, such
+   as *Passed 42, Failed 8*.
 
 Everything about how the run is built and named is on
 [UC-CODEGEN-008](../codegen/runAutomation.md).
@@ -102,11 +106,6 @@ one path that respects a signed off test run.
 so. The others still run.
 
 ## Where the plugin breaks its own rules
-
-**One message for each test case.** An automated test run of 50 raises 50
-messages reading *Passed* or *Failed*. Every other bulk gesture in Testin raises
-one message with a count. That is difference 25 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
 
 **An automated verdict still clears the tester's notes.** A pass clears all of
 them and a failure clears what happened. Each now says so afterwards, in a

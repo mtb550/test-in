@@ -59,9 +59,8 @@ There is no key for this. The tab is called **History**.
 **Always.** The tab shows the same line whether a test case is selected or not.
 It never looks at the test case.
 
-Two fields of the test case carry part of this. **Updated By** and **Updated
-At** are on the Details tab. They say who last changed the test case, and when.
-They do not say what changed.
+One row of the Details tab carries part of this. **Updated** says who last
+changed the test case, and when. It does not say what changed.
 
 ## Not decided
 

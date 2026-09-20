@@ -36,8 +36,8 @@ There is no key for this. The button's tooltip reads **Filter**.
   reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
-- **Rule-EDITOR-PANEL-094** — Four things can be filtered on: the priority, the
-  group, the module and, in a test run, the run status.
+- **Rule-EDITOR-PANEL-094** — Five things can be filtered on: the priority, the
+  automation, the group, the module and, in a test run, the run status.
 - **Rule-EDITOR-PANEL-095** — The module list is built from the test cases in
   this test set, so it only ever offers modules that exist.
 - **Rule-EDITOR-PANEL-096** — Choosing nothing in a filter means every test case
@@ -52,20 +52,24 @@ There is no key for this. The button's tooltip reads **Filter**.
 │  Reset Filters                       │
 │  ──────────────────────────────────  │
 │  Priority                          > │
+│  Automation                        > │
 │  Group                             > │
 │  Module                            > │
 │  Status                            > │
 └──────────────────────────────────────┘
 ```
 
-1. **Reset Filters** — drawn only while a filter is on. It is
-   [UC-EDITOR-PANEL-021](clearFilters.md).
+1. **Reset Filters** — always the first entry, and gray while no filter is on. It
+   is [UC-EDITOR-PANEL-021](clearFilters.md).
 2. **Priority** — **P1**, **P2** and **P3**, each with its own color.
-3. **Group** — every group Testin knows, with **No Group** first.
+3. **Automation** — the three automation states, which is
+   [UC-EDITOR-PANEL-047](seeWhatIsAutomated.md).
+4. **Group** — every group Testin knows, with **No Group** first.
    [When that list changes](refreshEditor.md#what-completion-and-the-group-filter-offer)
    is written on the refresh page.
-4. **Module** — the modules the test cases in this test set actually carry.
-5. **Status** — the run statuses. It is on a test run only.
+5. **Module** — the modules the test cases in this test set actually carry.
+6. **Status** — the run statuses. In a test set editor the row is gray and reads
+   *Status (only a test run records one)*.
 
 While a filter is on, the button shows the count in brackets. Its tooltip
 becomes **Filter**, then the count, then **active**.

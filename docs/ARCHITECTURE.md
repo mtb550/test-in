@@ -2,7 +2,7 @@
 
 # How Testin is put together
 
-The plugin is 512 classes in 32 top-level packages. This page is the map: which
+The plugin is 542 classes in 32 top-level packages. This page is the map: which
 packages are layers and which are side modules, the four rules the whole thing
 is built on, and two operations traced class by class — because everything else
 is a variation on one of them.
@@ -102,7 +102,7 @@ now, beside `StatusBarShortcut`, which is what fills it; the interfaces are in
 `model`, beside the four enums that implement them (#111).
 
 **The packages that are small and staying that way** are small because this table
-says so. `open`, `order` and `remove` hold two files, one and one; they are
+says so. `open`, `order` and `remove` hold two files each; they are
 Gestures, and the feature each acts on is a Surface. Merging a gesture into the
 surface it acts on is this table inverted, and a short package is a smaller price
 than a layer that is drawn here and not in the tree (#110).
@@ -259,7 +259,7 @@ their `update()` reads Swing state.
 Rendering may reformat a value. Saving never does. The stored JSON is always
 byte-identical to what the tester typed.
 
-Two methods on `model/TestEditorAttributes` are the whole rule:
+Two methods on `testcase/TestEditorAttributes` are the whole rule:
 
 - `gridValue(tc)` — the raw value, for anything typed into.
 - `displayValue(tc)` — the same value with a sentence made of it where the tester
@@ -380,7 +380,7 @@ contributes to the same point, and nothing in the core changes.
 
 | | |
 |---|---|
-| What Testin does for a tester | [the documentation](README.md) — 152 use cases, every rule numbered |
+| What Testin does for a tester | [the documentation](README.md) — 150 use cases, every rule numbered |
 | Why a design that looks wrong is that way | [Standing decisions](decisions.md) |
 | Every file Testin writes, field by field | [The formats on disk](formats.md) |
 | Setup, the checks, and how to contribute | [CONTRIBUTING.md](https://github.com/mtb550/test-in/blob/main/CONTRIBUTING.md) |

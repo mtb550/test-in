@@ -54,8 +54,9 @@ This opens no screen of Testin's own. The test run's editor opens or comes to
 the front, every pending card turns to running, and the IDE's own run window
 opens below it.
 
-Results land one at a time. Each one raises its own small message at the bottom
-of the IDE, reading *Passed* or *Failed*.
+Results land one at a time, and nothing is said per test case. When the last one
+is in, one small message appears at the bottom of the IDE and fades. It reads a
+figure for each verdict the test run now carries, such as *Passed 42, Failed 8*.
 
 ## Main flow
 
@@ -64,8 +65,9 @@ of the IDE, reading *Passed* or *Failed*.
 3. Testin gathers every test case with no verdict yet.
 4. All of them are claimed by this editor.
 5. They are handed to TestNG as one configuration.
-6. Results come back one at a time and are written into the test run.
-7. When the last one lands, the test run is marked **Completed**.
+6. Results come back one at a time and are written into the test run, silently.
+7. When the last one lands, one message reads the test run's figures, such as
+   *Passed 42, Failed 8*, and the test run is marked **Completed**.
 
 ## What Testin refuses
 
@@ -83,14 +85,11 @@ test cases to run*.
 
 ## Where the plugin breaks its own rules
 
-**One message per test case.** Two hundred test cases is two hundred messages.
-That is difference 25 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
-
 **A pass clears what a tester wrote by hand.** A test case is failed and written
 up in the morning. It is re-run in the afternoon and passes. The actual result,
-the error, the severity and the priority all go, with no dialog. That is
-difference 26.
+the error, the screenshots, the severity, the priority and the bug issue link
+all go, with no dialog. A message titled *Failure detail cleared* names them
+afterwards. That is difference 26.
 
 ---
 

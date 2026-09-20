@@ -25,9 +25,9 @@ The code runs, and Testin writes down whether each test case passed.
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
   when `testin.yml` names that test project. Otherwise nothing is generated,
-  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
-  **Run Tests** are gray and say why, and no gutter icon or automated mark is
-  shown. **Save to testin.yml**, in the Testin panel, turns code on.
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Code**
+  and **Run Tests** are gray and say why, and no gutter icon or automated mark
+  is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-031** — Whatever the tester selected is one run, not one run
   for each test case.
 - **Rule-CODEGEN-032** — The method is found by the test case's identity, never
@@ -63,7 +63,7 @@ The code runs, and Testin writes down whether each test case passed.
 | Clicks the run button | A card under the pointer, or the view panel |
 
 Running everything a test run has not judged yet is different, and is
-[UC-EDITOR-PANEL-017](../editorPanel/runWholeRun.md).
+[UC-EDITOR-PANEL-044](../editorPanel/runWholeRun.md).
 
 ## What the tester sees
 
@@ -118,11 +118,15 @@ message reads *Indexing interrupted the test run. Run it again.*
 
 **If the IDE has no TestNG or no Java plugin** — the menu entry is still there,
 grayed, naming the first one missing: *(needs the Java plugin)* or *(needs the
-TestNG plugin)*. The run button is not drawn.
+TestNG plugin)*. The run button is drawn gray. It does not grow under the
+pointer, and it says the same sentence when it is hovered.
 
-**If testin.yml does not name the open test project** - the entry is still
-there, grayed, and says *testin.yml does not name this test project. Save to testin.yml, in the Testin panel, turns code on.* Nothing starts
-(Rule-CODEGEN-082).
+**If testin.yml does not name the open test project** — the run button is drawn
+gray, and hovering it says *testin.yml does not name this test project. Save to
+testin.yml, in the Testin panel, turns code on.* The menu entry is not grayed.
+It stays live, and pressing it says the same sentence and starts nothing. That
+is difference 10 on
+[the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 
 ## What the run is called
 

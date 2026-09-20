@@ -125,7 +125,6 @@ with the old value, and the message names both the text and the column:
 | A priority Testin does not know | Refused. The priority it had already, and Testin says so |
 | A status Testin does not know | Refused. The status it had already, and Testin says so |
 | A group Testin does not know | Refused whole. The groups it had already, and Testin says so |
-| A date Testin does not know | Refused. The date it had already, and Testin says so |
 | A description with characters Testin will not keep | Those characters removed |
 
 ## Where the plugin breaks its own rules

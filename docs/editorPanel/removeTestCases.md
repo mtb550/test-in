@@ -74,7 +74,12 @@ Testin asks first. The test case's file and its generated test method both go.
 
 ## What Testin refuses
 
-**If nothing is selected** — **Delete** is gray and the key does nothing.
+**If nothing is selected** — **Delete Test Case** is gray, reading *Select a
+test case first.*
+
+**In a test run editor** — **Delete Test Case** is gray, reading *A test run
+keeps what it recorded, including for a test case that is gone. Delete the test
+case in its test set.*
 
 **If the tester presses `Escape`** — nothing is removed and nothing is said.
 

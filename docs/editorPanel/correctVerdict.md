@@ -41,7 +41,8 @@ Press the right verdict's key on the test case.
 - **Rule-EDITOR-PANEL-160** — Correcting a verdict re-stamps who recorded it and
   when. The original tester and the original time are gone.
 - **Rule-EDITOR-PANEL-161** — Changing a failed test case to passed asks first,
-  because it clears five things.
+  because it clears six things: the actual result, the error, the screenshots,
+  the bug severity, the bug priority and the bug issue link.
 - **Rule-EDITOR-PANEL-162** — Only passing clears anything. Failing and blocking
   clear nothing.
 
@@ -62,7 +63,7 @@ Press the right verdict's key on the test case.
 ```
 
 1. **The title** — the verdict being recorded.
-2. **The message** — names exactly what will be cleared, from the five.
+2. **The message** — names exactly what will be cleared, from the six.
 3. **The confirm word** — the verdict, again.
 
 ## Main flow
@@ -72,7 +73,7 @@ Press the right verdict's key on the test case.
 3. The tester selects it and presses `P`.
 4. The confirmation opens, naming what will be cleared.
 5. The tester presses `Enter`.
-6. **Passed** is recorded, and the five fields are cleared.
+6. **Passed** is recorded, and everything the message named is cleared.
 7. A message reads *Passed*.
 
 ## What Testin refuses
@@ -96,8 +97,8 @@ So is anything that clearing it removed.
 
 ## Where the plugin breaks its own rules
 
-**The warning is only on this path.** An automated pass clears the same five
-fields with no dialog at all. That is difference 26 on
+**The warning is only on this path.** An automated pass clears the same six
+things with no dialog at all. That is difference 26 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
 
 ---

@@ -92,9 +92,11 @@ the same situation answered two ways, and the way out on screen only once.
 verdict is one tester's account of executing one case: the status, when they
 gave it, what they saw, the stacktrace, the screenshots and the bug they filed.
 Those travel together or they say something nobody recorded, so the later
-`executedAt` takes the file, and the tester is told the choice was made rather
-than asked about it. Two testers judging **different** cases of one run never
-conflict at all: their verdicts are in different files.
+`executedAt` takes the file and nothing is asked. Nothing is said either: the
+line naming what was settled belongs to the merge window, and that window opens
+only when a question is left. That is difference 20. Two testers judging
+**different** cases of one run never conflict at all: their verdicts are in
+different files.
 
 **A run two testers executed** — merged by rule, with nothing to answer: the run
 started when the earlier of the two says it started, ended when the later says it
@@ -140,6 +142,10 @@ true of a test case and of nothing else.
 
 Only when it happened. A field one side never touched is settled by the ordinary
 three-way rule, which is nobody's decision, and nothing is said about it.
+
+Only when the window opens, too. A file the merge settles whole leaves nothing
+to answer, so no window opens and the list is never shown. That is difference
+20.
 
 ---
 

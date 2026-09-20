@@ -23,18 +23,18 @@ edited by hand. This is how to ask.
   declaration. The body is the tester's, and Testin never touches it.
 - **Rule-CODEGEN-004** — A rename or a move happens before the tree changes,
   while the old name still finds the code.
-- **Rule-CODEGEN-071** — The entry is live where there is a method to write and
-  gray with the reason where there is not, never left off the menu — a tester
-  who cannot see it cannot learn it is there.
 - **Rule-CODEGEN-005** — Test management works without any of this. A missing
   Java plugin or a missing test folder is a skip, never a failure.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
   when `testin.yml` names that test project. Otherwise nothing is generated,
-  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
-  **Run Tests** are gray and say why, and no gutter icon or automated mark is
-  shown. **Save to testin.yml**, in the Testin panel, turns code on.
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Code**
+  and **Run Tests** are gray and say why, and no gutter icon or automated mark
+  is shown. **Save to testin.yml**, in the Testin panel, turns code on.
+- **Rule-CODEGEN-071** — The entry is live where there is a method to write and
+  gray with the reason where there is not, never left off the menu — a tester
+  who cannot see it cannot learn it is there.
 - **Rule-CODEGEN-025** — This writes the same method creating a test case
   writes: the annotation, the declaration and an empty body, in the class the
   test set belongs to, with that class and its folders written if they are not
@@ -83,21 +83,24 @@ case, so a test case needs a description before it can have one.* The method
 appears when the description is filled in, which is
 [UC-CODEGEN-003](getMissingMethod.md).
 
-**If a description cannot name a Java method** — a message titled **test cases
-have no automation method** names them and says to reword.
+**If a description cannot name a Java method** — a message titled *A test case
+has no automation method*, or *\<how many\> test cases have no automation
+method*, names up to three of them and says to reword and generate again.
 
 **If another test case already answers to that name** — the second gets no
-method, and a message says which and asks for one of the two to be reworded.
+method. The same title appears, and the message says the name is taken and to
+reword the description by a word.
 
-**If the code project has no Java test source folder** — a message titled **Java
-Test Source Not Found** appears, and nothing is written.
+**If the code project has no Java test source folder** — a message titled **No
+Java Test Source Root** appears, and nothing is written.
 
 **If the IDE has no Java plugin** — the entry is still on the menu, grayed,
 reading *(needs the Java plugin)*.
 
-**If testin.yml does not name the open test project** - the entry is still
-on the menu, grayed, reading *Automate Test Case (needs testin.yml)*, and says
-*testin.yml does not name this test project. Save to testin.yml, in the Testin panel, turns code on.* (Rule-CODEGEN-082)
+**If testin.yml does not name the open test project** — the entry is still on
+the menu, grayed, reading *Automate Test Case (needs testin.yml)*. Hovering it
+says *testin.yml does not name this test project. Save to testin.yml, in the
+Testin panel, turns code on.* (Rule-CODEGEN-082)
 
 **If the IDE is indexing** — nothing is written, and the tester is told once for
 the whole gesture rather than once per test case.

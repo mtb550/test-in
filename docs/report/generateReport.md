@@ -8,6 +8,10 @@
 This turns one test run into a file: a PDF, a Word file, a web page or a
 spreadsheet.
 
+A test run can be reported on in four of its five statuses: **Created**,
+**Assigned**, **Completed** and **Closed**. **In Progress** is the one that
+cannot.
+
 `Ctrl+P` on the selected test run.
 
 ## Rules
@@ -109,8 +113,15 @@ those characters, and a notification titled *The PDF left some text out* says
 how many texts lost characters, shows one, and says the Word and HTML reports
 keep them (Rule-REPORT-018).
 
+**If the test run is still In Progress** — every way of asking is gray: the
+toolbar button, the tree entry and `Ctrl+P`. The button's tooltip reads *A
+report is written once the run has stopped — it is In Progress*. A report is
+about what a run recorded, and a run still going is still recording
+(Rule-REPORT-016).
+
 **If the selection is not a test run** — **Generate Report** is gray in the tree
-menu. A report is about one test run, and nothing else.
+menu, and its tooltip reads *Select a test run to report on.* A report is about
+one test run, and nothing else.
 
 **If the file name is empty** — nothing is written. The file name box turns red
 and reads *Name the file*, the cursor moves into it, and the dialog stays open.
@@ -125,10 +136,10 @@ the format, *report* gives the reason under it.
 
 ## Where the plugin breaks its own rules
 
-Nothing on this dialog. Differences 1, 2 and 3 on
-[the reports page](main.md#where-the-plugin-breaks-its-own-rules) were here, and
-all three are fixed. The PDF's font, difference 8, is under *What Testin
-refuses* above.
+Nothing on this dialog. The one left in this part is the PDF's font. That is
+difference 8 on
+[the reports page](main.md#where-the-plugin-breaks-its-own-rules), and it is
+under *What Testin refuses* above.
 
 ---
 

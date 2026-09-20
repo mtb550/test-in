@@ -8,8 +8,9 @@ they said when the IDE started.
 
 Testin watches the files. When one changes, it reads that test project again.
 
-There is no key for this. It starts on its own. `Ctrl+Alt+R` does the same job
-by hand, and is on [UC-TREE-PANEL-025](../treePanel/refreshTree.md).
+There is no key for this. It starts on its own. **Refresh** at the top of the
+panel does the same job by hand, and is on
+[UC-TREE-PANEL-025](../treePanel/refreshTree.md). It has no key either.
 
 ## Rules
 
@@ -56,7 +57,8 @@ by hand, and is on [UC-TREE-PANEL-025](../treePanel/refreshTree.md).
 | The Testin folder itself | No |
 | Anything outside the Testin folder | No |
 | Anything at all, when no Testin folder is set | No |
-| What Testin itself just wrote | No, for five seconds |
+| What Testin itself just wrote, still saying what Testin wrote | No, for five seconds |
+| A file Testin just wrote, edited by hand since | Yes |
 | A code project whose panel was never opened | No |
 | `testin.yml` | No |
 
@@ -89,9 +91,15 @@ One progress bar, whatever changed and however many test projects it touched.
 
 ## What Testin refuses
 
-**If the change is Testin's own write** — it is ignored for five seconds. A
-tester who edits a file by hand within five seconds of Testin saving it is
-ignored too. **Refresh** recovers it.
+**If the change is Testin's own write** — it is ignored for five seconds, as
+long as the file still says what Testin wrote. A tester who edits the same file
+by hand inside those five seconds changes what it says, so that change is read
+again like any other (Rule-INTERNAL-064).
+
+**If the change arrives while Testin's write is still running** — it is ignored
+until the five seconds are up. There is nothing on disk yet to compare, so the
+five seconds are the whole answer. The same holds for a file Testin deleted,
+renamed or moved. **Refresh** recovers anything missed that way.
 
 **If the tester cancels** — the read stops. The tree and the editors are still
 redrawn. What was read is on screen. What was not read is still the old

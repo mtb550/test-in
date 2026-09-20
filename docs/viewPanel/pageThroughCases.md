@@ -44,7 +44,7 @@ The two arrows sit in the panel's own title bar, above the tabs.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│  Testin                                                     ( < )  ( > )   │
+│  Testin View                                                ( < )  ( > )   │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -74,11 +74,14 @@ That is every gesture except the two named in Rule-VIEW-PANEL-022.
 
 **If the panel is showing nothing** — both arrows are gray.
 
-## Where the plugin breaks its own rules
+## Why the key means two things
 
-`Ctrl+Right` means two different things in two places. In the panel it moves to
-the next test case. In an editor it turns the page. Both are on one screen, and
-only the place the keyboard is decides which one happens.
+`Ctrl+Right` is forward, in whichever surface holds the keyboard. In the panel
+forward is the next test case, because the panel shows one at a time. In an
+editor forward is the next page, because a page is what an editor holds a lot
+of. Both are on one screen, and the place the keyboard is decides which one
+happens. The key is named after the gesture rather than after what it lands on,
+so one key has one meaning and two surfaces answer it.
 
 ---
 

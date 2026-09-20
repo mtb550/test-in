@@ -68,7 +68,7 @@ There is no key that opens this. It opens during a merge.
 │                                                                            │
 │                                              [ Keep Selected ]             │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  [k]  Enter Keep Selected       Escape Cancel                              │
+│  [k]  Enter Keep Selected       Escape Skip This One                       │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -102,8 +102,9 @@ is named at the end with everything else left unresolved.
 whole value is still what gets written.
 
 **If the conflicted file is a result** — no window opens. The side whose
-`executedAt` is later takes the file whole, and the tester is told the choice was
-made rather than asked to make it. Two testers judging *different* cases of one
+`executedAt` is later takes the file whole, and nothing is asked. Nothing is
+said either, because the settled list is carried by this window and the window
+never opens. That is difference 20. Two testers judging *different* cases of one
 run never conflict at all: their verdicts are in different files.
 
 **If two testers only moved a run along** — no window opens either. The start,

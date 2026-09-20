@@ -94,7 +94,8 @@ away.
 
 ## What Testin refuses
 
-**If nothing is selected** — **Update** is gray and `F2` does nothing.
+**If nothing is selected** — **Update Test Case** is gray, reading *Select a
+test case first.*, and `F2` does nothing.
 
 **If the save changed nothing** — the dialog closes and nothing at all happens.
 
@@ -115,6 +116,9 @@ refused.
 **If several test cases are selected** — the menu title becomes **Update**, then
 the count, then **Test Cases**. Picking a field opens the bulk editor instead.
 That is [UC-EDITOR-PANEL-007](bulkEdit.md).
+
+**In a test run editor** — **Update Test Case** is gray, reading *A test run
+records verdicts, not the test case. Change the test case in its test set.*
 
 ## The dialog cannot be moved
 

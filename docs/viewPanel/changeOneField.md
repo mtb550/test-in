@@ -95,10 +95,12 @@ starts working the first time a test case is drawn.
 **If the save would change nothing** — nothing is written, no message is raised,
 and nothing goes on the undo history.
 
-## Where the plugin breaks its own rules
+## Closing the panel afterwards
 
-**`Escape` cannot close the panel afterwards.** Using `F2` needs the keyboard to
-be in the panel, and `Escape` does nothing there. That is difference 2.
+`F2` needs the keyboard to be in the panel, and it leaves it there. `Escape`
+works from there too: it closes the panel from inside a tab exactly as it does
+from the editor (Rule-VIEW-PANEL-058). That is
+[UC-VIEW-PANEL-015](closePanel.md).
 
 ---
 

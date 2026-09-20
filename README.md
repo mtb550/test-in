@@ -33,9 +33,8 @@ they exercise.
 
 ## How the data is stored
 
-Everything Testin owns is plain files under the Testin folder you configure:
-
-A folder is a node because of the marker inside it:
+Everything Testin owns is plain files under the Testin folder you configure, and
+a folder is a node because of the marker inside it:
 
 | Marker | Node |
 |---|---|
@@ -121,7 +120,7 @@ walks one test case from written to reported, in pictures.
 
 Testin has eight parts. Each part gets a folder, and every thing a tester does
 in it gets a page of its own: the story, its rules, its screens, what happens
-step by step, and every way it can be refused. 150 use cases and 738 rules, each
+step by step, and every way it can be refused. 150 use cases and 739 rules, each
 checked against the code it describes.
 
 | Document | Covers |

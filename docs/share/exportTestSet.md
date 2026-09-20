@@ -54,7 +54,7 @@ There is no key for this. The menu entry is **Export**.
 │                                                              │
 │                                          [ Export ]          │
 ├──────────────────────────────────────────────────────────────┤
-│  [k]  Escape Cancel                                          │
+│  [k]  Enter Export        Escape Cancel                      │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -63,7 +63,7 @@ There is no key for this. The menu entry is **Export**.
    ticks or unticks the whole tab.
 3. **The other columns** — the 17 fields. Every column but the number can be
    typed into. Typing changes the file, and never the test case.
-4. **Export** — writes the file. `Enter` does not.
+4. **Export** — writes the file. So does `Enter`.
 
 ## Main flow
 
@@ -90,8 +90,15 @@ test set package and the **Test Cases** folder can be exported.
 **If the tester unticks every test case** — a message titled **Export Empty**
 reads *Select at least one test case to export.* The dialog stays open.
 
-**If the folder, the file name or the format is empty** — nothing is said. The
-cursor moves and the dialog stays open.
+**If the file name is empty** — its gray hint turns red and reads *Name the
+file*, and the box takes the cursor. Nothing is written and the dialog stays
+open. The file name is checked first, so it is the box that speaks when more
+than one is empty.
+
+**If the folder is empty** — the same, reading *Choose a folder*.
+
+**If no format is chosen** — the format list takes the cursor and nothing turns
+red. A list the tester can see is not a box that looks filled in.
 
 **If the file cannot be written** — a message titled **Export Failed** carries
 the reason.

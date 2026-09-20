@@ -9,7 +9,7 @@ exist.
 Remove a test case, and its method is deleted from the class.
 
 There is no key for this. It happens when a test case is removed, which is
-[UC-EDITOR-PANEL-012](../editorPanel/removeTestCases.md).
+[UC-EDITOR-PANEL-011](../editorPanel/removeTestCases.md).
 
 ## Rules
 
@@ -27,9 +27,9 @@ There is no key for this. It happens when a test case is removed, which is
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
   when `testin.yml` names that test project. Otherwise nothing is generated,
-  renamed, moved or removed, **Automate Test Case**, **Navigate to Code** and
-  **Run Tests** are gray and say why, and no gutter icon or automated mark is
-  shown. **Save to testin.yml**, in the Testin panel, turns code on.
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Code**
+  and **Run Tests** are gray and say why, and no gutter icon or automated mark
+  is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-049** — Removing a test case deletes its method from the class.
   The class itself stays.
 - **Rule-CODEGEN-050** — A test case with no method is skipped without a word.

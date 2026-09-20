@@ -2,7 +2,7 @@
 
 # Standing decisions
 
-> Ten decisions in Testin look wrong until you know why they were made. Each
+> Thirteen decisions in Testin look wrong until you know why they were made. Each
 > one has been proposed for reversal at least once, and each reversal would have
 > broken something the decision exists to protect. They are written here so a
 > contributor reads the reason before writing the fix.
@@ -52,11 +52,14 @@ indexer, the VFS operation happens first and the cache is updated after it
 succeeds.
 
 **Consequences.** Every read is an in-memory lookup, so the tree and the panels
-answer at once. Six packages are exempt — `codegen`, `config`, `git`,
-`importexport`, `report`, `setting`, `logger` — and what they have in common is
-that none of them reads or writes test data: they handle generated source, the
-automation repository's own `testin.yml`, the Git working tree, files outside
-the tree, report output, the IDE settings path, and the log.
+answer at once. A short list of packages may open a file directly, and what they
+have in common is that none of them reads or writes test data: they handle
+generated source, the automation repository's own `testin.yml`, the Git working
+tree, files outside the tree, report output, the IDE settings path, the log, and
+the temporary folder a bug report is sent from. The list itself is in
+[ARCHITECTURE.md](ARCHITECTURE.md) and nowhere else, because
+`ArchitectureTest` enforces exactly that list and a second copy of it here would
+be the one that goes stale.
 
 **If you are about to reverse it.** Updating the cache before the VFS operation
 is the specific version of this that keeps getting written, because it reads as

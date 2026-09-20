@@ -54,7 +54,7 @@ nothing changed.
 |---|---|
 | Presses `Enter` | The cards |
 | Double-clicks a card | The cards |
-| Chooses **View Details** | Either menu |
+| Chooses **View Test Case Details** | Either menu |
 | Presses `Enter`, or double-clicks, on the number column | The grid |
 
 ## Main flow
@@ -69,7 +69,8 @@ The panel itself is a part of Testin of its own, and is
 
 ## What Testin refuses
 
-**If nothing is selected** — **View Details** is gray and `Enter` does nothing.
+**If nothing is selected** — **View Test Case Details** is gray, reading *Select
+a test case first.*, and `Enter` does nothing.
 
 **If `Enter` is pressed on any grid column but the number** — the cell opens for
 editing instead, or nothing happens.

@@ -31,8 +31,9 @@ runs a card in the editor.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
-- **Rule-VIEW-PANEL-050** — The run button is drawn only where the IDE has the
-  TestNG plugin.
+- **Rule-VIEW-PANEL-050** — The run button is always drawn. Where it cannot work
+  it is gray, it does not grow under the pointer, the pointer stays an arrow,
+  and it says what it is waiting for. Nothing is left out (Rule-CODEGEN-062).
 - **Rule-VIEW-PANEL-051** — The same place shows the run button or the stop
   button, never both.
 - **Rule-VIEW-PANEL-052** — The button grows under the pointer, so it is clear
@@ -51,7 +52,7 @@ The two buttons sit between the title and the badges.
 1. **The first button** — goes to the automation code. It is
    [UC-VIEW-PANEL-014](goToCode.md).
 2. **The second button** — runs the test case. Its tooltip reads **Run Test
-   Case** and names `F5`.
+   Case** and names `F5`. Where it cannot work the tooltip says that instead.
 
 ## Main flow
 
@@ -64,9 +65,14 @@ The two buttons sit between the title and the badges.
 
 ## What Testin refuses
 
-**If the IDE has no TestNG plugin** — the run button is not drawn. If the Java
-plugin is missing too, the button beside it is not drawn either, and the whole
-row is left out.
+**If the IDE has no TestNG plugin** — the run button is gray, it does not grow
+under the pointer, and its tooltip reads *Run Test Case (needs the TestNG
+plugin)*. Clicking it says the same thing. Running a test case needs the Java
+plugin as well, so an IDE with neither names the Java one first.
+
+**If `testin.yml` does not name the open test project** — the run button is
+gray the same way, and says why. Running a test case reaches the automation
+code, and the code is off until the file names the project (Rule-CODEGEN-082).
 
 **If the test case is already running** — the place shows the stop button
 instead. Stopping is [UC-VIEW-PANEL-013](stopFromPanel.md).

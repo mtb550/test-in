@@ -58,8 +58,7 @@ it makes the repository, and a small message reads *Git initialized*.
 carries the reason.
 
 **If the IDE has no Git plugin** — both menu entries are still there, grayed,
-each reading *(needs the Git plugin)*. That was difference 19 on
-[the sharing page](main.md#where-the-plugin-breaks-its-own-rules), now fixed.
+each reading *(needs the Git plugin)*.
 
 ## What comes next
 
