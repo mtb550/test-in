@@ -21,7 +21,9 @@
     and it must never touch the developer's real settings.
 
     Costs one full indexing pass, so expect 10-20 minutes. A deliberate sweep, not
-    a per-commit gate - .github/workflows/inspect.yml runs it every two days.
+    a per-commit gate - .github/workflows/inspect.yml runs it on every push to
+    main. It was on a two-day schedule until 2026-09-12: a calendar runs it over
+    code nobody touched and misses the push that mattered.
 
     Exits non-zero for eight findings and no others. Two are the inspector's and
     are the standing rule, a null contract the checker can prove is broken:

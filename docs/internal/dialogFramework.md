@@ -35,8 +35,11 @@ and which keys it answers, and the shell builds the rest.
   confirming key does. Clicking a row in a list, or pressing the dialog's
   button, is the same as pressing `Enter`.
 - **Rule-INTERNAL-061** — A dialog opens in the middle of the window at the size
-  its contents need. A dialog that asks for a size instead can be moved and
-  resized.
+  its contents need. Two things make one movable and resizable: asking for a size
+  in pixels, or saying it is resizable and keeping the size its contents give. The
+  second is for a dialog whose rows decide how tall it is — a details popup grows
+  with what it lists, and a fixed height would squeeze its chart out below the
+  rows.
 - **Rule-INTERNAL-067** — A dialog says why it will not take what was typed and
   stays open with the value still in the field. An empty field is marked as the
   one holding the dialog open; a value the dialog refuses for any other reason
