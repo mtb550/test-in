@@ -122,7 +122,7 @@ final class RunWriter {
     }
 
     /**
-     * UC-INTERNAL-005, Rule-INTERNAL-011.
+     * Rule-INTERNAL-011.
      * <p>
      * One file per result, {@code <test case id>.ri}, and only the ones whose
      * bytes the run's folder does not already hold - so recording one verdict
