@@ -13,7 +13,7 @@
 | **Part of Testin** | None. This is the shape of the data, not a screen |
 | **Answers** | What is on disk, what may change, and what a version bump promises |
 | **State** | Written |
-| **Checked against** | `main` at `f369f1d6`, 9 September 2026, and against a real tree at `Testin/NAFATH` |
+| **Checked against** | `main` at `e6cbf4f1`, 20 September 2026 — every marker, the test case, the result and `testin.yml` read field by field against the new file structure (#305). The real tree at `Testin/NAFATH` was read at `f369f1d6`, 9 September 2026, and is still in the format this page replaced |
 | **Written to** | [The standard](standard.md), as far as it applies. A format is not a use case, so it has a shape and an example instead of a flow |
 
 ---
@@ -67,13 +67,14 @@ exactly one of each.
 
 ## The seven markers
 
-Every marker shares the same five fields, from `AbstractMarker`, and most add a
+Every marker shares the same six fields, from `AbstractMarker`, and most add a
 `status` of their own.
 
 ### Shared by all seven
 
 | Field | Type | Required | Meaning |
 |---|---|---|---|
+| `id` | UUID string | no, **omitted while empty** | The folder's own id. Stamped the first time Testin writes the marker and never changed after — not by a rename, a move, a status or an order change, or a merge — and fresh on a copied folder, because a copy is another folder. A marker written before ids has none and is stamped the next time anything writes it. Nothing in the plugin reads it: it names a project, a set or a run for a tool outside the IDE (Rule-INTERNAL-090) |
 | `order` | integer | no | Where the node sits among its siblings. **Omitted entirely when the node is unordered**, which is `Integer.MAX_VALUE` in memory — an absent `order` is the normal case, not a defect |
 | `createdBy` | string | no, defaults `""` | The tester's name as the settings hold it |
 | `createdAt` | date | no, defaults to now | When the directory was made |
@@ -105,6 +106,7 @@ nothing else may ask in a different order.
 
 ```json
 {
+  "id" : "8c1f0f2e-6a44-4a31-9f0b-5b2a7c4e91d3",
   "createdBy" : "Sara Al-Otaibi",
   "createdAt" : "Wednesday 02-09-2026 At 23:29:16 [Asia/Riyadh]",
   "modifiedBy" : "Sara Al-Otaibi",
@@ -127,6 +129,7 @@ stopped. They are the run's, so they are in the run's own file:
 
 ```json
 {
+  "id" : "b7d3a5c1-2e48-4f6a-8d09-1c5b7e2a4f80",
   "createdBy" : "Sara Al-Otaibi",
   "createdAt" : "Sunday 13-09-2026 At 09:00:00 [Asia/Riyadh]",
   "modifiedBy" : "Sara Al-Otaibi",

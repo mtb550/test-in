@@ -206,6 +206,14 @@ silently does nothing costs more than the setting it was meant to hold.
     catches it: throwing is how the platform is told to stay open and print the
     message under the field. Catching it and notifying instead would hand the
     dialog a success it did not have, and close it over a refused value.
+  - The 20 `protected void setUp() throws Exception` and `tearDown() throws
+    Exception` overrides in the ten `*IdeTest` classes — `BasePlatformTestCase`
+    declares both that way, so an override cannot narrow them. The test framework
+    is the one owner above, and it is the right one: a fixture that failed to set
+    up or to clean up is an error about the test rather than something to report
+    to a tester, and a broad catch inside either would hide it behind whatever
+    the test then asserted. These carry no comment of their own, because the
+    `@Override` is the whole reason.
 
   Adding another is a decision, not a shortcut: it needs the same shape (a
   declaration, one owner catching above it), a comment saying which, and a

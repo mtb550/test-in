@@ -17,25 +17,22 @@
 package org.testin.git;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.Bundle;
-import org.testin.util.Display;
-import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogButton;
 import org.testin.ui.framework.RadioSelection;
 import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.function.Consumer;
-import com.intellij.util.ui.JBUI;
 
 /**
  * What two testers disagreed about in one test case, and nothing else (#90).
@@ -53,6 +50,12 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
      * and a row that wrapped over four lines would bury the choice next to it.
      */
     private static final int SHOWN = 70;
+
+    /**
+     * What separates one settled decision from the next. A newline, because the
+     * message renders one as a line break.
+     */
+    private static final @NotNull String LINE = "\n";
 
     private final @NotNull List<Merge.Question> questions;
     private final @NotNull List<RadioSelection<Boolean>> answers = new ArrayList<>();
@@ -84,7 +87,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
         if (!settled.isEmpty()) rows.add(ComponentDialogBase.message(settledSentence(settled)));
 
         for (final Merge.Question question : questions) {
-            final @NotNull ComponentDialogBase<RadioSelection<Boolean>> row = ComponentDialogBase.<Boolean>radios(label(question.field()))
+            final @NotNull ComponentDialogBase<RadioSelection<Boolean>> row = ComponentDialogBase.<Boolean>radios(FieldName.of(question.field()))
                     .option(Bundle.message("dialog.conflict.option.mine", shortened(question.mine())), Boolean.FALSE)
                     .option(Bundle.message("dialog.conflict.option.remote", shortened(question.theirs())), Boolean.TRUE)
                     .select(Boolean.FALSE)
@@ -113,35 +116,24 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
     /**
      * UC-SHARE-017, Rule-SHARE-109.
      * <p>
-     * What the merge decided without asking, named.
+     * What the merge decided without asking, listed.
      * <p>
-     * The reason comes with it, because the fields differ in why they were not
-     * a question: who changed the case last has an answer in the two timestamps
-     * and none the tester could give, and a position is not something either of
-     * them can usefully choose about a merge.
+     * Each entry arrives as a finished sentence carrying its own reason, and this
+     * only joins them. It used to name the fields and then give one explanation
+     * for the lot - the later edit and the remote's position - which fitted a test
+     * case and nothing else: a run's marker settles its status, its execution
+     * stamps and whatever the two testers wrote, and the tester was told those had
+     * been settled by a rule about positions (#305).
      */
     private static @NotNull String settledSentence(final @NotNull List<String> settled) {
-        final @NotNull List<String> named = settled.stream().map(ResolveConflictDialog::label).toList();
+        final @NotNull String lead = settled.size() == 1
+                ? Bundle.message("dialog.conflict.settled.one")
+                : Bundle.message("dialog.conflict.settled.many");
 
-        return named.size() == 1
-                ? Bundle.message("dialog.conflict.settled.one", Display.andJoin(named))
-                : Bundle.message("dialog.conflict.settled.many", Display.andJoin(named));
-    }
-
-    /**
-     * The field as the tester knows it, from the enum that already names every
-     * test case field for the editor, the details panel and the importer. A
-     * field that enum does not carry keeps its own name rather than being
-     * dropped - the merge works on the file, which may hold more than the model
-     * does.
-     */
-    private static @NotNull String label(final @NotNull String jsonField) {
-        final @NotNull String constant = jsonField.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toUpperCase(Locale.ROOT);
-
-        for (final TestEditorAttributes attribute : TestEditorAttributes.values()) {
-            if (attribute.name().equals(constant)) return attribute.getName();
-        }
-        return jsonField;
+        // One to a line, rather than joined with "and": each is a sentence with a
+        // comma in it, and three of those in one run of text is a paragraph the
+        // tester has to unpick. The message renders a line break for a newline.
+        return lead + LINE + String.join(LINE, settled);
     }
 
     // UC-SHARE-018, Rule-SHARE-083

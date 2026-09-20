@@ -16,21 +16,17 @@
 
 package org.testin.view.marker;
 
-import org.testin.testcase.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.NodeCounter;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.model.NodeFigures;
-import org.testin.model.TestRunConfiguration;
-import org.testin.model.TestRunExecution;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.markers.Marker;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogDetails;
-import org.testin.services.Services;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
@@ -77,17 +73,12 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
                 .row(TestEditorAttributes.UPDATED_AT.getName(), Display.formatDate(marker.getModifiedAt()))
                 .row(TestEditorAttributes.STATUS.getName(), marker.getStatusLabel());
 
-        // What the run has to say about its own execution, which the run file
-        // records and the marker does not. Looked up rather than copied onto the
-        // marker: two owners for one fact is one of them going stale, and the
-        // indexer holds every run in memory, so this is a lookup and not a read
-        // from disk - the property the marker was put on the node for.
-        //
         // Whatever the marker has to say about itself - for a test run, when it
         // was executed and what the tester answered when it was created, which
-        // the marker holds and answers for (#305, S15). Added without asking
-        // what kind of marker this is, the same way the status row is: a marker
-        // with nothing to add returns nothing, and a blank value is dropped.
+        // the marker holds and answers for since those facts moved into it
+        // (#305, S15). Added without asking what kind of marker this is, the same
+        // way the status row is: a marker with nothing to add returns nothing,
+        // and a blank value is dropped.
         marker.getDetailRows().forEach(extra -> details.row(extra.caption(), extra.value()));
 
         type.getCounts().forEach(count -> details.row(count.getCaption(), count.of(figures)));

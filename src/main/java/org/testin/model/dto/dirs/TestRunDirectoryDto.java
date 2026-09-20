@@ -60,10 +60,6 @@ public class TestRunDirectoryDto extends DirectoryDto {
         return !marker.getStatus().isTerminal();
     }
 
-
-
-
-
     @Override
     public @NotNull DirectoryType getType() {
         return DirectoryType.TR;
@@ -85,8 +81,9 @@ public class TestRunDirectoryDto extends DirectoryDto {
      * Short, because a tester reads it: it is the screenshot's link in the view
      * panel. Five characters give some sixty million names, so the names the run
      * already holds are the only ones worth checking. Nothing in it names the run
-     * or its folder, so a rename or a move leaves it valid - the lesson of
-     * {@link #resultsFile}.
+     * or its folder, so a rename or a move leaves it valid - which is the lesson
+     * of the run file that was named after its run, and had to be found, renamed
+     * and moved with it until #305 gave every record a name of its own.
      */
     public static @NotNull String newScreenshotName(final @NotNull Set<String> taken) {
         return Stream.generate(TestRunDirectoryDto::randomScreenshotName)
@@ -102,20 +99,16 @@ public class TestRunDirectoryDto extends DirectoryDto {
     }
 
     /**
-     * Whether a file name is one {@link #newScreenshotName} gives. Any PNG named
-     * that way in a run's folder is taken for a screenshot, so one a tester put
-     * there by hand under such a name goes when no result names it.
+     * Whether a file name is one {@link #newScreenshotName} gives - the name rule,
+     * where the names are made. <b>Whether a file is a screenshot</b> is
+     * {@code FileKind.of(file, folder)}, which also knows it counts only inside a
+     * run: any PNG named this way in a run's folder is taken for a screenshot, so
+     * one a tester put there by hand under such a name goes when no result names
+     * it, while a five-character picture beside a test set is a file like any
+     * other (#305, S29).
      */
     public static boolean isScreenshotName(final @NotNull String fileName) {
         return SCREENSHOT_NAME.matcher(fileName).matches();
-    }
-
-    /**
-     * Whether a file is a run's screenshot, by its name: what the run writer,
-     * Git and a sync ask of a path they hold.
-     */
-    public static boolean isScreenshot(final @NotNull Path file) {
-        return isScreenshotName(String.valueOf(file.getFileName()));
     }
 
     /**

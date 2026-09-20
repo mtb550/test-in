@@ -20,13 +20,13 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.JavaCode;
 import org.testin.creator.NodeCreators;
 import org.testin.remove.Removals;
-import org.testin.model.markers.AbstractMarker;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.testng.Assert.assertEquals;
@@ -54,19 +54,29 @@ public class NodeKindTablesTest {
     private static final @NotNull List<String> KINDS =
             Arrays.stream(DirectoryType.values()).map(Enum::name).collect(Collectors.toList());
 
+    /** Any id will do: what is being asked is what the name it produces is not. */
+    private static final @NotNull UUID A_CASE = UUID.fromString("11111111-1111-4111-8111-111111111101");
+
     /**
      * Rule-INTERNAL-014, Rule-INTERNAL-090. A marker file name answers with the
-     * one kind it belongs to, and each kind carries the class that reads it - so
+     * one kind it belongs to, and no two kinds share the class that reads it - so
      * a reader names the kind and nothing else.
+     * <p>
+     * The files asked about below are the ones that really arrive beside a marker
+     * now: a test case, a result, and a screenshot in a run's folder. None of them
+     * is a marker, and a kind answering for one would have the scan read a record
+     * as a folder's facts (#305).
      */
     @Test
     public void everyMarkerFileNameNamesOneKind() {
         for (final DirectoryType kind : DirectoryType.values()) {
             assertEquals(DirectoryType.byMarker(kind.getMarker()).orElseThrow(), kind, kind.getMarker());
-            assertTrue(AbstractMarker.class.isAssignableFrom(kind.getMarkerClass()), kind + " reads " + kind.getMarkerClass());
         }
 
-        assertTrue(DirectoryType.byMarker("run.json").isEmpty(), "a file that is not a marker belongs to no kind");
+        for (final String record : List.of(FileKind.TEST_CASE.fileName(A_CASE), FileKind.RUN_ITEM.fileName(A_CASE), "a1b2c.png")) {
+            assertTrue(DirectoryType.byMarker(record).isEmpty(), record + " is a record, not a marker, so it belongs to no kind");
+        }
+
         assertEquals(DirectoryType.values().length,
                 Arrays.stream(DirectoryType.values()).map(DirectoryType::getMarkerClass).distinct().count(),
                 "no two kinds share a marker class");

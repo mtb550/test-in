@@ -41,7 +41,7 @@ import java.util.List;
  *                  reported so a tester knows a choice was made on their behalf,
  *                  which is the half that was missing (#261)
  */
-public record Merge(@NotNull ObjectNode merged, @NotNull List<Question> questions, @NotNull List<String> settled) {
+record Merge(@NotNull ObjectNode merged, @NotNull List<Question> questions, @NotNull List<String> settled) {
 
     public boolean isSettled() {
         return questions.isEmpty();
@@ -67,7 +67,11 @@ public record Merge(@NotNull ObjectNode merged, @NotNull List<Question> question
         final @NotNull String key = question.field().substring(dot + 1);
         final @NotNull JsonNode value = mapper.readTree(theirs).path(object).path(key);
 
-        merged.with(object).set(key, value.deepCopy());
+        // withObjectProperty, not with: the one-argument with(String) reads its
+        // argument as a JSON Pointer when it starts with a slash, which is why
+        // Jackson deprecated it, and the plugin verifier fails the build for a
+        // deprecated platform or bundled API.
+        merged.withObjectProperty(object).set(key, value.deepCopy());
     }
 
     /**

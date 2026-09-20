@@ -115,11 +115,14 @@ public final class StartupActivity implements ProjectActivity {
         }
 
         if (TestinRoot.isConfigured(testinPath)) {
-            // UC-INTERNAL-008, Rule-INTERNAL-091. Every project in the Testin folder,
-        // not only the one this repository is about: one left unconverted would be
-        // refused by the release that deletes the converter (#305, D9).
-        Services.getInstance(p, ProjectIndexer.class).convertEveryProject();
-        Services.getInstance(p, ProjectIndexer.class).indexWithProgress();
+            // UC-INTERNAL-008, Rule-INTERNAL-091. Every project in the Testin
+            // folder, not only the one this repository is about: one left
+            // unconverted would be refused by the release that deletes the
+            // converter (#305, D9). It runs on a pooled thread of its own, so
+            // neither this nor the index below waits for it.
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            indexer.convertEveryProject();
+            indexer.indexWithProgress();
         }
 
         TestCaseExecutionTracker.initGlobalListener(p);

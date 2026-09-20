@@ -22,7 +22,6 @@ import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.TestRunDto;
 import org.testng.annotations.Test;
 
 import java.time.ZoneId;

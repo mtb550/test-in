@@ -23,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.model.markers.TestSetMarker;
@@ -168,12 +167,13 @@ public class SampleProjectTest {
      * The runs parse, and each is where the plugin will look for it.
      * <p>
      * The folders are found by their marker and the results by
-     * {@link TestRunDirectoryDto#resultsFile}, so this asks where a run's results
-     * live rather than repeating the answer - repeating it is what lost them.
-     * The name used to be the folder's own, so renaming a cycle moved the folder
-     * and left the results behind, emptying the run at the next index (#177). A
-     * sample folder still carrying a {@code <name>.tc} is one this rename never
-     * reached.
+     * {@link FileKind#RUN_ITEM}, so this asks what a file is rather than repeating
+     * the answer - repeating it is what lost them. A run's results used to be one
+     * file named after the folder, so renaming a cycle moved the folder and left
+     * them behind, emptying the run at the next index (#177); they are one
+     * {@code <test case id>.ri} per case now, named by what they are about and by
+     * nothing the rename touches (#305). A sample folder still carrying a
+     * {@code <name>.json} is one this change never reached.
      */
     @Test
     public void everyRunParsesAndItsResultsNameCasesThatExist() {

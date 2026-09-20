@@ -23,11 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
+import org.testin.util.TestDataParser;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Merges the three versions Git keeps of one case's result (#305, Q-E).
@@ -40,14 +39,17 @@ import java.util.Locale;
  * <p>
  * So this asks nothing. The side whose {@code executedAt} is later is the side
  * kept, and the tester is told a choice was made, which is what
- * {@link Merge#settled} is for. Two testers judging different cases never reach
+ * {@link Merge#settled} is for. Neither side later means neither side executed
+ * it - two pending rows differing by an actual result somebody typed, a bug they
+ * linked, a screenshot they pasted - and there is no verdict to prefer, so this
+ * machine's stays, reported like any other choice made on the tester's behalf.
+ * <p>
+ * Two testers judging different cases never reach
  * here at all: their verdicts are in different files now, which is the reason
  * this story exists.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class RunItemMerge {
-
-    private static final @NotNull DateTimeFormatter WRITTEN = DateTimeFormatter.ofPattern(Config.DATE_FORMAT_PATTERN, Locale.US);
+final class RunItemMerge {
 
     private static final @NotNull String EXECUTED_AT = "executedAt";
 
@@ -76,15 +78,13 @@ public final class RunItemMerge {
      * When the verdict was given, and the epoch for a result nobody executed -
      * which is what a pending result carries, and what a file written by
      * something else may leave out entirely.
+     * <p>
+     * Through the one reader of a written date, which also forgives a weekday
+     * somebody edited by hand: java.time refuses the whole string when the
+     * weekday and the date disagree, and a date this could not read would read as
+     * "never executed" and lose the later verdict.
      */
     private static @NotNull ZonedDateTime executedAt(final @NotNull ObjectNode item) {
-        final @NotNull String written = item.path(EXECUTED_AT).asText("");
-        if (written.isBlank()) return Config.NOT_EXECUTED;
-
-        try {
-            return ZonedDateTime.parse(written, WRITTEN);
-        } catch (final RuntimeException notADate) {
-            return Config.NOT_EXECUTED;
-        }
+        return TestDataParser.date(item.path(EXECUTED_AT).asText("")).orElse(Config.NOT_EXECUTED);
     }
 }

@@ -19,11 +19,12 @@ package org.testin.indexer;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import java.io.IOException;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
+import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -36,6 +37,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
@@ -49,13 +51,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.testin.model.FileKind;
-import org.testin.model.TestRunItems;
-import org.testin.model.markers.TestProjectMarker;
-import org.testin.testcase.TestCaseOrder;
 
 @AllArgsConstructor
 final class IndexingScanner {
@@ -400,19 +398,6 @@ final class IndexingScanner {
     }
 
     /**
-     * UC-INTERNAL-002, Rule-INTERNAL-014.
-     * <p>
-     * A marker that is there and will not parse leaves its node drawn with
-     * default values: its number, its status and who made it are not what the
-     * file says, and nothing about the node on screen shows it. One thing that
-     * cannot be read never stops the rest, which is why the node is still drawn -
-     * but a node quietly wrong is worse than one that says so (#277).
-     * <p>
-     * One notification for the project, like the folders above, and it stays in
-     * the list rather than fading: a marker is repaired by hand, and the tester
-     * needs the names after the balloon would have gone.
-     */
-    /**
      * UC-INTERNAL-002, Rule-INTERNAL-011.
      * <p>
      * The results that would not parse, once for the project rather than once per
@@ -435,6 +420,19 @@ final class IndexingScanner {
                 Bundle.message("indexer.results.unread.message", count, named, rest));
     }
 
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-014.
+     * <p>
+     * A marker that is there and will not parse leaves its node drawn with
+     * default values: its number, its status and who made it are not what the
+     * file says, and nothing about the node on screen shows it. One thing that
+     * cannot be read never stops the rest, which is why the node is still drawn -
+     * but a node quietly wrong is worse than one that says so (#277).
+     * <p>
+     * One notification for the project, like the folders above, and it stays in
+     * the list rather than fading: a marker is repaired by hand, and the tester
+     * needs the names after the balloon would have gone.
+     */
     private void reportDamaged(final @NotNull String projectName, final @NotNull List<String> damaged) {
         if (damaged.isEmpty()) return;
 
@@ -550,20 +548,18 @@ final class IndexingScanner {
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
         final @NotNull List<TestRunItems> read = new ArrayList<>();
 
-        try (Stream<Path> files = Files.list(runPath)) {
-            for (final Path file : files.filter(file -> FileKind.of(file) == FileKind.RUN_ITEM).toList()) {
-                try {
-                    final @NotNull TestRunItems item = mapper.readValue(file.toFile(), TestRunItems.class);
-                    FileKind.RUN_ITEM.idIn(file).ifPresent(item::setId);
-                    read.add(item);
+        // Which files in the folder are results is the file owner's answer, not a
+        // second listing here: one filter, one failure to report (#305).
+        for (final Path file : Services.getInstance(p, TestDataFiles.class).resultsIn(runPath)) {
+            try {
+                final @NotNull TestRunItems item = mapper.readValue(file.toFile(), TestRunItems.class);
+                FileKind.RUN_ITEM.idIn(file).ifPresent(item::setId);
+                read.add(item);
 
-                } catch (final Exception ex) {
-                    Logger.error("Failed to read the result '" + file.toAbsolutePath() + "': " + ex.getMessage());
-                    scanned.getUnreadableResults().add(runPath.getFileName() + "/" + file.getFileName());
-                }
+            } catch (final Exception ex) {
+                Logger.error("Failed to read the result '" + file.toAbsolutePath() + "': " + ex.getMessage());
+                scanned.getUnreadableResults().add(runPath.getFileName() + "/" + file.getFileName());
             }
-        } catch (final IOException ex) {
-            Logger.error("Could not list the results of '" + runPath.getFileName() + "': " + ex.getMessage());
         }
 
         return inCaseOrder(read, scanned);

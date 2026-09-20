@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -142,6 +143,112 @@ public class FormatConversionIdeTest extends BasePlatformTestCase {
     }
 
     /**
+     * Rule-INTERNAL-082, Rule-INTERNAL-091, S1. Two files claiming one id: the
+     * first path alphabetically keeps it and the second takes one derived from
+     * the id it claimed and its own path inside the project.
+     * <p>
+     * Derived rather than drawn at random, and this is the branch that says so:
+     * the whole folder converts to the same names on both clones, so two testers
+     * who convert the same commit have nothing to conflict over. A random id
+     * would pass every other assertion here and produce a conflict on every
+     * converted case (#288).
+     */
+    public void testTwoFilesClaimingOneIdConvertTheSameWayOnBothMachines() {
+        final Path mine = withACopiedCase(anOldProject());
+        final Path theirs = withACopiedCase(anOldProject("NAFATH-clone"));
+
+        convert(mine);
+        convert(theirs);
+
+        final Path mySet = mine.resolve("Test Cases").resolve("Login");
+        final Path theirSet = theirs.resolve("Test Cases").resolve("Login");
+
+        assertEquals("the same folder converted on two machines has to end up holding the same file names,"
+                        + " or every converted case is a conflict", namesIn(mySet), namesIn(theirSet));
+
+        assertTrue("the file that claimed the id first kept it",
+                Files.isRegularFile(mySet.resolve(FileKind.TEST_CASE.fileName(NAMED_CASE))));
+        assertEquals("the copy went over the case it claimed instead of becoming a case of its own",
+                4, namesIn(mySet).stream().filter(name -> name.endsWith(".tc")).count());
+    }
+
+    /**
+     * Rule-INTERNAL-091, S3. A {@code .tp} that is there and will not parse:
+     * nothing in the project is touched.
+     * <p>
+     * The conversion is all or nothing on purpose - a project whose own marker
+     * cannot be read is one where the format number cannot be written either, so
+     * moving its files would leave a half-converted project that says it is in
+     * the old format. Which file to repair is the notification's to say.
+     */
+    public void testAProjectMarkerThatWillNotParseLeavesEverythingAlone() {
+        final Path project = anOldProject();
+        final String damaged = "{ \"status\" : ";
+        write(project.resolve(DirectoryType.TP.getMarker()), damaged);
+
+        convert(project);
+
+        assertTrue("a test case was converted although the project's own marker could not be read",
+                Files.isRegularFile(project.resolve("Test Cases").resolve("Login").resolve(NAMED_CASE + ".json")));
+        assertTrue("the old-format run was removed although the project's own marker could not be read",
+                Files.isDirectory(project.resolve("Test Runs").resolve("Cycle-1")));
+        assertEquals("the damaged marker was written over, which would replace it with defaults",
+                damaged, read(project.resolve(DirectoryType.TP.getMarker())));
+    }
+
+    /**
+     * D4, S2. A folder under Test Runs that Testin did not write is left where it
+     * is, whatever it holds.
+     * <p>
+     * The converter removes what it recognizes rather than what it finds: a run
+     * is a folder Testin marked as one, and a tester's own folder of notes is not
+     * test data to be wiped because it happens to hold a file of that name.
+     */
+    public void testAFolderTestinDidNotWriteIsNotRemoved() {
+        final Path project = anOldProject();
+        final Path notes = project.resolve("Test Runs").resolve("Notes from the cycle");
+        write(notes.resolve("run.json"), AN_OLD_RUN);
+
+        convert(project);
+
+        assertTrue("a folder under Test Runs with no marker was removed, and it was never Testin's to remove",
+                Files.isRegularFile(notes.resolve("run.json")));
+        assertFalse("and the run Testin did write is still there", Files.exists(project.resolve("Test Runs").resolve("Cycle-1")));
+    }
+
+    /**
+     * D4, S13. A conversion that could not finish leaves the format number out,
+     * so the next open tries again.
+     * <p>
+     * The number is written last and only when every step succeeded. Stamping it
+     * over a half-converted project is the one outcome there is no way back from:
+     * 2.14.0-alpha deletes the converter, and a project that says it is already
+     * in this format is never offered to it again.
+     */
+    public void testAConversionThatCouldNotFinishIsTriedAgain() {
+        final Path project = anOldProject();
+        final Path set = project.resolve("Test Cases").resolve("Login");
+
+        // The name the first case has to move to is a folder with something in
+        // it, which refuses the move the way a locked file does.
+        final Path inTheWay = set.resolve(FileKind.TEST_CASE.fileName(NAMED_CASE));
+        write(inTheWay.resolve("keep"), "in the way");
+
+        convert(project);
+
+        assertEquals("a conversion that failed half way wrote the format number anyway, so the next open would"
+                + " skip a project whose files this build cannot read", 0, formatOf(project));
+
+        deleteTree(inTheWay);
+        convert(project);
+
+        assertEquals("the conversion was not tried again once what refused it was gone",
+                TestProjectMarker.FORMAT, formatOf(project));
+        assertTrue("and the case it could not move the first time is filed under its id now",
+                Files.isRegularFile(set.resolve(FileKind.TEST_CASE.fileName(NAMED_CASE))));
+    }
+
+    /**
      * Rule-INTERNAL-091, S5. A format this build does not know is left alone, and
      * the project says why it cannot be read.
      */
@@ -178,6 +285,27 @@ public class FormatConversionIdeTest extends BasePlatformTestCase {
         write(project.resolve("Test Runs").resolve("Cycle-1").resolve("run.json"), AN_OLD_RUN);
 
         return project;
+    }
+
+    /**
+     * A second file claiming the id the first one has, the way a case copied on
+     * GitHub arrives (#288). Named so it sorts after the file it is a copy of.
+     */
+    private Path withACopiedCase(final Path project) {
+        write(project.resolve("Test Cases").resolve("Login").resolve("copy of login.json"), A_CASE);
+        return project;
+    }
+
+    /**
+     * What a folder holds, by name and in one order, so two conversions of the
+     * same folder can be compared.
+     */
+    private static List<String> namesIn(final Path folder) {
+        try (Stream<Path> children = Files.list(folder)) {
+            return children.map(file -> String.valueOf(file.getFileName())).sorted().toList();
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not list " + folder + ": " + ex.getMessage(), ex);
+        }
     }
 
     private void convert(final Path project) {

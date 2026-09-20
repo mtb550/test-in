@@ -23,6 +23,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -36,8 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import org.testin.model.DirectoryType;
-import org.testin.model.FileKind;
 
 /**
  * Turns a stopped pull into a test case question, or into no question at all
@@ -149,19 +149,8 @@ public final class ConflictResolution {
     }
 
     /**
-     * UC-SHARE-017, Rule-SHARE-078.
-     * <p>
-     * Resolves what it can and asks about the rest.
-     * <p>
-     * Called on a background thread - it reads Git and writes files - and hands
-     * back on the EDT. The two outcomes are separate because they are different
-     * situations for the caller: everything resolved means the rebase can go on,
-     * and anything left means it must not.
-     *
-     * @param conflicting the paths Git reports as conflicting
-     * @param onResolved  run when nothing conflicting is left
-     * @param onLeftOver  given whatever could not be resolved here - a run, a
-     *                    marker, or a file the plugin never wrote
+     * What settles one conflicted file: the three mergers have one shape, so the
+     * routing below is a table rather than three branches.
      */
     @FunctionalInterface
     private interface Merger {
@@ -191,6 +180,21 @@ public final class ConflictResolution {
         return Optional.empty();
     }
 
+    /**
+     * UC-SHARE-017, Rule-SHARE-078.
+     * <p>
+     * Resolves what it can and asks about the rest.
+     * <p>
+     * Called on a background thread - it reads Git and writes files - and hands
+     * back on the EDT. The two outcomes are separate because they are different
+     * situations for the caller: everything resolved means the rebase can go on,
+     * and anything left means it must not.
+     *
+     * @param conflicting the paths Git reports as conflicting
+     * @param onResolved  run when nothing conflicting is left
+     * @param onLeftOver  given whatever could not be resolved here - a run, a
+     *                    marker, or a file the plugin never wrote
+     */
     public static void resolve(final @NotNull Project p, final @NotNull Path repositoryPath, final @NotNull List<String> conflicting, final @NotNull Runnable onResolved, final @NotNull Consumer<List<String>> onLeftOver) {
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
@@ -306,15 +310,29 @@ public final class ConflictResolution {
     }
 
     /**
-     * What to call the case in a dialog title: its description, or the file name
-     * when the side being read will not parse.
+     * What to call the conflicted thing in a dialog title, as the tester knows
+     * it: a test case by its description, and anything inside a run by the run,
+     * which is the folder.
+     * <p>
+     * Only a test case carries a description, so everything else fell through to
+     * the file name - and a run's marker is called {@code .tr} in every run there
+     * has ever been. The tester resolving three run conflicts in a row was shown
+     * "Both Changed .tr" three times, with nothing to tell them which cycle they
+     * were looking at (#305).
+     * <p>
+     * A test case whose side will not parse keeps its file name, which is its id:
+     * not friendly, but it names one case and the folder does not.
      */
     private static @NotNull String name(final @NotNull Mapper mapper, final @NotNull String json, final @NotNull String relativePath) {
         final @NotNull String description = mapper.readTree(json).path("description").asText("");
         if (!description.isBlank()) return description;
 
         final @NotNull Path path = Path.of(relativePath);
-        return path.getFileName().toString();
+        if (FileKind.of(path) == FileKind.TEST_CASE) return String.valueOf(path.getFileName());
+
+        return Optional.ofNullable(path.getParent())
+                .map(folder -> String.valueOf(folder.getFileName()))
+                .orElseGet(() -> String.valueOf(path.getFileName()));
     }
 
 }

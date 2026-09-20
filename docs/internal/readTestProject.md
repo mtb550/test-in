@@ -29,7 +29,8 @@ There is no key for this. It starts on its own.
 - **Rule-INTERNAL-010** — A folder inside `Test Runs` is read the same way, from
   a file named `.tr` or a file named `.trp`.
 - **Rule-INTERNAL-011** — A file's name says what it is: every file ending in
-  `.tc` directly inside a test set is a test case. Nothing looks inside a file to
+  `.tc` directly inside a test set is a test case, and every file ending in `.ri`
+  directly inside a test run is one case's result. Nothing looks inside a file to
   decide what it is.
 - **Rule-INTERNAL-012** — A test case is known by its file name. What the file
   says its own name is does not decide.

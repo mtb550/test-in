@@ -16,7 +16,7 @@ up here rather than left to the code.
 | **Numbering** | Use cases are `UC-INTERNAL-001` to `UC-INTERNAL-008`. Rules are `Rule-INTERNAL-001` to `Rule-INTERNAL-092` |
 | **Retired** | `Rule-INTERNAL-086` said the captions down the left of one dialog share one width, widened to the longest caption so none is cut off. Retired 18 September 2026, when each caption moved onto its own line above its field (#328) and there was no column left to widen; read Rule-INTERNAL-087 instead. `Rule-INTERNAL-088` said `testin.yml` is read by one class and written by none. Retired 19 September 2026, when **Save to testin.yml** became its one writer (#335); read Rule-INTERNAL-089 instead. The numbers are not given to anything else |
 | **State** | **Written** |
-| **Checked against** | `main` at `2cb8c1dc`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-INTERNAL-003](noticeOutsideChange.md) and [UC-INTERNAL-004](numberTestCase.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. |
+| **Checked against** | `main` at `2cb8c1dc`, 7 September 2026. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-INTERNAL-003](noticeOutsideChange.md) and [UC-INTERNAL-004](numberTestCase.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. On 20 September 2026, at `e6cbf4f1`, the pages the #305 file structure changed were read against the code again. |
 | **Written to** | [How a document is written](../standard.md) |
 
 ---
@@ -26,7 +26,7 @@ up here rather than left to the code.
 | | What the tester does | Why a tester uses it | Where its rules are |
 |---|---|---|---|
 | **UC-INTERNAL-001** | [Find anything in the test project](globalSearch.md) | Reach one test case without scrolling a big tree. | Rule-INTERNAL-001 to Rule-INTERNAL-002, Rule-INTERNAL-066, Rule-INTERNAL-068 to Rule-INTERNAL-069, Rule-INTERNAL-071 |
-| **UC-INTERNAL-002** | [Read a test project from disk](readTestProject.md) | Every panel answers at once, with no wait. | Rule-INTERNAL-003 to Rule-INTERNAL-015, Rule-INTERNAL-062, Rule-INTERNAL-070 |
+| **UC-INTERNAL-002** | [Read a test project from disk](readTestProject.md) | Every panel answers at once, with no wait. | Rule-INTERNAL-003 to Rule-INTERNAL-015, Rule-INTERNAL-062, Rule-INTERNAL-070, Rule-INTERNAL-082 to Rule-INTERNAL-083, Rule-INTERNAL-089 to Rule-INTERNAL-090 |
 | **UC-INTERNAL-003** | [Pick up a change made outside the IDE](noticeOutsideChange.md) | See what a pull or a teammate changed. | Rule-INTERNAL-016 to Rule-INTERNAL-024 |
 | **UC-INTERNAL-004** | [Give a test case its number](numberTestCase.md) | Quote one number that means the same everywhere. | Rule-INTERNAL-025 to Rule-INTERNAL-035 |
 | **UC-INTERNAL-005** | [Keep a removed node so it can come back](keepRemovedNode.md) | Get back what a wrong Delete took away. | Rule-INTERNAL-036 to Rule-INTERNAL-045 |

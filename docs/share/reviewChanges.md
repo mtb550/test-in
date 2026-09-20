@@ -33,8 +33,11 @@ uncommitted work.
   changed file.
 - **Rule-SHARE-046** — A file Git says has changed gets a row even when Testin
   can see no difference inside it, so the tester can still commit it.
-- **Rule-SHARE-047** — Testin decides what a file is by reading it, not by its
-  name.
+- **Rule-SHARE-047** — Testin decides what a file is by its name, not by reading
+  it: a `.tc` is a test case, a `<test case id>.ri` is one case's result, and the
+  seven fixed marker names are markers. A record is identified by the name it is
+  written under, so a file the review cannot parse still gets the right kind of
+  row.
 - **Rule-SHARE-048** — A rename is two rows, the removal first and the addition
   second.
 - **Rule-SHARE-049** — Every row arrives selected.

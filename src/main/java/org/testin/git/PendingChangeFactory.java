@@ -16,12 +16,16 @@
 
 package org.testin.git;
 
-import org.testin.model.DirectoryType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
+import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.markers.TestRunMarker;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
@@ -33,10 +37,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
-import org.testin.model.FileKind;
-import org.testin.model.TestRunItems;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.markers.TestRunMarker;
 
 /**
  * Turns one changed file into the change the review shows.
@@ -67,7 +67,7 @@ final class PendingChangeFactory {
     }
 
     /**
-     * What the file is, read from what is in it.
+     * What the file is, read from its name.
      * <p>
      * The name settles it, through {@link FileKind}: a marker is one of the seven
      * fixed names, a test case is a {@code .tc}, one case's result a {@code .ri}.
@@ -103,14 +103,6 @@ final class PendingChangeFactory {
         }
     }
 
-    private static boolean isTestCaseId(final @NotNull String name) {
-        try {
-            UUID.fromString(name);
-            return true;
-        } catch (final IllegalArgumentException notAnId) {
-            return false;
-        }
-    }
 
     private static @NotNull PendingChange testCase(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper) {
         final @NotNull String testSet = parentName(relativePath);
