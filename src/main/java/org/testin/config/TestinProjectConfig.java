@@ -104,20 +104,14 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String rep
     public static final @NotNull TestinProjectConfig UNREADABLE = new TestinProjectConfig(
             TestinLocation.LOCAL, "", "", "");
 
-    /**
-     * The forms {@code git clone} is given, and nothing else.
-     * <p>
-     * The URL arrives in a file that travels with a repository and ends up as an
-     * argument to a command, so it is checked here rather than at whichever call
-     * site runs it first. Written as the characters a clone URL is made of rather
-     * than as the characters to fear: a list of allowed characters cannot be
-     * short by one the way a list of forbidden ones can.
-     */
-    private static final @NotNull Pattern REPO_URL =
-            Pattern.compile("^(https://|ssh://|" + TestinYml.SCP_PREFIX + ")[A-Za-z0-9._~:/?#@%+-]+$");
-
     public TestinProjectConfig {
-        repoUrl = validRepoUrl(repoUrl);
+        // Stripped, not judged. Whether this text is an address at all is
+        // GitRefs.isRepositoryUrl's answer, asked where something is about to
+        // clone it - this file used to answer it too, with a narrower rule, and
+        // dropped what it refused with only a line in the log. A testin.yml
+        // saying git://host/x produced a panel that never mentioned an address
+        // (#301, Rule-TREE-PANEL-117).
+        repoUrl = withoutCredentials(repoUrl);
 
         // Stripped on the way in, as RepoUrl is, and for the same reason: the
         // file is committed. Not refused when it names no repository - the
@@ -152,14 +146,6 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String rep
 
     private static @NotNull String strip(final @Nullable String value) {
         return Objects.requireNonNullElse(value, "").strip();
-    }
-
-    private static @NotNull String validRepoUrl(final @NotNull String value) {
-        final @NotNull String url = withoutCredentials(value);
-        if (url.isEmpty() || REPO_URL.matcher(url).matches()) return url;
-
-        Logger.warn("RepoUrl is not a clone URL and was ignored: " + url);
-        return "";
     }
 
     /**

@@ -24,6 +24,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
+import org.testin.git.GitRefs;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
@@ -198,7 +199,7 @@ public final class BoundTestProject {
      * (#301, R7).
      */
     public @NotNull Optional<String> cloneAddress() {
-        return TestinYml.cloneAddress(p, name());
+        return TestinYml.cloneAddress(p, name()).filter(GitRefs::isRepositoryUrl);
     }
 
     /**

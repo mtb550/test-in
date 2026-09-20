@@ -69,6 +69,12 @@ screens, and the tree is one of them.
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
+- **Rule-TREE-PANEL-117** — One thing decides whether text is an address a
+  repository can be cloned from, and testin.yml is not it. The file keeps the
+  address it was given, with any account or token taken out of it; whether that
+  text is an address at all is asked once, where something is about to act on
+  it. A file holding an address Testin does not recognise keeps it, so the
+  tester can see it and correct it, and is offered no clone.
 
 Rule-TREE-PANEL-100 also holds here. It says a test project that is not
 **Active** is drawn in the tree and holds nothing. It is written on

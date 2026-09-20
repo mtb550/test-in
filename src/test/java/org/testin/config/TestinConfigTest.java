@@ -150,15 +150,36 @@ public class TestinConfigTest {
     }
 
     /**
-     * The URL reaches {@code git clone}, so a value carrying a shell
-     * metacharacter is dropped when it is read, not when it is run.
+     * Rule-TREE-PANEL-117.
+     * <p>
+     * The file keeps the address it was given. It used to judge it as well, with
+     * a narrower rule than the one thing that decides that, and dropped what it
+     * refused with only a line in the log - so a testin.yml holding
+     * {@code git://host/x} produced a panel that never mentioned an address at
+     * all (#301).
+     * <p>
+     * What is refused is asked once, by {@code GitRefs.isRepositoryUrl}, where
+     * something is about to clone it. {@code GitRefsTest} holds that half,
+     * including the injected value this test used to pin.
      */
     @Test
-    public void refusesARepoUrlThatIsNotOne() {
-        assertEquals(TestinYml.parse("RepoUrl: \"https://x.com/r; rm -rf /\"\n", "injected").repoUrl(), "");
-        assertEquals(TestinYml.parse("RepoUrl: file:///etc/passwd\n", "scheme").repoUrl(), "");
+    public void keepsTheRepoUrlItWasGiven() {
+        assertEquals(TestinYml.parse("RepoUrl: \"https://x.com/r; rm -rf /\"\n", "injected").repoUrl(),
+                "https://x.com/r; rm -rf /", "kept in the file, and never offered as a clone");
+        assertEquals(TestinYml.parse("RepoUrl: file:///etc/passwd\n", "scheme").repoUrl(), "file:///etc/passwd");
         assertEquals(TestinYml.parse("RepoUrl: git@github.com:acme/cases.git\n", "ssh").repoUrl(),
                 "git@github.com:acme/cases.git");
+    }
+
+    /**
+     * The credential strip is not the judgement and did not move with it: the
+     * file is committed, so a token that reached it would be in the repository's
+     * history forever.
+     */
+    @Test
+    public void stillTakesTheTokenOutOfARepoUrl() {
+        assertEquals(TestinYml.parse("RepoUrl: https://ghp_secret@github.com/acme/cases.git\n", "token").repoUrl(),
+                "https://github.com/acme/cases.git");
     }
 
     /**

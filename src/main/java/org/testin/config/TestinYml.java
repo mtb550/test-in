@@ -89,6 +89,15 @@ public final class TestinYml {
      * One owner, because the file's own check, Git's check and Report Bug's
      * parser all read it (#66, finding 149).
      */
+    /*
+     * The shape of an address rather than anything about this file, so it does
+     * not belong here - and it stays anyway. Its two readers are
+     * GitRefs.isRepositoryUrl and BugRepository, one in git and one in config;
+     * git already depends on config, so moving it to git would make config
+     * depend on git and close the cycle ArchitectureTest calls "a cycle waiting
+     * for its second edge" (#112). It is four characters in one place, which is
+     * cheaper than the edge (#301, D10).
+     */
     public static final @NotNull String SCP_PREFIX = "git@";
 
     /**

@@ -286,6 +286,28 @@ public final class GitRefs {
     }
 
     /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-117.
+     * <p>
+     * The characters a clone address is made of. Written as what is allowed
+     * rather than what is feared: a list of allowed characters cannot be short
+     * by one the way a list of forbidden ones can.
+     * <p>
+     * It came from {@code TestinProjectConfig}, which applied it to the file's
+     * RepoUrl and nothing else, so the same value was judged by two different
+     * rules depending on where it was typed. A space, a semicolon or a quote
+     * fails here, which is why a clone address is the one kind of text this
+     * refuses without asking anything else (#301, F2, R12).
+     * <p>
+     * {@code =} is here and {@code &} is not. The one belongs to a query -
+     * {@code ?ref=main} is an address a tester can be given - and the config's
+     * copy of this list was missing it, which is one of the four addresses the
+     * two rules disagreed about. The other is the single character a URL and a
+     * shell both use for structure, and a clone address with two query
+     * parameters is not a thing {@code git clone} is handed in practice.
+     */
+    private static final @NotNull Pattern CLONE_CHARACTERS = Pattern.compile("^[A-Za-z0-9._~:/?#@%+=-]+$");
+
+    /**
      * True when the text names a repository to clone rather than a project to
      * create.
      * <p>
@@ -293,6 +315,13 @@ public final class GitRefs {
      * decides which happens. Deliberately narrow: a project name is free text
      * typed by the tester, and mistaking one for a URL would send them to a
      * clone they never asked for.
+     * <p>
+     * <b>The one answer, for everything that asks.</b> The file's own check used
+     * to be a second one, and the two disagreed: {@code git://host/x} and
+     * {@code http://host/x.git} were addresses here and were dropped from the
+     * file without a word, so a tester whose testin.yml said either saw a panel
+     * that never mentioned an address at all. The file keeps what it is given
+     * now, and this decides (#301, Rule-TREE-PANEL-117).
      * <p>
      * "http://" here is a scheme being recognized, not a link being followed:
      * this decides whether the tester typed a clone URL. Refusing to match it
@@ -302,6 +331,8 @@ public final class GitRefs {
     @SuppressWarnings("HttpUrlsUsage")
     public static boolean isRepositoryUrl(final @NotNull String text) {
         final @NotNull String value = text.trim();
+        if (!CLONE_CHARACTERS.matcher(value).matches()) return false;
+
         return value.startsWith("http://")
                 || value.startsWith("https://")
                 || value.startsWith("ssh://")

@@ -32,6 +32,60 @@ import static org.testng.Assert.*;
  */
 public class GitRefsTest {
 
+    /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-117.
+     * <p>
+     * The one answer to "is this an address a repository can be cloned from",
+     * asked by the create dialog, by the push dialog and by the panel before it
+     * offers a clone.
+     * <p>
+     * It had no test at all until #301, and that is how a second rule grew in
+     * {@code TestinProjectConfig} and disagreed with it for months: this one
+     * said yes to {@code git://host/x} and to {@code http://host/x.git} while
+     * the file's rule dropped both without a word, so a tester whose testin.yml
+     * held either saw a panel that never mentioned an address.
+     */
+    @Test
+    public void everyFormGitCloneTakesIsAnAddress() {
+        assertTrue(GitRefs.isRepositoryUrl("https://github.com/acme/repo.git"));
+        assertTrue(GitRefs.isRepositoryUrl("ssh://git@github.com/acme/repo.git"));
+        assertTrue(GitRefs.isRepositoryUrl("git@host:acme/repo.git"));
+        assertTrue(GitRefs.isRepositoryUrl("http://host/x.git"), "plain http is a scheme git clone takes");
+        assertTrue(GitRefs.isRepositoryUrl("git://host/x"), "the file's own rule used to drop this one");
+        assertTrue(GitRefs.isRepositoryUrl("https://host/r.git?ref=main"), "a query is part of the address");
+        assertTrue(GitRefs.isRepositoryUrl("  https://github.com/acme/repo.git  "), "surrounding space is trimmed");
+    }
+
+    /**
+     * A project name is free text a tester typed, and mistaking one for an
+     * address sends them to a clone they never asked for.
+     */
+    @Test
+    public void aProjectNameIsNotAnAddress() {
+        assertFalse(GitRefs.isRepositoryUrl("NAFATH"));
+        assertFalse(GitRefs.isRepositoryUrl("Checkout Regression"));
+        assertFalse(GitRefs.isRepositoryUrl(""));
+        assertFalse(GitRefs.isRepositoryUrl("   "));
+    }
+
+    /**
+     * Rule-TREE-PANEL-117.
+     * <p>
+     * The characters half of the rule, which came here from
+     * {@code TestinProjectConfig} when the file stopped judging addresses. The
+     * value ends up as an argument to {@code git clone}, and although git4idea
+     * builds an argument list rather than a shell string, a list of allowed
+     * characters is cheaper to keep than an argument about whether the next
+     * caller still builds one.
+     */
+    @Test
+    public void textWithCharactersNoAddressHasIsRefused() {
+        assertFalse(GitRefs.isRepositoryUrl("https://x.com/r; rm -rf /"), "a semicolon is not in a clone address");
+        assertFalse(GitRefs.isRepositoryUrl("https://x.com/r a"), "nor is a space inside one");
+        assertFalse(GitRefs.isRepositoryUrl("https://x.com/\"r\""), "nor a quote");
+        assertFalse(GitRefs.isRepositoryUrl("https://x.com/r|whoami"), "nor a pipe");
+    }
+
     private static PendingChange diff(final Path relativePath) {
         return new PendingChange(ChangeSubject.TEST_CASE, "a case", "a test set", UUID.randomUUID().toString(),
                 relativePath, DiffType.MODIFIED,
