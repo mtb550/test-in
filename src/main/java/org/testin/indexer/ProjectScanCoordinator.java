@@ -42,6 +42,29 @@ final class ProjectScanCoordinator {
         }
     }
 
+    /**
+     * UC-INTERNAL-003, Rule-INTERNAL-022.
+     * <p>
+     * Work that must not overlap a scan, under the same lock the scans share.
+     * <p>
+     * Emptying the store is the case this was written for. A full re-index clears
+     * everything and starts again, and it took no lock at all - so a Refresh
+     * landing while a clone's own scan was filling the store wiped what that scan
+     * had read, and the tree came back half a project or none (#66 finding 342).
+     * The file watcher's single-project rescan is the same shape.
+     * <p>
+     * The caller blocks until every scan in flight has finished, so it is called
+     * from a background thread and never from the EDT.
+     */
+    void exclusively(final @NotNull Runnable work) {
+        scanLock.writeLock().lock();
+        try {
+            work.run();
+        } finally {
+            scanLock.writeLock().unlock();
+        }
+    }
+
     // UC-INTERNAL-003, Rule-INTERNAL-022
     void rescanExclusively(final @NotNull Path projectPath) {
         scanLock.writeLock().lock();

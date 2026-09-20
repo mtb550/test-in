@@ -252,12 +252,19 @@ public final class ProjectIndexer {
     }
 
     public void resetForReindex() {
-        restoreEditorsOnComplete.set(false);
-        store.clearAll();
-        indexed.set(false);
-        indexing.set(false);
-        indexingLatch = new CountDownLatch(1);
-        Logger.info("Indexer reset for re-indexing");
+        // Not while a scan is reading into the store. Refresh calls this from a
+        // pooled thread and a clone scans its new project on the task thread, so
+        // the two met: clearAll() emptied what that scan had just filled, and the
+        // tree came back with half a project in it or none. The scans share a read
+        // lock; this takes the write one and waits for them (#66 finding 342).
+        scanCoordinator.exclusively(() -> {
+            restoreEditorsOnComplete.set(false);
+            store.clearAll();
+            indexed.set(false);
+            indexing.set(false);
+            indexingLatch = new CountDownLatch(1);
+            Logger.info("Indexer reset for re-indexing");
+        });
     }
 
     /**
