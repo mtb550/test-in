@@ -19,10 +19,7 @@ package org.testin.editor;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
-import com.intellij.openapi.actionSystem.ActionPlaces;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.ex.ActionUtil;
-import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.application.WriteIntentReadAction;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.util.ui.JBUI;
@@ -197,38 +194,13 @@ public abstract class AbstractIconButton extends JButton {
      * Taken here, once, so every toolbar button behaves like the same command
      * reached through the menu or its shortcut.
      */
-    /**
-     * Through the action system, which is what takes the lock.
-     * <p>
-     * This used to take the write-intent lock itself with
-     * {@code WriteIntentReadAction.run}, and that is the one API the platform
-     * offers for it and marks experimental - as it does
-     * {@code Application.runWriteIntentReadAction}, so there was no stable spelling
-     * of the same thing. Handing the click to {@code ActionUtil.invokeAction}
-     * instead asks the action system to dispatch it, and the action system takes
-     * the lock on the way in: the same lock, taken by the code whose job it is,
-     * and nothing here is experimental (#324).
-     * <p>
-     * One place for all fourteen buttons, as the lock was: a toolbar click now
-     * reaches its work the way the same command reaches it from a menu or a key.
-     */
+    // The platform marks WriteIntentReadAction experimental, and it is what the
+    // action system itself takes before dispatching - so the alternative is not
+    // a stable API, it is doing without the lock and asserting on the EDT.
+    @SuppressWarnings("UnstableApiUsage")
     @Override
     protected void fireActionPerformed(final @NotNull ActionEvent event) {
-        ActionUtil.invokeAction(new DumbAwareAction() {
-            @Override
-            public void actionPerformed(final @NotNull AnActionEvent e) {
-                clicked(event);
-            }
-        }, this, ActionPlaces.UNKNOWN, null, null);
-    }
-
-    /**
-     * What a click does, which is whatever Swing would have done with it. Named
-     * so the action above can reach it: {@code super} is not available inside an
-     * anonymous class.
-     */
-    private void clicked(final @NotNull ActionEvent event) {
-        super.fireActionPerformed(event);
+        WriteIntentReadAction.run(() -> super.fireActionPerformed(event));
     }
 
     private void setHovered(final boolean isHovered) {
