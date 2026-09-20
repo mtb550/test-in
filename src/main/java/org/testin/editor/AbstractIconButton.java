@@ -19,7 +19,13 @@ package org.testin.editor;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
-import com.intellij.openapi.application.WriteIntentReadAction;
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionUiKind;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.util.ui.JBUI;
@@ -191,16 +197,44 @@ public abstract class AbstractIconButton extends JButton {
      * read access, and the Create Test Case dialog's editor field asserted on
      * exactly that.
      * <p>
-     * Taken here, once, so every toolbar button behaves like the same command
-     * reached through the menu or its shortcut.
+     * <b>The action system takes that lock, so the click is given to it.</b> Taking
+     * it by hand meant {@code WriteIntentReadAction}, which the platform marks
+     * experimental - as it marks {@code Application.runWriteIntentReadAction}, so
+     * there was no stable spelling of the same thing, and the Marketplace carried
+     * a warning for it. Dispatching through {@code ActionUtil.performAction} asks
+     * the system whose job it is, and it takes the lock on the way in (#324).
+     * <p>
+     * One place for all fourteen buttons, as the lock was: a toolbar click now
+     * reaches its work the way the same command reaches it from a menu or a key.
+     * <p>
+     * Every API here was checked for {@code @Deprecated} as well as for an
+     * {@code ApiStatus} annotation. The three {@code ActionUtil.invokeAction}
+     * overloads are deprecated, and so is every convenient {@code AnActionEvent}
+     * factory - {@code createFromAnAction}, {@code createFromInputEvent},
+     * {@code createFromDataContext}. These four are clean.
      */
-    // The platform marks WriteIntentReadAction experimental, and it is what the
-    // action system itself takes before dispatching - so the alternative is not
-    // a stable API, it is doing without the lock and asserting on the EDT.
-    @SuppressWarnings("UnstableApiUsage")
     @Override
     protected void fireActionPerformed(final @NotNull ActionEvent event) {
-        WriteIntentReadAction.run(() -> super.fireActionPerformed(event));
+        final @NotNull AnAction clicked = new DumbAwareAction() {
+            @Override
+            public void actionPerformed(final @NotNull AnActionEvent e) {
+                swingClick(event);
+            }
+        };
+
+        ActionUtil.performAction(clicked, AnActionEvent.createEvent(clicked,
+                DataManager.getInstance().getDataContext(this),
+                clicked.getTemplatePresentation().clone(),
+                ActionPlaces.TOOLBAR, ActionUiKind.TOOLBAR, null));
+    }
+
+    /**
+     * What the click does, which is whatever Swing would have done with it. Named
+     * so the action above can reach it: {@code super} is not available from inside
+     * an anonymous class.
+     */
+    private void swingClick(final @NotNull ActionEvent event) {
+        super.fireActionPerformed(event);
     }
 
     private void setHovered(final boolean isHovered) {
