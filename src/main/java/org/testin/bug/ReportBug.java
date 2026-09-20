@@ -21,6 +21,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.config.BugRepository;
 import org.testin.config.TestinYml;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCaseFile;
@@ -88,10 +89,11 @@ public final class ReportBug {
         final @NotNull Optional<String> link = file.flatMap(where -> TestCaseLink.read(p, where));
         indicator.checkCanceled();
 
-        final @NotNull Optional<String> whyNotReady = GitHubCli.onPath(indicator).whyItCannotSend(TestinYml.bugRepoUrl(p));
+        final @NotNull String bugRepoUrl = TestinYml.bugRepoUrl(p);
+        final @NotNull Optional<String> whyNotReady = GitHubCli.onPath(indicator).whyItCannotSend(bugRepoUrl);
         indicator.checkCanceled();
 
-        return new PreparedBug(facts, BugTemplate.body(facts, link), TestinYml.bugRepository(p), whyNotReady);
+        return new PreparedBug(facts, BugTemplate.body(facts, link), BugRepository.of(bugRepoUrl), whyNotReady);
     }
 
     /**

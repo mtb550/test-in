@@ -229,13 +229,4 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String rep
     public boolean hasRepoUrl() {
         return location.isRemote() && !repoUrl.isEmpty();
     }
-
-    /**
-     * The repository Report Bug files issues in, and empty both when
-     * {@code bugRepoUrl} is not set and when it names no repository.
-     * {@link #bugRepoUrl()} tells the two apart, which is all a reason needs.
-     */
-    public @NotNull Optional<BugRepository> bugRepository() {
-        return BugRepository.of(bugRepoUrl);
-    }
 }

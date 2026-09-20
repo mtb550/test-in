@@ -54,7 +54,7 @@ public class TestinConfigTest {
                 "testinProject: cases\nbugRepoUrl: https://mtb550:ghp_secret@github.com/mtb550/product.git\n", "bug repo");
 
         assertEquals(config.bugRepoUrl(), "https://github.com/mtb550/product.git", "a token never survives, as for RepoUrl");
-        assertEquals(config.bugRepository().map(BugRepository::ghRepo).orElse(""), "github.com/mtb550/product");
+        assertEquals(BugRepository.of(config.bugRepoUrl()).map(BugRepository::ghRepo).orElse(""), "github.com/mtb550/product");
     }
 
     /**
@@ -63,13 +63,13 @@ public class TestinConfigTest {
      */
     @Test
     public void aBugRepoUrlThatNamesNoRepositoryIsKeptAndNotUsed() {
-        assertTrue(TestinYml.parse("testinProject: cases\n", "none").bugRepository().isEmpty());
+        assertTrue(BugRepository.of(TestinYml.parse("testinProject: cases\n", "none").bugRepoUrl()).isEmpty());
         assertEquals(TestinProjectConfig.EMPTY.bugRepoUrl(), "");
 
         final TestinProjectConfig wrong = TestinYml.parse(
                 "bugRepoUrl: https://github.com/mtb550/product/issues\n", "issues page");
         assertEquals(wrong.bugRepoUrl(), "https://github.com/mtb550/product/issues");
-        assertTrue(wrong.bugRepository().isEmpty());
+        assertTrue(BugRepository.of(wrong.bugRepoUrl()).isEmpty());
     }
 
     @Test

@@ -29,6 +29,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+import static com.tngtech.archunit.core.domain.JavaCall.Predicates.target;
+import static com.tngtech.archunit.core.domain.properties.HasName.Predicates.name;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 /**
@@ -243,11 +246,11 @@ public class ArchitectureTest {
     }
 
     /**
-     * Rule-INTERNAL-089: one class reads {@code testin.yml}, and it is the only
-     * class that writes it, for Save to testin.yml (#301, #335). The values it
-     * parses into are package-private, which the
-     * compiler holds; the parser is a library any class could import, which only
-     * this can.
+     * Rule-INTERNAL-089: one class reads {@code testin.yml} (#301, #335). The
+     * values it parses into are package-private, which the compiler holds; the
+     * parser is a library any class could import, which only this can. That it
+     * is also the only class that <i>writes</i> the file is
+     * {@link #onlyTheSaveButtonWritesTheConfigFile()}.
      */
     @Test
     public void onlyTestinYmlReadsTheConfigFile() {
@@ -258,6 +261,45 @@ public class ArchitectureTest {
                         + " and nothing else can open, parse or write the file (Rule-INTERNAL-089)");
 
         rule.check(CLASSES);
+    }
+
+    /**
+     * Rule-TREE-PANEL-113, Decision-013: the tester's {@code testin.yml} is
+     * written when they press <b>Save to testin.yml</b>, and at no other moment
+     * (#301, D8).
+     * <p>
+     * <b>It was true and nothing held it.</b> Seven places wrote the file before
+     * Decision-011 took it out, and each created it when it was absent, so a
+     * repository ended up carrying a committed file nobody chose to add. The
+     * invariant is two commits old and worth a test rather than a habit.
+     * <p>
+     * Two halves, because one gesture reaching the file needs both to fail.
+     * {@code save} having one caller is what stops a second gesture calling it;
+     * {@code createChildData} being spelled in one place is what stops a class
+     * writing the file without asking {@link TestinYml} at all. {@code JavaSourceRoot}
+     * is the other class allowed to create a file, and what it creates is the
+     * {@code .java} the tester asked Testin to generate.
+     */
+    @Test
+    public void onlyTheSaveButtonWritesTheConfigFile() {
+        final @NotNull ArchRule oneCaller = methods()
+                .that().areDeclaredIn("org.testin.config.TestinYml")
+                .and().haveName("save")
+                .should().onlyBeCalled().byClassesThat().haveFullyQualifiedName("org.testin.testproject.SaveTestinYml")
+                .because("Save to testin.yml is the only gesture that writes the file, so cloning, picking a test"
+                        + " project, creating one and renaming one leave a committed file alone (Decision-013)."
+                        + " A second caller is a second gesture writing it");
+
+        final @NotNull ArchRule oneWriter = noClasses()
+                .that().doNotHaveFullyQualifiedName("org.testin.config.TestinYml")
+                .and().doNotHaveFullyQualifiedName("org.testin.codegen.JavaSourceRoot")
+                .should().callMethodWhere(target(name("createChildData")))
+                .because("TestinYml holds the only write of testin.yml and JavaSourceRoot the only write of"
+                        + " generated code; everything else asks the indexer, whose cache is authoritative"
+                        + " (CLAUDE.md, Decision-013)");
+
+        oneCaller.check(CLASSES);
+        oneWriter.check(CLASSES);
     }
 
     /**

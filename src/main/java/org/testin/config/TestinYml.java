@@ -195,6 +195,14 @@ public final class TestinYml {
      * <p>
      * Whether this address is the one the file gives, compared with the
      * credentials taken out as the file's own is.
+     * <p>
+     * Read as address arithmetic it would belong in {@code git/GitRefs}, and it
+     * stays here (#301, D10). Its body is two reads of this file and one
+     * {@code equals}; {@code GitRefs} is "pure Git naming and selection rules,
+     * extracted so they are unit-testable without an IDE", and a method taking a
+     * {@link Project} and asking a service is neither. Moving it would also make
+     * the credential strip public outside this package. It is a question about
+     * the file, so the file's class answers it.
      */
     public static boolean isRepoUrl(final @NotNull Project p, final @NotNull String address) {
         final @NotNull TestinProjectConfig config = config(p);
@@ -207,14 +215,6 @@ public final class TestinYml {
      */
     public static @NotNull String bugRepoUrl(final @NotNull Project p) {
         return config(p).bugRepoUrl();
-    }
-
-    /**
-     * That repository, and empty both when the file gives none and when what it
-     * gives names no repository.
-     */
-    public static @NotNull Optional<BugRepository> bugRepository(final @NotNull Project p) {
-        return config(p).bugRepository();
     }
 
     /**
