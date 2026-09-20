@@ -34,9 +34,6 @@ import org.testin.services.Services;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.ui.FontSync;
-import org.testin.view.bugs.OpenBugsTab;
-import org.testin.view.details.DetailsTab;
-import org.testin.view.history.HistoryTab;
 
 import javax.swing.SwingUtilities;
 import java.awt.*;
@@ -262,9 +259,7 @@ public class ViewPanel implements Disposable {
 
     // Rule-VIEW-PANEL-008
     public void refreshCurrentView() {
-        new DetailsTab().load(p, detailsTab, currentFromIndex(), page.getCurrentPath());
-        new HistoryTab().load(historyTab);
-        new OpenBugsTab().load(p, openBugsTab, currentFromIndex());
+        for (final ViewTab tab : ViewTab.values()) tab.load(this);
     }
 
     /**
@@ -301,7 +296,7 @@ public class ViewPanel implements Disposable {
      * removal, a project reindexed underneath - because a panel that blanks is
      * worse than one showing the last thing that was true.
      */
-    private @NotNull Optional<TestCaseDto> currentFromIndex() {
+    @NotNull Optional<TestCaseDto> shownCase() {
         return getCurrentTestCase()
                 .map(shown -> Services.getInstance(p, ProjectIndexer.class).findTestCase(shown.getId()).orElse(shown));
     }

@@ -45,6 +45,12 @@ import java.util.stream.Collectors;
  * light mode's title bar opens the same list to choose which parts of its window
  * are drawn, and a button labeled "Details" beside a Ctrl+D that means something
  * else would have been two names for two things (#13).
+ * <p>
+ * <b>Deliberately not a framework dialog</b> (#69), for the reason the filter
+ * popup is not: the list stays open while the tester ticks and unticks, the view
+ * behind it changing as they go, and there is nothing to confirm. A framework
+ * dialog is a question that closes when it is answered; this one is answered by
+ * being left.
  */
 public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribute> extends AbstractIconButton implements ToolbarItem {
 

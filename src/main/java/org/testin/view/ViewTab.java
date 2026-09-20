@@ -16,12 +16,18 @@
 
 package org.testin.view;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import org.testin.util.Bundle;
+import org.testin.view.bugs.OpenBugsTab;
+import org.testin.view.details.DetailsTab;
+import org.testin.view.history.HistoryTab;
+
 import javax.swing.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -32,6 +38,12 @@ import java.util.function.Function;
  * Together, because the window used to name the three tabs and reach for their three
  * scroll panes in three hand-written lines - so a fourth tab meant remembering a
  * place that has nothing to do with declaring one (#175, C11).
+ * <p>
+ * Filling a tab is declared here too, for the same reason. A refresh used to
+ * construct all three tab classes by name and hand each one a different set of
+ * arguments, so a fourth tab was a fourth line in a method that is otherwise
+ * about nothing; now every tab says how it loads itself and the refresh is a walk
+ * over {@link #values()}.
  */
 @Getter
 @AllArgsConstructor
@@ -39,7 +51,8 @@ public enum ViewTab {
     DETAILS(
             Bundle.message("view.tab.details"),
             ViewPanel::getDetailsScrollPane,
-            ViewPanel::getDetailsTab
+            ViewPanel::getDetailsTab,
+            panel -> new DetailsTab().load(panel.getP(), panel.getDetailsTab(), panel.shownCase(), panel.getPage().getCurrentPath())
     ),
 
     // Reported as never used, and kept: the constants are read by values(), so
@@ -49,13 +62,15 @@ public enum ViewTab {
     HISTORY(
             Bundle.message("view.tab.history"),
             ViewPanel::getHistoryScrollPane,
-            ViewPanel::getHistoryTab
+            ViewPanel::getHistoryTab,
+            panel -> new HistoryTab().load(panel.getHistoryTab())
     ),
 
     OPEN_BUGS(
             Bundle.message("view.tab.open.bugs"),
             ViewPanel::getOpenBugsScrollPane,
-            ViewPanel::getOpenBugsTab
+            ViewPanel::getOpenBugsTab,
+            panel -> new OpenBugsTab().load(panel.getP(), panel.getOpenBugsTab(), panel.shownCase())
     );
 
     private final @NotNull String displayName;
@@ -66,6 +81,12 @@ public enum ViewTab {
      * The part that takes the keyboard when this tab comes to the front (#311).
      */
     private final @NotNull Function<ViewPanel, JComponent> keyboardTarget;
+
+    /**
+     * How this tab fills itself from the panel it belongs to.
+     */
+    @Getter(AccessLevel.NONE)
+    private final @NotNull Consumer<ViewPanel> loader;
 
     /**
      * The part of the panel this tab shows.
@@ -81,5 +102,16 @@ public enum ViewTab {
      */
     public @NotNull JComponent keyboardTargetOf(final @NotNull ViewPanel panel) {
         return keyboardTarget.apply(panel);
+    }
+
+    /**
+     * Rule-VIEW-PANEL-008.
+     * <p>
+     * Fills this tab from the panel. Every tab is loaded on a refresh, whichever
+     * one is in front: the tester switches tabs without anything reloading, so a
+     * tab that only filled when it came forward would show the case before last.
+     */
+    public void load(final @NotNull ViewPanel panel) {
+        loader.accept(panel);
     }
 }

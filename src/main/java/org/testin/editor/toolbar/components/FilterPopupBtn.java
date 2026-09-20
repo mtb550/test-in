@@ -39,6 +39,17 @@ import org.testin.util.Icons;
 import java.util.*;
 import java.util.function.Supplier;
 
+/**
+ * The toolbar's filter: a check-box list of every value a column can hold, with
+ * the test cases narrowing as boxes are ticked.
+ * <p>
+ * <b>Deliberately not a framework dialog</b> (#69). Every dialog on
+ * {@code ui.framework} is a question: it opens, it is answered, it closes, and a
+ * strip along the bottom names the keys that answer it. This is the opposite
+ * shape - it stays open while the tester ticks five boxes and watches the list
+ * shrink, it has nothing to confirm, and closing it is the answer. Giving it a
+ * title and a confirming key would add a question nobody asked.
+ */
 public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     @Getter
     @NotNull

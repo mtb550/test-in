@@ -40,6 +40,23 @@ import org.testin.util.Html;
 import java.awt.*;
 import java.util.Optional;
 
+/**
+ * Delivers a message, and only delivers it. The words live in {@code Done} when
+ * something worked and {@code Refused} when it did not - a class that says things
+ * has one job, and writing the sentences was six methods this class used to carry
+ * (#291).
+ * <p>
+ * Two kinds, and the question is whether the work can finish while the tester is
+ * not looking: {@link #softShow} is a balloon on the status bar that fades and
+ * leaves no trace, for work under the tester's hand, and {@link #info} is a real
+ * IDE notification that stays in the log, for a sync or a push that lands while
+ * they are reading something else.
+ * <p>
+ * <b>Not a dialog at all</b>, which is why it is not on {@code ui.framework}
+ * (#69). A balloon asks nothing and takes no answer; the platform owns its
+ * lifetime and its place on screen. Nothing here has a title bar, a field or a
+ * key.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class Notifier {

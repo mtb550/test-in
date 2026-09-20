@@ -48,6 +48,12 @@ import java.awt.event.MouseEvent;
  * last static mutable state of that shape, and a project service is what the
  * rest of the plugin uses - it is disposed with its project, so a popup left
  * open when a project closes goes with it.
+ * <p>
+ * <b>Deliberately not a framework dialog</b> (#69). It is a readout, not a
+ * question: it appears because the tester is already doing something else, shows
+ * one value, and fades. There is nothing to type, nothing to confirm and no key
+ * to name on a strip - and a framework dialog that stole the focus mid-zoom would
+ * take the keyboard away from the very gesture it is reporting on.
  */
 @Service(Service.Level.PROJECT)
 public final class ZoomIndicatorDialog implements Disposable {
