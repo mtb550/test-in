@@ -8,8 +8,10 @@
 **As a** tester, **I want** the panel to show my tree, or tell me what to do
 first, **so that** I am never stuck on an empty window.
 
-This page says what the panel shows when the tester opens it. There are five
-screens, and the tree is one of them.
+This page says what the panel shows when the tester opens it. There are six
+screens, and the tree is one of them. Every one of the other five offers a way
+forward, because a screen a tester cannot leave is the thing this page exists to
+prevent.
 
 ## Rules
 
@@ -75,6 +77,17 @@ screens, and the tree is one of them.
   text is an address at all is asked once, where something is about to act on
   it. A file holding an address Testin does not recognise keeps it, so the
   tester can see it and correct it, and is offered no clone.
+- **Rule-TREE-PANEL-118** — While the first index is still running the panel
+  says it is reading, in gray, and nothing else. A test project is found in the
+  index, so before the index exists no name resolves - and the screen for a name
+  that resolves to nothing is a red line about a project that is merely not read
+  yet. The panel says what is happening instead, and leaves that screen by
+  itself when indexing ends.
+- **Rule-TREE-PANEL-119** — A testin.yml that cannot be read is said once, in a
+  notification naming the file, and the panel then answers as though the file
+  were absent: the test project this machine picked, or the choose screen. A
+  file is corrected in an editor and there is no button that does it, so a
+  screen holding only that sentence is a screen with no way off it.
 
 Rule-TREE-PANEL-100 also holds here. It says a test project that is not
 **Active** is drawn in the tree and holds nothing. It is written on
@@ -127,15 +140,22 @@ Rule-TREE-PANEL-100 also holds here. It says a test project that is not
    the tree appears. With more than six test projects, Testin shows one link
    instead of a list. That link opens the **Select Test Project** dialog.
 
-Two more screens follow. The fifth is the tree itself.
+Three more screens follow. The sixth is the tree itself.
 
+- *Reading test projects...*, a gray line and nothing else. It is what a cold
+  start shows while the first index is being built, and it goes when the index
+  is done. Nothing is offered on it because the only thing to do is wait
+  (Rule-TREE-PANEL-118).
 - *\<name\> is not on this machine yet*, a gray line, then the link
-  **Clone \<name\>**.
+  **Clone \<name\>**, and under it **Choose another test project** - or
+  **Create your first test project** when the Testin folder holds none. The
+  clone is what the screen is for and it is not always an offer: without the Git
+  plugin it is gray, and the name came from a file a colleague committed.
 - **Create your first test project**, a link with no gray line above it.
 
 ## Main flow
 
-The panel shows one of five screens. It checks for them in the order of the
+The panel shows one of six screens. It checks for them in the order of the
 table below. Each screen starts with the same header, drawn above. After the
 header come the screen's own line and its own links.
 
@@ -146,7 +166,8 @@ hold one link each.
 |---|---|
 | No Testin folder is set | *Welcome to Testin* and the link **Configure Testin settings** |
 | The bound test project is found | The tree |
-| This code project's `testin.yml` names the test project the tree would show, it is not on this machine, and the file gives its Git address | *\<name\> is not on this machine yet* and the link **Clone \<name\>** |
+| The first index has not finished | *Reading test projects...*, in gray |
+| This code project's `testin.yml` names the test project the tree would show, it is not on this machine, and the file gives its Git address | *\<name\> is not on this machine yet*, the link **Clone \<name\>**, and **Choose another test project** |
 | No test project exists in the Testin folder | The link **Create your first test project** |
 | Otherwise | One link per test project, showing its name and then **Active** or **Inactive**. With more than six test projects, one link instead: **Select the test project for this repository** |
 
@@ -164,9 +185,13 @@ or offers to create the first one when there are none.
 **If the project file cannot be read** — the panel shows, in red, *testin.yml
 names \<name\>, which could not be read*.
 
-**If `testin.yml` is malformed** — the panel shows, in red, *testin.yml could
-not be read*, and under it *Fix the file and press Refresh - the reason is in
-the Testin log*.
+**If `testin.yml` is malformed** — Testin says so once, in a notification
+titled *testin.yml could not be read* and reading *Fix the file and press
+Refresh - the reason is in the Testin log*. The panel then shows whatever it
+would show if the file were not there at all: the test project this machine
+picked, or the choose screen (Rule-TREE-PANEL-119). It used to be a screen of
+its own, holding those two lines and nothing else - and a file is corrected in
+an editor, so that screen had no way off it.
 
 **Testin writes `testin.yml` only when the tester presses Save to testin.yml**
 (Rule-TREE-PANEL-112). It reads it when the code project has one, and goes on

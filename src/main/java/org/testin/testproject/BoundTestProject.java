@@ -80,9 +80,19 @@ public final class BoundTestProject {
      * choice was made; once the file names something else - a pull brought a
      * colleague's change - the file's name is the answer again. So the tester is
      * never held by the file, and the team's change still arrives.
+     * <p>
+     * <b>A file that names nothing names no different project</b>, so the choice
+     * stands (#66, finding 316). It used to be thrown away: taking
+     * {@code testinProject} out of the file, or leaving a file that would not
+     * parse, made {@code inFile} empty, which matched no stored name - and a
+     * tester who had picked a project was put back on the choose screen by an
+     * edit that said nothing about their pick. It is also what lets an unreadable
+     * file behave exactly like an absent one (Rule-TREE-PANEL-119).
      */
     static @NotNull String resolve(final @NotNull String inFile, final @NotNull List<String> choice) {
-        return choice.size() == 2 && choice.get(1).equals(inFile) ? choice.getFirst() : inFile;
+        if (choice.size() != 2) return inFile;
+
+        return inFile.isEmpty() || choice.get(1).equals(inFile) ? choice.getFirst() : inFile;
     }
 
     /**

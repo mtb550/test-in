@@ -33,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
 import com.intellij.ui.components.JBPanelWithEmptyText;
-import org.testin.config.TestinYml;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.RefreshAction;
 import org.testin.explorer.tree.TreePanelTree;
@@ -163,9 +162,16 @@ public final class TreePanel implements Disposable {
      * the screen for an unbound one - and leave it there.
      */
     private void refreshWhenIndexed() {
-        // Nothing indexes without a root, so the wait would never end - and a
-        // root configured later comes back through Apply, which refreshes every
-        // open panel itself.
+        // Nothing indexes without a root, so the wait would never end: with no
+        // root nothing calls indexWithProgress at all, so awaitIndexing would
+        // hold this pooled thread on a latch nobody counts down for as long as
+        // the project is open.
+        //
+        // A root set later comes back on its own route -
+        // SettingsConfigurable.apply calls refreshEveryOpenProject, which calls
+        // reindex() on every open panel. #301 read this return as the reason the
+        // no-root screen stays up and planned to delete it; following Apply
+        // showed the screen is already redrawn, so it stays (#301, D9).
         if (!Services.getInstance(p, TestinRoot.class).isConfigured()) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -316,11 +322,6 @@ public final class TreePanel implements Disposable {
      * tester needs to know (#8).
      */
     private boolean bindTheOnlyProject(final @NotNull Map<String, ProjectStatus> projects) {
-        // Not while testin.yml cannot be read: the panel says that first, and a
-        // file the tester is about to fix may name a different project (#66,
-        // finding 10).
-        if (TestinYml.isUnreadable(p)) return false;
-
         final @NotNull BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
         if (bound.isNamed() || projects.size() != 1) return false;
 
@@ -332,7 +333,7 @@ public final class TreePanel implements Disposable {
     }
 
     /**
-     * The five facts the panel decides on, gathered here and answered by
+     * The six facts the panel decides on, gathered here and answered by
      * {@link PanelState}. The root and the project listing are disk reads, so
      * they are asked for once per draw rather than once per branch.
      */
@@ -345,7 +346,7 @@ public final class TreePanel implements Disposable {
 
         return PanelState.of(
                 Services.getInstance(p, TestinRoot.class).isConfigured(),
-                TestinYml.isUnreadable(p),
+                Services.getInstance(p, ProjectIndexer.class).isIndexed(),
                 boundProject.isPresent(),
                 Services.getInstance(p, BoundTestProject.class).isMissing(underRoot),
                 Services.getInstance(p, BoundTestProject.class).cloneAddress().isPresent(),
@@ -388,8 +389,8 @@ public final class TreePanel implements Disposable {
         // open settings, to index again.
         switch (state) {
             case NO_ROOT -> offerSettings(emptyText);
+            case READING -> sayItIsReading(emptyText);
             case CLONE_BOUND -> offerClone(emptyText, boundProject);
-            case BROKEN_CONFIG -> sayTheFileIsBroken(emptyText);
             case NO_PROJECTS -> offerFirstProject(emptyText);
             case CHOOSE -> offerChoice(emptyText, boundProject);
 
@@ -401,22 +402,21 @@ public final class TreePanel implements Disposable {
     }
 
     /**
-     * UC-TREE-PANEL-001, Rule-TREE-PANEL-002.
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-118.
      * <p>
-     * The repository has a {@code testin.yml} and it could not be read.
+     * The first index has not finished, so no name can resolve yet.
      * <p>
-     * Named rather than offered a way out, because there is no button that
-     * corrects a file: the tester opens it and fixes the line. What the plugin
-     * can do is say which file and that the reason is in the log, instead of
-     * reporting the same "not bound to a test project" an unbound repository
-     * gets - which sent the tester to the picker to fix something the picker
-     * cannot reach (#66, finding 10).
+     * Gray and offered nothing, because the only thing to do about it is wait -
+     * and the wait ends without the tester, through {@link #refreshWhenIndexed()}.
+     * <p>
+     * This is where the broken-file screen used to be. A file that would not
+     * parse is a line to correct in an editor and no button corrects it, so a
+     * screen saying only that was a screen with no way off it: it is one
+     * notification now, raised where the file is read, and the panel answers as
+     * though the file were absent (Rule-TREE-PANEL-119, #301, D2).
      */
-    private void sayTheFileIsBroken(final @NotNull StatusText emptyText) {
-        emptyText.appendLine(Bundle.message("welcome.config.broken", TestinYml.fileName()),
-                SimpleTextAttributes.ERROR_ATTRIBUTES, null);
-        emptyText.appendLine(Bundle.message("welcome.config.broken.detail"),
-                SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
+    private void sayItIsReading(final @NotNull StatusText emptyText) {
+        emptyText.appendLine(Bundle.message("welcome.reading"), SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
     }
 
     /**
@@ -451,11 +451,28 @@ public final class TreePanel implements Disposable {
         // plugin failed with an IDE error instead of a word (#301, row 6).
         if (!OptionalPlugin.GIT.isAvailable()) {
             emptyText.appendLine(AllIcons.Vcs.Clone, OptionalPlugin.GIT.needs(clone), SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
+        } else {
+            emptyText.appendLine(AllIcons.Vcs.Clone, clone, SimpleTextAttributes.LINK_ATTRIBUTES,
+                    e -> new CloneTestProject(p, url, boundProject.name(), this).execute());
+        }
+
+        // The clone is what this screen is for and it is not always an offer:
+        // without the Git plugin it is gray, and the tester was sent here by a
+        // name a colleague committed rather than by one they chose. So the screen
+        // also says what else there is - the other projects under the root, or
+        // the first one when it holds none (#301, D9).
+        emptyText.appendLine("");
+
+        if (underRoot.isEmpty()) {
+            offerFirstProject(emptyText);
             return;
         }
 
-        emptyText.appendLine(AllIcons.Vcs.Clone, clone, SimpleTextAttributes.LINK_ATTRIBUTES,
-                e -> new CloneTestProject(p, url, boundProject.name(), this).execute());
+        emptyText.appendLine(
+                AllIcons.Actions.ModuleDirectory,
+                Bundle.message("welcome.another.project"),
+                SimpleTextAttributes.LINK_ATTRIBUTES,
+                e -> new BindTestProjectDialog(p, underRoot, this::reindex).show());
     }
 
     /**

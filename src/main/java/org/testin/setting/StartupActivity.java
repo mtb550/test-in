@@ -100,18 +100,14 @@ public final class StartupActivity implements ProjectActivity {
         if (bound.isNamed()) {
             Logger.info("Test project for this repository: '" + bound.name() + "'");
         } else {
-            // Said rather than only logged. The name is what the tree shows and
-            // what the reports are headed with, so the tester should hear that
-            // none is chosen when the project opens rather than at the first
-            // report. It asks for a pick, never for testin.yml (Rule-INTERNAL-089).
+            // Logged, not said. The panel's own screen asks for the pick, with
+            // the projects to pick from on it, and it is where the tester goes to
+            // answer - so a balloon on every open of every repository that names
+            // no test project was the same sentence twice, one of them in a place
+            // that cannot act on it. Testin Setup Required stays: no Testin folder
+            // is a different thing, and there is no panel screen for it until one
+            // is set (#301, piece 3).
             Logger.warn("No test project chosen for " + p.getName());
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-                if (p.isDisposed()) return;
-
-                Services.getInstance(p, Notifier.class).warn(p, Bundle.message("startup.no.project.title"),
-                        Bundle.message("startup.no.project.message"));
-            });
         }
 
         if (TestinRoot.isConfigured(testinPath)) {

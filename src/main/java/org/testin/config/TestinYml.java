@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -38,6 +39,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.util.Bundle;
 
 import java.io.IOException;
@@ -433,12 +436,41 @@ public final class TestinYml {
      * a broken config is a panel that says so, never a failed start.
      */
     private static @NotNull TestinProjectConfig load(final @NotNull Project p) {
-        return file(p)
+        final @NotNull TestinProjectConfig config = file(p)
                 .map(TestinYml::read)
                 .orElseGet(() -> {
                     Logger.info("No testin.yml in " + p.getName() + "; Testin goes on without it");
                     return TestinProjectConfig.EMPTY;
                 });
+
+        if (config.isUnreadable()) sayItCouldNotBeRead(p);
+
+        return config;
+    }
+
+    /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-119.
+     * <p>
+     * Says once that the file could not be read, where reading it failed.
+     * <p>
+     * Here rather than on the panel, because a file is corrected in an editor and
+     * no button corrects it: the panel used to hold a screen that said this and
+     * offered nothing, which is a screen with no way off it. Everything below
+     * then answers as though the file were absent, so the tester reaches the tree
+     * their own pick gives (#301, D2).
+     * <p>
+     * Once per read, and a read is a thing that happened: the project opening,
+     * Refresh, or Save to testin.yml writing. A draw is not a read, and the panel
+     * draws many times per read.
+     */
+    private static void sayItCouldNotBeRead(final @NotNull Project p) {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (p.isDisposed()) return;
+
+            Services.getInstance(p, Notifier.class).warn(p,
+                    Bundle.message("config.broken", fileName()),
+                    Bundle.message("config.broken.detail"));
+        });
     }
 
     private static @NotNull TestinProjectConfig read(final @NotNull Path file) {

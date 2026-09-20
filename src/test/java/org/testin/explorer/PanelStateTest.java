@@ -36,40 +36,41 @@ public class PanelStateTest {
      * The six facts, named at the call so a row of booleans is readable. The
      * order is the order {@link PanelState#of} declares them in.
      */
-    private static PanelState of(final boolean rootConfigured, final boolean configUnreadable, final boolean projectResolved, final boolean boundProjectMissing, final boolean cloneUrlKnown, final boolean anyProjectsUnderRoot) {
-        return PanelState.of(rootConfigured, configUnreadable, projectResolved, boundProjectMissing, cloneUrlKnown, anyProjectsUnderRoot);
+    private static PanelState of(final boolean rootConfigured, final boolean indexed, final boolean projectResolved, final boolean boundProjectMissing, final boolean cloneUrlKnown, final boolean anyProjectsUnderRoot) {
+        return PanelState.of(rootConfigured, indexed, projectResolved, boundProjectMissing, cloneUrlKnown, anyProjectsUnderRoot);
     }
 
     /**
-     * UC-TREE-PANEL-001.
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-118.
      * <p>
-     * A file that would not parse is its own answer, and it comes before every
-     * other one but the missing root.
+     * Nothing resolves before the index is built, so nothing below is decided
+     * yet: every row that is not the tree waits.
      * <p>
-     * It used to be indistinguishable from a repository nobody had bound: the
-     * loader answered EMPTY for both, so a mistyped indent was reported as "not
-     * bound to a test project" and then quietly bound to whatever single project
-     * was under the root - writing into the broken file, on every open, and
-     * never saying so (#66, finding 10).
+     * A test project is found in the index, and the panel is built the moment the
+     * tool window opens - which on a cold start is while the index is still being
+     * made. So the name a repository was bound to resolved to nothing for a
+     * second, the choose screen came up, and it carried that name in red with
+     * <i>could not be read</i> beside it: the one screen a tester should never be
+     * shown about a project that is sitting right there and merely not read yet.
      */
     @Test
-    public void aBrokenConfigIsItsOwnAnswer() {
-        assertEquals(of(true, true, false, false, false, true), PanelState.BROKEN_CONFIG,
-                "a file that would not parse is why nothing is bound, so the tester is told that rather than asked to choose");
+    public void nothingIsDecidedBeforeTheIndexIsBuilt() {
+        assertEquals(of(true, false, false, false, false, true), PanelState.READING,
+                "a name that has not resolved because nothing is indexed yet is not a name that resolves to nothing");
 
-        assertEquals(of(true, true, false, true, true, true), PanelState.BROKEN_CONFIG,
-                "a URL read out of a file that would not parse is not a URL to clone from");
+        assertEquals(of(true, false, false, true, true, true), PanelState.READING,
+                "the clone offer waits one draw too, rather than being made about a listing the index has not seen");
 
-        assertEquals(of(false, true, false, false, false, false), PanelState.NO_ROOT,
-                "with no root there is nowhere to look, which is true before the file is worth reading");
+        assertEquals(of(false, false, false, false, false, false), PanelState.NO_ROOT,
+                "with no root nothing indexes at all, so there is nothing to wait for - only a folder to set");
     }
 
     /**
-     * The state every other case in this file is about: a file that read
-     * cleanly, whatever it did or did not say.
+     * A project that resolved is the tree even mid-index: resolving means it is
+     * in the index, so there is nothing left to wait for.
      */
     @Test
-    public void aReadableFileLeavesTheRestOfTheTableAlone() {
+    public void aResolvedProjectBeatsTheWait() {
         assertEquals(of(true, false, true, false, false, true), PanelState.TREE);
     }
 
@@ -89,8 +90,8 @@ public class PanelStateTest {
      */
     @Test
     public void aResolvedProjectIsTheTree() {
-        assertEquals(of(true, false, true, false, false, true), PanelState.TREE);
-        assertEquals(of(true, false, true, false, true, true), PanelState.TREE);
+        assertEquals(of(true, true, true, false, false, true), PanelState.TREE);
+        assertEquals(of(true, true, true, false, true, true), PanelState.TREE);
     }
 
     /**
@@ -99,12 +100,12 @@ public class PanelStateTest {
      */
     @Test
     public void aMissingProjectWithAUrlIsCloned() {
-        assertEquals(of(true, false, false, true, true, false), PanelState.CLONE_BOUND);
+        assertEquals(of(true, true, false, true, true, false), PanelState.CLONE_BOUND);
 
         // Even with other projects sitting under the root: the tester asked for
         // this one, so offering the picker instead would answer a different
         // question than the one the repository has already answered.
-        assertEquals(of(true, false, false, true, true, true), PanelState.CLONE_BOUND);
+        assertEquals(of(true, true, false, true, true, true), PanelState.CLONE_BOUND);
     }
 
     /**
@@ -113,8 +114,8 @@ public class PanelStateTest {
      */
     @Test
     public void aMissingProjectWithoutAUrlFallsBack() {
-        assertEquals(of(true, false, false, true, false, false), PanelState.NO_PROJECTS);
-        assertEquals(of(true, false, false, true, false, true), PanelState.CHOOSE);
+        assertEquals(of(true, true, false, true, false, false), PanelState.NO_PROJECTS);
+        assertEquals(of(true, true, false, true, false, true), PanelState.CHOOSE);
     }
 
     /**
@@ -123,7 +124,7 @@ public class PanelStateTest {
      */
     @Test
     public void anUnboundRepositoryChooses() {
-        assertEquals(of(true, false, false, false, false, true), PanelState.CHOOSE);
+        assertEquals(of(true, true, false, false, false, true), PanelState.CHOOSE);
     }
 
     /**
@@ -132,7 +133,7 @@ public class PanelStateTest {
      */
     @Test
     public void anArchivedProjectChooses() {
-        assertEquals(of(true, false, false, false, true, true), PanelState.CHOOSE);
+        assertEquals(of(true, true, false, false, true, true), PanelState.CHOOSE);
     }
 
     /**
@@ -140,6 +141,6 @@ public class PanelStateTest {
      */
     @Test
     public void anEmptyRootCreates() {
-        assertEquals(of(true, false, false, false, false, false), PanelState.NO_PROJECTS);
+        assertEquals(of(true, true, false, false, false, false), PanelState.NO_PROJECTS);
     }
 }

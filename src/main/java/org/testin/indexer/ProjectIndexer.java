@@ -223,6 +223,20 @@ public final class ProjectIndexer {
     }
 
     /**
+     * UC-TREE-PANEL-001, Rule-TREE-PANEL-118.
+     * <p>
+     * Whether the first index has finished, asked rather than waited for.
+     * <p>
+     * {@link #awaitIndexing()} is the same fact and costs a blocked thread to
+     * read, which the panel cannot pay on a draw: what it needs to know is
+     * whether a name failing to resolve means the project is missing or only
+     * that nothing is indexed yet, and those two want opposite screens.
+     */
+    public boolean isIndexed() {
+        return indexed.get();
+    }
+
+    /**
      * Blocks until the index is built.
      * <p>
      * Only from a thread holding no lock. A read action that blocks here holds
