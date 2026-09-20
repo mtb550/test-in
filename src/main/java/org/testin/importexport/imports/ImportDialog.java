@@ -38,18 +38,9 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-/**
- * The import working dialog: source form on top, one preview tab per sheet
- * filling the middle, a visible Import button at the bottom. Reports the cases
- * the tester ticked through its callback, so a canceled dialog can never be
- * read back for a selection.
- */
 public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
-
     private final @NotNull Consumer<@NotNull Map<String, List<TestCaseDto>>> onImport;
 
-    // Created with the dialog, not on show: the file listener can load data as
-    // soon as the source field is filled.
     private final @NotNull SheetPreview preview;
 
     public ImportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader, final @NotNull Consumer<@NotNull Map<String, List<TestCaseDto>>> onImport) {
@@ -78,8 +69,6 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
     // UC-SHARE-007
     @Override
     protected void submit() {
-        // The form validates and focuses its own field; what the import
-        // consumes is the parsed data below.
         if (component().resolve().isEmpty()) return;
 
         if (preview.isEmpty()) {
@@ -93,11 +82,7 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
             return;
         }
 
-        // Closed before the work starts: the map above is the tester's
-        // choice already taken out of the preview, so nothing the import reads
-        // belongs to a dialog that is gone (#87).
         closeOk();
         onImport.accept(selected);
     }
-
 }

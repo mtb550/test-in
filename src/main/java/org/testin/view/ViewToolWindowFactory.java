@@ -36,10 +36,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
-
-    /**
-     * What a caller with nothing to do afterward passes.
-     */
     private static final @NotNull Consumer<ViewPanel> NOTHING_AFTER = viewer -> {
     };
 
@@ -47,36 +43,15 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         Services.getInstance(p, ViewPanelHolder.class).release(panel);
     }
 
-    /**
-     * This project's panel, once its tool window has built it.
-     */
     public static @NotNull Optional<ViewPanel> panel(final @NotNull Project p) {
         return Services.getInstance(p, ViewPanelHolder.class).get();
     }
 
-    /**
-     * The view tool window, empty in a project that has never opened it - which
-     * is what the platform answers, converted here rather than at five callers.
-     */
     public static @NotNull Optional<ToolWindow> toolWindow(final @NotNull Project p) {
         return Optional.ofNullable(ToolWindowManager.getInstance(p).getToolWindow("testin.view"));
     }
 
-    /**
-     * Rule-VIEW-PANEL-005.
-     * <p>
-     * Tells the details panel that these cases were written, so it re-reads if it
-     * is showing one of them.
-     * <p>
-     * Here rather than at each writer. The panel keeps its own copy of the case,
-     * so every path that writes one has to say so - and they did not: the test
-     * case dialog and undo told it, the run item dialog and the run grid's cell
-     * editor did not, and a tester watched the value they had just typed sit
-     * unchanged in the details beside the cell they typed it into.
-     * <p>
-     * A project whose panel has never been built answers empty and nothing
-     * happens, which is why no caller checks first.
-     */
+    // Rule-VIEW-PANEL-005
     public static void refreshIfShowing(final @NotNull Project p, final @NotNull Collection<TestCaseDto> written) {
         panel(p).ifPresent(view -> view.refreshIfShowing(written));
     }
@@ -103,26 +78,18 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
 
         final @NotNull ContentFactory contentFactory = ContentFactory.getInstance();
 
-        // In declaration order, which is the order they appear in - a tab
-        // added to the enum arrives here without this method changing.
         for (final ViewTab tab : ViewTab.values()) {
             final @NotNull Content content = contentFactory.createContent(tab.paneOf(panel), tab.getDisplayName(), false);
 
-            // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-080. A click on a tab's name,
-            // and Tab, put the keyboard in the tab rather than on the tool
-            // window around it (#311).
+            // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-080
             content.setPreferredFocusableComponent(tab.keyboardTargetOf(panel));
             toolWindow.getContentManager().addContent(content);
         }
 
         toolWindow.setTitleActions(new ViewPanelActions().create(panel, toolWindow.getComponent()));
 
-        // The startup work, and only that: it reads settings, reads testin.yml
-        // and starts the first index, none of which this call is waiting for.
-        // Everything the platform asked for is done above, as in Main.
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!p.isDisposed()) StartupActivity.execute(p);
         });
     }
-
 }

@@ -24,7 +24,6 @@ import org.testin.model.PackageStatus;
 import org.testin.model.markers.TestSetPackageMarker;
 import java.util.List;
 
-
 @Setter
 @Getter
 @NoArgsConstructor
@@ -35,14 +34,10 @@ public class TestSetPackageDirectoryDto extends DirectoryDto {
     @Builder.Default
     private TestSetPackageMarker marker = new TestSetPackageMarker();
 
-
     @Override
     public boolean isTestCaseContainer() {
         return true;
     }
-
-
-
 
     @Override
     public @NotNull DirectoryType getType() {
@@ -59,10 +54,6 @@ public class TestSetPackageDirectoryDto extends DirectoryDto {
         return marker.getStatus() == PackageStatus.ARCHIVED;
     }
 
-    /**
-     * A package of test sets is arranged by the tester: the order of a suite is a plan for
-     * working through it, not an accident of naming.
-     */
     @Override
     public boolean isOrderable() {
         return true;

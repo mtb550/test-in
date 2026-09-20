@@ -34,59 +34,17 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 
-/**
- * Small adapter over IntelliJ Git4Idea command execution.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class GitCommandRunner {
-
     static @NotNull String execute(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String... command) {
         return run(p, workingDirectory, "", command);
     }
 
-    /**
-     * Runs a command that talks to a remote, telling the handler which URL it is
-     * for.
-     * <p>
-     * That is what makes {@code GitLineHandler.isRemote()} true, and it is the
-     * only reason {@code git4idea} sets up its credential helper for the process. Without
-     * it a push over HTTPS gets no authentication support at all: no prompt, no
-     * stored credentials, just a failure that reads as a broken plugin. The URL
-     * is also how the IDE finds the credentials it already has for that host, so
-     * a tester is asked once rather than on every push.
-     */
     static @NotNull String executeRemote(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String remoteUrl, final @NotNull String... command) {
         return run(p, workingDirectory, remoteUrl, command);
     }
 
-    /**
-     * UC-SHARE-012, Rule-SHARE-058.
-     * <p>
-     * Runs a command over a set of paths, handing Git the list in a file rather
-     * than on the command line.
-     * <p>
-     * Windows refuses to start a process whose command line exceeds 32,767
-     * characters, and it refuses it as {@code CreateProcess error=206}, which
-     * names no path and no limit. A test project of 3,320 cases is around 240,000
-     * characters of paths, so committing one after an import failed outright -
-     * and it failed at the size where a tester has the most to lose.
-     * <p>
-     * Batching would only raise the ceiling, and cannot be done at all for
-     * {@code git commit}: the paths of one commit are one command. A file has no
-     * ceiling, so this is the way every path list reaches Git from here on.
-     * <p>
-     * Separated by NUL, which is the one byte a path cannot contain: the names
-     * hold spaces ("Test Cases") and Git applies its own unquoting to a
-     * newline-separated list, so a literal separator is the only one that cannot
-     * misread a name a tester chose.
-     * <p>
-     * Needs Git 2.25 or newer, which is where {@code --pathspec-from-file}
-     * arrived for both {@code add} and {@code commit}.
-     * <p>
-     * Answers nothing, unlike its two siblings: the commands that take a path
-     * list are {@code add}, which prints nothing when it works, and
-     * {@code commit}, whose summary nobody reads. A failure still raises.
-     */
+    // UC-SHARE-012, Rule-SHARE-058
     static void executeOverPaths(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull Collection<String> paths, final @NotNull String... command) {
         if (paths.isEmpty()) throw new IllegalArgumentException("Expected paths to run over");
 
@@ -106,13 +64,6 @@ final class GitCommandRunner {
         }
     }
 
-    /**
-     * The bytes Git reads the path list from.
-     * <p>
-     * Outside the repository deliberately: a file written inside the working
-     * tree is an untracked file, and this one exists only while a command that
-     * is reading the working tree runs.
-     */
     private static @NotNull Path writePathspec(final @NotNull Collection<String> paths) {
         try {
             final @NotNull Path file = Files.createTempFile("testin-pathspec", ".lst");
@@ -124,14 +75,6 @@ final class GitCommandRunner {
         }
     }
 
-    /**
-     * The path list as Git reads it: NUL between entries and none after the
-     * last, because a trailing separator would leave an empty pathspec behind
-     * it and Git rejects the whole command over one.
-     * <p>
-     * Package-private so a test can read what a tester's paths turn into
-     * without starting Git.
-     */
     static byte @NotNull [] pathspecBytes(final @NotNull Collection<String> paths) {
         return String.join("\0", paths).getBytes(StandardCharsets.UTF_8);
     }
@@ -146,15 +89,6 @@ final class GitCommandRunner {
 
         final @NotNull GitLineHandler handler = new GitLineHandler(p, workingDirectory, gitCommand);
 
-        // Nothing the plugin runs is a conversation, so no command of it opens an
-        // editor. `git rebase --continue` otherwise stops to have the replayed
-        // commit's message confirmed - a message the tester never wrote and has
-        // nothing to say about - and the sync then waits on a buffer nobody
-        // asked for, in the middle of resolving a conflict (#89).
-        //
-        // Set here rather than at that one call site: every command runs through
-        // this method, and the next one that would have opened an editor should
-        // not have to remember.
         handler.addCustomEnvironmentVariable(GitCommand.GIT_EDITOR_ENV, "true");
 
         handler.addParameters(Arrays.copyOfRange(command, 2, command.length));
@@ -162,36 +96,17 @@ final class GitCommandRunner {
 
         final @NotNull GitCommandResult result = Git.getInstance().runCommand(handler);
         if (!result.success()) {
-            // Redacted once, here, rather than at each place this ends up: the
-            // same string is logged and thrown, and what catches it writes it
-            // into a balloon. Git names the remote it was working against in its
-            // own failure messages, and an HTTPS remote can carry a token in
-            // that URL (#66).
             final @NotNull String details = GitSafeText.withoutCredentials(
                     result.getErrorOutputAsJoinedString().isBlank()
                             ? result.getOutputAsJoinedString()
                             : result.getErrorOutputAsJoinedString());
 
-            // The log in English, like every log line; the message in the
-            // tester's language, because what catches it puts it in front of
-            // them - "Failed to load branches: Git command failed: ..." read
-            // half in English in every IDE (#66, finding 291).
             Logger.error("Git command failed: " + details);
             throw new IllegalStateException(Bundle.message("git.command.failed", details));
         }
         return result.getOutputAsJoinedString();
     }
 
-    /**
-     * The platform's command object for the word a caller passed.
-     * <p>
-     * A switch on a {@code String} rather than on an enum, and it stays one:
-     * {@link GitCommand} is git4idea's, so there is no constant of ours to
-     * declare this on, and the input is a word rather than a type. The
-     * {@code default} is the point here rather than a gap - an unsupported word
-     * is a caller's mistake and says so, where an enum switch would be answering
-     * for a constant that cannot exist (#169).
-     */
     private static @NotNull GitCommand commandFor(final @NotNull String command) {
         return switch (command) {
             case "add" -> GitCommand.ADD;

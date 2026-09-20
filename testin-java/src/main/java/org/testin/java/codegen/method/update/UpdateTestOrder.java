@@ -43,46 +43,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Puts the generated methods in the order the tester arranged: the position into
- * each method's {@code priority}, and each method into its place in the file.
- * <p>
- * The attribute is called priority because that is TestNG's name for what
- * decides execution order. What it carries is the case's position, which is why
- * this fires on a reorder and not on a change to the case's own High/Medium/Low
- * - that decides nothing about running and writes nothing into the code
- * (Rule-CODEGEN-014).
- * <p>
- * The attribute is what a run obeys. Moving the method is for the person
- * reading the file, so that a class read top to bottom is the test set read top
- * to bottom (#242 follow-up).
- */
+// Rule-CODEGEN-014
 public class UpdateTestOrder extends UpdateTestBase implements GenAction {
-
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (obj instanceof TestCaseDto tc) executeAll(p, List.of(tc));
     }
 
-    /**
-     * UC-CODEGEN-011, Rule-CODEGEN-042, Rule-CODEGEN-067.
-     * <p>
-     * Every case in the sets these belong to, not only the ones handed in.
-     * <p>
-     * A position is a number with no room between two of them, so moving one
-     * case past three others changes where all four sit. A caller that knows it
-     * rearranged a whole set can hand the set over and this costs nothing; one
-     * that moved a single case - the update menu's Order field - would otherwise
-     * write that case's new number and leave every case it jumped carrying the
-     * number it had before.
-     * <p>
-     * <b>One command for the whole set.</b> Each case used to be its own
-     * {@code invokeLater} and its own write command, so dragging one card in a
-     * set of 120 meant 120 events, 120 class lookups and 120 entries in the
-     * IDE's undo - one CTRL+Z per case to take back one drag. That is the
-     * mistake {@code CreateTestMethod} records under #51, and this is the same
-     * fix: resolve the class once and do the set inside one command.
-     */
+    // UC-CODEGEN-011, Rule-CODEGEN-042, Rule-CODEGEN-067
     @Override
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
         final @NotNull Map<Path, List<TestCaseDto>> sets = new LinkedHashMap<>();
@@ -98,25 +66,11 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
                 WriteCommandAction.runWriteCommandAction(p, GenType.UPDATE_TEST_CASE_ORDER.getDescription(), null,
                         () -> ordered.forEach(inSet -> arrange(p, inSet)));
 
-        // Straight through when a command is already open, as UpdateTestBase's
-        // writers are, so a caller's command and this sweep are one undo entry
-        // rather than two (#312, A61). Otherwise handed to a later event and not
-        // waited for: a drag has redrawn the tree and the editor by the time
-        // this runs, and nothing downstream reads the code back.
         if (CommandProcessor.getInstance().getCurrentCommand() != null) inCommand.run();
         else ApplicationManager.getApplication().invokeLater(inCommand);
     }
 
-    /**
-     * UC-CODEGEN-011, Rule-CODEGEN-043, Rule-CODEGEN-067.
-     * <p>
-     * One set: every case's position written into its method, and every method
-     * put after the one before it.
-     * <p>
-     * A case with no method is passed over rather than reported, because the
-     * sweep touches every case in the set and a set half written would say so
-     * once per case (Rule-CODEGEN-044).
-     */
+    // UC-CODEGEN-011, Rule-CODEGEN-043, Rule-CODEGEN-067, Rule-CODEGEN-044
     private void arrange(final @NotNull Project p, final @NotNull List<TestCaseDto> inSet) {
         if (inSet.isEmpty()) return;
 
@@ -125,9 +79,6 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
 
         final @NotNull PsiClass pc = target.get();
 
-        // Read once for the set, not once per case. Asking the class per case
-        // walked every method in it for every case, which is the whole class
-        // squared for one drag.
         final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byCaseId(pc);
 
         @Nullable PsiElement after = null;
@@ -145,31 +96,10 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
             written++;
         }
 
-        // Once for the set, after the moves. The attribute writer used to
-        // reformat each method as it wrote it, so a drag on a set of 120
-        // reformatted 120 times - and every one of those but the last was
-        // formatting a layout the moves below were about to change (#66,
-        // finding 55).
         if (written > 0) reformat(p, pc);
     }
 
-    /**
-     * UC-CODEGEN-011, Rule-CODEGEN-067.
-     * <p>
-     * Puts one method where it belongs and answers with the method now in the
-     * file, which is what the next one goes after.
-     * <p>
-     * <b>Among the generated methods, not among all of them.</b> The first case
-     * goes before whichever generated method currently sits highest, so the
-     * tester's own members - a field, a {@code @BeforeMethod}, a helper written
-     * above the generated block - are not stepped over or shuffled. Testin
-     * arranges what Testin wrote.
-     * <p>
-     * <b>A method already in place is left alone,</b> which is what keeps this
-     * off the diff: a reorder that moved one card rewrites one method rather
-     * than the file. Moving is add-then-delete because PSI has no move; the
-     * added copy is the element that survives, so it is what comes back.
-     */
+    // UC-CODEGEN-011, Rule-CODEGEN-067
     private static @Nullable PsiElement place(final @NotNull PsiClass pc, final @NotNull PsiMethod pm, final @Nullable PsiElement after) {
         if (after == null) {
             final @Nullable PsiMethod first = firstGenerated(pc);
@@ -188,16 +118,6 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
         return moved;
     }
 
-    /**
-     * The generated method that sits highest in the class, and null in a class
-     * that holds none.
-     * <p>
-     * Asked by the case id Testin writes into the annotation, not by the
-     * annotation itself. Any {@code @Test} matched here until now, so a
-     * {@code @Test} the tester wrote by hand above the generated block was taken
-     * for the top of that block and every generated method was moved above it -
-     * a drag rewriting part of a file the tester owns (#66, finding 87).
-     */
     private static @Nullable PsiMethod firstGenerated(final @NotNull PsiClass pc) {
         for (final PsiMethod pm : pc.getMethods()) {
             if (GeneratedMethod.caseIdOf(pm).isPresent()) return pm;
@@ -206,16 +126,10 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
         return null;
     }
 
-    /**
-     * What follows an element once the blank lines between them are stepped
-     * over. Whitespace only: a comment the tester wrote is something, and a
-     * method sitting after one is not where this would have put it.
-     */
     private static @Nullable PsiElement nextAfter(final @NotNull PsiElement element) {
         PsiElement next = element.getNextSibling();
         while (next instanceof PsiWhiteSpace) next = next.getNextSibling();
 
         return next;
     }
-
 }

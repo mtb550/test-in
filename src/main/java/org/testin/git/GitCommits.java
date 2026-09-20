@@ -32,24 +32,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * A commit, and the commits moved between here and the remote.
- * <p>
- * Making a repository, naming its remote and setting who is committing are not
- * that, and were here until #291: they are three things done to a repository,
- * and {@link GitRepositoryService} is the repository. What is left is what the
- * name says.
- */
 public final class GitCommits {
-
     private final @NotNull Project p;
 
-    /**
-     * For the remote's URL, which the network commands need so {@code git4idea} can
-     * authenticate them. Read through the service that owns that question rather
-     * than asked again here - two answers to "what is the remote's URL" is one
-     * more than there should be.
-     */
     private final @NotNull GitRepositoryService repositories;
 
     public GitCommits(final @NotNull Project p) {
@@ -57,12 +42,6 @@ public final class GitCommits {
         this.repositories = new GitRepositoryService(p);
     }
 
-    /**
-     * The marker files present in the repository root and in every directory the
-     * selected test cases sit under. Checked on disk rather than assumed: which
-     * marker a directory carries is what says whether it is a test set, a package
-     * or a container, and only one of them is there.
-     */
     static @NotNull Set<String> markersAlongside(final @NotNull Path repositoryPath, final @NotNull Set<String> testCasePaths) {
         final @NotNull Set<String> markers = new LinkedHashSet<>();
 
@@ -78,17 +57,7 @@ public final class GitCommits {
         return markers;
     }
 
-    /**
-     * UC-SHARE-012, Rule-SHARE-112.
-     * <p>
-     * The screenshots Git reports as changed in the folder of every run being
-     * committed, so a run travels with the pictures it names and never without
-     * them (#313).
-     * <p>
-     * The review lists no screenshot on its own: one only arrives or goes because
-     * a result started or stopped naming it, so the result is the one change a
-     * tester needs to select (#305).
-     */
+    // UC-SHARE-012, Rule-SHARE-112
     static @NotNull Set<String> screenshotsAlongside(final @NotNull List<String> statusLines, final @NotNull Set<String> paths) {
         final @NotNull Set<String> runFolders = paths.stream()
                 .filter(path -> FileKind.of(Path.of(path)) == FileKind.RUN_ITEM)
@@ -97,7 +66,6 @@ public final class GitCommits {
 
         return GitRefs.parseStatus(statusLines).stream()
                 .map(GitRefs.StatusEntry::path)
-                // In a run folder by the line below, so the kind is known here.
                 .filter(path -> FileKind.of(Path.of(path), DirectoryType.TR) == FileKind.SCREENSHOT)
                 .filter(path -> runFolders.contains(folderOf(path)))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -107,23 +75,7 @@ public final class GitCommits {
         return Optional.ofNullable(Path.of(path).getParent()).map(Path::toString).orElse("");
     }
 
-    /**
-     * UC-SHARE-012, Rule-SHARE-054.
-     * <p>
-     * Commits what the tester selected, and the marker files that make it mean
-     * anything.
-     * <p>
-     * A directory is a test set because a {@code .ts} sits in it - the indexer
-     * decides what every node is by looking for its marker. Committing only the
-     * test case JSON therefore pushes files into directories that the colleague
-     * who pulls them cannot see as test sets at all, so the cases never appear in
-     * their tree.
-     * <p>
-     * The review lists markers in their own right now, so one can be committed
-     * deliberately: deactivating a project is a marker edit and nothing else. The
-     * ones above a selected case travel whether they were picked or not, because
-     * without them the case lands somewhere nothing recognizes.
-     */
+    // UC-SHARE-012, Rule-SHARE-054
     public void stageAndCommit(final @NotNull Path repositoryPath, final @NotNull String message, final @NotNull Collection<PendingChange> selectedChanges) {
         final @NotNull Set<String> paths = GitRefs.repoRelativePaths(selectedChanges);
         if (paths.isEmpty()) throw new IllegalArgumentException("No Git changes were selected");
@@ -139,40 +91,13 @@ public final class GitCommits {
         GitCommandRunner.executeOverPaths(p, repositoryPath, paths, "git", "commit", "--only", "-m", message);
     }
 
-    /**
-     * UC-SHARE-012, Rule-SHARE-055.
-     * <p>
-     * Of the paths to commit, the ones {@code git add} can be given.
-     * <p>
-     * It refuses a path that is in neither the working tree nor the index, and
-     * one such path fails the whole command - so the commit would not happen at
-     * all. The old side of a rename someone staged in another tool is exactly
-     * that path: the index already carries the move, and nothing by that name is
-     * left on disk.
-     * <p>
-     * Nothing is lost by leaving them out. {@code git commit --only} takes the
-     * working tree for every path it is given, so a file that is gone is
-     * committed as the deletion it is, staged or not. What still needs staging is
-     * the untracked file, which is every new test case.
-     * <p>
-     * Static and package-private so the Git workflow test stages the way the
-     * plugin does, instead of keeping a second copy of this rule that cannot be
-     * wrong in the same way.
-     */
+    // UC-SHARE-012, Rule-SHARE-055
     static @NotNull Set<String> stageable(final @NotNull Path repositoryPath, final @NotNull Set<String> paths) {
         return paths.stream()
                 .filter(path -> Files.exists(repositoryPath.resolve(path)))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    /**
-     * The short id of the commit at HEAD - what a tester quotes when they say
-     * which commit their work went into, and what the push reports afterward.
-     * <p>
-     * Blank rather than a failure when Git cannot answer: a repository with no
-     * commit in it yet has no HEAD, and the commit that just succeeded must not
-     * be reported as failed because the label for it could not be read.
-     */
     public @NotNull String headCommitId(final @NotNull Path repositoryPath) {
         try {
             return GitCommandRunner.execute(p, repositoryPath, "git", "rev-parse", "--short", "HEAD").trim();
@@ -182,33 +107,12 @@ public final class GitCommits {
         }
     }
 
-    /**
-     * Rebases on top of the remote and pushes - unless there is nothing there to
-     * rebase onto.
-     * <p>
-     * The pull is what stops a push overwriting a colleague's work, so it is not
-     * optional in general. It is impossible on a first push: an empty remote has
-     * no branch, and {@code git pull origin master} against one fails with
-     * "couldn't find remote ref master" before the push is ever attempted. So the
-     * remote is asked whether the branch exists, and the pull is skipped only when
-     * it does not.
-     */
     public void pullAndPush(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
         pullWhereTheRemoteHasBranch(repositoryPath, remote, branch);
         push(repositoryPath, remote, branch);
     }
 
-    /**
-     * UC-SHARE-016, Rule-SHARE-069.
-     * <p>
-     * Pulls the branch, unless the remote does not have it yet - the one pull
-     * both the push and Sync go through.
-     * <p>
-     * Sync used to pull on its own, without asking. A branch started here and
-     * never pushed made {@code git pull} fail with "couldn't find remote ref", so
-     * Sync failed every time and never reached the push that would have given the
-     * branch to the remote (#312, A41).
-     */
+    // UC-SHARE-016, Rule-SHARE-069
     public void pullWhereTheRemoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
         if (!remoteHasBranch(repositoryPath, remote, branch)) {
             Logger.info("Remote " + remote + " has no branch " + branch + " yet; pushing without pulling first");
@@ -218,32 +122,12 @@ public final class GitCommits {
         pull(repositoryPath, repositories.getRemoteUrl(repositoryPath, remote), remote, branch);
     }
 
-    /**
-     * UC-SHARE-016, Rule-SHARE-071.
-     * <p>
-     * Pulls with a rebase, telling the handler which remote URL it is for.
-     * <p>
-     * The URL is what lets the IDE find the credentials it already holds for
-     * that host. This was the one network command in the plugin that did not
-     * pass it, so a sync against a private repository asked for credentials the
-     * IDE had already been given, or failed where every other command succeeded.
-     * <p>
-     * Here rather than on a service of its own. There were two pulls - this
-     * class's, inside pullAndPush, and a one-method GitSyncService holding the
-     * other - so the flags the two passed could drift with nothing failing.
-     */
+    // UC-SHARE-016, Rule-SHARE-071
     private void pull(final @NotNull Path repositoryPath, final @NotNull String remoteUrl, final @NotNull String remote, final @NotNull String branch) {
         GitCommandRunner.executeRemote(p, repositoryPath, remoteUrl,
                 "git", "pull", "--rebase", "--autostash", remote, branch);
     }
 
-    /**
-     * False when the remote has no such branch, and equally when the remote could
-     * not be reached.
-     * <p>
-     * An unreachable remote fails the push a moment later, with a message that
-     * says so. That is better than failing here with one about a missing branch.
-     */
     private boolean remoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
         try {
             return !GitCommandRunner.executeRemote(p, repositoryPath, repositories.getRemoteUrl(repositoryPath, remote),
@@ -254,18 +138,7 @@ public final class GitCommits {
         }
     }
 
-    /**
-     * UC-SHARE-013, Rule-SHARE-077.
-     * <p>
-     * Pushes the branch, and sets its upstream on the way - so a branch that had
-     * none acquires one the first time it is pushed.
-     * <p>
-     * A repository with no remote is refused here, in Testin's own words. Three
-     * call sites ask for a push and only the push action itself checked, so
-     * continuing a rebase in a repository with no remote ran
-     * {@code git push -u "" <branch>} and showed the tester Git's complaint about
-     * an empty remote name instead (#66, finding 81).
-     */
+    // UC-SHARE-013, Rule-SHARE-077
     public void push(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
         if (remote.isBlank()) throw new IllegalStateException(Bundle.message("git.error.no.remote"));
 
@@ -273,6 +146,4 @@ public final class GitCommits {
                 "git", "push", "-u", remote, branch);
         Logger.info("Git push completed for " + repositoryPath);
     }
-
 }
-

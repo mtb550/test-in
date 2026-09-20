@@ -54,21 +54,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GenerateReportAction extends AbstractProjectAction {
-
-    /**
-     * Which run this action reports on, decided by the surface it was built for:
-     * the tree's selected node, or the run an editor is showing.
-     * <p>
-     * It used to be two nullable fields, and every reader worked out again which
-     * constructor had been called (#71).
-     */
     private final @NotNull Supplier<Optional<TestRunDirectoryDto>> selectedRun;
 
-    /**
-     * The tree entry, which registers the shortcut itself: the context menu
-     * builds this once with the tree it belongs to, so there is nothing for the
-     * tree's own registerShortcuts to add that would not bind the key twice.
-     */
     public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, Bundle.message("report.action.text"), Bundle.message("report.action.description"), AllIcons.ToolbarDecorator.Export);
         this.selectedRun = () -> TreeValues.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
@@ -80,12 +67,6 @@ public class GenerateReportAction extends AbstractProjectAction {
         this.selectedRun = () -> editor instanceof RunEditor re ? Optional.of(re.getParent()) : Optional.empty();
     }
 
-    /**
-     * The keyboard route, registered on the list it is reached from - the same
-     * shape as {@link org.testin.actions.EscapeAction}. The two-argument constructor is
-     * the toolbar button, which is clicked rather than typed and so registers
-     * nothing.
-     */
     public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         this(p, editor);
         registerCustomShortcutSet(Shortcuts.GenerateReport.getCustomShortcut(), list);
@@ -105,22 +86,12 @@ public class GenerateReportAction extends AbstractProjectAction {
                 .orElseGet(() -> Bundle.message("report.select.run.description")));
     }
 
-    /**
-     * UC-REPORT-001, Rule-REPORT-016.
-     * <p>
-     * True when the selection is a test run that can be reported on. Asked by
-     * {@code update}, so the tree entry and Ctrl+P gray for the same reason the
-     * toolbar button does.
-     */
+    // UC-REPORT-001, Rule-REPORT-016
     public boolean isAvailable() {
         return selectedRun.get().map(tr -> tr.getMarker().getStatus().isReportable()).orElse(false);
     }
 
-    /**
-     * UC-REPORT-001.
-     * <p>
-     * Direct entry point for toolbar buttons — no AnActionEvent required.
-     */
+    // UC-REPORT-001
     public void execute() {
         selectedRun.get().ifPresent(tr -> new GenerateReportDialog(p,
                 ReportFileName.suggestedFor(p, tr, ZonedDateTime.now()),
@@ -134,15 +105,6 @@ public class GenerateReportAction extends AbstractProjectAction {
 
     // UC-REPORT-001, Rule-REPORT-003
     private void processAndSave(final @NotNull Project p, final @NotNull TestRunDirectoryDto tr, final @NotNull FileTypes format, final @NotNull File outputFile) {
-        // Under a bar rather than on a bare pooled thread: the dialog is gone by
-        // now, and without one the tester sees nothing at all between pressing
-        // Generate and the notification arriving (#87).
-        //
-        // Failures are BackgroundWork's to report, and so is a cancel. This body
-        // had a catch of its own around everything, which ran first: it showed
-        // the tester "Failed to generate PDF report: null" for an exception with
-        // no message, and would have turned Cancel into "Report Error" had the
-        // work ever looked at Cancel (#66, finding 200).
         BackgroundWork.run(p, Bundle.message("report.task.generating", format.getLabel(), tr.getName()), Bundle.message("report.failed.title", format.getLabel()), indicator -> {
             final @NotNull Path dirPath = tr.getPath();
 
@@ -154,25 +116,11 @@ public class GenerateReportAction extends AbstractProjectAction {
 
             final byte[] fileBytes = format.generateReport(p, tr, runData, detailsMap);
 
-            // Rule-REPORT-003. The last moment Cancel can be honored with
-            // nothing left behind. Nothing asked before: the bar offered
-            // Cancel, the work ran to the end, the file was written and "PDF
-            // Report Generated" announced with Open and Copy path under it,
-            // and the platform then filed the finish as a cancel (#312, A49).
+            // Rule-REPORT-003
             indicator.checkCanceled();
 
             write(outputFile, fileBytes);
 
-            // Both actions come from their owners now. Opening was a bare
-            // Desktop call here: no desktop-support check, on the UI thread
-            // where opening blocks until Acrobat or Word starts, and a
-            // failure that only reached the log - so on a machine that
-            // cannot open files the tester pressed Open report and nothing
-            // happened.
-            //
-            // The wording stays this action's own. A report is not an
-            // export, and "PDF Report Generated" says more to the tester
-            // than the export notice's sentence would.
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
             notifier.infoWithActions(p,
@@ -184,10 +132,6 @@ public class GenerateReportAction extends AbstractProjectAction {
         });
     }
 
-    /**
-     * The report onto disk, in one go. An I/O failure travels on to
-     * BackgroundWork, which is the one place a failed report is reported.
-     */
     private static void write(final @NotNull File outputFile, final byte @NotNull [] content) {
         try {
             Files.write(outputFile.toPath(), content);
@@ -211,5 +155,4 @@ public class GenerateReportAction extends AbstractProjectAction {
 
         return detailsMap;
     }
-
 }

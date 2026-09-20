@@ -38,56 +38,20 @@ import java.util.Locale;
 import java.util.Map;
 
 public abstract class BaseCard extends JBPanel<BaseCard> {
-    /**
-     * Size delta of the card title over the list font. Shared with the mouse hit-testing
-     * in {@code CardMouseListener} so hover targets line up with the painted icons.
-     */
     public static final float TITLE_FONT_DELTA = 3.0f;
-    /**
-     * The title, in a text area rather than a label because a label does not
-     * wrap. This is how the plugin wraps text everywhere else - the details rows
-     * and the grid's cell editor do the same three calls - and it keeps the
-     * title as the tester's own words rather than as markup they can break with
-     * a {@code <}.
-     */
     protected final @NotNull JTextArea titleArea = Prose.of("");
     protected final @NotNull JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
     protected final @NotNull Map<String, JBLabel> attributeLabels = new HashMap<>();
     protected final @NotNull JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
     protected final @NotNull BorderLayoutPanel wrapper = new BorderLayoutPanel();
     protected boolean isRowHovered;
-    /**
-     * Which action icon the pointer is over, by name, and empty for none - the
-     * card draws one of them larger, and "none" is a state it draws too.
-     */
     protected @NotNull String hoveredAction = "";
-    /**
-     * Which button the card offers in its run slot. Run until something says
-     * otherwise, so a card whose state nobody tracks still offers the gesture.
-     */
     protected @NotNull CardHoverAction runSlot = CardHoverAction.RUN_TEST_CASE;
-    /**
-     * Whether this case has automation behind it, which is what the navigate
-     * icon draws. Unknown until somebody has looked, and unknown draws what the
-     * button has always drawn.
-     */
     protected @NotNull Automated automation = Automated.UNKNOWN;
-    /**
-     * The title as words, kept beside the label because a wrapped label holds
-     * markup instead - see {@link #layOutTitle}.
-     */
     private @NotNull String plainTitle = "";
-    /**
-     * How wide the title may be drawn before it wraps, and the widest the hover
-     * icons may be pushed out. Unbounded until a list says otherwise, so a card
-     * measured before it is laid out reads as the one-line card it used to be.
-     */
     private int titleColumnWidth = Integer.MAX_VALUE;
 
-    /**
-     * The project this card draws for: whether its icons are offered depends on
-     * it, since code is on per project (Rule-CODEGEN-082).
-     */
+    // Rule-CODEGEN-082
     protected final @NotNull Project p;
 
     public BaseCard(final @NotNull Project p) {
@@ -118,24 +82,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         add(wrapper, BorderLayout.CENTER);
     }
 
-    /**
-     * UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014.
-     * <p>
-     * The title line: the Order and Description attributes drawn together, as in
-     * "1. Log in with a valid user". Either half can be switched off in the
-     * Details popup - an unticked Order drops the number, an unticked Description
-     * arrives as an empty {@code description} - so the space between them belongs
-     * to whichever pair survives.
-     * <p>
-     * Static because two callers need the same answer: the card draws it, and the
-     * mouse listener measures it to know where the hover icons start. Composing it
-     * twice is how they drift.
-     * <p>
-     * The description arrives formatted rather than being formatted here. Both
-     * editors read it through {@code TestEditorAttributes.DESCRIPTION}, which is
-     * the one thing that knows a description is a sentence and a reference is
-     * not - this method only decides where the number goes (#22).
-     */
+    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014
     public static @NotNull String titleText(final int position, final boolean showOrder, final @NotNull String description) {
         final @NotNull String order = showOrder ? String.format(Locale.ENGLISH, "%d.", position) : "";
         final @NotNull String title = description.trim();
@@ -143,17 +90,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         return order.isEmpty() || title.isEmpty() ? order + title : order + " " + title;
     }
 
-    /**
-     * UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-003.
-     * <p>
-     * Lays the card out for the list it is drawn in: the fonts every label takes
-     * from the list, and the width the title has before it wraps, which is the
-     * list's own less what the card spends on insets and hover icons.
-     * <p>
-     * After {@code updateData}, and it has to be: the title cannot be laid out
-     * until both the font it is measured in and the width it must fit are known,
-     * and the font arrives here.
-     */
+    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-003
     public void applyListLayout(final @NotNull JList<?> list) {
         final @NotNull Font listFont = list.getFont();
         final float baseSize = listFont.getSize2D();
@@ -173,36 +110,12 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         layOutTitle();
     }
 
-    /**
-     * Draws the title on one line while it fits, and over as many as it takes
-     * when it does not.
-     * <p>
-     * The size is set by hand because a card is a renderer: it is measured
-     * before it is ever laid out, and a text area only knows how tall its text
-     * is once it knows how wide it may be. Told the column, it answers with the
-     * number of lines the row has to be.
-     * <p>
-     * This was markup first - {@code <html><body style='width:818px'>}, the form
-     * everybody writes - and it measured 1063x22, the whole sentence on one line
-     * with the CSS width silently ignored by the stylesheet a JLabel renders
-     * through. Pinned by CardTitleWrapTest, which asks how tall the card ended
-     * up rather than what it was told to do.
-     */
     private void layOutTitle() {
         titleArea.setText(plainTitle);
         titleArea.setSize(Math.min(titleColumnWidth, Short.MAX_VALUE), Short.MAX_VALUE);
     }
 
-    /**
-     * Draws the row. The title arrives composed - the editor owns what it reads,
-     * because only it knows which attributes are ticked - so neither card decides
-     * anything about it here.
-     */
     protected void updateUI(final int index, final @NotNull String title, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
-        // Kept as it arrived, and put on the label by applyListLayout once the
-        // font and the width it must fit are both known. Not set here as well:
-        // the label's text is markup when the title wraps, so one method composes
-        // it and everything that wants the words reads plainTitle instead.
         plainTitle = title;
 
         setBackground(RowStripe.of(index));
@@ -213,10 +126,6 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         attributeLabels.values().forEach(lbl -> lbl.setVisible(false));
 
         details.forEach((attrName, value) -> {
-            // A caption with nothing after it says nothing: "Executed At: " on a
-            // pending case, "Actual Result: " on a passing one. The framework's
-            // details rows drop blank values for the same reason; the card is the
-            // one place that decides it for every attribute.
             if (value.isBlank()) return;
 
             final @NotNull JBLabel lbl = attributeLabels.computeIfAbsent(attrName, k -> {
@@ -241,17 +150,6 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         }
     }
 
-    /**
-     * Width of the title line exactly as it is drawn, which is where the hover
-     * icons begin. Owned here because the card holds the title as it is drawn:
-     * the editor composes it, and either half of it can be switched off in the
-     * Details popup, so anything that rebuilds the string to measure it drifts
-     * away from what is on screen.
-     * <p>
-     * Capped at the title column, so a title that wrapped puts the icons at the
-     * end of its first line rather than off the card - which is what the width of
-     * the whole unwrapped string would ask for.
-     */
     public int titleWidth() {
         return Math.min(titleArea.getFontMetrics(titleArea.getFont()).stringWidth(plainTitle), titleColumnWidth);
     }

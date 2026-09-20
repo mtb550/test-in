@@ -37,8 +37,6 @@ public class CreateTestSetPackage implements NodeCreator {
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         TestSetPackageDirectoryDto tsp = Services.getInstance(p, DirectoryMapper.class).getTestSetPackageNode(p, newDirPath, parentDir);
 
-        // Nothing when the marker did not land: the write has said why (#312, A5).
         return Services.getInstance(p, ProjectIndexer.class).addTestSetPackage(tsp) ? Optional.of(tsp) : Optional.empty();
     }
 }
-

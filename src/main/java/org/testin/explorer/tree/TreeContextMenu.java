@@ -39,11 +39,6 @@ public class TreeContextMenu extends DefaultActionGroup {
     private final @NotNull Project p;
 
     public TreeContextMenu(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        // No short name: it is the label a group shows when nested as a submenu,
-        // this one is only ever the root of an ActionPopupMenu, and it carried
-        // "Tree Popup Menu" in English wherever the IDE was running. See
-        // AbstractEditorContextMenu, which says the same for the two editors
-        // (#66, finding 95).
         super("", true);
         this.p = p;
 
@@ -52,12 +47,6 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         addSeparator();
 
-        // Every status the selected node has, rather than the seven that were
-        // listed here. A status is a constant on its enum and this menu is the
-        // only place a tester reaches it, so one added there and not here would
-        // be a status nothing could ever set - and nothing would have said so
-        // (#175, C9). One declared group generates them, from the node rather
-        // than from a group per kind of node (#119, #110).
         add(actionsSubMenu(List.of(
                         Declared.forMenu("Testin.UpdateStatus")), List.of(
                         new UndoAction(p, tree, UndoScope.TREE, UndoDirection.UNDO),
@@ -70,8 +59,6 @@ public class TreeContextMenu extends DefaultActionGroup {
                         Declared.forMenu("Testin.CutNode"),
                         Declared.forMenu("Testin.PasteNode"))));
 
-        // Added in every IDE, and grayed with the reason when TestNG is missing,
-        // like every other entry that needs a plugin (#66, finding 142).
         addSeparator();
         add(Declared.forMenu("Testin.RunTests"));
 
@@ -81,9 +68,6 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         add(Declared.forMenu("Testin.Import"));
 
-        // Added in every IDE, and grayed with the reason when Git is missing.
-        // Leaving them out gave the menu a different shape in two IDEs with
-        // nothing to say why (#273).
         addSeparator();
         add(Declared.forMenu("Testin.SyncWithRemote"));
         add(Declared.forMenu("Testin.ViewPendingCommits"));
@@ -96,13 +80,11 @@ public class TreeContextMenu extends DefaultActionGroup {
         add(new GenerateReportAction(p, tree));
 
         add(Declared.forMenu("Testin.ShowNodeDetails"));
-
     }
 
     public void registerShortcuts(final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
         new EscapeAction(p, tree, transferHandler);
         new OpenContextMenuAction(tree, this);
-
     }
 
     @Override
@@ -110,20 +92,10 @@ public class TreeContextMenu extends DefaultActionGroup {
         return ActionUpdateThread.EDT;
     }
 
-
-    /**
-     * The Actions submenu: every status each kind can be set to, then the rest.
-     * <p>
-     * Two lists rather than one because the first is the three declared status
-     * groups, each generating its entries from an enum, and the second is
-     * written out - and a generated group joined to a literal one reads better
-     * than either a stream of both or a list nobody can tell apart.
-     */
     private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends AnAction> statusGroups, final @NotNull List<? extends AnAction> rest) {
         final @NotNull DefaultActionGroup group = ActionsMenu.group();
         statusGroups.forEach(group::add);
         rest.forEach(group::add);
         return group;
     }
-
 }

@@ -33,14 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/**
- * Collects the failure details when a test case is set to Failed: the actual
- * result (with the test case's description and expected result as muted
- * context), bug severity and bug priority — all framework components. Saves
- * on Enter, cancels on Escape; nothing is applied unless saved.
- */
 public class FailedResultDialog extends AbstractFrameworkDialog<SpellCheckedField> {
-
     private final @NotNull Consumer<FailureFields> onSave;
     private final @NotNull FailureFields fields;
 
@@ -49,19 +42,12 @@ public class FailedResultDialog extends AbstractFrameworkDialog<SpellCheckedFiel
         super(p);
         this.onSave = onSave;
 
-        // The case is wired lazily by the run editor; a run item whose test case
-        // no longer exists in the test set never gets one.
         final @NotNull Optional<TestCaseDto> tc = runItem.testCase();
 
         fields = new FailureFields(p, runPath, runItem);
 
         title = Bundle.message("dialog.failed.result.title");
 
-        // The dialog still opens without the test case: the tester came here to
-        // read and edit the recorded result, which lives on the run item. Only
-        // the two rows describing the case are affected, and the Expected row
-        // is left blank rather than filled with an apology - DialogDetails drops
-        // blank rows, so it simply does not appear.
         final @NotNull String description = tc.map(TestCaseDto::getDescription).orElse(Bundle.message("dialog.failed.result.gone"));
         final @NotNull String expectedResult = tc.map(TestCaseDto::getExpectedResult).orElse("");
 
@@ -83,10 +69,6 @@ public class FailedResultDialog extends AbstractFrameworkDialog<SpellCheckedFiel
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145
     @Override
     protected void submit() {
-        // Handed to the caller rather than applied to this row: the caller writes
-        // them onto the run as the indexer holds it now, which a sync may have
-        // replaced since this row was read (#66, findings 131 and 145). Escape
-        // never reaches here, so it never commits the edit.
         onSave.accept(fields);
         closeOk();
     }

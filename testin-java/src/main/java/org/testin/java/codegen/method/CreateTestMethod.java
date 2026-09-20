@@ -43,18 +43,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class CreateTestMethod implements GenAction {
-
     private static final @NotNull String TESTNG_TEST = "org.testng.annotations.Test";
 
-    /**
-     * Splits an FQCN list into the parts the generator needs, or null when there
-     * is no class and method to split into.
-     * <p>
-     * Both entry points read the same four values out of the list, and only the
-     * sync one used to check the length first — so a short FQCN threw
-     * IndexOutOfBoundsException out of the async path. Splitting in one place is
-     * what stops the two drifting apart again.
-     */
     static @NotNull Optional<Target> parse(final @NotNull List<String> fqcn) {
         if (fqcn.size() < 2) return Optional.empty();
 
@@ -65,52 +55,15 @@ public class CreateTestMethod implements GenAction {
                 fqcn.getLast()));
     }
 
-    /**
-     * UC-CODEGEN-002.
-     * <p>
-     * Writes the method here and now, in the caller's command when there is one.
-     * <p>
-     * A command inside a command is the outer one, so a caller generating for a
-     * whole set - an import, a copied test set - opens one command around its
-     * loop and gets one write lock, one reparse of the class and one undo entry
-     * instead of one of each per case. This used to hand every case to
-     * {@code invokeLater}, which put each one in an event of its own and so
-     * outside any command the caller had opened: fifty cases meant fifty
-     * separate freezes and fifty entries in the IDE's undo (#51).
-     * <p>
-     * On the EDT, because a write command action is. Both callers are: a dialog
-     * that just closed, and the copy's completion.
-     */
+    // UC-CODEGEN-002
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        // One case is a set of one. There is no second way of writing a method
-        // here: the two used to differ only in that this one added through the
-        // PSI and the other wrote text, which is a difference in speed, not in
-        // what ends up in the file.
         executeAll(p, List.of(tc));
     }
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-018.
-     * <p>
-     * Writes the methods for these cases. The only way in - one case comes
-     * through it as a set of one.
-     * <p>
-     * A test set is one class, and the work that belongs to the class was once
-     * done per case: finding it through the stub index, and reformatting after
-     * every method. Both happen once per class here, and the methods go in as
-     * one edit rather than one insertion each. One sheet of 550 took 38 seconds
-     * to generate before that and takes under two now (#66, 25).
-     * <p>
-     * Grouped by class rather than assumed to be one, because nothing stops a
-     * caller handing over cases from two sets.
-     * <p>
-     * On the EDT, because a write command action is - and one command around
-     * the whole set, so a sheet is one write lock and one undo entry rather
-     * than one of each per case (#51).
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-018
     @Override
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
         final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
@@ -128,24 +81,11 @@ public class CreateTestMethod implements GenAction {
                 () -> byClass.values().forEach(group -> createMethods(p, group)));
     }
 
-    /**
-     * Why this case gets no method, and how loudly to say it.
-     * <p>
-     * Empty is ordinary and short is not. A case with no description names no
-     * method, and that is a case somebody has not finished writing rather than
-     * anything wrong - it gets its method the moment they give it a description
-     * (#155). A list that is short for any other reason is a tree this cannot
-     * read, which is the error the message was written for.
-     */
     private void noMethodFor(final @NotNull TestCaseDto tc, final @NotNull List<String> fqcn) {
         if (fqcn.isEmpty()) Logger.debug("No description yet, so no method to write for " + tc.getId());
         else Logger.error("FQCN list is too short to generate a method: " + fqcn);
     }
 
-    /**
-     * The methods of one class. Anything the class cannot be found for falls
-     * back to the per-case path, which writes the file out and reads it back.
-     */
     private void createMethods(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
         final @NotNull Optional<Target> first = parse(Fqcn.ofMethod(cases.getFirst()));
         if (first.isEmpty()) return;
@@ -159,22 +99,7 @@ public class CreateTestMethod implements GenAction {
                         Fqcn.methodNameOf(tc), tc)));
     }
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-016.
-     * <p>
-     * Writes a whole set of methods into the class as one edit.
-     * <p>
-     * Adding them through the PSI one at a time is what made this slow: every
-     * add throws away the class's member cache, the next add rebuilds it, and
-     * the rebuild grows with the class - so the last method of a sheet costs
-     * several times the first. Measured at 550 methods, the batches went from
-     * 590ms to 2,035ms across one import for identical work.
-     * <p>
-     * The text of every method goes in at the closing brace in a single
-     * document edit, the file is parsed once, and the inserted span is
-     * formatted once. Nothing reads the class between the first method and the
-     * last, so nothing has to rebuild anything.
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-016
     private void injectAsText(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> cases) {
         final @NotNull PsiFile file = targetClass.getContainingFile();
         final @NotNull PsiDocumentManager documents = PsiDocumentManager.getInstance(p);
@@ -185,15 +110,6 @@ public class CreateTestMethod implements GenAction {
             return;
         }
 
-        // Named before anything is written: the class does not change until the
-        // single edit below, so what it already holds is read once and what this
-        // pass adds is remembered as it goes. That also catches a sheet listing
-        // one description twice, which asking the class could not.
-        //
-        // Keys to the case that owns them, empty for a method a tester wrote
-        // themselves. Keys rather than names because a method differing only in
-        // casing or underscores is the same method, and the exact compare wrote
-        // a stub beside it (#66, finding 41).
         final @NotNull Map<String, String> owners = new HashMap<>();
         final @NotNull Map<String, PsiMethod> byKey = new HashMap<>();
         for (final PsiMethod pm : targetClass.getMethods()) {
@@ -214,26 +130,11 @@ public class CreateTestMethod implements GenAction {
         for (final TestCaseDto tc : cases) {
             final @NotNull String id = tc.getId().toString();
 
-            // Asked of the id rather than of the name, which is the whole of
-            // #244: a case whose method exists is one carrying its id, not one
-            // whose description happens to sanitize the same way.
             if (generated.containsKey(id)) {
                 alreadyThere++;
                 continue;
             }
 
-            // The last refusal, after the dialogs' first one. A description that
-            // cannot become a Java identifier - one starting with a digit, one
-            // that is only punctuation, one that lands on a keyword - is refused
-            // in the Create and Update dialogs, and reaches here anyway from the
-            // import wizard, a sync carrying a case written on another machine,
-            // and hand-edited JSON in the data root.
-            //
-            // It used to be written out as text: "public void 4redxkJfsdf()"
-            // went into the class with no error at the time, and the next
-            // description change threw IncorrectOperationException out of a
-            // write action. Skipped and said out loud instead, which is what a
-            // case with no method already gets (#66, finding 40).
             if (!NameSanitizer.canMakeMethodName(tc.getDescription())) {
                 cannotBeNamed.add(tc);
                 continue;
@@ -244,20 +145,6 @@ public class CreateTestMethod implements GenAction {
             final @NotNull Optional<String> owner = Optional.ofNullable(owners.get(key));
 
             if (owner.isPresent()) {
-                // A method with no case id is the tester's own, written for this
-                // case by hand. Its body is left exactly as they wrote it - what
-                // is added is the case's id, so that Navigate to Code, Run and
-                // every updater can find it. Skipping silently is what left a
-                // hand-automated class reporting "no automation has been
-                // generated yet" for every case in it (#66, finding 41).
-                //
-                // Only a method carrying @Test, though. A helper, a @BeforeMethod
-                // or a constructor has no case id either, and it was taken for the
-                // tester's own test: adopt found no @Test to write the id into and
-                // did nothing, the case was counted as linked, and it never got a
-                // method - Automate Test Case then said "Automated 1" over it on
-                // every press (#66, finding 192). A generated method beside it
-                // would not compile, so the case has lost the name, and says so.
                 final @NotNull Optional<PsiMethod> theTestersOwn = Optional.ofNullable(byKey.get(key))
                         .filter(pm -> owner.orElseThrow().isEmpty() && GeneratedMethod.testAnnotationOf(pm).isPresent());
 
@@ -266,10 +153,6 @@ public class CreateTestMethod implements GenAction {
                     owners.put(key, id);
                     adopted++;
                 }
-                    // Another method already answers to that name - another case's,
-                    // or one that is not a test - so this one would get no method:
-                    // unrunnable, unreachable from the gutter, and until now silent
-                    // (#244).
                 else lostTheName.add(tc);
                 continue;
             }
@@ -278,8 +161,6 @@ public class CreateTestMethod implements GenAction {
             methods.append('\n').append(methodText(p, methodName, tc)).append('\n');
         }
 
-        // Counted, not narrated. Re-importing a sheet skips every method in it,
-        // and a line each buried everything else the import had to say.
         if (alreadyThere > 0) {
             Logger.info(alreadyThere + " of " + testMethods(cases.size())
                     + " already in " + targetClass.getQualifiedName());
@@ -297,12 +178,6 @@ public class CreateTestMethod implements GenAction {
 
         if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, JavaPsiFacade.getElementFactory(p));
 
-        // The import is a PSI change, and a pending PSI change locks the
-        // document against being edited as text - the platform throws "Document
-        // is locked by write PSI operations" rather than letting the two ways of
-        // writing the same file interleave. Writing it through first is what the
-        // message asks for, and it is also why the brace is located afterwards:
-        // adding an import moves everything below it.
         documents.doPostponedOperationsAndUnblockDocument(document.orElseThrow());
 
         final @NotNull Optional<PsiElement> closingBrace = Optional.ofNullable(targetClass.getRBrace());
@@ -318,20 +193,7 @@ public class CreateTestMethod implements GenAction {
         CodeStyleManager.getInstance(p).reformatText(file, insertAt, insertAt + methods.length());
     }
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-011.
-     * <p>
-     * These cases have no method because their description cannot become one.
-     * <p>
-     * Counted and named like its sibling above, and for the same reason: an
-     * import carrying thirty such cases is one problem with thirty examples, and
-     * thirty balloons is how a tester learns to dismiss the first.
-     * <p>
-     * It says what to do, because there is exactly one thing: give the case a
-     * description that starts with a letter. The dialogs refuse the same names
-     * while the tester is still typing, so a case that got here came in another
-     * way - an import, a sync, or a hand-edited file.
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-011
     private void reportCannotBeNamed(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> cannotBeNamed) {
         if (cannotBeNamed.isEmpty()) return;
 
@@ -342,23 +204,7 @@ public class CreateTestMethod implements GenAction {
                 Bundle.message("codegen.cannot.name.message", named(cannotBeNamed)));
     }
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-001.
-     * <p>
-     * Says which test cases got no method because another case already answers
-     * to the name theirs would have had.
-     * <p>
-     * The dialogs refuse a description that clashes, so a tester cannot type one
-     * in. These arrive by the doors that cannot be refused - an imported sheet,
-     * a paste, a branch switch, a sync - or were already on disk before the
-     * refusal existed. Left silent they were counted in with the methods that
-     * were skipped for already existing, and the tester found out at the first
-     * F5 that a case could not be run and could not be jumped to (#244).
-     * <p>
-     * A notification that stays rather than a balloon that fades: generation
-     * runs after an import, on its own time, and what it asks for - rewording
-     * one of the two descriptions - is not something to do on the spot.
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-001
     private void reportLostTheName(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> lost) {
         if (lost.isEmpty()) return;
 
@@ -369,28 +215,18 @@ public class CreateTestMethod implements GenAction {
                 Bundle.message("codegen.name.taken.message", named(lost)));
     }
 
-    /**
-     * The title both refusals share: how many test cases went without a method.
-     */
     private static @NotNull String noMethodTitle(final @NotNull List<TestCaseDto> without) {
         return without.size() == 1
                 ? Bundle.message("codegen.no.method.one")
                 : Bundle.message("codegen.no.method.many", String.valueOf(without.size()));
     }
 
-    /**
-     * Up to three of them by description, quoted, and how many more there are.
-     */
     private static @NotNull String named(final @NotNull List<TestCaseDto> cases) {
         final @NotNull String names = cases.stream().limit(3).map(TestCaseDto::getDescription).collect(Collectors.joining("\", \"", "\"", "\""));
 
         return cases.size() > 3 ? Bundle.message("codegen.named.and.more", names, String.valueOf(cases.size() - 3)) : names;
     }
 
-    /**
-     * The way that needs neither a document nor a brace, for the classes where
-     * the one edit cannot be made. Slower, and says why it is being used.
-     */
     private void oneAtATime(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> cases, final @NotNull String reason) {
         Logger.warn("Writing " + cases.size() + " methods one at a time into "
                 + targetClass.getQualifiedName() + ": " + reason);
@@ -400,10 +236,6 @@ public class CreateTestMethod implements GenAction {
             if (injectMethod(p, targetClass, Fqcn.methodNameOf(tc), tc).isPresent()) written++;
         }
 
-        // Once for the class, not once per method. This is the slow path
-        // already - it is here because the one edit could not be made - and
-        // reformatting each method as it landed made it slower for no reason
-        // the tester can see (#66, finding 25).
         if (written > 0) CodeStyleManager.getInstance(p).reformat(targetClass);
     }
 
@@ -414,10 +246,6 @@ public class CreateTestMethod implements GenAction {
                         + methodName + "'"));
     }
 
-    /**
-     * The fallback path: the class file is on disk but the PSI did not give us
-     * the class, so it is read back and the method injected into it.
-     */
     private void injectIntoFile(final @NotNull Project p, final @NotNull VirtualFile sourceRoot, final @NotNull List<String> packageList, final @NotNull String className, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
             final @NotNull String relativePath = String.join("/", packageList) + "/" + className + ".java";
@@ -427,8 +255,6 @@ public class CreateTestMethod implements GenAction {
                 return;
             }
 
-            // instanceof answers no for a file the PSI has not loaded and for one
-            // that is not Java, which are the same thing to do about here.
             if (!(PsiManager.getInstance(p).findFile(found.orElseThrow()) instanceof PsiJavaFile javaPsiFile)) {
                 Logger.error("retryInjectPhysically: file " + className + ".java is not a valid Java file for method '" + methodName + "'");
                 return;
@@ -448,24 +274,11 @@ public class CreateTestMethod implements GenAction {
         }
     }
 
-    /**
-     * Whether the file already imports TestNG's @Test. The platform answers "it
-     * does not" with no import statement, and this is the one place that reads
-     * that.
-     */
     private static boolean alreadyImportsTest(final @NotNull PsiImportList imports) {
         return imports.findSingleClassImportStatement(TESTNG_TEST) != null;
     }
 
-    /**
-     * UC-CODEGEN-002.
-     * <p>
-     * Puts the TestNG @Test import in the file, when it is not there already.
-     * <p>
-     * Both of the platform's empty answers mean the same thing here - a file
-     * with no import list of its own, and a TestNG that is not on the classpath
-     * - so neither is asked about separately.
-     */
+    // UC-CODEGEN-002
     private void addTestImport(final @NotNull Project p, final @NotNull PsiJavaFile javaFile, final @NotNull PsiElementFactory factory) {
         Optional.ofNullable(javaFile.getImportList())
                 .filter(imports -> !alreadyImportsTest(imports))
@@ -474,46 +287,22 @@ public class CreateTestMethod implements GenAction {
                         .ifPresent(testClass -> imports.add(factory.createImportStatement(testClass))));
     }
 
-    /**
-     * A count of test methods, singular when there is one. Log lines are read
-     * by people.
-     */
     private static @NotNull String testMethods(final int howMany) {
         return howMany + " test method" + (howMany == 1 ? "" : "s");
     }
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-014, Rule-CODEGEN-046.
-     * <p>
-     * The source of one generated test method: its TestNG annotation and an
-     * empty body. Written here for both ways of adding it - one at a time
-     * through the PSI, and a whole set as text.
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-014, Rule-CODEGEN-046
     private static @NotNull String methodText(final @NotNull Project p, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         final @NotNull StringBuilder attributes = new StringBuilder();
 
-        // No No-Group filter any more: a case in no group holds an empty list,
-        // where it used to hold a constant that meant the same thing (#296).
         if (!tc.getGroup().isEmpty()) {
-            // Escaped, not only quoted: a group is free text, and one holding a
-            // quote or a backslash stopped the whole class compiling (#312, A58).
             final @NotNull List<String> quoted = tc.getGroup().stream().map(JavaLiteral::of).toList();
 
             attributes.append(", groups = {").append(String.join(", ", quoted)).append("}");
         }
 
-        // The case's place in its test set, not its High/Medium/Low. TestNG runs
-        // methods in priority order, so this is what makes a run execute in the
-        // order the tester arranged - which is what the attribute is for here.
-        // The case's own priority stays a Testin field, shown in the grid and
-        // the reports; it decides nothing about execution.
         attributes.append(", priority = ").append(ExecutionPosition.of(p, tc));
 
-        // No quotes around the description here: JavaLiteral.of returns a
-        // quoted literal, brackets included. Wrapping it again wrote
-        // description = ""verify login"", which is not a Java string - the
-        // parser kept the raw text, newlines and all, and the generated class
-        // did not compile.
         final @NotNull String annotation = String.format("@Test(description = %s, testName = \"%s\"%s)",
                 JavaLiteral.of(tc.getDescription()),
                 tc.getId(),
@@ -523,16 +312,7 @@ public class CreateTestMethod implements GenAction {
                 + methodName + "\n}";
     }
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-016.
-     * <p>
-     * Adds one method through the PSI and hands back what it added, or nothing
-     * when the class already had it. The caller reformats what it gets.
-     * <p>
-     * The slow way, kept for the two places that cannot write text: a class
-     * with no document to edit, and one the PSI would not give us at all, which
-     * is read back off disk instead.
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-016
     private @NotNull Optional<PsiElement> injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
             final @NotNull PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
@@ -540,28 +320,17 @@ public class CreateTestMethod implements GenAction {
 
             if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, factory);
 
-            // By the case's id first, exactly as the batch path asks: a method
-            // already carrying this id is this case's method, whatever it has
-            // since been renamed to.
             if (GeneratedMethod.forCase(targetClass, tc).isPresent()) {
                 Logger.info("Method already exists: " + methodName);
                 return Optional.empty();
             }
 
-            // The key compare has to see every method's name, so this walks the
-            // class - affordable only because this is the rare per-case
-            // fallback. The batch path above pays for its walk once per class,
-            // which is what the finding about half a million comparisons asked
-            // for (#66, finding 23).
             final @NotNull String key = NameSanitizer.methodKey(methodName);
             final @NotNull Optional<PsiMethod> sameName = Arrays.stream(targetClass.getMethods())
                     .filter(pm -> key.equals(NameSanitizer.methodKey(pm.getName())))
                     .findFirst();
 
             if (sameName.isPresent()) {
-                // Another case owning the name is #244 and has to be said out
-                // loud; a method with no case id is one the tester wrote, and
-                // leaving that alone is what the key compare is for.
                 if (GeneratedMethod.caseIdOf(sameName.orElseThrow()).isPresent() || GeneratedMethod.testAnnotationOf(sameName.orElseThrow()).isEmpty())
                     reportLostTheName(p, targetClass, List.of(tc));
                 else
@@ -582,10 +351,6 @@ public class CreateTestMethod implements GenAction {
         }
     }
 
-    /**
-     * The pieces of a fully qualified method name: everything before the method
-     * for the file path, the package segments, the class, and the method.
-     */
     record Target(@NotNull String path, @NotNull List<String> packageList, @NotNull String className, @NotNull String methodName) {
     }
 }

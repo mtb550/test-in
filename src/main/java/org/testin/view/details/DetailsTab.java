@@ -54,19 +54,7 @@ import java.util.Optional;
 import java.util.List;
 import java.util.stream.Stream;
 
-/**
- * What a test case is, drawn: its title, its rows, the run's record of it, and
- * its badges.
- * <p>
- * Only that. Editing the case it is showing is {@link EditShownCase}, which took
- * 85 of this class's 322 lines with it when #302 split them - the key that opens
- * the update menu, the write that follows, and the question of where a case
- * shown from a search result would even be written to. Drawing a case and
- * opening the editor for it are two jobs, and this one is the first.
- */
 public class DetailsTab {
-
-
     final int SCROLL_UNIT_INCREMENT = 16;
     final @NotNull String PLACEHOLDER_TEXT = Bundle.message("details.placeholder");
     final int INSETS_DEFAULT = 5;
@@ -99,10 +87,6 @@ public class DetailsTab {
 
         FontSync.attachWheelZoom(p, contentPanel);
 
-        // The other half of the wheel, as the grid and the cards install it. A
-        // component with a wheel listener receives the wheel itself instead of
-        // the scroll pane around it, so with only the zoom listener a plain wheel
-        // did nothing here and only the scroll bar moved the case (#312, A75).
         contentPanel.addMouseWheelListener(WheelForwarding::forwardWheelToScrollPane);
 
         detailsTab.add(scrollPane, BorderLayout.CENTER);
@@ -110,20 +94,6 @@ public class DetailsTab {
         EditShownCase.bindTo(p, detailsTab);
     }
 
-    /**
-     * The run's own record of this case, and empty when the case is not being
-     * viewed under one.
-     * <p>
-     * Found from the path rather than passed in, because the path is the only
-     * thing the two doors into this panel agree on - the run editor's context
-     * menu and its grid double-click both hand over the node the selection came
-     * from, and the test editor hands over a test set, which resolves to no run
-     * and is exactly the case that must show no run rows.
-     * <p>
-     * The row comes from the indexer, which is the same object the run editor
-     * loaded and writes verdicts into, so the panel shows what the run holds
-     * now rather than a copy of what it held when it was opened.
-     */
     private static @NotNull Optional<TestRunItems> runItemFor(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
         if (currentPath.isEmpty()) return Optional.empty();
 
@@ -152,10 +122,6 @@ public class DetailsTab {
         addVerticalSpacer(panel, row);
     }
 
-    /**
-     * Rows shown in the details panel, in display order. Rows with custom rendering
-     * are dedicated components; plain label/value rows are table-driven.
-     */
     private @NotNull List<BaseDetails> detailRows(final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
         return Stream.of(
                 Stream.of(
@@ -169,20 +135,6 @@ public class DetailsTab {
         ).flatMap(rows -> rows).toList();
     }
 
-    /**
-     * What one execution of this case recorded, in the order a tester asks it:
-     * the verdict, how long it took, what actually happened, why, how bad the
-     * bug is, and the issue it was reported as.
-     * <p>
-     * Above the case's own attributes, because a tester who opened this panel
-     * during a run came for these. Below the badges, because the case still has
-     * to be identifiable first.
-     * <p>
-     * Present only when the case is being viewed under a run - opened from a run
-     * editor rather than from the test editor or a search result. A case nobody
-     * has run has no verdict and no duration, and seven rows saying so with a
-     * dash are seven lines read on every case to learn nothing.
-     */
     private static @NotNull Stream<BaseDetails> runRows(final @NotNull TestRunItems item, final @NotNull List<String> currentPath) {
         return Stream.of(
                 new RunAttributeRow(RunEditorAttributes.RUN_STATUS, item),
@@ -194,37 +146,15 @@ public class DetailsTab {
                 new BugIssueRow(item, currentPath));
     }
 
-    /**
-     * The case itself: the same rows wherever it is shown.
-     */
     private static @NotNull Stream<BaseDetails> caseRows() {
         return Stream.of(
                 new AttributeRow(TestEditorAttributes.EXPECTED_RESULT.getName(), (p, dto) -> TestEditorAttributes.EXPECTED_RESULT.displayValue(dto)),
                 new Steps(),
                 new AttributeRow(TestEditorAttributes.PRE_CONDITIONS.getName(), (p, dto) -> TestEditorAttributes.PRE_CONDITIONS.displayValue(dto)),
-                // Verbatim, and not through Display: test data is credentials, a
-                // query, a payload - values that are used, not read, so a
-                // character this panel decides to drop is a value that no longer
-                // works. The line breaks are the tester's own now that the field
-                // is multi-line, and the row renders them.
                 new AttributeRow(TestEditorAttributes.TEST_DATA.getName(), (p, dto) -> TestEditorAttributes.TEST_DATA.displayValue(dto)),
-                // No FQCN row. The fully qualified class and method name is how
-                // the plugin finds the generated code to navigate to and run -
-                // it is machinery, not something a tester reads while executing.
-                // It stays available as a toolbar attribute for anyone who wants
-                // it on the card or in the grid; it is only off the always-on
-                // panel.
                 new AttributeRow(TestEditorAttributes.REFERENCE.getName(), (p, dto) -> TestEditorAttributes.REFERENCE.displayValue(dto)),
                 new AttributeRow(TestEditorAttributes.MODULE.getName(), (p, dto) -> TestEditorAttributes.MODULE.displayValue(dto)),
-                // Where the case sits in its set, which is the number the card
-                // draws before the description and the number a generated
-                // method carries as its priority. Read from the set rather than
-                // the case: a position is what the set says, not something the
-                // case stores.
                 new AttributeRow(TestEditorAttributes.ORDER.getName(), (p, dto) -> String.valueOf(ExecutionPosition.of(p, dto))),
-                // Two rows for two facts, not four. Who and when read as one
-                // thing, and four captions to say two of them filled a quarter
-                // of the panel with words nobody needed twice (#23).
                 new AttributeRow(Bundle.message("details.created"), (p, dto) -> Display.whoAndWhen(dto.getCreatedBy(), dto.getCreatedAt())),
                 new AttributeRow(Bundle.message("details.updated"), (p, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt()))
         );
@@ -244,7 +174,4 @@ public class DetailsTab {
         spacerGbc.weighty = SPACER_WEIGHT_Y;
         panel.add(Box.createVerticalGlue(), spacerGbc);
     }
-
-
-
 }

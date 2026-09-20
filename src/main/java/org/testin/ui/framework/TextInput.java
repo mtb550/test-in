@@ -30,29 +30,12 @@ import javax.swing.text.DocumentFilter;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-/**
- * A large input field on its own — the component of the rename dialog and any
- * other single-value input. Same look and empty-submit cue as
- * {@link TextFieldWithSelections}, without the selection list.
- */
 public final class TextInput implements DialogComponent, TextValue {
-
-    /**
-     * What a field with no rule accepts: anything at all, and no filter is
-     * installed for it.
-     */
     static final @NotNull String ANYTHING = ".*";
 
     private final @NotNull FrameworkTextField input;
     private final @NotNull JTextField textField;
 
-    /**
-     * @param accepts what the field is allowed to hold, as a regular expression
-     *                the whole text must match. Checked as the text arrives, so
-     *                a field that means a number, a version or an id cannot be
-     *                made to hold anything else - there is nothing to validate
-     *                on submit and nothing to explain afterward
-     */
     TextInput(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull String initialValue, final @NotNull String accepts) {
         input = new FrameworkTextField(icon, placeHolderText, initialValue);
         textField = input.component();
@@ -60,21 +43,6 @@ public final class TextInput implements DialogComponent, TextValue {
         if (!ANYTHING.equals(accepts)) accept(Pattern.compile(accepts));
     }
 
-    /**
-     * Holds the field to what the pattern allows, by filtering its document -
-     * which catches typing, pasting and dropping alike. A key listener would let
-     * a paste straight through.
-     * <p>
-     * The test is on the text the change would produce, not on the characters
-     * arriving, so a pattern can say how long a value may be or what shape it
-     * has and not merely which letters it is made of. An edit that would break
-     * the pattern does not happen: the field simply does not take it, which is
-     * how a tester learns the rule without being told it.
-     * <p>
-     * Emptying the field is always allowed. A rule about what a value looks like
-     * is not a rule that there must be one - that is the dialog's decision, and
-     * it makes it on submit.
-     */
     private void accept(final @NotNull Pattern pattern) {
         ((AbstractDocument) textField.getDocument()).setDocumentFilter(new DocumentFilter() {
             @Override
@@ -99,16 +67,6 @@ public final class TextInput implements DialogComponent, TextValue {
                 }
             }
 
-            /**
-             * Whether what the field would then hold breaks the pattern - which
-             * is the question both callers ask, so it is the one this answers.
-             * <p>
-             * A document that cannot be read refuses nothing. The filter is here
-             * to keep a value well formed, not to be the last line of defense -
-             * the dialog checks again on submit - and refusing every keystroke
-             * because the document would not answer leaves a field the tester
-             * cannot type in at all, with nothing on screen saying why.
-             */
             private boolean refuses(final @NotNull FilterBypass bypass, final int offset, final int length, final @Nullable String text) {
                 final @NotNull String current;
                 try {
@@ -136,9 +94,6 @@ public final class TextInput implements DialogComponent, TextValue {
         input.showEmptyWarning();
     }
 
-    /**
-     * Runs after every change to the text, typed or pasted.
-     */
     public void onTextChanged(final @NotNull Runnable changed) {
         textField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
@@ -160,6 +115,5 @@ public final class TextInput implements DialogComponent, TextValue {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // The field has no submit gesture of its own; Enter is a declared key.
     }
 }

@@ -30,15 +30,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Shared filtering for the test and test-run editors.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestCaseFilter {
-
     public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull String query, final @NotNull Set<String> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules) {
-        // No run items on this path - the test editor has no statuses to filter
-        // by. An empty map says that; a function returning null only implies it.
         return filter(source, query, groups, priorities, modules, Collections.emptySet(),
                 id -> Optional.empty());
     }

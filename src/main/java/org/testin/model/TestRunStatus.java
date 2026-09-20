@@ -29,14 +29,6 @@ import org.testin.util.Shortcuts;
 import java.awt.event.KeyEvent;
 import javax.swing.*;
 
-/**
- * Lifecycle status of a test run. Constants carry their own icon, keyboard
- * shortcut and transition, so status rules live here instead of being
- * re-implemented as if-chains at the call sites (issue #37).
- * <p>
- * The icon is what the project tree draws for a run node, so a cycle's state
- * is readable without opening it.
- */
 @Getter
 @AllArgsConstructor
 public enum TestRunStatus implements MenuItem {
@@ -70,7 +62,7 @@ public enum TestRunStatus implements MenuItem {
             AllIcons.Gutter.ExtAnnotation,
             Stage.HANDED_OUT,
             SetBy.TESTER
-    ), //todo, later, use XML to add tester's name dynamic
+    ),
 
     CLOSED(
             Bundle.message("status.run.closed"),
@@ -80,27 +72,10 @@ public enum TestRunStatus implements MenuItem {
             SetBy.TESTER
     );
 
-    /**
-     * UC-TREE-PANEL-020, Rule-TREE-PANEL-068.
-     * <p>
-     * Who puts a run in this status. Two of the five are the run's own record of
-     * itself - Created when it is made, In Progress when execution starts - and
-     * offering them on the Set Status menu invited a tester to declare something
-     * that had either happened or not (#186).
-     */
+    // UC-TREE-PANEL-020, Rule-TREE-PANEL-068
     private enum SetBy { TESTER, TESTIN }
 
-    /**
-     * UC-TREE-PANEL-020, Rule-TREE-PANEL-092.
-     * <p>
-     * How far through its life the run is. A number rather than the declaration
-     * order, which is not the lifecycle: the constants are declared in the order
-     * the menu once drew them.
-     * <p>
-     * Completed and Closed share the last one. They are two ways of being over,
-     * not one after the other, and a run in either is signed off - which is
-     * already why Set Status is gray on it.
-     */
+    // UC-TREE-PANEL-020, Rule-TREE-PANEL-092
     private static final class Stage {
         private static final int MADE = 0;
         private static final int HANDED_OUT = 1;
@@ -110,10 +85,6 @@ public enum TestRunStatus implements MenuItem {
 
     private final @NotNull String label;
 
-    /**
-     * The key that moves a run to this status, and {@link Shortcuts#NO_KEY} for
-     * the statuses no key reaches.
-     */
     private final @NotNull KeyStroke shortcut;
     private final @NotNull Icon icon;
 
@@ -123,48 +94,21 @@ public enum TestRunStatus implements MenuItem {
     @Getter(AccessLevel.NONE)
     private final @NotNull SetBy setBy;
 
-    /**
-     * UC-TREE-PANEL-020, Rule-TREE-PANEL-068, Rule-TREE-PANEL-092.
-     * <p>
-     * Whether a tester can move this run to that status.
-     * <p>
-     * Two questions in one answer, because they are one question at the menu: is
-     * it a status a tester sets at all, and is it forward of where the run is
-     * now. A run could be moved from Assigned back to Created, and from In
-     * Progress back to Assigned, which un-says something that has happened
-     * (#186).
-     */
+    // UC-TREE-PANEL-020, Rule-TREE-PANEL-068, Rule-TREE-PANEL-092
     public boolean canBeSetFrom(final @NotNull TestRunStatus current) {
         return setBy == SetBy.TESTER && stage > current.stage;
     }
 
-    /**
-     * Rule-TREE-PANEL-092.
-     * <p>
-     * Whether this status is further along the run's life than that one, by the
-     * stage above - never by the declaration order, which is the order the menu
-     * once drew them in. What a merge takes when two testers executed one cycle
-     * (#305, Q-D), and the half of {@link #canBeSetFrom} that is about the run
-     * rather than about who may say so.
-     */
+    // Rule-TREE-PANEL-092
     public boolean isFurtherThan(final @NotNull TestRunStatus other) {
         return stage > other.stage;
     }
 
-    /**
-     * UC-REPORT-001, Rule-REPORT-016.
-     * <p>
-     * A report is about what a run recorded, and a run still going is still
-     * recording - so the document would describe a state that has already moved
-     * on (#253).
-     */
+    // UC-REPORT-001, Rule-REPORT-016
     public boolean isReportable() {
         return this != IN_PROGRESS;
     }
 
-    /**
-     * True when the run has reached a terminal state (completed or closed).
-     */
     public boolean isTerminal() {
         return this == COMPLETED || this == CLOSED;
     }
@@ -173,13 +117,6 @@ public enum TestRunStatus implements MenuItem {
         return Shortcuts.shortcutText(shortcut);
     }
 
-    /**
-     * The same word {@link #getLabel()} gives, under the name a menu row is asked
-     * for. {@code getLabel} is what a hundred callers already say for a display
-     * word and {@code getName} is what {@link org.testin.model.StatusBarItem}
-     * calls it, so one of the two has to bridge - and a status is read far more
-     * often than it is put on a menu.
-     */
     @Override
     public @NotNull String getName() {
         return label;

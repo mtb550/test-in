@@ -38,19 +38,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class UpdateTestCaseDialog extends TestCaseBaseDialog {
-
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-036
     public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p, existingDto, onSave);
 
-        // Rule-CODEGEN-001. The same refusal the create dialog makes, which is
-        // where it stopped: a description could not be typed into a clash but
-        // could be edited into one, and editing is how a clash is likelier to
-        // happen - "Verify login" is written first and "Verify login!" is a
-        // correction to it (#244).
-        //
-        // Every case in the set except this one. Comparing against itself would
-        // refuse a description the tester did not change.
+        // Rule-CODEGEN-001
         descriptionSection.compareAgainst(() -> Services.getInstance(p, ProjectIndexer.class)
                 .getTestCasesForTestSet(existingDto.getParent().getPath()).stream()
                 .filter(sibling -> !sibling.getId().equals(existingDto.getId()))
@@ -61,8 +53,6 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         final @NotNull TestCaseForm form = new TestCaseForm(targetSection.getFocusComponent(), false);
         final @NotNull JComponent keys = form.getPanel();
 
-        // Said once, before the loop: it grays the others out and records
-        // that only this one may write back.
         onlyEditable(targetSection);
 
         for (final CreateTestCaseSection section : getAllSections()) {
@@ -70,8 +60,6 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
             final boolean isTarget = (section == targetSection);
 
-            // Steps and groups are both several boxes, and opening either on a
-            // case that has none has to put one there to type into (#296).
             if (isTarget && section instanceof AbstractMultiValueSection s) {
                 if (s.getFields().isEmpty()) {
                     s.addField("", this::refit);
@@ -95,17 +83,11 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         title = Bundle.message("update.dialog.title.field", selectedItem.getName());
         components = List.of(ComponentDialogBase.of(form));
 
-        // The expected-result and test-data fields are multi-line text areas:
-        // each rebinds Enter, Ctrl+Enter and Tab on itself, since a multi-line
-        // editor would otherwise swallow them.
         expectedResultSection.enableMultiLine(this, this::submit);
         testDataSection.enableMultiLine(this, this::submit);
 
         registerShortcut(keys, Shortcuts.Enter.getCustomShortcut(), this::submit);
 
-        // Escape is bound rather than left to the popup's own cancel key: once an
-        // editor popup has been open over the dialog - the spelling corrections,
-        // for one - the built-in handler stops seeing the key.
         registerShortcut(keys, Shortcuts.Escape.getCustomShortcut(), this::closeCancel);
     }
 }

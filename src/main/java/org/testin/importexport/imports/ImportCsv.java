@@ -28,11 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ImportCsv {
-
-    // UC-SHARE-006. A file that will not parse throws to the one caller that
-    // reports it, FileDocumentListener. Caught here as well, it was said twice,
-    // and the empty answer after it was read there as "there is nothing in this
-    // file" - untrue, and the second of two messages (#66, finding 213).
+    // UC-SHARE-006
     public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
         final @NotNull Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         final @NotNull List<TestCaseDto> testCases = parseFile(p, file);
@@ -47,13 +43,6 @@ public class ImportCsv {
         return parseCsvFile(file, p);
     }
 
-    /**
-     * Which column each importable attribute sits in, keyed the way the reader
-     * below asks - lowercased, because a header is whatever the tester typed.
-     * <p>
-     * A header this import does not know is simply not in the map, and a column
-     * the file does not carry reads as blank at the row.
-     */
     private @NotNull Map<String, Integer> headerIndexes(final String @NotNull [] headers) {
         final @NotNull Map<String, Integer> byName = new HashMap<>();
 
@@ -80,14 +69,10 @@ public class ImportCsv {
         for (int r = 1; r < records.size(); r++) {
             final String @NotNull[] values = records.get(r);
 
-            // Every field comes from endRecord below, which builds them from a
-            // StringBuilder - so a field is blank or it is text, never absent.
             if (Arrays.stream(values).allMatch(String::isBlank)) continue;
 
             final @NotNull TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
 
-            // A column this file does not carry, or a short row that stops
-            // before it, both read as blank.
             refused += TestEditorAttributes.importRow(p, currentTestCase, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
                     .filter(colIndex -> colIndex < values.length)
                     .map(colIndex -> values[colIndex].trim())
@@ -101,11 +86,6 @@ public class ImportCsv {
         return result;
     }
 
-    /**
-     * Quote-aware CSV parser over the whole character stream. Unlike a per-line
-     * parser, this keeps newlines inside quoted fields (which our own CSV export
-     * produces for multi-line steps), reads UTF-8 explicitly, and strips a BOM.
-     */
     private @NotNull List<String[]> parseCsvRecords(final @NotNull File file) {
         final @NotNull List<String[]> records = new ArrayList<>();
         final @NotNull List<String> fields = new ArrayList<>();
@@ -113,7 +93,6 @@ public class ImportCsv {
 
         try (PushbackReader reader = new PushbackReader(
                 new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)))) {
-
             boolean inQuotes = false;
             boolean firstChar = true;
             int ci;
@@ -122,14 +101,14 @@ public class ImportCsv {
 
                 if (firstChar) {
                     firstChar = false;
-                    if (c == '\ufeff') continue; // BOM
+                    if (c == '\ufeff') continue;
                 }
 
                 if (inQuotes) {
                     if (c == '"') {
                         final int next = reader.read();
                         if (next == '"') {
-                            current.append('"'); // escaped quote
+                            current.append('"');
                         } else {
                             inQuotes = false;
                             if (next != -1) reader.unread(next);
@@ -163,7 +142,7 @@ public class ImportCsv {
     }
 
     private void endRecord(final @NotNull List<String[]> records, final @NotNull List<String> fields, final @NotNull StringBuilder current) {
-        if (fields.isEmpty() && current.isEmpty()) return; // blank line
+        if (fields.isEmpty() && current.isEmpty()) return;
 
         fields.add(current.toString());
         current.setLength(0);

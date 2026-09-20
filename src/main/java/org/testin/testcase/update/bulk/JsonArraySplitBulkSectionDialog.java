@@ -34,16 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-/**
- * Bulk-edits a list of values per test case - steps, groups - with the original
- * JSON on the left and an editable copy on the right.
- * <p>
- * Unlike the single-value dialog this one rebuilds its text: adding or removing
- * an item changes how many editable spans there are, so the document, the
- * markers and the guarded blocks are all made again.
- */
 public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkDialog<BulkJsonEditors> {
-
     private final @NotNull List<TestCaseDto> selectedItems;
     private final @NotNull Consumer<List<TestCaseDto>> updatedItems;
     private final @NotNull BulkJsonEditors editors;
@@ -51,10 +42,6 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
     private final @NotNull List<List<String>> originalValues = new ArrayList<>();
     private final @NotNull List<List<String>> activeValues = new ArrayList<>();
 
-    /**
-     * Which test case and which of its items each editable span belongs to, in
-     * the order the spans were written. Rebuilt with the text.
-     */
     private final @NotNull List<int[]> spanOwners = new ArrayList<>();
 
     protected JsonArraySplitBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
@@ -66,7 +53,6 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
 
         for (final List<String> values : extractOriginalValues(selectedItems)) {
             final @NotNull List<String> current = new ArrayList<>(Objects.requireNonNullElse(values, List.of()));
-            // An empty list still needs one span, or there is nowhere to type.
             if (current.isEmpty()) current.add("");
 
             originalValues.add(new ArrayList<>(current));
@@ -86,8 +72,6 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
                 StatusBarShortcut.build(Shortcuts.RemoveArrayItem, Bundle.message("bulk.shortcut.remove"), this::removeItemAtCarets),
                 StatusBarShortcut.build(Shortcuts.TabNext, Bundle.message("bulk.shortcut.next"), () -> editors.navigate(1, true)),
                 StatusBarShortcut.build(Shortcuts.TabPrevious, Bundle.message("bulk.shortcut.previous"), () -> editors.navigate(-1, true)),
-                // The arrows wrap here, unlike the value dialog: an array item is
-                // one line, so the caret has nowhere else to go.
                 StatusBarShortcut.build(Shortcuts.ArrowDown, Bundle.message("bulk.shortcut.next"), () -> editors.navigate(1, true)),
                 StatusBarShortcut.build(Shortcuts.ArrowUp, Bundle.message("bulk.shortcut.previous"), () -> editors.navigate(-1, true)),
                 StatusBarShortcut.build(Shortcuts.CaretOnEveryValue, Bundle.message("bulk.shortcut.all.carets"), this::caretOnEveryValue),
@@ -96,13 +80,8 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
 
         preferredSize = new Dimension(JBUI.scale(1100), JBUI.scale(550));
 
-        // The editor listens to the action system, not to Swing key bindings.
         editors.bindKeysToEditor(shortcuts);
     }
-
-    // ------------------------------------------------------------------
-    // What a concrete section supplies.
-    // ------------------------------------------------------------------
 
     protected abstract void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<List<String>> newValues);
 
@@ -112,19 +91,8 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
 
     protected abstract @NotNull List<List<String>> extractOriginalValues(final @NotNull List<TestCaseDto> items);
 
-    // ------------------------------------------------------------------
-    // The dialog.
-    // ------------------------------------------------------------------
-
-    /**
-     * UC-EDITOR-PANEL-007.
-     * <p>
-     * Shows the dialog and releases the editors when it closes. The framework
-     * creates the popup inside show(), so the close listener is attached after.
-     */
+    // UC-EDITOR-PANEL-007
     public void open() {
-        // A bulk editor already open is raised instead, with what was typed in
-        // it; this one never showed, so its editors go now rather than never.
         if (!show()) {
             editors.release();
             return;
@@ -139,17 +107,11 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         editors.focusFirstValue();
     }
 
-    /**
-     * Told where an editable item landed in the text being built.
-     */
     @FunctionalInterface
     private interface ItemRecorder {
         void record(int start, int end, int testCaseIndex, int itemIndex);
     }
 
-    /**
-     * The read-only side: it is written the same way and remembers nothing.
-     */
     private static final @NotNull ItemRecorder RECORDS_NOTHING = (start, end, testCaseIndex, itemIndex) -> {
     };
 
@@ -161,10 +123,6 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         final @NotNull List<TestCaseDto> edited = new ArrayList<>();
         final @NotNull List<List<String>> editedValues = new ArrayList<>();
 
-        // Against what the row started as, which this dialog has kept all along
-        // and never consulted. Without it every selected case is written back
-        // from the editor, so a case the tester never opened comes back with its
-        // steps trimmed and its blank ones dropped.
         for (int i = 0; i < selectedItems.size(); i++) {
             if (activeValues.get(i).equals(originalValues.get(i))) continue;
 
@@ -172,7 +130,6 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
             editedValues.add(activeValues.get(i));
         }
 
-        // Index-parallel, which is what applyValues expects.
         if (!edited.isEmpty()) applyValues(edited, editedValues);
 
         updatedItems.accept(edited);
@@ -180,11 +137,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         closeOk();
     }
 
-    /**
-     * UC-EDITOR-PANEL-007.
-     * <p>
-     * Ctrl+Enter: a new empty item after each item under a caret.
-     */
+    // UC-EDITOR-PANEL-007
     private void addItemAtCarets() {
         readEditorIntoValues();
 
@@ -196,19 +149,12 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
             activeValues.get(owner[0]).add(owner[1] + 1, "");
         }
 
-        // The last span is the topmost one, because indicesUnderCarets orders
-        // them last-first so the mutations above stay valid.
         final int[] focus = spanOwners.get(spans.getLast());
         render();
         focusItem(focus[0], focus[1] + 1);
     }
 
-    /**
-     * UC-EDITOR-PANEL-007.
-     * <p>
-     * Shift+Delete: drops each item under a caret. The last item of a test case
-     * is emptied rather than removed - a case with no items has nowhere to type.
-     */
+    // UC-EDITOR-PANEL-007
     private void removeItemAtCarets() {
         readEditorIntoValues();
 
@@ -240,10 +186,6 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         editors.caretOnEveryValue();
     }
 
-    /**
-     * Takes what is on screen back into the values. Every gesture that rebuilds
-     * the text starts here, or an edit made just before it would be discarded.
-     */
     private void readEditorIntoValues() {
         for (int span = 0; span < spanOwners.size() && span < editors.valueCount(); span++) {
             final int[] owner = spanOwners.get(span);
@@ -252,10 +194,6 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         }
     }
 
-    /**
-     * Writes both sides from the current values, recording which item each
-     * editable span belongs to.
-     */
     private void render() {
         final @NotNull StringBuilder left = new StringBuilder("[\n");
         final @NotNull StringBuilder right = new StringBuilder("[\n");
@@ -289,11 +227,6 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         editors.setContent(left.toString(), right.toString(), editableRanges);
     }
 
-    /**
-     * One quoted item per line, telling the recorder where each one landed. The
-     * left side records nothing, because nothing there is editable - which it
-     * says with a recorder that does nothing rather than with two nulls (#71).
-     */
     private void appendItems(final @NotNull StringBuilder out, final @NotNull List<String> items, final @NotNull ItemRecorder recorder, final int testCaseIndex) {
         for (int j = 0; j < items.size(); j++) {
             out.append("      \"");
@@ -317,11 +250,6 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         }
     }
 
-    /**
-     * What the span at this index started as, escaped the way the editor shows
-     * it. Spans added since the dialog opened have no original, so they always
-     * read as changed.
-     */
     private @NotNull String originalEscapedAt(final int span) {
         if (span >= spanOwners.size()) return "";
 

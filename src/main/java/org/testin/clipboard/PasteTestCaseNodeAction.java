@@ -58,15 +58,7 @@ import java.util.Optional;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Declared in {@code plugin.xml} (#119) with no key, so a tester can give it one
- * in the Keymap. CTRL+V is the grid's own paste.
- * <p>
- * The work is in {@link Work} because all of it wants a project and an editor,
- * and a declared action has neither until a keystroke arrives.
- */
 public class PasteTestCaseNodeAction extends DumbAwareAction {
-
     // UC-EDITOR-PANEL-017
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -75,8 +67,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        // Rule-EDITOR-PANEL-214. Gray with the reason on a node that cannot take
-        // a test case, rather than absent from that editor's menu (#248).
+        // Rule-EDITOR-PANEL-214
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             e.getPresentation().setEnabled(false);
             e.getPresentation().setDescription(Bundle.message("paste.case.disabled.description"));
@@ -86,22 +77,11 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
         GrayWithReason.unless(this, e, work(e).map(this::clipboardHoldsTestCases).orElse(false), Bundle.message("paste.case.nothing.description"));
     }
 
-    /**
-     * The clipboard contents {@link #update} last asked about, and the answer.
-     */
     private record Answered(@NotNull Transferable contents, boolean holdsTestCases) {
     }
 
     private @NotNull Optional<Answered> answered = Optional.empty();
 
-    /**
-     * Whether the clipboard holds test cases, parsed once for each thing put on
-     * it. The platform calls update on every menu repaint and toolbar refresh,
-     * and each call parsed the whole clipboard on the EDT - after a cut of a few
-     * hundred cases, once per repaint (#66, finding 223). The clipboard hands
-     * back the same contents until something new is put on it, so the answer
-     * is kept against them.
-     */
     private boolean clipboardHoldsTestCases(final @NotNull Work work) {
         return ClipboardContents.withFlavor(DataFlavor.stringFlavor)
                 .map(contents -> answered.filter(last -> last.contents() == contents).orElseGet(() -> {
@@ -117,19 +97,11 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
         return ActionUpdateThread.EDT;
     }
 
-    /**
-     * What this keystroke has to work with, and nothing when it arrived outside
-     * an editor.
-     */
     private static @NotNull Optional<Work> work(final @NotNull AnActionEvent e) {
         return Optional.ofNullable(e.getProject()).flatMap(p -> TestinData.editor(e).map(editor -> new Work(p, editor)));
     }
 
-    /**
-     * Pasting into one editor, for a project that is there.
-     */
     private record Work(@NotNull Project p, @NotNull TestinEditor editor) {
-
             void paste() {
                 final @NotNull List<TestCaseDto> pastedCases = getFromClipboard();
             if (pastedCases.isEmpty()) return;
@@ -140,21 +112,11 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 final @NotNull CutState cutState = Services.getInstance(p, CutState.class);
                 final boolean isCut = cutState.isCutOf(pastedCases);
 
-                // Read before the cut is called off, and kept: the generated
-                // method is found through the class of the set that holds the
-                // case, and by the time the code can be moved the case is already
-                // in its new one (#312, A54).
                 final @NotNull Optional<DirectoryDto> cutFromSet =
                         isCut ? cutState.source().map(TestinEditor::getParent) : Optional.empty();
 
-                // A cut the clipboard no longer holds is over: something else was
-                // copied since, so this paste is a copy and the cut cases stay
-                // where they are, no longer drawn faded (#312, A55).
                 if (!isCut) cutState.clear();
 
-                // What a CTRL+Z would have to put back on the source side, taken
-                // before the cut takes it away. Empty when this is a copy, which
-                // leaves the source alone and has nothing there to put back.
                 final @NotNull List<TestCaseDto> cutItems = cutState.source()
                         .map(sourceUI -> sourceUI.getAllTestCases().stream().filter(tc -> cutState.isPending(tc.getId())).toList())
                         .orElseGet(List::of);
@@ -163,10 +125,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
 
                 final @NotNull List<TestCaseDto> pastedHere = new ArrayList<>(pastedCases.size());
 
-                // Each copy beside the case it was copied from, so the generator
-                // can carry that method's body into the copy's own method
-                // (Rule-CODEGEN-078). Empty for a cut, which takes its method
-                // whole instead.
+                // Rule-CODEGEN-078
                 final @NotNull List<CopiedCase> copied = new ArrayList<>(pastedCases.size());
 
                 for (final TestCaseDto tc : pastedCases) {
@@ -176,39 +135,21 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                     destUI.getAllTestCases().add(clonedTc);
                     pastedHere.add(clonedTc);
 
-                    // The indexed case, not the one off the clipboard: a case's
-                    // test set is not written to its file and so is not on the
-                    // clipboard either, and the test set is the only way to the
-                    // class holding its method. A case the index no longer holds
-                    // - deleted since it was copied, or copied in another session
-                    // - falls back to the clipboard's own copy, which names no
-                    // test set and so carries no body.
                     if (!isCut) {
                         copied.add(new CopiedCase(clonedTc,
                                 Services.getInstance(p, ProjectIndexer.class).findTestCase(tc.getId()).orElse(tc)));
                     }
                 }
 
-                // Both sides of the move in one operation, so a cut here and a paste
-                // there is one press of CTRL+Z rather than two (#165). Taken before
-                // the sequence write puts the pasted cases on disk, which is why
-                // they read as absent.
                 final @NotNull Path destPath = destUI.getParent().getPath();
                 final @NotNull List<UUID> pastedIds = TestCaseSnapshot.idsOf(pastedHere);
                 final @NotNull List<TestCaseSnapshot> before = new ArrayList<>();
                 cutFrom.ifPresent(before::add);
                 before.add(TestCaseSnapshot.of(p, destPath, pastedIds));
 
-                // Rule-EDITOR-PANEL-082, Rule-INTERNAL-035. A cut is the same
-                // test case in a new place, so it keeps who created it. Moved as
-                // it is before the order is saved, so the sequence write already
-                // knows it and does not record the paster as its creator (#66,
-                // finding 114) - and after the snapshot above, which has to read
-                // the cases as absent.
+                // Rule-EDITOR-PANEL-082, Rule-INTERNAL-035
                 cutState.source().ifPresent(sourceUI -> moveCut(sourceUI, destUI, cutItems, pastedHere));
 
-                // Every write refused: nothing moved, and the cut is still waiting
-                // where it was for another try.
                 if (pastedHere.isEmpty()) return;
 
                 final int pasted = pastedHere.size();
@@ -220,34 +161,12 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
 
                     TestCaseSnapshot.record(p, UndoScope.of(destPath), TestCaseSnapshot.describe(isCut ? Bundle.message("snapshot.verb.move") : Bundle.message("snapshot.verb.paste"), pastedHere), before, after);
 
-                    // UC-EDITOR-PANEL-017, UC-CODEGEN-002, Rule-CODEGEN-078. A
-                    // copy is a new test case, so it gets a method of its own the
-                    // way a created one does - once it is on disk, which is what
-                    // the generator reads its position from. It wrote none, so F5
-                    // and Go to code said the copy had no generated code (#312,
-                    // A54) - and then wrote an empty one, so the automation the
-                    // tester copied the case for stayed behind. The copy
-                    // generator writes the same method and fills it with the
-                    // original's body.
+                    // UC-EDITOR-PANEL-017, UC-CODEGEN-002, Rule-CODEGEN-078
                     if (!isCut) GenType.COPY_TEST_CASE.executeAll(p, copied);
 
-                    // And a cut takes its method with it, body and all. It used
-                    // to take nothing: the case was in its new test set and its
-                    // method in the old class, so Run and Go to code looked where
-                    // the case now lives and found nothing - and removing the old
-                    // test set later deleted that class with the automation the
-                    // tester had written inside it (#312, A54).
-                    //
-                    // The set it came from has to be carried: the case's parent is
-                    // the destination by now, and a method is found through the
-                    // class of the set that holds the case.
                     else cutFromSet.ifPresent(source -> GenType.MOVE_TEST_CASE.executeAll(p,
                             pastedHere.stream().map(moved -> new MovedCase(moved, source)).toList()));
 
-                    // In the callback, once the sequence is persisted: the write is
-                    // two thread hops away and a newer sort can supersede it, so a
-                    // balloon shown when the call returned said Pasted for cases
-                    // that might never be written (#62; #312, A56).
                     Services.getInstance(p, Notifier.class).softShowCounted(p, Done.PASTED, pasted);
                 });
 
@@ -255,18 +174,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
             });
         }
 
-        /**
-         * UC-EDITOR-PANEL-017, Rule-INTERNAL-035.
-         * <p>
-         * Moves the cut cases into this editor's set, and takes out of the editor
-         * they came from only the ones that arrived.
-         * <p>
-         * Written where they go before they leave where they were. The cut used to
-         * be removed first, so a write that failed left a case in neither set
-         * until the tester went looking in the recycle bin (#66, finding 284). A
-         * case whose write fails now stays where it was, and the writer has said
-         * why.
-         */
+        // UC-EDITOR-PANEL-017, Rule-INTERNAL-035
         private void moveCut(final @NotNull TestinEditor sourceUI, final @NotNull TestEditor destUI, final @NotNull List<TestCaseDto> cutItems, final @NotNull List<TestCaseDto> pastedHere) {
             final @NotNull Path from = sourceUI.getParent().getPath();
             final @NotNull Path to = destUI.getParent().getPath();
@@ -282,17 +190,11 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
             pastedHere.removeAll(stayed);
             destUI.getAllTestCases().removeAll(stayed);
 
-            // The originals, by identity: cut and pasted in one editor, the list
-            // holds each case twice under one id until the original goes.
             final @NotNull Set<UUID> arrived = new HashSet<>(TestCaseSnapshot.idsOf(pastedHere));
             sourceUI.getAllTestCases().removeAll(cutItems.stream().filter(tc -> arrived.contains(tc.getId())).toList());
             if (sourceUI != destUI && sourceUI instanceof TestEditor sourceEditor) sourceEditor.reorderAndPersist();
         }
 
-        /**
-         * Whether the clipboard holds test cases. Anything else on it belongs to
-         * some other copy and leaves the menu entry disabled.
-         */
         private boolean holdsTestCases(final @NotNull Transferable contents) {
             return !readTestCases(contents).isEmpty();
         }
@@ -303,11 +205,6 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                     .orElseGet(List::of);
         }
 
-        /**
-         * The test cases on the clipboard, or none of them. Text that is not a JSON
-         * array is not a failed read - it is a tester copying a word - so it is
-         * turned away before the parser sees it and reports it as a warning.
-         */
         private @NotNull List<TestCaseDto> readTestCases(final @NotNull Transferable contents) {
             try {
                 final @NotNull String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
@@ -316,8 +213,6 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 final @NotNull List<TestCaseDto> parsed = Services.getInstance(p, Mapper.class).readValue(json, new TypeReference<>() {
                 });
 
-                // Hand-edited JSON can carry a null entry, and the clipboard is not a
-                // trusted source of our own format.
                 return parsed.stream().filter(Objects::nonNull).toList();
             } catch (final Exception ex) {
                 Logger.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
@@ -331,8 +226,6 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
             final @NotNull TestCaseDto clonedTc = Services.getInstance(p, Mapper.class).convertValue(original, TestCaseDto.class);
 
             if (isCut) {
-                // Moved, so changed by whoever pasted it: the name beside the time,
-                // not the previous modifier's name beside a new time.
                 clonedTc.touch(Services.getInstance(p, AppSettingsState.class).testerName);
             } else {
                 clonedTc.setId(UUID.randomUUID())

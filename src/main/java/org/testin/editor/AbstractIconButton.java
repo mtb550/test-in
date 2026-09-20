@@ -16,7 +16,6 @@
 
 package org.testin.editor;
 
-
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.ide.DataManager;
@@ -40,89 +39,33 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Optional;
 
-/**
- * A flat icon button: the icon alone at rest, a rounded hover pill and a
- * slightly larger icon under the pointer.
- * <p>
- * It paints its own background rather than leaving it to the look and feel. A
- * JButton is opaque, which promises Swing that every pixel inside the bounds is
- * covered, so a repaint of the button alone never repaints the toolbar behind
- * it. The stock painting does not keep that promise here - with the content
- * area unfilled it draws an icon and leaves the rest untouched, so those pixels
- * keep whatever was drawn there before. Filling from the toolbar's own color
- * keeps the promise and keeps the button invisible at rest.
- */
 public abstract class AbstractIconButton extends JButton {
-
     private final @NotNull Icon restIcon;
     private final @NotNull Icon zoomedIcon;
 
     private boolean hovered;
 
-    /**
-     * Whether this button is a toggle that is currently on.
-     * <p>
-     * Drawn as the platform draws a selected toolbar toggle, so a pressed Testin
-     * button and a pressed IDE one look the same. Here rather than on the one
-     * button that needed it first: a toolbar toggle showing its state is what
-     * every toolbar toggle will want (#13).
-     */
     private boolean on;
 
-    /**
-     * The key named in this button's tooltip, when its command has one - which
-     * is what makes the tooltip the platform's rich one rather than Swing's.
-     */
     private @NotNull Optional<String> shortcutText = Optional.empty();
 
     public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon) {
         super(null, icon);
-        // Swing's own contract: a null tooltip is no tooltip at all, and an
-        // empty one is a small empty box that follows the pointer.
         setToolTipText(tooltip.isEmpty() ? null : tooltip);
         setFocusable(false);
         setBorderPainted(false);
         setContentAreaFilled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Every pixel inside the bounds is still covered - paintComponent fills
-        // them - but it has to be this class that does it, not the look and feel.
-        // While opaque, the UI fills the whole rectangle with Button.background
-        // before anything else is drawn, which is the wrong color here and
-        // erases the hover pill along with it.
         setOpaque(false);
 
         this.restIcon = icon;
         this.zoomedIcon = Icons.zoomStandardIcon(icon, this);
 
-        // Measured once, from a standard platform icon rather than from this
-        // button's own, then frozen.
-        //
-        // Frozen because the look and feel keeps deciding the spacing, so the
-        // toolbar looks as it always has, and because setIcon() revalidates -
-        // without this the button grew when the pointer arrived and shrank when
-        // it left, re-laying out the whole toolbar and shifting the buttons out
-        // from under the pointer.
-        //
-        // From a reference icon rather than this button's own, so the measurement
-        // does not vary with what the button happens to draw. How much that is
-        // worth depends on the look and feel - Darcula floors an icon-only button
-        // at a square of its own choosing, and would have made most of these
-        // agree anyway - so this is not the reason a status bar arrow and a
-        // toolbar button look alike. That is PageBtn extending this class at all.
-        // It is here so the answer stops depending on which look and feel is
-        // loaded, which is not something a screenshot would ever have shown.
         setIcon(Icons.zoomStandardIcon(AllIcons.Actions.Refresh, this));
         final @NotNull Dimension size = getPreferredSize();
         setIcon(restIcon);
 
-        // Swing cannot build this one. BasicLookAndFeel.getDisabledIcon only grays
-        // an ImageIcon and returns null for anything else, and platform icons are
-        // not ImageIcons - so without this a disabled button paints its normal icon
-        // and looks clickable while ignoring every click.
-        //
-        // Derived from this button's own icon, so it cannot drift from what the
-        // button actually shows.
         setDisabledIcon(IconLoader.getDisabledIcon(restIcon));
 
         setPreferredSize(size);
@@ -142,28 +85,10 @@ public abstract class AbstractIconButton extends JButton {
         });
     }
 
-    /**
-     * A button whose command also has a keystroke. The platform's own tooltip
-     * draws the description and the shortcut together, the way every IDE
-     * toolbar button does, so the key is discoverable without opening the menu
-     * that also carries it.
-     * <p>
-     * The Swing tooltip is deliberately left unset - no tooltip, which is what an
-     * empty one means to the constructor above: HelpTooltip replaces it, and a
-     * button carrying both shows the plain one on some paths and the rich one on
-     * others.
-     */
     public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Shortcuts shortcut) {
         this(tooltip, icon, shortcut.getShortcutText());
     }
 
-    /**
-     * The same, for a button whose command is a declared action (#119).
-     * <p>
-     * The key is asked of the keymap by id rather than named here, so the
-     * tooltip prints whatever the tester has bound. A button naming our default
-     * after they rebound it is the failure declaring an action exists to end.
-     */
     public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull String shortcutText) {
         this("", icon);
 
@@ -171,16 +96,6 @@ public abstract class AbstractIconButton extends JButton {
         describe(tooltip);
     }
 
-    /**
-     * What this button says about itself - what it does, or why it is gray.
-     * <p>
-     * The one way to change it, because a button has one of two tooltips: the
-     * platform's rich one when its command has a key, Swing's plain one when it
-     * does not. Generate Report had the rich one and set the plain one over it
-     * to give its gray reason, so which of the two showed depended on the path
-     * the pointer took (#312, A29). Asked here, the button answers with the kind
-     * it has.
-     */
     protected final void describe(final @NotNull String text) {
         shortcutText.ifPresentOrElse(key -> {
             HelpTooltip.dispose(this);
@@ -191,28 +106,6 @@ public abstract class AbstractIconButton extends JButton {
         }, () -> setToolTipText(text.isEmpty() ? null : text));
     }
 
-    /**
-     * A Swing click arrives without the lock the action system takes before it
-     * calls an AnAction. So whatever the click opens runs on the EDT with no
-     * read access, and the Create Test Case dialog's editor field asserted on
-     * exactly that.
-     * <p>
-     * <b>The action system takes that lock, so the click is given to it.</b> Taking
-     * it by hand meant {@code WriteIntentReadAction}, which the platform marks
-     * experimental - as it marks {@code Application.runWriteIntentReadAction}, so
-     * there was no stable spelling of the same thing, and the Marketplace carried
-     * a warning for it. Dispatching through {@code ActionUtil.performAction} asks
-     * the system whose job it is, and it takes the lock on the way in (#324).
-     * <p>
-     * One place for all fourteen buttons, as the lock was: a toolbar click now
-     * reaches its work the way the same command reaches it from a menu or a key.
-     * <p>
-     * Every API here was checked for {@code @Deprecated} as well as for an
-     * {@code ApiStatus} annotation. The three {@code ActionUtil.invokeAction}
-     * overloads are deprecated, and so is every convenient {@code AnActionEvent}
-     * factory - {@code createFromAnAction}, {@code createFromInputEvent},
-     * {@code createFromDataContext}. These four are clean.
-     */
     @Override
     protected void fireActionPerformed(final @NotNull ActionEvent event) {
         final @NotNull AnAction clicked = new DumbAwareAction() {
@@ -228,11 +121,6 @@ public abstract class AbstractIconButton extends JButton {
                 ActionPlaces.TOOLBAR, ActionUiKind.TOOLBAR, null));
     }
 
-    /**
-     * What the click does, which is whatever Swing would have done with it. Named
-     * so the action above can reach it: {@code super} is not available from inside
-     * an anonymous class.
-     */
     private void swingClick(final @NotNull ActionEvent event) {
         super.fireActionPerformed(event);
     }
@@ -243,17 +131,6 @@ public abstract class AbstractIconButton extends JButton {
         repaint();
     }
 
-    /**
-     * A button that goes dead under the pointer stops looking live.
-     * <p>
-     * Hovering is driven by mouse events, and swing delivers none to a disabled
-     * component - so a button disabled while the pointer is on it never hears
-     * that the pointer left. In the toolbar that hardly happened; the page arrows
-     * are disabled on every page change, so paging onto the last page leaves the
-     * pointer sitting on a dead Next arrow still drawing its hover pill, and it
-     * keeps drawing it until the arrow comes back and the pointer crosses it
-     * again.
-     */
     @Override
     public void setEnabled(final boolean enabled) {
         super.setEnabled(enabled);
@@ -261,10 +138,6 @@ public abstract class AbstractIconButton extends JButton {
         if (!enabled && hovered) setHovered(false);
     }
 
-    /**
-     * Turns the pressed look on or off. A button nobody calls this on is drawn
-     * exactly as before.
-     */
     public void setOn(final boolean isOn) {
         if (on == isOn) return;
 
@@ -274,9 +147,6 @@ public abstract class AbstractIconButton extends JButton {
 
     @Override
     protected void paintComponent(final @NotNull Graphics g) {
-        // A button not yet added has no parent; the Optional starts at the call
-        // rather than after a @NotNull local that said otherwise (#66, finding
-        // 267).
         g.setColor(Optional.ofNullable(getParent()).map(Container::getBackground).orElseGet(this::getBackground));
         g.fillRect(0, 0, getWidth(), getHeight());
 

@@ -27,9 +27,6 @@ import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-/**
- * Keeps the visible grid cell aligned with the list selection.
- */
 @AllArgsConstructor
 public final class GridListSelectionSynchronizer implements ListSelectionListener {
     private final @NotNull JBList<?> list;

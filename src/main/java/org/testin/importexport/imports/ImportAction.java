@@ -62,34 +62,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.function.Supplier;
 
-/**
- * Reads a sheet of test cases into the selected node.
- * <p>
- * Declared in {@code plugin.xml} (#119), so Find Action offers it and a tester
- * can bind a key to it - it has never had one. That is why it has no
- * constructor and no fields: the platform builds one instance for the whole IDE,
- * so the node comes from the keystroke, and which columns an import reads is the
- * attributes' own answer rather than a list this carried for two importers to
- * read off it.
- * <p>
- * The import itself is in {@link Work}, which is what a keystroke that arrived
- * on a node with a project behind it has to work with.
- */
 public class ImportAction extends DumbAwareAction {
-
-    /** The gesture's name, which its dialog reads rather than spells. */
     public static final @NotNull String NAME = Bundle.message("import.action.name");
 
-    /**
-     * How many test methods go into one write command.
-     * <p>
-     * Larger than it was, because what a batch costs changed. Each one is now a
-     * single edit and a single reparse of the class file, and a reparse is
-     * proportional to the whole file - so twenty-two small batches reparse a
-     * growing file twenty-two times, where three large ones do it three times.
-     * Still batched rather than done in one go, so the EDT comes back in
-     * between and the progress bar can move.
-     */
     private static final int METHODS_PER_COMMAND = 200;
 
     // UC-SHARE-005
@@ -98,22 +73,12 @@ public class ImportAction extends DumbAwareAction {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        // No refusal here. update() grays the entry on exactly the nodes this
-        // would have refused, so the message could never be read - and a refusal
-        // nobody can reach is a sentence to keep right forever for no reader
-        // (#271). The gray entry is what says the node cannot take an import.
         TestinData.firstSelected(e, DirectoryDto.class)
                 .filter(DirectoryDto::isTestCaseContainer)
                 .ifPresent(dir -> new Work(p).openImportDialog(dir));
     }
 
-    /**
-     * UC-SHARE-005.
-     * <p>
-     * On a node that can take test cases, and gray on every other - including
-     * outside the Testin tree altogether, which is what keeps a key bound to
-     * this inert in a Java file (#119).
-     */
+    // UC-SHARE-005
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TestinData.singleSelectedNode(e)
@@ -126,14 +91,8 @@ public class ImportAction extends DumbAwareAction {
         return ActionUpdateThread.EDT;
     }
 
-    /**
-     * Importing into one node, for a project that is there.
-     */
     private record Work(@NotNull Project p) {
-
         private void openImportDialog(final @NotNull DirectoryDto dirDto) {
-            // The framework dialog reports through this callback rather than a
-            // return code, and only ever with a non-empty selection.
             new ImportDialog(p, TestEditorAttributes.all(Can.IMPORT),
                     (file, format) -> format.importToFile(p, file),
                     selectedCasesBySheet -> executeImportWriteAction(dirDto, selectedCasesBySheet))
@@ -142,29 +101,17 @@ public class ImportAction extends DumbAwareAction {
 
         // UC-SHARE-005, UC-SHARE-006
         private void executeImportWriteAction(final @NotNull DirectoryDto selectedDirDto, final @NotNull Map<String, List<TestCaseDto>> selectedCasesBySheet) {
-
             final @NotNull Path targetPath = selectedDirDto.getPath();
 
-            // Checked once up front: with code off - no Java plugin, or no
-            // testin.yml naming this test project - the import still runs, only
-            // the test-method generation is skipped (with a one-time notice).
             final boolean generateCode = CodeOn.isOnOrWarnOnce(p);
 
             final int total = selectedCasesBySheet.values().stream().mapToInt(List::size).sum();
 
-            // Off the EDT and under a bar. Every case is a file of its own, written
-            // through java.nio by the indexer, so the loop belongs on a background
-            // thread; what needs the EDT asks for it by name below (#87).
             BackgroundWork.run(p, Bundle.message("import.task.importing", String.valueOf(total), selectedDirDto.getName()),
                     Bundle.message("import.failed.title"), indicator -> {
                 indicator.setIndeterminate(false);
                 final long startedAt = System.currentTimeMillis();
 
-                // Once for the import, not once per sheet. Adding a test method
-                // resolves the references inside it, resolving reads the stub index,
-                // and reading the index while it is being rebuilt waits for the
-                // rebuild. Waiting here costs a background thread; waiting inside a
-                // write action costs the whole IDE.
                 if (generateCode) {
                     indicator.setText2(Bundle.message("import.progress.indexing"));
                     DumbService.getInstance(p).waitForSmartMode();
@@ -173,23 +120,14 @@ public class ImportAction extends DumbAwareAction {
 
                 int imported = 0;
 
-                // Every set this import made, until one takes a test case. The sets
-                // are all created before the first case is written, so a Cancel
-                // leaves the ones it never reached standing there empty, each with a
-                // class of its own and nothing in it - and nothing said so (#312,
-                // A51).
                 final @NotNull Set<String> stillEmpty = new LinkedHashSet<>();
 
                 try {
-                    // Inside the try, so a set that could not be made is reported
-                    // like any other failure part way, with the count (#66,
-                    // finding 212).
                     final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targets =
                             targetSets(selectedDirDto, targetPath, selectedCasesBySheet);
                     targets.keySet().forEach(made -> stillEmpty.add(made.getName()));
 
                     for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set : targets.entrySet()) {
-
                         final @NotNull TestSetDirectoryDto into = set.getKey();
                         final @NotNull List<TestCaseDto> cases = set.getValue();
                         final @NotNull Path setPath = into.getPath();
@@ -203,47 +141,24 @@ public class ImportAction extends DumbAwareAction {
 
                         imported += written.size();
 
-                        // UC-SHARE-007, Rule-SHARE-037.
-                        //
-                        // A Cancel is an answer, so it stops the loop rather than
-                        // throwing past the count into the catch below, which would
-                        // have told the tester their import failed for pressing the
-                        // button the bar offers them. The count above is exact:
-                        // every case it includes is written (#66, finding 83).
+                        // UC-SHARE-007, Rule-SHARE-037
                         if (indicator.isCanceled()) break;
                     }
                 } catch (final Exception ex) {
-                    // UC-SHARE-007, Rule-SHARE-037.
-                    //
-                    // Caught here rather than left to BackgroundWork, which reports
-                    // the reason and knows nothing about the count. An import writes
-                    // a file per test case, so a failure part way leaves what it
-                    // already wrote - and the tester was told only that it failed,
-                    // with nothing to say whether there was anything to clean up
-                    // (#260).
-                    //
-                    // "At least", because the set being written when it stopped may
-                    // have got some of the way through. It is the number the tester
-                    // can act on: the sets before it are whole.
+                    // UC-SHARE-007, Rule-SHARE-037
                     Logger.error("Import failed after at least " + imported + " of " + total + ": " + FailureText.of(ex));
 
                     Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.failed.title"),
                             Bundle.message("import.failed.partial", String.valueOf(imported), String.valueOf(total), FailureText.of(ex)));
 
-                    // The cases it did write are on disk, and the message says so;
-                    // the tree shows them, as it does after an import that finished
-                    // (#66, finding 211).
                     refreshTarget(targetPath);
                     return;
                 }
 
-                // The set the tester was standing on is reopened, so what they just
-                // imported is in front of them. A container has no editor of its own.
                 if (selectedDirDto instanceof TestSetDirectoryDto ts) {
                     onEdt(() -> Services.getInstance(p, TestinEditors.class).closeThenOpen(p, ts));
                 }
 
-                // The count is the news, whichever shape was imported into (#62).
                 Services.getInstance(p, Notifier.class).softShowCounted(p, Done.IMPORTED, imported);
 
                 reportEmptySets(List.copyOf(stillEmpty));
@@ -254,35 +169,13 @@ public class ImportAction extends DumbAwareAction {
             });
         }
 
-        /**
-         * Shows what the import wrote.
-         * <p>
-         * Asynchronous refresh: a synchronous recursive VFS refresh inside a
-         * write action is disallowed by the platform and can freeze the IDE. The
-         * indexer owns the refresh and runs the whole call, lookup included, off
-         * the EDT.
-         */
         private void refreshTarget(final @NotNull Path targetPath) {
             Services.getInstance(p, ProjectIndexer.class).refreshDirectory(targetPath);
             ApplicationManager.getApplication().invokeLater(() ->
                     Services.getInstance(p, TreePanel.class).getProjectTree().refresh());
         }
 
-        /**
-         * UC-SHARE-007, Rule-SHARE-037.
-         * <p>
-         * Names the test sets this import made and never put anything into.
-         * <p>
-         * A package import makes every set before it writes the first case, so a
-         * Cancel leaves the ones it had not reached standing empty, each with a
-         * generated class of its own. Nothing said so, and a tester who stopped
-         * an import of twenty sheets found twenty test sets in the tree with no
-         * way to tell which had anything in them (#312, A51).
-         * <p>
-         * Named rather than removed: an empty test set is a thing a tester might
-         * want to keep and fill, and deleting folders behind a Cancel is not what
-         * Cancel means.
-         */
+        // UC-SHARE-007, Rule-SHARE-037
         private void reportEmptySets(final @NotNull List<String> empty) {
             if (empty.isEmpty()) return;
 
@@ -298,21 +191,8 @@ public class ImportAction extends DumbAwareAction {
                     Bundle.message("import.empty.message", count, named, rest));
         }
 
-        /**
-         * UC-SHARE-006, Rule-SHARE-031.
-         * <p>
-         * Which test set each sheet's cases are going into.
-         * <p>
-         * Two shapes, and only this decides between them: a test set takes every
-         * sheet into itself, and a container takes one new set per sheet, named
-         * after it. What happens to a set's cases afterwards - written, parented,
-         * generated, counted - is the same either way, and used to be written twice.
-         * <p>
-         * The sets are made before any case is written, and on the EDT, because
-         * making one generates its Java class and that is a write command.
-         */
+        // UC-SHARE-006, Rule-SHARE-031
         private @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targetSets(final @NotNull DirectoryDto selectedDirDto, final @NotNull Path targetPath, final @NotNull Map<String, List<TestCaseDto>> casesBySheet) {
-
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
                 final @NotNull List<TestCaseDto> everything = new ArrayList<>();
                 casesBySheet.values().forEach(everything::addAll);
@@ -325,18 +205,11 @@ public class ImportAction extends DumbAwareAction {
                 final @NotNull String name = NameSanitizer.removeSpecialChars(sheetName);
                 final @NotNull Path path = targetPath.resolve(name);
 
-                // Nothing when the set's marker did not land, which the write has
-                // already said. Unwrapped bare, the tester read "No value present"
-                // as the reason (#66, finding 212).
                 sets.put(onEdtCompute(() -> {
                     final @NotNull TestSetDirectoryDto made = (TestSetDirectoryDto) new CreateTestSet(p)
                             .execute(name, selectedDirDto, path)
                             .orElseThrow(() -> new IllegalStateException(Bundle.message("import.set.not.made", name)));
 
-                    // Asked for here, because the creator no longer generates. The
-                    // tree route runs the node type's generator after creating, and
-                    // this route has no such follow-up - so without this line an
-                    // imported set would arrive with no class at all.
                     try {
                         JavaCode.of(DirectoryType.TS).getCreated().execute(p, made);
                     } catch (final Exception ex) {
@@ -350,45 +223,16 @@ public class ImportAction extends DumbAwareAction {
             return sets;
         }
 
-        /**
-         * Generates the automation test method for each imported case, in batches.
-         * The target name only labels the log line.
-         * <p>
-         * Through the registry like every other caller: naming the generator class
-         * made this the one place that could keep working its own way while the
-         * rest of the plugin changed how a method is made.
-         * <p>
-         * Batched rather than one command for the whole sheet, which is what #51
-         * asked for and what froze the IDE for forty-nine seconds on a sheet of five
-         * hundred and fifty. A write action cannot be interrupted, so one command
-         * around every case holds the EDT until the last one is written - the
-         * progress bar cannot even repaint. {@link #METHODS_PER_COMMAND} at a time
-         * releases it between batches, and that constant says why it is the size
-         * it is. The cost is an undo entry per batch instead of one for the sheet,
-         * and a single undo of a fifty-second operation was not a thing anyone
-         * could use.
-         */
         private void generateTestMethods(final @NotNull List<TestCaseDto> testCases, final @NotNull String targetName, final @NotNull ProgressIndicator indicator) {
             Logger.info("Import: generating test methods for '" + targetName + "' with " + testCases.size() + " cases");
             final long startedAt = System.currentTimeMillis();
 
             for (int from = 0; from < testCases.size(); from += METHODS_PER_COMMAND) {
-                // A Cancel does not stop this, and that is the point. What it is
-                // given is what was written: those test cases are on disk, and
-                // leaving them without a method leaves a case nothing can run and
-                // no way in the plugin to write one for it afterwards - Automate
-                // Test Case is not built. A Cancel pressed while the cases were
-                // being written used to skip the generation for all of them,
-                // because the flag was already set by the time this was reached
-                // (#312, A51).
-
                 final @NotNull List<TestCaseDto> batch =
                         testCases.subList(from, Math.min(from + METHODS_PER_COMMAND, testCases.size()));
                 final int written = from + batch.size();
 
                 indicator.setText2(Bundle.message("import.progress.generating", String.valueOf(written), String.valueOf(testCases.size())));
-                // The batch as one, not case by case: the generator finds the
-                // class and reformats it once for the whole group.
                 onEdt(() -> GenType.CREATE_TEST_CASE.executeAll(p, batch));
             }
 
@@ -396,20 +240,10 @@ public class ImportAction extends DumbAwareAction {
                     + (System.currentTimeMillis() - startedAt) + "ms");
         }
 
-        /**
-         * UC-SHARE-005, Rule-SHARE-025, Rule-SHARE-037.
-         *
-         * @return the cases written. Every one of them is on disk, so a tester who
-         * stopped the import part way is told a number they can act on. A case
-         * whose write was refused is not among them: the writer has said why, and
-         * it is neither counted as imported nor given a method (#66, finding 285)
-         */
+        // UC-SHARE-005, Rule-SHARE-025, Rule-SHARE-037
         private @NotNull List<TestCaseDto> linkAndSaveTestCases(final @NotNull Path dirPath, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            // After what is already in the set, in the order the sheet listed them.
-            // Nothing that was there is touched: an import used to rewrite the case
-            // that happened to be last.
             String rank = tailRank;
 
             for (final TestCaseDto currentTestCase : testCases) {
@@ -417,15 +251,9 @@ public class ImportAction extends DumbAwareAction {
                 currentTestCase.setOrder(rank);
             }
 
-            // The imported cases keep the audit their file carried; the tail is an
-            // existing case whose link changed, so it is an ordinary save and is
-            // recorded as modified by whoever ran the import.
             final @NotNull List<TestCaseDto> written = new ArrayList<>(testCases.size());
             int tried = 0;
             for (final TestCaseDto tc : testCases) {
-                // Asked rather than thrown, as the indexing scan asks it: stopping
-                // is an answer, and an exception here would have to be sorted back
-                // out from a real failure by every caller above.
                 if (indicator.isCanceled()) break;
 
                 if (indexer.putTestCaseVerbatim(dirPath, tc)) written.add(tc);
@@ -438,10 +266,6 @@ public class ImportAction extends DumbAwareAction {
             return written;
         }
 
-        /**
-         * The last case in the set, which is what an import lands after. From the
-         * indexer, which is the source of truth for what is already there.
-         */
         private @NotNull String rankOfTail(final @NotNull Path directory) {
             return findExistingTail(directory).map(TestCaseDto::getOrder).orElse("");
         }
@@ -454,14 +278,6 @@ public class ImportAction extends DumbAwareAction {
         }
     }
 
-    /**
-     * What the import spent, in the log, every time one runs.
-     * <p>
-     * Here because the alternative is guessing. An import is a file per case and
-     * a PSI method per case, and which of the two dominates depends on the sheet
-     * and on whether the IDE was indexing - so the answer is measured rather
-     * than assumed, and it is in the log the next time somebody asks.
-     */
     private static void report(final int cases, final long startedAt, final long readyAt) {
         final long finishedAt = System.currentTimeMillis();
         Logger.info("Import: " + cases + " cases in " + (finishedAt - startedAt) + "ms"
@@ -469,21 +285,10 @@ public class ImportAction extends DumbAwareAction {
                 + " writing and generating " + (finishedAt - readyAt) + "ms)");
     }
 
-    /**
-     * Runs work that must be on the EDT and waits for it, so the steps of an
-     * import stay in the order the import wrote them. Safe to wait from here:
-     * the bar is a background task, so the EDT is not waiting on us.
-     */
     private static void onEdt(final @NotNull Runnable work) {
-        // Explicitly non-modal. The default modality is the one captured where
-        // the task was started, which was the import dialog - and that dialog is
-        // closed by now, so waiting on it would wait forever.
         ApplicationManager.getApplication().invokeAndWait(work, ModalityState.nonModal());
     }
 
-    /**
-     * The same, for a step whose answer the next one needs.
-     */
     private static <T> @NotNull T onEdtCompute(final @NotNull Supplier<T> work) {
         final @NotNull List<T> answer = new ArrayList<>(1);
         onEdt(() -> answer.add(work.get()));

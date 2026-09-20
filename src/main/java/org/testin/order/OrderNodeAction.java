@@ -36,22 +36,7 @@ import org.testin.util.Bundle;
 
 import java.util.Optional;
 
-/**
- * Gives a node its place among its siblings: a number the tester types.
- * <p>
- * Nodes with a number come first, smallest first; the rest follow by the date
- * they were created, which is the order a folder has always read in. Two nodes
- * with the same number is not a problem - the date decides - so a node can be
- * put third without renumbering anything.
- * <p>
- * Declared in {@code plugin.xml} (#119), which is what puts it in Find Action
- * and lets a tester give it a key of their own in Settings -> Keymap - it has
- * never had one, and until now there was nowhere to ask for it. That is also why
- * it has no constructor and no fields: the platform builds one instance for the
- * whole IDE, so the node comes from the keystroke.
- */
 public class OrderNodeAction extends DumbAwareAction {
-
     // UC-TREE-PANEL-015
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -61,13 +46,7 @@ public class OrderNodeAction extends DumbAwareAction {
         orderable(e).ifPresent(node -> new OrderDialog(p, node.getOrder(), order -> apply(p, node, order)).show());
     }
 
-    /**
-     * UC-TREE-PANEL-015, Rule-TREE-PANEL-055.
-     * <p>
-     * Ordered is said when the node moved, and not when it did not. Re-typing
-     * the number a node already has writes the same marker and used to raise the
-     * same message, which reads as an answer to a change nobody made (#193).
-     */
+    // UC-TREE-PANEL-015, Rule-TREE-PANEL-055
     private void apply(final @NotNull Project p, final @NotNull DirectoryDto node, final int order) {
         if (node.getOrder() == order) return;
 
@@ -76,10 +55,7 @@ public class OrderNodeAction extends DumbAwareAction {
 
         Services.getInstance(p, Notifier.class).softShow(p, Done.ORDERED);
 
-        // Rule-TREE-PANEL-103. On the tree's history, like a rename, a move and
-        // a removal. It was the one tree gesture that recorded nothing, so a
-        // tester who renumbered the wrong node could not take it back with the
-        // key that takes back everything else there (#66, finding 218).
+        // Rule-TREE-PANEL-103
         Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                 Bundle.message("order.undo", node.getName()),
                 () -> place(p, node, before),
@@ -88,15 +64,7 @@ public class OrderNodeAction extends DumbAwareAction {
                 }));
     }
 
-    /**
-     * UC-TREE-PANEL-015, Rule-TREE-PANEL-055.
-     * <p>
-     * Gives the node this place and redraws the tree, and answers whether the
-     * marker landed - which the history reads as whether an undo came back.
-     * <p>
-     * A marker that did not land is not confirmed, and the node keeps the place
-     * it still has on disk: the write has said why (#312, A6).
-     */
+    // UC-TREE-PANEL-015, Rule-TREE-PANEL-055
     private boolean place(final @NotNull Project p, final @NotNull DirectoryDto node, final int order) {
         final int was = node.getOrder();
         node.getMarker().setOrder(order);
@@ -106,40 +74,15 @@ public class OrderNodeAction extends DumbAwareAction {
             return false;
         }
 
-        // The tree is drawn from the children index, which sorts on the way out
-        // - so what redraws it is a refresh, not a re-index.
         Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
         return true;
     }
 
-    /**
-     * The selected node, when it is a kind that can be ordered.
-     * <p>
-     * Empty means one of three things, and none of them needs telling apart: the
-     * node is one with no arrangement to have - a project, or one of its two
-     * containers - several are selected, or the keystroke never arrived in the
-     * Testin tree at all. Each of them is a reason to be gray, which is the only
-     * thing the two callers do with the answer.
-     */
     private @NotNull Optional<DirectoryDto> orderable(final @NotNull AnActionEvent e) {
-        // One node, so several selected grays the entry rather than ordering the
-        // first and passing over the rest in silence (#192).
         return TestinData.singleSelectedNode(e).filter(DirectoryDto::isOrderable);
     }
 
-    /**
-     * UC-TREE-PANEL-015, Rule-TREE-PANEL-058.
-     * <p>
-     * Always on the menu, and grayed out on a node that has no order to set.
-     * <p>
-     * Hiding it would answer a question the tester did not ask: an entry that
-     * appears on some nodes and not others reads as a menu that changes shape,
-     * and they have to find out by right-clicking around which nodes have it.
-     * Greyed out says the same thing in place - this exists, not for this one.
-     * <p>
-     * It is the guard on the key as well now: outside the Testin tree there is no
-     * node to order, so a key bound to this is gray in a Java file (#119).
-     */
+    // UC-TREE-PANEL-015, Rule-TREE-PANEL-058
     @Override
     public void update(final @NotNull AnActionEvent e) {
         GrayWithReason.unless(this, e, orderable(e).isPresent(), Bundle.message("order.disabled.description"));
@@ -147,7 +90,6 @@ public class OrderNodeAction extends DumbAwareAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // update() reads the tree's selection, which is Swing state (#52).
         return ActionUpdateThread.EDT;
     }
 }

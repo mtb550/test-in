@@ -41,119 +41,38 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/**
- * The Testin editor showing a node: find it, open it, focus it, reload it,
- * close it.
- * <p>
- * Was {@code EditorUtil}, which named no job - and there is a
- * {@code com.intellij.openapi.editor.ex.util.EditorUtil} in the platform, so an
- * import list held two of that name and the wrong one is one keystroke away.
- * The {@code Testin} prefix is what CLAUDE.md already does where a plain noun
- * collides with a platform type, as {@code TestinEditor} and
- * {@code TestinFileSystem} do (#291).
- * <p>
- * Every lookup here matches on the node's <b>path</b>. Two test sets both called
- * "Login" in different packages are one name and two nodes, and matching on the
- * name answers for whichever happened to be open first.
- * <p>
- * Which tabs were open last time the project closed is not here: that is a list
- * of paths outliving the editors it names, and it belongs to
- * {@link LastOpenEditors}.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class TestinEditors {
-
-    /**
-     * The open file showing the node at this path, and empty when none is.
-     * <p>
-     * By path, which is the node's identity. Two test sets both called "Login"
-     * in different packages are one name and two nodes, and the name answers
-     * for whichever happened to be open first - a search result opened its
-     * neighbour's editor that way, and a rename closed the other one's tab.
-     * <p>
-     * The one lookup in this class. Four methods wrote this loop out again
-     * beside it, each with its own comment saying why it matched on the path
-     * (#312, A20).
-     */
     private @NotNull Optional<VirtualFile> openFileAt(final @NotNull Project p, final @NotNull Path path) {
         return Arrays.stream(FileEditorManager.getInstance(p).getOpenFiles())
                 .filter(open -> open instanceof UnifiedVirtualFile testinFile && testinFile.getDir().getPath().equals(path))
                 .findFirst();
     }
 
-    /**
-     * Re-reads whatever editor is open on this node, keeping the filters and the
-     * search the tester has narrowed it with. Nothing when none is open.
-     * <p>
-     * Found by path rather than held: an editor closed and opened again on the
-     * same node is a different object showing the same data, and an operation
-     * recorded before that would otherwise reload a disposed one - whose toolbar
-     * has been emptied, so the first thing it asks for is not there (#165).
-     */
     public void reloadOpen(final @NotNull Project p, final @NotNull Path path) {
         editorAt(p, path).ifPresent(TestinEditor::reloadData);
     }
 
-    /**
-     * UC-TREE-PANEL-011, UC-TREE-PANEL-012, Rule-TREE-PANEL-111, Rule-TREE-PANEL-116.
-     * <p>
-     * Closes every editor showing this node or a node under it - light mode
-     * closes with its run editor.
-     * <p>
-     * By path, which is a node's identity. It took the node's name once and
-     * closed whichever tab matched, so renaming one of two same-named test sets
-     * closed the other's tab. And it matched the node alone, so renaming or
-     * removing a package left the test sets under it open, holding their old
-     * paths, for the next cell edit to write a folder that was gone back into
-     * existence (#331).
-     */
+    // UC-TREE-PANEL-011, UC-TREE-PANEL-012, Rule-TREE-PANEL-111, Rule-TREE-PANEL-116
     public void close(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         openFilesUnder(p, dir.getPath()).forEach(FileEditorManager.getInstance(p)::closeFile);
     }
 
-    /**
-     * UC-TREE-PANEL-011, Rule-TREE-PANEL-111.
-     * <p>
-     * Whether an editor on this node or under it is in the middle of something -
-     * a run executing, a cell being edited - that closing it would throw away.
-     */
+    // UC-TREE-PANEL-011, Rule-TREE-PANEL-111
     public boolean busyUnder(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         return openFilesUnder(p, dir.getPath()).stream()
                 .flatMap(open -> Arrays.stream(FileEditorManager.getInstance(p).getAllEditors(open)))
                 .anyMatch(tab -> tab instanceof UnifiedFileEditor unified && unified.getEditor().isBusy());
     }
 
-    /**
-     * The open files showing this node or a node under it - by path, and
-     * {@link Path#startsWith} compares whole names, so {@code Login} never
-     * matches {@code Login2}. The one lookup for "under", beside
-     * {@link #openFileAt} for "at".
-     */
     private @NotNull List<VirtualFile> openFilesUnder(final @NotNull Project p, final @NotNull Path path) {
         return Arrays.stream(FileEditorManager.getInstance(p).getOpenFiles())
                 .filter(open -> open instanceof UnifiedVirtualFile testinFile && testinFile.getDir().getPath().startsWith(path))
                 .toList();
     }
 
-    /**
-     * Rule-EDITOR-PANEL-015.
-     * <p>
-     * Closes every Testin tab as the project closes, once their paths are safely
-     * written down.
-     * <p>
-     * So that the IDE has nothing of ours left to remember. Two things were
-     * reopening these tabs: the entry above, and the IDE's own tab list, which
-     * records a Testin tab by its {@code testin://} address like any other file.
-     * The IDE's attempt could never work - it asks the file system for that
-     * address before the index exists, and twenty seconds before it could
-     * answer - so every launch began with two "No file exists" warnings and a
-     * tab the IDE had given up on being opened again by us (#160).
-     * <p>
-     * There is one owner now. This runs in {@code projectClosingBeforeSave},
-     * which is before the IDE writes its tab list, so what it writes for Testin
-     * is nothing.
-     */
+    // Rule-EDITOR-PANEL-015
     public void closeAll(final @NotNull Project p) {
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
@@ -162,23 +81,7 @@ public final class TestinEditors {
         }
     }
 
-    /**
-     * UC-TREE-PANEL-025, Rule-TREE-PANEL-082.
-     * <p>
-     * Brings every open Testin editor back in line with the index that was just
-     * rebuilt: the ones whose node is still there read it again, and the ones
-     * whose node is gone close.
-     * <p>
-     * An editor holds the node it was opened on and the test cases it read from
-     * it, so after a re-index both can be wrong. A branch switch replaces every
-     * file under the project - a test set that is still there holds different
-     * cases, and one the branch does not have is not there at all. Left alone,
-     * the first shows a colleague's old data and the second shows cases that
-     * exist nowhere, and saving either would write them back.
-     * <p>
-     * On the EDT, after indexing has finished. Asked before the cache is rebuilt
-     * it would close every editor in the project.
-     */
+    // UC-TREE-PANEL-025, Rule-TREE-PANEL-082
     public void refreshOpen(final @NotNull Project p) {
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
@@ -195,11 +98,6 @@ public final class TestinEditors {
                 if (!(tab instanceof UnifiedFileEditor unified)) continue;
 
                 final @NotNull TestinEditor editor = unified.getEditor();
-                // A running run or an open grid cell is live state the tester is
-                // in the middle of, and a reload throws it away - the timer stops
-                // with its seconds unstamped, the half-typed cell is gone. The
-                // change on disk waits for them to finish; their own Refresh
-                // button, pressed on purpose, still reloads.
                 if (editor.isBusy()) {
                     Logger.info("Leaving a busy editor as it is rather than reloading under the tester: "
                             + testinFile.getName());
@@ -210,35 +108,10 @@ public final class TestinEditors {
         }
     }
 
-    /**
-     * Whether the index still holds this editor's node, asked by its path. One
-     * question answers for both kinds of editor, because a node of any kind is
-     * found by its path.
-     */
     private boolean isIndexed(final @NotNull Project p, final @NotNull UnifiedVirtualFile file) {
-        // Asked as a question rather than by fetching and comparing to null: the
-        // lookups promise a node now, so calling one to find out whether there
-        // is one would fail rather than answer (#71).
         return Services.getInstance(p, ProjectIndexer.class).nodeExists(file.getDir().getPath());
     }
 
-    /**
-     * Opens a node's editor - or focuses the one already open - and hands it to
-     * whoever asked, once there is one to hand.
-     * <p>
-     * <b>One block and in order.</b> {@code openNow} blocks until the editor
-     * exists, so what follows has something to talk to. It cannot be a second
-     * {@code invokeLater}: the open pumps the event queue while it waits, so the
-     * second call runs <em>inside</em> the first and finds no editor - which is
-     * why a test case picked from the search opened its editor on page one with
-     * nothing selected (#29). Owning that ordering in one place is what this
-     * method is for, and why the two halves it uses stay private.
-     * <p>
-     * <b>What to say to the editor is the caller's.</b> A run says "start what
-     * you have left", a search result says "land on this case"; neither is
-     * knowledge a class named after editors should be carrying, and each lives
-     * in the package the sentence is about.
-     */
     public void openThen(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull Consumer<TestinEditor> tell) {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!openNow(p, dir, true)) return;
@@ -247,42 +120,18 @@ public final class TestinEditors {
         });
     }
 
-    /**
-     * Opens a node's editor and puts the cursor on one of its test cases (#29).
-     * <p>
-     * Told to the editor rather than done to it: an editor that has just been
-     * built has no test cases yet - it reads them on a pooled thread - so it is
-     * asked to land on the case once it has one.
-     *
-     * @param tc the case to land on inside that editor
-     */
     public void openAndSelect(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull TestCaseDto tc) {
         openThen(p, dir, editor -> {
             editor.selectWhenLoaded(tc.getId());
 
-            // Outside the editor's own business: the details panel is handed the
-            // case itself rather than asked to find it, so it fills in whether
-            // the editor has read its cases or not.
             ViewToolWindowFactory.showPanel(p, List.of(tc), dir.getPath2());
         });
     }
 
-    /**
-     * The run editor open on this run, and empty when nothing has it open.
-     */
     public @NotNull Optional<RunEditor> runEditorFor(final @NotNull Project p, final @NotNull TestRunDirectoryDto run) {
         return editorFor(p, run).filter(RunEditor.class::isInstance).map(RunEditor.class::cast);
     }
 
-    /**
-     * The open Testin editor showing this node, and empty when none is - which
-     * happens when the open above could not build one, and when nothing has this
-     * node open at all.
-     * <p>
-     * Public because a change made somewhere else has to reach whatever is
-     * drawing the node: setting a test run's status from the tree left that
-     * run's open editor on the old one (#191).
-     */
     public @NotNull Optional<TestinEditor> editorFor(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         return editorAt(p, dir.getPath());
     }
@@ -303,46 +152,14 @@ public final class TestinEditors {
         }, () -> open(p, dir)));
     }
 
-    /**
-     * Opens the node's editor, or focuses it when it is already open.
-     * <p>
-     * There used to be an {@code openIfNotOpen} beside this saying the same
-     * thing, from when this one always opened a second tab. Opening what is
-     * already open <em>is</em> focusing it, so the two names were one behavior.
-     */
     public void open(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         open(p, dir, true);
     }
 
-    /**
-     * The same, for a caller that is opening several at once and wants the
-     * cursor to land on one of them rather than on each in turn - which is
-     * {@link LastOpenEditors}, reopening what was open last time.
-     */
     public void open(final @NotNull Project p, final @NotNull DirectoryDto dir, final boolean focus) {
         ApplicationManager.getApplication().invokeLater(() -> openNow(p, dir, focus));
     }
 
-    /**
-     * Opens the node's editor, or focuses it when it is already open, and
-     * answers whether there is now an editor to talk to.
-     * <p>
-     * <b>On the EDT, and synchronous.</b> {@code openFile} blocks until the
-     * editor exists, so a caller that needs to say something to that editor can
-     * say it on the next line. It cannot say it from a second
-     * {@code invokeLater}: openFile pumps the event queue while it waits, so the
-     * second call runs <em>inside</em> the first and finds no editor yet. That
-     * is why a test case picked from the search opened its editor on page one
-     * with nothing selected, while one whose editor was already open worked
-     * (#29).
-     * <p>
-     * A node with no editor is refused rather than guessed at. The type used to
-     * be read as "a test run, or else a test set", so every other node - a
-     * package, the Test Cases folder, the Test Runs folder - was opened as a
-     * test set and died casting itself to one. What can be opened is the node's
-     * own declaration, and the two kinds that say yes are exactly the two the
-     * editors are written for.
-     */
     private boolean openNow(final @NotNull Project p, final @NotNull DirectoryDto dir, final boolean focus) {
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
@@ -364,13 +181,6 @@ public final class TestinEditors {
         return true;
     }
 
-    /**
-     * The node behind every Testin editor open right now, as absolute paths.
-     * <p>
-     * What is open is this class's answer to give; writing it down and reading
-     * it back on the next launch is {@link LastOpenEditors}, which is the one
-     * caller (#291).
-     */
     public @NotNull List<Path> openNodePaths(final @NotNull Project p) {
         final @NotNull List<Path> paths = new ArrayList<>();
 
@@ -380,5 +190,4 @@ public final class TestinEditors {
 
         return paths;
     }
-
 }

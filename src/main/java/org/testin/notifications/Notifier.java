@@ -40,27 +40,9 @@ import org.testin.util.Html;
 import java.awt.*;
 import java.util.Optional;
 
-/**
- * Delivers a message, and only delivers it. The words live in {@code Done} when
- * something worked and {@code Refused} when it did not - a class that says things
- * has one job, and writing the sentences was six methods this class used to carry
- * (#291).
- * <p>
- * Two kinds, and the question is whether the work can finish while the tester is
- * not looking: {@link #softShow} is a balloon on the status bar that fades and
- * leaves no trace, for work under the tester's hand, and {@link #info} is a real
- * IDE notification that stays in the log, for a sync or a push that lands while
- * they are reading something else.
- * <p>
- * <b>Not a dialog at all</b>, which is why it is not on {@code ui.framework}
- * (#69). A balloon asks nothing and takes no answer; the platform owns its
- * lifetime and its place on screen. Nothing here has a title bar, a field or a
- * key.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class Notifier {
-
     private static final @NotNull String GROUP_ID = "testin.notifications";
 
     public void softShow(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
@@ -71,15 +53,6 @@ public final class Notifier {
         showBalloon(p, String.format("<html>%s</html>", Html.ofText(message)), MessageType.INFO);
     }
 
-    /**
-     * The same balloon, in red, for an action that did not happen.
-     * <p>
-     * A confirmation and a refusal read identically at a glance when both carry
-     * the blue information icon, and a refusal is the one the tester has to act
-     * on - it is telling them to do something differently. It still fades: this
-     * is feedback on the gesture they just made, not a failure worth keeping
-     * beside real ones (#62).
-     */
     public void softRefuse(final @NotNull Project p, final @NotNull String message) {
         showBalloon(p, String.format("<html>%s</html>", Html.ofText(message)), MessageType.ERROR);
     }
@@ -88,47 +61,18 @@ public final class Notifier {
         showBalloon(p, String.format("<html><b>%s</b><br>%s</html>", Html.ofText(title), Html.ofText(message)), MessageType.ERROR);
     }
 
-    /**
-     * A refusal about one thing, in the words {@link Refused} keeps.
-     * <p>
-     * Composing the sentence is not this class's job - delivering it is. Five
-     * refusals used to be a method each here, which made the class that hands
-     * messages to the platform also the class that decides what they say.
-     */
     public void softRefuse(final @NotNull Project p, final @NotNull Refused refusal, final @NotNull String name) {
         softRefuse(p, refusal.about(name));
     }
 
-    /**
-     * Rule-TREE-PANEL-007, Rule-EDITOR-PANEL-008.
-     * <p>
-     * Confirms an operation that ran over a selection: <i>Copied</i> for one,
-     * <i>Copied 3</i> for several. Here rather than at the call sites so that
-     * every bulk action counts the same way (#62).
-     * <p>
-     * What the sentence looks like is {@link Done#counted}'s, not this class's -
-     * delivering it is the job here.
-     */
+    // Rule-TREE-PANEL-007, Rule-EDITOR-PANEL-008
     public void softShowCounted(final @NotNull Project p, final @NotNull String outcome, final int count) {
-        // Nothing happened, so there is nothing to confirm. It used to say
-        // "Removed 0", which is a balloon telling the tester that their gesture
-        // reached nothing - news only if something was expected, and the caller
-        // that expected something says so itself (#269).
         if (count <= 0) return;
 
         softShow(p, Done.counted(outcome, count));
     }
 
-    /**
-     * Rule-TREE-PANEL-007, Rule-EDITOR-PANEL-008.
-     * <p>
-     * The same two, taking the outcome rather than a word for it.
-     * <p>
-     * Preferred over the String forms wherever the outcome is one of the
-     * {@link Done} constants, which is almost everywhere: the enum is what keeps
-     * the past-tense rule from being a thing each call site remembers on its
-     * own.
-     */
+    // Rule-TREE-PANEL-007, Rule-EDITOR-PANEL-008
     public void softShow(final @NotNull Project p, final @NotNull Done done) {
         softShow(p, done.getOutcome());
     }
@@ -137,18 +81,8 @@ public final class Notifier {
         softShowCounted(p, done.getOutcome(), count);
     }
 
-    /**
-     * Lightweight fading balloon anchored to the IDE status bar.
-     */
     private void showBalloon(final @NotNull Project p, final @NotNull String htmlContent, final @NotNull MessageType type) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            // A project window that is closing, or has not opened its frame yet,
-            // has no status bar to anchor to. Nothing is raised in its place -
-            // a second notification about a failed notification is noise - but
-            // it is written down, because what these balloons carry is every
-            // "exported", "imported" and "synced" the plugin says, and an export
-            // that finished with nobody told is not the same as one that did not
-            // finish (#270).
             Optional.ofNullable(WindowManager.getInstance().getIdeFrame(p))
                     .map(IdeFrame::getStatusBar)
                     .map(StatusBar::getComponent)
@@ -167,10 +101,6 @@ public final class Notifier {
         });
     }
 
-    /**
-     * An error with nothing written above the message: the message is the whole
-     * of it.
-     */
     private static final @NotNull String NO_TITLE = "";
 
     public void error(final @NotNull Project p, final @NotNull String message) {
@@ -189,29 +119,10 @@ public final class Notifier {
         notify(p, title, message, NotificationType.ERROR);
     }
 
-    /**
-     * A link on a notification, and the notification goes away when it is
-     * clicked.
-     * <p>
-     * Every one of these is a one-shot offer - initialize the repository,
-     * continue the rebase, open the settings - so the notification that made the
-     * offer has nothing left to say once it is taken. Built here rather than at
-     * the call sites because {@code NotificationAction.createSimple} does not
-     * expire and nothing fails when it does not: the notification simply stays,
-     * with its link still live. On the conflict notification that meant Abort
-     * could be clicked, and then Continue, on a rebase that no longer existed.
-     */
     public @NotNull NotificationAction action(final @NotNull String name, final @NotNull Runnable action) {
         return NotificationAction.createSimpleExpiring(name, action);
     }
 
-    /**
-     * A link on a notification that keeps working after it is clicked (#28).
-     * <p>
-     * For the offer that is not one-shot: opening what the notification is
-     * about. A reported bug's Open is clicked, read, closed and clicked again,
-     * and the notification stays in the log exactly so that it can be.
-     */
     public @NotNull NotificationAction lastingAction(final @NotNull String name, final @NotNull Runnable action) {
         return NotificationAction.createSimple(name, action);
     }
@@ -228,26 +139,15 @@ public final class Notifier {
         notify(p, title, message, NotificationType.INFORMATION, actions);
     }
 
-    /**
-     * A failure the tester can do something about, with the something attached.
-     * <p>
-     * An error with no way forward is just news; this is for the ones where the
-     * answer is "try that again" - a push that could not reach the remote, say.
-     */
     public void errorWithActions(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
         notify(p, title, message, NotificationType.ERROR, actions);
     }
 
     private void notify(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationType type, final @NotNull NotificationAction... actions) {
-        // Rule-EDITOR-PANEL-206. A notification is HTML too, and what it carries
-        // is as often a tool's output or a path as a sentence (#66, finding 197).
+        // Rule-EDITOR-PANEL-206
         final @NotNull String titleText = Html.ofText(title);
         final @NotNull String messageText = Html.ofText(message);
 
-        // The platform has one overload with a title and one without, and picks
-        // by which is called - so "no title" needs a value to be chosen by. It
-        // used to be a null, which the annotation sweep then declared impossible
-        // while the one caller that passes it went on passing it (#93).
         final @NotNull Notification notification = title.isEmpty()
                 ? NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(messageText, type)
                 : NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(titleText, messageText, type);

@@ -32,20 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Optional;
 
-/**
- * A screenshot at its real size, scrolled when it is larger than the dialog
- * (#50).
- * <p>
- * Also the one place a PNG is read back into a picture, and the one maker of
- * its thumbnail: the failure form's strip under the error box and the details
- * panel's Stacktrace row both ask {@link #thumbnail}, so a screenshot that
- * draws in one draws the same in the other.
- */
 public final class Picture implements DialogComponent {
-
-    /**
-     * How high a screenshot's thumbnail is drawn, wherever one is.
-     */
     private static final int THUMBNAIL_HEIGHT = 48;
 
     private final @NotNull JBScrollPane panel;
@@ -55,11 +42,6 @@ public final class Picture implements DialogComponent {
         panel.setBorder(JBUI.Borders.empty());
     }
 
-    /**
-     * The picture these bytes hold, and empty for bytes that are not one - only
-     * a hand-edited run file holds those. Logged rather than thrown: a
-     * screenshot that cannot be drawn still stays saved.
-     */
     static @NotNull Optional<BufferedImage> read(final byte @NotNull [] png) {
         try {
             final @NotNull Optional<BufferedImage> image = Optional.ofNullable(ImageIO.read(new ByteArrayInputStream(png)));
@@ -71,20 +53,8 @@ public final class Picture implements DialogComponent {
         }
     }
 
-    /**
-     * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081.
-     * <p>
-     * The screenshot at thumbnail height, its width in proportion, and the empty
-     * square of {@link #noThumbnail} for one that cannot be read.
-     * <p>
-     * Moved here from the failure form's strip, where it was private, so the
-     * details panel draws the same picture rather than a second maker of it
-     * (#328).
-     */
+    // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081
     public static @NotNull Icon thumbnail(final byte @NotNull [] png) {
-        // No bytes is a file that is not there yet - a sync has not brought it -
-        // and the indexer has said so. Reading them would add a second warning
-        // calling it "not a picture".
         if (png.length == 0) return noThumbnail();
 
         return read(png)
@@ -92,11 +62,6 @@ public final class Picture implements DialogComponent {
                 .orElseGet(Picture::noThumbnail);
     }
 
-    /**
-     * The empty square a thumbnail takes while it cannot be drawn: before its
-     * file has been read, and for bytes that are not a picture. The same size,
-     * so nothing moves when the picture arrives.
-     */
     public static @NotNull Icon noThumbnail() {
         return EmptyIcon.create(JBUI.scale(THUMBNAIL_HEIGHT));
     }
@@ -113,7 +78,6 @@ public final class Picture implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // Looking at a picture is not a submit gesture; the declared keys close.
     }
 
     @Override

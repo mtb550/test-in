@@ -29,7 +29,6 @@ import javax.swing.border.Border;
 
 @AllArgsConstructor
 public abstract class AbstractListRenderer<U extends TestinEditor> implements ListCellRenderer<TestCaseDto> {
-
     private static final @NotNull Border SELECTED_BORDER = JBUI.Borders.customLine(EditorColors.SELECTION_BORDER, 1);
     private static final @NotNull Border UNSELECTED_BORDER = JBUI.Borders.empty(1);
     protected final @NotNull U editor;
@@ -40,9 +39,6 @@ public abstract class AbstractListRenderer<U extends TestinEditor> implements Li
         final boolean isRowHovered = (index == editor.getHoveredIndex());
         final @NotNull String hover = isRowHovered ? editor.getHoveredIconAction() : "";
 
-        // The row, not the case's position in the set: this is what stripes the
-        // cards, and stripes alternate down the screen. The number in the title
-        // is the position, and the editor is asked for that by name.
         final @NotNull BaseCard card = bindDataAndGetCard(list, tc, index, isSelected, isRowHovered, hover);
 
         card.setBorder(isSelected ? SELECTED_BORDER : UNSELECTED_BORDER);
@@ -52,4 +48,3 @@ public abstract class AbstractListRenderer<U extends TestinEditor> implements Li
 
     protected abstract @NotNull BaseCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int row, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover);
 }
-

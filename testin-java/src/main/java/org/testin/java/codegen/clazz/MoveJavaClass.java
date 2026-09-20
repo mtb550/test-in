@@ -30,17 +30,7 @@ import org.testin.logger.Logger;
 import java.util.Optional;
 import java.util.List;
 
-/**
- * Moves a test set's generated class into the package its new place in the tree
- * stands for.
- * <p>
- * A move is not a rename: the class keeps its name and changes the package it
- * declares. Nothing did this before, so dragging a test set moved the node and
- * left the class where it was - and because a fully-qualified name is built from
- * the tree path, every case under it stopped being runnable (#51).
- */
 public class MoveJavaClass implements GenAction {
-
     // UC-CODEGEN-016, Rule-CODEGEN-053, Rule-CODEGEN-054
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
@@ -69,8 +59,6 @@ public class MoveJavaClass implements GenAction {
 
             final @NotNull Optional<VirtualFile> target = JavaSourceRoot.packageFolder(sourceRoot, destination);
 
-            // No folder to move into, and a class dropped where it already is:
-            // neither is a move.
             if (target.isEmpty() || target.get().equals(file.get().getParent())) return;
 
             file.get().move(this, target.get());

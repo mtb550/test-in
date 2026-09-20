@@ -42,47 +42,20 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Every bug this test case has, and which cycle found it.
- * <p>
- * It used to say <i>No bugs found for this test case</i> whatever the case had,
- * because it never looked at one - so a case showing Blocker and High on the
- * Details tab was told beside it that it had none. Two tabs describing the same
- * test case have to agree, which is the rule the panel is built on (#229).
- * <p>
- * A bug is not a thing of its own here. It is what a run row records about a
- * failure, so this reads the runs rather than the case: the same case can carry
- * a Blocker in one cycle and nothing in the next, and both are worth seeing.
- */
 public class OpenBugsTab {
-
     private static final int GAP = 12;
 
-    /**
-     * UC-VIEW-PANEL-008, Rule-VIEW-PANEL-038, Rule-VIEW-PANEL-064.
-     * <p>
-     * With no test case shown there is no test case to say anything about, which
-     * is why the empty case is asked first and answers differently (#230).
-     */
+    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-038, Rule-VIEW-PANEL-064
     public void load(final @NotNull Project p, final @NotNull JBPanel<?> bugTab, final @NotNull Optional<TestCaseDto> shown) {
         bugTab.removeAll();
         bugTab.setLayout(new BorderLayout());
 
         bugTab.add(contents(p, shown), BorderLayout.NORTH);
 
-        // Its own, as the details tab's load does its own. This tab is the one
-        // that draws something different per test case, and it swapped its rows
-        // without painting them - so paging to the next case, or a running test
-        // reporting a result, left the previous case's bugs on screen until the
-        // tester switched tabs away and back (#66, finding 79).
         bugTab.revalidate();
         bugTab.repaint();
     }
 
-    /**
-     * What this tab is showing: the open bugs, or the one sentence that says why
-     * there are none to show.
-     */
     private @NotNull JComponent contents(final @NotNull Project p, final @NotNull Optional<TestCaseDto> shown) {
         if (shown.isEmpty()) return note(Bundle.message("view.bugs.no.selection"));
 
@@ -92,12 +65,7 @@ public class OpenBugsTab {
         return bugs.isEmpty() ? note(Bundle.message("view.bugs.none")) : rows(bugs);
     }
 
-    /**
-     * UC-VIEW-PANEL-008, Rule-VIEW-PANEL-064.
-     * <p>
-     * One block per bug: which run found it, how bad it is, the issue it was
-     * filed as, and what happened.
-     */
+    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-064
     private static @NotNull JBPanel<?> rows(final @NotNull List<OpenBug> bugs) {
         final @NotNull JBPanel<?> panel = new JBPanel<>();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -117,9 +85,6 @@ public class OpenBugsTab {
         return panel;
     }
 
-    /**
-     * The run's name, which is the only thing that says which cycle found this.
-     */
     private static @NotNull JBLabel heading(final @NotNull OpenBug bug) {
         final @NotNull JBLabel label = new JBLabel(bug.runName());
         label.setFont(JBFont.label().asBold().deriveFont(FontSync.getBaseFontSize()));
@@ -127,10 +92,6 @@ public class OpenBugsTab {
         return label;
     }
 
-    /**
-     * How bad and how soon, in the severity's own color - the same one the run
-     * grid and the reports paint it, because the constant carries it.
-     */
     private static @NotNull JBLabel severity(final @NotNull OpenBug bug) {
         final @NotNull JBLabel label = new JBLabel(
                 bug.item().getBugSeverity().getLabel() + " / " + bug.item().getBugPriority().getLabel());
@@ -141,10 +102,6 @@ public class OpenBugsTab {
         return label;
     }
 
-    /**
-     * The issue it was filed as, opening it in the browser - the same reference
-     * and the same way there as the Details tab's link.
-     */
     private static @NotNull ActionLink issue(final @NotNull String url) {
         final @NotNull ActionListener open = event -> BugIssueUrl.open(url);
         final @NotNull ActionLink link = new ActionLink(BugIssueUrl.reference(url), open);
@@ -161,10 +118,6 @@ public class OpenBugsTab {
         return label;
     }
 
-    /**
-     * A box layout stretches its children, so every row is told to sit left
-     * rather than in the middle of whatever width the tab has.
-     */
     private static @NotNull JComponent left(final @NotNull JComponent row) {
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
 

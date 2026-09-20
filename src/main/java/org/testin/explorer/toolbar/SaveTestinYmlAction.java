@@ -28,15 +28,8 @@ import org.testin.util.Bundle;
 
 import java.util.Optional;
 
-/**
- * UC-TREE-PANEL-029.
- * <p>
- * Save to testin.yml, the eighth button in the panel's title bar: the only way
- * {@code testin.yml} is ever written (#335). The work is {@link SaveTestinYml}'s,
- * which the code-off notification presses too.
- */
+// UC-TREE-PANEL-029
 public class SaveTestinYmlAction extends DumbAwareAction {
-
     private final @NotNull Project p;
 
     public SaveTestinYmlAction(final @NotNull Project p) {

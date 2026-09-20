@@ -25,12 +25,7 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.Consumer;
 
-
-/**
- * One status across a selection, edited as text like the priority beside it.
- */
 public class StatusBulkSectionDialog extends JsonSplitBulkSectionDialog {
-
     public StatusBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
         super(p, selectedItems, updatedItems);
     }
@@ -54,6 +49,4 @@ public class StatusBulkSectionDialog extends JsonSplitBulkSectionDialog {
     protected boolean acceptsBlank() {
         return false;
     }
-
-
 }

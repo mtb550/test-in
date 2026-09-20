@@ -42,12 +42,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 final class IndexerDataStore {
-
     private final @NotNull DirectoryChildrenIndex childrenIndex = new DirectoryChildrenIndex();
 
-    /**
-     * The marker files this index is built from, read and written in one place.
-     */
     private final @NotNull MarkerFiles markers;
     private final @NotNull TestCaseSequenceStore testCaseStore;
 
@@ -75,10 +71,6 @@ final class IndexerDataStore {
     @Getter
     private final @NotNull Map<String, TestRunDto> testRunsByPath = new ConcurrentHashMap<>();
 
-    /**
-     * All directory maps, used by operations that must be applied uniformly
-     * (rename, lookup, clear). Keep in sync when adding a new directory kind.
-     */
     private final @NotNull List<Map<String, ? extends DirectoryDto>> dirMaps = List.of(
             testProjectsByPath,
             testSetsDirByPath,
@@ -97,16 +89,10 @@ final class IndexerDataStore {
         return testCaseStore.getTestCasesById();
     }
 
-    /**
-     * See {@link TestCaseSequenceStore#unreadableIn}.
-     */
     @NotNull Set<String> unreadableCasesIn(final @NotNull Path testSetPath) {
         return testCaseStore.unreadableIn(testSetPath);
     }
 
-    /**
-     * The file a test case is in now - see {@link TestCaseSequenceStore#fileOf}.
-     */
     @NotNull Path testCaseFileOf(final @NotNull TestCaseDto tc) {
         return testCaseStore.fileOf(tc.getParent().getPath(), tc.getId());
     }
@@ -124,11 +110,6 @@ final class IndexerDataStore {
         return Optional.ofNullable(testRunsByPath.get(testRunPath.toString()));
     }
 
-    /**
-     * The run's folder, and none when a sync or a delete has taken it - a
-     * state of the data, unlike the getter below, which is asked only by what
-     * already had the run in hand.
-     */
     @NotNull Optional<TestRunDirectoryDto> findTestRunDir(final @NotNull Path testRunPath) {
         return Optional.ofNullable(testRunsDirByPath.get(testRunPath.toString()));
     }
@@ -143,14 +124,6 @@ final class IndexerDataStore {
         return indexed(testRunsDirByPath.get(path.toString()), "test run directory", path);
     }
 
-    /**
-     * A test case by id, which may genuinely be gone.
-     * <p>
-     * The one lookup here keyed by data rather than by something on screen: a
-     * test run holds the ids of the cases it ran, an execution event names one,
-     * and a case can be deleted after either was written. So this answers with
-     * an Optional - absence is a state of the data, not a caller's mistake.
-     */
     @NotNull
     Optional<TestCaseDto> findTestCase(final @NotNull UUID id) {
         return Optional.ofNullable(testCaseStore.getTestCasesById().get(id));
@@ -161,15 +134,6 @@ final class IndexerDataStore {
         return indexed(testSetsDirByPath.get(path.toString()), "test set", path);
     }
 
-    /**
-     * A node the cache was asked for by something that already had it.
-     * <p>
-     * You cannot open a test set that is not indexed, rename one that is not
-     * selected, or report on a run the tree is not showing - the key came out of
-     * this cache, so the answer is in it. A miss is therefore a mistake in the
-     * plugin, not a state of the data, and it is said once here rather than
-     * guessed at by every caller.
-     */
     private static <T> @NotNull T indexed(final @Nullable T node, final @NotNull String kind, final @NotNull Path path) {
         if (node != null) return node;
 
@@ -179,9 +143,6 @@ final class IndexerDataStore {
 
     // UC-INTERNAL-004, Rule-INTERNAL-033
     boolean putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
-        // The marker follows the write. A save that changed nothing did not
-        // modify the set, and stamping the set's marker for it would move the
-        // lie one level up (#164).
         if (!testCaseStore.put(testSetPath, tc)) return false;
 
         markTestSetModified(testSetPath);
@@ -190,8 +151,6 @@ final class IndexerDataStore {
 
     // UC-INTERNAL-004, Rule-INTERNAL-035
     boolean putTestCaseVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
-        // The marker follows the write here too: a set whose case never reached
-        // disk was not modified.
         if (!testCaseStore.putVerbatim(testSetPath, tc)) return false;
 
         markTestSetModified(testSetPath);
@@ -208,8 +167,6 @@ final class IndexerDataStore {
     }
 
     boolean removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
-        // The marker follows the delete: a set whose case is still on disk was
-        // not modified.
         if (!testCaseStore.remove(testSetPath, tcId)) return false;
 
         markTestSetModified(testSetPath);
@@ -222,34 +179,11 @@ final class IndexerDataStore {
         markTestSetModified(testSetPath);
     }
 
-    /**
-     * A set whose contents changed was modified, and its marker says so.
-     * <p>
-     * The methods above are the ways a set's contents change - a case saved,
-     * one imported, one moved, one removed, the order rearranged - and each says so
-     * here rather than each writing the marker itself. The test case already
-     * carries its own audit, stamped where every save arrives; this is the other
-     * half of the same fact, and without it a set edited all week reported the
-     * day it was renamed.
-     * <p>
-     * The set only. A package and a test project are not modified because
-     * something below them was: a date meaning "something, somewhere underneath"
-     * cannot be read for anything, and it would write a marker per level on every
-     * keystroke that saves.
-     * <p>
-     * Empty when the path is not an indexed test set. That is not a failure - a
-     * case can be written into a set the scan has not reached yet - and it costs
-     * only the marker not being touched, so it is passed over rather than raised.
-     */
     private void markTestSetModified(final @NotNull Path testSetPath) {
         Optional.ofNullable(testSetsDirByPath.get(testSetPath.toString()))
                 .ifPresent(ts -> markers.touched(testSetPath, DirectoryType.TS.getMarker(), ts.getMarker()));
     }
 
-    /**
-     * Index-only registration; used when the caller persists the JSON itself
-     * (e.g. the run-status writer, which snapshots the bytes beforehand).
-     */
     void registerTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
         testRunsByPath.put(testRunPath.toString(), tr);
     }
@@ -270,20 +204,6 @@ final class IndexerDataStore {
         return addDir(testRunPackagesByPath, trp, DirectoryType.TRP.getMarker(), trp.getMarker());
     }
 
-    /**
-     * A new node: the marker is written first, and the cache learns about it
-     * only if that landed.
-     * <p>
-     * Architecture rule 2, and this method used to be it inverted. Creating a
-     * node performs no VFS operation of its own - the directory comes into
-     * existence as a side effect of the marker write - so a cache updated first
-     * left a fully indexed test set drawn in the tree with nothing on disk,
-     * which then survived every rescan until the tester pressed Refresh. Now a
-     * failed write reports itself and nothing is drawn (#66, finding 85).
-     * <p>
-     * And says whether it landed, so a creator does not confirm a node that was
-     * never made (#312, A5).
-     */
     private <V extends DirectoryDto> boolean addDir(final @NotNull Map<String, V> map, final @NotNull V dto, final @NotNull String markerFileName, final @NotNull Object marker) {
         if (!markers.write(dto.getPath(), markerFileName, marker)) return false;
 
@@ -293,31 +213,16 @@ final class IndexerDataStore {
         return true;
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-014.
-     * <p>
-     * A node's marker, read through the one class that owns both halves of that
-     * file - see {@link MarkerFiles}.
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-014
     <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name) {
         return markers.read(dirPath, kind, name);
     }
 
-    /**
-     * The nodes whose marker was there and would not parse, since the last time
-     * anyone asked, and forgotten in the asking.
-     */
     @NotNull List<String> takeDamagedMarkers() {
         return markers.takeDamaged();
     }
 
-    /**
-     * Rule-INTERNAL-091.
-     * <p>
-     * Why a project's contents were not read - written by an older Testin and not
-     * converted, or by a newer one - so the tree can say it where the contents
-     * would have been (#305, S9). Empty for every project that was read.
-     */
+    // Rule-INTERNAL-091
     private final @NotNull Map<String, String> refusedProjects = new ConcurrentHashMap<>();
 
     void refuse(final @NotNull Path projectPath, final @NotNull String reason) {
@@ -332,57 +237,25 @@ final class IndexerDataStore {
         return Optional.ofNullable(refusedProjects.get(projectPath.toString()));
     }
 
-    /**
-     * Rule-INTERNAL-090, Rule-TREE-PANEL-051. The copied folder's marker, under
-     * an id of its own.
-     */
+    // Rule-INTERNAL-090, Rule-TREE-PANEL-051
     boolean giveFreshMarkerId(final @NotNull Path markerFile) {
         return markers.giveFreshId(markerFile);
     }
 
-    /**
-     * Whether a directory carries one kind's marker.
-     */
     boolean hasMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind) {
         return markers.has(dirPath, kind);
     }
 
-    /**
-     * What kind a directory is marked as, asked once.
-     */
     @NotNull Optional<DirectoryType> markedAs(final @NotNull Path dirPath, final @NotNull List<DirectoryType> family) {
         return markers.markedAs(dirPath, family);
     }
 
-    /**
-     * VFS refresh of a directory, off whichever thread asked for it.
-     * <p>
-     * The {@code async} flag of {@code refreshNioFiles} only defers the refresh
-     * itself: resolving the paths to VirtualFiles happens on the calling thread
-     * and reads the VFS persistence, which is a slow operation the EDT is not
-     * allowed to perform. Creation flows run on the EDT, so the whole call moves
-     * to a pooled thread rather than only the refresh it schedules.
-     */
     void refreshDir(final @NotNull Path dirPath) {
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 LocalFileSystem.getInstance().refreshNioFiles(List.of(dirPath), true, true, null));
     }
 
-    /**
-     * Makes a single file the plugin just wrote with {@code java.nio} visible in
-     * the IDE, creating its VFS entry when there is not one yet.
-     * <p>
-     * The directory it sits in is refreshed first, and that is the part that
-     * matters: a file the VFS has never seen is discovered by re-reading its
-     * parent's children, not by resolving the file itself. One level only -
-     * recursion here would walk a whole project to deliver two lines of YAML,
-     * which is what the directory form above is for.
-     * <p>
-     * Synchronous, and therefore on a pooled thread: a refresh that resolves a
-     * path reads the VFS persistence, which the EDT is not allowed to do.
-     */
     void refreshFile(final @NotNull Path file) {
-        // Boundary: java.nio answers null for a path with no parent (#71).
         final @NotNull Optional<Path> parent = Optional.ofNullable(file.getParent());
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -391,22 +264,7 @@ final class IndexerDataStore {
         });
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-021.
-     * <p>
-     * Puts a finished scan of one test project into the index.
-     * <p>
-     * Added first, removed second, and that order is the whole point. Emptying
-     * the project out before the pass that reads it again left the index with no
-     * record of a project that is on disk for as long as the walk took - see
-     * {@link ScannedProject} for what a tester lost in that window (#312, A1).
-     * Adding first means a node that both passes found is overwritten rather than
-     * ever absent, and what goes is exactly what the scan did not find, which is
-     * what was deleted.
-     * <p>
-     * The children index is invalidated once, at the end, rather than by each
-     * removal on the way through.
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-021
     void swapIn(final @NotNull Path projectPath, final @NotNull ScannedProject scanned) {
         testProjectsByPath.putAll(scanned.getProjects());
         testCasesMainDirsByPath.putAll(scanned.getTestCasesMainDirs());
@@ -417,8 +275,6 @@ final class IndexerDataStore {
         testRunsDirByPath.putAll(scanned.getTestRunDirs());
         testRunsByPath.putAll(scanned.getTestRuns());
 
-        // The cases go in as one move, because dropping a set's ids drops its
-        // cases with them and the two maps must not disagree even briefly.
         testCaseStore.swapIn(projectPath, scanned.getTestCasesById(), scanned.getTestSetCaseIds(), scanned.handNamedFilesAlone(), scanned.getUnreadableCases());
 
         dropUnseen(testProjectsByPath, projectPath, scanned.getProjects());
@@ -433,28 +289,10 @@ final class IndexerDataStore {
         childrenIndex.invalidate();
     }
 
-    /**
-     * Everything this map held under the project that the finished scan did not
-     * find - which is what was deleted while nobody was looking.
-     * <p>
-     * By the key rather than by the value's own path, because one of these maps
-     * holds runs rather than directories and a run carries no path. The key is
-     * the path in every one of them, which is what makes one method enough.
-     */
     private static void dropUnseen(final @NotNull Map<String, ?> held, final @NotNull Path projectPath, final @NotNull Map<String, ?> found) {
         held.keySet().removeIf(key -> Path.of(key).startsWith(projectPath) && !found.containsKey(key));
     }
 
-    /**
-     * Drops a whole test project out of the cache: the project itself, its two
-     * main directories, and every package, set and run beneath it.
-     * <p>
-     * Two callers, and the log line says the cache-level fact both of them mean:
-     * a test project the tester deleted, and a folder a rescan found is no
-     * longer a test project Testin reads. A rescan of one that still is does not
-     * come here - it swaps the new pass in over the old one, so the project is
-     * never absent while it is read (#312, A1).
-     */
     void removeTestProject(final @NotNull Path path) {
         final @NotNull String pathStr = path.toString();
         testProjectsByPath.remove(pathStr);
@@ -543,16 +381,6 @@ final class IndexerDataStore {
         Logger.info("Removed test run package at: " + pathStr);
     }
 
-    /**
-     * A new test project, under the same order as {@link #addDir}: its own
-     * marker and the two that bring Test Cases and Test Runs into existence are
-     * written first, and the cache learns about the project only if all three
-     * landed.
-     * <p>
-     * The project's own marker used to be written after the cache was updated,
-     * and whether any of them landed was answered to nobody, so a project that
-     * could not be written was still bound, drawn and confirmed (#312, A5).
-     */
     boolean addTestProject(final @NotNull TestProjectDirectoryDto tp) {
         final boolean written = markers.write(tp.getPath(), tp.getMarkerFileName(), tp.getMarker())
                 && markers.write(tp.getTestCasesDirectory().getPath(), DirectoryType.TCD.getMarker(), tp.getTestCasesDirectory().getMarker())
@@ -570,34 +398,14 @@ final class IndexerDataStore {
         return true;
     }
 
-    /**
-     * Writes a node's marker back after something on it changed - a status, for
-     * now. The status is part of the children's sort order, so the cached lists
-     * are stale the moment it is written.
-     * <p>
-     * Answers whether it landed, so a caller does not confirm a change that
-     * is not on disk (#312, A6).
-     */
     boolean persistMarker(final @NotNull DirectoryDto dto) {
         final boolean written = markers.write(dto.getPath(), dto.getMarkerFileName(), dto.getMarker());
         childrenIndex.invalidate();
-        // As every other marker write does, so the VFS - and the Git paths that
-        // read through it - see the change without waiting for something else.
         refreshDir(dto.getPath());
         return written;
     }
 
-    /**
-     * Rule-INTERNAL-083, Rule-INTERNAL-090.
-     * <p>
-     * A test run's marker, written like every other node's - which is the point:
-     * the refusal over an unreadable file and the folder id are {@code
-     * MarkerFiles}' to apply, and the run writer used to write this one file
-     * itself and get neither (#305).
-     *
-     * @return whether it landed, and false for a run the index does not hold -
-     * which the writer has already checked, and which cannot be marked
-     */
+    // Rule-INTERNAL-083, Rule-INTERNAL-090
     boolean persistRunMarker(final @NotNull Path runPath) {
         return findTestRunDir(runPath).map(this::persistMarker).orElse(false);
     }
@@ -605,8 +413,6 @@ final class IndexerDataStore {
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
         final @NotNull String oldStr = oldPath.toString();
         final @NotNull String newStr = newPath.toString();
-        // A node renamed to the top of the tree has nothing above it, which is
-        // what a root is - so this stays the one nullable the model declares.
         final @Nullable DirectoryDto newParentDto = Optional.ofNullable(newPath.getParent())
                 .flatMap(this::findByPath)
                 .orElse(null);
@@ -627,47 +433,20 @@ final class IndexerDataStore {
         testCaseStore.renamed(oldPath, newPath);
         childrenIndex.invalidate();
 
-        // UC-TREE-PANEL-011, Rule-TREE-PANEL-100. A project's two containers go
-        // with it. An inactive project's are in none of the maps above, so they
-        // kept the old path and a node created after reactivating it was written
-        // into a folder that no longer existed.
+        // UC-TREE-PANEL-011, Rule-TREE-PANEL-100
         findByPath(newPath).ifPresent(renamed -> renamed.fixedChildren().forEach(child ->
                 updatePathAndParent(child, newPath.resolve(child.getPath().getFileName()), renamed)));
 
-        // The renamed/moved node itself was modified - record it in the marker,
-        // the persisted home of audit info. Descendants only changed location,
-        // so their own audit stays untouched.
         findByPath(newPath)
                 .ifPresent(renamed -> markers.touched(renamed.getPath(), renamed.getMarkerFileName(), renamed.getMarker()));
     }
 
-    /**
-     * @param newParent null only for a node moved to a path with no parent -
-     *                  the filesystem-root boundary above, carried one call
-     *                  deep rather than re-derived here (#71)
-     */
     private void updatePathAndParent(final @NotNull DirectoryDto dto, final @NotNull Path newPath, final @Nullable DirectoryDto newParent) {
         dto.setPath(newPath);
         dto.setName(newPath.getFileName().toString());
         dto.setParent(newParent);
     }
 
-    /**
-     * Every breadcrumb at or below a moved node, rebuilt once every node above
-     * it already carries its new name.
-     * <p>
-     * It has to be a second pass. A breadcrumb is read off the live parent
-     * objects, and the seven maps are renamed in a fixed order with test sets
-     * (index 1) before the packages that hold them (index 3) - so rebuilding as
-     * each map was visited read the package's old name for every set beneath it.
-     * Renaming a package Login to Auth left every test set under it saying
-     * {@code [NAFATH, Test Cases, Login, ts2]}, and path2 is not cosmetic: the
-     * code generator builds the generated Java package and class name from it,
-     * and NodeRename runs the codegen rename first - so the generated subtree
-     * moved to auth while the index still believed every set lived in login, and
-     * the next case saved there regenerated its method into the old package
-     * (#66, finding 69).
-     */
     private void rebuildPath2Under(final @NotNull Path newPath) {
         allDirectories().stream()
                 .filter(node -> node.getPath().startsWith(newPath))
@@ -733,21 +512,7 @@ final class IndexerDataStore {
         childrenIndex.invalidate();
     }
 
-    /**
-     * Every indexed node, of every kind, in no particular order.
-     * <p>
-     * Read from the seven maps the scan already fills rather than kept as an
-     * eighth: a list of the same nodes would be a second record of one fact, and
-     * would have to be corrected by every create, move, rename and delete that
-     * the maps already handle.
-     * <p>
-     * Package-private rather than private since #29, which searches node names
-     * and needs the same list the children index is built from - the one place
-     * that already answers "every node the plugin knows".
-     */
     @NotNull Collection<DirectoryDto> allDirectories() {
-        // Test projects are included too; they are roots (null parent) and are
-        // simply skipped by the children index.
         final @NotNull List<DirectoryDto> directories = new ArrayList<>();
         for (final Map<String, ? extends DirectoryDto> map : dirMaps) {
             directories.addAll(map.values());

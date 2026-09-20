@@ -40,7 +40,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class Id extends BaseDetails {
-
     final int BADGE_ARC_SIZE = 16;
     final int BADGE_BORDER_V = 3;
     final int BADGE_BORDER_H = 10;
@@ -77,25 +76,7 @@ public class Id extends BaseDetails {
         idBadge.setBorder(JBUI.Borders.empty(BADGE_BORDER_V, BADGE_BORDER_H));
         idBadge.setOpaque(false);
 
-        // UC-VIEW-PANEL-009, Rule-VIEW-PANEL-063.
-        //
-        // The identity is the link, because it is the one thing on the panel
-        // that names exactly one test case.
-        //
-        // The editor, and not the tree. GoTo is what the search and the path bar
-        // call, and it reveals the node in the tree first because for them
-        // "where is this" is half the question. It is not half of this one: the
-        // tester is looking at the case already and asked for the editor, so
-        // moving the tree underneath them is an answer to something nobody
-        // asked. openAndSelect is the other half of GoTo, and the one owner of
-        // opening a test set on a case.
-        //
-        // A case shown from a run has no parent once it has been removed from the
-        // set that run recorded it in - the same state A62 met on the edit path.
-        // The badge opened a test set at the empty path for it: an editor on
-        // nothing, from the one control that promises to show the case (#312,
-        // N12). Shown and refusing with the reason rather than left off the
-        // panel, which is the rule for a control that cannot work.
+        // UC-VIEW-PANEL-009, Rule-VIEW-PANEL-063
         final boolean hasTestSet = !dto.getParent().getPath().toString().isEmpty();
 
         idBadge.setToolTipText(hasTestSet ? GO_TOOLTIP : Bundle.message("view.id.go.nowhere"));

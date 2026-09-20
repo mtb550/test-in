@@ -42,10 +42,6 @@ import java.util.Map;
 
 @AllArgsConstructor
 public class NavigationBar extends BaseDetails {
-
-    // The platform's muted text, which follows the theme. A flat gray was
-    // visibly dimmer in the dark theme than the id badge beside it, which
-    // does follow it (#66, finding 259).
     final @NotNull Color DEFAULT_TEXT_COLOR = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
     final int SEPARATOR_BORDER_V = 0;
     final int SEPARATOR_BORDER_H = 6;
@@ -58,11 +54,6 @@ public class NavigationBar extends BaseDetails {
     final int GBC_INSETS_BOTTOM = 0;
     final int GBC_INSETS_RIGHT = 16;
 
-    /**
-     * The path from the test project down to the node the editor shows, which
-     * comes last. Empty when the caller had none to give, and then the bar draws
-     * nothing.
-     */
     private final @NotNull List<String> currentPath;
 
     // UC-VIEW-PANEL-010, Rule-VIEW-PANEL-041
@@ -75,11 +66,9 @@ public class NavigationBar extends BaseDetails {
 
         {
             for (int i = 0; i < currentPath.size(); i++) {
-
                 final @NotNull String labelText = currentPath.get(i);
                 final boolean isLast = (i == currentPath.size() - 1);
 
-                // Captured: the listener below runs long after the loop has ended.
                 final int index = i;
 
                 final @NotNull JBLabel folderLabel = new JBLabel(labelText);
@@ -100,27 +89,7 @@ public class NavigationBar extends BaseDetails {
                         setUnderline(folderLabel, false);
                     }
 
-                    /**
-                     * UC-VIEW-PANEL-010, Rule-VIEW-PANEL-042, Rule-VIEW-PANEL-043.
-                     * <p>
-                     * Every step goes where it says, not only the last one.
-                     * <p>
-                     * All of them took a hand pointer, turned the link color and
-                     * underlined themselves, and only the last did anything -
-                     * clicking Test Cases to go up a level did nothing and said
-                     * nothing (#228). The steps above the last are the test
-                     * project, the Test Cases folder and the packages, and none
-                     * of those has an editor to open, so what going to one means
-                     * is the tree going there.
-                     * <p>
-                     * Which is what {@code GoTo} already does, for the global
-                     * search: bring the tool window up, expand to the node, and
-                     * open its editor if it has one. A node that has none is
-                     * refused there rather than guessed at, so the last step
-                     * opens a test set and a step above it simply reveals - one
-                     * call, and this bar does not have to know which kind it is
-                     * looking at.
-                     */
+                    // UC-VIEW-PANEL-010, Rule-VIEW-PANEL-042, Rule-VIEW-PANEL-043
                     @Override
                     public void mouseClicked(final MouseEvent e) {
                         final @NotNull Path stepPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath.subList(0, index + 1));
@@ -157,4 +126,3 @@ public class NavigationBar extends BaseDetails {
         label.setFont(font.deriveFont(attributes));
     }
 }
-

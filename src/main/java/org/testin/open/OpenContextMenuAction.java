@@ -31,26 +31,10 @@ import java.awt.*;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-/**
- * Opens a component's context menu from the keyboard, over whatever is selected
- * in it.
- * <p>
- * A tree and a list answer "where is the selection" in different words, and that
- * is the only difference between them here. So each entry point brings its own
- * answer and everything after it is the same: one component, one menu, one point
- * to show it at. It used to hold a field for each kind and null the other, which
- * made the whole of {@code actionPerformed} a walk through four null checks
- * deciding which half of the class it was in.
- */
 public class OpenContextMenuAction extends DumbAwareAction {
-
     private final @NotNull JComponent owner;
     private final @NotNull DefaultActionGroup cm;
 
-    /**
-     * Where on the owner the menu appears, and empty when nothing is selected -
-     * there is no sensible place to put a menu about nothing.
-     */
     private final @NotNull Supplier<Optional<Point>> anchor;
 
     public OpenContextMenuAction(final @NotNull SimpleTree tree, final @NotNull DefaultActionGroup cm) {
@@ -81,10 +65,6 @@ public class OpenContextMenuAction extends DumbAwareAction {
                 .show(owner, at.x, at.y));
     }
 
-    /**
-     * The middle of the selected row. Swing answers null for the rows of an
-     * empty selection, and for the bounds of a row that is not showing.
-     */
     private static @NotNull Optional<Point> selectedRow(final @NotNull SimpleTree tree) {
         final int[] rows = TreeValues.selectedRows(tree);
         if (rows.length == 0) return Optional.empty();
@@ -93,13 +73,6 @@ public class OpenContextMenuAction extends DumbAwareAction {
                 .map(bounds -> new Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2));
     }
 
-    /**
-     * The same for a grid, where the selection is a cell rather than a row.
-     * <p>
-     * Anchored on the cell the tester is actually in, so the menu opens where
-     * they are looking - a grid can be scrolled sideways, and the first column
-     * is often off screen.
-     */
     private static @NotNull Optional<Point> selectedCell(final @NotNull JBTable table) {
         final int row = table.getSelectedRow();
         final int column = table.getSelectedColumn();
@@ -109,10 +82,6 @@ public class OpenContextMenuAction extends DumbAwareAction {
         return Optional.of(new Point(cell.x + cell.width / 4, cell.y + cell.height / 2));
     }
 
-    /**
-     * A quarter across the selected cell rather than half, so a long test case
-     * name is still readable beside the menu.
-     */
     private static @NotNull Optional<Point> selectedCell(final @NotNull JBList<?> list) {
         final int index = list.getSelectedIndex();
         if (index == -1) return Optional.empty();
@@ -123,7 +92,6 @@ public class OpenContextMenuAction extends DumbAwareAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - no update() here reads Swing state; do not switch to EDT (#52).
         return ActionUpdateThread.BGT;
     }
 }

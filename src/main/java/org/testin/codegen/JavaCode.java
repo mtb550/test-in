@@ -21,28 +21,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 
-/**
- * What happens to a node kind's generated Java when the node is created,
- * renamed or moved: one constant per {@link DirectoryType}, named after it.
- * <p>
- * Three columns on that enum until #111, which named five classes from this
- * package and made the vocabulary import a side module. What a node <i>is</i>
- * belongs to the domain; what its code does when it moves belongs here, beside
- * the generators that do it.
- * <p>
- * Every kind answers all three, and the ones that generate nothing answer
- * {@link NoJavaCode} - a test run records what was executed and writes no Java,
- * and a test project never moves at all. Stated rather than left to a null, so
- * every caller runs the answer unconditionally.
- * <p>
- * What it is told to say is {@link DirectoryType#getDescription()} rather than a
- * phrase spelled here: the word for a kind of node belongs to the kind, which is
- * the answer {@code CodeGenerators} already gives when no generator is
- * installed.
- * <p>
- * {@link #of} asks for the constant of the same name; nothing branches on the
- * type, and {@code NodeKindTablesTest} says the two lists still match.
- */
 @Getter
 @AllArgsConstructor
 public enum JavaCode {
@@ -88,26 +66,13 @@ public enum JavaCode {
             new NoJavaCode(DirectoryType.TR.getDescription())
     );
 
-    /**
-     * UC-CODEGEN-004, Rule-CODEGEN-023 - the class or method the node brings
-     * into being.
-     */
+    // UC-CODEGEN-004, Rule-CODEGEN-023
     private final @NotNull GenAction created;
 
-    /**
-     * UC-CODEGEN-015, UC-CODEGEN-017, Rule-CODEGEN-051 - what a rename does to
-     * it. Here rather than in the rename action, which used to ask
-     * {@code instanceof} which generator a node wanted (#51).
-     */
+    // UC-CODEGEN-015, UC-CODEGEN-017, Rule-CODEGEN-051
     private final @NotNull GenAction renamed;
 
-    /**
-     * UC-CODEGEN-016, UC-CODEGEN-017, Rule-CODEGEN-053 - what a move does to
-     * it. A move changes which package a file declares, so it is its own
-     * operation and not a rename with a different argument. Nothing did it at
-     * all before: a dragged test set left its class behind, and the cases under
-     * it stopped being runnable (#51).
-     */
+    // UC-CODEGEN-016, UC-CODEGEN-017, Rule-CODEGEN-053
     private final @NotNull GenAction moved;
 
     public static @NotNull JavaCode of(final @NotNull DirectoryType type) {

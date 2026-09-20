@@ -33,19 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * Picks the groups a test case belongs to, for an import or export cell.
- * <p>
- * On the framework, so the two keys it binds are shown rather than assumed: it
- * used to sit on the frameless wrapper, which put Enter and Escape into the
- * root pane and told the tester about neither (#66).
- * <p>
- * The rows are the groups and the selection is the answer - a group is chosen
- * by being selected, which is what the framework's multi-select table already
- * means everywhere else it is used.
- */
 public final class GroupSelectionDialog extends AbstractFrameworkDialog<SelectionTable> {
-
     private final @NotNull SelectionTable groups;
     private final @NotNull Consumer<@NotNull String> onPicked;
 
@@ -68,19 +56,11 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
 
         groups = table.getComponent();
 
-        // No Group first, then every group the project has used. It was the eight
-        // constants of an enum; a group is a word now, so the list is what the
-        // cache has seen rather than what somebody shipped (#296).
         groups.addRow(Groups.NONE);
         Services.getInstance(p, TestCaseValues.class).getGroups().stream().sorted().forEach(groups::addRow);
         groups.selectRows(rowsOf(currentSelection));
     }
 
-    /**
-     * The rows the value arriving from the cell already names. A test case
-     * stores its groups as text, so the match is by name - the value the cell
-     * holds is the value this dialog produced last time.
-     */
     private @NotNull List<Integer> rowsOf(final @NotNull String currentSelection) {
         final @NotNull List<Integer> rows = new ArrayList<>();
         if (currentSelection.isBlank()) return rows;
@@ -103,14 +83,6 @@ public final class GroupSelectionDialog extends AbstractFrameworkDialog<Selectio
         closeOk();
     }
 
-    /**
-     * The selection as a test case stores it: the group names, comma separated.
-     * <p>
-     * Through {@link Groups#text}, which is the owner of that line for the cell,
-     * the card and the sheet alike. This wrote the join out itself, so the
-     * dialog that produces the value and the classes that read it agreed only by
-     * having been written the same day (#291).
-     */
     private @NotNull String selectedGroupsStr() {
         return Groups.text(groups.getSelectedRows().stream()
                 .map(row -> groups.getValueAt(row, 0))

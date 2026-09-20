@@ -24,16 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * A label/field grid for dialog forms: labels in a narrow left column, fields
- * taking the rest of the width, one row per call.
- * <p>
- * The forms that ask for a file each repeated the same GridBag constraints.
- * Here they live once, so a form reads as the rows it has and the two dialogs
- * a tester sees side by side line their labels up the same way.
- */
 public final class FormRows extends JBPanel<FormRows> {
-
     private final @NotNull GridBagConstraints gbc = new GridBagConstraints();
 
     private int nextRow;
@@ -47,9 +38,6 @@ public final class FormRows extends JBPanel<FormRows> {
         gbc.anchor = GridBagConstraints.WEST;
     }
 
-    /**
-     * One label/field row.
-     */
     public @NotNull FormRows row(final @NotNull String label, final @NotNull JComponent field) {
         gbc.gridx = 0;
         gbc.gridy = nextRow;
@@ -65,10 +53,6 @@ public final class FormRows extends JBPanel<FormRows> {
         return this;
     }
 
-    /**
-     * A row spanning both columns - a note under the fields, not a field of
-     * its own.
-     */
     public @NotNull FormRows wideRow(final @NotNull JComponent component) {
         gbc.gridx = 0;
         gbc.gridy = nextRow;

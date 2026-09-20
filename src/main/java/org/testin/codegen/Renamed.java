@@ -27,66 +27,22 @@ import org.testin.util.NameSanitizer;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A node and the name it is about to take.
- * <p>
- * A {@link GenAction} is handed one object, and a rename needs two things: the
- * node as it still is, so its generated code can be found where it currently
- * sits, and the name it is becoming. That is why renaming used to go around
- * {@link GenType} and call the generators directly, behind an instanceof chain
- * of its own (#51).
- * <p>
- * The node has not been renamed yet when this is built. The order matters: the
- * Java is renamed first, while the old name is still what finds it.
- */
 public record Renamed(@NotNull DirectoryDto dir, @NotNull String newName) {
-
-    /**
-     * The package the new name makes - the one answer, for the check below and
-     * for the generator that moves the code.
-     */
     public @NotNull String newPackage() {
         return NameSanitizer.packageName(newName);
     }
 
-    /**
-     * UC-TREE-PANEL-011, Rule-CODEGEN-082.
-     * <p>
-     * Whether this renames a test project to the name {@code testin.yml} gives -
-     * Ctrl+Z on a rename of the file's project. Code is on for a project only
-     * while the file names the open one, so the rename's code moves under the
-     * new name, with the choice following first. Asked under the old name, code
-     * was off, and the package stayed where the rename had put it while the
-     * folder went back (#66, finding 311).
-     */
+    // UC-TREE-PANEL-011, Rule-CODEGEN-082
     public boolean toTheFilesName(final @NotNull Project p) {
         return dir.getType() == DirectoryType.TP && TestinYml.names(p, newName);
     }
 
-    /**
-     * Rule-CODEGEN-082.
-     * <p>
-     * Whether this rename moves automation code: code is on now, or turns on as
-     * a test project takes the name {@code testin.yml} gives.
-     */
+    // Rule-CODEGEN-082
     public boolean movesCode(final @NotNull Project p) {
         return CodeOn.isOn(p) || OptionalPlugin.JAVA.isAvailable() && toTheFilesName(p);
     }
 
-    /**
-     * UC-CODEGEN-017, Rule-CODEGEN-080.
-     * <p>
-     * Whether the automation code already has the package this rename would make,
-     * beside the one it renames - a test project renamed to {@code Tests} in a
-     * code project that has its own {@code tests} package. Moving the code there
-     * fails, and the tree would rename anyway, leaving every generated method
-     * under a name nothing looks for.
-     * <p>
-     * Only when the old package is there too: a colleague's rename already pulled
-     * leaves the new package and no old one, and following it is not in the way.
-     * Asked of the VFS, in memory, and only where there is code to move
-     * ({@link #movesCode}).
-     */
+    // UC-CODEGEN-017, Rule-CODEGEN-080
     public boolean packageInTheWay(final @NotNull Project p) {
         if (!DirectoryType.BECOME_JAVA_PACKAGES.contains(dir.getType()) || !movesCode(p)) return false;
 

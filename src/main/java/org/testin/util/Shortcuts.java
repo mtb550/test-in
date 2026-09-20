@@ -30,38 +30,13 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-/**
- * Every keystroke question the plugin asks, and the keys more than one class
- * binds.
- * <p>
- * The constants are the shared keys - a single-use keystroke stays a constant in
- * the action or enum that owns it.
- * <p>
- * <b>A declared action's key is not here.</b> An action declared in
- * {@code plugin.xml} carries its default keystroke in that XML, because the
- * Keymap page reads it from there and a tester can rebind it - so a constant
- * here would be a second owner that goes stale the first time anybody does.
- * Anything that wants to print such a key asks the platform for the tester's
- * actual binding, not this file for the default (#119). The four static helpers answer the same
- * questions for those: what shortcut set is this, what does it read as, does
- * this event match. One owner either way, so a shared key and a single-use key
- * cannot start behaving differently.
- */
 @Getter
 @AllArgsConstructor
 public enum Shortcuts {
-
-    /**
-     * No key at all. A status bar hint renders a keystroke its component binds
-     * itself and binds nothing of its own, and this is what it carries instead
-     * of a null every reader would have to check (#71). The keystroke is one
-     * the keyboard cannot produce, so nothing can match it by accident.
-     */
     EMPTY(
             KeyStroke.getKeyStroke(KeyEvent.VK_UNDEFINED, 0)
     ),
 
-    // Dialog confirm / dismiss
     Enter(
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
     ),
@@ -70,25 +45,14 @@ public enum Shortcuts {
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)
     ),
 
-    /**
-     * Spelling corrections in the dialog editors. Bound by the platform, not by
-     * us - declared here only so the status bars render it from one source
-     * instead of spelling "Alt+Enter" out by hand.
-     */
     Corrections(
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK)
     ),
 
-    /**
-     * Inserts a line break where Enter cannot, because Enter commits or saves:
-     * the grid cell editor and the multi-line expected-result field. One key for
-     * both, so the two surfaces stay learnable as a pair.
-     */
     InsertNewLine(
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK)
     ),
 
-    // Bulk JSON editors: add and remove an array item, caret on every value
     AddArrayItem(
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK)
     ),
@@ -101,19 +65,10 @@ public enum Shortcuts {
             KeyStroke.getKeyStroke(KeyEvent.VK_A, menuMask() | InputEvent.SHIFT_DOWN_MASK)
     ),
 
-    // Toolbar search (test editor + run editor)
     FocusSearch(
             KeyStroke.getKeyStroke(KeyEvent.VK_F, menuMask())
     ),
 
-    // Item operations shared between the project tree, editors, and details panel
-    /**
-     * The platform copy gesture, so it is CMD+C on a Mac like every other copy
-     * there (#25) - and so it matches the key a grid keeps for its own cells,
-     * which is built from the same modifier. Hard-coded CTRL made those two
-     * disagree on macOS only: the grid kept CMD+C and the menu still took CTRL+C,
-     * leaving one platform with two different copy gestures.
-     */
     CopyItem(
             KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask())
     ),
@@ -126,23 +81,10 @@ public enum Shortcuts {
             KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask())
     ),
 
-    /**
-     * Testin's own keys, declared here rather than inside the action that binds
-     * them.
-     * <p>
-     * Every one of these was a KeyStroke field in its own class, which is one
-     * key that this file does not know about each - and this file is what says
-     * what a surface answers. Their modifier is left as it was: CTRL is what the
-     * rest of the register uses for a key Testin invented, as against the seven
-     * above that borrow a gesture the platform already owns. Whether a plugin's
-     * own keys should take CMD on a Mac is the half of #25 that needs a Mac to
-     * answer.
-     */
     ToggleDetails(
             KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK)
     ),
 
-    /** The keyboard's menu key. It carries no modifier anywhere. */
     ContextMenu(
             KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0)
     ),
@@ -159,28 +101,14 @@ public enum Shortcuts {
             KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)
     ),
 
-    // A confirmation's second answer - the one that is neither doing it nor
-    // walking away, e.g. reviewing the changes a branch switch would carry.
     ConfirmAlternative(
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK)
     ),
 
-    // Run editor: export the run's results (context menu + toolbar button)
     GenerateReport(
             KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)
     ),
 
-    // Card actions (context menu + hover icons)
-
-    // Forward and back, in whichever surface has the keyboard. Named for the
-    // gesture and not for what it lands on, because the two surfaces move
-    // through different things and both are right: a page of fifty cards in the
-    // editor, one test case in the view panel, which shows one at a time and so
-    // has nothing else forward could mean there.
-    //
-    // They were NextTestCase and PreviousTestCase, and the editor used them for
-    // pages - so the name said one surface and the binding said both, and
-    // docs/shortcuts.md listed the same key twice with two meanings (#224).
     Next(
             KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK)
     ),
@@ -189,14 +117,6 @@ public enum Shortcuts {
             KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK)
     ),
 
-    // The ends of the same journey, on the same keys with Shift. A set of forty
-    // pages was reachable only one page at a time, and the two arrows that go
-    // straight there have been on the status bar since it was built with no key
-    // to press: the tester who wanted the last page clicked, and the tester who
-    // knew the keyboard could not get there at all.
-    //
-    // Shift adds reach to a direction everywhere else a keyboard does this, so
-    // there is nothing new to learn once Ctrl+Left is known.
     First(
             KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)
     ),
@@ -205,14 +125,6 @@ public enum Shortcuts {
             KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)
     ),
 
-    // The copy menu's rows. Its own keys, not the update menu's: the two menus
-    // hold different things - a tester copies the class name, the identity and
-    // the path and can never edit them - so one enum over both would put rows
-    // in the update menu that mean nothing there. What they share is this file,
-    // which is where a key lives whatever menu shows it.
-    //
-    // The letters match the update menu's wherever the field is the same, so D
-    // is the description in both and nobody learns a second alphabet.
     CopyAll(
             KeyStroke.getKeyStroke(KeyEvent.VK_A, 0)
     ),
@@ -269,7 +181,6 @@ public enum Shortcuts {
             KeyStroke.getKeyStroke(KeyEvent.VK_H, 0)
     ),
 
-    // Field navigation inside the create/update dialogs
     TabNext(
             KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0)
     ),
@@ -290,7 +201,6 @@ public enum Shortcuts {
             KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK)
     ),
 
-    // Test case fields (create dialog sections + fields enums)
     CreateTestCaseDescription(
             KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK)
     ),
@@ -315,11 +225,6 @@ public enum Shortcuts {
             KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)
     ),
 
-    /**
-     * The same two letters the update menu uses for these fields, so a tester
-     * learns each field once: T is test data and B is pre-conditions, with Ctrl
-     * in the create dialog and without it on a card.
-     */
     CreateTestCaseTestData(
             KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)
     ),
@@ -328,7 +233,6 @@ public enum Shortcuts {
             KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK)
     ),
 
-    // Test case update-menu fields (update dialogs + fields enums)
     UpdateTestCaseDescription(
             KeyStroke.getKeyStroke(KeyEvent.VK_D, 0)
     ),
@@ -367,15 +271,8 @@ public enum Shortcuts {
 
     private final @NotNull KeyStroke key;
 
-    /**
-     * No key, as a key: what a status or a field carries when nothing binds it.
-     */
     public static final @NotNull KeyStroke NO_KEY = EMPTY.key;
 
-    /**
-     * The platform menu modifier (Cmd on macOS, Ctrl elsewhere), same source
-     * as the other cross-platform shortcuts; plain Ctrl in headless test runs.
-     */
     @MagicConstant(flagsFromClass = InputEvent.class)
     public static int menuMask() {
         try {
@@ -401,10 +298,6 @@ public enum Shortcuts {
         return matches(e, key);
     }
 
-    // The same four questions for a keystroke that is not one of the shared keys
-    // above - a single-use one a class declares for itself. One owner either way,
-    // so a key bound here and a key bound there behave the same.
-
     public static @NotNull CustomShortcutSet customShortcut(final @NotNull KeyStroke key) {
         return new CustomShortcutSet(key);
     }
@@ -413,29 +306,14 @@ public enum Shortcuts {
         return new KeyboardShortcut(key, null);
     }
 
-    /**
-     * A keystroke as a tester reads it, and nothing at all for the key that
-     * never arrives - what is bound to no key has no name to show (#71).
-     */
     public static @NotNull String shortcutText(final @NotNull KeyStroke key) {
         return isNoKey(key) ? "" : KeymapUtil.getKeystrokeText(key);
     }
 
-    /**
-     * True when this is the keystroke nothing produces - see {@link #EMPTY}.
-     */
     public static boolean isNoKey(final @NotNull KeyStroke key) {
         return NO_KEY.equals(key);
     }
 
-    /**
-     * Whether the event is this shortcut.
-     * <p>
-     * Built into a KeyStroke and compared, rather than comparing the modifier
-     * masks: KeyStroke normalizes what it is given to carry both the old and the
-     * extended bits, while KeyEvent.getModifiersEx reports only the extended
-     * ones. Ctrl+C therefore compared 130 against 128 and never matched.
-     */
     public static boolean matches(final @NotNull KeyEvent e, final @NotNull KeyStroke key) {
         return key.equals(KeyStroke.getKeyStrokeForEvent(e));
     }

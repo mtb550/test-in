@@ -37,10 +37,6 @@ public class CreateTestRunPackage implements NodeCreator {
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         TestRunPackageDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).getTestRunPackageNode(p, newDirPath, parentDir);
 
-        // The indexer owns all file/dir I/O: it creates the directory + .trp marker
-        // (with JSON content) and registers the node - and nothing is answered
-        // when the marker did not land, because the write has said why (#312, A5).
         return Services.getInstance(p, ProjectIndexer.class).addTestRunPackage(tr) ? Optional.of(tr) : Optional.empty();
     }
 }
-

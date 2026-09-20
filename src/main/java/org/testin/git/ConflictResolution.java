@@ -39,72 +39,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-/**
- * Turns a stopped pull into a test case question, or into no question at all
- * (#90).
- * <p>
- * Git holds three versions of every conflicted file - the common ancestor, this
- * machine's, and the one the pull brought - and {@link TestCaseMerge} settles
- * almost every field between them. What this adds is the round trip: reading the
- * three stages, writing the merged case back, staging it, and asking the tester
- * only about the files that still hold a disagreement.
- * <p>
- * File access is direct, which the architecture rule allows this package: the
- * merged text is exactly what Git must see staged, and going through the indexer
- * would rewrite it in the plugin's own formatting. The cache is rebuilt by the
- * re-index that follows the rebase.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConflictResolution {
-
-    /**
-     * Git's three sides of a conflicted file, in the index: the common ancestor,
-     * ours, theirs. During a rebase "ours" is the branch being replayed onto and
-     * "theirs" is the tester's own commits, which is why nothing downstream is
-     * labeled by stage number.
-     */
     private static final int BASE = 1;
     private static final int REMOTE = 2;
     private static final int MINE = 3;
 
-    /**
-     * One conflicted test case the merge could not finish on its own.
-     */
     private record Pending(@NotNull String relativePath, @NotNull String name, @NotNull ObjectNode merged, @NotNull List<Merge.Question> questions, @NotNull List<String> settled, @NotNull String theirs) {
     }
 
-    /**
-     * UC-SHARE-017.
-     * <p>
-     * Carries a stopped rebase all the way through, resolving each stop as it
-     * comes.
-     * <p>
-     * A rebase stops once per conflicting commit, not once per conflict. So
-     * resolving one stop and handing back left a tester pressing Resolve on the
-     * same notification over and over - thirty-one commits meant up to
-     * thirty-one presses of a button named Resolve, which is not what the word
-     * means (#89). This keeps going: merge, continue, and if the next commit
-     * stops too, merge that one as well.
-     * <p>
-     * It stops of its own accord in three places, and only these three: the
-     * rebase finished, something is left that needs the tester's answer, or a
-     * round went by without {@link GitRepositoryService#rebaseStep} advancing.
-     * The last is what makes the loop provably finite rather than argued to be -
-     * every turn of it must move the rebase on by at least one commit.
-     * <p>
-     * Call it off the EDT. {@code onFinished} and {@code onStuck} are handed
-     * back on the EDT.
-     */
+    // UC-SHARE-017
     public static void resolveRebase(final @NotNull Project p, final @NotNull Path repositoryPath, final @NotNull Runnable onFinished, final @NotNull Consumer<List<String>> onStuck) {
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);
 
         round(p, git, repositoryPath, git.rebaseStep(repositoryPath), onFinished, onStuck);
     }
 
-    /**
-     * One stop: resolve what is conflicting now, continue, and decide whether
-     * there is another stop to take.
-     */
     private static void round(final @NotNull Project p, final @NotNull GitRepositoryService git, final @NotNull Path repositoryPath, final int stepBefore, final @NotNull Runnable onFinished, final @NotNull Consumer<List<String>> onStuck) {
         resolve(p, repositoryPath, git.conflictingPaths(repositoryPath),
                 () -> ApplicationManager.getApplication().executeOnPooledThread(
@@ -112,23 +62,13 @@ public final class ConflictResolution {
                 onStuck);
     }
 
-    /**
-     * UC-SHARE-017, Rule-SHARE-079.
-     * <p>
-     * What to do once a stop is resolved: continue the rebase, and read what
-     * that left behind.
-     */
+    // UC-SHARE-017, Rule-SHARE-079
     private static void continueOn(final @NotNull Project p, final @NotNull GitRepositoryService git, final @NotNull Path repositoryPath, final int stepBefore, final @NotNull Runnable onFinished, final @NotNull Consumer<List<String>> onStuck) {
         if (!git.couldNotContinueRebase(repositoryPath)) {
             ApplicationManager.getApplication().invokeLater(onFinished);
             return;
         }
 
-        // It stopped again. Only files still conflicting are ours to carry on
-        // with; anything else is a failure, and it is said as one. It used to be
-        // asked of hasConflicts, which is true whenever the rebase directory is
-        // there - and a continue that failed leaves it there - so the failure
-        // came back as a conflict naming no file, and Continue looped (#312, A43).
         final @NotNull List<String> stillConflicting = git.conflictingPaths(repositoryPath);
         if (stillConflicting.isEmpty()) {
             Logger.warn("The rebase could not continue, and nothing is left conflicting");
@@ -148,26 +88,12 @@ public final class ConflictResolution {
         round(p, git, repositoryPath, stepNow, onFinished, onStuck);
     }
 
-    /**
-     * What settles one conflicted file: the three mergers have one shape, so the
-     * routing below is a table rather than three branches.
-     */
     @FunctionalInterface
     private interface Merger {
-
         @NotNull Merge merge(@NotNull Mapper mapper, @NotNull String base, @NotNull String mine, @NotNull String theirs);
     }
 
-    /**
-     * UC-SHARE-018, Rule-SHARE-080.
-     * <p>
-     * Which rules settle this file, and nothing for one Testin cannot merge -
-     * a folder's marker other than a run's, or a file the plugin never wrote.
-     * <p>
-     * The name says what the file is, so the routing is a table rather than a
-     * guess (#305): a test case merges field by field, one case's result as one
-     * verdict, and a run's own marker by rule.
-     */
+    // UC-SHARE-018, Rule-SHARE-080
     private static @NotNull Optional<Merger> mergerFor(final @NotNull String relativePath) {
         final @NotNull Path file = Path.of(relativePath);
 
@@ -180,21 +106,7 @@ public final class ConflictResolution {
         return Optional.empty();
     }
 
-    /**
-     * UC-SHARE-017, Rule-SHARE-078.
-     * <p>
-     * Resolves what it can and asks about the rest.
-     * <p>
-     * Called on a background thread - it reads Git and writes files - and hands
-     * back on the EDT. The two outcomes are separate because they are different
-     * situations for the caller: everything resolved means the rebase can go on,
-     * and anything left means it must not.
-     *
-     * @param conflicting the paths Git reports as conflicting
-     * @param onResolved  run when nothing conflicting is left
-     * @param onLeftOver  given whatever could not be resolved here - a run, a
-     *                    marker, or a file the plugin never wrote
-     */
+    // UC-SHARE-017, Rule-SHARE-078
     public static void resolve(final @NotNull Project p, final @NotNull Path repositoryPath, final @NotNull List<String> conflicting, final @NotNull Runnable onResolved, final @NotNull Consumer<List<String>> onLeftOver) {
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
@@ -214,9 +126,6 @@ public final class ConflictResolution {
             final @NotNull String theirs = git.stageContent(repositoryPath, relativePath, REMOTE);
 
             if (mine.isBlank() || theirs.isBlank()) {
-                // One side deleted the file and the other changed it. Which of
-                // those a team meant is not a field question, so it stays with
-                // the tester.
                 leftOver.add(relativePath);
                 continue;
             }
@@ -236,19 +145,9 @@ public final class ConflictResolution {
                 ask(p, git, mapper, repositoryPath, pending, leftOver, onResolved, onLeftOver));
     }
 
-    /**
-     * UC-SHARE-018, Rule-SHARE-081.
-     * <p>
-     * Asks about one conflicted case, then the next. One dialog at a time: three
-     * dialogs at once would be three questions with no order to them, and each
-     * answer is written and staged before the following question opens.
-     */
+    // UC-SHARE-018, Rule-SHARE-081
     private static void ask(final @NotNull Project p, final @NotNull GitRepositoryService git, final @NotNull Mapper mapper, final @NotNull Path repositoryPath, final @NotNull List<Pending> pending, final @NotNull List<String> leftOver, final @NotNull Runnable onResolved, final @NotNull Consumer<List<String>> onLeftOver) {
         if (pending.isEmpty()) {
-            // Nothing to put back together. A case carries its own position, so
-            // two testers who each added one to the same set wrote two files
-            // with two ranks and never touched a third - the order comes out of
-            // the merge intact, with no set-wide repair to run.
             if (leftOver.isEmpty()) onResolved.run();
             else onLeftOver.accept(List.copyOf(leftOver));
             return;
@@ -281,11 +180,6 @@ public final class ConflictResolution {
         }, skipped).show();
     }
 
-    /**
-     * Writes the merged case and stages it, which is what tells Git the conflict
-     * is over. Answers whether both halves worked - a file written and not
-     * staged would stop the rebase again with no conflict left to see.
-     */
     // UC-SHARE-017, Rule-SHARE-074
     private static boolean keep(final @NotNull Project p, final @NotNull GitRepositoryService git, final @NotNull Path repositoryPath, final @NotNull String relativePath, final @NotNull ObjectNode merged) {
         try {
@@ -300,29 +194,12 @@ public final class ConflictResolution {
 
         if (git.stageResolved(repositoryPath, relativePath)) return true;
 
-        // Said, not only logged. A merged file Git will not take stops the pull
-        // again with no conflict on screen to explain it, so the tester saw a
-        // sync that simply refused to finish and nothing about why (#259).
         Logger.error("Merged but could not stage " + relativePath);
         Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.merge.not.accepted.title"),
                 Bundle.message("git.merge.not.accepted.message", relativePath));
         return false;
     }
 
-    /**
-     * What to call the conflicted thing in a dialog title, as the tester knows
-     * it: a test case by its description, and anything inside a run by the run,
-     * which is the folder.
-     * <p>
-     * Only a test case carries a description, so everything else fell through to
-     * the file name - and a run's marker is called {@code .tr} in every run there
-     * has ever been. The tester resolving three run conflicts in a row was shown
-     * "Both Changed .tr" three times, with nothing to tell them which cycle they
-     * were looking at (#305).
-     * <p>
-     * A test case whose side will not parse keeps its file name, which is its id:
-     * not friendly, but it names one case and the folder does not.
-     */
     private static @NotNull String name(final @NotNull Mapper mapper, final @NotNull String json, final @NotNull String relativePath) {
         final @NotNull String description = mapper.readTree(json).path("description").asText("");
         if (!description.isBlank()) return description;
@@ -334,5 +211,4 @@ public final class ConflictResolution {
                 .map(folder -> String.valueOf(folder.getFileName()))
                 .orElseGet(() -> String.valueOf(path.getFileName()));
     }
-
 }

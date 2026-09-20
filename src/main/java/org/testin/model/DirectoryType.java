@@ -121,28 +121,7 @@ public enum DirectoryType {
             List.of(NodeCount.TOTAL)
     );
 
-
-    /**
-     * UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-043, Rule-TREE-PANEL-044.
-     * <p>
-     * What may be dropped or pasted into each kind of node, as one table.
-     * <p>
-     * It was five predicates over seven files until #176: {@code
-     * isTransferTarget} on the target, {@code acceptsTransferred} overridden
-     * five times, and three {@code isAllowedIn...} questions that existed only
-     * to be asked by those overrides and by nothing else. One fact - which kinds
-     * go inside which - answered in thirteen method bodies, where no reader
-     * could see the whole of it and no two rows could be compared.
-     * <p>
-     * A test run accepts nothing, which is the one thing this table changed. It
-     * answered {@code isTransferTarget() == true} before and refused every
-     * source that reached it, so the tree flashed a drop highlight over a node
-     * that was never going to take the drop.
-     * <p>
-     * Empty for the three that take nothing: a test project holds its two fixed
-     * containers and nothing a tester puts there, a test set holds test cases
-     * rather than nodes, and a run holds run items.
-     */
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-043, Rule-TREE-PANEL-044
     private static final @NotNull Map<DirectoryType, Set<DirectoryType>> ACCEPTS = Map.of(
             TP, Set.of(),
             TCD, Set.of(TS, TSP),
@@ -152,92 +131,26 @@ public enum DirectoryType {
             TS, Set.of(),
             TR, Set.of());
 
-    /**
-     * Whether a node of that kind may be dropped or pasted into a node of this
-     * one.
-     */
     public boolean accepts(final @NotNull DirectoryType source) {
         return ACCEPTS.getOrDefault(this, Set.of()).contains(source);
     }
 
-    /**
-     * Whether anything at all may be put into this kind - what the tree asks
-     * before it draws a drop highlight.
-     * <p>
-     * {@code getOrDefault} rather than {@code get}: a kind missing from the
-     * table takes nothing, which is the safe answer, and {@code
-     * NodeKindTablesTest} is what says none is missing.
-     */
     public boolean acceptsAnything() {
         return !ACCEPTS.getOrDefault(this, Set.of()).isEmpty();
     }
 
-    /**
-     * What a directory directly under Test Cases may be marked as, and in which
-     * order to ask.
-     * <p>
-     * The order is the precedence, and it was written out at four call sites and
-     * written down at none: a directory carrying both markers is read as a test
-     * set, because a set is what holds cases and a package is what holds sets.
-     * Anyone probing in the other order would have got a different tree and no
-     * warning about it (#173).
-     */
     public static final @NotNull List<DirectoryType> UNDER_TEST_CASES = List.of(TS, TSP);
 
-    /**
-     * The same question on the run side, with the same precedence rule.
-     */
     public static final @NotNull List<DirectoryType> UNDER_TEST_RUNS = List.of(TR, TRP);
 
-    /**
-     * UC-TREE-PANEL-008, Rule-TREE-PANEL-095.
-     * <p>
-     * The kinds whose name becomes a Java package - Rule-CODEGEN-008, every
-     * folder above a test set.
-     * <p>
-     * The test set itself is not one of them: its name becomes the class, which
-     * always ends in {@code Test} and so is never a word Java keeps for itself.
-     * The run family generates no code at all, so a test run may be called
-     * anything a folder may be called.
-     * <p>
-     * A list beside the two above it rather than a thirteenth column on the
-     * enum. It is one fact about two constants, and saying "no" seven times in a
-     * constructor argument is harder to read than the two names are.
-     */
+    // UC-TREE-PANEL-008, Rule-TREE-PANEL-095, Rule-CODEGEN-008
     public static final @NotNull List<DirectoryType> BECOME_JAVA_PACKAGES = List.of(TP, TSP);
 
-    /**
-     * UC-TREE-PANEL-008, Rule-TREE-PANEL-095.
-     * <p>
-     * Whether a node of this kind may be called that - asked by the create and
-     * rename dialogs before the name is stored.
-     * <p>
-     * Asked of the type rather than tested for at the dialogs, so the three that
-     * ask cannot come to three different answers, and a kind of node added later
-     * is covered by the list above rather than by remembering to edit them
-     * (#11).
-     * <p>
-     * Two rules, and the second used to be missing. A name has to be one folder
-     * inside the one selected, whatever the kind; only a test project and a test
-     * set package are also asked whether Java can take it as a package. So a
-     * test set, a test run and a test run package took any name at all, and one
-     * carrying a slash or {@code ..} wrote its folder wherever that path led
-     * (#312, A65). Which of the two a name broke is {@code Refused.ofName}'s to
-     * say: the rule is the model's and the words are not.
-     */
+    // UC-TREE-PANEL-008, Rule-TREE-PANEL-095
     public boolean canTakeName(final @NotNull String name) {
         return isOneFolderName(name) && (!BECOME_JAVA_PACKAGES.contains(this) || NameSanitizer.canMakePackageName(name));
     }
 
-    /**
-     * Whether this names one folder rather than a way through several.
-     * <p>
-     * Both separators, on every platform: a name typed with a backslash on Linux
-     * is not a folder called {@code a\b} anywhere a tester would want, and a
-     * repository carrying such a folder would break the next Windows machine to
-     * clone it. {@code .} and {@code ..} are names the filesystem has already
-     * taken.
-     */
     public static boolean isOneFolderName(final @NotNull String name) {
         final @NotNull String trimmed = name.trim();
 
@@ -248,91 +161,32 @@ public enum DirectoryType {
                 && trimmed.indexOf('\\') < 0;
     }
 
-    /**
-     * The markers a family is recognized by, joined the way a warning says them -
-     * {@code .ts/.tsp}. Asked rather than typed, so a marker renamed here does not
-     * leave a log line describing the name it used to have.
-     */
     public static @NotNull String markerNames(final @NotNull List<DirectoryType> family) {
         return family.stream().map(DirectoryType::getMarker).collect(Collectors.joining("/"));
     }
 
-    /**
-     * Rule-INTERNAL-014, Rule-INTERNAL-090.
-     * <p>
-     * The kind of folder a file name is the marker of, and empty when it is not
-     * a marker at all - the one answer, for the scan, the copy and anything that
-     * meets a file and has to say what it is.
-     */
+    // Rule-INTERNAL-014, Rule-INTERNAL-090
     public static @NotNull Optional<DirectoryType> byMarker(final @NotNull String fileName) {
         return Arrays.stream(values()).filter(type -> type.marker.equals(fileName)).findFirst();
     }
 
-    /**
-     * What this kind is called in a log line - the description in lower case, so
-     * the word and its capitalized form cannot drift apart. Every reader of a
-     * marker used to be handed this word by hand, beside the marker's file name
-     * and the class it parses to: three facts about one thing, spelled out at
-     * seven call sites, and nothing checking they belonged together (#173).
-     */
     public @NotNull String getMarkerKind() {
         return description.toLowerCase(Locale.ROOT);
     }
 
     private final @NotNull String description;
 
-    /**
-     * UC-CODEGEN-001, Rule-CODEGEN-008.
-     * <p>
-     * <b>The folder this kind of node lives in on disk, and never anything a
-     * tester reads.</b> Empty for every kind but the two fixed containers, which
-     * are the only ones whose folder Testin names rather than the tester.
-     * <p>
-     * It was called {@code displayedName} and described as a label, and it is
-     * not one: all nine callers resolve a path with it, set a DTO name from it,
-     * build a {@code path2} out of it or strip it back off again in
-     * {@link org.testin.codegen.Fqcn}. Not one of them draws anything. The tree
-     * shows it only because the DTO takes its name from here.
-     * <p>
-     * The name mattered the moment the plugin was to be translated. "Test Cases"
-     * read as a caption, and a caption is exactly what gets translated - which
-     * would have pointed every existing test project at a folder called
-     * something else, and changed the package every generated class is written
-     * into. Called what it is, it is obviously not a string to translate (#11).
-     */
+    // UC-CODEGEN-001, Rule-CODEGEN-008
     private final @NotNull String folderName;
     private final @NotNull Icon icon;
     private final @NotNull String marker;
 
-    /**
-     * Rule-INTERNAL-014.
-     * <p>
-     * The class that holds this kind of folder's facts, so the kind is all a
-     * reader needs to name: the seven call sites that read a marker used to pass
-     * the class beside the kind, which is the same fact written twice.
-     */
+    // Rule-INTERNAL-014
     private final @NotNull Class<? extends AbstractMarker> markerClass;
 
     private final @NotNull SimpleTextAttributes attributes;
 
-    /**
-     * Which of the two ways of counting a node this kind is counted by, and so
-     * what its Details draws - see {@link NodeStatistics}. Declared here beside
-     * the icon because it is the same kind of fact: something true of the type,
-     * answered once, rather than a question the Details dialog asks about the
-     * node in front of it (#82).
-     */
     private final @NotNull NodeStatistics statistics;
 
-    /**
-     * The counts this kind of node reports as rows in its Details, in order.
-     * <p>
-     * A type lists only what can apply to it. Nothing on the test-case side can
-     * hold a run and nothing on the run side can hold a test set, so those are
-     * impossible states rather than choices, and a {@code 0} there would imply
-     * it could be otherwise. A test run lists its total alone: the rest of its
-     * numbers are the chart, and printing them twice would be the popup
-     * disagreeing with itself about which one to read.
-     */
     private final @NotNull List<NodeCount> counts;
 }

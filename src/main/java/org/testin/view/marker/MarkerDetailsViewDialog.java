@@ -34,27 +34,7 @@ import org.testin.util.Shortcuts;
 
 import java.util.List;
 
-/**
- * The Details popup on a tree node: what the node is, where it lives, the audit
- * and status its marker carries, and how much is inside it.
- * <p>
- * The rows read the {@link Marker} contract, and that contract is the per-node
- * declaration - a marker with a status of its own answers
- * {@link Marker#getStatusLabel()}, one without answers blank, and the
- * framework's details builder drops a blank row. So a test set shows its
- * Deprecated or Active, a fixed container shows no Status row at all, and no
- * node type is named here (#68).
- * <p>
- * The counts arrive the same way: the node's {@link DirectoryType} declares
- * which of them apply and how they are gathered. So a test project counting
- * four things and a test run charting five are one line of code here (#82).
- * <p>
- * They are computed as this dialog is built and kept nowhere. The indexer
- * already holds the tree in memory, so a count is a walk of what is cached -
- * and one that is never stored cannot go stale behind a sync.
- */
 public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<DialogDetails> {
-
     public MarkerDetailsViewDialog(final @NotNull Project p, final @NotNull DirectoryDto dto) {
         super(p);
 
@@ -73,12 +53,6 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
                 .row(TestEditorAttributes.UPDATED_AT.getName(), Display.formatDate(marker.getModifiedAt()))
                 .row(TestEditorAttributes.STATUS.getName(), marker.getStatusLabel());
 
-        // Whatever the marker has to say about itself - for a test run, when it
-        // was executed and what the tester answered when it was created, which
-        // the marker holds and answers for since those facts moved into it
-        // (#305, S15). Added without asking what kind of marker this is, the same
-        // way the status row is: a marker with nothing to add returns nothing,
-        // and a blank value is dropped.
         marker.getDetailRows().forEach(extra -> details.row(extra.caption(), extra.value()));
 
         type.getCounts().forEach(count -> details.row(count.getCaption(), count.of(figures)));
@@ -89,10 +63,6 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
 
         shortcuts = List.of(StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("shortcut.close"), this::closeCancel));
 
-        // Sized to its rows rather than fixed, and still movable and resizable.
-        // A fixed 600 by 500 fit one-line rows; with each caption above its value
-        // (#328) a test run's rows and chart needed more, and the chart was
-        // squeezed out below them.
         resizable = true;
     }
 
@@ -101,9 +71,7 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
         closeOk();
     }
 
-    /**
-     * UC-INTERNAL-007, Rule-INTERNAL-075. Shows one node. Asked about another, the newer node is the one wanted.
-     */
+    // UC-INTERNAL-007, Rule-INTERNAL-075
     @Override
     protected boolean replacesItsKind() {
         return true;

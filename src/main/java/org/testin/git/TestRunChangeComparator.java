@@ -25,33 +25,9 @@ import org.testin.model.TestRunExecution;
 import java.util.*;
 import org.testin.model.markers.TestRunMarker;
 
-/**
- * Compares two revisions of a test run's own facts - how it was configured and
- * when it was executed, which its {@code .tr} holds beside its status (#305, D6).
- * <p>
- * Its results are not here: each is its own file, compared by
- * {@link RunItemChangeComparator}. A tester reviewing a commit reads one row per
- * verdict that changed, under the case it is about, rather than one line saying a
- * run changed somehow.
- * <p>
- * Nothing here reverts. A verdict is a record of work, not an edit: putting it
- * back would say a case was never run.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class TestRunChangeComparator {
-
-    /**
-     * UC-SHARE-010, Rule-SHARE-046.
-     * <p>
-     * What changed in a run's own facts - the answers the tester gave when it was
-     * created, and when it was executed - which its {@code .tr} holds beside its
-     * status (#305, D6).
-     * <p>
-     * Through the same enums the Details popup and the reports read, so a change
-     * reads under the heading they show it under and in the format they show it
-     * in. Walked, not listed: a ninth question is compared by being declared
-     * there and nowhere else.
-     */
+    // UC-SHARE-010, Rule-SHARE-046
     static @NotNull List<FieldChange> compareFacts(final @NotNull TestRunMarker oldMarker, final @NotNull TestRunMarker newMarker) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
 

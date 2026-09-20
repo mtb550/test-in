@@ -42,25 +42,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class TestinPathPanel {
-
     private final @NotNull TextFieldWithBrowseButton pathField = new TextFieldWithBrowseButton();
     private final @NotNull JButton openFolderBtn = new JButton(Bundle.message("settings.path.open"));
 
-    /**
-     * Where the box is asked whether it names a folder, one question at a time.
-     * <p>
-     * It was asked on the EDT from the document listener. On a local disk that
-     * is invisible; on a network path to a host that is down, or a mapped drive
-     * that is not connected, every character typed stopped the whole IDE for
-     * the file system's timeout (#66, finding 177).
-     */
     private final @NotNull ExecutorService probe = AppExecutorUtil.createBoundedApplicationPoolExecutor("Testin Folder Probe", 1);
 
-    /**
-     * What the box held when it was last asked about, so an answer about text
-     * that has since changed is dropped, and a question queued behind a newer
-     * one is never asked.
-     */
     private final @NotNull AtomicReference<String> asked = new AtomicReference<>("");
 
     public TestinPathPanel() {
@@ -91,9 +77,6 @@ public final class TestinPathPanel {
                 Desktop.getDesktop().open(new File(pathField.getText()));
 
             } catch (final Exception ex) {
-                // A dialog rather than a Notifier balloon: the settings page is
-                // application-level and has no project to notify through, and it
-                // is modal anyway, so a balloon behind it would go unread (#70).
                 Messages.showErrorDialog(openFolderBtn,
                         Bundle.message("settings.path.open.failed", ex.getMessage()), Bundle.message("settings.path.open.failed.title"));
             }

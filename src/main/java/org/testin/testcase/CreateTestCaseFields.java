@@ -32,17 +32,8 @@ import java.util.function.Function;
 
 import static org.testin.testcase.TestCaseDialogKey.*;
 
-/**
- * A field of the create test case dialog: the section it builds, the icon and
- * placeholder it shows, and the key that jumps to it.
- * <p>
- * Every constant here is a field. The keys a section advertises are
- * {@link TestCaseDialogKey}, which is why this enum no longer carries constants
- * that are null for everything except a name and a keystroke.
- */
 @Getter
 public enum CreateTestCaseFields implements StatusBarItem {
-
     DESCRIPTION(
             TestEditorAttributes.DESCRIPTION.getName(),
             Shortcuts.CreateTestCaseDescription,
@@ -115,36 +106,16 @@ public enum CreateTestCaseFields implements StatusBarItem {
             ADD_GROUP, AUTO_COMPLETE, NAVIGATE_TAB
     );
 
-    /**
-     * The fields the entry section advertises a jump key for.
-     * <p>
-     * Held here rather than in DESCRIPTION's own declaration because a constant
-     * cannot reference one declared after it — which is the whole reason five
-     * duplicate {@code *_SHORTCUT} constants used to exist.
-     */
     private static final @NotNull List<CreateTestCaseFields> JUMP_KEYS =
             List.of(DESCRIPTION, EXPECTED_RESULT, MODULE, STEPS, TEST_DATA, PRE_CONDITIONS, PRIORITY, GROUP);
 
     private final @NotNull String name;
-    /**
-     * The key that jumps to this field, and {@link Shortcuts#EMPTY} for the
-     * fields no key reaches.
-     * <p>
-     * Only the fields in {@link #JUMP_KEYS} have their key advertised in the
-     * status bar, so a binding outside that list is one nobody could discover.
-     */
     private final @NotNull Shortcuts shortcut;
     private final @NotNull Icon icon;
     private final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor;
 
-    /**
-     * Empty for the two sections with no text field of their own to prompt in.
-     */
     private final @NotNull String placeholder;
 
-    /**
-     * The keys this section adds to the shared ones.
-     */
     private final TestCaseDialogKey @NotNull [] ownKeys;
 
     CreateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull Icon icon, final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor, final @NotNull String placeholder, final TestCaseDialogKey @NotNull ... ownKeys) {
@@ -156,20 +127,10 @@ public enum CreateTestCaseFields implements StatusBarItem {
         this.ownKeys = ownKeys;
     }
 
-    /**
-     * UC-EDITOR-PANEL-005.
-     * <p>
-     * What the section strip shows while this section holds the focus: its own
-     * keys, and on the entry section the keys that jump to the other fields.
-     * <p>
-     * Save and Cancel are not here. They mean the same thing in every section,
-     * so the dialog adds them last, in the same place whichever section is
-     * focused (Rule-EDITOR-PANEL-199, #56).
-     */
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-199
     public StatusBarItem @NotNull [] getStatusBarItems() {
         final @NotNull List<StatusBarItem> items = new ArrayList<>(List.of(ownKeys));
 
-        // Description is where the dialog opens, so its bar is also the map.
         if (this == DESCRIPTION) items.addAll(JUMP_KEYS);
 
         return items.toArray(StatusBarItem[]::new);

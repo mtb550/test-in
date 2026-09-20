@@ -57,30 +57,15 @@ public enum BugPriority {
             "⚪ Low"
     );
 
-    /**
-     * What a tester can choose, in the order declared above - everything but
-     * EMPTY, for the reason {@link BugSeverity#CHOICES} gives (#175, C14).
-     */
     public static final @NotNull List<BugPriority> CHOICES =
             Arrays.stream(values()).filter(priority -> priority != EMPTY).toList();
 
-    /**
-     * What to show for a stored value, where EMPTY means nobody has chosen yet.
-     */
     public static @NotNull BugPriority orDefault(final @NotNull BugPriority stored) {
         return stored == EMPTY ? LOW : stored;
     }
 
     private final @NotNull String label;
     private final @NotNull Color color;
-    /**
-     * How loudly this reads in a report - see {@link ReportEmphasis}.
-     */
     private final @NotNull ReportEmphasis emphasis;
-    /**
-     * How a filed bug report writes it (#28), in English for the reason
-     * {@link BugSeverity#getInBugReport} gives.
-     */
     private final @NotNull String inBugReport;
-
 }

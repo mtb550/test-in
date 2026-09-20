@@ -49,10 +49,6 @@ public class TestCard extends BaseCard {
 
         this.isPendingCut = Services.getInstance(p, CutState.class).isPending(tc.getId());
 
-        // Read here beside the cut state, for the same reason: a card learns
-        // everything it draws at the moment it is filled in. Whatever is known
-        // right now - unknown on the first paint of a page, which draws exactly
-        // what the button always drew.
         this.automation = Services.getInstance(p, AutomationState.class).of(tc.getId());
 
         Arrays.stream(TestEditorAttributes.values())

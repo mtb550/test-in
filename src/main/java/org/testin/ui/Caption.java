@@ -28,65 +28,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Locale;
 
-/**
- * Rule-INTERNAL-087.
- * <p>
- * What a caption looks like where Testin names a value with a word: JetBrains
- * Mono, a family of its own beside the UI font the values are in, two points
- * below the base size it is given, in capitals, in the muted caption gray
- * (#328). The base is the editor font where a test case is read, and the
- * dialog's label font in a dialog.
- * <p>
- * One owner, because the plugin had three: the details panel set its captions
- * bold at the editor size, the dialogs in the platform's small font, and light
- * mode in small capitals. Changed here, every caption built through it
- * follows. Three places still set their own and are recorded in #66: the From
- * and To lines of the move, remove and switch-branch dialogs, the import and
- * export forms, and the run configuration form.
- */
+// Rule-INTERNAL-087
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Caption {
-
-    /**
-     * Bundled with the IDE: the JetBrains Runtime ships and registers it
-     * ({@code jbr/lib/fonts/JetBrainsMono-Regular.ttf}), so it is there on every
-     * OS whatever the tester's settings, and Testin ships no font of its own.
-     */
     private static final @NotNull String FAMILY = "JetBrains Mono";
 
     private static final int SMALLER = 2;
 
-    /**
-     * A caption for the value it names.
-     *
-     * @param baseSize the size of the text around it: the editor font size where
-     *                 a test case is read, the UI font size in a dialog. Already in
-     *                 screen terms, so the caption is not scaled a second time
-     */
     public static @NotNull JBLabel of(final @NotNull String text, final float baseSize) {
         final @NotNull JBLabel label = new JBLabel(text.toUpperCase(Locale.ROOT));
 
-        // Wrapped with the platform's fallback: JetBrains Mono has no
-        // Devanagari, and a plain Java font draws a glyph it lacks as an empty
-        // box, so a Hindi caption would read as a row of them. Sized after the
-        // wrapping, not before: the wrapped font is a UIResource, which a theme
-        // change swaps back for the default label font, and the derived one is a
-        // plain font that keeps its fallback.
         label.setFont(UIUtil.getFontWithFallback(new Font(FAMILY, Font.PLAIN, 1)).deriveFont(Math.max(FontSync.FLOOR, baseSize - SMALLER)));
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         return label;
     }
 
-    /**
-     * A dialog's value with its caption above it, at the dialog's own size:
-     * the one shape every captioned component of the dialog framework takes,
-     * so their gaps cannot drift apart. No caption, no line for one - the
-     * value keeps the same space above it.
-     * <p>
-     * The caption starts 12 pixels in, at the framework's text edge: where its
-     * fields and text areas start their text. It sat at the dialog's own edge,
-     * left of the text it named.
-     */
     public static @NotNull BorderLayoutPanel above(final @NotNull String caption, final @NotNull JComponent value) {
         final @NotNull BorderLayoutPanel panel = JBUI.Panels.simplePanel(0, 2).addToCenter(value).withBorder(JBUI.Borders.emptyTop(8)).andTransparent();
         if (!caption.isEmpty()) panel.addToTop(of(caption, JBUI.Fonts.label().getSize2D()).withBorder(JBUI.Borders.emptyLeft(12)));

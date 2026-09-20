@@ -35,14 +35,8 @@ public class GroupMultiSelectEditor extends AbstractCellEditor implements TableC
         button.setBackground(UIManager.getColor("Table.selectionBackground"));
         button.setForeground(UIManager.getColor("Table.selectionForeground"));
 
-        // The dialog is a popup, not a modal: it answers through the callback
-        // rather than on the line that showed it, and the cell stops editing
-        // whichever way it closed - picked or canceled.
         button.addActionListener(e -> {
             final @NotNull GroupSelectionDialog dialog = new GroupSelectionDialog(p, currentValue, picked -> currentValue = picked);
-            // A picker already open for another cell is raised instead, and this
-            // one never built its popup - asking it when it closed threw at the
-            // tester and left this cell stuck editing (#66, finding 210).
             if (dialog.show()) dialog.onClosed(this::fireEditingStopped);
             else fireEditingStopped();
         });

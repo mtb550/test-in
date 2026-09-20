@@ -39,30 +39,8 @@ import java.util.Map;
 import java.util.Optional;
 
 public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel> implements Disposable {
-
-    /**
-     * How tall an editor's bars are, top and bottom.
-     * <p>
-     * Declared here because the toolbar is the one the other matches: the status
-     * bar reads this rather than carrying a second number, so the two strips
-     * framing an editor cannot come to differ by two pixels that nobody can
-     * explain. Both are laid out north and south of a {@code BorderLayout}, which
-     * takes the height from the preferred size and stretches the width, so this
-     * is the whole of it.
-     */
     public static final int BAR_HEIGHT = JBUI.scale(30);
 
-    /**
-     * The height a bar reports, given the height its contents actually need.
-     * <p>
-     * A floor, not a ceiling, and that distinction is the whole of it. Both bars
-     * used to state {@link #BAR_HEIGHT} flatly, which asked a swing grid bag
-     * layout for less room than its children wanted - and a grid bag given less
-     * than it needs abandons preferred sizes and lays every child out at its
-     * minimum instead. Anything with a natural minimum survived that; the two
-     * labels that had been given one by hand, to let them shorten on a narrow
-     * bar, were laid out at the height in it and disappeared.
-     */
     public static int barHeight(final int naturalHeight) {
         return Math.max(naturalHeight, BAR_HEIGHT);
     }
@@ -79,16 +57,6 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     @Getter
     private @NotNull ViewMode currentView = ViewMode.LIST_VIEW;
 
-    /**
-     * Lays out toolbar items and registers each one so it can be found again.
-     * <p>
-     * A toolbar item that is not a Swing component says so. The two copies of
-     * this loop skipped one silently and, because registering happens in the
-     * same branch, left it out of the lookup table too - so the wiring mistake
-     * surfaced later as an unrelated lookup throwing somewhere else. Nothing
-     * makes a ToolbarItem a component today; the interface is a marker, so this
-     * is the only place that can notice.
-     */
     private void addItems(final @NotNull List<ToolbarItem> items, final @NotNull GridBagConstraints gbc) {
         for (final ToolbarItem item : items) {
             if (!(item instanceof JComponent component)) {
@@ -110,14 +78,6 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         this.searchTxt = new SearchTxt(callbacks::onToolBarSearchValueChanged, callbacks::onToolBarSearchFocusReleased);
     }
 
-    /**
-     * The toolbar's item of that class.
-     * <p>
-     * Throws rather than returning null: every caller names a concrete button
-     * that its own toolbar registers, so a miss is a wiring mistake and not a
-     * state to handle. The {@code @NotNull} contract already made the platform's
-     * instrumentation throw here — this only says which class was missing.
-     */
     public <T extends ToolbarItem> @NotNull T getToolbarItem(final @NotNull Class<T> itemClass) {
         return Optional.ofNullable(toolbarItems.get(itemClass))
                 .map(itemClass::cast)
@@ -125,21 +85,11 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
                         itemClass.getSimpleName() + " is not registered on " + getClass().getSimpleName()));
     }
 
-    /**
-     * UC-EDITOR-PANEL-019.
-     * <p>
-     * Registers the search-focus shortcut on the given scope (the editor's
-     * main panel), so the toolbar owns the whole search story: the field, its
-     * callbacks and its shortcut (#18).
-     */
+    // UC-EDITOR-PANEL-019
     public void installSearchFocusShortcut(final @NotNull JComponent scope) {
         new FocusSearchAction(searchTxt, scope);
     }
 
-    /**
-     * Width is the layout's own; the height is the shared bar height, or more if
-     * this toolbar's contents need more. See {@link #barHeight}.
-     */
     @Override
     public @NotNull Dimension getPreferredSize() {
         final @NotNull Dimension natural = super.getPreferredSize();
@@ -156,35 +106,19 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
 
         addItems(getCustomComponents(), gbc);
 
-        // What this toolbar alone puts on the right, before the button every
-        // toolbar has. Details stays last among the buttons and stays here: both
-        // toolbars want it in the same place, and an override they would each
-        // fill in identically is a place for them to drift apart.
         addItems(getTrailingComponents(), gbc);
 
         final @NotNull NodeDetailsBtn details = new NodeDetailsBtn(callbacks);
         add(details, gbc);
         toolbarItems.put(NodeDetailsBtn.class, details);
 
-        // Last, and this is the whole of why the bar looks the way it does: the
-        // search is the one component with a weight, so everything above packs
-        // to the left and the field fills whatever is left over.
         gbc.gridx++;
         addSearch(gbc);
 
         wireViewButtons();
     }
 
-    /**
-     * UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-212.
-     * <p>
-     * The search field, and the slack.
-     * <p>
-     * It carries the only weight on the bar, so everything laid out before it is
-     * packed to the left and the field takes the rest. That is why it goes last
-     * rather than being pushed there with a strut, and why there is exactly one
-     * of it.
-     */
+    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-212
     private void addSearch(final @NotNull GridBagConstraints gbc) {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -223,14 +157,9 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
 
     protected abstract @NotNull List<ToolbarItem> getCustomComponents();
 
-    /**
-     * What this toolbar puts after the other buttons, beside Details. Empty for
-     * a toolbar with nothing of its own to put there.
-     */
     protected @NotNull List<ToolbarItem> getTrailingComponents() {
         return List.of();
     }
-
 
     @Override
     public void dispose() {

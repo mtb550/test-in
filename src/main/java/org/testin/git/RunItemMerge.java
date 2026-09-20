@@ -28,41 +28,11 @@ import org.testin.util.TestDataParser;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-/**
- * Merges the three versions Git keeps of one case's result (#305, Q-E).
- * <p>
- * <b>The later verdict wins whole.</b> A result is one tester's account of
- * executing one case: the verdict, when they gave it, how long it took, what
- * they saw, the stacktrace, the screenshots and what they filed about it. Those
- * travel together or they say something nobody recorded - a Passed carrying the
- * other tester's stacktrace, a Failed with no actual result.
- * <p>
- * So this asks nothing. The side whose {@code executedAt} is later is the side
- * kept, and the tester is told a choice was made, which is what
- * {@link Merge#settled} is for. Neither side later means neither side executed
- * it - two pending rows differing by an actual result somebody typed, a bug they
- * linked, a screenshot they pasted - and there is no verdict to prefer, so this
- * machine's stays, reported like any other choice made on the tester's behalf.
- * <p>
- * Two testers judging different cases never reach
- * here at all: their verdicts are in different files now, which is the reason
- * this story exists.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class RunItemMerge {
-
     private static final @NotNull String EXECUTED_AT = "executedAt";
 
-    /**
-     * UC-SHARE-018, Rule-SHARE-080.
-     * <p>
-     * The three stages Git holds, as one verdict.
-     *
-     * @param base   the common ancestor, unread: a verdict is not merged field by
-     *               field, so what it grew from decides nothing
-     * @param mine   this machine's version
-     * @param theirs the version the pull brought
-     */
+    // UC-SHARE-018, Rule-SHARE-080
     public static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String base, final @NotNull String mine, final @NotNull String theirs) {
         final @NotNull ObjectNode mineNode = mapper.readTree(mine);
         final @NotNull ObjectNode theirsNode = mapper.readTree(theirs);
@@ -74,16 +44,6 @@ final class RunItemMerge {
         return new Merge(takeTheirs ? theirsNode : mineNode, List.of(), List.of(Bundle.message("git.merge.verdict")));
     }
 
-    /**
-     * When the verdict was given, and the epoch for a result nobody executed -
-     * which is what a pending result carries, and what a file written by
-     * something else may leave out entirely.
-     * <p>
-     * Through the one reader of a written date, which also forgives a weekday
-     * somebody edited by hand: java.time refuses the whole string when the
-     * weekday and the date disagree, and a date this could not read would read as
-     * "never executed" and lose the later verdict.
-     */
     private static @NotNull ZonedDateTime executedAt(final @NotNull ObjectNode item) {
         return TestDataParser.date(item.path(EXECUTED_AT).asText("")).orElse(Config.NOT_EXECUTED);
     }

@@ -41,22 +41,7 @@ import java.awt.*;
 import java.nio.file.Path;
 import java.util.List;
 
-/**
- * Where the case runs in its test set, as the number the tester reads on its
- * card: "Position: 3 of 17".
- * <p>
- * The one section the create dialog never offers. A case being created has no
- * position to choose - it goes to the end of its set, which is where a tester
- * looks for something that has just arrived - so this is reachable only from
- * the update menu, and {@link #setupShortcut} deliberately binds nothing.
- * <p>
- * What it writes is a rank, not the number. Ranks are strings with room between
- * any two of them, so moving a case writes that one case and leaves the rest of
- * the set alone - the same one-file move a drag makes. The number is only how
- * the tester says which two cases to land between.
- */
 public class OrderSection implements CreateTestCaseSection {
-
     private final @NotNull Project p;
 
     @Getter
@@ -67,10 +52,6 @@ public class OrderSection implements CreateTestCaseSection {
     public OrderSection(final @NotNull Project p) {
         this.p = p;
 
-        // The platform's own numeric field: a plain text field that already
-        // knows a range, refuses what is outside it and says why. Nothing to
-        // write here for any of that - no filter on the document, no pattern,
-        // no clamp on the way out - and the range is set when the set is known.
         this.position = new IntegerField(Bundle.message("order.section.position"), 1, 1);
         this.position.setFont(fieldFont());
         this.position.setColumns(4);
@@ -92,11 +73,6 @@ public class OrderSection implements CreateTestCaseSection {
         return wrapper;
     }
 
-    /**
-     * The case's place in its set when the dialog opened, and how many places
-     * there are - both read from the set rather than from the case, because a
-     * case carries a rank and not a number.
-     */
     @Override
     public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
         final @NotNull List<TestCaseDto> inSet = ExecutionPosition.setOf(p, dto);
@@ -105,22 +81,13 @@ public class OrderSection implements CreateTestCaseSection {
 
         position.setMaxValue(size);
 
-        // Where the case already is, as the value and as the fallback: text the
-        // field cannot read as a position in range means leave it where it is,
-        // which is the only harmless answer to give.
         position.setDefaultValue(current);
         position.setValue(current);
 
         outOf.setText(Bundle.message("order.section.of", String.valueOf(size)));
     }
 
-    /**
-     * UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-054.
-     * <p>
-     * Refuses a position the field cannot read as one, in the platform's own
-     * words - "Value must be between 1 and 17" - rather than quietly leaving the
-     * case where it is and reporting the edit as saved.
-     */
+    // UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-054
     @Override
     public boolean accepts() {
         try {
@@ -128,32 +95,17 @@ public class OrderSection implements CreateTestCaseSection {
             return true;
 
         } catch (final ConfigurationException invalid) {
-            // getMessageHtml rather than getMessage, which is deprecated. A
-            // balloon renders HTML, so the chunk goes in as it is.
             Services.getInstance(p, Notifier.class).softRefuse(p, invalid.getMessageHtml().toString());
             return false;
         }
     }
 
-    /**
-     * UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-055.
-     * <p>
-     * Ranks the case between the two it was asked to land between, as they sit
-     * in the set with this case taken out of it.
-     * <p>
-     * Taken out first because the tester reads positions on the list they are
-     * looking at: moving the third case of five to fourth means landing between
-     * the cases now at three and four, and counting this case among them would
-     * put it back where it was.
-     */
+    // UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-055
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
         final @NotNull List<TestCaseDto> inSet = ExecutionPosition.setOf(p, dto);
         final int target = position.getValue();
 
-        // Where it already is: a rank is a new string every time it is written,
-        // so re-ranking a case that has not moved would rewrite its file and
-        // change the set's order in the commit for a move nobody made.
         if (target == TestCaseOrder.positionOf(inSet, dto)) return;
 
         rankTheUnranked(inSet, dto);
@@ -162,39 +114,13 @@ public class OrderSection implements CreateTestCaseSection {
                 .filter(tc -> !tc.getId().equals(dto.getId()))
                 .toList();
 
-        // An empty rank on either side is "nothing on that side", which is what
-        // Rank.between already means by it - so the first and last places need
-        // no branch of their own.
         final @NotNull String before = target > 1 ? others.get(target - 2).getOrder() : "";
         final @NotNull String after = target <= others.size() ? others.get(target - 1).getOrder() : "";
 
         dto.setOrder(Rank.between(before, after));
     }
 
-    /**
-     * UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-055.
-     * <p>
-     * Gives the set ranks when part of it has none, so a place in it means
-     * something.
-     * <p>
-     * A set can arrive with unranked cases: imported, brought by a sync, or
-     * written by hand. Asking for a rank between two of those asks for one
-     * between nothing and nothing, and the answer is the middle of the whole
-     * alphabet - which sorts exactly where the case already was. The tester
-     * typed 3, read <i>Re-sorted</i>, and watched nothing move (#312, A84).
-     * <p>
-     * Ranked the way a drag ranks: the order on screen becomes the ranks, and a
-     * case already in the right place keeps the one it had, so this writes the
-     * few that were unranked rather than the whole set.
-     * <p>
-     * And written, which is the half that is easy to miss. These are the index's
-     * own objects, so ranking them changes what every open editor is drawing -
-     * but the dialog saves only the case it is about, so left here they would be
-     * unranked again at the next read and the tester's move would come undone
-     * with them (#312, N19). Off the EDT because it is one file per case, and
-     * the ranks themselves are already applied in memory, so the case's own
-     * place is worked out from them either way.
-     */
+    // UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-055
     private void rankTheUnranked(final @NotNull List<TestCaseDto> inSet, final @NotNull TestCaseDto dto) {
         if (inSet.stream().noneMatch(tc -> tc.getOrder().isEmpty())) return;
 
@@ -211,13 +137,8 @@ public class OrderSection implements CreateTestCaseSection {
                 ranked.forEach(moved -> Services.getInstance(p, ProjectIndexer.class).putTestCase(setPath, moved)));
     }
 
-    /**
-     * Nothing: the create dialog is the only caller that offers a section by a
-     * shortcut of its own, and it does not offer this one.
-     */
     @Override
     public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction) {
-        // See the class comment: a case being created has no position to choose.
     }
 
     @Override

@@ -29,23 +29,11 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 
 public abstract class BaseDetails {
-
     protected float getValueFontSize() {
         return FontSync.getBaseFontSize();
     }
 
-    /**
-     * A link in the value's font.
-     * <p>
-     * Typed rather than inline: ActionLink also takes a Kotlin function of the
-     * same shape, and an untyped lambda matches both. Auto-hide is off, because
-     * ActionLink hides itself when disabled, and a link that cannot work is shown
-     * gray with its reason (#66, finding 150).
-     * <p>
-     * Not focusable: {@code Tab} moves between the view panel's tabs, and a link
-     * holding the keyboard would take {@code Tab} for itself (#311,
-     * Rule-VIEW-PANEL-080). A link is clicked.
-     */
+    // Rule-VIEW-PANEL-080
     protected @NotNull ActionLink link(final @NotNull String text, final @NotNull ActionListener onClick) {
         final @NotNull ActionLink link = new ActionLink(text, onClick);
         link.setAutoHideOnDisable(false);
@@ -64,14 +52,6 @@ public abstract class BaseDetails {
         return LabelValueRow.add(panel, gbc, labelText, valueComponent, getValueFontSize(), row);
     }
 
-    /**
-     * Adds a component at its natural size, left-aligned - the shape a badge
-     * row or an icon row takes, as against the caption and value rows above
-     * them.
-     * <p>
-     * The insets stay the caller's: the two rows sit at different distances from
-     * whatever follows them, and that is the only thing they disagree about.
-     */
     protected int addFullWidthRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull JComponent component, final @NotNull Insets insets, final int row) {
         gbc.gridx = 0;
         gbc.gridy = row;

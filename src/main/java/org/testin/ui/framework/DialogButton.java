@@ -24,13 +24,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Optional;
 
-/**
- * A confirm button row — for working dialogs where a visible OK button reads
- * better than an Enter hint. Clicking it runs the dialog's submit action; the
- * button is the default-styled primary action, right-aligned.
- */
 public final class DialogButton implements DialogComponent {
-
     private final @NotNull JButton button;
     private final @NotNull JBPanel<?> panel;
     private @NotNull Runnable submitRequest = () -> {
@@ -46,20 +40,11 @@ public final class DialogButton implements DialogComponent {
         panel.add(button);
     }
 
-    /**
-     * Working dialogs disable the button while the input is incomplete.
-     */
     public void setEnabled(final boolean enabled) {
         button.setEnabled(enabled);
     }
 
-    /**
-     * UC-INTERNAL-007, Rule-INTERNAL-080.
-     * <p>
-     * Enabled when there is no reason against pressing it, and disabled with
-     * the reason on hover when there is - so a button the tester cannot press
-     * never leaves them guessing why (#28).
-     */
+    // UC-INTERNAL-007, Rule-INTERNAL-080
     public void enableUnless(final @NotNull Optional<String> reason) {
         button.setEnabled(reason.isEmpty());
         button.setToolTipText(reason.orElse(""));
@@ -80,13 +65,6 @@ public final class DialogButton implements DialogComponent {
         this.submitRequest = submit;
     }
 
-    /**
-     * A button row is the wrong thing to hand spare space to.
-     * <p>
-     * Without this, a dialog that declares no filler at all - a form and a
-     * button, say - gave the space to its last component, which is this one. The
-     * button then drifted into the middle instead of sitting at the bottom.
-     */
     @Override
     public boolean canFillSpace() {
         return false;

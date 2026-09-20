@@ -30,13 +30,9 @@ import org.testin.testproject.SelectTestProjectAction;
 import java.util.List;
 
 public class TreePanelActions {
-
     // UC-TREE-PANEL-028
     public @NotNull List<AnAction> create(final @NotNull Project p, final @NotNull TreePanel tp) {
         return List.of(
-                // The keystroke reaches the search from anywhere, which is the
-                // point of it - and is also why nothing on screen says the
-                // search exists. The button is where a tester finds out.
                 GlobalSearchAction.registered(),
                 new OpenSettingsAction(p),
                 new ExpandAllAction(tp),

@@ -36,7 +36,6 @@ public class TestListRenderer extends AbstractListRenderer<TestinEditor> {
     // UC-EDITOR-PANEL-001
     @Override
     protected @NotNull TestCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int row, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover) {
-
         card.updateData(row, tc, editor.getSelectedDetails(), editor.cardTitle(tc));
         card.setActionsState(isSelected, isRowHovered, hover);
         card.applyListLayout(list);

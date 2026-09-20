@@ -38,84 +38,37 @@ import org.testin.util.Once;
 import java.nio.file.Path;
 
 public final class StartupActivity implements ProjectActivity {
-
     private static final @NotNull Key<Boolean> STARTED = Key.create("testin.started");
 
-    /**
-     * UC-SETTING-002, Rule-SETTING-014.
-     * <p>
-     * Everything Testin does when a project opens, once per project.
-     * <p>
-     * Three doors lead here - the platform's startup extension, the tree tool
-     * window and the view tool window - because any of the three can be the
-     * first thing a tester touches, and each has to work on its own. They are
-     * not alternatives, though: opening a project ran all of them, so the log
-     * said {@code StartupActivity.execute()} twice, the settings were read
-     * twice, and a full scan of the Testin root was started a second time while
-     * the first was still walking it.
-     * <p>
-     * Guarded here rather than at each door, so a fourth door costs nothing and
-     * cannot forget.
-     */
+    // UC-SETTING-002, Rule-SETTING-014
     public static void execute(final @NotNull Project p) {
         if (!Once.claim(p, STARTED)) return;
 
         final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
-        // An unconfigured root is the empty path, not the absence of one - and
-        // not the empty string either. This asked the stored value whether it
-        // was empty while the setup warning asked the normalized path, so a root
-        // of nothing but spaces produced the setup warning and a log line
-        // announcing defaults were being saved, in the same startup.
         final @NotNull Path testinPath = TestinRoot.normalize(settings.rootTestinPath);
         final boolean rootConfigured = TestinRoot.isConfigured(testinPath);
 
-        // What is true, rather than what this used to claim. It said it was
-        // saving default settings and saved nothing: the serializer writes only
-        // what differs from a default, so a first run has nothing to write
-        // (#312, A94).
         if (!rootConfigured) {
             Logger.info("No Testin folder is set yet, so nothing is read until one is");
         }
 
-        // The log level is applied where the settings are read, which is before
-        // any project opens - see AppSettingsState.applyLogLevel. It used to be
-        // applied here, so testin.log was empty for everything that happened
-        // first, which is the part a tester turns TRACE on to see (#312, A94).
-
         Logger.info("StartupActivity.execute()");
 
-        // Whatever the last run kept for an undo nobody is coming back for. Here
-        // rather than at shutdown: the copies that matter are the ones a
-        // shutdown never reached.
         Services.getInstance(DeletedNodes.class).sweep();
 
         Logger.info("testin Path: " + testinPath);
 
-        // Before the first index, never after it: the name says which test
-        // project the first index is about, and an index started without it
-        // would have to be thrown away and run again (#6).
         final @NotNull BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
 
         if (bound.isNamed()) {
             Logger.info("Test project for this repository: '" + bound.name() + "'");
         } else {
-            // Logged, not said. The panel's own screen asks for the pick, with
-            // the projects to pick from on it, and it is where the tester goes to
-            // answer - so a balloon on every open of every repository that names
-            // no test project was the same sentence twice, one of them in a place
-            // that cannot act on it. Testin Setup Required stays: no Testin folder
-            // is a different thing, and there is no panel screen for it until one
-            // is set (#301, piece 3).
             Logger.warn("No test project chosen for " + p.getName());
         }
 
         if (TestinRoot.isConfigured(testinPath)) {
-            // UC-INTERNAL-008, Rule-INTERNAL-091. Every project in the Testin
-            // folder, not only the one this repository is about: one left
-            // unconverted would be refused by the release that deletes the
-            // converter (#305, D9). It runs on a pooled thread of its own, so
-            // neither this nor the index below waits for it.
+            // UC-INTERNAL-008, Rule-INTERNAL-091
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             indexer.convertEveryProject();
             indexer.indexWithProgress();
@@ -123,27 +76,12 @@ public final class StartupActivity implements ProjectActivity {
 
         TestCaseExecutionTracker.initGlobalListener(p);
 
-        // A cut is only a cut while it is on the clipboard, and the clipboard is
-        // written from six places and from every other application (#312, N3).
         CutState.initClipboardWatch(p);
 
-        // Before any surface exists. Recording a verdict used to be something
-        // the open editors did on the side, so a run in a session where none
-        // had been opened stored nothing.
         TestCaseExecutionSubscriber.initRecording(p);
     }
 
-    /**
-     * UC-SETTING-002, Rule-SETTING-014.
-     * <p>
-     * The setup prompt belongs to opening a project, so it hangs off the
-     * platform's door and not off {@link #execute(Project)}, which has three of
-     * them. A tester who opened the view panel to read a test case was handed a
-     * settings notification instead (#236).
-     * <p>
-     * Outside the claim on purpose: whichever door started Testin, the project
-     * still opened, and this is the one door that means it did.
-     */
+    // UC-SETTING-002, Rule-SETTING-014
     private static void warnIfUnconfigured(final @NotNull Project p) {
         final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         if (TestinRoot.isConfigured(TestinRoot.normalize(settings.rootTestinPath))) return;

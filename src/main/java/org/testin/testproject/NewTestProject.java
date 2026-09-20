@@ -32,15 +32,7 @@ import org.testin.setting.TestinRoot;
 import java.nio.file.Path;
 import java.util.Optional;
 
-/**
- * UC-TREE-PANEL-002.
- * <p>
- * Makes a new, empty test project and binds this repository to it.
- * <p>
- * Not an action. It was one - an AnAction with a title, an icon, an update and
- * an actionPerformed - that nothing registered: the create dialog built it and
- * called execute, so the action half could never run (#312, A100).
- */
+// UC-TREE-PANEL-002
 @AllArgsConstructor
 public final class NewTestProject {
     private final @NotNull Project p;
@@ -49,7 +41,6 @@ public final class NewTestProject {
 
     // UC-TREE-PANEL-002, Rule-TREE-PANEL-017
     public void execute() {
-
         final @NotNull Path tpPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(tpName);
 
         if (Services.getInstance(p, ProjectIndexer.class).isTaken(tpPath, Optional.empty())) {
@@ -59,17 +50,12 @@ public final class NewTestProject {
 
         final @NotNull TestProjectDirectoryDto created = Services.getInstance(p, DirectoryMapper.class).setTestProjectNode(p, tpPath);
 
-        // A project whose markers did not land is not bound, drawn or confirmed:
-        // the write has already said why (#312, A5).
         if (!Services.getInstance(p, ProjectIndexer.class).addTestProject(created)) return;
 
-        // A repository asks for exactly one test project, so the one it just made
-        // is the one it is about - chosen on this machine; creating one never
-        // writes testin.yml (#8, Rule-TREE-PANEL-106).
+        // Rule-TREE-PANEL-106
         Services.getInstance(p, BoundTestProject.class).choose(created.getName());
 
         tp.refresh();
         Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
     }
-
 }

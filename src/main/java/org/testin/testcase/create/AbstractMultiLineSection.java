@@ -34,28 +34,13 @@ import org.testin.util.Shortcuts;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * A section whose value is typed over as many lines as the tester needs -
- * Expected Result and Test Data - and everything the two have in common.
- * <p>
- * One owner for it rather than a copy per section. What is shared is not a style
- * but four separate compensations for things {@link EditorTextField} stops doing
- * the moment one-line mode is switched off, each of which was found the hard way
- * and none of which is guessable from the field's own API. A second copy would be
- * a second thing to keep right, and the first to fall behind.
- */
 public abstract class AbstractMultiLineSection implements CreateTestCaseSection {
-
     protected final @NotNull Project p;
 
     protected final @NotNull EditorTextField field;
 
     private final @NotNull JBPanel<?> wrapper;
 
-    /**
-     * The field height the popup was last measured around - see the document
-     * listener in {@link #enableMultiLine}.
-     */
     private int packedHeight;
 
     protected AbstractMultiLineSection(final @NotNull Project p, final @NotNull EditorTextField field, final @NotNull CreateTestCaseFields describes) {
@@ -66,92 +51,23 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
         this.wrapper = createWrapper(describes.getIcon(), this.field);
     }
 
-    /**
-     * Turns the field into a multi-line text area and hands its keys to the ones
-     * a tester expects there. A multi-line editor otherwise takes Enter and Tab
-     * for itself, so each is rebound:
-     * <ul>
-     *   <li>Enter saves the dialog,</li>
-     *   <li>Ctrl+Enter ({@link Shortcuts#InsertNewLine}) inserts a line break,</li>
-     *   <li>Tab / Shift+Tab move to the next / previous field,</li>
-     *   <li>Alt+Enter is left to the platform - it opens the spelling corrections.</li>
-     * </ul>
-     * Bound through the dialog's own registrar, which stands a key down while a
-     * popup is actually using it, and so through the action system - the only
-     * place an IntelliJ editor reads its keys from (a Swing binding on it is
-     * never reached).
-     * <p>
-     * <b>Enter on the field, CTRL+ENTER on the editor.</b> Which component a key
-     * is registered against decides whether the editor gets it first, and the
-     * editor swallows what it is offered before anything outside it is asked.
-     */
     public void enableMultiLine(final @NotNull TestCaseBaseDialog base, final @NotNull Runnable onSave) {
         field.setOneLineMode(false);
 
-        // Three things EditorTextField.initOneLineMode does for a one-line field
-        // and not for a multi-line one, so the line above is what took each of
-        // them away. Settings providers run after initOneLineMode, which is why
-        // putting them back here is enough.
         field.addSettingsProvider(editor -> {
-
-            // Tab leaves the field instead of indenting inside it. Registering
-            // VK_TAB through the action system did nothing, because the editor
-            // has its own Tab action and the editor is where the key stops.
-            // Traversal keys are read by AWT before any of that, which is why
-            // this is the thing that works - and why the two Tab registrations
-            // that used to be here are gone rather than kept alongside it.
             editor.getContentComponent().setFocusTraversalKeysEnabled(true);
 
-            // CTRL+ENTER, bound on the editor's own content component and not
-            // on the field around it.
-            //
-            // It was on the field, and the log says it never once ran: while the
-            // focus is in an editor, the editor's own handling of a key comes
-            // first, and a key it does not use is swallowed rather than passed
-            // on. The line breaks a tester did get came from the editor, which
-            // is why they arrived sometimes and not others - an open suggestion
-            // list takes the key before the editor sees it, and the list is
-            // open exactly when somebody has just started typing.
-            //
-            // The same rule the Tab comment above records, found the same way.
-            // Registered per editor, so an editor rebuilt for this field gets
-            // its own and there is never a second one on the same component.
             base.registerShortcut(editor.getContentComponent(), Shortcuts.InsertNewLine.getCustomShortcut(), () -> insertNewLine(editor));
 
-            // The frame and its blue focus ring - the platform's own border, so
-            // it follows the theme and repaints on focus by itself.
             editor.setBorder(new DarculaEditorTextFieldBorder(field, editor));
 
-            // The colors a dialog is read in rather than the ones a source file
-            // is: a one-line field is bound to the scheme of the current UI
-            // theme, a multi-line one to whatever scheme the editor is set to.
-            // A dark theme over a light editor scheme - the ordinary pairing -
-            // therefore drew this field's text black while every other field in
-            // the dialog was white.
-            //
-            // The font rides on the scheme, so the new one is given the dialog's
-            // font too; without that the field would come back at the editor's
-            // size while its neighbors keep the size every field is set in.
             final @NotNull EditorColorsScheme themed = editor.createBoundColorSchemeDelegate(EditorColorsManager.getInstance().getSchemeForCurrentUITheme());
-            // The size the dialog's other fields are set in, asked for once
-            // and used for both halves of the scheme's font.
             final @NotNull Font font = fieldFont();
             themed.setEditorFontName(font.getFontName());
             themed.setEditorFontSize(font.getSize());
             editor.setColorsScheme(themed);
         });
 
-        // The dialog grows and shrinks with the text.
-        //
-        // The field already reports the editor's height as its preferred size,
-        // but the editor sits in a scroll pane, and a scroll pane is a Swing
-        // validation root: the revalidation a new line causes stops there and
-        // never reaches the popup. So the popup is re-measured here instead.
-        //
-        // Only when the height actually changed, because this fires on every
-        // keystroke and repacking also scrolls the focused component back into
-        // view - doing that per character would drag the caret around while a
-        // tester types.
         field.addDocumentListener(new DocumentListener() {
             @Override
             public void documentChanged(final @NotNull DocumentEvent event) {
@@ -165,19 +81,9 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
             }
         });
 
-        // Enter stays on the field: saving is the dialog's, and the editor has
-        // nothing of its own to do with a key the dialog has claimed.
         base.registerShortcut(field, Shortcuts.Enter.getCustomShortcut(), onSave::run);
     }
 
-    /**
-     * Inserts a line break at the caret.
-     * <p>
-     * The editor is the one the key was bound on, handed over rather than asked
-     * for again: {@code field.getEditor()} is null until the editor exists, and
-     * this key is registered on that editor's own component, so there was never
-     * a case to check for.
-     */
     private void insertNewLine(final @NotNull Editor editor) {
         final int caret = editor.getCaretModel().getOffset();
         WriteCommandAction.runWriteCommandAction(p, () -> {

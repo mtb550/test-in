@@ -47,20 +47,9 @@ import java.util.function.Function;
 
 import static org.testin.testcase.TestCaseDialogKey.*;
 
-/**
- * A field the update menu offers: the section it opens, the bulk editor behind
- * it, and the generator that follows the change into the Java code. Its icon is
- * the create form's, so a field looks the same in the form and on the menu.
- * <p>
- * Every constant here is a field. The keys a section advertises are
- * {@link TestCaseDialogKey}, shared with {@link CreateTestCaseFields} — the two
- * dialogs offer the same keys, and did so as two separate sets of constants
- * until the keys became a type of their own.
- */
 @Getter
 @AllArgsConstructor
 public enum UpdateTestCaseFields implements MenuItem {
-
     DESCRIPTION(
             TestEditorAttributes.DESCRIPTION.getName(),
             Shortcuts.UpdateTestCaseDescription,
@@ -141,15 +130,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             new TestCaseDialogKey[]{ADD_GROUP, AUTO_COMPLETE, NAVIGATE_TAB}
     ),
 
-    /**
-     * UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194.
-     * <p>
-     * Where the case is in its own life, which is the one field here that no key
-     * opens. The letters that would name it are taken by fields a tester reaches
-     * far more often - `s` is Steps - and a status is not worth taking one from
-     * them, so this is a menu row and nothing else - and, with no letter to draw,
-     * the one field that keeps a stock icon.
-     */
+    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194
     STATUS(
             TestEditorAttributes.STATUS.getName(),
             Shortcuts.EMPTY,
@@ -160,15 +141,6 @@ public enum UpdateTestCaseFields implements MenuItem {
             new TestCaseDialogKey[]{}
     ),
 
-    /**
-     * The one field with no bulk form. A position is a place between two other
-     * cases, and "move these eight to third" has no single meaning - so the
-     * bulk action says so rather than guessing, which is the same answer the
-     * tester would get from dragging eight cards onto one row.
-     * <p>
-     * Also the one field the create dialog does not offer: see
-     * {@link org.testin.testcase.create.OrderSection}.
-     */
     ORDER(
             TestEditorAttributes.ORDER.getName(),
             Shortcuts.UpdateTestCaseOrder,
@@ -186,16 +158,9 @@ public enum UpdateTestCaseFields implements MenuItem {
     private final @NotNull BulkEditorAction bulkAction;
     private final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor;
 
-    /**
-     * The keys this section adds to the shared ones.
-     */
     private final TestCaseDialogKey @NotNull [] ownKeys;
 
-    /**
-     * What the section strip shows while this section holds the focus: its own
-     * keys, and nothing else. The dialog adds Save and Cancel after them, in the
-     * same place whatever the field (Rule-EDITOR-PANEL-199, #56).
-     */
+    // Rule-EDITOR-PANEL-199
     public StatusBarItem @NotNull [] getStatusBarItems() {
         return ownKeys.clone();
     }
@@ -206,9 +171,6 @@ public enum UpdateTestCaseFields implements MenuItem {
     }
 
     public void bindShortcut(final @NotNull JComponent component, final @NotNull Runnable onTrigger) {
-        // A constant with no key binds nothing, which is what MenuItem promises.
-        // Registering the empty keystroke would claim VK_UNDEFINED for whichever
-        // field declared it first.
         if (Shortcuts.isNoKey(shortcut.getKey())) return;
 
         new DumbAwareAction() {

@@ -40,28 +40,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.swing.tree.TreePath;
 
-/**
- * The next cycle, from the one before it.
- * <p>
- * A test cycle is a test run, and cycle 2 usually covers what cycle 1 covered.
- * Rebuilding that by hand means re-ticking every case in the selection tree and
- * retyping every configuration answer - slow on a run of any size, and a missed
- * tick silently changes what the cycle was for (#9).
- * <p>
- * This opens the same dialog creating a run opens, holding the previous cycle's
- * cases and its configuration, with a name suggested. Nothing else is carried:
- * the run is written by the same path a new one is, which builds its items from
- * the ticked cases and gives it a fresh marker - so no verdict, duration or
- * stack trace from the last cycle can reach this one.
- * <p>
- * Declared in {@code plugin.xml} (#119), so the platform builds one instance for
- * the whole IDE and what it acts on comes from the keystroke. The work is in
- * {@link Work} for the same reason {@code JavaSourceRoot.RootWork} is separate:
- * an action is a gesture and an answer to "is this available", and everything
- * else it was carrying belongs to something that has a project to work with.
- */
 public class ReCreateTestRunAction extends DumbAwareAction {
-
     // UC-TREE-PANEL-021
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -81,20 +60,10 @@ public class ReCreateTestRunAction extends DumbAwareAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // update() reads the tree's selection, which is Swing state.
         return ActionUpdateThread.EDT;
     }
 
-    /**
-     * Re-creating one run, for a project that is there.
-     */
     private record Work(@NotNull Project p) {
-
-        /**
-         * The run and the folder it sits in, read off the same path - the parent
-         * is taken from the tree rather than from the node, which carries it as
-         * a field that may not be set.
-         */
         private void reCreateAt(final @NotNull TreePath path) {
             TreeValues.directoryAt(path)
                     .filter(TestRunDirectoryDto.class::isInstance)
@@ -113,9 +82,6 @@ public class ReCreateTestRunAction extends DumbAwareAction {
                     .map(DirectoryDto::getName)
                     .collect(Collectors.toSet());
 
-            // A case removed since the source run is simply not in the tree, so it
-            // is not ticked and not carried. Nothing to report and nothing to skip:
-            // the tree is built from what exists now.
             Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
                     tp -> new CreateTestRun(p).configureRun(tp.getTestCasesDirectory(), NextRunName.after(source.getName(), taken), parent, cases, source.getMarker().getConfiguration()),
                     () -> Logger.warn("Re-create test run: no test project is bound to " + p.getName()));

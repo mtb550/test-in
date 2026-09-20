@@ -45,77 +45,18 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-/**
- * The TestNG runs this plugin started: starting them, stopping them, and hearing
- * when one ends.
- * <p>
- * The runner used to call {@code ProgramRunnerUtil.executeConfiguration}
- * directly, which is fire-and-forget - nothing was kept, so nothing could be
- * stopped, and no button had anything to call (#34).
- * <p>
- * <b>A stop reaches the run a case belongs to, and no other.</b> A run holds one
- * case when it was started from a card and all of them when it was started from
- * a test set, because one configuration is one process either way. Stopping a
- * case in a run of twelve therefore stops all twelve - there is one process
- * behind them - and every one of them is put back. Stopping a case that is a run
- * of its own leaves the others alone.
- * <p>
- * Two things have to stop, and killing one of them is not a stop. The
- * <b>process</b> is killed rather than asked to end - see {@link #kill}. The
- * <b>launch that has not happened yet</b> is dropped: a run hops to a pooled
- * thread and back to the EDT before its process exists, and a tester who presses
- * Stop in that second means it.
- * <p>
- * What is running and what each case last did is {@link RunRegistry}'s, which
- * knows nothing of the platform. This class is the half that does: it launches,
- * it kills, it listens for a process ending, and it tells the editors what
- * changed. Every question a surface asks goes to the registry through here.
- */
 @Service(Service.Level.PROJECT)
 public final class TestNGExecution implements Disposable {
-
     private final @NotNull Project p;
 
-    /**
-     * What is running and what each case last did.
-     */
     private final @NotNull RunRegistry registry = new RunRegistry();
 
-    /**
-     * The live process behind each run this plugin started, and the name of the
-     * run it belongs to.
-     * <p>
-     * Kept because the platform's own way of answering "which processes are
-     * running" is {@code ExecutionManager.getRunningDescriptors}, which carries
-     * {@code @ApiStatus.Internal} - the load-bearing call in the only feature
-     * that can stop a run, on a method that can change or vanish in any release
-     * with no deprecation (#140). The public execution topic hands the handler
-     * over as the process starts, so what the stop needs is recorded when it is
-     * offered rather than searched for afterwards.
-     * <p>
-     * Keyed by handler rather than by run name: a Testin configuration allows
-     * running in parallel, so two processes can carry one name, and a map the
-     * other way round would lose one of them.
-     * <p>
-     * Only runs this plugin launched go in - a tester's own configuration of the
-     * same name is theirs to stop.
-     */
     private final @NotNull Map<ProcessHandler, String> live = new ConcurrentHashMap<>();
 
-    /**
-     * Written out rather than generated: a project service's constructor is its
-     * contract with the platform, which looks for exactly (Project) and refuses
-     * to build the service otherwise. A generated one changes shape whenever a
-     * field is added, and the platform only says so at runtime.
-     * <p>
-     * The subscription is the only way this service hears about a run that ended
-     * without saying anything - see {@link #ended}.
-     */
     public TestNGExecution(final @NotNull Project p) {
         this.p = p;
 
         p.getMessageBus().connect(this).subscribe(ExecutionManager.EXECUTION_TOPIC, new ExecutionListener() {
-
             @Override
             public void processStarted(final @NotNull String executorId, final @NotNull ExecutionEnvironment env, final @NotNull ProcessHandler handler) {
                 final @NotNull String runName = env.getRunProfile().getName();
@@ -135,51 +76,22 @@ public final class TestNGExecution implements Disposable {
         });
     }
 
-    /**
-     * The subscription above is parented here, so the platform takes it down
-     * when the project closes. Nothing else is held.
-     */
     @Override
     public void dispose() {
     }
 
-    /**
-     * UC-CODEGEN-008, Rule-CODEGEN-034.
-     * <p>
-     * A case is on its way to the runner: remembered, and shown as running.
-     * <p>
-     * Remembering it and marking it are one fact, so they happen together. The
-     * platform's own report arrives a second or two later under a name of
-     * TestNG's choosing; this is what makes the card change the moment it is
-     * clicked.
-     */
+    // UC-CODEGEN-008, Rule-CODEGEN-034
     public void starting(final @NotNull TestCaseDto tc) {
         registry.starting(tc.getId());
 
         TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.RUNNING, Duration.ZERO, Failure.NONE);
     }
 
-    /**
-     * Which of these cases the tester still wants run, taking them out of the
-     * queue as it answers.
-     * <p>
-     * Asked immediately before the configuration is built, so a case stopped
-     * while the run was being prepared is left out of it rather than started and
-     * then killed.
-     */
     public @NotNull List<TestCaseDto> stillWanted(final @NotNull List<TestCaseDto> cases) {
         return cases.stream().filter(tc -> registry.take(tc.getId())).toList();
     }
 
-    /**
-     * UC-CODEGEN-008, Rule-CODEGEN-076.
-     * <p>
-     * The name to launch under: what the caller asked for, or that name with a
-     * number after it when a run of that name is still going.
-     * <p>
-     * Asked before the configuration is built, because the configuration is what
-     * carries the name and a stop finds a process by it.
-     */
+    // UC-CODEGEN-008, Rule-CODEGEN-076
     public @NotNull String freeRunName(final @NotNull String wanted) {
         return registry.freeName(wanted);
     }
@@ -192,55 +104,19 @@ public final class TestNGExecution implements Disposable {
         ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
     }
 
-    /**
-     * A case that was asked for is not going to run. Drops it from the queue and
-     * puts the card back, saying nothing - for the paths that have already told
-     * the tester why in their own words.
-     */
     public void notStarting(final @NotNull TestCaseDto tc) {
         registry.notStarting(tc.getId());
 
         TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.IDLE, Duration.ZERO, Failure.NONE);
     }
 
-    /**
-     * UC-CODEGEN-008.
-     * <p>
-     * A case that was asked for has no generated method to run.
-     * <p>
-     * The card is already showing Running by the time this is reached - it is
-     * marked at the click, a second before the launch - so a path that returned
-     * quietly left the case looking like it was running for the rest of the
-     * session.
-     * <p>
-     * Says nothing. Twelve cases with no code raised twelve balloons, one per
-     * case; {@link #started} says it once, with the count, when the runner has
-     * finished looking (#66, finding 18).
-     */
+    // UC-CODEGEN-008
     public void noGeneratedCode(final @NotNull TestCaseDto tc) {
         Logger.warn("Not running '" + tc.getDescription() + "': it has no generated code");
         notStarting(tc);
     }
 
-    /**
-     * UC-CODEGEN-008, Rule-CODEGEN-033, Rule-CODEGEN-074.
-     * <p>
-     * What the run turned out to be, said once and only once the runner knows.
-     * <p>
-     * <b>After the gesture, not at it.</b> Whether a case can run is answered by
-     * looking for its generated method, which happens on a pooled thread a
-     * moment after the press - so the count taken at the click was the count
-     * asked for rather than the count starting. Twelve cases with no code read
-     * "Running 12" and were then refused one by one, twelve balloons saying the
-     * opposite of the first (#66, finding 18).
-     * <p>
-     * The cards answer for the gap: they turn to running at the press
-     * (Rule-CODEGEN-034), so the gesture is never unacknowledged while this is
-     * being worked out.
-     * <p>
-     * The refusal names the case when there is one of it and counts them when
-     * there are more, because a tester who asked for one already knows which.
-     */
+    // UC-CODEGEN-008, Rule-CODEGEN-033, Rule-CODEGEN-074, Rule-CODEGEN-034
     public void started(final @NotNull List<TestCaseDto> running, final @NotNull List<TestCaseDto> withoutCode) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
@@ -252,77 +128,31 @@ public final class TestNGExecution implements Disposable {
                 one ? withoutCode.getFirst().getDescription() : String.valueOf(withoutCode.size()));
     }
 
-    /**
-     * UC-CODEGEN-009, Rule-CODEGEN-038.
-     * <p>
-     * Whether a report arriving for this case belongs to a run the tester
-     * stopped.
-     */
+    // UC-CODEGEN-009, Rule-CODEGEN-038
     public boolean isStopped(final @NotNull TestCaseDto tc) {
         return registry.isStopped(tc.getId());
     }
 
-    /**
-     * UC-CODEGEN-009, Rule-CODEGEN-036.
-     * <p>
-     * Whether a stop has something to reach for this case: a launch on its way
-     * or a process it is running under.
-     * <p>
-     * The one answer to "is this case running", for the run/stop slot, the
-     * double-run guard and the stop itself. They each used to work it out from a
-     * field on the DTO, and all three went blind together the moment a rescan
-     * handed the editors fresh instances (#116).
-     */
+    // UC-CODEGEN-009, Rule-CODEGEN-036
     public boolean isRunning(final @NotNull UUID id) {
         return registry.isRunning(id);
     }
 
-    /**
-     * The status a surface paints for this case. Asked of the runner because the
-     * answer has to outlive a rescan: both the Running badge of a case mid-run
-     * and the verdict of one that has finished used to be dropped along with the
-     * DTO instance that carried them.
-     */
     public @NotNull RunStatus statusOf(final @NotNull TestCaseDto tc) {
         return registry.statusOf(tc.getId());
     }
 
-    /**
-     * UC-CODEGEN-008.
-     * <p>
-     * A report landed with this case's result: what every surface paints from
-     * now on, and the end of the case counting as running.
-     */
+    // UC-CODEGEN-008
     void reported(final @NotNull UUID id, final @NotNull RunStatus status) {
         registry.reported(id, status);
     }
 
-    /**
-     * UC-CODEGEN-009, Rule-CODEGEN-037.
-     * <p>
-     * Kills the runs these cases belong to and drops their launches that have not
-     * started yet.
-     * <p>
-     * Silent: every path here has a tester watching the card they clicked, and
-     * the card changing is the answer.
-     *
-     * @return how many cases were put back, which is more than were asked for when
-     *         they share a run - the count the one notification reports
-     */
+    // UC-CODEGEN-009, Rule-CODEGEN-037
     public int stop(final @NotNull List<TestCaseDto> cases) {
         return stopCases(cases.stream().map(TestCaseDto::getId).toList());
     }
 
-    /**
-     * UC-CODEGEN-009, Rule-CODEGEN-037.
-     * <p>
-     * The same, for a caller that holds ids rather than cases.
-     * <p>
-     * The run editor is one: it remembers which cases it launched by id,
-     * because that is what an execution report names and the instance it held
-     * at launch is replaced by the next rescan. Only the ids were ever used
-     * here - the cases above are mapped to them on the way in.
-     */
+    // UC-CODEGEN-009, Rule-CODEGEN-037
     public int stopCases(final @NotNull Collection<UUID> ids) {
         final @NotNull RunRegistry.Stop stop = registry.stopping(List.copyOf(ids));
         if (stop.cases().isEmpty()) return 0;
@@ -337,19 +167,6 @@ public final class TestNGExecution implements Disposable {
         return stop.cases().size();
     }
 
-    /**
-     * A run of this plugin's has ended, and the cases it never reported on are
-     * put back.
-     * <p>
-     * The only way this service hears about a process it did not kill itself. A
-     * build that fails before a single test reports, a crashed JVM and the IDE's
-     * own Stop button in the Run tool window all end a run without a verdict,
-     * and every case still recorded under it would otherwise read as running for
-     * the rest of the session.
-     * <p>
-     * Runs this plugin did not start are ignored, by the same name check the
-     * stop uses: a tester's own configuration is theirs.
-     */
     private void ended(final @NotNull ExecutionEnvironment env) {
         final @NotNull String runName = env.getRunProfile().getName();
         final @NotNull List<UUID> abandoned = registry.ended(runName);
@@ -359,23 +176,6 @@ public final class TestNGExecution implements Disposable {
         abandoned.forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, Duration.ZERO, Failure.NONE));
     }
 
-    /**
-     * Ends one test process the way the IDE's own Stop button ends a stubborn
-     * one: it requests termination, and a handler that can kill its process tree
-     * asks for the kill rather than for the JVM's cooperation.
-     * <p>
-     * The polite ask alone is what the platform tries first, and it was not
-     * enough here - a run stopped two seconds in still reported itself passed
-     * fourteen seconds later, having run to the end (#34).
-     * <p>
-     * Says which of the two it did, because the ways this can fail look
-     * identical from the outside.
-     * <p>
-     * Given the handler rather than a descriptor to find one in: the handler is
-     * what the execution topic hands over when the process starts, and the
-     * descriptor with no handler behind it - which this used to have to refuse -
-     * is a state that can no longer arrive.
-     */
     private void kill(final @NotNull ProcessHandler handler, final @NotNull String runName) {
         handler.putUserData(ProcessHandler.TERMINATION_REQUESTED, Boolean.TRUE);
 
@@ -389,30 +189,12 @@ public final class TestNGExecution implements Disposable {
         }
     }
 
-    /**
-     * The live processes of these runs, by the handler that stops each and the
-     * run it belongs to.
-     * <p>
-     * Read from what the execution topic recorded rather than asked of
-     * {@code ExecutionManager.getRunningDescriptors}, which is internal API.
-     * Only runs this plugin launched were ever recorded, so the check that used
-     * to be half of this filter has already been made.
-     * <p>
-     * Terminated all the same: a handler is dropped when its process ends, and
-     * this is the belt to that braces - a process that died between the
-     * bookkeeping and the stop is not something to ask to die again.
-     */
     private @NotNull Map<ProcessHandler, String> running(final @NotNull Set<String> names) {
         return live.entrySet().stream()
                 .filter(one -> names.contains(one.getValue()) && !one.getKey().isProcessTerminated())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    /**
-     * How a test case is named in an execution report: a Testin-generated method
-     * is named by the case's id, which is what lets the first report identify the
-     * case outright.
-     */
     private static @NotNull String key(final @NotNull UUID id) {
         return id.toString().toLowerCase();
     }

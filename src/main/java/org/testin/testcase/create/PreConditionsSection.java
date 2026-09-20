@@ -23,13 +23,7 @@ import org.testin.testcase.CreateTestCaseFields;
 import org.testin.util.SpellChecker;
 import org.testin.util.Shortcuts;
 
-/**
- * What has to be true before this test case can be run - one line, spell
- * checked, and nothing to complete from: a pre-condition is written rather than
- * chosen.
- */
 public class PreConditionsSection extends AbstractOneLineSection {
-
     public PreConditionsSection(final @NotNull Project p) {
         super(SpellChecker.createField(p), CreateTestCaseFields.PRE_CONDITIONS, Shortcuts.CreateTestCasePreConditions);
     }

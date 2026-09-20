@@ -27,13 +27,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class HistoryTab {
-
-    /// UC-VIEW-PANEL-007, Rule-VIEW-PANEL-037.
-    ///
-    /// An honest empty state, because a test case records one edit and forgets
-    /// the rest - there is no history to show. Recording it is #150. This drew
-    /// demo data once, which read as a working feature holding somebody else's
-    /// data.
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-037
     public void load(final @NotNull JBPanel<?> historyTab) {
         historyTab.removeAll();
 
@@ -43,9 +37,6 @@ public class HistoryTab {
 
         historyTab.add(emptyState, BorderLayout.CENTER);
 
-        // Its own, as the details tab's load does its own. A tab that swapped its
-        // contents and left them unpainted showed the previous test case's rows
-        // until the tester switched away and back (#66, finding 79).
         historyTab.revalidate();
         historyTab.repaint();
     }

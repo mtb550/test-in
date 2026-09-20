@@ -67,18 +67,9 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 public final class TestRunPdfGenerator {
-
-    /**
-     * The font every text on the page is checked against, once it exists.
-     */
     private @NotNull Optional<PdfFont> printsWith = Optional.empty();
 
-    /**
-     * Each text that had a character the font cannot print, in the order they
-     * were put on the page.
-     */
     private final @NotNull Set<String> leftOut = new LinkedHashSet<>();
-
 
     private final @NotNull DeviceRgb DARK_NAVY = new DeviceRgb(0x1F, 0x38, 0x64);
     private final @NotNull DeviceRgb MEDIUM_BLUE = new DeviceRgb(0x2E, 0x54, 0x96);
@@ -94,46 +85,26 @@ public final class TestRunPdfGenerator {
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
     public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
-        // try-with-resources: closing the Document also closes the PdfDocument and
-        // PdfWriter, including on any failure path inside the body. The PdfDocument
-        // is a resource in its own right so it still closes if the Document
-        // constructor is what fails; closing it twice is a no-op.
-        //
-        // The false is immediate flush, and it has to be off. On - the default -
-        // iText writes each page out as soon as the layout moves onto the next one,
-        // and a page already written cannot be drawn on again. The footer pass below
-        // draws on every page after the whole body is laid out, so on any report
-        // that ran to a second page it reached a page iText had closed behind it and
-        // threw "Cannot draw elements on already flushed pages". Off, nothing is
-        // written until close(), so every page is still open when the footers go on.
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              PdfDocument pdf = new PdfDocument(new PdfWriter(baos));
              Document document = new Document(pdf, pdf.getDefaultPageSize(), false)) {
-
             PdfFont boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
             PdfFont regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 
-            // All three are Helvetica, one encoding between them, so what one of
-            // them cannot print none of them can (Rule-REPORT-018).
+            // Rule-REPORT-018
             printsWith = Optional.of(regularFont);
             PdfFont italicFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE);
 
             final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
 
-            // TITLE
             document.add(para(Bundle.message("report.title"))
                     .setFont(boldFont).setFontSize(ReportFont.TITLE.pt()).setFontColor(DARK_NAVY)
                     .setMarginBottom(2));
 
-            // SUBTITLE - the project, and the run under it. Two lines rather
-            // than one, because they answer different questions: which project
-            // this is, and which run of it.
             document.add(para(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(trDir.getMarker()), TestRunConfiguration.COMPONENT.valueIn(trDir.getMarker()))))
                     .setFont(regularFont).setFontSize(ReportFont.SUBTITLE.pt()).setFontColor(MEDIUM_BLUE)
                     .setMarginBottom(0));
 
-            // The rule closes the two names, above the notice - the notice is a
-            // caption on the block, not part of it.
             document.add(para(trDir.getName())
                     .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(MEDIUM_BLUE)
                     .setPaddingBottom(4)
@@ -144,7 +115,6 @@ public final class TestRunPdfGenerator {
                     .setFont(italicFont).setFontSize(ReportFont.CAPTION.pt()).setFontColor(DARK_GRAY)
                     .setMarginBottom(20));
 
-            // SECTION 1: REPORT OVERVIEW
             Paragraph sec1 = para(Bundle.message("report.heading.overview"))
                     .setFont(boldFont)
                     .setFontSize(ReportFont.SECTION.pt())
@@ -154,9 +124,6 @@ public final class TestRunPdfGenerator {
                     .setMarginBottom(12);
             document.add(sec1);
 
-
-            // One traversal of the results serves the whole report: the counts
-            // below, the pass rate, and who executed it.
             final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
 
             Table overviewTable = new Table(UnitValue.createPercentArray(new float[]{30, 70}))
@@ -169,7 +136,6 @@ public final class TestRunPdfGenerator {
 
             document.add(overviewTable);
 
-            // SECTION 2: EXECUTION SUMMARY
             Paragraph sec2 = para(Bundle.message("report.heading.execution"))
                     .setFont(boldFont)
                     .setFontSize(ReportFont.SECTION.pt())
@@ -180,20 +146,11 @@ public final class TestRunPdfGenerator {
                     .setMarginTop(20);
             document.add(sec2);
 
-            // The same sentence the HTML report opens with, naming the run. The
-            // four formats used to open one run two ways - "Sprint 3 Cycle 1
-            // holds 12 test cases" here and "This run holds 12 test cases"
-            // there - drift the duplicated-string gate could not catch, because
-            // the two literals were never the same literal (#66, finding 91).
-            //
-            // The values go in as text rather than as numbers, so the digits are
-            // the same digits the tiles beside this paragraph are built from.
             document.add(para(
                     Bundle.message("report.summary.named", trDir.getName(),
                             String.valueOf(summary.total()), String.valueOf(summary.executed()), summary.passRate() + "%"))
                     .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(BLACK)
                     .setMarginBottom(12));
-
 
             final @NotNull java.util.List<ReportTile> tiles = ReportTile.shownFor(summary);
 
@@ -210,11 +167,6 @@ public final class TestRunPdfGenerator {
 
             document.add(statsTable);
 
-            // SECTION 3: RESULT ANALYSIS
-            // SECTION 3: RESULT ANALYSIS - only what the tester wrote.
-            // A verdict they said nothing about prints no heading, and a run
-            // nobody analyzed prints no section, so the numbering below starts
-            // at 3 instead of 4.
             final boolean analyzed = ResultAnalysis.anyWrittenIn(trDir.getMarker().getResultAnalysis());
 
             if (analyzed) {
@@ -242,9 +194,6 @@ public final class TestRunPdfGenerator {
                 }
             }
 
-            // SECTIONS 4+: one case table per status, empty ones omitted. Numbered
-            // as printed rather than per section, so a run with nothing blocked
-            // does not jump from 5 to 7.
             int sectionNumber = analyzed ? 4 : 3;
             for (final ReportSection section : ReportSection.values()) {
                 final long count = section.count(summary);
@@ -255,20 +204,14 @@ public final class TestRunPdfGenerator {
                         rgb(section.getHexColor()), rgb(section.textHex()), section.isWithFailureDetail(), section::matches);
             }
 
-
             float pageWidth = pdf.getDefaultPageSize().getWidth();
             float leftMargin = document.getLeftMargin();
             float rightMargin = document.getRightMargin();
 
-            // Every page, not only the last one. It was built on getLastPage(), so a
-            // report of any length carried its footer on the final page alone -
-            // while the Word generator drew one on every page of the same report
-            // (#66, finding 34).
             for (int page = 1; page <= pdf.getNumberOfPages(); page++) {
                 final @NotNull Canvas footerCanvas = new Canvas(pdf.getPage(page),
                         new Rectangle(leftMargin, 0, pageWidth - leftMargin - rightMargin, 28));
 
-                // Horizontal rule above the footer text (HTML footer's border-top)
                 final @NotNull PdfCanvas pdfCanvas = footerCanvas.getPdfCanvas();
                 pdfCanvas.setStrokeColor(BORDER_GRAY);
                 pdfCanvas.setLineWidth(1.0f);
@@ -276,7 +219,6 @@ public final class TestRunPdfGenerator {
                 pdfCanvas.lineTo(pageWidth - rightMargin, 34);
                 pdfCanvas.stroke();
 
-                // Footer — all text on a single line:
                 footerCanvas.add(para()
                         .setFont(regularFont).setFontSize(ReportFont.CAPTION.pt()).setFontColor(DARK_GRAY)
                         .setTextAlignment(TextAlignment.CENTER)
@@ -299,14 +241,6 @@ public final class TestRunPdfGenerator {
         }
     }
 
-
-    /**
-     * A hex color as iText wants it.
-     * <p>
-     * The result-analysis sections declare their color once, as the hex string
-     * all three report formats already used, so the paragraph in the PDF is the
-     * same green as the one in the Word file and the HTML page.
-     */
     private @NotNull DeviceRgb rgb(final @NotNull String hex) {
         return new DeviceRgb(
                 Integer.parseInt(hex.substring(0, 2), 16),
@@ -328,23 +262,16 @@ public final class TestRunPdfGenerator {
                 .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(BLACK)
                 .setMarginBottom(12));
 
-        // Sized by what is in them rather than by a share of the page each.
-        // Fixed shares meant guessing how wide "Enhancement" is: too small and it
-        // wrapped, too large and the description - the column anyone actually
-        // reads - lost the room for nothing. Under auto layout the narrow columns
-        // take what their longest word needs and the description takes the rest.
         Table table = new Table(withFailureDetail ? 4 : 2)
                 .useAllAvailableWidth()
                 .setAutoLayout()
                 .setBorder(Border.NO_BORDER);
 
-        // Header row
         addCaseTableHeader(table, "#", headerBg, headerFg, boldFont);
         addCaseTableHeader(table, Bundle.message("caption.test.case"), headerBg, headerFg, boldFont);
         if (withFailureDetail) addCaseTableHeader(table, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg, boldFont);
         if (withFailureDetail) addCaseTableHeader(table, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg, boldFont);
 
-        // Data rows — alternating LIGHT_BG / WHITE
         int idx = 1;
         boolean alt = true;
         for (TestRunItems item : tr.getResults()) {
@@ -353,7 +280,6 @@ public final class TestRunPdfGenerator {
             DeviceRgb rowBg = alt ? LIGHT_BG : WHITE;
             alt = !alt;
 
-            // # column
             table.addCell(new Cell()
                     .setBackgroundColor(rowBg)
                     .setBorder(new SolidBorder(BORDER_GRAY, 1))
@@ -362,7 +288,6 @@ public final class TestRunPdfGenerator {
                             .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(DARK_GRAY)
                             .setTextAlignment(TextAlignment.CENTER)));
 
-            // Test Case column
             final @NotNull String caseName = ReportedCase.of(detailsMap, item.getId()).getDescription();
             final @NotNull String tcName = caseName.isEmpty() ? "—" : caseName;
             final @NotNull Cell testCaseCell = new Cell()
@@ -378,7 +303,6 @@ public final class TestRunPdfGenerator {
                 final @NotNull Paragraph actual = para(Bundle.message("report.actual.result", actualResult))
                         .setFont(regularFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY);
 
-                // The issue it was reported as, right after what happened (#50).
                 item.bugIssue().ifPresent(url -> actual.add(text(" ("))
                         .add(new Link(BugIssueUrl.shortReference(url), PdfAction.createURI(url)).setFontColor(LINK_BLUE))
                         .add(text(")")));
@@ -464,9 +388,6 @@ public final class TestRunPdfGenerator {
         table.addCell(cell);
     }
 
-    /**
-     * A paragraph of this text, checked against the font on the way in.
-     */
     private @NotNull Paragraph para(final @NotNull String text) {
         return new Paragraph(printable(text));
     }
@@ -475,30 +396,11 @@ public final class TestRunPdfGenerator {
         return new Paragraph();
     }
 
-    /**
-     * A run of this text inside a paragraph, checked the same way.
-     */
     private @NotNull Text text(final @NotNull String text) {
         return new Text(printable(text));
     }
 
-    /**
-     * UC-REPORT-001, Rule-REPORT-018.
-     * <p>
-     * The text as it is, remembered when the font cannot print some of it.
-     * <p>
-     * The fonts are the PDF standard fonts, whose encoding is Latin only, and
-     * iText skips a character it has no glyph for rather than failing. So a test
-     * case written in Arabic, Hindi, Cyrillic or Chinese printed as an empty cell
-     * in the document a tester attaches to a ticket - and in a Hindi IDE every
-     * heading vanished too - with nothing said (#66, finding 170). Printing
-     * those scripts properly needs a font that holds them and letter shaping
-     * this library only does with a paid add-on; until then the PDF says what
-     * it left out.
-     * <p>
-     * Spaces and line breaks are not counted: the PDF lays them out rather than
-     * drawing them.
-     */
+    // UC-REPORT-001, Rule-REPORT-018
     private @NotNull String printable(final @NotNull String text) {
         printsWith.ifPresent(font -> {
             final boolean loses = text.codePoints()
@@ -509,12 +411,7 @@ public final class TestRunPdfGenerator {
         return text;
     }
 
-    /**
-     * UC-REPORT-001, Rule-REPORT-018.
-     * <p>
-     * Said once, after the document is written. A notification that stays,
-     * because a report is written in the background and read afterwards.
-     */
+    // UC-REPORT-001, Rule-REPORT-018
     private void sayWhatWasLeftOut(final @NotNull Project p) {
         if (leftOut.isEmpty()) return;
 

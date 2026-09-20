@@ -34,27 +34,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-/**
- * What two testers disagreed about in one test case, and nothing else (#90).
- * <p>
- * Everything the merge could settle is already settled by the time this opens -
- * the fields only one side touched, the audit stamps, the order pointers. What
- * is left is a row per field both sides rewrote, mine beside theirs, which on a
- * real conflict is one or two rows rather than the seventeen a text merge would
- * show.
- */
 public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogButton> {
-
-    /**
-     * How much of a value a row shows. A description fits; a steps list does not,
-     * and a row that wrapped over four lines would bury the choice next to it.
-     */
     private static final int SHOWN = 70;
 
-    /**
-     * What separates one settled decision from the next. A newline, because the
-     * message renders one as a line break.
-     */
     private static final @NotNull String LINE = "\n";
 
     private final @NotNull List<Merge.Question> questions;
@@ -62,14 +44,6 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
     private final @NotNull Consumer<Set<String>> onResolved;
     private final @NotNull Runnable onSkipped;
 
-    /**
-     * @param testCase   what the case is called, for the title - a tester
-     *                   resolving three conflicts in a row needs to know which
-     *                   one they are looking at
-     * @param onResolved the fields the tester chose the remote's value for.
-     *                   Named rather than numbered, so the caller applies them by
-     *                   field and never by row order
-     */
     public ResolveConflictDialog(final @NotNull Project p, final @NotNull String testCase, final @NotNull List<Merge.Question> questions, final @NotNull List<String> settled, final @NotNull Consumer<Set<String>> onResolved, final @NotNull Runnable onSkipped) {
         super(p);
         this.questions = questions;
@@ -80,10 +54,6 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
 
         final @NotNull List<ComponentDialogBase<?>> rows = new ArrayList<>();
 
-        // Said here, in the dialog that is already about this test case, rather
-        // than in a message afterwards: the tester is looking at the decisions
-        // they are being asked to make, and these are the ones that were made
-        // for them. Nothing is shown when nothing was settled (#261).
         if (!settled.isEmpty()) rows.add(ComponentDialogBase.message(settledSentence(settled)));
 
         for (final Merge.Question question : questions) {
@@ -102,10 +72,6 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
 
         components = List.copyOf(rows);
 
-        // Skip rather than Cancel, and it says so on the status bar. Escape
-        // used to end the whole sync: the rest of the conflicting test cases
-        // were never asked about, and the tester was left mid-rebase with no
-        // word about any of it (#258).
         shortcuts = List.of(
                 StatusBarShortcut.build(Shortcuts.Enter, Bundle.message("dialog.conflict.button.keep"), this::submit),
                 StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("dialog.conflict.shortcut.skip"), this::skip));
@@ -113,26 +79,12 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
         preferredSize = new Dimension(JBUI.scale(700), JBUI.scale(120 + (60 * questions.size())));
     }
 
-    /**
-     * UC-SHARE-017, Rule-SHARE-109.
-     * <p>
-     * What the merge decided without asking, listed.
-     * <p>
-     * Each entry arrives as a finished sentence carrying its own reason, and this
-     * only joins them. It used to name the fields and then give one explanation
-     * for the lot - the later edit and the remote's position - which fitted a test
-     * case and nothing else: a run's marker settles its status, its execution
-     * stamps and whatever the two testers wrote, and the tester was told those had
-     * been settled by a rule about positions (#305).
-     */
+    // UC-SHARE-017, Rule-SHARE-109
     private static @NotNull String settledSentence(final @NotNull List<String> settled) {
         final @NotNull String lead = settled.size() == 1
                 ? Bundle.message("dialog.conflict.settled.one")
                 : Bundle.message("dialog.conflict.settled.many");
 
-        // One to a line, rather than joined with "and": each is a sentence with a
-        // comma in it, and three of those in one run of text is a paragraph the
-        // tester has to unpick. The message renders a line break for a newline.
         return lead + LINE + String.join(LINE, settled);
     }
 
@@ -144,14 +96,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogB
         return oneLine.length() <= SHOWN ? oneLine : oneLine.substring(0, SHOWN - 1) + "…";
     }
 
-    /**
-     * UC-SHARE-018, Rule-SHARE-084.
-     * <p>
-     * This test case is left as Git has it, and the sync goes on to the next
-     * one. What the tester already answered is written and staged before each
-     * question closes, so it stays; this one is reported at the end with
-     * everything else that could not be resolved here.
-     */
+    // UC-SHARE-018, Rule-SHARE-084
     private void skip() {
         closeCancel();
         onSkipped.run();

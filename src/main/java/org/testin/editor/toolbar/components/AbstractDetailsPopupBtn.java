@@ -36,30 +36,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-/**
- * A button that shows a persistent check-box popup of what a view shows. The
- * concrete subclasses supply the enum options, the persistence key, and what to
- * call it.
- * <p>
- * The tooltip is the subclass's because the third caller is not a details popup:
- * light mode's title bar opens the same list to choose which parts of its window
- * are drawn, and a button labeled "Details" beside a Ctrl+D that means something
- * else would have been two names for two things (#13).
- * <p>
- * <b>Deliberately not a framework dialog</b> (#69), for the reason the filter
- * popup is not: the list stays open while the tester ticks and unticks, the view
- * behind it changing as they go, and there is nothing to confirm. A framework
- * dialog is a question that closes when it is answered; this one is answered by
- * being left.
- */
 public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribute> extends AbstractIconButton implements ToolbarItem {
-
-    /**
-     * What the two details popups are called. Passed by each subclass rather
-     * than fixed here, because the third caller is not one of them - light
-     * mode's title bar opens the same list under its own word - but written
-     * once, because those two do share it.
-     */
     protected static final @NotNull String FIELDS = Bundle.message("toolbar.fields");
 
     @Getter
@@ -68,22 +45,14 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
     private final @NotNull String propertyKey;
     private final @NotNull List<E> options;
 
-    /**
-     * Whether a view refresh is already queued for the current burst of ticks.
-     */
     private final @NotNull AtomicBoolean refreshQueued = new AtomicBoolean();
 
     protected AbstractDetailsPopupBtn(final @NotNull String tooltip, final @NotNull String propertyKey, final @NotNull Class<E> attributes, final @NotNull Runnable onToolBarDetailsSelectedChanged) {
-        // A checked box, matching the check-box list this button opens. The
-        // previous icon was a framed panel with rules in it, which the New UI
-        // draws almost identically to the List View button beside it.
         super(tooltip, AllIcons.Actions.Selectall);
 
         this.propertyKey = propertyKey;
         this.options = List.of(attributes.getEnumConstants());
 
-        // Only when nothing is stored yet: the attributes the enum flags on, not
-        // every option. A saved selection is honored exactly as it was saved.
         final @NotNull String defaults = options.stream()
                 .filter(o -> o.getToolBarDefault().isSelectedByDefault())
                 .map(Enum::name)
@@ -99,7 +68,6 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
             }
         }
 
-        // The locked attributes hold the state they declare, whatever was stored.
         options.forEach(o -> o.getToolBarDefault().enforceLock(o, selectedDetails));
 
         addActionListener(e -> showDetailsPopup(onToolBarDetailsSelectedChanged));
@@ -117,15 +85,9 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
     // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-024
     private void showDetailsPopup(final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         final @NotNull CheckBoxList<E> detailsList = new CheckBoxList<>() {
-            /**
-             * UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-023.
-             * <p>
-             * Grays the locked attributes out, and stops the click and the space
-             * key from toggling them - the platform asks this before both.
-             */
+            // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-023
             @Override
             protected boolean isEnabled(final int index) {
-                // A row the list has not filled in yet locks nothing.
                 return Optional.ofNullable(getItemAt(index))
                         .map(item -> item.getToolBarDefault().isSwitchable())
                         .orElse(true);
@@ -143,10 +105,6 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
 
             saveProps();
 
-            // The refresh re-measures every card on the page, or every column
-            // against every row - work the checkbox should not be waiting on. It
-            // runs on the next pass instead, so the tick lands immediately, and
-            // one refresh covers a burst of them rather than one refresh each.
             if (refreshQueued.compareAndSet(false, true)) {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     refreshQueued.set(false);

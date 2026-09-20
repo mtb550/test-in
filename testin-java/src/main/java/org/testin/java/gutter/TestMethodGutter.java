@@ -45,10 +45,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class TestMethodGutter extends RelatedItemLineMarkerProvider implements DumbAware {
-
-    /**
-     * Empty when the annotation's testName is not a UUID at all.
-     */
     private static @NotNull Optional<UUID> parseUuid(final @NotNull String value) {
         try {
             return Optional.of(UUID.fromString(value));
@@ -66,14 +62,9 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
             return;
         }
 
-        // Rule-CODEGEN-082. No icon while code is off: the method is there, but
-        // this code project's testin.yml does not name the test project open in
-        // the tree, so a click would lead to a case that is not this code's.
+        // Rule-CODEGEN-082
         if (!CodeOn.isOn(p)) return;
 
-        // Only mark testin-managed methods: a string that is not the testName
-        // of a TestNG @Test is ordinary code, and a handwritten testName like
-        // "smoke" is not a UUID - clicking its marker would throw.
         Optional.ofNullable(PsiTreeUtil.getParentOfType(token, PsiLiteralExpression.class))
                 .filter(TestMethodGutter::namesATestCase)
                 .map(literal -> StringUtil.unquoteString(literal.getText()).trim())
@@ -89,13 +80,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         )));
     }
 
-    /**
-     * UC-CODEGEN-007, Rule-CODEGEN-029.
-     * <p>
-     * Whether this string literal is the testName of a TestNG @Test. Each step
-     * up the tree can run out of parents, and running out means the same as
-     * finding the wrong thing: not ours.
-     */
+    // UC-CODEGEN-007, Rule-CODEGEN-029
     private static boolean namesATestCase(final @NotNull PsiLiteralExpression literal) {
         return Optional.ofNullable(PsiTreeUtil.getParentOfType(literal, PsiNameValuePair.class))
                 .filter(pair -> "testName".equals(pair.getName()))
@@ -104,12 +89,6 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 .isPresent();
     }
 
-    /**
-     * The generated method the mark sits on, for the sentence a refusal needs.
-     * Read on the click rather than kept, because a marker outlives several edits
-     * of the method around it. Said without a name, in the tester's language,
-     * when the mark is not inside one (#66, finding 290).
-     */
     private static @NotNull String methodName(final @NotNull PsiElement element) {
         return Optional.ofNullable(PsiTreeUtil.getParentOfType(element, PsiMethod.class)).map(PsiMethod::getName).orElseGet(() -> Bundle.message("gutter.this.method"));
     }
@@ -123,30 +102,16 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.awaitIndexing();
 
-                // Generated code outlives the case it was generated from: the
-                // annotation still names an id nobody can open.
                 indexer.findTestCase(uuid).ifPresentOrElse(
                         dto -> {
                             Logger.info("Found in indexer: " + dto.getDescription());
 
-                            // The same call the card, the grid and View Details
-                            // make, so the mark has no behavior of its own: it
-                            // shows the case and stops. A tester reading a method
-                            // asked what it proves, and expanding the tree and
-                            // opening an editor is a bigger answer than that
-                            // question - which is what #228 made it do, reversed
-                            // here. Going to the case is the identity in the panel
-                            // this opens.
                             ApplicationManager.getApplication().invokeLater(() ->
                                     ViewToolWindowFactory.showPanel(p, List.of(dto), dto.getParent().getPath2(), ViewPanel::focusDetailsTab));
                         },
                         () -> refuseMissingCase(p, uuid, methodName));
 
             } catch (final Exception ex) {
-                // Named for what failed rather than titled "Error", which said
-                // nothing the message did not and was the same word two other
-                // files write. Found the day the gate first read this module
-                // (#170).
                 Logger.error("Could not open the test case behind this mark: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() ->
                         Services.getInstance(p, Notifier.class).error(p, Bundle.message("gutter.not.opened.title"), Bundle.message("gutter.not.opened.message", FailureText.of(ex)))
@@ -155,19 +120,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         });
     }
 
-    /**
-     * UC-CODEGEN-007, Rule-CODEGEN-069.
-     * <p>
-     * The click found nothing, which is an ordinary answer rather than a
-     * failure: generated code outlives the test case it was written from, so a
-     * method whose case has been removed still carries the mark and still names
-     * an id. It went to the log alone, and the tester clicking got no answer at
-     * all (#245).
-     * <p>
-     * A soft refusal rather than a notification that stays, because it is
-     * feedback on the click just made and the remedy - open the test set, or
-     * delete the method - is theirs either way.
-     */
+    // UC-CODEGEN-007, Rule-CODEGEN-069
     private static void refuseMissingCase(final @NotNull Project p, final @NotNull UUID uuid, final @NotNull String methodName) {
         Logger.info("No test case behind " + methodName + ": " + uuid);
 

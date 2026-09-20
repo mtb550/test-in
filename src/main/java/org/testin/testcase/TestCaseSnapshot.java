@@ -38,49 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * What a handful of test cases looked like at one moment: the ones that were
- * there, and the ids that were not. Applying it makes that moment true again,
- * which is the whole of undo and redo for test data.
- * <p>
- * Absence is a list of ids rather than a null or a placeholder case, so taking
- * back a creation and taking back an edit are one piece of code: one puts a
- * case back, the other takes one away, and no reader asks which it is. That is
- * also why every gesture takes the same snapshot - the ids it is about to
- * touch, before and after - instead of a record shaped like the gesture.
- * <p>
- * The cases are deep copies. Every write path hands the indexer the DTO it is
- * already holding and the indexer keeps that object, so a snapshot of
- * references would be a snapshot of whatever the change is about to do to them.
- * <p>
- * A case appearing or disappearing takes its generated method with it, the way
- * the create and remove actions do. Restoring the JSON alone left the set and
- * the generated class disagreeing - the case back on the card, no method to run
- * it - until something else happened to regenerate. What a case's fields
- * generate is a different question and stays with #153.
- */
 public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @NotNull List<TestCaseDto> present, @NotNull List<UUID> absent) {
-
-    /**
-     * UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-228.
-     * <p>
-     * How these ids stand in this test set right now.
-     * <p>
-     * Called twice around a change - once before, once after - and the pair is
-     * the operation. An id this set holds no case for lands in {@code absent},
-     * which is what a case that has not been created yet, has just been
-     * removed, or has just been moved out looks like.
-     * <p>
-     * <b>In this set, not anywhere.</b> Cases were looked up by id across the
-     * whole project, so a case that had moved to another set still counted as
-     * present here. A cut-and-paste records the destination as "absent here"
-     * before the paste, and once Ctrl+Z had put the case back in its source
-     * set it existed again - so that snapshot could never stand, and Ctrl+Y
-     * refused with "These test cases changed since" and blamed a sync, a pull or
-     * another IDE for a change nobody had made (#66, finding 178). The source's
-     * after-snapshot was wrong the same way: it recorded the moved case as still
-     * present in the set it had left.
-     */
+    // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-228
     public static @NotNull TestCaseSnapshot of(final @NotNull Project p, final @NotNull Path testSetPath, final @NotNull List<UUID> ids) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         final @NotNull List<TestCaseDto> present = new ArrayList<>(ids.size());
@@ -94,68 +53,26 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return new TestCaseSnapshot(p, testSetPath, present, absent);
     }
 
-    /**
-     * UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-067.
-     * <p>
-     * How a gesture over these cases is named in the undo menu - "Undo Remove
-     * 'Log in with a valid user'", "Undo Update 4 test cases". The case's own
-     * words when there is one, because that is what the tester recognizes it
-     * by, and a count when there are more of them than a sentence would hold.
-     */
+    // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-067
     public static @NotNull String describe(final @NotNull String verb, final @NotNull List<TestCaseDto> cases) {
         return cases.size() == 1
                 ? Bundle.message("snapshot.undo.one", verb, cases.getFirst().getDescription())
                 : Bundle.message("snapshot.undo.many", verb, String.valueOf(cases.size()));
     }
 
-    /**
-     * The ids of a selection, which is what every call site has in its hand.
-     */
     public static @NotNull List<UUID> idsOf(final @NotNull List<TestCaseDto> cases) {
         return cases.stream().map(TestCaseDto::getId).toList();
     }
 
-    /**
-     * UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-038.
-     * <p>
-     * Records a change that has already happened, so CTRL+Z can put it back.
-     * <p>
-     * One operation for the whole gesture, whatever its size: a bulk edit over
-     * forty cases is one press to undo, because the snapshot either side of it
-     * covers all forty. Pushing inside the loop is what would make it forty.
-     * <p>
-     * Whatever is on screen is told afterwards, by path - see
-     * {@link #tellTheSurfaces}.
-     */
+    // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-038
     public static void record(final @NotNull Project p, final @NotNull String description, final @NotNull TestCaseSnapshot before, final @NotNull TestCaseSnapshot after) {
         record(p, UndoScope.of(before.testSetPath()), description, List.of(before), List.of(after));
     }
 
-    /**
-     * UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-070.
-     * <p>
-     * The same, for a gesture that touches more than one test set - a cut in
-     * one and a paste into another is a single press of CTRL+Z, so it is a
-     * single operation over both sets rather than one operation each. It lands
-     * in the editor the tester made the gesture in, which is the one they will
-     * press the key in.
-     */
+    // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-070
     public static void record(final @NotNull Project p, final @NotNull UndoScope scope, final @NotNull String description, final @NotNull List<TestCaseSnapshot> before, final @NotNull List<TestCaseSnapshot> after) {
-        // Nothing changed, so there is nothing to take back - and pushing it
-        // anyway would spend a press of CTRL+Z on a gesture that did nothing
-        // while dropping a real one off the end of a bounded stack.
         if (same(before, after)) return;
 
-        // Pushed on the EDT, once, here: the two actions read the stacks from
-        // update(), which the platform runs on the EDT, and a grid cell
-        // persists from a pooled thread. Said in one place so that no call site
-        // has to remember which thread it is on.
-        // The four-argument form, so both reversals can answer. The
-        // three-argument one wraps a Runnable in a supplier that returns true
-        // whatever happened, and restore can refuse - the tester then read
-        // "These test cases changed since" and "Undone" on one press, saying
-        // opposite things (#66, finding 75). Nothing is held aside here, which
-        // is what the empty forget says.
         ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, UndoHistories.class).push(scope, new UndoHistories.Operation(
                 description,
                 () -> restore(p, before, after),
@@ -164,23 +81,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
                 })));
     }
 
-    /**
-     * UC-INTERNAL-004, Rule-INTERNAL-063.
-     * <p>
-     * Puts a moment back, unless something else has changed the cases since.
-     * <p>
-     * {@code expected} is how they stood when this operation was recorded. A
-     * sync, a Git pull or another IDE may have written over them in the
-     * meantime, and their work is not this operation's to overwrite - so it
-     * refuses and says so rather than writing.
-     * <p>
-     * <b>Answers whether it wrote</b>, because the refusal above is the
-     * tester's answer and nothing may be said over it. It returned void, so
-     * every undo of a test-case change reported {@code true} and CTRL+Z after a
-     * colleague's sync raised two balloons that contradicted each other: the
-     * refusal, and "Undone" on top of it. The tree path has answered since
-     * #275; this is the other half of that pair (#66, finding 75).
-     */
+    // UC-INTERNAL-004, Rule-INTERNAL-063
     private static boolean restore(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> target, final @NotNull List<TestCaseSnapshot> expected) {
         if (!expected.stream().allMatch(TestCaseSnapshot::stillStands)) {
             Services.getInstance(p, Notifier.class).softRefuse(p,
@@ -189,35 +90,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
             return false;
         }
 
-        // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-215.
-        //
-        // Every removal first, then every restoration - not each snapshot in
-        // turn. A cut keeps the case's id, so undoing a cut-and-paste asks for
-        // the same id to be present in the source and absent in the destination,
-        // and the order those two are applied in decides whether the tester
-        // keeps their test cases.
-        //
-        // Snapshot at a time, the source put case X back and the destination
-        // then found that very case - by id, globally - and deleted it. The
-        // tester cut from A, pasted into B, pressed CTRL+Z, and the cases
-        // vanished from both: the JSON still on disk in A but out of the index,
-        // so nothing drew it, and the generated methods gone. Redo could not
-        // recover it either, because the before snapshot no longer stood (#66,
-        // finding 66 - the worst data-loss path found).
-        //
-        // In two phases it is right for every shape of move. Across two sets the
-        // destination gives X up before the source takes it back. Within one
-        // set - where both snapshots name the same path, so no test of the path
-        // could have told them apart - X is removed and then restored, which is
-        // the state being asked for. A copy-and-paste is unaffected either way:
-        // its ids are fresh, so nothing overlaps.
-        //
-        // Every snapshot tries, whatever the one before it answered. The files
-        // are written off the EDT, under a bar that cannot be canceled, the way
-        // the tree's undo puts nodes back: a case half put back is worse than one
-        // not put back. Undoing a removal of forty cases wrote forty files while
-        // the IDE stood still (#66, finding 224). The code follows on the EDT,
-        // from what the files took.
+        // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-215
         final @NotNull Written written = new Written();
         final boolean allBack = ProgressManager.getInstance().<Boolean, RuntimeException>runProcessWithProgressSynchronously(() -> {
             boolean all = true;
@@ -231,61 +104,20 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return allBack;
     }
 
-    /**
-     * What putting the snapshots back did to the files, kept for the code that
-     * follows on the EDT: the cases taken out, the ones coming back from a
-     * removal, and every one written.
-     */
     private record Written(@NotNull List<TestCaseDto> removed, @NotNull List<TestCaseDto> comingBack, @NotNull List<TestCaseDto> landed) {
-
         Written() {
             this(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         }
 
-        /**
-         * One call per kind. Only executeAll opens the single write command, so
-         * taking back a removal of forty cases used to put forty entries on the
-         * IDE's own undo history (#66, finding 80).
-         */
         void generate(final @NotNull Project p) {
             if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
             if (!comingBack.isEmpty()) GenType.CREATE_TEST_CASE.executeAll(p, comingBack);
 
-            // UC-CODEGEN-002, Rule-CODEGEN-068.
-            //
-            // The case came back; its code comes back with it. Restoring put the
-            // data back and left the method saying whatever the change being
-            // undone had made it say - the new name after undoing a rename, the
-            // new groups after undoing a group change, the new position after
-            // undoing a drag. The tester took the change back and only half of it
-            // went.
-            //
-            // Every part rather than the one that moved, because a snapshot is
-            // the case as it was and not a list of what changed. Silent where a
-            // case has no method, and it writes none: a method deleted on purpose
-            // stays deleted.
-            //
-            // Only for the cases that were written: a method rewritten to match a
-            // case the disk never took would describe a case that is not there.
+            // UC-CODEGEN-002, Rule-CODEGEN-068
             if (!landed.isEmpty()) GenType.RECONCILE_TEST_CASE.executeAll(p, landed);
         }
     }
 
-    /**
-     * Brings whatever is on screen back in line with what was just written: the
-     * editor open on each set, and the details panel when it is showing one of
-     * these cases.
-     * <p>
-     * Found by path, not held. Every call site used to hand over its own refresh,
-     * which in practice meant handing over the editor it was standing in - and an
-     * editor closed and reopened between the change and the undo is a different
-     * object. The old one is disposed, its toolbar emptied with it, so reloading
-     * it threw on the first item it asked for.
-     * <p>
-     * The data only, so the filters and the search the tester narrowed the view
-     * with survive an undo. Refresh drops those because a tester pressing Refresh
-     * means it; nobody pressing CTRL+Z does.
-     */
     private static void tellTheSurfaces(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> written) {
         final @NotNull TestinEditors editors = Services.getInstance(p, TestinEditors.class);
 
@@ -303,36 +135,16 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return true;
     }
 
-    /**
-     * Whether the index still holds exactly what this snapshot says it did, in
-     * the test set it says it did.
-     * <p>
-     * The set is asked as well as the cases because the cases are found by id,
-     * which a rename or removal of their set does not change. Undoing a
-     * cut-and-paste after the source set was renamed passed on the ids alone,
-     * then took the cases out of the destination and threw putting them back
-     * into a set no longer indexed - so they ended up in neither (#312, A82).
-     */
     private boolean stillStands() {
         return Services.getInstance(p, ProjectIndexer.class).nodeExists(testSetPath) && sameAs(of(p, testSetPath, ids()));
     }
 
-    /**
-     * Every id this snapshot speaks for, present and absent alike - which is
-     * how a caller takes the matching snapshot again later.
-     */
     public @NotNull List<UUID> ids() {
         final @NotNull List<UUID> ids = new ArrayList<>(idsOf(present));
         ids.addAll(absent);
         return ids;
     }
 
-    /**
-     * Compared as the JSON they are stored as, because a test case is a Lombok
-     * DTO with no value equality and adding one would change how every map and
-     * set in the plugin treats it. The JSON is also exactly what a difference
-     * would mean here: the bytes on disk are not what this snapshot took.
-     */
     private boolean sameAs(final @NotNull TestCaseSnapshot other) {
         return absent.equals(other.absent) && asJson().equals(other.asJson());
     }
@@ -342,25 +154,10 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return present.stream().map(mapper::writeValueAsString).sorted().toList();
     }
 
-    /**
-     * UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-215.
-     * <p>
-     * The cases this snapshot says are gone, taken out of the index.
-     * <p>
-     * Its own half of the work because {@link #restore} runs every snapshot's
-     * removals before any snapshot's restorations - see the comment there for
-     * what went wrong when it did not.
-     * <p>
-     * Answers whether every one of them went. A case whose file the system
-     * would not delete is still there, the writer has said why, and the undo is
-     * not confirmed over it (#66, finding 292).
-     */
+    // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-215
     private boolean removeAbsent(final @NotNull Written written) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-        // Only what is actually there. An id that is already gone is the state
-        // this asks for, and deleting a file twice is a warning in the log for
-        // a job already done.
         final @NotNull List<TestCaseDto> stillThere = absent.stream().flatMap(id -> indexer.findTestCase(id).stream()).toList();
 
         boolean allWent = true;
@@ -372,49 +169,15 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return allWent;
     }
 
-    /**
-     * UC-EDITOR-PANEL-017.
-     * <p>
-     * The cases this snapshot holds, put back as they were.
-     * <p>
-     * Answers whether every one of them was written. A case whose write was
-     * refused is still as it was, the writer has said why, and the undo is not
-     * confirmed over it (#66, finding 285).
-     */
+    // UC-EDITOR-PANEL-017
     private boolean restorePresent(final @NotNull Written written) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-        // The set the cases belong to, put back on them before anything reads
-        // them.
-        //
-        // A snapshot's cases are deep copies, and a copy goes through JSON,
-        // where the parent is @JsonIgnore - so every case in one carries an
-        // empty test set. That is the path the whole of code generation is
-        // derived from: with it empty, Fqcn.ofMethod answers "DefaultTest",
-        // which no class is called, and every generator quietly found nothing.
-        // Undoing a rename left the method named after the new description,
-        // undoing a group change left the groups, and undoing a removal never
-        // wrote the method back.
-        //
-        // Worse than that, the parent-less copy was what went into the index, so
-        // a single CTRL+Z left the case with no way to name its own class until
-        // the next rescan (#66, finding 44).
         final @NotNull TestSetDirectoryDto parent = indexer.getTestSetByPath(testSetPath);
         present.forEach(tc -> tc.setParent(parent));
 
-        // Verbatim, so the case comes back with the audit it had. Written
-        // through putTestCase it would be stamped as modified by whoever
-        // pressed CTRL+Z, which says the opposite of what just happened (#164).
-        //
-        // A copy per write for the same reason the snapshot is a copy: the
-        // indexer keeps the object it is given, and this snapshot may be
-        // applied again by the next redo.
         boolean allBack = true;
         for (final TestCaseDto tc : present) {
-            // A case the index has never heard of is one coming back from a
-            // removal rather than one being edited back, and only the first
-            // needs a method written. Asked before the save, because after it
-            // every case is there.
             final boolean isComingBack = indexer.findTestCase(tc.getId()).isEmpty();
 
             final @NotNull TestCaseDto stored = copy(p, tc);

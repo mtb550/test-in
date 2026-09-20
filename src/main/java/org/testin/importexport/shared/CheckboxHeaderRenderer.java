@@ -40,4 +40,3 @@ public class CheckboxHeaderRenderer implements TableCellRenderer {
         return headerCheckbox;
     }
 }
-

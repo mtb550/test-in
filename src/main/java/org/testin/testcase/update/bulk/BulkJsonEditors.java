@@ -48,17 +48,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.IntFunction;
 
-/**
- * The bulk editor pair: the original JSON on the left, read-only, and an
- * editable copy on the right where only the values are writable.
- * <p>
- * A framework dialog component, so the bulk dialogs declare it as content
- * instead of assembling a popup themselves. It knows about editable ranges and
- * nothing else - a value per test case or an item of an array per test case
- * look identical from here, which is why one component serves both dialogs.
- */
 final class BulkJsonEditors implements DialogComponent {
-
     private final @NotNull Project p;
 
     private final @NotNull Document leftDoc;
@@ -73,10 +63,6 @@ final class BulkJsonEditors implements DialogComponent {
     private final @NotNull TextAttributes leftLineAttr = new TextAttributes();
     private final @NotNull Disposable docListenerDisposable = Disposer.newDisposable();
 
-    /**
-     * The escaped text each value started as, by marker index. Diff highlighting
-     * compares against it; the dialogs know what "original" means, this does not.
-     */
     private @NotNull IntFunction<String> originalTextAt = index -> "";
 
     BulkJsonEditors(final @NotNull Project p) {
@@ -87,7 +73,6 @@ final class BulkJsonEditors implements DialogComponent {
         BulkJsonEditor.setupEditorAppearance(leftEditor, p);
         leftEditor.getContentComponent().setFocusable(false);
         leftEditor.getSettings().setCaretRowShown(false);
-        // The left side is context, not a place to put a caret.
         leftEditor.addEditorMouseListener(new EditorMouseListener() {
             @Override
             public void mousePressed(final @NotNull EditorMouseEvent event) {
@@ -96,15 +81,11 @@ final class BulkJsonEditors implements DialogComponent {
         });
 
         rightDoc = EditorFactory.getInstance().createDocument("");
-        // Silences the platform's "cannot modify" popup when a keystroke lands
-        // on a guarded block; the guard still refuses the edit.
         EditorActionManager.getInstance().setReadonlyFragmentModificationHandler(rightDoc, e -> {
         });
         rightEditor = EditorFactory.getInstance().createEditor(rightDoc, p);
         BulkJsonEditor.setupEditorAppearance(rightEditor, p);
 
-        // A scheme that defines no caret row color gets the one this dialog
-        // would have drawn anyway, light or dark.
         final @NotNull Color caretRowColor = Optional
                 .ofNullable(rightEditor.getColorsScheme().getColor(EditorColors.CARET_ROW_COLOR))
                 .orElseGet(() -> new JBColor(Gray._245, Gray._50));
@@ -134,16 +115,7 @@ final class BulkJsonEditors implements DialogComponent {
         }.registerCustomShortcutSet(new CustomShortcutSet(keyStroke), target);
     }
 
-    /**
-     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-040.
-     * <p>
-     * Replaces both sides. The editable ranges are offsets into the right text;
-     * everything between and around them becomes a guarded block, so the JSON
-     * shape cannot be typed over.
-     * <p>
-     * Called once by the value dialog and again on every add or remove by the
-     * array dialog, which is why the previous guards are torn down first.
-     */
+    // UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-040
     void setContent(final @NotNull String leftText, final @NotNull String rightText, final @NotNull List<int[]> editableRanges) {
         WriteCommandAction.runWriteCommandAction(p, () -> {
             for (final RangeMarker guard : guardBlocks) rightDoc.removeGuardedBlock(guard);
@@ -172,10 +144,6 @@ final class BulkJsonEditors implements DialogComponent {
         });
     }
 
-    /**
-     * What each value started as, by marker index, so an untouched value can be
-     * told from an edited one.
-     */
     void setOriginalTextSource(final @NotNull IntFunction<String> originalTextAt) {
         this.originalTextAt = originalTextAt;
     }
@@ -184,12 +152,6 @@ final class BulkJsonEditors implements DialogComponent {
         return markers.size();
     }
 
-    /**
-     * The current text of one value, empty when its marker did not survive an
-     * edit - the caller decides what an unreadable value means. An Optional
-     * rather than an empty string, because a value the tester cleared is an
-     * answer and an unreadable one is not (#71).
-     */
     @NotNull Optional<String> valueAt(final int index) {
         final @NotNull RangeMarker marker = markers.get(index);
         if (!marker.isValid()) return Optional.empty();
@@ -197,10 +159,6 @@ final class BulkJsonEditors implements DialogComponent {
         return Optional.of(rightDoc.getText(new TextRange(marker.getStartOffset(), marker.getEndOffset())));
     }
 
-    /**
-     * The value indices under carets, deduplicated and ordered last-first so a
-     * caller mutating a list by index stays valid as it goes.
-     */
     @NotNull List<Integer> indicesUnderCarets() {
         final @NotNull List<Integer> indices = new ArrayList<>();
 
@@ -213,9 +171,6 @@ final class BulkJsonEditors implements DialogComponent {
         return indices;
     }
 
-    /**
-     * Puts the caret at the end of one value, which is where typing continues.
-     */
     void focusValue(final int index) {
         if (index < 0 || index >= markers.size()) return;
 
@@ -223,12 +178,7 @@ final class BulkJsonEditors implements DialogComponent {
         if (marker.isValid()) rightEditor.getCaretModel().moveToOffset(marker.getEndOffset());
     }
 
-    /**
-     * UC-EDITOR-PANEL-007.
-     * <p>
-     * Moves to the neighboring value. Reads the marker offsets live, because a
-     * position captured when the text was built goes stale as soon as anyone types.
-     */
+    // UC-EDITOR-PANEL-007
     void navigate(final int direction, final boolean wrap) {
         if (markers.isEmpty()) return;
 
@@ -243,34 +193,18 @@ final class BulkJsonEditors implements DialogComponent {
         focusValue(target);
     }
 
-    /**
-     * UC-EDITOR-PANEL-007.
-     * <p>
-     * Ctrl+Shift+A: one caret at the end of every value.
-     */
+    // UC-EDITOR-PANEL-007
     void caretOnEveryValue() {
         BulkJsonEditor.placeCaretOnAll(rightEditor, liveMarkers());
         refreshRowHighlights();
     }
 
-    // ------------------------------------------------------------------
-    // Behavior installed once, in the constructor.
-    // ------------------------------------------------------------------
-
-    /**
-     * Releases both editors. The platform does not reclaim them with the popup,
-     * so the dialog calls this when it closes.
-     */
     void release() {
         Disposer.dispose(docListenerDisposable);
         if (!leftEditor.isDisposed()) EditorFactory.getInstance().releaseEditor(leftEditor);
         if (!rightEditor.isDisposed()) EditorFactory.getInstance().releaseEditor(rightEditor);
     }
 
-    /**
-     * A caret that lands on the JSON around a value is pulled to the nearest
-     * place it can actually type.
-     */
     private void installCaretSnapping() {
         rightEditor.getCaretModel().addCaretListener(new CaretListener() {
             @Override
@@ -294,12 +228,7 @@ final class BulkJsonEditors implements DialogComponent {
         });
     }
 
-    /**
-     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-043.
-     * <p>
-     * Values that differ from what they started as get a green background, so an
-     * edit is visible without comparing the two sides by eye.
-     */
+    // UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-043
     private void installDiffHighlighting() {
         rightDoc.addDocumentListener(new DocumentListener() {
             @Override
@@ -332,9 +261,6 @@ final class BulkJsonEditors implements DialogComponent {
         }
     }
 
-    /**
-     * The two sides scroll as one, so a value always faces what it started as.
-     */
     private void installScrollSync() {
         leftEditor.getScrollingModel().addVisibleAreaListener(e -> {
             final int target = e.getNewRectangle().y;
@@ -350,10 +276,6 @@ final class BulkJsonEditors implements DialogComponent {
         });
     }
 
-    /**
-     * Ctrl+Click adds or removes a caret, so the same edit can be typed into
-     * several values at once.
-     */
     private void installMultiCaretClick() {
         rightEditor.addEditorMouseListener(new EditorMouseListener() {
             @Override
@@ -369,8 +291,6 @@ final class BulkJsonEditors implements DialogComponent {
                     position = rightEditor.logicalToVisualPosition(rightEditor.offsetToLogicalPosition(snapped));
                 }
 
-                // Clicking a spot that already has a caret takes it away, unless
-                // it is the last one; clicking anywhere else adds one.
                 final @NotNull CaretModel caretModel = rightEditor.getCaretModel();
                 final @NotNull VisualPosition clicked = position;
                 Optional.ofNullable(caretModel.getCaretAt(clicked)).ifPresentOrElse(
@@ -383,9 +303,6 @@ final class BulkJsonEditors implements DialogComponent {
         });
     }
 
-    /**
-     * Highlights the left-hand line facing each caret, so the pair reads as rows.
-     */
     private void refreshRowHighlights() {
         if (leftEditor.isDisposed() || rightEditor.isDisposed()) return;
 
@@ -401,10 +318,6 @@ final class BulkJsonEditors implements DialogComponent {
         }
     }
 
-    /**
-     * The value containing this offset, or -1 when the offset is in the JSON
-     * around the values.
-     */
     private int indexAt(final int offset) {
         for (int i = 0; i < markers.size(); i++) {
             final @NotNull RangeMarker marker = markers.get(i);
@@ -412,10 +325,6 @@ final class BulkJsonEditors implements DialogComponent {
         }
         return -1;
     }
-
-    // ------------------------------------------------------------------
-    // DialogComponent.
-    // ------------------------------------------------------------------
 
     private @NotNull List<RangeMarker> liveMarkers() {
         return markers.stream().filter(RangeMarker::isValid).toList();
@@ -433,7 +342,6 @@ final class BulkJsonEditors implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // Nothing here submits on its own; Enter is a declared shortcut.
     }
 
     @Override
@@ -441,22 +349,11 @@ final class BulkJsonEditors implements DialogComponent {
         return true;
     }
 
-    /**
-     * False because a Swing key binding on an editor is not reached: an IntelliJ
-     * editor consumes keys through its own action handlers first, so Enter
-     * inserted a newline instead of saving. {@link #bindKeysToEditor} registers
-     * the same declaration through the action system instead.
-     */
     @Override
     public boolean acceptsDialogKeys() {
         return false;
     }
 
-    /**
-     * Binds the dialog's declared shortcuts on the editor through the action
-     * system, which is what an editor listens to. The declaration is still the
-     * one source - the status bar renders from it and this binds from it.
-     */
     void bindKeysToEditor(final @NotNull List<StatusBarShortcut> shortcuts) {
         final @NotNull JComponent target = rightEditor.getContentComponent();
 
@@ -467,20 +364,12 @@ final class BulkJsonEditors implements DialogComponent {
             final @NotNull Runnable action = Objects.requireNonNull(shortcut.action());
             register(action, key.getKey(), target);
 
-            // Shift+Enter saves as well, and the strip says so (#211). It exists
-            // so the gesture that normally inserts a line break cannot put a
-            // newline inside a value the JSON shape says is one line - and a key
-            // that works without being named is a key nobody finds.
             if (key == Shortcuts.Enter) {
                 register(action, Shortcuts.ConfirmAlternative.getKey(), target);
             }
         }
     }
 
-    /**
-     * Called once the dialog is on screen: the first value takes the caret, and
-     * the row highlight follows it.
-     */
     void focusFirstValue() {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (leftEditor.isDisposed() || rightEditor.isDisposed()) return;

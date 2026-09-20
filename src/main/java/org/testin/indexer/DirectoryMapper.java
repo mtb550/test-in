@@ -44,7 +44,6 @@ import java.nio.file.Path;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class DirectoryMapper {
-
     public @NotNull TestProjectDirectoryDto setTestProjectNode(final @NotNull Project p, final @NotNull Path path) {
         final @NotNull String fileName = path.getFileName().toString();
 
@@ -180,18 +179,10 @@ public final class DirectoryMapper {
         }
     }
 
-    /**
-     * Builds a run node without reading the marker file (used when creating a new run).
-     */
     public @NotNull TestRunDirectoryDto setTestRunNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
-        // The marker a new run starts with, rather than none at all: what the
-        // builder would have defaulted to, said out loud.
         return buildTestRunNode(p, path, parent, new TestRunMarker());
     }
 
-    /**
-     * Builds a run node, reading its marker from disk (used when indexing an existing run).
-     */
     public @NotNull TestRunDirectoryDto getTestRunNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final @NotNull String fileName = path.getFileName().toString();
         final @NotNull TestRunMarker marker = Services.getInstance(p, ProjectIndexer.class).readMarker(path, DirectoryType.TR, fileName);
@@ -221,5 +212,4 @@ public final class DirectoryMapper {
             throw new RuntimeException(ex);
         }
     }
-
 }

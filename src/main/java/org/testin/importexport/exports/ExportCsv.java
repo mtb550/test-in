@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ExportCsv {
-
     // UC-SHARE-002
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), StandardCharsets.UTF_8))) {
@@ -55,7 +54,6 @@ public class ExportCsv {
             Logger.error(ex.getMessage());
             throw new RuntimeException(ex);
         }
-
     }
 
     private @NotNull String escapeCsvField(final @NotNull String value) {
@@ -69,4 +67,3 @@ public class ExportCsv {
         return value;
     }
 }
-

@@ -26,7 +26,6 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import java.util.List;
 
 public class RemoveJavaClass implements GenAction {
-
     // UC-CODEGEN-018, Rule-CODEGEN-059
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
@@ -42,5 +41,4 @@ public class RemoveJavaClass implements GenAction {
         JavaSourceRoot.writeInRoot(p, "removing class", testSourceRoot ->
                 JavaSourceRoot.deleteUnder(testSourceRoot, packagePath + "/" + fileName, this));
     }
-
 }

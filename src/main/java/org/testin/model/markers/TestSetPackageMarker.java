@@ -28,10 +28,6 @@ import org.testin.model.PackageStatus;
 @Accessors(chain = true)
 @ToString(callSuper = true)
 public class TestSetPackageMarker extends AbstractMarker implements PackageMarker {
-    /**
-     * Archived packages keep everything inside them and sort after the active
-     * ones, left collapsed (#68).
-     */
     @NonNull
     private PackageStatus status = PackageStatus.ACTIVE;
 }

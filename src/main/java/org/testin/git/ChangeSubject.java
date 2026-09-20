@@ -16,28 +16,9 @@
 
 package org.testin.git;
 
-/**
- * What a pending change is about.
- * <p>
- * The review used to know one answer - a test case - and read every {@code .json}
- * in the repository as one. A test run parsed that way came out as a test case
- * with no description, which is why its row showed a blank name; worse, comparing
- * two revisions of it found no test-case field different, so an edited run
- * vanished from the review entirely, and since the commit stages only what the
- * review lists, it could never be committed from here (#66).
- * <p>
- * Every changed file now says which of these it is, so nothing is read as
- * something it is not and nothing drops out.
- */
 public enum ChangeSubject {
-
     TEST_CASE,
 
-    /**
-     * One case's result in one run - a {@code .ri}. A run itself is a folder, so
-     * what the review shows for it is its marker and the results under it: there
-     * is no file that is "the run" any more (#305).
-     */
     RUN_ITEM,
 
     MARKER,

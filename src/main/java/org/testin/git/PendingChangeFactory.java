@@ -38,25 +38,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
-/**
- * Turns one changed file into the change the review shows.
- * <p>
- * What the file is decides how it is read, and the decision is made here rather
- * than by whoever renders a row. It used to read every {@code .json} as a test
- * case, which is how a test run became a nameless row and an edited run became
- * no row at all (#66).
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class PendingChangeFactory {
-
-    /**
-     * UC-SHARE-010, Rule-SHARE-047.
-     * <p>
-     * The change for one file. Always one: a file Git reports as changed is a
-     * file the tester has to be able to commit, and the review is the only place
-     * that can offer it - answering null here used to drop a run, a reorder or
-     * an audit stamp out of the commit entirely (#66).
-     */
+    // UC-SHARE-010, Rule-SHARE-047
     static @NotNull PendingChange fromFile(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper, final @NotNull Function<UUID, Optional<TestCaseDto>> cases) {
         return switch (subjectOf(relativePath)) {
             case TEST_CASE -> testCase(type, beforeJson, afterJson, relativePath, mapper);
@@ -66,19 +50,6 @@ final class PendingChangeFactory {
         };
     }
 
-    /**
-     * What the file is, read from its name.
-     * <p>
-     * The name settles it, through {@link FileKind}: a marker is one of the seven
-     * fixed names, a test case is a {@code .tc}, one case's result a {@code .ri}.
-     * It used to read the file and look for a field - a run carried
-     * {@code results}, a case a description - because nothing in a name said what
-     * a file was, and a hand-placed file could be taken for something it is not.
-     * The names say it now, and the file is never opened to find out (#305).
-     * <p>
-     * Anything else is a file nobody planned for, and it is still listed - what
-     * the review does not show cannot be committed.
-     */
     private static @NotNull ChangeSubject subjectOf(final @NotNull Path relativePath) {
         return switch (FileKind.of(relativePath)) {
             case MARKER -> ChangeSubject.MARKER;
@@ -88,10 +59,6 @@ final class PendingChangeFactory {
         };
     }
 
-    /**
-     * The JSON as a plain map, or empty when there is nothing readable there.
-     * Used to ask what a file is before committing to a type for it.
-     */
     private static @NotNull Map<String, Object> fieldsIn(final @NotNull Mapper mapper, final @NotNull String json) {
         if (json.isBlank()) return Map.of();
 
@@ -102,7 +69,6 @@ final class PendingChangeFactory {
             return Map.of();
         }
     }
-
 
     private static @NotNull PendingChange testCase(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper) {
         final @NotNull String testSet = parentName(relativePath);
@@ -125,9 +91,6 @@ final class PendingChangeFactory {
                 final @NotNull TestCaseDto newState = read(mapper, afterJson, TestCaseDto.class);
                 final @NotNull List<FieldChange> fieldChanges = TestCaseChangeComparator.compare(oldState, newState);
 
-                // A test case file that changed with no reviewable field
-                // different - a reordering, an audit stamp - is still a change
-                // to commit, so it gets the row it needs to be selected on.
                 yield new PendingChange(ChangeSubject.TEST_CASE, newState.getDescription(), testSet,
                         newState.getId().toString(), relativePath, DiffType.MODIFIED, oldState,
                         fieldChanges.isEmpty()
@@ -137,19 +100,7 @@ final class PendingChangeFactory {
         };
     }
 
-    /**
-     * UC-SHARE-010, Rule-SHARE-047.
-     * <p>
-     * One case's result in one run, named by the case rather than by the file:
-     * {@code 4fd2a19b-….ri} says nothing to a tester, and the description of the
-     * case it is about says everything (#305, S22). The test set beside it comes
-     * from the same place, so a result reads where its case reads.
-     * <p>
-     * The case is asked of the index, which is the one thing that knows it - a
-     * result holds the verdict, not the case. A case this repository's project
-     * does not hold, or one removed since, leaves the id in its place: a row a
-     * tester can still select and commit says more than no row at all.
-     */
+    // UC-SHARE-010, Rule-SHARE-047
     private static @NotNull PendingChange runItem(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper, final @NotNull Function<UUID, Optional<TestCaseDto>> cases) {
         final @NotNull Optional<UUID> caseId = FileKind.RUN_ITEM.idIn(relativePath);
         final @NotNull Optional<TestCaseDto> tc = caseId.flatMap(cases);
@@ -171,10 +122,6 @@ final class PendingChangeFactory {
                 relativePath, type, nothingCommitted(), changes);
     }
 
-    /**
-     * A marker change, described by the one thing in it a tester recognizes:
-     * its status. Everything else it holds is the audit the plugin fills in.
-     */
     private static @NotNull PendingChange marker(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper) {
         final @NotNull String node = parentName(relativePath);
         final @NotNull String before = statusIn(mapper, beforeJson);
@@ -189,9 +136,6 @@ final class PendingChangeFactory {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
         changes.add(new FieldChange(relativePath.getFileName().toString(), before, after, changeType));
 
-        // A test run's own facts live in its marker, so a .tr that changed says
-        // which of them did - the configuration, the execution - the way a test
-        // case's file says which of its fields changed (#305, D6).
         if (type == DiffType.MODIFIED && DirectoryType.byMarker(relativePath.getFileName().toString()).filter(kind -> kind == DirectoryType.TR).isPresent()) {
             changes.addAll(TestRunChangeComparator.compareFacts(
                     read(mapper, beforeJson, TestRunMarker.class), read(mapper, afterJson, TestRunMarker.class)));
@@ -200,13 +144,7 @@ final class PendingChangeFactory {
         return new PendingChange(ChangeSubject.MARKER, node, "", "", relativePath, type, nothingCommitted(), changes);
     }
 
-    /**
-     * UC-SHARE-010.
-     * <p>
-     * The row for a file that could not be read at all - deleted between the
-     * status and the read, or written by something else. It says only what Git
-     * said, which is enough to select it and commit it.
-     */
+    // UC-SHARE-010
     static @NotNull PendingChange unreadable(final @NotNull DiffType type, final @NotNull Path relativePath) {
         return other(type, relativePath);
     }
@@ -223,20 +161,12 @@ final class PendingChangeFactory {
                 List.of(new FieldChange(relativePath.toString(), "", "", changeType)));
     }
 
-    /**
-     * The status inside a marker, or blank when the file is not there or does
-     * not carry one. Read as a map because seven marker classes hold different
-     * statuses and this needs the word, not the type.
-     */
     private static @NotNull String statusIn(final @NotNull Mapper mapper, final @NotNull String json) {
         final @NotNull Object status = fieldsIn(mapper, json).get("status");
         return Objects.toString(status, "");
     }
 
     private static @NotNull String parentName(final @NotNull Path relativePath) {
-        // A file at the repository's root has no parent - the test project's own
-        // marker is one - so the Optional starts at the call, not after a
-        // @NotNull local that said otherwise (#66, finding 265).
         return Optional.ofNullable(relativePath.getParent()).map(Path::getFileName).map(Path::toString).orElse("");
     }
 
@@ -245,11 +175,6 @@ final class PendingChangeFactory {
         return mapper.readValue(json, type);
     }
 
-    /**
-     * What a change with no committed side carries there: an empty test case,
-     * which nothing reads, because the change's type already says there is
-     * nothing to put back (#66, finding 286).
-     */
     private static @NotNull TestCaseDto nothingCommitted() {
         return TestCaseDto.builder().build();
     }

@@ -39,17 +39,6 @@ import org.testin.util.Icons;
 import java.util.*;
 import java.util.function.Supplier;
 
-/**
- * The toolbar's filter: a check-box list of every value a column can hold, with
- * the test cases narrowing as boxes are ticked.
- * <p>
- * <b>Deliberately not a framework dialog</b> (#69). Every dialog on
- * {@code ui.framework} is a question: it opens, it is answered, it closes, and a
- * strip along the bottom names the keys that answer it. This is the opposite
- * shape - it stays open while the tester ticks five boxes and watches the list
- * shrink, it has nothing to confirm, and closing it is the answer. Giving it a
- * title and a confirming key would add a question nobody asked.
- */
 public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     @Getter
     @NotNull
@@ -67,20 +56,12 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     @NotNull
     private final Set<TestStatus> selectedStatus = new HashSet<>();
 
-    /**
-     * Which automation states the tester is narrowing to, and empty for all of
-     * them.
-     */
     @Getter
     private final Set<Automated> selectedAutomation = new HashSet<>();
 
     @NotNull
     private final Supplier<Set<String>> availableModulesSupplier;
 
-    /**
-     * Every group the project has used, asked for when the menu opens rather
-     * than held - a group typed a second ago belongs on it.
-     */
     private final Supplier<Set<String>> availableGroupsSupplier;
 
     @NotNull
@@ -106,14 +87,6 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         updateToolBarFilterState();
     }
 
-    /**
-     * The five sets a tester can narrow the list with, as one list.
-     * <p>
-     * They were spelled out three times - counted for the badge, tested for the
-     * Reset action, cleared on reset - so a fifth kind of filter meant finding
-     * all three and a missed one showed as a badge that counted something the
-     * Reset button said was not there.
-     */
     private @NotNull List<Set<?>> filters() {
         return List.of(selectedPriority, selectedGroup, selectedModule, selectedStatus, selectedAutomation);
     }
@@ -123,31 +96,11 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         return filters().stream().mapToInt(Set::size).sum();
     }
 
-    /**
-     * Whether the tester has narrowed the list from this popup. Asked by the Reset
-     * action, which hides itself when there is nothing to reset.
-     * <p>
-     * Not the same question as "is the list on screen narrowed", which the status
-     * bar answers for itself by comparing the shown count with the total - that
-     * one also catches a search query and a filter that happens to match
-     * everything, and this one does not.
-     */
     public boolean hasActiveFilters() {
         return activeFilterCount() > 0;
     }
 
-    /**
-     * UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-009.
-     * <p>
-     * What the button says while a filter is on: the count beside the icon, in
-     * the color that means a filter is on, and the button drawn as held down.
-     * <p>
-     * Held down rather than merely tinted, and by the same painter light mode's
-     * pin uses, because that is the look this plugin already gives a button that
-     * is doing something rather than waiting to. A tester who leaves a filter on
-     * and comes back to a screen missing most of its test cases has to see the
-     * reason without looking for it.
-     */
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-009
     public void updateToolBarFilterState() {
         final int activeFiltersCount = activeFilterCount();
 
@@ -170,11 +123,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         onToolBarFilterReset.run();
     }
 
-    /**
-     * UC-EDITOR-PANEL-021, Rule-EDITOR-PANEL-099.
-     * <p>
-     * Clears the UI state without triggering a second editor refresh.
-     */
+    // UC-EDITOR-PANEL-021, Rule-EDITOR-PANEL-099
     public void clearFilters() {
         filters().forEach(Set::clear);
         updateToolBarFilterState();
@@ -190,16 +139,6 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         final @NotNull DefaultActionGroup filterResetBtn = new DefaultActionGroup();
 
         filterResetBtn.add(new DumbAwareAction(Bundle.message("filter.reset"), Bundle.message("filter.reset.description"), AllIcons.Actions.Cancel) {
-            /**
-             * Gray, never gone. It hid itself when there was nothing to reset,
-             * so the popup changed shape under the tester and the one entry that
-             * says "filters exist here" was missing exactly when they had not
-             * found them yet (#312, A28).
-             * <p>
-             * The reason is in the text because a disabled popup entry never
-             * shows its description - the same thing A73 is about, one surface
-             * along.
-             */
             @Override
             public void update(final @NotNull AnActionEvent e) {
                 final boolean anyFilter = hasActiveFilters();
@@ -211,7 +150,6 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
 
             @Override
             public @NotNull ActionUpdateThread getActionUpdateThread() {
-                // BGT on purpose - update() reads only fields/services, never Swing state; do not switch to EDT (#52).
                 return ActionUpdateThread.BGT;
             }
 
@@ -222,25 +160,17 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         });
         filterResetBtn.addSeparator();
 
-        // priority menu
         final @NotNull DefaultActionGroup filterPriorityMenu = new DefaultActionGroup(TestEditorAttributes.PRIORITY.getName(), true);
         Arrays.stream(Priority.values()).forEach(p ->
                 filterPriorityMenu.add(new ToggleFilterAction<>(p.getLabel(), Icons.dot(p.getColor()),
                         p, selectedPriority, FilterMembership.plain(), onChanged)));
         filterResetBtn.add(filterPriorityMenu);
 
-        // automation menu: only the states a tester can act on. "Not read yet"
-        // is not one of them - by the time this popup is open the answer is in,
-        // and nobody can look for cases nobody has looked at.
         final @NotNull DefaultActionGroup filterAutomationMenu = new DefaultActionGroup(Bundle.message("filter.automation"), true);
         Automated.FILTERABLE.forEach(a -> filterAutomationMenu.add(new ToggleFilterAction<>(a.getLabel(), a.getIcon(),
                 a, selectedAutomation, FilterMembership.plain(), onChanged)));
         filterResetBtn.add(filterAutomationMenu);
 
-        // The group menu is dynamic for the same reason the module menu below it
-        // is: a group is a word a tester types, so the list is what the project
-        // has used rather than what an enum shipped (#296). No Group is first and
-        // is not one of them - it is how a tester asks for the cases in none.
         final @NotNull ActionGroup filterGroupMenu = new ActionGroup(TestEditorAttributes.GROUP.getName(), true) {
             // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
             @Override
@@ -258,7 +188,6 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         };
         filterResetBtn.add(filterGroupMenu);
 
-        // module menu is dynamic: modules come from the currently loaded test cases
         final @NotNull ActionGroup filterModuleMenu = new ActionGroup(TestEditorAttributes.MODULE.getName(), true) {
             // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
             @Override
@@ -276,9 +205,6 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         };
         filterResetBtn.add(filterModuleMenu);
 
-        // Asked of the toolbar rather than tested for a class. The event half
-        // of this interface already carries defaults for "only a run does it";
-        // the state half did not, so the buttons tested instead.
         if (callbacks.hasRunStatuses()) {
             final @NotNull DefaultActionGroup filterStatusMenu = new DefaultActionGroup(TestEditorAttributes.STATUS.getName(), true);
             Arrays.stream(TestStatus.values()).forEach(s ->
@@ -286,24 +212,13 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
                             s, selectedStatus, FilterMembership.plain(), onChanged)));
             filterResetBtn.add(filterStatusMenu);
         } else {
-            // A row rather than nothing, so the popup has one shape everywhere
-            // and a tester in a test set learns that a verdict is something a
-            // test run has, rather than wondering where the filter went (#312,
-            // A28). A plain disabled entry rather than an empty submenu, because
-            // a submenu with nothing under it is not reliably drawn at all.
             filterResetBtn.add(nothingToFilterOn(Bundle.message("filter.status.no.run")));
         }
 
         return filterResetBtn;
     }
 
-    /**
-     * UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-098.
-     * <p>
-     * An entry that is there, says what it would filter and cannot: the whole
-     * reason is in the text, because a popup never shows a disabled entry's
-     * description.
-     */
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-098
     private static @NotNull AnAction nothingToFilterOn(final @NotNull String text) {
         return new DumbAwareAction(text) {
             @Override
@@ -313,13 +228,11 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
 
             @Override
             public @NotNull ActionUpdateThread getActionUpdateThread() {
-                // Reads nothing at all, so never the EDT (#52).
                 return ActionUpdateThread.BGT;
             }
 
             @Override
             public void actionPerformed(final @NotNull AnActionEvent e) {
-                // Disabled on every path, so nothing can reach this.
             }
         };
     }

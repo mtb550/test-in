@@ -33,29 +33,11 @@ import org.testin.util.Shortcuts;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Asks which test project this automation repository exercises, once, and keeps
- * the answer on this machine (#8, Rule-TREE-PANEL-106).
- * <p>
- * The only screen that lists every test project under the Testin root, and it
- * appears until a project is chosen. What replaced the dropdown is not another
- * dropdown: the choice is made once and kept on this machine, never written
- * into the code project (Rule-TREE-PANEL-106).
- * <p>
- * Inactive projects are listed with their status rather than hidden. A tester
- * whose project is inactive would otherwise look at a list that does not contain
- * the project they know is there, with nothing saying why.
- */
+// Rule-TREE-PANEL-106
 public final class BindTestProjectDialog extends AbstractFrameworkDialog<SelectionTable> {
-
     private final @NotNull SelectionTable projects;
     private final @NotNull Runnable onBound;
 
-    /**
-     * @param underRoot the test projects to choose from, by name - handed in
-     *                  rather than read here, because both callers have already
-     *                  read the same listing to decide whether to open this at all
-     */
     public BindTestProjectDialog(final @NotNull Project p, final @NotNull Map<String, ProjectStatus> underRoot, final @NotNull Runnable onBound) {
         super(p);
         this.onBound = onBound;
@@ -82,11 +64,6 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
         selectCurrent();
     }
 
-    /**
-     * Opens on the project the repository already names, so a tester who came
-     * here to change the binding sees where it stands rather than an empty
-     * selection.
-     */
     private void selectCurrent() {
         final @NotNull String bound = Services.getInstance(p, BoundTestProject.class).name();
 
@@ -107,10 +84,6 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog<Selecti
         Services.getInstance(p, BoundTestProject.class).choose(projects.getValueAt(selected.getFirst(), 0));
         closeOk();
 
-        // The outcome and nothing else. It was the name under it as well, which
-        // is the one noun left in a confirmation anywhere in the plugin - and the
-        // tester chose that name from the list they are looking at, and the tree
-        // behind the balloon reloads onto it (#66, finding 94).
         Services.getInstance(p, Notifier.class).softShow(p, Done.BOUND);
         onBound.run();
     }

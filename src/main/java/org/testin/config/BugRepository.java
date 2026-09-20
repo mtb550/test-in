@@ -22,42 +22,13 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * The development repository Report Bug files issues in, read out of
- * {@code bugRepoUrl} (#28, P2).
- * <p>
- * Its own parser rather than the {@code RepoUrl} check. That check answers
- * "can Git clone this", which accepts forms {@code gh --repo} cannot use - and
- * once #301 lets it accept {@code file:} URLs and local paths, the gap would
- * widen without anything failing. What {@code gh} needs is exactly a host, an
- * owner and a repository, so an address is kept only when it reduces to those
- * three and nothing more: an address with {@code /issues} after it, a file, a
- * path, or an owner with no repository is refused, and the tester is told.
- *
- * @param host  where the repository lives - {@code github.com}, or a GitHub
- *              Enterprise host
- * @param owner the account or organization that owns it
- * @param name  the repository's own name, without {@code .git}
- */
 public record BugRepository(@NotNull String host, @NotNull String owner, @NotNull String name) {
-
-    /**
-     * The schemes a web or SSH address arrives with. {@code git@host:owner/repo}
-     * has none and is read on its own.
-     */
     private static final @NotNull Pattern SCHEME = Pattern.compile("^(https?|ssh)://");
 
     private static final @NotNull Pattern HOST = Pattern.compile("^[A-Za-z0-9.-]+$");
 
-    /**
-     * An owner or a repository name: the characters GitHub allows in either.
-     */
     private static final @NotNull Pattern PART = Pattern.compile("^[A-Za-z0-9._-]+$");
 
-    /**
-     * The repository an address names, and empty when it does not name exactly
-     * one.
-     */
     public static @NotNull Optional<BugRepository> of(final @NotNull String address) {
         final @NotNull String value = TestinProjectConfig.withoutCredentials(address);
         if (value.isEmpty()) return Optional.empty();
@@ -76,8 +47,6 @@ public record BugRepository(@NotNull String host, @NotNull String owner, @NotNul
         final int slash = rest.indexOf('/');
         if (slash < 0) return Optional.empty();
 
-        // An account before the host, as ssh://git@host carries, and a port
-        // after it, as ssh://host:2222 does, are neither of them the host.
         final @NotNull String authority = rest.substring(0, slash);
         final @NotNull String hostAndPort = authority.substring(authority.lastIndexOf('@') + 1);
         final int port = hostAndPort.indexOf(':');
@@ -98,17 +67,10 @@ public record BugRepository(@NotNull String host, @NotNull String owner, @NotNul
         return Optional.of(new BugRepository(host, parts[0], parts[1]));
     }
 
-    /**
-     * What {@code gh --repo} takes: {@code HOST/OWNER/REPO}, which names the host
-     * too, so a GitHub Enterprise repository is filed where it lives.
-     */
     public @NotNull String ghRepo() {
         return host + "/" + owner + "/" + name;
     }
 
-    /**
-     * How a tester recognizes it: {@code owner/name}.
-     */
     public @NotNull String displayName() {
         return owner + "/" + name;
     }

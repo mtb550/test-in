@@ -29,22 +29,10 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
 import java.util.List;
 
-
-/**
- * UC-TREE-PANEL-005, UC-TREE-PANEL-006.
- * <p>
- * Declared in {@code plugin.xml} (#119) so Find Action offers it, and with no
- * {@code keyboard-shortcut} of its own: ENTER on a tree is that tree's gesture,
- * not a command, and a global ENTER would fire in every editor in the IDE. The
- * tree registers it on the declared instance instead, which keeps one action
- * behind both the menu entry and the key.
- */
+// UC-TREE-PANEL-005, UC-TREE-PANEL-006
 public class OpenAction extends DumbAwareAction {
-
     // UC-TREE-PANEL-005, UC-TREE-PANEL-006, Rule-TREE-PANEL-022
     public static void execute(final @NotNull Project p, final @NotNull List<DirectoryDto> selected) {
-        // Unresolvable nodes are not in the list at all, and one that cannot be
-        // opened is skipped: the rest of the selection still opens.
         selected.stream()
                 .filter(DirectoryDto::isOpenableInEditor)
                 .forEach(dir -> {

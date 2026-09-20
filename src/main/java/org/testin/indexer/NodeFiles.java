@@ -41,39 +41,12 @@ import java.util.function.IntConsumer;
 import java.util.stream.Stream;
 import org.testin.model.FileKind;
 
-/**
- * Where a node's files are: deleting them, moving them, copying them, renaming
- * them - and putting the cache right afterwards, in that order.
- * <p>
- * <b>The ordering rule this class exists to keep.</b> The cache update runs only
- * <b>after</b> the VFS operation succeeded, never before, and only when it
- * succeeded. A marker write creates directories, so a cache update that ran
- * first left a directory the rename then failed on ("already exists in VFS"),
- * and one that ran either way dropped a node the VFS had refused to delete -
- * the tree stopped showing something that was still on disk (#66, F2).
- * <p>
- * <b>Every operation reports what happened</b>, not merely that it is over. The
- * callbacks used to be bare Runnables that fired on both outcomes, so a caller
- * had to read the cache back to find out whether the move it asked for
- * happened.
- * <p>
- * Package-private, and reached only through {@link ProjectIndexer}, which is the
- * single door to file access. It hands itself in as the VFS requestor, so the
- * platform still sees these operations coming from the indexer, and as the way
- * back to the rescan a copy needs.
- */
 @AllArgsConstructor
 final class NodeFiles {
-
     private final @NotNull Project p;
     private final @NotNull ProjectIndexer indexer;
     private final @NotNull IndexerDataStore store;
 
-    /**
-     * Deletes on disk, refreshes, and only then updates the cache - the order
-     * CLAUDE.md requires. The refresh is asynchronous: the synchronous one ran
-     * on the EDT, and a full VFS refresh there is a slow operation.
-     */
     void remove(final @NotNull Path path, final @NotNull Runnable cacheUpdate, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         Services.getInstance(p, VfsExecutor.class).removeVf(p, indexer, path,
                 deleted -> VirtualFileManager.getInstance().asyncRefresh(() -> {
@@ -82,9 +55,6 @@ final class NodeFiles {
                 }));
     }
 
-    /**
-     * Moves the node, and reports whether it moved.
-     */
     void move(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Consumer<@NotNull Boolean> onFinished) {
         final @NotNull Optional<Path> found = Optional.ofNullable(newPath.getParent());
         if (found.isEmpty()) {
@@ -108,18 +78,6 @@ final class NodeFiles {
         }), () -> onFinished.accept(false));
     }
 
-    /**
-     * The index follows a node renamed or moved on disk, then the caller hears
-     * of it on the EDT.
-     * <p>
-     * After the VFS operation and never before it: the cache update writes the
-     * touched marker at the new path, and that write creates directories, so
-     * run first it makes the target exist and the rename fails with "already
-     * exists in VFS". Off the EDT, because it walks every indexed node to
-     * rebuild its breadcrumb and writes the marker - work that ran inside the
-     * VFS write action, beside methods that hop off the EDT to avoid exactly
-     * that (#66, finding 225).
-     */
     private void followOnDisk(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable then) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             store.renameNode(oldPath, newPath);
@@ -127,11 +85,6 @@ final class NodeFiles {
         });
     }
 
-    /**
-     * Copies each source into the target, and reports how many arrived - not how
-     * many were attempted. Every copy runs its own VFS action and any of them
-     * can fail on its own, so the count is the only honest answer.
-     */
     void copy(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final @NotNull IntConsumer onComplete) {
         if (sourcePaths.isEmpty()) {
             onComplete.accept(0);
@@ -141,24 +94,11 @@ final class NodeFiles {
         final @NotNull AtomicInteger pending = new AtomicInteger(sourcePaths.size());
         final @NotNull AtomicInteger copied = new AtomicInteger();
 
-        // The subtrees that actually arrived, waiting to be given fresh ids.
-        // Collected rather than rewritten in place, because the rewrite is a
-        // directory walk plus a read, a write and a delete for every case in
-        // the copy - and the callback that used to do it runs on the UI thread
-        // inside the write action the copy holds. A test set of any size froze
-        // the whole IDE for as long as it took, with no progress bar and no way
-        // to cancel, while the much cheaper re-index beside it had already been
-        // moved off the UI thread.
         final @NotNull List<Path> arrived = new CopyOnWriteArrayList<>();
 
-        // Both outcomes drain the counter, so the tree is still rebuilt when a
-        // copy fails; only the success path raises the count.
         final @NotNull Runnable operationFinished = () -> {
             if (pending.decrementAndGet() != 0) return;
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                // Before the re-index, which is the ordering that matters: the
-                // scanner takes a case's identity from its file name, so the
-                // new ids have to be on disk before the index reads them.
                 arrived.forEach(this::reidentifyCopiedCases);
 
                 indexer.refreshIndexedProject(targetPath);
@@ -189,17 +129,6 @@ final class NodeFiles {
         }
     }
 
-    /**
-     * Renames the node. Unlike the copy and move forms this needs no success
-     * flag: the whole body is one VFS operation, and {@code executeVfsAction}
-     * reports and swallows a failure before the cache update and the callback
-     * are reached.
-     * <p>
-     * Nothing here knows what kind of node it is renaming, and nothing needs to.
-     * A test run briefly did - its results were named after the folder, so the
-     * rename had to carry them - and that special case went away when the name
-     * stopped depending on the folder (#177).
-     */
     void rename(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
         Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, vf -> {
             try {
@@ -213,38 +142,12 @@ final class NodeFiles {
         });
     }
 
-    /**
-     * UC-TREE-PANEL-014, Rule-TREE-PANEL-051.
-     * <p>
-     * Gives every test case in a freshly copied subtree an id of its own.
-     * <p>
-     * A copy is a copy of the files, so the cases in it arrive carrying the ids
-     * of the cases they came from - and a case's id is its identity here: the
-     * index holds one case per id, so the copy and the original would resolve to
-     * the same case, and editing either would edit both. Pasting a single case
-     * has always taken a fresh id; copying a whole set never went through that
-     * code (#51).
-     * <p>
-     * Before the index reads them, and by the file name, because the file name
-     * is what the scanner takes the identity from - the id inside is rewritten
-     * to match so the two never disagree.
-     * <p>
-     * Test runs are left alone. Their file is named for their folder rather than
-     * for an id, so they are not touched by this, and a copied run still refers
-     * to the cases it actually executed.
-     * <p>
-     * A case whose file a tester named by hand comes through here like any
-     * other, and leaves with the name Testin gives - a fresh id, and the file
-     * called after it. The name it had was the tester's on the original, which
-     * keeps it; the copy is a case Testin wrote.
-     */
+    // UC-TREE-PANEL-014, Rule-TREE-PANEL-051
     private void reidentifyCopiedCases(final @NotNull Path copiedRoot) {
         final List<Path> caseFiles;
         final List<Path> markerFiles;
 
         try (Stream<Path> files = Files.walk(copiedRoot)) {
-            // Collected before rewriting: the walk is lazy, and creating and
-            // deleting files under it while it runs is not its contract.
             final @NotNull List<Path> all = files.filter(Files::isRegularFile).toList();
 
             caseFiles = all.stream()
@@ -263,27 +166,12 @@ final class NodeFiles {
         final long given = caseFiles.stream().filter(this::reidentify).count();
         Logger.info("Gave " + given + " of " + caseFiles.size() + " copied test case(s) new ids under " + copiedRoot.getFileName());
 
-        // Rule-INTERNAL-090. The folders too: a copied folder's marker arrives
-        // holding the original's id, and an id names one folder (#305, D5).
+        // Rule-INTERNAL-090
         final long folders = markerFiles.stream().filter(store::giveFreshMarkerId).count();
         Logger.info("Gave " + folders + " of " + markerFiles.size() + " copied folder(s) ids of their own under " + copiedRoot.getFileName());
     }
 
-    /**
-     * UC-TREE-PANEL-014, Rule-TREE-PANEL-051.
-     * <p>
-     * The case under a new id, and the file under the old one removed - in that
-     * order, and the second only once the first has landed.
-     * <p>
-     * The old file was deleted without asking whether the new one had been
-     * written, so a refused write left neither and the copy was silently one
-     * case short (#66, finding 176). Kept, the old file is a copy carrying the
-     * original's id, which the next scan reports as two files claiming one
-     * identity - a problem the tester is told about, where the lost case was
-     * not. The writer has already said the write failed.
-     *
-     * @return whether the case now has its own id.
-     */
+    // UC-TREE-PANEL-014, Rule-TREE-PANEL-051
     private boolean reidentify(final @NotNull Path caseFile) {
         try {
             final @NotNull TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(caseFile.toFile(), TestCaseDto.class);
@@ -292,9 +180,6 @@ final class NodeFiles {
             tc.setId(fresh);
             if (!Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(FileKind.TEST_CASE.fileName(fresh)), tc)) return false;
 
-            // Claimed before it goes, as every other removal is, or the watcher
-            // takes Testin's own delete for an outside change and reads the
-            // project a second time (#312, A8).
             Services.getInstance(OwnWrites.class).record(caseFile);
             Files.delete(caseFile);
             return true;

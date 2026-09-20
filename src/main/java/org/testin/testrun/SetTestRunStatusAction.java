@@ -29,7 +29,6 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
-
 public class SetTestRunStatusAction extends AbstractProjectAction {
     final @NotNull SimpleTree tree;
 
@@ -44,10 +43,6 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
         TreeValues.selected(tree, TestRunDirectoryDto.class).ifPresent(this::askForStatus);
     }
 
-    /**
-     * Inside the menu callback, so a dismissed menu changes nothing and says
-     * nothing (#62).
-     */
     private void askForStatus(final @NotNull TestRunDirectoryDto testRunDto) {
         new TestRunStatusMenuDialog(p, testRunDto.getMarker().getStatus(), selectedStatus ->
                 Services.getInstance(p, TestRunStatusChange.class).apply(testRunDto, selectedStatus)).show();

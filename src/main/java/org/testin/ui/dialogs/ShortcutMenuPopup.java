@@ -40,50 +40,17 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.swing.*;
 
-/**
- * UC-INTERNAL-007, Rule-INTERNAL-054, Rule-INTERNAL-067.
- * <p>
- * Generic list-menu popup with per-item shortcuts, used by the copy menu, the
- * update menu and the status menu. Selection happens by click, Enter, or an
- * item own keyboard shortcut; the popup closes after invoking the selection
- * callback.
- * <p>
- * Not a framework dialog and does not need to be - a menu is rows and nothing
- * else, and each row already carries its own key and prints it. What it does
- * share is the promise: the keys the menu itself answers come from the one
- * declaration that draws the strip, through {@link DialogKeys} and
- * {@link StatusBarBase} - the same two halves every dialog uses.
- * <p>
- * Enter used to be registered here and printed nowhere. The rows say their own
- * letters, so the single key a tester is most likely to reach for - the one that
- * takes the row already highlighted - was the only one the menu never mentioned
- * (#11).
- */
+// UC-INTERNAL-007, Rule-INTERNAL-054, Rule-INTERNAL-067
 @RequiredArgsConstructor
 public final class ShortcutMenuPopup<T extends MenuItem> {
-
     private final @NotNull Project p;
     private final @NotNull String title;
     private final T @NotNull [] items;
     private final @NotNull Consumer<T> onSelection;
 
-    /**
-     * UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-009.
-     * <p>
-     * Why a row cannot do its work right now, in a few words, or nothing when it
-     * can. Every row can by default, so a menu that has no such row says so by
-     * not asking.
-     * <p>
-     * A row that refuses is drawn gray with its reason beside it and does
-     * nothing when it is chosen, rather than looking live and answering with a
-     * balloon after the menu has closed - which is what the update menu Order
-     * row did on every multiple selection (#312, A85).
-     */
+    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-009
     private @NotNull Function<T, Optional<String>> refusal = item -> Optional.empty();
 
-    /**
-     * The menu, with one question added: ask this of a row before drawing it.
-     */
     public @NotNull ShortcutMenuPopup<T> refusing(final @NotNull Function<T, Optional<String>> whyNot) {
         this.refusal = whyNot;
         return this;
@@ -116,20 +83,7 @@ public final class ShortcutMenuPopup<T extends MenuItem> {
         popup.showCenteredInCurrentWindow(p);
     }
 
-    /**
-     * UC-INTERNAL-007, Rule-INTERNAL-054, Rule-INTERNAL-067.
-     * <p>
-     * The keys the menu itself answers - as opposed to the letters its rows
-     * carry - declared once and handed to both halves: {@link DialogKeys} binds
-     * them and {@link StatusBarBase} draws them.
-     * <p>
-     * Enter was a {@code registerCustomShortcutSet} of its own here, which
-     * worked and said nothing. The arrows bind themselves, the way they do in
-     * every list, so they are declared as the hint every other Testin list
-     * shows.
-     *
-     * @return the strip that same declaration renders
-     */
+    // UC-INTERNAL-007, Rule-INTERNAL-054, Rule-INTERNAL-067
     private @NotNull JBPanel<?> declaredKeys(final @NotNull JBList<T> list, final @NotNull JBPopup popup) {
         final @NotNull List<StatusBarShortcut> declared = List.of(
                 StatusBarShortcut.confirm(() -> ListValue.selected(list).ifPresent(item -> select(item, popup))),
@@ -141,12 +95,6 @@ public final class ShortcutMenuPopup<T extends MenuItem> {
         return new StatusBarBase(declared.toArray(StatusBarItem[]::new)).getPanel();
     }
 
-    /**
-     * What each row answers to: its own letter, and a click anywhere on it.
-     * <p>
-     * A row key belongs to the row rather than to the popup showing it, which is
-     * why {@link MenuItem#bindShortcut} is declared there and asked here.
-     */
     private void bindRows(final @NotNull JBList<T> list, final @NotNull JBPopup popup) {
         for (final T item : items) {
             item.bindShortcut(list, () -> select(item, popup));
@@ -165,8 +113,6 @@ public final class ShortcutMenuPopup<T extends MenuItem> {
     }
 
     private void select(final @NotNull T item, final @NotNull JBPopup popup) {
-        // A refused row is not a row: it stays on screen saying why, and the
-        // menu stays open so the tester can choose one that works.
         if (refusal.apply(item).isPresent()) return;
 
         onSelection.accept(item);

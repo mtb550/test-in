@@ -50,40 +50,14 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class UpdateTestBase {
-
-    /**
-     * The generated method for this test case, found by the id in its @Test
-     * annotation - empty when the class holds no such method.
-     */
     protected @NotNull Optional<PsiMethod> findMethodByTestName(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
         return GeneratedMethod.forCase(pc, tc);
     }
 
-    /**
-     * The method's @Test annotation, empty on a method that has none.
-     */
     protected @NotNull Optional<PsiAnnotation> getTestAnnotation(final @NotNull PsiMethod pm) {
         return GeneratedMethod.testAnnotationOf(pm);
     }
 
-    /**
-     * Sets one attribute of an annotation, through the PSI rather than by
-     * editing its text.
-     * <p>
-     * It used to find the attribute in the rendered text and splice the new
-     * value in over the old one, ending the old value at the first comma,
-     * bracket or newline it met - inside a quoted string as readily as outside
-     * one. A description reading "Login, then log out" or "Login (as admin)"
-     * spliced the annotation at the punctuation within the quotes, and the
-     * generated class stopped compiling or the reparse threw. Every case in
-     * that test set stopped running, and nothing told the tester.
-     * <p>
-     * setDeclaredAttributeValue is the platform's own answer and it replaces or
-     * adds without either branch being written here. The value is parsed from a
-     * throwaway annotation rather than as an expression, because an attribute
-     * can legally be an array initializer - the groups attribute is one - and
-     * {@code {"a", "b"}} is not a Java expression.
-     */
     protected void updateAnnotationAttribute(final @NotNull PsiElementFactory pf, final @NotNull PsiAnnotation pa, final @NotNull String attrName, final @NotNull String newValue) {
         final @NotNull PsiAnnotation parsed = pf.createAnnotationFromText("@A(v = " + newValue + ")", pa);
 
@@ -96,33 +70,14 @@ public class UpdateTestBase {
         pa.setDeclaredAttributeValue(attrName, value);
     }
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-012, Rule-CODEGEN-040.
-     * <p>
-     * The description onto the method: into the annotation, and into the
-     * method's name.
-     * <p>
-     * Here rather than in the updater that used to hold it, because the restore
-     * writes the same thing and two copies of "what a description does to a
-     * method" is how the two come to disagree.
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-012, Rule-CODEGEN-040
     protected void writeDescription(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
         updateTestAnnotationAttribute(p, pm, "description", JavaLiteral.of(tc.getDescription()));
 
-        // A method cannot be nameless, so a description cleared to nothing
-        // leaves the method under the name it already has - the same reason
-        // className keeps its fallback. The annotation still records that the
-        // description is now empty, which is what the case says (#155).
         final @NotNull String newMethodName = NameSanitizer.methodName(tc.getDescription());
         if (newMethodName.isEmpty() || pm.getName().equals(newMethodName)) return;
 
-        // Rule-CODEGEN-079. The two questions CreateTestMethod asks before it
-        // writes a name, asked before this renames one. The dialogs ask them too,
-        // but a description reaches here through doors that cannot: a grid cell,
-        // a bulk edit, an undo. Unasked, the first threw IncorrectOperationException
-        // out of the write command, and the second put two methods with one
-        // signature in the class, so nothing in that test set compiled (#66,
-        // findings 159 and 160).
+        // Rule-CODEGEN-079
         if (!NameSanitizer.canMakeMethodName(tc.getDescription())) {
             keptItsName(p, pm, Bundle.message("codegen.rename.not.a.method", pm.getName(), newMethodName));
             return;
@@ -136,10 +91,6 @@ public class UpdateTestBase {
         pm.setName(newMethodName);
     }
 
-    /**
-     * Whether a method other than this one already answers to that name. By key,
-     * because punctuation and capitals do not make two methods (#244).
-     */
     private static boolean anotherMethodIsCalled(final @NotNull PsiMethod pm, final @NotNull String methodName) {
         final @NotNull String key = NameSanitizer.methodKey(methodName);
 
@@ -148,161 +99,57 @@ public class UpdateTestBase {
                 .anyMatch(other -> other != pm && key.equals(NameSanitizer.methodKey(other.getName())));
     }
 
-    /**
-     * The description was saved and the method was not renamed, said while the
-     * tester is still looking at the edit that caused it.
-     */
     private static void keptItsName(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String why) {
         Logger.warn("Kept the name of " + pm.getName() + ": " + why);
 
         Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("codegen.rename.kept.title"), why);
     }
 
-    /**
-     * UC-CODEGEN-002, UC-CODEGEN-012, Rule-CODEGEN-046.
-     * <p>
-     * The case's groups onto the method, and the whole attribute rewritten
-     * because a group taken away has to go as well as one added.
-     * <p>
-     * The last group taken away takes the attribute with it, exactly as
-     * {@link #writeEnabled} below takes {@code enabled} off a case that is no
-     * longer disabled. It used to write {@code groups = {}}, so a case created
-     * with no groups and a case whose groups had been cleared described the same
-     * state two ways in one class - and the document says the attribute is
-     * written only for a case that belongs to at least one group. TestNG accepts
-     * the empty braces, so nothing failed; the file simply stopped being what
-     * the document describes (#287).
-     */
+    // UC-CODEGEN-002, UC-CODEGEN-012, Rule-CODEGEN-046
     protected void writeGroups(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
-        // Escaped, not only quoted: a group is free text, and one holding a quote
-        // or a backslash wrote an annotation that did not compile (#312, A58).
         final @NotNull List<String> quoted = tc.getGroup().stream().map(JavaLiteral::of).toList();
 
         if (quoted.isEmpty()) removeTestAnnotationAttribute(p, pm, "groups");
         else updateTestAnnotationAttribute(p, pm, "groups", "{" + String.join(", ", quoted) + "}");
     }
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-047, Rule-CODEGEN-048.
-     * <p>
-     * Disabled writes the attribute; anything else takes it off rather than
-     * writing true, so a case that was once disabled does not carry a word that
-     * says nothing.
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-047, Rule-CODEGEN-048
     protected void writeEnabled(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
         if (tc.getStatus() == TestCaseStatus.DISABLED) updateTestAnnotationAttribute(p, pm, "enabled", "false");
         else removeTestAnnotationAttribute(p, pm, "enabled");
     }
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-014.
-     * <p>
-     * The class a case generates into: its test set's.
-     * <p>
-     * Asked of the set, not of the case. It was worked out from the case's
-     * method name with the method taken off the end, and a case with no
-     * description names no method - so the answer was empty. Three callers ask
-     * with the first case of a set, and one description-less case sitting first
-     * switched off the order sweep, the undo's rewrite and a copy's body for
-     * every case in that set: cards dragged into a new order while the run kept
-     * the old one (#66, finding 193). A case with no description is a thing
-     * Rule-CODEGEN-021 supports, so its set must not depend on it.
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-014, Rule-CODEGEN-021
     protected static @NotNull Optional<PsiClass> classOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        // Through the one resolver, because an updater asking for a class it can
-        // already see and a generator asking for one it may have to write are the
-        // same question with two answers, and they used to be two lookups.
         return GeneratedClass.find(p, Fqcn.ofClass(tc.getParent()));
     }
 
-    /**
-     * Updates one attribute of the method's {@code @Test} annotation. The
-     * concrete update actions only differ in the attribute name and value
-     * expression.
-     * <p>
-     * <b>It does not reformat.</b> Whoever asked for the write knows how many
-     * methods it is about to touch and reformats once at the end - see
-     * {@link #reformat}. This ended with a reformat of its own until #66's
-     * finding 55, which was one per gesture while callers changed one case at a
-     * time and became one per case the day a whole set went through in a single
-     * command: 120 reformats for one drag, the first 119 of them formatting a
-     * layout the moves after them were about to change.
-     */
     protected void updateTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String attrName, final @NotNull String newValue) {
         getTestAnnotation(pm).ifPresentOrElse(testAnnotation ->
                         updateAnnotationAttribute(JavaPsiFacade.getElementFactory(p), testAnnotation, attrName, newValue),
                 () -> Logger.warn("Update: method has no @Test annotation"));
     }
 
-    /**
-     * Tidies what a write left, once for whatever it touched.
-     * <p>
-     * <b>Whoever wrote tidies, and only them.</b> A batch reformats its class,
-     * because one pass over the class costs less than one per method. A single
-     * update reformats its own method. A removal reformats nothing, because it
-     * wrote nothing - it deleted the method, and asking the formatter to tidy an
-     * element that has left the PSI tree throws "Invalid root block PSI element"
-     * out of the write command.
-     * <p>
-     * That is why this is not called from {@link #applyToMethod}, which serves
-     * the removal as well as the writes and cannot know which it is looking at
-     * (#66, finding 55).
-     */
     protected void reformat(final @NotNull Project p, final @NotNull PsiElement element) {
         CodeStyleManager.getInstance(p).reformat(element);
     }
 
-    /**
-     * Takes one attribute off the method's {@code @Test} annotation, leaving
-     * the rest of it alone.
-     * <p>
-     * A sibling of the method above rather than a value it could be passed: the
-     * platform removes an attribute when it is set to nothing, and nothing is
-     * not something {@code updateAnnotationAttribute} can parse out of an
-     * annotation it builds to read the value from.
-     */
     protected void removeTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String attrName) {
         getTestAnnotation(pm).ifPresentOrElse(testAnnotation -> testAnnotation.setDeclaredAttributeValue(attrName, null),
                 () -> Logger.warn("Update: method has no @Test annotation"));
     }
 
-    /**
-     * The edit was saved and no code changed, because there is no generated
-     * method to change.
-     * <p>
-     * Said out loud rather than written to the log and forgotten. The tester
-     * watched the case change in the editor and has no other way to learn that
-     * the code did not follow - it happened five times in one log before anybody
-     * noticed (#66, finding 19).
-     */
     private void noCodeToUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String detail) {
         Logger.warn("Update: " + detail);
 
         Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NO_GENERATED_CODE, tc.getDescription());
     }
 
-    /**
-     * Applies a change to the case's generated method, and says so when there is
-     * none to change.
-     */
     protected void applyUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater) {
         applyToMethod(p, tc, title, updater, detail -> noCodeToUpdate(p, tc, detail));
     }
 
-    /**
-     * UC-CODEGEN-003, Rule-CODEGEN-019.
-     * <p>
-     * The same, where a case with no generated method should be given one.
-     * <p>
-     * A description is what names a method, so a case saved without one has no
-     * method written for it at all. Filling the description in later is
-     * therefore not an update to make - it is the first thing that makes the
-     * method nameable - and the code follows the case (#155).
-     * <p>
-     * It replaces a balloon that told the tester there was no generated code and
-     * left them to do something about it. Writing the method is what they would
-     * have done.
-     */
+    // UC-CODEGEN-003, Rule-CODEGEN-019
     protected void applyOrCreate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater) {
         applyToMethod(p, tc, title, updater, detail -> {
             Logger.info("Writing the method for '" + tc.getDescription() + "' now that it has a name: " + detail);
@@ -310,44 +157,12 @@ public class UpdateTestBase {
         });
     }
 
-    /**
-     * UC-CODEGEN-011, Rule-CODEGEN-044.
-     * <p>
-     * The same, where a case with no generated method is the normal state
-     * rather than news.
-     * <p>
-     * Removing a method that is not there needs no saying, and neither does
-     * renumbering one. The order rewrite sweeps every case in the set each time
-     * one is created or dragged, so a balloon per case without code turned
-     * creating a test case into a balloon about the case just created - and a
-     * set nobody has generated code for into one balloon per case it holds.
-     */
+    // UC-CODEGEN-011, Rule-CODEGEN-044
     protected void applyIfGenerated(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater) {
         applyToMethod(p, tc, title, updater, detail -> Logger.debug("No generated method for '" + tc.getDescription() + "': " + detail));
     }
 
-    // Shared boilerplate for all update actions: resolve the FQCN, locate the target class and
-    // its @Test method by testName, then apply the specific update inside a write command action.
-    /**
-     * UC-CODEGEN-012, Rule-CODEGEN-045.
-     * <p>
-     * The same write applied to many cases, as <b>one</b> undo entry.
-     * <p>
-     * {@link org.testin.codegen.GenAction#executeAll} defaults to a loop over
-     * {@code execute}, and each {@code execute} opened its own {@code
-     * invokeLater} and its own write command - so changing the group on fifty
-     * selected cases was fifty events, fifty class lookups and fifty entries in
-     * the IDE's undo: fifty CTRL+Z presses to take back one gesture (#66,
-     * finding 56).
-     * <p>
-     * Grouped by class, because that is what a lookup costs and what a reformat
-     * is about: the class is resolved once, every one of its methods is written,
-     * and the class is reformatted once at the end (#66, finding 55).
-     * <p>
-     * A case whose method is missing is passed over rather than reported. A
-     * bulk edit over a set that was never generated would otherwise say so once
-     * per case, which is the noise this method exists to remove.
-     */
+    // UC-CODEGEN-012, Rule-CODEGEN-045
     protected void applyToEach(final @NotNull Project p, final @NotNull List<?> items, final @NotNull String title, final @NotNull BiConsumer<PsiMethod, TestCaseDto> updater) {
         final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
 
@@ -365,9 +180,6 @@ public class UpdateTestBase {
                 WriteCommandAction.runWriteCommandAction(p, title, null,
                         () -> byClass.forEach((path, cases) -> writeAll(p, path, cases, updater)));
 
-        // The same rule the single form follows below: straight through when a
-        // command is already open, so a caller that wrapped this in one of its
-        // own still ends with one entry rather than two.
         if (CommandProcessor.getInstance().getCurrentCommand() != null) inCommand.run();
         else ApplicationManager.getApplication().invokeLater(inCommand);
     }
@@ -383,9 +195,6 @@ public class UpdateTestBase {
 
         final @NotNull PsiClass pc = target.orElseThrow();
 
-        // Read once for the class rather than once per case, the same way the
-        // order sweep reads it - asking per case walks every method in the class
-        // for every case in it.
         final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byCaseId(pc);
 
         int written = 0;
@@ -413,12 +222,6 @@ public class UpdateTestBase {
                                                 () -> onMissing.accept("no method with testName=" + tc.getId())),
                                         () -> onMissing.accept("class not found: " + path)));
 
-        // Straight through when a command is already open, and only then hop.
-        // The hop is what used to make a bulk edit forty undo entries: a
-        // command opened around the list is left behind by the first
-        // invokeLater, so every case started one of its own (#153). A nested
-        // write command is merged into the open one, which is why the work
-        // itself needs no branch.
         if (CommandProcessor.getInstance().getCurrentCommand() != null) inCommand.run();
         else ApplicationManager.getApplication().invokeLater(inCommand);
     }

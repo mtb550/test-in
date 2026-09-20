@@ -38,39 +38,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class RefreshAction extends AbstractProjectAction {
-
-    /**
-     * What the toolbar button reports when it is the tester pressing Refresh.
-     */
     private static final @NotNull String REFRESHED = Done.REFRESHED.getOutcome();
 
     private final @NotNull TreePanel tp;
 
-    /**
-     * Stops a second re-index starting through one already running.
-     * <p>
-     * It only works because there is one of these per project, held on
-     * {@link TreePanel}. Constructing one to call {@code execute} gives it a
-     * guard nobody else can see, which is what this used to be.
-     */
     private final @NotNull AtomicBoolean refreshGuard = new AtomicBoolean(false);
 
-    /**
-     * UC-TREE-PANEL-025, UC-TREE-PANEL-026, Rule-TREE-PANEL-081.
-     * <p>
-     * What arrived while a re-index was running, and what to say when it has
-     * been done - empty when nothing is waiting.
-     * <p>
-     * A second press of Refresh was fine to ignore: nothing had changed by
-     * pressing it. A branch switch is not. It checks the branch out first and
-     * comes here to read what arrived with it, so ignoring it left every file on
-     * disk belonging to one branch and the whole index belonging to another,
-     * with no message and no sign that anything was wrong (#312, A66).
-     * <p>
-     * The last one wins, because a re-index reads everything either way and only
-     * the sentence at the end differs. Two switches queued behind one run mean
-     * one re-index, reporting the branch that is actually checked out.
-     */
+    // UC-TREE-PANEL-025, UC-TREE-PANEL-026, Rule-TREE-PANEL-081
     private final @NotNull AtomicReference<Optional<String>> queued = new AtomicReference<>(Optional.empty());
 
     public RefreshAction(final @NotNull Project p, final @NotNull TreePanel tp) {
@@ -83,17 +57,7 @@ public class RefreshAction extends AbstractProjectAction {
         execute(REFRESHED);
     }
 
-    /**
-     * UC-TREE-PANEL-025, UC-TREE-PANEL-026, Rule-TREE-PANEL-081.
-     * <p>
-     * Re-indexes and rebuilds the tree, reporting the outcome in the caller's
-     * words.
-     * <p>
-     * A branch switch is this action with a different sentence at the end: the
-     * work is identical - re-index, rebuild, close what is gone - and the only
-     * thing the tester needs told apart is what caused it. One notification
-     * either way, because two would be one too many for one press.
-     */
+    // UC-TREE-PANEL-025, UC-TREE-PANEL-026, Rule-TREE-PANEL-081
     public void execute(final @NotNull String outcome) {
         if (!refreshGuard.compareAndSet(false, true)) {
             queued.set(Optional.of(outcome));
@@ -105,15 +69,6 @@ public class RefreshAction extends AbstractProjectAction {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                // The repository's testin.yml is on disk too, and Refresh is the
-                // tester saying "read the disk again". It was read once when the
-                // service was created and never after, so a file that was deleted,
-                // hand-edited, or brought in by a branch switch left the plugin
-                // acting on what it said at startup (#6).
-                //
-                // Before the index, exactly as at startup: the file names the test
-                // project, and indexing is scoped to it. Through the binding, so
-                // the gutter answers again with it (#66, finding 312).
                 Services.getInstance(p, BoundTestProject.class).reread();
 
                 final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -126,12 +81,6 @@ public class RefreshAction extends AbstractProjectAction {
                 ApplicationManager.getApplication().invokeLater(() -> rebuildTree(outcome));
 
             } catch (final Exception ex) {
-                // Every step above can fail, and the guard used to be released
-                // only inside the rebuild at the end - so one failed re-index
-                // left it set and Refresh, the branch dropdown and the welcome
-                // screen's Create, Clone and Select links stopped responding for
-                // the rest of the session, saying nothing but one log line
-                // written for a different case (#66, finding 67).
                 Logger.error("Refresh: re-indexing failed - " + ex.getMessage());
                 releaseAndRunWhatWaited();
                 Services.getInstance(p, Notifier.class).error(p, Bundle.message("toolbar.refresh.failed.title"), ex.getMessage());
@@ -139,36 +88,18 @@ public class RefreshAction extends AbstractProjectAction {
         });
     }
 
-    /**
-     * UC-TREE-PANEL-025, Rule-TREE-PANEL-081.
-     * <p>
-     * The half that runs on the EDT once the index is rebuilt, and the one place
-     * that releases the guard when the work reached this far - whatever happens
-     * while it draws.
-     */
+    // UC-TREE-PANEL-025, Rule-TREE-PANEL-081
     private void rebuildTree(final @NotNull String outcome) {
         try {
             if (p.isDisposed()) return;
 
-            // Before the tree is rebuilt: an editor is holding the node
-            // it was opened on and the cases it read from it, and after a
-            // re-index either can be data that is gone.
             Services.getInstance(p, TestinEditors.class).refreshOpen(p);
 
             tp.refresh();
             Logger.info("Refresh: tree rebuilt");
 
-            // Refresh is the tester saying "read everything again", and the
-            // remote is part of everything. The rebuild above no longer fetches
-            // by itself - it happens on every rename, removal and status change
-            // too, and none of those can have moved a branch (#312, A70). A
-            // branch switch arrives here as well, which is the other moment a
-            // fetch is worth its price.
             tp.fetchBranches();
 
-            // At the end, not the start: the tree is only usable now, and a
-            // click that found a refresh already running returned above
-            // without saying anything.
             Services.getInstance(p, Notifier.class).softShow(p, outcome);
 
         } finally {
@@ -176,14 +107,7 @@ public class RefreshAction extends AbstractProjectAction {
         }
     }
 
-    /**
-     * UC-TREE-PANEL-025, Rule-TREE-PANEL-081.
-     * <p>
-     * Lets the next one in, and starts it if one is waiting.
-     * <p>
-     * The guard is dropped first, so the waiting run takes it rather than
-     * finding it held and queueing itself behind its own predecessor.
-     */
+    // UC-TREE-PANEL-025, Rule-TREE-PANEL-081
     private void releaseAndRunWhatWaited() {
         refreshGuard.set(false);
 
@@ -198,7 +122,6 @@ public class RefreshAction extends AbstractProjectAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - this action has no update() reading Swing state; do not switch to EDT (#52).
         return ActionUpdateThread.BGT;
     }
 }

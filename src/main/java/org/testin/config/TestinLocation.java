@@ -21,35 +21,11 @@ import org.testin.logger.Logger;
 
 import java.util.Locale;
 
-/**
- * Whether a test project is shared with anyone, as {@code testin.yml} says it.
- * <p>
- * The file's own word, not something worked out from which other keys happen to
- * be filled in. That makes it possible for the file to contradict itself - to
- * say {@code remote} and give no address - so this is authoritative and the rest
- * is checked against it, rather than the other way round.
- */
 public enum TestinLocation {
-
-    /**
-     * This machine only. Test projects are created here and go nowhere, which is
-     * a perfectly ordinary way to work and the right default for a file that
-     * says nothing.
-     */
     LOCAL,
 
-    /**
-     * Shared through Git, cloned from the file's {@code RepoUrl}.
-     */
     REMOTE;
 
-    /**
-     * What the file said, and {@link #LOCAL} when it said nothing recognizable.
-     * <p>
-     * A word nobody can read is a project nobody can reach, and defaulting to
-     * local means the tester keeps working on their own copy rather than having
-     * the plugin guess at a server.
-     */
     public static @NotNull TestinLocation of(final @NotNull String value) {
         if (value.isEmpty()) return LOCAL;
 
@@ -65,9 +41,6 @@ public enum TestinLocation {
         return this == REMOTE;
     }
 
-    /**
-     * The word the file uses for it, which {@link #of} reads back.
-     */
     public @NotNull String written() {
         return name().toLowerCase(Locale.ROOT);
     }

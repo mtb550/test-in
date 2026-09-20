@@ -27,9 +27,6 @@ import org.testin.explorer.TreePanel;
 import javax.swing.*;
 import java.util.function.Consumer;
 
-/**
- * Toolbar action that operates on the project tree when it is available.
- */
 abstract class AbstractTreeAction extends DumbAwareAction {
     private final @NotNull TreePanel tp;
     private final @NotNull Consumer<SimpleTree> operation;
@@ -46,13 +43,7 @@ abstract class AbstractTreeAction extends DumbAwareAction {
         operation.accept(tp.getProjectTree().getMainTree());
     }
 
-    /**
-     * UC-TREE-PANEL-028, Rule-TREE-PANEL-101.
-     * <p>
-     * Gray, with the reason, while the welcome screen is up. The tree is hidden
-     * rather than removed there, so the button stayed live and opened or closed
-     * a tree nobody could see (#66, finding 216).
-     */
+    // UC-TREE-PANEL-028, Rule-TREE-PANEL-101
     @Override
     public void update(final @NotNull AnActionEvent e) {
         final boolean treeShowing = tp.showsTree();
@@ -65,7 +56,6 @@ abstract class AbstractTreeAction extends DumbAwareAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // The update reads whether the tree is showing, which is Swing state.
         return ActionUpdateThread.EDT;
     }
 }

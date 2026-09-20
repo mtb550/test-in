@@ -41,16 +41,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * A multi-line text area — for pasted content like an error or an exception,
- * and, where the dialog asks for it with {@code images(list)}, screenshots: a
- * pasted image shows as a thumbnail under the box, never as text. Enter inserts
- * a newline (the dialog keys stay off this component), Tab moves the focus like
- * everywhere else, and it claims the dialog's remaining space.
- */
 public final class TextArea implements DialogComponent {
-
-
     private final @NotNull JBTextArea area;
     private final @NotNull ScreenshotStrip strip;
     private final @NotNull JBPanel<?> panel;
@@ -68,14 +59,9 @@ public final class TextArea implements DialogComponent {
             area.getEmptyText().setText(placeholder);
         }
 
-        // Tab traverses the dialog instead of inserting a tab character.
         area.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, null);
         area.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, null);
 
-        // Bound on the area itself, as the framework's single-line fields
-        // are, because a popup or a dialog can eat the keys on the way here.
-        // An area that takes images answers paste itself, once, in
-        // installImagePaste - so paste is not bound here as well.
         if (acceptsImages) {
             FrameworkTextField.bindAllButPaste(area);
             installImagePaste();
@@ -86,21 +72,12 @@ public final class TextArea implements DialogComponent {
         final @NotNull JBScrollPane scroll = new JBScrollPane(area);
         scroll.setBorder(JBUI.Borders.empty());
 
-        // Under the box, and empty - so no height at all - until a screenshot
-        // is stored or pasted (#50).
         strip = new ScreenshotStrip(images);
 
-        // UC-EDITOR-PANEL-034, Rule-INTERNAL-087. A caption above the box when
-        // the dialog gives one (#328).
+        // UC-EDITOR-PANEL-034, Rule-INTERNAL-087
         panel = Caption.above(caption, JBUI.Panels.simplePanel(scroll).addToBottom(strip.getPanel()).andTransparent());
     }
 
-    /**
-     * Empty when the image cannot be encoded, which the caller reads as "paste it
-     * as text instead". It used to signal that by throwing, so a genuine encoding
-     * failure and an image the clipboard had not finished loading arrived at the
-     * same catch and neither was logged.
-     */
     private static byte @NotNull [] toPng(final @NotNull Image image) {
         final BufferedImage buffered;
         if (image instanceof BufferedImage alreadyBuffered) {
@@ -108,8 +85,6 @@ public final class TextArea implements DialogComponent {
         } else {
             final int width = image.getWidth(null);
             final int height = image.getHeight(null);
-            // A not-yet-loaded async image reports -1; the caller falls back
-            // to the normal text paste.
             if (width <= 0 || height <= 0) return new byte[0];
 
             buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -131,11 +106,6 @@ public final class TextArea implements DialogComponent {
         }
     }
 
-    /**
-     * Adds whatever image the clipboard is holding to the strip under the box,
-     * and says whether it did. An empty clipboard and text on the clipboard are
-     * the same answer - no - which is what makes the caller a single line.
-     */
     private boolean addPastedScreenshot() {
         return ClipboardContents.withFlavor(DataFlavor.imageFlavor)
                 .map(this::addScreenshot)
@@ -151,25 +121,12 @@ public final class TextArea implements DialogComponent {
             strip.add(png);
             return true;
         } catch (final UnsupportedFlavorException | IOException ex) {
-            // The clipboard would not hand over the image it just said it had -
-            // the normal paste runs instead.
             Logger.warn("Could not read the pasted image: " + ex.getMessage());
             return false;
         }
     }
 
-    /**
-     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
-     * <p>
-     * The paste gesture, answered once: a picture on the clipboard (e.g. a
-     * screenshot) becomes a thumbnail under the box, and anything else is the
-     * area's own paste. Copy and cut stay the component's own.
-     * <p>
-     * A registered action rather than the area's input map, because the IDE
-     * dispatches its own paste before a component's input map: a paste bound
-     * there never ran. Seen in the sandbox on 2026-09-15 - Ctrl+V pasted
-     * nothing, and the log's last action read EditorPaste (#50).
-     */
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     private void installImagePaste() {
         DumbAwareAction.create(event -> {
             if (!addPastedScreenshot()) area.paste();
@@ -180,24 +137,14 @@ public final class TextArea implements DialogComponent {
         return area.getText();
     }
 
-    /**
-     * The screenshots under the box, in the order they were pasted, and empty
-     * for a box that takes none.
-     */
     public @NotNull List<byte[]> getImages() {
         return strip.screenshots();
     }
 
-    /**
-     * Runs after a screenshot is pasted under the box or taken out of it.
-     */
     public void onImagesChanged(final @NotNull Runnable changed) {
         strip.onChange(changed);
     }
 
-    /**
-     * Runs after every change to the text, typed or pasted.
-     */
     public void onTextChanged(final @NotNull Runnable changed) {
         area.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
@@ -219,12 +166,10 @@ public final class TextArea implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // Typing is not a submit gesture; the declared keys save.
     }
 
     @Override
     public boolean acceptsDialogKeys() {
-        // Enter must insert a newline here, never submit the dialog.
         return false;
     }
 

@@ -38,35 +38,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
-/**
- * Writes test data to disk. Package-private, and in this package, so that the
- * architecture rule is enforced by the compiler rather than by convention: the
- * indexer is the single owner of test data file access, and nothing outside it
- * can reach this writer at all.
- */
 @Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class TestDataFiles {
-
-    /**
-     * UC-INTERNAL-004, Rule-INTERNAL-033.
-     * <p>
-     * Whether the file already holds exactly what this content serializes to.
-     * <p>
-     * The file is the only record of what a test case looked like before an
-     * edit. The index hands its own objects out and the dialogs edit them in
-     * place, so by the time a save arrives the indexed case and the case being
-     * saved are the same object and there is nothing left in memory to compare
-     * against (#164).
-     * <p>
-     * Asked as bytes, through the mapper that wrote them, so the question is
-     * literally the rule in CLAUDE.md: would this write leave the file
-     * byte-identical.
-     * <p>
-     * A file that cannot be read is not identical. Missing is the ordinary case
-     * - a test case being created - and unreadable is a real problem, which the
-     * write that follows reports properly rather than this deciding on it.
-     */
+    // UC-INTERNAL-004, Rule-INTERNAL-033
     <T> boolean alreadyHolds(final @NotNull Project p, final @NotNull Path path, final @NotNull T content) {
         try {
             return Arrays.equals(Files.readAllBytes(path), Services.getInstance(p, Mapper.class).writeValueAsBytes(content));
@@ -75,11 +50,6 @@ final class TestDataFiles {
         }
     }
 
-    /**
-     * The same question for bytes a caller already has in hand - the run writer
-     * snapshots each result on the calling thread and asks here, on its own
-     * (#305, G5).
-     */
     boolean alreadyHolds(final @NotNull Path path, final byte @NotNull [] bytes) {
         try {
             return Arrays.equals(Files.readAllBytes(path), bytes);
@@ -88,28 +58,14 @@ final class TestDataFiles {
         }
     }
 
-    /**
-     * @return whether the bytes landed. A caller that updates the cache after
-     * the write has to know, because architecture rule 2 makes the write the
-     * thing that decides whether the node exists at all (#66, finding 85).
-     */
     <T> boolean write(final @NotNull Project p, final @NotNull Path path, final @NotNull T content) {
         return writeBytes(p, path, Services.getInstance(p, Mapper.class).writeValueAsBytes(content));
     }
 
-    /**
-     * Writes bytes as they are: JSON the run writer snapshotted on the EDT, or a
-     * screenshot's PNG. The disk I/O runs on the writer's worker thread.
-     */
     boolean write(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
         return writeBytes(p, path, jsonBytes);
     }
 
-    /**
-     * A file's bytes, and none when it is missing or unreadable - which a
-     * screenshot a sync has not brought yet is, and which its reader draws as an
-     * empty square rather than failing on (#313).
-     */
     byte @NotNull [] readBytes(final @NotNull Path path) {
         try {
             return Files.readAllBytes(path);
@@ -119,12 +75,7 @@ final class TestDataFiles {
         }
     }
 
-    /**
-     * Rule-INTERNAL-011.
-     * <p>
-     * The result files in a run's folder, and none when the folder cannot be
-     * listed - a run whose folder has gone holds nothing (#305).
-     */
+    // Rule-INTERNAL-011
     @NotNull List<Path> resultsIn(final @NotNull Path runPath) {
         try (Stream<Path> inside = Files.list(runPath)) {
             return inside.filter(file -> FileKind.of(file) == FileKind.RUN_ITEM).toList();
@@ -134,10 +85,6 @@ final class TestDataFiles {
         }
     }
 
-    /**
-     * The screenshots in a run's folder, and none when the folder cannot be
-     * listed - a run whose folder has gone has nothing left to sweep.
-     */
     @NotNull List<Path> screenshotsIn(final @NotNull Path runPath) {
         try (Stream<Path> inside = Files.list(runPath)) {
             return inside.filter(file -> FileKind.of(file, DirectoryType.TR) == FileKind.SCREENSHOT).toList();
@@ -149,11 +96,6 @@ final class TestDataFiles {
 
     // UC-INTERNAL-003, Rule-INTERNAL-019
     private boolean writeBytes(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
-        // The last line of defense for test data: writing nothing over a file
-        // empties it, and an empty marker takes its node's audit info with it.
-        // Six markers in a real data root were left at zero bytes this way.
-        // Nothing legitimate written here is empty - the smallest marker is a
-        // pair of braces.
         if (jsonBytes.length == 0) {
             Logger.error("Refusing to write an empty file, which would erase it: " + path);
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.nothing.written", path.getFileName()));
@@ -161,18 +103,11 @@ final class TestDataFiles {
         }
 
         try {
-            // Before the write, not after: the VFS event can arrive while this
-            // thread is still in Files.write, and a file claimed a moment too
-            // late looks to the watcher like somebody else's edit (#20).
             Services.getInstance(OwnWrites.class).record(path);
 
-            // The platform's own helper: it knows that a path with no parent - a
-            // filesystem root - has no folder to create.
             FileUtil.createParentDirs(path.toFile());
             Files.write(path, jsonBytes);
 
-            // What actually landed, so an edit a tester makes inside the window
-            // is told from this write rather than swallowed with it (#278).
             Services.getInstance(OwnWrites.class).wrote(path, jsonBytes);
             return true;
         } catch (final IOException ex) {
@@ -181,16 +116,7 @@ final class TestDataFiles {
         }
     }
 
-    /**
-     * UC-INTERNAL-008, Rule-INTERNAL-091.
-     * <p>
-     * Moves a file, claimed at both ends so the watcher takes neither for an
-     * outside change. One operation rather than a write and a delete: a crash
-     * between those two leaves the same content in two files, and the next scan
-     * reads one case twice (#305, S11).
-     *
-     * @return whether the file is at its new path now
-     */
+    // UC-INTERNAL-008, Rule-INTERNAL-091
     boolean move(final @NotNull Project p, final @NotNull Path from, final @NotNull Path to) {
         try {
             Services.getInstance(OwnWrites.class).record(from);
@@ -205,16 +131,7 @@ final class TestDataFiles {
         }
     }
 
-    /**
-     * UC-INTERNAL-008, Rule-INTERNAL-091, Rule-INTERNAL-036.
-     * <p>
-     * A whole folder, to the recycle bin where there is one: what the converter
-     * does with a run written in the old format, whose results this build cannot
-     * read (#305, D4). Every file in it is claimed first, so the watcher reads
-     * none of it as an outside change.
-     *
-     * @return whether the folder is gone
-     */
+    // UC-INTERNAL-008, Rule-INTERNAL-091, Rule-INTERNAL-036
     boolean removeTree(final @NotNull Project p, final @NotNull Path folder) {
         try (Stream<Path> inside = Files.walk(folder)) {
             inside.forEach(path -> Services.getInstance(OwnWrites.class).record(path));
@@ -236,24 +153,11 @@ final class TestDataFiles {
         }
     }
 
-    /**
-     * UC-INTERNAL-005, Rule-INTERNAL-036.
-     * <p>
-     * Removes a file. Its folder stays: a test set outlives its last case, and a
-     * run its last screenshot.
-     *
-     * @return whether the file is gone now: removed, in the recycle bin, or never
-     * there. False when the system refused to delete it, which this has already
-     * said. It answered nothing, so a test case whose file would not go was
-     * dropped from the index anyway (#66, finding 292)
-     */
+    // UC-INTERNAL-005, Rule-INTERNAL-036
     boolean delete(final @NotNull Project p, final @NotNull Path path) {
         try {
             Services.getInstance(OwnWrites.class).record(path);
 
-            // To the recycle bin, so a case removed by mistake is recovered the
-            // way every other file on this machine is. One JSON file, so the
-            // move is cheap enough for the thread the removal already runs on.
             if (!Trash.accepted(p, path)) Files.deleteIfExists(path);
         } catch (final IOException ex) {
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", ex.getMessage()));
@@ -269,6 +173,4 @@ final class TestDataFiles {
         Logger.error("unable to write content: " + ex.getMessage());
         Logger.error("path" + path);
     }
-
-
 }

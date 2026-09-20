@@ -32,19 +32,7 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.IntConsumer;
 
-/**
- * Asks for the number a node sits at among its siblings.
- * <p>
- * One field, because that is the whole decision. Empty means no number, and a
- * node with no number follows the numbered ones by the date it was created -
- * which is how every folder reads before anyone types anything.
- * <p>
- * The field takes 1 and up, never 0. Zero is what the marker holds when nobody
- * has said, so a tester who typed it would be asking for a position and getting
- * "no position" - a rule the field enforces rather than a surprise it explains.
- */
 final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
-
     private final @NotNull IntConsumer onSubmit;
 
     // UC-TREE-PANEL-015, Rule-TREE-PANEL-055
@@ -67,28 +55,11 @@ final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
-    /**
-     * The field's text for a node's number: empty for a node nobody numbered.
-     * <p>
-     * The one place the two meet, so nothing else in the plugin has to know that
-     * a very large number means "none" - and the same place turns an empty field
-     * back into it on the way out.
-     */
     private static @NotNull String shown(final int order) {
         return order == Marker.NOT_ORDERED ? "" : String.valueOf(order);
     }
 
-    /**
-     * UC-TREE-PANEL-015, Rule-TREE-PANEL-055.
-     * <p>
-     * Refuses a number too large and stays open, rather than writing something
-     * the tester did not type.
-     * <p>
-     * A value that will not fit used to come back as "no position at all", so
-     * typing a long number took the node's position off, dropped it back into
-     * date order, and confirmed with Ordered. Three wrong answers to one typo,
-     * and the only one the tester saw was the one saying it worked (#193).
-     */
+    // UC-TREE-PANEL-015, Rule-TREE-PANEL-055
     @Override
     protected void submit() {
         final @NotNull String text = component().getText().trim();
@@ -96,11 +67,6 @@ final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
 
         if (number.isEmpty()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("dialog.order.refused.title"),
-                    // The int, so MessageFormat groups it: 2,147,483,647 rather
-                    // than ten undivided digits, and grouped the way the reader's
-                    // own locale groups numbers. It was passed as a string while
-                    // the sentence moved into the bundle, because a translation
-                    // commit must change nothing a tester sees (#66, finding 97).
                     Bundle.message("dialog.order.refused.message", Marker.NOT_ORDERED));
             return;
         }
@@ -109,12 +75,6 @@ final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
         closeOk();
     }
 
-    /**
-     * What the tester typed, as a number. Empty takes the number off again,
-     * which is the one way a position is meant to be cleared. Anything the field
-     * let through that is not a position - a number too large to hold, and the
-     * sentinel that means "none" - is nothing, and the caller refuses it.
-     */
     private static @NotNull OptionalInt typed(final @NotNull String text) {
         if (text.isEmpty()) return OptionalInt.of(Marker.NOT_ORDERED);
 

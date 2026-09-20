@@ -33,14 +33,6 @@ import org.testin.util.Once;
 
 import java.util.List;
 
-/**
- * Every automation-code operation the plugin can perform. Constants carry no
- * PSI-dependent classes: Java-backed actions are resolved lazily through
- * {@link CodeGenerators}, an extension point a content module contributes to -
- * so this enum is safe to load in IDEs without Java support (PyCharm, GoLand,
- * WebStorm, ...), and the classes that do the work are not in the core jar at
- * all (#144).
- */
 @Getter
 public enum GenType {
     REMOVE_TEST_PROJECT(
@@ -87,49 +79,16 @@ public enum GenType {
             Bundle.message("codegen.remove.test.case")
     ),
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-077.
-     * <p>
-     * A test case cut from one test set and pasted into another takes its method
-     * with it, body and all.
-     * <p>
-     * Not a remove and a create: a create writes a fresh method with a TODO in
-     * it, and what makes this worth doing is the automation the tester wrote.
-     * The one generator that carries text from one class to another (#312, A54).
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-077
     MOVE_TEST_CASE(
             Bundle.message("codegen.move.test.case")
     ),
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-078.
-     * <p>
-     * A test case pasted as a copy gets a method of its own, with the body of
-     * the method it was copied from in it.
-     * <p>
-     * It used to be {@link #CREATE_TEST_CASE} on this path, which writes the
-     * method a new case gets - the right annotation, the right name, and a TODO
-     * where the automation should be. That is right for a case somebody has just
-     * created and wrong for a copy: the tester copied the case because of what
-     * was in it, and the one part that was theirs was the part left behind.
-     * <p>
-     * A separate operation from the move rather than the same one asked twice,
-     * because the two differ in what becomes of the original: a move takes the
-     * method with it, a copy leaves it where it is.
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-078
     COPY_TEST_CASE(
             Bundle.message("codegen.copy.test.case")
     ),
 
-    /**
-     * Renaming the generated method is part of this, not a step beside it: the
-     * method is named after the case's description, so a description that
-     * changed and a method that did not are the same edit half done.
-     * <p>
-     * There was a RENAME_TEST_CASE beside this one, with a handler that renamed
-     * and nothing else. Nothing ever dispatched it, and if anything had it would
-     * have left the @Test description saying what the case used to say.
-     */
     UPDATE_TEST_CASE_DESCRIPTION(
             Bundle.message("codegen.update.test.case")
     ),
@@ -163,79 +122,30 @@ public enum GenType {
             Bundle.message("codegen.update.test.case")
     ),
 
-    /**
-     * Priority writes nothing into the code any more. The generated method's
-     * priority attribute carries the case's position in its set, because that is
-     * what decides execution order; the case's own High/Medium/Low is a Testin
-     * field, shown and filtered and reported, and no concern of the automation.
-     */
     UPDATE_TEST_CASE_PRIORITY(
             Bundle.message("codegen.update.test.case"),
             "priority"
     ),
 
-    /**
-     * And order is what does write, for the same reason: a test framework runs
-     * methods in the order the priority attribute gives them.
-     */
     UPDATE_TEST_CASE_ORDER(
             Bundle.message("codegen.update.test.case")
     ),
 
-    /**
-     * Everything Testin writes about a case, written again from the case.
-     * <p>
-     * For CTRL+Z, which restores the case and knows nothing about the code. A
-     * snapshot is the case as it was rather than a list of what changed, so
-     * there is no one field to update - this writes them all, which is right
-     * whichever one moved.
-     */
     RECONCILE_TEST_CASE(
             Bundle.message("codegen.restore.test.case")
     ),
 
-    /**
-     * Whether the case runs at all. Disabled is the one status that says
-     * anything about that, and it used to say it to Testin alone: the card
-     * showed it, the JSON stored it, and the suite ran the case exactly as
-     * before (#166).
-     */
     UPDATE_TEST_CASE_STATUS(
             Bundle.message("codegen.update.test.case")
     ),
 
-    /**
-     * The attributes that never reach the Java: ids, paths, the audit fields.
-     * A constant rather than a null on the attribute, so an edit runs its
-     * generator either way instead of asking whether it has one.
-     */
     NO_CODE_CHANGE(
             Bundle.message("codegen.no.code.change"),
             "read-only attribute"
     );
 
-    /**
-     * What this operation is called where a tester meets it: the entry on the
-     * IDE's undo history, and the thing the "still indexing" refusal names.
-     * <p>
-     * Every constant carried an English phrase beside this one as well - "Update
-     * Automation Test Method Description &amp; Name", and twenty-two more - read
-     * by one log line and shown to nobody. They were either dead weight or a
-     * gutter mark that was never built; they were the first, and the log names
-     * the constant instead (#66, finding 93).
-     */
     private final @NotNull String description;
 
-    /**
-     * What this operation does to the generated code.
-     * <p>
-     * A value for every constant: the data-only attributes carry the no-op, and
-     * everything else carries the resolver below. The resolver looks the real
-     * generator up when it runs rather than here, which is what keeps this enum
-     * free of PSI classes so it still loads in an IDE without Java support - and
-     * is why the field can hold a value instead of a null standing for "look it
-     * up later" (#71).
-     */
     private final @NotNull GenAction action;
 
     GenType(final @NotNull String description) {
@@ -248,24 +158,9 @@ public enum GenType {
         this.action = new NoOpCodeUpdate(dataOnlyField);
     }
 
-    /**
-     * Marks that this project has already been told the IDE is indexing, so it is
-     * told once rather than once per item of a bulk operation.
-     */
     private static final @NotNull Key<Boolean> INDEXING_SAID = Key.create("testin.codegen.indexingSaid");
 
-    /**
-     * Runs the Java-backed generator for this operation - or, in an IDE with no
-     * Java plugin, says so once per project and skips quietly.
-     * <p>
-     * A class rather than the method reference it used to be, so that it can
-     * answer for a list as well as for one item. A lambda cannot: it takes the
-     * interface's default {@code executeAll}, which is a loop, and the whole
-     * point of handing a generator the set is that it can do the per-class work
-     * once instead of per case.
-     */
     private final class JavaCodeUpdate implements GenAction {
-
         // UC-CODEGEN-019, Rule-CODEGEN-005
         @Override
         public void execute(final @NotNull Project p, final @NotNull Object obj) {
@@ -274,25 +169,7 @@ public enum GenType {
             CodeGenerators.find(GenType.this).execute(p, obj);
         }
 
-        /**
-         * UC-CODEGEN-019, Rule-CODEGEN-005, Rule-EDITOR-PANEL-046.
-         * <p>
-         * One command around the whole list, so one gesture is one entry on the
-         * IDE's undo history.
-         * <p>
-         * Each generator used to open a command per case, so bulk-editing forty
-         * descriptions was forty entries with the same name on them, and a
-         * tester who changed their mind held CTRL+Z and watched the class
-         * rewrite itself a method at a time with no way to tell how many
-         * presses were left. Dragging one card in a set of two hundred was
-         * worse: the order sweep touches every case in the set (#153).
-         * <p>
-         * The hop is here rather than in each generator because a command has
-         * to be opened on the EDT and a caller may not be on it - the update
-         * menu hands its list over from a pooled thread. A generator that opens
-         * one of its own is merged into this one rather than starting a second,
-         * which is what lets the two that batch by class keep doing it.
-         */
+        // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-EDITOR-PANEL-046
         @Override
         public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
             if (!canGenerate(p) || items.isEmpty()) return;
@@ -302,62 +179,22 @@ public enum GenType {
                             () -> CodeGenerators.find(GenType.this).executeAll(p, items)));
         }
 
-        /**
-         * UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-006, Rule-CODEGEN-082.
-         * <p>
-         * Whether there is anything that can generate right now. Two questions,
-         * and both belong here rather than in the fourteen generators: whether
-         * code is on - the Java plugin, and a {@code testin.yml} naming the open
-         * test project (#335) - and whether the IDE has finished its index, since
-         * a class cannot be looked up by name while it builds.
-         * <p>
-         * Every generator resolves its target through
-         * {@code JavaPsiFacade.findClass}, which raises rather than answering
-         * empty while the index is being built - and every action that reaches
-         * one is a {@code DumbAwareAction}, so they are all live during
-         * indexing. The two together are an internal error in front of a tester
-         * who was creating a test case (#126).
-         */
+        // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-006, Rule-CODEGEN-082
         private boolean canGenerate(final @NotNull Project p) {
             if (!CodeOn.isOnOrWarnOnce(p)) return false;
             if (!DumbService.isDumb(p)) return true;
 
-            // Once for the project, the way the missing-Java-plugin half one line
-            // above already says it. The refusal is about the IDE, not about the
-            // test case that happened to be first, and it had no guard at all - so
-            // removing forty cases while the IDE was indexing was forty red
-            // balloons for one gesture (#66, finding 80).
             if (Once.claim(p, INDEXING_SAID)) {
                 Services.getInstance(p, Notifier.class).softRefuse(p, Refused.WHILE_INDEXING, description);
 
-                // Once per indexing, not once per session. Never released, the
-                // claim was spent by the first Gradle sync or branch switch, and
-                // every later indexing refused generation in silence - a test
-                // case created, a set renamed or a card dragged got no method and
-                // one log line (#66, finding 195). Released when the IDE is smart
-                // again, the next indexing says so again, once.
                 DumbService.getInstance(p).runWhenSmart(() -> p.putUserData(INDEXING_SAID, null));
             }
 
-            // The constant, not the description: a log line reads the same in
-            // every language the plugin speaks, and the description does not.
             Logger.info("Skipped " + name() + ": the IDE is indexing");
             return false;
         }
     }
 
-    /**
-     * Generates for a whole list in one go. A caller with a set in hand - an
-     * import, a copied test set, a bulk edit - hands the set over rather than
-     * the cases one by one, so the generator can do the work that is per class
-     * once instead of per case.
-     * <p>
-     * Through the same action {@link #getAction()} returns, which it did not
-     * used to be: it went straight to the registry, so a data-only attribute
-     * asked for a Java generator it has no use for and warned about the missing
-     * Java plugin on the way. The two forms of the same operation now behave the
-     * same, because they are the same object.
-     */
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
         action.executeAll(p, items);
     }

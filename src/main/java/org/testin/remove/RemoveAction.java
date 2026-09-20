@@ -46,28 +46,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
-/**
- * UC-TREE-PANEL-012.
- * <p>
- * Declared in {@code plugin.xml} (#119), so Find Action offers it by name and
- * the Keymap lists it. No constructor and no fields: the platform builds one
- * instance for the whole IDE, so the nodes come from the keystroke.
- * <p>
- * <b>And declared with no default key.</b> DELETE is the tree's key, the card
- * list's and the grid's, and a registered shortcut is dispatched before a
- * component's input map - so one keymap entry would answer for all three. The
- * tree puts DELETE on this action itself, which is what Delete Test Case already
- * does on the two editors' lists.
- * <p>
- * The removal is in {@link Work}, which is what a keystroke that arrived in the
- * tree with a project behind it has to work with.
- */
+// UC-TREE-PANEL-012
 public class RemoveAction extends DumbAwareAction {
-
-    /**
-     * Every selected node that can actually be removed - the tree's fixed shape
-     * is not among them.
-     */
     private static @NotNull List<DirectoryDto> removableNodes(final @NotNull AnActionEvent e) {
         return TestinData.selectedNodes(e).stream()
                 .filter(DirectoryDto::isRemovable)
@@ -86,13 +66,7 @@ public class RemoveAction extends DumbAwareAction {
         new Work(p).confirm(nodesToRemove);
     }
 
-    /**
-     * UC-TREE-PANEL-012, Rule-TREE-PANEL-042.
-     * <p>
-     * Gray where nothing selected can go - and outside the Testin tree, where
-     * nothing is selected at all, which is what keeps DELETE the tree's own key
-     * rather than one that fires anywhere (#119).
-     */
+    // UC-TREE-PANEL-012, Rule-TREE-PANEL-042
     @Override
     public void update(final @NotNull AnActionEvent e) {
         GrayWithReason.unless(this, e, !removableNodes(e).isEmpty(), Bundle.message("remove.node.disabled.description"));
@@ -103,17 +77,9 @@ public class RemoveAction extends DumbAwareAction {
         return ActionUpdateThread.EDT;
     }
 
-    /**
-     * Removing a selection of nodes, for a project that is there.
-     */
     private record Work(@NotNull Project p) {
-
         // UC-TREE-PANEL-012, Rule-TREE-PANEL-038
         private void confirm(final @NotNull List<DirectoryDto> nodesToRemove) {
-            // What it holds goes in the message, under the question. The row below
-            // carries the path, captioned "From", and a second captioned row would
-            // read as a destination. A test project takes every test set, case and
-            // run inside it.
             final @NotNull String holds = nodesToRemove.size() == 1
                     ? NodeCounter.childCounts(p, nodesToRemove.getFirst()).describe()
                     : "";
@@ -123,8 +89,6 @@ public class RemoveAction extends DumbAwareAction {
                     : Bundle.message("remove.confirm.many", String.valueOf(nodesToRemove.size())))
                     + (holds.isEmpty() ? "" : System.lineSeparator() + holds);
 
-            // Single node: its path shows exactly what is being deleted. Several, and
-            // there is no one path to show, which the dialog reads as no From row.
             final @NotNull String from = nodesToRemove.size() == 1 ? nodesToRemove.getFirst().getPath().toString() : "";
             new ConfirmDialog(p, Bundle.message("remove.confirm.title"), msg, from, "", Bundle.message("remove.confirm.button"), () -> removeNodes(nodesToRemove)).show();
         }
@@ -135,21 +99,9 @@ public class RemoveAction extends DumbAwareAction {
 
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            // One press of CTRL+Z puts back everything this one gesture removed, so
-            // what it would take is collected here and recorded once, below - not per
-            // node, which is what would cost four presses to undo a selection of
-            // four.
             final @NotNull List<Kept> kept = new ArrayList<>(nodesToRemove.size());
 
-            // Copied aside before it goes, because the recycle bin the removal
-            // sends it to is somewhere the platform can put things and cannot
-            // take them out of again. A node whose copy could not be made is
-            // still removed; it is simply not part of what CTRL+Z can reach.
-            //
-            // Rule-TREE-PANEL-102. Behind a progress bar and off the EDT: the
-            // copy is the whole node - for a test project every set, case and
-            // run in it - and it froze the IDE for as long as that took, with no
-            // way to stop it (#66, finding 179). Cancel removes nothing.
+            // Rule-TREE-PANEL-102
             final boolean copied = ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
                 for (final DirectoryDto node : nodesToRemove) {
                     ProgressManager.checkCanceled();
@@ -162,9 +114,7 @@ public class RemoveAction extends DumbAwareAction {
                 return;
             }
 
-            // Every editor on a removed node or under it closes with it - a
-            // removed package takes its test sets' editors, which were left open
-            // over deleted data (Rule-TREE-PANEL-116).
+            // Rule-TREE-PANEL-116
             for (final DirectoryDto node : nodesToRemove) {
                 Services.getInstance(p, TestinEditors.class).close(p, node);
             }
@@ -172,10 +122,6 @@ public class RemoveAction extends DumbAwareAction {
             removeEach(nodesToRemove, went -> {
                 Logger.info("Removed " + went.size() + " of " + nodesToRemove.size() + " node(s).");
 
-                // Only what really went is put on the history. A node whose delete
-                // failed is still there, and an entry for it offered CTRL+Z over a
-                // node that never left - or, when nothing went at all, an entry
-                // for nothing (#66, finding 217).
                 final @NotNull List<Kept> undoable = kept.stream().filter(one -> went.contains(one.dto())).toList();
                 kept.stream().filter(one -> !went.contains(one.dto())).forEach(one -> indexer.forgetKept(one.copy()));
 
@@ -184,10 +130,6 @@ public class RemoveAction extends DumbAwareAction {
                 recordRemoval(went, undoable);
                 Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, went.size());
 
-                // At the moment it happens, not when the tester presses CTRL+Z and
-                // finds out. A removal whose copy could not be kept aside is still a
-                // removal; what it is not is undoable, and that is the half nothing
-                // used to say (#196).
                 final int lost = went.size() - undoable.size();
                 if (lost > 0) {
                     Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("remove.not.undoable.title"),
@@ -198,22 +140,7 @@ public class RemoveAction extends DumbAwareAction {
             });
         }
 
-        /**
-         * UC-TREE-PANEL-012, Rule-TREE-PANEL-042.
-         * <p>
-         * Removes every node, and rebuilds the tree once the last of them has
-         * actually gone, handing over the ones that did.
-         * <p>
-         * The count is drained by the callbacks rather than by the loop, because
-         * removal is asynchronous: a tree rebuilt when the loop ends is rebuilt
-         * before a single node has been removed. Only the ones that really went are
-         * handed over - a fixed container reports false, and used to be reported as
-         * if it were removed.
-         * <p>
-         * Both the removal and the redo of one come through here. The redo had its
-         * own copy of the loop, without the waiting, so it rebuilt the tree before
-         * anything had gone and read as a key that did nothing.
-         */
+        // UC-TREE-PANEL-012, Rule-TREE-PANEL-042
         private void removeEach(final @NotNull List<DirectoryDto> nodes, final @NotNull Consumer<@NotNull List<DirectoryDto>> whenAllGone) {
             final @NotNull AtomicInteger pending = new AtomicInteger(nodes.size());
             final @NotNull List<DirectoryDto> went = new CopyOnWriteArrayList<>();
@@ -229,16 +156,6 @@ public class RemoveAction extends DumbAwareAction {
             }
         }
 
-        /**
-         * Records what a removal would take to reverse, on the tree's own history -
-         * the surface the tester was standing on when they removed it, and the one
-         * they will press CTRL+Z on (#165).
-         * <p>
-         * Pushed even when nothing could be kept aside. The entry then puts nothing
-         * back and says why - which is what the tester needs CTRL+Z to do here.
-         * Pushing nothing meant the next CTRL+Z reached the change before this one
-         * and took that back instead, which they never asked for (#196).
-         */
         // UC-TREE-PANEL-012, Rule-TREE-PANEL-040
         private void recordRemoval(final @NotNull List<DirectoryDto> asked, final @NotNull List<Kept> kept) {
             final @NotNull String what = asked.size() == 1
@@ -255,14 +172,7 @@ public class RemoveAction extends DumbAwareAction {
                     () -> kept.forEach(one -> Services.getInstance(p, ProjectIndexer.class).forgetKept(one.copy()))));
         }
 
-        /**
-         * UC-TREE-PANEL-016, Rule-TREE-PANEL-040, Rule-INTERNAL-063.
-         * <p>
-         * Puts back what the removal kept aside, and answers whether all of it came
-         * back. False means this has already said why, so the press is not confirmed
-         * on top of it - a tester used to get "Undo Incomplete" and "Undone" from
-         * one CTRL+Z, the two contradicting each other (#275).
-         */
+        // UC-TREE-PANEL-016, Rule-TREE-PANEL-040, Rule-INTERNAL-063
         private boolean restoreAll(final @NotNull List<Kept> kept) {
             if (kept.isEmpty()) {
                 Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("remove.not.undoable.title"),
@@ -272,10 +182,7 @@ public class RemoveAction extends DumbAwareAction {
 
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            // Rule-TREE-PANEL-102. Off the EDT for the reason the removal is: the
-            // copy back is the whole node, and the test project is read again
-            // after it (#66, finding 179). Not canceled half way: a node half put
-            // back is worse than one not put back.
+            // Rule-TREE-PANEL-102
             final @NotNull List<Kept> lost = new ArrayList<>();
             ProgressManager.getInstance().runProcessWithProgressSynchronously(
                     () -> lost.addAll(kept.stream().filter(one -> !indexer.restoreNode(one.copy(), one.original())).toList()),
@@ -288,22 +195,12 @@ public class RemoveAction extends DumbAwareAction {
             return false;
         }
 
-        /**
-         * UC-TREE-PANEL-017.
-         * <p>
-         * Takes them away again, through the same handler and the same waiting the
-         * removal used - so the generated code, the caches and the tree see a redo
-         * exactly as they saw the removal. The copies stay where they are: a redo is
-         * one more press away from being undone again.
-         */
+        // UC-TREE-PANEL-017
         private void removeAll(final @NotNull List<Kept> kept) {
             removeEach(kept.stream().map(Kept::dto).toList(), went -> Logger.info("Removed " + went.size() + " node(s) again."));
         }
     }
 
-    /**
-     * One node that went, and the copy that can bring it back.
-     */
     private record Kept(@NotNull DirectoryDto dto, @NotNull Path original, @NotNull Path copy) {
     }
 }

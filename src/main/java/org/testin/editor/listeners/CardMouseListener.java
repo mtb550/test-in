@@ -69,11 +69,6 @@ public class CardMouseListener extends MouseAdapter {
         final boolean isClickOnItem = index >= 0 && list.getCellBounds(index, index).contains(e.getPoint());
 
         if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-            // Focused, not just shown: the details tab carries the F2 binding
-            // itself, so landing the focus there is what lets a tester open the
-            // update menu straight after the double-click. The same call the
-            // View Details actions make - the double-click was the one way in
-            // that showed the panel and left the focus behind.
             if (isClickOnItem)
                 Optional.ofNullable(model.getElementAt(index)).ifPresent(selected -> ViewToolWindowFactory.showPanel(p, List.of(selected), path, ViewPanel::focusDetailsTab));
 
@@ -110,10 +105,6 @@ public class CardMouseListener extends MouseAdapter {
 
             Logger.trace(action.getTooltip() + ", tc: " + tc.getDescription());
 
-            // A gray icon is on the card so the tester can see the button exists
-            // and learn what it needs - and pressing it says that, rather than
-            // doing nothing. The tooltip says the same, but a tooltip is read by
-            // whoever waited for it (#312, A16).
             final @NotNull Optional<String> whyNot = action.whyNotOffered(p);
             if (whyNot.isPresent()) {
                 Services.getInstance(p, Notifier.class).softRefuse(p, whyNot.orElseThrow());
@@ -121,14 +112,6 @@ public class CardMouseListener extends MouseAdapter {
                 return;
             }
 
-            // Which editor the tester clicked in. The reports that follow name
-            // only the case, and a case can be in several open runs.
-            //
-            // Only for the icon that starts something. Claiming stamps when
-            // execution began and moves a Created run to In Progress, and this
-            // ran for whichever icon was clicked - so the stop icon started the
-            // run it was stopping, and so did the one that only navigates to the
-            // test method (#221).
             if (action == CardHoverAction.RUN_TEST_CASE) editor.launching(tc.getId());
 
             action.execute(p, tc);
@@ -157,8 +140,6 @@ public class CardMouseListener extends MouseAdapter {
             editor.setHoveredIconAction(actionName);
             needsRepaint = true;
 
-            // Swing's own contract: a null tooltip is no tooltip, and an empty
-            // one is a small empty box that follows the pointer.
             list.setToolTipText(currentAction.map(action -> action.getHintText(p)).orElse(null));
         }
 
@@ -181,9 +162,6 @@ public class CardMouseListener extends MouseAdapter {
         WheelForwarding.forwardWheelToScrollPane(e);
     }
 
-    /**
-     * The action under the pointer, when the pointer is inside a row at all.
-     */
     private @NotNull Optional<CardHoverAction> actionUnder(final @NotNull MouseEvent e, final int index) {
         if (index == -1) return Optional.empty();
 
@@ -196,25 +174,14 @@ public class CardMouseListener extends MouseAdapter {
     private @NotNull Optional<CardHoverAction> getActionAtPoint(final int index, final int xInCell, final int yInCell) {
         if (index == -1) return Optional.empty();
 
-        // Must match the font the card paints the title in, or the width is
-        // measured against the wrong glyphs and every target shifts.
         final float baseSize = list.getFont().getSize2D();
         final @NotNull Font titleFont = list.getFont().deriveFont(Font.BOLD, baseSize + BaseCard.TITLE_FONT_DELTA);
 
-        // The title is asked of the editor, which owns what it reads, and where
-        // the icons sit is asked of CardTitle, which paints them. Neither is worked
-        // out here: both used to be, and both drifted.
         final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
         final @NotNull String title = editor.cardTitle(tc);
 
-        // Capped at the title column exactly as the card caps what it paints, so
-        // a title long enough to wrap keeps the clickable band under the icons
-        // rather than out past the edge of the card.
         final int titleWidth = Math.min(list.getFontMetrics(titleFont).stringWidth(title), CardTitle.titleColumnWidth(list.getWidth()));
 
-        // The card draws the run button or the stop button by the same rule, so
-        // the pointer is over whichever one this case is offering.
         return CardTitle.descriptionActionIcons(titleWidth).at(xInCell, yInCell, CardHoverAction.runSlot(p, tc));
     }
-
 }

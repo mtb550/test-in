@@ -37,16 +37,7 @@ import javax.swing.*;
 import java.io.File;
 import java.util.Arrays;
 
-/**
- * Where a generated file goes: a destination folder, a file name and a format.
- * <p>
- * A framework dialog component, so the dialogs that write a file declare it as
- * content instead of laying the rows out themselves. It owns its own layout,
- * which is a component's business; the dialog owns the title, the button and
- * the status bar.
- */
 public final class DestinationForm implements DialogComponent {
-
     private final @NotNull Project p;
     private final @NotNull FormRows rows;
     private final @NotNull TextFieldWithBrowseButton folderField = new TextFieldWithBrowseButton();
@@ -59,18 +50,6 @@ public final class DestinationForm implements DialogComponent {
 
         fileNameField.setText(fileName);
         formatCombo.setSelectedItem(defaultFormat);
-        // The combo holds the format itself and renders its label, so the
-        // selection needs no lookup back from text.
-        //
-        // Subclassed rather than built by SimpleListCellRenderer.create: both
-        // factory overloads are deprecated on the 2026.2 branch and say they
-        // will be removed, so an earlier fix that swapped one for the other
-        // only moved the problem. The class is not going anywhere - customize
-        // is its one abstract method - so implementing it is the form that
-        // survives.
-        //
-        // The empty string is what an unselected combo renders, and the only
-        // reason this reads a null at all; the model holds no nulls of its own.
         formatCombo.setRenderer(new SimpleListCellRenderer<>() {
             @Override
             public void customize(final @NotNull JList<? extends FileTypes> list, final FileTypes format, final int index, final boolean selected, final boolean focused) {
@@ -85,23 +64,11 @@ public final class DestinationForm implements DialogComponent {
 
         folderField.addBrowseFolderListener(p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
 
-        // Seeded, never opened: the dialog already shows what it will write, so
-        // the tester browses when they want to. Only the import dialog, which
-        // has nothing to show until a file is chosen, opens its chooser itself.
         folderField.setText(defaultFolder());
 
         rows = buildRows();
     }
 
-    /**
-     * The name with the chosen format's extension on it.
-     * <p>
-     * Only a tail that is itself a known extension is replaced. Cutting at the
-     * last dot regardless turned "Sprint 1.2 Report" into "Sprint 1.pdf" - the
-     * file was written, under a name the tester did not choose.
-     */
-    // Package-private rather than private so the naming rule can be tested
-    // without a Project and a Swing form behind it.
     static @NotNull String withExtension(final @NotNull String fileName, final @NotNull String extension) {
         if (fileName.endsWith(extension)) return fileName;
 
@@ -124,21 +91,11 @@ public final class DestinationForm implements DialogComponent {
         return formRows;
     }
 
-    /**
-     * UC-SHARE-001.
-     * <p>
-     * The destination, or empty when a field is still empty - in which case the
-     * offending field takes the focus and the dialog stays open.
-     */
+    // UC-SHARE-001
     public @NotNull Optional<Destination> resolve() {
         final @NotNull String folder = folderField.getText().trim();
         final @NotNull String fileName = fileNameField.getText().trim();
 
-        // Said in the box that is empty, the way every dialog on the framework
-        // says it. All three used to move the cursor and nothing else: the
-        // tester pressed the button, the dialog stayed open, nothing turned red
-        // and nothing was written - which reads as a button that does not work
-        // rather than as a field that needs filling in (#251).
         if (fileName.isEmpty()) {
             EmptyWarning.show(fileNameField, Bundle.message("destination.name.the.file"));
             return Optional.empty();
@@ -159,15 +116,7 @@ public final class DestinationForm implements DialogComponent {
         return Optional.of(new Destination(new File(folder, withExtension(fileName, format.getExtension())), format));
     }
 
-    /**
-     * Rule-SETTING-021, Rule-SETTING-023.
-     * <p>
-     * Where the dialog starts, never where it writes. This form used to offer a
-     * "Set as default folder" tick box that stored the chosen folder, so a
-     * setting the tester had made on the settings page was overwritten from a
-     * dialog - and the box was drawn only while no folder was set, so once one
-     * was there it could not be changed back from here (#240).
-     */
+    // Rule-SETTING-021, Rule-SETTING-023
     private @NotNull String defaultFolder() {
         return Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
     }
@@ -184,14 +133,8 @@ public final class DestinationForm implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // The dialog confirms by its own button - Export or Generate - not by
-        // Enter in a field.
     }
 
-    /**
-     * A resolved destination. Only produced when every field is filled, so the
-     * caller never has to re-check them.
-     */
     public record Destination(@NotNull File file, @NotNull FileTypes format) {
     }
 }

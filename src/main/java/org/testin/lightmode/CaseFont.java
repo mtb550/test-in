@@ -25,37 +25,8 @@ import org.testin.ui.FontSync;
 
 import java.awt.Font;
 
-/**
- * How large light mode writes the case, before the tester's own zoom (#13).
- * <p>
- * <b>Anchored to the editor, not to the UI font.</b> The size comes from
- * {@link FontSync#getBaseFontSize()}, which is what the details panel and every
- * other place the plugin shows a test case already uses - so a tester who has
- * set their IDE font to sixteen point reads the case at sixteen point here too,
- * rather than at whatever the platform happens to make of a label. Light mode
- * used to take the UI font and stood out from every other surface for it.
- * <p>
- * <b>Three sizes, and the difference between them is the point.</b>
- * {@link #description} is the thing being tested and is set larger and bold;
- * {@link #body} - the expected result, the steps, the test data - is read
- * against it at the editor's own size; {@link #label}, for the test set name
- * and the cut-off notice, is smaller still, because it names or notes rather
- * than being read for itself. A field is named by its icon rather than a word.
- * Flattening them would leave a window of one uniform paragraph.
- * <p>
- * Methods rather than constants, deliberately. The editor font is a setting the
- * tester can change while the IDE is running, and a constant would freeze
- * whichever size was in force when this class was first loaded - the same
- * mistake {@code TestStatus} records beside its lazy colors.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class CaseFont {
-
-    /**
-     * How much larger the description is than the case's other text, and how
-     * much smaller a label is. Points rather than a ratio, because the anchor is
-     * a point size the tester chose and these read as steps from it.
-     */
     private static final int BIGGER = 3;
     private static final int SMALLER = 2;
 
@@ -75,10 +46,6 @@ final class CaseFont {
         return JBFont.label().deriveFont(style, Math.max(FontSync.FLOOR, size));
     }
 
-    /**
-     * A font at this window's zoom. One owner, because the case, its details and
-     * the failure form each wrote the same multiplication.
-     */
     static @NotNull Font zoomed(final @NotNull Font base, final float zoom) {
         return base.deriveFont(base.getSize2D() * zoom);
     }

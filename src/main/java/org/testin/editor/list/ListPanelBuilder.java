@@ -44,34 +44,12 @@ import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-/**
- * Builds the card-list view used by both editors — the list-view counterpart of
- * {@code grid/GridPanelBuilder}. The editors keep only their own specifics
- * (renderer, drag-and-drop reordering, model sync).
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ListPanelBuilder {
-
     public static @NotNull ListView build(final @NotNull Project p, final @NotNull Disposable fontSyncDisposable, final @NotNull TestinEditor editor) {
         final @NotNull CollectionListModel<TestCaseDto> model = new CollectionListModel<>(new ArrayList<>());
 
-        // UC-EDITOR-PANEL-001 and UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-003.
-        //
-        // A card is drawn to the width it is given - a long title wraps onto more
-        // lines rather than running off the side - so this list never scrolls
-        // sideways, and saying so is what stops it trying.
-        //
-        // JList works the answer out instead, by comparing the widest card with
-        // the viewport, and until the list has been laid out it has no width to
-        // give: CardTitle.titleColumnWidth reads zero, decides there is no column to
-        // wrap inside, and lets the title run as far as it likes, which lays the
-        // card out 32767 pixels wide. So opening an editor put a horizontal
-        // scrollbar under a virtually endless row, and every re-measure as the
-        // real width arrived grew its thumb a little until the bar went away.
-        //
-        // Answered here rather than by making the zero-width case guess a column:
-        // a card with nowhere to wrap really has no column, and the fix for that
-        // is to give it the width, which is what this does.
+        // UC-EDITOR-PANEL-001, UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-003
         final @NotNull JBList<TestCaseDto> list = new CaseList(model, editor);
         list.setBackground(UIUtil.getPanelBackground());
         list.setOpaque(true);
@@ -80,17 +58,8 @@ public final class ListPanelBuilder {
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setExpandableItemsEnabled(false);
 
-        // A list redraws its cards from the new font through its own UI.
         FontSync.syncWithNativeEditor(p, list, fontSyncDisposable, delta -> list.updateUI());
 
-        // A narrower list wraps a title over more lines, so the rows are taller -
-        // and a JList in its default vertical orientation never finds that out.
-        // BasicListUI recomputes cell heights when the model, the font or the
-        // fixed height changes, and on a width change only for the two wrapping
-        // orientations; for this one it takes the width change and does nothing
-        // with it. So the rows are re-measured here, on the width alone: dragging
-        // the editor's height changes no title's wrapping and is not worth a
-        // full relayout of the page.
         list.addComponentListener(new ComponentAdapter() {
             private int lastWidth = -1;
 
@@ -111,11 +80,6 @@ public final class ListPanelBuilder {
         return new ListView(model, list, scrollPane);
     }
 
-    /**
-     * Wires the interaction listeners shared by the test and run editors:
-     * mouse handling (hover icons, wheel forwarding, context menu), shortcuts,
-     * view-panel selection sync, and grid-selection sync.
-     */
     public static void wireCommonListeners(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull ListView view, final @NotNull DirectoryDto dir, final @NotNull AbstractEditorContextMenu contextMenu, final @NotNull Supplier<Optional<JBTable>> gridTableSupplier, final @NotNull BooleanSupplier gridActiveSupplier) {
         final @NotNull JBList<TestCaseDto> list = view.list();
 

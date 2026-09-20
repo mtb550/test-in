@@ -54,12 +54,7 @@ public class SearchTxt extends SearchTextField implements Disposable, ToolbarIte
         });
     }
 
-    /**
-     * UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-093.
-     * <p>
-     * ESC releases focus back to the editor list without clearing the filter
-     * text (issue #18) - leaving the field is not resetting the search.
-     */
+    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-093
     @Override
     protected boolean preprocessEventForTextField(final KeyEvent e) {
         if (Shortcuts.Escape.matches(e) && e.getID() == KeyEvent.KEY_PRESSED) {
@@ -70,15 +65,6 @@ public class SearchTxt extends SearchTextField implements Disposable, ToolbarIte
         return super.preprocessEventForTextField(e);
     }
 
-    /**
-     * What the tester typed, trimmed, and nothing else done to it.
-     * <p>
-     * It used to be lowercased here with no locale, and lowercased again by the
-     * filter with {@code Locale.ROOT}, so the second one could not undo the
-     * first: on a Turkish or Azeri IDE this turned the I of Login into a dotless
-     * i, and the search came back empty for a word that was on screen. One owner
-     * for the question, and it is the filter (#66, finding 82).
-     */
     public @NotNull String getSearchQuery() {
         return getText().trim();
     }

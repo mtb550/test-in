@@ -23,7 +23,6 @@ import org.testin.model.DirectoryType;
 import org.testin.model.markers.TestRunsMainDirectoryMarker;
 import java.util.List;
 
-
 @Setter
 @Getter
 @NoArgsConstructor
@@ -33,7 +32,6 @@ public class TestRunsMainDirectoryDto extends DirectoryDto {
     @NonNull
     @Builder.Default
     private TestRunsMainDirectoryMarker marker = new TestRunsMainDirectoryMarker();
-
 
     @Override
     public boolean isRenamable() {
@@ -49,8 +47,6 @@ public class TestRunsMainDirectoryDto extends DirectoryDto {
     public boolean isRemovable() {
         return false;
     }
-
-
 
     @Override
     public @NotNull DirectoryType getType() {

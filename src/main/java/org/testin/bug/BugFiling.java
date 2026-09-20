@@ -36,23 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Sends the bug report a tester wrote, and records the issue it became (#28).
- * <p>
- * The send runs in the background and cannot be canceled. The answer is
- * recorded on the EDT, and only after the run and the run item are found again
- * through the indexer: a run renamed or removed while {@code gh} was talking is
- * not written back to where it used to be.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BugFiling {
-
-    /**
-     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-073, Rule-VIEW-PANEL-077.
-     * <p>
-     * Sends it. What to redraw once the answer is recorded is the caller's to
-     * say, because the surfaces showing the run item are the caller's to know.
-     */
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-073, Rule-VIEW-PANEL-077
     public static void send(final @NotNull Project p, final @NotNull BugReports.RunItem item, final @NotNull BugRepository repository, final @NotNull BugReports.Edits edits, final @NotNull List<byte[]> screenshots, final @NotNull Runnable redraw) {
         final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
         reports.keep(item, edits);
@@ -68,10 +54,6 @@ public final class BugFiling {
                 });
     }
 
-    /**
-     * On the EDT, with what {@code gh} answered. An issue that exists is always
-     * announced with its Open, whether or not it could be stored.
-     */
     static void record(final @NotNull Project p, final @NotNull BugReports.RunItem item, final @NotNull IssueCreation answer) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
@@ -83,28 +65,18 @@ public final class BugFiling {
             if (answer.notUploaded() > 0) said.add(Bundle.message("bug.not.uploaded", answer.notUploaded()));
             else if (!answer.problem().isEmpty()) said.add(answer.problem());
 
-            // Plain lines: one of them can be gh's own stderr, and the notifier
-            // turns text into HTML itself (#66, finding 197).
             notifier.infoWithActions(p, Done.REPORTED.getOutcome(), String.join("\n", said),
                     notifier.lastingAction(Bundle.message("bug.open.issue"), () -> BugIssueUrl.open(url)));
         }, () -> notifier.error(p, Bundle.message("bug.send.failed.title"), answer.problem()));
     }
 
-    /**
-     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-074.
-     * <p>
-     * Writes the issue's address on the run item, and says why not when it
-     * cannot: the run was renamed or removed, or the run item is gone or no
-     * longer failed.
-     */
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-074
     static @NotNull Optional<String> store(final @NotNull Project p, final @NotNull BugReports.RunItem item, final @NotNull String url) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         final @NotNull Optional<TestRunItems> found = indexer.findTestRun(item.run()).flatMap(item::in);
         if (found.isEmpty()) return Optional.of(Bundle.message("bug.not.stored.moved"));
         if (found.orElseThrow().getStatus() != TestStatus.FAILED) return Optional.of(Bundle.message("bug.not.stored.no.longer.failed"));
 
-        // Through the indexer's change, as a verdict is, so a link stored while a
-        // sync brings the run in lands on the run that arrived (#66, finding 151).
         indexer.changeRun(item.run(), run -> item.failedIn(run).ifPresentOrElse(result -> result.setBugIssueUrl(url),
                 () -> Logger.warn("The run a sync brought in no longer has this failure, so its bug link was not stored: " + url)));
         return Optional.empty();

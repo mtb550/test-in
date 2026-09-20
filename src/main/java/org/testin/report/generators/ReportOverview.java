@@ -32,33 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.testin.model.markers.TestRunMarker;
 
-/**
- * What section one of every report says about the run.
- * <p>
- * The three generators each held their own copy of these ten rows - the same
- * captions, the same values, the same four conditions - and they had already
- * drifted apart in four ways at once: the HTML report was missing the change
- * log, the commit id and the component, and printed a Test Type of "API
- * Functional Testing" that it had never read from the run; the Word file
- * captioned the platform pair with a backslash where the other two used a
- * comma; and the run status came out as a word in one format and as an enum
- * constant in the other two.
- * <p>
- * None of that was catchable, because three files agreeing is not something a
- * compiler can check. Stated once here, it is not something that has to be
- * checked.
- * <p>
- * Rows, not rendering: a caption and a value are all three formats have in
- * common, and iText, Word and a stylesheet have nothing else worth sharing.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReportOverview {
-
-    /**
-     * The value a report prints for a commit nobody recorded. Not blank: the row
-     * is there to say whether this run is pinned to a commit, and an empty cell
-     * reads as a question the report forgot to answer.
-     */
     private static final @NotNull String NOT_RECORDED = Bundle.message("report.overview.not.recorded");
 
     // Rule-REPORT-002
@@ -69,26 +44,13 @@ public final class ReportOverview {
         rows.add(new DetailRow(Bundle.message("report.overview.project"), projectName));
         rows.add(new DetailRow(Bundle.message("node.tr"), trDir.getName()));
 
-        // Every configuration field, walked rather than listed. Listed, it
-        // printed five of the eight: the language, the browser and the device
-        // type were asked of the tester, written to two files, and appeared in
-        // no report at all - and a ninth question would have been the fourth.
-        //
-        // Only what the tester answered. A row saying nothing is a row the
-        // reader has to look at to find out it says nothing.
         for (final TestRunConfiguration field : TestRunConfiguration.values()) {
-            // The commit id is the one field whose blank is worth a row: it says
-            // whether the run is pinned to a commit, and an empty cell reads as
-            // a question the report forgot to answer.
             if (field == TestRunConfiguration.COMMIT_ID) {
                 rows.add(new DetailRow(field.getDisplayName(),
                         field.valueIn(marker).isEmpty() ? NOT_RECORDED : field.valueIn(marker)));
                 continue;
             }
 
-            // The platform and the component are one row, captioned by whichever
-            // halves were answered - so a run with no platform reads
-            // "Component: Backend" rather than "Platform, Component: , Backend".
             if (field == TestRunConfiguration.COMPONENT) continue;
 
             if (field == TestRunConfiguration.PLATFORM) {
@@ -105,11 +67,6 @@ public final class ReportOverview {
             add(rows, field.getDisplayName(), field.valueIn(marker));
         }
 
-        // Through add, like every row above: it is the one place that drops a
-        // blank, and going round it is how a run nobody executed printed Executed
-        // By, Execution Started and Execution Ended with nothing after them
-        // (#254). TestRunExecution.valueIn already promises every reader does
-        // this; the report was the reader that did not.
         add(rows, RunEditorAttributes.EXECUTED_BY.getName(), summary.executedBy());
         TestRunExecution.rowsOf(marker).forEach(row -> add(rows, row.caption(), row.value()));
         add(rows, RunEditorAttributes.RUN_STATUS.getName(), marker.getStatus().getLabel());
@@ -117,9 +74,6 @@ public final class ReportOverview {
         return List.copyOf(rows);
     }
 
-    /**
-     * A row, unless there is nothing to put in it.
-     */
     private static void add(final @NotNull List<DetailRow> rows, final @NotNull String caption, final @NotNull String value) {
         if (value.isEmpty()) return;
 

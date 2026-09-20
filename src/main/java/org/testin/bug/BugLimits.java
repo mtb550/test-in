@@ -23,26 +23,13 @@ import org.testin.util.Bundle;
 
 import java.util.Optional;
 
-/**
- * What GitHub and {@code gh} will take in one issue (#28), asked as the tester
- * types so that Send says so before anything is sent.
- * <p>
- * A long Selenium stacktrace passes the body's limit on its own, which is the
- * case this exists for.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BugLimits {
-
     private static final int TITLE = 256;
     private static final int BODY = 65_536;
     private static final int SCREENSHOTS = 50;
 
-    /**
-     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-071.
-     * <p>
-     * Why this would be refused, and empty when it would not. Counted in the
-     * string's own characters, which is never fewer than GitHub counts.
-     */
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-071
     static @NotNull Optional<String> whyNot(final @NotNull String title, final @NotNull String body, final int screenshots) {
         final int titleLength = title.strip().length();
 

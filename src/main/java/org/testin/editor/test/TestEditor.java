@@ -60,24 +60,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestSetDirectoryDto> implements Toolbar {
-
-
     private final @NotNull ModelChangeNotifier modelChangeNotifier;
 
     @Getter
     private final @NotNull TestToolbar toolBar;
-    /**
-     * One counter for every model-replacing operation - data loads and badge
-     * sorts alike (#24). Each one bumps and checks it, so a stale in-flight
-     * result never overwrites a newer one, whichever kind it is.
-     */
     private final @NotNull AtomicInteger modelGeneration = new AtomicInteger();
 
-    /**
-     * True from the moment a load starts until its data is on screen. The empty
-     * message asks it, so a list that is empty because it is still loading keeps
-     * the loading message instead of being told there is nothing to show.
-     */
     private volatile boolean loading;
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-119
@@ -89,7 +77,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     public TestEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
         super(p, vf.getTestSet());
 
-        // Test editor specifics: manual reordering by drag-and-drop and the card renderer.
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
         list.setTransferHandler(new TransferListener(p, this));
@@ -110,18 +97,11 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
 
         TestCaseExecutionSubscriber.onReported(p, projectDisposable, (tc, status, duration, failure) -> list.repaint());
 
-        // List view is the default mode when the editor opens.
         onToolBarSwitchedToListView();
 
         loadDataAsync();
     }
 
-
-
-    /**
-     * The same, telling {@code onLoaded} once the cases are on screen - which is
-     * the only moment a refresh can honestly be confirmed.
-     */
     @Override
     protected void loadDataAsync(final @NotNull Runnable onLoaded) {
         final int generation = modelGeneration.incrementAndGet();
@@ -140,8 +120,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
                         currentTestCases.clear();
                         list.setPaintBusy(false);
                         loading = false;
-                        // The message comes from refreshView, which is the one place
-                        // that knows what the page ended up holding.
                         refreshView();
                         onLoaded.run();
                     });
@@ -161,7 +139,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
 
                     ordered.forEach(tc -> tc.setParent(parent));
 
-                    // The item may now sit on a different page than before the reload.
                     jumpToPageOfPendingSelection();
 
                     list.setPaintBusy(false);
@@ -172,12 +149,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
                     onLoaded.run();
                 });
 
-            // A read that throws used to leave the editor saying Loading for the
-            // rest of the session: the pooled body had no catch, so nothing
-            // cleared the flag, nothing painted, and the only trace was whatever
-            // the platform logged about an uncaught exception. The run editor has
-            // said what happened all along; this is the same thing on this side
-            // (#66).
             } catch (final Exception ex) {
                 Logger.error("Failed to load test set data from disk: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
@@ -207,37 +178,16 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                // Ranked along the order on screen, which is the order the tester
-                // just arranged. A case already sitting in the right place keeps the
-                // rank it had, so a drag writes the case that moved and leaves the
-                // rest of the set alone.
                 final @NotNull List<TestCaseDto> moved = TestCaseOrder.place(snapshot);
 
                 Services.getInstance(p, ProjectIndexer.class).updateSequence(dirPath, snapshot, moved);
 
-                // The generated methods carry the position, so a reorder has to
-                // rewrite them or the run keeps executing in the order before the
-                // drag. Every case in the set, not only the ones whose rank changed:
-                // moving one case past three others changes where all four sit, and
-                // a position is a number with no room between two of them.
-                //
-                // Skipped where there is nothing to write - an IDE with no Java
-                // plugin answers with a no-op, and a set nobody has generated code
-                // for has no methods to update.
                 if (!snapshot.isEmpty()) GenType.UPDATE_TEST_CASE_ORDER.executeAll(p, snapshot);
 
                 onPersisted.run();
 
                 ApplicationManager.getApplication().invokeLater(this::refreshView);
 
-            // The drag's own catch is in TransferListener, around the call - which
-            // this body runs after and off, so a failure here escaped it. The
-            // tester was told nothing, onPersisted never ran, and the screen kept
-            // an order, a paste or a new card that no file holds (#312, N2).
-            //
-            // Reading again is the only honest end: this editor cannot know which
-            // of the writes got through, and what is on disk is the answer for a
-            // drag, a paste and a create alike.
             } catch (final Exception ex) {
                 Logger.error("Failed to save the test case sequence: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
@@ -248,20 +198,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         });
     }
 
-
-    /**
-     * UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-009.
-     * <p>
-     * Told, not revealed. Moving the view says nothing and changes nothing, and
-     * this used to change the most visible thing the tester had set up - every
-     * filter, thrown away to show one card, with no word about it. Creating a
-     * test case under a filter, dragging one, and choosing a search result all
-     * came through here (#205).
-     * <p>
-     * The test case is there either way, so this says where to look for it
-     * rather than refusing anything - which is why the sentence is here and not
-     * beside Testin's refusals.
-     */
+    // UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-009
     @Override
     protected void notOnAnyPage(final @NotNull TestCaseDto tc) {
         Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("editor.hidden.title"),
@@ -273,17 +210,10 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     public void appendNewTestCase(final @NotNull TestCaseDto tc, final @NotNull Runnable onPersisted) {
         hold(tc);
         orderThen(() -> {
-            // Again, because a load that landed while the order was computed
-            // replaced the model with what is on disk - and this case is not on
-            // disk until the write below puts it there. Without this it would be
-            // written out of a set that no longer holds it, which is to say not
-            // written at all, while onPersisted said Created (#312, N1).
             hold(tc);
 
             updateSequenceAndSaveAll(onPersisted);
 
-            // VFS refresh goes through the indexer - file access is the
-            // indexer's alone (see CLAUDE.md).
             Services.getInstance(p, ProjectIndexer.class).refreshDirectory(parent.getPath());
 
             refreshView();
@@ -291,12 +221,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         });
     }
 
-    /**
-     * Puts a test case in the model, once. Asked by id rather than by instance:
-     * a reload builds new objects for the same cases, and {@link TestCaseDto}
-     * has no equality of its own, so the same case read twice would be added
-     * twice and drawn twice.
-     */
     private void hold(final @NotNull TestCaseDto tc) {
         synchronized (allTestCases) {
             if (allTestCases.stream().noneMatch(held -> held.getId().equals(tc.getId()))) allTestCases.add(tc);
@@ -306,11 +230,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-119
     @Override
     public void onToolBarCreateTestCaseClicked() {
-        // Asked here as well as in the action's update, because the toolbar
-        // button calls straight through and never passes it. The key and the
-        // menu entry gray themselves while the set is being read; this is the
-        // third door, and it says the same thing rather than letting the create
-        // throw the load away (#312, A18).
         if (loading) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("create.case.still.loading"));
             return;
@@ -344,11 +263,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         return getToolBar().getToolbarItem(TestDetailsPopupBtn.class).getSelectedDetails();
     }
 
-
-    /**
-     * The replace is not an edit, so the notifier that watches for edits is
-     * quiet while it happens.
-     */
     @Override
     protected void replaceModel(final @NotNull List<TestCaseDto> pageItems) {
         modelChangeNotifier.pause();
@@ -356,55 +270,22 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         modelChangeNotifier.resume();
     }
 
-    /**
-     * UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-101.
-     * <p>
-     * How much of this set is automated, and the message when there is nothing
-     * to draw at all.
-     */
+    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-101
     @Override
     protected void drawStatus(final @NotNull PageWindow page, final int totalItems) {
         showEmptyStateIfNothingToDraw(totalItems);
 
-        // Fired and forgotten: the list is already on screen, and this answers
-        // for it whenever it answers. Nothing waits, so a test set opens at the
-        // speed it opened before; a read that fails leaves the cards drawing
-        // what they drew, which is the icon the button always had.
-        //
-        // The whole set rather than the page, because it is one class either
-        // way - and because the filter narrows the set, not the page.
         final @NotNull List<TestCaseDto> all = snapshotOfAll();
         final @NotNull AutomationState automation = Services.getInstance(p, AutomationState.class);
 
         automation.read(p, all, this::refreshView);
 
-        // Read from what the service holds now, not from what the call above
-        // will find: that one answers on its own time and calls back here, so
-        // the count is written twice - blank on the way in, filled in when the
-        // answers land.
         statusBar.showAutomated(automation.writtenIn(all), automation.knownIn(all));
 
         statusBar.updatePaginationState(page.page(), page.totalPages());
     }
 
-    /**
-     * UC-EDITOR-PANEL-001.
-     * <p>
-     * What an empty list says, decided here because this is where the page is
-     * decided.
-     * <p>
-     * It used to be set only by the two places that load data, so a list emptied
-     * any other way kept whatever message was last written - remove the last
-     * test case after a refresh and the editor sat on "Refreshing..." forever,
-     * for a refresh that had finished minutes ago.
-     * <p>
-     * Two empties, two answers: nothing in the test set at all, which is an
-     * invitation to add one, and nothing matching the search, which is not - the
-     * cases are there and the filter is hiding them.
-     * <p>
-     * Silent while loading. The load paths own that message, and overwriting it
-     * here would flash "No test cases found" over data that is still on its way.
-     */
+    // UC-EDITOR-PANEL-001
     private void showEmptyStateIfNothingToDraw(final int totalItems) {
         if (totalItems > 0 || loading) return;
 
@@ -415,49 +296,21 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         }
     }
 
-
-    /**
-     * Re-sorts asynchronously, then persists the resulting sequence through
-     * the indexer. Persisting must wait for the sort to land - callers use
-     * this instead of running the two steps sequentially themselves.
-     */
     public void reorderAndPersist() {
         reorderAndPersist(() -> {
         });
     }
 
-    /**
-     * The same, telling {@code onPersisted} when the new order is on disk - what
-     * a paste needs before it can record what undoing itself would take.
-     */
     public void reorderAndPersist(final @NotNull Runnable onPersisted) {
         orderThen(() -> updateSequenceAndSaveAll(onPersisted));
     }
 
-    /**
-     * UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-013.
-     * <p>
-     * Recomputes the order off the EDT (#24): the
-     * walk runs on a pooled thread and the result is applied back on the EDT,
-     * where onDone continues (persisting, refreshing). Any newer sort or load
-     * bumps the generation, so a stale result never overwrites a newer one.
-     */
+    // UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-013
     @Override
     public void refreshOrdered() {
         orderThen(this::refreshView);
     }
 
-    /**
-     * Orders the cases, then continues.
-     * <p>
-     * The generation guards the <b>order</b>, which a newer sort or load makes
-     * stale. It does not guard {@code onDone}, which is the tester's own action
-     * carrying on - a paste, a create or a drag, each of which writes. Skipping
-     * it when the generation moved meant the write never ran: the card sat on
-     * screen, nothing reached disk, no undo was recorded and the next load took
-     * it away again (#312, N1). What onDone writes it reads from the model as it
-     * is now, so running it after a newer load is not stale, it is current.
-     */
     private void orderThen(final @NotNull Runnable onDone) {
         final List<TestCaseDto> snapshot;
         synchronized (allTestCases) {
@@ -485,14 +338,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         });
     }
 
-    /**
-     * UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095.
-     * <p>
-     * The modules this test set uses, from {@link Modules} - which is what a
-     * module is, the same way the groups below come from the owner that holds
-     * those. Which cases to ask about is the editor's; what counts as a module
-     * is not (#291).
-     */
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
     @Override
     public @NotNull Set<String> getAvailableModules() {
         return Modules.in(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(parent.getPath()));
@@ -526,13 +372,8 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         return Services.getInstance(p, AutomationState.class).matching(matched, filters.automation());
     }
 
-    /**
-     * The test editor lets go of the notifier it put on the model; everything
-     * else a tab holds is {@link AbstractTestinEditor#dispose()}.
-     */
     @Override
     protected void disposeLoadedData() {
         model.removeListDataListener(modelChangeNotifier);
     }
-
 }

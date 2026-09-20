@@ -25,7 +25,6 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 
 public class RemoveTestMethod extends UpdateTestBase implements GenAction {
-
     // UC-CODEGEN-014, Rule-CODEGEN-049, Rule-CODEGEN-050
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {

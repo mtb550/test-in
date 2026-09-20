@@ -25,36 +25,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
-/**
- * Cached parent-to-children lookup used by the asynchronous project tree.
- */
 final class DirectoryChildrenIndex {
-
-    /**
-     * Replaced whole, never edited in place.
-     * <p>
-     * A reader that finds the index clean goes straight to the map without
-     * taking the lock, which is the point of the count below. The rebuild used
-     * to clear the live map and put the entries back one at a time, so such a
-     * reader could look between the two and get {@code List.of()} - a node
-     * drawn with no children under it, for no reason it could ever repeat. The
-     * rebuild already built its answer separately, and now it swaps that in as
-     * one assignment: a reader sees the old map or the new one (#66, finding 84).
-     */
     private volatile @NotNull Map<Path, List<DirectoryDto>> childrenByParent = Map.of();
 
-    /**
-     * How many times the index has been told it is stale, and how many of
-     * those the map was built after.
-     * <p>
-     * It was one flag, cleared when a rebuild finished. A scan changes the
-     * nodes and then invalidates, so a rebuild that read them before the change
-     * and finished after the invalidation cleared the flag over the old answer,
-     * and the refresh that followed read it as fresh: a test set a pull had just
-     * deleted stayed in the tree (#66, finding 173). A rebuild now records the
-     * count it started from, so an invalidation that lands during it leaves the
-     * index stale and the next reader builds again.
-     */
     private final @NotNull AtomicLong invalidations = new AtomicLong();
     private volatile long builtAfter = -1;
 
@@ -73,18 +46,6 @@ final class DirectoryChildrenIndex {
         invalidate();
     }
 
-    /**
-     * How a folder reads: live nodes before retired ones, then the number the
-     * tester gave, then the date it was created, then the name.
-     * <p>
-     * No rule about nodes nobody numbered, because there is nothing to say: a
-     * node with no number carries {@link Marker#NOT_ORDERED}, which is the
-     * largest number there is and sorts after every real one on its own.
-     * <p>
-     * Two nodes with the same number is not a problem to fix either. The date
-     * decides between them, so a set can be put third without renumbering the
-     * set that was third already.
-     */
     private static final @NotNull Comparator<DirectoryDto> BY_ARRANGEMENT = Comparator
             .comparing(DirectoryDto::isRetired)
             .thenComparingInt(DirectoryDto::getOrder)
@@ -99,18 +60,9 @@ final class DirectoryChildrenIndex {
 
             final @NotNull Map<Path, List<DirectoryDto>> rebuilt = new HashMap<>();
             for (final DirectoryDto directory : source.get()) {
-                // A test project sits under nothing, so it is nobody's child.
                 Optional.ofNullable(directory.getParent()).ifPresent(parent ->
                         rebuilt.computeIfAbsent(parent.getPath(), ignored -> new ArrayList<>()).add(directory));
             }
-            // Retired nodes - archived packages, deprecated test sets - sort after
-            // the live ones, so last quarter's work stops being the first thing in
-            // the tree.
-            //
-            // Within each half: the order a tester arranged, then by name for
-            // everything they have not. A folder nobody has dragged in reads
-            // exactly as it always did, which is why nothing had to be converted
-            // when nodes learned to carry a rank.
             rebuilt.values().forEach(children -> children.sort(BY_ARRANGEMENT));
             rebuilt.replaceAll((parent, children) -> List.copyOf(children));
 

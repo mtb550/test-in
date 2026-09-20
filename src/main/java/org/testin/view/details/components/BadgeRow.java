@@ -30,7 +30,6 @@ import java.awt.*;
 import java.util.List;
 
 public class BadgeRow extends BaseDetails {
-
     final int FLOW_GAP = 6;
     final int INSETS_TOP = 8;
     final int INSETS_LEFT = 16;
@@ -45,7 +44,6 @@ public class BadgeRow extends BaseDetails {
 
         final @NotNull List<Badges.Badge> badges = Badges.caseBadges(dto);
 
-        // Last, the way a card orders them. None for a case nobody has run.
         final @NotNull RunStatus tempStatus = Services.getInstance(p, TestNGExecution.class).statusOf(dto);
         if (tempStatus.hasBadge()) badges.add(Badges.createRunStatusBadge(tempStatus.getBadge()));
 

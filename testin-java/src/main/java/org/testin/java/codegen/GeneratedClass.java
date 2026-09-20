@@ -31,58 +31,16 @@ import org.testin.codegen.JavaSourceRoot;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * UC-CODEGEN-001, Rule-CODEGEN-009, Rule-CODEGEN-010.
- * <p>
- * The class a test set's generated code lives in: found, or written out where it
- * is not there yet.
- * <p>
- * The twin of {@link GeneratedMethod}, and the same kind of owner - that one
- * answers which method belongs to a test case, this one which class belongs to a
- * test set. It takes the same arguments as {@link JavaSourceRoot#classFile},
- * because it is the PSI side of exactly that call.
- * <p>
- * <b>Writing the class writes the path.</b> Nothing in Testin creates a Java
- * package on its own: a folder in the tree is test data that names a package,
- * not a request to write one. The folders come into being when a class needs
- * them, which {@code JavaSourceRoot.packageFolder} does with one
- * {@code createDirectoryIfMissing} for the whole chain - so no caller here has a
- * package to make first.
- * <p>
- * One owner because the create generator had this privately and the move
- * generator did not, and the two disagreed about the same situation: a test case
- * pasted into a test set with no class got a method when it was a copy, because
- * creating one creates the class, and lost its method when it was a cut, because
- * the move looked the class up and gave up. Same gesture, same destination, two
- * answers.
- */
+// UC-CODEGEN-001, Rule-CODEGEN-009, Rule-CODEGEN-010
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GeneratedClass {
-
-    /**
-     * The class this fully qualified name stands for, and empty when the project
-     * holds none.
-     * <p>
-     * For a caller asking about a class that must already exist - the one a
-     * method is being taken out of. Reading the index, so a caller holds the
-     * read action.
-     */
     public static @NotNull Optional<PsiClass> find(final @NotNull Project p, final @NotNull List<String> classFqcn) {
         if (classFqcn.isEmpty()) return Optional.empty();
 
         return byName(p, String.join(".", classFqcn));
     }
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-010.
-     * <p>
-     * The same class, written out as an empty one - with every package folder on
-     * its path - when the project has none.
-     * <p>
-     * Empty only when the file could not be written or the PSI would not give
-     * the class back afterwards, which is what sends the create generator down
-     * its read-it-off-disk path.
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-010
     public static @NotNull Optional<PsiClass> findOrWrite(final @NotNull Project p, final @NotNull List<String> packageList, final @NotNull String className) {
         final @NotNull String path = packageList.isEmpty() ? className : String.join(".", packageList) + "." + className;
 
@@ -95,31 +53,11 @@ public final class GeneratedClass {
         return byName(p, path);
     }
 
-    /**
-     * The same, for a caller that already holds the dotted name - one grouping
-     * its cases by the class they generate into, which is a name rather than a
-     * list by then.
-     */
     public static @NotNull Optional<PsiClass> byName(final @NotNull Project p, final @NotNull String path) {
         return Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)));
     }
 
-    /**
-     * UC-CODEGEN-002, Rule-CODEGEN-011.
-     * <p>
-     * The file that was just written, given to the PSI so the class in it can be
-     * found on the next line.
-     * <p>
-     * <b>One document, not every document.</b> This was
-     * {@code commitAllDocuments()}, which flushes every open document in the
-     * project - so generating a method while the tester had six files open paid
-     * for all six, and the file it was actually waiting on was the one it could
-     * not name (#66, finding 22).
-     * <p>
-     * Nothing to commit is an answer, not a failure. A file created through the
-     * virtual file system has no document loaded against it until something
-     * opens one, and the PSI reads it either way.
-     */
+    // UC-CODEGEN-002, Rule-CODEGEN-011
     private static void commit(final @NotNull Project p, final @NotNull VirtualFile written) {
         final @NotNull PsiDocumentManager documents = PsiDocumentManager.getInstance(p);
 

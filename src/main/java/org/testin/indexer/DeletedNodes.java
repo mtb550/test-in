@@ -31,44 +31,14 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * A copy of a node kept aside while CTRL+Z can still reach it.
- * <p>
- * The recycle bin holds the tester's copy and is the one they can find without
- * this plugin - but the platform can put things into it and cannot take them
- * out, so a removal that is meant to be undoable needs a second copy somewhere
- * we control. This is that copy, and it lives as long as the operation that can
- * restore it: pushed off the end of that surface's history and it goes, and
- * whatever a run ends still holding is cleared by the next one.
- * <p>
- * Under the IDE's own system directory rather than anywhere below the Testin
- * root. A folder under the root would be indexed,
- * committed and synced unless three other places learned to skip it, and
- * deleted test data would travel to every machine the tester works on.
- */
 @Service(Service.Level.APP)
 @NoArgsConstructor
 public final class DeletedNodes {
-
     private final @NotNull Path staging = Path.of(PathManager.getSystemPath(), "testin", "deleted");
 
     private final @NotNull AtomicBoolean swept = new AtomicBoolean();
 
-    /**
-     * UC-INTERNAL-005, Rule-INTERNAL-044.
-     * <p>
-     * Clears whatever the last run left behind, once per IDE run.
-     * <p>
-     * At startup rather than at shutdown, because the copies that matter are
-     * exactly the ones a shutdown never reached - an IDE that crashed or was
-     * killed. Nothing here can be reached by a session that has only just
-     * started: an undo stack begins empty, so every copy left over belongs to a
-     * run that has ended.
-     * <p>
-     * Once per run and not once per project: two projects open share this
-     * directory, and the second one to open must not clear what the first is
-     * still holding.
-     */
+    // UC-INTERNAL-005, Rule-INTERNAL-044
     public void sweep() {
         if (!swept.compareAndSet(false, true)) return;
         if (!Files.isDirectory(staging)) return;
@@ -77,17 +47,7 @@ public final class DeletedNodes {
         else Logger.warn("Could not clear " + staging + "; copies from the previous run are still there.");
     }
 
-    /**
-     * UC-INTERNAL-005, Rule-INTERNAL-037, Rule-INTERNAL-039, Rule-INTERNAL-041.
-     * <p>
-     * Copies a node aside and answers where it went, or nothing at all when the
-     * copy failed - in which case the removal still happens and simply cannot be
-     * undone, which is what every removal did before this existed.
-     * <p>
-     * Its own folder per removal, named by a fresh id, so two sets removed under
-     * the same name are two things to put back rather than one overwriting the
-     * other.
-     */
+    // UC-INTERNAL-005, Rule-INTERNAL-037, Rule-INTERNAL-039, Rule-INTERNAL-041
     public @NotNull Optional<Path> keep(final @NotNull Path node) {
         if (!Files.exists(node)) return Optional.empty();
 
@@ -107,15 +67,7 @@ public final class DeletedNodes {
         }
     }
 
-    /**
-     * UC-INTERNAL-005, Rule-INTERNAL-042.
-     * <p>
-     * Puts a kept node back where it was removed from, and says whether it went.
-     * <p>
-     * Refuses a path something already occupies. A node created under the same
-     * name since the removal is a tester's work, and an undo that wrote over it
-     * would be destroying something to restore something.
-     */
+    // UC-INTERNAL-005, Rule-INTERNAL-042
     public boolean putBack(final @NotNull Path kept, final @NotNull Path original) {
         if (Files.exists(original)) {
             Logger.warn("Not restoring " + original + ": something is there already.");
@@ -137,14 +89,7 @@ public final class DeletedNodes {
         }
     }
 
-    /**
-     * UC-INTERNAL-005, Rule-INTERNAL-043.
-     * <p>
-     * Nobody can reach the operation holding this any more, so the copy goes for
-     * good. Outright rather than to the recycle bin: the bin already took the
-     * tester's own copy when the node was removed, and a second one arriving
-     * later would be a duplicate they never asked for.
-     */
+    // UC-INTERNAL-005, Rule-INTERNAL-043
     public void forget(final @NotNull Path kept) {
         if (!FileUtil.delete(kept.getParent().toFile()))
             Logger.warn("Left a kept copy of a removed node behind at " + kept.getParent());

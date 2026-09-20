@@ -39,28 +39,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class DescriptionSection extends AbstractOneLineSection {
-
-    /**
-     * The description's letter in red, for a description the dialog refused.
-     */
     private static final @NotNull Icon REFUSED = Icons.fieldLetter("D", Icons.RED);
 
     private final @NotNull Project p;
 
-    /**
-     * How the hint in the empty box is drawn, handed to the editor when it is
-     * made: no color of its own, so the editor's gray, until the description is
-     * refused.
-     */
     private final @NotNull TextAttributes hint = new TextAttributes();
 
-    /**
-     * The other test cases in this test set, as they are when asked.
-     * <p>
-     * None until a dialog says what to compare against, and none is a dialog
-     * with nothing to compare - it refuses nothing, which is what the update
-     * dialogs want.
-     */
     private @NotNull Supplier<List<TestCaseDto>> siblings = List::of;
 
     public DescriptionSection(final @NotNull Project p) {
@@ -71,23 +55,11 @@ public class DescriptionSection extends AbstractOneLineSection {
         field.addSettingsProvider(editor -> editor.setPlaceholderAttributes(hint));
     }
 
-    /**
-     * UC-EDITOR-PANEL-005, Rule-CODEGEN-001.
-     * <p>
-     * The test cases this description must not name the same method as, asked
-     * for again at each Enter. They were read once, when the dialog opened, on
-     * the belief that the set could not change while it was in front of it; but
-     * the popup stays open when the tester clicks away, and the editors and the
-     * tree behind it stay live, so a case written meanwhile was not compared
-     * against (#66, finding 219).
-     */
+    // UC-EDITOR-PANEL-005, Rule-CODEGEN-001
     public void compareAgainst(final @NotNull Supplier<List<TestCaseDto>> siblings) {
         this.siblings = siblings;
     }
 
-    /**
-     * The test methods the other test cases in this test set name now.
-     */
     private @NotNull Set<String> takenMethodKeys() {
         return siblings.get().stream()
                 .map(TestCaseDto::getDescription)
@@ -97,17 +69,7 @@ public class DescriptionSection extends AbstractOneLineSection {
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * UC-EDITOR-PANEL-005.
-     * <p>
-     * Turns the description red, or back: the text typed, the hint in the empty
-     * box, and the icon. Turning only the text red left an empty description
-     * looking untouched, since there was no text to turn red - and an empty one
-     * is what Enter refuses most (#328).
-     * <p>
-     * The foreground rather than the background, which it once was: a field
-     * refused once then stayed red however it was corrected.
-     */
+    // UC-EDITOR-PANEL-005
     public void setError(final boolean error) {
         field.setForeground(error ? Icons.RED : UIUtil.getTextFieldForeground());
         hint.setForegroundColor(error ? Icons.RED : null);
@@ -116,20 +78,7 @@ public class DescriptionSection extends AbstractOneLineSection {
         field.repaint();
     }
 
-    /**
-     * UC-EDITOR-PANEL-005, Rule-CODEGEN-001.
-     * <p>
-     * Refuses a description the generated code could not be named after.
-     * <p>
-     * Here rather than in the generator, which is where it used to be found: by
-     * then the description is stored, the method is being renamed or written,
-     * and the answer is either an exception the tester did not cause or a method
-     * declaration Java will not compile. A description is typed once and read
-     * from for the life of the case, so this is the moment to say no (#66).
-     * <p>
-     * A blank one is not this section's refusal to make - the save has always
-     * owned that, and it says so differently.
-     */
+    // UC-EDITOR-PANEL-005, Rule-CODEGEN-001
     @Override
     public boolean accepts() {
         final @NotNull String description = field.getText().trim();
@@ -149,11 +98,6 @@ public class DescriptionSection extends AbstractOneLineSection {
             return false;
         }
 
-        // Punctuation and capitals are dropped on the way to a method name, so
-        // "Log in" and "Log-in!" are one method - and only one was ever written.
-        // The second test case ended up with no method of its own: it could not
-        // be run and could not be jumped to, and nothing said so until the first
-        // F5 (#244).
         if (takenMethodKeys().contains(NameSanitizer.methodKey(methodName))) {
             setError(true);
             Services.getInstance(p, Notifier.class).softRefuse(p,
@@ -167,23 +111,15 @@ public class DescriptionSection extends AbstractOneLineSection {
         return true;
     }
 
-
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
         dto.setDescription(typed());
     }
 
-    /**
-     * The description as {@link #applyTo} would save it, so the save can refuse
-     * a blank one before anything is written onto the case.
-     */
     public @NotNull String typed() {
         return field.getText().trim();
     }
-
-
-
 
     @Override
     public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {

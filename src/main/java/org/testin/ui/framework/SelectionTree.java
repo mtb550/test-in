@@ -27,13 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.util.function.Consumer;
 
-/**
- * A checkbox tree of selectable items — the component of the run-creation
- * dialog. Space toggles the focused row; checking a branch checks its
- * children. The dialog reads the selection by visiting the checked nodes.
- */
 public final class SelectionTree implements DialogComponent {
-
     private final @NotNull CheckboxTree tree;
     private final @NotNull CheckedTreeNode root;
     private final @NotNull JBScrollPane panel;
@@ -46,31 +40,18 @@ public final class SelectionTree implements DialogComponent {
         panel = new JBScrollPane(tree);
     }
 
-    /**
-     * Visits every checked leaf's user object, depth first.
-     */
     public void forEachChecked(final @NotNull Consumer<Object> visitor) {
         visitChecked(root, visitor);
     }
 
-    /**
-     * Visits every leaf's user object, checked or not - what the tree offered,
-     * as against what the tester chose.
-     */
     public void forEachLeaf(final @NotNull Consumer<Object> visitor) {
         visitLeaves(root, visitor);
     }
 
-    /**
-     * True when at least one leaf is checked.
-     */
     public boolean hasChecked() {
         return hasCheckedLeaf(root);
     }
 
-    /**
-     * Runs the listener whenever any row's check state changes.
-     */
     public void onCheckChanged(final @NotNull Runnable listener) {
         tree.addCheckboxTreeListener(new CheckboxTreeListener() {
             @Override
@@ -117,7 +98,6 @@ public final class SelectionTree implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // Checking rows is not a submit gesture; the declared keys confirm.
     }
 
     @Override

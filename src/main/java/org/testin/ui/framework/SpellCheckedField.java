@@ -25,19 +25,8 @@ import org.testin.util.SpellChecker;
 
 import javax.swing.*;
 
-/**
- * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221.
- * <p>
- * A one-line field that underlines a misspelled word, with the IDE's own
- * corrections on Alt+Enter (#314).
- * <p>
- * An editor rather than a Swing field: the spell checker is an inspection, and
- * runs only on an editor with a PSI file behind it, which
- * {@link SpellChecker#createField} builds. It looks like the framework's field,
- * through {@link FrameworkTextField#style}.
- */
+// UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221
 public final class SpellCheckedField implements DialogComponent {
-
     private final @NotNull EditorTextField field;
     private final @NotNull JBPanel<?> panel;
 
@@ -49,10 +38,7 @@ public final class SpellCheckedField implements DialogComponent {
         field.setShowPlaceholderWhenFocused(true);
         FrameworkTextField.style(field);
 
-        // UC-EDITOR-PANEL-034, Rule-INTERNAL-087. Named by its caption as well
-        // as its hint: the hint goes as soon as something is typed, and the box
-        // was then the one field in the dialog that said nothing about itself
-        // (#328).
+        // UC-EDITOR-PANEL-034, Rule-INTERNAL-087
         panel = Caption.above(caption, field);
     }
 
@@ -72,6 +58,5 @@ public final class SpellCheckedField implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // Typing is not a submit gesture; Enter is a declared key.
     }
 }

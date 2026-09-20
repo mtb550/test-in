@@ -42,25 +42,8 @@ import java.awt.event.MouseEvent;
 import java.nio.file.Path;
 import java.util.List;
 
-/**
- * The first few lines of a failure's stacktrace, the link to the whole text,
- * and a thumbnail of each screenshot pasted with it.
- * <p>
- * Its own row type rather than a {@link RunAttributeRow} that checks which
- * attribute it is holding: every other run value is a word or a sentence, and
- * this one is fifty lines of framework plumbing around the two that name the
- * tester's own code. Given the whole panel it would be the whole panel.
- * <p>
- * Three lines because that is what the top of a stacktrace is worth: the frame
- * that threw, and enough beneath it to recognize where. Everything else is read
- * in {@link ErrorDetailsDialog}, once, by a tester who has decided they need it.
- */
 @AllArgsConstructor
 public final class StacktraceRow extends BaseDetails {
-
-    /**
-     * How much of the trace the panel shows before handing over to the dialog.
-     */
     private static final int LINES_SHOWN = 3;
 
     private static final int LINK_MARGIN_TOP = 6;
@@ -69,20 +52,9 @@ public final class StacktraceRow extends BaseDetails {
 
     private final @NotNull TestRunItems item;
 
-    /**
-     * The run the item belongs to, as the panel names it - where its screenshot
-     * files are read from, for their thumbnails and when one is clicked.
-     */
     private final @NotNull List<String> currentPath;
 
-
-    /**
-     * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-035, Rule-VIEW-PANEL-081.
-     * <p>
-     * A case with nothing to explain draws no row - the same rule every other
-     * run row follows, and the reason a passing case shows none of them. A
-     * failure with screenshots and no text still has something to show.
-     */
+    // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-035, Rule-VIEW-PANEL-081
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final @NotNull String stacktrace = item.getStacktrace();
@@ -102,11 +74,6 @@ public final class StacktraceRow extends BaseDetails {
         return addRow(panel, gbc, RunEditorAttributes.STACKTRACE.getName(), container, currentRow);
     }
 
-    /**
-     * Monospaced and not wrapped. A stacktrace read in a proportional font
-     * loses the indentation that makes it scannable, and wrapping one long
-     * frame across two lines would spend a third of the preview on it.
-     */
     private @NotNull JTextArea preview(final @NotNull List<String> lines) {
         final @NotNull JTextArea area = new JTextArea(String.join("\n", lines.subList(0, Math.min(LINES_SHOWN, lines.size()))));
         area.setFont(JBFont.create(new Font(Font.MONOSPACED, Font.PLAIN, (int) getValueFontSize())));
@@ -117,27 +84,12 @@ public final class StacktraceRow extends BaseDetails {
         return area;
     }
 
-    /**
-     * Named with the count rather than "more", so a tester knows before
-     * clicking whether the rest is two lines or eighty.
-     */
     private @NotNull ActionLink showAllLink(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull String stacktrace, final int total) {
         return link(Bundle.message("view.stacktrace.show.all", String.valueOf(total)),
                 event -> new ErrorDetailsDialog(p, dto.getDescription(), item.getActualResult(), stacktrace).show());
     }
 
-    /**
-     * UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081.
-     * <p>
-     * One screenshot as the failure form shows it when pasted: its thumbnail,
-     * the file name on hover, and a click that opens it at its real size in a
-     * window of its own, as the link reading its file name did (#328).
-     * <p>
-     * Read and shrunk off the EDT, and only set on it. The panel redraws on
-     * every refresh and a screenshot is a file of megabytes, so the square is
-     * drawn empty at once and filled when its thumbnail is ready. A panel that has moved on by then
-     * has dropped this label, and filling it changes nothing on screen.
-     */
+    // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081
     private @NotNull JComponent thumbnail(final @NotNull Project p, final @NotNull String name) {
         final @NotNull Path runPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
 
@@ -159,9 +111,6 @@ public final class StacktraceRow extends BaseDetails {
         return square;
     }
 
-    /**
-     * One line under the preview: Show all on its own, then the screenshots.
-     */
     private static @NotNull JBPanel<?> line(final @NotNull List<? extends JComponent> parts) {
         final @NotNull JBPanel<?> line = new JBPanel<>(new HorizontalLayout(JBUI.scale(LINK_GAP)));
         line.setOpaque(false);

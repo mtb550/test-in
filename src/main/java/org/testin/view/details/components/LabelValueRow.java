@@ -28,32 +28,14 @@ import org.testin.ui.framework.Prose;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * A caption and the value it names, as the details panel draws every field:
- * the caption on a line of its own, and the value under it across the whole
- * panel.
- * <p>
- * It was a caption column at least 255 pixels wide beside the value, so on a
- * narrow panel the captions took more room than the values: at 350 pixels a
- * value had about 55 to wrap in (#328). With the caption above, neither needs a
- * width of its own, at any panel width or font size.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LabelValueRow {
-
     private static final int SPACE_ABOVE = 12;
     private static final int CAPTION_GAP = 2;
     private static final int SIDE = 16;
 
-    /**
-     * Rule-VIEW-PANEL-006.
-     * <p>
-     * Adds the value in the read-only wrapping area the details panel uses. A blank
-     * value adds nothing - neither caption nor value - and leaves the row number
-     * where it was.
-     */
+    // Rule-VIEW-PANEL-006
     public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String caption, final @NotNull String valueText, final float fontSize, final int row) {
-
         if (valueText.trim().isEmpty()) return row;
 
         final @NotNull JTextArea valueArea = Prose.of(valueText);
@@ -62,12 +44,7 @@ public final class LabelValueRow {
         return add(panel, gbc, caption, valueArea, fontSize, row);
     }
 
-    /**
-     * UC-VIEW-PANEL-004, Rule-VIEW-PANEL-082.
-     * <p>
-     * The caption on {@code row} and the value on the row under it, both across
-     * the panel, so the next field starts two rows down.
-     */
+    // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-082
     public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String caption, final @NotNull JComponent value, final float fontSize, final int row) {
         gbc.gridx = 0;
         gbc.weightx = 1.0;

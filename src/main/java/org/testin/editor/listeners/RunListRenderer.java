@@ -38,9 +38,6 @@ public class RunListRenderer extends AbstractListRenderer<RunEditor> {
     // UC-EDITOR-PANEL-030
     @Override
     protected @NotNull RunCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int row, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover) {
-        // The results map can be transiently empty during a refresh while the list
-        // still repaints; render a pending placeholder rather than crashing inside
-        // the cell renderer.
         final @NotNull TestRunItems runItem = editor.runItem(tc.getId())
                 .orElseGet(() -> TestRunItems.builder().id(tc.getId()).tc(Optional.of(tc)).build());
 

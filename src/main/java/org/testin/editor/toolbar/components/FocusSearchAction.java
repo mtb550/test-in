@@ -24,11 +24,6 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 
-/**
- * Focuses the toolbar search field from anywhere inside the editor the scope
- * component spans (issue #18). Registered on the editor's main panel, so the
- * shortcut never leaks outside a Testin editor.
- */
 public class FocusSearchAction extends DumbAwareAction {
     private final @NotNull SearchTxt searchTxt;
 

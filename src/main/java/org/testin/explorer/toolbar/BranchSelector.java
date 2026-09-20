@@ -49,36 +49,14 @@ public class BranchSelector {
     private final @NotNull ComboBox<String> comboBox;
     private final @NotNull DefaultComboBoxModel<String> model;
 
-    /**
-     * The repository this box is showing branches of, and the empty path while
-     * there is none - the same "nothing configured" the Testin root uses, so
-     * there is one shape of absence rather than two (#71).
-     */
     private @NotNull Path projectPath = Path.of("");
 
-    // Written from background git tasks and read on the EDT. Empty, never null,
-    // when no branch is known yet.
     private volatile @NotNull String currentBranch = "";
 
-    /**
-     * The branches the box is currently showing, so a second pass that brings
-     * nothing new can leave it untouched. Empty while it holds a placeholder.
-     */
     private volatile @NotNull List<String> shown = List.of();
 
     private boolean isUpdating = false;
 
-    /**
-     * True while the box holds an explanation rather than branches - loading,
-     * no project, not a repository, nothing found.
-     * <p>
-     * A field rather than a comparison against the text on screen. That is what
-     * it used to be, and it guarded only two of the four messages: selecting
-     * "Not a Git repository" was read as a request to check out a branch by that
-     * name. The strings are also shown to the tester, so rewording one silently
-     * broke the guard - which is exactly what nearly happened when the ellipsis
-     * in "Loading branches..." was corrected in two places at once.
-     */
     private boolean showingPlaceholder = false;
 
     public BranchSelector(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
@@ -100,25 +78,17 @@ public class BranchSelector {
     public void updateProject(final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
         final @NotNull Path path = testProjectDirectory.map(TestProjectDirectoryDto::getPath).orElse(Path.of(""));
 
-        // Whether this is a different project, asked before the field moves on.
-        // It is what decides between reading the branches off disk and going to
-        // the remote: this method runs on every rebuild of the panel, and a
-        // rebuild is what a rename, a removal and a status change each cause -
-        // so every one of them ran git fetch --all --prune against the remote,
-        // for a change that cannot have altered a branch (#312, A70).
         final boolean projectChanged = !path.equals(projectPath);
         this.projectPath = path;
 
         currentBranch = "";
 
-        // The folder decides: a Git repository has branches, with or without a
-        // testin.yml (Rule-TREE-PANEL-108).
+        // Rule-TREE-PANEL-108
         final boolean showable = !path.toString().isEmpty() && !git.isNotRepository(path);
 
         comboBox.setVisible(showable);
 
         if (!showable) {
-            // Still said, for the log and for a project not cloned here yet.
             showPlaceholder(Bundle.message("branch.not.a.repository"));
             return;
         }
@@ -127,40 +97,14 @@ public class BranchSelector {
         loadGitBranches(path, projectChanged);
     }
 
-    /**
-     * UC-TREE-PANEL-026, Rule-TREE-PANEL-108.
-     * <p>
-     * Reads the branches again and asks the remote for what it has.
-     * <p>
-     * The three moments that are worth a fetch say so by calling this: Refresh,
-     * a branch switch, and opening a different test project - the last of which
-     * {@link #updateProject} answers for itself. Everything else that rebuilds
-     * the panel reads what Git already holds, which is the answer to almost
-     * every question anyone asks this box (#312, A70).
-     */
+    // UC-TREE-PANEL-026, Rule-TREE-PANEL-108
     public void fetchBranches() {
         if (projectPath.toString().isEmpty() || git.isNotRepository(projectPath)) return;
 
         loadGitBranches(projectPath, true);
     }
 
-    /**
-     * UC-TREE-PANEL-026.
-     * <p>
-     * Replaces whatever the box holds with an explanation, and marks it as one.
-     * <p>
-     * The whole job, not half of it: clearing the box, forgetting what was in
-     * it, saying it cannot be selected from, and only then putting the words up.
-     * It used to add the words while its caller did the clearing, and the two
-     * drifted the moment there was something else to forget - a refresh left
-     * {@code shown} holding the previous branches, so the load that followed
-     * found nothing new to show and left "Loading branches..." on screen with
-     * the box disabled.
-     * <p>
-     * The marking matters just as much: a box holding "Failed to load branches"
-     * that did not say it was a placeholder read a click on it as a request to
-     * check out a branch by that name.
-     */
+    // UC-TREE-PANEL-026
     private void showPlaceholder(final @NotNull String text) {
         isUpdating = true;
         try {
@@ -174,13 +118,7 @@ public class BranchSelector {
         }
     }
 
-    /**
-     * UC-TREE-PANEL-026.
-     * <p>
-     * The event is reported as unused, and the parameter stays: this is an
-     * {@code ActionListener} target, so the signature is the contract rather
-     * than a choice. The selected branch comes from the box, not the event (#61).
-     */
+    // UC-TREE-PANEL-026
     private void onSelection(final @NotNull ActionEvent e) {
         if (isUpdating) return;
 
@@ -193,27 +131,8 @@ public class BranchSelector {
         checkoutBranchAndRefreshTree(selectedBranch);
     }
 
-    /**
-     * UC-TREE-PANEL-026, Rule-TREE-PANEL-085.
-     * <p>
-     * Checks the branch out and re-reads everything that came with it.
-     * <p>
-     * Rebuilding the tree is not enough and never was. The tree is drawn from
-     * the indexer's cache, and a checkout replaces every file under the project
-     * - so a tree redrawn from the old cache shows the test cases of the branch
-     * that was left, misses the ones only the new branch has, and reads stale
-     * descriptions for the ones on both. Everything downstream of the cache -
-     * the editors, the details panel, the reports - was reading the old branch
-     * too (#88).
-     * <p>
-     * So the switch does what Refresh does, through the same action rather than
-     * a copy of it: the VFS is told the files changed, the index is thrown away
-     * and rebuilt with a progress bar, editors on nodes the new branch does not
-     * have are closed, and the tree is rebuilt from what was actually read.
-     */
+    // UC-TREE-PANEL-026, Rule-TREE-PANEL-085
     private void checkoutBranchAndRefreshTree(final @NotNull String targetBranch) {
-        // Captured before the task starts: the field can be reassigned by a
-        // project switch while the checkout is still running.
         final @NotNull Path repositoryPath = projectPath;
         if (repositoryPath.toString().isEmpty()) return;
 
@@ -235,23 +154,7 @@ public class BranchSelector {
         });
     }
 
-    /**
-     * UC-TREE-PANEL-026, Rule-TREE-PANEL-085.
-     * <p>
-     * Asks before a switch takes uncommitted work with it.
-     * <p>
-     * Git hardly ever refuses. A new test case is an untracked file and comes
-     * along without a word; an edited one comes along too unless the file
-     * differs on the branch being entered, which is the one case Git stops. So
-     * the common outcome is a tester landing on another branch with work that
-     * belongs to the one they left - and here that work looks like it belongs
-     * where it landed, because the tree shows it and the review offers it for
-     * commit.
-     * <p>
-     * The box goes back to the current branch first, so a question left
-     * unanswered leaves the panel saying where the repository actually is. A
-     * switch that goes ahead puts it right again when the tree is rebuilt.
-     */
+    // UC-TREE-PANEL-026, Rule-TREE-PANEL-085
     private void askBeforeCarryingWorkAcross(final @NotNull Path repositoryPath, final @NotNull String targetBranch, final int pending) {
         restoreSelectedBranch();
 
@@ -275,9 +178,6 @@ public class BranchSelector {
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
 
-                // Empty means the checkout did not happen; the git reason is
-                // already in testin.log, and the sentence worth showing is the
-                // one below rather than the command's output (#63).
                 final @NotNull String checkedOut = git.checkout(repositoryPath, targetBranch);
                 if (checkedOut.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() -> refuseSwitch(repositoryPath, targetBranch));
@@ -286,9 +186,6 @@ public class BranchSelector {
 
                 currentBranch = checkedOut;
 
-                // The files changed underneath the IDE, which knows nothing about
-                // a checkout the plugin ran as a command. Through the indexer,
-                // which owns file access, and before the re-index reads them.
                 Services.getInstance(p, ProjectIndexer.class).refreshDirectory(repositoryPath);
 
                 ApplicationManager.getApplication().invokeLater(() -> tp.reindex(Bundle.message("git.switched.to", checkedOut)));
@@ -296,14 +193,7 @@ public class BranchSelector {
         });
     }
 
-    /**
-     * UC-TREE-PANEL-026.
-     * <p>
-     * What a refused checkout says. Git refuses when the switch would overwrite
-     * uncommitted work, which here means edited test cases - so the message
-     * names that as the cause and carries the review that clears it, instead of
-     * asking the tester a question about their own repository.
-     */
+    // UC-TREE-PANEL-026
     private void refuseSwitch(final @NotNull Path repositoryPath, final @NotNull String targetBranch) {
         restoreSelectedBranch();
 
@@ -311,16 +201,9 @@ public class BranchSelector {
         notifier.warnWithAction(p, Bundle.message("git.branch.not.switched.title"),
                 Bundle.message("branch.not.switched.message", targetBranch),
                 Bundle.message("branch.review.changes"),
-                // Built on the panel's own tree: the review belongs to the
-                // project the tree is showing, which is the one whose branch
-                // would not switch.
                 () -> ViewPendingCommitsAction.reviewFor(p, repositoryPath));
     }
 
-    /**
-     * Puts the box back on the branch that is actually checked out — the failed
-     * selection is still showing, and leaving it there says the checkout worked.
-     */
     private void restoreSelectedBranch() {
         isUpdating = true;
         try {
@@ -332,23 +215,7 @@ public class BranchSelector {
         }
     }
 
-    /**
-     * UC-TREE-PANEL-026.
-     * <p>
-     * Fills the box, twice.
-     * <p>
-     * First from what Git already holds, which needs no network and is on
-     * screen immediately. Then from the remote, once the fetch behind it comes
-     * back with anything new.
-     * <p>
-     * It used to fetch first and show nothing until it returned. A fetch can
-     * stop to ask for credentials, sit on a host that is not reachable, or take
-     * a minute on a large repository - and on this repository it asked for a
-     * username while the IDE was frozen, so the box read "Loading branches..."
-     * until the IDE was killed (#89). The branches Git already knows are the
-     * answer to almost every question anyone asks this box, and they were there
-     * the whole time.
-     */
+    // UC-TREE-PANEL-026
     private void loadGitBranches(final @NotNull Path repositoryPath, final boolean fromRemote) {
         ProgressManager.getInstance().run(new Task.Backgroundable(p, Bundle.message("branch.task.loading"), true) {
             @Override
@@ -358,11 +225,6 @@ public class BranchSelector {
                 indicator.setText(Bundle.message("branch.progress.reading"));
                 readBranchesInto(repositoryPath);
 
-                // The disk is the whole answer unless somebody asked for the
-                // remote. A fetch can stop for credentials, sit on a host that is
-                // not reachable, or take a minute - which is a price worth paying
-                // when the tester pressed Refresh and never worth paying because
-                // they renamed a test set (#312, A70).
                 if (!fromRemote) return;
 
                 indicator.setText(Bundle.message("branch.progress.fetching"));
@@ -374,24 +236,11 @@ public class BranchSelector {
         });
     }
 
-    /**
-     * UC-TREE-PANEL-026.
-     * <p>
-     * Reads the branches Git holds on disk and hands them to the box. No
-     * network, so nothing here can hang on a remote.
-     */
+    // UC-TREE-PANEL-026
     private void readBranchesInto(final @NotNull Path repositoryPath) {
         try {
             final @NotNull List<String> branches = git.getAvailableBranches(repositoryPath);
 
-            // Taken as Git gives it, empty included. Keeping the last name when
-            // Git names none is what let a HEAD detached outside Testin - a
-            // checkout of a tag or a commit in a terminal, a bisect, a rebase
-            // stopped partway - go on showing the branch that was checked out
-            // before it. It also undid A69 one line further down, which selects
-            // nothing exactly when this is empty: the old name is still a branch
-            // that exists, so the box found it in the list and selected it (#312,
-            // N10).
             currentBranch = git.getCurrentBranch(repositoryPath);
 
             ApplicationManager.getApplication().invokeLater(() -> showBranches(branches));
@@ -405,13 +254,7 @@ public class BranchSelector {
         }
     }
 
-    /**
-     * UC-TREE-PANEL-026.
-     * <p>
-     * Brings the remote up to date, and says so rather than failing when it
-     * cannot: the box is already showing branches, and a remote that is down is
-     * not a reason to take them away.
-     */
+    // UC-TREE-PANEL-026
     private void fetchQuietly(final @NotNull Path repositoryPath) {
         try {
             git.fetchRemoteBranches(repositoryPath);
@@ -423,17 +266,6 @@ public class BranchSelector {
         }
     }
 
-    /**
-     * The one owner of what the box holds. Both passes come through here, and
-     * so does every future caller: filling a combo box means suppressing its
-     * own listener, deciding what stays selected and whether it is selectable
-     * at all, and a second copy of that is how a placeholder became a checkout
-     * request the first time.
-     * <p>
-     * A second pass that brings nothing new leaves the box alone entirely. The
-     * tester may have opened it, or picked a branch that is checking out, and
-     * rebuilding the model underneath them would take that back.
-     */
     private void showBranches(final @NotNull List<String> branches) {
         if (branches.isEmpty()) {
             showPlaceholder(Bundle.message("branch.none"));
@@ -448,9 +280,6 @@ public class BranchSelector {
                 model.addElement(branch);
             }
 
-            // Nothing selected when Git names no branch - a detached HEAD. The
-            // first branch used to be selected and adopted as current, so the box
-            // claimed a branch nobody was on and picking it did nothing (#312, A69).
             if (branches.contains(currentBranch)) {
                 comboBox.setSelectedItem(currentBranch);
             } else {
@@ -465,14 +294,10 @@ public class BranchSelector {
         }
     }
 
-
     public @NotNull JComponent getComponent() {
         return comboBox;
     }
 
-    /**
-     * What the box is showing, and the empty string when it is showing nothing.
-     */
     public @NotNull String getSelectedBranch() {
         return Objects.toString(comboBox.getSelectedItem(), "");
     }

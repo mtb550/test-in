@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class RenameJavaPackage implements GenAction {
-
     // UC-CODEGEN-017, Rule-CODEGEN-056
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
@@ -46,9 +45,6 @@ public class RenameJavaPackage implements GenAction {
                 () -> Logger.info("Could not find Test Source Root in the project modules."));
     }
 
-    /**
-     * The rename itself, once the source root is known.
-     */
     private void renameUnder(final @NotNull Project p, final @NotNull VirtualFile testSourceRoot, final @NotNull List<String> fqcn, final @NotNull String newTop) {
         final @NotNull Optional<VirtualFile> found = JavaSourceRoot.under(testSourceRoot, String.join("/", fqcn))
                 .filter(VirtualFile::isDirectory);
@@ -63,10 +59,6 @@ public class RenameJavaPackage implements GenAction {
             try {
                 pkgDir.rename(this, newTop);
 
-                // The package lines, through their one owner: each file's package
-                // is where it now sits below the source root. This rename kept
-                // its own copy, built from the new name and the old parent
-                // package - the same answer the long way round (#312, A60).
                 PackageDeclarations.retarget(p, testSourceRoot, pkgDir);
                 Logger.info("Package renamed to: " + newTop);
             } catch (final IOException ex) {

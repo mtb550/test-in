@@ -35,53 +35,18 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * The marker file round trip: reading one, writing one, and answering what a
- * directory is marked as.
- * <p>
- * One class owns both halves. The read used to live in {@code DirectoryMapper}
- * and the write in the store, so the indexer owned one end of a file and a
- * mapper owned the other - the debt #49 records, which grew from two markers to
- * seven when #68 fixed the five that were written and never read.
- * <p>
- * <b>A marker that will not parse is not a missing node.</b> The file is a type
- * discriminator as well as a payload, so its directory is a real node either
- * way; dropping it out of the tree would hide test cases over an unreadable
- * audit stamp. The default is used, the name is remembered, and whoever is
- * scanning reports all of them at once.
- * <p>
- * Package-private, behind {@link ProjectIndexer} like everything else that
- * touches a test data file.
- */
 @AllArgsConstructor
 final class MarkerFiles {
-
     private final @NotNull Project p;
 
-    /**
-     * The nodes whose marker would not parse, so the tester is told once for the
-     * project rather than once per node.
-     */
     private final @NotNull Set<String> damaged = ConcurrentHashMap.newKeySet();
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-014.
-     * <p>
-     * A missing or unreadable marker falls back to a default instance rather
-     * than failing - see the class note for why.
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-014
     @SuppressWarnings("unchecked")
     <M extends AbstractMarker> @NotNull M read(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name) {
         final @NotNull Class<M> markerClass = (Class<M>) kind.getMarkerClass();
         final @NotNull Path markerFile = dirPath.resolve(kind.getMarker());
 
-        // Asked before reading, because a marker that is not there yet is the
-        // ordinary case: a node is created, its directory appears, and the marker
-        // follows. Handing an absent file to the mapper made it log an ERROR on
-        // the way out - one per node created, 135 in a single sandbox session -
-        // and those were the first thing a search for ERROR found. Now an ERROR
-        // from the mapper means what it says: a file that is there and will not
-        // parse (#66).
         if (!Files.exists(markerFile)) return defaultFor(markerClass, kind);
 
         try {
@@ -90,44 +55,15 @@ final class MarkerFiles {
         } catch (final Exception ex) {
             Logger.warn("Unreadable " + kind.getMarkerKind() + " marker '" + name + "', using defaults: " + ex.getMessage());
 
-            // Remembered as well as logged. The node is still drawn, and drawn
-            // looking ordinary - its number, its status and who made it are the
-            // defaults rather than what the file says - and the log is at a level
-            // most testers never turn on (#277). Whoever is scanning reports it.
             damaged.add(name);
             return defaultFor(markerClass, kind);
         }
     }
 
-    /**
-     * Writes the marker, stamping it first when it has never been written: a new
-     * marker (createdBy still blank) takes the full audit stamp, and one loaded
-     * from disk passes through untouched.
-     * <p>
-     * The two steps are one call because every caller made both, in this order,
-     * and a write that forgot the stamp is a node with no author.
-     *
-     * @return whether the marker landed. Writing it is what brings the node's
-     * directory into existence, so a creation that indexed first and wrote
-     * afterwards drew a test set in the tree with nothing on disk (#66,
-     * finding 85).
-     */
     boolean write(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Object marker) {
         final @NotNull Path file = dirPath.resolve(markerFileName);
 
-        // UC-INTERNAL-002, Rule-INTERNAL-083. An empty creator used to mean "never
-        // written", and two other things have one too. A marker read back from a
-        // file that would not parse is the defaults, and writing it replaced the
-        // damaged file - status, number, creator, date and all - the first time a
-        // test case was saved into that set, before the tester could repair it
-        // (#66, finding 162). And a marker written while no tester name is set
-        // has an empty creator for good, so every later write stamped it again
-        // and reset its creation date: the node sorted to the bottom of its
-        // folder on every save, and read as created today (finding 172).
-        //
-        // The file on disk says which it is. None yet is a new node, stamped
-        // once. One that parses keeps the creation it holds. One that does not is
-        // left for the tester to repair; the scan has already named it.
+        // UC-INTERNAL-002, Rule-INTERNAL-083
         if (marker instanceof Marker m && m.getCreatedBy().isEmpty()) {
             if (!Files.exists(file)) {
                 m.stampCreated(tester());
@@ -137,27 +73,13 @@ final class MarkerFiles {
             }
         }
 
-        // Rule-INTERNAL-090. Stamped here and nowhere else, so every marker
-        // Testin writes has one and no write changes the one a marker already
-        // has. A marker that would not parse was refused above, which is what
-        // keeps an id out of a file the tester still has to repair (#305, D5).
+        // Rule-INTERNAL-090
         if (marker instanceof Marker m && m.getId().isEmpty()) m.setId(UUID.randomUUID().toString());
 
         return Services.getInstance(p, TestDataFiles.class).write(p, file, marker);
     }
 
-    /**
-     * Rule-INTERNAL-090, Rule-TREE-PANEL-051.
-     * <p>
-     * Gives the marker in this folder an id of its own, whatever it had: a copied
-     * folder is a new folder, and an id names one folder (#305, D5). The copy's
-     * audit block stays as it is - who made the original and when is what a copy
-     * inherits, as its contents do.
-     *
-     * @return whether the marker now has an id of its own. False for a file that
-     * is not a marker, or one that will not parse, which is left as it is like
-     * every other damaged marker
-     */
+    // Rule-INTERNAL-090, Rule-TREE-PANEL-051
     boolean giveFreshId(final @NotNull Path markerFile) {
         final @NotNull Optional<DirectoryType> kind = DirectoryType.byMarker(String.valueOf(markerFile.getFileName()));
         if (kind.isEmpty()) return false;
@@ -174,10 +96,6 @@ final class MarkerFiles {
         }
     }
 
-    /**
-     * Whether the marker on disk reads as a marker, which is the one thing that
-     * tells a damaged file from one written by somebody with no name set.
-     */
     private boolean parses(final @NotNull Path file, final @NotNull Class<?> markerClass) {
         try {
             Services.getInstance(p, Mapper.class).readValue(file.toFile(), markerClass);
@@ -187,27 +105,13 @@ final class MarkerFiles {
         }
     }
 
-    /**
-     * The marker of a node that has just changed: whoever is at the keyboard
-     * becomes its modifier, and it is written.
-     */
     void touched(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Marker marker) {
         marker.touch(tester());
 
         write(dirPath, markerFileName, marker);
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-014.
-     * <p>
-     * The nodes whose marker was there and would not parse, since the last time
-     * anyone asked, and forgotten in the asking.
-     * <p>
-     * Handed to the scan to report because a notification per node would be one
-     * per node - a project whose markers were all damaged by one bad merge would
-     * raise dozens. The scan already reports the folders it could not read this
-     * way.
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-014
     @NotNull List<String> takeDamaged() {
         final @NotNull List<String> taken = List.copyOf(damaged);
         damaged.clear();
@@ -215,23 +119,11 @@ final class MarkerFiles {
         return taken;
     }
 
-    /**
-     * Whether a directory carries one kind's marker.
-     */
     boolean has(final @NotNull Path dirPath, final @NotNull DirectoryType kind) {
         return Files.exists(dirPath.resolve(kind.getMarker()));
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-009.
-     * <p>
-     * What kind a directory is marked as, asked once.
-     * <p>
-     * The probe lives here rather than on the enum because reading the disk is
-     * the indexer's alone (CLAUDE.md), and the order lives on the enum because
-     * the precedence is a fact about the kinds rather than about this scan - the
-     * split #173 asked for, so {@code model} stays a leaf (#111).
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-009
     @NotNull Optional<DirectoryType> markedAs(final @NotNull Path dirPath, final @NotNull List<DirectoryType> family) {
         return family.stream().filter(kind -> has(dirPath, kind)).findFirst();
     }

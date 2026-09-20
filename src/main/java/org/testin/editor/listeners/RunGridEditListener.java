@@ -31,22 +31,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Writes a run grid edit into the run (#74).
- * <p>
- * The counterpart of {@link GridEditListener}, and deliberately not the same
- * class: a test case edit writes a test case and regenerates automation code, a
- * run edit writes the run JSON and generates nothing. What the two do share -
- * the guards, and confirming the edit - is {@link AbstractGridEditListener}'s.
- */
 public class RunGridEditListener extends AbstractGridEditListener {
-
     private final @NotNull RunEditor editor;
 
-    /**
-     * Repaints the list behind the grid, so a card shows what was typed into the
-     * cell when the tester switches back.
-     */
     private final @NotNull Runnable onEdited;
 
     public RunGridEditListener(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> pageItems, final @NotNull Runnable onEdited) {
@@ -65,9 +52,6 @@ public class RunGridEditListener extends AbstractGridEditListener {
     protected @NotNull GridEdit apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto onThisRow, final int row, final int col) {
         final @NotNull RunEditorAttributes attr = RunEditorAttributes.values()[col];
 
-        // The table model refuses these columns already; asked again of the same
-        // attribute because a programmatic setValueAt never goes through the
-        // model's answer.
         if (!attr.isEdited()) return GridEdit.UNCHANGED;
 
         final @NotNull Optional<TestRunItems> found = editor.runItem(onThisRow.getId());
@@ -76,18 +60,13 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
         final @NotNull String before = attr.getRunValueExtractor().execute(item, p);
 
-        // A run keeps what it recorded about a case that has since been deleted -
-        // the same refusal the verdict path gives, worded once in the service.
         if (item.isRemoved()) {
             model.setValueAt(before, row, col);
             Services.getInstance(p, RunStatusService.class).refuseRemoved(p);
             return GridEdit.REFUSED;
         }
 
-        // Rule-EDITOR-PANEL-174. The run the indexer holds, asked before the
-        // cell changes anything: a run whose folder had left the index took the
-        // edit into the editor's copy, dropped it at the write, and reported
-        // "Updated 1" (#66, finding 208).
+        // Rule-EDITOR-PANEL-174
         if (Services.getInstance(p, RunStatusService.class).heldRun(p, editor.getParent().getPath()).isEmpty()) {
             model.setValueAt(before, row, col);
             return GridEdit.REFUSED;
@@ -97,14 +76,10 @@ public class RunGridEditListener extends AbstractGridEditListener {
         attr.getRunValueSetter().execute(item, typed);
         final @NotNull String after = attr.getRunValueExtractor().execute(item, p);
 
-        // Written back whatever happened: the value the run now holds is what the
-        // cell must show, even where the setter normalized what was typed.
         model.setValueAt(after, row, col);
 
         if (Objects.equals(before, after)) return GridEdit.UNCHANGED;
 
-        // As a change on the run the indexer holds, so the edit lands on the run
-        // as it is now (#66, finding 152).
         Services.getInstance(p, ProjectIndexer.class).changeRun(editor.getParent().getPath(),
                 run -> run.resultOf(onThisRow.getId()).ifPresent(result -> attr.getRunValueSetter().execute(result, typed)));
         onEdited.run();

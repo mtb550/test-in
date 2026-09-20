@@ -31,18 +31,9 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * Renames a tree node. The constructor is the declaration: title, component,
- * status bar mapping — plus the submit action.
- */
 final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
-
     private final @NotNull Consumer<@NotNull String> onSubmit;
 
-    /**
-     * The kind of node being renamed, which is what decides whether the new name
-     * has to be one Java can take - see {@link DirectoryType#canTakeName}.
-     */
     private final @NotNull DirectoryType type;
 
     // UC-TREE-PANEL-011

@@ -66,16 +66,18 @@ That means a page's rules need not be consecutive - 47, 48, 49 and then 194 is a
 page that was added to later, which is the numbering working. The page is the
 order to read them in; the number is only how to find one.
 
-Where the method has javadoc, the marker is a line of its own inside it, first:
+**There is no javadoc to put it in.** Since 20 September 2026 the marker is the
+only comment a method carries, so it is always the `//` line above the signature:
 
 ```java
-/**
- * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-144.
- * <p>
- * Escape records nothing at all, neither the detail nor the verdict, because a
- * half-written failure is worse than no failure.
- */
+// UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-144
+public void recordVerdict(final @NotNull TestCaseDto testCase) {
 ```
+
+The sentence that used to sit under it - *"Escape records nothing at all, neither
+the detail nor the verdict, because a half-written failure is worse than no
+failure"* - now goes in the commit message, and the behavior itself is in
+`Rule-EDITOR-PANEL-144` on its page. Read the comment rule in `CLAUDE.md`.
 
 ## The eight prefixes
 
@@ -158,10 +160,11 @@ A key that used to do one thing and now does another:
 
 ## Two things this is not
 
-**It is not a licence to write comments that repeat the code.** The marker says
-*which documented behavior this is*. It does not describe what the lines do. A
-comment that says why still earns its place; a comment that narrates the next
-line still does not.
+**It is not a licence to write any other comment.** The marker says *which
+documented behavior this is*. It does not describe what the lines do, and nothing
+else is added beside it - not a paragraph saying why, not a line narrating the
+next one. The why goes in the commit message; `CLAUDE.md` says why, and what the
+two exceptions are.
 
 **It is not a reason to weaken the documentation to match the code.** When the
 code and the document disagree, one of them is wrong and the disagreement is

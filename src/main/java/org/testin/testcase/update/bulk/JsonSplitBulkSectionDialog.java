@@ -35,24 +35,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-/**
- * Bulk-edits one value per test case: the original JSON on the left, an
- * editable copy on the right where only that value can be typed into.
- * <p>
- * A framework dialog - the title, the status bar and the key bindings come from
- * the declaration below, so a shortcut cannot be shown without working.
- */
 public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog<BulkJsonEditors> {
-
     private final @NotNull List<TestCaseDto> selectedItems;
     private final @NotNull Consumer<List<TestCaseDto>> updatedItems;
     private final @NotNull BulkJsonEditors editors;
 
-    /**
-     * The escaped text each value started as, by index - what an untouched
-     * value looks like on screen, which is not what is in storage: a line break
-     * is shown as the two characters that stand for it.
-     */
     private final @NotNull List<String> originalEscaped = new ArrayList<>();
 
     protected JsonSplitBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
@@ -80,99 +67,39 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
 
         preferredSize = new Dimension(JBUI.scale(1000), JBUI.scale(450));
 
-        // The editor listens to the action system, not to Swing key bindings.
         editors.bindKeysToEditor(shortcuts);
     }
 
-    // ------------------------------------------------------------------
-    // What a concrete section supplies.
-    // ------------------------------------------------------------------
-
     protected abstract @NotNull String getPopupTitle();
 
-    /**
-     * JSON key of the edited field, e.g. "testData".
-     */
     protected abstract @NotNull String getJsonFieldName();
 
-
-    /**
-     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-039.
-     * <p>
-     * Which field of a test case this dialog edits. The two questions a bulk
-     * edit asks of it - what is in there now, and write this back - are the two
-     * {@link TestEditorAttributes} already answers for the grid, the import and
-     * the update menu.
-     * <p>
-     * The seven dialogs answered them themselves until #176, and one of the
-     * seven had drifted: a description typed here went in unsanitized, while the
-     * same description typed into a grid cell or imported from a sheet did not.
-     * Nothing failed - the two just stopped agreeing about what a description is.
-     */
+    // UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-039
     protected abstract @NotNull TestEditorAttributes attribute();
 
-    /**
-     * What the field holds now, as the tester will see it in the JSON - the raw
-     * value, because this is an editable surface and a formatted one would be
-     * committed back (Rule-EDITOR-PANEL-005).
-     */
+    // Rule-EDITOR-PANEL-005
     protected @NotNull String getOriginalValue(final @NotNull TestCaseDto tc) {
         return attribute().gridValue(tc);
     }
 
-    /**
-     * Writes what the tester typed, through the one setter that owns the field:
-     * it sanitizes where the field is sanitized, parses where it is parsed, and
-     * refuses a word it cannot read by leaving the case as it was.
-     */
     protected boolean setValue(final @NotNull TestCaseDto tc, final @NotNull String value) {
         return attribute().getImportSetter().execute(p, tc, value);
     }
 
-    /**
-     * Whether a value edited to blank may be applied (e.g. a description must not be blanked).
-     */
     protected boolean acceptsBlank() {
         return true;
     }
 
-    /**
-     * The edited rows this field cannot take because of what the other rows
-     * hold, by index. A field that refuses one says why itself, once.
-     * <p>
-     * None for every field but the description, which is the one value that
-     * names something that must be unique: a test method (Rule-EDITOR-PANEL-224).
-     */
+    // Rule-EDITOR-PANEL-224
     protected @NotNull Set<Integer> clashing(final @NotNull List<TestCaseDto> items, final @NotNull List<EditedValue> newValues) {
         return Set.of();
     }
 
-    /**
-     * Whether the description is rendered as read-only context above the edited field.
-     * False when the edited field IS the description.
-     */
     protected boolean showsDescriptionContext() {
         return true;
     }
 
-    /**
-     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-041.
-     * <p>
-     * Writes the rows the tester edited, and answers with the cases it actually
-     * wrote to.
-     * <p>
-     * The answer is the point. This has always skipped the untouched rows - the
-     * caller then handed the whole selection on to be saved, regenerated and
-     * counted, so fifty cases were written to disk and their automation
-     * rebuilt because one of them was edited, and the tester was told fifty had
-     * changed. Two rules for what a bulk edit touched, in two places, and only
-     * one of them was right.
-     * <p>
-     * A row Testin could not read is not one of them either. It is left as it
-     * was, kept out of the answer so the count does not claim it, and said once
-     * with the others - Rule-EDITOR-PANEL-206, which the grid and the two
-     * importers already kept and this dialog did not (#295).
-     */
+    // UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-041, Rule-EDITOR-PANEL-206
     protected @NotNull List<TestCaseDto> applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<EditedValue> newValues) {
         final @NotNull List<TestCaseDto> written = new ArrayList<>();
         final @NotNull Set<Integer> clashing = clashing(items, newValues);
@@ -183,18 +110,11 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
             final @NotNull EditedValue edited = newValues.get(i);
             if (!edited.changed()) continue;
 
-            // Counted, not passed over. A field that will not take a blank is
-            // refusing the value the tester typed, and skipping it silently
-            // closed the dialog with nothing changed and nothing said - three
-            // descriptions cleared to blank looked exactly like three saved
-            // (#66, finding 81).
             if (edited.value().isEmpty() && !acceptsBlank()) {
                 refused++;
                 continue;
             }
 
-            // Said by the field that refused it, in its own words - a clash is
-            // not a value Testin could not read.
             if (clashing.contains(i)) continue;
 
             if (!setValue(items.get(i), edited.value())) {
@@ -210,19 +130,8 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
         return written;
     }
 
-    // ------------------------------------------------------------------
-    // The dialog.
-    // ------------------------------------------------------------------
-
-    /**
-     * UC-EDITOR-PANEL-007.
-     * <p>
-     * Shows the dialog and releases the editors when it closes. The framework
-     * creates the popup inside show(), so the close listener is attached after.
-     */
+    // UC-EDITOR-PANEL-007
     public void open() {
-        // A bulk editor already open is raised instead, with what was typed in
-        // it; this one never showed, so its editors go now rather than never.
         if (!show()) {
             editors.release();
             return;
@@ -243,8 +152,6 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
         final @NotNull List<EditedValue> newValues = new ArrayList<>();
 
         for (int i = 0; i < selectedItems.size(); i++) {
-            // A row reading the same as it started was not edited, and neither
-            // was one the editor cannot read back - both are left as they are.
             final int index = i;
             newValues.add(editors.valueAt(index)
                     .filter(current -> !current.equals(originalEscaped.get(index)))
@@ -252,18 +159,11 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
                     .orElse(EditedValue.UNCHANGED));
         }
 
-        // Only the cases that were written. Handing on the whole selection
-        // saved and regenerated every one of them and reported a count nobody
-        // had earned.
         updatedItems.accept(applyValues(selectedItems, newValues));
 
         closeOk();
     }
 
-    /**
-     * Both sides of the pair, and the ranges of the right one that may be typed
-     * into. The two texts are identical up to the values themselves.
-     */
     private void buildContent() {
         final @NotNull StringBuilder left = new StringBuilder("[\n");
         final @NotNull StringBuilder right = new StringBuilder("[\n");

@@ -27,15 +27,8 @@ import javax.swing.*;
 import java.util.Optional;
 import java.util.function.Function;
 
-/**
- * Row renderer for {@link ShortcutMenuPopup}: icon, name, grayed shortcut text.
- * <p>
- * A row that cannot do its work is drawn gray with the reason in place of its
- * key, which is the whole of it - the popup refuses the row itself.
- */
 @RequiredArgsConstructor
 final class ShortcutMenuRenderer<T extends MenuItem> extends ColoredListCellRenderer<T> {
-
     private final @NotNull Function<T, Optional<String>> refusal;
 
     @Override
@@ -49,8 +42,6 @@ final class ShortcutMenuRenderer<T extends MenuItem> extends ColoredListCellRend
                 ? SimpleTextAttributes.REGULAR_ATTRIBUTES
                 : SimpleTextAttributes.GRAYED_ATTRIBUTES);
 
-        // The reason where the key would be. A row that cannot work has no key
-        // worth printing, and the tester is reading that line either way.
         append("   " + whyNot.orElseGet(value::getShortcutText), SimpleTextAttributes.GRAYED_ATTRIBUTES);
         setBorder(JBUI.Borders.empty(6, 12));
     }

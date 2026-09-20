@@ -30,17 +30,7 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * Creates a test project — new, or imported by cloning a Git URL.
- * <p>
- * One field, no choice to make: what was typed says which it is. A repository
- * URL is clonable and a project name is not, so asking the tester to also pick
- * from a list was asking them to repeat themselves — and to be wrong. The
- * placeholder already promised this ("set name or paste url...") long before the
- * dialog behaved that way.
- */
 public final class CreateProjectDialog extends AbstractFrameworkDialog<TextInput> {
-
     private final @NotNull Consumer<@NotNull String> onCreate;
 
     // UC-TREE-PANEL-002, UC-TREE-PANEL-003
@@ -71,18 +61,7 @@ public final class CreateProjectDialog extends AbstractFrameworkDialog<TextInput
         closeOk();
     }
 
-    /**
-     * UC-TREE-PANEL-002, UC-TREE-PANEL-003, Rule-TREE-PANEL-095.
-     * <p>
-     * Whether what was typed is something this dialog can act on - and the one
-     * field means the rule has two halves, the way the dialog itself does.
-     * <p>
-     * A test project's name becomes the first Java package of everything under
-     * it, so it has to be a name Java accepts. A repository address does not: the
-     * clone is named after its repository, and a repository name Java refuses is
-     * made into one it accepts (Rule-TREE-PANEL-107) - so refusing an address for
-     * not being a Java name would refuse the clone this dialog exists to offer.
-     */
+    // UC-TREE-PANEL-002, UC-TREE-PANEL-003, Rule-TREE-PANEL-095, Rule-TREE-PANEL-107
     private static boolean isNameOrUrl(final @NotNull String typed) {
         return GitRefs.isRepositoryUrl(typed) || DirectoryType.TP.canTakeName(typed);
     }

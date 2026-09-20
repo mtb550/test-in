@@ -31,11 +31,6 @@ import java.awt.*;
 public interface CreateTestCaseSection {
     @NotNull JBPanel<?> getWrapper();
 
-    /**
-     * Whether the tester has opened this section. An unopened section has not
-     * been added to the dialog and so has no parent, and a missing parent
-     * means nothing else here - which is why it is read in this one place.
-     */
     default boolean isShown() {
         return getWrapper().getParent() != null;
     }
@@ -45,41 +40,14 @@ public interface CreateTestCaseSection {
         focusOnShow();
     }
 
-    /**
-     * What takes focus when the section opens: the component it already
-     * advertises, unless a section wants something else or nothing at all.
-     */
     default void focusOnShow() {
         getFocusComponent().requestFocus();
     }
 
-    /**
-     * Whether this section has a popup open, which takes Enter for itself.
-     * <p>
-     * A combo with its list down answers Enter by choosing the value the tester
-     * highlighted, so the dialog's own Enter has to stand down for it. Asked of
-     * the sections rather than named one at a time where the keystroke is
-     * guarded: that guard knew about the Priority combo and nothing else, so
-     * Enter with the Status list open saved the dialog on the value that was
-     * selected before the list was opened (#66, finding 87).
-     * <p>
-     * No by default: a section with nothing to drop down takes nothing.
-     */
     default boolean isPopupOpen() {
         return false;
     }
 
-    /**
-     * Whether what this section is holding can be written to the test case.
-     * <p>
-     * Asked before anything is applied, so a section that refuses stops the save
-     * whole: a refused edit that still reached the file would stamp the case as
-     * modified for a change nobody made.
-     * <p>
-     * A section that refuses says why itself - a balloon, a field marked in red
-     * - because only it knows what is wrong with what it holds. Yes by default:
-     * a section with nothing to check has nothing to refuse.
-     */
     default boolean accepts() {
         return true;
     }
@@ -94,25 +62,10 @@ public interface CreateTestCaseSection {
 
     void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction);
 
-    /**
-     * The font every field in the dialog is drawn in.
-     * <p>
-     * Derived when a section is built rather than held as a constant: the size
-     * follows the IDE's own label font, so a value captured once at class load
-     * would keep whatever size the IDE had the first time a dialog was opened.
-     */
     default @NotNull Font fieldFont() {
         return JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     }
 
-    /**
-     * The look every text field in the dialog shares: the font, the placeholder
-     * the field describes itself with, and the padding inside its frame.
-     * <p>
-     * Whether the field is one line is deliberately not set here. That is the
-     * one thing the sections genuinely differ on - it is what makes Test Data
-     * and Expected Result what they are - so each says it for itself.
-     */
     default void styleField(final @NotNull EditorTextField field, final @NotNull CreateTestCaseFields describes) {
         field.setFont(fieldFont());
         field.setPlaceholder(describes.getPlaceholder());
@@ -120,29 +73,10 @@ public interface CreateTestCaseSection {
         field.setBorder(JBUI.Borders.empty(10));
     }
 
-    /**
-     * A section's row: its icon on the left, and whatever the section lets the
-     * tester edit filling the rest.
-     * <p>
-     * Every section is laid out this way, so it is laid out once. A section that
-     * composed its own row is the one whose icon sits a few pixels off the
-     * others the first time this spacing changes.
-     */
     default @NotNull JBPanel<?> createWrapper(final @NotNull Icon icon, final @NotNull JComponent field) {
         return createWrapper(new JBLabel(icon), field);
     }
 
-    /**
-     * The same row around an icon the section keeps, so it can change the icon
-     * later - the description turns its icon red when it is refused.
-     * <p>
-     * The icon panel is built here rather than in a method of its own. It had
-     * one, and making it private failed the Plugin Verifier: the call compiled
-     * to an {@code invokeinterface} against a private interface method, which is
-     * an {@code IncompatibleClassChangeError} waiting for a JVM that checks. Do
-     * not extract it into a private method again; a public default method, like
-     * the overload above, is safe.
-     */
     default @NotNull JBPanel<?> createWrapper(final @NotNull JBLabel iconLabel, final @NotNull JComponent field) {
         final @NotNull JBPanel<?> iconPanel = new JBPanel<>(new GridBagLayout());
         iconPanel.setOpaque(false);

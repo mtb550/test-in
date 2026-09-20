@@ -48,8 +48,6 @@ public class PrioritySection implements CreateTestCaseSection {
         this.priority.setRenderer(new ColoredListCellRenderer<>() {
             @Override
             protected void customizeCellRenderer(final @NotNull JList<? extends Priority> list, final Priority value, final int index, final boolean selected, final boolean hasFocus) {
-                // Swing renders the empty selection with no value at all, and
-                // there is nothing to draw for it.
                 Optional.ofNullable(value).ifPresent(priority -> {
                     setIcon(Icons.dot(priority.getColor()));
                     append(Bundle.message("section.priority.caption"));

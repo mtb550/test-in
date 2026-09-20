@@ -20,12 +20,5 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 
-/**
- * Where a test case's file sits, as {@link ProjectIndexer#testCaseFile} answers
- * it (#28).
- *
- * @param testProject the folder of the test project holding the case
- * @param inProject   the case's file, relative to that folder
- */
 public record TestCaseFile(@NotNull Path testProject, @NotNull Path inProject) {
 }

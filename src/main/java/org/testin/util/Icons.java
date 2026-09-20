@@ -30,66 +30,15 @@ import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
-/**
- * The icons Testin makes for itself: a stock one grayed or enlarged, a colored
- * dot, and a test case field's letter in a frame.
- * <p>
- * Was {@code IconManager}, which managed nothing and is also the name of
- * {@code com.intellij.ui.IconManager} in the platform - the same collision
- * {@code EditorUtil} had, and the reason CLAUDE.md asks for a name that says
- * what the class does (#291).
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Icons {
-
-    /**
-     * UC-EDITOR-PANEL-001, UC-INTERNAL-001.
-     * <p>
-     * What a test case looks like, wherever one is drawn: the card, the card's
-     * hover action, and a row in the search.
-     * <p>
-     * Here rather than at each of the three, because it is one answer to one
-     * question and they were three copies of it - a change had to be made three
-     * times and noticed three times.
-     * <p>
-     * <b>Not the class icon.</b> It was, and that picture means a Java class -
-     * which is what {@link org.testin.model.Automated} still draws for the
-     * generated method, on the same card. Two things on one card cannot be the
-     * same picture, and of the two it is the Java class that has the better
-     * claim to it.
-     * <p>
-     * <b>Drawn gray</b>, like everything else - see {@link #gray}.
-     */
+    // UC-EDITOR-PANEL-001, UC-INTERNAL-001
     public static final @NotNull Icon TEST_CASE = gray(AllIcons.Nodes.Type);
 
-    /**
-     * The colors a field is drawn in: the platform's own icon gray, and its red
-     * for a field the dialog refused. One value each in every theme, as Muteb
-     * chose. Named here so a caller says which, and a change is made once.
-     */
     public static final @NotNull Color GRAY = new Color(0x6C707E);
     public static final @NotNull Color RED = new Color(0xDB3B4B);
 
-    /**
-     * UC-EDITOR-PANEL-005.
-     * <p>
-     * A test case field, wherever it is named by its icon - the create and
-     * update forms, the update and copy menus, Record Failure and light mode:
-     * the letter of the key that opens it, in a rounded frame, the frame and the
-     * letter in the one color given (#328).
-     * <p>
-     * Drawn here rather than put together from the platform's {@code TextIcon}
-     * over a frame file. That pair left the letter a pixel above and to the
-     * left of the middle - {@code TextIcon} measures its box one way and draws
-     * in it another - and tinting the file kept its brightness, so a black shape
-     * stayed black whatever the color (measured, #328).
-     * <p>
-     * <b>The letter is drawn as a shape, like the frame</b>, and centered on
-     * that shape. Drawn as text, the screen's font hinting narrowed it and
-     * snapped it to whole pixels, so at 125% the letter on screen was not the
-     * one measured and sat a pixel left of the middle. A shape is painted
-     * exactly where it is measured, at every scale.
-     */
+    // UC-EDITOR-PANEL-005
     public static @NotNull Icon fieldLetter(final @NotNull String letter, final @NotNull Color color) {
         final @NotNull Font font = JBUI.Fonts.label(9f).asBold();
         return new Icon() {
@@ -100,7 +49,6 @@ public final class Icons {
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2.setColor(color);
 
-                    // Half the one-pixel line inside the edge, so the line is sharp.
                     final float edge = JBUIScale.scale(1.5f);
                     g2.setStroke(new BasicStroke(JBUIScale.scale(1f)));
                     g2.draw(new RoundRectangle2D.Float(x + edge, y + edge, getIconWidth() - 2 * edge, getIconHeight() - 2 * edge, JBUIScale.scale(5f), JBUIScale.scale(5f)));
@@ -126,24 +74,7 @@ public final class Icons {
         };
     }
 
-    /**
-     * UC-INTERNAL-007, Rule-INTERNAL-077.
-     * <p>
-     * The same icon with the color taken out of it.
-     * <p>
-     * <b>Testin's surfaces are gray.</b> A plugin draws stock platform icons,
-     * and a handful of them ship colored - {@code Nodes.Type} is a
-     * {@code #3574F0} ring and stem over a pale blue fill. One colored glyph in
-     * a list of gray ones is the loudest thing on the row, and the row is for
-     * reading what it says rather than for looking at its icon.
-     * <p>
-     * Desaturated through the platform rather than by keeping a second copy of
-     * the file, so it follows the icon if JetBrains redraws it.
-     * <p>
-     * <b>Not for a color that means something.</b> An error is red and a passed
-     * test is green because the color is the fact, not decoration - those are
-     * drawn as they are. This is for an icon that names a thing.
-     */
+    // UC-INTERNAL-007, Rule-INTERNAL-077
     public static @NotNull Icon gray(final @NotNull Icon icon) {
         return IconUtil.desaturate(icon);
     }
@@ -155,10 +86,6 @@ public final class Icons {
         return IconUtil.scale(icon, contextComponent, SCALE_FACTOR);
     }
 
-    /**
-     * The colored dot the priority and group rows are marked with, centered in a
-     * standard 16px icon.
-     */
     public static @NotNull Icon dot(final @NotNull Color color) {
         return new Icon() {
             @Override

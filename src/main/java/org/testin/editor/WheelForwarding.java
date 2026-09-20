@@ -26,22 +26,9 @@ import java.awt.Component;
 import java.awt.event.MouseWheelEvent;
 import java.util.Optional;
 
-/**
- * Lets a component that does not scroll pass the wheel on to the one that does.
- * <p>
- * Split out of editor/Shared (#113). Its own class because it is neither a
- * badge nor a card measurement - it is one Swing gesture, and the grid and the
- * card listener both need it to behave the same way.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class WheelForwarding {
-    /**
-     * UC-SETTING-011, Rule-SETTING-039.
-     * <p>
-     * Hands a wheel event to the enclosing scroll pane, so a component that does
-     * not scroll itself does not swallow the gesture. Ctrl/Meta is left alone -
-     * that is the font zoom, not a scroll.
-     */
+    // UC-SETTING-011, Rule-SETTING-039
     public static void forwardWheelToScrollPane(final @NotNull MouseWheelEvent e) {
         if (e.isControlDown() || e.isMetaDown())
             return;
@@ -55,17 +42,6 @@ public final class WheelForwarding {
                 });
     }
 
-    /**
-     * The nearest scroll pane this component sits in that has something to
-     * scroll, walking up until Swing runs out of parents - which is where the
-     * null comes from and where it stops.
-     * <p>
-     * A scroll pane showing no scroll bar is passed over, because the platform's
-     * own handler does nothing with a wheel there. The view panel's Details tab
-     * keeps its content in a scroll pane of its own, which the tab's scroll pane
-     * lays out at full height, so the wheel handed to the nearest one moved
-     * nothing (#312, A75).
-     */
     private static @NotNull Optional<JBScrollPane> findScrollPane(final @NotNull Component component) {
         return Optional.ofNullable((JBScrollPane) SwingUtilities.getAncestorOfClass(JBScrollPane.class, component))
                 .flatMap(pane -> pane.getVerticalScrollBar().isVisible() || pane.getHorizontalScrollBar().isVisible() ? Optional.of(pane) : findScrollPane(pane));

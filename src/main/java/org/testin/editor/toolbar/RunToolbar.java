@@ -36,14 +36,6 @@ import java.util.List;
 public class RunToolbar extends AbstractToolbarPanel {
     private final @NotNull Project p;
 
-    /**
-     * The editor this toolbar belongs to, typed as what it is.
-     * <p>
-     * Three of the buttons below are on this toolbar and no other, and each
-     * asked at runtime whether the callbacks it was handed happened to be a run
-     * editor - a question that could not be false. Declaring it here lets the
-     * compiler answer instead, and the three guards go.
-     */
     private final @NotNull RunEditor editor;
 
     public RunToolbar(final @NotNull Project p, final @NotNull RunEditor editor) {
@@ -58,8 +50,6 @@ public class RunToolbar extends AbstractToolbarPanel {
     public @NotNull List<ToolbarItem> getCustomComponents() {
         return List.of(
                 new StartExecutionBtn(editor, getCallbacks()::onStartExecutionClicked),
-                // Laid out beside Start and never removed: RunEditor flips which of the
-                // two is visible, the way the list and grid view buttons already swap.
                 new StopExecutionBtn(getCallbacks()::onStopExecutionClicked),
                 new LightModeBtn(editor),
                 new GenerateReportBtn(p, editor),
@@ -68,8 +58,6 @@ public class RunToolbar extends AbstractToolbarPanel {
                 new FilterPopupBtn(getCallbacks(), getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules, getCallbacks()::getAvailableGroups),
                 new ListViewBtn(getCallbacks()::onToolBarSwitchedToListView),
                 new GridViewBtn(getCallbacks()::onToolBarSwitchedToGridView)
-                // The search field is created and laid out by AbstractToolbarPanel itself
-                // because it needs its own horizontal-fill constraints.
         );
     }
 

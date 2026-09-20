@@ -29,22 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Compares two revisions of one case's result, the way
- * {@link TestCaseChangeComparator} does for a test case (#305).
- * <p>
- * A result is what one tester recorded about one case: the verdict, what they
- * saw, how long it took, and what they filed about it. Each is a row, under the
- * caption the run editor's own column carries, so a change reads in the words
- * the tester gave it.
- * <p>
- * The screenshots are named rather than counted: the file names are what the
- * commit carries beside the result, and a tester reviewing a failure wants to
- * see that a picture arrived with it.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class RunItemChangeComparator {
-
     // UC-SHARE-010, Rule-SHARE-046
     static @NotNull List<FieldChange> compare(final @NotNull TestRunItems oldItem, final @NotNull TestRunItems newItem) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
@@ -59,9 +45,6 @@ final class RunItemChangeComparator {
         addIfChanged(changes, RunEditorAttributes.EXECUTED_AT.getName(), Display.formatDate(oldItem.getExecutedAt()), Display.formatDate(newItem.getExecutedAt()));
         addIfChanged(changes, Bundle.message("git.change.screenshots"), String.join(", ", oldItem.getScreenshots()), String.join(", ", newItem.getScreenshots()));
 
-        // A result that changed with nothing above different still changed - a
-        // duration, a field this does not read - and it has to be selectable,
-        // because the commit stages only what the review lists.
         if (changes.isEmpty()) {
             changes.add(new FieldChange(RunEditorAttributes.RUN_STATUS.getName(), "", Bundle.message("git.change.changed"), ChangeType.CHANGE_RUN_ITEM));
         }
@@ -69,10 +52,6 @@ final class RunItemChangeComparator {
         return changes;
     }
 
-    /**
-     * What a result says, in one line: the verdict, and what the tester saw when
-     * it was not a pass.
-     */
     static @NotNull String summary(final @NotNull TestRunItems item) {
         final @NotNull String said = item.getActualResult().isBlank() ? "" : " - " + item.getActualResult();
         return item.getStatus().getLabel() + said;

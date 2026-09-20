@@ -32,11 +32,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class GridCellEditor extends AbstractCellEditor implements TableCellEditor {
-
     private final @NotNull JBTextArea textArea = new JBTextArea();
-    /**
-     * The table being edited in, empty between edits.
-     */
     private @NotNull Optional<JTable> editingTable = Optional.empty();
     private int editingRow = -1;
 
@@ -54,10 +50,6 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
             }
         });
 
-        // Ctrl+Enter inserts a line break inside the cell; plain Enter commits.
-        // The break goes in at the caret, not the end of the text. Shared with
-        // the expected-result field through Shortcuts.InsertNewLine, so both
-        // surfaces use the one key.
         textArea.getInputMap().put(Shortcuts.InsertNewLine.getKey(), "insertNewLine");
         textArea.getActionMap().put("insertNewLine", new AbstractAction() {
             @Override
@@ -77,25 +69,13 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
         textArea.setBackground(table.getSelectionBackground());
         textArea.setForeground(table.getForeground());
         textArea.setBorder(BorderFactory.createCompoundBorder(
-                // The selection's own border color, from its owner, as the
-                // selected cell draws it - not a second spelling of the same
-                // blue (#66, finding 262).
                 BorderFactory.createLineBorder(EditorColors.SELECTION_BORDER, 1),
                 BorderFactory.createEmptyBorder(GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING)));
 
-        // Returned directly: JTable sizes the editor component to the full cell
-        // rectangle, so the border outlines the cell. The old wrapper panel gave the
-        // text area only its preferred height, leaving the border hugging a single
-        // text line in the middle of tall (word-wrapped) rows.
         ApplicationManager.getApplication().invokeLater(textArea::requestFocusInWindow);
         return textArea;
     }
 
-    /**
-     * A line added with CTRL+ENTER needs somewhere to go: grow the row while the
-     * cell is still open, so the caret stays visible instead of typing into a
-     * clipped area. The row is re-measured for real when the edit is committed.
-     */
     private void growRowToFitEditor() {
         editingTable.filter(table -> editingRow >= 0 && editingRow < table.getRowCount())
                 .ifPresent(this::growRowIn);

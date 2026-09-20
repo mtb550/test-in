@@ -33,23 +33,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * The sheets about to be imported or exported: one tab each, a checkbox per
- * test case, and the editable cells the tester can correct before committing.
- * <p>
- * It keeps its table models, which is the whole point - a preview that cannot
- * be read back is decorative, and the export dialog was exactly that for as
- * long as it built its tabs and dropped them.
- */
 @RequiredArgsConstructor
 public final class SheetPreview implements DialogComponent {
-
-    /**
-     * The table of a sheet the preview never built one for: no rows, so nothing
-     * of that sheet is selected.
-     */
     private static final @NotNull DefaultTableModel NO_MODEL = new DefaultTableModel();
-
 
     private final @NotNull Project p;
     private final @NotNull List<TestEditorAttributes> attributes;
@@ -59,18 +45,8 @@ public final class SheetPreview implements DialogComponent {
 
     private @NotNull Map<String, List<TestCaseDto>> sheets = new LinkedHashMap<>();
 
-
-    /**
-     * UC-SHARE-007, Rule-SHARE-036.
-     * <p>
-     * Replaces the preview with these sheets. The models go with the tabs:
-     * keeping the previous file's would leave rows nobody can see still
-     * selectable.
-     */
+    // UC-SHARE-007, Rule-SHARE-036
     public void show(final @NotNull Map<String, List<TestCaseDto>> newSheets) {
-        // Debug, not info. The preview is rebuilt on every keystroke in the
-        // search field, so at info this wrote a line per character typed and
-        // buried whatever the tester opened the log to read (#312, N17).
         Logger.debug("Import preview: showing " + newSheets.values().stream().mapToInt(List::size).sum()
                 + " cases in " + newSheets.size() + " sheet(s), replacing " + sheets.size() + " sheet(s)");
         sheets = newSheets;
@@ -84,8 +60,6 @@ public final class SheetPreview implements DialogComponent {
             final @NotNull List<TestCaseDto> testCases = entry.getValue();
 
             final @NotNull DefaultTableModel model = new TablePanelBuilder().createModel(attributes, testCases);
-            // Without this an edited cell is shown and then dropped: the model
-            // holds it, and nothing carries it back to the test case.
             model.addTableModelListener(new CellEditListener(attributes, p, testCases));
 
             models.put(entry.getKey(), model);
@@ -93,26 +67,15 @@ public final class SheetPreview implements DialogComponent {
         }
     }
 
-    /**
-     * True before anything has been loaded - the import dialog opens this way
-     * and stays so until a file is chosen.
-     */
     public boolean isEmpty() {
         return sheets.isEmpty();
     }
 
-    /**
-     * UC-SHARE-001, Rule-SHARE-008.
-     * <p>
-     * The ticked cases per sheet. A sheet with nothing ticked is left out, so an
-     * empty result means the tester selected nothing at all.
-     */
+    // UC-SHARE-001, Rule-SHARE-008
     public @NotNull Map<String, List<TestCaseDto>> selected() {
         final @NotNull Map<String, List<TestCaseDto>> selectedBySheet = new LinkedHashMap<>();
 
         for (final Map.Entry<String, List<TestCaseDto>> entry : sheets.entrySet()) {
-            // A sheet the preview never built a table for shows nothing, so
-            // nothing of it is selected.
             final @NotNull DefaultTableModel model = models.getOrDefault(entry.getKey(), NO_MODEL);
 
             final @NotNull List<TestCaseDto> casesInSheet = entry.getValue();
@@ -143,13 +106,8 @@ public final class SheetPreview implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // Nothing here submits; the dialog's button does.
     }
 
-    /**
-     * The form above keeps the initial focus - the tester types a destination
-     * before they touch the preview.
-     */
     @Override
     public boolean wantsFocus() {
         return false;

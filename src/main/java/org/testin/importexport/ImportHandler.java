@@ -26,9 +26,6 @@ import java.util.Map;
 
 @FunctionalInterface
 public interface ImportHandler {
-    /**
-     * The formats that cannot be imported from — see {@link ExportHandler#UNSUPPORTED}.
-     */
     ImportHandler UNSUPPORTED = (p, importFile) -> {
         throw new IllegalStateException("This format cannot be imported from");
     };

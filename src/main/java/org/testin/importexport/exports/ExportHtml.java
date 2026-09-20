@@ -33,18 +33,14 @@ import java.util.List;
 import java.util.Map;
 
 public class ExportHtml {
-
     // UC-SHARE-002, Rule-SHARE-022
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
-        // Explicit UTF-8: the document declares <meta charset="UTF-8">, and the platform
-        // default charset (e.g. cp1252 on Windows) would mangle non-ASCII text.
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), StandardCharsets.UTF_8))) {
             writeHtmlDocument(writer, sheetsData);
         } catch (final IOException ex) {
             Logger.error(ex.getMessage());
             throw new RuntimeException(ex);
         }
-
     }
 
     private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
@@ -139,4 +135,3 @@ public class ExportHtml {
         }
     }
 }
-

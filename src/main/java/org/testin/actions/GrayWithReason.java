@@ -24,22 +24,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-/**
- * Rule-EDITOR-PANEL-230, Rule-TREE-PANEL-104.
- * <p>
- * An entry that cannot work on what is selected is gray, and says why in its
- * tooltip.
- * <p>
- * Twelve actions grayed themselves with nothing said, against the rule that a
- * control which cannot work is shown and disabled with the reason, while seven
- * others beside them wrote one (#66, findings 236 to 247). One owner, because the
- * other half is easy to miss: a presentation outlives one update, so a reason
- * set while gray stays as the tooltip of an entry that works again unless it is
- * put back - here, to the entry's own description.
- */
+// Rule-EDITOR-PANEL-230, Rule-TREE-PANEL-104
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GrayWithReason {
-
     public static void unless(final @NotNull AnAction action, final @NotNull AnActionEvent e, final boolean works, final @NotNull String reason) {
         e.getPresentation().setEnabled(works);
         e.getPresentation().setDescription(works ? Objects.requireNonNullElse(action.getTemplatePresentation().getDescription(), "") : reason);

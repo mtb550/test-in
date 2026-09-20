@@ -27,11 +27,7 @@ import java.io.File;
 import java.util.*;
 
 public class ImportJson {
-
-    // UC-SHARE-006. A file that will not parse throws to the one caller that
-    // reports it, FileDocumentListener. Caught here as well, it was said twice,
-    // and the empty answer after it was read there as "there is nothing in this
-    // file" - untrue, and the second of two messages (#66, finding 213).
+    // UC-SHARE-006
     public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
         return parseFile(p, file);
     }

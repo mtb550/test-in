@@ -44,37 +44,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Runs test cases through TestNG: any number of them, as one run.
- * <p>
- * One runner rather than one per shape. There were two - one setting
- * {@code TEST_OBJECT = METHOD} for a single case, one setting
- * {@code TEST_OBJECT = CLASS} for a whole test set - and they differed in little
- * else, while everything built on the first had to be built again on the second
- * or go without. The second went without: a test set run could not be stopped,
- * marked no card as running, and ran a different case when the one asked for had
- * no generated method (#36).
- * <p>
- * {@code TEST_OBJECT = PATTERN} takes a set of {@code Class,method} entries, so
- * one case and a hundred are the same call with a different number of entries.
- * What differs is the grouping, and that belongs to the caller: a card runs its
- * one case, so stopping it stops nothing else; a test set runs all of its cases
- * together, so it costs one process.
- * <p>
- * <b>The cases are carried through, not a class name.</b> That is what lets this
- * mark every card at the click, refuse a case whose method was never generated,
- * and hand the execution service the list it needs to put them back when the run
- * is stopped. The old class runner was handed a string, which is why it could do
- * none of those things.
- */
 public final class TestNGRunner implements TestRunner {
-
-    /**
-     * Runs these cases as one run.
-     * <p>
-     * A case with no generated method is dropped and said out loud; the rest
-     * still run. Nothing at all is started when none of them can be.
-     */
     @Override
     public void run(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
         if (cases.isEmpty()) return;
@@ -82,20 +52,12 @@ public final class TestNGRunner implements TestRunner {
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         if (DumbService.isDumb(p)) {
-            // Told to the execution service as well as to the tester. Whoever
-            // asked for these cases has already claimed them - that claim is what
-            // makes their verdicts land in the right test run - and a claim on a
-            // case that never starts is never released, so that run would go on
-            // recording the case's results from every other run it sits in.
             cases.forEach(execution::notStarting);
 
             DumbService.getInstance(p).showDumbModeNotification(Bundle.message("testng.indexing.wait"));
             return;
         }
 
-        // Marked here, where the tester's gesture is. Everything below hops to a
-        // pooled thread and back, and a card that only turned Running when the
-        // process finally existed would sit unchanged for a second after a click.
         cases.forEach(execution::starting);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -111,10 +73,6 @@ public final class TestNGRunner implements TestRunner {
         });
     }
 
-    /**
-     * Finds the generated method of each case under a read action, and hands the
-     * launch back to the EDT.
-     */
     private void prepare(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
@@ -123,12 +81,6 @@ public final class TestNGRunner implements TestRunner {
         Optional<Module> module = Optional.empty();
 
         for (final TestCaseDto tc : cases) {
-            // By the id in the annotation, which is the case's identity. Asked
-            // for the method whose name its description sanitizes to, two cases
-            // differing only in punctuation both answered with the one method
-            // that was written for the pair - so they collapsed into a single
-            // pattern entry, TestNG ran it once, and the second case ended with
-            // no verdict and nothing said about it.
             final @NotNull Optional<List<String>> method = CodeNavigation.available().methodOf(p, tc);
 
             if (method.isEmpty()) {
@@ -141,10 +93,6 @@ public final class TestNGRunner implements TestRunner {
             if (module.isEmpty()) module = moduleOf(p, method.orElseThrow());
         }
 
-        // The refusal for the cases with no code, before the empty return,
-        // because this is the one place that knows which they are. Nothing was
-        // said at the click (#66, finding 18). The running count waits for the
-        // launch, which is the one place that knows which cases start (#312, A13).
         execution.started(List.of(), withoutCode);
 
         if (found.isEmpty()) return;
@@ -153,17 +101,7 @@ public final class TestNGRunner implements TestRunner {
         ApplicationManager.getApplication().invokeLater(() -> launch(p, found, runModule));
     }
 
-    /**
-     * A case and the generated method that runs it, carried together so the
-     * pattern and the run's name are built from the method that was actually
-     * found rather than from the case's description a second time.
-     */
     private record Generated(@NotNull TestCaseDto tc, @NotNull List<String> fqcn) {
-
-        /**
-         * One entry of the pattern set: the class and the method, which is the
-         * form the TestNG plugin splits on a comma.
-         */
         private @NotNull String pattern() {
             return String.join(".", fqcn.subList(0, fqcn.size() - 1)) + "," + fqcn.getLast();
         }
@@ -173,9 +111,6 @@ public final class TestNGRunner implements TestRunner {
         }
     }
 
-    /**
-     * The module the generated class sits in, which is the module the run needs.
-     */
     private static @NotNull Optional<Module> moduleOf(final @NotNull Project p, final @NotNull List<String> fqcn) {
         final @NotNull String classFqcn = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
@@ -183,16 +118,9 @@ public final class TestNGRunner implements TestRunner {
                 .map(ModuleUtilCore::findModuleForPsiElement);
     }
 
-    /**
-     * Builds the configuration and starts it, for whichever of the cases the
-     * tester still wants.
-     */
     private void launch(final @NotNull Project p, final @NotNull List<Generated> found, final @NotNull Optional<Module> module) {
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
-        // Asked here rather than earlier: a case stopped while the run was being
-        // prepared is left out of the pattern set instead of being started and
-        // then killed a moment later.
         final @NotNull List<TestCaseDto> stillWanted = execution.stillWanted(found.stream().map(Generated::tc).toList());
         if (stillWanted.isEmpty()) {
             Logger.info("Not starting: every case in the run was stopped before it began");
@@ -203,19 +131,11 @@ public final class TestNGRunner implements TestRunner {
         final @NotNull List<TestCaseDto> cases = generated.stream().map(Generated::tc).toList();
 
         final @NotNull LinkedHashSet<String> patterns = new LinkedHashSet<>(generated.stream().map(Generated::pattern).toList());
-        // Free of any run this plugin still has going: a second launch of the
-        // same test set is numbered rather than sharing the first one's name,
-        // which is what the registry keys every case by (#312, A11).
         final @NotNull String name = execution.freeRunName(configNameFor(generated));
 
         final @NotNull RunManager runManager = RunManager.getInstance(p);
         final @NotNull TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
 
-        // Reused only when what carries that name is a TestNG configuration.
-        // findConfigurationByName answers with whatever holds the name - a
-        // JUnit run, a Gradle task, an Application the tester set up - and the
-        // cast below then threw, or worse, this quietly took a configuration of
-        // the tester's own and rewrote it into a TestNG pattern run.
         final @NotNull RunnerAndConfigurationSettings settings = Optional.ofNullable(runManager.findConfigurationByName(name))
                 .filter(existing -> existing.getConfiguration() instanceof TestNGConfiguration)
                 .orElseGet(() -> {
@@ -225,10 +145,6 @@ public final class TestNGRunner implements TestRunner {
                     return created;
                 });
 
-        // Not a cast. What the factory above builds is a TestNG configuration,
-        // and if some future platform change means it is not, this says so
-        // instead of ending the run in a ClassCastException the tester sees as
-        // an IDE error report.
         if (!(settings.getConfiguration() instanceof TestNGConfiguration configuration)) {
             Logger.warn("'" + name + "' is not a TestNG configuration, so the run was not started");
             return;
@@ -245,19 +161,11 @@ public final class TestNGRunner implements TestRunner {
 
         Logger.info("Running as '" + name + "': " + patterns);
 
-        // Counted here, from the cases the platform is handed: a case stopped
-        // while the run was prepared is not one that started (Rule-CODEGEN-033).
+        // Rule-CODEGEN-033
         execution.started(cases, List.of());
         execution.launch(cases, settings);
     }
 
-    /**
-     * What the run is called, which is also how a stop finds its process.
-     * <p>
-     * One case keeps the name a single run has always had. A whole test set takes
-     * its class's name, because that is what the tester ran. A selection spanning
-     * classes says how many, since no one name is true of it.
-     */
     private static @NotNull String configNameFor(final @NotNull List<Generated> generated) {
         final @NotNull List<String> classes = generated.stream().map(Generated::simpleClassName).distinct().toList();
 

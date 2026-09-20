@@ -26,23 +26,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-/**
- * A primary action with alternatives behind an arrow — the IDE's own commit
- * control, which is what a tester already knows: the common answer is on the
- * button and the others are one click away, rather than in a menu somewhere
- * else or a second dialog afterward.
- * <p>
- * Every action submits the dialog. Which one was pressed is a question the
- * dialog asks afterward through {@link #getChosen()}, so there is one submit
- * path with one validation in it, and the choice only decides what happens with
- * what the dialog collected.
- * <p>
- * The first label is the default: it is what the button shows, what a click
- * runs, and what the dialog's Enter gesture runs, so the key and the button
- * cannot mean two different things.
- */
 public final class DialogSplitButton implements DialogComponent {
-
     private final @NotNull JBOptionButton button;
     private final @NotNull JBPanel<?> panel;
     private final @NotNull String defaultLabel;
@@ -67,10 +51,6 @@ public final class DialogSplitButton implements DialogComponent {
         panel.add(button);
     }
 
-    /**
-     * The label the tester pressed. Read inside the dialog's submit, which is
-     * the only thing that needs to know.
-     */
     public @NotNull String getChosen() {
         return chosen;
     }
@@ -86,11 +66,7 @@ public final class DialogSplitButton implements DialogComponent {
                 chosen = label;
                 submitRequest.run();
 
-                // Rule-INTERNAL-054. The submit has read the choice by now. One the
-                // dialog refused leaves it open, and Enter - captioned with the
-                // first label - reads the choice again: left on the alternative,
-                // Enter captioned "Commit & Push" committed without pushing
-                // (#312, A76).
+                // Rule-INTERNAL-054
                 chosen = defaultLabel;
             }
         };
@@ -106,19 +82,11 @@ public final class DialogSplitButton implements DialogComponent {
         return button;
     }
 
-    /**
-     * Enter submits the way the default action does, so the chosen label is
-     * left as it is - the first one, unless the tester picked another.
-     */
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
         this.submitRequest = submit;
     }
 
-    /**
-     * A button row is the wrong thing to hand spare space to; see
-     * {@link DialogButton#canFillSpace()}.
-     */
     @Override
     public boolean canFillSpace() {
         return false;

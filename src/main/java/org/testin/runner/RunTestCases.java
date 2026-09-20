@@ -27,65 +27,24 @@ import org.testin.services.OptionalPlugin;
 
 import java.util.List;
 
-/**
- * Starting test cases: marking them as running, handing them to the runner, and
- * saying so once.
- * <p>
- * Separate from {@link RunTestCaseAction}, which is how a menu offers it. The
- * two callers that already know which cases to run - the card's run icon and the
- * details panel's - used to build an action to reach this, one of them handing
- * it a null list it had no use for (#71).
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RunTestCases {
-
-    /**
-     * UC-CODEGEN-008, Rule-CODEGEN-031, Rule-CODEGEN-033.
-     * <p>
-     * Runs a selection as one run.
-     * <p>
-     * <b>One run for the selection, not one per case.</b> A run is a compile and
-     * a JVM, so twelve selected cases used to mean twelve of each, all starting
-     * at once - the tester watched "Executing pre-compile tasks" twelve times
-     * and the cases ran in parallel, in no order anyone chose. One configuration
-     * compiles once and TestNG walks the methods in sequence, which is what
-     * running the generated class by hand already did.
-     * <p>
-     * What it costs is per-case stopping, and the runner already treats that as
-     * the ordinary case: one configuration is one process, so stopping a case in
-     * a run of twelve stops the eleven beside it - and every one of them is put
-     * back, which is exactly what {@code TestNGExecution.stop} does for a test
-     * set run today.
-     * <p>
-     * Rule-CODEGEN-035. The methods run in the order the tester arranged: every
-     * generated method's {@code priority} is the case's position in its set
-     * (#242), and TestNG runs by priority before declaration order. This said
-     * the opposite after #242 had made it so (#66, finding 280).
-     */
+    // UC-CODEGEN-008, Rule-CODEGEN-031, Rule-CODEGEN-033, Rule-CODEGEN-035
     public static void run(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         if (testCases.isEmpty()) return;
 
-        // Rule-CODEGEN-082. Every Run reaches this, the card's and the menu's, so
-        // the code it runs is asked about here once.
+        // Rule-CODEGEN-082
         if (!CodeOn.isOnOrWarn(p)) return;
         if (!OptionalPlugin.TESTNG.isAvailableOrWarn(p)) return;
 
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
-        // A case already going is left alone rather than started twice. Filtered
-        // before the launch, not inside it, so the count below is what actually
-        // started.
         final @NotNull List<TestCaseDto> starting = testCases.stream()
                 .filter(tc -> !execution.isRunning(tc.getId()))
                 .toList();
 
         if (starting.isEmpty()) return;
 
-        // Nothing is said here. What a run turns out to be is only known a
-        // second later, when the runner has looked for each case's generated
-        // method, so a count taken at the click said "Running 12" over twelve
-        // cases that could not run. The runner says it once it knows - see
-        // TestNGExecution.started (#66, finding 18).
         TestRunner.available().run(p, starting);
     }
 }

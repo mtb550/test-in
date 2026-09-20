@@ -29,21 +29,7 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * Collects the Git identity required for a first commit.
- * <p>
- * On the framework, like every other dialog: the constructor declares the
- * title, the components and the keys, and the status bar shows the keys it
- * declared. It used to be hand-built on the frameless wrapper, which bound
- * Enter and Escape into the root pane and told the tester about neither (#66).
- * <p>
- * The scope is two radios rather than a "set globally" checkbox. The question
- * has two named halves - this repository, or every repository on the machine -
- * and a radio pair says both out loud where a checkbox only names one and
- * leaves the other to be inferred from it being off.
- */
 final class GitIdentityDialog extends AbstractFrameworkDialog<TextInput> {
-
     private final @NotNull TextInput nameField;
     private final @NotNull TextInput emailField;
     private final @NotNull RadioSelection<Boolean> scope;
@@ -88,9 +74,6 @@ final class GitIdentityDialog extends AbstractFrameworkDialog<TextInput> {
         final @NotNull String name = accepted(nameField);
         if (name.isEmpty()) return;
 
-        // Git records whatever it is handed, so a name typed into the email box
-        // is not noticed until somebody reads a commit and wonders who wrote it
-        // (#272).
         final @NotNull String email = accepted(emailField, GitRefs::isEmailAddress, Refused.NOT_AN_EMAIL_ADDRESS);
         if (email.isEmpty()) return;
 
@@ -98,10 +81,6 @@ final class GitIdentityDialog extends AbstractFrameworkDialog<TextInput> {
         closeOk();
     }
 
-    /**
-     * What the tester filled in: the two values Git needs, and whether they
-     * belong to this repository or to the machine.
-     */
     record Identity(@NotNull String name, @NotNull String email, boolean global) {
     }
 }

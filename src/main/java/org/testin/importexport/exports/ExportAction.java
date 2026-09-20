@@ -41,22 +41,7 @@ import org.testin.util.Mapper;
 
 import java.util.*;
 
-/**
- * Writes what a node holds out to a file the tester can send.
- * <p>
- * Declared in {@code plugin.xml} (#119), so Find Action offers it and a tester
- * can bind a key to it - it has never had one. That is why it has no
- * constructor and no fields: the platform builds one instance for the whole IDE,
- * so the node comes from the keystroke, and the columns an export holds are the
- * attributes' own answer rather than a list this carried for three exporters to
- * read off it.
- * <p>
- * The export itself is in {@link Work}, which is what a keystroke that arrived
- * on a node with a project behind it has to work with.
- */
 public class ExportAction extends DumbAwareAction {
-
-    /** The gesture's name, which its dialog reads rather than spells. */
     public static final @NotNull String NAME = Bundle.message("export.action.name");
 
     // UC-SHARE-001, UC-SHARE-002
@@ -68,13 +53,7 @@ public class ExportAction extends DumbAwareAction {
         TestinData.firstSelected(e, DirectoryDto.class).ifPresent(dir -> new Work(p).exportFrom(dir));
     }
 
-    /**
-     * UC-SHARE-001.
-     * <p>
-     * On a node that holds test cases, and gray on every other - including
-     * outside the Testin tree altogether, which is what keeps a key bound to
-     * this inert in a Java file (#119).
-     */
+    // UC-SHARE-001
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TestinData.singleSelectedNode(e)
@@ -87,17 +66,8 @@ public class ExportAction extends DumbAwareAction {
         return ActionUpdateThread.EDT;
     }
 
-    /**
-     * Exporting one node, for a project that is there.
-     */
     private record Work(@NotNull Project p) {
-
-        /**
-         * UC-SHARE-001, Rule-SHARE-015.
-         * <p>
-         * Everything the action does once it knows which node it is exporting
-         * from.
-         */
+        // UC-SHARE-001, Rule-SHARE-015
         private void exportFrom(final @NotNull DirectoryDto dirDto) {
             final @NotNull Optional<VirtualFile> resolved = resolveTargetDir(dirDto);
             if (resolved.isEmpty()) return;
@@ -118,33 +88,17 @@ public class ExportAction extends DumbAwareAction {
                         return;
                     }
 
-                    // Before the file is written, not after: an export missing test
-                    // cases looks exactly like a whole one, and the count in the
-                    // Exported message counts what was gathered, so it looks right
-                    // too (#263).
                     new ConfirmDialog(p, Bundle.message("export.unreadable.title"), unreadableWarning(gathered.unreadable()),
                             "", "", Bundle.message("export.anyway"), () -> chooseWhatToExport(sheets, targetDir)).show();
                 });
             });
         }
 
-        /**
-         * The framework dialog reports through this callback rather than a return
-         * code, so the destination is never read back out of a dialog that was
-         * canceled. It hands back the cases the tester left ticked, not the ones
-         * gathered above.
-         */
         private void chooseWhatToExport(final @NotNull Map<String, List<TestCaseDto>> sheets, final @NotNull VirtualFile targetDir) {
             new ExportDialog(p, TestEditorAttributes.all(Can.EXPORT), sheets, targetDir, this::writeExport).show();
         }
 
-        /**
-         * UC-SHARE-001, Rule-SHARE-005.
-         * <p>
-         * The write, once the tester has chosen a file. Under its own bar and after
-         * the dialog has closed: a workbook of several hundred cases took the EDT
-         * with it, and the dialog sat there for all of it (#87).
-         */
+        // UC-SHARE-001, Rule-SHARE-005
         private void writeExport(final DestinationForm.@NotNull Destination destination, final @NotNull Map<String, List<TestCaseDto>> selected) {
             final int cases = selected.values().stream().mapToInt(List::size).sum();
 
@@ -156,26 +110,7 @@ public class ExportAction extends DumbAwareAction {
                     });
         }
 
-        /**
-         * UC-SHARE-002, Rule-SHARE-001.
-         * <p>
-         * Every test set beneath the node, however deep.
-         * <p>
-         * It used to look one level down and no further, so exporting a package
-         * whose test sets sit inside sub-packages gathered nothing from them - and
-         * said nothing, so the tester sent a file missing most of what they meant to
-         * send (#262).
-         * <p>
-         * One walk for both kinds of node. A test set holds its cases directly and
-         * has no folders under it, so the recursion simply stops - which is what the
-         * two branches here used to say the long way.
-         * <p>
-         * <b>Through the indexer.</b> It used to walk the VFS and parse every
-         * .json for itself, so an export could serve content the tree was not
-         * showing, and re-read the whole project to do it - 2,246 files in the
-         * sandbox, every one of them already read and already in memory. The
-         * import half asks the indexer for the same data (#66, finding 87).
-         */
+        // UC-SHARE-002, Rule-SHARE-001
         private @NotNull Gathered gather(final @NotNull DirectoryDto node) {
             final @NotNull List<Sheet> found = new ArrayList<>();
             final @NotNull List<String> unreadable = new ArrayList<>();
@@ -188,17 +123,7 @@ public class ExportAction extends DumbAwareAction {
             return new Gathered(sheets, unreadable);
         }
 
-        /**
-         * UC-SHARE-003, Rule-SHARE-020.
-         * <p>
-         * Copies of the cases, for the preview to be corrected on. The indexer hands
-         * out its own objects, and the preview writes a corrected cell onto the case
-         * it was given - so a typo fixed for the file changed the test case itself,
-         * even when the export was canceled, and the next ordinary save of that case
-         * wrote it to disk with no undo entry (#312, A48). The parent is not in the
-         * JSON, so it is carried across by hand: the class name a sheet shows is
-         * built from it.
-         */
+        // UC-SHARE-003, Rule-SHARE-020
         private @NotNull List<TestCaseDto> detached(final @NotNull List<TestCaseDto> cases) {
             final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
             return cases.stream()
@@ -209,16 +134,9 @@ public class ExportAction extends DumbAwareAction {
         private void walk(final @NotNull DirectoryDto node, final @NotNull List<String> path, final @NotNull List<Sheet> found, final @NotNull List<String> unreadable) {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            // Already in the order the editor shows, because the indexer answers
-            // with the rule the screen is drawn from - so a sheet's rows and the
-            // screen they were exported from cannot disagree.
             final @NotNull List<TestCaseDto> here = indexer.getTestCasesForTestSet(node.getPath());
             if (!here.isEmpty()) found.add(new Sheet(path, detached(here)));
 
-            // Asked of the indexer, which read them. This walked the folder
-            // through the VFS and read file names to work it out again - inside
-            // the tree, where importexport's exemption from rule 1 does not
-            // reach (#66, finding 278).
             unreadable.addAll(indexer.unreadableCasesIn(node.getPath()).stream().sorted().toList());
 
             for (final DirectoryDto child : indexer.getChildren(node.getPath())) {
@@ -229,27 +147,13 @@ public class ExportAction extends DumbAwareAction {
         }
     }
 
-    /**
-     * What a walk of the exported node found: one sheet per folder holding test
-     * cases, and the test case files it could not read.
-     */
     private record Gathered(@NotNull Map<String, List<TestCaseDto>> sheets, @NotNull List<String> unreadable) {
     }
 
-    /**
-     * One folder that holds test cases, and where it sits under the node being
-     * exported. The path is kept rather than a name because two test sets in
-     * different sub-packages can share one.
-     */
     private record Sheet(@NotNull List<String> path, @NotNull List<TestCaseDto> cases) {
     }
 
-    /**
-     * UC-SHARE-002, Rule-SHARE-001.
-     * <p>
-     * What is about to be missing, named rather than counted: a tester who
-     * recognizes the file knows whether the export is worth sending.
-     */
+    // UC-SHARE-002, Rule-SHARE-001
     private static @NotNull String unreadableWarning(final @NotNull List<String> unreadable) {
         final @NotNull String named = String.join(", ", unreadable.subList(0, Math.min(5, unreadable.size())));
         final @NotNull String rest = unreadable.size() > 5
@@ -262,14 +166,6 @@ public class ExportAction extends DumbAwareAction {
         return Bundle.message("export.unreadable.message", count, named, rest);
     }
 
-    /**
-     * The shortest tail of a test set's path that no earlier sheet has taken -
-     * its own name where that is free, and its parent's name in front of it
-     * where it is not.
-     * <p>
-     * A name rather than a number, because the tester reads these as sheet
-     * titles and has to tell two same-named test sets apart by where they live.
-     */
     private static @NotNull String uniqueKey(final @NotNull Map<String, ?> taken, final @NotNull List<String> path) {
         for (int from = path.size() - 1; from >= 0; from--) {
             final @NotNull String key = String.join(" - ", path.subList(from, path.size()));
@@ -279,10 +175,6 @@ public class ExportAction extends DumbAwareAction {
         return String.join(" - ", path) + " (" + (taken.size() + 1) + ")";
     }
 
-    /**
-     * Empty when the path is not in the VFS; a file resolves to its parent
-     * directory.
-     */
     private static @NotNull Optional<VirtualFile> resolveTargetDir(final @NotNull DirectoryDto dirDto) {
         return Optional.ofNullable(LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString()))
                 .map(target -> target.isDirectory() ? target : target.getParent());

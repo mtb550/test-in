@@ -33,25 +33,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-/**
- * Where a bug report's test case can be opened on the web (#28).
- * <p>
- * Built from the test project folder's own Git remote and checked-out branch,
- * not from {@code repoUrl} in {@code testin.yml}, which can go stale while the
- * remote cannot. The link opens once the file has been pushed.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestCaseLink {
-
-    /**
-     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068.
-     * <p>
-     * The link, read off Git, and empty when it cannot be built: no Git plugin,
-     * a test project folder that is not its repository's root, no remote, no
-     * branch, or a remote that does not name a host, an owner and a repository.
-     * <p>
-     * Off the EDT: every answer here is a git command.
-     */
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068
     public static @NotNull Optional<String> read(final @NotNull Project p, final @NotNull TestCaseFile file) {
         if (!OptionalPlugin.GIT.isAvailable()) return Optional.empty();
 
@@ -64,21 +48,12 @@ public final class TestCaseLink {
         return of(remoteUrl, git.getCurrentBranch(file.testProject()), file.inProject());
     }
 
-    /**
-     * The link from what Git answered: {@code https://HOST/OWNER/REPO/blob/BRANCH/PATH}.
-     * A clone or SSH address becomes its web form, and {@code .git} is dropped -
-     * the same reading {@code bugRepoUrl} gets.
-     */
     static @NotNull Optional<String> of(final @NotNull String remoteUrl, final @NotNull String branch, final @NotNull Path inProject) {
         if (branch.isBlank()) return Optional.empty();
 
         return BugRepository.of(remoteUrl).flatMap(repository -> web(repository, branch, inProject));
     }
 
-    /**
-     * Percent-encoded, parentheses included: a Markdown link ends at the first
-     * unbalanced one, and a test set may be called anything.
-     */
     private static @NotNull Optional<String> web(final @NotNull BugRepository repository, final @NotNull String branch, final @NotNull Path inProject) {
         final @NotNull String file = StreamSupport.stream(inProject.spliterator(), false)
                 .map(Path::toString)

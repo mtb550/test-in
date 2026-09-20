@@ -31,16 +31,7 @@ import org.testin.logger.Logger;
 import java.util.Optional;
 import java.util.List;
 
-/**
- * Moves a package's generated folder into the package its new place in the tree
- * stands for, carrying everything under it.
- * <p>
- * The folder moves and then every {@code .java} file beneath it is made to
- * declare where it now sits - including the ones in packages nested inside,
- * which move with their parent and each land somewhere new.
- */
 public class MoveJavaPackage implements GenAction {
-
     // UC-CODEGEN-017, Rule-CODEGEN-057, Rule-CODEGEN-058
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
@@ -68,9 +59,6 @@ public class MoveJavaPackage implements GenAction {
             final @NotNull VirtualFile folder = found.get();
             final @NotNull Optional<VirtualFile> target = JavaSourceRoot.packageFolder(sourceRoot, destination);
 
-            // No folder to move into; a package dropped where it already is; and a
-            // package dropped into itself, which would take the folder with it.
-            // None of the three is a move.
             if (target.isEmpty()
                     || target.get().equals(folder.getParent())
                     || VfsUtil.isAncestor(folder, target.get(), false)) return;

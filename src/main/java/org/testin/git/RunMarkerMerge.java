@@ -33,46 +33,17 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Merges the three versions Git keeps of a test run's own marker (#305, Q-D).
- * <p>
- * Two testers executing one cycle both write its {@code .tr}: each Start stamps
- * the beginning, every Stop overwrites the end, and both move its status. Nothing
- * merged markers, so every shared run conflicted on this file - on values whose
- * disagreement has one obvious answer.
- * <p>
- * So it is answered by rule, and the tester is asked nothing about it: the run
- * started when the <b>earlier</b> of the two says it started, ended when the
- * <b>later</b> says it ended, and its status is the one <b>further along</b>,
- * because a run somebody completed is not created again. The audit block takes
- * the later edit, as a test case's does.
- * <p>
- * What the two testers wrote - the configuration and the result analysis - is
- * merged key by key, and only a key both of them changed differently is a
- * question. Everything else about the marker is the file's own: its id, when it
- * was created and by whom, and where it sits among its siblings.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class RunMarkerMerge {
-
     private static final @NotNull String STARTED = "executionStartedAt";
     private static final @NotNull String ENDED = "executionEndedAt";
     private static final @NotNull String STATUS = "status";
     private static final @NotNull String MODIFIED_AT = "modifiedAt";
     private static final @NotNull String MODIFIED_BY = "modifiedBy";
 
-    /**
-     * The two maps a tester writes into, which merge key by key rather than as
-     * one value: two testers who answered different questions, or wrote about
-     * different verdicts, disagreed about nothing.
-     */
     private static final @NotNull List<String> WRITTEN_INTO = List.of("configuration", "resultAnalysis");
 
-    /**
-     * UC-SHARE-018, Rule-SHARE-080.
-     * <p>
-     * The three stages Git holds, by the rules above.
-     */
+    // UC-SHARE-018, Rule-SHARE-080
     public static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String base, final @NotNull String mine, final @NotNull String theirs) {
         final @NotNull ObjectNode baseNode = mapper.readTree(base);
         final @NotNull ObjectNode mineNode = mapper.readTree(mine);
@@ -93,11 +64,6 @@ final class RunMarkerMerge {
         return new Merge(merged, List.copyOf(questions), List.copyOf(settled));
     }
 
-    /**
-     * The run started when the earlier side says it started and ended when the
-     * later says it ended - a cycle two people executed ran from the first thing
-     * either of them did to the last.
-     */
     private static void execution(final @NotNull ObjectNode merged, final @NotNull ObjectNode mine, final @NotNull ObjectNode theirs, final @NotNull List<String> settled) {
         take(merged, mine, theirs, STARTED, true, settled, Bundle.message("git.merge.execution.started"));
         take(merged, mine, theirs, ENDED, false, settled, Bundle.message("git.merge.execution.ended"));
@@ -108,8 +74,6 @@ final class RunMarkerMerge {
         final @NotNull ZonedDateTime yours = stamp(theirs, field);
         if (ours.equals(yours)) return;
 
-        // A stamp nobody made is not a candidate: the epoch means it never
-        // happened, so the side that did happen wins whichever end this is.
         final boolean takeTheirs = Config.isNotExecuted(ours)
                 || !Config.isNotExecuted(yours) && (earliest ? yours.isBefore(ours) : yours.isAfter(ours));
 
@@ -117,12 +81,6 @@ final class RunMarkerMerge {
         settled.add(said);
     }
 
-    /**
-     * The status further along, as the status itself says - by its stage in the
-     * run's life, not by the order the constants happen to be declared in, which
-     * is the order a menu once drew them: a run somebody has completed is not
-     * created again, and one somebody closed is not in progress.
-     */
     private static void status(final @NotNull ObjectNode merged, final @NotNull ObjectNode mine, final @NotNull ObjectNode theirs, final @NotNull List<String> settled) {
         final @NotNull TestRunStatus ours = statusIn(mine);
         final @NotNull TestRunStatus yours = statusIn(theirs);
@@ -132,10 +90,6 @@ final class RunMarkerMerge {
         settled.add(Bundle.message("git.merge.status"));
     }
 
-    /**
-     * The audit block takes the later edit whole, so who last changed the run and
-     * when stay one fact - the same rule a test case's takes.
-     */
     private static void audit(final @NotNull ObjectNode merged, final @NotNull ObjectNode mine, final @NotNull ObjectNode theirs) {
         if (!stamp(theirs, MODIFIED_AT).isAfter(stamp(mine, MODIFIED_AT))) return;
 
@@ -143,12 +97,6 @@ final class RunMarkerMerge {
         merged.set(MODIFIED_BY, theirs.path(MODIFIED_BY).deepCopy());
     }
 
-    /**
-     * What the testers wrote, key by key: a key one side left alone takes the
-     * other's, and only a key both changed differently is a question - named as
-     * {@code configuration.PLATFORM}, which is what {@link Merge#answer} writes
-     * back into.
-     */
     private static void written(final @NotNull Mapper mapper, final @NotNull ObjectNode merged, final @NotNull ObjectNode base, final @NotNull ObjectNode mine, final @NotNull ObjectNode theirs, final @NotNull String object, final @NotNull List<Merge.Question> questions, final @NotNull List<String> settled) {
         final @NotNull Set<String> keys = new LinkedHashSet<>();
         mine.path(object).fieldNames().forEachRemaining(keys::add);
@@ -180,11 +128,6 @@ final class RunMarkerMerge {
         }
     }
 
-    /**
-     * A stamp the file carries, through the one reader of a written date - which
-     * forgives a weekday edited by hand, where a plain parse would read the whole
-     * value as "never happened" and take the wrong side.
-     */
     private static @NotNull ZonedDateTime stamp(final @NotNull ObjectNode marker, final @NotNull String field) {
         return TestDataParser.date(marker.path(field).asText("")).orElse(Config.NOT_EXECUTED);
     }

@@ -45,42 +45,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * Editing the test case the Details panel is showing: the key that opens the
- * update menu, and writing back what it returns.
- * <p>
- * {@link DetailsTab} draws what a case <i>is</i> - its rows, its run item, its
- * badges - and carried this as well until #302. Say that class's job in a
- * sentence and then these methods', and the second is not the first: drawing a
- * case is not opening the editor for it. It was 85 lines of 322 and the only
- * part that reached a dialog, took a snapshot or wrote to disk.
- * <p>
- * <b>Where it writes is the whole difficulty.</b> A case shown from a search
- * result has no parent and no path, so there is no test set to write into - and
- * an edit that reaches no disk is one the tester believes they made, and finds
- * out about at the next open with no idea which change went (#234). Every
- * answer here runs inside the branch that found somewhere to write.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EditShownCase {
-
-    /**
-     * Set on the panel once the key is bound to it, because the panel is
-     * redrawn on every selection and binding again would stack one action per
-     * case the tester looked at.
-     */
     private static final @NotNull String SHORTCUT_REGISTERED_KEY = "DetailsTab.f2.registered";
 
-    /**
-     * UC-VIEW-PANEL-011, Rule-VIEW-PANEL-044.
-     * <p>
-     * Puts the update key on the Details panel, once.
-     * <p>
-     * Whatever Update Test Case is bound to, not a key of this panel's own: one
-     * key, one owner, and a tester who rebinds F2 rebinds it here too (#119).
-     * The action itself is this panel's, because what it edits is the case the
-     * panel is showing rather than an editor's selection.
-     */
+    // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-044
     public static void bindTo(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab) {
         if (Boolean.TRUE.equals(detailsTab.getClientProperty(SHORTCUT_REGISTERED_KEY))) return;
 
@@ -96,7 +65,6 @@ public final class EditShownCase {
 
             @Override
             public @NotNull ActionUpdateThread getActionUpdateThread() {
-                // BGT on purpose - no update() here reads Swing state; do not switch to EDT (#52).
                 return ActionUpdateThread.BGT;
             }
         }.registerCustomShortcutSet(Declared.shortcutSet("Testin.UpdateTestCase"), detailsTab);
@@ -106,8 +74,6 @@ public final class EditShownCase {
     private static void open(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
         final @NotNull List<TestCaseDto> items = List.of(dto);
 
-        // Before the menu, for the same reason the editor's own update takes it
-        // there: the dialog edits the DTO it was given.
         final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(items);
         final @NotNull Optional<Path> undoPath = writesTo(p, dto, currentPath);
         final @NotNull Optional<TestCaseSnapshot> before = undoPath.map(editPath -> TestCaseSnapshot.of(p, editPath, ids));
@@ -115,18 +81,7 @@ public final class EditShownCase {
         new TestCaseUpdateMenuDialog(p, items, (tcs, gt) -> save(p, dto, currentPath, tcs, gt, ids, before)).show();
     }
 
-    /**
-     * UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007.
-     * <p>
-     * What the dialog came back with, written where the case lives.
-     * <p>
-     * Both the confirmation and the code generation are inside the branch that
-     * wrote something. They used to fire whatever happened, and there is a case
-     * where nothing happens by design: a test case opened from a search result
-     * has no path and no parent, so there is nowhere to write and not a byte
-     * reaches disk. The tester was told "Updated" and closed the dialog on an
-     * edit that was never saved.
-     */
+    // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007
     private static void save(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath, final @NotNull List<TestCaseDto> tcs, final @NotNull org.testin.codegen.GenType gt, final @NotNull List<UUID> ids, final @NotNull Optional<TestCaseSnapshot> before) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
@@ -134,10 +89,6 @@ public final class EditShownCase {
             boolean changed = false;
             for (final TestCaseDto tc : tcs) changed |= indexer.putTestCase(editPath, tc);
 
-            // Nothing written, so nothing to confirm - the same reason the
-            // branch above exists, one step further in: a save that reached
-            // disk and changed nothing is as little of an update as one that
-            // never got there (#164).
             if (!changed) return;
 
             before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.update"), tcs), taken, TestCaseSnapshot.of(p, editPath, ids)));
@@ -148,12 +99,6 @@ public final class EditShownCase {
         }, () -> nowhereToWrite(p, dto));
     }
 
-    /**
-     * Said once, where it happened, and said to the tester as well as to the
-     * log. An edit that reaches no disk and no screen is one the tester believes
-     * they made - and they find out at the next open, with no idea which change
-     * went (#234).
-     */
     private static void nowhereToWrite(final @NotNull Project p, final @NotNull TestCaseDto dto) {
         Logger.warn("No test set to write '" + dto.getDescription() + "' to - the edit was not saved");
 
@@ -161,11 +106,6 @@ public final class EditShownCase {
                 Bundle.message("details.not.saved.message"));
     }
 
-    /**
-     * Where an update writes: the case's own parent when it has one, otherwise
-     * the test set the navigation path names. Empty when neither says - a case
-     * shown from a search result, with no path and no parent read yet.
-     */
     private static @NotNull Optional<Path> writesTo(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
         final @NotNull DirectoryDto parent = dto.getParent();
         if (!parent.getPath().toString().isEmpty()) return Optional.of(parent.getPath());
@@ -174,10 +114,6 @@ public final class EditShownCase {
 
         final @NotNull Path resolved = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
 
-        // Found rather than demanded, and only a test set. From a run the path
-        // names the run, and a test case removed from its set is shown there with
-        // no parent - demanding a test set at that path raised an internal error
-        // instead of saying the edit has nowhere to go (#312, A62).
         return Services.getInstance(p, ProjectIndexer.class).find(resolved)
                 .filter(TestSetDirectoryDto.class::isInstance)
                 .map(DirectoryDto::getPath);

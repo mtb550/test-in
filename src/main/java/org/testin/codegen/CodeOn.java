@@ -37,22 +37,9 @@ import org.testin.util.Once;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Rule-CODEGEN-082.
- * <p>
- * Whether Testin may touch this code project's automation code: the Java plugin
- * is there, and {@code testin.yml} names the test project open in the tree. The
- * one answer every code feature asks - generating, Automate Test Case, Navigate
- * to Code, Run Tests, the gutter and the automated marks (#335).
- * <p>
- * The same four shapes {@link OptionalPlugin} offers, so a place that asked
- * whether the Java plugin is here asks this instead with the same call, and the
- * plugin stays the first question: a missing plugin still says so in its own
- * words.
- */
+// Rule-CODEGEN-082
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CodeOn {
-
     private static final @NotNull Key<Boolean> SAID = Key.create("testin.codeOn.said");
 
     // Rule-CODEGEN-082
@@ -60,12 +47,7 @@ public final class CodeOn {
         return OptionalPlugin.JAVA.isAvailable() && whyOff(p).isEmpty();
     }
 
-    /**
-     * Rule-CODEGEN-082.
-     * <p>
-     * Why {@code testin.yml} keeps code off, and nothing while it names the open
-     * test project. Compared exactly, as the binding compares names.
-     */
+    // Rule-CODEGEN-082
     public static @NotNull Optional<String> whyOff(final @NotNull Project p) {
         final @NotNull String open = Services.getInstance(p, BoundTestProject.class).name();
         if (TestinYml.names(p, open)) return Optional.empty();
@@ -74,12 +56,7 @@ public final class CodeOn {
         return Optional.of(named.isEmpty() ? Bundle.message("code.off.not.named") : Bundle.message("code.off.names.other", named, open));
     }
 
-    /**
-     * Rule-CODEGEN-082.
-     * <p>
-     * For a gesture the tester made on purpose - Navigate to Code, Run: says why
-     * every time it is refused.
-     */
+    // Rule-CODEGEN-082
     public static boolean isOnOrWarn(final @NotNull Project p) {
         if (!OptionalPlugin.JAVA.isAvailableOrWarn(p)) return false;
 
@@ -88,13 +65,7 @@ public final class CodeOn {
         return why.isEmpty();
     }
 
-    /**
-     * Rule-CODEGEN-082, Rule-CODEGEN-005.
-     * <p>
-     * For code a tree change would have written: skipped, and said once per
-     * project with the button that turns code on - a notification that stays,
-     * because the skip happens under a gesture about something else.
-     */
+    // Rule-CODEGEN-082, Rule-CODEGEN-005
     public static boolean isOnOrWarnOnce(final @NotNull Project p) {
         if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return false;
 
@@ -111,14 +82,7 @@ public final class CodeOn {
         return false;
     }
 
-    /**
-     * Rule-CODEGEN-082, Rule-TREE-PANEL-104.
-     * <p>
-     * Grays an entry with the reason written into it while code is off, as
-     * {@link OptionalPlugin#enableOrExplain} does for a missing plugin - and puts
-     * the entry's own words back while it is on. Code can turn on while the IDE
-     * runs, which a plugin cannot, and a presentation outlives one update.
-     */
+    // Rule-CODEGEN-082, Rule-TREE-PANEL-104
     public static boolean enableOrExplain(final @NotNull AnAction action, final @NotNull AnActionEvent e) {
         final @NotNull Presentation presentation = e.getPresentation();
         if (!OptionalPlugin.JAVA.enableOrExplain(action, presentation)) return false;

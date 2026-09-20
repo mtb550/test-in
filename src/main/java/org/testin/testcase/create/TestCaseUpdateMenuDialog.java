@@ -33,7 +33,6 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 public class TestCaseUpdateMenuDialog {
-
     private final @NotNull Project p;
     private final @NotNull List<TestCaseDto> items;
     private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GenType> updatedItems;
@@ -44,30 +43,12 @@ public class TestCaseUpdateMenuDialog {
         this.updatedItems = updatedItems;
     }
 
-    /**
-     * What follows an accepted update, wherever it was started from: the view
-     * panel catches up if it is showing one of the cases, and the automation
-     * code is regenerated off the EDT.
-     * <p>
-     * Every caller of this dialog needs both, and each had written both out, so
-     * a change to what an update entails had to be made once per call site.
-     */
     public static void applyAftermath(final @NotNull Project p, final @NotNull List<TestCaseDto> updated, final @NotNull GenType gt) {
         ViewToolWindowFactory.refreshIfShowing(p, updated);
 
-        // Every case that was updated, not the first of them. This took the
-        // list and generated for one element of it, which was invisible while
-        // the only caller had a single case and became a bulk edit that wrote
-        // all the data and one method's worth of code - with one "Updated"
-        // covering both (#151).
         Logger.trace("Generating automation code for " + updated.size() + ": " + gt);
 
-        // UC-CODEGEN-003, Rule-CODEGEN-019. One case takes the single-case form,
-        // the one a grid cell edit takes: it writes the method for a case given
-        // its first description, and says so when a group or status edit finds
-        // no method to change. The bulk form passes a missing method over in
-        // silence, so the same edit from F2 or the view panel wrote nothing and
-        // said nothing (#312, A57).
+        // UC-CODEGEN-003, Rule-CODEGEN-019
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             if (updated.size() == 1) gt.getAction().execute(p, updated.getFirst());
             else gt.executeAll(p, updated);
@@ -80,10 +61,6 @@ public class TestCaseUpdateMenuDialog {
                 ? Bundle.message("update.dialog.title.one")
                 : Bundle.message("update.dialog.title.many", String.valueOf(items.size()));
 
-        // Order is drawn gray on a multiple selection, with the reason where its
-        // key would be. It used to look like every other row, take the press,
-        // close the menu and answer with a balloon - a refusal the tester had to
-        // trigger to read, on the one field that has no bulk form (#312, A85).
         new ShortcutMenuPopup<>(p, title, UpdateTestCaseFields.values(), this::open)
                 .refusing(field -> field == UpdateTestCaseFields.ORDER && items.size() > 1
                         ? Optional.of(Bundle.message("update.order.one.at.a.time"))
@@ -91,17 +68,7 @@ public class TestCaseUpdateMenuDialog {
                 .show();
     }
 
-    /**
-     * UC-EDITOR-PANEL-006, UC-EDITOR-PANEL-007.
-     * <p>
-     * Opens one field's editor over the cases this dialog was given: what
-     * choosing a row on the menu does, and what a field's letter pressed on a
-     * selected card does with no menu in between.
-     * <p>
-     * A method rather than the lambda it used to be, so the second way in
-     * reaches the same code instead of a copy of it. The two differ only in
-     * whether the tester was shown the list to pick from.
-     */
+    // UC-EDITOR-PANEL-006, UC-EDITOR-PANEL-007
     public void open(final @NotNull UpdateTestCaseFields field) {
         final @NotNull GenType gt = field.getGt();
         Logger.trace("Update field -> " + field.getName() + " | changeType = " + gt);

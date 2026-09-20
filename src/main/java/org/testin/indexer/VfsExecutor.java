@@ -35,53 +35,22 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-/**
- * Performs VFS mutations. Package-private, and in this package, so that the
- * architecture rule is enforced by the compiler rather than by convention: the
- * indexer is the single owner of test data file access, and nothing outside it
- * can reach this executor at all.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 final class VfsExecutor {
-
-    /**
-     * The file at this path, and empty when the VFS cannot resolve it - deleted
-     * underneath us, or never refreshed into it.
-     * <p>
-     * Off the EDT by contract: refreshAndFindFile refreshes synchronously and
-     * reads the VFS persistence, which the EDT is not allowed to do. The one
-     * place the platform's null becomes an answer of its own, so the three
-     * operations below are written as though a path always resolves (#71).
-     */
     private static @NotNull Optional<VirtualFile> find(final @NotNull Path path) {
         return Optional.ofNullable(LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path));
     }
 
-    /**
-     * UC-INTERNAL-003, Rule-INTERNAL-019.
-     * <p>
-     * Says this change is the plugin's own, so the file watcher does not read
-     * the project again for something the plugin is already redrawing (#20).
-     * <p>
-     * Claimed before the operation runs, because the VFS event can arrive while
-     * it is still running.
-     */
+    // UC-INTERNAL-003, Rule-INTERNAL-019
     private static void claim(final @NotNull Path path) {
         Services.getInstance(OwnWrites.class).record(path);
     }
 
-    // Renaming is the only single-path VFS operation, so the title it reports a
-    // failure under is not a parameter: one caller, one word, and a second
-    // operation would bring its own method rather than a second string.
     void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull VfsOperation operation) {
         final @NotNull String errorTitle = Bundle.message("vfs.rename.failed.title");
         claim(path);
 
-        // The lookup runs off the EDT and the operation on it: refreshAndFindFile
-        // refreshes synchronously and reads the VFS persistence, which the EDT is
-        // not allowed to do, while the operation itself mutates the VFS and so
-        // needs the write action.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Optional<VirtualFile> vf = find(path);
 
@@ -90,8 +59,6 @@ final class VfsExecutor {
                         try {
                             operation.execute(file);
                         } catch (final Exception ex) {
-                            // A failed VFS operation is reported, never thrown into the
-                            // EDT as an exception dialog (parity with the two-path form).
                             Services.getInstance(p, Notifier.class).error(p, errorTitle, Bundle.message("vfs.operation.failed", ex.getMessage()));
                         }
                     }),
@@ -104,7 +71,6 @@ final class VfsExecutor {
         claim(sourcePath);
         claim(targetPath);
 
-        // Both lookups off the EDT, the operation on it - see the single-path form.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Optional<VirtualFile> sourceVf = find(sourcePath);
             final @NotNull Optional<VirtualFile> targetVf = find(targetPath);
@@ -129,31 +95,10 @@ final class VfsExecutor {
         });
     }
 
-    /**
-     * UC-INTERNAL-005, Rule-INTERNAL-036.
-     * <p>
-     * Deletes the file, then reports on the EDT whether it is gone.
-     * <p>
-     * The callback exists because the lookup has to leave the EDT, which makes
-     * the deletion asynchronous; callers that update the indexer cache afterward
-     * must wait for it.
-     * <p>
-     * It reports whether the file is gone, not merely that the attempt finished.
-     * The callback used to run either way, so a caller could not tell a deletion
-     * that failed from one that worked — and the indexer's cache update ran on
-     * both, dropping a node that was still on disk (#66, F2).
-     * <p>
-     * A path the VFS cannot find counts as deleted: there is nothing left to
-     * remove, and the cache should stop describing it.
-     */
+    // UC-INTERNAL-005, Rule-INTERNAL-036
     void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onDeleted) {
         claim(path);
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-
-            // The recycle bin first, and on this thread rather than in the write
-            // action below: trashing a whole test project is the platform
-            // walking it file by file, which is not work for the EDT. A desktop
-            // with no bin answers no and the VFS delete runs as it always did.
             if (Trash.accepted(p, path)) {
                 ApplicationManager.getApplication().invokeLater(() -> onDeleted.accept(true));
                 return;
@@ -166,7 +111,6 @@ final class VfsExecutor {
 
                 WriteAction.run(() -> {
                     try {
-                        // A path the VFS cannot find counts as deleted - see above.
                         if (vf.isPresent()) vf.get().delete(requester);
                     } catch (final IOException ex) {
                         deleted.set(false);
@@ -178,5 +122,4 @@ final class VfsExecutor {
             });
         });
     }
-
 }

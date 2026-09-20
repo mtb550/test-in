@@ -23,7 +23,6 @@ import org.testin.model.DirectoryType;
 import org.testin.model.TestSetStatus;
 import org.testin.model.markers.TestSetMarker;
 
-
 @Setter
 @Getter
 @NoArgsConstructor
@@ -33,7 +32,6 @@ public class TestSetDirectoryDto extends DirectoryDto {
     @NonNull
     @Builder.Default
     private TestSetMarker marker = new TestSetMarker();
-
 
     @Override
     public boolean isTestCaseContainer() {
@@ -45,9 +43,6 @@ public class TestSetDirectoryDto extends DirectoryDto {
         return true;
     }
 
-
-
-
     @Override
     public @NotNull DirectoryType getType() {
         return DirectoryType.TS;
@@ -58,10 +53,6 @@ public class TestSetDirectoryDto extends DirectoryDto {
         return marker.getStatus() == TestSetStatus.DEPRECATED;
     }
 
-    /**
-     * A test set is arranged by the tester: the order of a suite is a plan for
-     * working through it, not an accident of naming.
-     */
     @Override
     public boolean isOrderable() {
         return true;

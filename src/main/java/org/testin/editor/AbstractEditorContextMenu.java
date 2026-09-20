@@ -36,50 +36,14 @@ import java.util.Arrays;
 import org.testin.editor.grid.NotWhileEditing;
 import org.testin.model.dto.TestCaseDto;
 
-
 public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
-
-    /**
-     * No short name, and neither subclass may pass one.
-     * <p>
-     * A {@code DefaultActionGroup}'s short name is the label it shows when it is
-     * nested inside another menu as a submenu. These two are roots of an
-     * {@code ActionPopupMenu} and are nothing else, so the platform never asks
-     * for it - and each carried an English sentence there, "Test Editor Context
-     * Menu" and "Run Editor Context Menu", left untranslated because nobody can
-     * read them (#66, finding 95).
-     * <p>
-     * Deleted rather than given a bundle key, which would be three keys in three
-     * languages for text that is never drawn. If one of these is ever nested,
-     * the label is blank and obviously wrong, which is the failure worth having:
-     * the English one reads as deliberate in a French menu and fails nothing.
-     * The name goes back, from the bundle, in the commit that nests it.
-     */
     protected AbstractEditorContextMenu() {
         super("", true);
     }
 
     public abstract void registerShortcuts(final @NotNull JBList<TestCaseDto> list);
 
-    /**
-     * UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-213.
-     * <p>
-     * Everything done <em>to</em> a test case, one level down: the clipboard,
-     * the delete, and this editor's own history.
-     * <p>
-     * Seven entries of the twelve were these, and none of them is what a tester
-     * opens the menu for - they all have keys, and the keys are what anybody
-     * uses after the first week. At the top level they pushed Automate, Run and
-     * Navigate to Code, which is what this plugin is for, off the end of a list
-     * nobody read that far down.
-     * <p>
-     * <b>The same seven in both editors</b>, which is why this is here and not in
-     * either menu. A test run cannot hold or lose a test case, so Cut, Paste and
-     * Delete are gray there with the reason on the entry - shown and refused
-     * rather than left out, so a tester learns the gesture exists and where it
-     * does work. Each entry decides that for itself, from the node the editor is
-     * open on.
-     */
+    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-213
     protected @NotNull DefaultActionGroup actions(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
         final @NotNull DefaultActionGroup actions = ActionsMenu.group();
 
@@ -91,49 +55,18 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
 
         actions.addSeparator();
 
-        // This editor's own history, not the tree's and not another editor's:
-        // two cases removed here come back here, and the two removed in the
-        // editor beside it come back there (#165).
         actions.add(new UndoAction(p, list, UndoScope.of(dir.getPath()), UndoDirection.UNDO));
         actions.add(new UndoAction(p, list, UndoScope.of(dir.getPath()), UndoDirection.REDO));
 
         return actions;
     }
 
-    /**
-     * Rule-EDITOR-PANEL-010.
-     * <p>
-     * Every shortcut this menu offers, live on the grid as well as on the list
-     * (#74).
-     * <p>
-     * The actions bind themselves to the list when the menu is built, and
-     * switching to grid view takes the list out of the component tree, so all of
-     * them went quiet - a tester could set a status from the grid with the mouse
-     * but not with the keyboard, which is the wrong way round for the fastest
-     * part of the job.
-     * <p>
-     * Bound from the menu rather than one action at a time, so what the right
-     * button offers and what the keyboard offers cannot drift apart: an action
-     * added to the menu is live in both views by being on the menu.
-     */
+    // Rule-EDITOR-PANEL-010
     public void bindShortcutsTo(final @NotNull JBTable table) {
         bindGroup(this, table);
     }
 
-    /**
-     * The group's entries, and the entries of any group inside it.
-     * <p>
-     * A nested group is one child to the loop above and seven keys to a tester,
-     * so walking only the top level would take Copy, Cut, Paste, Delete, Undo
-     * and Redo off the grid the day they were gathered under one entry - and
-     * silently, because a shortcut that is never registered fails by doing
-     * nothing.
-     */
     private static void bindGroup(final @NotNull DefaultActionGroup group, final @NotNull JBTable table) {
-        // What each group was given. The verdicts are added when their group is
-        // made so that they are here: built only when the menu asked, they were
-        // skipped, and P, F and B did nothing on the grid (#66, finding 201).
-        // The form that asks the group is the platform's alone to call (#324).
         for (final AnAction action : group.getChildren(ActionManager.getInstance())) {
             if (action instanceof DefaultActionGroup nested) {
                 bindGroup(nested, table);
@@ -146,17 +79,6 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
         }
     }
 
-    /**
-     * Whether this action's key is one the grid answers for itself.
-     * <p>
-     * The same keystrokes carry different meanings on the two views, and binding
-     * a menu entry to the table settles it the wrong way round - the IDE
-     * dispatches a registered shortcut before a component's own input map, so
-     * the menu's version wins rather than competes.
-     * <p>
-     * Every action stays on the menu and still acts on the test case there. It is
-     * only the key the grid keeps, and only while a grid is on screen.
-     */
     private static boolean claimedByTheGrid(final @NotNull AnAction action) {
         return Arrays.stream(action.getShortcutSet().getShortcuts())
                 .filter(KeyboardShortcut.class::isInstance)

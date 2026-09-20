@@ -43,32 +43,13 @@ import java.util.Map;
 import java.util.UUID;
 
 public final class TestRunExcelGenerator {
-
-    /**
-     * What a spreadsheet cell shows for a description or expected result that is
-     * not there - because the case is gone, or because nobody filled it in. Both
-     * read the same to whoever opens the report.
-     */
     private static @NotNull String orNotAvailable(final @NotNull String value) {
         return value.isEmpty() ? Bundle.message("report.overview.not.recorded") : value;
     }
 
-
-    /**
-     * UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-020.
-     * <p>
-     * Two sheets. The first says what the other three formats say before their
-     * tables - the overview, the execution summary and what the tester wrote
-     * about the run. The second is the test cases alone, a header row and one
-     * row each, so it can be sorted and filtered as one list.
-     * <p>
-     * The overview and the analysis were missing: a tester who sent the
-     * spreadsheet sent a different report from the PDF of the same run, and
-     * their written analysis appeared nowhere in it (#66, finding 199).
-     */
+    // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-020
     public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-
             final @NotNull Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
             final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
 
@@ -84,12 +65,7 @@ public final class TestRunExcelGenerator {
         }
     }
 
-    /**
-     * Rule-REPORT-020.
-     * <p>
-     * The overview, the execution summary and the result analysis, as captions
-     * and values in two columns, under the headings the other formats use.
-     */
+    // Rule-REPORT-020
     private static void writeOverview(final @NotNull Worksheet ws, final @NotNull String projectName, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull TestRunSummary summary) {
         ws.value(0, 0, Bundle.message("report.title"));
         ws.style(0, 0).bold().fontSize(14).set();
@@ -104,9 +80,6 @@ public final class TestRunExcelGenerator {
         row = heading(ws, row + 1, Bundle.message("report.heading.execution"));
         ws.value(row++, 0, Bundle.message("report.summary.named", trDir.getName(),
                 String.valueOf(summary.total()), String.valueOf(summary.executed()), summary.passRate() + "%"));
-        // A number rather than its text, so the headline can be summed, sorted
-        // and charted; the unit is the cell's format, quoted so Excel prints it
-        // rather than reading "%" as "times a hundred".
         for (final ReportTile figure : ReportTile.shownFor(summary)) {
             caption(ws, row, figure.getLabel(), figure.getHex());
             ws.value(row, 1, figure.amountIn(summary));
@@ -114,7 +87,6 @@ public final class TestRunExcelGenerator {
             row++;
         }
 
-        // Only what the tester wrote - see the PDF generator.
         if (ResultAnalysis.anyWrittenIn(trDir.getMarker().getResultAnalysis())) {
             row = heading(ws, row + 1, Bundle.message("report.heading.analysis"));
 
@@ -132,9 +104,6 @@ public final class TestRunExcelGenerator {
         ws.width(1, 80);
     }
 
-    /**
-     * A section heading on the overview sheet, answering the row after it.
-     */
     private static int heading(final @NotNull Worksheet ws, final int row, final @NotNull String text) {
         ws.value(row, 0, text);
         ws.style(row, 0).bold().fontSize(12).set();
@@ -142,20 +111,12 @@ public final class TestRunExcelGenerator {
         return row + 1;
     }
 
-    /**
-     * A caption in the color the other formats print it in.
-     */
     private static void caption(final @NotNull Worksheet ws, final int row, final @NotNull String text, final @NotNull String hex) {
         ws.value(row, 0, text);
         ws.style(row, 0).bold().fontColor(hex).set();
     }
 
-    /**
-     * Rule-REPORT-020.
-     * <p>
-     * The test cases: the column names, then one row per case, filled with the
-     * color its verdict's table carries in the other formats.
-     */
+    // Rule-REPORT-020
     private static void writeCases(final @NotNull Worksheet ws, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         ws.value(0, 0, Bundle.message("report.excel.caption.id"));
         ws.value(0, 1, RunEditorAttributes.DESCRIPTION.getName());
@@ -182,12 +143,9 @@ public final class TestRunExcelGenerator {
             ws.value(row, 6, Display.formatDuration(result.getDuration()));
             ws.value(row, 7, orNotAvailable(details.getExpectedResult()));
 
-            // One style call per cell: a second call on a cell replaces its font,
-            // which would take the ink back off the fill.
             final @NotNull ReportSection verdict = ReportSection.of(result);
             ws.range(row, 0, row, 8).style().fillColor(verdict.getHexColor()).fontColor(verdict.textHex()).wrapText(true).set();
 
-            // Its own column, empty when the run item was not reported (#50).
             final int line = row;
             result.bugIssue().ifPresent(url -> {
                 ws.hyperlink(line, 8, HyperLink.external(url, BugIssueUrl.shortReference(url)));
@@ -197,14 +155,14 @@ public final class TestRunExcelGenerator {
             row++;
         }
 
-        ws.width(0, 40); // ID
-        ws.width(1, 30); // Title
-        ws.width(2, 15); // Status
-        ws.width(3, 30); // Actual Result
-        ws.width(4, 15); // Severity
-        ws.width(5, 15); // Priority
-        ws.width(6, 15); // Duration
-        ws.width(7, 40); // Expected Result
-        ws.width(8, 15); // Bug Issue
+        ws.width(0, 40);
+        ws.width(1, 30);
+        ws.width(2, 15);
+        ws.width(3, 30);
+        ws.width(4, 15);
+        ws.width(5, 15);
+        ws.width(6, 15);
+        ws.width(7, 40);
+        ws.width(8, 15);
     }
 }

@@ -30,27 +30,14 @@ import javax.swing.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RunTreeCellRenderer {
-
     public static @NotNull CheckboxTree.CheckboxTreeCellRenderer create() {
         return new CheckboxTree.CheckboxTreeCellRenderer() {
-            // Both @NotNull because the platform says so, not because it looks
-            // right: CheckboxTreeCellRendererBase is Kotlin, and its bytecode
-            // calls Intrinsics.checkNotNullParameter on tree and on value. It
-            // already throws on null, so the annotations cannot add a crash -
-            // which is the check that was missing when an unverified @NotNull on
-            // a renderer parameter caused the paint crash fixed in 92f1a1ed.
             @Override
             public void customizeRenderer(final @NotNull JTree tree, final @NotNull Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
                 if (value instanceof CheckedTreeNode node) {
-                    // instanceof is false for a node carrying nothing, so the kinds
-                    // below answer for the empty node too. Asked of the node each
-                    // time rather than held in a @NotNull local, which it can
-                    // leave null (#66, finding 266).
                     if (node.getUserObject() instanceof DirectoryDto dir)
                         getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 
-                    // A case is drawn plainly: it is in the tree to be picked,
-                    // not to report a verdict.
                     else if (node.getUserObject() instanceof TestCaseDto tc)
                         getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 

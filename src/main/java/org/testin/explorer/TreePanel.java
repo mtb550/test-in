@@ -49,7 +49,6 @@ import org.testin.testproject.BoundTestProject;
 import org.testin.testproject.CloneTestProject;
 import org.testin.util.Bundle;
 
-
 import java.awt.*;
 import java.util.Optional;
 import java.util.Map;
@@ -58,78 +57,25 @@ import java.util.Map;
 public final class TreePanel implements Disposable {
     private final @NotNull Project p;
 
-    /**
-     * The component the tool window shows.
-     */
     @Getter
     private final @NotNull JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
 
-    /**
-     * UC-TREE-PANEL-001, Rule-TREE-PANEL-097.
-     * <p>
-     * The branch bar and the tree. Added to the panel once and <b>hidden</b>
-     * rather than removed when there is no project to show, because the tree may
-     * never leave the component hierarchy: the platform reads
-     * {@code event.project!!} before any title action runs, and it reads it from
-     * a data context anchored on a component of this panel. A component with no
-     * parent has no frame above it to answer with, and the tester gets a
-     * NullPointerException from a stack with no Testin frame in it.
-     * <p>
-     * The panel was emptied and rebuilt on every draw until #66, so this held
-     * for as long as the welcome screen was showing - which is whenever no test
-     * project is bound.
-     * <p>
-     * Hiding keeps the welcome screen too: {@code JBPanelWithEmptyText} draws
-     * its empty text while no child is <i>visible</i>, rather than while it has
-     * none. Which component the title bar is anchored on while the tree is
-     * hidden is {@link #aimTheTitleBar()}.
-     */
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-097
     private final @NotNull JBPanel<?> treeView = new JBPanel<>(new BorderLayout());
 
-    /**
-     * UC-TREE-PANEL-028, Rule-TREE-PANEL-101.
-     * <p>
-     * The tool window content this panel fills, so every draw can aim the title
-     * bar at whatever is on screen. Empty until the platform makes it: this is
-     * a project service, and it is built before the tool window asks for one.
-     */
+    // UC-TREE-PANEL-028, Rule-TREE-PANEL-101
     private @NotNull Optional<Content> content = Optional.empty();
 
     private final @NotNull BranchSelector branchSelector;
 
-    /**
-     * The one Refresh for this project, held here because the guard that stops
-     * two re-indexes overlapping is a field on it.
-     * <p>
-     * Every caller used to build its own, so the guard only ever stopped a
-     * second click on the same toolbar button. A branch switch landing while
-     * the tester pressed Refresh started a second re-index through the first:
-     * it wipes the cache the first pass is filling and replaces the latch the
-     * other pass counts down, so the tree can be drawn from a half-built index.
-     * The "already in progress, ignoring click" line could never appear for the
-     * one combination it was written for.
-     */
     @Getter
     private final @NotNull RefreshAction refreshAction;
 
-    /**
-     * Asked for by every action that changes a node and has to redraw it.
-     */
     @Getter
     private final @NotNull TreePanelTree projectTree;
 
-    /**
-     * What is under the Testin root, as the last draw read it. Held for the one
-     * hop between deciding which state to show and drawing it, so the listing is
-     * not walked twice for the same picture.
-     */
     private @NotNull Map<String, ProjectStatus> underRoot = Map.of();
 
-    /**
-     * How many projects the welcome screen offers as lines before it hands the
-     * choice to the picker instead. A status text does not scroll, so a long
-     * list would run off the panel.
-     */
     private static final int INLINE_CHOICES = 6;
 
     public TreePanel(final @NotNull Project p) {
@@ -153,25 +99,7 @@ public final class TreePanel implements Disposable {
         refreshWhenIndexed();
     }
 
-    /**
-     * Draws again when indexing finishes.
-     * <p>
-     * The panel is built the moment the tool window is opened, and on a cold
-     * start that is while the index is still being built. The bound project is
-     * looked up in the index, so drawing only once would show a bound repository
-     * the screen for an unbound one - and leave it there.
-     */
     private void refreshWhenIndexed() {
-        // Nothing indexes without a root, so the wait would never end: with no
-        // root nothing calls indexWithProgress at all, so awaitIndexing would
-        // hold this pooled thread on a latch nobody counts down for as long as
-        // the project is open.
-        //
-        // A root set later comes back on its own route -
-        // SettingsConfigurable.apply calls refreshEveryOpenProject, which calls
-        // reindex() on every open panel. #301 read this return as the reason the
-        // no-root screen stays up and planned to delete it; following Apply
-        // showed the screen is already redrawn, so it stays (#301, D9).
         if (!Services.getInstance(p, TestinRoot.class).isConfigured()) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -183,26 +111,11 @@ public final class TreePanel implements Disposable {
         });
     }
 
-    /**
-     * UC-TREE-PANEL-001, Rule-TREE-PANEL-001.
-     * <p>
-     * Redraws the panel around whichever test project this repository is bound
-     * to - the tree when there is one, and the way to get one when there is not.
-     * <p>
-     * The one owner of what the panel shows. Every action that can change the
-     * answer calls this and nothing else - indexing finishing, a refresh, a
-     * rename, creating or cloning a project, binding one. The tree, the branch
-     * box and the empty state can then never disagree about which project is open.
-     */
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-001
     public void refresh() {
-        // Gathered off the EDT, drawn on it. What the panel decides on is a
-        // directory walk that reads a marker per project, and the threading rule
-        // in CLAUDE.md keeps disk work off the thread that paints (#66).
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Map<String, ProjectStatus> listing = Services.getInstance(p, ProjectIndexer.class).testProjects();
 
-            // Binding changes what indexing covers, so the answer is re-indexed
-            // rather than redrawn - the same route every other binder takes.
             if (bindTheOnlyProject(listing)) {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (!p.isDisposed()) reindex();
@@ -210,13 +123,6 @@ public final class TreePanel implements Disposable {
                 return;
             }
 
-            // Read once, on this thread, and carried to the draw. The draw
-            // used to ask again on the EDT a moment later, so a concurrent
-            // refresh emptying the index cache between the two reads left the
-            // state saying TREE while the second read said nothing was bound -
-            // and the welcome screen's TREE branch appends no links at all. The
-            // tester got the "Welcome to Testin" header with no Create, Clone or
-            // Select line, and no way out but pressing Refresh again.
             final @NotNull Optional<TestProjectDirectoryDto> boundProject = bound();
             final @NotNull PanelState state = state(listing, boundProject);
 
@@ -227,23 +133,11 @@ public final class TreePanel implements Disposable {
         });
     }
 
-    /**
-     * Whether the tree is on screen, rather than the welcome screen - a
-     * question for the buttons that act on it.
-     */
     public boolean showsTree() {
         return treeView.isVisible();
     }
 
-    /**
-     * Draws the panel from an answer it was given. On the EDT, and reading
-     * nothing: every question it could ask was answered by
-     * {@link #state(Map, Optional)} before it was called - the bound project
-     * included, which is the one it used to go and read for itself.
-     */
     private void draw(final @NotNull PanelState state, final @NotNull Optional<TestProjectDirectoryDto> boundProject) {
-        // Hidden, not removed - see the field. What the welcome screen replaces
-        // is what the panel draws, not what it contains.
         treeView.setVisible(boundProject.isPresent());
         aimTheTitleBar();
         panel.getEmptyText().clear();
@@ -254,48 +148,19 @@ public final class TreePanel implements Disposable {
         panel.repaint();
     }
 
-    /**
-     * UC-TREE-PANEL-028, Rule-TREE-PANEL-101.
-     * <p>
-     * Takes the content the platform built around this panel, and aims the
-     * title bar for the first time.
-     */
+    // UC-TREE-PANEL-028, Rule-TREE-PANEL-101
     public void showIn(final @NotNull Content shownIn) {
         content = Optional.of(shownIn);
         aimTheTitleBar();
     }
 
-    /**
-     * UC-TREE-PANEL-028, Rule-TREE-PANEL-101.
-     * <p>
-     * Points the title bar at whatever this panel is showing: the tree while
-     * there is one, the panel itself while the welcome screen is up.
-     * <p>
-     * <b>It has to be a component that is showing.</b> The platform aims every
-     * title-bar button at the content's preferred focusable component - it
-     * builds the button's data context there, and it refuses to run the action
-     * at all when that component is not showing. The tree is hidden for as long
-     * as the welcome screen is up, so Settings, Refresh and Select Test Project
-     * each did nothing whatever in the one state where a tester most needs
-     * them, leaving one line in the log and nothing on screen (#66).
-     * <p>
-     * The tree keeps it whenever it is there, because that is also where the
-     * keyboard belongs (Rule-TREE-PANEL-097) and where the tree's own keys are
-     * answered.
-     */
+    // UC-TREE-PANEL-028, Rule-TREE-PANEL-101, Rule-TREE-PANEL-097
     private void aimTheTitleBar() {
         final @NotNull JComponent onScreen = treeView.isVisible() ? projectTree.getMainTree() : panel;
         content.ifPresent(shownIn -> shownIn.setPreferredFocusableComponent(onScreen));
     }
 
-    /**
-     * UC-TREE-PANEL-004, Rule-TREE-PANEL-106.
-     * <p>
-     * Chooses the project the tester clicked in the welcome screen, on this
-     * machine. Re-indexed rather than redrawn: indexing is scoped to the chosen
-     * project, so the cache built before the choice is not the one the tree
-     * needs.
-     */
+    // UC-TREE-PANEL-004, Rule-TREE-PANEL-106
     private void bindTo(final @NotNull String name) {
         Services.getInstance(p, BoundTestProject.class).choose(name);
         reindex();
@@ -305,22 +170,7 @@ public final class TreePanel implements Disposable {
         return Services.getInstance(p, BoundTestProject.class).get();
     }
 
-    /**
-     * UC-TREE-PANEL-001, Rule-TREE-PANEL-015.
-     * <p>
-     * Chooses the only test project there is for a repository that names none,
-     * and says whether it did.
-     * <p>
-     * A picker with one row is a question with one answer, and a fresh clone of
-     * an automation repository beside a Testin root that holds a single project
-     * is the common first run. The tree opens, rather than asking a tester who
-     * has nothing to choose between.
-     * <p>
-     * Only when nothing names a project at all. A name that resolves to nothing -
-     * a renamed folder, a name nobody uses - is a different state with a
-     * different sentence, and silently choosing past it would hide the thing the
-     * tester needs to know (#8).
-     */
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-015
     private boolean bindTheOnlyProject(final @NotNull Map<String, ProjectStatus> projects) {
         final @NotNull BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
         if (bound.isNamed() || projects.size() != 1) return false;
@@ -332,16 +182,7 @@ public final class TreePanel implements Disposable {
         return true;
     }
 
-    /**
-     * The six facts the panel decides on, gathered here and answered by
-     * {@link PanelState}. The root and the project listing are disk reads, so
-     * they are asked for once per draw rather than once per branch.
-     */
     private @NotNull PanelState state(final @NotNull Map<String, ProjectStatus> listing, final @NotNull Optional<TestProjectDirectoryDto> boundProject) {
-        // Handed in rather than read here: the caller has already walked the root
-        // to decide whether there was one project to bind to, and that walk reads
-        // a marker per project. The bound project comes in for the same reason
-        // and one more - the draw forks on it, so the two must be one read.
         underRoot = listing;
 
         return PanelState.of(
@@ -361,15 +202,7 @@ public final class TreePanel implements Disposable {
         branchSelector.updateProject(Optional.of(tp));
     }
 
-
-    /**
-     * UC-TREE-PANEL-001.
-     * <p>
-     * The screen for a repository with no project open, and the one step out of
-     * it. Which step depends on what is missing: a root to look in, a project to
-     * look at, or which one - named by {@code testin.yml} or chosen on this
-     * machine (#8, Rule-TREE-PANEL-106).
-     */
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-106
     private void showWelcome(final @NotNull PanelState state) {
         final @NotNull StatusText emptyText = panel.getEmptyText();
 
@@ -384,9 +217,6 @@ public final class TreePanel implements Disposable {
 
         final @NotNull BoundTestProject boundProject = Services.getInstance(p, BoundTestProject.class);
 
-        // Which offer to make is the state's answer; making it is this panel's
-        // job, because every branch reaches back into it - to bind a project, to
-        // open settings, to index again.
         switch (state) {
             case NO_ROOT -> offerSettings(emptyText);
             case READING -> sayItIsReading(emptyText);
@@ -394,36 +224,16 @@ public final class TreePanel implements Disposable {
             case NO_PROJECTS -> offerFirstProject(emptyText);
             case CHOOSE -> offerChoice(emptyText, boundProject);
 
-            // Unreachable, and now actually so: the state and the branch that
-            // chose this method come from one read of the bound project, so
-            // TREE here would mean the two disagreed about a single value.
             case TREE -> Logger.warn("Welcome screen asked to draw a resolved project");
         }
     }
 
-    /**
-     * UC-TREE-PANEL-001, Rule-TREE-PANEL-118.
-     * <p>
-     * The first index has not finished, so no name can resolve yet.
-     * <p>
-     * Gray and offered nothing, because the only thing to do about it is wait -
-     * and the wait ends without the tester, through {@link #refreshWhenIndexed()}.
-     * <p>
-     * This is where the broken-file screen used to be. A file that would not
-     * parse is a line to correct in an editor and no button corrects it, so a
-     * screen saying only that was a screen with no way off it: it is one
-     * notification now, raised where the file is read, and the panel answers as
-     * though the file were absent (Rule-TREE-PANEL-119, #301, D2).
-     */
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-118, Rule-TREE-PANEL-119
     private void sayItIsReading(final @NotNull StatusText emptyText) {
         emptyText.appendLine(Bundle.message("welcome.reading"), SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
     }
 
-    /**
-     * UC-TREE-PANEL-001.
-     * <p>
-     * No root is set, so the only step out of here is the settings page.
-     */
+    // UC-TREE-PANEL-001
     private void offerSettings(final @NotNull StatusText emptyText) {
         emptyText.appendLine(
                 AllIcons.General.Settings,
@@ -432,12 +242,7 @@ public final class TreePanel implements Disposable {
                 e -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class));
     }
 
-    /**
-     * UC-TREE-PANEL-001, UC-TREE-PANEL-003.
-     * <p>
-     * The repository names a project this machine does not hold yet, so the step
-     * out is to clone the one it names rather than to pick a different one.
-     */
+    // UC-TREE-PANEL-001, UC-TREE-PANEL-003
     private void offerClone(final @NotNull StatusText emptyText, final @NotNull BoundTestProject boundProject) {
         final @NotNull String url = boundProject.cloneAddress().orElse("");
         final @NotNull String clone = Bundle.message("welcome.clone", boundProject.name());
@@ -446,9 +251,7 @@ public final class TreePanel implements Disposable {
                 SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
         emptyText.appendLine("");
 
-        // Rule-TREE-PANEL-104. Shown and gray, with the reason, when the Git
-        // plugin is off: the clone is git4idea's, and building it without the
-        // plugin failed with an IDE error instead of a word (#301, row 6).
+        // Rule-TREE-PANEL-104
         if (!OptionalPlugin.GIT.isAvailable()) {
             emptyText.appendLine(AllIcons.Vcs.Clone, OptionalPlugin.GIT.needs(clone), SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
         } else {
@@ -456,11 +259,6 @@ public final class TreePanel implements Disposable {
                     e -> new CloneTestProject(p, url, boundProject.name(), this).execute());
         }
 
-        // The clone is what this screen is for and it is not always an offer:
-        // without the Git plugin it is gray, and the tester was sent here by a
-        // name a colleague committed rather than by one they chose. So the screen
-        // also says what else there is - the other projects under the root, or
-        // the first one when it holds none (#301, D9).
         emptyText.appendLine("");
 
         if (underRoot.isEmpty()) {
@@ -475,11 +273,7 @@ public final class TreePanel implements Disposable {
                 e -> new BindTestProjectDialog(p, underRoot, this::reindex).show());
     }
 
-    /**
-     * UC-TREE-PANEL-001, UC-TREE-PANEL-002.
-     * <p>
-     * The root is set and empty, so there is nothing to choose between yet.
-     */
+    // UC-TREE-PANEL-001, UC-TREE-PANEL-002
     private void offerFirstProject(final @NotNull StatusText emptyText) {
         emptyText.appendLine(
                 AllIcons.General.Add,
@@ -488,25 +282,14 @@ public final class TreePanel implements Disposable {
                 e -> new CreateTestProjectAction(p, this).execute());
     }
 
-    /**
-     * UC-TREE-PANEL-001, UC-TREE-PANEL-004.
-     * <p>
-     * The root holds projects and none of them is bound to this repository, so
-     * the step out is to say which.
-     */
+    // UC-TREE-PANEL-001, UC-TREE-PANEL-004
     private void offerChoice(final @NotNull StatusText emptyText, final @NotNull BoundTestProject boundProject) {
-        // Say why before offering the picker, so a binding that stopped
-        // resolving - a renamed folder, a name nobody uses - reads as a
-        // fact and not as a first run.
         final @NotNull String problem = boundProject.problem(underRoot);
         if (!problem.isEmpty()) {
             emptyText.appendLine(problem, SimpleTextAttributes.ERROR_ATTRIBUTES, null);
             emptyText.appendLine("");
         }
 
-        // Few enough to read at a glance: one line each, one click to
-        // bind. The dialog is for the root that holds more than a
-        // screenful, where a list in a status text stops being a list.
         if (underRoot.size() <= INLINE_CHOICES) {
             underRoot.forEach((name, status) -> emptyText.appendLine(
                     AllIcons.Actions.ModuleDirectory,
@@ -523,31 +306,15 @@ public final class TreePanel implements Disposable {
                 e -> new BindTestProjectDialog(p, underRoot, this::reindex).show());
     }
 
-    /**
-     * Indexes again and redraws. Binding a repository changes which project is
-     * indexed at all, so the cache built for the old answer is not the one the
-     * tree needs - which is why every caller that binds one comes back here
-     * rather than calling {@link #refresh()} directly.
-     */
     public void reindex() {
         refreshAction.execute();
     }
 
-    /**
-     * UC-TREE-PANEL-025, Rule-TREE-PANEL-108.
-     * <p>
-     * Asks the branch box to go to the remote. Refresh and a branch switch both
-     * end here; every other rebuild of this panel reads what Git already holds
-     * (#312, A70).
-     */
+    // UC-TREE-PANEL-025, Rule-TREE-PANEL-108
     public void fetchBranches() {
         branchSelector.fetchBranches();
     }
 
-    /**
-     * Re-indexes and rebuilds, reporting what caused it rather than the generic
-     * refresh - a branch switch says which branch.
-     */
     public void reindex(final @NotNull String outcome) {
         refreshAction.execute(outcome);
     }

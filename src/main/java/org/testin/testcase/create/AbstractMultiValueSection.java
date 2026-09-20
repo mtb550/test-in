@@ -37,25 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-/**
- * UC-EDITOR-PANEL-005.
- * <p>
- * A field a test case holds several of: one completion box per value, stacked,
- * and a key that adds another.
- * <p>
- * Steps have worked this way for as long as they have been a list. Groups were
- * tick boxes over an enum until a group became a word (#296), and the moment
- * they stopped being a fixed set they became the same thing: a few values a
- * tester types, completed from what the project already uses. So the rows, the
- * key that adds one, the focus and what is saved are here, and a section says
- * only which field it is and how the test case holds it.
- * <p>
- * <b>There is no remove.</b> A row left empty is not saved - {@link #applyTo}
- * drops it - so clearing a box is removing the value, and the X button and its
- * key were a second way to say the same thing. They are gone.
- */
+// UC-EDITOR-PANEL-005
 public abstract class AbstractMultiValueSection implements CreateTestCaseSection {
-
     protected final @NotNull Project p;
 
     @Getter
@@ -74,36 +57,16 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
         this.wrapper = createWrapper(field().getIcon(), this.container);
     }
 
-    /**
-     * Which field this section edits. Everything drawn - the icon, the
-     * placeholder, the key that opens it - is that field's own.
-     */
     protected abstract @NotNull CreateTestCaseFields field();
 
-    /**
-     * What the completion offers: every value the project has already used.
-     */
     protected abstract @NotNull Set<String> completions(final @NotNull TestCaseValues cache);
 
-    /**
-     * The values as the test case holds them.
-     */
     protected abstract @NotNull List<String> valuesOf(final @NotNull TestCaseDto dto);
 
-    /**
-     * Writes them back, blanks already dropped.
-     */
     protected abstract void write(final @NotNull TestCaseDto dto, final @NotNull List<String> values);
 
-    /**
-     * The key that opens the section and adds a row.
-     */
     protected abstract @NotNull Shortcuts addKey();
 
-    /**
-     * What a row says before anything is typed in it. Numbered for steps, where
-     * the order is the point; the same words for every row otherwise.
-     */
     protected @NotNull String placeholderFor(final int index) {
         return field().getPlaceholder();
     }
@@ -113,10 +76,6 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
         return wrapper;
     }
 
-    /**
-     * Nothing: the tester opens the section to type into a row the overload
-     * below has not added yet, and it focuses that row.
-     */
     @Override
     public void focusOnShow() {
     }
@@ -151,12 +110,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
         container.add(row);
     }
 
-    /**
-     * UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-033.
-     * <p>
-     * Every row that has something in it, in the order they are drawn. A row
-     * left empty is not a value, which is why nothing needs removing.
-     */
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-033
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
         final @NotNull List<String> values = new ArrayList<>();

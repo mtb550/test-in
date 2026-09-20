@@ -38,21 +38,6 @@ import org.testin.util.Bundle;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-/**
- * Sets one status on the selected node - one instance per status the node
- * offers, built by {@link UpdateStatusGroup}.
- * <p>
- * Whose status it is, this never asks. A test project, a test set and a package
- * each carry a marker, the marker says which statuses it accepts and applies
- * the one it is given, and setting any of them is the same four steps: mark it,
- * stamp who did it, write the marker, redraw. There were three of these, one
- * per kind, differing in the name of a DTO class and in nothing else, so a fix
- * to one - a missing {@code touch}, a notification that never appeared - was a
- * fix to one of three (#110).
- * <p>
- * Which status it sets is the only thing it carries; the project and the tree
- * come from the keystroke.
- */
 public class UpdateStatusAction extends DumbAwareAction {
     private final @NotNull NodeStatus status;
 
@@ -75,11 +60,6 @@ public class UpdateStatusAction extends DumbAwareAction {
         final @NotNull Marker marker = dir.getMarker();
         final @NotNull NodeStatus before = marker.status();
 
-        // The whole of what this method changes, not just the status. A write
-        // that did not land left the marker saying this tester modified the node
-        // a moment ago, which is a name and a timestamp for something that never
-        // happened - and it is what the view panel shows and the next real write
-        // would carry to disk (#312, N5).
         final @NotNull String modifiedByBefore = marker.getModifiedBy();
         final @NotNull ZonedDateTime modifiedAtBefore = marker.getModifiedAt();
 
@@ -87,8 +67,6 @@ public class UpdateStatusAction extends DumbAwareAction {
             marker.applyStatus(status);
             marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
 
-            // A marker that did not land is not confirmed, and the node keeps
-            // the status it still has on disk: the write has said why (#312, A6).
             if (!Services.getInstance(p, ProjectIndexer.class).persistMarker(dir)) {
                 marker.applyStatus(before);
                 marker.setModifiedBy(modifiedByBefore);
@@ -96,13 +74,8 @@ public class UpdateStatusAction extends DumbAwareAction {
                 return;
             }
 
-            // The panel, not only the tree: a test project going inactive
-            // changes what the panel has to show, and a package going archived
-            // changes where it sits in the tree the panel then draws. One call
-            // covers both, and it is the one removing a node already makes.
             Services.getInstance(p, TreePanel.class).getProjectTree().updateNodes();
 
-            // The status names itself: "Archived", "Deprecated", "Active" (#62).
             Services.getInstance(p, Notifier.class).softShow(p, status.getLabel());
 
         } catch (final Exception ex) {
@@ -111,10 +84,6 @@ public class UpdateStatusAction extends DumbAwareAction {
         }
     }
 
-    /**
-     * The node selected on its own, when this status is one of its own - empty
-     * on any other node, which is what takes the entry off the menu.
-     */
     private @NotNull Optional<DirectoryDto> selected(final @NotNull AnActionEvent e) {
         return TestinData.singleSelectedNode(e).filter(dir -> dir.getMarker().statuses().contains(status));
     }

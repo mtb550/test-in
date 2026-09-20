@@ -26,18 +26,8 @@ import org.testin.util.Shortcuts;
 import java.util.List;
 import java.util.Set;
 
-/**
- * UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-033.
- * <p>
- * The steps of a test case, one box each, added with CTRL+S.
- * <p>
- * The rows, the key and what is saved are {@link AbstractMultiValueSection}'s -
- * groups work the same way since they became words rather than constants
- * (#296). What is this section's own is the numbering: a step's place is part of
- * what it says, so the placeholder counts.
- */
+// UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-033
 public class StepsSection extends AbstractMultiValueSection {
-
     public StepsSection(final @NotNull Project p) {
         super(p);
     }
@@ -67,10 +57,6 @@ public class StepsSection extends AbstractMultiValueSection {
         return Shortcuts.CreateTestCaseAddStep;
     }
 
-    /**
-     * "Step 1", "Step 2". The order is what a step means, so the row says which
-     * one it is before anything is typed in it.
-     */
     @Override
     protected @NotNull String placeholderFor(final int index) {
         return CreateTestCaseFields.STEPS.getPlaceholder() + (index + 1);

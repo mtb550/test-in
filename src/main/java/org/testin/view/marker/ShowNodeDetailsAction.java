@@ -25,16 +25,8 @@ import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
 
-
-/**
- * UC-TREE-PANEL-027.
- * <p>
- * Declared in {@code plugin.xml} (#119): the platform builds one instance for
- * the IDE, so what it acts on comes from the keystroke rather than from whoever
- * built it, and its name, description and icon are in the XML the Keymap reads.
- */
+// UC-TREE-PANEL-027
 public class ShowNodeDetailsAction extends DumbAwareAction {
-
     // UC-TREE-PANEL-027, Rule-TREE-PANEL-087
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -44,14 +36,7 @@ public class ShowNodeDetailsAction extends DumbAwareAction {
         TestinData.singleSelectedNode(e).ifPresent(dir -> new MarkerDetailsViewDialog(p, dir).show());
     }
 
-    /**
-     * UC-TREE-PANEL-027, Rule-TREE-PANEL-087.
-     * <p>
-     * The dialog is about one node, so several selected grays the entry. It had
-     * no update() at all: the entry stayed black over any selection and opened
-     * the first row's details, with nothing to say the rest had been passed over
-     * (#192).
-     */
+    // UC-TREE-PANEL-027, Rule-TREE-PANEL-087
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TestinData.singleSelectedNode(e).isPresent());
@@ -59,8 +44,6 @@ public class ShowNodeDetailsAction extends DumbAwareAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // EDT now: update() reads the tree's selection, which is Swing state (#52).
         return ActionUpdateThread.EDT;
     }
-
 }

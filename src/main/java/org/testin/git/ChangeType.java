@@ -21,7 +21,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 
-
 @Getter
 @AllArgsConstructor
 public enum ChangeType {
@@ -83,11 +82,6 @@ public enum ChangeType {
             (current, old) -> current.setPreConditions(old.getPreConditions())
     ),
 
-    // Everything below is about a file that is not a test case. None of them
-    // reverts: a run's results and a node's marker are written by the plugin as
-    // work happens, and putting one back is undoing the work rather than undoing
-    // an edit. They are listed so they can be seen and committed (#66).
-
     CREATE_RUN_ITEM(
             Bundle.message("change.create.run.item"),
             RevertAction.NONE
@@ -135,19 +129,9 @@ public enum ChangeType {
 
     private final @NotNull String label;
 
-    /**
-     * How a row of this kind is put back. Add and remove revert nothing:
-     * creating or deleting a whole test case has no field to put back.
-     */
     private final @NotNull RevertAction revertAction;
 
-    /**
-     * Whether a row of this kind can be put back at all - which is what grays
-     * the revert out. The one reader of what the action is, so no caller has to
-     * know that "reverts nothing" and "cannot be reverted" are the same fact.
-     */
     public boolean isRevertable() {
         return revertAction != RevertAction.NONE;
     }
-
 }

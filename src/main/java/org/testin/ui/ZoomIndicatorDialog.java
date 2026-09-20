@@ -38,37 +38,12 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-/**
- * The "Font size: 14pt" bubble that appears while the tester zooms.
- * <p>
- * One per project, not one per IDE. The popup and the timer that hides it were
- * static, which is one slot for every open project: the bubble is shown against
- * a component in one project's window, and a zoom in the other project canceled
- * it and restarted a timer the first was still counting on. It was the plugin's
- * last static mutable state of that shape, and a project service is what the
- * rest of the plugin uses - it is disposed with its project, so a popup left
- * open when a project closes goes with it.
- * <p>
- * <b>Deliberately not a framework dialog</b> (#69). It is a readout, not a
- * question: it appears because the tester is already doing something else, shows
- * one value, and fades. There is nothing to type, nothing to confirm and no key
- * to name on a strip - and a framework dialog that stole the focus mid-zoom would
- * take the keyboard away from the very gesture it is reporting on.
- */
 @Service(Service.Level.PROJECT)
 public final class ZoomIndicatorDialog implements Disposable {
-
     private final @NotNull Project p;
 
-    /**
-     * One indicator at a time in this project: zooming happens in the focused
-     * editor, so a new one replaces the previous.
-     */
     private @NotNull Optional<JBPopup> currentPopup = Optional.empty();
 
-    /**
-     * One reusable timer rather than one per wheel event.
-     */
     private final @NotNull Timer hideTimer = new Timer(5000, e -> hide());
 
     ZoomIndicatorDialog(final @NotNull Project p) {
@@ -76,11 +51,7 @@ public final class ZoomIndicatorDialog implements Disposable {
         hideTimer.setRepeats(false);
     }
 
-    /**
-     * UC-SETTING-011.
-     * <p>
-     * Shows what the font size has just become, against this component.
-     */
+    // UC-SETTING-011
     public static void show(final @NotNull Project p, final @NotNull JComponent parent, final float currentSize) {
         Services.getInstance(p, ZoomIndicatorDialog.class).showIn(parent, currentSize);
     }

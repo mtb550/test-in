@@ -38,68 +38,19 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
-/**
- * UC-INTERNAL-008, Rule-INTERNAL-091.
- * <p>
- * The one thing that converts a test project, and the one thing that says what a
- * conversion did (#305, S8).
- * <p>
- * <b>Application level, and keyed by the project's folder.</b> Scans share a read
- * lock, there is one scan coordinator per open window, and the file watcher
- * re-reads in every window - so two windows opening the same Testin folder would
- * otherwise convert one project twice at once: the same case moved by both, the
- * format number written by one over the other's half-finished work. One lock per
- * project folder, held across the whole conversion, is what makes that
- * impossible whatever opens what.
- * <p>
- * Deleted with {@link FormatConverter} in 2.14.0-alpha, except for the check that
- * refuses a project this build cannot read, which lives on the marker.
- */
+// UC-INTERNAL-008, Rule-INTERNAL-091
 @Service(Service.Level.APP)
 public final class Conversions {
-
-    /**
-     * One lock per project folder. Kept rather than dropped: a project converted
-     * once is asked about on every scan, and a map that forgets would hand two
-     * scans two locks for one folder.
-     */
     private final @NotNull Map<String, Object> locks = new ConcurrentHashMap<>();
 
-    /**
-     * What has already been said, so the same outcome is reported once.
-     * <p>
-     * A conversion that could not finish leaves the format number out on purpose,
-     * so the next scan tries again - and a project that cannot be converted at all
-     * fails again every time. Without this the tester got the same notification on
-     * every scan and every change to the Testin folder, for something they had
-     * already been told once and can only fix by hand (#305, S3).
-     * <p>
-     * The report is a record, so two identical outcomes are the same value and
-     * this needs nothing but the reports themselves. A retry that got further has
-     * different counts and is said, which is the half worth hearing.
-     */
     private final @NotNull Set<FormatConverter.Report> said = ConcurrentHashMap.newKeySet();
 
-    /**
-     * UC-INTERNAL-008, Rule-INTERNAL-091.
-     * <p>
-     * Brings this project to the format this build reads, once, whoever asks
-     * first - the scan before it reads a project, or the sweep at start. A project
-     * already in it returns without touching a file.
-     */
+    // UC-INTERNAL-008, Rule-INTERNAL-091
     void ensure(final @NotNull Project p, final @NotNull Path project) {
         report(p, convert(p, project).map(List::of).orElse(List.of()));
     }
 
-    /**
-     * UC-INTERNAL-008, Rule-INTERNAL-091.
-     * <p>
-     * D9: <b>every</b> test project in the Testin folder, not only the one a
-     * repository is about - a project nobody opened under 2.13.0-alpha would be
-     * refused by 2.14.0-alpha, and the tester would have nothing left that could
-     * convert it. Run at every start and every time the Testin folder changes,
-     * skipping what is already converted, so there is no flag to keep (S10).
-     */
+    // UC-INTERNAL-008, Rule-INTERNAL-091
     void sweep(final @NotNull Project p) {
         final @NotNull Path root = Services.getInstance(p, TestinRoot.class).getPath();
         if (root.toString().isEmpty() || !Files.isDirectory(root)) return;
@@ -118,11 +69,6 @@ public final class Conversions {
         }
     }
 
-    /**
-     * The folders under the Testin root that are test projects: the ones carrying
-     * a project marker. Sorted, so the notification lists them the same way every
-     * time.
-     */
     private static @NotNull List<Path> projectsIn(final @NotNull Path root) {
         try (Stream<Path> children = Files.list(root)) {
             return children.filter(Files::isDirectory)
@@ -135,17 +81,7 @@ public final class Conversions {
         }
     }
 
-    /**
-     * UC-INTERNAL-008, Rule-INTERNAL-092.
-     * <p>
-     * One notification for the whole conversion, in the log where it stays: which
-     * projects were converted, how many test cases each kept and how many runs it
-     * lost, and any file left for the tester to repair. A conversion is something
-     * that happened to a tester's data while they were opening a project, so it
-     * says so once and does not fade (D9).
-     * <p>
-     * Once for each outcome, which {@link #said} is what makes true.
-     */
+    // UC-INTERNAL-008, Rule-INTERNAL-092
     private void report(final @NotNull Project p, final @NotNull List<FormatConverter.Report> reports) {
         final @NotNull List<FormatConverter.Report> worth = reports.stream()
                 .filter(report -> report.changedAnything() || report.failed() || !report.toRepair().isEmpty())

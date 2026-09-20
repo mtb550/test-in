@@ -29,30 +29,11 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * The screenshots pasted into a text area: a small picture of each, and the
- * button that takes it out (#50).
- * <p>
- * Built only from platform parts - a label holding a scaled icon and the
- * platform's own close button - so nothing here paints, and nothing breaks when
- * a theme, a font or a screen changes. Loading and pasting both go through
- * {@link #add}, so a screenshot cannot look one way when pasted and another when
- * the form is opened again.
- */
 final class ScreenshotStrip {
-
     private final @NotNull List<byte[]> screenshots = new ArrayList<>();
 
-    /**
-     * No vertical gap, so a strip with no thumbnails takes no height under a box
-     * that has never held a screenshot.
-     */
     private final @NotNull JBPanel<?> panel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(8), 0));
 
-    /**
-     * Told after a screenshot is added or taken out, so a surface that sizes
-     * itself to what it holds can follow the strip.
-     */
     private @NotNull Runnable changed = () -> {
     };
 
@@ -78,9 +59,6 @@ final class ScreenshotStrip {
         this.changed = changed;
     }
 
-    /**
-     * A copy, so nothing outside can change the list the thumbnails show.
-     */
     @NotNull List<byte[]> screenshots() {
         return List.copyOf(screenshots);
     }
@@ -89,12 +67,7 @@ final class ScreenshotStrip {
         return panel;
     }
 
-    /**
-     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
-     * <p>
-     * That exact screenshot: each paste is its own array, and the list removes
-     * by identity, so one of two identical screenshots goes and the other stays.
-     */
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     private void remove(final byte @NotNull [] png, final @NotNull JComponent thumbnail) {
         screenshots.remove(png);
         panel.remove(thumbnail);

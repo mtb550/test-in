@@ -56,18 +56,9 @@ import java.util.UUID;
 public class CreateTestRun implements NodeCreator {
     private final @NotNull Project p;
 
-    /**
-     * UC-TREE-PANEL-009.
-     * <p>
-     * Asynchronous creator: shows the run configuration dialog and completes on OK,
-     * including its own tree refresh and editor opening. Always answers empty,
-     * because the node does not exist yet when this returns.
-     */
+    // UC-TREE-PANEL-009
     @Override
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
-        // The tree this was started from only exists when a project is bound, so
-        // nobody can click their way into the miss. It is checked because a run
-        // written against no project would be a directory nothing owns.
         Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
                 tp -> configureRun(tp.getTestCasesDirectory(), name, parentDir, Set.of(), Map.of()),
                 () -> Logger.warn("Create test run: no test project is bound to " + p.getName()));
@@ -75,31 +66,13 @@ public class CreateTestRun implements NodeCreator {
         return Optional.empty();
     }
 
-    /**
-     * UC-TREE-PANEL-009, UC-TREE-PANEL-021.
-     * <p>
-     * Opens the run form set to create, which is what makes a run and what makes
-     * the next cycle: they differ only in what the form opens holding - the
-     * previous cycle's cases ticked and its configuration filled in - and not at
-     * all in how the run is written, which is what keeps a re-created run from
-     * being a second kind of run (#9).
-     */
+    // UC-TREE-PANEL-009, UC-TREE-PANEL-021
     public void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Set<UUID> sourceCases, final @NotNull Map<TestRunConfiguration, String> sourceConfiguration) {
         new RunForm(p).open(testCasesRoot, name, sourceCases, sourceConfiguration,
                 new RunFormAction(Bundle.message("run.create.title"), Bundle.message("run.create.button"), (form, selection) -> create(form, selection, parentDir)));
     }
 
-    /**
-     * UC-TREE-PANEL-009, Rule-TREE-PANEL-004.
-     * <p>
-     * Writes the run, or refuses and says why - and answers which, because the
-     * dialog stays open on a refusal.
-     * <p>
-     * The name is resolved here rather than before the dialog opened, since here
-     * is where the tester finished deciding it. That also puts the two checks
-     * the name needs in one place: the tree's create action makes them for the
-     * name it asks for, and nothing made them for a name typed afterwards.
-     */
+    // UC-TREE-PANEL-009, Rule-TREE-PANEL-004
     private boolean create(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull DirectoryDto parentDir) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
@@ -110,8 +83,6 @@ public class CreateTestRun implements NodeCreator {
             return false;
         }
 
-        // The popup is not modal - the tree stays live while the dialog is open,
-        // so the parent may have been removed.
         if (!indexer.nodeExists(parentDir.getPath())) {
             notifier.softRefuse(p, Bundle.message("run.parent.gone", parentDir.getName()));
             return false;
@@ -129,63 +100,33 @@ public class CreateTestRun implements NodeCreator {
         return true;
     }
 
-
-
     // UC-TREE-PANEL-009, Rule-TREE-PANEL-031
     private void saveSelectedToJSON(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull TreePanel tp, final @NotNull TestRunDirectoryDto trDir) {
-        // Read once, here, while the dialog is still on screen. Everything below
-        // works from this map rather than going back to the form, and the
-        // background write further down could not go back to it anyway (#87).
         final @NotNull Map<TestRunConfiguration, String> configuration = form.configuration();
 
-        // Who made it and when is the marker's, which every node carries and the
-        // details popup already reads. The run held a second copy that nothing
-        // ever read back.
         final @NotNull TestRunDto tr = new TestRunDto();
 
         final @NotNull List<TestRunItems> items = new ArrayList<>();
         RunForm.checkedCases(selection).forEach(id -> items.add(new TestRunItems().setId(id).setStatus(TestStatus.PENDING)));
         tr.setResults(items);
 
-        // The form and the checked tree were read above, while the dialog was
-        // still there; from here nothing touches a component (#87).
         BackgroundWork.run(p, Bundle.message("run.task.creating", savePath.getFileName()), Bundle.message("run.create.failed.title"), indicator -> {
-            // Defaults are correct (status CREATED); addTestRunDir stamps the
-            // tester's audit info before the marker's first write.
-            // The answers the tester gave are the run's own facts, so they go in
-            // its marker, with its status and its audit block (#305, D6).
             final @NotNull TestRunMarker marker = new TestRunMarker().setConfiguration(TestRunConfiguration.answered(configuration));
             trDir.setMarker(marker);
 
-            // A run whose marker did not land is not opened or confirmed: the
-            // write has already said why (#312, A5).
-            //
-            // And before the run itself, which is architecture rule 2: the
-            // directory only comes into existence as a side effect of the marker
-            // write. Indexing the run and queueing run.json first left a folder
-            // holding results and no .tr when the marker failed - which every
-            // rescan then skipped as not a test run, so the tester saw nothing
-            // and the files stayed (#312, N4).
             if (!Services.getInstance(p, ProjectIndexer.class).addTestRunDir(trDir)) return;
 
             Services.getInstance(p, ProjectIndexer.class).putTestRun(savePath, tr);
 
-            // File access is the indexer's alone (see CLAUDE.md).
             Services.getInstance(p, ProjectIndexer.class).refreshDirectory(savePath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 tp.getProjectTree().refresh();
                 Services.getInstance(p, TestinEditors.class).open(p, trDir);
 
-                // Here rather than in CreateTreeNodeAction: creating a run is
-                // asynchronous, and the action returns while the dialog is still
-                // open (#62).
                 Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
             });
 
         });
     }
-
-
 }
-

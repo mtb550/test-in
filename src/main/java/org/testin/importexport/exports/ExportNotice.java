@@ -39,30 +39,9 @@ import java.util.Optional;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * Says an export finished, and offers to open what it produced.
- * <p>
- * One place for all four formats. It was four copies of the same eight lines,
- * three of them identical to the character.
- * <p>
- * So the wording, the action label and the decision to raise this on the EDT
- * could each drift in one format without anyone noticing in the others.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ExportNotice {
-
-    /**
-     * UC-SHARE-004, Rule-SHARE-022.
-     * <p>
-     * The one confirmation an export gets: a notification that stays, titled with
-     * how many test cases went, naming the file, with Open and Copy path under
-     * it. Open sends a web page to the browser and anything else to what the
-     * machine opens it with.
-     * <p>
-     * One. Each exporter raised this and the action raised a balloon counting
-     * the cases as well, so one export confirmed itself twice (#66, finding
-     * 277). The action is what knows both the file and the count, so it asks.
-     */
+    // UC-SHARE-004, Rule-SHARE-022
     static void show(final @NotNull Project p, final @NotNull File file, final int cases) {
         ApplicationManager.getApplication().invokeLater(() -> {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
@@ -71,17 +50,7 @@ public final class ExportNotice {
         });
     }
 
-    /**
-     * UC-SHARE-004.
-     * <p>
-     * Opens a file the plugin has just written, whatever wrote it.
-     * <p>
-     * Public because the report generator had its own copy of this - a bare
-     * {@code Desktop.getDesktop().open}, which skipped the desktop-support check
-     * below, ran on the UI thread where opening blocks until Acrobat or Word has
-     * started, and reported its failure only to the log. A tester on a machine
-     * that cannot open files pressed Open report and nothing happened at all.
-     */
+    // UC-SHARE-004
     public static void open(final @NotNull Project p, final @NotNull File file) {
         Optional.ofNullable(LocalFileSystem.getInstance().findFileByPath(file.getAbsolutePath()))
                 .filter(VirtualFile::exists)
@@ -90,18 +59,9 @@ public final class ExportNotice {
                                 .error(p, Bundle.message("export.open.error.title"), Bundle.message("export.open.missing")));
     }
 
-    /**
-     * Hands the file to whatever application claims its extension, and says so
-     * when the desktop cannot. Here rather than in a utility class: this is the
-     * only thing in the plugin that asks the operating system to open anything.
-     */
     private static void openWithAssociatedProgram(final @NotNull Project p, final @NotNull VirtualFile virtualFile) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
-        // A web page goes to the browser, whichever button wrote it. The same
-        // .html opened in whatever application claimed the extension when it was
-        // a report and in the browser when it was an export - one file, two
-        // behaviors, decided by which half of the plugin made it (#256).
         if (virtualFile.getName().toLowerCase(Locale.ROOT).endsWith(".html")) {
             BrowserUtil.browse(new File(virtualFile.getPath()).toURI().toString());
             return;
@@ -123,15 +83,7 @@ public final class ExportNotice {
         });
     }
 
-    /**
-     * UC-REPORT-003, Rule-REPORT-015.
-     * <p>
-     * The link that puts a written file's full path on the clipboard, the same
-     * on every message about a file the plugin wrote. Here beside {@link #open},
-     * which the report and the export already share, rather than in Notifier,
-     * which delivers links and chooses none of their words - this was the one it
-     * did (#66, finding 233).
-     */
+    // UC-REPORT-003, Rule-REPORT-015
     public static @NotNull NotificationAction copyPath(final @NotNull Project p, final @NotNull File file) {
         final @NotNull NotificationAction copy = Services.getInstance(p, Notifier.class).action(Bundle.message("notification.copy.path"),
                 () -> CopyPasteManager.getInstance().setContents(new StringSelection(file.getAbsolutePath())));

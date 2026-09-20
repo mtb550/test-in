@@ -42,39 +42,19 @@ import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * The GitHub issue a failure was reported as, and the link that reports it
- * (#28).
- * <p>
- * Its own row type rather than a {@link RunAttributeRow}: the value is two
- * links, and one of them is disabled for reasons that are not on the run item -
- * a report already on its way, or another one open.
- */
 @AllArgsConstructor
 public final class BugIssueRow extends BaseDetails {
-
     private static final int LINK_GAP = 16;
 
     private final @NotNull TestRunItems item;
     private final @NotNull List<String> currentPath;
 
-    /**
-     * UC-VIEW-PANEL-005, UC-VIEW-PANEL-016, Rule-VIEW-PANEL-031, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075.
-     * <p>
-     * Drawn for a failed run item, which can be reported, and for any run item
-     * that has been - a link, once there, stays until a pass clears it. Report
-     * Bug asks why it is off every time the row is drawn, because the panel
-     * rebuilds itself on every refresh and a disabled link held anywhere else
-     * would be drawn enabled again.
-     */
+    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-016, Rule-VIEW-PANEL-031, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final @NotNull Optional<String> bugIssue = item.bugIssue();
         if (item.shownStatus() != TestStatus.FAILED && bugIssue.isEmpty()) return currentRow;
 
-        // Found rather than demanded: a run whose results are indexed before its
-        // folder is has no folder node yet, and drawing the panel must not throw
-        // over it (#66, finding 140).
         return Services.getInstance(p, ProjectIndexer.class).find(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
                 .filter(TestRunDirectoryDto.class::isInstance)
                 .map(TestRunDirectoryDto.class::cast)
@@ -82,9 +62,6 @@ public final class BugIssueRow extends BaseDetails {
                 .orElse(currentRow);
     }
 
-    /**
-     * The row, once the run's folder is there to report from.
-     */
     private int drawLinks(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow, final @NotNull Optional<String> bugIssue, final @NotNull TestRunDirectoryDto runDirectory) {
         final @NotNull Optional<String> off = Services.getInstance(p, BugReports.class)
                 .whyReportBugIsOff(new BugReports.RunItem(runDirectory.getPath(), item.getId()), item);
@@ -107,10 +84,6 @@ public final class BugIssueRow extends BaseDetails {
         return addRow(panel, gbc, RunEditorAttributes.BUG_ISSUE.getName(), links, currentRow);
     }
 
-    /**
-     * Every surface showing the run item: this panel, and the run editor whose
-     * Bug Issue column changes when the link is stored.
-     */
     private static void redraw(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto runDirectory) {
         ViewToolWindowFactory.refreshIfShowing(p, List.of(dto));
         Services.getInstance(p, TestinEditors.class).runEditorFor(p, runDirectory).ifPresent(RunEditor::refreshAfterStatusChange);

@@ -29,14 +29,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-/**
- * Execution status of a test case. Constants carry their own presentation and
- * action wiring: label, icon, shortcut, extra-dialog flag.
- * <p>
- * So adding a status means adding one constant here. It does not mean writing a
- * new action class, wiring a new shortcut, and remembering a new menu entry
- * (see issue #37).
- */
 @Getter
 @AllArgsConstructor
 public enum TestStatus {
@@ -66,13 +58,8 @@ public enum TestStatus {
 
     PENDING(
             "808080",
-            // Lazy because it comes from the theme: resolved at class-load time it
-            // would keep the color of whichever theme happened to be active then.
             JBColor.lazy(UIUtil::getContextHelpForeground),
             Bundle.message("status.verdict.pending"),
-            // No menu entry, so not on the menu: the run owns this status. It
-            // means "queued to run", and a run only clears it on completion, so a
-            // tester setting it afterward leaves a state nothing reconciles.
             MenuEntry.NONE,
             false
     ),
@@ -81,12 +68,6 @@ public enum TestStatus {
             "9E9E9E",
             JBColor.GRAY,
             Bundle.message("status.verdict.removed"),
-            // Off the menu, and shown rather than set: the test case this result
-            // belongs to has been deleted, so there is nothing left to execute
-            // and nothing left to judge. The row stays because the run executed
-            // it once, and what it recorded is history rather than a verdict
-            // anyone can still give (#66). The file keeps that verdict; only
-            // TestRunItems.shownStatus answers Removed (#66, finding 110).
             MenuEntry.NONE,
             false
     ),
@@ -95,11 +76,6 @@ public enum TestStatus {
             "808080",
             JBColor.GRAY.brighter(),
             Bundle.message("status.verdict.untested"),
-            // Off the menu, and the plugin sets it: a tester gives one of three
-            // verdicts — passed, failed or blocked — and anything still pending
-            // when the run completes or closes becomes untested by itself. It is
-            // the record of a case the run never reached, not a verdict someone
-            // chose, so there is nothing for a menu entry to apply.
             MenuEntry.NONE,
             false
     );
@@ -108,46 +84,15 @@ public enum TestStatus {
     private final @NotNull Color rowColor;
     private final @NotNull String label;
 
-    /**
-     * How this status appears on the status menu, and {@link MenuEntry#NONE} for
-     * the two the run sets for itself.
-     * <p>
-     * One field is the whole answer: there used to be a separate addedToMenu
-     * flag beside it, which allowed the two states that cannot mean anything —
-     * an entry that is never shown, and a status offered with no key to apply
-     * it. PENDING was the first: off the menu, yet carrying an icon and a key
-     * nothing could reach.
-     */
     private final @NotNull MenuEntry menuEntry;
 
-    /**
-     * True when applying this status first collects details in a dialog (FAILED).
-     */
     private final boolean collectsFailureDetails;
 
-    /**
-     * True when a tester chose this status. The three the menu offers are the
-     * three verdicts, and PENDING and UNTESTED are the two the run sets for
-     * itself - which is what the null menu entry already says. Asked by name
-     * here so no caller has to know the two facts coincide.
-     */
     public boolean isVerdict() {
         return menuEntry != MenuEntry.NONE;
     }
 
-    /**
-     * The status menu's presentation of a status it offers: the icon of its
-     * action and the key that applies it. Only the statuses on the menu have
-     * one, which is what makes the null meaningful.
-     */
     public record MenuEntry(@NotNull Icon icon, @NotNull KeyStroke shortcut) {
-
-        /**
-         * The presentation of a status the menu does not offer: nothing to draw
-         * and no key that reaches it. Never shown - {@link #isVerdict()} is what
-         * decides that - and here so a status off the menu says so with a value
-         * of its own type.
-         */
         public static final @NotNull MenuEntry NONE =
                 new MenuEntry(EmptyIcon.ICON_16, KeyStroke.getKeyStroke(KeyEvent.VK_UNDEFINED, 0));
     }

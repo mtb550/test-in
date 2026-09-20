@@ -28,14 +28,7 @@ import org.testin.util.Shortcuts;
 
 import java.util.List;
 
-/**
- * One screenshot pasted with a failure, at its real size, for looking at (#50).
- * <p>
- * Built like {@link ErrorDetailsDialog}, its neighbor in the Stacktrace row: the
- * text opens in that one, and each screenshot in this one. Nothing is saved.
- */
 public final class ScreenshotDialog extends AbstractFrameworkDialog<Picture> {
-
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 700;
 
@@ -45,8 +38,6 @@ public final class ScreenshotDialog extends AbstractFrameworkDialog<Picture> {
 
         title = name;
 
-        // Sized rather than left to the picture: a screenshot is as large as the
-        // screen it was taken of. Setting it also makes the popup resizable.
         preferredSize = JBUI.size(WIDTH, HEIGHT);
 
         components = List.of(ComponentDialogBase.picture(png));
@@ -59,9 +50,7 @@ public final class ScreenshotDialog extends AbstractFrameworkDialog<Picture> {
         closeOk();
     }
 
-    /**
-     * UC-INTERNAL-007, Rule-INTERNAL-075. Shows one screenshot. Asked for another, the newer one is the one wanted.
-     */
+    // UC-INTERNAL-007, Rule-INTERNAL-075
     @Override
     protected boolean replacesItsKind() {
         return true;

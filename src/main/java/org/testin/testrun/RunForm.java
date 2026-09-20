@@ -36,42 +36,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * The run configuration dialog, opened holding whatever the caller wants it to
- * hold.
- * <p>
- * Three flows open it and only one of them is creating a run: a new run opens it
- * empty, re-creating a cycle opens it on the previous cycle's cases and answers
- * (#9), and editing opens it on the run's own (#96). It used to live inside the
- * creator, which meant two of its callers reached into a class named for
- * something they were not doing - and, more to the point, that the tree of test
- * cases could only be built by whoever was creating.
- * <p>
- * What the tree shows is read from the index every time this opens, never from
- * what a run remembers. That is what makes editing worth having: a case added to
- * a test set after the run was created appears here, unticked.
- */
 @AllArgsConstructor
 public final class RunForm {
-
     private final @NotNull Project p;
 
-    /**
-     * UC-TREE-PANEL-009, UC-TREE-PANEL-021, UC-TREE-PANEL-022.
-     * <p>
-     * Builds the tree off the EDT - it awaits indexing and walks the project -
-     * and shows the dialog back on it.
-     */
+    // UC-TREE-PANEL-009, UC-TREE-PANEL-021, UC-TREE-PANEL-022
     public void open(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull Set<UUID> checked, final @NotNull Map<TestRunConfiguration, String> configuration, final @NotNull RunFormAction action) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-
             final @NotNull DefaultMutableTreeNode fullModelNode = buildDirectoryTree(testCasesRoot.getPath(), testCasesRoot);
 
             final @NotNull CheckedTreeNode root = convertToCheckedNodes(fullModelNode);
             if (!checked.isEmpty()) checkOnly(root, checked);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-
                 final @NotNull RunConfigurationForm form = new RunConfigurationForm(name);
                 if (!configuration.isEmpty()) form.fillFrom(configuration);
 
@@ -82,35 +59,7 @@ public final class RunForm {
         });
     }
 
-    /**
-     * UC-TREE-PANEL-022, Rule-TREE-PANEL-093.
-     * <p>
-     * Ticks the cases wanted, unticks everything else, and leaves every folder
-     * saying what is actually under it.
-     * <p>
-     * Both halves of that, because a node arrives ticked: {@code CheckedTreeNode}
-     * defaults to checked, which is why creating a run opens with the whole
-     * project selected. Opening on a run's own cases means that run's scope, so
-     * everything outside it has to come off.
-     * <p>
-     * <b>Including the folders, which is the part that was missing.</b> This set
-     * the test case rows and left every folder at its default of ticked, so
-     * editing a run that covered two cases of fifty opened with all of its
-     * folders ticked - the tree said the run covered everything before the
-     * tester touched it.
-     * <p>
-     * And the tree is built on a {@code CheckPolicy} that propagates in all four
-     * directions, so a folder is not only wrong to read, it is dangerous to
-     * click: unticking one that looks ticked unticks every case beneath it, and
-     * unticking an executed case discards its verdict, its actual result, its
-     * bug severity and priority, its duration and its stack trace
-     * (Rule-TREE-PANEL-076). One click a tester makes to correct what the tree
-     * is telling them, and a cycle's results are gone.
-     *
-     * @return whether everything under this node is ticked, which is what makes
-     * a folder ticked - computed on the way back up, so a folder can only say
-     * what its children say
-     */
+    // UC-TREE-PANEL-022, Rule-TREE-PANEL-093, Rule-TREE-PANEL-076
     private boolean checkOnly(final @NotNull CheckedTreeNode node, final @NotNull Set<UUID> wanted) {
         if (node.getUserObject() instanceof TestCaseDto tc) {
             final boolean covered = wanted.contains(tc.getId());
@@ -129,18 +78,7 @@ public final class RunForm {
         return allCovered;
     }
 
-    /**
-     * UC-TREE-PANEL-009, Rule-TREE-PANEL-030.
-     * <p>
-     * The node for a folder, with its test cases or its child folders under it.
-     * <p>
-     * Always returns a node. It used to return null for an empty test set or an
-     * empty container, and take an isRoot flag to exempt the top of the tree.
-     * That gave one method two contracts: the root could never be null and a
-     * child routinely was.
-     * <p>
-     * The caller below drops the empties instead - the same behavior, one rule.
-     */
+    // UC-TREE-PANEL-009, Rule-TREE-PANEL-030
     private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder, final @NotNull DirectoryDto thisNodeDto) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         indexer.awaitIndexing();
@@ -155,14 +93,10 @@ public final class RunForm {
         }
 
         for (final DirectoryDto child : indexer.getChildren(folder)) {
-            // A deprecated test set, or anything under an archived package, is not
-            // offered for a new run: that is what retiring it means (#68).
             if (child.isRetired()) continue;
 
             final @NotNull DefaultMutableTreeNode childNode = buildDirectoryTree(child.getPath(), child);
 
-            // An empty test set, or a package holding only empty ones, would
-            // clutter the tree with a branch that cannot be ticked.
             if (childNode.getChildCount() > 0) node.add(childNode);
         }
 
@@ -178,10 +112,6 @@ public final class RunForm {
         return newNode;
     }
 
-    /**
-     * The test cases ticked in the tree, which is the one thing every caller
-     * wants out of it.
-     */
     public static @NotNull Set<UUID> checkedCases(final @NotNull SelectionTree selection) {
         final @NotNull Set<UUID> ids = new LinkedHashSet<>();
 
@@ -192,12 +122,7 @@ public final class RunForm {
         return ids;
     }
 
-    /**
-     * UC-TREE-PANEL-022, Rule-TREE-PANEL-076.
-     * <p>
-     * Every test case the tree offered, ticked or not - so a caller can tell a
-     * case the tester unticked from one they were never shown.
-     */
+    // UC-TREE-PANEL-022, Rule-TREE-PANEL-076
     public static @NotNull Set<UUID> offeredCases(final @NotNull SelectionTree selection) {
         final @NotNull Set<UUID> ids = new LinkedHashSet<>();
 

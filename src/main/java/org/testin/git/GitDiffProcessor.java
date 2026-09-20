@@ -38,30 +38,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
-/**
- * Builds the test-case review model from what Git reports as changed. The
- * IDE-free diff construction lives in {@link PendingChangeFactory} and the
- * porcelain parsing in {@link GitRefs}; this class only asks Git and reads the
- * two sides of each change.
- * <p>
- * It used to ask the IDE instead - {@code ChangeListManager.getAllChanges()} -
- * and that was wrong twice over.
- * <p>
- * The IDE tracks only repositories registered as VCS roots in the open project.
- * A Testin root is deliberately a separate repository from the automation
- * project, so the change list was empty for it, and the review reported "No
- * changes" however much had changed.
- * <p>
- * And a brand-new test case is untracked, which that list never reports at all.
- * So the first commit of a new test set could not be made from the plugin under
- * any layout.
- * <p>
- * Asking Git directly also makes the read match the writes: init, add, commit,
- * remote, config, pull and push already run as Git commands.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GitDiffProcessor {
-
     // UC-SHARE-010
     public static @NotNull List<PendingChange> getPendingChanges(final @NotNull Project p, final @NotNull Path repositoryRoot) {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
@@ -75,22 +53,7 @@ public final class GitDiffProcessor {
                 indexer::findTestCase);
     }
 
-    /**
-     * UC-SHARE-010.
-     * <p>
-     * The review, built from what Git said and what is on disk.
-     * <p>
-     * Separated from {@link #getPendingChanges} so the whole mapping can be
-     * exercised against plain status lines and real files, without an IDE or a
-     * repository: which lines are ours, which side of each change is read from
-     * where, and which changes are not worth showing.
-     *
-     * @param committedContent the file's content as committed, empty when there
-     *                         is none - a new file, or no commits yet
-     * @param cases            the test case an id names, asked of the index: a
-     *                         result is named by the case it is about, and the
-     *                         file holds the verdict rather than the case (#305)
-     */
+    // UC-SHARE-010
     static @NotNull List<PendingChange> toDiffs(final @NotNull List<String> statusLines, final @NotNull Path repositoryRoot, final @NotNull Mapper mapper, final @NotNull Function<String, String> committedContent, final @NotNull Function<UUID, Optional<TestCaseDto>> cases) {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
         final @NotNull List<PendingChange> result = new ArrayList<>();
@@ -98,20 +61,8 @@ public final class GitDiffProcessor {
         for (final GitRefs.StatusEntry entry : GitRefs.parseStatus(statusLines)) {
             final @NotNull Path relativePath = Path.of(entry.path());
 
-            // A run's screenshot has no row of its own: it only arrives or goes
-            // because a result started or stopped naming it, and committing that
-            // result carries it (#313).
-            //
-            // Only inside a run folder, which is what the marker beside it says: a
-            // five-character picture a tester keeps in a test set is a file like
-            // any other, and hiding it left them unable to commit it at all
-            // (#305, S29).
             if (FileKind.of(relativePath, folderKindOf(root, relativePath)) == FileKind.SCREENSHOT) continue;
 
-            // An untracked file that is no longer there is not a pending change:
-            // Git listed it a moment ago and something removed it since. Listing
-            // it would offer the tester a row that cannot be staged, because
-            // there is no file for "git add" to find.
             if (entry.type() == DiffType.ADDED && !Files.exists(root.resolve(relativePath))) {
                 Logger.warn("Skipping " + relativePath + ": Git listed it as new, and it is gone");
                 continue;
@@ -127,12 +78,6 @@ public final class GitDiffProcessor {
                         cases));
 
             } catch (final RuntimeException ex) {
-                // One unreadable file does not take the review down with it. Git
-                // said this path changed, so it is a change the tester has to be
-                // able to commit - it is listed with what little can be said
-                // about it, and the reason goes to the log. Throwing here meant a
-                // file deleted between the status and the read, or a hand-edited
-                // one, emptied the whole review (#66).
                 Logger.warn("Listing " + relativePath + " without detail: " + ex.getMessage());
                 result.add(PendingChangeFactory.unreadable(entry.type(), relativePath));
             }
@@ -140,17 +85,7 @@ public final class GitDiffProcessor {
         return result;
     }
 
-    /**
-     * Rule-INTERNAL-011.
-     * <p>
-     * What kind of folder holds this file, as far as the working tree can say: a
-     * run when the folder carries a run's marker, and nothing in particular
-     * otherwise - which is all {@link FileKind} needs to tell a screenshot from a
-     * picture (#305, S29).
-     * <p>
-     * Asked of the disk rather than of the index: the review is about what Git
-     * reports, including a file in a project this window has not indexed.
-     */
+    // Rule-INTERNAL-011
     private static @NotNull DirectoryType folderKindOf(final @NotNull Path repositoryRoot, final @NotNull Path relativePath) {
         final @NotNull Optional<Path> folder = Optional.ofNullable(repositoryRoot.resolve(relativePath).getParent());
         final boolean isRun = folder.filter(at -> Files.exists(at.resolve(DirectoryType.TR.getMarker()))).isPresent();
@@ -158,14 +93,6 @@ public final class GitDiffProcessor {
         return isRun ? DirectoryType.TR : DirectoryType.TRD;
     }
 
-    /**
-     * Empty for a deletion, which by definition has no file left on disk.
-     * <p>
-     * Read with plain file access rather than through the VFS: this is the
-     * working tree as Git just described it, and a VFS copy that has not caught
-     * up would disagree with the status line that named the file. {@code git} is
-     * an exempt package for exactly this kind of read.
-     */
     private static @NotNull String workingContent(final @NotNull Path root, final @NotNull Path relativePath, final @NotNull GitRefs.StatusEntry entry) {
         if (entry.type() == DiffType.DELETED) return "";
 
@@ -173,10 +100,6 @@ public final class GitDiffProcessor {
         try {
             return Files.readString(file, StandardCharsets.UTF_8);
         } catch (final IOException ex) {
-            // Not fatal to the review: the change is still listed, with whatever
-            // can be said about it, and the caller decides what to show. A file
-            // the plugin cannot read is a file the tester still has to be able
-            // to commit.
             Logger.warn("Could not read changed file " + file + ": " + ex.getMessage());
             throw new IllegalStateException("Could not read " + relativePath, ex);
         }

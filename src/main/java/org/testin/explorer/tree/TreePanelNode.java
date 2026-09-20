@@ -33,9 +33,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * IntelliJ tree node whose children are resolved by StructureTreeModel in the background.
- */
 public final class TreePanelNode extends AbstractTreeNode<Object> {
     private final @NotNull Project p;
 
@@ -58,21 +55,9 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
         if (!(value instanceof DirectoryDto directory)) return List.of();
 
         try {
-            // Never waits for the index, and this is load-bearing rather than an
-            // optimization. The platform calls this on the tree's Invoker inside
-            // a read action, and a read action that blocks blocks every write
-            // action in the IDE with it - including the one DumbService takes to
-            // start indexing, which is the EDT's. Waiting here for 32 seconds
-            // froze the whole IDE and killed it (#89).
-            //
-            // A node with nothing indexed under it yet answers with nothing, and
-            // TreePanel.refreshWhenIndexed draws it again when the index is
-            // ready. That wait is on a pooled thread, holding no lock.
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            // Rule-INTERNAL-091. A project this build cannot read has nothing
-            // under it, and the reason goes where the contents would have been -
-            // an empty project and a refused one look the same otherwise (#305).
+            // Rule-INTERNAL-091
             final @NotNull Optional<String> refused = indexer.whyNotRead(directory.getPath());
             if (refused.isPresent()) return List.of(child(new TreeLoadError(refused.orElseThrow())));
 
@@ -99,13 +84,7 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
         return getValue() instanceof DirectoryDto ? LeafState.ASYNC : LeafState.ALWAYS;
     }
 
-    /**
-     * UC-TREE-PANEL-028, Rule-TREE-PANEL-008.
-     * <p>
-     * The platform's expand-all asks every node this before descending into it.
-     * An archived package answers no, so it stays collapsed when the tree opens
-     * a project, while a click still expands it as before.
-     */
+    // UC-TREE-PANEL-028, Rule-TREE-PANEL-008
     @Override
     public boolean isIncludedInExpandAll() {
         return !(getValue() instanceof DirectoryDto directory && directory.isRetired());

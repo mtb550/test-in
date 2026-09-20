@@ -28,7 +28,6 @@ import org.testin.editor.toolbar.components.ToolbarItem;
 import java.util.List;
 
 public class TestToolbar extends AbstractToolbarPanel {
-
     public TestToolbar(final @NotNull Toolbar callbacks) {
         super(callbacks);
         layoutComponents();
@@ -44,8 +43,6 @@ public class TestToolbar extends AbstractToolbarPanel {
                 new FilterPopupBtn(getCallbacks(), getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules, getCallbacks()::getAvailableGroups),
                 new ListViewBtn(getCallbacks()::onToolBarSwitchedToListView),
                 new GridViewBtn(getCallbacks()::onToolBarSwitchedToGridView)
-                // The search field is created and laid out by AbstractToolbarPanel itself
-                // because it needs its own horizontal-fill constraints.
         );
     }
 }

@@ -19,24 +19,8 @@ package org.testin.editor;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * The two kinds of editor, and the keys their remembered view settings are
- * kept under in the IDE's properties: the grid's column widths and the Details
- * checkboxes (#312, N20).
- * <p>
- * One owner because the words were spelled in four places - the two grids and
- * the two Details buttons - and a kind renamed in one of them would have read
- * nothing back.
- * <p>
- * <b>The words are stored.</b> Every tester's properties already hold keys like
- * {@code testin.grid.colWidth.test.Description} and
- * {@code testin.selectedDetails.run.v7}, so changing a word, or the shape of a
- * key, throws away what those testers set. A constant may be renamed; its word
- * may not. {@code EditorKindTest} pins the strings.
- */
 @AllArgsConstructor
 public enum EditorKind {
-
     TEST(
             "test"
     ),
@@ -47,23 +31,12 @@ public enum EditorKind {
 
     private final @NotNull String word;
 
-    /**
-     * UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-022.
-     * <p>
-     * Where this kind's Details checkboxes are remembered. The version is the
-     * button's, bumped only when a stored selection would answer an older
-     * question.
-     */
+    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-022
     public @NotNull String detailsKey(final int version) {
         return "testin.selectedDetails." + word + ".v" + version;
     }
 
-    /**
-     * UC-EDITOR-PANEL-004, Rule-EDITOR-PANEL-026.
-     * <p>
-     * Where a grid column's width is remembered for this kind, by the column's
-     * header.
-     */
+    // UC-EDITOR-PANEL-004, Rule-EDITOR-PANEL-026
     public @NotNull String columnWidthKey(final @NotNull Object header) {
         return "testin.grid.colWidth." + word + "." + header;
     }

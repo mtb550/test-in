@@ -29,13 +29,7 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-/**
- * Creates a test node (test set or test set package) under the test cases
- * main directory or a test set package. The constructor is the declaration:
- * title, components, status bar mapping — plus the submit action.
- */
 public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWithSelections<DirectoryType>> {
-
     private final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onCreate;
 
     // UC-TREE-PANEL-007, UC-TREE-PANEL-008, Rule-TREE-PANEL-024
@@ -63,9 +57,6 @@ public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWit
     // UC-TREE-PANEL-007, UC-TREE-PANEL-008, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095
     @Override
     protected void submit() {
-        // Which of the two was picked decides what the name has to be able to
-        // do: a test set package becomes a Java package and a test set becomes
-        // the class. Asked of the type rather than written out here (#11).
         final @NotNull DirectoryType type = component().getSelectedValue();
 
         final @NotNull String name = accepted(component(), value -> Refused.ofName(type, value));

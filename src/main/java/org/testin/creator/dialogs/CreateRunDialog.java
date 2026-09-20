@@ -29,13 +29,7 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-/**
- * Creates a run node (test run or test run package) under the test runs main
- * directory or a test run package. The constructor is the declaration:
- * title, components, status bar mapping — plus the submit action.
- */
 public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWithSelections<DirectoryType>> {
-
     private final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onCreate;
 
     // UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-032
@@ -62,9 +56,6 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
     // UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095
     @Override
     protected void submit() {
-        // The same question the test side asks, and the run types answer yes to
-        // every name - they generate no code. Asked anyway, so a run node is not
-        // the one dialog that knows a rule instead of asking for it.
         final @NotNull DirectoryType type = component().getSelectedValue();
 
         final @NotNull String name = accepted(component(), value -> Refused.ofName(type, value));

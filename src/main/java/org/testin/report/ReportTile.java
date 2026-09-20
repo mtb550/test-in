@@ -27,33 +27,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-/**
- * The headline figures a report opens with, and everything that differs between
- * them (#174).
- * <p>
- * Four generators printed this row and each wrote the list out: the same seven
- * labels, the same seven values off the same summary, and the same six colors -
- * declared twice over as {@code DeviceRgb} in the PDF and as hex strings in the
- * Word file, holding the identical six values. Two of them also decided how many
- * tiles there are with {@code hasRemoved() ? 7 : 6}, which is a fact about the
- * list stated beside the list rather than counted from it.
- * <p>
- * <b>They had already drifted.</b> The spreadsheet opened with Executed and no
- * Total Cases while the other three opened with Total Cases and no Executed, so
- * two reports of one run disagreed about what the run was - and nothing in the
- * code said whether that was meant. It was not: decided 2026-09-04, the
- * spreadsheet adopts this list like everything else.
- * <p>
- * Executed is not here and is not lost. It is Passed, Failed and Blocked added
- * up - which is Total minus Untested and Removed, because the total counts a
- * removed case and nobody ran one. The narrative sentence above the HTML tiles
- * still says it, and a figure a reader can work out does not need a tile of its
- * own in four formats.
- */
 @Getter
 @AllArgsConstructor
 public enum ReportTile {
-
     TOTAL_CASES(
             Bundle.message("report.tile.total.cases"),
             "1F3864",
@@ -94,14 +70,6 @@ public enum ReportTile {
             ""
     ),
 
-    /**
-     * Only when the run has any.
-     * <p>
-     * The total counts removed cases, so without a tile of their own the figures
-     * beside the total do not add up to it - which is why this is hidden rather
-     * than printed as a zero, and why the row's width is counted rather than
-     * assumed.
-     */
     REMOVED(TestStatus.REMOVED.getLabel(), "595959", "var(--verdict-removed)", TestRunSummary::removed, "") {
         @Override
         public boolean isShownFor(final @NotNull TestRunSummary summary) {
@@ -119,61 +87,27 @@ public enum ReportTile {
 
     private final @NotNull String label;
 
-    /**
-     * The color as six hex digits, which is what the Word file wants directly and
-     * what the PDF builds a {@code DeviceRgb} from. One value rather than the two
-     * spellings of it those generators each kept.
-     */
     private final @NotNull String hex;
 
-    /**
-     * The same color as the stylesheet's own token, so the HTML report follows the
-     * theme it is rendered in rather than a hex that ignores it.
-     */
     private final @NotNull String cssToken;
 
-    /**
-     * The figure as a number, so the spreadsheet can write one - it wrote the
-     * text, and whoever opened the workbook could not sum, sort or chart the
-     * headline, and got "number stored as text" on each (#66, finding 227).
-     */
     private final @NotNull Function<TestRunSummary, Number> amount;
 
-    /**
-     * What is written after the number when it is read as text: "%" for the
-     * pass rate, nothing for a count.
-     */
     private final @NotNull String unit;
 
-    /**
-     * What this tile reads for a run.
-     */
     public @NotNull String valueIn(final @NotNull TestRunSummary summary) {
         return amountIn(summary) + unit;
     }
 
-    /**
-     * The same figure as a number, for a format that holds numbers.
-     */
     public @NotNull Number amountIn(final @NotNull TestRunSummary summary) {
         return amount.apply(summary);
     }
 
-    /**
-     * Whether this run has anything to say under this heading. Every tile but
-     * Removed always does.
-     */
     public boolean isShownFor(final @NotNull TestRunSummary summary) {
         return true;
     }
 
-    /**
-     * Rule-REPORT-002.
-     * <p>
-     * The headline for one run, in order - and the count, which the two
-     * generators that need a table width now take from {@code size()} rather than
-     * from a ternary restating the rule above.
-     */
+    // Rule-REPORT-002
     public static @NotNull List<ReportTile> shownFor(final @NotNull TestRunSummary summary) {
         return Arrays.stream(values()).filter(tile -> tile.isShownFor(summary)).toList();
     }

@@ -21,10 +21,8 @@ import org.testin.editor.AbstractIconButton;
 import org.jetbrains.annotations.NotNull;
 
 public class StopExecutionBtn extends AbstractIconButton implements ToolbarItem {
-
     // UC-EDITOR-PANEL-035
     public StopExecutionBtn(final @NotNull Runnable onStopExecutionClicked) {
-        // https://intellij-icons.jetbrains.design/
         super(ExecutionControl.STOP.getLabel(), ExecutionControl.STOP.getIcon());
 
         addActionListener(e -> onStopExecutionClicked.run());

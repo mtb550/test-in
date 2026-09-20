@@ -39,62 +39,19 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Where generated automation code goes: the project's Java test source root.
- * <p>
- * There is none in a PyCharm project, or in a Java project with no test source
- * folder marked. Every generator treats that as "skip", never as a failure,
- * because test management works perfectly well without code generation.
- * <p>
- * That skip is the reason this class hands out work runners rather than only the
- * root itself. Five generators used to write the same four lines - find it, check
- * it, run a write action, log an IO failure - and three of the five logged
- * nothing at all, so the same missing root explained itself differently depending
- * on which generator noticed it (#66, finding 19).
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JavaSourceRoot {
-
-    /**
-     * Work to do against the source root, allowed to fail the way file work
-     * does - which is why it is not a plain {@link java.util.function.Consumer}.
-     * <p>
-     * The {@code throws} stays deliberately, and is one of the exceptions CLAUDE.md
-     * lists to the rule that a method handles its own failures. It is a
-     * functional interface whose whole point is to let the lambda fail so that
-     * {@link #run} catches for all of them; removing it would put a try/catch
-     * in every generator lambda, which is the duplication this class exists to
-     * delete.
-     */
     @FunctionalInterface
     public interface RootWork {
         void run(final @NotNull VirtualFile root) throws IOException;
     }
 
-    /**
-     * The same, for work that makes a file and whose caller needs the file it
-     * made.
-     * <p>
-     * {@link RootWork} answers nothing, so what it created was reachable only by
-     * looking it up again - which is why writing a class ended in
-     * {@code commitAllDocuments()}, a flush of every open document in the
-     * project standing in for the one document that had just been written (#66,
-     * finding 22).
-     * <p>
-     * Its {@code throws} stays for the reason {@link RootWork}'s does: one owner,
-     * {@link #run}, catches for every lambda. CLAUDE.md lists it beside that one.
-     */
     @FunctionalInterface
     public interface RootFile {
         @NotNull Optional<VirtualFile> from(final @NotNull VirtualFile root) throws IOException;
     }
 
-    /**
-     * UC-CODEGEN-020, Rule-CODEGEN-064, Rule-CODEGEN-066.
-     * <p>
-     * Detected once and cached; the modules are scanned again only if the cached
-     * root stopped being valid, which is what happens when the folder is deleted.
-     */
+    // UC-CODEGEN-020, Rule-CODEGEN-064, Rule-CODEGEN-066
     public static @NotNull Optional<VirtualFile> find(final @NotNull Project p) {
         final @NotNull TestSourceRoot remembered = Services.getInstance(p, TestSourceRoot.class);
 
@@ -116,37 +73,9 @@ public final class JavaSourceRoot {
         return Optional.empty();
     }
 
-    /**
-     * Said once for a project, however many test cases went past without a root
-     * to write into. Fifty saved cases are one absent source root, not fifty.
-     */
     private static final @NotNull Key<Boolean> NO_ROOT_SAID = Key.create("testin.noJavaTestSourceRoot.said");
 
-    /**
-     * UC-CODEGEN-020, Rule-CODEGEN-065, Rule-CODEGEN-072.
-     * <p>
-     * Like {@link #find} and also says so, for the generators that create
-     * something - the tester is left wondering why no code appeared otherwise.
-     * <p>
-     * At the point of use, and only there. Project open used to ask the same
-     * question and raise the same balloon before anything had been asked of it,
-     * so a tester who opened the IDE to read test cases was told about
-     * automation they were not doing, on every open, forever - and the check
-     * bought nothing, because reading test data is gated on the Testin root and
-     * every generator already skips for itself (#286).
-     * <p>
-     * And once for the project. The message is about the project, not about the
-     * test case that happened to be first.
-     *
-     * @param className the class that was not written. A name, not a phrase: the
-     *                  sentence around it is one bundle key, so it reads as one
-     *                  sentence in every language. It used to be handed an English
-     *                  clause - "creating test class", or "creating the class for
-     *                  LoginTest" from the other caller - which made the message
-     *                  two half-sentences glued together, one of them never
-     *                  translated and the two never agreeing (#297, #66 finding
-     *                  335)
-     */
+    // UC-CODEGEN-020, Rule-CODEGEN-065, Rule-CODEGEN-072
     public static @NotNull Optional<VirtualFile> findOrWarn(final @NotNull Project p, final @NotNull String className) {
         final @NotNull Optional<VirtualFile> root = find(p);
 
@@ -158,23 +87,11 @@ public final class JavaSourceRoot {
         return root;
     }
 
-    /**
-     * Whatever sits at a path under the source root: nothing when the code was
-     * never generated for that node, or when someone deleted it by hand. Both
-     * are ordinary states, which is why every caller gets an answer rather than
-     * a null to interpret.
-     */
     public static @NotNull Optional<VirtualFile> under(final @NotNull VirtualFile root, final @NotNull String relativePath) {
         return Optional.ofNullable(root.findFileByRelativePath(relativePath));
     }
 
-    /**
-     * UC-CODEGEN-018, Rule-CODEGEN-060.
-     * <p>
-     * Deletes what sits at a path under the source root, when anything does.
-     * Removing a class and removing a package were the same five lines, and
-     * neither of them was ever a failure when there was nothing to remove.
-     */
+    // UC-CODEGEN-018, Rule-CODEGEN-060
     public static void deleteUnder(final @NotNull VirtualFile root, final @NotNull String relativePath, final @NotNull Object requestor) {
         final @NotNull Optional<VirtualFile> found = under(root, relativePath).filter(VirtualFile::exists);
         if (found.isEmpty()) return;
@@ -189,18 +106,7 @@ public final class JavaSourceRoot {
         }
     }
 
-    /**
-     * UC-CODEGEN-001, Rule-CODEGEN-008.
-     * <p>
-     * The folder this package stands for under the root, made if it is not there
-     * yet, and empty when the platform could not make it - which it says by
-     * answering null.
-     * <p>
-     * Said once here rather than at each of the four generators that need a
-     * package folder: three worded the failure differently and the fourth said
-     * nothing at all, so the same missing folder explained itself differently
-     * depending on which generator noticed (#71).
-     */
+    // UC-CODEGEN-001, Rule-CODEGEN-008
     public static @NotNull Optional<VirtualFile> packageFolder(final @NotNull VirtualFile root, final @NotNull List<String> packageSegments) {
         final @NotNull String relative = String.join("/", packageSegments);
 
@@ -216,22 +122,7 @@ public final class JavaSourceRoot {
         return folder;
     }
 
-    /**
-     * UC-CODEGEN-001, Rule-CODEGEN-009, Rule-CODEGEN-010.
-     * <p>
-     * The class file for this name, written as an empty class if it is not there
-     * yet, and empty when the package folder could not be made.
-     * <p>
-     * One owner, because two generators wrote this same file and wrote it
-     * differently: the class a test set generates and the class a generated
-     * method needs were the same empty class with different whitespace inside
-     * it, and only one of the two said anything when the file was already there
-     * (#71).
-     * <p>
-     * Package segments stay camelCase (see NameSanitizer.packageName): the
-     * folder names and the declaration written here have to agree, or findClass
-     * never resolves what was written.
-     */
+    // UC-CODEGEN-001, Rule-CODEGEN-009, Rule-CODEGEN-010
     public static @NotNull Optional<VirtualFile> classFile(final @NotNull VirtualFile root, final @NotNull List<String> packageSegments, final @NotNull String className) {
         final @NotNull Optional<VirtualFile> folder = packageFolder(root, packageSegments);
         if (folder.isEmpty()) return Optional.empty();
@@ -249,9 +140,6 @@ public final class JavaSourceRoot {
 
         try {
             final @NotNull VirtualFile file = folder.get().createChildData(JavaSourceRoot.class, fileName);
-            // No blank line inside the braces: every generated method is written
-            // with one before it, so a class carrying its own would give the
-            // first method two.
             VfsUtil.saveText(file, declaration + "public class " + className + " {\n}\n");
 
             Logger.info("Test class created at: " + file.getPath());
@@ -262,41 +150,15 @@ public final class JavaSourceRoot {
         }
     }
 
-    /**
-     * Runs the work against the root, and does nothing at all when there is
-     * none. For a caller already inside a write action of its own.
-     * <p>
-     * The one place an IO failure from generating code is caught and named.
-     * Every runner below leads here, so a file that could not be written
-     * explains itself the same way whichever generator was doing the writing -
-     * which is the whole reason this class hands out runners.
-     *
-     * @param whatFailed named in the log if the work raises, e.g. "removing class"
-     */
     public static void inRoot(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
         run(find(p), whatFailed, work);
     }
 
-    /**
-     * The same, and tells the tester when there is no root - see
-     * {@link #findOrWarn}.
-     * <p>
-     * Two words for two readers: {@code className} goes into the sentence the
-     * tester reads, and {@code whatFailed} into the log line, which stays English
-     * like every other log line.
-     */
     private static void inRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull String whatFailed, final @NotNull RootWork work) {
         run(findOrWarn(p, className), whatFailed, work);
     }
 
-    /**
-     * UC-CODEGEN-020, Rule-CODEGEN-064.
-     * <p>
-     * Runs work that makes a file and answers with the file, empty when there
-     * was no root, when the work made nothing, or when it failed - the same
-     * three ways its void sibling stays silent, said in a value the caller can
-     * read.
-     */
+    // UC-CODEGEN-020, Rule-CODEGEN-064
     public static @NotNull Optional<VirtualFile> fileInRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull String whatFailed, final @NotNull RootFile work) {
         final @NotNull Optional<VirtualFile> root = findOrWarn(p, className);
         if (root.isEmpty()) return Optional.empty();
@@ -319,41 +181,16 @@ public final class JavaSourceRoot {
         }
     }
 
-    /**
-     * UC-CODEGEN-020, Rule-CODEGEN-065.
-     * <p>
-     * Runs the work against the root inside a write action, silently skipping a
-     * project that has no root, and logging an IO failure as "Error " plus what
-     * was being done. For tidying up after something the tester removed: there
-     * is nothing to report when there was no root to remove from.
-     *
-     * @param whatFailed named in the log if the work raises, e.g. "removing class"
-     */
+    // UC-CODEGEN-020, Rule-CODEGEN-065
     public static void writeInRoot(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
         WriteAction.run(() -> inRoot(p, whatFailed, work));
     }
 
-    /**
-     * For work that edits PSI, which the platform refuses outside a command -
-     * "Must not change PSI outside command or undo-transparent action". A write
-     * action is not enough, and the difference does not show until the edit is
-     * attempted: moving a class threw here on the first drag (#51).
-     *
-     * @param title      names the command, as the platform shows it
-     * @param whatFailed named in the log if the work raises, e.g. "moving class"
-     */
     public static void commandInRoot(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final @NotNull RootWork work) {
         WriteCommandAction.runWriteCommandAction(p, title, null, () -> inRoot(p, whatFailed, work));
     }
 
-    /**
-     * UC-CODEGEN-020, Rule-CODEGEN-065.
-     * <p>
-     * The same for work that creates something, so a missing root is said out
-     * loud: the tester made a node and is expecting a file to appear.
-     *
-     * @param whatFailed named in the log if the work raises, e.g. "creating package"
-     */
+    // UC-CODEGEN-020, Rule-CODEGEN-065
     public static void writeInRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull String whatFailed, final @NotNull RootWork work) {
         WriteAction.run(() -> inRootOrWarn(p, className, whatFailed, work));
     }

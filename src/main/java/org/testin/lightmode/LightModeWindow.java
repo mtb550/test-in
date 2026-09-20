@@ -61,83 +61,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * The light mode window: one test case, above everything else (#13).
- * <p>
- * A real top-level frame rather than a tool window, which is the whole
- * requirement - a tool window belongs to the IDE frame and is hidden with it, and
- * staying visible while IntelliJ is minimized is the reason this exists at all.
- * <p>
- * Undecorated, so the title bar is ours: the pin, the run name and what the
- * design puts beside them are part of the window rather than sitting under an
- * operating system bar that says the same things differently on two platforms.
- * The price is that dragging is ours too, which is {@link #dragBy}.
- * <p>
- * <b>It shows the run editor, it does not run anything.</b> Start, stop, which
- * case is being executed and what a verdict does to the run are all the
- * editor's, exactly as they are when the tester works in the grid - so the two
- * cannot disagree, and light mode inherits every fix to the execution flow
- * without asking. What is here is the drawing of it, and
- * {@link #refresh} is how the editor says something changed.
- * <p>
- * Where it sits is the platform's problem, not this class's.
- * {@link WindowStateService} stores a location against a key, so the window
- * comes back where the tester left it. Deliberately the application-level
- * instance rather than the per-project one: this window belongs to the screen
- * the tester is sitting at, not to whichever project happened to open it - which
- * also means closing it while a project shuts down asks nothing of that
- * project.
- */
 final class LightModeWindow {
-
-    /**
-     * One key for the placement. Versioned, so a later layout change that makes
-     * an old position wrong can start again rather than restoring a window
-     * somewhere that no longer makes sense.
-     */
     private static final @NotNull String PLACEMENT = "testin.lightMode.v1";
 
-    /**
-     * And one for the zoom, which is the same kind of fact and kept in the same
-     * place: how this tester wants this window on this screen. A different store
-     * because a zoom is not a position - WindowStateService holds where and how
-     * big, and this is neither.
-     */
     private static final @NotNull String ZOOM = "testin.lightMode.zoom.v1";
 
-    /**
-     * How wide the window opens, before the tester drags it or a remembered
-     * width replaces it. Only the width is a number: the height is whatever the
-     * case needs, which is what {@link #fitHeight} works out.
-     */
     private static final int WIDTH = 420;
 
-    /**
-     * How narrow the tester may drag it. Not zero, and not the width of the
-     * widest label: a window too narrow to hold a sentence is not a smaller
-     * window, and one that cannot be made narrow enough to sit beside the
-     * application under test is not doing its job.
-     */
     private static final int MIN_WIDTH = 280;
 
-    /**
-     * The strip down each side that grabs the edge, and the reason the window
-     * has visible rails at all. Only left and right are given a thickness, and
-     * that is the whole of "width only": the platform's resize listener reads
-     * this per side, so a top and bottom of zero mean there is no edge to take
-     * hold of there and no cursor offering one.
-     */
     private static final int GRAB = 4;
 
-    /**
-     * How far the wheel takes the case, and in what steps.
-     * <p>
-     * Down as well as up: a tester who wants more of the case on screen at once
-     * is asking the same question as one who wants it bigger, from the other
-     * end. The floor is not zero - text nobody can read is not a smaller
-     * window, it is the same broken window the description toggle would have
-     * been.
-     */
     private static final float ZOOM_STEP = 0.1f;
     private static final float ZOOM_MIN = 0.8f;
     private static final float ZOOM_MAX = 2.0f;
@@ -146,26 +80,10 @@ final class LightModeWindow {
     private final @NotNull RunEditor editor;
     private final @NotNull Runnable onClosed;
 
-    /**
-     * The run editor's own execution buttons, drawn with its icons. A tester who
-     * presses Start in the toolbar and then Stop in this window is pressing the
-     * same two buttons, so they look like the same two buttons - and light mode
-     * stops drawing the platform's run-code arrow, which the toolbar had already
-     * moved away from because manual execution runs no code.
-     */
     private final @NotNull TitleBarBtn start = new TitleBarBtn(ExecutionControl.START.getLabel(), ExecutionControl.START.getIcon());
     private final @NotNull TitleBarBtn stop = new TitleBarBtn(ExecutionControl.STOP.getLabel(), ExecutionControl.STOP.getIcon());
     private final @NotNull JBLabel counter = new JBLabel();
 
-    /**
-     * The sizes the case is written at before any zoom, read once here as the
-     * window opens - so it opens at whatever the tester has the editor font set
-     * to now, and the wheel takes it from there.
-     * <p>
-     * The expected result takes the same size as every attribute in the details
-     * panel, because they are the same kind of thing being read; only the
-     * description is set apart, and the test set name sits below both as a label.
-     */
     private final @NotNull Font setFont = CaseFont.label();
     private final @NotNull Font descriptionFont = CaseFont.description();
     private final @NotNull Font expectedFont = CaseFont.body();
@@ -174,36 +92,20 @@ final class LightModeWindow {
     private final @NotNull JTextArea description = Prose.of(descriptionFont, JBUI.CurrentTheme.Label.foreground());
     private final @NotNull JTextArea expected = Prose.of(expectedFont, JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
-    /**
-     * The expected result behind its icon, shown and hidden as one, so an empty
-     * expected result leaves no icon behind.
-     */
     private final @NotNull JComponent expectedRow = iconBefore(CreateTestCaseFields.EXPECTED_RESULT.getIcon(), expected);
     private final @NotNull JBLabel idle = new JBLabel(Bundle.message("light.idle"), SwingConstants.CENTER);
 
     private final @NotNull JBLabel chosen = new JBLabel();
     private final @NotNull SlidingPanel caseView = new SlidingPanel(new BorderLayout());
 
-    /** The case the window is showing, so a refresh can tell a new one from the same one again. */
     private @NotNull Optional<UUID> shownCase = Optional.empty();
 
-    /**
-     * Everything this window animates, canceled in one go when it closes.
-     * The platform stops an Animator when its parent goes, so nothing has to
-     * remember which movements were still running.
-     */
     private final @NotNull Disposable motionScope = Disposer.newDisposable("Testin light mode motion");
 
     private @NotNull Optional<Animator> heightMotion = Optional.empty();
     private @NotNull Optional<Animator> slideMotion = Optional.empty();
     private final @NotNull CaseDetails details;
 
-    /**
-     * The one box under the case. It holds the details that {@code Ctrl+D} fills
-     * with steps and tags, or the four fields a failure is written into - never
-     * both, and never one added below the other. There is one window and one box
-     * in it (#13).
-     */
     private final @NotNull JBPanel<?> underCase = new JBPanel<>(new BorderLayout());
 
     private final @NotNull JBLabel caseClock = clock(Bundle.message("light.case.clock"));
@@ -211,71 +113,20 @@ final class LightModeWindow {
     private final @NotNull JBPanel<?> strip = new JBPanel<>(new BorderLayout());
     private final @NotNull JBPanel<?> setLine = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
-    /**
-     * The verdicts, the clocks and the keys, shown together or not at all.
-     * <p>
-     * All three answer questions about a case being executed, so before the run
-     * is started there is nothing for any of them to say - and one thing that
-     * appears and disappears is one thing to reason about, where three were
-     * three chances for the window to be caught half dressed.
-     */
     private final @NotNull JBPanel<?> footer = new JBPanel<>(new BorderLayout());
 
-    /**
-     * The three verdicts, and nothing while a failure is being written - the
-     * form is the only thing to look at then, and Enter and Escape are what
-     * finish it.
-     */
     private final @NotNull JComponent verdictRow = verdictButtons();
 
     private final @NotNull StatusBarBase statusBar = new StatusBarBase(new StatusBarItem[0]);
 
-    /**
-     * The checkboxes, and the memory of which are ticked. Asked rather than
-     * mirrored into fields here: the button is already the answer, and a copy of
-     * it would be the thing that goes stale.
-     */
     private final @NotNull ViewMenuBtn viewMenu = new ViewMenuBtn(this::applyView);
 
-    /**
-     * The failure being written up, and empty the rest of the time.
-     * <p>
-     * Every key in this window asks it first. While a form is waiting to be
-     * filled in, Escape belongs to the form rather than to the window, Enter
-     * means save, and the verdict keys mean nothing at all - a case whose
-     * failure is halfway written down is not one to give a second verdict to.
-     */
     private @NotNull Optional<FailureForm> capture = Optional.empty();
 
-    /**
-     * How much bigger the case is drawn than the window around it.
-     * <p>
-     * One number for the three paragraphs and the detail rows, because they are
-     * one thing being read. The title bar, the verdicts, the clocks and the keys
-     * are not part of it: zoom exists so the case can be read from where the
-     * tester is actually sitting, and making the furniture bigger would only
-     * cost them the screen space they were trying to free.
-     * <p>
-     * Remembered per machine, beside the position, the width and the view menu's
-     * ticks: how large a tester needs the case drawn is a fact about their screen
-     * and their eyes, not about the run they happen to have open. Clamped on the
-     * way in as well as on the way out, so a hand-edited properties file cannot
-     * open a window nobody can read.
-     */
     private float zoom = Math.clamp(PropertiesComponent.getInstance().getFloat(ZOOM, 1.0f), ZOOM_MIN, ZOOM_MAX);
 
-    /**
-     * Whether Ctrl+D is down. A held key repeats its press, and every repeat
-     * flipped the details back, so the window pulsed open and shut; one press is
-     * one flip until the key comes up. Cleared on D's release with or without
-     * Ctrl, because either may be let go first.
-     */
     private boolean detailsKeyHeld = false;
 
-    /**
-     * The width the last resize left, so the height can be refitted for a change
-     * in width and ignored for the changes in height it makes itself.
-     */
     private int lastWidth;
 
     LightModeWindow(final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
@@ -287,18 +138,10 @@ final class LightModeWindow {
         frame.setAlwaysOnTop(true);
         frame.setContentPane(content());
 
-        // Before the frame is packed, because the height is measured from the
-        // case and the case is drawn at the zoom this tester left it at.
         applyZoom();
 
-        // Before the first refresh, not instead of it: a frame is not laid out
-        // at all until it has a peer, and measuring a wrapped paragraph before
-        // then measures it at no width.
         frame.pack();
 
-        // Before the first refresh, because the height is fitted to the width:
-        // restoring a wider window afterward would leave it as tall as it would
-        // have been at the default one.
         placeIt();
         refresh();
 
@@ -309,24 +152,10 @@ final class LightModeWindow {
         frame.setVisible(true);
     }
 
-    /**
-     * By path, which is how the indexer identifies a run everywhere else - the
-     * editor and this window are handed the same cached object today, and this
-     * does not quietly depend on that staying true.
-     */
     boolean shows(final @NotNull TestRunDirectoryDto other) {
         return editor.getParent().getPath().equals(other.getPath());
     }
 
-    /**
-     * Draws whatever the editor is doing now: the case it is executing, how far
-     * through the run that is, and whether there is anything to judge yet.
-     * <p>
-     * Everything is read at the moment it is drawn rather than pushed in as it
-     * changes. The editor already holds all of it, and a copy kept here would be
-     * one more thing that can be stale - which, in a window whose whole job is
-     * to show the tester what they are testing, is the one thing it must not be.
-     */
     void refresh() {
         final @NotNull List<TestCaseDto> cases = editor.getCurrentTestCases();
         final int index = editor.getCurrentlyExecutingIndex();
@@ -343,25 +172,13 @@ final class LightModeWindow {
         start.setVisible(!editor.isExecuting());
         stop.setVisible(editor.isExecuting());
 
-        // Rule-EDITOR-PANEL-135. Gray when there is nothing to walk, with the
-        // reason, as the toolbar's Start is. Live, it refused on the IDE's status
-        // bar - the one this window keeps out of view (#312, A31).
+        // Rule-EDITOR-PANEL-135
         start.setEnabled(editor.canStartManualExecution());
         start.setToolTipText(StartExecutionBtn.tooltipFor(editor));
 
         final @NotNull Optional<UUID> wasShowing = shownCase;
         if (executing) showCase(cases.get(index));
 
-        // A different case outdates a half-written failure: the case it describes
-        // is no longer the case in front of the tester. Dropped rather than
-        // carried over, because carrying it over would attach one case's failure
-        // to the next one's row.
-        //
-        // Only a different case. Most calls are redraws of the same one - another
-        // case's automated result arriving, the run's configuration edited - and
-        // dropping the form on those threw away what the tester was typing
-        // (#312, A26). A form that stays is left where it is rather than put back,
-        // because putting it back takes the keyboard from the field being typed in.
         if (!executing || !shownCase.equals(wasShowing)) capture = Optional.empty();
 
         if (capture.isPresent()) applyParts();
@@ -373,64 +190,29 @@ final class LightModeWindow {
         frame.repaint();
     }
 
-    /**
-     * The two clocks, and only them.
-     * <p>
-     * Quiet and small, and never in the body: a number counting up in front of a
-     * tester is a stopwatch, and a stopwatch makes them hurry. That is why they
-     * are down here rather than beside the case, and why they are drawn in the
-     * hint color rather than the text color.
-     */
     void tick() {
         caseClock.setText(Display.formatCaseClock(editor.getCurrentCaseElapsed()));
         runClock.setText(Display.formatRunClock(editor.getElapsed()));
     }
 
-    /**
-     * Keeps the window as wide as it is, and as tall as what is in it.
-     * <p>
-     * A description that wraps to three lines needs a taller window than one
-     * that fits on one, and the tester asked for neither: the design gives them
-     * the width and keeps the height out of their hands, because the only thing
-     * that should move it is what the case says.
-     * <p>
-     * The width is applied before the height is asked for, and that order is the
-     * whole method. A wrapped paragraph reports the height it needs for the
-     * width it currently has, so measuring first and sizing afterward would
-     * measure the width it is about to stop having.
-     */
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-202, Rule-EDITOR-PANEL-204
     private void fitHeight() {
         frame.validate();
 
-        // What the case wants, and what the screen has. A very long description
-        // at a large zoom asked for a window taller than the display, which put
-        // the verdict buttons and the status bar off the bottom of it - and
-        // those are the only things that finish a case (#66, finding 54).
         final int wanted = frame.getPreferredSize().height;
         final int usable = usableHeight();
 
-        // Said before it is done, so the tester knows the case goes on rather
-        // than believing they have read it. The notice makes the window taller
-        // still, which changes nothing: it is already at the screen's height and
-        // stays there.
         details.setCutOff(wanted > usable);
         frame.validate();
 
         final int target = Math.min(frame.getPreferredSize().height, usable);
         final int from = frame.getHeight();
 
-        // Nothing to move, and the two cases where moving would be wrong: a
-        // window not on screen yet has no height to grow from, and a repeat of
-        // the height it already has is every refresh that changed nothing.
         if (from == target || !frame.isShowing() || from <= 0) {
             frame.setSize(frame.getWidth(), target);
             return;
         }
 
-        // Dropped rather than finished: the new run starts from wherever this
-        // one had reached, which is what makes a second verdict key pressed
-        // mid-movement land at once instead of queueing behind it.
         heightMotion.ifPresent(Animator::dispose);
 
         heightMotion = Motion.run(motionScope, "Testin light mode height",
@@ -438,17 +220,7 @@ final class LightModeWindow {
                 () -> frame.setSize(frame.getWidth(), target));
     }
 
-
-    /**
-     * UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-217.
-     * <p>
-     * How tall a window may be on the display this one is on: the screen, less
-     * whatever the desktop keeps for itself - a taskbar, a dock, a menu bar.
-     * <p>
-     * Asked of the frame's own device rather than of the primary one, because a
-     * tester working across two monitors is usually doing it so that the window
-     * can sit on the second.
-     */
+    // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-217
     private int usableHeight() {
         return Optional.ofNullable(frame.getGraphicsConfiguration())
                 .map(gc -> gc.getBounds().height
@@ -457,50 +229,23 @@ final class LightModeWindow {
                 .orElseGet(() -> Toolkit.getDefaultToolkit().getScreenSize().height);
     }
 
-    /**
-     * UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-201.
-     * <p>
-     * The case on screen, and the movement from the last one when it is a
-     * different case.
-     * <p>
-     * Asked by id rather than assumed, because this runs on every refresh - a
-     * clock tick, a window resize, a verdict on the case already showing - and
-     * only a genuinely different case is something a tester needs to be shown
-     * arriving. Sliding on every tick would be a window that never stops moving.
-     * <p>
-     * The first case does not slide. Nothing left, so nothing takes its place.
-     */
+    // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-201
     private void showCase(final @NotNull TestCaseDto tc) {
         final boolean arrived = shownCase.map(previous -> !previous.equals(tc.getId())).orElse(false);
         shownCase = Optional.of(tc.getId());
 
-        // Before the fields are overwritten: this is the last moment the case
-        // that is leaving still exists to be looked at.
         if (arrived) caseView.captureLeaving();
 
         set.setText(tc.getParent().getName());
         description.setText(TestEditorAttributes.DESCRIPTION.displayValue(tc));
         expected.setText(TestEditorAttributes.EXPECTED_RESULT.displayValue(tc));
 
-        // Visibility is not touched here: rebuilding the rows does not change
-        // whether they are shown, and toggleDetails is the one thing that decides.
         details.show(tc);
 
         if (arrived) slideCaseIn();
     }
 
-    /**
-     * UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-201.
-     * <p>
-     * Runs the case block down and the next one in behind it, over the one
-     * duration everything in Testin moves at.
-     * <p>
-     * Rule-EDITOR-PANEL-204.
-     * <p>
-     * A slide already running is dropped where it is rather than allowed to
-     * finish: a tester holding a verdict key is asking for the next case now,
-     * and a movement that queued would put the whole run behind it.
-     */
+    // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-201, Rule-EDITOR-PANEL-204
     private void slideCaseIn() {
         if (!caseView.hasSomethingToSlide()) return;
 
@@ -511,29 +256,15 @@ final class LightModeWindow {
                 () -> caseView.setTravelled(1.0));
     }
 
-    /**
-     * Closes, and says so - the toolbar button is drawn from whether this window
-     * exists, so every route out of it comes through here.
-     */
     void close() {
         closeQuietly();
 
         onClosed.run();
     }
 
-    /**
-     * Closes without saying so, for the project shutting down: the position is
-     * still worth keeping, but there is nobody left to tell.
-     * <p>
-     * The position is read off the frame here rather than tracked while it moves:
-     * a drag is a stream of events and only the last one matters.
-     */
     void closeQuietly() {
         WindowStateService.getInstance().putLocation(PLACEMENT, frame.getLocation());
 
-        // Both stored, only the width read back. Where and how wide this window
-        // sits on this screen is one fact and belongs under one key; the height
-        // is not the tester's and is worked out from the case every time.
         WindowStateService.getInstance().putSize(PLACEMENT, frame.getSize());
 
         Disposer.dispose(motionScope);
@@ -551,27 +282,6 @@ final class LightModeWindow {
                 .ifPresentOrElse(frame::setLocation, () -> frame.setLocationRelativeTo(null));
     }
 
-    /**
-     * Escape leaves whatever the tester is in; Enter commits it; P, F and B
-     * judge the case on screen.
-     * <p>
-     * Bound on the window rather than on a component inside it, because the
-     * tester's hands are on the keyboard and nothing here is worth focusing.
-     * Each verdict is bound from the keystroke the status itself declares - the
-     * same one {@link KeyBtn} prints on its cap - so the key that works and the
-     * key that is advertised cannot come apart.
-     * <p>
-     * <b>One handler per key, which then asks what is on screen.</b> Escape is
-     * the clear case: it means "leave this", and while a failure is being
-     * written the thing to leave is the form rather than the window. Two
-     * handlers racing for Escape would have been resolved by whichever the
-     * framework consulted first, silently.
-     * <p>
-     * A window binding is only reached by a key the focused component did not
-     * take, which is what makes typing safe: the error capture keeps Enter for
-     * its own newlines, and every letter typed into a field stays in the field
-     * rather than recording a verdict.
-     */
     private void bindKeys() {
         bind(Shortcuts.Escape.getKey(), "testin.lightMode.escape", this::escape);
         bind(Shortcuts.Enter.getKey(), "testin.lightMode.commit", this::saveCapture);
@@ -594,20 +304,6 @@ final class LightModeWindow {
         });
     }
 
-    /**
-     * The wheel resizes the case, and only inside this window.
-     * <p>
-     * Deliberately not {@code FontSync.attachWheelZoom}, which is the plugin's
-     * other wheel zoom and the wrong one here: it ends in a write to the global
-     * editor scheme and to every open IDE editor, so wheeling over this window
-     * would resize the tester's Java files behind it. What was asked for was to
-     * zoom light mode and nothing else (#13).
-     * <p>
-     * No modifier. The IDE's own convention is Ctrl and the wheel, but this
-     * window has nothing else a wheel could mean - and a scroll pane inside it,
-     * such as the error capture, takes the event before this does, because the
-     * event goes to the deepest component that handles it.
-     */
     private void bindWheel() {
         frame.getContentPane().addMouseWheelListener(e -> {
             zoomBy(-e.getWheelRotation() * ZOOM_STEP);
@@ -615,15 +311,7 @@ final class LightModeWindow {
         });
     }
 
-    /**
-     * UC-EDITOR-PANEL-046.
-     * <p>
-     * Redraws the case at a new size, and refits the window around it - a
-     * paragraph set larger wraps to more lines, and the height is the content's.
-     * <p>
-     * Nothing happens at the ends of the range, so wheeling past the limit costs
-     * a comparison rather than a relayout on every tick.
-     */
+    // UC-EDITOR-PANEL-046
     private void zoomBy(final float delta) {
         final float next = Math.clamp(zoom + delta, ZOOM_MIN, ZOOM_MAX);
         if (next == zoom) return;
@@ -635,20 +323,9 @@ final class LightModeWindow {
         fitHeight();
     }
 
-    /**
-     * Draws everything the tester reads at the current zoom - the three
-     * paragraphs, the detail rows and the failure form if one is open.
-     * <p>
-     * Called by the wheel and once as the window opens, because a remembered
-     * zoom is nothing until something applies it. One method for both, so the
-     * size a window opens at and the size the wheel takes it to cannot come from
-     * two different lists of components.
-     */
     private void applyZoom() {
         set.setFont(scaled(setFont));
 
-        // The same size as the set name: the two share a line, and either can
-        // carry it alone when the other is hidden.
         chosen.setFont(scaled(setFont));
         description.setFont(scaled(descriptionFont));
         expected.setFont(scaled(expectedFont));
@@ -673,19 +350,7 @@ final class LightModeWindow {
         });
     }
 
-    /**
-     * UC-EDITOR-PANEL-046.
-     * <p>
-     * Opens or closes the case's other fields, and resizes the window to what is
-     * left.
-     * <p>
-     * Only the height moves: the tester chose the width and the details are not
-     * a reason to take it away from them.
-     * <p>
-     * One key both ways, as Muteb chose: Ctrl+D shows the details, and Ctrl+D
-     * again hides them. The status bar names it, so a tester does not have to
-     * remember a second key for the way back.
-     */
+    // UC-EDITOR-PANEL-046
     private void toggleDetailsOnce() {
         if (detailsKeyHeld) return;
 
@@ -694,7 +359,6 @@ final class LightModeWindow {
     }
 
     private void toggleDetails() {
-        // A form cannot be collapsed while it is waiting to be filled in.
         if (capture.isPresent()) return;
 
         details.setVisible(!details.isVisible());
@@ -702,17 +366,7 @@ final class LightModeWindow {
         fitHeight();
     }
 
-    /**
-     * UC-EDITOR-PANEL-046.
-     * <p>
-     * Takes a verdict on the case being executed - the one on screen.
-     * <p>
-     * A verdict that collects failure details opens the form instead of
-     * recording anything; the record happens when the tester saves it. Which
-     * verdict that is comes from the status itself, so this does not name
-     * FAILED and would not have to be found again if a second such verdict were
-     * ever added.
-     */
+    // UC-EDITOR-PANEL-046
     private void judge(final @NotNull TestStatus status) {
         if (capture.isPresent()) return;
 
@@ -724,27 +378,12 @@ final class LightModeWindow {
         record(status);
     }
 
-    /**
-     * Writes the verdict down, through the same service call the grid makes -
-     * which advances to the next case, persists, completes the run if that was
-     * the last one, and tells the tester. It refuses on its own when nothing is
-     * being executed, which is what a key pressed on the idle window is.
-     */
     private void record(final @NotNull TestStatus status) {
         final @NotNull Project p = editor.getProject();
 
         Services.getInstance(p, RunStatusService.class).executeNext(p, editor, status);
     }
 
-    /**
-     * Opens the failure form on the case being executed, and puts the caret in
-     * its first field.
-     * <p>
-     * Nothing happens if there is no row to write on - a case the run does not
-     * cover, or one removed from the test set. The window says nothing about it
-     * because the tester pressed a key rather than asking a question, and the
-     * form simply not opening is the answer.
-     */
     private void openCapture() {
         executingItem().ifPresent(item -> {
             capture = Optional.of(new FailureForm(editor.getProject(), editor.getParent().getPath(), item, zoom, this::fitHeight));
@@ -756,10 +395,6 @@ final class LightModeWindow {
         });
     }
 
-    /**
-     * Leaves the form with the case still unjudged and nothing written - which
-     * is the promise Escape makes everywhere else in this plugin.
-     */
     private void cancelCapture() {
         capture = Optional.empty();
 
@@ -767,19 +402,9 @@ final class LightModeWindow {
         fitHeight();
     }
 
-    /**
-     * Writes the four fields onto the run row and then records the verdict, in
-     * that order: a verdict is what decides whether what was typed survives, so
-     * it goes last. It is also the order {@code FailedResultDialog} uses.
-     */
     private void saveCapture() {
         capture.ifPresent(form -> {
-            // Rule-EDITOR-PANEL-225. The verdict only once the detail is written.
-            // The answer was dropped, so a run renamed, removed or synced away
-            // under the window threw the typed failure away - actual result,
-            // severity, priority, stacktrace and screenshots - and recorded the
-            // case Failed with nothing behind it (#66, finding 169). Refused, the
-            // form stays open with everything in it, and the service has said why.
+            // Rule-EDITOR-PANEL-225
             if (!form.save()) return;
 
             capture = Optional.empty();
@@ -791,12 +416,7 @@ final class LightModeWindow {
         });
     }
 
-    /**
-     * UC-EDITOR-PANEL-046.
-     * <p>
-     * Escape means "leave what I am in": the form while one is open, and the
-     * window otherwise.
-     */
+    // UC-EDITOR-PANEL-046
     private void escape() {
         if (capture.isPresent()) {
             cancelCapture();
@@ -806,32 +426,11 @@ final class LightModeWindow {
         close();
     }
 
-    /**
-     * UC-EDITOR-PANEL-046.
-     * <p>
-     * Draws whichever of the two states the window is in - the case with its
-     * details and three verdicts, or the case with a failure form under it.
-     * <p>
-     * One method, because the two things that change do so together. Split
-     * across the places that trigger them, a window could show the form over
-     * the details, or Escape's hint while Escape meant something else.
-     */
-    // The platform marks WriteIntentReadAction experimental, and it is what the
-    // action system itself takes before dispatching - see AbstractIconButton.
+    // UC-EDITOR-PANEL-046
     @SuppressWarnings("UnstableApiUsage")
     private void showCapture() {
         underCase.removeAll();
 
-        // Under the write-intent lock, because the failure form holds a
-        // spell-checked field and that field is an editor: an editor builds
-        // itself when it is added to a window that is showing. The spell
-        // checking restarts the code analyzer, which reads the document, and
-        // the editor sets up its highlighter, which needs the write-intent lock.
-        // A dialog is handed that lock; this window is built by hand and is
-        // handed nothing. With no lock, F wrote an IDE error report naming
-        // Testin (#312, N22). A read action was the fix for that, and the
-        // platform refuses the highlighter's lock inside one, so F threw and
-        // the form never showed. The write-intent lock covers both.
         WriteIntentReadAction.run(() -> underCase.add(capture.map(form -> (JComponent) form).orElse(details), BorderLayout.CENTER));
 
         statusBar.updateItems(capture.isPresent() ? commitKeys() : caseKeys());
@@ -839,50 +438,19 @@ final class LightModeWindow {
         applyParts();
     }
 
-    /**
-     * What the view menu decided, applied to the window and the height re-fitted
-     * around it.
-     * <p>
-     * Called by the menu itself when a box is ticked. The redraw is the menu's
-     * to trigger and this one's to perform, which is the same split every
-     * details popup in the plugin already uses.
-     */
     private void applyView() {
         applyParts();
         fitHeight();
     }
 
-    /**
-     * Which parts are drawn, asked of the menu each time rather than remembered.
-     * <p>
-     * <b>Writing up a failure overrides two of the five.</b> The verdicts go,
-     * because the case is already judged and the form is the only thing left to
-     * do; the status bar comes back whatever the tester ticked, because with no
-     * buttons on the form it is the only place Enter and Escape are written
-     * down, and a form that cannot say how to finish it is a trap. Hiding the
-     * row is theirs to choose on a case they are reading - not on a form they
-     * have to finish.
-     * <p>
-     * Nothing is left behind as an empty band: a hidden component takes no space
-     * in a border layout, so turning off the clocks closes the buttons up over
-     * them and turning off both leaves the case sitting on the status bar.
-     */
     private void applyParts() {
         final boolean writing = capture.isPresent();
 
-        // The set name and the verdict share a line, and either can carry it on
-        // its own: the tester may have turned the name off, and a failure being
-        // written up has to say so whatever they turned off. The separator is
-        // only drawn when there are two things to separate.
         set.setVisible(shows(LightModePart.SET_NAME));
         chosen.setVisible(writing);
         chosen.setText(set.isVisible() ? " · " + TestStatus.FAILED.getLabel() : TestStatus.FAILED.getLabel());
         setLine.setVisible(set.isVisible() || chosen.isVisible());
 
-        // One reason it may not be drawn: the case does not have one. It is not
-        // on the view menu - it is the other half of the description, and a
-        // tester who can see what to do but not what should happen cannot judge
-        // the case in front of them.
         expectedRow.setVisible(!expected.getText().isBlank());
 
         strip.setVisible(shows(LightModePart.DURATION));
@@ -894,10 +462,6 @@ final class LightModeWindow {
         return viewMenu.getSelectedDetails().contains(part);
     }
 
-    /**
-     * The run row for the case being executed, and empty when there is none to
-     * write on.
-     */
     private @NotNull Optional<TestRunItems> executingItem() {
         final @NotNull List<TestCaseDto> cases = editor.getCurrentTestCases();
         final int index = editor.getCurrentlyExecutingIndex();
@@ -910,11 +474,6 @@ final class LightModeWindow {
     private @NotNull JComponent content() {
         final @NotNull JBPanel<?> panel = new JBPanel<>(new BorderLayout());
 
-        // A hairline all round, and a rail down each side wide enough to take
-        // hold of. The rails are the window's own background rather than the
-        // body's, so they read as the frame they are - and they exist because an
-        // undecorated window has no edge the operating system would have given
-        // it (#13).
         panel.setBackground(JBUI.CurrentTheme.CustomFrameDecorations.paneBackground());
         panel.setBorder(BorderFactory.createCompoundBorder(
                 JBUI.Borders.customLine(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground()),
@@ -927,27 +486,10 @@ final class LightModeWindow {
         return panel;
     }
 
-    /**
-     * The window's own title bar: start or stop, the pin, which run this is and
-     * how far through it the tester is. Dragging is bound here because this is
-     * the strip a tester expects to drag.
-     * <p>
-     * <b>No close button.</b> An undecorated window has no chrome the operating
-     * system drew, so one was added back - and it was furniture the design never
-     * asked for, on the one strip that is meant to hold only what the tester
-     * works with. Three routes out are already there and every one of them is
-     * announced: Escape, named in the status bar; the toolbar's Light Mode
-     * button, which is a toggle and stays pressed for as long as this window
-     * exists; and the run finishing, which closes it. A fourth control for a
-     * gesture already covered three times is a control to remove.
-     */
     private @NotNull JComponent titleBar() {
         final @NotNull JBPanel<?> bar = new JBPanel<>(new BorderLayout(JBUI.scale(6), 0));
         bar.setBorder(JBUI.Borders.empty(4, 6));
 
-        // The same tint the status bar takes, from the same platform token, so
-        // the window is a case between two rails of furniture rather than a case
-        // with a strip under it and something else over it.
         bar.setBackground(JBUI.CurrentTheme.Advertiser.background());
 
         start.addActionListener(e -> editor.onStartExecutionClicked());
@@ -960,10 +502,6 @@ final class LightModeWindow {
         left.add(pin());
         left.add(viewMenu);
 
-        // A step up from the small font both of these used to take. The case
-        // grows with the wheel and this row deliberately does not, so at any
-        // zoom past the first click the run's name and how far through it the
-        // tester is were the smallest things on a window they head.
         counter.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
         bar.add(left, BorderLayout.WEST);
@@ -978,10 +516,6 @@ final class LightModeWindow {
         return bar;
     }
 
-    /**
-     * Pressed on arrival, because the window opens on top - the button reports
-     * the state rather than setting it, so the two cannot disagree.
-     */
     private @NotNull TitleBarBtn pin() {
         final @NotNull TitleBarBtn button = new TitleBarBtn(Bundle.message("light.pin"), AllIcons.General.Pin_tab);
 
@@ -994,48 +528,20 @@ final class LightModeWindow {
         return button;
     }
 
-    /**
-     * Dragging the title bar moves the window, which the operating system would
-     * have done had the window been decorated.
-     * <p>
-     * The platform's own listener rather than the arithmetic this used to do by
-     * hand. Both work for the ordinary case; this one also knows about the
-     * button that started the drag, the screen the pointer crossed onto and the
-     * toolkit it is running under, which the handwritten version did not and
-     * would have had to learn one bug report at a time.
-     */
     private void dragBy(final @NotNull JComponent bar) {
         new WindowMoveListener(bar).installTo(bar);
     }
 
-    /**
-     * UC-EDITOR-PANEL-046.
-     * <p>
-     * The tester may make the window wider or narrower, and may never make it
-     * taller.
-     * <p>
-     * That is the whole rule, and it is stated once, as the left and right
-     * insets of {@link #GRAB} with nothing top or bottom: the platform's resize
-     * listener asks each side separately, so an edge with no thickness offers no
-     * cursor and takes no drag. The height is not the tester's to set - it is
-     * whatever the case needs, which is what {@link #fitHeight} decides and what
-     * {@code Ctrl+D} changes.
-     */
+    // UC-EDITOR-PANEL-046
     private void bindResize() {
         frame.setMinimumSize(new Dimension(JBUI.scale(MIN_WIDTH), 0));
 
         final @NotNull JComponent content = (JComponent) frame.getContentPane();
-        // The insets are the constructor's second argument; the override that
-        // returned them again allocated a fresh Insets on every mouse move.
         final @NotNull WindowResizeListener resize = new WindowResizeListener(content, JBUI.insets(0, GRAB), null);
 
         content.addMouseListener(resize);
         content.addMouseMotionListener(resize);
 
-        // A wider window wraps the case into fewer lines, so the height that was
-        // right before the drag is not right after it. Only on a width change:
-        // fitHeight sets the height itself, and reacting to that would be this
-        // method answering its own event.
         frame.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(final @NotNull ComponentEvent e) {
@@ -1047,24 +553,12 @@ final class LightModeWindow {
         });
     }
 
-    /**
-     * The case, or the sentence that stands in for it before the run is started.
-     * Both are built once and one of them is shown, so starting a run does not
-     * re-lay out the window.
-     */
     private @NotNull JComponent body() {
         set.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
-        // Gray like every icon that names a thing, and as far from the name as
-        // the description's icon is from the description, so the two texts
-        // start at one edge.
         set.setIcon(Icons.gray(DirectoryType.TS.getIcon()));
         set.setIconTextGap(JBUI.scale(CaseDetails.GAP));
         idle.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
-        // The one place a verdict is colored while the tester is still working:
-        // they have chosen Failed and are writing it up, so it is a state rather
-        // than an offer. Everywhere else in this window the three verdicts are
-        // drawn alike.
         chosen.setForeground(TestStatus.FAILED.getRowColor());
 
         final @NotNull JBPanel<?> text = new JBPanel<>(new BorderLayout(0, JBUI.scale(10)));
@@ -1073,8 +567,6 @@ final class LightModeWindow {
         text.add(expectedRow, BorderLayout.CENTER);
 
         details.setBorder(JBUI.Borders.emptyTop(14));
-        // Closed until asked for. The window exists to put one sentence in front
-        // of a tester, so everything else starts out of the way.
         details.setVisible(false);
 
         setLine.setOpaque(false);
@@ -1089,10 +581,6 @@ final class LightModeWindow {
         caseView.add(text, BorderLayout.CENTER);
         caseView.add(underCase, BorderLayout.SOUTH);
 
-        // The width is this window's to choose and the height is the case's, so
-        // the panel answers with one of each rather than taking a fixed size -
-        // which is also what lets a wrapped paragraph be measured at the width
-        // it is actually going to be drawn at.
         final @NotNull JBPanel<?> panel = new JBPanel<>(new BorderLayout()) {
             @Override
             public @NotNull Dimension getPreferredSize() {
@@ -1107,11 +595,6 @@ final class LightModeWindow {
         return panel;
     }
 
-    /**
-     * The three verdicts, equally wide because they are equally likely - a
-     * tester reaching for one of them is not choosing between a default and two
-     * exceptions.
-     */
     private @NotNull JComponent verdictButtons() {
         final @NotNull JBPanel<?> verdicts = new JBPanel<>(new GridLayout(1, 0, JBUI.scale(6), 0));
         verdicts.setBorder(JBUI.Borders.empty(0, 10, 10, 10));
@@ -1126,21 +609,10 @@ final class LightModeWindow {
         return verdicts;
     }
 
-    /**
-     * The letter that applies a status, read from the status itself so the cap
-     * and the binding cannot name different keys.
-     */
     private static @NotNull String keyOf(final @NotNull TestStatus status) {
         return Shortcuts.shortcutText(status.getMenuEntry().shortcut());
     }
 
-    /**
-     * What sits under the case: the three verdicts, the two clocks, and the keys.
-     * <p>
-     * The verdicts and the clocks take the window's own background and the
-     * status bar takes the platform's advertiser tint, so the strip of keys
-     * reads as furniture and the two rows above it as part of the case.
-     */
     private @NotNull JComponent footer() {
         footer.setOpaque(false);
         footer.add(verdictRow, BorderLayout.NORTH);
@@ -1150,11 +622,6 @@ final class LightModeWindow {
         return footer;
     }
 
-    /**
-     * This case on the left, the whole run on the right. Neither is labeled: the
-     * tester learns which is which once, and a word beside each would make the
-     * clocks the loudest thing in a window built to hold one sentence.
-     */
     private @NotNull JComponent durationStrip() {
         strip.setBorder(JBUI.Borders.empty(0, 10, 8, 10));
         strip.setOpaque(false);
@@ -1164,16 +631,6 @@ final class LightModeWindow {
         return strip;
     }
 
-    /**
-     * The keys, drawn by the same strip every dialog in the plugin uses - so
-     * light mode's keycaps are the plugin's keycaps, and the next change to them
-     * arrives here without being asked for.
-     * <p>
-     * Hints, every one: this window binds its own keys in {@link #bindKeys}, and
-     * an entry that claimed to bind them too would be a second claimant on P.
-     * The letters still come from {@link TestStatus}, so the cap cannot name a
-     * key that does nothing.
-     */
     private StatusBarItem @NotNull [] caseKeys() {
         final @NotNull List<StatusBarItem> items = new ArrayList<>();
         items.add(StatusBarShortcut.hint(Shortcuts.ToggleDetails.getShortcutText(), Bundle.message("shortcut.details")));
@@ -1186,11 +643,6 @@ final class LightModeWindow {
         return items.toArray(new StatusBarItem[0]);
     }
 
-    /**
-     * Two keys while a failure is being written, and neither of them is one of
-     * the case's keys above: Ctrl+D cannot collapse a form waiting to be filled
-     * in, and Escape has stopped meaning close.
-     */
     private StatusBarItem @NotNull [] commitKeys() {
         return new StatusBarItem[]{
                 StatusBarShortcut.hint(Shortcuts.Enter.getShortcutText(), Bundle.message("shortcut.save.and.next")),
@@ -1198,11 +650,6 @@ final class LightModeWindow {
                 StatusBarShortcut.corrections()};
     }
 
-    /**
-     * A field's text with the field's icon before it, in the middle of the
-     * text's height, and as far from it as the details rows' icons are from
-     * theirs.
-     */
     private static @NotNull JComponent iconBefore(final @NotNull Icon icon, final @NotNull JComponent text) {
         return JBUI.Panels.simplePanel(CaseDetails.GAP, 0).addToLeft(new JBLabel(icon)).addToCenter(text).andTransparent();
     }
@@ -1215,5 +662,4 @@ final class LightModeWindow {
 
         return label;
     }
-
 }

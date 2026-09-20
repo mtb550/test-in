@@ -34,34 +34,10 @@ import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-/**
- * The framework's single-line input: its look, its placeholder, and the red cue
- * a dialog shows when the tester submits it empty.
- * <p>
- * One owner because there were two, byte for byte. {@link TextInput} and
- * {@link TextFieldWithSelections} each built the same field the same way and
- * each carried the same placeholder-and-warning pair, so improving the cue -
- * or changing the font, or the border - meant editing two files and noticing
- * that the second one existed.
- * <p>
- * The clipboard bindings are here too, and they are the reason this is worth
- * more than tidiness. A popup or a dialog can eat Ctrl+V, Ctrl+C and Ctrl+X on
- * the way to a field, so they have to be bound on the field itself. Only the
- * search field did that; rename, the commit message, and the Git name and email
- * did not. The multi-line area was the worst of them: it
- * replaces the paste action to insert a pasted screenshot and never bound the
- * key that reaches it, so its whole image-paste feature rested on a binding the
- * class next door documents as unreliable.
- */
 final class FrameworkTextField {
-
     private final @NotNull ExtendableTextField field;
     private final @NotNull String placeholder;
 
-    /**
-     * What is drawn around the text right now. Held because the two are set
-     * from different places at different times and applied together.
-     */
     private @NotNull Icon icon;
     private @NotNull String note = "";
 
@@ -79,7 +55,6 @@ final class FrameworkTextField {
             field.getEmptyText().setText(placeholder);
             TextComponentEmptyText.setupPlaceholderVisibility(field);
 
-            // Typing clears a red empty-submit warning back to the normal look.
             field.getDocument().addDocumentListener(new DocumentAdapter() {
                 @Override
                 protected void textChanged(final @NotNull DocumentEvent e) {
@@ -94,36 +69,17 @@ final class FrameworkTextField {
         bindClipboard(field);
     }
 
-    /**
-     * The framework field's look: its font and its padding. One owner for this
-     * Swing field and the spell-checked editor field, so the two cannot drift
-     * (#314).
-     */
     static void style(final @NotNull JComponent field) {
-        // Derived from the label font at construction, so every dialog open
-        // picks up the current IDE font-size setting.
         field.setFont(JBFont.label().biggerOn(6f));
-        // 12px left rhythm shared by the field text and any list rows below.
         field.setBorder(JBUI.Borders.empty(10, 12));
     }
 
-    /**
-     * The icon drawn before the text, which the field whose icon follows the
-     * selection changes after construction. Here rather than at that caller,
-     * because the icon and the note are drawn together, and this class holds
-     * both.
-     */
     void setLeadingIcon(final @NotNull Icon icon) {
         this.icon = icon;
         DialogStyle.setDecorations(field, icon, note);
     }
 
-    /**
-     * UC-INTERNAL-001, Rule-INTERNAL-073.
-     * <p>
-     * One short thing said at the end of the field - how many the search
-     * matched - and empty to say nothing.
-     */
+    // UC-INTERNAL-001, Rule-INTERNAL-073
     void setNote(final @NotNull String note) {
         this.note = note;
         DialogStyle.setDecorations(field, icon, note);
@@ -137,15 +93,9 @@ final class FrameworkTextField {
         return field.getText();
     }
 
-    /**
-     * Turns the placeholder red until the tester types - the empty-submit cue.
-     */
     void showEmptyWarning() {
         emptyWarningShown = true;
 
-        // Through the shared one, so the framework dialogs and the report and
-        // export dialog cannot drift into two ways of saying it (#251). The
-        // placeholder is this field's own words, which is what it passes.
         EmptyWarning.show(field, placeholder);
     }
 
@@ -157,25 +107,11 @@ final class FrameworkTextField {
         field.repaint();
     }
 
-    /**
-     * Binds cut, copy, paste and select-all on the component itself.
-     * <p>
-     * Static so the multi-line area can take the same bindings without taking
-     * the single-line look with them.
-     */
     static void bindClipboard(final @NotNull JTextComponent component) {
         bind(component, KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx(), DefaultEditorKit.pasteAction);
         bindAllButPaste(component);
     }
 
-    /**
-     * Cut, copy and select-all, for a component whose paste is answered
-     * elsewhere - the area that takes a pasted screenshot, whose registered
-     * action is the one handler for paste. Bound here as well, the area's own
-     * Ctrl+V was dead behind that action, and a tester who moved Paste to
-     * another key got image paste on it and plain text on Ctrl+V (#66, finding
-     * 271).
-     */
     static void bindAllButPaste(final @NotNull JTextComponent component) {
         final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 

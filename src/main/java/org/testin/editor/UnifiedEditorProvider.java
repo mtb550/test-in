@@ -26,7 +26,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
-
     @Override
     public boolean accept(final @NotNull Project p, final @NotNull VirtualFile file) {
         return file instanceof UnifiedVirtualFile vf && vf.isValid();
@@ -35,7 +34,6 @@ public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
     @Override
     public @NotNull FileEditor createEditor(final @NotNull Project p, final @NotNull VirtualFile file) {
         if (file instanceof UnifiedVirtualFile unifiedFile) {
-
             final @NotNull FileType ft = unifiedFile.getFileType();
             if (!(ft instanceof EditorType editorType))
                 throw new IllegalArgumentException("Unknown FileType: " + ft);

@@ -36,7 +36,6 @@ public class Steps extends BaseDetails {
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-027
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int row) {
-
         final @NotNull List<String> steps = dto.getSteps();
 
         if (steps.isEmpty() || steps.stream().allMatch(String::isBlank))
@@ -61,7 +60,6 @@ public class Steps extends BaseDetails {
         final @NotNull JTextArea stepArea = Prose.of(text);
         stepArea.setFont(JBFont.label().deriveFont(Font.PLAIN, getValueFontSize()));
 
-        // The one place prose carries a border: the gap between two steps.
         stepArea.setBorder(JBUI.Borders.emptyBottom(marginBottom));
         return stepArea;
     }

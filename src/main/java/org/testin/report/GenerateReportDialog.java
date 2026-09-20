@@ -31,13 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-/**
- * Where to write a test run report: the destination form and a Generate button.
- * The same form the export dialog uses, so the two ask for a destination the
- * same way.
- */
 public final class GenerateReportDialog extends AbstractFrameworkDialog<DestinationForm> {
-
     private final @NotNull BiConsumer<@NotNull FileTypes, @NotNull File> onGenerate;
 
     // UC-REPORT-001
@@ -67,8 +61,6 @@ public final class GenerateReportDialog extends AbstractFrameworkDialog<Destinat
     @Override
     protected void submit() {
         component().resolve().ifPresent(destination -> {
-            // The format and the file are values, so the dialog goes first
-            // and the report is generated under a progress bar (#87).
             closeOk();
             onGenerate.accept(destination.format(), destination.file());
         });

@@ -42,27 +42,10 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString()
 public class TestRunDto {
-
     @NotNull
     @Builder.Default
     private List<TestRunItems> results = new ArrayList<>();
 
-    /**
-     * The same run, covering exactly these cases (#96).
-     * <p>
-     * A case that stays keeps its result <b>whole</b> - the verdict, the actual
-     * result, the bug severity and priority, the duration, who executed it and
-     * when, and the stack trace - because the item is carried across rather than
-     * rebuilt from its id. A case that arrives is {@link TestStatus#PENDING}. A
-     * case that goes is dropped with everything it recorded.
-     * <p>
-     * Order is the run's own and is left alone: the cases it already covered stay
-     * in the order it had them, and new ones are appended. Re-covering a run is
-     * not a re-sort.
-     * <p>
-     * Returns a new run and leaves this one untouched, so the caller still holds
-     * what the run was - which is what an undo puts back.
-     */
     public @NotNull TestRunDto coverOnly(final @NotNull Set<UUID> wanted) {
         final @NotNull Map<UUID, TestRunItems> held = new LinkedHashMap<>();
         results.forEach(item -> held.put(item.getId(), item));
@@ -79,28 +62,12 @@ public class TestRunDto {
         return new TestRunDto().setResults(covered);
     }
 
-    /**
-     * Whether every case in this run has been judged.
-     * <p>
-     * Asked of the run rather than counted at a call site, because the answer
-     * decides when a run is over and two places counting it would eventually
-     * disagree about a deleted case.
-     * <p>
-     * A run with no cases is not finished, it is empty - completing it the
-     * moment it is created would be the wrong answer to a question nobody
-     * asked.
-     */
     @JsonIgnore
     public boolean isFullyJudged() {
         return !results.isEmpty() && results.stream().allMatch(TestRunItems::isJudged);
     }
 
-    /**
-     * This run's result for one test case, whatever state it is in, and empty
-     * when the run does not cover the test case. Every lookup by id asks here.
-     */
     public @NotNull Optional<TestRunItems> resultOf(final @NotNull UUID testCaseId) {
         return results.stream().filter(item -> item.getId().equals(testCaseId)).findFirst();
     }
-
 }

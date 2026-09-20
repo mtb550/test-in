@@ -39,16 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-/**
- * The export working dialog: destination form on top, the sheets to export
- * filling the middle, a visible Export button at the bottom. Enter exports and
- * Escape cancels, and the status bar names both.
- * <p>
- * What the tester ticks is what gets written. The preview used to draw its
- * checkboxes and then export everything regardless.
- */
 public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm> {
-
     private final @NotNull SheetPreview preview;
     private final @NotNull BiConsumer<DestinationForm.@NotNull Destination,
             @NotNull Map<String, List<TestCaseDto>>> onExport;
@@ -59,7 +50,6 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
 
         title = Bundle.message("dialog.export.title");
 
-        // Offer only formats that actually have an export handler (PDF/Word are report-only).
         final @NotNull DestinationForm form = new DestinationForm(p,
                 Arrays.stream(FileTypes.values()).filter(FileTypes::isExportable).toArray(FileTypes[]::new),
                 FileTypes.XLSX,
@@ -92,8 +82,6 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
                 return;
             }
 
-            // Both the destination and the selection are values already, so
-            // the dialog can go before anything is written (#87).
             closeOk();
             onExport.accept(destination, selected);
         });

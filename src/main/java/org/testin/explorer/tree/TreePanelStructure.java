@@ -25,16 +25,7 @@ import java.util.Optional;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.util.Bundle;
 
-/**
- * Supplies the selected project hierarchy to IntelliJ's asynchronous tree models.
- */
 public final class TreePanelStructure extends AbstractTreeStructure {
-
-    /**
-     * The root the tree draws when the repository is bound to no project - a
-     * word rather than a node, which is what the panel covers with its welcome
-     * screen anyway.
-     */
     private static final @NotNull String NO_PROJECT = Bundle.message("tree.root.project");
 
     private final @NotNull Project p;
@@ -64,10 +55,6 @@ public final class TreePanelStructure extends AbstractTreeStructure {
         return node.getChildren().toArray();
     }
 
-    /**
-     * The platform's contract: null is how a tree structure says "this is the
-     * root", and AbstractTreeStructure reads it before we do (#71).
-     */
     @Override
     public @Nullable Object getParentElement(final @NotNull Object element) {
         return element instanceof TreePanelNode node ? node.getParent() : null;

@@ -33,40 +33,14 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-/**
- * The one owner of what a filed bug says (#28): the team's template, filled in.
- * <p>
- * The wording is in {@code bugReport.md} beside this class and nowhere else,
- * with a named placeholder for each part, so changing how a bug reads is one
- * edit to one file. It is not translated, and nothing translated goes into it:
- * the issue is written for the team's repository, not for this tester's screen.
- * <p>
- * Tester text can neither break the template nor act on GitHub. A cell escapes
- * its pipes and keeps its line breaks as {@code <br>}; a heading or a rule typed
- * into a section stays text; code sits in a fence longer than any run of
- * backticks inside it; and an {@code @name} or a {@code #123} mentions nobody
- * and links nothing.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BugTemplate {
-
-    /**
-     * What a part says when Testin has nothing to put in it.
-     */
     static final @NotNull String NOT_AVAILABLE = "n\\a";
 
-    /**
-     * Between the values that share one cell or line of the report.
-     */
     static final @NotNull String SEPARATOR = " · ";
 
     private static final @NotNull String RESOURCE = "bugReport.md";
 
-    /**
-     * A zero-width space, as an entity. Between {@code @} and a name, or
-     * {@code #} and a number, GitHub sees neither a mention nor a reference,
-     * and the reader sees no difference.
-     */
     private static final @NotNull String UNLINK = "&#8203;";
 
     private static final @NotNull Pattern PLACEHOLDER = Pattern.compile("\\{\\{(\\w+)}}");
@@ -79,12 +53,7 @@ public final class BugTemplate {
 
     private static final @NotNull String TEMPLATE = load();
 
-    /**
-     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068, Rule-VIEW-PANEL-076.
-     * <p>
-     * The issue's body, from the facts and the link to the test case's file,
-     * which is left out when it could not be built.
-     */
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068, Rule-VIEW-PANEL-076
     static @NotNull String body(final @NotNull BugFacts facts, final @NotNull Optional<String> testCaseLink) {
         final @NotNull String shortId = facts.testCaseId().toString().substring(0, 8);
 
@@ -108,49 +77,26 @@ public final class BugTemplate {
                 Map.entry("tag", inline("#" + facts.testSetName().replaceAll("\\s+", "")))));
     }
 
-    /**
-     * The name a screenshot is attached under, counting from one. The body
-     * refers to it by this name, and {@code gh} swaps the reference for the
-     * uploaded image.
-     */
     static @NotNull String screenshotFile(final int number) {
         return "screenshot-" + number + ".png";
     }
 
-    /**
-     * In one pass, so a placeholder a tester typed into a value is written as
-     * text and never filled.
-     */
     private static @NotNull String fill(final @NotNull Map<String, String> parts) {
         return PLACEHOLDER.matcher(TEMPLATE).replaceAll(placeholder -> Matcher.quoteReplacement(parts.getOrDefault(placeholder.group(1), placeholder.group())));
     }
 
-    /**
-     * A table cell: backslashes first, then pipes, and line breaks as
-     * {@code <br>}.
-     */
     static @NotNull String cell(final @NotNull String value) {
         if (value.isBlank()) return NOT_AVAILABLE;
 
         return inline(value.strip().replace("\\", "\\\\").replace("|", "\\|")).replaceAll("\\R", "<br>");
     }
 
-    /**
-     * Text under a heading, where a line typed as {@code # title} or
-     * {@code ---} would otherwise become a heading of its own.
-     */
     static @NotNull String section(final @NotNull String value) {
         if (value.isBlank()) return NOT_AVAILABLE;
 
         return blockText(value.strip());
     }
 
-    /**
-     * Numbered one after another, blank steps left out: GitHub numbers a list
-     * from its first item whatever the rest say, so a gap would read one way in
-     * the dialog and another on the issue. A step's second line is indented to
-     * stay inside it.
-     */
     static @NotNull String steps(final @NotNull List<String> steps) {
         final @NotNull List<String> written = steps.stream().filter(step -> !step.isBlank()).toList();
         if (written.isEmpty()) return NOT_AVAILABLE;
@@ -166,9 +112,6 @@ public final class BugTemplate {
         return marker + blockText(step.strip()).replace("\n", "\n" + " ".repeat(marker.length()));
     }
 
-    /**
-     * Verbatim, because what is in it is used rather than read.
-     */
     static @NotNull String codeBlock(final @NotNull String value) {
         if (value.isBlank()) return NOT_AVAILABLE;
 
@@ -176,10 +119,6 @@ public final class BugTemplate {
         return fence + "\n" + TRAILING_LINE_BREAKS.matcher(value).replaceAll("") + "\n" + fence;
     }
 
-    /**
-     * The stacktrace, folded under its first line. The screenshots have their
-     * own heading.
-     */
     static @NotNull String exception(final @NotNull String stacktrace) {
         final @NotNull String text = stacktrace.strip();
         if (text.isEmpty()) return NOT_AVAILABLE;
@@ -206,9 +145,6 @@ public final class BugTemplate {
         return RULE.matcher(line).replaceFirst("$1\\\\");
     }
 
-    /**
-     * Text in the flow of Markdown: no HTML tag opens, and nothing links.
-     */
     private static @NotNull String inline(final @NotNull String text) {
         return unlinked(text.replace("<", "&lt;"));
     }

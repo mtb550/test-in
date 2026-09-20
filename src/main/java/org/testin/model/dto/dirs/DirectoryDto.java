@@ -45,22 +45,9 @@ public abstract class DirectoryDto {
     @Builder.Default
     private ArrayList<String> path2 = new ArrayList<>();
 
-    /**
-     * Null for the root node: nothing above the test project.
-     */
     @ToString.Exclude
     private @Nullable DirectoryDto parent;
 
-    /**
-     * This node and every node above it, nearest first, ending at the test
-     * project.
-     * <p>
-     * The root's absent parent is what ends the walk. Everything that needs the
-     * chain - rebuilding a path2, finding which test project owns a node - gets
-     * a list it can iterate or stream without asking whether anything is above
-     * it. The children index is the one other reader of the parent, because it
-     * wants the one level above a node and not the chain.
-     */
     public @NotNull List<DirectoryDto> selfAndAncestors() {
         final @NotNull List<DirectoryDto> chain = new ArrayList<>();
         for (DirectoryDto current = this; current != null; current = current.getParent()) {
@@ -69,13 +56,6 @@ public abstract class DirectoryDto {
         return chain;
     }
 
-    /**
-     * A child's {@code path2}, from its parent's and its own name.
-     * <p>
-     * On the type that owns {@code path2}, so a node built from the tree and one
-     * read from disk describe where they sit in the same way. The parent list is
-     * absent for a test project, which has nothing above it.
-     */
     public static @NotNull ArrayList<String> pathOf(final @NotNull List<String> parentPath, final @NotNull String name) {
         final @NotNull ArrayList<String> path = new ArrayList<>(parentPath);
         path.add(name);
@@ -83,166 +63,68 @@ public abstract class DirectoryDto {
         return path;
     }
 
-    /**
-     * The node's marker; each subtype's Lombok-generated getter returns its
-     * concrete marker type and satisfies this by covariant return. Audit info
-     * (created/modified by and when) lives only here — the marker JSON is the
-     * persisted truth, the DTO stores none of it.
-     */
     @NonNull
     public abstract Marker getMarker();
 
-    /**
-     * The number the tester gave this node, or {@link Marker#NOT_ORDERED} when
-     * they have not - which sorts after every number anyone did give.
-     */
     public int getOrder() {
         return getMarker().getOrder();
     }
 
-    /**
-     * Whether a tester can put this node in a deliberate order among its
-     * siblings.
-     * <p>
-     * False here, for the nodes that have no siblings worth arranging: the two
-     * containers of a project are exactly two and always the same way round, and
-     * a project is what the tree is rooted at. Everything a tester puts in a
-     * folder says otherwise - unnumbered, those still read by the date they were
-     * made, which is the order they have always had.
-     */
     public boolean isOrderable() {
         return false;
     }
 
-    /**
-     * File name of this node's marker JSON inside the directory.
-     * <p>
-     * Read from the kind rather than declared again. Every subclass overrode
-     * this to return its own {@code DirectoryType.X.getMarker()} - the same
-     * expression seven times, with the constant spelled in by hand beside a
-     * {@code getType()} that already named it. Nothing checked the two agreed,
-     * so a subclass could have answered one kind here and another there.
-     */
     @NonNull
     public String getMarkerFileName() {
         return getType().getMarker();
     }
 
-
-    // Capability flags replace the instanceof chains that used to branch on
-    // node type across the actions (issue #37): a new node type declares what
-    // it supports here instead of being hunted for at every call site.
-
-    /**
-     * UC-TREE-PANEL-007, UC-TREE-PANEL-009.
-     * <p>
-     * The kinds of node that can be created under this one, and none for a node
-     * that creates nothing. The test project creates its children itself, and a
-     * test set or run holds test cases rather than nodes, so only the
-     * containers name any: test sets and packages on one side, runs and
-     * packages on the other.
-     * <p>
-     * Declared here so the create action asks the node rather than testing its
-     * class to choose a dialog (#312, A74).
-     */
+    // UC-TREE-PANEL-007, UC-TREE-PANEL-009
     public @NotNull List<DirectoryType> childKinds() {
         return List.of();
     }
 
-    /**
-     * True when nodes can be created under this one.
-     */
     public boolean canCreateChildren() {
         return !childKinds().isEmpty();
     }
 
-    /**
-     * True when the user may rename this node; the fixed root containers say no.
-     */
     public boolean isRenamable() {
         return true;
     }
 
-    /**
-     * The folders that come with this node and go with it - a test project's
-     * Test Cases and Test Runs - and none for every other kind. A rename moves
-     * them with their node even when nothing else under it is indexed, as for an
-     * inactive project (Rule-TREE-PANEL-100).
-     */
+    // Rule-TREE-PANEL-100
     public @NotNull List<DirectoryDto> fixedChildren() {
         return List.of();
     }
 
-    /**
-     * True when test cases can be imported into or exported from this node.
-     */
     public boolean isTestCaseContainer() {
         return false;
     }
 
-    /**
-     * True when the node opens in an editor tab (test sets and test runs).
-     */
     public boolean isOpenableInEditor() {
         return false;
     }
 
-    /**
-     * True when the node can be cut, copied or dragged to another location;
-     * the test project and the fixed root containers say no, and so does a test
-     * run once it is closed.
-     */
     public boolean isTransferable() {
         return true;
     }
 
-    /**
-     * True when the user may remove this node; the fixed root containers say no.
-     * A test project may be removed, behind a confirmation that says how much
-     * goes with it - it is the largest delete in the plugin.
-     */
     public boolean isRemovable() {
         return true;
     }
 
-    /**
-     * True when anything at all may be pasted or dropped into this node - the
-     * question the tree asks before it draws a drop highlight.
-     * <p>
-     * The kind answers it, from the one table that says which kinds go inside
-     * which (#176). It was two overrides and three helper predicates until then,
-     * and a test run said yes here while refusing every source that arrived.
-     */
     public boolean isTransferTarget() {
         return getType().acceptsAnything();
     }
 
-
-
-
-    /**
-     * True when the given node may be pasted or dropped into this one, which is
-     * {@link DirectoryType#accepts} asked of the two kinds - see the table there
-     * for what goes inside what, and why it is one table (#176).
-     */
     public boolean acceptsTransferred(final @NotNull DirectoryDto source) {
         return getType().accepts(source.getType());
     }
 
-    /**
-     * True when the node is out of current work: a deprecated test set, an
-     * archived package. Nothing inside it changes; what changes is how the
-     * plugin treats it - drawn gray, ordered after its siblings, left collapsed
-     * by expand-all, and not offered when a run is configured. Declared here so
-     * the renderer, the children index, the tree node and the run dialog ask
-     * one question instead of each knowing which status enum means "retired"
-     * on which node (#68).
-     */
     public boolean isRetired() {
         return false;
     }
 
     @NotNull
     public abstract DirectoryType getType();
-
 }

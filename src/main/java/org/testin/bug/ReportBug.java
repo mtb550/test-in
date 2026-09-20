@@ -38,23 +38,9 @@ import org.testin.util.Bundle;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * Report Bug: prepares a failed run item's bug report and opens it (#28).
- * <p>
- * Everything slow happens before the dialog opens, under the IDE's progress
- * bar, so the text a tester edits never changes under their hands and Send is
- * already enabled or disabled with its reason.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReportBug {
-
-    /**
-     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-067.
-     * <p>
-     * On the EDT, at the click. Nothing starts when Report Bug is off for the
-     * run item or it is no longer failed. What to redraw as the report moves on
-     * is the caller's to say.
-     */
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-067
     public static void start(final @NotNull Project p, final @NotNull TestRunDirectoryDto runDirectory, final @NotNull UUID runItemId, final @NotNull TestCaseDto tc, final @NotNull Runnable redraw) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
@@ -79,10 +65,6 @@ public final class ReportBug {
                 });
     }
 
-    /**
-     * Off the EDT, under the progress bar. The configuration is read again, as
-     * Refresh does, so a {@code bugRepoUrl} added by hand counts without one.
-     */
     private static @NotNull PreparedBug prepare(final @NotNull Project p, final @NotNull BugFacts facts, final @NotNull Optional<TestCaseFile> file, final @NotNull ProgressIndicator indicator) {
         Services.getInstance(p, BoundTestProject.class).reread();
 
@@ -96,10 +78,6 @@ public final class ReportBug {
         return new PreparedBug(facts, BugTemplate.body(facts, link), BugRepository.of(bugRepoUrl), whyNotReady);
     }
 
-    /**
-     * On the EDT, once prepared. The dialog shows one of a kind at a time, so a
-     * report prepared while another run item's is open waits for that one.
-     */
     private static void open(final @NotNull Project p, final @NotNull BugReports.RunItem item, final @NotNull PreparedBug bug, final @NotNull Runnable redraw) {
         final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
         if (reports.anotherIsOpen(item)) {

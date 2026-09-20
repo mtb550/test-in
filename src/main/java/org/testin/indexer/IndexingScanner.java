@@ -58,7 +58,6 @@ import java.util.stream.Stream;
 
 @AllArgsConstructor
 final class IndexingScanner {
-
     private final @NotNull Project p;
     private final @NotNull IndexerDataStore store;
 
@@ -81,22 +80,12 @@ final class IndexingScanner {
     // UC-INTERNAL-002, Rule-INTERNAL-005, Rule-INTERNAL-007, Rule-INTERNAL-091
     private void scanProjectContents(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
-            // UC-INTERNAL-008, Rule-INTERNAL-091.
-            //
-            // Before the project is read, and where both scan paths meet: a
-            // project opened at startup, one the tester picks, one #301's clone
-            // brings in, and a rescan after a copy or a restore all arrive here
-            // (#305, G14). A project already in this build's format is not
-            // touched.
+            // UC-INTERNAL-008, Rule-INTERNAL-091
             Services.getInstance(Conversions.class).ensure(p, projectPath);
 
             final @NotNull TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).getTestProjectNode(p, projectPath);
 
-            // Rule-INTERNAL-091. Written by an older Testin and not converted -
-            // a conversion that failed - or by a newer one whose format this
-            // build does not know: the project is a node saying why, and nothing
-            // in it is read or written. Reading a format this build does not
-            // understand is how a build deletes what it cannot see (#305, S5).
+            // Rule-INTERNAL-091
             final @NotNull Optional<String> refused = tp.getMarker().whyNotReadable();
             if (refused.isPresent()) {
                 Logger.warn("Not reading " + projectPath.getFileName() + ": " + refused.orElseThrow());
@@ -107,30 +96,13 @@ final class IndexingScanner {
                 return;
             }
 
-            // UC-INTERNAL-003, Rule-INTERNAL-021.
-            //
-            // Read into a pass of its own and put in at the end, so the index
-            // never stops holding a project that is on disk. What the scan did
-            // not find is dropped by the swap, which is how a rescan forgets what
-            // disappeared instead of only learning what arrived: the scan used to
-            // put and never remove, and the one path that cleared was Refresh -
-            // so a test set deleted by a Git pull or a branch switch stayed in
-            // the tree with its cases still in global search, the
-            // completion cache and every export, until the tester pressed the
-            // button Rule-INTERNAL-021 exists so they do not have to (#66,
-            // finding 68). It cleared by emptying the project out first, which is
-            // what ScannedProject describes and #312's A1 cost.
+            // UC-INTERNAL-003, Rule-INTERNAL-021
+            // Rule-INTERNAL-021
             final @NotNull ScannedProject scanned = new ScannedProject();
             scanned.getProjects().put(projectPath.toString(), tp);
             store.readable(projectPath);
 
-            // UC-TREE-PANEL-001, Rule-TREE-PANEL-100.
-            //
-            // The node, and nothing under it. An inactive project is not being
-            // worked on, so reading its test sets, cases and runs is a directory
-            // walk nobody asked for - but it is still a project, and the tree
-            // says so by drawing it with "Inactive" beside its name. Still
-            // swapped in, so going inactive drops what it held.
+            // UC-TREE-PANEL-001, Rule-TREE-PANEL-100
             if (!tp.getMarker().getStatus().isActive()) {
                 Logger.info("Inactive project, indexed without its contents: " + projectPath.getFileName());
                 store.swapIn(projectPath, scanned);
@@ -141,9 +113,6 @@ final class IndexingScanner {
                 indicator.setFraction(0.1);
                 indicator.setText(Bundle.message("indexer.progress.test.sets", tp.getName()));
 
-            // Per scan, not a field: one scanner is built per project and reused
-            // for every rescan, so a field would carry the last pass's folders
-            // into this one.
             final @NotNull List<Path> unread = new ArrayList<>();
 
             final @NotNull TestCasesMainDirectoryDto tcd = tp.getTestCasesDirectory();
@@ -157,10 +126,6 @@ final class IndexingScanner {
             scanned.getTestRunsMainDirs().put(trd.getPath().toString(), trd);
             scanTestRunDirs(trd.getPath(), trd, indicator, unread, scanned);
 
-            // A pass the tester stopped read part of the project, and putting
-            // that in would delete everything the walk had not reached yet. The
-            // index goes on holding what it held, which is what it held a moment
-            // ago and is still on disk.
             if (indicator.isCanceled()) {
                 Logger.info("Scan canceled, so the index was left as it was: " + projectPath.getFileName());
                 return;
@@ -176,9 +141,6 @@ final class IndexingScanner {
             reportUnreadableResults(tp.getName(), scanned.getUnreadableResults());
             reportClashing(tp.getName(), List.copyOf(scanned.getClashingCases()));
 
-        // Nothing is swapped in, for the same reason a canceled pass is not: a
-        // scan that threw halfway read half a project, and the half it did not
-        // reach is not gone from disk.
         } catch (final Exception ex) {
             Logger.error("Failed to scan project: " + projectPath.getFileName() + " - " + ex.getMessage());
         }
@@ -190,11 +152,6 @@ final class IndexingScanner {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
             for (final Path dirPath : dirs) {
-                // Between test sets, because that is where the tester's Cancel
-                // has to land: a project is thousands of files and the pass is
-                // long enough to want stopping. Asked rather than thrown -
-                // stopping is an answer, so there is no exception for every
-                // caller above to sort back out from a real failure.
                 if (indicator.isCanceled()) return;
 
                 store.markedAs(dirPath, DirectoryType.UNDER_TEST_CASES).ifPresentOrElse(
@@ -220,8 +177,6 @@ final class IndexingScanner {
             try (Stream<Path> subPaths = Files.list(path)) {
                 subPaths.filter(Files::isDirectory)
                         .forEach(subPath -> {
-                            // The else was missing here, so a folder skipped one
-                            // level down said nothing at all, not even to the log.
                             store.markedAs(subPath, DirectoryType.UNDER_TEST_CASES).ifPresentOrElse(marked -> {
                                 if (marked == DirectoryType.TS) scanTestSet(subPath, tsp, indicator, scanned);
                                 else scanTestSetPackage(subPath, tsp, indicator, unread, scanned);
@@ -255,18 +210,12 @@ final class IndexingScanner {
                                 tc.setParent(ts);
                                 tc.setId(identityOf(filePath, tc));
 
-                                // Said rather than silently kept. The index holds
-                                // one case per identity, so the second file of a
-                                // pair goes over the first and both sets then
-                                // resolve that id to whichever landed last
-                                // (#312, A3).
                                 if (scanned.getTestCasesById().put(tc.getId(), tc) != null) {
                                     scanned.getClashingCases().add(ts.getName() + "/" + filePath.getFileName());
                                     scanned.getClashingIds().add(tc.getId());
                                 }
 
-                                // Rule-INTERNAL-084. Remembered, so the save that
-                                // files it under its id takes this one away.
+                                // Rule-INTERNAL-084
                                 if (!filePath.equals(TestCaseSequenceStore.named(path, tc.getId()))) {
                                     scanned.getHandNamedFiles().put(tc.getId(), filePath);
                                 }
@@ -276,8 +225,6 @@ final class IndexingScanner {
                                 Logger.error("Failed to read test case '" + filePath.toAbsolutePath() +
                                         "': " + ex.getMessage());
 
-                                // Kept, so an export can name it without walking
-                                // the folder itself (#66, finding 278).
                                 scanned.getUnreadableCases().computeIfAbsent(path.toString(), ignored -> ConcurrentHashMap.newKeySet())
                                         .add(filePath.getFileName().toString());
                             }
@@ -300,7 +247,6 @@ final class IndexingScanner {
             final @NotNull List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
             for (final Path dirPath : dirs) {
-                // The same stopping point on the run side, for the same reason.
                 if (indicator.isCanceled()) return;
 
                 store.markedAs(dirPath, DirectoryType.UNDER_TEST_RUNS).ifPresentOrElse(
@@ -326,7 +272,6 @@ final class IndexingScanner {
             try (Stream<Path> subPaths = Files.list(path)) {
                 subPaths.filter(Files::isDirectory)
                         .forEach(subPath -> {
-                            // The else was missing here too.
                             store.markedAs(subPath, DirectoryType.UNDER_TEST_RUNS).ifPresentOrElse(marked -> {
                                 if (marked == DirectoryType.TR) scanTestRun(subPath, trp, indicator, scanned);
                                 else scanTestRunPackageDir(subPath, trp, indicator, unread, scanned);
@@ -339,50 +284,22 @@ final class IndexingScanner {
         }
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-015.
-     * <p>
-     * A folder with no marker is not a node, so the scan cannot read it or
-     * anything under it. Most of them are nothing: a folder somebody made beside
-     * the test sets, a working directory, something a tool left behind. Those are
-     * the ordinary case and saying anything about them would be noise.
-     * <p>
-     * A folder holding test cases is not the ordinary case. Those cases are on
-     * disk and in no panel, no search, no report and no export, and until now the
-     * only trace was one line in a log nothing points at - four of them sat in the
-     * sandbox project that way, and one in a real data root (#276).
-     * <p>
-     * So the log line is kept for every skip, and the folder is remembered only
-     * when it holds something the tester would miss.
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-015
     private void skipped(final @NotNull Path dirPath, final @NotNull List<DirectoryType> family, final @NotNull String where, final @NotNull List<Path> unread) {
         Logger.warn("Skipping unmarked directory under " + where + " (missing " + DirectoryType.markerNames(family) + "): " + dirPath);
 
         if (holdsTestCases(dirPath)) unread.add(dirPath);
     }
 
-    /**
-     * One listing of a folder the scan was about to throw away, so it costs
-     * nothing on the folders that are really nodes.
-     */
     private boolean holdsTestCases(final @NotNull Path dirPath) {
         try (Stream<Path> files = Files.list(dirPath)) {
             return files.filter(Files::isRegularFile).anyMatch(IndexingScanner::looksLikeACaseFile);
         } catch (final Exception unreadable) {
-            // A folder that will not even list is a bigger problem than a missing
-            // marker, and the line above already said the scan skipped it.
             return false;
         }
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-015.
-     * <p>
-     * One notification for the whole project, not one per folder, and it stays in
-     * the log rather than fading: a scan finishes on its own time, and a balloon
-     * that fades while the tester is reading something else is no better than the
-     * silence it replaced.
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-015
     private void reportUnread(final @NotNull String projectName, final @NotNull List<Path> unread) {
         final @NotNull List<String> names = unread.stream().map(path -> path.getFileName().toString()).toList();
 
@@ -391,14 +308,7 @@ final class IndexingScanner {
                 : Bundle.message("indexer.unread.many", String.valueOf(names.size()), named, rest));
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-011.
-     * <p>
-     * The results that would not parse, once for the project rather than once per
-     * file. The run is shown without them, and nothing writes over them or
-     * removes them, so the tester can repair the file and press Refresh (#305,
-     * S21).
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-011
     private void reportUnreadableResults(final @NotNull String projectName, final @NotNull Set<String> unreadable) {
         final @NotNull List<String> names = unreadable.stream().sorted().toList();
 
@@ -407,58 +317,16 @@ final class IndexingScanner {
                 : Bundle.message("indexer.results.unread.many", String.valueOf(names.size()), named, rest));
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-014.
-     * <p>
-     * A marker that is there and will not parse leaves its node drawn with
-     * default values: its number, its status and who made it are not what the
-     * file says, and nothing about the node on screen shows it. One thing that
-     * cannot be read never stops the rest, which is why the node is still drawn -
-     * but a node quietly wrong is worse than one that says so (#277).
-     * <p>
-     * One notification for the project, like the folders above, and it stays in
-     * the list rather than fading: a marker is repaired by hand, and the tester
-     * needs the names after the balloon would have gone.
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-014
     private void reportDamaged(final @NotNull String projectName, final @NotNull List<String> damaged) {
         say(Bundle.message("indexer.damaged.title", projectName), damaged, (named, rest) -> damaged.size() == 1
                 ? Bundle.message("indexer.damaged.one", String.valueOf(damaged.size()), named, rest)
                 : Bundle.message("indexer.damaged.many", String.valueOf(damaged.size()), named, rest));
     }
 
-    /**
-     * How many are shown by name before the message says how many more. Five is
-     * enough to recognise the folder or the file and short enough to read in a
-     * notification.
-     */
     private static final int SHOWN = 5;
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-015.
-     * <p>
-     * One notification about several things the scan could not read: how many,
-     * five of them by name, and how many more.
-     * <p>
-     * <b>The sentence is one key, not two glued together.</b> Each of the three
-     * families used to keep a count phrase - "One folder holds", "{0} folders
-     * hold" - and drop it into a shared body. That read as broken English the
-     * moment there was one of anything ("One folder holds test cases and carry no
-     * marker"), said "the run that holds it" of forty runs, and gave French a
-     * participle that had to agree with a number the other half of the sentence
-     * was holding, so it read "3 resultats sont absent". A whole sentence per
-     * plural has none of those problems in any language, and a translator sees
-     * what they are translating (#297, #66 finding 326).
-     * <p>
-     * This owns the counting and the notification; every key stays at the call
-     * site. {@code BundleKeysTest} finds a key by reading the source for a bundle
-     * lookup with the key written into it, so a key passed in here as an argument
-     * would be one the guard reports as asked for by nobody - which is how a
-     * sentence comes to be translated into three languages and read by no tester.
-     *
-     * @param title    the notification's heading, already looked up
-     * @param sentence given the five names and the "and N more" tail, answers the
-     *                 whole sentence for the number there turned out to be
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-015
     private void say(final @NotNull String title, final @NotNull List<String> names, final @NotNull BinaryOperator<String> sentence) {
         if (names.isEmpty()) return;
 
@@ -470,17 +338,7 @@ final class IndexingScanner {
         Services.getInstance(p, Notifier.class).warn(p, title, sentence.apply(named, rest));
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-082.
-     * <p>
-     * The test case files whose identity another file had already taken, named
-     * once for the project.
-     * <p>
-     * The same shape as the two above it, and for the same reason: the tester
-     * repairs this by renaming a file, and needs the names after a balloon would
-     * have faded. What it cannot do is choose which of the pair keeps the
-     * identity, so it says which files collided and leaves that to them.
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-082
     private void reportClashing(final @NotNull String projectName, final @NotNull List<String> clashing) {
         if (clashing.isEmpty()) return;
 
@@ -504,10 +362,7 @@ final class IndexingScanner {
 
             scanned.getTestRunDirs().put(path.toString(), tr);
 
-            // Rule-INTERNAL-011. Registered for every {@code .tr}, whatever its
-            // folder holds: a run is a run before its first verdict and after its
-            // last case is unticked, and one registered only when a results file
-            // existed could not be edited again (#305, S21).
+            // Rule-INTERNAL-011
             scanned.getTestRuns().put(path.toString(), new TestRunDto().setResults(resultsIn(path, scanned)));
 
             indicator.setText(Bundle.message("indexer.progress.test.run", path.getFileName()));
@@ -518,32 +373,11 @@ final class IndexingScanner {
         }
     }
 
-    /**
-     * Whether an unmarked folder's file looks like a test case, so the warning
-     * can say how many it is passing over.
-     * <p>
-     * A guess on purpose, and the only place one is made. The folder carries no
-     * marker, so there is no test set to ask - which is exactly what the warning
-     * is about. A name Testin wrote is the best evidence available; a run's file
-     * is named for its folder and does not match.
-     * <p>
-     * Deliberately not the same question as {@code ProjectIndexer.isCaseFile},
-     * which asks whether a file <b>is</b> a test case and answers it by the rule
-     * - a {@code .tc} directly inside a test set. The two shared one method
-     * until #288, and the sharing is what hid that they were asking different
-     * things.
-     */
     private static boolean looksLikeACaseFile(final @NotNull Path file) {
         return FileKind.TEST_CASE.idIn(file).isPresent();
     }
 
-    /**
-     * Rule-INTERNAL-091.
-     * <p>
-     * The project as a node and nothing else, which is what a refused project is
-     * indexed as - the same shape an inactive one takes, so the tree can say what
-     * it is rather than leaving the tester with an empty panel (#305, S9).
-     */
+    // Rule-INTERNAL-091
     private static @NotNull ScannedProject scannedNode(final @NotNull Path projectPath, final @NotNull TestProjectDirectoryDto tp) {
         final @NotNull ScannedProject scanned = new ScannedProject();
         scanned.getProjects().put(projectPath.toString(), tp);
@@ -551,27 +385,11 @@ final class IndexingScanner {
         return scanned;
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-011, Rule-INTERNAL-012.
-     * <p>
-     * A run's results, one {@code <test case id>.ri} each, in the order their
-     * cases sit in their test sets - the order the run editor draws and every
-     * report prints, so a directory listing's own order is never what a tester
-     * sees (#305, S19). A result whose case this project no longer holds keeps
-     * its verdict and comes last.
-     * <p>
-     * The file name is the identity, as it is for a test case
-     * (Rule-INTERNAL-012): the id inside is read back only to be replaced by it.
-     * <p>
-     * A file that will not parse is reported and left where it is - never written
-     * over, never removed, and never read as a case nobody judged (#305, S21).
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-011, Rule-INTERNAL-012
     private @NotNull List<TestRunItems> resultsIn(final @NotNull Path runPath, final @NotNull ScannedProject scanned) {
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
         final @NotNull List<TestRunItems> read = new ArrayList<>();
 
-        // Which files in the folder are results is the file owner's answer, not a
-        // second listing here: one filter, one failure to report (#305).
         for (final Path file : Services.getInstance(p, TestDataFiles.class).resultsIn(runPath)) {
             try {
                 final @NotNull TestRunItems item = mapper.readValue(file.toFile(), TestRunItems.class);
@@ -587,13 +405,7 @@ final class IndexingScanner {
         return inCaseOrder(read, scanned);
     }
 
-    /**
-     * Rule-INTERNAL-011.
-     * <p>
-     * The results in their cases' own order, and the ones whose case this project
-     * does not hold after them - a run outlives the cases it was made from, and
-     * what it recorded about a removed one is still its record (#305, S19).
-     */
+    // Rule-INTERNAL-011
     private static @NotNull List<TestRunItems> inCaseOrder(final @NotNull List<TestRunItems> results, final @NotNull ScannedProject scanned) {
         final @NotNull Map<UUID, TestRunItems> byId = new LinkedHashMap<>();
         results.forEach(item -> byId.put(item.getId(), item));
@@ -612,28 +424,7 @@ final class IndexingScanner {
         return ordered;
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-012.
-     * <p>
-     * Which test case a file is: its name, when the name is a UUID.
-     * <p>
-     * The plugin writes a case to {@code <id>.tc} and reads it back keyed by
-     * the id inside, so the two always agree - until a file is copied outside
-     * the plugin, which is a thing people do on GitHub. Then two files claim one
-     * id, the cache keeps whichever the parallel scan reached last, and the other
-     * case is gone. Worse than gone: when the file that lost was the one holding
-     * {@code isHead}, the set has no starting point at all and every case in it
-     * shows as unsorted.
-     * <p>
-     * The name is the identity because it cannot collide - one directory cannot
-     * hold two files with the same name - so a copied file becomes a second case
-     * rather than a coin toss. It arrives pointed at by nothing, which is what
-     * the Unsorted badge is for.
-     * <p>
-     * A name that is not a UUID keeps the id inside the file: that is a file the
-     * plugin did not write, and inventing an identity for it would be worse than
-     * believing what it says.
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-012
     private static @NotNull UUID identityOf(final @NotNull Path filePath, final @NotNull TestCaseDto tc) {
         final @NotNull Optional<UUID> fromTheName = FileKind.TEST_CASE.idIn(filePath);
 

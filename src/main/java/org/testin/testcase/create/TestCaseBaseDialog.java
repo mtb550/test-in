@@ -48,29 +48,12 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-/**
- * UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-006.
- * <p>
- * The create and update test case dialogs, on the dialog framework: the
- * framework owns the popup, its title, its strip, its sizing and its
- * one-of-a-kind rule; this owns the sections, which strip each shows, and the
- * keys that reach past the editors inside them. They were the one dialog family
- * built by hand, so every improvement to the framework had to be made twice or
- * not at all (#66, finding 234).
- */
+// UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-006
 @Getter
 public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCaseForm> {
-    /**
-     * Every section is a key in the status bar mapping, both being built from
-     * the same two enums. This is what a section that somehow is not would
-     * show: an empty bar rather than another section's items.
-     */
     @Getter(AccessLevel.NONE)
     private static final @NotNull StatusBarItem[] NO_ITEMS = new StatusBarItem[0];
 
-    /**
-     * The test case the form writes into when it is saved, and who hears of it.
-     */
     @Getter(AccessLevel.NONE)
     private final @NotNull TestCaseDto dto;
     @Getter(AccessLevel.NONE)
@@ -86,26 +69,12 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
     protected final @NotNull StepsSection stepsSection;
     protected final @NotNull OrderSection orderSection;
     protected final @NotNull StatusSection statusSection;
-    /**
-     * Owns all global registrations of this dialog (application focus listener,
-     * per-step shortcuts). Parented to the project, so everything is released
-     * even when the popup is torn down without firing onClosed.
-     */
     protected final @NotNull Disposable dialogDisposable;
     protected final @NotNull Map<CreateTestCaseSection, StatusBarItem[]> statusBarMapping;
     private final @NotNull List<CreateTestCaseSection> cachedSections;
-    /**
-     * A focus change nothing listens for, before the dynamic status bar is
-     * installed.
-     */
     private static final @NotNull PropertyChangeListener NOTHING_ON_FOCUS = evt -> {
     };
 
-    /**
-     * What a focus change updates the status bar with, and one that updates
-     * nothing before the dynamic bar is installed. Removing a listener that was
-     * never added is what the focus manager does with it: nothing.
-     */
     private @NotNull PropertyChangeListener focusListener = NOTHING_ON_FOCUS;
 
     public TestCaseBaseDialog(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
@@ -126,14 +95,6 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
         this.orderSection = new OrderSection(p);
         this.statusSection = new StatusSection();
 
-        // Every section either dialog offers, in the order the create dialog
-        // lays them out and then whatever only the update menu has.
-        //
-        // It used to be the create dialog's fields alone, which was the same
-        // list until Order arrived: a case being created has no position to
-        // choose, so Order is the first field one dialog offers and the other
-        // does not (#162). A section missing from here is invisible to the
-        // update dialog, to the focus-to-status-bar mapping and to the save.
         this.cachedSections = Stream.concat(
                         Arrays.stream(CreateTestCaseFields.values()).map(CreateTestCaseFields::getSectionExtractor),
                         Arrays.stream(UpdateTestCaseFields.values()).map(UpdateTestCaseFields::getSectionExtractor))
@@ -145,19 +106,12 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
         for (final CreateTestCaseFields field : CreateTestCaseFields.values())
             bars.put(field.getSectionExtractor().apply(this), field.getStatusBarItems());
 
-        // Only for the sections the create dialog has no entry for: where both
-        // enums name the same section, the create dialog's bar is the one this
-        // mapping has always shown.
         for (final UpdateTestCaseFields field : UpdateTestCaseFields.values())
             bars.putIfAbsent(field.getSectionExtractor().apply(this), field.getStatusBarItems());
 
         this.statusBarMapping = Map.copyOf(bars);
     }
 
-    /**
-     * The section the focused component belongs to. Focus can sit on the dialog
-     * itself between two sections, which is no section rather than a missing one.
-     */
     private @NotNull Optional<CreateTestCaseSection> sectionHolding(final @NotNull Component focusOwner) {
         return getAllSections().stream()
                 .filter(section -> UIUtil.isDescendingFrom(focusOwner, section.getWrapper()))
@@ -165,15 +119,12 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
     }
 
     protected void initDynamicStatusBar(final @NotNull JComponent parentPanel) {
-        // Focus leaving the window arrives as no new owner at all, and a focus
-        // owner outside this dialog is somebody else's business.
         focusListener = evt -> Optional.ofNullable((Component) evt.getNewValue())
                 .filter(focusOwner -> UIUtil.isDescendingFrom(focusOwner, parentPanel))
                 .flatMap(this::sectionHolding)
                 .ifPresent(section -> showSectionKeys(statusBarMapping.getOrDefault(section, NO_ITEMS)));
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("focusOwner", focusListener);
 
-        // Removal runs on any disposal path (popup onClosed or project teardown).
         Disposer.register(dialogDisposable, this::removeFocusListener);
     }
 
@@ -182,12 +133,7 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
         focusListener = NOTHING_ON_FOCUS;
     }
 
-    /**
-     * Rule-EDITOR-PANEL-199.
-     * <p>
-     * The strip shows a section's own keys, then Save and Cancel - always last,
-     * so a tester looks for Save in the same place whichever field they are in.
-     */
+    // Rule-EDITOR-PANEL-199
     protected final void showSectionKeys(final StatusBarItem @NotNull [] items) {
         final @NotNull List<StatusBarItem> all = new ArrayList<>(List.of(items));
         all.addAll(List.of(TestCaseDialogKey.SAVE, TestCaseDialogKey.CANCEL));
@@ -195,43 +141,19 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
         showKeys(all.toArray(StatusBarItem[]::new));
     }
 
-    /**
-     * The focus listener and the section keys go with the dialog, however it
-     * closed.
-     */
     @Override
     protected void closed() {
         Disposer.dispose(dialogDisposable);
     }
 
-    /**
-     * The one section the tester may change, and empty when they may change all
-     * of them - which is what creating a test case means.
-     * <p>
-     * The update dialog opens on one field and shows the others grayed out, so
-     * "shown" and "may write" stopped being the same question. Only the save
-     * filtered, and it filtered on shown alone, so every grayed section wrote
-     * itself back over the case. One section had grown a guard of its own
-     * against exactly that and the rest had not - which is how editing a case's
-     * priority came to re-write its expected result as trimmed text, silently
-     * changing a stored value with leading or trailing whitespace, against the
-     * project's own rule that saving never reformats.
-     */
     private @NotNull Optional<CreateTestCaseSection> editableSection = Optional.empty();
 
-    /**
-     * UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-035.
-     * <p>
-     * Greys out every section but this one, and records that only it may write.
-     */
+    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-035
     protected void onlyEditable(final @NotNull CreateTestCaseSection target) {
         editableSection = Optional.of(target);
         getAllSections().forEach(section -> section.setEditable(section == target));
     }
 
-    /**
-     * Whether this section may write what it holds back to the test case.
-     */
     private boolean mayWrite(final @NotNull CreateTestCaseSection section) {
         return section.isShown() && editableSection.map(target -> target == section).orElse(true);
     }
@@ -240,24 +162,7 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
         return cachedSections;
     }
 
-    /**
-     * UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-201.
-     * <p>
-     * Binds a key in this dialog, standing it down while a popup is using it.
-     * <p>
-     * <b>Only the keys a popup actually uses.</b> Every binding stood down
-     * while the completion lookup or a combo was open, which is right for Enter
-     * and Escape - the popup owns those, and a dialog that saved itself over an
-     * open suggestion list would be saving the value the tester was in the
-     * middle of replacing. It is wrong for everything else: the expected-result
-     * and test-data fields suggest as the tester types, so the lookup is open
-     * most of the time they are in one - and CTRL+ENTER, the key that puts a
-     * line break in those very fields, was dead for exactly as long (#66).
-     * <p>
-     * Derived from the keystroke rather than from a list of exceptions kept
-     * beside it: a popup claims the plain key, never a combination. A list
-     * would be right today and stale at the next binding.
-     */
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-201
     public void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull Runnable action) {
         new DumbAwareAction() {
             @Override
@@ -277,31 +182,15 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
         }.registerCustomShortcutSet(shortcutSet, component);
     }
 
-    /**
-     * Whether code completion is showing its popup. The platform answers with no
-     * lookup when it is not, and this is the one place that reads that.
-     */
     private boolean completionIsOpen() {
         return LookupManager.getInstance(p).getActiveLookup() != null;
     }
 
-    /**
-     * Whether anything is open over this dialog that reads keys before it does -
-     * the completion lookup, or a section's own list.
-     */
     private boolean aPopupIsOpen() {
         return completionIsOpen() || getAllSections().stream().anyMatch(CreateTestCaseSection::isPopupOpen);
     }
 
-    /**
-     * UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-201.
-     * <p>
-     * Whether an open popup is using this key.
-     * <p>
-     * It uses the plain ones - Enter to take what is highlighted, Escape to
-     * close - and nothing else. A combination reaches the field underneath,
-     * which is what makes CTRL+ENTER a line break while a suggestion list is up.
-     */
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-201
     private static boolean popupClaims(final @NotNull CustomShortcutSet shortcutSet) {
         return Arrays.stream(shortcutSet.getShortcuts())
                 .filter(KeyboardShortcut.class::isInstance)
@@ -313,29 +202,10 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
     // Rule-EDITOR-PANEL-029, Rule-EDITOR-PANEL-035
     @Override
     protected void submit() {
-        // A section the tester never opened holds its empty defaults, and
-        // writing those over the dto would erase what is already there. A
-        // section shown but grayed out holds the stored value and must not
-        // write it back either, because writing it back trims it. Asked here
-        // rather than at the top of every applyTo method.
         final @NotNull List<CreateTestCaseSection> writers = getAllSections().stream().filter(this::mayWrite).toList();
 
-        // Before anything is applied, not after: a section that cannot write
-        // what it holds has already said so, and going on would save the
-        // case unchanged and stamp it as edited anyway.
         if (!writers.stream().allMatch(CreateTestCaseSection::accepts)) return;
 
-        // A blank description is refused before anything is applied too. The
-        // update dialog edits the very case the index holds, so applying first
-        // blanked that case before this said no: Escape did not bring the text
-        // back, and the next save of the case wrote it (#312, A83).
-        //
-        // Only when this save is the one writing it. Tested against what was
-        // stored, a test case imported with no description at all refused
-        // every single-field edit: the description is shown read-only in
-        // those, so setting the priority on such a case was refused because
-        // of a field the tester was not editing, and the red box was on a
-        // field they could not type in (#312, N11).
         if (writers.contains(descriptionSection) && descriptionSection.typed().trim().isEmpty()) {
             descriptionSection.setError(true);
             return;
@@ -346,5 +216,4 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
 
         closeOk();
     }
-
 }

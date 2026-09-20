@@ -46,11 +46,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TreePanelTree implements Disposable {
-
-    /**
-     * What a reveal does afterward when the caller wants nothing - the same
-     * shape the view panel uses for the same reason.
-     */
     private static final @NotNull Runnable NOTHING_AFTER = () -> {
     };
 
@@ -64,22 +59,9 @@ public class TreePanelTree implements Disposable {
     private final @NotNull SimpleTree mainTree;
     private final @NotNull AtomicBoolean refreshScheduled = new AtomicBoolean();
 
-    /**
-     * Path of the project currently shown in the tree. The tree auto-expands when it
-     * loads a different project (startup and selector changes); refreshes of the same
-     * project keep the user's own expand/collapse state. Empty while no project is selected.
-     */
     private volatile @NotNull String expandedProjectPath = "";
     private volatile boolean disposed;
 
-    /**
-     * A node to put the tree on once the next rebuild has finished.
-     * <p>
-     * Held rather than passed, because the rebuild the caller wants to follow
-     * may be one already scheduled: a paste refreshes through the indexer, and
-     * a second refresh arriving while the first is in flight is dropped by
-     * design. Whichever rebuild completes consumes this.
-     */
     private @NotNull Optional<Path> revealAfterRebuild = Optional.empty();
 
     public TreePanelTree(final @NotNull Project p, final @NotNull TreePanel tp) {
@@ -89,26 +71,12 @@ public class TreePanelTree implements Disposable {
         this.treeStructure = new TreePanelStructure(p, bound());
         this.structureModel = new StructureTreeModel<>(treeStructure, this);
         this.treeModel = new AsyncTreeModel(structureModel, this);
-        // UC-INTERNAL-001, Rule-INTERNAL-002.
-        //
-        // The tree answers the platform's questions as well as its own, so an
-        // action the platform built - one declared in plugin.xml, with a
-        // no-arg constructor and no way to be handed a tree - can find out what
-        // is selected here. Nothing in this plugin published a data key before
-        // #119, which is why every action had to be constructed by hand and was
-        // invisible to Find Action and the Keymap.
-        //
-        // Subclassed here rather than in a file of its own: it is one method,
-        // and it belongs where the tree is built rather than one indirection
-        // away from it.
+        // UC-INTERNAL-001, Rule-INTERNAL-002
         this.mainTree = new TestinTree(treeModel);
         this.scrollPane = new JBScrollPane(mainTree);
 
         mainTree.setRootVisible(true);
         mainTree.setShowsRootHandles(true);
-        // Nodes can only be moved into a directory.  INSERT also exposes
-        // sibling positions, which the transfer handler cannot resolve to a
-        // destination directory.
         mainTree.setDropMode(DropMode.ON);
         mainTree.setAutoscrolls(true);
 
@@ -123,44 +91,18 @@ public class TreePanelTree implements Disposable {
         mainTree.addMouseListener(new TreeMouseListener(p, mainTree, treeContextMenu));
         treeContextMenu.registerShortcuts(mainTree, transferHandler);
 
-        // ENTER on a tree is that tree's gesture rather than a command, so it is
-        // not in the keymap - it is put on the declared action here, which keeps
-        // one action behind both the menu entry and the key (#119).
         Declared.bindTo("Testin.Open", mainTree);
 
-        // Not in the keymap either: the grid answers CTRL+C and CTRL+X for its
-        // own cells and the card list for a test case, and a registered shortcut
-        // is dispatched before a component's input map - so a keymap entry would
-        // answer for all three (#119).
         Declared.bindTo("Testin.CopyNode", mainTree);
         Declared.bindTo("Testin.CutNode", mainTree);
         Declared.bindTo("Testin.PasteNode", mainTree);
 
-        // Nor this one: DELETE is the card list's key as well as the tree's, and
-        // it is the grid's for a cell's contents (#119).
         Declared.bindTo("Testin.RemoveNode", mainTree);
 
         quietSwingsOwnClipboard(mainTree);
     }
 
-    /**
-     * Rule-TREE-PANEL-006.
-     * <p>
-     * Leaves the declared Copy, Cut and Paste Node as the only handlers of their
-     * keys on the tree.
-     * <p>
-     * A JTree carries Swing's own clipboard actions under the same keys, and the
-     * IDE only swallows a key while the registered action is enabled. Paste Node
-     * grays itself for more than one selected row, so Ctrl+V fell through to
-     * Swing's paste - which skipped the name-collision notice and the question
-     * Rule-TREE-PANEL-006 says every move and copy asks, and moved or copied the
-     * nodes into the first selected row (#66, finding 189). Copy and Cut had the
-     * same second path.
-     * <p>
-     * Shadowed by the actions' own names rather than by a list of keys, so every
-     * key the look and feel maps to them - Ctrl+V, the Paste key, Shift+Insert -
-     * goes quiet together, and a key the look and feel adds later does too.
-     */
+    // Rule-TREE-PANEL-006
     private static void quietSwingsOwnClipboard(final @NotNull JTree tree) {
         final @NotNull Action nothing = new AbstractAction() {
             @Override
@@ -173,33 +115,10 @@ public class TreePanelTree implements Disposable {
         }
     }
 
-    /**
-     * Expands to a node and selects it, wherever it is (#29).
-     * <p>
-     * Matched on the path the node already carries rather than on a node object,
-     * because the tree builds its own wrappers as it expands and the caller has
-     * the one the indexer holds - two objects for one node, and only one of them
-     * is ever in the tree.
-     * <p>
-     * The visitor is what makes this work at any depth: the platform walks from
-     * the root, and a branch whose path is not a prefix of the target is not
-     * expanded at all, so revealing a case eight levels down opens eight nodes
-     * rather than the whole tree.
-     */
     public void reveal(final @NotNull Path target) {
         reveal(target, NOTHING_AFTER);
     }
 
-    /**
-     * The same, and then whatever the caller wanted done once the node is
-     * actually there.
-     * <p>
-     * A callback rather than a returned promise, because the one thing anybody
-     * wants afterward is the focus - and asking for it before the walk finishes
-     * puts it on a row the tree has not selected yet.
-     *
-     * @param afterFound run on the EDT once the node is selected and scrolled to
-     */
     public void reveal(final @NotNull Path target, final @NotNull Runnable afterFound) {
         if (disposed) return;
 
@@ -218,23 +137,11 @@ public class TreePanelTree implements Disposable {
         }));
     }
 
-    /**
-     * Puts the keyboard on the tree, for a tester who asked to be taken to a
-     * node: the node is selected, and the arrow keys should move from it.
-     */
     public void focus() {
         mainTree.requestFocusInWindow();
     }
 
-    /**
-     * UC-TREE-PANEL-013, UC-TREE-PANEL-014.
-     * <p>
-     * Rebuilds from the indexer and then puts the tree on this node.
-     * <p>
-     * For anything that adds a node the tester is looking for - a paste, a
-     * drop. The tree stays as they left it and the new node is selected in it,
-     * rather than the tester hunting for what they just made.
-     */
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014
     public void refreshAndReveal(final @NotNull Path target) {
         revealAfterRebuild = Optional.of(target);
         refresh();
@@ -253,11 +160,6 @@ public class TreePanelTree implements Disposable {
                 final boolean projectChanged = !projectPath.isEmpty() && !projectPath.equals(expandedProjectPath);
                 expandedProjectPath = projectPath;
 
-                // What is open and what is selected, before the rebuild throws
-                // the nodes away. Invalidating builds new node objects, and a
-                // tree that cannot recognize them comes back collapsed - so a
-                // paste, a rename or a re-index folded the tree up under the
-                // tester and left them to find their way back down.
                 final @NotNull TreeState shape = TreeState.createOn(mainTree);
 
                 structureModel.invalidateAsync().thenRun(() -> {
@@ -266,8 +168,6 @@ public class TreePanelTree implements Disposable {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (disposed) return;
 
-                        // A different project is the one time the tree should
-                        // not be put back as it was: it is a different tree.
                         if (projectChanged) TreeUtil.promiseExpandAll(mainTree);
                         else shape.applyTo(mainTree);
 
@@ -283,9 +183,6 @@ public class TreePanelTree implements Disposable {
         });
     }
 
-    /**
-     * Puts the tree on whatever the last caller asked to be shown, once.
-     */
     private void consumePendingReveal() {
         final @NotNull Optional<Path> target = revealAfterRebuild;
         revealAfterRebuild = Optional.empty();
@@ -297,11 +194,6 @@ public class TreePanelTree implements Disposable {
         tp.refresh();
     }
 
-    /**
-     * The test project this repository is bound to, asked for fresh each time.
-     * The tree used to read it out of a combo box; it now reads it from the one
-     * service that answers the question (#8).
-     */
     private @NotNull Optional<TestProjectDirectoryDto> bound() {
         return Services.getInstance(p, BoundTestProject.class).get();
     }

@@ -32,21 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Excel / DataGrip-style interaction for the grid tables:
- * <ul>
- *   <li>multi-interval cell selection (drag, Shift, Ctrl)</li>
- *   <li>clicking the order column selects the whole row;
- *       Ctrl toggles rows, Shift extends the row range</li>
- *   <li>Ctrl+C / Ctrl+X / Ctrl+V on cells using tab-separated clipboard text,
- *       compatible with Excel and DataGrip. Paste and cut go through the table
- *       model, so the normal edit listener persists the changes; read-only
- *       tables simply ignore paste/cut mutations.</li>
- * </ul>
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GridExcelBehavior {
-
     public static void install(final @NotNull JBTable table) {
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setCellSelectionEnabled(true);
@@ -56,31 +43,17 @@ public final class GridExcelBehavior {
         installClipboardActions(table);
     }
 
-    // ------------------------------------------------------------------
-    // Row selection via the sequence column
-    // ------------------------------------------------------------------
-
     private static void installSequenceColumnRowSelection(final @NotNull JBTable table) {
-        // Register ahead of the UI handler: listeners run in order, and ours must
-        // consume the press before the table UI applies plain cell selection.
         final MouseListener @NotNull[] existing = table.getMouseListeners();
         for (final MouseListener listener : existing) table.removeMouseListener(listener);
         table.addMouseListener(new SequenceColumnRowSelector(table));
         for (final MouseListener listener : existing) table.addMouseListener(listener);
     }
 
-    // ------------------------------------------------------------------
-    // Clipboard (TSV, Excel-compatible)
-    // ------------------------------------------------------------------
-
     private static void installClipboardActions(final @NotNull JBTable table) {
-        // Bound from GridKeys, which is also what the context menu is kept out
-        // of - so a key cannot be bound here and forgotten there.
         final @NotNull InputMap inputMap = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         GridKeys.clipboard().forEach(inputMap::put);
 
-        // Handlers keyed by the same names GridKeys bound, so the two halves of a
-        // binding cannot be spelled differently in two files.
         final @NotNull ActionMap actionMap = table.getActionMap();
         actionMap.put(GridKeys.COPY, action(() -> copySelection(table, false)));
         actionMap.put(GridKeys.CUT, action(() -> copySelection(table, true)));
@@ -107,8 +80,6 @@ public final class GridExcelBehavior {
             if (r > 0) sb.append('\n');
             for (int c = 0; c < cols.length; c++) {
                 if (c > 0) sb.append('\t');
-                // A cell can hold nothing, which toString answers; a @NotNull
-                // local in between said otherwise (#66, finding 267).
                 sb.append(escapeTsvField(Objects.toString(table.getValueAt(rows[r], cols[c]), "")));
             }
         }
@@ -127,8 +98,6 @@ public final class GridExcelBehavior {
 
     // UC-EDITOR-PANEL-018, Rule-EDITOR-PANEL-088
     private static void pasteIntoSelection(final @NotNull JBTable table) {
-        // An empty clipboard and a clipboard holding no text are the same
-        // nothing to paste.
         final @NotNull String text = Objects.requireNonNullElse(
                 CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor), "");
         if (text.isEmpty()) return;
@@ -141,7 +110,6 @@ public final class GridExcelBehavior {
         if (block.isEmpty()) return;
 
         if (block.size() == 1 && block.getFirst().size() == 1) {
-            // Single value: fill every selected cell, like Excel.
             final @NotNull String value = block.getFirst().getFirst();
             for (final int row : table.getSelectedRows()) {
                 for (final int col : table.getSelectedColumns()) {
@@ -153,7 +121,6 @@ public final class GridExcelBehavior {
             return;
         }
 
-        // Block paste anchored at the top-left selected cell.
         for (int r = 0; r < block.size(); r++) {
             final int row = anchorRow + r;
             if (row >= table.getRowCount()) break;
@@ -169,12 +136,7 @@ public final class GridExcelBehavior {
         }
     }
 
-    /**
-     * UC-EDITOR-PANEL-018, Rule-EDITOR-PANEL-087.
-     * <p>
-     * Excel TSV quoting: fields containing tabs, newlines, or quotes are wrapped
-     * in double quotes with internal quotes doubled.
-     */
+    // UC-EDITOR-PANEL-018, Rule-EDITOR-PANEL-087
     private static @NotNull String escapeTsvField(final @NotNull String value) {
         if (value.indexOf('\t') < 0 && value.indexOf('\n') < 0 && value.indexOf('\r') < 0 && value.indexOf('"') < 0) {
             return value;
@@ -182,10 +144,6 @@ public final class GridExcelBehavior {
         return '"' + value.replace("\"", "\"\"") + '"';
     }
 
-    /**
-     * Parses Excel-style TSV: fields separated by tabs, records by newlines,
-     * quoted fields may contain tabs, newlines, and doubled quotes.
-     */
     private static @NotNull List<List<String>> parseTsv(final @NotNull String text) {
         final @NotNull List<List<String>> records = new ArrayList<>();
         List<String> fields = new ArrayList<>();
@@ -222,7 +180,6 @@ public final class GridExcelBehavior {
             }
         }
 
-        // Trailing record without a final newline.
         if (!current.isEmpty() || !fields.isEmpty()) {
             fields.add(current.toString());
             records.add(fields);

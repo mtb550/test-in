@@ -24,7 +24,6 @@ import org.testin.model.TestRunStatus;
 import org.testin.util.Bundle;
 
 public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem {
-
     private final @NotNull RunEditor editor;
 
     public StartExecutionBtn(final @NotNull RunEditor editor, final @NotNull Runnable onStartExecutionClicked) {
@@ -34,18 +33,7 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
         addActionListener(e -> onStartExecutionClicked.run());
     }
 
-    /**
-     * UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135.
-     * <p>
-     * Why the button is gray, in the order the reasons matter: a walk already
-     * going, then a run that records nothing more, then a walk with nowhere to
-     * land. The last one covers a test run holding no test cases, a filter
-     * matching nothing, and a list whose test cases have all been judged - all
-     * three of which left the button live and startable (#215).
-     * <p>
-     * Public because light mode's Start is the same button and grays for the same
-     * reasons, so it says the same words (#312, A31).
-     */
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
     public static @NotNull String tooltipFor(final @NotNull RunEditor editor) {
         if (editor.isExecuting()) return Bundle.message("toolbar.executing");
 

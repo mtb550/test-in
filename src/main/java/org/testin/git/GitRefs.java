@@ -29,48 +29,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * Pure Git naming and selection rules, extracted from the Git4Idea-backed
- * services so they are unit-testable without an IDE or a repository.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GitRefs {
-
     private static final @NotNull Pattern HEAD_BRANCH = Pattern.compile("(?m)^\\s*HEAD branch:\\s*(\\S+)\\s*$");
 
     private static final @NotNull String REMOTES_PREFIX = "remotes/";
 
-    /**
-     * What {@code git remote show} prints for a remote that has no branches.
-     */
     private static final @NotNull String NO_HEAD_BRANCH = "(unknown)";
 
-    /**
-     * The porcelain codes for a path with a conflict: either side added, either
-     * side deleted, or both changed it.
-     */
     private static final @NotNull Set<String> UNMERGED =
             Set.of("DD", "AU", "UD", "UA", "DU", "AA", "UU");
 
-    /**
-     * UC-SHARE-010, Rule-SHARE-048.
-     * <p>
-     * Reads {@code git status --porcelain -uall} into what changed.
-     * <p>
-     * Pure text, so the rules can be asserted without a repository. The three
-     * that matter, and that cost real debugging when they are wrong:
-     * <ul>
-     *   <li>{@code ??} is untracked, which is what a brand-new test case is
-     *       until something stages it - so it is an addition, not nothing.</li>
-     *   <li>A path containing a space comes back wrapped in double quotes with
-     *       C-style escapes, and every test set named with a space produces one.</li>
-     *   <li>A rename is reported as {@code old -> new} and is <b>two</b> changes,
-     *       not one: the file is there under the new name and gone from the old.
-     *       Listing only the new path commits half the move, and whoever pulls it
-     *       gets both copies. A copy - {@code C} - is the one arrow that leaves
-     *       its source where it was, so only {@code R} produces the deletion.</li>
-     * </ul>
-     */
+    // UC-SHARE-010, Rule-SHARE-048
     public static @NotNull List<StatusEntry> parseStatus(final @NotNull List<String> porcelainLines) {
         final @NotNull List<StatusEntry> entries = new ArrayList<>();
 
@@ -85,7 +55,6 @@ public final class GitRefs {
             final @NotNull String path = unquote(renameArrow < 0 ? rawPath : rawPath.substring(renameArrow + 4));
             if (path.isEmpty()) continue;
 
-            // The deletion first, so the move reads in the order it happened.
             if (renameArrow >= 0 && code.indexOf('R') >= 0) {
                 final @NotNull String from = unquote(rawPath.substring(0, renameArrow));
                 if (!from.isEmpty()) entries.add(new StatusEntry(DiffType.DELETED, slashed(from)));
@@ -96,15 +65,6 @@ public final class GitRefs {
         return entries;
     }
 
-    /**
-     * The branch names from {@code git branch -a}, as the tester picks them:
-     * {@code main} for a local branch and {@code origin/main} for a remote one.
-     * <p>
-     * Two things are dropped. The {@code * } marking the current branch, which is
-     * decoration. And the symbolic ref line {@code remotes/origin/HEAD -> origin/main},
-     * which names no branch of its own - checking it out detaches HEAD, and it
-     * would sit in the list looking like a third branch.
-     */
     public static @NotNull List<String> parseBranches(final @NotNull List<String> branchOutput) {
         return branchOutput.stream()
                 .map(line -> line.startsWith("*") ? line.substring(1) : line)
@@ -117,11 +77,6 @@ public final class GitRefs {
                 .toList();
     }
 
-    /**
-     * True when {@code git status --porcelain} reports a path both sides
-     * touched - the state a pull leaves behind when it cannot merge, and the
-     * only thing that makes the abort-or-continue offer worth showing.
-     */
     public static boolean hasUnmergedPaths(final @NotNull List<String> porcelainLines) {
         return porcelainLines.stream()
                 .filter(line -> line.length() >= 2)
@@ -129,19 +84,10 @@ public final class GitRefs {
                 .anyMatch(UNMERGED::contains);
     }
 
-    /**
-     * A path as the rest of the plugin compares them: forward slashes, whatever
-     * the platform wrote. Git speaks slashes on every platform, and a path read
-     * back from a marker on Windows does not.
-     */
     private static @NotNull String slashed(final @NotNull String path) {
         return path.replace('\\', '/');
     }
 
-    /**
-     * The paths Git reports as conflicting, from the same porcelain output
-     * {@link #hasUnmergedPaths} answers yes or no about.
-     */
     public static @NotNull List<String> unmergedPaths(final @NotNull List<String> porcelainLines) {
         return porcelainLines.stream()
                 .filter(line -> line.length() >= 4)
@@ -152,17 +98,7 @@ public final class GitRefs {
                 .toList();
     }
 
-    /**
-     * UC-SHARE-017.
-     * <p>
-     * What a tester is told when a pull stops on conflicts.
-     * <p>
-     * Naming the files is the whole point: "resolve them in the IDE" without
-     * saying which ones sends a tester looking through a tree for something the
-     * plugin already knows (#66). Both the sync and the push say this, from
-     * here, because two copies of a sentence drift the way two copies of a rule
-     * do.
-     */
+    // UC-SHARE-017
     public static @NotNull String conflictMessage(final @NotNull List<String> unmergedPaths) {
         if (unmergedPaths.isEmpty()) {
             return Bundle.message("git.conflict.unnamed");
@@ -181,20 +117,11 @@ public final class GitRefs {
         if (code.equals("??") || code.indexOf('A') >= 0) return DiffType.ADDED;
         if (code.indexOf('D') >= 0) return DiffType.DELETED;
 
-        // After the deletion check, so a rename whose new file was then deleted
-        // stays a deletion. Nothing existed under the new name to modify, which
-        // is what makes it an addition rather than a change.
         if (code.indexOf('R') >= 0) return DiffType.ADDED;
 
         return DiffType.MODIFIED;
     }
 
-    /**
-     * Undoes git's path quoting: the whole path in double quotes, with
-     * backslash escapes and non-ASCII bytes as octal. The octal matters because
-     * a test set named in Arabic arrives entirely as escapes, and decoding the
-     * bytes as UTF-8 is the only way back to the name on disk.
-     */
     private static @NotNull String unquote(final @NotNull String rawPath) {
         if (rawPath.length() < 2 || rawPath.charAt(0) != '"' || !rawPath.endsWith("\"")) return rawPath;
 
@@ -227,15 +154,6 @@ public final class GitRefs {
         return bytes.toString(StandardCharsets.UTF_8);
     }
 
-    /**
-     * The HEAD branch reported by {@code git remote show}, or empty.
-     * <p>
-     * A remote with no commits reports {@code HEAD branch: (unknown)} - it has no
-     * branches yet, so there is nothing to name. Read literally that is a branch
-     * called {@code (unknown)}, which is what a first push tried to pull from:
-     * "couldn't find remote ref (unknown)". Empty instead, so the caller falls
-     * back to the branch checked out here, which is the one being pushed.
-     */
     public static @NotNull String parseHeadBranch(final @NotNull String remoteShowOutput) {
         final @NotNull Matcher matcher = HEAD_BRANCH.matcher(remoteShowOutput);
         if (!matcher.find()) return "";
@@ -244,10 +162,6 @@ public final class GitRefs {
         return NO_HEAD_BRANCH.equals(branch) ? "" : branch;
     }
 
-    /**
-     * The remote to sync with: {@code origin} when present, otherwise the
-     * first remote, otherwise nothing at all.
-     */
     public static @NotNull String chooseRemote(final @NotNull List<String> remotes) {
         final @NotNull List<String> names = remotes.stream()
                 .map(String::trim)
@@ -257,22 +171,7 @@ public final class GitRefs {
         return names.isEmpty() ? "" : names.getFirst();
     }
 
-    /**
-     * UC-SHARE-008, Rule-SHARE-108.
-     * <p>
-     * Whether this is the shape of an email address: something, an at sign,
-     * something with a dot in it, and no spaces anywhere.
-     * <p>
-     * The shape and nothing more. Git records whatever it is given and no
-     * address can be proved to exist without sending to it, so what is worth
-     * refusing is the answer that is plainly not one - a name typed into the
-     * wrong box, a path, a sentence. Anything narrower would refuse addresses
-     * that work.
-     * <p>
-     * Beside {@link #isRepositoryUrl} because it is the same kind of question
-     * asked of the other half of a Git identity, and a tester who typed one into
-     * the wrong dialog should hear the same sort of answer.
-     */
+    // UC-SHARE-008, Rule-SHARE-108
     public static boolean isEmailAddress(final @NotNull String text) {
         final @NotNull String value = text.trim();
 
@@ -285,49 +184,10 @@ public final class GitRefs {
         return domain.length() >= 3 && domain.indexOf('.') > 0 && !domain.endsWith(".");
     }
 
-    /**
-     * UC-TREE-PANEL-001, Rule-TREE-PANEL-117.
-     * <p>
-     * The characters a clone address is made of. Written as what is allowed
-     * rather than what is feared: a list of allowed characters cannot be short
-     * by one the way a list of forbidden ones can.
-     * <p>
-     * It came from {@code TestinProjectConfig}, which applied it to the file's
-     * RepoUrl and nothing else, so the same value was judged by two different
-     * rules depending on where it was typed. A space, a semicolon or a quote
-     * fails here, which is why a clone address is the one kind of text this
-     * refuses without asking anything else (#301, F2, R12).
-     * <p>
-     * {@code =} is here and {@code &} is not. The one belongs to a query -
-     * {@code ?ref=main} is an address a tester can be given - and the config's
-     * copy of this list was missing it, which is one of the four addresses the
-     * two rules disagreed about. The other is the single character a URL and a
-     * shell both use for structure, and a clone address with two query
-     * parameters is not a thing {@code git clone} is handed in practice.
-     */
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-117
     private static final @NotNull Pattern CLONE_CHARACTERS = Pattern.compile("^[A-Za-z0-9._~:/?#@%+=-]+$");
 
-    /**
-     * True when the text names a repository to clone rather than a project to
-     * create.
-     * <p>
-     * The create-project dialog takes one field for both, so this is what
-     * decides which happens. Deliberately narrow: a project name is free text
-     * typed by the tester, and mistaking one for a URL would send them to a
-     * clone they never asked for.
-     * <p>
-     * <b>The one answer, for everything that asks.</b> The file's own check used
-     * to be a second one, and the two disagreed: {@code git://host/x} and
-     * {@code http://host/x.git} were addresses here and were dropped from the
-     * file without a word, so a tester whose testin.yml said either saw a panel
-     * that never mentioned an address at all. The file keeps what it is given
-     * now, and this decides (#301, Rule-TREE-PANEL-117).
-     * <p>
-     * "http://" here is a scheme being recognized, not a link being followed:
-     * this decides whether the tester typed a clone URL. Refusing to match it
-     * would not make anything more secure, it would stop plain-http remotes
-     * being clonable at all - hence the suppression.
-     */
+    // Rule-TREE-PANEL-117
     @SuppressWarnings("HttpUrlsUsage")
     public static boolean isRepositoryUrl(final @NotNull String text) {
         final @NotNull String value = text.trim();
@@ -341,35 +201,16 @@ public final class GitRefs {
                 || value.endsWith(".git");
     }
 
-
     public static @NotNull String localNameOf(final @NotNull String remoteBranchName) {
         return remoteBranchName.substring(remoteBranchName.indexOf('/') + 1);
     }
 
-    /**
-     * UC-TREE-PANEL-026, Rule-TREE-PANEL-086.
-     * <p>
-     * True when a picked name is a remote's branch: not a branch on this machine,
-     * and starting with the name of one of the remotes.
-     * <p>
-     * Asked of the lists rather than of a slash. A local branch may be called
-     * {@code feature/login}, and reading that slash as a remote prefix checked
-     * out a new branch called {@code login} - so a commit went there while the
-     * push sent the untouched {@code feature/login} and said Pushed (#312, A40).
-     */
+    // UC-TREE-PANEL-026, Rule-TREE-PANEL-086
     public static boolean isRemoteBranch(final @NotNull String branch, final @NotNull List<String> localBranches, final @NotNull List<String> remotes) {
         return !localBranches.contains(branch)
                 && remotes.stream().map(String::trim).filter(remote -> !remote.isEmpty()).anyMatch(remote -> branch.startsWith(remote + "/"));
     }
 
-    /**
-     * Every directory the given repository-relative files sit under, itself
-     * repository-relative, with the repository root as the empty string.
-     * <p>
-     * Used to find the marker files that have to travel with a commit: a test
-     * case is a file in a directory, and that directory is only a test set
-     * because a {@code .ts} sits beside it.
-     */
     public static @NotNull Set<String> ancestorDirectories(final @NotNull Collection<String> relativePaths) {
         final @NotNull Set<String> directories = new LinkedHashSet<>();
         directories.add("");
@@ -382,11 +223,6 @@ public final class GitRefs {
         return directories;
     }
 
-    /**
-     * The forward-slashed repository-relative paths behind the selected
-     * changes, deduplicated in selection order.
-     */
-
     public static @NotNull Set<String> repoRelativePaths(final @NotNull Collection<PendingChange> changes) {
         return changes.stream()
                 .map(PendingChange::relativeFilePath)
@@ -394,10 +230,6 @@ public final class GitRefs {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    /**
-     * One line of {@code git status --porcelain}: what happened to a file, and
-     * which file, with the path already unquoted and slashed for comparison.
-     */
     public record StatusEntry(@NotNull DiffType type, @NotNull String path) {
     }
 }

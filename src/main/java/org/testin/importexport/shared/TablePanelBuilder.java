@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TablePanelBuilder {
-
     public String @NotNull [] buildColumnNames(final @NotNull List<TestEditorAttributes> attributes) {
         final @NotNull List<String> columnNames = new ArrayList<>();
         columnNames.add("");
@@ -96,10 +95,6 @@ public class TablePanelBuilder {
         );
 
         try {
-            // By the same name buildColumnNames wrote, not by a literal that has
-            // to match it. A rename of the attribute moved the column and left
-            // this lookup throwing into the catch below - logged, and the editor
-            // quietly without its dropdowns.
             final @NotNull TableColumn priorityCol = table.getColumn(TestEditorAttributes.PRIORITY.getName());
             final @NotNull ComboBox<String> priorityBox = new ComboBox<>();
             for (final Priority pr : Priority.values()) {
@@ -117,6 +112,4 @@ public class TablePanelBuilder {
 
         return table;
     }
-
-
 }

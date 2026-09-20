@@ -24,7 +24,6 @@ import org.testin.model.markers.TestProjectMarker;
 
 import java.util.List;
 
-
 @Setter
 @Getter
 @NoArgsConstructor
@@ -32,7 +31,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class TestProjectDirectoryDto extends DirectoryDto {
-
     @NotNull
     @Builder.Default
     private TestCasesMainDirectoryDto testCasesDirectory = new TestCasesMainDirectoryDto();
@@ -41,16 +39,9 @@ public class TestProjectDirectoryDto extends DirectoryDto {
     @Builder.Default
     private TestRunsMainDirectoryDto testRunsDirectory = new TestRunsMainDirectoryDto();
 
-
     @NotNull
     @Builder.Default
     private TestProjectMarker marker = new TestProjectMarker();
-
-
-
-    // The test project node is not moved or pasted into from the tree: every
-    // path under it is built from where it is. It is renamed like any node, and
-    // what is named after it follows (#331).
 
     @Override
     public @NotNull List<DirectoryDto> fixedChildren() {
@@ -61,7 +52,6 @@ public class TestProjectDirectoryDto extends DirectoryDto {
     public boolean isTransferable() {
         return false;
     }
-
 
     @Override
     public @NotNull DirectoryType getType() {

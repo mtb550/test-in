@@ -49,14 +49,6 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 public enum FileTypes {
-    /**
-     * Import only. The legacy workbook still has to be recognized by its
-     * extension so a tester can import one, but nothing here writes it: XLS was
-     * handed the xlsx exporter, so choosing it produced xlsx bytes in a file
-     * named .xls. Excel warned about the mismatch on every open and some tools
-     * refused the file outright, and because nothing in the plugin failed the
-     * complaint only ever came back from whoever received it.
-     */
     XLS(
             "XLS",
             ".xls",
@@ -120,29 +112,15 @@ public enum FileTypes {
             (p, trDir, tr, detailsMap) -> new TestRunWordGenerator().generate(p, trDir, tr, detailsMap)
     );
 
-    // todo: add XML object.
-
     private final @NotNull String label;
     private final @NotNull String extension;
 
-    /**
-     * The import dialog's hint, given the columns an import reads, and empty
-     * for formats that need no explanation. From the bundle: it sat here as two
-     * English paragraphs (#66, finding 253).
-     */
     private final @NotNull Function<String, String> hint;
 
-    /**
-     * The hint this format shows, naming these columns.
-     */
     public @NotNull String hintFor(final @NotNull String columns) {
         return hint.apply(columns);
     }
 
-    // PDF and WORD are report-only and HTML has no importer, so those carry the
-    // handler's UNSUPPORTED instance. Ask what a format supports with the
-    // is* methods below - a handler is always present, so its absence is not
-    // the question to ask.
     private final @NotNull ExportHandler exportHandler;
     private final @NotNull ImportHandler importHandler;
     private final @NotNull ReportHandler reportHandler;
@@ -159,24 +137,12 @@ public enum FileTypes {
         return reportHandler != ReportHandler.UNSUPPORTED;
     }
 
-    /**
-     * The format that can read this file name, empty when nothing can. Only
-     * formats with an import handler count; matching an .html file would NPE
-     * downstream.
-     * <p>
-     * Here rather than on the dialog's document listener, which is where it was
-     * until #291: which extension belongs to which format is what this enum is,
-     * and a listener that debounces keystrokes had no business answering it.
-     */
     public static @NotNull Optional<FileTypes> importerFor(final @NotNull String fileName) {
         return Arrays.stream(values())
                 .filter(type -> type.isImportable() && fileName.endsWith(type.getExtension()))
                 .findFirst();
     }
 
-    /**
-     * The extensions an import understands, as a tester would say them.
-     */
     public static @NotNull String importableExtensions() {
         return Arrays.stream(values())
                 .filter(FileTypes::isImportable)
@@ -184,11 +150,6 @@ public enum FileTypes {
                 .collect(Collectors.joining(", "));
     }
 
-    /**
-     * The same extensions as a file chooser filters on them, without the dot.
-     * The import's chooser listed them by hand beside this enum, which is
-     * where a format's extension lives (#312, A53).
-     */
     public static String @NotNull [] importableExtensionsForChooser() {
         return Arrays.stream(values())
                 .filter(FileTypes::isImportable)
@@ -197,7 +158,6 @@ public enum FileTypes {
     }
 
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
-        // Checked here rather than left to the handler, so the failure names the format.
         if (!isExportable()) throw new IllegalStateException(label + " cannot be exported to");
         exportHandler.execute(p, destFile, sheetsData);
     }

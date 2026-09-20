@@ -43,22 +43,6 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
 public final class TestCaseDto {
-
-    /**
-     * Where this case sits in its test set, as a value it owns (see
-     * {@link org.testin.testcase.Rank}).
-     * <p>
-     * It used to be two fields naming other cases - {@code isHead} and
-     * {@code next} - so a case knew its neighbors instead of its position.
-     * Every insertion, deletion and reorder then rewrote a case the tester had
-     * not touched, which is what made two people working in parallel conflict on
-     * a third person's file, and what let one lost pointer leave a whole test
-     * set with no order at all.
-     * <p>
-     * Empty on a case that has not been placed yet - imported, copied in,
-     * arrived from a merge. Those sort after the placed ones, oldest first, and
-     * are given a rank the next time anything writes them.
-     */
     @NonNull
     @Builder.Default
     private volatile String order = "";
@@ -113,11 +97,6 @@ public final class TestCaseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
     private volatile ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
-    /**
-     * The empty timestamp until the case is edited for the first time: a case
-     * nobody has changed has no modification date, and every reader gets a blank
-     * from {@link org.testin.util.Display#formatDate} rather than asking whether it is set.
-     */
     @NonNull
     @Builder.Default
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
@@ -135,20 +114,6 @@ public final class TestCaseDto {
     @Builder.Default
     private volatile String preConditions = "";
 
-    /**
-     * The stand-in for a case a run refers to and the index no longer has.
-     * <p>
-     * A run records what was executed, and deleting a test case afterward does
-     * not un-execute it. The row therefore stays, carrying the verdict, actual
-     * result and timings the run wrote against it, and saying plainly that the
-     * case itself is gone.
-     * <p>
-     * The run used to drop the row with only a log line, so a run built with
-     * twelve cases quietly showed eleven while its file still held twelve.
-     * <p>
-     * The id is kept because it is the only identity left: two deleted cases in
-     * one run are otherwise the same row twice.
-     */
     public static @NotNull TestCaseDto deleted(final @NotNull UUID id) {
         return TestCaseDto.builder()
                 .id(id)
@@ -156,11 +121,6 @@ public final class TestCaseDto {
                 .build();
     }
 
-    /**
-     * Fills the creation audit, and leaves the modification pair empty: a case
-     * that has just been made has not been changed by anyone yet. Called once, by
-     * the write path, the first time this case is saved.
-     */
     public void stampCreated(final @NotNull String tester) {
         createdBy = tester;
         createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
@@ -169,21 +129,11 @@ public final class TestCaseDto {
         updatedAt = Config.NOT_EXECUTED;
     }
 
-    /**
-     * Records a change by the given tester, now. The creation pair is never
-     * touched again after {@link #stampCreated}.
-     */
     public void touch(final @NotNull String tester) {
         updatedBy = tester;
         updatedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
-    /**
-     * Takes another state's whole audit - who created and changed this case, and
-     * when. For a revert that leaves nothing reviewable changed: the case is then
-     * the one that was committed, and a fresh stamp would keep it in the review
-     * for a change nobody made (#66, finding 128).
-     */
     public void takeAuditOf(final @NotNull TestCaseDto other) {
         createdBy = other.createdBy;
         createdAt = other.createdAt;

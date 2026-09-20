@@ -27,7 +27,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.util.NameSanitizer;
 
 public class UpdateTestDescription extends UpdateTestBase implements GenAction {
-
     // UC-CODEGEN-010, Rule-CODEGEN-039, Rule-CODEGEN-040
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
@@ -38,11 +37,6 @@ public class UpdateTestDescription extends UpdateTestBase implements GenAction {
         });
     }
 
-    /**
-     * A selection of cases as one command and one undo entry - see
-     * {@link UpdateTestBase#applyToEach} for what that is worth and what it
-     * cost before (#66, finding 56).
-     */
     @Override
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
         applyToEach(p, items, GenType.UPDATE_TEST_CASE_DESCRIPTION.getDescription(), (pm, tc) -> writeDescription(p, pm, tc));

@@ -21,14 +21,5 @@ import org.testin.config.BugRepository;
 
 import java.util.Optional;
 
-/**
- * A bug report ready to open (#28): what it says, where it would be filed, and
- * whether it can be sent.
- *
- * @param body        the template, filled
- * @param repository  where it would be filed, and empty when {@code bugRepoUrl}
- *                    names no repository
- * @param whyNotReady why it cannot be sent, and empty when it can
- */
 record PreparedBug(@NotNull BugFacts facts, @NotNull String body, @NotNull Optional<BugRepository> repository, @NotNull Optional<String> whyNotReady) {
 }

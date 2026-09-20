@@ -19,9 +19,5 @@ package org.testin.explorer.tree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.dirs.DirectoryDto;
 
-
-/**
- * Stable local drag/drop payload; avoids JVM array-class DataFlavor resolution issues.
- */
 public record TreeTransferPayload(@NotNull DirectoryDto[] nodes, int clipboardAction) {
 }

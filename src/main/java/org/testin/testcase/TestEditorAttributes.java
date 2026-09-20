@@ -50,22 +50,6 @@ import static org.testin.importexport.imports.ImportSetter.took;
 
 @Getter
 public enum TestEditorAttributes implements ToolBarAttribute {
-
-    /**
-     * The row's position on the page, drawn by the card title and by the grid's
-     * first column. The test case carries no such value - the position is the
-     * view's, not the model's - so the extractor is empty and each view fills
-     * the number in from the index it is already counting.
-     * <p>
-     * Locked on, the way the description is. It is not a field the tester
-     * chooses to see - it is the grid's row header, and the target of the two
-     * gestures that are not edits: clicking it selects the whole row, and ENTER
-     * and the double-click open the details panel. Every other column is
-     * editable, so those two keys already mean "start editing" there and have
-     * nowhere else to go. Unticking Order took all three away and said nothing
-     * (#207); ToolBarDefault.LOCKED_CHECKED already named this column in its own
-     * javadoc, and only the constant disagreed.
-     */
     ORDER(
             Bundle.message("attribute.order"),
             ToolBarDefault.LOCKED_CHECKED,
@@ -75,7 +59,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ) {
         @Override
         public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
-            // Drawn by the card title, ahead of the description: "1. Log in with a valid user".
         }
     },
 
@@ -89,7 +72,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ) {
         @Override
         public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
-            // The card title is the description; a details row under it would print it twice.
         }
     },
 
@@ -102,16 +84,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.EXPORT
     ),
 
-    /**
-     * Singular, and the run grid, the create dialog and the update dialog all
-     * say it this way now because they ask here.
-     * <p>
-     * Two of them said "Expected Results" while the grid, the run editor and the
-     * details panel said "Expected Result" - the same field under two names, in
-     * front of the same tester, for as long as each was written out separately.
-     * Nothing failed and nothing could: a caption that has already drifted does
-     * not even look like a duplicated string.
-     */
     EXPECTED_RESULT(
             Bundle.message("attribute.expected.result"),
             ToolBarDefault.ON,
@@ -257,58 +229,17 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.IMPORT, Can.EXPORT
     );
 
-    /**
-     * What a tester is allowed to do with an attribute, said by name.
-     * <p>
-     * These were four booleans in a row on every constant - {@code true, true,
-     * false, true} - and nobody could read which was which without scrolling to
-     * the field declarations. A fifth thing a tester might do would have meant
-     * editing all eighteen; now it means one constant here and nothing else.
-     */
     public enum Can {
-
-        /** Typed into a grid cell. False for what the tester does not own: the
-         * row number, the identity a case is filed under, and the audit pairs. */
         EDIT,
 
-        /** Read from an imported sheet. */
         IMPORT,
 
-        /**
-         * Carried by a clipboard copy of the test case.
-         * <p>
-         * The ten a tester writes, which is exactly {@link #EDIT}'s set: what
-         * they typed is what they mean to paste into a bug report or a chat.
-         * The row number, the identity, the fully qualified name, the path and
-         * the four audit fields are machinery and provenance, and nobody pastes
-         * a UUID at somebody.
-         * <p>
-         * It was declared on the description and on nothing else, so Ctrl+C put
-         * one line on the clipboard and said "Details copied" (#197).
-         */
         COPY,
 
-        /** Written into an exported sheet. */
         EXPORT
     }
 
-    /**
-     * UC-EDITOR-PANEL-019, UC-INTERNAL-001, Rule-EDITOR-PANEL-091.
-     * <p>
-     * Whether any field this test case carries holds what was typed.
-     * <p>
-     * One owner, where there were two. The global search asked this of all
-     * eighteen attributes and the editor's own search box wrote out four field
-     * names by hand - so the two disagreed about what a search is, and a tester
-     * looking for a module found nothing in the editor and the case in the
-     * global search (#212, #294). A column added here is now searchable in both
-     * without touching anything else.
-     * <p>
-     * Short-circuits on the first attribute that holds it, so the common case -
-     * a description match - costs one comparison rather than eighteen. The row
-     * number needs no exception: its extractor is empty, and an empty value
-     * holds no query.
-     */
+    // UC-EDITOR-PANEL-019, UC-INTERNAL-001, Rule-EDITOR-PANEL-091
     public static boolean anyContains(final @NotNull TestCaseDto tc, final @NotNull String wanted) {
         final @NotNull String lowered = wanted.toLowerCase(Locale.ROOT);
 
@@ -319,43 +250,11 @@ public enum TestEditorAttributes implements ToolBarAttribute {
         return false;
     }
 
-    /**
-     * Rule-VIEW-PANEL-026, Rule-EDITOR-PANEL-005.
-     * <p>
-     * The attributes a tester writes as sentences, and the only ones a reader
-     * capitalizes and closes with a period.
-     * <p>
-     * Reference, module and test data are not on the list and must not be. A
-     * reference is an identifier, a module is a label, and test data is a value
-     * that gets used rather than read - a period after "JIRA-123" reads as a
-     * typo, and a period after a password breaks it. The panel added one to the
-     * first two for as long as each row decided formatting for itself (#22).
-     * <p>
-     * Here rather than at the surfaces, because the card, the details panel and
-     * light mode all show the same field and each was deciding separately: the
-     * card printed the raw expected result directly beside a panel showing it
-     * closed with a period.
-     */
+    // Rule-VIEW-PANEL-026, Rule-EDITOR-PANEL-005
     private static final @NotNull Set<TestEditorAttributes> PROSE =
             EnumSet.of(DESCRIPTION, EXPECTED_RESULT, STEPS, PRE_CONDITIONS);
 
-    /**
-     * UC-SHARE-005, UC-SHARE-006, Rule-SHARE-110.
-     * <p>
-     * Whether a spreadsheet column with that header is this attribute.
-     * <p>
-     * <b>Two spellings are accepted, and the second is the one that survives
-     * translation.</b> The caption is what an export writes and what a tester
-     * sees, so it is the natural header - and it is also the string that becomes
-     * French the day the plugin does. The constant name with its underscores
-     * opened out is the same words in English forever, so a file exported by a
-     * colleague on another language still finds its columns, and the sample
-     * workbook shipped in the plugin keeps working everywhere (#11).
-     * <p>
-     * Asked here rather than compared at the two importers, which had the same
-     * line each: the CSV reader and the Excel reader cannot come to different
-     * answers about what a column is called.
-     */
+    // UC-SHARE-005, UC-SHARE-006, Rule-SHARE-110
     public boolean isColumn(final @NotNull String header) {
         final @NotNull String wanted = header.trim();
 
@@ -365,37 +264,15 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     private final @NotNull String name;
     private final @NotNull ToolBarDefault toolBarDefault;
 
-    /**
-     * How the value is read off a test case, for every surface that shows it.
-     * <p>
-     * A plain {@code Function} rather than the {@link ValueExtractor} the run
-     * attributes use, because not one of these eighteen ever read the
-     * {@code Project} that interface hands over - it is there for
-     * {@link RunEditorAttributes}, where one extractor genuinely asks the
-     * indexer. Carrying it here cost more than an unused parameter: it made
-     * "does this test case hold this text" a question only a caller holding a
-     * project could ask, which is why the editor's search box wrote its own
-     * answer instead of using the one the global search already had (#294).
-     */
     private final @NotNull Function<TestCaseDto, String> testValueExtractor;
 
-    /** How an imported cell is written back onto a test case. */
     private final @NotNull ImportSetter importSetter;
 
-    /** Automation code update to run when this attribute changes. */
     private final @NotNull GenType genType;
 
-    /**
-     * Empty for an attribute the tester only reads - the row number is the one.
-     */
     @Getter(AccessLevel.NONE)
     private final @NotNull Set<Can> can;
 
-    /**
-     * Which attributes each capability covers, in column order - see
-     * {@link #all}. Built after the constants, which is when {@code values()}
-     * has an answer to give.
-     */
     private static final @NotNull Map<Can, List<TestEditorAttributes>> BY_CAPABILITY = EnumSet.allOf(Can.class).stream()
             .collect(Collectors.toUnmodifiableMap(capability -> capability, capability -> List.of(values()).stream().filter(attribute -> attribute.can(capability)).toList()));
 
@@ -408,17 +285,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
         this.can = can.length == 0 ? EnumSet.noneOf(Can.class) : EnumSet.copyOf(List.of(can));
     }
 
-    /**
-     * UC-SHARE-006, Rule-SHARE-106, Rule-EDITOR-PANEL-206.
-     * <p>
-     * Writes one row of an imported sheet onto a test case, and answers how many
-     * of its values Testin could not read.
-     * <p>
-     * The two importers had this loop each, differing only in how a cell is
-     * fetched out of the file - so the count #264 asks for would have been
-     * written twice, and the next importer would have written it a third time.
-     * What varies is the cell lookup, so that is what is passed.
-     */
+    // UC-SHARE-006, Rule-SHARE-106, Rule-EDITOR-PANEL-206
     public static int importRow(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull Function<TestEditorAttributes, String> cell) {
         int refused = 0;
 
@@ -430,16 +297,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
         return refused;
     }
 
-    /**
-     * UC-SHARE-006, Rule-SHARE-106, Rule-EDITOR-PANEL-206.
-     * <p>
-     * Says once how many values a sheet carried that Testin could not read, and
-     * nothing at all when it could read them all.
-     * <p>
-     * Once with a count, never once per row: an import of two hundred cases with
-     * an unreadable priority column is one thing that happened, and two hundred
-     * balloons is how a tester learns to dismiss all of them (#62).
-     */
+    // UC-SHARE-006, Rule-SHARE-106, Rule-EDITOR-PANEL-206
     public static void sayWhatWasRefused(final @NotNull Project p, final int refused) {
         if (refused == 0) return;
 
@@ -448,68 +306,27 @@ public enum TestEditorAttributes implements ToolBarAttribute {
                 : Bundle.message("attribute.value.many", String.valueOf(refused)));
     }
 
-    /**
-     * The one question every surface asks. One method rather than one accessor
-     * per capability, so the grid, the import, the clipboard and the export all
-     * ask in the same words - and a capability added later needs no new method.
-     */
     public boolean can(final @NotNull Can capability) {
         return can.contains(capability);
     }
 
-    /**
-     * UC-SHARE-002, Rule-SHARE-001.
-     * <p>
-     * Every attribute a tester can do this to, in column order.
-     * <p>
-     * The list the exporters write their header from, which used to be a field
-     * on {@code ExportAction} - so three exporters were handed the action just
-     * to read one list off it, and the action could not be declared to the
-     * platform while it carried state (#119). Which columns an export holds is
-     * this enum's knowledge either way.
-     * <p>
-     * Worked out once per capability rather than per sheet: a workbook of five
-     * hundred cases asks for it on every row.
-     */
+    // UC-SHARE-002, Rule-SHARE-001
     public static @NotNull List<TestEditorAttributes> all(final @NotNull Can capability) {
         return BY_CAPABILITY.get(capability);
     }
 
-    /**
-     * The value as the grid shows it. Steps get one line each there, so ALT+ENTER
-     * writes the next step; the sequence numbers stay a view-panel concern. Every
-     * other attribute - and every other surface, including exports, clipboard
-     * copy and the import preview - uses the canonical extractor unchanged.
-     */
     public @NotNull String gridValue(final @NotNull TestCaseDto tc) {
         return this == STEPS ? String.join("\n", tc.getSteps()) : testValueExtractor.apply(tc);
     }
 
-    /**
-     * Rule-VIEW-PANEL-026, Rule-EDITOR-PANEL-005.
-     * <p>
-     * The value as a reader sees it: a sentence where the tester wrote one, and
-     * untouched everywhere else.
-     * <p>
-     * Display only, and deliberately not what {@link #gridValue} answers. A grid
-     * cell and an editor field are typed into, so they load the raw value - a
-     * period this method adds would otherwise be committed back into the JSON
-     * the first time a tester edited a cell they had not changed, which is the
-     * whole thing #22 exists to prevent.
-     */
+    // Rule-VIEW-PANEL-026, Rule-EDITOR-PANEL-005
     public @NotNull String displayValue(final @NotNull TestCaseDto tc) {
         final @NotNull String raw = testValueExtractor.apply(tc);
 
         return PROSE.contains(this) ? Display.format(raw) : raw;
     }
 
-    /**
-     * Renders as a plain detail row. The attributes drawn as badges override
-     * this in their own body — the two behaviors sit on the constants that
-     * have them instead of being chosen by a null at run time.
-     */
     public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
         details.put(name, displayValue(tc));
     }
-
 }

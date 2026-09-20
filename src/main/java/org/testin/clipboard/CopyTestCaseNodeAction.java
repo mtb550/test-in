@@ -36,13 +36,7 @@ import org.testin.util.Mapper;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
-/**
- * Declared in {@code plugin.xml} (#119) with no key, so a tester can give it one
- * in the Keymap. CTRL+C beside it is the grid's own copy, of the text in front
- * of you; this one copies the test cases themselves, from the right-click menu.
- */
 public class CopyTestCaseNodeAction extends DumbAwareAction {
-
     // UC-EDITOR-PANEL-015
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -53,16 +47,12 @@ public class CopyTestCaseNodeAction extends DumbAwareAction {
 
         if (!tcs.isEmpty()) {
             try {
-                // The write calls the cut off by itself now (#312, N3), so this
-                // no longer says so twice.
                 final @NotNull String json = Services.getInstance(p, Mapper.class).writeValueAsString(tcs);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
                 Services.getInstance(p, Notifier.class).softShowCounted(p, Done.COPIED, tcs.size());
 
             } catch (final Exception ex) {
-                // Said, not only logged: the tester pressed the key and should
-                // not be left to find the clipboard empty (#66, finding 272).
                 Logger.error("Copy Node failed: " + FailureText.of(ex));
                 Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("clipboard.copy.failed.title"), FailureText.of(ex));
             }
@@ -71,12 +61,7 @@ public class CopyTestCaseNodeAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        // Rule-EDITOR-PANEL-214. Gray with the reason in a test run editor, the
-        // way Cut and Paste beside it already are - Copy was the last of the
-        // three still live there. A test run records what happened to a test
-        // case, and the case itself belongs to the test set holding it, so a
-        // copy taken from a run reaches past the run for something the run does
-        // not own.
+        // Rule-EDITOR-PANEL-214
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             e.getPresentation().setEnabled(false);
             e.getPresentation().setDescription(Bundle.message("copy.case.disabled.description"));

@@ -31,31 +31,9 @@ import org.testin.util.Display;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * What a bug report is made of, copied off the run item, its test case and its
- * run at the moment Report Bug is clicked (#28).
- * <p>
- * A copy rather than the objects, because those are what the run editor writes
- * verdicts into on the EDT, and the report is filled after Git has been asked
- * off it.
- *
- * @param testRun  the run's name
- * @param platform the run's platform and component, as one value
- * @param executed who executed the run item and when, as one value
- */
 @Builder(toBuilder = true)
 public record BugFacts(@NotNull String title, @NotNull BugSeverity severity, @NotNull BugPriority priority, @NotNull String platform, @NotNull String actualResult, @NotNull String expectedResult, @NotNull List<String> steps, @NotNull String testData, @NotNull String stacktrace, @NotNull List<byte[]> screenshots, @NotNull String testRun, @NotNull String executed, @NotNull String browser, @NotNull String device, @NotNull String language, @NotNull String commit, @NotNull UUID testCaseId, @NotNull String testSetName) {
-
-    /**
-     * UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068.
-     * <p>
-     * On the EDT. The issue's title is the test case's description, and every
-     * value reads as the Details tab shows it: the description and the expected
-     * result asked of their attribute, each step formatted as the Steps row
-     * formats it. The actual result and the test data are shown as typed there,
-     * so they are copied as typed (#28, P35). The screenshots come read already,
-     * because their files are the indexer's (#313).
-     */
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068
     public static @NotNull BugFacts of(final @NotNull TestRunItems item, final @NotNull TestCaseDto tc, final @NotNull TestRunMarker run, final @NotNull String testRun, final @NotNull List<byte[]> screenshots) {
         return new BugFacts(
                 TestEditorAttributes.DESCRIPTION.displayValue(tc),

@@ -33,15 +33,9 @@ import java.util.List;
 
 @AllArgsConstructor
 public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor {
-
     private final @NotNull Project p;
     private final @NotNull UnifiedVirtualFile vf;
 
-    /**
-     * The Testin editor inside this tab. Exposed so a re-index can tell it to
-     * read the node again - the tab is what the platform hands back, and the
-     * editor is what holds the data.
-     */
     @Getter
     private final @NotNull TestinEditor editor;
 
@@ -50,11 +44,6 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
         return editor.getComponent();
     }
 
-    /**
-     * Strengthened from the platform's nullable contract: every Testin editor is
-     * built around a list, and the list is final and made in the constructor -
-     * so there is no moment when the editor is open and has nothing to focus.
-     */
     @Override
     public @NotNull JComponent getPreferredFocusedComponent() {
         return editor.getPreferredFocusedComponent();
@@ -109,8 +98,6 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
                 return;
             }
 
-            // Following, not asking: moving to another editor must not reopen a
-            // panel the tester closed.
             viewer.showIfOpen(selected, vf.getDir().getPath2());
         });
     }

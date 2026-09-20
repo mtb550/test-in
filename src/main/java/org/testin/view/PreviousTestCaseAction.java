@@ -26,10 +26,6 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 
-/**
- * Steps the View Panel back to the previous of the cases it was handed. The
- * twin of {@link NextTestCaseAction}, and moved here with it (#291).
- */
 public class PreviousTestCaseAction extends DumbAwareAction {
     private final @NotNull ViewPagination controller;
 
@@ -38,7 +34,6 @@ public class PreviousTestCaseAction extends DumbAwareAction {
         this.controller = controller;
 
         this.registerCustomShortcutSet(Shortcuts.Previous.getCustomShortcut(), component);
-
     }
 
     // UC-VIEW-PANEL-003
@@ -55,9 +50,6 @@ public class PreviousTestCaseAction extends DumbAwareAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // EDT although update() reads no Swing component: ViewPagination's index
-        // and item list are plain fields mutated on the EDT, so a background
-        // read would enable the button from a stale position (#52).
         return ActionUpdateThread.EDT;
     }
 }

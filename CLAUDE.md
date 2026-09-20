@@ -176,6 +176,28 @@ silently does nothing costs more than the setting it was meant to hold.
   that lands while they are reading a bug report is still there afterwards. Those
   keep a short title and one line of detail — `Synced` / "Up to date with the
   remote" — never a sentence and never an exclamation mark.
+- **The code carries no comments but its markers.** A `UC-` or `Rule-` marker
+  above the signature, and nothing else: no javadoc, no paragraph saying why, no
+  line narrating the next one. Muteb, 20 September 2026: *"i want to make my
+  classes clear and simple, no more comments accept rule and use case numbers."*
+  <p>
+  27,483 comment lines came out of `src/main/java` in one commit - 34% of every
+  line in it, against 35,130 lines of code. What replaced them is not nothing:
+  **the marker says which documented behavior this is, `docs/` says what that
+  behavior is, and the commit message says why the code is shaped this way.** A
+  reason belongs in the commit body, where `git blame` reaches it and where it
+  cannot drift from the code, rather than in a paragraph above the method.
+  <p>
+  So write the commit message as if it were the comment you did not write: what
+  was wrong, what was tried and refused, which trap the shape avoids. That is
+  where the next reader looks, and it is the one record that is still true years
+  later. Every comment this policy removed is in `af5f3013` and readable with
+  `git show af5f3013:<path>` forever.
+  <p>
+  Two exceptions, and only two. A comment a machine reads stays -
+  `//noinspection`, `// @formatter:off` - because it is part of the build rather
+  than prose. And the Apache notice at the top of every file stays, untouched
+  (`MissingCopyright` gates it).
 - **American English**, in comments and in text a tester reads. The platform API
   this is written against is American (`Color`, `EditorColors`, `normalize`), so
   British spellings put two dialects in one sentence — a comment about "the caret

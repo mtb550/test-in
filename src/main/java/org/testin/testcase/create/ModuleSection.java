@@ -26,12 +26,7 @@ import org.testin.testcase.CreateTestCaseFields;
 import org.testin.util.SpellChecker;
 import org.testin.util.Shortcuts;
 
-/**
- * The module this test case belongs to, completing from the modules the project
- * already uses.
- */
 public class ModuleSection extends AbstractOneLineSection {
-
     public ModuleSection(final @NotNull Project p) {
         super(SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseValues.class).getModules(), CreateTestCaseFields.MODULE.getIcon()), ""),
                 CreateTestCaseFields.MODULE, Shortcuts.CreateTestCaseModule);

@@ -26,11 +26,6 @@ import java.util.Map;
 
 @FunctionalInterface
 public interface ExportHandler {
-    /**
-     * The formats that cannot be exported to. A value rather than a null, so
-     * {@link org.testin.importexport.FileTypes} holds a handler either way and the
-     * dropdowns ask what a format supports instead of whether one exists.
-     */
     ExportHandler UNSUPPORTED = (p, destFile, sheetsData) -> {
         throw new IllegalStateException("This format cannot be exported to");
     };

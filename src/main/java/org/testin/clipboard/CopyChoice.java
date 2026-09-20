@@ -39,34 +39,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-207.
- * <p>
- * One row of the copy menu: a value of the test case, and the letter that puts
- * it on the clipboard.
- * <p>
- * Its own type rather than the update menu's {@code UpdateTestCaseFields}, which
- * is the same shape and not the same thing. This menu offers the class name, the
- * identity and the path - values a tester copies into a ticket or a stack trace
- * and can never edit - so one enum over both would have put rows in the update
- * menu that mean nothing there, or left them out of the menu that exists for
- * them.
- * <p>
- * What the two share is where the parts live: the keystroke is in
- * {@link Shortcuts}, the caption is the attribute's own, and the popup is
- * {@code ShortcutMenuPopup}. The letters match the update menu's wherever the
- * field is the same, so D is the description in both - and each row shows its
- * letter in a frame, the create form's own icon where the field is one of its
- * (#328).
- */
+// UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-207
 @Getter
 public enum CopyChoice implements MenuItem {
-
-    /**
-     * Everything the tester wrote, which is what CTRL+C did on its own before
-     * this menu existed - so it is the first row and the one already selected,
-     * and CTRL+C then ENTER is the gesture it always was.
-     */
     ALL_DETAILS(
             Bundle.message("copy.all.details"),
             Shortcuts.CopyAll,
@@ -133,16 +108,6 @@ public enum CopyChoice implements MenuItem {
             Icons.fieldLetter("R", Icons.GRAY)
     ),
 
-    /**
-     * The three the update menu cannot offer, and the reason this enum is not
-     * that one. None of them is written by a tester - Testin derives all three -
-     * and all three are what somebody pastes into a stack trace, a ticket or a
-     * command line.
-     * <p>
-     * The class name is copied dotted, as Java and a stack trace write it. The
-     * grid column draws it as a " &gt; " breadcrumb to read, and copying that
-     * gave a name that matched nothing a tester pasted it into (#312, A59).
-     */
     FQCN(
             TestEditorAttributes.FQCN,
             Shortcuts.CopyFqcn,
@@ -166,16 +131,8 @@ public enum CopyChoice implements MenuItem {
     private final @NotNull Shortcuts shortcut;
     private final @NotNull Icon icon;
 
-    /**
-     * The value this row copies, and empty for the row that copies all of them.
-     * Empty rather than a null, so no reader tests for one.
-     */
     private final @NotNull Optional<TestEditorAttributes> attribute;
 
-    /**
-     * What this row puts on the clipboard for one test case: the attribute's own
-     * value, unless the row says otherwise.
-     */
     @Getter(AccessLevel.NONE)
     private final @NotNull Function<TestCaseDto, String> copied;
 
@@ -199,40 +156,19 @@ public enum CopyChoice implements MenuItem {
         this.copied = CopyChoice::allDetailsOf;
     }
 
-    /**
-     * UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-208.
-     * <p>
-     * What this row puts on the clipboard for one test case.
-     * <p>
-     * A single value is copied bare, with no caption: a tester who asked for the
-     * class name wants to paste the class name, not "FQCN: " and then it. The
-     * whole test case keeps its captions, because there it is the captions that
-     * make it readable.
-     */
+    // UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-208
     public @NotNull String from(final @NotNull TestCaseDto tc) {
         return copied.apply(tc);
     }
 
-    /**
-     * Every field the tester wrote, captioned, one to a line - and a field left
-     * empty is not a line (#197).
-     */
     private static @NotNull String allDetailsOf(final @NotNull TestCaseDto tc) {
         return Arrays.stream(TestEditorAttributes.values())
                 .filter(attr -> attr.can(Can.COPY))
                 .filter(attr -> !attr.gridValue(tc).isBlank())
-                // The colon belongs to this line, not to the caption. It used to be
-                // part of the name, so the view panel drew test case rows with
-                // one and run rows without in the same column (#232).
                 .map(attr -> attr.getName() + ": " + attr.gridValue(tc))
                 .collect(Collectors.joining("\n"));
     }
 
-    /**
-     * What the tester is told afterward. The value, not the count of characters:
-     * "Description copied", and "Description copied 3" for a selection - the same
-     * shape every other copy in the plugin uses.
-     */
     public @NotNull String copiedMessage(final int cases) {
         return cases == 1
                 ? Bundle.message("copy.done.one", name)
@@ -244,13 +180,6 @@ public enum CopyChoice implements MenuItem {
         return shortcut.getShortcutText();
     }
 
-    /**
-     * Makes this row's letter pick it while the menu is showing.
-     * <p>
-     * The same binding {@code UpdateTestCaseFields} does for the update menu, and
-     * the reason it is here rather than in the popup: a row's key belongs to the
-     * row.
-     */
     @Override
     public void bindShortcut(final @NotNull JComponent component, final @NotNull Runnable onTrigger) {
         new DumbAwareAction() {
@@ -261,11 +190,6 @@ public enum CopyChoice implements MenuItem {
         }.registerCustomShortcutSet(shortcut.getCustomShortcut(), component);
     }
 
-    /**
-     * The whole menu for a selection: every row's value for every case, blocks
-     * separated by a blank line so a multi-case copy reads as separate answers
-     * and not one run-on.
-     */
     public @NotNull String from(final @NotNull List<TestCaseDto> cases) {
         return cases.stream().map(this::from).collect(Collectors.joining("\n\n"));
     }

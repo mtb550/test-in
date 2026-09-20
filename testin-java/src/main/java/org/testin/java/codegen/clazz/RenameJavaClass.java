@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class RenameJavaClass implements GenAction {
-
     // UC-CODEGEN-015, Rule-CODEGEN-052
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
@@ -54,12 +53,10 @@ public class RenameJavaClass implements GenAction {
 
             final @NotNull PsiClass targetClass = found.orElseThrow();
             final @NotNull String newClassName = NameSanitizer.className(newName);
-            // Receiver is the non-null side: PsiClass#getName is null for anonymous classes.
             if (!newClassName.equals(targetClass.getName())) {
                 targetClass.setName(newClassName);
             }
             Logger.info("Renamed test class to: " + newClassName);
         });
     }
-
 }

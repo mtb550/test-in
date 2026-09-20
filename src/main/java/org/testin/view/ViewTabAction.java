@@ -32,20 +32,8 @@ import javax.swing.*;
 import java.util.Optional;
 import java.util.function.Function;
 
-/**
- * UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080.
- * <p>
- * {@code Tab} and {@code Shift+Tab} on the view panel's tabs: the next or the
- * previous tab comes to the front, with the keyboard in it (#311).
- * <p>
- * The tabs are the tool window's contents, so which one comes next is the
- * platform {@link ContentManager}'s answer, and it wraps. The keyboard is put
- * there by selecting the tab in front again with focus requested, which is the
- * same path a click on a tab's name takes: each content names its tab as the
- * component that takes the focus.
- */
+// UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080
 public final class ViewTabAction extends AbstractProjectAction {
-
     @AllArgsConstructor
     enum Direction {
         NEXT(
@@ -91,7 +79,6 @@ public final class ViewTabAction extends AbstractProjectAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT: there is no update() here reading Swing state.
         return ActionUpdateThread.BGT;
     }
 }

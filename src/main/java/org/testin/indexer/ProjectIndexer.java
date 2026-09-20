@@ -59,22 +59,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * The single owner of file access. No other class may read, write or execute
- * operations on virtual files (VFS) or physical files — everything goes
- * through the indexer so its cache objects stay authoritative and every read
- * is a fast in-memory lookup (e.g. {@link #nodeExists}). The packages exempt
- * from this, and why, are listed in {@code docs/ARCHITECTURE.md} and only there:
- * this said three while that said eight (#66, finding 228).
- * <p>
- * Ordering rule: the cache update (which may persist markers — and marker
- * writes create directories) runs only <b>after</b> the VFS operation
- * succeeded, never before. Violating this creates phantom directories and
- * "already exists in VFS" failures.
- */
 @Service(Service.Level.PROJECT)
 public final class ProjectIndexer {
-
     private final @NotNull Project p;
     private final @NotNull IndexerDataStore store;
     private final @NotNull ProjectScanCoordinator scanCoordinator;
@@ -83,13 +69,6 @@ public final class ProjectIndexer {
     private final @NotNull AtomicBoolean restoreEditorsOnComplete = new AtomicBoolean(true);
     private final @NotNull RunWriter runWriter;
     private final @NotNull NodeFiles nodeFiles;
-    /**
-     * Counts the whole indexing pass, not the projects in it.
-     * <p>
-     * It used to be replaced with one latch per project once the list was known,
-     * so a thread that had already entered {@link #awaitIndexing} was left
-     * waiting on a latch nobody could reach (#66, finding 67).
-     */
     private volatile @NotNull CountDownLatch indexingLatch = new CountDownLatch(1);
 
     public ProjectIndexer(final @NotNull Project p) {
@@ -124,8 +103,6 @@ public final class ProjectIndexer {
                 return;
             }
 
-            // The pass's own, so a pass a Refresh has since replaced counts down
-            // nothing of the pass that replaced it.
             final @NotNull AtomicInteger projectsLeft = new AtomicInteger(validProjects.size());
             final @NotNull CountDownLatch passLatch = indexingLatch;
             Logger.info("Indexing " + validProjects.size() + " projects..");
@@ -168,28 +145,10 @@ public final class ProjectIndexer {
             Logger.error("indexWithProgress: " + ex.getMessage());
             indexing.set(false);
 
-            // Nothing below is going to count the latch down now, and
-            // awaitIndexing blocks on it. One failed re-index used to leave
-            // Refresh, the branch dropdown and the welcome screen's links dead
-            // for the rest of the session (#66, finding 67).
             indexingLatch.countDown();
         }
     }
 
-    /**
-     * One project's scan is over, whichever way it ended.
-     * <p>
-     * The counter and the latch are the pass's own, taken when it started. A
-     * Refresh or a branch switch pressed while a pass is still scanning resets
-     * the index and starts a second pass, and the first pass's scans still
-     * finish. They used to count down one shared counter and whichever latch was
-     * current, so the second pass was told it had finished when the first one
-     * did, and the tree and the editors redrew over a project still being read
-     * (#312, A2).
-     *
-     * @return whether that was the last project of a pass that is still the
-     * current one - a pass that has been replaced has nothing left to finish
-     */
     private boolean oneProjectFinished(final @NotNull AtomicInteger projectsLeft, final @NotNull CountDownLatch passLatch) {
         if (projectsLeft.decrementAndGet() != 0) return false;
 
@@ -222,33 +181,11 @@ public final class ProjectIndexer {
         });
     }
 
-    /**
-     * UC-TREE-PANEL-001, Rule-TREE-PANEL-118.
-     * <p>
-     * Whether the first index has finished, asked rather than waited for.
-     * <p>
-     * {@link #awaitIndexing()} is the same fact and costs a blocked thread to
-     * read, which the panel cannot pay on a draw: what it needs to know is
-     * whether a name failing to resolve means the project is missing or only
-     * that nothing is indexed yet, and those two want opposite screens.
-     */
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-118
     public boolean isIndexed() {
         return indexed.get();
     }
 
-    /**
-     * Blocks until the index is built.
-     * <p>
-     * Only from a thread holding no lock. A read action that blocks here holds
-     * the read lock for as long as the wait, and every write action in the IDE
-     * queues behind it - including the one {@code DumbService} takes on the EDT
-     * to start indexing. The tree used to call this from its Invoker, which the
-     * platform runs inside a read action, and a 32-second wait froze the IDE
-     * until it was killed (#89).
-     * <p>
-     * Checked rather than documented, because the comment was not enough: the
-     * call site that did it looked exactly like the two that are safe.
-     */
     public void awaitIndexing() {
         if (indexed.get()) return;
 
@@ -266,11 +203,6 @@ public final class ProjectIndexer {
     }
 
     public void resetForReindex() {
-        // Not while a scan is reading into the store. Refresh calls this from a
-        // pooled thread and a clone scans its new project on the task thread, so
-        // the two met: clearAll() emptied what that scan had just filled, and the
-        // tree came back with half a project in it or none. The scans share a read
-        // lock; this takes the write one and waits for them (#66 finding 342).
         scanCoordinator.exclusively(() -> {
             restoreEditorsOnComplete.set(false);
             store.clearAll();
@@ -281,26 +213,11 @@ public final class ProjectIndexer {
         });
     }
 
-    /**
-     * The Testin root as an absolute path, or the empty path when none is set.
-     * A relative root is resolved against the open project, which is how it has
-     * always been read - here rather than at each caller so that indexing and
-     * the project listing can never disagree about where the root is.
-     */
     private @NotNull Path absoluteRoot() {
         return Services.getInstance(p, TestinRoot.class).absolutePath();
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-006.
-     * <p>
-     * Just the project this repository is bound to, when it is bound to one.
-     * <p>
-     * The reason the change is worth making: a tester with eleven test projects
-     * under the root indexed all eleven on every open, and used one of them. An
-     * unbound repository still indexes everything, because the picker that binds
-     * it is the only screen that has a use for the others.
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-006
     private @NotNull List<Path> boundOnly(final @NotNull List<Path> projects) {
         final @NotNull String bound = Services.getInstance(p, BoundTestProject.class).name();
         if (bound.isEmpty()) return projects;
@@ -318,25 +235,11 @@ public final class ProjectIndexer {
         return scoped;
     }
 
-    /**
-     * Whether this is the project this repository is bound to - by
-     * {@code testin.yml} or on this machine - or any project, when none is
-     * named. Asked by startup and by a rescan alike.
-     */
     private boolean isBound(final @NotNull Path projectPath) {
         final @NotNull String bound = Services.getInstance(p, BoundTestProject.class).name();
         return bound.isEmpty() || bound.equals(projectPath.getFileName().toString());
     }
 
-    /**
-     * Every test project folder under the root with the status its marker gives,
-     * inactive ones included. The listing behind the picker that binds a
-     * repository, and behind the sentence that says why a bound project is not
-     * showing - both of which have to know about a project the index skipped.
-     * <p>
-     * A directory read rather than a cache read, deliberately: it answers about
-     * projects that were never indexed, which is exactly what the cache cannot do.
-     */
     public @NotNull Map<String, ProjectStatus> testProjects() {
         final @NotNull Map<String, ProjectStatus> byName = new LinkedHashMap<>();
         final @NotNull Path root = absoluteRoot();
@@ -349,8 +252,6 @@ public final class ProjectIndexer {
                         .getTestProjectNode(p, path).getMarker().getStatus());
 
             } catch (final Exception ex) {
-                // One project that will not be read must not cost the tester the
-                // list of the others - the listing is what they choose from.
                 Logger.warn("Could not read test project '" + name + "': " + ex.getMessage());
             }
         }
@@ -384,10 +285,6 @@ public final class ProjectIndexer {
         return valid;
     }
 
-    /**
-     * Whether a folder under the Testin root is a test project: it carries the
-     * {@code .tp} marker. Asked by startup and by a rescan alike.
-     */
     private boolean isTestProjectFolder(final @NotNull Path folder) {
         return store.hasMarker(folder, DirectoryType.TP);
     }
@@ -407,38 +304,12 @@ public final class ProjectIndexer {
         return store.getTestCasesForTestSet(testSetPath);
     }
 
-    /**
-     * UC-INTERNAL-006, Rule-INTERNAL-046.
-     * <p>
-     * How many test cases a test set holds.
-     * <p>
-     * Counted from the ids the store already keeps rather than from the cases:
-     * {@link #getTestCasesForTestSet} builds the list and sorts it into rank
-     * order, and sorting 2,770 cases to produce a number nobody reads is work
-     * for nothing.
-     * <p>
-     * A node that holds no cases of its own answers zero, so a walk asks every
-     * node it meets the same question instead of first asking what kind it is.
-     */
+    // UC-INTERNAL-006, Rule-INTERNAL-046
     public long caseCountOf(final @NotNull Path testSetPath) {
         return store.getTestSetCaseIds().getOrDefault(testSetPath.toString(), List.of()).size();
     }
 
-    /**
-     * Rule-TREE-PANEL-008.
-     * <p>
-     * Every test case under this node, in tree order: a test set's own cases, and
-     * those of every test set beneath a package.
-     * <p>
-     * No instanceof and no special case for a package: a node that holds no cases
-     * of its own answers with an empty list, so one walk serves a test set, a
-     * package of them, and the Test Cases root alike.
-     * <p>
-     * Retired branches are left out. A deprecated test set, or anything under an
-     * archived package, is not current work - the same rule that keeps it out of
-     * the case selection when a run is configured (#68). A retired node the
-     * tester picked out themselves is still walked: they asked for it by name.
-     */
+    // Rule-TREE-PANEL-008
     public @NotNull List<TestCaseDto> getTestCasesUnder(final @NotNull DirectoryDto dir) {
         final @NotNull List<TestCaseDto> cases = new ArrayList<>(getTestCasesForTestSet(dir.getPath()));
 
@@ -455,55 +326,23 @@ public final class ProjectIndexer {
         return withRemovedMarked(store.getTestRunByPath(testRunPath));
     }
 
-    /**
-     * UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126.
-     * <p>
-     * Marks each result whose test case is no longer indexed as removed, on the
-     * run about to be handed out. Decided here, on every read, because the
-     * indexer is the one place that knows which test cases exist: a case deleted
-     * or put back since the last read is answered by the next one. The mark is
-     * never written, so the file keeps the verdict (#66, finding 110).
-     */
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
     private @NotNull TestRunDto withRemovedMarked(final @NotNull TestRunDto run) {
         run.getResults().forEach(item -> item.setRemoved(store.findTestCase(item.getId()).isEmpty()));
         return run;
     }
 
-    /**
-     * UC-VIEW-PANEL-008, Rule-VIEW-PANEL-065.
-     * <p>
-     * Every indexed test run, by the path it sits at - the run half of
-     * {@link #getAllTestCases()}.
-     * <p>
-     * By path because a run does not carry its own name: it is the folder's, and
-     * the folder is the key this cache is already held under. A tab that wants
-     * to say which cycle a bug was found in needs both.
-     */
+    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-065
     public @NotNull Map<Path, TestRunDto> getAllTestRuns() {
         return store.getTestRunsByPath().entrySet().stream()
                 .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), entry -> withRemovedMarked(entry.getValue())));
     }
 
-    /**
-     * UC-INTERNAL-006, Rule-INTERNAL-051.
-     * <p>
-     * The run recorded at this path, and empty when the tree has the directory
-     * but nothing could be read out of it - a run whose JSON is missing, or one
-     * that would not parse, both of which the scan logs and carries on past.
-     * <p>
-     * {@link #getTestRunByPath} is for callers that cannot continue without a
-     * run and should fail loudly; this is for the ones that can say so instead.
-     * The Details popup is the second kind: a run it cannot read is still a node
-     * whose name, path and audit it can show.
-     */
+    // UC-INTERNAL-006, Rule-INTERNAL-051
     public @NotNull Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
         return store.findTestRun(testRunPath).map(this::withRemovedMarked);
     }
 
-    /**
-     * A test case by id, empty when it is not indexed - a case deleted after a
-     * run recorded it, or after the code that names it was generated.
-     */
     public @NotNull Optional<TestCaseDto> findTestCase(final @NotNull UUID id) {
         return store.findTestCase(id);
     }
@@ -520,18 +359,7 @@ public final class ProjectIndexer {
         return store.getTestProjectsByPath();
     }
 
-    /**
-     * UC-TREE-PANEL-002, UC-TREE-PANEL-003, UC-TREE-PANEL-011, Rule-TREE-PANEL-004.
-     * <p>
-     * Whether something already has this name, asked of the disk: the bound
-     * project's siblings are not indexed, and a folder another program just made
-     * is on disk before anything here knows of it. The one answer for creating a
-     * test project, naming a clone and renaming a node.
-     *
-     * @param renaming the node being renamed, which the disk finds under its new
-     *                 name when a rename only changes case on a file system that
-     *                 ignores case - it is not in its own way
-     */
+    // UC-TREE-PANEL-002, UC-TREE-PANEL-003, UC-TREE-PANEL-011, Rule-TREE-PANEL-004
     public boolean isTaken(final @NotNull Path wanted, final @NotNull Optional<Path> renaming) {
         if (!Files.exists(wanted)) return false;
 
@@ -551,84 +379,33 @@ public final class ProjectIndexer {
         return store.getChildren(parentPath);
     }
 
-    /**
-     * UC-INTERNAL-004, Rule-INTERNAL-033.
-     * <p>
-     * Saves a test case, and says whether it did - false when the file already
-     * holds it exactly, which is a tester who opened a field, changed nothing and
-     * pressed Enter (#164), and false when the file could not be written, which
-     * the writer has already said (#66, finding 163). Either way there is
-     * nothing for the caller to confirm, regenerate or take back.
-     */
+    // UC-INTERNAL-004, Rule-INTERNAL-033
     public boolean putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
         return store.putTestCase(testSetPath, tc);
     }
 
-    /**
-     * UC-INTERNAL-004, Rule-INTERNAL-035.
-     * <p>
-     * Saves a case exactly as it was given, audit included. Every ordinary save
-     * stamps who did it and when; these are the saves where that would be a lie.
-     * <p>
-     * An import writes the audit the file being imported carries. An undo writes
-     * the audit the case had before the change it is taking back - stamping it
-     * would record the tester as having modified a case at the moment they
-     * un-modified it (#164, #165). A cut being pasted is the same case in a new
-     * place, and the ordinary save would record the paster as its creator (#66,
-     * finding 114).
-     */
+    // UC-INTERNAL-004, Rule-INTERNAL-035
     public boolean putTestCaseVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
         return store.putTestCaseVerbatim(testSetPath, tc);
     }
 
-    /**
-     * UC-EDITOR-PANEL-017, Rule-INTERNAL-035.
-     * <p>
-     * Moves a cut test case into another set, audit and all: written where it
-     * goes first, and taken out of where it was only once that write landed
-     * (#66, finding 284).
-     *
-     * @return whether it moved. When it did not, it is still in its old set, and
-     * the writer has said why.
-     */
+    // UC-EDITOR-PANEL-017, Rule-INTERNAL-035
     public boolean moveTestCase(final @NotNull Path fromSet, final @NotNull Path toSet, final @NotNull TestCaseDto tc) {
         return store.moveTestCase(fromSet, toSet, tc);
     }
 
-    /**
-     * UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-064.
-     * <p>
-     * Removes a test case: its file, then its place in the index.
-     *
-     * @return whether it is gone. When the file would not go, the case is still
-     * in its set and the writer has said why, so there is nothing for the caller
-     * to confirm, count or take the method of (#66, finding 292).
-     */
+    // UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-064
     public boolean removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
         if (!store.removeTestCase(testSetPath, tcId)) return false;
 
-        // The completion cache is derived from the test cases, so it has to shrink
-        // with them - otherwise a deleted description keeps being offered.
         Services.getInstance(p, TestCaseValues.class).reload(this::getAllTestCases);
         return true;
     }
 
-    /**
-     * Every indexed test case, across all test sets.
-     */
     public @NotNull List<TestCaseDto> getAllTestCases() {
         return List.copyOf(store.getTestCasesById().values());
     }
 
-    /**
-     * Every indexed node, of every kind - the other half of what the plugin
-     * knows, beside {@link #getAllTestCases()} (#29).
-     * <p>
-     * A view of what the scan already holds, so it costs one pass over memory
-     * and cannot go stale: there is nothing here to update when a node is
-     * created, moved or removed, because the maps it reads are the ones those
-     * operations already change.
-     */
     public @NotNull List<DirectoryDto> getAllNodes() {
         return List.copyOf(store.allDirectories());
     }
@@ -638,23 +415,9 @@ public final class ProjectIndexer {
         store.updateSequence(testSetPath, orderedList, moved);
     }
 
-    /**
-     * Changes a run as the index holds it, and writes it through the one writer
-     * that owns the file - see {@link RunWriter} for why there is only one.
-     * <p>
-     * Every write of an existing run comes through here or {@link #saveRun},
-     * which write the run the index holds rather than one a caller kept (#66,
-     * finding 152).
-     */
     public void changeRun(final @NotNull Path runPath, final @NotNull Consumer<TestRunDto> change) {
         findTestRun(runPath).ifPresentOrElse(run -> {
-            // Rule-INTERNAL-011. Which cases the change took out of the run,
-            // asked here and nowhere else: a result's file goes because this
-            // change stopped covering that case - Edit Test Run unticking it -
-            // and never because a file in the folder is not in the snapshot. The
-            // writer worked it out from the folder listing, which made a result a
-            // pull had just brought, or one whose snapshot failed, look unwanted
-            // (#305).
+            // Rule-INTERNAL-011
             final @NotNull Set<UUID> before = coveredBy(run);
             change.accept(run);
 
@@ -665,17 +428,10 @@ public final class ProjectIndexer {
         }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
     }
 
-    /**
-     * The cases a run covers, by id.
-     */
     private static @NotNull Set<UUID> coveredBy(final @NotNull TestRunDto run) {
         return run.getResults().stream().map(TestRunItems::getId).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    /**
-     * Changes a run's marker as the index holds it, and writes it - the same as
-     * {@link #changeRun}, for the other half of what a run is.
-     */
     public void changeRunMarker(final @NotNull Path runPath, final @NotNull Consumer<TestRunMarker> change) {
         store.findTestRunDir(runPath).ifPresentOrElse(dir -> {
             final @NotNull TestRunMarker marker = dir.getMarker();
@@ -684,70 +440,29 @@ public final class ProjectIndexer {
         }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + runPath.getFileName()));
     }
 
-    /**
-     * Writes a run as the index holds it, for a caller whose change is already
-     * on that run, such as an open editor's execution stamps (#66, finding 152).
-     */
     public void saveRun(final @NotNull Path runPath) {
         changeRun(runPath, run -> {
         });
     }
 
-    /**
-     * Registers the run and writes it, through the one writer that owns the file.
-     * <p>
-     * It used to write straight from the calling thread while
-     * {@link #changeRun} queued its writes - so the run JSON had two writers
-     * and no order between them. Saving Result Analysis took the direct path on
-     * the UI thread while a verdict recorded moments earlier could still be
-     * queued, holding a snapshot taken before the analysis existed; the queued
-     * write then landed second and silently restored the older file. The tester
-     * found their analysis gone after the next reload.
-     * <p>
-     * The registration stays immediate. Creating a run needs the index to know
-     * about it on the next line, and only the disk write belongs in the queue.
-     * This is the one door that puts a run into the index: {@link #changeRun}
-     * refuses a run that is not there (#66, finding 143).
-     */
     public void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
         runWriter.create(testRunPath, tr);
     }
 
-    /**
-     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219.
-     * <p>
-     * Keeps newly pasted screenshots as PNG files beside the run, each under a
-     * short name of its own, and answers the names, in order, for the run item
-     * to hold (#313).
-     */
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     public @NotNull List<String> storeScreenshots(final @NotNull Path runPath, final @NotNull List<byte[]> pngs) {
         return runWriter.storeScreenshots(runPath, pngs);
     }
 
-    /**
-     * The PNG bytes of one screenshot a run item names, and none when its file
-     * is missing.
-     */
     public byte @NotNull [] screenshot(final @NotNull Path runPath, final @NotNull String name) {
         return runWriter.readScreenshot(runPath, name);
     }
 
-    /**
-     * The PNG bytes of every screenshot a run item names, in its order.
-     */
     public @NotNull List<byte[]> screenshots(final @NotNull Path runPath, final @NotNull TestRunItems item) {
         return item.getScreenshots().stream().map(name -> screenshot(runPath, name)).toList();
     }
 
-    /**
-     * Deletes a test project from disk and from the cache, in that order.
-     * <p>
-     * The largest delete the plugin performs: the directory holds every test
-     * set, case and run of that project. It goes to the recycle bin, and the
-     * removal keeps a copy aside first so CTRL+Z can put it back
-     * (UC-INTERNAL-005); the confirmation still counts what is inside before it
-     * asks.
-     */
+    // UC-INTERNAL-005
     public void removeTestProject(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         removeVf(path, () -> store.removeTestProject(path), onRemoved);
     }
@@ -768,89 +483,35 @@ public final class ProjectIndexer {
         removeVf(path, () -> store.removeTestRunPackage(path), onRemoved);
     }
 
-    /**
-     * UC-TREE-PANEL-012, Rule-TREE-PANEL-042.
-     * <p>
-     * Removes nothing, for the two containers the tree never deletes: Test Cases
-     * and Test Runs go with their test project and never on their own.
-     * <p>
-     * The callback still runs, and reports false. RemoveAction counts
-     * completions to know when to rebuild the tree, so a node that quietly did
-     * nothing would leave the count short and the tree never rebuilt.
-     * <p>
-     * It must not be counted as removed either, or the tester is told a node
-     * went that is still in front of them.
-     */
+    // UC-TREE-PANEL-012, Rule-TREE-PANEL-042
     public void refuseRemove(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         Logger.info("Not removed: " + path.getFileName() + " is not removable from the tree");
         onRemoved.accept(false);
     }
 
-    /**
-     * Deletes the node's files, then updates the cache - see {@link NodeFiles},
-     * which owns that order and the reason for it.
-     */
     private void removeVf(final @NotNull Path path, final @NotNull Runnable cacheUpdate, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         nodeFiles.remove(path, cacheUpdate, onRemoved);
     }
 
-    /**
-     * Reports whether the node moved, not merely that the attempt is over.
-     */
     public void moveNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Consumer<@NotNull Boolean> onFinished) {
         nodeFiles.move(oldPath, newPath, onFinished);
     }
 
-    /**
-     * Copies each source into the target, and reports how many arrived - not how
-     * many were attempted.
-     */
     public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final @NotNull IntConsumer onComplete) {
         nodeFiles.copy(sourcePaths, targetPath, onComplete);
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-011.
-     * <p>
-     * A test case is a {@code .tc} directly inside a test set: {@link FileKind}
-     * answers the first half, the caller the second, so the copy and the scan
-     * agree about what a test case is. A run item is a {@code .ri} inside a test
-     * run and a marker is one of the seven fixed names, so neither answers true.
-     * <p>
-     * It used to ask whether the file name parsed as a UUID. That is how Testin
-     * names the files it writes, but not the only legal name: a case file named
-     * by hand is read by the scan, which takes its identity from inside the file
-     * instead. So the scan indexed it and this passed over it, and copying its
-     * test set left the copy carrying the original's id - two files claiming one
-     * case, where editing either edited both (#288).
-     * <p>
-     * The test-set check is injected so the rule stays testable without an
-     * indexer - the same reason {@code TreeTransferHandler.isValidDestination}
-     * takes its occupied check as a parameter.
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-011
     static boolean isCaseFile(final @NotNull Path file, final @NotNull Predicate<Path> isTestSet) {
         return FileKind.of(file) == FileKind.TEST_CASE && isTestSet.test(file.getParent());
     }
 
-    /**
-     * UC-INTERNAL-005, Rule-INTERNAL-037, Rule-INTERNAL-041.
-     * <p>
-     * Keeps a copy of a node aside before it is removed, so the removal can be
-     * taken back, and answers where it was kept. Nothing when the copy could not
-     * be made, in which case the removal still happens and simply cannot be
-     * undone - which is what every removal did before (#165).
-     */
+    // UC-INTERNAL-005, Rule-INTERNAL-037, Rule-INTERNAL-041
     public @NotNull Optional<Path> keepAside(final @NotNull Path node) {
         return Services.getInstance(DeletedNodes.class).keep(node);
     }
 
-    /**
-     * UC-INTERNAL-005, Rule-INTERNAL-042.
-     * <p>
-     * Puts a removed node back from the copy kept aside for it, and re-reads the
-     * test project it landed in so the tree, the open editors and the caches all
-     * agree with the disk again.
-     */
+    // UC-INTERNAL-005, Rule-INTERNAL-042
     public boolean restoreNode(final @NotNull Path kept, final @NotNull Path original) {
         if (!Services.getInstance(DeletedNodes.class).putBack(kept, original)) return false;
 
@@ -859,28 +520,15 @@ public final class ProjectIndexer {
         return true;
     }
 
-    /**
-     * UC-INTERNAL-005, Rule-INTERNAL-043.
-     * <p>
-     * Nobody can reach the operation that was holding this any more.
-     */
+    // UC-INTERNAL-005, Rule-INTERNAL-043
     public void forgetKept(final @NotNull Path kept) {
         Services.getInstance(DeletedNodes.class).forget(kept);
     }
 
-    /**
-     * Re-reads the test project a change landed in, innermost first. Package
-     * private because {@link NodeFiles} reaches back for it when a copy has
-     * finished arriving.
-     */
     void refreshIndexedProject(final @NotNull Path changedPath) {
         testProjectHolding(changedPath).ifPresent(scanCoordinator::rescanExclusively);
     }
 
-    /**
-     * The folder of the indexed test project this path sits in, innermost first,
-     * and empty when none holds it.
-     */
     private @NotNull Optional<Path> testProjectHolding(final @NotNull Path path) {
         return store.getTestProjectsByPath().keySet().stream()
                 .map(Path::of)
@@ -888,37 +536,18 @@ public final class ProjectIndexer {
                 .max(Comparator.comparingInt(Path::getNameCount));
     }
 
-    /**
-     * UC-SHARE-002, Rule-SHARE-001.
-     * <p>
-     * The test case files in this set the last scan could not read, by name.
-     */
+    // UC-SHARE-002, Rule-SHARE-001
     public @NotNull Set<String> unreadableCasesIn(final @NotNull Path testSetPath) {
         return store.unreadableCasesIn(testSetPath);
     }
 
-    /**
-     * UC-INTERNAL-004, Rule-INTERNAL-034.
-     * <p>
-     * Where a test case's file sits: the test project folder holding it, and the
-     * file's path inside that folder - what a bug report links to in the test
-     * project's repository (#28). Empty when no indexed test project holds the
-     * case's test set.
-     * <p>
-     * Answered here because the file's name is the indexer's to decide; a link
-     * builder spelling {@code <id>.tc} itself would be one more copy of it.
-     */
+    // UC-INTERNAL-004, Rule-INTERNAL-034
     public @NotNull Optional<TestCaseFile> testCaseFile(final @NotNull TestCaseDto tc) {
         final @NotNull Path file = store.testCaseFileOf(tc);
         return testProjectHolding(file).map(testProject -> new TestCaseFile(testProject, testProject.relativize(file)));
     }
 
-    /**
-     * UC-TREE-PANEL-002.
-     * <p>
-     * A new node, and whether its markers landed - the creators confirm only a
-     * node that was made (#312, A5).
-     */
+    // UC-TREE-PANEL-002
     public boolean addTestProject(final @NotNull TestProjectDirectoryDto tp) {
         return store.addTestProject(tp);
     }
@@ -939,21 +568,7 @@ public final class ProjectIndexer {
         return store.addTestRunPackage(trp);
     }
 
-    /**
-     * UC-INTERNAL-003, Rule-INTERNAL-016.
-     * <p>
-     * Reads a test project again after a change on disk, or forgets it when the
-     * folder is not one Testin reads: it has no {@code .tp} marker, or it is not
-     * the project this repository is bound to ({@code BoundTestProject}).
-     * <p>
-     * The watcher knows only a path, and a scan puts whatever folder it is given
-     * into the index as a test project - so a folder of notes beside the
-     * projects became one, and a project the binding leaves out was read
-     * in although startup had left it out (#66, finding 120). These are the two
-     * questions startup asks through {@link #collectValidProjects} and
-     * {@link #boundOnly}; a folder that has stopped being a test project, its
-     * marker gone with it, is dropped rather than read back.
-     */
+    // UC-INTERNAL-003, Rule-INTERNAL-016
     public void rescanChangedProject(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         if (isTestProjectFolder(projectPath) && isBound(projectPath)) {
             scanSingleProject(projectPath, indicator);
@@ -969,17 +584,7 @@ public final class ProjectIndexer {
         scanSingleProject(projectPath, new EmptyProgressIndicator());
     }
 
-    /**
-     * UC-INTERNAL-003, Rule-INTERNAL-021.
-     * <p>
-     * The same pass, reporting into a bar the tester can watch and stop.
-     * <p>
-     * The indicator is carried rather than made here because the scan is what
-     * knows the answer: which test set it is on, how far through it is, and
-     * whether Cancel has been pressed. A caller that has a bar hands it over; a
-     * caller with nowhere to show one passes an empty indicator, which reports
-     * nothing and is never canceled, so both go down one path (#20).
-     */
+    // UC-INTERNAL-003, Rule-INTERNAL-021
     public void scanSingleProject(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         Logger.info("Scanning single project: " + projectPath.getFileName());
         try {
@@ -989,45 +594,15 @@ public final class ProjectIndexer {
         }
     }
 
-    /**
-     * Writes any node's marker back through the indexer, which owns file access.
-     * Every marker write goes through here, whichever node it belongs to.
-     * Writing the file, invalidating the cached children and refreshing the VFS
-     * are one act: a caller that does only the first leaves a file the IDE never
-     * hears about, and the Git paths read through the IDE.
-     * <p>
-     * Answers whether the marker landed (#312, A6).
-     */
     public boolean persistMarker(final @NotNull DirectoryDto dto) {
         return store.persistMarker(dto);
     }
 
-    /**
-     * Reads a node's marker, falling back to a default instance when the file is
-     * missing or unreadable. The indexer owns both directions of the marker round
-     * trip; nothing outside it opens a marker file (#49).
-     */
     public <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name) {
         return store.readMarker(dirPath, kind, name);
     }
 
-    /**
-     * UC-INTERNAL-008, Rule-INTERNAL-091.
-     * <p>
-     * Converts every test project in the Testin folder that is not in this
-     * build's format yet, at every start (#305, D9). A project the scan is about
-     * to read is converted by the scan itself, whenever it runs.
-     * <p>
-     * <b>Off the EDT.</b> It reads and rewrites every test case file of every
-     * project in the folder, and startup runs on the EDT - so this froze the IDE
-     * for as long as the conversion took, on the one open where there was
-     * something to convert. A pooled thread rather than a progress bar: it must
-     * not be cancelled half way, and it already says what it did in a
-     * notification that stays.
-     * <p>
-     * Nothing waits for it. The projects the first index reads are converted
-     * inside that index, which is what leaves this pass the ones nobody opened.
-     */
+    // UC-INTERNAL-008, Rule-INTERNAL-091
     public void convertEveryProject() {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             if (p.isDisposed()) return;
@@ -1036,71 +611,33 @@ public final class ProjectIndexer {
         });
     }
 
-    /**
-     * Rule-INTERNAL-091.
-     * <p>
-     * Why this project's contents are not in the index, and nothing when they
-     * are: the tree draws the reason where the contents would have been.
-     */
+    // Rule-INTERNAL-091
     public @NotNull Optional<String> whyNotRead(final @NotNull Path projectPath) {
         return store.whyNotRead(projectPath);
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-014.
-     * <p>
-     * The nodes drawn with default values because their marker would not parse,
-     * and forgotten in the asking, so the scan that reports them reports each
-     * one once.
-     */
+    // UC-INTERNAL-002, Rule-INTERNAL-014
     public @NotNull List<String> takeDamagedMarkers() {
         return store.takeDamagedMarkers();
     }
 
-    /**
-     * The node at a path, whatever kind it is, empty when nothing is indexed
-     * there. Saves a caller that only has a path from having to know which kind
-     * of node to ask for.
-     * <p>
-     * The one path lookup that answers rather than promises: its callers ask
-     * about a path they remembered - editors to reopen from a previous session,
-     * a path typed into settings - and what was there last time may not be there
-     * now. Every other lookup is keyed by something on the screen and returns
-     * the node (#71).
-     */
     public @NotNull Optional<DirectoryDto> find(final @NotNull Path path) {
         return store.findByPath(path);
     }
 
-    /**
-     * Cache lookup, no disk access: true when a tree node exists at the path.
-     */
     public boolean nodeExists(final @NotNull Path path) {
         return store.findByPath(path).isPresent();
     }
 
-    /**
-     * VFS refresh of a directory — file access stays inside the indexer, and
-     * callers (often on the EDT) are never blocked on disk.
-     */
     public void refreshDirectory(final @NotNull Path path) {
         store.refreshDir(path);
     }
 
-    /**
-     * VFS refresh of one file the plugin wrote outside the VFS, so it appears in
-     * the Project view without waiting for the IDE to notice it by itself.
-     */
     public void refreshFile(final @NotNull Path file) {
         store.refreshFile(file);
     }
 
-    /**
-     * Renames the node, and calls back only when it worked - {@link NodeFiles}
-     * says why that needs no flag and why the cache update comes second.
-     */
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
         nodeFiles.rename(oldPath, newPath, onFinished);
     }
-
 }

@@ -25,22 +25,11 @@ import java.util.List;
 public interface GenAction {
     void execute(final @NotNull Project p, final @NotNull Object obj);
 
-    /**
-     * The same, for many at once. One at a time unless a generator can do
-     * better - which the test method generator can, because a whole set is one
-     * class and the class only needs finding and formatting once.
-     */
     default void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
         for (final Object item : items) execute(p, item);
     }
 
-    /**
-     * Rule-CODEGEN-081.
-     * <p>
-     * Whether this touches any code at all. Every generator does;
-     * {@link NoJavaCode} is the one that says no, so a rename can ask whether it
-     * has code to move before it waits for the IDE to finish indexing.
-     */
+    // Rule-CODEGEN-081
     default boolean generates() {
         return true;
     }

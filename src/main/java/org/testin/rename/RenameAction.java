@@ -36,21 +36,8 @@ import org.testin.util.Bundle;
 
 import java.util.Optional;
 
-/**
- * UC-TREE-PANEL-011.
- * <p>
- * Declared in {@code plugin.xml} (#119), which is what puts it in Find Action
- * and makes its key remappable in Settings -> Keymap. That is why it has no
- * constructor and no fields: the platform builds one instance for the whole
- * IDE, so what it acts on has to come from the keystroke rather than from
- * whoever built it.
- * <p>
- * Its name, description, icon and default key are in the XML for the same
- * reason - the Keymap page reads them from there, and a second copy in a
- * {@code super(...)} call is one of them going stale.
- */
+// UC-TREE-PANEL-011
 public class RenameAction extends DumbAwareAction {
-
     // UC-TREE-PANEL-011
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -68,9 +55,6 @@ public class RenameAction extends DumbAwareAction {
     private void renameNode(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
         if (newName.isBlank() || newName.equals(dir.getName())) return;
 
-        // No parent means a filesystem root, which is not a node this tree can
-        // rename. Asked first because applyRename resolves the new path against
-        // the parent and would throw on null (#66, F3).
         if (Optional.ofNullable(dir.getPath().getParent()).isEmpty()) {
             Logger.warn("Rename refused, no parent directory: " + dir.getPath());
             return;
@@ -81,17 +65,9 @@ public class RenameAction extends DumbAwareAction {
         final @NotNull String oldName = dir.getName();
         final @NotNull TreePanel tp = Services.getInstance(p, TreePanel.class);
 
-        // Both inside the callback. NodeRename.apply's onDone runs when the
-        // rename has finished and never if it failed, and the entry used to be
-        // pushed on the line after it regardless - so a tester who saw "Rename
-        // Failed" then found CTRL+Z offering Undo Rename, which renamed the node
-        // to the name it already had and reported Undone, while the operation
-        // they wanted back was one press further down (#66, finding 74).
         NodeRename.apply(p, tp, dir, newName, () -> {
             Services.getInstance(p, Notifier.class).softShow(p, Done.RENAMED);
 
-            // The dto reference stays valid across renames, so undo and redo are
-            // the same routine with the names swapped.
             Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                     Bundle.message("rename.undo", oldName),
                     () -> applyRename(p, dir, oldName),
@@ -101,20 +77,7 @@ public class RenameAction extends DumbAwareAction {
         });
     }
 
-    /**
-     * UC-TREE-PANEL-011, Rule-TREE-PANEL-037.
-     * <p>
-     * The undo and redo reverses pass no {@code onDone}: they are confirmed as
-     * "Undone" and "Redone" by their own actions, and a second balloon saying it
-     * was renamed would double-report one keystroke (#62).
-     * <p>
-     * Refused for the same reasons as the rename itself, before anything moves.
-     * The reverse used to go straight to the rename, which renames the generated
-     * code first: the class went back to the old name, the folder rename then
-     * failed on the sibling holding it, and the history said "Undone" over a
-     * tree and code that no longer matched (#312, A63). False tells the history
-     * nothing came back, so it neither confirms nor spends the press.
-     */
+    // UC-TREE-PANEL-011, Rule-TREE-PANEL-037
     private boolean applyRename(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
         if (NodeRename.refused(p, dir, newName)) return false;
 
@@ -123,13 +86,7 @@ public class RenameAction extends DumbAwareAction {
         return true;
     }
 
-    /**
-     * UC-TREE-PANEL-011, Rule-TREE-PANEL-104, Rule-TREE-PANEL-111.
-     * <p>
-     * Why this node cannot be renamed right now, and empty when it can. One
-     * answer for the gray entry and for the keystroke, which the platform sends
-     * whatever the entry looked like.
-     */
+    // UC-TREE-PANEL-011, Rule-TREE-PANEL-104, Rule-TREE-PANEL-111
     private static @NotNull Optional<String> whyNot(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         if (!dir.isRenamable()) return Optional.of(Bundle.message("rename.disabled.description"));
         if (Services.getInstance(p, TestinEditors.class).busyUnder(p, dir)) return Optional.of(Bundle.message("rename.disabled.busy"));
@@ -137,17 +94,7 @@ public class RenameAction extends DumbAwareAction {
         return Optional.empty();
     }
 
-    /**
-     * UC-TREE-PANEL-011, Rule-TREE-PANEL-104.
-     * <p>
-     * Renaming is about one node, so several selected grays it rather than
-     * quietly renaming the first (#192).
-     * <p>
-     * Also the guard that keeps a declared key to itself: the answer is empty
-     * when the keystroke arrived anywhere but the Testin tree, so this is gray in
-     * a Java file rather than renaming whatever the tree happens to hold behind
-     * it (#119).
-     */
+    // UC-TREE-PANEL-011, Rule-TREE-PANEL-104
     @Override
     public void update(final @NotNull AnActionEvent e) {
         final @NotNull Optional<String> why = Optional.ofNullable(e.getProject())
@@ -161,5 +108,4 @@ public class RenameAction extends DumbAwareAction {
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.EDT;
     }
-
 }

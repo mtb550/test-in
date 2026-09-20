@@ -38,12 +38,7 @@ import java.awt.datatransfer.StringSelection;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Declared in {@code plugin.xml} (#119) with no key, so a tester can give it one
- * in the Keymap. CTRL+X is the grid's own cut, and this one acts on the node.
- */
 public class CutTestCaseNodeAction extends DumbAwareAction {
-
     // UC-EDITOR-PANEL-016
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -56,22 +51,16 @@ public class CutTestCaseNodeAction extends DumbAwareAction {
 
         if (!selectedTestCases.isEmpty()) {
             try {
-                // The clipboard first, then the cut. Writing the clipboard calls
-                // off whatever cut was waiting, so a cut recorded before its own
-                // write would call itself off (#312, N3).
                 final @NotNull String json = Services.getInstance(p, Mapper.class).writeValueAsString(selectedTestCases);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
                 Services.getInstance(p, CutState.class).cut(editor, selectedTestCases);
 
-                // The cards draw a cut case faded, so the editor redraws from
-                // what it is holding rather than this reaching for its list.
                 editor.refreshView();
 
                 Services.getInstance(p, Notifier.class).softShowCounted(p, Done.CUT, selectedTestCases.size());
 
             } catch (final Exception ex) {
-                // Said, not only logged (#66, finding 272).
                 Logger.error("Cut Node failed: " + FailureText.of(ex));
                 Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("clipboard.cut.failed.title"), FailureText.of(ex));
             }
@@ -80,8 +69,7 @@ public class CutTestCaseNodeAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        // Rule-EDITOR-PANEL-214. Gray with the reason on a node that cannot lose
-        // a test case, rather than absent from that editor's menu (#248).
+        // Rule-EDITOR-PANEL-214
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             e.getPresentation().setEnabled(false);
             e.getPresentation().setDescription(Bundle.message("cut.case.disabled.description"));

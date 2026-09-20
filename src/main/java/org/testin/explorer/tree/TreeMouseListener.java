@@ -61,17 +61,6 @@ public class TreeMouseListener extends PopupHandler {
         }
     }
 
-    /**
-     * The node under the pointer, and empty when there is none there.
-     * <p>
-     * The whole row responds, not only the label: the wide selection paints the
-     * full width, so clicks in the indentation or right of the text hit the same
-     * node. Matched by Y alone, and below the last row is still a miss.
-     * <p>
-     * A path with nothing behind it is a miss too. Both callers wanted a node
-     * rather than a path, and each used to ask for the path and then ask again
-     * whether it had one - the same question in two places (#71).
-     */
     private @NotNull Optional<TreePath> nodeAt(final int x, final int y) {
         final int row = tree.getClosestRowForLocation(x, y);
         if (row < 0) return Optional.empty();

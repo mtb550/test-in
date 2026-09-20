@@ -39,9 +39,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-
 public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
-
     public DescriptionBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
         super(p, selectedItems, updatedItems);
     }
@@ -71,25 +69,7 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
         return false;
     }
 
-    /**
-     * UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-224.
-     * <p>
-     * The rows whose new description the update dialog would have refused: one
-     * that cannot name a Java method, and one that names the same method as
-     * another test case in its test set.
-     * <p>
-     * This dialog asked neither, so three cards given one description came out
-     * as three methods with one name, the class stopped compiling, and every
-     * case in that test set stopped running - while the tester read
-     * <i>Updated 3</i> (#66, finding 159).
-     * <p>
-     * <b>Against what stays, and then against each other.</b> A case outside
-     * this dialog keeps its description, and so does a row the tester left
-     * alone; those names are taken before any edited row is looked at. Each
-     * edited row then takes its own name in turn, so two rows given one
-     * description clash with each other - and two rows that swap descriptions
-     * do not, because neither old name is kept.
-     */
+    // UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-224
     @Override
     protected @NotNull Set<Integer> clashing(final @NotNull List<TestCaseDto> items, final @NotNull List<EditedValue> newValues) {
         final @NotNull Set<UUID> inThisDialog = items.stream().map(TestCaseDto::getId).collect(Collectors.toSet());
@@ -124,8 +104,6 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
             }
         }
 
-        // The words the update dialog already uses, so a refusal reads the same
-        // whichever door the description came through.
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
         if (!notANameYet.isEmpty()) {
             notifier.softRefuse(p, Bundle.message("description.not.a.method.title"), Bundle.message("description.not.a.method.message", notANameYet.getFirst()));
@@ -137,10 +115,6 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
         return clashing;
     }
 
-    /**
-     * The method names the test set's other cases already hold - every case in
-     * it that this dialog is not editing.
-     */
     private @NotNull Set<String> keysOutside(final @NotNull Path testSet, final @NotNull Set<UUID> inThisDialog) {
         final @NotNull Set<String> keys = new HashSet<>();
 
@@ -151,10 +125,6 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
         return keys;
     }
 
-    /**
-     * The key of the method a description names, and nothing for one that names
-     * none - a case with no description holds no name another can take.
-     */
     private static @NotNull Optional<String> keyOf(final @NotNull String description) {
         return Optional.of(NameSanitizer.methodName(description))
                 .filter(name -> !name.isEmpty())

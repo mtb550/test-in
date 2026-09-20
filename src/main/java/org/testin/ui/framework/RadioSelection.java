@@ -28,13 +28,7 @@ import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * One captioned radio row — a caption above one radio button per option
- * (e.g. bug severity, bug priority). The dialog reads {@link #getSelected()}
- * on submit; a declared initial value keeps the selection always valid.
- */
 public final class RadioSelection<T> implements DialogComponent {
-
     private final @NotNull JBPanel<?> panel;
     private final @NotNull JRadioButton firstButton;
     private @NotNull T selected;
@@ -44,11 +38,8 @@ public final class RadioSelection<T> implements DialogComponent {
 
         final @NotNull Font radioFont = JBFont.label().biggerOn(2f);
         final @NotNull ButtonGroup group = new ButtonGroup();
-        // No gap before the first button, so it starts under its caption's
-        // first letter; a flow layout puts its gap on the left edge too.
         final @NotNull JBPanel<?> radioRow = new JBPanel<>(new HorizontalLayout(8));
         radioRow.setOpaque(false);
-        // At the framework's text edge, under the caption's first letter.
         radioRow.setBorder(JBUI.Borders.emptyLeft(12));
 
         Optional<JRadioButton> first = Optional.empty();
@@ -62,7 +53,6 @@ public final class RadioSelection<T> implements DialogComponent {
             radioRow.add(radio);
             if (first.isEmpty()) first = Optional.of(radio);
         }
-        // The builder guarantees at least one option.
         this.firstButton = first.orElseThrow();
 
         // Rule-INTERNAL-087
@@ -85,12 +75,8 @@ public final class RadioSelection<T> implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // Choosing an option is not a submit gesture; the declared keys save.
     }
 
-    /**
-     * One selectable option: the text on the radio and the submitted value.
-     */
     record Option<T>(@NotNull String name, @NotNull T value) {
     }
 }

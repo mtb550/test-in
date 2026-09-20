@@ -75,20 +75,14 @@ public class ViewPanel implements Disposable {
         FontSync.syncWithNativeEditor(p, historyTab, this);
         FontSync.syncWithNativeEditor(p, openBugsTab, this);
 
-        // Rule-SETTING-039. The other half of the wheel, beside the zoom that
-        // takes it: a tab with a wheel listener receives the wheel itself instead
-        // of the scroll pane around it, so a plain wheel scrolled none of the
-        // three tabs (#312, A75).
+        // Rule-SETTING-039
         tabs().forEach(tab -> tab.addMouseWheelListener(WheelForwarding::forwardWheelToScrollPane));
 
         detailsScrollPane = createScrollPane(detailsTab);
         historyScrollPane = createScrollPane(historyTab);
         openBugsScrollPane = createScrollPane(openBugsTab);
 
-        // Rule-VIEW-PANEL-058. On each tab, because focus is in whichever one
-        // the tester is reading - and F2 puts it there, which is how a tester
-        // ended up unable to close the panel with the key that closes it
-        // everywhere else (#226).
+        // Rule-VIEW-PANEL-058
         new EscapeAction(p, detailsTab);
         new EscapeAction(p, historyTab);
         new EscapeAction(p, openBugsTab);
@@ -100,10 +94,6 @@ public class ViewPanel implements Disposable {
 
         refreshCurrentView();
 
-        // Only when the case reported is the one on display. Every start and
-        // every finish of a run rebuilt all three tabs, whichever case it was -
-        // on a 200-case run 400 rebuilds on the EDT, each walking every run in
-        // the project for Open Bugs (#66, finding 185).
         TestCaseExecutionSubscriber.onReported(p, this, (tc, status, duration, failure) -> refreshIfShowing(List.of(tc)));
     }
 
@@ -111,16 +101,7 @@ public class ViewPanel implements Disposable {
         return Stream.of(detailsTab, historyTab, openBugsTab);
     }
 
-    /**
-     * UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080.
-     * <p>
-     * A tab the keyboard can be in: focusable from the start, and answering
-     * {@code Tab} and {@code Shift+Tab} (#311).
-     * <p>
-     * {@code Tab} is a focus traversal key, and AWT hands it to the focus manager
-     * before the IDE's actions are asked, so the tab stops treating it as one -
-     * otherwise the two actions never run.
-     */
+    // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080
     private void takesTheKeyboard(final @NotNull JBPanel<?> tab) {
         tab.setFocusable(true);
         tab.setFocusTraversalKeysEnabled(false);
@@ -129,25 +110,10 @@ public class ViewPanel implements Disposable {
         new ViewTabAction(p, tab, ViewTabAction.Direction.PREVIOUS);
     }
 
-    /**
-     * UC-VIEW-PANEL-017, Rule-VIEW-PANEL-080.
-     * <p>
-     * A press anywhere inside a tab puts the keyboard in that tab (#66, finding
-     * 158).
-     * <p>
-     * Watched on the IDE's event queue rather than by a listener on each tab.
-     * Nearly everything a tab draws is a {@code Prose} text area, and a text area
-     * takes the press for its caret before any parent hears it, so a listener on
-     * the tab heard only the empty space between rows. Through the focus manager,
-     * so a press that comes back from another window lands too. Never consumes
-     * the press: the link or path step under it still does its own thing.
-     */
+    // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-080
     private boolean focusTabPressed(final @NotNull AWTEvent event) {
         if (!(event instanceof MouseEvent press) || press.getID() != MouseEvent.MOUSE_PRESSED) return false;
 
-        // The queue sees the press before Swing hands it down, so its component
-        // is the IDE's frame (IdeFrameImpl, measured in the sandbox) and never a
-        // tab. What was pressed is the deepest component under the pointer.
         Optional.ofNullable(SwingUtilities.getDeepestComponentAt(press.getComponent(), press.getX(), press.getY()))
                 .flatMap(pressed -> tabs().filter(tab -> SwingUtilities.isDescendingFrom(pressed, tab)).findFirst())
                 .ifPresent(tab -> IdeFocusManager.getInstance(p).requestFocus(tab, true));
@@ -173,32 +139,13 @@ public class ViewPanel implements Disposable {
         }));
     }
 
-    /**
-     * UC-VIEW-PANEL-002, Rule-VIEW-PANEL-015, Rule-VIEW-PANEL-016.
-     * <p>
-     * Follows what is selected, and stays shut when the tester has shut it.
-     * <p>
-     * The difference between this and {@link #show} is who asked. Double-clicking
-     * a card or pressing ENTER on a sequence cell is a request for the details,
-     * and opens the panel. Changing the selection, or moving to another editor,
-     * is not - it is the tester doing something else, and a panel they closed
-     * must not reappear because they clicked a different tab.
-     * <p>
-     * The rule was in one of the two places that needed it. Selection changes
-     * checked; switching editors never did, so closing the panel lasted until the
-     * next editor tab.
-     */
+    // UC-VIEW-PANEL-002, Rule-VIEW-PANEL-015, Rule-VIEW-PANEL-016
     public void showIfOpen(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
         if (!isOpen()) return;
 
         this.show(testCases, path);
     }
 
-    /**
-     * Whether the tester has this panel on screen. Asked by everything that
-     * follows rather than asks - three places were spelling the same question
-     * out, which is two more than can be changed together.
-     */
     private boolean isOpen() {
         return ViewToolWindowFactory.toolWindow(p).filter(ToolWindow::isVisible).isPresent();
     }
@@ -216,10 +163,6 @@ public class ViewPanel implements Disposable {
         this.updateList(List.of(), List.of());
     }
 
-    /**
-     * Brings the Details tab to the front. Both callers show a test case, and a
-     * test case is shown on Details - no other tab was ever asked for.
-     */
     private void selectDetailsTab() {
         ViewToolWindowFactory.toolWindow(p).ifPresent(tw -> {
             for (final Content content : tw.getContentManager().getContents()) {
@@ -231,19 +174,7 @@ public class ViewPanel implements Disposable {
         });
     }
 
-    /**
-     * UC-VIEW-PANEL-015, Rule-VIEW-PANEL-060.
-     * <p>
-     * Closes the panel when what it is showing came from the node being closed
-     * - an editor shutting down takes its own cases off the screen, and nobody
-     * else's.
-     * <p>
-     * By the node rather than by one case. It used to be told whichever case
-     * happened to be selected as the editor went down, and the editor's own
-     * teardown emptied the panel unconditionally a moment later anyway - so a
-     * tester reading a case from one editor watched the panel go blank because
-     * they closed another (#233).
-     */
+    // UC-VIEW-PANEL-015, Rule-VIEW-PANEL-060
     public void hide(final @NotNull List<String> closingPath) {
         if (!isOpen()) return;
         if (!page.getCurrentPath().equals(closingPath)) return;
@@ -262,40 +193,17 @@ public class ViewPanel implements Disposable {
         for (final ViewTab tab : ViewTab.values()) tab.load(this);
     }
 
-    /**
-     * Rule-VIEW-PANEL-005.
-     * <p>
-     * Refreshes the panel when the case on display is one of those updated.
-     * The callers used to work this out from outside, asking the panel three
-     * questions in a row; whether a refresh is needed is the panel's own business.
-     */
+    // Rule-VIEW-PANEL-005
     public void refreshIfShowing(final @NotNull Collection<TestCaseDto> updated) {
         getCurrentTestCase()
                 .filter(current -> updated.stream().anyMatch(item -> item.getId().equals(current.getId())))
                 .ifPresent(current -> refreshCurrentView());
     }
 
-    /**
-     * The case on display, empty while the panel is showing none.
-     */
     public @NotNull Optional<TestCaseDto> getCurrentTestCase() {
         return page.getCurrentItem();
     }
 
-    /**
-     * The case on display as the indexer holds it now, rather than as this panel
-     * was handed it.
-     * <p>
-     * The panel is given cases when it is opened and keeps them while the tester
-     * pages through - so a redraw drew whatever it was holding, which is the
-     * value at the moment the panel opened. Every writer telling the panel to
-     * refresh was still not enough: it refreshed, and re-rendered the same stale
-     * object.
-     * <p>
-     * Falls back to the held copy when the indexer no longer has the case - a
-     * removal, a project reindexed underneath - because a panel that blanks is
-     * worse than one showing the last thing that was true.
-     */
     @NotNull Optional<TestCaseDto> shownCase() {
         return getCurrentTestCase()
                 .map(shown -> Services.getInstance(p, ProjectIndexer.class).findTestCase(shown.getId()).orElse(shown));

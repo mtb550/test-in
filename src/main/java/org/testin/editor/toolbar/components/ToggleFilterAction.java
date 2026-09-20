@@ -25,23 +25,12 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.util.Set;
 
-/**
- * One check-mark entry in the toolbar filter popup: toggles a value in its
- * selection set and notifies the owning button.
- */
 final class ToggleFilterAction<T> extends DumbAwareToggleAction {
-
     private final @NotNull T value;
     private final @NotNull Set<T> selection;
     private final @NotNull FilterMembership<T> membership;
     private final @NotNull Runnable onChanged;
 
-    /**
-     * @param icon the swatch a priority row shows, and null on every other row.
-     *             Really null rather than an empty icon: a toggle draws its own
-     *             checkmark where the icon would go, and an icon that is there
-     *             but paints nothing takes that place (#71)
-     */
     ToggleFilterAction(final @NotNull String text, final @Nullable Icon icon, final @NotNull T value, final @NotNull Set<T> selection, final @NotNull FilterMembership<T> membership, final @NotNull Runnable onChanged) {
         super(text, null, icon);
         this.value = value;
@@ -64,7 +53,6 @@ final class ToggleFilterAction<T> extends DumbAwareToggleAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - update() reads only fields/services, never Swing state; do not switch to EDT (#52).
         return ActionUpdateThread.BGT;
     }
 }

@@ -26,7 +26,6 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.util.Bundle;
 
 public class OpenSettingsAction extends AbstractProjectAction {
-
     public OpenSettingsAction(final @NotNull Project p) {
         super(p, Bundle.message("settings.action.text"), Bundle.message("settings.action.description"), AllIcons.General.Settings);
     }
@@ -39,7 +38,6 @@ public class OpenSettingsAction extends AbstractProjectAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - no update() here reads Swing state; do not switch to EDT (#52).
         return ActionUpdateThread.BGT;
     }
 }

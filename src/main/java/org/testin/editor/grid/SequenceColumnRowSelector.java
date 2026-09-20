@@ -25,15 +25,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
 
-/**
- * Excel-style row selection via the order column: plain click selects
- * the whole row, Ctrl toggles rows, Shift extends the row range. Must be
- * registered ahead of the table UI's mouse handler and consumes the press so
- * default cell selection cannot override the row selection.
- */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 final class SequenceColumnRowSelector extends MouseAdapter {
-
     private final @NotNull JBTable table;
 
     // UC-EDITOR-PANEL-024, Rule-EDITOR-PANEL-108
@@ -63,17 +56,10 @@ final class SequenceColumnRowSelector extends MouseAdapter {
 
         table.setColumnSelectionInterval(0, table.getColumnCount() - 1);
 
-        // Every column is selected so the row copies as one line, which loses
-        // where the tester actually clicked - getSelectedColumn then answers 0,
-        // the leftmost column. The anchor is put back on the sequence, because
-        // that is the cell this gesture is about and something has to remember
-        // it (#74).
         table.getColumnModel().getSelectionModel().setAnchorSelectionIndex(viewCol);
 
         table.requestFocusInWindow();
 
-        // Consumed events are ignored by BasicTableUI, so the default
-        // cell-selection handling cannot override the row selection.
         e.consume();
     }
 }

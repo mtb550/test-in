@@ -36,20 +36,6 @@ import org.testin.util.Bundle;
 import java.util.Optional;
 import java.util.List;
 
-/**
- * Sets the selected test cases to any user-settable {@link TestStatus}. The
- * constant carries the label, icon, shortcut and whether details are collected
- * first - one action for all statuses instead of one class per status.
- * <p>
- * Built by {@link SetTestCaseStatusGroup}, which is what {@code plugin.xml}
- * declares (#119). Which status it records is the only thing it carries: the
- * editor and the selection come from the keystroke.
- * <p>
- * Its key does not: P, F and B are bare letters, and a bare letter in the keymap
- * would answer everywhere in the IDE, including while somebody is typing. The
- * group puts them on the run editor's list, where a verdict is a gesture of that
- * list rather than a command.
- */
 public class SetTestCaseStatusAction extends DumbAwareAction {
     @Getter
     private final @NotNull TestStatus status;
@@ -74,15 +60,12 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
 
     // UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033
     private void record(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
-        // Single selection of a run item: collect failure details first, apply after the dialog closes.
         if (status.isCollectsFailureDetails() && editor instanceof RunEditor runEditor && selectedItems.size() == 1) {
             final @NotNull Optional<TestRunItems> runItem = runEditor.runItem(selectedItems.getFirst().getId())
                     .filter(item -> !item.isRemoved());
 
             if (runItem.isPresent()) {
                 new FailedResultDialog(p, runEditor.getParent().getPath(), runItem.orElseThrow(), fields -> {
-                    // Onto the run the indexer holds now, as F2's edit is, rather than
-                    // the editor's own row, which a sync may have replaced (#66, finding 145).
                     if (Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, runEditor.getParent().getPath(), selectedItems.getFirst().getId(), fields)) {
                         applyStatus(p, editor, selectedItems);
                     }
@@ -98,13 +81,7 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
         Services.getInstance(p, RunStatusService.class).applyStatus(p, editor, selectedItems, status);
     }
 
-    /**
-     * UC-EDITOR-PANEL-032.
-     * <p>
-     * On a selected case in a run editor, and gray everywhere else. A verdict
-     * belongs to a run, and the test set editor answers the same data key with
-     * no run behind it (#119).
-     */
+    // UC-EDITOR-PANEL-032
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TestinData.editor(e).filter(RunEditor.class::isInstance).isPresent()

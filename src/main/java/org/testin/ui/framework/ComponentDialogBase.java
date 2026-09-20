@@ -31,152 +31,72 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-/**
- * The typed content part of a framework dialog. Each component type gets its
- * own fluent builder here, so a dialog class declares its content as one flat
- * chain; new component types are added as new builders without touching
- * existing dialogs.
- */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ComponentDialogBase<C extends DialogComponent> {
-
     @Getter
     private final @NotNull C component;
 
-    /**
-     * An input field over a selection list — the create-dialog component.
-     * One {@code .selection(...)} call per row:
-     * <pre>
-     * ComponentDialogBase.&lt;DirectoryType&gt;textFieldWithSelections()
-     *         .icon(...)
-     *         .placeholder("set name...")
-     *         .selection(icon, "Test Set", "Holds test cases", DirectoryType.TS)
-     *         .build()
-     * </pre>
-     */
     public static <T> @NotNull TextFieldBuilder<T> textFieldWithSelections() {
         return new TextFieldBuilder<>();
     }
 
-    /**
-     * An input field on its own — the rename-dialog component.
-     */
     public static @NotNull TextInputBuilder textField() {
         return new TextInputBuilder();
     }
 
-    /**
-     * UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221.
-     * <p>
-     * An input field that underlines a misspelled word, with the IDE's
-     * corrections on Alt+Enter - for a sentence a tester writes (#314).
-     */
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221
     public static @NotNull ComponentDialogBase<SpellCheckedField> spellCheckedField(final @NotNull Project p, final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value) {
         return new ComponentDialogBase<>(new SpellCheckedField(p, caption, placeholder, value));
     }
 
-    /**
-     * A plain message on its own — the ordinary confirmation.
-     */
     public static @NotNull ComponentDialogBase<DialogMessage> message(final @NotNull String text) {
         return message(text, "", "");
     }
 
-    /**
-     * A message with the muted From/To rows that show where a transfer goes.
-     * An empty side is a side the message does not mention.
-     */
     public static @NotNull ComponentDialogBase<DialogMessage> message(final @NotNull String text, final @NotNull String from, final @NotNull String to) {
         return new ComponentDialogBase<>(new DialogMessage(text, from, to));
     }
 
-    /**
-     * Wraps an application-specific component that implements
-     * {@link DialogComponent} (e.g. a form built by its own class).
-     */
     public static <C extends DialogComponent> @NotNull ComponentDialogBase<C> of(final @NotNull C component) {
         return new ComponentDialogBase<>(component);
     }
 
-    /**
-     * A button with alternatives behind an arrow: the first label is the
-     * default, the rest sit under it. For a dialog whose one action has a
-     * second, less common form - commit, or commit and push.
-     */
     public static @NotNull ComponentDialogBase<DialogSplitButton> splitButton(final @NotNull String... labels) {
         return new ComponentDialogBase<>(new DialogSplitButton(List.of(labels)));
     }
 
-    /**
-     * A confirm button row — clicking it submits the dialog. For working
-     * dialogs where a visible OK button reads better than an Enter hint.
-     */
     public static @NotNull ComponentDialogBase<DialogButton> button(final @NotNull String text) {
         return new ComponentDialogBase<>(new DialogButton(text));
     }
 
-    /**
-     * Read-only context rows — muted caption + value, display only.
-     */
     public static @NotNull DetailsBuilder details() {
         return new DetailsBuilder();
     }
 
-    /**
-     * A multi-line text area — e.g. a pasted error or exception.
-     */
     public static @NotNull TextAreaBuilder textArea() {
         return new TextAreaBuilder();
     }
 
-    /**
-     * A screenshot at its real size, scrolled when it is larger (#50).
-     */
     public static @NotNull ComponentDialogBase<Picture> picture(final byte @NotNull [] png) {
         return new ComponentDialogBase<>(new Picture(png));
     }
 
-    /**
-     * A captioned row offering existing values and accepting a new one — the
-     * open-set counterpart of {@link #radios}. The selected value must be one
-     * of the options; what the tester types over it need not be.
-     */
     public static @NotNull ComponentDialogBase<ChoiceInput> choice(final @NotNull String caption, final @NotNull List<String> options, final @NotNull String selected) {
         return new ComponentDialogBase<>(new ChoiceInput(caption, List.copyOf(options), selected));
     }
 
-    /**
-     * A captioned radio row — one radio per option, one always selected.
-     */
     public static <T> @NotNull RadioBuilder<T> radios(final @NotNull String caption) {
         return new RadioBuilder<>(caption);
     }
 
-    /**
-     * A read-only table the tester selects rows in — "here is what changed,
-     * pick the ones you mean". One {@code .column(...)} call per column:
-     * <pre>
-     * ComponentDialogBase.table()
-     *         .column("Change Type", 120)
-     *         .column("Description", 240)
-     *         .build()
-     * </pre>
-     */
     public static @NotNull TableBuilder table() {
         return new TableBuilder();
     }
 
-    /**
-     * Fluent builder for {@link SelectionTable}.
-     */
     public static final class TableBuilder {
-
         private final @NotNull List<String> columns = new ArrayList<>();
         private final @NotNull List<Integer> widths = new ArrayList<>();
 
-        /**
-         * One column: its heading, and the width it prefers before scaling.
-         */
         public @NotNull TableBuilder column(final @NotNull String heading, final int width) {
             columns.add(heading);
             widths.add(width);
@@ -188,17 +108,10 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
     }
 
-    /**
-     * Fluent builder for {@link DialogDetails}.
-     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class DetailsBuilder {
-
         private final @NotNull List<DialogDetails.Row> rows = new ArrayList<>();
 
-        /**
-         * One caption/value row; a blank value skips the row.
-         */
         public @NotNull DetailsBuilder row(final @NotNull String caption, final @NotNull String value) {
             if (!value.isBlank()) {
                 rows.add(new DialogDetails.Row(caption, Optional.empty(), value));
@@ -206,10 +119,6 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             return this;
         }
 
-        /**
-         * One row named by an icon rather than a caption, as a test case field
-         * is named by its letter; a blank value skips the row.
-         */
         public @NotNull DetailsBuilder row(final @NotNull Icon icon, final @NotNull String value) {
             if (!value.isBlank()) {
                 rows.add(new DialogDetails.Row("", Optional.of(icon), value));
@@ -222,19 +131,10 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
     }
 
-    /**
-     * Fluent builder for {@link RadioSelection}.
-     */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class RadioBuilder<T> {
-
         private final @NotNull String caption;
         private final @NotNull List<RadioSelection.Option<T>> options = new ArrayList<>();
-        /**
-         * The option selected when the dialog opens, and none until
-         * {@link #select} says - an Optional rather than a nullable field, which
-         * is how a field says "not set yet" here (#312, A79).
-         */
         private @NotNull Optional<T> selected = Optional.empty();
 
         public @NotNull RadioBuilder<T> option(final @NotNull String name, final @NotNull T value) {
@@ -242,18 +142,11 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             return this;
         }
 
-        /**
-         * Every choice a kind offers, in its own order - so a constant added to
-         * the enum reaches the dialog without anybody remembering to list it.
-         */
         public @NotNull RadioBuilder<T> options(final @NotNull List<T> values, final @NotNull Function<T, String> name) {
             values.forEach(value -> option(name.apply(value), value));
             return this;
         }
 
-        /**
-         * The initially selected value — must be one of the options.
-         */
         public @NotNull RadioBuilder<T> select(final @NotNull T value) {
             this.selected = Optional.of(value);
             return this;
@@ -263,8 +156,6 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             if (options.isEmpty()) {
                 throw new IllegalStateException("radios needs at least one .option(...)");
             }
-            // A builder that was never given a selection matches no option
-            // either, so one test covers both mistakes.
             if (options.stream().noneMatch(option -> selected.filter(option.value()::equals).isPresent())) {
                 throw new IllegalStateException("radios needs .select(...) with one of the declared options");
             }
@@ -272,12 +163,8 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
     }
 
-    /**
-     * Fluent builder for {@link TextArea}.
-     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class TextAreaBuilder {
-
         private @NotNull String caption = "";
         private @NotNull String placeholder = "";
         private @NotNull String value = "";
@@ -285,10 +172,6 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         private boolean acceptsImages = false;
         private @NotNull List<byte[]> images = List.of();
 
-        /**
-         * A caption above the box. None unless asked for: an area that is the
-         * whole dialog, like Report Bug's body, is named by the dialog's title.
-         */
         public @NotNull TextAreaBuilder caption(final @NotNull String caption) {
             this.caption = caption;
             return this;
@@ -304,19 +187,11 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             return this;
         }
 
-        /**
-         * Preferred visible rows; the area still grows with the dialog.
-         */
         public @NotNull TextAreaBuilder rows(final int rows) {
             this.rows = rows;
             return this;
         }
 
-        /**
-         * Lets Ctrl+V with an image on the clipboard add it as a screenshot under
-         * the box, starting from these. Off unless asked for: only a failure's
-         * Error Capture keeps screenshots (#66, finding 127; #50).
-         */
         public @NotNull TextAreaBuilder images(final @NotNull List<byte[]> images) {
             this.acceptsImages = true;
             this.images = images;
@@ -328,12 +203,8 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
     }
 
-    /**
-     * Fluent builder for {@link TextInput}.
-     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class TextInputBuilder {
-
         private @NotNull Icon icon = DialogStyle.NO_ICON;
         private @NotNull String placeholder = "";
         private @NotNull String value = "";
@@ -349,23 +220,11 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             return this;
         }
 
-        /**
-         * The value the field opens with (e.g. the current name on rename).
-         */
         public @NotNull TextInputBuilder value(final @NotNull String value) {
             this.value = value;
             return this;
         }
 
-        /**
-         * What the field may hold, as a regular expression the whole value must
-         * match - {@code [0-9]*} for a number, {@code [A-Z]{2,4}} for a code.
-         * <p>
-         * Enforced as the text arrives rather than checked on submit, so the
-         * field cannot be made to hold anything else in the first place.
-         * Emptying it is always allowed; whether empty is acceptable is the
-         * dialog's decision.
-         */
         public @NotNull TextInputBuilder accepting(final @NotNull String regex) {
             this.accepts = regex;
             return this;
@@ -376,17 +235,8 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
     }
 
-    /**
-     * Fluent builder for {@link TextFieldWithSelections}.
-     */
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class TextFieldBuilder<T> {
-
-        /**
-         * How many rows a searching picker shows before it scrolls. Enough to
-         * scan without moving the eye, and few enough that the dialog is not the
-         * whole screen.
-         */
         private static final int SEARCH_ROWS = 12;
 
         private final @NotNull List<SelectionList<T>> selections = new ArrayList<>();
@@ -394,9 +244,6 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         private @NotNull Icon icon = DialogStyle.NO_ICON;
         private @NotNull String placeholder = "";
 
-        /**
-         * The field's leading icon before a selection takes over.
-         */
         public @NotNull TextFieldBuilder<T> icon(final @NotNull Icon icon) {
             this.icon = icon;
             return this;
@@ -407,18 +254,11 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             return this;
         }
 
-        /**
-         * One selectable row: icon, name, muted hint, and the submitted value.
-         */
         public @NotNull TextFieldBuilder<T> selection(final @NotNull Icon icon, final @NotNull String name, final @NotNull String hint, final @NotNull T value) {
             selections.add(SelectionList.add(icon, name, hint, value));
             return this;
         }
 
-        /**
-         * Rows that answer to what the tester has typed, for a picker that
-         * searches rather than one that offers a fixed set (#29).
-         */
         public @NotNull TextFieldBuilder<T> rows(final @NotNull Rows<T> rows) {
             this.rows = Optional.of(rows);
             return this;
@@ -435,9 +275,6 @@ public final class ComponentDialogBase<C extends DialogComponent> {
                         "textFieldWithSelections needs at least one .selection(...) or a .rows(...)");
             }
 
-            // A fixed set is rows that ignore the query, so there is one way to
-            // hold rows rather than two, and one of them declared as a special
-            // case of the other.
             final @NotNull List<SelectionList<T>> fixed = List.copyOf(selections);
             final @NotNull Rows.Answer<T> always = Rows.Answer.of(fixed);
 
@@ -446,4 +283,3 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
     }
 }
-

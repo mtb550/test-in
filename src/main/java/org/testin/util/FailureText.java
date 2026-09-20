@@ -22,24 +22,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-/**
- * The words a failure can be reported with.
- * <p>
- * One owner because the question has one answer and it was being written out
- * at each place that reported a failure - four times correctly and six times
- * not at all. {@code getMessage()} is null for an exception thrown without one,
- * and every place that says a failure hands the words to a parameter declared
- * {@code @NotNull}, which the IDE instruments into a runtime check. So a push or
- * a sync that failed with no message made the handler reporting it throw, and
- * the tester was told nothing (#66, finding 183).
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FailureText {
-
-    /**
-     * Its message, or - when it carries none - its type, which is still more
-     * than nothing to go on.
-     */
     public static @NotNull String of(final @NotNull Throwable failure) {
         return Objects.requireNonNullElse(failure.getMessage(), failure.toString());
     }

@@ -26,13 +26,7 @@ import org.testin.util.Bundle;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * A plain message — the component of the confirmation dialogs. Multi-line via
- * {@code \n}; optional muted "From/To" rows show where a transfer goes. The
- * panel itself takes the focus so the dialog's declared keys work immediately.
- */
 public final class DialogMessage implements DialogComponent {
-
     private final @NotNull JBPanel<?> panel;
 
     DialogMessage(final @NotNull String text, final @NotNull String from, final @NotNull String to) {
@@ -40,10 +34,6 @@ public final class DialogMessage implements DialogComponent {
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setOpaque(false);
 
-        // Escaped before it becomes HTML, as DialogDetails escapes its values: the
-        // text quotes names and descriptions the tester typed, and Swing's renderer
-        // drops anything that looks like a tag - so "Remove 'Login refuses <empty>
-        // password'?" asked about a description that does not exist (#312, A78).
         final @NotNull JBLabel message = new JBLabel("<html>" + Html.ofText(text) + "</html>");
         message.setAlignmentX(Component.LEFT_ALIGNMENT);
         content.add(message);
@@ -58,11 +48,6 @@ public final class DialogMessage implements DialogComponent {
         panel.add(content, BorderLayout.CENTER);
     }
 
-    /**
-     * A muted "From: path" row, or nothing at all when the message does not name
-     * that side. One place decides whether the row exists, so both calls above
-     * are unconditional.
-     */
     private static void addPathRow(final @NotNull JBPanel<?> content, final @NotNull String caption, final @NotNull String path, final int topGap) {
         if (path.isEmpty()) return;
 
@@ -86,6 +71,5 @@ public final class DialogMessage implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // A message has no submit gesture of its own; the declared keys do it.
     }
 }

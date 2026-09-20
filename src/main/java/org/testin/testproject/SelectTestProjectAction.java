@@ -34,17 +34,7 @@ import org.testin.util.Bundle;
 
 import java.util.Map;
 
-/**
- * Changes which test project this repository is bound to (#8).
- * <p>
- * The way back. A repository names one project and the panel shows only that
- * one, which is the point - but a tester who bound the wrong one, or whose
- * project was renamed, would otherwise have to edit {@code testin.yml} by hand
- * to say so. One toolbar button, not a dropdown: choosing is a thing done twice
- * in a repository's life, not on every glance at the tree.
- */
 public final class SelectTestProjectAction extends AbstractProjectAction {
-
     private final @NotNull TreePanel tp;
 
     public SelectTestProjectAction(final @NotNull Project p, final @NotNull TreePanel tp) {
@@ -55,17 +45,12 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
     // UC-TREE-PANEL-004
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        // The listing walks the Testin root and reads a marker per project, so it
-        // happens off the EDT; the dialog it feeds opens back on it (#66).
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Map<String, ProjectStatus> underRoot = Services.getInstance(p, ProjectIndexer.class).testProjects();
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (p.isDisposed()) return;
 
-                // An empty picker would say nothing at all. The button beside
-                // this one is the answer, so the message points at it rather
-                // than opening a dialog with no rows in it.
                 if (underRoot.isEmpty()) {
                     Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("project.none.title"),
                             Bundle.message("project.none.message"));
@@ -80,16 +65,11 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
     // UC-TREE-PANEL-028, Rule-TREE-PANEL-115
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        // There is nothing to choose from without a root. Both branches, so the
-        // button comes back once one is configured.
-        // Gray with the reason, as every gray entry is (#301, F7); both
-        // branches, so the reason goes when a folder is set.
         GrayWithReason.unless(this, e, Services.getInstance(p, TestinRoot.class).isConfigured(), Bundle.message("toolbar.disabled.no.root"));
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - update() reads a setting, never Swing state (#52).
         return ActionUpdateThread.BGT;
     }
 }

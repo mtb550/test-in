@@ -28,16 +28,7 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 
-/**
- * Takes the last thing back, or puts it forward again, on the surface the
- * tester is standing on.
- * <p>
- * Two things it is told and neither of which it works out: which way it goes,
- * and whose history it reads. That is what lets the project tree and every test
- * editor offer the same pair of keys over histories of their own (#165).
- */
 public class UndoAction extends AbstractProjectAction {
-
     private final @NotNull UndoDirection direction;
     private final @NotNull UndoScope scope;
 
@@ -53,16 +44,8 @@ public class UndoAction extends AbstractProjectAction {
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @NotNull UndoHistories service = Services.getInstance(p, UndoHistories.class);
 
-        // Asked before, not after: the service returns silently on an empty
-        // stack, so notifying unconditionally would claim something that never
-        // ran. The presentation is disabled in that case, but a shortcut can
-        // still fire.
         if (!direction.can(service, scope)) return;
 
-        // Only what happened. The word used to be said the moment the
-        // operation had been fired, so an undo that could not put a node back
-        // raised its own refusal and then this on top of it - two messages on
-        // one press, contradicting each other (#275).
         if (direction.apply(service, scope)) Services.getInstance(p, Notifier.class).softShow(p, direction.getDone());
     }
 
@@ -77,7 +60,6 @@ public class UndoAction extends AbstractProjectAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // The undo stacks mutate on the EDT; reading them there avoids races.
         return ActionUpdateThread.EDT;
     }
 }

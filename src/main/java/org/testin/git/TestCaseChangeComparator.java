@@ -27,12 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Compares user-editable test-case fields and describes how each change can be reverted.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class TestCaseChangeComparator {
-
     static @NotNull List<FieldChange> compare(final @NotNull TestCaseDto oldState, final @NotNull TestCaseDto newState) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
         addIfChanged(changes, TestEditorAttributes.DESCRIPTION.getName(), oldState.getDescription(), newState.getDescription(), ChangeType.CHANGE_DESCRIPTION);

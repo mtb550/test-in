@@ -53,16 +53,9 @@ public class CreateTestProjectAction extends AbstractProjectAction {
         execute();
     }
 
-    /**
-     * UC-TREE-PANEL-002, UC-TREE-PANEL-003, Rule-TREE-PANEL-107.
-     * <p>
-     * Direct entry point for the tree panel's empty state — no AnActionEvent required.
-     */
+    // UC-TREE-PANEL-002, UC-TREE-PANEL-003, Rule-TREE-PANEL-107
     public void execute() {
-
         new CreateProjectDialog(p, name -> {
-            // What was typed decides: a repository URL is cloned, anything else
-            // is a name for a new project.
             if (!GitRefs.isRepositoryUrl(name)) {
                 new NewTestProject(p, tp, name).execute();
                 return;
@@ -70,10 +63,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
 
             if (!OptionalPlugin.GIT.isAvailableOrWarn(p)) return;
 
-            // Named after its repository, so a code project with no testin.yml
-            // clones as readily as one with it (Rule-TREE-PANEL-107). Only the
-            // name testin.yml gives with its own address is never numbered, so a
-            // folder of that name already here is said rather than cloned over.
+            // Rule-TREE-PANEL-107
             final @NotNull String projectName = CloneTestProject.nameFor(p, name);
             final @NotNull Path folder = Services.getInstance(p, TestinRoot.class).getPath().resolve(projectName);
 
@@ -90,19 +80,11 @@ public class CreateTestProjectAction extends AbstractProjectAction {
     // UC-TREE-PANEL-028, Rule-TREE-PANEL-115
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        // Both branches, the way Select Test Project answers the same question.
-        // Only the false branch was written here, and a presentation keeps
-        // whatever it was last told - so once this had been drawn without a
-        // Testin folder it stayed gray for the rest of the IDE session, however
-        // the setting changed afterwards (#189).
-        // Gray with the reason, as every gray entry is (#301, F7); both
-        // branches, so the reason goes when a folder is set.
         GrayWithReason.unless(this, e, Services.getInstance(p, TestinRoot.class).isConfigured(), Bundle.message("toolbar.disabled.no.root"));
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - update() reads only fields/services, never Swing state; do not switch to EDT (#52).
         return ActionUpdateThread.BGT;
     }
 }

@@ -53,11 +53,9 @@ public class RunCard extends BaseCard {
 
         updateUI(index, title, badges, details);
 
-        // The status label is there only when the tester is showing that column.
         Optional.ofNullable(attributeLabels.get(RunEditorAttributes.RUN_STATUS.getName())).ifPresent(statusLabel -> {
             statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
             statusLabel.setForeground(runItem.shownStatus().getRowColor());
         });
-
     }
 }

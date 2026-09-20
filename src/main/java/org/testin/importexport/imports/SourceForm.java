@@ -49,17 +49,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-/**
- * Where imported test cases come from: a source file, and the chosen format's
- * hint about the columns the file needs.
- * <p>
- * The mirror of {@code DestinationForm} for dialogs that read a file instead of
- * writing one. It lives beside the import code rather than in {@code ui.dialogs}
- * because the hint it renders is built from the importable attributes - that is
- * an import concern, not a dialog one.
- */
 public final class SourceForm implements DialogComponent {
-
     private final @NotNull Project p;
     private final @NotNull List<TestEditorAttributes> importAttributes;
     private final @NotNull FormRows rows;
@@ -79,19 +69,13 @@ public final class SourceForm implements DialogComponent {
 
         fileField.addBrowseFolderListener(p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
 
-        // The form shows the hint for whatever format was just parsed; the
-        // dialog only ever hears about the data.
         fileField.getTextField().getDocument().addDocumentListener(
                 new FileDocumentListener(fileField, p, this::showStatus, (format, parsedData) -> {
                     showFormatHint(format);
                     onDataLoaded.accept(parsedData);
                 }, importLoader));
 
-        // UC-SHARE-007, Rule-SHARE-036. The preview is emptied the moment the box
-        // names another file, and filled again when that file is read. It used to
-        // keep the last file's sheets while the next was waiting to be read, and
-        // for good when the path named no readable file - so Import wrote the
-        // previous file's test cases under a box naming a different one (#312, A50).
+        // UC-SHARE-007, Rule-SHARE-036
         fileField.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
             protected void textChanged(final @NotNull DocumentEvent e) {
@@ -106,33 +90,17 @@ public final class SourceForm implements DialogComponent {
         rows.wideRow(formatHint);
     }
 
-    /**
-     * UC-SHARE-005, Rule-SETTING-021.
-     * <p>
-     * Opens the chooser as soon as the dialog is on screen - the import dialog
-     * has nothing to preview until a file is picked, so it asks for one instead
-     * of waiting. The default folder, when set, seeds the field so the chooser
-     * starts there. Deferred, so the chooser opens over a dialog that is
-     * already up.
-     */
+    // UC-SHARE-005, Rule-SETTING-021
     public void selectSourceFile() {
         fileField.setText(defaultFolder());
 
-        // Fired directly, not registered: addBrowseFolderListener above already
-        // owns the button, and registering this one too opened the chooser a
-        // second time as soon as the first closed.
         final @NotNull ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener =
                 new ComponentWithBrowseButton.BrowseFolderActionListener<>(fileField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
         ApplicationManager.getApplication().invokeLater(() ->
                 browseListener.actionPerformed(new ActionEvent(fileField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
     }
 
-    /**
-     * UC-SHARE-005.
-     * <p>
-     * The chosen file, or empty when the field is still empty - in which case
-     * it takes the focus and the dialog stays open.
-     */
+    // UC-SHARE-005
     public @NotNull Optional<File> resolve() {
         final @NotNull String filePath = fileField.getText().trim();
         if (filePath.isEmpty()) {
@@ -143,27 +111,12 @@ public final class SourceForm implements DialogComponent {
         return Optional.of(new File(filePath));
     }
 
-    /**
-     * UC-SHARE-005, Rule-SHARE-107.
-     * <p>
-     * What the form says while it is reading a file, on the row the format hint
-     * uses when it has one.
-     * <p>
-     * One row rather than two: the two never have anything to say at the same
-     * moment - the hint describes a file that has been read, and this describes
-     * one being read - and a second line that is blank most of the time is a
-     * gap in the form for nothing.
-     */
+    // UC-SHARE-005, Rule-SHARE-107
     private void showStatus(final @NotNull String status) {
         formatHint.setText(status);
         formatHint.setVisible(!status.isBlank());
     }
 
-    /**
-     * The format's hint, with the importable column names filled in. Built from
-     * the attributes the form was given, so it can never list a column the
-     * import would ignore.
-     */
     private void showFormatHint(final @NotNull FileTypes format) {
         final @NotNull String columns = importAttributes.stream()
                 .filter(a -> a.can(Can.IMPORT))
@@ -197,8 +150,5 @@ public final class SourceForm implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // Nothing, because Enter is the dialog's rather than this field's:
-        // ImportDialog binds it to Import on the status bar, so a form that
-        // answered it too would give one key two handlers.
     }
 }

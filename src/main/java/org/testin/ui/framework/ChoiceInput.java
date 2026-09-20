@@ -29,21 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * One captioned row offering a list of values and accepting one that is not on
- * it — a muted caption and an editable combo box.
- * <p>
- * {@link RadioSelection} is the row for a closed set: three severities, and no
- * fourth. This is the row for an open one, where the list is what exists today
- * and the tester may name something that does not exist yet — a Git branch being
- * the first of them.
- * <p>
- * What comes back is text, always trimmed, and never null: a row the tester
- * cleared reads as empty, which the dialog decides about rather than guarding
- * against.
- */
 public final class ChoiceInput implements DialogComponent {
-
     private final @NotNull JBPanel<?> panel;
     private final @NotNull ComboBox<String> combo;
 
@@ -60,36 +46,15 @@ public final class ChoiceInput implements DialogComponent {
 
         enterPicksOnlyFromTheOpenList();
 
-        // Again whenever the combo is given a new text field. A theme change
-        // does that - the look and feel installs an editor of its own - and a
-        // binding put on the old field went with it, so after switching themes
-        // Enter in the box stopped reaching the dialog (#66, finding 287).
         combo.addPropertyChangeListener("editor", changed -> enterPicksOnlyFromTheOpenList());
     }
 
-    /**
-     * Rule-INTERNAL-055, Rule-INTERNAL-085.
-     * <p>
-     * Enter picks the value under it while the list is open, and is the
-     * dialog's key the rest of the time.
-     * <p>
-     * The cursor is in the combo's own text field, not the combo, and that
-     * field takes Enter to commit what was typed whether the list is open or
-     * not - so the dialog's Enter never arrived, and in Pending Changes a tester
-     * who typed a new branch name and pressed Enter got nothing, under a strip
-     * reading "Enter - Commit and Push" (#66, finding 186). Handing the field's
-     * Enter to the dialog outright would push while the tester was picking a
-     * branch from the list. So the field's binding answers only while the list is
-     * open; the rest of the time it stands aside and the key reaches the
-     * dialog's.
-     */
+    // Rule-INTERNAL-055, Rule-INTERNAL-085
     private void enterPicksOnlyFromTheOpenList() {
         if (!(combo.getEditor().getEditorComponent() instanceof JComponent field)) return;
 
         final @NotNull KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
 
-        // Once per field: taken again from a field that already has it, the pick
-        // would be this action calling itself.
         if (PICK.equals(field.getInputMap().get(enter))) return;
 
         final @NotNull Optional<Action> pick = Optional.ofNullable(field.getInputMap().get(enter)).map(key -> field.getActionMap().get(key));
@@ -109,21 +74,10 @@ public final class ChoiceInput implements DialogComponent {
         });
     }
 
-    /**
-     * What the row holds: a value picked from the list, or whatever was typed
-     * over it. Trimmed, because a branch name with a space around it is a
-     * different name to Git and the same one to the tester.
-     */
     public @NotNull String getValue() {
-        // An editor nobody typed into holds nothing, which toString answers
-        // (#312, A79).
         return Objects.toString(combo.getEditor().getItem(), "").trim();
     }
 
-    /**
-     * Whether the value is one of the offered ones. The caller decides what a
-     * new value means — creating a branch is not the same as choosing one.
-     */
     public boolean isNew() {
         final @NotNull String value = getValue();
 
@@ -145,14 +99,10 @@ public final class ChoiceInput implements DialogComponent {
 
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        // Picking a value is not a submit gesture: the tester still has a
-        // message to write and rows to deselect after choosing where it goes.
     }
 
     @Override
     public boolean wantsFocus() {
-        // The dialog opens on its table or its message field. This row is a
-        // decision most testers leave alone, so it does not take the caret.
         return false;
     }
 

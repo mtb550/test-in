@@ -16,7 +16,6 @@
 
 package org.testin.testcase.create;
 
-
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.JBPanel;
@@ -31,7 +30,6 @@ import org.testin.util.SpellChecker;
 import javax.swing.*;
 
 public class ExpectedResultSection extends AbstractMultiLineSection {
-
     public ExpectedResultSection(final @NotNull Project p) {
         super(p, SpellChecker.createCompletionField(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseValues.class).getExpectedResults(), CreateTestCaseFields.EXPECTED_RESULT.getIcon()), ""), CreateTestCaseFields.EXPECTED_RESULT);
     }

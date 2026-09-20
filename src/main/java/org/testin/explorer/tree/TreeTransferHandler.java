@@ -63,9 +63,6 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 
-/**
- * Transfers application values and lets the async model rebuild from indexer state.
- */
 public class TreeTransferHandler extends TransferHandler {
     public static final @NotNull DataFlavor NODE_FLAVOR =
             new DataFlavor(TreeTransferPayload.class, "Testin tree nodes");
@@ -74,10 +71,6 @@ public class TreeTransferHandler extends TransferHandler {
     private final @NotNull SimpleTree tree;
     private final @NotNull Runnable refresh;
 
-    /**
-     * Rebuilds the tree and puts it on a node - what a paste and a drop want,
-     * because the node they made is the one the tester is looking for.
-     */
     private final @NotNull Consumer<Path> refreshAndReveal;
     @Getter
     private final @NotNull Set<DirectoryDto> selectedNodes;
@@ -91,18 +84,7 @@ public class TreeTransferHandler extends TransferHandler {
         this.refreshAndReveal = refreshAndReveal;
     }
 
-    /**
-     * UC-TREE-PANEL-013, UC-TREE-PANEL-014.
-     * <p>
-     * The handler of the tree this keystroke arrived in, and nothing when it
-     * arrived anywhere else (#119).
-     * <p>
-     * Copy, Cut and Paste are declared actions now, so none of them is handed a
-     * tree - each has to ask the event which tree has the keyboard and then ask
-     * that tree for its handler. Written here rather than three times, because
-     * "whose handler answers for this event" is one question and this class is
-     * what it is about.
-     */
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014
     public static @NotNull Optional<TreeTransferHandler> of(final @NotNull AnActionEvent e) {
         return TestinData.tree(e)
                 .map(JComponent::getTransferHandler)
@@ -110,13 +92,7 @@ public class TreeTransferHandler extends TransferHandler {
                 .map(TreeTransferHandler.class::cast);
     }
 
-    /**
-     * Rule-TREE-PANEL-013.
-     * <p>
-     * Transfers never cross test projects, whatever the node types — the
-     * clipboard survives switching projects, so a cut in project A must not
-     * paste into project B. Unresolvable ownership rejects.
-     */
+    // Rule-TREE-PANEL-013
     static boolean sameTestProject(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
         final @NotNull Optional<Path> sourceProject = owningProject(source).map(DirectoryDto::getPath);
 
@@ -124,10 +100,6 @@ public class TreeTransferHandler extends TransferHandler {
                 && sourceProject.equals(owningProject(target).map(DirectoryDto::getPath));
     }
 
-    /**
-     * Empty when the node hangs outside any test project - ownership
-     * unresolvable.
-     */
     private static @NotNull Optional<DirectoryDto> owningProject(final @NotNull DirectoryDto node) {
         return node.selfAndAncestors().stream()
                 .filter(TestProjectDirectoryDto.class::isInstance)
@@ -140,15 +112,7 @@ public class TreeTransferHandler extends TransferHandler {
                 : Bundle.message("transfer.items", String.valueOf(sources.size()));
     }
 
-    /**
-     * UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-004, Rule-TREE-PANEL-045.
-     * <p>
-     * The destination must not be the node itself, inside its own subtree, or
-     * its current parent — and must not already contain a node with the same
-     * name. Any of those makes the VFS operation fail with an IO error
-     * ("already exists"). Applies to copy and move alike. The occupied check
-     * is injected so the rules stay testable without an indexer.
-     */
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-004, Rule-TREE-PANEL-045
     static boolean isValidDestination(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target, final @NotNull Predicate<Path> occupied) {
         final @NotNull Path sourcePath = source.getPath().normalize();
         final @NotNull Path targetPath = target.getPath().normalize();
@@ -163,18 +127,12 @@ public class TreeTransferHandler extends TransferHandler {
         return COPY_OR_MOVE;
     }
 
-    /**
-     * UC-TREE-PANEL-013, UC-TREE-PANEL-014.
-     * <p>
-     * Swing's contract: null is how a TransferHandler says there is nothing to
-     * drag, and the platform reads it before anything of ours does (#71).
-     */
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014
     @Override
     protected @Nullable Transferable createTransferable(final @NotNull JComponent c) {
         final @NotNull List<DirectoryDto> directories = transferableSelection();
         if (directories.isEmpty()) return null;
 
-        // A styled ghost instead of Swing's raw black box.
         setDragImage(createDragImage(describe(directories)));
         setDragImageOffset(new Point(JBUI.scale(-14), JBUI.scale(-10)));
 
@@ -182,9 +140,6 @@ public class TreeTransferHandler extends TransferHandler {
                 directories.toArray(DirectoryDto[]::new), clipboardAction));
     }
 
-    /**
-     * A small theme-colored pill with the dragged name or count.
-     */
     private @NotNull BufferedImage createDragImage(final @NotNull String text) {
         final @NotNull Font font = tree.getFont();
         final @NotNull FontMetrics metrics = tree.getFontMetrics(font);
@@ -211,66 +166,25 @@ public class TreeTransferHandler extends TransferHandler {
         return image;
     }
 
-    /**
-     * UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-002.
-     * <p>
-     * Whether copying or cutting would put anything on the clipboard - which is
-     * true of the nodes that declare themselves transferable, and no others.
-     * <p>
-     * The menu entries ask this rather than deciding for themselves, so what a
-     * grayed Copy means and what Copy would do are the same rule read twice.
-     */
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-002
     public boolean hasTransferableSelection() {
         return !transferableSelection().isEmpty();
     }
 
-    /**
-     * UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-002, Rule-TREE-PANEL-044.
-     * <p>
-     * Whether Paste is worth offering on what is selected.
-     * <p>
-     * The clipboard holds Testin nodes and the selection is a place that can
-     * hold children. Deliberately not "do these particular nodes land here" -
-     * that is the paste's question, and it answers it out loud.
-     * <p>
-     * It used to be the same question, so a paste that could not land left the
-     * action grayed out. A grayed menu entry says something; Ctrl+V on a grayed
-     * action says nothing at all, and pasting a test set into the folder it
-     * already sits in did exactly nothing. The tester now gets a reason.
-     * <p>
-     * Still grayed where pasting has no meaning: a test project holds its two
-     * containers and nothing else, and no node is a child of one.
-     */
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-002, Rule-TREE-PANEL-044
     public boolean canPasteFromClipboard() {
-        // One target, so several selected grays Paste rather than pasting into
-        // whichever row happened to be first (#192).
         final @NotNull Optional<DirectoryDto> target = TreeValues.singleSelectedDirectory(tree).filter(DirectoryDto::isTransferTarget);
         if (target.isEmpty()) return false;
 
-        // The same second question a drop asks, and the reason Paste used to be
-        // black on a test run: a test run is a transfer target - a test case can
-        // be dropped into one - but nothing on the clipboard from the tree can
-        // land in it. Pressing it refused with "Select a folder" every time,
-        // while on a test set, which also takes nothing, the entry was gray
-        // (#183).
         return clipboardNodes().stream().anyMatch(node -> canTransferInto(node, target.orElseThrow()));
     }
 
-    /**
-     * What the tree put on the clipboard, and empty for anything else on it -
-     * a copied file, text from an editor, nothing at all.
-     */
     private @NotNull List<DirectoryDto> clipboardNodes() {
         return ClipboardContents.withFlavor(NODE_FLAVOR)
                 .map(this::nodesOf)
                 .orElseGet(List::of);
     }
 
-    /**
-     * The nodes inside a transferable already known to carry them. Empty when
-     * the clipboard changed underneath the read, which is the one way asking
-     * for data of a flavor it just claimed to have can still fail.
-     */
     private @NotNull List<DirectoryDto> nodesOf(final @NotNull Transferable contents) {
         try {
             return List.of(((TreeTransferPayload) contents.getTransferData(NODE_FLAVOR)).nodes());
@@ -295,8 +209,6 @@ public class TreeTransferHandler extends TransferHandler {
                 .filter(target -> anySourceLands(support, target))
                 .isPresent();
 
-        // No drop highlight over places nothing can land on - the highlight
-        // otherwise lingers as a stray selection band.
         if (support.isDrop()) support.setShowDropLocation(valid);
         if (!valid) return false;
 
@@ -306,12 +218,6 @@ public class TreeTransferHandler extends TransferHandler {
         return true;
     }
 
-    /**
-     * Live drag feedback: the no-drop cursor appears over targets that would
-     * reject everything being dragged (family rules, own parent, own subtree).
-     * Same-JVM transfer data is readable during dragOver; if the platform
-     * refuses, stay permissive - importData re-checks everything anyway.
-     */
     private boolean anySourceLands(final @NotNull TransferSupport support, final @NotNull DirectoryDto target) {
         try {
             final @NotNull TreeTransferPayload payload = (TreeTransferPayload) support.getTransferable().getTransferData(NODE_FLAVOR);
@@ -338,12 +244,9 @@ public class TreeTransferHandler extends TransferHandler {
             final int action = resolveAction(support, payload);
             final @NotNull List<DirectoryDto> sources = transferableSources(payload.nodes(), target);
 
-            // Clipboard pastes are notified by PasteNodeAction before this runs.
             if (support.isDrop()) notifyNameCollisions(payload.nodes(), target);
             if (sources.isEmpty()) return false;
 
-            // Drag-drop confirms before changing anything; clipboard paste
-            // already confirmed in PasteNodeAction.
             if (support.isDrop()) {
                 final @NotNull String verb = action == COPY ? Bundle.message("transfer.copy") : Bundle.message("transfer.move");
                 final @NotNull Path fromPath = sources.getFirst().getPath().getParent();
@@ -365,9 +268,6 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
-    /**
-     * Only the sources the target accepts and that can actually land on it.
-     */
     private @NotNull List<DirectoryDto> transferableSources(final DirectoryDto @NotNull [] nodes, final @NotNull DirectoryDto target) {
         final @NotNull List<DirectoryDto> accepted = new ArrayList<>();
         for (final DirectoryDto source : nodes) {
@@ -376,38 +276,20 @@ public class TreeTransferHandler extends TransferHandler {
         return accepted;
     }
 
-    /**
-     * UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-043, Rule-TREE-PANEL-044, Rule-TREE-PANEL-045.
-     * <p>
-     * True when the source may be pasted or dropped into the target at all.
-     */
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-043, Rule-TREE-PANEL-044, Rule-TREE-PANEL-045
     public boolean canTransferInto(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
-        // Existence comes from the indexer cache - file access is the
-        // indexer's alone (see CLAUDE.md).
         return target.acceptsTransferred(source)
                 && sameTestProject(source, target)
                 && isValidDestination(source, target, path -> Services.getInstance(p, ProjectIndexer.class).nodeExists(path));
     }
 
-    /**
-     * True when only a name collision at the target blocks this source.
-     */
     private boolean isNameCollision(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
         return target.acceptsTransferred(source)
                 && isValidDestination(source, target, path -> false)
                 && Services.getInstance(p, ProjectIndexer.class).nodeExists(target.getPath().resolve(source.getName()));
     }
 
-    /**
-     * UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-004.
-     * <p>
-     * Small soft balloon naming what could not land because the name is taken,
-     * and whether there was anything to say.
-     * <p>
-     * The answer is the point: a paste that lands nothing has to tell the
-     * tester so, and must not tell them twice when this has already named the
-     * nodes it stopped.
-     */
+    // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-004
     public boolean notifyNameCollisions(final DirectoryDto @NotNull [] nodes, final @NotNull DirectoryDto target) {
         final @NotNull List<DirectoryDto> collided = new ArrayList<>();
         for (final DirectoryDto source : nodes) {
@@ -431,9 +313,6 @@ public class TreeTransferHandler extends TransferHandler {
             Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), copied -> {
                 generateForCopies(sources, target);
 
-                // On the copy that arrived, so the tester sees what they made
-                // without going looking for it. One node: several copies land
-                // beside each other, and the first is where the eye goes.
                 refreshAndReveal.accept(target.getPath().resolve(sources.getFirst().getName()));
 
                 confirmLanded(Done.PASTED, copied);
@@ -441,31 +320,18 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
-    /**
-     * Confirms what actually arrived, for both the clipboard paste and the drop.
-     * The count comes from the indexer, which reports how many of the operations
-     * it ran succeeded (#66, F2).
-     */
     private void confirmLanded(final @NotNull Done outcome, final int landed) {
         if (landed == 0) return;
 
         Services.getInstance(p, Notifier.class).softShowCounted(p, outcome, landed);
     }
 
-    /**
-     * Where the transfer would land: the row under a drop, or whatever the tree
-     * has selected for a clipboard paste.
-     */
     private @NotNull Optional<DirectoryDto> targetDirectory(final @NotNull TransferSupport support) {
         return support.isDrop()
                 ? dropPath(support).flatMap(TreeValues::directoryAt)
                 : TreeValues.selectedDirectory(tree);
     }
 
-    /**
-     * SimpleTree has a drop location type of its own, and reporting the drop by
-     * the wrong one is how ordering silently refused every drop it was given.
-     */
     private @NotNull Optional<TreePath> dropPath(final @NotNull TransferSupport support) {
         if (support.getDropLocation() instanceof SimpleTree.DropLocation dropLocation) {
             return Optional.ofNullable(dropLocation.getPath());
@@ -481,8 +347,6 @@ public class TreeTransferHandler extends TransferHandler {
             return payload.clipboardAction() == MOVE ? MOVE : COPY;
         }
 
-        // Keep Ctrl-drag copy support. A normal internal tree drag is a move,
-        // including platforms that report NONE before the drop action is set.
         if (support.getUserDropAction() == COPY) return COPY;
         support.setDropAction(MOVE);
         return MOVE;
@@ -490,19 +354,11 @@ public class TreeTransferHandler extends TransferHandler {
 
     // UC-TREE-PANEL-013, Rule-TREE-PANEL-047
     private void moveNodes(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
-        // Captured before the move - the DTO paths change underneath.
         final @NotNull List<Path> oldPaths = sources.stream().map(DirectoryDto::getPath).toList();
         final @NotNull List<Path> newPaths = sources.stream()
                 .map(source -> target.getPath().resolve(source.getName()))
                 .toList();
 
-        // Inside the callback, not on the line after it. moveBatch is
-        // asynchronous - pooled thread, invokeLater, write action - so the entry
-        // used to be filed before a single node had moved, and without asking
-        // the count the callback reports. A drop that moved nothing was silent
-        // and still left a Move entry whose undo moved paths that do not exist,
-        // one press above the operation the tester actually wanted back
-        // (#66, finding 74).
         moveBatch(oldPaths, newPaths, moved -> {
             confirmLanded(Done.MOVED, moved);
             if (moved == 0) return;
@@ -519,27 +375,16 @@ public class TreeTransferHandler extends TransferHandler {
         });
     }
 
-    /**
-     * The undo and redo reverses pass no {@code onDone}: they are confirmed as
-     * "Undone" and "Redone" by their own actions, and a second balloon saying
-     * the nodes moved would double-report one keystroke.
-     */
     private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to, final @NotNull IntConsumer onDone) {
         final @NotNull AtomicInteger remaining = new AtomicInteger(from.size());
         final @NotNull AtomicInteger moved = new AtomicInteger();
 
-        // Before the data moves, while the old paths are still what find the
-        // generated code - and here rather than at the gesture, because undo and
-        // redo are this same routine with the two lists swapped, so they carry
-        // the code back and forth without knowing they do (#51).
         syncCode(from, to);
 
         for (int i = 0; i < from.size(); i++) {
             final @NotNull Path source = from.get(i);
 
             Services.getInstance(p, ProjectIndexer.class).moveNode(source, to.get(i), wasMoved -> {
-                // The move is asynchronous, so this can land after the project
-                // closed; refreshing a disposed tree throws.
                 if (p.isDisposed()) return;
 
                 if (wasMoved) moved.incrementAndGet();
@@ -553,16 +398,7 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
-    /**
-     * Generates the Java for what was just copied.
-     * <p>
-     * A copy has none of its own: the files were duplicated, and nothing in them
-     * is Java. Unlike a move there is nothing to carry over, so each copied node
-     * and everything under it is generated from scratch - which is also why this
-     * runs after the copy rather than before it, the opposite of a move (#51).
-     * Whether code is on is the generators' question, so a copied test run is
-     * not told it is off (Rule-CODEGEN-082).
-     */
+    // Rule-CODEGEN-082
     private void generateForCopies(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
@@ -571,74 +407,26 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
-    /**
-     * UC-TREE-PANEL-013, Rule-TREE-PANEL-048.
-     * <p>
-     * Moves the generated Java of every node in the batch, as one command.
-     * <p>
-     * One command for the gesture rather than one per node: every mover opens a
-     * command of its own, and a command inside a command is the outer one, so
-     * dragging twenty test sets takes the write lock once, reparses once and
-     * leaves the tester one undo entry beside the tree's own - not twenty to
-     * press through, each undoing a class move while the tree stays where it is.
-     * Whether code is on is each mover's question, said once for the project,
-     * so moving test runs is not told it is off (Rule-CODEGEN-082).
-     */
+    // UC-TREE-PANEL-013, Rule-TREE-PANEL-048, Rule-CODEGEN-082
     private void syncCode(final @NotNull List<Path> from, final @NotNull List<Path> to) {
         WriteCommandAction.runWriteCommandAction(p, Bundle.message("transfer.move.code.command"), null, () -> {
             for (int i = 0; i < from.size(); i++) moveCodeOf(from.get(i), to.get(i));
         });
     }
 
-    /**
-     * UC-TREE-PANEL-016, Rule-TREE-PANEL-098.
-     * <p>
-     * The node did not move, so its code comes back.
-     * <p>
-     * The Java goes first and deliberately - the old path is what finds it, so
-     * it has to happen while the node is still where it was. The node move that
-     * follows is asynchronous and can fail: a name already taken at the target,
-     * an IO error. Nothing put the code back, so the tree showed the test set
-     * where it had always been while its class sat in the package it was going
-     * to, and every case under it stopped being runnable until the set was
-     * dragged again (#66, finding 21).
-     * <p>
-     * Hard to reach from a drag, because a drop onto a taken name is refused
-     * before it starts. Reachable from undo and redo, which call the same
-     * routine with the two lists swapped and checked nothing.
-     * <p>
-     * The reverse of moving a node's code to another parent is moving it to its
-     * own, which is what the node still has: the move failed, so it is where it
-     * started.
-     */
+    // UC-TREE-PANEL-016, Rule-TREE-PANEL-098
     private void putCodeBack(final @NotNull Path source) {
         Logger.warn("Move refused for " + source.getFileName() + "; putting its generated code back.");
 
         syncCode(List.of(source), List.of(source));
     }
 
-    /**
-     * Moves the generated Java that belongs to the node at this path, if the
-     * node has any. Which generator that is belongs to the node itself.
-     */
     private void moveCodeOf(final @NotNull Path from, final @NotNull Path to) {
-        // A destination with no parent is the filesystem root, which is not a
-        // place a test set can land.
         Optional.ofNullable(to.getParent()).ifPresent(target ->
                 Services.getInstance(p, ProjectIndexer.class).find(from)
                         .ifPresent(dir -> JavaCode.of(dir.getType()).getMoved().execute(p, new Moved(dir, target))));
     }
 
-    /**
-     * Stops drawing the cut rows faded.
-     * <p>
-     * Only the clipboard may call this, because the faded rows say one thing:
-     * these nodes are on the clipboard, waiting to be pasted. A drag says
-     * nothing about the clipboard, and both drag paths used to call it - the
-     * drop through {@code transfer} and the drag's own {@code exportDone} - so
-     * dragging any node cleared the fade off a cut that was still there and
-     * still pastable, leaving the tester no sign of what was waiting (#312, N6).
-     */
     private void resetLastAction() {
         selectedNodes.clear();
         tree.repaint();
@@ -665,30 +453,13 @@ public class TreeTransferHandler extends TransferHandler {
                 directories.toArray(DirectoryDto[]::new), action)));
         updateClipboardState(action, directories);
 
-        // Here rather than in CopyNodeAction and CutNodeAction: this is the point
-        // that knows the clipboard was actually written, how many nodes went on
-        // it, and which of the two it was. A copy changes nothing on screen, so
-        // without this the tester has no way to tell it happened.
         Services.getInstance(p, Notifier.class)
                 .softShowCounted(p, cut ? Done.CUT : Done.COPIED, directories.size());
     }
 
-    /**
-     * UC-TREE-PANEL-013, Rule-TREE-PANEL-050, Rule-TREE-PANEL-006.
-     * <p>
-     * Pastes the clipboard's nodes into the target the confirmation named.
-     * <p>
-     * Given the target rather than reading the tree's selection: the tree stays
-     * clickable while the confirmation is open, so a row clicked before Move was
-     * pressed used to be where the nodes landed - a change nobody confirmed
-     * (#312, A72).
-     */
+    // UC-TREE-PANEL-013, Rule-TREE-PANEL-050, Rule-TREE-PANEL-006
     public void pasteFromClipboard(final @NotNull DirectoryDto target) {
         ClipboardContents.withFlavor(NODE_FLAVOR).ifPresent(contents -> {
-            // A cut is spent by the paste that carries it out. Left on the
-            // clipboard it offered the same move again, from a folder the nodes
-            // had already left, and the second attempt found nothing there. A
-            // copy stays: a copy is meant to be pasted more than once.
             final boolean wasCut = isCut(contents);
 
             final @NotNull List<DirectoryDto> sources = nodesOf(contents).stream()
@@ -701,15 +472,7 @@ public class TreeTransferHandler extends TransferHandler {
         });
     }
 
-    /**
-     * UC-TREE-PANEL-013, Rule-TREE-PANEL-050.
-     * <p>
-     * Whether the nodes on the clipboard were put there by Cut - asked of the
-     * clipboard, which is what the move is decided from. It used to be asked of
-     * the faded rows, which a drag in between clears while the cut stays on the
-     * clipboard, so the paste that carried the cut out never spent it (#312,
-     * A71).
-     */
+    // UC-TREE-PANEL-013, Rule-TREE-PANEL-050
     private boolean isCut(final @NotNull Transferable contents) {
         try {
             return ((TreeTransferPayload) contents.getTransferData(NODE_FLAVOR)).clipboardAction() == MOVE;
@@ -719,14 +482,7 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
-    /**
-     * UC-TREE-PANEL-013, Rule-TREE-PANEL-050.
-     * <p>
-     * Takes the nodes off the clipboard and off the screen: nothing is left
-     * waiting to be pasted, and no row stays faded. Only Testin's own nodes are
-     * cleared away - anything else on the clipboard belongs to somebody else's
-     * copy.
-     */
+    // UC-TREE-PANEL-013, Rule-TREE-PANEL-050
     public void clearClipboard() {
         if (ClipboardContents.withFlavor(NODE_FLAVOR).isPresent()) {
             CopyPasteManager.getInstance().setContents(new StringSelection(""));

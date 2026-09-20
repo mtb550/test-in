@@ -31,17 +31,10 @@ import java.io.InputStream;
 import java.util.*;
 
 public class ImportExcel {
-
-    // UC-SHARE-006. A file that will not parse throws to the one caller that
-    // reports it, FileDocumentListener. Caught here as well, it was said twice,
-    // and the empty answer after it was read there as "there is nothing in this
-    // file" - untrue, and the second of two messages (#66, finding 213).
+    // UC-SHARE-006
     public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
         final @NotNull Map<String, List<TestCaseDto>> result = new LinkedHashMap<>(parseFile(p, file));
 
-        // The count the file gave, against the count the tester ticks and the
-        // count the import writes. Three numbers that should agree, and did not
-        // (#66, finding 24).
         Logger.info("Import: parsed " + result.values().stream().mapToInt(List::size).sum()
                 + " cases from " + result.size() + " sheet(s) of " + file.getName());
         return result;
@@ -77,22 +70,11 @@ public class ImportExcel {
             }
         }
 
-        // Once for the workbook, which is what Rule-SHARE-106 says. Each sheet
-        // used to say it for itself, so a five-sheet file raised five balloons
-        // each carrying its own part of one number (#66, finding 81).
+        // Rule-SHARE-106
         TestEditorAttributes.sayWhatWasRefused(p, refused);
     }
 
-    /**
-     * What one sheet held: its test cases, and how many values Testin could not
-     * read from them.
-     */
     private record Parsed(@NotNull List<TestCaseDto> cases, int refused) {
-
-        /**
-         * A sheet with no header row - an empty one, or one whose first row the
-         * file never wrote.
-         */
         private static final @NotNull Parsed NOTHING = new Parsed(List.of(), 0);
     }
 
@@ -117,15 +99,11 @@ public class ImportExcel {
 
         int refused = 0;
 
-        // The sheet's own iterator visits the rows that exist, so a file with a
-        // gap in the middle needs no test for the rows that are not there.
         for (final Row row : sheet) {
             if (row.getRowNum() == headerRow.getRowNum() || isEmpty(row, dataFormatter)) continue;
 
             final @NotNull TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
 
-            // A column the file does not carry reads as blank, which is what an
-            // absent value means to every importer.
             refused += TestEditorAttributes.importRow(p, currentTestCase, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
                     .map(colIndex -> dataFormatter.formatCellValue(row.getCell(colIndex)).trim())
                     .orElse(""));
@@ -136,10 +114,6 @@ public class ImportExcel {
         return new Parsed(sheetList, refused);
     }
 
-    /**
-     * A row worth importing has something in it. The formatter answers a missing
-     * cell with an empty string, so no cell needs testing for its own absence.
-     */
     private static boolean isEmpty(final @NotNull Row row, final @NotNull DataFormatter dataFormatter) {
         for (int c = 0; c < row.getLastCellNum(); c++) {
             if (!dataFormatter.formatCellValue(row.getCell(c)).trim().isEmpty()) return false;
