@@ -1,5 +1,5 @@
-# The Plugin Verifier against every IDE the plugin claims to run in, on the same
-# two-day schedule as the inspections.
+# The Plugin Verifier against every IDE the plugin claims to run in, on every
+# push to main.
 #
 # build.yml verifies against IntelliJ IDEA only, because that is the one verdict
 # that can turn a pull request red for a real reason. This is the other half:
@@ -13,12 +13,30 @@
 name: Verify
 
 on:
+  # Every push to main, so the Marketplace's answer is known for the commit that
+  # changed it rather than up to two days later. It was on the schedule alone
+  # until 2026-09-20, and that is how a deprecated call reached main and stayed
+  # there: build.yml caught it because it gates on IntelliJ IDEA, but the count
+  # a tester reads on the plugin page is this one, and nothing was asking for it.
+  push:
+    branches: [main]
+
+  # Kept as well as the push. A platform release can change this answer with no
+  # commit of ours behind it - a method deprecated in the next IDE is a warning
+  # that appears on a quiet week - and only a clock finds that.
   schedule:
     # 03:00 UTC on every odd day - an hour after Inspect, so the two never
     # compete for a runner or for the same Gradle cache entry.
     - cron: '0 3 */2 * *'
 
   workflow_dispatch:
+
+# A second push to main makes the first run's answer worthless, so it is
+# cancelled rather than left to finish. Named per workflow and branch, so it
+# never cancels the scheduled run or a run of build.yml.
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read

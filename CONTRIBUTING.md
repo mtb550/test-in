@@ -200,8 +200,8 @@ string a tester reads should have one owner; the number may go down and never up
 
 | Workflow | When |
 |---|---|
-| `build.yml` | Every push and pull request |
-| `verify.yml` | The JetBrains plugin verifier, against IntelliJ IDEA, PyCharm and Rider |
+| `build.yml` | Every push to `main` and every pull request. Compiles, runs the unit tests, and verifies against **IntelliJ IDEA** - the one verdict that turns a pull request red |
+| `verify.yml` | Every push to `main`, plus every second day and on demand. The same verifier against **all six targets** - IntelliJ IDEA, PyCharm and Rider at 261 and 262 - compared against `.github/verification-baseline.txt`. This is the number the JetBrains Marketplace shows a tester before they install |
 | `inspect.yml` | Every push to `main`, and on demand against a branch |
 
 No workflow publishes a release. It is published from a maintainer's machine
