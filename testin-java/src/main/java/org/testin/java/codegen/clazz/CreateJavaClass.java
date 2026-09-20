@@ -40,7 +40,7 @@ public class CreateJavaClass implements GenAction {
 
         Logger.info("Ready to generate Test Class: " + className + " in package: " + fqcn);
 
-        JavaSourceRoot.writeInRootOrWarn(p, "creating test class",
+        JavaSourceRoot.writeInRootOrWarn(p, className, "creating test class",
                 root -> JavaSourceRoot.classFile(root, packageSegments, className));
     }
 }

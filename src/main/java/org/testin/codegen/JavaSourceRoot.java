@@ -138,15 +138,21 @@ public final class JavaSourceRoot {
      * And once for the project. The message is about the project, not about the
      * test case that happened to be first.
      *
-     * @param skipped what did not happen, in the tester's words - "creating the
-     *                class for LoginTest"
+     * @param className the class that was not written. A name, not a phrase: the
+     *                  sentence around it is one bundle key, so it reads as one
+     *                  sentence in every language. It used to be handed an English
+     *                  clause - "creating test class", or "creating the class for
+     *                  LoginTest" from the other caller - which made the message
+     *                  two half-sentences glued together, one of them never
+     *                  translated and the two never agreeing (#297, #66 finding
+     *                  335)
      */
-    public static @NotNull Optional<VirtualFile> findOrWarn(final @NotNull Project p, final @NotNull String skipped) {
+    public static @NotNull Optional<VirtualFile> findOrWarn(final @NotNull Project p, final @NotNull String className) {
         final @NotNull Optional<VirtualFile> root = find(p);
 
         if (root.isEmpty() && Once.claim(p, NO_ROOT_SAID)) {
             Services.getInstance(p, Notifier.class).warn(p, Bundle.message("codegen.no.source.root.title"),
-                    Bundle.message("codegen.no.source.root.message", skipped));
+                    Bundle.message("codegen.no.source.root.message", className));
         }
 
         return root;
@@ -274,9 +280,13 @@ public final class JavaSourceRoot {
     /**
      * The same, and tells the tester when there is no root - see
      * {@link #findOrWarn}.
+     * <p>
+     * Two words for two readers: {@code className} goes into the sentence the
+     * tester reads, and {@code whatFailed} into the log line, which stays English
+     * like every other log line.
      */
-    private static void inRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
-        run(findOrWarn(p, whatFailed), whatFailed, work);
+    private static void inRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull String whatFailed, final @NotNull RootWork work) {
+        run(findOrWarn(p, className), whatFailed, work);
     }
 
     /**
@@ -287,8 +297,8 @@ public final class JavaSourceRoot {
      * three ways its void sibling stays silent, said in a value the caller can
      * read.
      */
-    public static @NotNull Optional<VirtualFile> fileInRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootFile work) {
-        final @NotNull Optional<VirtualFile> root = findOrWarn(p, whatFailed);
+    public static @NotNull Optional<VirtualFile> fileInRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull String whatFailed, final @NotNull RootFile work) {
+        final @NotNull Optional<VirtualFile> root = findOrWarn(p, className);
         if (root.isEmpty()) return Optional.empty();
 
         try {
@@ -344,7 +354,7 @@ public final class JavaSourceRoot {
      *
      * @param whatFailed named in the log if the work raises, e.g. "creating package"
      */
-    public static void writeInRootOrWarn(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
-        WriteAction.run(() -> inRootOrWarn(p, whatFailed, work));
+    public static void writeInRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull String whatFailed, final @NotNull RootWork work) {
+        WriteAction.run(() -> inRootOrWarn(p, className, whatFailed, work));
     }
 }

@@ -89,7 +89,7 @@ public final class GeneratedClass {
         final @NotNull Optional<PsiClass> existing = byName(p, path);
         if (existing.isPresent()) return existing;
 
-        JavaSourceRoot.fileInRootOrWarn(p, "creating the class for " + className,
+        JavaSourceRoot.fileInRootOrWarn(p, className, "creating the class for " + className,
                 root -> JavaSourceRoot.classFile(root, packageList, className)).ifPresent(written -> commit(p, written));
 
         return byName(p, path);

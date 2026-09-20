@@ -52,6 +52,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -383,18 +384,11 @@ final class IndexingScanner {
      * silence it replaced.
      */
     private void reportUnread(final @NotNull String projectName, final @NotNull List<Path> unread) {
-        if (unread.isEmpty()) return;
+        final @NotNull List<String> names = unread.stream().map(path -> path.getFileName().toString()).toList();
 
-        final @NotNull String named = unread.stream().limit(5).map(path -> path.getFileName().toString()).collect(Collectors.joining(", "));
-        final @NotNull String rest = unread.size() > 5
-                ? Bundle.message("indexer.more", String.valueOf(unread.size() - 5))
-                : "";
-        final @NotNull String count = unread.size() == 1
-                ? Bundle.message("indexer.unread.one")
-                : Bundle.message("indexer.unread.many", String.valueOf(unread.size()));
-
-        Services.getInstance(p, Notifier.class).warn(p, Bundle.message("indexer.unread.title", projectName),
-                Bundle.message("indexer.unread.message", count, named, rest));
+        say(Bundle.message("indexer.unread.title", projectName), names, (named, rest) -> names.size() == 1
+                ? Bundle.message("indexer.unread.one", String.valueOf(names.size()), named, rest)
+                : Bundle.message("indexer.unread.many", String.valueOf(names.size()), named, rest));
     }
 
     /**
@@ -406,18 +400,11 @@ final class IndexingScanner {
      * S21).
      */
     private void reportUnreadableResults(final @NotNull String projectName, final @NotNull Set<String> unreadable) {
-        if (unreadable.isEmpty()) return;
+        final @NotNull List<String> names = unreadable.stream().sorted().toList();
 
-        final @NotNull String named = unreadable.stream().sorted().limit(5).collect(Collectors.joining(", "));
-        final @NotNull String rest = unreadable.size() > 5
-                ? Bundle.message("indexer.more", String.valueOf(unreadable.size() - 5))
-                : "";
-        final @NotNull String count = unreadable.size() == 1
-                ? Bundle.message("indexer.results.unread.one")
-                : Bundle.message("indexer.results.unread.many", String.valueOf(unreadable.size()));
-
-        Services.getInstance(p, Notifier.class).warn(p, Bundle.message("indexer.results.unread.title", projectName),
-                Bundle.message("indexer.results.unread.message", count, named, rest));
+        say(Bundle.message("indexer.results.unread.title", projectName), names, (named, rest) -> names.size() == 1
+                ? Bundle.message("indexer.results.unread.one", String.valueOf(names.size()), named, rest)
+                : Bundle.message("indexer.results.unread.many", String.valueOf(names.size()), named, rest));
     }
 
     /**
@@ -434,18 +421,53 @@ final class IndexingScanner {
      * needs the names after the balloon would have gone.
      */
     private void reportDamaged(final @NotNull String projectName, final @NotNull List<String> damaged) {
-        if (damaged.isEmpty()) return;
+        say(Bundle.message("indexer.damaged.title", projectName), damaged, (named, rest) -> damaged.size() == 1
+                ? Bundle.message("indexer.damaged.one", String.valueOf(damaged.size()), named, rest)
+                : Bundle.message("indexer.damaged.many", String.valueOf(damaged.size()), named, rest));
+    }
 
-        final @NotNull String named = damaged.stream().limit(5).collect(Collectors.joining(", "));
-        final @NotNull String rest = damaged.size() > 5
-                ? Bundle.message("indexer.more", String.valueOf(damaged.size() - 5))
+    /**
+     * How many are shown by name before the message says how many more. Five is
+     * enough to recognise the folder or the file and short enough to read in a
+     * notification.
+     */
+    private static final int SHOWN = 5;
+
+    /**
+     * UC-INTERNAL-002, Rule-INTERNAL-015.
+     * <p>
+     * One notification about several things the scan could not read: how many,
+     * five of them by name, and how many more.
+     * <p>
+     * <b>The sentence is one key, not two glued together.</b> Each of the three
+     * families used to keep a count phrase - "One folder holds", "{0} folders
+     * hold" - and drop it into a shared body. That read as broken English the
+     * moment there was one of anything ("One folder holds test cases and carry no
+     * marker"), said "the run that holds it" of forty runs, and gave French a
+     * participle that had to agree with a number the other half of the sentence
+     * was holding, so it read "3 resultats sont absent". A whole sentence per
+     * plural has none of those problems in any language, and a translator sees
+     * what they are translating (#297, #66 finding 326).
+     * <p>
+     * This owns the counting and the notification; every key stays at the call
+     * site. {@code BundleKeysTest} finds a key by reading the source for a bundle
+     * lookup with the key written into it, so a key passed in here as an argument
+     * would be one the guard reports as asked for by nobody - which is how a
+     * sentence comes to be translated into three languages and read by no tester.
+     *
+     * @param title    the notification's heading, already looked up
+     * @param sentence given the five names and the "and N more" tail, answers the
+     *                 whole sentence for the number there turned out to be
+     */
+    private void say(final @NotNull String title, final @NotNull List<String> names, final @NotNull BinaryOperator<String> sentence) {
+        if (names.isEmpty()) return;
+
+        final @NotNull String named = names.stream().limit(SHOWN).collect(Collectors.joining(", "));
+        final @NotNull String rest = names.size() > SHOWN
+                ? Bundle.message("indexer.more", String.valueOf(names.size() - SHOWN))
                 : "";
-        final @NotNull String count = damaged.size() == 1
-                ? Bundle.message("indexer.damaged.one")
-                : Bundle.message("indexer.damaged.many", String.valueOf(damaged.size()));
 
-        Services.getInstance(p, Notifier.class).warn(p, Bundle.message("indexer.damaged.title", projectName),
-                Bundle.message("indexer.damaged.message", count, named, rest));
+        Services.getInstance(p, Notifier.class).warn(p, title, sentence.apply(named, rest));
     }
 
     /**
