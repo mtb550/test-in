@@ -30,39 +30,45 @@ import java.util.function.ToLongFunction;
 
 enum ReportSection {
     FAILED(
-            Bundle.message("report.section.failed.title"
-    ),
-
+            Bundle.message("report.section.failed.title"),
             Bundle.message("report.section.failed.description"),
-            "F2685A", TestRunSummary::failed, true, TestStatus.FAILED),
+            "F2685A",
+            TestRunSummary::failed,
+            true,
+            TestStatus.FAILED),
 
     PASSED(
-            Bundle.message("report.section.passed.title"
-    ),
-
+            Bundle.message("report.section.passed.title"),
             Bundle.message("report.section.passed.description"),
-            "4FBF60", TestRunSummary::passed, false, TestStatus.PASSED),
+            "4FBF60",
+            TestRunSummary::passed,
+            false,
+            TestStatus.PASSED),
 
     BLOCKED(
-            Bundle.message("report.section.blocked.title"
-    ),
-
+            Bundle.message("report.section.blocked.title"),
             Bundle.message("report.section.blocked.description"),
-            "F5B940", TestRunSummary::blocked, false, TestStatus.BLOCKED),
+            "F5B940",
+            TestRunSummary::blocked,
+            false,
+            TestStatus.BLOCKED),
 
     UNTESTED(
-            Bundle.message("report.section.untested.title"
-    ),
-
+            Bundle.message("report.section.untested.title"),
             Bundle.message("report.section.untested.description"),
-            "96A1B0", TestRunSummary::untested, false, TestStatus.PENDING, TestStatus.UNTESTED),
+            "96A1B0",
+            TestRunSummary::untested,
+            false,
+            TestStatus.PENDING,
+            TestStatus.UNTESTED),
 
     REMOVED(
-            Bundle.message("report.section.removed.title"
-    ),
-
+            Bundle.message("report.section.removed.title"),
             Bundle.message("report.section.removed.description"),
-            "96A1B0", TestRunSummary::removed, false, TestStatus.REMOVED);
+            "96A1B0",
+            TestRunSummary::removed,
+            false,
+            TestStatus.REMOVED);
 
     @Getter
     private final @NotNull String title;

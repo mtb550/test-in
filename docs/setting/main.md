@@ -171,6 +171,8 @@ it.
 
 | Gone | Was | Read instead |
 |---|---|---|
+| **Rule-SETTING-002** | *Nothing on this page is checked. A folder that does not exist is stored exactly as typed.* Retired 21 September 2026: `SettingsConfigurable.refuseAnImpossibleRoot` refuses four kinds of impossible root, and every field is trimmed on the way in, so neither half was true | [Rule-SETTING-042](openSettings.md) and Rule-SETTING-013 |
+| **Rule-SETTING-003** | *Nothing on this page raises a message when it is saved.* Retired 21 September 2026: the page refuses a folder that does not exist by throwing `ConfigurationException`, which is how the platform is told to hold the dialog open and print the message. [UC-SETTING-001](openSettings.md) stated this rule and then stated Rule-SETTING-042 eighteen lines below it, saying the opposite | [Rule-SETTING-042](openSettings.md) |
 | **UC-SETTING-009** | *Name my account on the team's server* - the account an SFTP sync connected as. Removed 19 September 2026, when Git became the only way a test project is shared ([#334](https://github.com/mtb550/test-in/issues/334)) | — |
 | **UC-SETTING-010** | *Name the key file this machine offers* - the SSH key an SFTP sync proved this machine with | — |
 | **Rule-SETTING-031** | *The account belongs to this machine and this person. It is never written into the file the team shares.* | — |

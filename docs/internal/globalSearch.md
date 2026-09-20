@@ -36,7 +36,11 @@ This is the fastest way to reach one test set, one test run or one test case.
   that action, never on the one the IDE holds. The Keymap page keeps showing
   what it shipped with, and the tooltip that prints the key reads it from the
   same place the binding does.
-- **Rule-INTERNAL-069** — Testin never takes a default key the IDE already uses.
+- **Rule-INTERNAL-069** — Testin takes a default key the IDE already uses only
+  where the alternative is worse, and the descriptor says which and why beside
+  the binding. `F12` on Automate Test Case is the one: `CTRL+F12` is
+  FileStructurePopup's and had no Mac entry at all, which left generating code
+  unreachable by key on a Mac.
   When two actions claim one keystroke the IDE runs whichever is enabled and
   says nothing, and a component binding cannot win it back - so the key is
   changed instead.

@@ -56,9 +56,9 @@ This puts the tree back the way it was before the last change.
   It is the tree's own, one for each code project, and no editor shares it. The
   history is held in memory, so closing the IDE loses it, and the copies kept
   aside for restoring removed nodes go at the next start.
-- **Rule-TREE-PANEL-060** — Four things can be undone: a move, a rename, a
-  removal, and an edit of a test run. Four cannot: creating anything, an order
-  number, a copy, and a status change.
+- **Rule-TREE-PANEL-060** — Five things can be undone: a move, a rename, an
+  order number, a removal, and an edit of a test run. Three cannot: creating
+  anything, a copy, and a status change.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is - drawn with Inactive beside its name like any other status - and its test

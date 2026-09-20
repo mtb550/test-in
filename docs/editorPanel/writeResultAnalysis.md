@@ -44,8 +44,6 @@ There is no key for this. The button's tooltip reads **Result Analysis**.
 - **Rule-EDITOR-PANEL-192** — `Enter` in a box makes a new paragraph. A box
   takes text only: a screenshot on the clipboard pastes nothing. **Save** is a
   button.
-- **Rule-EDITOR-PANEL-193** — The analysis appears in the PDF, Word and web
-  reports. The spreadsheet report leaves it out.
 
 ## The screen
 

@@ -13,9 +13,6 @@ There is no key for this. It is the checkbox at the bottom of the page.
 
 - **Rule-SETTING-001** — One page for the whole IDE. Every code project open in
   it reads the same values.
-- **Rule-SETTING-002** — Nothing on this page is checked. A folder that does not
-  exist is stored exactly as typed.
-- **Rule-SETTING-003** — Nothing on this page raises a message when it is saved.
 - **Rule-SETTING-004** — Only a changed Testin folder makes Testin read the disk
   again. Every other setting is read where it is used, when it is used.
 - **Rule-SETTING-005** — A password is never on this page. Testin asks for none:

@@ -162,7 +162,7 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
         return cachedSections;
     }
 
-    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-201
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-218
     public void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull Runnable action) {
         new DumbAwareAction() {
             @Override
@@ -190,7 +190,7 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
         return completionIsOpen() || getAllSections().stream().anyMatch(CreateTestCaseSection::isPopupOpen);
     }
 
-    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-201
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-218
     private static boolean popupClaims(final @NotNull CustomShortcutSet shortcutSet) {
         return Arrays.stream(shortcutSet.getShortcuts())
                 .filter(KeyboardShortcut.class::isInstance)

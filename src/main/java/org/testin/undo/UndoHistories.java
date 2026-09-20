@@ -64,7 +64,7 @@ public final class UndoHistories {
         return next(of(scope).redoStack).description();
     }
 
-    // UC-INTERNAL-004, Rule-INTERNAL-063
+    // UC-INTERNAL-005, Rule-INTERNAL-063
     public boolean undo(final @NotNull UndoScope scope) {
         final @NotNull History history = of(scope);
         if (history.undoStack.isEmpty()) return false;
@@ -118,7 +118,7 @@ public final class UndoHistories {
     }
 
     public record Operation(@NotNull String description, @NotNull BooleanSupplier undo, @NotNull BooleanSupplier redo, @NotNull Runnable forget) {
-        // UC-INTERNAL-004, Rule-INTERNAL-063
+        // UC-INTERNAL-005, Rule-INTERNAL-063
         public Operation(final @NotNull String description, final @NotNull Runnable undo, final @NotNull Runnable redo) {
             this(description, always(undo), always(redo), () -> {
             });

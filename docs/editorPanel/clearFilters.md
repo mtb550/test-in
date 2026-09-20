@@ -69,8 +69,10 @@ cannot learn, and the entry is also how they find out filters live here at all.
 The search text stays. A tester who cannot see a test case after clearing the
 filters should check the search box, which is still narrowing the list.
 
-**Refresh** clears both. That is
-[UC-EDITOR-PANEL-027](refreshEditor.md).
+**Refresh** clears neither. It reads the data again and leaves every filter
+and the search text exactly as they are (Rule-EDITOR-PANEL-117 on
+[UC-EDITOR-PANEL-027](refreshEditor.md)). This page said the opposite until
+21 September 2026.
 
 ---
 
