@@ -35,6 +35,8 @@ they exercise.
 
 Everything Testin owns is plain files under the Testin folder you configure:
 
+A folder is a node because of the marker inside it:
+
 | Marker | Node |
 |---|---|
 | `.tp` | Test project |
@@ -42,9 +44,16 @@ Everything Testin owns is plain files under the Testin folder you configure:
 | `.tsp` / `.ts` | Test set package, test set |
 | `.trp` / `.tr` | Test run package, test run |
 
-Test cases are JSON, one file each. **Stored values are byte-identical to what
-you typed** — Testin formats for display only, never on save — so a diff shows
-the change you made and nothing else.
+The records beside those markers are JSON too, and **each one is named by what it
+is about**: a test case is `<id>.tc`, and one case's result in a test run is
+`<test case id>.ri`. So renaming or moving anything leaves every file still
+valid, two testers recording verdicts on different cases of the same run never
+touch the same file, and what a run recorded about itself — its status, when it
+ran, how it was configured — lives in the run's own `.tr`.
+
+**Stored values are byte-identical to what you typed** — Testin formats for
+display only, never on save — so a diff shows the change you made and nothing
+else.
 
 ## Requirements
 
@@ -126,10 +135,11 @@ checked against the code it describes.
 | **[Sharing work with the team](docs/share/main.md)** | Export, import and Git |
 | **[Inside Testin](docs/internal/main.md)** | The search, and the one thing that owns every file |
 
-Five pages sit outside the eight parts: [First run](docs/firstRun.md), [every
+Seven pages sit outside the eight parts: [First run](docs/firstRun.md), [every
 shortcut](docs/shortcuts.md), [the formats on disk](docs/formats.md), [the
-standing decisions](docs/decisions.md) and [how Testin is put
-together](docs/ARCHITECTURE.md).
+standing decisions](docs/decisions.md), [how Testin is put
+together](docs/ARCHITECTURE.md), [the product](docs/product.md) and [how a
+document is written](docs/standard.md).
 
 Questions, ideas and feedback are welcome in
 [Discussions](https://github.com/mtb550/test-in/discussions).

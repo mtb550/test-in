@@ -2,8 +2,13 @@
 
 # UC-TREE-PANEL-022: Edit a test run
 
-> **No key.** On the menu: **Edit Run**. **`Ctrl+Z`** in the tree takes the
-> edit back.
+> **`F2`** in the tree, or **Edit Test Run** on the menu. **`Ctrl+Z`** in the
+> tree takes the edit back.
+>
+> `F2` changes the thing in front of the tester, and which thing that is depends
+> on where they are standing: Update Test Case answers it in the test editor,
+> Failed Test Case Details in the run editor, and this one in the tree. Each is
+> gray where the others answer, so only one can ever take the key.
 
 **As a** tester, **I want** to change which test cases a test run covers, its
 name and its configuration, **so that** a test run can be corrected without
@@ -93,7 +98,7 @@ the IDE.
 ## Main flow
 
 1. The tester selects a test run that is not signed off.
-2. The tester chooses **Edit Run**.
+2. The tester chooses **Edit Test Run**.
 3. The **Edit Test Run** dialog opens. It shows the test run's name, its test
    cases already ticked, and its configuration already filled in. Test cases
    added to a test set since the test run was created appear unticked.
@@ -111,7 +116,7 @@ the IDE.
 
 ## What Testin refuses
 
-**If the test run is Completed or Closed** — **Edit Run** is gray.
+**If the test run is Completed or Closed** — **Edit Test Run** is gray.
 
 **If the test run was signed off from its editor while the dialog was open** —
 the dialog stays open, and *'\<run\>' was Completed while this was open -
@@ -135,7 +140,7 @@ a clash.
 **If the last test case is unticked** — **Save** is disabled. **Create** does
 the same on an empty new test run.
 
-**If several rows are selected** — **Edit Run** is gray. It needs exactly one.
+**If several rows are selected** — **Edit Test Run** is gray. It needs exactly one.
 
 ---
 

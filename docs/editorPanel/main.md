@@ -169,7 +169,7 @@ Analysis**, light mode, and stopping one running test case.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│ (+) (refresh) (fields) (filter) (grid)   [ search...          ]  (details) │
+│ (+) (refresh) (fields) (filter) (grid) (details) [ search................ ]│
 ├────────────────────────────────────────────────────────────────────────────┤
 │                                                                            │
 │   1. Log in with a valid user.                       ( P1 ) ( Regression ) │
@@ -187,7 +187,8 @@ Analysis**, light mode, and stopping one running test case.
 ```
 
 1. **The toolbar** — create, refresh, choose the fields shown, filter, switch
-   view, search, and the test set's own details.
+   view, the test set's own details, and the search field. The search field is
+   last, and every button sits to its left in one unbroken row.
 2. **A card** — its number in the test set, then its description, then a badge
    for the priority and one for each group.
 3. **The detail lines** — one for each field the tester chose to show.
@@ -203,7 +204,8 @@ The same shape, with three things added.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│ (start) (light) (report) (refresh) (fields) (filter) (grid) [ search ] (..)│
+│ (start) (light) (report) (refresh) (fields) (filter) (grid) (analysis)      │
+│ (details) [ search.......................................................] │
 ├────────────────────────────────────────────────────────────────────────────┤
 │                                                                            │
 │   1. Log in with a valid user.                       ( P1 ) ( Passed )     │
@@ -216,18 +218,20 @@ The same shape, with three things added.
 │                                                                            │
 ├────────────────────────────────────────────────────────────────────────────┤
 │  2 of 12 test cases    |< < 1 of 1 > >|   In Progress                      │
-│                        Passed 1 - Failed 1 - Pending 10   00:01:14  [ 50 ] │
+│                        Passed 1 · Failed 1 · Pending 10   00:01:14  [ 50 ] │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
 1. **Start Manual Execution** — the first button. It becomes **Stop Execution**
    while a run is going.
 2. **Light mode** — the always on top window, on [its own page](lightMode.md).
-3. **The run status** — on the right of the status bar, with the tree's own
+3. **Result Analysis** — the last button before the test run's own details and
+   the search field.
+4. **The run status** — on the right of the status bar, with the tree's own
    icon.
-4. **The figures** — one for each verdict any test case carries. A verdict
-   nobody recorded is not drawn.
-5. **The clock** — how long this test run has been executing. It ticks once a
+5. **The figures** — one for each verdict any test case carries, separated by a
+   dot. A verdict nobody recorded is not drawn.
+6. **The clock** — how long this test run has been executing. It ticks once a
    second.
 
 ---

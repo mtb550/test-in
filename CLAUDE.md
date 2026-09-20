@@ -286,5 +286,6 @@ silently does nothing costs more than the setting it was meant to hold.
   inspector is reading it produces findings about a version that no longer
   exists, which reads exactly like a real defect.
   <p>
-  Either way the bar is the same: `DataFlowIssue` and `ReturnNull` at zero, and
-  every other survivor needs a reason written beside it.
+  Either way the bar is the same: the eight rules it gates on at zero -
+  CONTRIBUTING.md names them, and this file does not keep a second list that
+  would fall behind - and every other survivor needs a reason written beside it.

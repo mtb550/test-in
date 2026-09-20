@@ -3,8 +3,7 @@
 # UC-TREE-PANEL-018: Retire a test project, a test set or a package
 
 > **No key.** On the menu: **Actions**, then the status. A test project has
-> **Deactivate** and **Archive**. A test set has **Mark Deprecated**. A package
-> has **Archive**.
+> **Deactivate**. A test set has **Mark Deprecated**. A package has **Archive**.
 
 **As a** tester, **I want** to mark old work retired, **so that** it stays for
 its history without getting in the way of what I am testing now.
@@ -113,8 +112,9 @@ To bring one back, see [UC-TREE-PANEL-019](reactivateNode.md).
 ## What Testin refuses
 
 **If the status could not be written** — Testin says *Unable to update status to
-\<status\>* for a test project, *Unable to mark test set \<status\>* for a test
-set, or *Unable to mark package \<status\>* for a package. Nothing changes.
+\<status\>*, whichever kind of node it was, and nothing changes. One sentence for
+the three, because what failed is the same thing each time and the node is in
+front of the tester who asked.
 
 **If more than one node is selected** — the status entries are not offered.
 

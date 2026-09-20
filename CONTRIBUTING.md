@@ -97,9 +97,30 @@ work had it not been noticed immediately.
 |---|---|---|
 | `./gradlew compileJava test` | It compiles, and the unit tests and the documentation guards pass | Every change, before you offer it |
 | `./gradlew runIde` | It actually works | Anything a tester can see — see below |
-| `./gradlew inspect` | The six gate rules and the display-string ratchet | Before offering a change for a sandbox test, when it touched nullability, annotations, or many files |
+| `./gradlew inspect` | The eight gate rules and the display-string ratchet | Before offering a change for a sandbox test, when it touched nullability, annotations, or many files |
 | `git worktree add ../testin-<what> <branch>` | A second branch, checked out at once | Whenever two pieces of work run at the same time — see below |
 | `./gradlew verifyDistribution` | No test classes and no compile-only dependencies reached the jar | Runs in CI; run it if you touched packaging |
+
+### One build at a time in one checkout
+
+Two Gradle invocations sharing a project directory corrupt each other's outputs,
+and the errors they produce read exactly like real ones:
+
+- a class reported as `cannot find symbol` from inside its own package;
+- `package org.testin.util does not exist` in a submodule, while `:compileJava`
+  and `:jar` both report UP-TO-DATE;
+- `Unable to delete directory 'build\classes\java\main' - a process is still
+  writing to the target directory`;
+- a `NoSuchFileException` for `build/test-results/test/binary/in-progress-results-generic.bin`;
+- a task reported as FAILED after every one of its tests has logged PASSED.
+
+None of those is a defect in the code. `./gradlew --stop`, then `clean`, then one
+run clears it, and `--no-build-cache` is the escape if it comes back.
+
+This is the other half of the worktree rule above: a second working tree gives
+the other piece of work its own `build/` as well as its own branch. Running two
+builds in one checkout cost three separate diagnoses of failures that did not
+exist, on 20 September 2026.
 
 ### A hundred compile errors are usually one
 

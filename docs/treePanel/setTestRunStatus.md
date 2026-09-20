@@ -80,24 +80,26 @@ The status says how far the test run has got.
 ┌──────────────────────────────────────────────────────────────┐
 │  Set Test Run Status                                         │
 ├──────────────────────────────────────────────────────────────┤
-│  > +  Created                                           (1)  │
-│    @  In Progress                                            │
-│    *  Completed                                     2   (2)  │
-│    !  Assigned                                      1        │
+│  > !  Assigned                                      1   (1)  │
+│    *  Completed                                     2        │
 │    x  Closed                                        3        │
+├──────────────────────────────────────────────────────────────┤
+│  [k]  Enter Confirm      ↑↓ Select      Escape Cancel   (3)  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **Five rows, one per status** — each with its icon. It is the same icon the
-   tree draws for a test run in that status.
-2. **A key beside three of them** — *Created* and *In Progress* have none. They
-   are the test run's own record of itself. The keys are not in order down the
-   list, because the rows are in a different order from the keys. **Assigned**
-   is `1`, **Completed** is `2`, **Closed** is `3`.
-3. The popup opens in the middle of the IDE window, not at the pointer. The
-   first row is selected. The tester chooses in three ways: with `↑` `↓` and
-   `Enter`, with a key, or with a click. **Nothing on screen says so.** The
-   popup has no status bar.
+1. **One row for each status the run can move to** — each with its icon, the same
+   icon the tree draws for a test run in that status. Drawn here for a run that
+   is *Created*, which can move to any of the three. From *Assigned* or *In
+   Progress* there are two rows, Completed and Closed.
+2. **Only forward, and only what a tester sets.** *Created* and *In Progress* are
+   the test run's own record of itself and are never rows; nor is the status the
+   run already has, because moving to it would say nothing. The keys belong to
+   the statuses rather than to the positions: **Assigned** is `1`, **Completed**
+   is `2`, **Closed** is `3`, whichever of them the popup is showing.
+3. **The status bar says how to choose.** The popup opens in the middle of the
+   IDE window, not at the pointer, with the first row selected. The tester
+   chooses with `↑` `↓` and `Enter`, with a key, or with a click.
 
 ## Main flow
 
@@ -127,11 +129,6 @@ case removed from its test set.
 
 **If several rows are selected** — **Set Status** stays black and acts on the
 last row the tester clicked.
-
-> **The popup offers the status the test run already has.** Choosing it rewrites
-> the record. It stamps who changed it and when, and it confirms with that word.
-> Rule-TREE-PANEL-065 keeps the current status off the menu, but it holds for
-> retiring and not here.
 
 > **An open editor of that test run follows.** Its status, its verdict counts
 > and the rows that just became **Untested** all redraw where they are
