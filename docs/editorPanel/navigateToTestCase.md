@@ -48,8 +48,8 @@ No key. The card's last button, or the right-click menu.
   that card, as the card's other buttons are, and it is the last of them, after
   Run, so the two buttons testers already use keep their places. Its icon is the
   letter frame the Create Test Case dialog uses, reading tc, frame and letters in
-  the green of the Run button beside it. It sits in the same slot as every other
-  button on the card, and grows under the pointer like the others.
+  one green, the same in a light theme and a dark one. It sits in the same slot as
+  every other button on the card, and grows under the pointer like the others.
 - **Rule-EDITOR-PANEL-236** — A test case that is in no test set is refused with
   a message, and nothing opens.
 - **Rule-EDITOR-PANEL-237** — One gesture has one name wherever it is offered.
