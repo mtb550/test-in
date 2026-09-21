@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.time.ZonedDateTime;
 
 import static org.testng.Assert.*;
 
@@ -134,7 +135,7 @@ public class ChangeTypeRevertTest {
         final TestCaseDto committed = committed()
                 .setCreatedBy("Sara Al-Otaibi")
                 .setUpdatedBy("Sara Al-Otaibi")
-                .setUpdatedAt(java.time.ZonedDateTime.parse("2026-09-01T10:00:00Z"));
+                .setUpdatedAt(ZonedDateTime.parse("2026-09-01T10:00:00Z"));
         final TestCaseDto current = committed().setModule("edited module").setUpdatedBy("Muteb");
 
         ChangeType.CHANGE_MODULE.getRevertAction().apply(current, committed);

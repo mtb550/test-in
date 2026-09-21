@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.lang.reflect.Field;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -170,7 +171,7 @@ public class NodeKindTablesTest {
      */
     private static @NotNull Set<String> constantsOf(final @NotNull Class<?> owner, final @NotNull String field) {
         try {
-            final @NotNull java.lang.reflect.Field declared = owner.getDeclaredField(field);
+            final @NotNull Field declared = owner.getDeclaredField(field);
             declared.setAccessible(true);
 
             return ((Map<?, ?>) declared.get(null)).keySet().stream()

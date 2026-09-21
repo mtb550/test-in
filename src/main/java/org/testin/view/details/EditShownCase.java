@@ -39,6 +39,7 @@ import org.testin.testcase.TestCaseSnapshot;
 import org.testin.testcase.create.TestCaseUpdateMenuDialog;
 import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
+import org.testin.codegen.GenType;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -82,7 +83,7 @@ public final class EditShownCase {
     }
 
     // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007
-    private static void save(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath, final @NotNull List<TestCaseDto> tcs, final @NotNull org.testin.codegen.GenType gt, final @NotNull List<UUID> ids, final @NotNull Optional<TestCaseSnapshot> before) {
+    private static void save(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath, final @NotNull List<TestCaseDto> tcs, final @NotNull GenType gt, final @NotNull List<UUID> ids, final @NotNull Optional<TestCaseSnapshot> before) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         writesTo(p, dto, currentPath).ifPresentOrElse(editPath -> {

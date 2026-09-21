@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Optional;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -79,7 +80,7 @@ public class SearchTest {
         final Hit hit = Hit.of(tc);
 
         assertSame(hit.node(), login, "a case is not a node of its own, so the tree goes to its set");
-        assertEquals(hit.testCase(), java.util.Optional.of(tc), "and the editor lands on the case");
+        assertEquals(hit.testCase(), Optional.of(tc), "and the editor lands on the case");
         assertEquals(hit.name(), "Sign in with a valid user");
     }
 

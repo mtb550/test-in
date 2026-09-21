@@ -20,16 +20,19 @@ import com.intellij.ui.components.fields.ExtendableTextField;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Shortcuts;
 import org.testng.annotations.Test;
+import org.testng.Assert;
 
 import java.util.List;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.awt.event.KeyEvent;
 
 import static org.testng.Assert.*;
 
@@ -181,10 +184,10 @@ public class FrameworkComponentsTest {
 
     @Test
     public void radiosRejectEmptyOptionsAndForeignSelection() {
-        org.testng.Assert.expectThrows(IllegalStateException.class, () ->
+        Assert.expectThrows(IllegalStateException.class, () ->
                 ComponentDialogBase.<String>radios("x").build());
 
-        org.testng.Assert.expectThrows(IllegalStateException.class, () ->
+        Assert.expectThrows(IllegalStateException.class, () ->
                 ComponentDialogBase.<String>radios("x").option("A", "A").select("B").build());
     }
 
@@ -262,7 +265,7 @@ public class FrameworkComponentsTest {
 
     @Test
     public void builtStatusBarEntryRendersTheKeymapText() {
-        final StatusBarShortcut entry = StatusBarShortcut.build(org.testin.util.Shortcuts.Enter, "Confirm", () -> {
+        final StatusBarShortcut entry = StatusBarShortcut.build(Shortcuts.Enter, "Confirm", () -> {
         });
 
         assertTrue(entry.isBindable());
@@ -283,10 +286,10 @@ public class FrameworkComponentsTest {
         final ChoiceInput choice = ComponentDialogBase.choice("Branch", List.of("main", "release"), "main").getComponent();
         final JComboBox<?> combo = (JComboBox<?>) choice.getFocusComponent();
 
-        combo.setEditor(new javax.swing.plaf.basic.BasicComboBoxEditor());
+        combo.setEditor(new BasicComboBoxEditor());
 
         final JComponent field = (JComponent) combo.getEditor().getEditorComponent();
-        final Object key = field.getInputMap().get(KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0));
+        final Object key = field.getInputMap().get(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
         assertFalse(field.getActionMap().get(key).isEnabled(),
                 "with the list closed, the new field kept Enter from the dialog");
     }

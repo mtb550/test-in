@@ -36,6 +36,7 @@ import javax.swing.JComponent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.awt.BorderLayout;
 
 // UC-EDITOR-PANEL-005
 public abstract class AbstractMultiValueSection implements CreateTestCaseSection {
@@ -101,10 +102,10 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
         box.setShowPlaceholderWhenFocused(true);
         box.setBorder(JBUI.Borders.empty(6, 10));
 
-        final @NotNull JBPanel<?> row = new JBPanel<>(new java.awt.BorderLayout());
+        final @NotNull JBPanel<?> row = new JBPanel<>(new BorderLayout());
         row.setOpaque(false);
         row.setBorder(JBUI.Borders.emptyBottom(6));
-        row.add(box, java.awt.BorderLayout.CENTER);
+        row.add(box, BorderLayout.CENTER);
 
         fields.add(box);
         container.add(row);

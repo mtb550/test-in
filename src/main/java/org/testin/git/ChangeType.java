@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
+import java.util.ArrayList;
 
 @Getter
 @AllArgsConstructor
@@ -45,7 +46,7 @@ public enum ChangeType {
 
     CHANGE_STEPS(
             Bundle.message("change.change.steps"),
-            (current, old) -> current.setSteps(new java.util.ArrayList<>(old.getSteps()))),
+            (current, old) -> current.setSteps(new ArrayList<>(old.getSteps()))),
 
     CHANGE_PRIORITY(
             Bundle.message("change.change.priority"),
@@ -54,7 +55,7 @@ public enum ChangeType {
 
     CHANGE_GROUP(
             Bundle.message("change.change.group"),
-            (current, old) -> current.setGroup(new java.util.ArrayList<>(old.getGroup()))
+            (current, old) -> current.setGroup(new ArrayList<>(old.getGroup()))
     ),
 
     CHANGE_STATUS(

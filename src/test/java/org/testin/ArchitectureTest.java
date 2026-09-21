@@ -23,6 +23,7 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
+import org.testng.Assert;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -332,7 +333,7 @@ public class ArchitectureTest {
                 .sorted()
                 .toList();
 
-        org.testng.Assert.assertFalse(deliberate.isEmpty(),
+        Assert.assertFalse(deliberate.isEmpty(),
                 "If model no longer carries any Swing or AWT type, the convention has changed and the fourth"
                         + " rule is now worth writing. Read this method's javadoc before deleting it.");
     }

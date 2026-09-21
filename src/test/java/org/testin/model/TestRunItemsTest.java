@@ -71,7 +71,7 @@ public class TestRunItemsTest {
     public void anUnrunItemIsPending() {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
 
-        assertEquals(item.getStatus(), org.testin.model.TestStatus.PENDING, "an unrun item defaults to PENDING");
+        assertEquals(item.getStatus(), TestStatus.PENDING, "an unrun item defaults to PENDING");
     }
 
     @Test

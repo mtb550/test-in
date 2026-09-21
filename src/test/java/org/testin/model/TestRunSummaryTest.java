@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.ArrayList;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -64,7 +65,7 @@ public class TestRunSummaryTest {
     }
 
     private static int rateOf(final int passed, final int failed) {
-        final List<TestRunItems> results = new java.util.ArrayList<>();
+        final List<TestRunItems> results = new ArrayList<>();
         for (int i = 0; i < passed; i++) results.add(item(TestStatus.PASSED));
         for (int i = 0; i < failed; i++) results.add(item(TestStatus.FAILED));
 

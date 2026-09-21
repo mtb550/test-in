@@ -19,6 +19,7 @@ package org.testin.indexer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.setting.TestinRoot;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -27,7 +28,7 @@ import java.util.Optional;
 public final class WatchedPath {
     // UC-INTERNAL-003, Rule-INTERNAL-016, Rule-INTERNAL-017, Rule-INTERNAL-018
     public static @NotNull Optional<Path> testProjectOf(final @NotNull Path changed, final @NotNull Path root) {
-        if (!org.testin.setting.TestinRoot.isConfigured(root)) return Optional.empty();
+        if (!TestinRoot.isConfigured(root)) return Optional.empty();
         if (!changed.startsWith(root)) return Optional.empty();
 
         final @NotNull Path relative = root.relativize(changed);

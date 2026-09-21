@@ -53,7 +53,7 @@ public interface TestinEditor extends Disposable {
     }
 
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-180
-    default void launching(final @NotNull java.util.UUID caseId) {
+    default void launching(final @NotNull UUID caseId) {
     }
 
     @NotNull DirectoryDto getParent();

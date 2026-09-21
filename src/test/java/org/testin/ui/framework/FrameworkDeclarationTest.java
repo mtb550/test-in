@@ -59,7 +59,7 @@ public class FrameworkDeclarationTest {
         final Runnable action = () -> {
         };
         final StatusBarShortcut entry = new StatusBarShortcut(
-                org.testin.util.Shortcuts.Enter, "Enter", "Confirm", action);
+                Shortcuts.Enter, "Enter", "Confirm", action);
 
         assertTrue(entry.isBindable(), "a built entry must bind");
         assertEquals(entry.getName(), "Confirm");

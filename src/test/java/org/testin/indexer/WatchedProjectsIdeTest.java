@@ -25,6 +25,7 @@ import org.testin.services.Services;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.io.IOException;
 
 /**
  * UC-INTERNAL-003, Rule-INTERNAL-016.
@@ -68,7 +69,7 @@ public class WatchedProjectsIdeTest extends BasePlatformTestCase {
         try {
             Files.createDirectories(notes);
             Files.writeString(notes.resolve("todo.txt"), "not test data");
-        } catch (final java.io.IOException ex) {
+        } catch (final IOException ex) {
             throw new AssertionError("could not make the folder", ex);
         }
 
@@ -91,7 +92,7 @@ public class WatchedProjectsIdeTest extends BasePlatformTestCase {
 
         try {
             Files.delete(project.resolve(DirectoryType.TP.getMarker()));
-        } catch (final java.io.IOException ex) {
+        } catch (final IOException ex) {
             throw new AssertionError("could not remove the marker", ex);
         }
 

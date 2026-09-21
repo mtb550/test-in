@@ -142,6 +142,10 @@ silently does nothing costs more than the setting it was meant to hold.
   `Bundle` is the one exception in `src/main`, because its constructor calls
   `super(...)` and Lombok writes an empty body. Read the
   `lombok-writes-the-boilerplate` skill under `.claude/skills/`.
+- **A class is named by its import, never by its package path.** `Optional`,
+  not `java.util.Optional`, in code and in tests alike; the only exception is
+  a simple name that already means another class in that file. Read the
+  `import-never-qualify` skill under `.claude/skills/`.
 - **A class does one job, and its name says which.** Before adding a method to
   an existing class, say the class's job in one sentence, then the method's. If
   the second is not the first, the method belongs elsewhere — even when the

@@ -62,6 +62,7 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.List;
 
 public final class TestRunPdfGenerator {
     private @NotNull Optional<PdfFont> printsWith = Optional.empty();
@@ -149,7 +150,7 @@ public final class TestRunPdfGenerator {
                     .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(BLACK)
                     .setMarginBottom(12));
 
-            final @NotNull java.util.List<ReportTile> tiles = ReportTile.shownFor(summary);
+            final @NotNull List<ReportTile> tiles = ReportTile.shownFor(summary);
 
             final float[] tileWidths = new float[tiles.size()];
             Arrays.fill(tileWidths, 100f / tileWidths.length);

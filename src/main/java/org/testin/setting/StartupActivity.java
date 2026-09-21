@@ -22,6 +22,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.util.Key;
 import kotlin.coroutines.Continuation;
+import kotlin.Unit;
 import org.jetbrains.annotations.NotNull;
 import org.testin.clipboard.CutState;
 import org.testin.indexer.DeletedNodes;
@@ -99,9 +100,9 @@ public final class StartupActivity implements ProjectActivity {
     }
 
     @Override
-    public @NotNull Object execute(final @NotNull Project p, final @NotNull Continuation<? super kotlin.Unit> continuation) {
+    public @NotNull Object execute(final @NotNull Project p, final @NotNull Continuation<? super Unit> continuation) {
         execute(p);
         warnIfUnconfigured(p);
-        return kotlin.Unit.INSTANCE;
+        return Unit.INSTANCE;
     }
 }

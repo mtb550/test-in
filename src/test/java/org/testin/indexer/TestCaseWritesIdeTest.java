@@ -22,12 +22,15 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
+import org.testin.testcase.TestCaseOrder;
+import org.testin.setting.AppSettingsState;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.io.IOException;
 
 /**
  * UC-INTERNAL-004.
@@ -138,7 +141,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
             Files.deleteIfExists(file);
             Files.createDirectories(file);
             Files.writeString(file.resolve("keep"), "in the way");
-        } catch (final java.io.IOException ex) {
+        } catch (final IOException ex) {
             throw new AssertionError("could not set up the refused delete", ex);
         }
     }
@@ -156,7 +159,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         try (var files = Files.list(set)) {
             final Path caseFile = files.filter(file -> file.getFileName().toString().endsWith(".tc")).findFirst().orElseThrow();
             Files.move(caseFile, set.resolve(HAND_NAMED));
-        } catch (final java.io.IOException ex) {
+        } catch (final IOException ex) {
             throw new AssertionError("could not name the case file by hand", ex);
         }
 
@@ -230,17 +233,17 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         final TestCaseDto created = testCase(ts, "");
         final List<TestCaseDto> arranged = List.of(created);
 
-        indexer().updateSequence(ts.getPath(), arranged, org.testin.testcase.TestCaseOrder.place(arranged));
+        indexer().updateSequence(ts.getPath(), arranged, TestCaseOrder.place(arranged));
 
         final TestCaseDto indexed = indexer().findTestCase(created.getId()).orElseThrow();
         assertFalse("the order write gave the new case no rank", indexed.getOrder().isEmpty());
         assertEquals("the order write did not stamp the new case as created",
-                Services.getInstance(getProject(), org.testin.setting.AppSettingsState.class).testerName, indexed.getCreatedBy());
+                Services.getInstance(getProject(), AppSettingsState.class).testerName, indexed.getCreatedBy());
 
         try {
             assertTrue("the case's file does not carry the rank it was given",
                     Files.readString(fileOf(ts, created)).contains(indexed.getOrder()));
-        } catch (final java.io.IOException ex) {
+        } catch (final IOException ex) {
             throw new AssertionError("the new case was not written", ex);
         }
     }
@@ -288,7 +291,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         // or read-only file does.
         try {
             Files.createDirectories(fileOf(signUp, cut));
-        } catch (final java.io.IOException ex) {
+        } catch (final IOException ex) {
             throw new AssertionError("could not set up the refused write", ex);
         }
 

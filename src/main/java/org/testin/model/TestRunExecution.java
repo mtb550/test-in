@@ -18,6 +18,7 @@ package org.testin.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.AccessLevel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.model.markers.DetailRow;
@@ -46,7 +47,7 @@ public enum TestRunExecution {
 
     private final @NotNull String displayName;
 
-    @Getter(lombok.AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
     private final @NotNull Function<TestRunMarker, ZonedDateTime> at;
 
     public @NotNull String valueIn(final @NotNull TestRunMarker run) {

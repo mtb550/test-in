@@ -40,6 +40,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
+import java.util.Locale;
 
 public final class TestRunHtmlGenerator {
     final String DARK_BLUE = "#1f3864";
@@ -113,7 +114,7 @@ public final class TestRunHtmlGenerator {
                 if (written.isEmpty()) continue;
 
                 html.append("<div class='analysis-heading' style='color: var(--verdict-")
-                        .append(section.name().toLowerCase(java.util.Locale.ROOT)).append(")'>")
+                        .append(section.name().toLowerCase(Locale.ROOT)).append(")'>")
                         .append(section.heading(summary)).append("</div>")
                         .append("<div class='analysis-text'>")
                         .append(StringUtil.escapeXmlEntities(written))
@@ -128,7 +129,7 @@ public final class TestRunHtmlGenerator {
 
             appendCaseTable(html, sectionNumber++, section.getTitle(),
                     section.description("<b>" + count + "</b>"),
-                    section.name().toLowerCase(java.util.Locale.ROOT), section.isWithFailureDetail(),
+                    section.name().toLowerCase(Locale.ROOT), section.isWithFailureDetail(),
                     results, section::matches);
         }
 
@@ -279,7 +280,7 @@ public final class TestRunHtmlGenerator {
         final @NotNull StringBuilder tokens = new StringBuilder();
 
         for (final ReportSection section : ReportSection.values()) {
-            final @NotNull String name = section.name().toLowerCase(java.util.Locale.ROOT);
+            final @NotNull String name = section.name().toLowerCase(Locale.ROOT);
             tokens.append("--section-").append(name).append(": #").append(section.getHexColor()).append(";")
                     .append("--section-").append(name).append("-ink: #").append(section.textHex()).append(";");
         }

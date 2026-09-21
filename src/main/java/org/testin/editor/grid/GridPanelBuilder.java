@@ -48,6 +48,10 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
@@ -207,10 +211,10 @@ public class GridPanelBuilder {
     }
 
     private static void addColumnResizeListener(final @NotNull JBTable table, final @NotNull RowHeights rowHeights) {
-        table.getColumnModel().addColumnModelListener(new javax.swing.event.TableColumnModelListener() {
+        table.getColumnModel().addColumnModelListener(new TableColumnModelListener() {
             // UC-EDITOR-PANEL-004, Rule-EDITOR-PANEL-026
             @Override
-            public void columnMarginChanged(final javax.swing.event.ChangeEvent e) {
+            public void columnMarginChanged(final ChangeEvent e) {
                 Optional.ofNullable(table.getTableHeader())
                         .map(JTableHeader::getResizingColumn)
                         .ifPresent(resizing -> widthKey(table, resizing).ifPresent(key ->
@@ -220,20 +224,20 @@ public class GridPanelBuilder {
             }
 
             @Override
-            public void columnAdded(final javax.swing.event.TableColumnModelEvent e) {
+            public void columnAdded(final TableColumnModelEvent e) {
             }
 
             @Override
-            public void columnRemoved(final javax.swing.event.TableColumnModelEvent e) {
+            public void columnRemoved(final TableColumnModelEvent e) {
             }
 
             @Override
-            public void columnMoved(final javax.swing.event.TableColumnModelEvent e) {
+            public void columnMoved(final TableColumnModelEvent e) {
                 rowHeights.scheduleAll();
             }
 
             @Override
-            public void columnSelectionChanged(final javax.swing.event.ListSelectionEvent e) {
+            public void columnSelectionChanged(final ListSelectionEvent e) {
             }
         });
     }

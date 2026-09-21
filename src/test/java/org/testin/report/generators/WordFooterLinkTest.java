@@ -23,6 +23,7 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
+import org.apache.poi.wp.usermodel.HeaderFooterType;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -48,7 +49,7 @@ public class WordFooterLinkTest {
         try (ByteArrayOutputStream saved = new ByteArrayOutputStream()) {
             try (XWPFDocument written = new XWPFDocument()) {
                 final @NotNull XWPFFooter footer =
-                        written.createFooter(org.apache.poi.wp.usermodel.HeaderFooterType.DEFAULT);
+                        written.createFooter(HeaderFooterType.DEFAULT);
                 final @NotNull XWPFParagraph line = footer.createParagraph();
 
                 line.createRun().setText("Generated automatically by ");

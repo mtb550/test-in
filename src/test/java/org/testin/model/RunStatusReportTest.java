@@ -17,6 +17,7 @@
 package org.testin.model;
 
 import org.testng.annotations.Test;
+import java.util.Arrays;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -42,7 +43,7 @@ public class RunStatusReportTest {
     public void onlyRunningSaysTheCaseIsStillGoing() {
         assertTrue(RunStatus.RUNNING.stillGoing());
 
-        assertEquals(java.util.Arrays.stream(RunStatus.values()).filter(RunStatus::stillGoing).count(), 1);
+        assertEquals(Arrays.stream(RunStatus.values()).filter(RunStatus::stillGoing).count(), 1);
     }
 
     /**
