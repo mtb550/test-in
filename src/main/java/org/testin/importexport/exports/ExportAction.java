@@ -37,7 +37,7 @@ import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.services.BackgroundWork;
 import org.testin.util.Bundle;
-import org.testin.util.Mapper;
+import org.testin.testcase.TestCaseSnapshot;
 
 import java.util.*;
 
@@ -125,9 +125,8 @@ public class ExportAction extends DumbAwareAction {
 
         // UC-SHARE-003, Rule-SHARE-020
         private @NotNull List<TestCaseDto> detached(final @NotNull List<TestCaseDto> cases) {
-            final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
             return cases.stream()
-                    .map(tc -> mapper.convertValue(tc, TestCaseDto.class).setParent(tc.getParent()))
+                    .map(tc -> TestCaseSnapshot.copy(p, tc).setParent(tc.getParent()))
                     .toList();
         }
 

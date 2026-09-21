@@ -223,7 +223,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
         private @NotNull TestCaseDto cloneForPasting(final @NotNull TestCaseDto original, final boolean isCut) {
             final @NotNull ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
-            final @NotNull TestCaseDto clonedTc = Services.getInstance(p, Mapper.class).convertValue(original, TestCaseDto.class);
+            final @NotNull TestCaseDto clonedTc = TestCaseSnapshot.copy(p, original);
 
             if (isCut) {
                 clonedTc.touch(Services.getInstance(p, AppSettingsState.class).testerName);

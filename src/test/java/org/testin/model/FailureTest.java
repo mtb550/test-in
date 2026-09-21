@@ -16,6 +16,7 @@
 
 package org.testin.model;
 
+import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -77,7 +78,7 @@ public class FailureTest {
 
         // The order RunStatusService.executeManual uses: record, then judge.
         new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
-        item.recordVerdict(TestStatus.PASSED, "tester");
+        item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
 
         assertEquals(item.getActualResult(), "", "a case that passed has nothing to explain");
         assertEquals(item.getStacktrace(), "");
@@ -88,7 +89,7 @@ public class FailureTest {
         final TestRunItems item = row();
 
         new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
-        item.recordVerdict(TestStatus.FAILED, "tester");
+        item.recordVerdict(TestStatus.FAILED, "tester", new TestCaseDto());
 
         assertEquals(item.getActualResult(), "expected [true] but found [false]");
         assertEquals(item.getExecutedBy(), "tester");
@@ -104,7 +105,7 @@ public class FailureTest {
         final TestRunItems item = row().setBugIssueUrl("https://github.com/mtb550/product/issues/123");
 
         new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
-        item.recordVerdict(TestStatus.FAILED, "tester");
+        item.recordVerdict(TestStatus.FAILED, "tester", new TestCaseDto());
 
         assertEquals(item.getBugIssueUrl(), "https://github.com/mtb550/product/issues/123");
     }

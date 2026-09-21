@@ -260,6 +260,7 @@ one put there by hand under such a name goes too.
 | `actualResult` | string | Empty unless the case failed |
 | `stacktrace` | string | Empty unless the case failed. Text only: a pasted screenshot is never in it |
 | `screenshots` | array of strings | The file names of the screenshots pasted with the failure, beside this file, in the order they were pasted. Left out when there are none; cleared by a pass and by an automated failure, and their files go with the next write |
+| `testCase` | object | The test case as it was when the verdict was given, in the shape of a `.tc` (Rule-EDITOR-PANEL-238). Left out until a verdict is given, so a pending result has none, and a result written before 2.13.0-alpha has none either and shows the test case as it is now. A correction keeps it; running the case again replaces it (Rule-EDITOR-PANEL-240, Rule-EDITOR-PANEL-241). Editing or deleting the test case never touches it |
 | `bugSeverity` | enum | `EMPTY` `BLOCKER` `MAJOR` `MINOR` `ENHANCEMENT` |
 | `bugPriority` | enum | `EMPTY` `HIGH` `MEDIUM` `LOW` |
 | `bugIssueUrl` | string | The GitHub issue the failure was reported as, written by [Report Bug](viewPanel/reportBug.md). Empty until then; cleared by a pass, kept by an automated failure |

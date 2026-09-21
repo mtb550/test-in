@@ -51,6 +51,8 @@ or `F`.
   before it writes its own, and keeps the bug severity, the bug priority and the
   bug issue link. The message that names what a pass cleared names what it
   cleared too.
+- **Rule-EDITOR-PANEL-241** — Running a judged row again records the new verdict
+  against the test case as it is now.
 
 ## What the tester sees
 

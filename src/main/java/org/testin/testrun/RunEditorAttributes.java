@@ -31,9 +31,7 @@ import org.testin.model.ValueExtractor;
 import org.testin.util.Bundle;
 import org.testin.ui.Badges;
 import org.testin.codegen.Fqcn;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.Services;
 import org.testin.util.Display;
 
 import java.util.List;
@@ -164,9 +162,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     PATH(
             TestEditorAttributes.PATH.getName(),
             ToolBarDefault.OFF,
-            (item, p) -> Services.getInstance(p, ProjectIndexer.class).findTestCase(item.getId())
-                    .map(tc -> String.join(" > ", tc.getParent().getPath2()))
-                    .orElse("")
+            (item, p) -> String.join(" > ", item.liveCase().getParent().getPath2())
     ),
 
     FQCN(

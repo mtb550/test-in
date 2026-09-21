@@ -194,7 +194,8 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return allBack;
     }
 
-    private static @NotNull TestCaseDto copy(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+    // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-238
+    public static @NotNull TestCaseDto copy(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         return Services.getInstance(p, Mapper.class).convertValue(tc, TestCaseDto.class);
     }
 }

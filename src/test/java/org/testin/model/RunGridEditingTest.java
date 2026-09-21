@@ -16,6 +16,7 @@
 
 package org.testin.model;
 
+import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 import org.testin.testrun.RunEditorAttributes;
 
@@ -124,7 +125,7 @@ public class RunGridEditingTest {
         row.setBugSeverity(BugSeverity.MAJOR);
         row.setBugPriority(BugPriority.HIGH);
 
-        row.recordVerdict(TestStatus.PASSED, "mtb");
+        row.recordVerdict(TestStatus.PASSED, "mtb", new TestCaseDto());
 
         assertEquals(row.getActualResult(), "");
         assertEquals(row.getStacktrace(), "");
@@ -139,7 +140,7 @@ public class RunGridEditingTest {
         final TestRunItems row = item();
         row.setActualResult("The balance showed 0.00");
 
-        row.recordVerdict(TestStatus.FAILED, "mtb");
+        row.recordVerdict(TestStatus.FAILED, "mtb", new TestCaseDto());
 
         assertEquals(row.getActualResult(), "The balance showed 0.00",
                 "the actual result is the point of a failure");
@@ -152,7 +153,7 @@ public class RunGridEditingTest {
         row.setBugSeverity(BugSeverity.MAJOR);
 
         final List<String> warned = row.wouldClear(TestStatus.PASSED, Failure.NONE);
-        row.recordVerdict(TestStatus.PASSED, "mtb");
+        row.recordVerdict(TestStatus.PASSED, "mtb", new TestCaseDto());
 
         assertTrue(row.wouldClear(TestStatus.PASSED, Failure.NONE).isEmpty(),
                 "everything named in the warning is gone afterward, or the warning was wrong: " + warned);

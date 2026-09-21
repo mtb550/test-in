@@ -114,7 +114,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                         .collect(Collectors.toMap(TestRunItems::getId, item -> item,
                                 (existingItem, duplicateItem) -> existingItem));
 
-                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(run.getResults().stream().map(TestRunItems::shownCase).toList());
+                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(run.getResults().stream().map(TestRunItems::liveCase).toList());
                 Services.getInstance(p, TestCaseValues.class).load(ordered);
 
                 ApplicationManager.getApplication().invokeLater(() -> {

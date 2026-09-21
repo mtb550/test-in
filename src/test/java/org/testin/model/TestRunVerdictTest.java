@@ -16,6 +16,7 @@
 
 package org.testin.model;
 
+import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -54,7 +55,7 @@ public class TestRunVerdictTest {
     public void passingAFailedCaseClearsEverythingTheFailureDescribed() {
         final TestRunItems item = failedWithBug();
 
-        item.recordVerdict(TestStatus.PASSED, "tester");
+        item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
 
         assertEquals(item.getStatus(), TestStatus.PASSED);
         assertEquals(item.getBugSeverity(), BugSeverity.EMPTY);
@@ -69,7 +70,7 @@ public class TestRunVerdictTest {
     public void failingAgainKeepsTheBugTheDialogJustCollected() {
         final TestRunItems item = failedWithBug();
 
-        item.recordVerdict(TestStatus.FAILED, "tester");
+        item.recordVerdict(TestStatus.FAILED, "tester", new TestCaseDto());
 
         assertEquals(item.getBugSeverity(), BugSeverity.MAJOR, "re-failing must not wipe the details");
         assertEquals(item.getBugPriority(), BugPriority.HIGH);
@@ -85,7 +86,7 @@ public class TestRunVerdictTest {
                 .status(TestStatus.PENDING)
                 .build();
 
-        item.recordVerdict(TestStatus.PASSED, "tester");
+        item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
 
         assertEquals(item.getStatus(), TestStatus.PASSED);
         assertEquals(item.getBugSeverity(), BugSeverity.EMPTY);
@@ -96,7 +97,7 @@ public class TestRunVerdictTest {
     public void everyVerdictRecordsWhoAndWhen() {
         final TestRunItems item = failedWithBug();
 
-        item.recordVerdict(TestStatus.BLOCKED, "muteb");
+        item.recordVerdict(TestStatus.BLOCKED, "muteb", new TestCaseDto());
 
         assertEquals(item.getExecutedBy(), "muteb");
         assertEquals(item.getExecutedAt().getNano(), 0, "stamped to the second, as the run JSON stores it");
@@ -108,8 +109,8 @@ public class TestRunVerdictTest {
 
         // The route does not matter, only the destination: details collected
         // while failing are just as stale after a detour through Blocked.
-        item.recordVerdict(TestStatus.BLOCKED, "tester");
-        item.recordVerdict(TestStatus.PASSED, "tester");
+        item.recordVerdict(TestStatus.BLOCKED, "tester", new TestCaseDto());
+        item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
 
         assertEquals(item.getBugSeverity(), BugSeverity.EMPTY);
         assertEquals(item.getBugPriority(), BugPriority.EMPTY);
@@ -124,7 +125,7 @@ public class TestRunVerdictTest {
 
         // Blocked is not a pass - the reported bug may still be real, so only
         // passing clears. See the note on recordVerdict.
-        item.recordVerdict(TestStatus.BLOCKED, "tester");
+        item.recordVerdict(TestStatus.BLOCKED, "tester", new TestCaseDto());
 
         assertEquals(item.getBugSeverity(), BugSeverity.MAJOR);
         assertEquals(item.getBugPriority(), BugPriority.HIGH);

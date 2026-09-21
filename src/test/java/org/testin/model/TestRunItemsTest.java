@@ -102,7 +102,7 @@ public class TestRunItemsTest {
         item.recordDuration(Duration.ofMillis(84));
         item.setActualResult("expected [true] but found [false]");
 
-        item.recordVerdict(TestStatus.PASSED, "tester");
+        item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
 
         assertEquals(item.getActualResult(), "");
         assertEquals(item.getDuration(), Duration.ofMillis(84), "a case that passed still took time");

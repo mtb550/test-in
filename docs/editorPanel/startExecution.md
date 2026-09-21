@@ -60,6 +60,9 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
   verdict onto another test case. While the filter hides the test case being
   executed, a verdict key records nothing and says so, and clearing the filter
   brings it back.
+- **Rule-EDITOR-PANEL-238** — A verdict records a copy of the test case as it is
+  at that moment, so a fix made to the test case while running it is what the
+  verdict keeps.
 
 ## What the tester sees
 

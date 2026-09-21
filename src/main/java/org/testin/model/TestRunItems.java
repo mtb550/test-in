@@ -41,11 +41,36 @@ import java.util.UUID;
 @SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TestRunItems {
+    private static final @NotNull UUID NOT_JUDGED = new UUID(0L, 0L);
+
     @JsonIgnore
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     @Builder.Default
     private @NotNull Optional<TestCaseDto> tc = Optional.empty();
+
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-238, Rule-EDITOR-PANEL-239
+    @NotNull
+    @Builder.Default
+    @Setter(AccessLevel.NONE)
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NotJudgedAgainst.class)
+    private TestCaseDto testCase = notJudged();
+
+    private static @NotNull TestCaseDto notJudged() {
+        return TestCaseDto.builder().id(NOT_JUDGED).build();
+    }
+
+    static final class NotJudgedAgainst {
+        @Override
+        public boolean equals(final Object value) {
+            return value instanceof TestCaseDto judged && judged.getId().equals(NOT_JUDGED);
+        }
+
+        @Override
+        public int hashCode() {
+            return NOT_JUDGED.hashCode();
+        }
+    }
 
     @NotNull
     @Builder.Default
@@ -96,7 +121,12 @@ public class TestRunItems {
     public @NotNull TestRunItems showing(final @NotNull Optional<TestCaseDto> live) {
         tc = live;
         removed = live.isEmpty();
+        live.filter(now -> isJudgedAgainst()).ifPresent(now -> testCase.setParent(now.getParent()));
         return this;
+    }
+
+    private boolean isJudgedAgainst() {
+        return !testCase.getId().equals(NOT_JUDGED);
     }
 
     @JsonIgnore
@@ -124,7 +154,19 @@ public class TestRunItems {
         return status.isVerdict() || isRemoved();
     }
 
-    public void recordVerdict(final @NotNull TestStatus next, final @NotNull String tester) {
+    // UC-EDITOR-PANEL-031, UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-238, Rule-EDITOR-PANEL-241
+    public void recordVerdict(final @NotNull TestStatus next, final @NotNull String tester, final @NotNull TestCaseDto asItIsNow) {
+        testCase = asItIsNow;
+        judge(next, tester);
+    }
+
+    // UC-EDITOR-PANEL-038, UC-EDITOR-PANEL-039, Rule-EDITOR-PANEL-240
+    public void correctVerdict(final @NotNull TestStatus next, final @NotNull String tester, final @NotNull TestCaseDto asItIsNow) {
+        if (!isJudgedAgainst()) testCase = asItIsNow;
+        judge(next, tester);
+    }
+
+    private void judge(final @NotNull TestStatus next, final @NotNull String tester) {
         if (clears(next)) FailureDetail.clearAll(this);
 
         status = next;
@@ -140,8 +182,13 @@ public class TestRunItems {
         return clears(next) ? FailureDetail.filledIn(this) : failure.wouldClear(this);
     }
 
-    // UC-EDITOR-PANEL-030, Rule-REPORT-021, Rule-VIEW-PANEL-083
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-239, Rule-REPORT-021, Rule-VIEW-PANEL-083
     public @NotNull TestCaseDto shownCase() {
+        return isJudgedAgainst() ? testCase : liveCase();
+    }
+
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
+    public @NotNull TestCaseDto liveCase() {
         return tc.orElseGet(() -> TestCaseDto.deleted(id));
     }
 }

@@ -45,6 +45,8 @@ Press the right verdict's key on the test case.
   the bug severity, the bug priority and the bug issue link.
 - **Rule-EDITOR-PANEL-162** — Only passing clears anything. Failing and blocking
   clear nothing.
+- **Rule-EDITOR-PANEL-240** — Correcting a verdict keeps the test case it was
+  given against. Only the verdict, who gave it and when change.
 
 ## The screen
 

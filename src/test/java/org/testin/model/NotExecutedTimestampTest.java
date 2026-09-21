@@ -16,6 +16,7 @@
 
 package org.testin.model;
 
+import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Display;
 import org.testng.annotations.Test;
 
@@ -45,7 +46,7 @@ public class NotExecutedTimestampTest {
     public void aVerdictGivesTheCaseARealTime() {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
 
-        item.recordVerdict(TestStatus.PASSED, "tester");
+        item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
 
         assertFalse(Config.isNotExecuted(item.getExecutedAt()));
         assertFalse(Display.formatDate(item.getExecutedAt()).isEmpty());
