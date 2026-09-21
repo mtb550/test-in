@@ -82,11 +82,11 @@ public final class RunStatusService {
         ApplicationManager.getApplication().invokeLater(() -> editor.startTimerForIndex(executingIndex));
     }
 
-    // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-241
+    // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-241, Rule-EDITOR-PANEL-242
     public boolean recordReported(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
         if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
-            editor.stopExecution();
+            editor.startTimerForIndex(tcIndex + 1);
         }
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;

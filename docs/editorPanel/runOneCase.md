@@ -53,6 +53,10 @@ or `F`.
   cleared too.
 - **Rule-EDITOR-PANEL-241** — Running a judged row again records the new verdict
   against the test case as it is now.
+- **Rule-EDITOR-PANEL-242** — A status from the automation for the test case the
+  walk is on moves the walk to the next test case waiting for a verdict, exactly
+  as the tester's own verdict does, and execution goes on. Until the status
+  comes, the walk stays on that test case.
 
 ## What the tester sees
 
@@ -75,6 +79,13 @@ the message and the bar cannot count one test run differently.
 6. Each result comes back and is written into the test run, silently.
 7. When the last one is in, one message reads the whole test run's figures, such
    as *Passed 42, Failed 8*.
+
+**During a walk** ([UC-EDITOR-PANEL-031](startExecution.md)), running the test
+case the walk is on keeps the walk there, its clock counting, until the status
+comes back. The status then moves the walk to the next test case waiting for a
+verdict, as the tester's own verdict does, and execution goes on
+(Rule-EDITOR-PANEL-242). The time recorded is still the framework's own
+(Rule-EDITOR-PANEL-183).
 
 Everything about how the run is built and named is on
 [UC-CODEGEN-008](../codegen/runAutomation.md).
