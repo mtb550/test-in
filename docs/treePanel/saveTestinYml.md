@@ -109,7 +109,7 @@ creating, cloning, renaming, committing and pushing never do.
 4. The tester presses `Enter`. Testin writes the lines, reads the file again,
    and shows *Saved*.
 5. Code turns on for this test project: generating, **Automate Test Case**,
-   **Navigate to Code**, **Run Tests**, the gutter icons and the automated marks
+   **Navigate to Test Method**, **Run Tests**, the gutter icons and the automated marks
    (Rule-CODEGEN-082).
 
 ## When code is off

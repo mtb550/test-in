@@ -57,7 +57,7 @@ The identity sits in a gray pill under the path, with the button to its right.
 ```
 
 1. **The pill** — the test case's identity, in full. The pointer becomes a hand
-   over it and its tooltip reads **Go to this test case**. Clicking it opens the
+   over it and its tooltip reads **Navigate to Test Case**. Clicking it opens the
    test set's editor and selects the row. Where there is no test set to open the
    pointer stays an arrow and the tooltip says so instead.
 2. **The button** — its tooltip reads **Copy ID**. The pointer becomes a hand
@@ -84,9 +84,8 @@ the two: a path step names a place, and the identity names a test case.
 Copying refuses nothing. There is no gray state and no way for it to fail.
 
 **If the test case has no test set to open** — the pointer stays an arrow over
-the pill, its tooltip says why, and clicking it reads *This test case was opened
-without its test set, so there is nothing to open. It was removed from the set
-the run recorded it in.* This is the only way to meet it: a test run keeps the
+the pill, its tooltip says why, and clicking it reads *There is no test set to
+open this test case in.* This is the only way to meet it: a test run keeps the
 verdict of a case its test set no longer holds, and the panel shows that case
 from the run.
 

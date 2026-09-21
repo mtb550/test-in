@@ -62,13 +62,14 @@ This is the menu in a test set editor.
 ┌──────────────────────────────────┐
 │  Create Test Case                │
 │  View Test Case Details          │
+│  Navigate to Test Case           │
 │  ──────────────────────────────  │
 │  Update Test Case                │
 │  Actions                       > │
 │  ──────────────────────────────  │
 │  Automate Test Case              │
 │  Run Test Case                   │
-│  Navigate to Test Code           │
+│  Navigate to Test Method         │
 └──────────────────────────────────┘
 ```
 
@@ -98,15 +99,19 @@ In the grid the menu opens on the selected cell instead.
 ## What the menu holds
 
 In a test set editor, in this order: **Create Test Case**, **View Test Case
-Details**, **Update Test Case**, **Actions**, **Automate Test Case**, **Run Test
-Case**, **Navigate to Test Code**.
+Details**, **Navigate to Test Case**, **Update Test Case**, **Actions**,
+**Automate Test Case**, **Run Test Case**, **Navigate to Test Method**.
+
+**Navigate to Test Case** is gray here and says why: the test case is already in
+the test set open there. It is on the menu of both editors so the menu is one
+shape wherever it opens (Rule-EDITOR-PANEL-234).
 
 **Actions** opens onto the seven that act on the test case rather than on the
 automation: **Copy Test Case Value**, **Copy Test Case**, **Cut Test Case**,
 **Paste Test Case**, **Delete Test Case**, then **Undo** and **Redo**. They are
 one level down because they all have keys and none of them is what the menu is
 opened for — at the top level they pushed Automate Test Case, Run Test Case and
-Navigate to Test Code off the end of a list nobody read that far down.
+Navigate to Test Method off the end of a list nobody read that far down.
 
 **The same seven are in the test run editor's menu**, in the same place and
 under the same word. Four of them are gray there, each saying why on the entry:
@@ -139,8 +144,9 @@ TestNG plugin, and each entry says which plugin it is waiting for.
 
 In a test run editor the menu holds the three verdicts first — **Passed**,
 **Failed** and **Blocked** — then **Failed Test Case Details**, then **View Test
-Case Details**, then **Actions**, then **Run Test Case** and **Navigate to Test
-Code**. **Create Test Case**, **Update Test Case** and **Automate Test Case** are
+Case Details** and **Navigate to Test Case**, then **Actions**, then **Run Test
+Case** and **Navigate to Test Method**. **Create Test Case**, **Update Test Case**
+and **Automate Test Case** are
 not on it. A test run records verdicts rather than the test case, and it covers
 test cases that already exist.
 

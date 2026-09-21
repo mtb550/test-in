@@ -26,10 +26,8 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.TestinEditors;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
-import org.testin.services.Services;
+import org.testin.navigate.NavigateToTestCaseAction;
 import org.testin.ui.FontSync;
 import org.testin.util.Bundle;
 
@@ -38,6 +36,7 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 public class Id extends BaseDetails {
     final int BADGE_ARC_SIZE = 16;
@@ -46,7 +45,7 @@ public class Id extends BaseDetails {
     final int FLOW_GAP = 8;
     final int COPY_SUCCESS_DELAY_MS = 1500;
     final @NotNull String COPY_TOOLTIP = Bundle.message("view.id.copy");
-    final @NotNull String GO_TOOLTIP = Bundle.message("view.id.go");
+    final @NotNull String GO_TOOLTIP = Bundle.message("action.Testin.NavigateToTestCase.text");
     final @NotNull Color BG_COLOR = new JBColor(Gray._230, Gray._80);
     final @NotNull Color FG_COLOR = new JBColor(Gray._130, Gray._170);
     final int INSETS_TOP = 5;
@@ -77,19 +76,14 @@ public class Id extends BaseDetails {
         idBadge.setOpaque(false);
 
         // UC-VIEW-PANEL-009, Rule-VIEW-PANEL-063
-        final boolean hasTestSet = !dto.getParent().getPath().toString().isEmpty();
+        final @NotNull Optional<String> whyNot = NavigateToTestCaseAction.whyNot(dto);
 
-        idBadge.setToolTipText(hasTestSet ? GO_TOOLTIP : Bundle.message("view.id.go.nowhere"));
-        idBadge.setCursor(Cursor.getPredefinedCursor(hasTestSet ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
+        idBadge.setToolTipText(whyNot.orElse(GO_TOOLTIP));
+        idBadge.setCursor(Cursor.getPredefinedCursor(whyNot.isEmpty() ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
         idBadge.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                if (!hasTestSet) {
-                    Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("view.id.go.nowhere"));
-                    return;
-                }
-
-                Services.getInstance(p, TestinEditors.class).openAndSelect(p, dto.getParent(), dto);
+                NavigateToTestCaseAction.execute(p, dto);
             }
         });
 

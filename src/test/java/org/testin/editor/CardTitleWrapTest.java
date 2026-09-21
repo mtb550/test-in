@@ -18,12 +18,15 @@ package org.testin.editor;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import javax.swing.*;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -110,10 +113,45 @@ public class CardTitleWrapTest {
      */
     @Test
     public void theIconsStillFitAfterATitleThatFillsTheColumn() {
-        final int column = CardTitle.titleColumnWidth(900);
+        final @NotNull List<CardHoverAction.Offered> buttons = everyButton();
+        final int column = CardTitle.titleColumnWidth(900, buttons.size());
+        final @NotNull List<CardTitle.Slot> slots = CardTitle.descriptionActionIcons(column, buttons).slots();
 
         assertTrue(column > 0 && column < 900, "a 900px list must give a bounded column, got " + column);
-        assertTrue(CardTitle.descriptionActionIcons(column).run().getMaxX() <= 900, "the icons after a full-width title run off the card");
+        assertEquals(slots.size(), buttons.size(), "every button gets a slot");
+        assertTrue(slots.getLast().at().getMaxX() <= 900, "the icons after a full-width title run off the card");
+    }
+
+    /**
+     * UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-235.
+     * <p>
+     * The new button goes last, and the two before it stay exactly where a card
+     * drew them when it held two - the positions testers already know.
+     */
+    @Test
+    public void theNewButtonGoesLastAndMovesNeitherOfTheOthers() {
+        final List<CardTitle.Slot> before = CardTitle.descriptionActionIcons(200, offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_CASE)).slots();
+        final List<CardTitle.Slot> now = CardTitle.descriptionActionIcons(200, everyButton()).slots();
+
+        assertEquals(now.get(0).at(), before.get(0).at(), "the method button moved");
+        assertEquals(now.get(1).at(), before.get(1).at(), "the run button moved");
+        assertEquals(now.getLast().button().action(), CardHoverAction.NAVIGATE_TO_TEST_CASE);
+        assertEquals(now.getLast().at().getSize(), now.getFirst().at().getSize(), "the new button's slot is not the size of the others");
+        assertTrue(now.getLast().at().getMinX() > now.get(1).at().getMaxX(), "the new button overlaps Run");
+    }
+
+    /**
+     * The point a click lands on and the button it acts on are the same list,
+     * so a click can never reach the wrong button.
+     */
+    @Test
+    public void aClickLandsOnTheButtonDrawnThere() {
+        final CardTitle.ActionIcons icons = CardTitle.descriptionActionIcons(200, everyButton());
+
+        for (final CardTitle.Slot slot : icons.slots()) {
+            assertEquals(icons.at((int) slot.at().getCenterX(), (int) slot.at().getCenterY()).orElseThrow(), slot.button());
+        }
+        assertTrue(icons.at(0, 0).isEmpty(), "a click on the title reached a button");
     }
 
     /**
@@ -123,6 +161,14 @@ public class CardTitleWrapTest {
      */
     @Test
     public void aListWithNoWidthYetLetsTheTitleRun() {
-        assertEquals(CardTitle.titleColumnWidth(0), Integer.MAX_VALUE);
+        assertEquals(CardTitle.titleColumnWidth(0, 3), Integer.MAX_VALUE);
+    }
+
+    private static List<CardHoverAction.Offered> everyButton() {
+        return offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_CASE, CardHoverAction.NAVIGATE_TO_TEST_CASE);
+    }
+
+    private static List<CardHoverAction.Offered> offered(final CardHoverAction... actions) {
+        return Arrays.stream(actions).map(action -> new CardHoverAction.Offered(action, Optional.empty())).toList();
     }
 }

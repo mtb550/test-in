@@ -9,7 +9,7 @@ in a tab. It is where test cases are written, and where a test run is executed.
 |---|---|
 | **Part of Testin** | The editor panel |
 | **Answers** | What a tester can do to test cases and to a test run, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-047`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-232` |
+| **Numbering** | Use cases are `UC-EDITOR-PANEL-001` to `UC-EDITOR-PANEL-048`. Rules are `Rule-EDITOR-PANEL-001` to `Rule-EDITOR-PANEL-237` |
 | **Retired** | `Rule-EDITOR-PANEL-193` said the analysis appears in the PDF, Word and web reports and that the spreadsheet leaves it out. Retired 21 September 2026: `c97c44f6` gave the spreadsheet an Overview sheet carrying the overview, the execution summary and the result analysis, and [Rule-REPORT-020](../report/generateReport.md) states that. The two rules contradicted each other for three days and this one lost. Read Rule-REPORT-020 instead. `Rule-EDITOR-PANEL-231` said each open field in Create Test Case and Update Test Case is named by a caption above it. Retired 18 September 2026, when the captions were taken off those two dialogs again (#328): a field is named by its icon and its gray hint, as it was before. The number is not given to anything else |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `1270e599`, 20 September 2026. Every page of this part was read against the code that day: every message quoted, every menu entry, every key, every status bar strip and every drawn screen. |
@@ -78,6 +78,7 @@ about a verdict.
 | **UC-EDITOR-PANEL-045** | [Write the result analysis](writeResultAnalysis.md) | Say what the test run as a whole showed. |
 | **UC-EDITOR-PANEL-046** | [Work in light mode](lightMode.md) | Judge test cases in a small window above your app. |
 | **UC-EDITOR-PANEL-047** | [See which test cases are automated](seeWhatIsAutomated.md) | Tell what a run will cover without opening the code. |
+| **UC-EDITOR-PANEL-048** | [Go from a test run to a test case](navigateToTestCase.md) | Open the test case behind a row, in its own test set. |
 
 ---
 

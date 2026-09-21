@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Badges;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.BaseCard;
-import org.testin.editor.CardHoverAction;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.services.Services;
@@ -49,7 +48,6 @@ public class RunCard extends BaseCard {
                 .filter(activeDetails::contains)
                 .forEach(attr -> attr.applyToUI(runItem, badges, details, p));
 
-        this.runSlot = CardHoverAction.runSlot(p, runItem.shownCase());
 
         updateUI(index, title, badges, details);
 

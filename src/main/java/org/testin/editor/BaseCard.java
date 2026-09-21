@@ -24,6 +24,7 @@ import com.intellij.ui.components.panels.VerticalLayout;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Badges;
 import org.testin.model.Automated;
@@ -46,7 +47,8 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected final @NotNull BorderLayoutPanel wrapper = new BorderLayoutPanel();
     protected boolean isRowHovered;
     protected @NotNull String hoveredAction = "";
-    protected @NotNull CardHoverAction runSlot = CardHoverAction.RUN_TEST_CASE;
+    @Setter
+    private @NotNull List<CardHoverAction.Offered> hoverButtons = List.of();
     protected @NotNull Automated automation = Automated.UNKNOWN;
     private @NotNull String plainTitle = "";
     private int titleColumnWidth = Integer.MAX_VALUE;
@@ -106,7 +108,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
             c.setFont(listFont.deriveFont(Font.BOLD, badgeSize));
         }
 
-        titleColumnWidth = CardTitle.titleColumnWidth(list.getWidth());
+        titleColumnWidth = CardTitle.titleColumnWidth(list.getWidth(), hoverButtons.size());
         layOutTitle();
     }
 
@@ -159,7 +161,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected void paintChildren(final Graphics g) {
         super.paintChildren(g);
         if (isRowHovered) {
-            CardTitle.drawDescriptionActionIcons(p, this, g, titleWidth(), hoveredAction, runSlot, automation);
+            CardTitle.drawDescriptionActionIcons(this, g, titleWidth(), hoveredAction, hoverButtons, automation);
         }
     }
 

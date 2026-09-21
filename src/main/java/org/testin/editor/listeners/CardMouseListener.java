@@ -100,21 +100,20 @@ public class CardMouseListener extends MouseAdapter {
         final @NotNull Rectangle bounds = list.getCellBounds(index, index);
         if (!bounds.contains(e.getPoint())) return;
 
-        getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y).ifPresent(action -> {
+        getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y).ifPresent(button -> {
             final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
 
-            Logger.trace(action.getTooltip() + ", tc: " + tc.getDescription());
+            Logger.trace(button.action().getTooltip() + ", tc: " + tc.getDescription());
 
-            final @NotNull Optional<String> whyNot = action.whyNotOffered(p);
-            if (whyNot.isPresent()) {
-                Services.getInstance(p, Notifier.class).softRefuse(p, whyNot.orElseThrow());
+            if (!button.works()) {
+                Services.getInstance(p, Notifier.class).softRefuse(p, button.hintText());
                 e.consume();
                 return;
             }
 
-            if (action == CardHoverAction.RUN_TEST_CASE) editor.launching(tc.getId());
+            if (button.action() == CardHoverAction.RUN_TEST_CASE) editor.launching(tc.getId());
 
-            action.execute(p, tc);
+            button.action().execute(p, tc);
 
             e.consume();
         });
@@ -123,7 +122,7 @@ public class CardMouseListener extends MouseAdapter {
     @Override
     public void mouseMoved(final MouseEvent e) {
         final int index = list.locationToIndex(e.getPoint());
-        final @NotNull Optional<CardHoverAction> currentAction = actionUnder(e, index);
+        final @NotNull Optional<CardHoverAction.Offered> currentAction = actionUnder(e, index);
 
         list.setCursor(Cursor.getPredefinedCursor(currentAction.isPresent() ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
 
@@ -134,13 +133,13 @@ public class CardMouseListener extends MouseAdapter {
             needsRepaint = true;
         }
 
-        final @NotNull String actionName = currentAction.map(Enum::name).orElse("");
+        final @NotNull String actionName = currentAction.map(button -> button.action().name()).orElse("");
 
         if (!actionName.equals(editor.getHoveredIconAction())) {
             editor.setHoveredIconAction(actionName);
             needsRepaint = true;
 
-            list.setToolTipText(currentAction.map(action -> action.getHintText(p)).orElse(null));
+            list.setToolTipText(currentAction.map(CardHoverAction.Offered::hintText).orElse(null));
         }
 
         if (needsRepaint)
@@ -162,7 +161,7 @@ public class CardMouseListener extends MouseAdapter {
         WheelForwarding.forwardWheelToScrollPane(e);
     }
 
-    private @NotNull Optional<CardHoverAction> actionUnder(final @NotNull MouseEvent e, final int index) {
+    private @NotNull Optional<CardHoverAction.Offered> actionUnder(final @NotNull MouseEvent e, final int index) {
         if (index == -1) return Optional.empty();
 
         final @NotNull Rectangle bounds = list.getCellBounds(index, index);
@@ -171,7 +170,7 @@ public class CardMouseListener extends MouseAdapter {
         return getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y);
     }
 
-    private @NotNull Optional<CardHoverAction> getActionAtPoint(final int index, final int xInCell, final int yInCell) {
+    private @NotNull Optional<CardHoverAction.Offered> getActionAtPoint(final int index, final int xInCell, final int yInCell) {
         if (index == -1) return Optional.empty();
 
         final float baseSize = list.getFont().getSize2D();
@@ -180,8 +179,9 @@ public class CardMouseListener extends MouseAdapter {
         final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
         final @NotNull String title = editor.cardTitle(tc);
 
-        final int titleWidth = Math.min(list.getFontMetrics(titleFont).stringWidth(title), CardTitle.titleColumnWidth(list.getWidth()));
+        final @NotNull List<CardHoverAction.Offered> buttons = CardHoverAction.onCard(p, editor.getParent(), tc);
+        final int titleWidth = Math.min(list.getFontMetrics(titleFont).stringWidth(title), CardTitle.titleColumnWidth(list.getWidth(), buttons.size()));
 
-        return CardTitle.descriptionActionIcons(titleWidth).at(xInCell, yInCell, CardHoverAction.runSlot(p, tc));
+        return CardTitle.descriptionActionIcons(titleWidth, buttons).at(xInCell, yInCell);
     }
 }

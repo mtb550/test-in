@@ -27,7 +27,10 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Icons;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.Automated;
 import org.testin.navigate.NavigateToCodeAction;
+import org.testin.navigate.NavigateToTestCaseAction;
 import org.testin.notifications.Notifier;
 import org.testin.runner.RunTestCases;
 import org.testin.runner.TestNGExecution;
@@ -40,16 +43,19 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 @Getter
 @AllArgsConstructor
 public enum CardHoverAction {
     NAVIGATE_TO_TEST_METHOD(
-            Bundle.message("automated.navigate"),
+            Bundle.message("action.Testin.NavigateToCode.text"),
             "Testin.NavigateToCode",
             List.of(OptionalPlugin.JAVA),
             Icons.TEST_CASE,
-            (p, cases) -> NavigateToCodeAction.execute(p, cases.getFirst())
+            (p, cases) -> NavigateToCodeAction.execute(p, cases.getFirst()),
+            CardHoverAction::anywhere
     ),
 
     RUN_TEST_CASE(
@@ -57,7 +63,8 @@ public enum CardHoverAction {
             "Testin.RunTestCase",
             List.of(OptionalPlugin.JAVA, OptionalPlugin.TESTNG),
             AllIcons.RunConfigurations.TestState.Run,
-            RunTestCases::run
+            RunTestCases::run,
+            CardHoverAction::anywhere
     ),
 
     STOP_TEST_CASE(
@@ -65,7 +72,17 @@ public enum CardHoverAction {
             "",
             List.of(OptionalPlugin.TESTNG),
             AllIcons.Actions.Suspend,
-            CardHoverAction::stopRun
+            CardHoverAction::stopRun,
+            CardHoverAction::anywhere
+    ),
+
+    NAVIGATE_TO_TEST_CASE(
+            Bundle.message("action.Testin.NavigateToTestCase.text"),
+            "Testin.NavigateToTestCase",
+            List.of(),
+            Icons.fieldLetter("tc", Icons.GRAY),
+            (p, cases) -> NavigateToTestCaseAction.execute(p, cases.getFirst()),
+            NavigateToTestCaseAction::whyNot
     );
 
     private final @NotNull String tooltip;
@@ -78,9 +95,38 @@ public enum CardHoverAction {
     @Getter(AccessLevel.NONE)
     private final @NotNull BiConsumer<Project, List<TestCaseDto>> onClick;
 
+    @Getter(AccessLevel.NONE)
+    private final @NotNull BiFunction<DirectoryDto, TestCaseDto, Optional<String>> whyNotOnCard;
+
+    public record Offered(@NotNull CardHoverAction action, @NotNull Optional<String> whyNot) {
+        public boolean works() {
+            return whyNot.isEmpty();
+        }
+
+        public @NotNull String hintText() {
+            return whyNot.orElseGet(action::hint);
+        }
+    }
+
+    // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-234, Rule-EDITOR-PANEL-235
+    public static @NotNull List<Offered> onCard(final @NotNull Project p, final @NotNull DirectoryDto openOn, final @NotNull TestCaseDto tc) {
+        return Stream.of(NAVIGATE_TO_TEST_METHOD, runSlot(p, tc), NAVIGATE_TO_TEST_CASE)
+                .map(action -> new Offered(action, action.whyNotOffered(p).or(() -> action.whyNotOnCard.apply(openOn, tc))))
+                .toList();
+    }
+
+    private static @NotNull Optional<String> anywhere(final @NotNull DirectoryDto openOn, final @NotNull TestCaseDto tc) {
+        return Optional.empty();
+    }
+
     // UC-CODEGEN-009, Rule-CODEGEN-005
     public boolean enableOrExplain(final @NotNull Presentation presentation) {
         return requires.stream().allMatch(plugin -> plugin.enableOrExplain(presentation, tooltip));
+    }
+
+    // UC-EDITOR-PANEL-047, UC-EDITOR-PANEL-048
+    public @NotNull Icon iconOn(final @NotNull Automated automation) {
+        return this == NAVIGATE_TO_TEST_METHOD ? automation.getIcon() : icon;
     }
 
     public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
@@ -114,7 +160,11 @@ public enum CardHoverAction {
     }
 
     public @NotNull String getHintText(final @NotNull Project p) {
-        return whyNotOffered(p).orElseGet(() -> (tooltip + " " + Declared.shortcutText(actionId)).trim());
+        return whyNotOffered(p).orElseGet(this::hint);
+    }
+
+    private @NotNull String hint() {
+        return (tooltip + " " + Declared.shortcutText(actionId)).trim();
     }
 
     // UC-EDITOR-PANEL-047, Rule-CODEGEN-082

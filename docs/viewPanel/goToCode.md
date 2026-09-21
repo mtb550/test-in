@@ -61,7 +61,7 @@ The same icon and the same words as the card in the editor, which is
 
 | The tooltip reads | What it means |
 |---|---|
-| **Navigate to Code** | Testin has not read the code yet, or this IDE has no Java plugin |
+| **Navigate to Test Method** | Testin has not read the code yet, or this IDE has no Java plugin |
 | **Automated** | The generated test method has something in it |
 | **No test method** | The test case names a method and there is none |
 | **Not automated** | There is no method, or Testin wrote one and nobody filled it in |
@@ -75,7 +75,7 @@ The same icon and the same words as the card in the editor, which is
 ## What Testin refuses
 
 **If the IDE has no Java plugin** — the button is gray, it does not grow under
-the pointer, and its tooltip reads *Navigate to Code (needs the Java plugin)*.
+the pointer, and its tooltip reads *Navigate to Test Method (needs the Java plugin)*.
 Clicking it says the same thing.
 
 **If `testin.yml` does not name the open test project** — the button is gray

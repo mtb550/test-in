@@ -28,7 +28,7 @@ nothing about it until something would have written code.
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
   when `testin.yml` names that test project. Otherwise nothing is generated,
-  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Code**
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-064** — Testin looks for the test source folder once when the

@@ -406,7 +406,7 @@ test project name"*, and *"yaml file can be created or updated by use new button
 shown in explorer toolbar"* (#335).
 
 **Decision.** Testin touches a test project's automation code - generating it,
-Automate Test Case, Navigate to Code, Run Tests, the gutter, the automated
+Automate Test Case, Navigate to Test Method, Run Tests, the gutter, the automated
 marks - only when `testin.yml` names that test project (`codegen/CodeOn`,
 Rule-CODEGEN-082). One button, **Save to testin.yml**, writes the file: the open
 test project and where it is cloned from, three lines, after showing them

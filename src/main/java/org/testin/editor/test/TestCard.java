@@ -22,7 +22,6 @@ import org.testin.ui.Badges;
 import org.testin.clipboard.CutState;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.BaseCard;
-import org.testin.editor.CardHoverAction;
 import org.testin.model.RunStatus;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
@@ -56,7 +55,6 @@ public class TestCard extends BaseCard {
                 .forEach(attr -> attr.applyToUI(tc, badges, details));
 
         final @NotNull RunStatus runStatus = Services.getInstance(p, TestNGExecution.class).statusOf(tc);
-        this.runSlot = CardHoverAction.runSlot(p, tc);
 
         if (runStatus.hasBadge()) badges.add(Badges.createRunStatusBadge(runStatus.getBadge()));
 

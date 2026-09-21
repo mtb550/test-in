@@ -477,6 +477,11 @@
         </action>
 
         <action
+                id="Testin.NavigateToTestCase"
+                class="org.testin.navigate.NavigateToTestCaseAction"
+        />
+
+        <action
                 id="Testin.ViewDetails"
                 class="org.testin.view.ViewDetailsAction"
                 icon="AllIcons.Actions.PreviewDetails"

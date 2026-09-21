@@ -44,6 +44,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         add(Declared.forMenu("Testin.UpdateRunItem"));
         addSeparator();
         add(Declared.forMenu("Testin.ViewDetails"));
+        add(Declared.forMenu("Testin.NavigateToTestCase"));
         addSeparator();
 
         add(actions(p, dir, list));

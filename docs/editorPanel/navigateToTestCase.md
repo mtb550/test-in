@@ -1,0 +1,100 @@
+[Documentation](../README.md) › [The editor panel](main.md) › UC-EDITOR-PANEL-048
+
+# UC-EDITOR-PANEL-048: Go from a test run to a test case
+
+**As a** tester executing a test run, **I want** to open the test case behind a
+row in its own test set, **so that** I can read it or fix it where it lives
+without hunting for it in the tree.
+
+The test case's own test set editor opens with the test case selected, as
+clicking its identity in the view panel does. The test run editor stays open
+behind it.
+
+No key. The card's last button, or the right-click menu.
+
+## Rules
+
+- **Rule-EDITOR-PANEL-001** — A test set opens in one editor and a test run in
+  another. Both are the same shape: a toolbar on top, the rows in the middle, a
+  status bar at the bottom.
+- **Rule-EDITOR-PANEL-002** — Both editors open showing cards. The grid is built
+  the first time the tester asks for it.
+- **Rule-EDITOR-PANEL-003** — A card is drawn to the width of the list. A title
+  too long for that width wraps onto more lines, and the cards never scroll
+  sideways.
+- **Rule-EDITOR-PANEL-004** — A page holds 50 test cases until the tester says
+  otherwise. The most a page can hold is 1000.
+- **Rule-EDITOR-PANEL-005** — What the tester types is stored exactly. Testin
+  may draw it differently, and never saves the drawn form.
+- **Rule-EDITOR-PANEL-006** — A save that would leave the file as it is writes
+  nothing, and says nothing.
+- **Rule-EDITOR-PANEL-007** — Each editor keeps an undo history of its own, and
+  the tree keeps another.
+- **Rule-EDITOR-PANEL-008** — Every change confirms itself with one message in
+  the past tense. A change to several test cases gets one message with a count.
+- **Rule-EDITOR-PANEL-009** — Moving the view says nothing and changes nothing.
+  Paging, filtering, searching and opening the details panel are all silent.
+  None of them throws a filter away: a test case the filter is hiding is
+  reported rather than brought into view.
+- **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
+  that would act on the row is refused.
+- **Rule-EDITOR-PANEL-233** — Navigate to Test Case opens the test case's own
+  test set editor and selects it there, as clicking its identity in the view
+  panel does. The tree does not move.
+- **Rule-EDITOR-PANEL-234** — It is on every card and in both editors'
+  right-click menus. In a test set's own editor it is gray, and says the test
+  case is already in the test set open there.
+- **Rule-EDITOR-PANEL-235** — On a card it is drawn only while the pointer is on
+  that card, as the card's other buttons are, and it is the last of them, after
+  Run, so the two buttons testers already use keep their places. Its icon is the
+  letter frame the Create Test Case dialog uses, reading tc, in the same slot as
+  every other button on the card, and it grows under the pointer like the
+  others.
+- **Rule-EDITOR-PANEL-236** — A test case that is in no test set is refused with
+  a message, and nothing opens.
+- **Rule-EDITOR-PANEL-237** — One gesture has one name wherever it is offered.
+  The menu entry, the card's button and the view panel's identity all say
+  Navigate to Test Case; the method's entry and button both say Navigate to Test
+  Method.
+
+## The screen
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Sign in with a correct username and password         [m]  [▶]  [tc]    │
+│  Pending                                                        (1)     │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **The buttons** — drawn only while the pointer is on the card: Navigate to
+   Test Method, Run, then **tc**, Navigate to Test Case. The one under the
+   pointer grows and names itself.
+
+The right-click menu offers **Navigate to Test Case** beside **View Test Case
+Details**, in both editors. In a test set's own editor the button and the entry
+are gray and say why.
+
+## Main flow
+
+1. The tester is working through a test run.
+2. The tester rests the pointer on a row's card, and its buttons appear, the
+   last one reading **tc**.
+3. The tester clicks it, or right-clicks the row and chooses **Navigate to Test
+   Case**.
+4. The test case's own test set editor opens, or comes forward if it is already
+   open, with the test case selected.
+5. The tree stays where it was. The test run editor stays open behind.
+
+## What Testin refuses
+
+**If the test set is the one already open** — the button and the menu entry are
+gray in a test set's own editor, and read *This test case is already in the test
+set open here.*
+
+**If the test case is in no test set** — deleted since the run recorded it — the
+button is gray, and a message reads *There is no test set to open this test case
+in.*, and nothing opens.
+
+---
+
+[Documentation](../README.md) › [The editor panel](main.md)

@@ -16,6 +16,7 @@
 
 package org.testin.editor.listeners;
 
+import org.testin.editor.CardHoverAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunCard;
@@ -42,6 +43,7 @@ public class RunListRenderer extends AbstractListRenderer<RunEditor> {
                 .orElseGet(() -> TestRunItems.builder().id(tc.getId()).tc(Optional.of(tc)).build());
 
         card.updateData(row, editor.getSelectedDetails(), runItem, editor.cardTitle(tc));
+        card.setHoverButtons(CardHoverAction.onCard(editor.getProject(), editor.getParent(), tc));
         card.setActionsState(isSelected, isRowHovered, hover);
         card.applyListLayout(list);
 

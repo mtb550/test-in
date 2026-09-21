@@ -16,6 +16,7 @@
 
 package org.testin.editor.listeners;
 
+import org.testin.editor.CardHoverAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
@@ -37,6 +38,7 @@ public class TestListRenderer extends AbstractListRenderer<TestinEditor> {
     @Override
     protected @NotNull TestCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int row, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover) {
         card.updateData(row, tc, editor.getSelectedDetails(), editor.cardTitle(tc));
+        card.setHoverButtons(CardHoverAction.onCard(editor.getProject(), editor.getParent(), tc));
         card.setActionsState(isSelected, isRowHovered, hover);
         card.applyListLayout(list);
 
