@@ -42,17 +42,12 @@ import org.testin.rename.NodeRename;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.ui.framework.SelectionTree;
-import org.testin.undo.UndoScope;
-import org.testin.undo.UndoHistories;
 import org.testin.services.BackgroundWork;
 import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
-import org.testin.util.Mapper;
 
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -103,16 +98,16 @@ public class EditTestRunAction extends DumbAwareAction {
             final @NotNull Set<UUID> covered = current.getResults().stream().map(TestRunItems::getId).collect(Collectors.toSet());
 
             Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
-                    tp -> new RunForm(p).open(tp.getTestCasesDirectory(), run.getName(), covered, run.getMarker().getConfiguration(), saves(run, parent, current)),
+                    tp -> new RunForm(p).open(tp.getTestCasesDirectory(), run.getName(), covered, run.getMarker().getConfiguration(), saves(run, parent)),
                     () -> Logger.warn("Edit test run: no test project is bound to " + p.getName()));
         }
 
-        private @NotNull RunFormAction saves(final @NotNull TestRunDirectoryDto run, final @NotNull DirectoryDto parent, final @NotNull TestRunDto current) {
-            return new RunFormAction(Bundle.message("run.edit.title"), StatusBarShortcut.SAVE, (form, selection) -> save(run, parent, current, form, selection));
+        private @NotNull RunFormAction saves(final @NotNull TestRunDirectoryDto run, final @NotNull DirectoryDto parent) {
+            return new RunFormAction(Bundle.message("run.edit.title"), StatusBarShortcut.SAVE, (form, selection) -> save(run, parent, form, selection));
         }
 
         // UC-TREE-PANEL-022, Rule-TREE-PANEL-074, Rule-TREE-PANEL-076
-        private boolean save(final @NotNull TestRunDirectoryDto run, final @NotNull DirectoryDto parent, final @NotNull TestRunDto current, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection) {
+        private boolean save(final @NotNull TestRunDirectoryDto run, final @NotNull DirectoryDto parent, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection) {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
@@ -132,34 +127,16 @@ public class EditTestRunAction extends DumbAwareAction {
                 return false;
             }
 
-            final @NotNull String oldName = run.getName();
-            if (!name.equals(oldName) && NodeRename.refused(p, run, name)) return false;
+            if (!name.equals(run.getName()) && NodeRename.refused(p, run, name)) return false;
 
             final @NotNull Set<UUID> checked = RunForm.checkedCases(selection);
             final @NotNull Set<UUID> offered = RunForm.offeredCases(selection);
             final @NotNull Map<TestRunConfiguration, String> configuration = TestRunConfiguration.answered(form.configuration());
 
-            final @NotNull TestRunDto after = current.coverOnly(wanted(current, checked, offered::contains));
-
-            final @NotNull TestRunDto before = copyOf(current);
-
-            final @NotNull Set<UUID> coveredBefore = idsOf(before);
-            final @NotNull Map<UUID, TestRunItems> recordedBefore = byId(before);
-
-            final @NotNull Set<UUID> coveredAfter = idsOf(after);
-            final @NotNull Map<UUID, TestRunItems> recordedAfter = byId(after);
-
-            final @NotNull Map<TestRunConfiguration, String> configurationBefore = Map.copyOf(run.getMarker().getConfiguration());
-
             applyEdit(run, name, runPath -> {
                 indexer.changeRun(runPath, held -> held.setResults(held.coverOnly(wanted(held, checked, offered::contains)).getResults()));
                 indexer.changeRunMarker(runPath, marker -> marker.setConfiguration(configuration));
             }, () -> Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED));
-
-            Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
-                    Bundle.message("run.undo.edit", oldName),
-                    () -> putCoverageBack(run, oldName, coveredBefore, configurationBefore, recordedBefore),
-                    () -> putCoverageBack(run, name, coveredAfter, configuration, recordedAfter)));
 
             return true;
         }
@@ -172,10 +149,6 @@ public class EditTestRunAction extends DumbAwareAction {
                     .filter(couldBeTicked.negate())
                     .forEach(wanted::add);
             return wanted;
-        }
-
-        private boolean isIndexed(final @NotNull UUID id) {
-            return Services.getInstance(p, ProjectIndexer.class).findTestCase(id).isPresent();
         }
 
         private void applyEdit(final @NotNull TestRunDirectoryDto run, final @NotNull String toName, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
@@ -203,43 +176,6 @@ public class EditTestRunAction extends DumbAwareAction {
                     onDone.run();
                 });
             });
-        }
-
-        // UC-TREE-PANEL-021, Rule-TREE-PANEL-009
-        private void putCoverageBack(final @NotNull TestRunDirectoryDto run, final @NotNull String toName, final @NotNull Set<UUID> covered, final @NotNull Map<TestRunConfiguration, String> configuration, final @NotNull Map<UUID, TestRunItems> recorded) {
-            if (!run.isStillOpen()) {
-                Services.getInstance(p, Notifier.class).softRefuse(p,
-                        Bundle.message("run.status.changed", run.getName(), run.getMarker().getStatusLabel()));
-                return;
-            }
-
-            applyEdit(run, toName, runPath -> {
-                Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, held -> {
-                    final @NotNull Set<UUID> holdsNow = idsOf(held);
-
-                    final @NotNull List<TestRunItems> items = held.coverOnly(wanted(held, covered, this::isIndexed)).getResults().stream()
-                            .map(item -> holdsNow.contains(item.getId()) ? item : recorded.getOrDefault(item.getId(), item))
-                            .collect(Collectors.toCollection(ArrayList::new));
-
-                    held.setResults(items);
-                });
-
-                Services.getInstance(p, ProjectIndexer.class).changeRunMarker(runPath, marker -> marker.setConfiguration(configuration));
-            }, () -> {
-            });
-        }
-
-        private static @NotNull Set<UUID> idsOf(final @NotNull TestRunDto run) {
-            return run.getResults().stream().map(TestRunItems::getId).collect(Collectors.toCollection(LinkedHashSet::new));
-        }
-
-        private static @NotNull Map<UUID, TestRunItems> byId(final @NotNull TestRunDto run) {
-            return run.getResults().stream().collect(Collectors.toMap(TestRunItems::getId, item -> item, (first, second) -> first));
-        }
-
-        private @NotNull TestRunDto copyOf(final @NotNull TestRunDto run) {
-            final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
-            return mapper.readValue(mapper.writeValueAsString(run), TestRunDto.class);
         }
     }
 }

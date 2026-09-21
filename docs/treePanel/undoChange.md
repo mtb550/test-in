@@ -56,9 +56,10 @@ This puts the tree back the way it was before the last change.
   It is the tree's own, one for each code project, and no editor shares it. The
   history is held in memory, so closing the IDE loses it, and the copies kept
   aside for restoring removed nodes go at the next start.
-- **Rule-TREE-PANEL-060** — Five things can be undone: a move, a rename, an
-  order number, a removal, and an edit of a test run. Three cannot: creating
-  anything, a copy, and a status change.
+- **Rule-TREE-PANEL-060** — Four things can be undone: a move, a rename, an
+  order number and a removal. Four cannot: creating anything, a copy, a status
+  change, and an edit of a test run, its name included. An edit is final once it
+  is saved.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is - drawn with Inactive beside its name like any other status - and its test
@@ -76,13 +77,12 @@ status bar at the bottom right of the IDE.
 
 ## Main flow
 
-1. The last change to the tree was a move, a rename, a removal, a new place
-   given with **Order**, or an edit of a test run.
+1. The last change to the tree was a move, a rename, a removal, or a new place
+   given with **Order**.
 2. The tester presses `Ctrl+Z`, or chooses **Actions → Undo \<what\>**.
 3. Testin reverses the change. Moved nodes go back. A renamed node gets its old
    name. An ordered node gets its old place. Removed nodes are restored from the copy kept aside, under a progress
-   bar reading *Putting back*. An edited test run
-   gets its previous name, test cases and settings.
+   bar reading *Putting back*.
 4. Testin shows *Undone*.
 
 To put an undone change back, see [UC-TREE-PANEL-017](redoChange.md).

@@ -2,8 +2,8 @@
 
 # UC-TREE-PANEL-022: Edit a test run
 
-> **`F2`** in the tree, or **Edit Test Run** on the menu. **`Ctrl+Z`** in the
-> tree takes the edit back.
+> **`F2`** in the tree, or **Edit Test Run** on the menu. Saving is final:
+> **`Ctrl+Z`** does not take it back.
 >
 > `F2` changes the thing in front of the tester, and which thing that is depends
 > on where they are standing: Update Test Case answers it in the test editor,
@@ -63,12 +63,6 @@ This changes a test run that is not signed off yet.
 - **Rule-TREE-PANEL-074** — Removing a test case from a test run drops
   everything that test case recorded in that test run. Adding a test case adds
   it as **Pending**.
-- **Rule-TREE-PANEL-075** — An edit can be undone, as one step
-  (Rule-TREE-PANEL-060). It puts back what the edit changed - the test cases
-  covered, the name and the configuration - and touches nothing else: a verdict
-  recorded since the save stays, and a test case the undo brings back arrives
-  with what the run had recorded about it. A run signed off since the save
-  refuses the undo, for the reason it refuses a save.
 - **Rule-TREE-PANEL-076** — A test case this dialog does not show is not one the
   tester chose to remove. That is a test case deleted from its test set after
   the test run was made, and one in a test set deprecated, or under a package
@@ -108,11 +102,8 @@ the IDE.
 6. Testin removes any test case the tester unticked, with everything the test
    run recorded about it. A newly ticked test case is added as **Pending**.
 7. The tree refreshes, and Testin shows *Updated*.
-8. `Ctrl+Z` in the tree puts the previous name, test cases and configuration all
-   back, and Testin shows *Undone*. Those three things and nothing else: a
-   verdict recorded since the save stays exactly as it is, and a test case the
-   undo brings back arrives with what the run had recorded about it rather than
-   as Pending.
+8. The edit is final. It is not put on the tree's history, so `Ctrl+Z` does not
+   take it back (Rule-TREE-PANEL-060).
 
 ## What Testin refuses
 
@@ -124,11 +115,6 @@ nothing saved* is shown in red.
 
 **If the test run was removed while the dialog was open** — *'\<run\>' no longer
 exists - nothing saved* is shown in red.
-
-**If the test run was signed off before the undo** — nothing is put back, and a
-message reads *'\<run\>' was Completed while this was open - nothing saved*. A
-run that has been reported on must not move underneath the report, which is the
-same question **Save** asks.
 
 **If the name is emptied** — *A test run needs a name* is shown in red, and the
 dialog stays open.
