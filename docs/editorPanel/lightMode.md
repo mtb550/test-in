@@ -191,7 +191,8 @@ sits before it in the middle of its height.
 
 ### 6. The test set name, in small capitals above the description
 
-It carries the test set's icon, in gray, and a line's space under it. It is
+It carries the test set's icon, in gray, inside a rounded frame drawn in the
+same gray (Rule-EDITOR-PANEL-232), and a line's space under it. It is
 on by default, because a description alone can be ambiguous. "Sign in with
 a correct username and password" could sit under a Login test set. It could also
 sit under a Checkout test set testing guest sign-in.
@@ -568,6 +569,10 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
   A case longer than the screen stops at the edge and says so on its last row,
   because the verdict buttons and the status bar finish a case and a window
   taller than the screen puts them where nobody can reach them.
+- **Rule-EDITOR-PANEL-232** — The test set's name sits in a rounded frame, drawn
+  in the gray the name is set in, so it reads as a label above the test case
+  rather than as part of it. The frame stays quieter than the description, and
+  it goes with the name when the name is turned off.
 
 **Why 200 milliseconds.** `P` is pressed once per test case, so a hundred-case
 run is a hundred of these, and the tester is watching the application under test

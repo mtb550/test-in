@@ -24,6 +24,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.WindowStateService;
+import com.intellij.ui.RoundedLineBorder;
 import com.intellij.ui.WindowMoveListener;
 import com.intellij.ui.WindowResizeListener;
 import com.intellij.ui.components.JBLabel;
@@ -71,6 +72,8 @@ final class LightModeWindow {
     private static final int MIN_WIDTH = 280;
 
     private static final int GRAB = 4;
+
+    private static final int SET_FRAME_ARC = 20;
 
     private static final float ZOOM_STEP = 0.1f;
     private static final float ZOOM_MIN = 0.8f;
@@ -553,10 +556,13 @@ final class LightModeWindow {
         });
     }
 
+    // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-232
     private @NotNull JComponent body() {
-        set.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+        final @NotNull Color setGray = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
+        set.setForeground(setGray);
         set.setIcon(Icons.gray(DirectoryType.TS.getIcon()));
         set.setIconTextGap(JBUI.scale(CaseDetails.GAP));
+        set.setBorder(JBUI.Borders.compound(new RoundedLineBorder(setGray, JBUI.scale(SET_FRAME_ARC), 1), JBUI.Borders.empty(1, 7)));
         idle.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
         chosen.setForeground(TestStatus.FAILED.getRowColor());
