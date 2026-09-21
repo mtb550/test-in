@@ -50,10 +50,10 @@ tell you what changes and which message appears.
 | **[The settings page](setting/main.md)** | Everything set once per machine, and where each value is kept | 9 | 34 |
 | **[Automation code and the gutter](codegen/main.md)** | The test methods Testin writes, and how they are kept in step with the tree | 20 | 81 |
 | **[Reports](report/main.md)** | Writing a test run out as a document, in four formats | 3 | 20 |
-| **[Sharing work with the team](share/main.md)** | Export, import and Git. Every way test data leaves and arrives | 18 | 92 |
+| **[Sharing work with the team](share/main.md)** | Export, import and Git. Every way test data leaves and arrives | 18 | 93 |
 | **[Inside Testin](internal/main.md)** | The parts that belong to no panel: the search, and the one thing that owns every file | 8 | 91 |
 
-**150 use cases and 739 rules**, each one checked against the code it describes.
+**150 use cases and 740 rules**, each one checked against the code it describes.
 
 Every part also lists two more things at the end of its page: where the plugin
 breaks its own rules today, and what nobody has decided yet. Both are honest

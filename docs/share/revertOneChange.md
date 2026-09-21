@@ -36,6 +36,11 @@ Right click the row in the review.
 - **Rule-SHARE-118** — Right-clicking a row that is already selected leaves the
   selection as it is, so what Commit will send does not change by looking at the
   menu. The menu's entry acts on the row that was right-clicked.
+- **Rule-SHARE-119** — A revert can be taken back. It goes on the test set's own
+  history like every other change to a test case, so Ctrl+Z in that test set's
+  editor puts back what the revert threw away: the value that was typed, the new
+  test case it removed, or the removal it undid. It is the only way back,
+  because the revert writes to disk at once.
 
 ## The screen
 
@@ -55,6 +60,7 @@ Right click the row in the review.
    the whole dialog around them.
 2. **The menu** — right clicking a row opens it. It holds one entry.
 3. **Revert this change** — puts that one field back, then takes the row away.
+   `Ctrl+Z` in that test set's editor takes the revert back (Rule-SHARE-119).
 
 ## Main flow
 

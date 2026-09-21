@@ -25,6 +25,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.testcase.TestCaseSnapshot;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ChoiceInput;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -132,7 +133,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     private record Row(@NotNull PendingChange diff, @NotNull FieldChange change) {
     }
 
-    // UC-SHARE-011, Rule-SHARE-051
+    // UC-SHARE-011, Rule-SHARE-051, Rule-SHARE-119
     private void revertRow(final @NotNull Project p, final int row) {
         if (row >= rowDifferences.size()) return;
 
@@ -152,6 +153,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             final @NotNull Path testSetPath = found.orElseThrow();
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             final @NotNull UUID testCaseId = UUID.fromString(diff.testCaseId());
+            final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, testSetPath, List.of(testCaseId));
 
             final boolean reverted = switch (diff.type()) {
                 case ADDED -> indexer.removeTestCase(testSetPath, testCaseId);
@@ -161,6 +163,10 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             };
 
             if (!reverted) return;
+
+            final @NotNull TestCaseSnapshot after = TestCaseSnapshot.of(p, testSetPath, List.of(testCaseId));
+            final @NotNull List<TestCaseDto> named = before.present().isEmpty() ? after.present() : before.present();
+            TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.revert"), named), before, after);
 
             removeRow(row);
             Services.getInstance(p, Notifier.class).softShow(p, Done.REVERTED);
