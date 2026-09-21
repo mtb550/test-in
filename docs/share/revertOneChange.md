@@ -92,7 +92,8 @@ and the reason, or one titled **Revert Failed** carries it.
 
 ## A new or removed test case
 
-Reverting a **Create Test Case** row removes that new test case. Reverting a
+Reverting a **Create Test Case** row removes that new test case, and the test
+method Testin generated for it (Rule-CODEGEN-049). Reverting a
 **Remove Test Case** row puts the removed test case back as it was committed,
 with who created it and when.
 

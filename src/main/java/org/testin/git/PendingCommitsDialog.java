@@ -16,6 +16,7 @@
 
 package org.testin.git;
 
+import org.testin.codegen.GenType;
 import org.testin.notifications.Done;
 import org.testin.model.DirectoryType;
 import com.intellij.openapi.project.Project;
@@ -156,7 +157,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, testSetPath, List.of(testCaseId));
 
             final boolean reverted = switch (diff.type()) {
-                case ADDED -> indexer.removeTestCase(testSetPath, testCaseId);
+                case ADDED -> removeNewTestCase(indexer, testSetPath, testCaseId, before);
                 // Rule-INTERNAL-035
                 case DELETED -> indexer.putTestCaseVerbatim(testSetPath, diff.committed());
                 case MODIFIED -> revertField(indexer, testSetPath, changeType, diff);
@@ -174,6 +175,14 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         } catch (final Exception ex) {
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("dialog.pending.revert.failed.title"), Bundle.message("dialog.pending.revert.failed.message", ex.getMessage()));
         }
+    }
+
+    // UC-SHARE-011, Rule-CODEGEN-049
+    private boolean removeNewTestCase(final @NotNull ProjectIndexer indexer, final @NotNull Path testSetPath, final @NotNull UUID testCaseId, final @NotNull TestCaseSnapshot before) {
+        if (!indexer.removeTestCase(testSetPath, testCaseId)) return false;
+
+        GenType.REMOVE_TEST_CASE.executeAll(p, before.present());
+        return true;
     }
 
     // UC-SHARE-011, Rule-SHARE-052
