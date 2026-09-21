@@ -238,6 +238,11 @@ produce, and removing either would lose a verdict nobody asked to lose. Writing
 a verdict writes the one file it is about, so two testers judging different
 cases of one run never touch the same file.
 
+**A result is known by its file name** (Rule-INTERNAL-094). A `.ri` whose name
+is not a test case id, `login-result.ri` renamed by hand for one, is not read:
+the scan names it in a warning, and nothing writes a second file for it.
+Renamed to its test case's id, it is read again at the next Refresh.
+
 The screenshots a failure names sit in the same folder, one PNG each, named by
 five random lowercase letters and digits that no result of the run already holds
 - `k3f9a.png`. Testin writes a screenshot before the result that names it, and

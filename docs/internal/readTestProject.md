@@ -76,6 +76,10 @@ There is no key for this. It starts on its own.
   the run holds, and a removal takes only the file whose case a change stopped
   covering. A verdict nobody can read is still a verdict somebody recorded, and
   the tester repairs the file and presses Refresh.
+- **Rule-INTERNAL-094** — A result is known by its file name, as a test case is.
+  A result file whose name is not a test case id is not read, and a warning
+  names it; renamed to its test case's id, it is read again at the next Refresh.
+  Nothing writes a second file for it.
 
 ## The budget
 

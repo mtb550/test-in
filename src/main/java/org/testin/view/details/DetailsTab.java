@@ -25,14 +25,11 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.WheelForwarding;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.codegen.ExecutionPosition;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.Services;
-import org.testin.setting.TestinRoot;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.ui.FontSync;
@@ -62,13 +59,13 @@ public class DetailsTab {
     final double SPACER_WEIGHT_Y = 1.0;
 
     // UC-VIEW-PANEL-004
-    public void load(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab, final @NotNull Optional<TestCaseDto> dto, final @NotNull List<String> currentPath) {
+    public void load(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab, final @NotNull Optional<TestCaseDto> dto, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
         detailsTab.removeAll();
         detailsTab.setLayout(new BorderLayout());
         detailsTab.setBorder(BorderFactory.createEmptyBorder());
 
         dto.ifPresentOrElse(
-                testCase -> renderCase(p, detailsTab, testCase, runItemFor(p, testCase, currentPath), currentPath),
+                testCase -> renderCase(p, detailsTab, testCase, runItem, currentPath),
                 () -> renderPlaceholder(detailsTab));
 
         detailsTab.revalidate();
@@ -92,14 +89,6 @@ public class DetailsTab {
         detailsTab.add(scrollPane, BorderLayout.CENTER);
 
         EditShownCase.bindTo(p, detailsTab);
-    }
-
-    private static @NotNull Optional<TestRunItems> runItemFor(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
-        if (currentPath.isEmpty()) return Optional.empty();
-
-        return Services.getInstance(p, ProjectIndexer.class)
-                .findTestRun(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
-                .flatMap(run -> run.resultOf(dto.getId()));
     }
 
     private void renderPlaceholder(final @NotNull JBPanel<?> panel) {

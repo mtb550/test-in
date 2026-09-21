@@ -41,6 +41,9 @@ A card shows only a title. This opens the whole test case beside it.
   The panel shows the first, and the rest are reached with the paging keys.
 - **Rule-VIEW-PANEL-014** — The panel is handed the folder the test case was
   opened from. That folder decides whether the run rows are drawn.
+- **Rule-VIEW-PANEL-083** — Opened from a test run, the panel shows that run's
+  row: the test case as the row shows it, read again every time the panel
+  refreshes. The run editor's row and the panel always show the same test case.
 
 ## The screen
 

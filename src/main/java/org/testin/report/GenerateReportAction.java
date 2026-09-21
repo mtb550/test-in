@@ -30,7 +30,6 @@ import org.testin.editor.run.RunEditor;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.importexport.FileTypes;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -49,9 +48,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class GenerateReportAction extends AbstractProjectAction {
     private final @NotNull Supplier<Optional<TestRunDirectoryDto>> selectedRun;
@@ -111,10 +107,7 @@ public class GenerateReportAction extends AbstractProjectAction {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             final @NotNull TestRunDto runData = indexer.getTestRunByPath(dirPath);
 
-            final @NotNull Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(p, runData);
-            indicator.checkCanceled();
-
-            final byte[] fileBytes = format.generateReport(p, tr, runData, detailsMap);
+            final byte[] fileBytes = format.generateReport(p, tr, runData);
 
             // Rule-REPORT-003
             indicator.checkCanceled();
@@ -138,21 +131,5 @@ public class GenerateReportAction extends AbstractProjectAction {
         } catch (final IOException ex) {
             throw new UncheckedIOException(ex);
         }
-    }
-
-    private @NotNull Map<UUID, TestCaseDto> fetchTestCaseDetails(final @NotNull Project p, final @NotNull TestRunDto tr) {
-        final @NotNull Map<UUID, TestCaseDto> detailsMap = new ConcurrentHashMap<>();
-
-        if (tr.getResults().isEmpty()) {
-            return detailsMap;
-        }
-
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-
-        for (final TestRunItems item : tr.getResults()) {
-            indexer.findTestCase(item.getId()).ifPresent(tc -> detailsMap.put(item.getId(), tc));
-        }
-
-        return detailsMap;
     }
 }

@@ -219,7 +219,7 @@ public final class RunStatusService {
 
                 final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
                 if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
-                    editor.stopExecution();
+                    editor.stopExecutionUntimed();
                 }
             }
 

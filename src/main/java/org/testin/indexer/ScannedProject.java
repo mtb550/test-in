@@ -64,6 +64,9 @@ final class ScannedProject {
     // Rule-INTERNAL-011
     private final @NotNull Set<String> unreadableResults = ConcurrentHashMap.newKeySet();
 
+    // Rule-INTERNAL-094
+    private final @NotNull Set<String> handNamedResults = ConcurrentHashMap.newKeySet();
+
     // UC-SHARE-002, Rule-SHARE-001
     private final @NotNull Map<String, Set<String>> unreadableCases = new ConcurrentHashMap<>();
 

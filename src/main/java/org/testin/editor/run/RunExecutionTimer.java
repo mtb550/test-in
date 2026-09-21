@@ -64,6 +64,15 @@ final class RunExecutionTimer implements Disposable {
         counting = Optional.empty();
     }
 
+    // UC-EDITOR-PANEL-039, Rule-EDITOR-PANEL-164
+    void discard() {
+        timer.stop();
+        timer = notTicking();
+
+        counting.ifPresent(item -> item.setDuration(alreadyCounted));
+        counting = Optional.empty();
+    }
+
     private void elapse() {
         counting.ifPresent(item -> item.setDuration(alreadyCounted.plusMillis(System.currentTimeMillis() - startedAt)));
     }

@@ -32,7 +32,6 @@ import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunItems;
-import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
@@ -46,8 +45,6 @@ import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.function.Predicate;
 
 public final class TestRunWordGenerator {
@@ -66,7 +63,7 @@ public final class TestRunWordGenerator {
     final String BLACK = "000000";
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
-    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (XWPFDocument doc = new XWPFDocument()) {
                 final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
@@ -136,7 +133,7 @@ public final class TestRunWordGenerator {
                     if (count == 0) continue;
 
                     buildCaseTable(doc, String.valueOf(sectionNumber++), section.getTitle(),
-                            section.description(String.valueOf(count)), tr, detailsMap, section.getHexColor(), section.textHex(),
+                            section.description(String.valueOf(count)), tr, section.getHexColor(), section.textHex(),
                             section.isWithFailureDetail(), section::matches);
                 }
 
@@ -237,7 +234,7 @@ public final class TestRunWordGenerator {
         hrun.setColor(headingColor);
     }
 
-    private void buildCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull String headerBg, final @NotNull String headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
+    private void buildCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull String headerBg, final @NotNull String headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
         addHeading(doc, sectionNumber + ". " + sectionTitle, 20, 12);
         addText(doc, description, ReportFont.LEAD.ptRounded(), false, BLACK, NO_BORDER, 12);
 
@@ -270,7 +267,7 @@ public final class TestRunWordGenerator {
             XWPFTableCell tcCell = row.getCell(1);
             shadeCell(tcCell, rowBg);
             setCellPadding(tcCell, 4, 6, 4, 6);
-            final @NotNull String caseName = ReportedCase.of(detailsMap, item.getId()).getDescription();
+            final @NotNull String caseName = item.shownCase().getDescription();
             final @NotNull String tcName = caseName.isEmpty() ? "—" : caseName;
             setCellText(tcCell, tcName, ReportFont.BODY.ptRounded(), false, BLACK);
 

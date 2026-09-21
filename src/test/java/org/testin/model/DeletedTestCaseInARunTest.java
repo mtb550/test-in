@@ -79,8 +79,7 @@ public class DeletedTestCaseInARunTest {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = removedItem(id, Config.NOT_EXECUTED);
 
-        final TestCaseDto shown = item.testCase()
-                .orElseThrow(() -> new AssertionError("the row is drawn from a placeholder, so there is one"));
+        final TestCaseDto shown = item.shownCase();
 
         assertEquals(shown.getId(), id, "the id is the only identity a deleted case has left");
         assertTrue(shown.getDescription().contains(id.toString()),

@@ -139,6 +139,7 @@ final class IndexingScanner {
             reportUnread(tp.getName(), unread);
             reportDamaged(tp.getName(), Services.getInstance(p, ProjectIndexer.class).takeDamagedMarkers());
             reportUnreadableResults(tp.getName(), scanned.getUnreadableResults());
+            reportHandNamedResults(tp.getName(), scanned.getHandNamedResults());
             reportClashing(tp.getName(), List.copyOf(scanned.getClashingCases()));
 
         } catch (final Exception ex) {
@@ -317,6 +318,15 @@ final class IndexingScanner {
                 : Bundle.message("indexer.results.unread.many", String.valueOf(names.size()), named, rest));
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-094
+    private void reportHandNamedResults(final @NotNull String projectName, final @NotNull Set<String> handNamed) {
+        final @NotNull List<String> names = handNamed.stream().sorted().toList();
+
+        say(Bundle.message("indexer.results.unnamed.title", projectName), names, (named, rest) -> names.size() == 1
+                ? Bundle.message("indexer.results.unnamed.one", String.valueOf(names.size()), named, rest)
+                : Bundle.message("indexer.results.unnamed.many", String.valueOf(names.size()), named, rest));
+    }
+
     // UC-INTERNAL-002, Rule-INTERNAL-014
     private void reportDamaged(final @NotNull String projectName, final @NotNull List<String> damaged) {
         say(Bundle.message("indexer.damaged.title", projectName), damaged, (named, rest) -> damaged.size() == 1
@@ -391,9 +401,16 @@ final class IndexingScanner {
         final @NotNull List<TestRunItems> read = new ArrayList<>();
 
         for (final Path file : Services.getInstance(p, TestDataFiles.class).resultsIn(runPath)) {
+            // Rule-INTERNAL-094
+            final @NotNull Optional<UUID> id = FileKind.RUN_ITEM.idIn(file);
+            if (id.isEmpty()) {
+                scanned.getHandNamedResults().add(runPath.getFileName() + "/" + file.getFileName());
+                continue;
+            }
+
             try {
                 final @NotNull TestRunItems item = mapper.readValue(file.toFile(), TestRunItems.class);
-                FileKind.RUN_ITEM.idIn(file).ifPresent(item::setId);
+                item.setId(id.orElseThrow());
                 read.add(item);
 
             } catch (final Exception ex) {

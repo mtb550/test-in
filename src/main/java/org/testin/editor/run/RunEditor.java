@@ -114,21 +114,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                         .collect(Collectors.toMap(TestRunItems::getId, item -> item,
                                 (existingItem, duplicateItem) -> existingItem));
 
-                final @NotNull List<TestCaseDto> loadedItems = new ArrayList<>();
-                for (final TestRunItems item : run.getResults()) {
-                    final @NotNull Optional<TestCaseDto> indexed = indexer.findTestCase(item.getId());
-
-                    if (indexed.isEmpty()) {
-                        Logger.warn("Test run references a deleted test case id=" + item.getId());
-                    }
-
-                    final @NotNull TestCaseDto testCase = indexed.orElseGet(() -> TestCaseDto.deleted(item.getId()));
-
-                    loadedItems.add(testCase);
-                    Optional.ofNullable(results.get(item.getId())).ifPresent(runItem -> runItem.setTc(testCase));
-                }
-
-                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(loadedItems);
+                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(run.getResults().stream().map(TestRunItems::shownCase).toList());
                 Services.getInstance(p, TestCaseValues.class).load(ordered);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
@@ -628,6 +614,12 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         Services.getInstance(p, ProjectIndexer.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionEnded);
 
         haltExecution();
+    }
+
+    // UC-EDITOR-PANEL-039, Rule-EDITOR-PANEL-164
+    public void stopExecutionUntimed() {
+        executionTimer.discard();
+        stopExecution();
     }
 
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-152

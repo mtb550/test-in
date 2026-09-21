@@ -31,6 +31,8 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.actions.EscapeAction;
 import org.testin.editor.WheelForwarding;
 import org.testin.services.Services;
+import org.testin.setting.TestinRoot;
+import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.ui.FontSync;
@@ -204,9 +206,20 @@ public class ViewPanel implements Disposable {
         return page.getCurrentItem();
     }
 
+    // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-083
     @NotNull Optional<TestCaseDto> shownCase() {
-        return getCurrentTestCase()
-                .map(shown -> Services.getInstance(p, ProjectIndexer.class).findTestCase(shown.getId()).orElse(shown));
+        return getCurrentTestCase().map(shown -> shownRunItem().map(TestRunItems::shownCase)
+                .orElseGet(() -> Services.getInstance(p, ProjectIndexer.class).findTestCase(shown.getId()).orElse(shown)));
+    }
+
+    // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-083
+    @NotNull Optional<TestRunItems> shownRunItem() {
+        final @NotNull List<String> path = page.getCurrentPath();
+        if (path.isEmpty()) return Optional.empty();
+
+        return getCurrentTestCase().flatMap(shown -> Services.getInstance(p, ProjectIndexer.class)
+                .findTestRun(Services.getInstance(p, TestinRoot.class).resolve(path))
+                .flatMap(run -> run.resultOf(shown.getId())));
     }
 
     // UC-VIEW-PANEL-001, Rule-VIEW-PANEL-011, Rule-VIEW-PANEL-012

@@ -43,7 +43,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Getter
@@ -64,7 +63,7 @@ public enum FileTypes {
             columns -> Bundle.message("import.hint.xlsx", columns),
             (p, destFile, sheets) -> new ExportExcel().exportToFile(p, destFile, sheets),
             (p, importFile) -> new ImportExcel().processImport(p, importFile),
-            (p, trDir, tr, detailsMap) -> new TestRunExcelGenerator().generate(p, trDir, tr, detailsMap)
+            (p, trDir, tr) -> new TestRunExcelGenerator().generate(p, trDir, tr)
     ),
 
     JSON(
@@ -91,7 +90,7 @@ public enum FileTypes {
             columns -> "",
             (p, destFile, sheets) -> new ExportHtml().exportToFile(p, destFile, sheets),
             ImportHandler.UNSUPPORTED,
-            (p, trDir, tr, detailsMap) -> new TestRunHtmlGenerator().generate(p, trDir, tr, detailsMap).getBytes(StandardCharsets.UTF_8)
+            (p, trDir, tr) -> new TestRunHtmlGenerator().generate(p, trDir, tr).getBytes(StandardCharsets.UTF_8)
     ),
 
     PDF(
@@ -100,7 +99,7 @@ public enum FileTypes {
             columns -> "",
             ExportHandler.UNSUPPORTED,
             ImportHandler.UNSUPPORTED,
-            (p, trDir, tr, detailsMap) -> new TestRunPdfGenerator().generate(p, trDir, tr, detailsMap)
+            (p, trDir, tr) -> new TestRunPdfGenerator().generate(p, trDir, tr)
     ),
 
     WORD(
@@ -109,7 +108,7 @@ public enum FileTypes {
             columns -> "",
             ExportHandler.UNSUPPORTED,
             ImportHandler.UNSUPPORTED,
-            (p, trDir, tr, detailsMap) -> new TestRunWordGenerator().generate(p, trDir, tr, detailsMap)
+            (p, trDir, tr) -> new TestRunWordGenerator().generate(p, trDir, tr)
     );
 
     private final @NotNull String label;
@@ -167,8 +166,8 @@ public enum FileTypes {
         return importHandler.execute(p, importFile);
     }
 
-    public byte @NotNull [] generateReport(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+    public byte @NotNull [] generateReport(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
         if (!isReportable()) throw new IllegalStateException(label + " has no report generator");
-        return reportHandler.execute(p, trDir, tr, detailsMap);
+        return reportHandler.execute(p, trDir, tr);
     }
 }

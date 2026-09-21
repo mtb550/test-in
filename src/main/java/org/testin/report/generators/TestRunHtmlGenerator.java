@@ -23,7 +23,6 @@ import org.testin.model.markers.DetailRow;
 import org.testin.model.TestRunSummary;
 import org.testin.report.ReportTile;
 import org.testin.model.TestRunItems;
-import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import com.intellij.openapi.util.text.StringUtil;
@@ -39,8 +38,6 @@ import org.testin.util.Display;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
@@ -55,7 +52,7 @@ public final class TestRunHtmlGenerator {
     final String BORDER_COLOR = "#d0d7e5";
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
-    public @NotNull String generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+    public @NotNull String generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
         final @NotNull List<TestRunItems> results = tr.getResults();
         final int total = results.size();
         final @NotNull TestRunSummary summary = TestRunSummary.of(results);
@@ -132,7 +129,7 @@ public final class TestRunHtmlGenerator {
             appendCaseTable(html, sectionNumber++, section.getTitle(),
                     section.description("<b>" + count + "</b>"),
                     section.name().toLowerCase(java.util.Locale.ROOT), section.isWithFailureDetail(),
-                    results, detailsMap, section::matches);
+                    results, section::matches);
         }
 
         html.append("<div class='footer'>")
@@ -148,7 +145,7 @@ public final class TestRunHtmlGenerator {
     }
 
     // Rule-REPORT-019
-    private void appendCaseTable(final @NotNull StringBuilder html, final int sectionNumber, final @NotNull String title, final @NotNull String blurb, final @NotNull String section, final boolean withFailureDetail, final @NotNull List<TestRunItems> results, final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull Predicate<TestRunItems> filter) {
+    private void appendCaseTable(final @NotNull StringBuilder html, final int sectionNumber, final @NotNull String title, final @NotNull String blurb, final @NotNull String section, final boolean withFailureDetail, final @NotNull List<TestRunItems> results, final @NotNull Predicate<TestRunItems> filter) {
         html.append("<div class='section-title-bar'><div class='section-title'>").append(sectionNumber).append(". ").append(title).append("</div></div>");
         html.append("<div class='summary-text'>").append(blurb).append("</div>");
         html.append("<table class='detail-table'>")
@@ -167,7 +164,7 @@ public final class TestRunHtmlGenerator {
         results.stream()
                 .filter(filter)
                 .forEach(item -> {
-                    final @NotNull String desc = ReportedCase.of(detailsMap, item.getId()).getDescription();
+                    final @NotNull String desc = item.shownCase().getDescription();
 
                     html.append("<tr>")
                             .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")

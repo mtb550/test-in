@@ -323,24 +323,24 @@ public final class ProjectIndexer {
     }
 
     public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
-        return withRemovedMarked(store.getTestRunByPath(testRunPath));
+        return withCasesShown(store.getTestRunByPath(testRunPath));
     }
 
-    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
-    private @NotNull TestRunDto withRemovedMarked(final @NotNull TestRunDto run) {
-        run.getResults().forEach(item -> item.setRemoved(store.findTestCase(item.getId()).isEmpty()));
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-REPORT-021, Rule-VIEW-PANEL-083
+    private @NotNull TestRunDto withCasesShown(final @NotNull TestRunDto run) {
+        run.getResults().forEach(item -> item.showing(store.findTestCase(item.getId())));
         return run;
     }
 
     // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-065
     public @NotNull Map<Path, TestRunDto> getAllTestRuns() {
         return store.getTestRunsByPath().entrySet().stream()
-                .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), entry -> withRemovedMarked(entry.getValue())));
+                .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), entry -> withCasesShown(entry.getValue())));
     }
 
     // UC-INTERNAL-006, Rule-INTERNAL-051
     public @NotNull Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
-        return store.findTestRun(testRunPath).map(this::withRemovedMarked);
+        return store.findTestRun(testRunPath).map(this::withCasesShown);
     }
 
     public @NotNull Optional<TestCaseDto> findTestCase(final @NotNull UUID id) {

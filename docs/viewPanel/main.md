@@ -10,7 +10,7 @@ it.
 |---|---|
 | **Part of Testin** | The view panel |
 | **Answers** | What the panel shows, how a test case gets into it, and what a tester can do from it |
-| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-082` |
+| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-083` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code. |
 | **Written to** | [How a document is written](../standard.md) |

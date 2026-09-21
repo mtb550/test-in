@@ -46,7 +46,6 @@ import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunItems;
-import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -58,12 +57,10 @@ import org.testin.util.Display;
 
 import java.io.ByteArrayOutputStream;
 import java.time.ZonedDateTime;
-import java.util.Map;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Predicate;
 
 public final class TestRunPdfGenerator {
@@ -84,7 +81,7 @@ public final class TestRunPdfGenerator {
     private final @NotNull DeviceRgb LINK_BLUE = rgb(ReportText.LINK_BLUE);
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
-    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              PdfDocument pdf = new PdfDocument(new PdfWriter(baos));
              Document document = new Document(pdf, pdf.getDefaultPageSize(), false)) {
@@ -200,7 +197,7 @@ public final class TestRunPdfGenerator {
                 if (count == 0) continue;
 
                 buildCaseTable(document, String.valueOf(sectionNumber++), section.getTitle(),
-                        section.description(String.valueOf(count)), tr, detailsMap, boldFont, regularFont,
+                        section.description(String.valueOf(count)), tr, boldFont, regularFont,
                         rgb(section.getHexColor()), rgb(section.textHex()), section.isWithFailureDetail(), section::matches);
             }
 
@@ -248,7 +245,7 @@ public final class TestRunPdfGenerator {
                 Integer.parseInt(hex.substring(4, 6), 16));
     }
 
-    private void buildCaseTable(final @NotNull Document document, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont, final @NotNull DeviceRgb headerBg, final @NotNull DeviceRgb headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
+    private void buildCaseTable(final @NotNull Document document, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont, final @NotNull DeviceRgb headerBg, final @NotNull DeviceRgb headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
         document.add(para(sectionNumber + ". " + sectionTitle)
                 .setFont(boldFont)
                 .setFontSize(ReportFont.SECTION.pt())
@@ -288,7 +285,7 @@ public final class TestRunPdfGenerator {
                             .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(DARK_GRAY)
                             .setTextAlignment(TextAlignment.CENTER)));
 
-            final @NotNull String caseName = ReportedCase.of(detailsMap, item.getId()).getDescription();
+            final @NotNull String caseName = item.shownCase().getDescription();
             final @NotNull String tcName = caseName.isEmpty() ? "—" : caseName;
             final @NotNull Cell testCaseCell = new Cell()
                     .setBackgroundColor(rowBg)

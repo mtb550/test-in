@@ -20,36 +20,40 @@ import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.testng.Assert.*;
 
 /**
- * The two contracts {@code tc} serves (#48).
+ * Which test case a run row shows (#306, piece 0).
  * <p>
- * A run item read straight out of the run JSON has no test case attached, and
- * one whose case has since been deleted never gets one - {@code FailedResultDialog}
- * opens for both and must cope. The editor, on the other hand, drops the items it
- * cannot resolve and assigns a case to every item it keeps, so nothing that
- * reaches a renderer is missing one.
- * <p>
- * Same field, two contracts. {@code testCase()} is for the first, {@code shownCase()}
- * for the second.
+ * A run item read straight out of the run JSON has no test case attached; the
+ * indexer wires the live one through {@code showing} on every hand-out, and that
+ * one call also decides whether the row is removed. {@code shownCase()} is the
+ * only way anything reads it, so a row whose case is gone still draws a named
+ * placeholder rather than failing.
  */
 public class TestRunItemsTest {
 
     @Test
-    public void aFreshItemHasNoTestCaseUntilTheEditorWiresOne() {
-        assertTrue(TestRunItems.builder().id(UUID.randomUUID()).build().testCase().isEmpty(),
-                "the case is @JsonIgnore - deserializing a run never fills it");
+    public void shownCaseIsTheWiredCase() {
+        final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).build();
+        final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build().showing(Optional.of(tc));
+
+        assertSame(item.shownCase(), tc);
+        assertFalse(item.isRemoved(), "a row showing a live case is not removed");
     }
 
     @Test
-    public void shownCaseIsTheWiredCase() {
-        final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).build();
-        final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build().setTc(tc);
+    public void showingNoCaseMarksTheRowRemovedAndNamesIt() {
+        final UUID id = UUID.randomUUID();
+        final TestRunItems item = TestRunItems.builder().id(id).build()
+                .showing(Optional.of(TestCaseDto.builder().id(id).build()))
+                .showing(Optional.empty());
 
-        assertSame(item.shownCase(), tc);
+        assertTrue(item.isRemoved(), "the live case and the removed mark are set by one call, so they cannot disagree");
+        assertEquals(item.shownCase().getDescription(), TestCaseDto.deleted(id).getDescription());
     }
 
     @Test
@@ -64,11 +68,9 @@ public class TestRunItemsTest {
     }
 
     @Test
-    public void testCaseStaysAvailableForTheCallersThatMustHandleItsAbsence() {
+    public void anUnrunItemIsPending() {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
 
-        // FailedResultDialog renders "No longer in the test set" from exactly this.
-        assertTrue(item.testCase().isEmpty());
         assertEquals(item.getStatus(), org.testin.model.TestStatus.PENDING, "an unrun item defaults to PENDING");
     }
 

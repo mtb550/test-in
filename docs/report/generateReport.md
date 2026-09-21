@@ -53,6 +53,10 @@ cannot.
   and the result analysis. Test Cases holds the column names and one row for
   each test case, and nothing else, each row filled with the color of its
   verdict.
+- **Rule-REPORT-021** — Every row names its test case the way the test run shows
+  it, in every format. A test case deleted since the run was made is named as
+  the run names it, Deleted test case and its id; no row is left blank or
+  printed as a dash.
 
 ## The screen
 

@@ -39,7 +39,6 @@ import org.testin.util.Display;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Map;
 import java.util.UUID;
 
 public final class TestRunExcelGenerator {
@@ -48,13 +47,13 @@ public final class TestRunExcelGenerator {
     }
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-020
-    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             final @NotNull Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
             final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
 
             writeOverview(wb.newWorksheet(Bundle.message("report.excel.sheet.overview")), Services.getInstance(p, BoundTestProject.class).name(), trDir, tr, summary);
-            writeCases(wb.newWorksheet(Bundle.message("report.excel.sheet.cases")), tr, detailsMap);
+            writeCases(wb.newWorksheet(Bundle.message("report.excel.sheet.cases")), tr);
 
             wb.finish();
 
@@ -117,7 +116,7 @@ public final class TestRunExcelGenerator {
     }
 
     // Rule-REPORT-020
-    private static void writeCases(final @NotNull Worksheet ws, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+    private static void writeCases(final @NotNull Worksheet ws, final @NotNull TestRunDto tr) {
         ws.value(0, 0, Bundle.message("report.excel.caption.id"));
         ws.value(0, 1, RunEditorAttributes.DESCRIPTION.getName());
         ws.value(0, 2, RunEditorAttributes.RUN_STATUS.getName());
@@ -132,7 +131,7 @@ public final class TestRunExcelGenerator {
         int row = 1;
         for (final TestRunItems result : tr.getResults()) {
             final @NotNull UUID id = result.getId();
-            final @NotNull TestCaseDto details = ReportedCase.of(detailsMap, id);
+            final @NotNull TestCaseDto details = result.shownCase();
 
             ws.value(row, 0, id.toString());
             ws.value(row, 1, orNotAvailable(details.getDescription()));

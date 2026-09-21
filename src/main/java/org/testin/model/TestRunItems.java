@@ -47,11 +47,6 @@ public class TestRunItems {
     @Builder.Default
     private @NotNull Optional<TestCaseDto> tc = Optional.empty();
 
-    public @NotNull TestRunItems setTc(final @NotNull TestCaseDto testCase) {
-        this.tc = Optional.of(testCase);
-        return this;
-    }
-
     @NotNull
     @Builder.Default
     private UUID id = new UUID(0L, 0L);
@@ -94,7 +89,15 @@ public class TestRunItems {
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
     @JsonIgnore
     @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private boolean removed;
+
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
+    public @NotNull TestRunItems showing(final @NotNull Optional<TestCaseDto> live) {
+        tc = live;
+        removed = live.isEmpty();
+        return this;
+    }
 
     @JsonIgnore
     public boolean isRemoved() {
@@ -137,10 +140,7 @@ public class TestRunItems {
         return clears(next) ? FailureDetail.filledIn(this) : failure.wouldClear(this);
     }
 
-    public @NotNull Optional<TestCaseDto> testCase() {
-        return tc;
-    }
-
+    // UC-EDITOR-PANEL-030, Rule-REPORT-021, Rule-VIEW-PANEL-083
     public @NotNull TestCaseDto shownCase() {
         return tc.orElseGet(() -> TestCaseDto.deleted(id));
     }

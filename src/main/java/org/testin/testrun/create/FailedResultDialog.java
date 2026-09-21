@@ -30,7 +30,6 @@ import org.testin.util.Bundle;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 public class FailedResultDialog extends AbstractFrameworkDialog<SpellCheckedField> {
@@ -42,19 +41,16 @@ public class FailedResultDialog extends AbstractFrameworkDialog<SpellCheckedFiel
         super(p);
         this.onSave = onSave;
 
-        final @NotNull Optional<TestCaseDto> tc = runItem.testCase();
+        final @NotNull TestCaseDto tc = runItem.shownCase();
 
         fields = new FailureFields(p, runPath, runItem);
 
         title = Bundle.message("dialog.failed.result.title");
 
-        final @NotNull String description = tc.map(TestCaseDto::getDescription).orElse(Bundle.message("dialog.failed.result.gone"));
-        final @NotNull String expectedResult = tc.map(TestCaseDto::getExpectedResult).orElse("");
-
         final @NotNull List<ComponentDialogBase<?>> all = new ArrayList<>();
         all.add(ComponentDialogBase.details()
-                .row(CreateTestCaseFields.DESCRIPTION.getIcon(), description)
-                .row(CreateTestCaseFields.EXPECTED_RESULT.getIcon(), expectedResult)
+                .row(CreateTestCaseFields.DESCRIPTION.getIcon(), tc.getDescription())
+                .row(CreateTestCaseFields.EXPECTED_RESULT.getIcon(), tc.getExpectedResult())
                 .build());
         all.addAll(fields.components());
 
