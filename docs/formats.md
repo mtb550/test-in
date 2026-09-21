@@ -253,7 +253,7 @@ one put there by hand under such a name goes too.
 | Field | Type | Meaning |
 |---|---|---|
 | `id` | UUID string | The test case this result is about - the same id the file is named by, which is what decides it (Rule-INTERNAL-012). Written so the file says what it is about on its own |
-| `status` | enum | `PASSED` `FAILED` `BLOCKED` as a tester or the automation judged it; `PENDING` until then; `UNTESTED` for a case still pending when the run completed or closed. A case whose test case was deleted since the run keeps its status here and is shown as Removed; `REMOVED` is no longer written, and a file written by 2.11.0-alpha or earlier that holds it is read as removed |
+| `status` | enum | `PASSED` `FAILED` `BLOCKED` as a tester or the automation judged it; `PENDING` until then; `UNTESTED` for a case still pending when the run completed or closed. A case whose test case was deleted since the run keeps its status here; it is shown as Removed if it was never judged, and with its verdict if it was; `REMOVED` is no longer written, and a file written by 2.11.0-alpha or earlier that holds it is read as removed |
 | `duration` | number, seconds | Nanosecond precision, written as a decimal |
 | `executedBy` | string | |
 | `executedAt` | date | |

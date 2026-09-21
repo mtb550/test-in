@@ -86,6 +86,17 @@ public class DeletedTestCaseInARunTest {
                 "the row names itself rather than drawing blank: " + shown.getDescription());
     }
 
+    @Test
+    public void aRowNeverJudgedOfADeletedCaseIsShownRemoved() {
+        final TestRunItems item = TestRunItems.builder()
+                .id(UUID.randomUUID())
+                .status(TestStatus.PENDING)
+                .removed(true)
+                .build();
+
+        assertEquals(item.shownStatus(), TestStatus.REMOVED, "nothing was executed, and now nothing can be");
+    }
+
     /**
      * #66, finding 110: a removed row is shown as Removed, while the run written
      * back still carries the verdict it recorded. Opening a run used to set
@@ -93,7 +104,7 @@ public class DeletedTestCaseInARunTest {
      * it over the verdict.
      */
     @Test
-    public void aRemovedRowIsShownRemovedAndWrittenWithItsVerdict() {
+    public void aJudgedRowOfADeletedCaseShowsItsVerdictAndIsWrittenWithIt() {
         final TestRunItems item = TestRunItems.builder()
                 .id(UUID.randomUUID())
                 .status(TestStatus.PASSED)
@@ -101,7 +112,7 @@ public class DeletedTestCaseInARunTest {
                 .build();
 
         assertTrue(item.isRemoved(), "the verdict path, the details editor and the walker refuse it");
-        assertEquals(item.shownStatus(), TestStatus.REMOVED, "the tester sees Removed");
+        assertEquals(item.shownStatus(), TestStatus.PASSED, "a recorded result is shown whatever happened to the test case (#306)");
 
         try {
             final String written = new String(RealMapper.build().writeValueAsBytes(TestRunDto.builder().results(List.of(item)).build()), StandardCharsets.UTF_8);

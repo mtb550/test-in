@@ -93,17 +93,16 @@ public class CaseAsJudgedTest {
     }
 
     @Test
-    public void aCaseDeletedAfterItsVerdictKeepsItsFullTextShownRemoved() {
+    public void aCaseDeletedAfterItsVerdictKeepsItsFullTextAndItsVerdict() {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = TestRunItems.builder().id(id).build();
         item.recordVerdict(TestStatus.PASSED, "tester", caseReading(id, "before"));
 
         item.showing(Optional.empty());
 
-        assertTrue(item.isRemoved());
-        assertEquals(item.shownStatus(), TestStatus.REMOVED);
+        assertTrue(item.isRemoved(), "nothing may act on the row of a case that no longer exists");
+        assertEquals(item.shownStatus(), TestStatus.PASSED, "the result is shown whatever happened to the test case");
         assertEquals(item.shownCase().getDescription(), "before", "not the placeholder");
-        assertEquals(item.getStatus(), TestStatus.PASSED, "the verdict stays on the record");
     }
 
     @Test

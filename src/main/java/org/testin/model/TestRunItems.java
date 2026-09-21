@@ -134,9 +134,9 @@ public class TestRunItems {
         return removed || status == TestStatus.REMOVED;
     }
 
-    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239
     public @NotNull TestStatus shownStatus() {
-        return isRemoved() ? TestStatus.REMOVED : status;
+        return isRemoved() && !status.isVerdict() ? TestStatus.REMOVED : status;
     }
 
     public @NotNull Optional<String> bugIssue() {
