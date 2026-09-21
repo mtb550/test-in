@@ -48,7 +48,6 @@ public class RunCard extends BaseCard {
                 .filter(activeDetails::contains)
                 .forEach(attr -> attr.applyToUI(runItem, badges, details, p));
 
-
         updateUI(index, title, badges, details);
 
         Optional.ofNullable(attributeLabels.get(RunEditorAttributes.RUN_STATUS.getName())).ifPresent(statusLabel -> {

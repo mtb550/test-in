@@ -23,7 +23,6 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.AbstractEditorContextMenu;
-import org.testin.editor.BaseCard;
 import org.testin.editor.CardHoverAction;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -173,14 +172,9 @@ public class CardMouseListener extends MouseAdapter {
     private @NotNull Optional<CardHoverAction.Offered> getActionAtPoint(final int index, final int xInCell, final int yInCell) {
         if (index == -1) return Optional.empty();
 
-        final float baseSize = list.getFont().getSize2D();
-        final @NotNull Font titleFont = list.getFont().deriveFont(Font.BOLD, baseSize + BaseCard.TITLE_FONT_DELTA);
-
         final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
-        final @NotNull String title = editor.cardTitle(tc);
-
         final @NotNull List<CardHoverAction.Offered> buttons = CardHoverAction.onCard(p, editor.getParent(), tc);
-        final int titleWidth = Math.min(list.getFontMetrics(titleFont).stringWidth(title), CardTitle.titleColumnWidth(list.getWidth(), buttons.size()));
+        final int titleWidth = CardTitle.titleWidth(list, editor.cardTitle(tc), buttons.size());
 
         return CardTitle.descriptionActionIcons(titleWidth, buttons).at(xInCell, yInCell);
     }

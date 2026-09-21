@@ -39,7 +39,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public abstract class BaseCard extends JBPanel<BaseCard> {
-    public static final float TITLE_FONT_DELTA = 3.0f;
     protected final @NotNull JTextArea titleArea = Prose.of("");
     protected final @NotNull JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
     protected final @NotNull Map<String, JBLabel> attributeLabels = new HashMap<>();
@@ -52,6 +51,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected @NotNull Automated automation = Automated.UNKNOWN;
     private @NotNull String plainTitle = "";
     private int titleColumnWidth = Integer.MAX_VALUE;
+    private int titleWidth;
 
     // Rule-CODEGEN-082
     protected final @NotNull Project p;
@@ -97,7 +97,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         final @NotNull Font listFont = list.getFont();
         final float baseSize = listFont.getSize2D();
 
-        titleArea.setFont(listFont.deriveFont(Font.BOLD, baseSize + TITLE_FONT_DELTA));
+        titleArea.setFont(CardTitle.titleFont(list));
 
         for (final JBLabel lbl : attributeLabels.values()) {
             lbl.setFont(listFont.deriveFont(baseSize));
@@ -109,6 +109,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         }
 
         titleColumnWidth = CardTitle.titleColumnWidth(list.getWidth(), hoverButtons.size());
+        titleWidth = CardTitle.titleWidth(list, plainTitle, hoverButtons.size());
         layOutTitle();
     }
 
@@ -152,16 +153,12 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         }
     }
 
-    public int titleWidth() {
-        return Math.min(titleArea.getFontMetrics(titleArea.getFont()).stringWidth(plainTitle), titleColumnWidth);
-    }
-
     // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-195
     @Override
     protected void paintChildren(final Graphics g) {
         super.paintChildren(g);
         if (isRowHovered) {
-            CardTitle.drawDescriptionActionIcons(this, g, titleWidth(), hoveredAction, hoverButtons, automation);
+            CardTitle.drawDescriptionActionIcons(this, g, titleWidth, hoveredAction, hoverButtons, automation);
         }
     }
 

@@ -16,9 +16,9 @@
 
 package org.testin.editor.listeners;
 
-import org.testin.editor.CardHoverAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.CardHoverAction;
 import org.testin.editor.run.RunCard;
 import org.testin.editor.run.RunEditor;
 import org.testin.model.TestRunItems;

@@ -162,10 +162,6 @@ public enum CardHoverAction {
                 : RUN_TEST_METHOD;
     }
 
-    public @NotNull String getHintText(final @NotNull Project p) {
-        return whyNotOffered(p).orElseGet(this::hint);
-    }
-
     private @NotNull String hint() {
         return (tooltip + " " + Declared.shortcutText(actionId)).trim();
     }
@@ -180,9 +176,5 @@ public enum CardHoverAction {
         // Rule-CODEGEN-082
         if (missing.isPresent() || !requires.contains(OptionalPlugin.JAVA)) return missing;
         return CodeOn.whyOff(p);
-    }
-
-    public boolean isOffered(final @NotNull Project p) {
-        return whyNotOffered(p).isEmpty();
     }
 }
