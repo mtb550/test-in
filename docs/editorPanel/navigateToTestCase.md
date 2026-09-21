@@ -41,15 +41,15 @@ No key. The card's last button, or the right-click menu.
 - **Rule-EDITOR-PANEL-233** — Navigate to Test Case opens the test case's own
   test set editor and selects it there, as clicking its identity in the view
   panel does. The tree does not move.
-- **Rule-EDITOR-PANEL-234** — It is on every card and in both editors'
-  right-click menus. In a test set's own editor it is gray, and says the test
-  case is already in the test set open there.
+- **Rule-EDITOR-PANEL-234** — It is on a test run's cards and on the test run
+  editor's right-click menu. A test set's own cards and menu do not offer it:
+  they are already in the test set.
 - **Rule-EDITOR-PANEL-235** — On a card it is drawn only while the pointer is on
   that card, as the card's other buttons are, and it is the last of them, after
   Run, so the two buttons testers already use keep their places. Its icon is the
-  letter frame the Create Test Case dialog uses, reading tc, in the same slot as
-  every other button on the card, and it grows under the pointer like the
-  others.
+  letter frame the Create Test Case dialog uses, reading tc, frame and letters in
+  the green of the Run button beside it. It sits in the same slot as every other
+  button on the card, and grows under the pointer like the others.
 - **Rule-EDITOR-PANEL-236** — A test case that is in no test set is refused with
   a message, and nothing opens.
 - **Rule-EDITOR-PANEL-237** — One gesture has one name wherever it is offered.
@@ -70,9 +70,8 @@ No key. The card's last button, or the right-click menu.
    Test Method, Run, then **tc**, Navigate to Test Case. The one under the
    pointer grows and names itself.
 
-The right-click menu offers **Navigate to Test Case** beside **View Test Case
-Details**, in both editors. In a test set's own editor the button and the entry
-are gray and say why.
+The test run editor's right-click menu offers **Navigate to Test Case** beside
+**View Test Case Details**. A test set's own cards and menu do not offer it.
 
 ## Main flow
 
@@ -86,10 +85,6 @@ are gray and say why.
 5. The tree stays where it was. The test run editor stays open behind.
 
 ## What Testin refuses
-
-**If the test set is the one already open** — the button and the menu entry are
-gray in a test set's own editor, and read *This test case is already in the test
-set open here.*
 
 **If the test case is in no test set** — deleted since the run recorded it — the
 button is gray, and a message reads *There is no test set to open this test case

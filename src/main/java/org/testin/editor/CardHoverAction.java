@@ -43,8 +43,7 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.stream.Stream;
+import java.util.function.Function;
 
 @Getter
 @AllArgsConstructor
@@ -80,7 +79,7 @@ public enum CardHoverAction {
             Bundle.message("action.Testin.NavigateToTestCase.text"),
             "Testin.NavigateToTestCase",
             List.of(),
-            Icons.fieldLetter("tc", Icons.GRAY),
+            Icons.fieldLetter("tc", Icons.GREEN),
             (p, cases) -> NavigateToTestCaseAction.execute(p, cases.getFirst()),
             NavigateToTestCaseAction::whyNot
     );
@@ -96,7 +95,7 @@ public enum CardHoverAction {
     private final @NotNull BiConsumer<Project, List<TestCaseDto>> onClick;
 
     @Getter(AccessLevel.NONE)
-    private final @NotNull BiFunction<DirectoryDto, TestCaseDto, Optional<String>> whyNotOnCard;
+    private final @NotNull Function<TestCaseDto, Optional<String>> whyNotOnCard;
 
     public record Offered(@NotNull CardHoverAction action, @NotNull Optional<String> whyNot) {
         public boolean works() {
@@ -110,12 +109,16 @@ public enum CardHoverAction {
 
     // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-234, Rule-EDITOR-PANEL-235
     public static @NotNull List<Offered> onCard(final @NotNull Project p, final @NotNull DirectoryDto openOn, final @NotNull TestCaseDto tc) {
-        return Stream.of(NAVIGATE_TO_TEST_METHOD, runSlot(p, tc), NAVIGATE_TO_TEST_CASE)
-                .map(action -> new Offered(action, action.whyNotOffered(p).or(() -> action.whyNotOnCard.apply(openOn, tc))))
+        final @NotNull List<CardHoverAction> buttons = openOn.isTestCaseContainer()
+                ? List.of(NAVIGATE_TO_TEST_METHOD, runSlot(p, tc))
+                : List.of(NAVIGATE_TO_TEST_METHOD, runSlot(p, tc), NAVIGATE_TO_TEST_CASE);
+
+        return buttons.stream()
+                .map(action -> new Offered(action, action.whyNotOffered(p).or(() -> action.whyNotOnCard.apply(tc))))
                 .toList();
     }
 
-    private static @NotNull Optional<String> anywhere(final @NotNull DirectoryDto openOn, final @NotNull TestCaseDto tc) {
+    private static @NotNull Optional<String> anywhere(final @NotNull TestCaseDto tc) {
         return Optional.empty();
     }
 

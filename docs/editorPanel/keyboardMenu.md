@@ -62,7 +62,6 @@ This is the menu in a test set editor.
 ┌──────────────────────────────────┐
 │  Create Test Case                │
 │  View Test Case Details          │
-│  Navigate to Test Case           │
 │  ──────────────────────────────  │
 │  Update Test Case                │
 │  Actions                       > │
@@ -99,12 +98,8 @@ In the grid the menu opens on the selected cell instead.
 ## What the menu holds
 
 In a test set editor, in this order: **Create Test Case**, **View Test Case
-Details**, **Navigate to Test Case**, **Update Test Case**, **Actions**,
-**Automate Test Case**, **Run Test Method**, **Navigate to Test Method**.
-
-**Navigate to Test Case** is gray here and says why: the test case is already in
-the test set open there. It is on the menu of both editors so the menu is one
-shape wherever it opens (Rule-EDITOR-PANEL-234).
+Details**, **Update Test Case**, **Actions**, **Automate Test Case**, **Run Test
+Method**, **Navigate to Test Method**.
 
 **Actions** opens onto the seven that act on the test case rather than on the
 automation: **Copy Test Case Value**, **Copy Test Case**, **Cut Test Case**,
@@ -145,10 +140,9 @@ TestNG plugin, and each entry says which plugin it is waiting for.
 In a test run editor the menu holds the three verdicts first — **Passed**,
 **Failed** and **Blocked** — then **Failed Test Case Details**, then **View Test
 Case Details** and **Navigate to Test Case**, then **Actions**, then **Run Test
-Method** and **Navigate to Test Method**. **Create Test Case**, **Update Test Case**
-and **Automate Test Case** are
-not on it. A test run records verdicts rather than the test case, and it covers
-test cases that already exist.
+Method** and **Navigate to Test Method**. **Create Test Case**, **Update Test
+Case** and **Automate Test Case** are not on it. A test run records verdicts
+rather than the test case, and it covers test cases that already exist.
 
 ---
 

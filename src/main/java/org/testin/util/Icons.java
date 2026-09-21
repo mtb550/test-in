@@ -17,6 +17,7 @@
 package org.testin.util;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.scale.JBUIScale;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
@@ -37,6 +38,7 @@ public final class Icons {
 
     public static final @NotNull Color GRAY = new Color(0x6C707E);
     public static final @NotNull Color RED = new Color(0xDB3B4B);
+    public static final @NotNull Color GREEN = new JBColor(0x208A3C, 0x57965C);
 
     // UC-EDITOR-PANEL-005
     public static @NotNull Icon fieldLetter(final @NotNull String letter, final @NotNull Color color) {

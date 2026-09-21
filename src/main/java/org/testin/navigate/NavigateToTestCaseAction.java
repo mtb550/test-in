@@ -27,7 +27,6 @@ import org.testin.actions.TestinData;
 import org.testin.editor.CardHoverAction;
 import org.testin.editor.TestinEditors;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -45,11 +44,6 @@ public class NavigateToTestCaseAction extends DumbAwareAction {
         return tc.getParent().getPath().toString().isEmpty()
                 ? Optional.of(Bundle.message("navigate.test.case.nowhere"))
                 : Optional.empty();
-    }
-
-    // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-234, Rule-EDITOR-PANEL-236
-    public static @NotNull Optional<String> whyNot(final @NotNull DirectoryDto openOn, final @NotNull TestCaseDto tc) {
-        return openOn.isTestCaseContainer() ? Optional.of(Bundle.message("navigate.test.case.here")) : whyNot(tc);
     }
 
     // UC-EDITOR-PANEL-048, UC-VIEW-PANEL-009, Rule-EDITOR-PANEL-233, Rule-EDITOR-PANEL-236, Rule-VIEW-PANEL-063
@@ -71,11 +65,11 @@ public class NavigateToTestCaseAction extends DumbAwareAction {
         TestinData.selectedCases(e).stream().findFirst().ifPresent(tc -> execute(p, tc));
     }
 
-    // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-234
+    // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-236
     @Override
     public void update(final @NotNull AnActionEvent e) {
         final @NotNull Optional<TestCaseDto> first = TestinData.selectedCases(e).stream().findFirst();
-        final @NotNull Optional<String> whyNot = TestinData.editor(e).flatMap(editor -> first.flatMap(tc -> whyNot(editor.getParent(), tc)));
+        final @NotNull Optional<String> whyNot = first.flatMap(NavigateToTestCaseAction::whyNot);
 
         GrayWithReason.unless(this, e, first.isPresent() && whyNot.isEmpty(), whyNot.orElse(""));
     }

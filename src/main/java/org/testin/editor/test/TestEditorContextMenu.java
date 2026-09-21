@@ -42,7 +42,6 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
 
         add(Declared.forMenu("Testin.CreateTestCase"));
         add(Declared.forMenu("Testin.ViewDetails"));
-        add(Declared.forMenu("Testin.NavigateToTestCase"));
 
         addSeparator();
 
