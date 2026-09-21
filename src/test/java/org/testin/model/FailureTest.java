@@ -76,7 +76,7 @@ public class FailureTest {
     public void passingAfterwardsClearsWhatTheFailureRecorded() {
         final TestRunItems item = row();
 
-        // The order RunStatusService.executeManual uses: record, then judge.
+        // The order RunStatusService.recordReported uses: record, then judge.
         new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
         item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
 

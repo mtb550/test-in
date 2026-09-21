@@ -126,7 +126,7 @@ public class ExportAction extends DumbAwareAction {
         // UC-SHARE-003, Rule-SHARE-020
         private @NotNull List<TestCaseDto> detached(final @NotNull List<TestCaseDto> cases) {
             return cases.stream()
-                    .map(tc -> TestCaseSnapshot.copy(p, tc).setParent(tc.getParent()))
+                    .map(tc -> TestCaseSnapshot.copy(p, tc))
                     .toList();
         }
 

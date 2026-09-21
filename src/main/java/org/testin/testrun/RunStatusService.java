@@ -82,7 +82,8 @@ public final class RunStatusService {
         ApplicationManager.getApplication().invokeLater(() -> editor.startTimerForIndex(executingIndex));
     }
 
-    public boolean executeManual(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
+    // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-241
+    public boolean recordReported(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
         if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
             editor.stopExecution();
@@ -123,8 +124,7 @@ public final class RunStatusService {
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-238
     private static @NotNull TestCaseDto asItIsNow(final @NotNull Project p, final @NotNull TestRunItems item) {
-        final @NotNull TestCaseDto live = item.liveCase();
-        return TestCaseSnapshot.copy(p, live).setParent(live.getParent());
+        return TestCaseSnapshot.copy(p, item.liveCase());
     }
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167

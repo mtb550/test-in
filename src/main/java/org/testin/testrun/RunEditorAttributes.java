@@ -31,7 +31,6 @@ import org.testin.model.ValueExtractor;
 import org.testin.util.Bundle;
 import org.testin.ui.Badges;
 import org.testin.codegen.Fqcn;
-import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Display;
 
 import java.util.List;
@@ -168,10 +167,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     FQCN(
             TestEditorAttributes.FQCN.getName(),
             ToolBarDefault.LOCKED_UNCHECKED,
-            (item, p) -> {
-                final @NotNull TestCaseDto tc = item.shownCase();
-                return String.join(" > ", Fqcn.ofMethod(tc));
-            }
+            (item, p) -> String.join(" > ", Fqcn.ofMethod(item.liveCase()))
     );
 
     private final @NotNull String name;

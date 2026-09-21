@@ -315,7 +315,7 @@ public class GridPanelBuilder {
 
         for (final TestCaseDto tc : testCases) {
             final @NotNull TestRunItems runItem = Optional.ofNullable(resultsMap.get(tc.getId()))
-                    .orElseGet(() -> TestRunItems.builder().id(tc.getId()).tc(Optional.of(tc)).build());
+                    .orElseGet(() -> TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc)));
 
             final String @NotNull[] row = new String[columns.length];
             final int rowNumber = position.applyAsInt(tc);

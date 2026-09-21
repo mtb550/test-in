@@ -484,7 +484,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         status.getVerdict().ifPresent(verdict -> {
             sayWhatTheVerdictCleared(tc, verdict, failure);
 
-            Services.getInstance(p, RunStatusService.class).executeManual(p, this, tc, verdict, duration, failure);
+            Services.getInstance(p, RunStatusService.class).recordReported(p, this, tc, verdict, duration, failure);
 
             if (launchedHere.isEmpty()) sayWhatTheRunRecorded();
         });

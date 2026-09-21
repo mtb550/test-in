@@ -65,8 +65,8 @@ public class TestCaseFilterTest {
         final TestRunItems item = TestRunItems.builder()
                 .id(passed.getId())
                 .status(TestStatus.PASSED)
-                .tc(java.util.Optional.of(passed))
-                .build();
+                .build()
+                .showing(java.util.Optional.of(passed));
 
         // The filter asks for an answer per id, and a case the run never
         // recorded answers with nothing rather than with a null.

@@ -47,7 +47,7 @@ public class TestRunItems {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     @Builder.Default
-    private @NotNull Optional<TestCaseDto> tc = Optional.empty();
+    private @NotNull Optional<TestCaseDto> live = Optional.empty();
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-238, Rule-EDITOR-PANEL-239
     @NotNull
@@ -118,10 +118,10 @@ public class TestRunItems {
     private boolean removed;
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
-    public @NotNull TestRunItems showing(final @NotNull Optional<TestCaseDto> live) {
-        tc = live;
-        removed = live.isEmpty();
-        live.filter(now -> isJudgedAgainst()).ifPresent(now -> testCase.setParent(now.getParent()));
+    public @NotNull TestRunItems showing(final @NotNull Optional<TestCaseDto> now) {
+        live = now;
+        removed = now.isEmpty();
+        if (isJudgedAgainst()) now.ifPresent(tc -> testCase.setParent(tc.getParent()));
         return this;
     }
 
@@ -189,6 +189,6 @@ public class TestRunItems {
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
     public @NotNull TestCaseDto liveCase() {
-        return tc.orElseGet(() -> TestCaseDto.deleted(id));
+        return live.orElseGet(() -> TestCaseDto.deleted(id));
     }
 }
