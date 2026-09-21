@@ -75,7 +75,14 @@ if ($mainText -notmatch 'Rules are `Rule-([A-Z][A-Z-]*)-\d+` to `Rule-[A-Z][A-Z-
 
 $prefix = $Matches[1]
 $last = [int]$Matches[2]
-$next = $last + 1
+
+# Above every number the part has ever given, not only the highest one still written.
+# A retired rule keeps its number forever and is named only in a Retired row once its
+# bullet is gone, so reading the Numbering row alone handed a retired number out again.
+$everGiven = Get-ChildItem (Join-Path $root 'docs') -Recurse -Filter '*.md' |
+    ForEach-Object { [regex]::Matches((Get-Content $_.FullName -Raw), "Rule-$prefix-(\d+)") } |
+    ForEach-Object { [int]$_.Groups[1].Value }
+$next = [int](([int[]]$everGiven + $last | Measure-Object -Maximum).Maximum) + 1
 $name = 'Rule-{0}-{1:D3}' -f $prefix, $next
 
 # One bullet, wrapped the way the documents are: 80 columns, two spaces under the
