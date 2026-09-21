@@ -81,7 +81,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
                 })));
     }
 
-    // UC-INTERNAL-004, Rule-INTERNAL-063
+    // UC-INTERNAL-005, Rule-INTERNAL-063
     private static boolean restore(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> target, final @NotNull List<TestCaseSnapshot> expected) {
         if (!expected.stream().allMatch(TestCaseSnapshot::stillStands)) {
             Services.getInstance(p, Notifier.class).softRefuse(p,
