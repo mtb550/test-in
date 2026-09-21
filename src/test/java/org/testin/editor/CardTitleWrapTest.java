@@ -130,7 +130,7 @@ public class CardTitleWrapTest {
      */
     @Test
     public void theNewButtonGoesLastAndMovesNeitherOfTheOthers() {
-        final List<CardTitle.Slot> before = CardTitle.descriptionActionIcons(200, offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_CASE)).slots();
+        final List<CardTitle.Slot> before = CardTitle.descriptionActionIcons(200, offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD)).slots();
         final List<CardTitle.Slot> now = CardTitle.descriptionActionIcons(200, everyButton()).slots();
 
         assertEquals(now.get(0).at(), before.get(0).at(), "the method button moved");
@@ -165,7 +165,7 @@ public class CardTitleWrapTest {
     }
 
     private static List<CardHoverAction.Offered> everyButton() {
-        return offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_CASE, CardHoverAction.NAVIGATE_TO_TEST_CASE);
+        return offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD, CardHoverAction.NAVIGATE_TO_TEST_CASE);
     }
 
     private static List<CardHoverAction.Offered> offered(final CardHoverAction... actions) {

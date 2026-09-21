@@ -52,7 +52,7 @@ The two buttons sit between the title and the badges.
 1. **The first button** — goes to the automation code. It is
    [UC-VIEW-PANEL-014](goToCode.md).
 2. **The second button** — runs the test case. Its tooltip reads **Run Test
-   Case** and names `F5`. Where it cannot work the tooltip says that instead.
+   Method** and names `F5`. Where it cannot work the tooltip says that instead.
 
 ## Main flow
 
@@ -66,7 +66,7 @@ The two buttons sit between the title and the badges.
 ## What Testin refuses
 
 **If the IDE has no TestNG plugin** — the run button is gray, it does not grow
-under the pointer, and its tooltip reads *Run Test Case (needs the TestNG
+under the pointer, and its tooltip reads *Run Test Method (needs the TestNG
 plugin)*. Clicking it says the same thing. Running a test case needs the Java
 plugin as well, so an IDE with neither names the Java one first.
 

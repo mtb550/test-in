@@ -30,7 +30,7 @@ import java.util.List;
 @AllArgsConstructor
 public enum Automated {
     UNKNOWN(
-            Bundle.message("action.Testin.NavigateToCode.text"),
+            Bundle.message("action.Testin.NavigateToTestMethod.text"),
             AllIcons.Nodes.Class
     ),
 

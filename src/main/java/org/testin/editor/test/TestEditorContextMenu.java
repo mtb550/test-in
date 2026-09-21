@@ -53,8 +53,8 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
         addSeparator();
 
         add(Declared.forMenu("Testin.AutomateTestCase"));
-        add(Declared.forMenu("Testin.RunTestCase"));
-        add(Declared.forMenu("Testin.NavigateToCode"));
+        add(Declared.forMenu("Testin.RunTestMethod"));
+        add(Declared.forMenu("Testin.NavigateToTestMethod"));
     }
 
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194

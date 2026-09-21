@@ -50,8 +50,8 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         add(actions(p, dir, list));
 
         addSeparator();
-        add(Declared.forMenu("Testin.RunTestCase"));
-        add(Declared.forMenu("Testin.NavigateToCode"));
+        add(Declared.forMenu("Testin.RunTestMethod"));
+        add(Declared.forMenu("Testin.NavigateToTestMethod"));
     }
 
     // UC-EDITOR-PANEL-026, UC-EDITOR-PANEL-029

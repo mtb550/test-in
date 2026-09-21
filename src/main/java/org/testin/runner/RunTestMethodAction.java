@@ -28,7 +28,7 @@ import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;
 
-public class RunTestCaseAction extends DumbAwareAction {
+public class RunTestMethodAction extends DumbAwareAction {
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-150
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -38,7 +38,7 @@ public class RunTestCaseAction extends DumbAwareAction {
         final @NotNull List<TestCaseDto> selected = TestinData.selectedCases(e);
         final @NotNull CardHoverAction gesture = CardHoverAction.runSlot(p, selected);
 
-        if (gesture == CardHoverAction.RUN_TEST_CASE) {
+        if (gesture == CardHoverAction.RUN_TEST_METHOD) {
             TestinData.editor(e).ifPresent(ui -> selected.forEach(tc -> ui.launching(tc.getId())));
         }
 

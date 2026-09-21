@@ -28,7 +28,7 @@ import org.testin.editor.CardHoverAction;
 import org.testin.model.dto.TestCaseDto;
 
 // UC-CODEGEN-006
-public class NavigateToCodeAction extends DumbAwareAction {
+public class NavigateToTestMethodAction extends DumbAwareAction {
     public static void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         if (!CodeOn.isOnOrWarn(p)) return;
 

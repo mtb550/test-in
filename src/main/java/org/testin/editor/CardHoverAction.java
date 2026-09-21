@@ -29,7 +29,7 @@ import org.testin.util.Icons;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.Automated;
-import org.testin.navigate.NavigateToCodeAction;
+import org.testin.navigate.NavigateToTestMethodAction;
 import org.testin.navigate.NavigateToTestCaseAction;
 import org.testin.notifications.Notifier;
 import org.testin.runner.RunTestCases;
@@ -50,25 +50,25 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public enum CardHoverAction {
     NAVIGATE_TO_TEST_METHOD(
-            Bundle.message("action.Testin.NavigateToCode.text"),
-            "Testin.NavigateToCode",
+            Bundle.message("action.Testin.NavigateToTestMethod.text"),
+            "Testin.NavigateToTestMethod",
             List.of(OptionalPlugin.JAVA),
             Icons.TEST_CASE,
-            (p, cases) -> NavigateToCodeAction.execute(p, cases.getFirst()),
+            (p, cases) -> NavigateToTestMethodAction.execute(p, cases.getFirst()),
             CardHoverAction::anywhere
     ),
 
-    RUN_TEST_CASE(
-            Bundle.message("card.run.test.case"),
-            "Testin.RunTestCase",
+    RUN_TEST_METHOD(
+            Bundle.message("action.Testin.RunTestMethod.text"),
+            "Testin.RunTestMethod",
             List.of(OptionalPlugin.JAVA, OptionalPlugin.TESTNG),
             AllIcons.RunConfigurations.TestState.Run,
             RunTestCases::run,
             CardHoverAction::anywhere
     ),
 
-    STOP_TEST_CASE(
-            Bundle.message("card.stop.test.case"),
+    STOP_TEST_METHOD(
+            Bundle.message("card.stop.test.method"),
             "",
             List.of(OptionalPlugin.TESTNG),
             AllIcons.Actions.Suspend,
@@ -155,8 +155,8 @@ public enum CardHoverAction {
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         return cases.stream().anyMatch(tc -> execution.isRunning(tc.getId()))
-                ? STOP_TEST_CASE
-                : RUN_TEST_CASE;
+                ? STOP_TEST_METHOD
+                : RUN_TEST_METHOD;
     }
 
     public @NotNull String getHintText(final @NotNull Project p) {

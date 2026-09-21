@@ -27,7 +27,7 @@ public class ViewPanelActions {
     // UC-VIEW-PANEL-003, UC-VIEW-PANEL-012, UC-VIEW-PANEL-014
     public @NotNull List<AnAction> create(final @NotNull ViewPanel panel, final @NotNull JComponent component) {
         ShownCaseAction.bind(panel, CardHoverAction.NAVIGATE_TO_TEST_METHOD, component);
-        ShownCaseAction.bind(panel, CardHoverAction.RUN_TEST_CASE, component);
+        ShownCaseAction.bind(panel, CardHoverAction.RUN_TEST_METHOD, component);
 
         return List.of(
                 new PreviousTestCaseAction(panel.getPage(), component),

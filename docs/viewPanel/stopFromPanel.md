@@ -50,7 +50,7 @@ The stop button stands exactly where the run button stands.
 1. **The first button** — goes to the automation code. A running test case does
    not change it.
 2. **The second button** — the stop button. Its tooltip reads **Stop Test
-   Case**, and it names no key.
+   Method**, and it names no key.
 
 The run button is drawn on [UC-VIEW-PANEL-012](runFromPanel.md).
 

@@ -68,7 +68,7 @@ This is the menu in a test set editor.
 │  Actions                       > │
 │  ──────────────────────────────  │
 │  Automate Test Case              │
-│  Run Test Case                   │
+│  Run Test Method                 │
 │  Navigate to Test Method         │
 └──────────────────────────────────┘
 ```
@@ -77,7 +77,7 @@ This is the menu in a test set editor.
    selected cell in the grid.
 2. **The separator lines** — they group entries that belong together.
 3. **The last group of three** — gray in an IDE without the Java or TestNG
-   plugin, and each names what it needs, as *Run Test Case (needs the TestNG
+   plugin, and each names what it needs, as *Run Test Method (needs the TestNG
    plugin)*. A test run editor has two of them: **Automate Test Case** is not
    offered there.
 4. **Moving in it** — the arrow keys move down the entries, and `Enter` chooses
@@ -100,7 +100,7 @@ In the grid the menu opens on the selected cell instead.
 
 In a test set editor, in this order: **Create Test Case**, **View Test Case
 Details**, **Navigate to Test Case**, **Update Test Case**, **Actions**,
-**Automate Test Case**, **Run Test Case**, **Navigate to Test Method**.
+**Automate Test Case**, **Run Test Method**, **Navigate to Test Method**.
 
 **Navigate to Test Case** is gray here and says why: the test case is already in
 the test set open there. It is on the menu of both editors so the menu is one
@@ -110,7 +110,7 @@ shape wherever it opens (Rule-EDITOR-PANEL-234).
 automation: **Copy Test Case Value**, **Copy Test Case**, **Cut Test Case**,
 **Paste Test Case**, **Delete Test Case**, then **Undo** and **Redo**. They are
 one level down because they all have keys and none of them is what the menu is
-opened for — at the top level they pushed Automate Test Case, Run Test Case and
+opened for — at the top level they pushed Automate Test Case, Run Test Method and
 Navigate to Test Method off the end of a list nobody read that far down.
 
 **The same seven are in the test run editor's menu**, in the same place and
@@ -145,7 +145,7 @@ TestNG plugin, and each entry says which plugin it is waiting for.
 In a test run editor the menu holds the three verdicts first — **Passed**,
 **Failed** and **Blocked** — then **Failed Test Case Details**, then **View Test
 Case Details** and **Navigate to Test Case**, then **Actions**, then **Run Test
-Case** and **Navigate to Test Method**. **Create Test Case**, **Update Test Case**
+Method** and **Navigate to Test Method**. **Create Test Case**, **Update Test Case**
 and **Automate Test Case** are
 not on it. A test run records verdicts rather than the test case, and it covers
 test cases that already exist.

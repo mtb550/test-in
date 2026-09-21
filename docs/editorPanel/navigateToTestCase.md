@@ -54,8 +54,8 @@ No key. The card's last button, or the right-click menu.
   a message, and nothing opens.
 - **Rule-EDITOR-PANEL-237** — One gesture has one name wherever it is offered.
   The menu entry, the card's button and the view panel's identity all say
-  Navigate to Test Case; the method's entry and button both say Navigate to Test
-  Method.
+  Navigate to Test Case; the method's entries and buttons say Navigate to Test
+  Method and Run Test Method, because the method is what they reach and run.
 
 ## The screen
 

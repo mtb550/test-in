@@ -217,7 +217,7 @@ status. Nine of them carry a default key, on seven keys:
 | `Shift+F6` | Rename Testin Node | The tree |
 | `F2` | Update Test Case, Failed Test Case Details, Edit Test Run | Both editors, the view panel, and the tree |
 | *none by default* | Copy, Cut and Paste Test Case | Both editors. Declared with no key, so Find Action offers them and a tester who wants one can set it |
-| `F5` | Run Test Case | Both editors and the view panel |
+| `F5` | Run Test Method | Both editors and the view panel |
 | `Shift+F5` | Navigate to Test Method | Both editors and the view panel |
 | `F12`, `Cmd+F12` on a Mac | Automate Test Case | Both editors |
 

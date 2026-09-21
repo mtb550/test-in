@@ -59,7 +59,7 @@ The code runs, and Testin writes down whether each test case passed.
 | The tester does this | Where |
 |---|---|
 | Presses `F5` | The list of test cases in either editor |
-| Chooses **Run Test Case** | The menu in either editor |
+| Chooses **Run Test Method** | The menu in either editor |
 | Clicks the run button | A card under the pointer, or the view panel |
 
 Running everything a test run has not judged yet is different, and is
