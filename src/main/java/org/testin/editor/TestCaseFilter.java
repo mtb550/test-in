@@ -49,14 +49,16 @@ public final class TestCaseFilter {
                 .collect(Collectors.toList());
     }
 
-    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-091
+    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-091, Rule-EDITOR-PANEL-239
     private static boolean matches(final @NotNull TestCaseDto testCase, final @NotNull String query, final @NotNull Set<String> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules, final @NotNull Set<TestStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
-        final boolean matchesSearch = query.isEmpty() || TestEditorAttributes.anyContains(testCase, query);
-        final boolean matchesPriority = priorities.isEmpty() || priorities.contains(testCase.getPriority());
+        final @NotNull TestCaseDto shown = runItemProvider.apply(testCase.getId()).map(TestRunItems::shownCase).orElse(testCase);
+
+        final boolean matchesSearch = query.isEmpty() || TestEditorAttributes.anyContains(shown, query);
+        final boolean matchesPriority = priorities.isEmpty() || priorities.contains(shown.getPriority());
         final boolean matchesGroup = groups.isEmpty()
-                || (groups.contains(Groups.NONE) && testCase.getGroup().isEmpty())
-                || testCase.getGroup().stream().anyMatch(groups::contains);
-        final boolean matchesModule = modules.isEmpty() || modules.contains(testCase.getModule());
+                || (groups.contains(Groups.NONE) && shown.getGroup().isEmpty())
+                || shown.getGroup().stream().anyMatch(groups::contains);
+        final boolean matchesModule = modules.isEmpty() || modules.contains(shown.getModule());
         final boolean matchesStatus = statuses.isEmpty()
                 || matchesStatus(testCase.getId(), statuses, runItemProvider);
 
