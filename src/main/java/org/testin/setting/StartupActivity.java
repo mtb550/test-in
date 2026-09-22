@@ -40,23 +40,38 @@ import java.nio.file.Path;
 
 public final class StartupActivity implements ProjectActivity {
     private static final @NotNull Key<Boolean> STARTED = Key.create("testin.started");
+    private static final @NotNull Key<Boolean> READ = Key.create("testin.read");
 
-    // UC-SETTING-002, Rule-SETTING-014
+    // UC-SETTING-002
     public static void execute(final @NotNull Project p) {
-        if (!Once.claim(p, STARTED)) return;
+        if (Once.claim(p, STARTED)) wire(p);
 
-        final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        readTheFolder(p);
+    }
 
-        final @NotNull Path testinPath = TestinRoot.normalize(settings.rootTestinPath);
-        final boolean rootConfigured = TestinRoot.isConfigured(testinPath);
-
-        if (!rootConfigured) {
-            Logger.info("No Testin folder is set yet, so nothing is read until one is");
-        }
-
+    private static void wire(final @NotNull Project p) {
         Logger.info("StartupActivity.execute()");
 
         Services.getInstance(DeletedNodes.class).sweep();
+
+        TestCaseExecutionTracker.initGlobalListener(p);
+
+        CutState.initClipboardWatch(p);
+
+        TestCaseExecutionSubscriber.initRecording(p);
+    }
+
+    // UC-SETTING-002, Rule-SETTING-014
+    private static void readTheFolder(final @NotNull Project p) {
+        final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        final @NotNull Path testinPath = TestinRoot.normalize(settings.rootTestinPath);
+
+        if (!TestinRoot.isConfigured(testinPath)) {
+            Logger.info("No Testin folder is set yet, so nothing is read until one is");
+            return;
+        }
+
+        if (!Once.claim(p, READ)) return;
 
         Logger.info("testin Path: " + testinPath);
 
@@ -68,18 +83,10 @@ public final class StartupActivity implements ProjectActivity {
             Logger.warn("No test project chosen for " + p.getName());
         }
 
-        if (TestinRoot.isConfigured(testinPath)) {
-            // UC-INTERNAL-008, Rule-INTERNAL-091
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-            indexer.convertEveryProject();
-            indexer.indexWithProgress();
-        }
-
-        TestCaseExecutionTracker.initGlobalListener(p);
-
-        CutState.initClipboardWatch(p);
-
-        TestCaseExecutionSubscriber.initRecording(p);
+        // UC-INTERNAL-008, Rule-INTERNAL-091
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        indexer.convertEveryProject();
+        indexer.indexWithProgress();
     }
 
     // UC-SETTING-002, Rule-SETTING-014
