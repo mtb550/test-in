@@ -22,8 +22,8 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;
 import org.jetbrains.annotations.NotNull;
-import org.testng.annotations.Test;
 import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -76,18 +76,6 @@ public class ArchitectureTest {
      * hold what they are not.
      */
     private static final @NotNull JavaClasses CLASSES = productionClasses();
-
-    private static @NotNull JavaClasses productionClasses() {
-        final @NotNull Path compiled = Path.of("build", "classes", "java", "main").toAbsolutePath();
-
-        if (!Files.isDirectory(compiled)) {
-            throw new AssertionError("No compiled classes at " + compiled + " - the architecture rules have"
-                    + " nothing to read. Run this through Gradle, which compiles src/main first.");
-        }
-
-        return new ClassFileImporter().importPath(compiled);
-    }
-
     /**
      * Everything a leaf may not reach: the feature packages, which is every
      * package but {@code model}, {@code util} and {@code logger}.
@@ -101,7 +89,6 @@ public class ArchitectureTest {
             "org.testin.open..", "org.testin.clipboard..", "org.testin.runner..", "org.testin.notifications..",
             "org.testin.setting..", "org.testin.config..", "org.testin.actions..", "org.testin.bug.."
     };
-
     /**
      * Empty since 11 September 2026, and that is #111 answered rather than a gap
      * in this file. It held six.
@@ -129,7 +116,6 @@ public class ArchitectureTest {
      * instead of from the vocabulary, and is written down in ARCHITECTURE.md.
      */
     private static final @NotNull Set<String> MODEL_LEAF_EXCEPTIONS = Set.of();
-
     /**
      * What {@code util} may not import: the features, but not {@code services} or
      * {@code notifications}.
@@ -148,7 +134,6 @@ public class ArchitectureTest {
             "org.testin.undo..", "org.testin.rename..", "org.testin.remove..", "org.testin.open..",
             "org.testin.clipboard..", "org.testin.runner..", "org.testin.bug.."
     };
-
     /**
      * Empty, and that is the answer to #112 rather than a gap in this file.
      * <p>
@@ -165,7 +150,6 @@ public class ArchitectureTest {
      * unconditionally and the next one to break it fails here (#291).
      */
     private static final @NotNull Set<String> UTIL_EXCEPTIONS = Set.of();
-
     /**
      * The classes outside the indexer and its exempt list that read or write
      * files directly (#49), and there are none. The one there was,
@@ -173,6 +157,17 @@ public class ArchitectureTest {
      * reach a file on its own fails here.
      */
     private static final @NotNull Set<String> FILE_ACCESS_EXCEPTIONS = Set.of();
+
+    private static @NotNull JavaClasses productionClasses() {
+        final @NotNull Path compiled = Path.of("build", "classes", "java", "main").toAbsolutePath();
+
+        if (!Files.isDirectory(compiled)) {
+            throw new AssertionError("No compiled classes at " + compiled + " - the architecture rules have"
+                    + " nothing to read. Run this through Gradle, which compiles src/main first.");
+        }
+
+        return new ClassFileImporter().importPath(compiled);
+    }
 
     /**
      * Matched on the outermost class, so freezing a name covers the anonymous
@@ -277,7 +272,7 @@ public class ArchitectureTest {
      * Two halves, because one gesture reaching the file needs both to fail.
      * {@code save} having one caller is what stops a second gesture calling it;
      * {@code createChildData} being spelled in one place is what stops a class
-     * writing the file without asking {@link TestinYml} at all. {@code JavaSourceRoot}
+     * writing the file without asking {@code TestinYml} at all. {@code JavaSourceRoot}
      * is the other class allowed to create a file, and what it creates is the
      * {@code .java} the tester asked Testin to generate.
      */

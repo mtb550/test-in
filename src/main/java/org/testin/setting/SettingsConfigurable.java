@@ -38,7 +38,7 @@ import org.testin.services.Services;
 import org.testin.setting.dialogs.TestinPathPanel;
 import org.testin.util.Bundle;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;

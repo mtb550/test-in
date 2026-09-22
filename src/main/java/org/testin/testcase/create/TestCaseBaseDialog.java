@@ -29,36 +29,33 @@ import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
 import org.testin.model.StatusBarItem;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestCaseDialogKey;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import java.awt.Component;
+import java.awt.KeyboardFocusManager;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.Optional;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 // UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-006
 @Getter
-public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCaseForm> {
+public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog {
     @Getter(AccessLevel.NONE)
     private static final @NotNull StatusBarItem[] NO_ITEMS = new StatusBarItem[0];
-
-    @Getter(AccessLevel.NONE)
-    private final @NotNull TestCaseDto dto;
-    @Getter(AccessLevel.NONE)
-    private final @NotNull Consumer<@NotNull TestCaseDto> onSave;
-
+    private static final @NotNull PropertyChangeListener NOTHING_ON_FOCUS = evt -> {
+    };
     protected final @NotNull DescriptionSection descriptionSection;
     protected final @NotNull ExpectedResultSection expectedResultSection;
     protected final @NotNull ModuleSection moduleSection;
@@ -71,11 +68,13 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
     protected final @NotNull StatusSection statusSection;
     protected final @NotNull Disposable dialogDisposable;
     protected final @NotNull Map<CreateTestCaseSection, StatusBarItem[]> statusBarMapping;
+    @Getter(AccessLevel.NONE)
+    private final @NotNull TestCaseDto dto;
+    @Getter(AccessLevel.NONE)
+    private final @NotNull Consumer<@NotNull TestCaseDto> onSave;
     private final @NotNull List<CreateTestCaseSection> cachedSections;
-    private static final @NotNull PropertyChangeListener NOTHING_ON_FOCUS = evt -> {
-    };
-
     private @NotNull PropertyChangeListener focusListener = NOTHING_ON_FOCUS;
+    private @NotNull Optional<CreateTestCaseSection> editableSection = Optional.empty();
 
     public TestCaseBaseDialog(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p);
@@ -112,6 +111,15 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
         this.statusBarMapping = Map.copyOf(bars);
     }
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-218
+    private static boolean popupClaims(final @NotNull CustomShortcutSet shortcutSet) {
+        return Arrays.stream(shortcutSet.getShortcuts())
+                .filter(KeyboardShortcut.class::isInstance)
+                .map(KeyboardShortcut.class::cast)
+                .map(KeyboardShortcut::getFirstKeyStroke)
+                .anyMatch(stroke -> stroke.getModifiers() == 0);
+    }
+
     private @NotNull Optional<CreateTestCaseSection> sectionHolding(final @NotNull Component focusOwner) {
         return getAllSections().stream()
                 .filter(section -> UIUtil.isDescendingFrom(focusOwner, section.getWrapper()))
@@ -145,8 +153,6 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
     protected void closed() {
         Disposer.dispose(dialogDisposable);
     }
-
-    private @NotNull Optional<CreateTestCaseSection> editableSection = Optional.empty();
 
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-035
     protected void onlyEditable(final @NotNull CreateTestCaseSection target) {
@@ -188,15 +194,6 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog<TestCas
 
     private boolean aPopupIsOpen() {
         return completionIsOpen() || getAllSections().stream().anyMatch(CreateTestCaseSection::isPopupOpen);
-    }
-
-    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-218
-    private static boolean popupClaims(final @NotNull CustomShortcutSet shortcutSet) {
-        return Arrays.stream(shortcutSet.getShortcuts())
-                .filter(KeyboardShortcut.class::isInstance)
-                .map(KeyboardShortcut.class::cast)
-                .map(KeyboardShortcut::getFirstKeyStroke)
-                .anyMatch(stroke -> stroke.getModifiers() == 0);
     }
 
     // Rule-EDITOR-PANEL-029, Rule-EDITOR-PANEL-035

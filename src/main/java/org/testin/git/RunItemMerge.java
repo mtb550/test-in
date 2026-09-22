@@ -33,7 +33,7 @@ final class RunItemMerge {
     private static final @NotNull String EXECUTED_AT = "executedAt";
 
     // UC-SHARE-018, Rule-SHARE-080
-    public static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String base, final @NotNull String mine, final @NotNull String theirs) {
+    public static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String mine, final @NotNull String theirs) {
         final @NotNull ObjectNode mineNode = mapper.readTree(mine);
         final @NotNull ObjectNode theirsNode = mapper.readTree(theirs);
 

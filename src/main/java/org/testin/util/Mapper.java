@@ -17,11 +17,11 @@
 package org.testin.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.intellij.openapi.components.Service;
 import lombok.AccessLevel;
@@ -30,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
 import java.io.File;
-import java.io.InputStream;
 
 @Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -69,17 +68,6 @@ public final class Mapper {
 
         } catch (final Exception ex) {
             Logger.error("Failed to parse JSON string to class " + valueType.getSimpleName());
-            throw new RuntimeException(ex.getMessage());
-        }
-    }
-
-    public @NotNull <T> T readValue(final @NotNull InputStream src, final @NotNull Class<T> valueType) {
-        try {
-            return mapper.readValue(src, valueType);
-
-        } catch (final Exception ex) {
-            Logger.error("Failed to read InputStream to class " + valueType.getSimpleName());
-            Logger.error("Exception: " + ex.getMessage());
             throw new RuntimeException(ex.getMessage());
         }
     }

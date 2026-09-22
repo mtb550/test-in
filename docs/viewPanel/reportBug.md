@@ -148,26 +148,26 @@ After:
 The body is Markdown. GitHub draws it as tables, headings and a folded error.
 Anything Testin cannot get reads `n\a`.
 
-| Part | Where it comes from | Reads `n\a` when |
-|---|---|---|
-| **Severity** | The bug severity, with a colored dot | It is not set |
-| **Priority** | The bug priority, with a colored dot | It is not set |
-| **Platform** | The test run's platform and component | Both are empty |
-| **Environment** | Nothing in Testin | Always |
-| **Build** | Nothing in Testin | Always |
-| **Actual result** | What the tester says actually happened, exactly as typed | It is empty |
-| **Expected result** | The test case's expected result, as the Details tab shows it | It is empty |
-| **Steps to reproduce** | The test case's steps, numbered, each as the Details tab shows it | There are no steps |
-| **Test data** | The test case's test data, exactly as typed | It is empty |
-| **Impact** | Nothing in Testin | Always |
-| **Exception** | The error's text, folded under its first line | There is no text |
-| **Screenshots** | Every screenshot pasted into the error | There are none |
-| **Test run** | The test run's name | Never |
-| **Executed** | Who recorded the verdict, and when | Nobody has |
-| **Browser, device and language** | The test run's answers, each on its own | Each one is empty |
-| **Commit** | The test run's commit | It is empty |
-| **Test case** | The first eight characters of its identity, and its test set | Never |
-| **The last line** | The test set's name as a tag | Never |
+| Part                             | Where it comes from                                               | Reads `n\a` when   |
+|----------------------------------|-------------------------------------------------------------------|--------------------|
+| **Severity**                     | The bug severity, with a colored dot                              | It is not set      |
+| **Priority**                     | The bug priority, with a colored dot                              | It is not set      |
+| **Platform**                     | The test run's platform and component                             | Both are empty     |
+| **Environment**                  | Nothing in Testin                                                 | Always             |
+| **Build**                        | Nothing in Testin                                                 | Always             |
+| **Actual result**                | What the tester says actually happened, exactly as typed          | It is empty        |
+| **Expected result**              | The test case's expected result, as the Details tab shows it      | It is empty        |
+| **Steps to reproduce**           | The test case's steps, numbered, each as the Details tab shows it | There are no steps |
+| **Test data**                    | The test case's test data, exactly as typed                       | It is empty        |
+| **Impact**                       | Nothing in Testin                                                 | Always             |
+| **Exception**                    | The error's text, folded under its first line                     | There is no text   |
+| **Screenshots**                  | Every screenshot pasted into the error                            | There are none     |
+| **Test run**                     | The test run's name                                               | Never              |
+| **Executed**                     | Who recorded the verdict, and when                                | Nobody has         |
+| **Browser, device and language** | The test run's answers, each on its own                           | Each one is empty  |
+| **Commit**                       | The test run's commit                                             | It is empty        |
+| **Test case**                    | The first eight characters of its identity, and its test set      | Never              |
+| **The last line**                | The test set's name as a tag                                      | Never              |
 
 The **Test case** part links to the test case's file on GitHub. The link is left
 out when Git cannot say where the file is. That happens without the Git plugin,

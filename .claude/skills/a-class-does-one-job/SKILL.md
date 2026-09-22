@@ -56,10 +56,10 @@ A message and the delivery of a message are related and are not the same job.
 It is not an argument against shared owners. Centralising is right — see
 `centralize-shared-design`. The two rules run together:
 
-| | |
-|---|---|
-| `centralize-shared-design` | This thing needs **an** owner |
-| this skill | And that owner is **not** whatever class is convenient |
+|                            |                                                        |
+|----------------------------|--------------------------------------------------------|
+| `centralize-shared-design` | This thing needs **an** owner                          |
+| this skill                 | And that owner is **not** whatever class is convenient |
 
 Nor is it an argument for many tiny classes. A class with one job may be large.
 The question is never how many methods it has; it is whether one sentence

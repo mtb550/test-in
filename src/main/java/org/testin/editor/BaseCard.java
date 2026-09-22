@@ -26,13 +26,19 @@ import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.ui.Badges;
 import org.testin.model.Automated;
+import org.testin.ui.Badges;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.RowStripe;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BoxLayout;
+import javax.swing.JList;
+import javax.swing.JTextArea;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -44,17 +50,16 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected final @NotNull Map<String, JBLabel> attributeLabels = new HashMap<>();
     protected final @NotNull JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
     protected final @NotNull BorderLayoutPanel wrapper = new BorderLayoutPanel();
+    // Rule-CODEGEN-082
+    protected final @NotNull Project p;
     protected boolean isRowHovered;
     protected @NotNull String hoveredAction = "";
+    protected @NotNull Automated automation = Automated.UNKNOWN;
     @Setter
     private @NotNull List<CardHoverAction.Offered> hoverButtons = List.of();
-    protected @NotNull Automated automation = Automated.UNKNOWN;
     private @NotNull String plainTitle = "";
     private int titleColumnWidth = Integer.MAX_VALUE;
     private int titleWidth;
-
-    // Rule-CODEGEN-082
-    protected final @NotNull Project p;
 
     public BaseCard(final @NotNull Project p) {
         this.p = p;

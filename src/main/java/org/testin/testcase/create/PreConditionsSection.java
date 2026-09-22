@@ -20,8 +20,8 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.util.SpellChecker;
 import org.testin.util.Shortcuts;
+import org.testin.util.SpellChecker;
 
 public class PreConditionsSection extends AbstractOneLineSection {
     public PreConditionsSection(final @NotNull Project p) {
@@ -35,7 +35,7 @@ public class PreConditionsSection extends AbstractOneLineSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto) {
         field.setText(dto.getPreConditions());
     }
 }

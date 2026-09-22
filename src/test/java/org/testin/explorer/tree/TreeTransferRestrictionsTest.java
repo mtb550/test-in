@@ -38,9 +38,9 @@ import static org.testng.Assert.assertTrue;
  */
 public class TreeTransferRestrictionsTest {
 
-    private static DirectoryDto project(final String root, final String name) {
+    private static DirectoryDto project(final String name) {
         final TestProjectDirectoryDto dto = new TestProjectDirectoryDto();
-        dto.setPath(Path.of(root, name));
+        dto.setPath(Path.of("Testin", name));
         return dto;
     }
 
@@ -51,9 +51,9 @@ public class TreeTransferRestrictionsTest {
         return dto;
     }
 
-    private static DirectoryDto node(final String first, final String... more) {
+    private static DirectoryDto node(final String... underRoot) {
         final TestSetPackageDirectoryDto dto = new TestSetPackageDirectoryDto();
-        dto.setPath(Path.of(first, more));
+        dto.setPath(Path.of("root", underRoot));
         return dto;
     }
 
@@ -181,23 +181,23 @@ public class TreeTransferRestrictionsTest {
 
     @Test
     public void destinationMustNotBeSelfSubtreeOrParent() {
-        final DirectoryDto source = node("root", "test-cases", "pkg");
+        final DirectoryDto source = node("test-cases", "pkg");
 
-        assertFalse(TreeTransferHandler.isValidDestination(source, node("root", "test-cases", "pkg"), path -> false),
+        assertFalse(TreeTransferHandler.isValidDestination(source, node("test-cases", "pkg"), path -> false),
                 "onto itself must be invalid");
-        assertFalse(TreeTransferHandler.isValidDestination(source, node("root", "test-cases", "pkg", "inner"), path -> false),
+        assertFalse(TreeTransferHandler.isValidDestination(source, node("test-cases", "pkg", "inner"), path -> false),
                 "into its own subtree must be invalid");
-        assertFalse(TreeTransferHandler.isValidDestination(source, node("root", "test-cases"), path -> false),
+        assertFalse(TreeTransferHandler.isValidDestination(source, node("test-cases"), path -> false),
                 "into its own parent must be invalid - this was the IO-exception copy");
 
-        assertTrue(TreeTransferHandler.isValidDestination(source, node("root", "test-cases", "other"), path -> false),
+        assertTrue(TreeTransferHandler.isValidDestination(source, node("test-cases", "other"), path -> false),
                 "an unrelated sibling target must stay valid");
     }
 
     @Test
     public void destinationMustNotAlreadyContainTheName() {
-        final DirectoryDto source = node("root", "test-cases", "pkg");
-        final DirectoryDto target = node("root", "test-cases", "other");
+        final DirectoryDto source = node("test-cases", "pkg");
+        final DirectoryDto target = node("test-cases", "other");
         final Path occupiedPath = Path.of("root", "test-cases", "other", "pkg");
 
         assertFalse(TreeTransferHandler.isValidDestination(source, target, occupiedPath::equals),
@@ -208,11 +208,11 @@ public class TreeTransferRestrictionsTest {
 
     @Test
     public void transfersNeverCrossTestProjects() {
-        final DirectoryDto projectA = project("Testin", "projectA");
+        final DirectoryDto projectA = project("projectA");
         final DirectoryDto packageInA = childPackage(projectA, "pkg");
         final DirectoryDto casesDirInA = childPackage(projectA, "Test Cases");
 
-        final DirectoryDto projectB = project("Testin", "projectB");
+        final DirectoryDto projectB = project("projectB");
         final DirectoryDto packageInB = childPackage(projectB, "pkg2");
 
         assertTrue(TreeTransferHandler.sameTestProject(packageInA, casesDirInA),

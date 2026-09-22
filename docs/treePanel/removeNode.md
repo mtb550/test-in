@@ -36,10 +36,10 @@ The node goes to the recycle bin, so nothing is lost for good.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -65,8 +65,8 @@ The node goes to the recycle bin, so nothing is lost for good.
 - **Rule-TREE-PANEL-094** — A test run can be removed whatever its status. A
   signed-off run still refuses a rename, a new number and a drag, because a run
   that is renamed or moved is still named in a report and now described wrongly
-  - but a removed run is not misdescribed, it is gone, and a reader who cannot
-  find it knows exactly that.
+    - but a removed run is not misdescribed, it is gone, and a reader who cannot
+      find it knows exactly that.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is - drawn with Inactive beside its name like any other status - and its test
@@ -116,13 +116,12 @@ and no path.
 2. The tester presses `Delete`, or chooses **Actions → Remove**.
 3. The **Confirm Removing** dialog opens. For one node it asks *Remove
    '\<name\>'?*. It then says how many test sets, test cases and test runs the
-   node holds, and shows where it is after *From:*. For several nodes it asks
-   *Remove these N items?*, where N is how many.
+   node holds, and shows where it is after *From:*. For several nodes it asks *Remove these N items?*, where N is how
+   many.
 4. The tester presses `Enter`.
-5. Testin keeps a copy of each node for undo, under a progress bar reading
-   *Removing*, and then closes every editor open on a removed node or under
-   it - a removed package takes its test sets' editors with it
-   (Rule-TREE-PANEL-116).
+5. Testin keeps a copy of each node for undo, under a progress bar reading *Removing*, and then closes every editor open
+   on a removed node or under
+   it - a removed package takes its test sets' editors with it (Rule-TREE-PANEL-116).
 6. The node goes to the desktop's recycle bin, and its automation code goes with
    it. On a desktop with no recycle bin the node is deleted outright.
 7. The tree rebuilds. Testin shows *Removed*, or *Removed N* for several. The

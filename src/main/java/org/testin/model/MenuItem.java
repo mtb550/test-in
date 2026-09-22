@@ -18,7 +18,8 @@ package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
 
 public interface MenuItem extends StatusBarItem {
     @NotNull Icon getIcon();

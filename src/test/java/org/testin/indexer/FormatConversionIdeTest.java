@@ -17,6 +17,7 @@
 package org.testin.indexer;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.testin.TempTree;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
 import org.testin.model.markers.TestProjectMarker;
@@ -26,7 +27,6 @@ import org.testin.util.Mapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -70,6 +70,35 @@ public class FormatConversionIdeTest extends BasePlatformTestCase {
 
     private Path root;
 
+    /**
+     * What a folder holds, by name and in one order, so two conversions of the
+     * same folder can be compared.
+     */
+    private static List<String> namesIn(final Path folder) {
+        try (Stream<Path> children = Files.list(folder)) {
+            return children.map(file -> String.valueOf(file.getFileName())).sorted().toList();
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not list " + folder + ": " + ex.getMessage(), ex);
+        }
+    }
+
+    private static String read(final Path file) {
+        try {
+            return Files.readString(file);
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not read " + file + ": " + ex.getMessage(), ex);
+        }
+    }
+
+    private static void write(final Path file, final String content) {
+        try {
+            Files.createDirectories(file.getParent());
+            Files.writeString(file, content);
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not write " + file + ": " + ex.getMessage(), ex);
+        }
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -79,7 +108,7 @@ public class FormatConversionIdeTest extends BasePlatformTestCase {
     @Override
     protected void tearDown() throws Exception {
         try {
-            deleteTree(root);
+            TempTree.delete(root);
         } finally {
             super.tearDown();
         }
@@ -164,7 +193,7 @@ public class FormatConversionIdeTest extends BasePlatformTestCase {
         final Path theirSet = theirs.resolve("Test Cases").resolve("Login");
 
         assertEquals("the same folder converted on two machines has to end up holding the same file names,"
-                        + " or every converted case is a conflict", namesIn(mySet), namesIn(theirSet));
+                + " or every converted case is a conflict", namesIn(mySet), namesIn(theirSet));
 
         assertTrue("the file that claimed the id first kept it",
                 Files.isRegularFile(mySet.resolve(FileKind.TEST_CASE.fileName(NAMED_CASE))));
@@ -239,7 +268,7 @@ public class FormatConversionIdeTest extends BasePlatformTestCase {
         assertEquals("a conversion that failed half way wrote the format number anyway, so the next open would"
                 + " skip a project whose files this build cannot read", 0, formatOf(project));
 
-        deleteTree(inTheWay);
+        TempTree.delete(inTheWay);
         convert(project);
 
         assertEquals("the conversion was not tried again once what refused it was gone",
@@ -296,18 +325,6 @@ public class FormatConversionIdeTest extends BasePlatformTestCase {
         return project;
     }
 
-    /**
-     * What a folder holds, by name and in one order, so two conversions of the
-     * same folder can be compared.
-     */
-    private static List<String> namesIn(final Path folder) {
-        try (Stream<Path> children = Files.list(folder)) {
-            return children.map(file -> String.valueOf(file.getFileName())).sorted().toList();
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not list " + folder + ": " + ex.getMessage(), ex);
-        }
-    }
-
     private void convert(final Path project) {
         Services.getInstance(Conversions.class).ensure(getProject(), project);
     }
@@ -342,30 +359,5 @@ public class FormatConversionIdeTest extends BasePlatformTestCase {
         }
 
         throw new AssertionError("No marker in " + folder);
-    }
-
-    private static String read(final Path file) {
-        try {
-            return Files.readString(file);
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not read " + file + ": " + ex.getMessage(), ex);
-        }
-    }
-
-    private static void write(final Path file, final String content) {
-        try {
-            Files.createDirectories(file.getParent());
-            Files.writeString(file, content);
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not write " + file + ": " + ex.getMessage(), ex);
-        }
-    }
-
-    private static void deleteTree(final Path folder) {
-        try (Stream<Path> walk = Files.walk(folder)) {
-            walk.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
-        } catch (final IOException ex) {
-            System.err.println("Could not clean up " + folder + ": " + ex.getMessage());
-        }
     }
 }

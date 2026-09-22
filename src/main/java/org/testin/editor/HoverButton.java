@@ -29,8 +29,11 @@ import org.testin.actions.Declared;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.SwingConstants;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 

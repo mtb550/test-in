@@ -77,7 +77,7 @@ public class DifferenceNumbersTest {
      * A row of a differences table. A live one carries the rule it breaks and
      * what a tester sees; a retired one carries what it was and when it went.
      */
-    private static final Pattern ROW = Pattern.compile("^\\| \\*\\*Difference (\\d+)\\*\\* \\|(.*)$", Pattern.MULTILINE);
+    private static final Pattern ROW = Pattern.compile("^\\| \\*\\*Difference (\\d+)\\*\\* +\\|(.*)$", Pattern.MULTILINE);
 
     /**
      * A page pointing at a difference, and the part whose list it means.
@@ -88,11 +88,105 @@ public class DifferenceNumbersTest {
      * are written.
      */
     private static final Pattern CITATION = Pattern.compile(
-            "difference (\\d+)(?:\\s+on\\s*\\[[^\\]]*\\]\\((?:\\.\\./(\\w+)/)?main\\.md)?",
+            "difference (\\d+)(?:\\s+on\\s*\\[[^]]*]\\((?:\\.\\./(\\w+)/)?main\\.md)?",
             Pattern.CASE_INSENSITIVE);
 
     private static final Pattern RULE_WRITTEN = Pattern.compile("\\*\\*(Rule-[A-Z][A-Z-]*-\\d+)\\*\\*");
     private static final Pattern RULE_NAMED = Pattern.compile("Rule-[A-Z][A-Z-]*-\\d+");
+
+    /**
+     * Every pointer at a difference, on every page.
+     * <p>
+     * A part's front page is read too, with its own two tables taken out first.
+     * It used to be skipped whole, because every row of those tables reads as a
+     * citation of itself - and the cost of that shortcut was the one thing these
+     * tests exist to catch: a front page describing a difference another part
+     * has retired went unnoticed, which docs/internal/main.md was doing (#66,
+     * finding 99).
+     */
+    private static void forEachCitation(final Citation tell) {
+        for (final Path page : pages()) {
+            final String part = page.getParent().getFileName().toString();
+
+            final Matcher cited = CITATION.matcher(oneLine(withoutDifferenceRows(read(page))));
+            while (cited.find()) {
+                tell.found(part + "/" + page.getFileName(), cited.group(2) == null ? part : cited.group(2),
+                        Integer.parseInt(cited.group(1)));
+            }
+        }
+    }
+
+    /**
+     * The page with its differences tables taken out, so what is left is the
+     * prose that points at them.
+     */
+    private static String withoutDifferenceRows(final String text) {
+        return ROW.matcher(text).replaceAll("");
+    }
+
+    /**
+     * The difference numbers each part lists, on one side of the retirement line
+     * or the other.
+     */
+    private static Map<String, Set<Integer>> differences(final boolean gone) {
+        final Map<String, Set<Integer>> byPart = new TreeMap<>();
+
+        for (final Path main : mainPages()) {
+            final String[] halves = RETIRED_FROM_HERE.split(read(main));
+            final String half = gone ? String.join("", List.of(halves).subList(Math.min(1, halves.length), halves.length))
+                    : halves[0];
+
+            final Matcher row = ROW.matcher(half);
+            final Set<Integer> numbers = new LinkedHashSet<>();
+            while (row.find()) numbers.add(Integer.parseInt(row.group(1)));
+
+            byPart.put(main.getParent().getFileName().toString(), numbers);
+        }
+
+        return byPart;
+    }
+
+    /**
+     * A citation can wrap onto the next line between the number and the link
+     * that says whose it is, so the page is read as one line before matching.
+     */
+    private static String oneLine(final String text) {
+        return text.replaceAll("\\s+", " ");
+    }
+
+    private static List<Path> mainPages() {
+        return pages().stream().filter(page -> "main.md".equals(page.getFileName().toString())).toList();
+    }
+
+    /**
+     * Every page inside a part. The pages at the top of {@code docs} belong to
+     * no part and list no differences.
+     */
+    private static List<Path> pages() {
+        final List<Path> pages = new ArrayList<>();
+
+        try (Stream<Path> tree = Files.walk(DOCS)) {
+            for (final Path file : tree.toList()) {
+                if (!file.toString().endsWith(".md")) continue;
+                if (file.getParent().equals(DOCS)) continue;
+
+                pages.add(file);
+            }
+        } catch (final IOException ex) {
+            fail("Could not read " + DOCS + ": " + ex.getMessage());
+        }
+
+        return pages;
+    }
+
+    private static String read(final Path file) {
+        try {
+            return Files.readString(file);
+        } catch (final IOException ex) {
+            fail("Could not read " + file + ": " + ex.getMessage());
+            return "";
+        }
+    }
 
     /**
      * A page must not describe a difference its part has already retired.
@@ -200,99 +294,5 @@ public class DifferenceNumbersTest {
      */
     private interface Citation {
         void found(String page, String part, int number);
-    }
-
-    /**
-     * Every pointer at a difference, on every page.
-     * <p>
-     * A part's front page is read too, with its own two tables taken out first.
-     * It used to be skipped whole, because every row of those tables reads as a
-     * citation of itself - and the cost of that shortcut was the one thing these
-     * tests exist to catch: a front page describing a difference another part
-     * has retired went unnoticed, which docs/internal/main.md was doing (#66,
-     * finding 99).
-     */
-    private static void forEachCitation(final Citation tell) {
-        for (final Path page : pages()) {
-            final String part = page.getParent().getFileName().toString();
-
-            final Matcher cited = CITATION.matcher(oneLine(withoutDifferenceRows(read(page))));
-            while (cited.find()) {
-                tell.found(part + "/" + page.getFileName(), cited.group(2) == null ? part : cited.group(2),
-                        Integer.parseInt(cited.group(1)));
-            }
-        }
-    }
-
-    /**
-     * The page with its differences tables taken out, so what is left is the
-     * prose that points at them.
-     */
-    private static String withoutDifferenceRows(final String text) {
-        return ROW.matcher(text).replaceAll("");
-    }
-
-    /**
-     * The difference numbers each part lists, on one side of the retirement line
-     * or the other.
-     */
-    private static Map<String, Set<Integer>> differences(final boolean gone) {
-        final Map<String, Set<Integer>> byPart = new TreeMap<>();
-
-        for (final Path main : mainPages()) {
-            final String[] halves = RETIRED_FROM_HERE.split(read(main));
-            final String half = gone ? String.join("", List.of(halves).subList(Math.min(1, halves.length), halves.length))
-                    : halves[0];
-
-            final Matcher row = ROW.matcher(half);
-            final Set<Integer> numbers = new LinkedHashSet<>();
-            while (row.find()) numbers.add(Integer.parseInt(row.group(1)));
-
-            byPart.put(main.getParent().getFileName().toString(), numbers);
-        }
-
-        return byPart;
-    }
-
-    /**
-     * A citation can wrap onto the next line between the number and the link
-     * that says whose it is, so the page is read as one line before matching.
-     */
-    private static String oneLine(final String text) {
-        return text.replaceAll("\\s+", " ");
-    }
-
-    private static List<Path> mainPages() {
-        return pages().stream().filter(page -> "main.md".equals(page.getFileName().toString())).toList();
-    }
-
-    /**
-     * Every page inside a part. The pages at the top of {@code docs} belong to
-     * no part and list no differences.
-     */
-    private static List<Path> pages() {
-        final List<Path> pages = new ArrayList<>();
-
-        try (Stream<Path> tree = Files.walk(DOCS)) {
-            for (final Path file : tree.toList()) {
-                if (!file.toString().endsWith(".md")) continue;
-                if (file.getParent().equals(DOCS)) continue;
-
-                pages.add(file);
-            }
-        } catch (final IOException ex) {
-            fail("Could not read " + DOCS + ": " + ex.getMessage());
-        }
-
-        return pages;
-    }
-
-    private static String read(final Path file) {
-        try {
-            return Files.readString(file);
-        } catch (final IOException ex) {
-            fail("Could not read " + file + ": " + ex.getMessage());
-            return "";
-        }
     }
 }

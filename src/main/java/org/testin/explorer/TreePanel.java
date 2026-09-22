@@ -16,7 +16,6 @@
 
 package org.testin.explorer;
 
-import org.testin.services.OptionalPlugin;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
@@ -26,21 +25,20 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.ui.content.Content;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import javax.swing.JComponent;
-import java.awt.BorderLayout;
-import com.intellij.ui.components.JBPanelWithEmptyText;
 import org.testin.creator.CreateTestProjectAction;
+import org.testin.explorer.toolbar.BranchSelector;
 import org.testin.explorer.toolbar.RefreshAction;
 import org.testin.explorer.tree.TreePanelTree;
-import org.testin.explorer.toolbar.BranchSelector;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.setting.SettingsConfigurable;
 import org.testin.setting.TestinRoot;
@@ -49,23 +47,19 @@ import org.testin.testproject.BoundTestProject;
 import org.testin.testproject.CloneTestProject;
 import org.testin.util.Bundle;
 
-import java.awt.*;
-import java.util.Optional;
+import javax.swing.JComponent;
+import java.awt.BorderLayout;
 import java.util.Map;
+import java.util.Optional;
 
 @Service(Service.Level.PROJECT)
 public final class TreePanel implements Disposable {
+    private static final int INLINE_CHOICES = 6;
     private final @NotNull Project p;
-
     @Getter
     private final @NotNull JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
-
     // UC-TREE-PANEL-001, Rule-TREE-PANEL-097
     private final @NotNull JBPanel<?> treeView = new JBPanel<>(new BorderLayout());
-
-    // UC-TREE-PANEL-028, Rule-TREE-PANEL-101
-    private @NotNull Optional<Content> content = Optional.empty();
-
     private final @NotNull BranchSelector branchSelector;
 
     @Getter
@@ -73,10 +67,9 @@ public final class TreePanel implements Disposable {
 
     @Getter
     private final @NotNull TreePanelTree projectTree;
-
+    // UC-TREE-PANEL-028, Rule-TREE-PANEL-101
+    private @NotNull Optional<Content> content = Optional.empty();
     private @NotNull Map<String, ProjectStatus> underRoot = Map.of();
-
-    private static final int INLINE_CHOICES = 6;
 
     public TreePanel(final @NotNull Project p) {
         this.p = p;

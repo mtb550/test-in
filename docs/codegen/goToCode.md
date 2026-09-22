@@ -36,11 +36,11 @@ This opens the Java method that runs the selected test case.
 
 ## The three ways in
 
-| The tester does this | Where |
-|---|---|
-| Presses `Shift+F5` | The list of test cases in either editor |
-| Chooses **Navigate to Test Method** | The menu in either editor |
-| Clicks the class button | A card under the pointer, or the view panel |
+| The tester does this                | Where                                       |
+|-------------------------------------|---------------------------------------------|
+| Presses `Shift+F5`                  | The list of test cases in either editor     |
+| Chooses **Navigate to Test Method** | The menu in either editor                   |
+| Clicks the class button             | A card under the pointer, or the view panel |
 
 ## The screen
 

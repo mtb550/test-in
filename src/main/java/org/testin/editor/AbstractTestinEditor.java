@@ -25,43 +25,43 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.Declared;
+import org.testin.actions.EscapeAction;
+import org.testin.editor.grid.GridEnterAction;
 import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.editor.grid.GridView;
 import org.testin.editor.list.ListPanelBuilder;
 import org.testin.editor.list.ListView;
-import org.testin.editor.statusbar.StatusBar;
-import org.testin.editor.toolbar.AbstractToolbarPanel;
-import org.testin.editor.toolbar.Toolbar;
-import com.intellij.ui.table.JBTable;
-import org.testin.actions.EscapeAction;
-import org.testin.editor.grid.GridEnterAction;
 import org.testin.editor.listeners.GridContextMenuListener;
 import org.testin.editor.listeners.GridSelectionListener;
 import org.testin.editor.statusbar.PageAction;
-import org.testin.open.OpenContextMenuAction;
-import org.testin.ui.FontSync;
-import org.testin.actions.Declared;
+import org.testin.editor.statusbar.StatusBar;
+import org.testin.editor.toolbar.AbstractToolbarPanel;
+import org.testin.editor.toolbar.Toolbar;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
-import org.testin.undo.UndoHistories;
-import org.testin.undo.UndoScope;
+import org.testin.open.OpenContextMenuAction;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
+import org.testin.ui.FontSync;
+import org.testin.undo.UndoHistories;
+import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 
 import javax.swing.JComponent;
-import java.awt.event.MouseListener;
 import java.awt.BorderLayout;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -96,35 +96,25 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     protected final @NotNull ListView listView;
 
     protected final @NotNull AbstractEditorContextMenu contextMenu;
-
+    @Getter
+    protected final @NotNull StatusBar statusBar = new StatusBar();
     protected @NotNull Optional<GridView> grid = Optional.empty();
-
     @Getter
     @Setter
     protected int currentPage = 1;
-
     // UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-222
     @Getter
     protected int pageSize = TestinEditor.pageSizeOf(PropertiesComponent.getInstance().getValue(TestinEditor.PAGE_SIZE_KEY, ""));
-
-    @Getter
-    protected final @NotNull StatusBar statusBar = new StatusBar();
-
-    public abstract @NotNull AbstractToolbarPanel getToolBar();
-
     @Getter
     @Setter
     protected @NotNull String hoveredIconAction = "";
-
     @Getter
     @Setter
     protected int hoveredIndex = -1;
-
     protected @NotNull Optional<UUID> selectionToRestore = Optional.empty();
-
     protected int gridColumnToRestore = -1;
-
     private boolean goingTo = false;
+    private boolean disposed;
 
     protected AbstractTestinEditor(final @NotNull Project p, final @NotNull N parent) {
         this.p = p;
@@ -149,6 +139,8 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
 
         this.contextMenu = buildContextMenu();
     }
+
+    public abstract @NotNull AbstractToolbarPanel getToolBar();
 
     // UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-107, Rule-EDITOR-PANEL-222
     @Override
@@ -466,8 +458,6 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
                 () -> grid.map(GridView::table),
                 () -> getToolBar().getCurrentView() == ViewMode.GRID_VIEW);
     }
-
-    private boolean disposed;
 
     protected boolean isDisposed() {
         return disposed;

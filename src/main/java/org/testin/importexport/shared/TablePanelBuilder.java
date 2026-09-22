@@ -16,19 +16,20 @@
 
 package org.testin.importexport.shared;
 
-import org.testin.editor.grid.GridPanelBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.logger.Logger;
 import org.testin.model.Priority;
-import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.util.Bundle;
 
-import javax.swing.*;
+import javax.swing.DefaultCellEditor;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class TablePanelBuilder {
 
     // UC-SHARE-003, Rule-SHARE-017
     public @NotNull DefaultTableModel createModel(final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull List<TestCaseDto> testCases) {
-        final String @NotNull[] columns = buildColumnNames(importAttributes);
+        final String @NotNull [] columns = buildColumnNames(importAttributes);
         final @NotNull DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public @NotNull Class<?> getColumnClass(final int columnIndex) {
@@ -62,7 +63,7 @@ public class TablePanelBuilder {
 
         int index = 1;
         for (final TestCaseDto tc : testCases) {
-            final Object @NotNull[] rowData = new Object[columns.length];
+            final Object @NotNull [] rowData = new Object[columns.length];
             rowData[0] = Boolean.TRUE;
             rowData[1] = String.valueOf(index++);
 

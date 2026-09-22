@@ -21,13 +21,12 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.logger.Logger;
-import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.view.ViewToolWindowFactory;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -59,8 +58,6 @@ public interface TestinEditor extends Disposable {
     @NotNull DirectoryDto getParent();
 
     @NotNull StatusBar getStatusBar();
-
-    @NotNull AbstractToolbarPanel getToolBar();
 
     int getCurrentPage();
 

@@ -22,7 +22,8 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.UUID;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * What a run row keeps when a test framework reports one of its cases.

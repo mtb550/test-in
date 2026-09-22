@@ -38,11 +38,11 @@ import org.testin.util.Bundle;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Function;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Getter
@@ -61,7 +61,7 @@ public enum FileTypes {
             "Excel",
             ".xlsx",
             columns -> Bundle.message("import.hint.xlsx", columns),
-            (p, destFile, sheets) -> new ExportExcel().exportToFile(p, destFile, sheets),
+            (p, destFile, sheets) -> new ExportExcel().exportToFile(destFile, sheets),
             (p, importFile) -> new ImportExcel().processImport(p, importFile),
             (p, trDir, tr) -> new TestRunExcelGenerator().generate(p, trDir, tr)
     ),
@@ -79,7 +79,7 @@ public enum FileTypes {
             "CSV",
             ".csv",
             columns -> Bundle.message("import.hint.csv", columns),
-            (p, destFile, sheets) -> new ExportCsv().exportToFile(p, destFile, sheets),
+            (p, destFile, sheets) -> new ExportCsv().exportToFile(destFile, sheets),
             (p, importFile) -> new ImportCsv().processImport(p, importFile),
             ReportHandler.UNSUPPORTED
     ),
@@ -88,7 +88,7 @@ public enum FileTypes {
             "HTML",
             ".html",
             columns -> "",
-            (p, destFile, sheets) -> new ExportHtml().exportToFile(p, destFile, sheets),
+            (p, destFile, sheets) -> new ExportHtml().exportToFile(destFile, sheets),
             ImportHandler.UNSUPPORTED,
             (p, trDir, tr) -> new TestRunHtmlGenerator().generate(p, trDir, tr).getBytes(StandardCharsets.UTF_8)
     ),
@@ -115,26 +115,9 @@ public enum FileTypes {
     private final @NotNull String extension;
 
     private final @NotNull Function<String, String> hint;
-
-    public @NotNull String hintFor(final @NotNull String columns) {
-        return hint.apply(columns);
-    }
-
     private final @NotNull ExportHandler exportHandler;
     private final @NotNull ImportHandler importHandler;
     private final @NotNull ReportHandler reportHandler;
-
-    public boolean isExportable() {
-        return exportHandler != ExportHandler.UNSUPPORTED;
-    }
-
-    public boolean isImportable() {
-        return importHandler != ImportHandler.UNSUPPORTED;
-    }
-
-    public boolean isReportable() {
-        return reportHandler != ReportHandler.UNSUPPORTED;
-    }
 
     public static @NotNull Optional<FileTypes> importerFor(final @NotNull String fileName) {
         return Arrays.stream(values())
@@ -154,6 +137,22 @@ public enum FileTypes {
                 .filter(FileTypes::isImportable)
                 .map(type -> type.getExtension().substring(1))
                 .toArray(String[]::new);
+    }
+
+    public @NotNull String hintFor(final @NotNull String columns) {
+        return hint.apply(columns);
+    }
+
+    public boolean isExportable() {
+        return exportHandler != ExportHandler.UNSUPPORTED;
+    }
+
+    public boolean isImportable() {
+        return importHandler != ImportHandler.UNSUPPORTED;
+    }
+
+    public boolean isReportable() {
+        return reportHandler != ReportHandler.UNSUPPORTED;
     }
 
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {

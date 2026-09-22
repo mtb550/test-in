@@ -44,12 +44,12 @@ There is no key for this. It happens when a package is renamed or moved.
 
 ## What this covers
 
-| The tester does this | What happens to the code |
-|---|---|
+| The tester does this       | What happens to the code                                         |
+|----------------------------|------------------------------------------------------------------|
 | Renames a test set package | The folder is renamed, every file below declares the new package |
-| Moves a test set package | The folder is moved, every file below declares the new package |
-| Renames the test project | The folder at the top is renamed, and every file below follows |
-| Removes the test project | The folder at the top is deleted, with everything under it |
+| Moves a test set package   | The folder is moved, every file below declares the new package   |
+| Renames the test project   | The folder at the top is renamed, and every file below follows   |
+| Removes the test project   | The folder at the top is deleted, with everything under it       |
 
 Test run packages and test runs have no code, so nothing happens for them.
 

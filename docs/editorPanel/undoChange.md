@@ -88,13 +88,13 @@ everything was.
 
 ## What one press takes back
 
-| The tester did | One press takes back |
-|---|---|
-| Changed one field on 30 test cases | All 30 |
-| Removed four test cases | All four |
-| Dragged three cards | All three |
-| Typed in one grid cell | That one cell |
-| Cut in one test set and pasted into another | Both halves |
+| The tester did                              | One press takes back |
+|---------------------------------------------|----------------------|
+| Changed one field on 30 test cases          | All 30               |
+| Removed four test cases                     | All four             |
+| Dragged three cards                         | All three            |
+| Typed in one grid cell                      | That one cell        |
+| Cut in one test set and pasted into another | Both halves          |
 
 ## What the history does not hold
 

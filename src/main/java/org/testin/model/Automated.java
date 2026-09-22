@@ -23,7 +23,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import org.testin.util.Bundle;
-import javax.swing.*;
+
+import javax.swing.Icon;
 import java.util.List;
 
 @Getter

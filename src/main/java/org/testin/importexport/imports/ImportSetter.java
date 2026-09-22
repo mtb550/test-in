@@ -21,15 +21,16 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @FunctionalInterface
 public interface ImportSetter {
-    boolean execute(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String value);
-
-    static boolean always(final @NotNull Runnable write) {
-        write.run();
-        return true;
+    static @NotNull ImportSetter always(final @NotNull BiConsumer<TestCaseDto, String> write) {
+        return (p, tc, value) -> {
+            write.accept(tc, value);
+            return true;
+        };
     }
 
     static <T> boolean took(final @NotNull Optional<T> read, final @NotNull Consumer<T> onto) {
@@ -37,4 +38,6 @@ public interface ImportSetter {
 
         return read.isPresent();
     }
+
+    boolean execute(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String value);
 }

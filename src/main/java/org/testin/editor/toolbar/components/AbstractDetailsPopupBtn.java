@@ -16,14 +16,14 @@
 
 package org.testin.editor.toolbar.components;
 
-import org.testin.editor.AbstractIconButton;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.CheckBoxList;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.AbstractIconButton;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
 import org.testin.ui.dialogs.DialogStyle;

@@ -19,12 +19,16 @@ package org.testin.git;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-
 import org.testin.config.TestinYml;
 import org.testin.util.Bundle;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,6 +43,9 @@ public final class GitRefs {
 
     private static final @NotNull Set<String> UNMERGED =
             Set.of("DD", "AU", "UD", "UA", "DU", "AA", "UU");
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-117
+    private static final @NotNull Pattern CLONE_CHARACTERS = Pattern.compile("^[A-Za-z0-9._~:/?#@%+=-]+$");
+    private static final @NotNull Pattern REMOTE_SCHEME = Pattern.compile("^(https?|ssh|git)://");
 
     // UC-SHARE-010, Rule-SHARE-048
     public static @NotNull List<StatusEntry> parseStatus(final @NotNull List<String> porcelainLines) {
@@ -184,19 +191,12 @@ public final class GitRefs {
         return domain.length() >= 3 && domain.indexOf('.') > 0 && !domain.endsWith(".");
     }
 
-    // UC-TREE-PANEL-001, Rule-TREE-PANEL-117
-    private static final @NotNull Pattern CLONE_CHARACTERS = Pattern.compile("^[A-Za-z0-9._~:/?#@%+=-]+$");
-
     // Rule-TREE-PANEL-117
-    @SuppressWarnings("HttpUrlsUsage")
     public static boolean isRepositoryUrl(final @NotNull String text) {
         final @NotNull String value = text.trim();
         if (!CLONE_CHARACTERS.matcher(value).matches()) return false;
 
-        return value.startsWith("http://")
-                || value.startsWith("https://")
-                || value.startsWith("ssh://")
-                || value.startsWith("git://")
+        return REMOTE_SCHEME.matcher(value).find()
                 || value.startsWith(TestinYml.SCP_PREFIX)
                 || value.endsWith(".git");
     }

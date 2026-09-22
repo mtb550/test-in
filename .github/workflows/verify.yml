@@ -19,7 +19,7 @@ on:
   # there: build.yml caught it because it gates on IntelliJ IDEA, but the count
   # a tester reads on the plugin page is this one, and nothing was asking for it.
   push:
-    branches: [main]
+    branches: [ main ]
 
   # Kept as well as the push. A platform release can change this answer with no
   # commit of ours behind it - a method deprecated in the next IDE is a warning

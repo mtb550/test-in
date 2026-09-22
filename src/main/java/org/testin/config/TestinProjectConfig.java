@@ -25,21 +25,16 @@ import org.testin.util.Bundle;
 
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.regex.Pattern;
 
 // Rule-INTERNAL-089, Rule-TREE-PANEL-106
-record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String repoUrl, @NotNull String testinProject, @NotNull String bugRepoUrl) {
+record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String repoUrl, @NotNull String testinProject,
+                           @NotNull String bugRepoUrl) {
+    public static final @NotNull TestinProjectConfig EMPTY = new TestinProjectConfig(
+            TestinLocation.LOCAL, "", "", "");
     static final @NotNull String PROJECT_KEY = "testinProject";
     static final @NotNull String LOCATION_KEY = "location";
     static final @NotNull String REPO_URL_KEY = "RepoUrl";
     static final @NotNull String BUG_REPO_URL_KEY = "bugRepoUrl";
-
-    public static final @NotNull TestinProjectConfig EMPTY = new TestinProjectConfig(
-            TestinLocation.LOCAL, "", "", "");
-
-    public static final @NotNull TestinProjectConfig UNREADABLE = new TestinProjectConfig(
-            TestinLocation.LOCAL, "", "", "");
 
     public TestinProjectConfig {
         // Rule-TREE-PANEL-117
@@ -88,12 +83,6 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String rep
 
     public @NotNull String projectName() {
         return testinProject;
-    }
-
-    // UC-TREE-PANEL-001
-    @SuppressWarnings("ObjectEquality")
-    public boolean isUnreadable() {
-        return this == UNREADABLE;
     }
 
     public boolean hasRepoUrl() {

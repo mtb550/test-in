@@ -25,19 +25,23 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.Services;
-import org.testin.setting.TestinRoot;
 import org.testin.search.GoTo;
 import org.testin.search.Hit;
+import org.testin.services.Services;
+import org.testin.setting.TestinRoot;
 import org.testin.ui.FontSync;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor

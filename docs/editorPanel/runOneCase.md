@@ -92,12 +92,12 @@ Everything about how the run is built and named is on
 
 ## What is recorded
 
-| Written | From |
-|---|---|
-| The verdict | Whether the framework said it passed or failed |
-| The duration | The framework's own timing |
-| The actual result and the error | The framework's message and stacktrace |
-| Who ran it, and when | The name on the settings page, and now |
+| Written                         | From                                           |
+|---------------------------------|------------------------------------------------|
+| The verdict                     | Whether the framework said it passed or failed |
+| The duration                    | The framework's own timing                     |
+| The actual result and the error | The framework's message and stacktrace         |
+| Who ran it, and when            | The name on the settings page, and now         |
 
 A failure clears what the last failure said happened first - the actual result,
 the error and the screenshots pasted with it - and keeps the bug severity, the

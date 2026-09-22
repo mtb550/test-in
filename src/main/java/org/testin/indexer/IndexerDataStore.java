@@ -37,7 +37,14 @@ import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.model.markers.AbstractMarker;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -79,10 +86,23 @@ final class IndexerDataStore {
             testRunPackagesByPath,
             testCasesMainDirsByPath,
             testRunsMainDirsByPath);
+    // Rule-INTERNAL-091
+    private final @NotNull Map<String, String> refusedProjects = new ConcurrentHashMap<>();
 
     IndexerDataStore(final @NotNull Project p) {
         this.testCaseStore = new TestCaseSequenceStore(p);
         this.markers = new MarkerFiles(p);
+    }
+
+    private static <T> @NotNull T indexed(final @Nullable T node, final @NotNull String kind, final @NotNull Path path) {
+        if (node != null) return node;
+
+        Logger.error("No " + kind + " indexed at " + path);
+        throw new IllegalStateException("No " + kind + " indexed at " + path);
+    }
+
+    private static void dropUnseen(final @NotNull Map<String, ?> held, final @NotNull Path projectPath, final @NotNull Map<String, ?> found) {
+        held.keySet().removeIf(key -> Path.of(key).startsWith(projectPath) && !found.containsKey(key));
     }
 
     @NotNull Map<UUID, TestCaseDto> getTestCasesById() {
@@ -120,11 +140,6 @@ final class IndexerDataStore {
     }
 
     @NotNull
-    TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {
-        return indexed(testRunsDirByPath.get(path.toString()), "test run directory", path);
-    }
-
-    @NotNull
     Optional<TestCaseDto> findTestCase(final @NotNull UUID id) {
         return Optional.ofNullable(testCaseStore.getTestCasesById().get(id));
     }
@@ -132,13 +147,6 @@ final class IndexerDataStore {
     @NotNull
     TestSetDirectoryDto getTestSetDirByPath(final @NotNull Path path) {
         return indexed(testSetsDirByPath.get(path.toString()), "test set", path);
-    }
-
-    private static <T> @NotNull T indexed(final @Nullable T node, final @NotNull String kind, final @NotNull Path path) {
-        if (node != null) return node;
-
-        Logger.error("No " + kind + " indexed at " + path);
-        throw new IllegalStateException("No " + kind + " indexed at " + path);
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-033
@@ -214,16 +222,13 @@ final class IndexerDataStore {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name) {
-        return markers.read(dirPath, kind, name);
+    <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name, final @NotNull Class<M> markerClass) {
+        return markers.read(dirPath, kind, name, markerClass);
     }
 
     @NotNull List<String> takeDamagedMarkers() {
         return markers.takeDamaged();
     }
-
-    // Rule-INTERNAL-091
-    private final @NotNull Map<String, String> refusedProjects = new ConcurrentHashMap<>();
 
     void refuse(final @NotNull Path projectPath, final @NotNull String reason) {
         refusedProjects.put(projectPath.toString(), reason);
@@ -255,15 +260,6 @@ final class IndexerDataStore {
                 LocalFileSystem.getInstance().refreshNioFiles(List.of(dirPath), true, true, null));
     }
 
-    void refreshFile(final @NotNull Path file) {
-        final @NotNull Optional<Path> parent = Optional.ofNullable(file.getParent());
-
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            parent.ifPresent(dir -> LocalFileSystem.getInstance().refreshNioFiles(List.of(dir), false, false, null));
-            LocalFileSystem.getInstance().refreshAndFindFileByNioFile(file);
-        });
-    }
-
     // UC-INTERNAL-002, Rule-INTERNAL-021
     void swapIn(final @NotNull Path projectPath, final @NotNull ScannedProject scanned) {
         testProjectsByPath.putAll(scanned.getProjects());
@@ -287,10 +283,6 @@ final class IndexerDataStore {
         dropUnseen(testRunsByPath, projectPath, scanned.getTestRuns());
 
         childrenIndex.invalidate();
-    }
-
-    private static void dropUnseen(final @NotNull Map<String, ?> held, final @NotNull Path projectPath, final @NotNull Map<String, ?> found) {
-        held.keySet().removeIf(key -> Path.of(key).startsWith(projectPath) && !found.containsKey(key));
     }
 
     void removeTestProject(final @NotNull Path path) {

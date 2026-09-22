@@ -113,14 +113,14 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
    *Platform* from **Web** to **Mobile** drops the browser that was picked. The
    lists are:
 
-   | Field | Offers |
-   |---|---|
-   | Test Type | *Functional Test*, *Performance Test* |
-   | Platform | *Web*, *Mobile* |
-   | Component | *Frontend*, *Backend* |
-   | Language | *English*, *Arabic*, *French* |
-   | Browser | *Chrome*, *Firefox*, *Safari*, *Edge* |
-   | Device Type | *iPhone*, *Samsung*, *Huawei* |
+   | Field       | Offers                                |
+   |-------------|---------------------------------------|
+   | Test Type   | *Functional Test*, *Performance Test* |
+   | Platform    | *Web*, *Mobile*                       |
+   | Component   | *Frontend*, *Backend*                 |
+   | Language    | *English*, *Arabic*, *French*         |
+   | Browser     | *Chrome*, *Firefox*, *Safari*, *Edge* |
+   | Device Type | *iPhone*, *Samsung*, *Huawei*         |
 
 4. **The test cases** — the whole folder tree, with a tick box on every row.
    The **Test Cases** row is at the top. Under it come each package, each test

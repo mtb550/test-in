@@ -19,13 +19,25 @@ package org.testin.importexport.imports;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
-import org.testin.model.dto.TestCaseDto;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PushbackReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ImportCsv {
     // UC-SHARE-006
@@ -67,7 +79,7 @@ public class ImportCsv {
         int refused = 0;
 
         for (int r = 1; r < records.size(); r++) {
-            final String @NotNull[] values = records.get(r);
+            final String @NotNull [] values = records.get(r);
 
             if (Arrays.stream(values).allMatch(String::isBlank)) continue;
 

@@ -36,7 +36,8 @@ public final class BugLimits {
         if (titleLength == 0) return Optional.of(Bundle.message("bug.limit.title.empty"));
         if (titleLength > TITLE) return Optional.of(Bundle.message("bug.limit.title.long", titleLength, TITLE));
         if (body.length() > BODY) return Optional.of(Bundle.message("bug.limit.body.long", body.length(), BODY));
-        if (screenshots > SCREENSHOTS) return Optional.of(Bundle.message("bug.limit.screenshots", screenshots, SCREENSHOTS));
+        if (screenshots > SCREENSHOTS)
+            return Optional.of(Bundle.message("bug.limit.screenshots", screenshots, SCREENSHOTS));
 
         return Optional.empty();
     }

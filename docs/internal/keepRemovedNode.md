@@ -42,11 +42,11 @@ between them.
 
 ## Where a removed node goes
 
-| Where | What it is for |
-|---|---|
-| The desktop recycle bin | The tester's copy. Found and restored without Testin |
-| A folder the IDE owns, outside the Testin folder | Testin's copy, so `Ctrl+Z` can reach it |
-| Nowhere | When the desktop has no recycle bin, or the node was already gone |
+| Where                                            | What it is for                                                    |
+|--------------------------------------------------|-------------------------------------------------------------------|
+| The desktop recycle bin                          | The tester's copy. Found and restored without Testin              |
+| A folder the IDE owns, outside the Testin folder | Testin's copy, so `Ctrl+Z` can reach it                           |
+| Nowhere                                          | When the desktop has no recycle bin, or the node was already gone |
 
 ## The screen
 

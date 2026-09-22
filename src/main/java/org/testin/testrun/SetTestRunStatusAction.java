@@ -16,7 +16,6 @@
 
 package org.testin.testrun;
 
-import org.testin.actions.GrayWithReason;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -24,6 +23,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
+import org.testin.actions.GrayWithReason;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;

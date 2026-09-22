@@ -49,7 +49,16 @@ import org.testin.util.Bundle;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -77,6 +86,20 @@ public final class ProjectIndexer {
         this.scanCoordinator = new ProjectScanCoordinator(new IndexingScanner(p, store));
         this.runWriter = new RunWriter(p, store);
         this.nodeFiles = new NodeFiles(p, this, store);
+    }
+
+    private static boolean sameFile(final @NotNull Path one, final @NotNull Path other) {
+        try {
+            return Files.isSameFile(one, other);
+        } catch (final IOException ex) {
+            Logger.warn("Could not compare " + one + " with " + other + ": " + ex.getMessage());
+            return false;
+        }
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-011
+    static boolean isCaseFile(final @NotNull Path file, final @NotNull Predicate<Path> isTestSet) {
+        return FileKind.of(file) == FileKind.TEST_CASE && isTestSet.test(file.getParent());
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-013
@@ -351,10 +374,6 @@ public final class ProjectIndexer {
         return store.getTestSetDirByPath(path);
     }
 
-    public @NotNull TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {
-        return store.getTestRunDirByPath(path);
-    }
-
     public @NotNull Map<String, TestProjectDirectoryDto> getTestProjectsByPath() {
         return store.getTestProjectsByPath();
     }
@@ -364,15 +383,6 @@ public final class ProjectIndexer {
         if (!Files.exists(wanted)) return false;
 
         return renaming.map(self -> !sameFile(self, wanted)).orElse(true);
-    }
-
-    private static boolean sameFile(final @NotNull Path one, final @NotNull Path other) {
-        try {
-            return Files.isSameFile(one, other);
-        } catch (final IOException ex) {
-            Logger.warn("Could not compare " + one + " with " + other + ": " + ex.getMessage());
-            return false;
-        }
     }
 
     public @NotNull List<DirectoryDto> getChildren(final @NotNull Path parentPath) {
@@ -418,18 +428,12 @@ public final class ProjectIndexer {
     public void changeRun(final @NotNull Path runPath, final @NotNull Consumer<TestRunDto> change) {
         findTestRun(runPath).ifPresentOrElse(run -> {
             // Rule-INTERNAL-011
-            final @NotNull Set<UUID> before = coveredBy(run);
+            final @NotNull Set<UUID> gone = run.coveredIds();
             change.accept(run);
-
-            final @NotNull Set<UUID> gone = new LinkedHashSet<>(before);
-            gone.removeAll(coveredBy(run));
+            gone.removeAll(run.coveredIds());
 
             runWriter.persist(runPath, run, gone);
         }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
-    }
-
-    private static @NotNull Set<UUID> coveredBy(final @NotNull TestRunDto run) {
-        return run.getResults().stream().map(TestRunItems::getId).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public void changeRunMarker(final @NotNull Path runPath, final @NotNull Consumer<TestRunMarker> change) {
@@ -499,11 +503,6 @@ public final class ProjectIndexer {
 
     public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final @NotNull IntConsumer onComplete) {
         nodeFiles.copy(sourcePaths, targetPath, onComplete);
-    }
-
-    // UC-INTERNAL-002, Rule-INTERNAL-011
-    static boolean isCaseFile(final @NotNull Path file, final @NotNull Predicate<Path> isTestSet) {
-        return FileKind.of(file) == FileKind.TEST_CASE && isTestSet.test(file.getParent());
     }
 
     // UC-INTERNAL-005, Rule-INTERNAL-037, Rule-INTERNAL-041
@@ -598,8 +597,8 @@ public final class ProjectIndexer {
         return store.persistMarker(dto);
     }
 
-    public <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name) {
-        return store.readMarker(dirPath, kind, name);
+    public <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name, final @NotNull Class<M> markerClass) {
+        return store.readMarker(dirPath, kind, name, markerClass);
     }
 
     // UC-INTERNAL-008, Rule-INTERNAL-091
@@ -631,10 +630,6 @@ public final class ProjectIndexer {
 
     public void refreshDirectory(final @NotNull Path path) {
         store.refreshDir(path);
-    }
-
-    public void refreshFile(final @NotNull Path file) {
-        store.refreshFile(file);
     }
 
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {

@@ -28,7 +28,7 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.Consumer;
 
-final class RemoteUrlDialog extends AbstractFrameworkDialog<TextInput> {
+final class RemoteUrlDialog extends AbstractFrameworkDialog {
     private final @NotNull TextInput urlField;
     private final @NotNull Consumer<@NotNull String> onUrl;
 

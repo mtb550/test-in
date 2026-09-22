@@ -75,26 +75,26 @@ The list opens under the button. It has no title.
 
 ## The 18 fields
 
-| Field | Shown to start with | Can be changed |
-|---|---|---|
-| Order | Yes | **No** |
-| Description | Yes | **No** |
-| ID | No | **No** |
-| Expected Result | Yes | Yes |
-| Steps | No | Yes |
-| Priority | Yes | Yes |
-| FQCN | No | Yes |
-| Reference | No | Yes |
-| Test Data | No | Yes |
-| Pre Conditions | No | Yes |
-| Group | Yes | Yes |
-| Path | No | Yes |
-| Module | No | Yes |
-| Status | No | Yes |
-| Created By | No | Yes |
-| Updated By | No | Yes |
-| Created At | No | Yes |
-| Updated At | No | Yes |
+| Field           | Shown to start with | Can be changed |
+|-----------------|---------------------|----------------|
+| Order           | Yes                 | **No**         |
+| Description     | Yes                 | **No**         |
+| ID              | No                  | **No**         |
+| Expected Result | Yes                 | Yes            |
+| Steps           | No                  | Yes            |
+| Priority        | Yes                 | Yes            |
+| FQCN            | No                  | Yes            |
+| Reference       | No                  | Yes            |
+| Test Data       | No                  | Yes            |
+| Pre Conditions  | No                  | Yes            |
+| Group           | Yes                 | Yes            |
+| Path            | No                  | Yes            |
+| Module          | No                  | Yes            |
+| Status          | No                  | Yes            |
+| Created By      | No                  | Yes            |
+| Updated By      | No                  | Yes            |
+| Created At      | No                  | Yes            |
+| Updated At      | No                  | Yes            |
 
 ## Main flow
 

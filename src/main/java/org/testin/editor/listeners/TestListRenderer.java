@@ -24,7 +24,7 @@ import org.testin.editor.test.TestCard;
 import org.testin.editor.test.TestEditor;
 import org.testin.model.dto.TestCaseDto;
 
-import javax.swing.*;
+import javax.swing.JList;
 
 public class TestListRenderer extends AbstractListRenderer<TestinEditor> {
     private final @NotNull TestCard card;

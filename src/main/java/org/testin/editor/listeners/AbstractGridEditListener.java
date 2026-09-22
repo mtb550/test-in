@@ -28,13 +28,13 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-import java.util.List;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractGridEditListener implements TableModelListener {
@@ -45,6 +45,12 @@ public abstract class AbstractGridEditListener implements TableModelListener {
     private final @NotNull Set<UUID> writtenThisGesture = new HashSet<>();
 
     private boolean updating = false;
+
+    private static @NotNull String shortened(final @NotNull String value) {
+        final @NotNull String oneLine = value.replace('\n', ' ').trim();
+
+        return oneLine.length() <= 60 ? oneLine : oneLine.substring(0, 59) + "…";
+    }
 
     // UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-052
     @Override
@@ -105,11 +111,5 @@ public abstract class AbstractGridEditListener implements TableModelListener {
 
         Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("grid.adjusted.title"),
                 Bundle.message("grid.adjusted.message", shortened(stored), shortened(typed)));
-    }
-
-    private static @NotNull String shortened(final @NotNull String value) {
-        final @NotNull String oneLine = value.replace('\n', ' ').trim();
-
-        return oneLine.length() <= 60 ? oneLine : oneLine.substring(0, 59) + "\u2026";
     }
 }

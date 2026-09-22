@@ -2,8 +2,8 @@
 
 # UC-SHARE-013: Commit and push
 
-**As a** tester, **I want** my work recorded and sent in one press,
-**so that** the team has it without a second gesture I might forget.
+**As a** tester, **I want** my work recorded and sent in one press, **so that** the team has it without a second gesture
+I might forget.
 
 A commit records the work here. A push sends it to the team's copy, which Git
 calls the remote. This does both in one press.
@@ -51,8 +51,7 @@ something else.
    [UC-SHARE-012](commitChanges.md) describes.
 3. Testin reads the remote address.
 4. Testin pushes the branch.
-5. A message titled **Pushed** reads *Commit*, then the short identifier, then
-   *is on*, then the remote and the branch.
+5. A message titled **Pushed** reads *Commit*, then the short identifier, then *is on*, then the remote and the branch.
 
 ## What Testin refuses
 
@@ -73,8 +72,7 @@ page pasted in place of its clone address is the usual way to meet this.
 the question, and the push not happening is the answer to it. The commit was
 already made.
 
-**If the address cannot be added** — a message titled **Git Error** reads
-*Failed to add remote:* and then the reason.
+**If the address cannot be added** — a message titled **Git Error** reads *Failed to add remote:* and then the reason.
 
 **If the remote cannot be read** — a message titled **Git Error** reads *Could
 not read the Git remote:* and then the reason.

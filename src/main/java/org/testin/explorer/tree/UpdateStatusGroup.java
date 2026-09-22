@@ -30,6 +30,13 @@ import org.testin.model.markers.Marker;
 import java.util.List;
 
 public class UpdateStatusGroup extends DefaultActionGroup {
+    private static @NotNull List<NodeStatus> statuses(final @NotNull AnActionEvent e) {
+        return TestinData.singleSelectedNode(e)
+                .map(DirectoryDto::getMarker)
+                .map(Marker::statuses)
+                .orElseGet(List::of);
+    }
+
     // UC-TREE-PANEL-018, Rule-TREE-PANEL-065
     @Override
     public AnAction @NotNull [] getChildren(final @Nullable AnActionEvent e) {
@@ -38,13 +45,6 @@ public class UpdateStatusGroup extends DefaultActionGroup {
         return statuses(e).stream()
                 .map(UpdateStatusAction::new)
                 .toArray(AnAction[]::new);
-    }
-
-    private static @NotNull List<NodeStatus> statuses(final @NotNull AnActionEvent e) {
-        return TestinData.singleSelectedNode(e)
-                .map(DirectoryDto::getMarker)
-                .map(Marker::statuses)
-                .orElseGet(List::of);
     }
 
     @Override

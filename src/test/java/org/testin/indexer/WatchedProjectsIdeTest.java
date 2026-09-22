@@ -19,13 +19,13 @@ package org.testin.indexer;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.testin.TempTree;
 import org.testin.model.DirectoryType;
 import org.testin.services.Services;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
-import java.io.IOException;
 
 /**
  * UC-INTERNAL-003, Rule-INTERNAL-016.
@@ -46,10 +46,8 @@ public class WatchedProjectsIdeTest extends BasePlatformTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        try (var walk = Files.walk(root)) {
-            walk.sorted(Comparator.reverseOrder()).forEach(each -> each.toFile().delete());
-        } catch (final Exception ignored) {
-            // Left for the operating system.
+        try {
+            TempTree.delete(root);
         } finally {
             super.tearDown();
         }

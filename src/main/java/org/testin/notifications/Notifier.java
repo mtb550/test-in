@@ -34,16 +34,16 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.util.Bundle;
 import org.testin.util.Html;
 
-import java.awt.*;
+import java.awt.Point;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class Notifier {
     private static final @NotNull String GROUP_ID = "testin.notifications";
+    private static final @NotNull String NO_TITLE = "";
 
     public void softShow(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
         showBalloon(p, String.format("<html><b>%s</b><br>%s</html>", Html.ofText(title), Html.ofText(message)), MessageType.INFO);
@@ -82,26 +82,22 @@ public final class Notifier {
     }
 
     private void showBalloon(final @NotNull Project p, final @NotNull String htmlContent, final @NotNull MessageType type) {
-        ApplicationManager.getApplication().invokeLater(() -> {
-            Optional.ofNullable(WindowManager.getInstance().getIdeFrame(p))
-                    .map(IdeFrame::getStatusBar)
-                    .map(StatusBar::getComponent)
-                    .ifPresentOrElse(statusBarComponent -> {
-                        final @NotNull Balloon balloon = JBPopupFactory.getInstance()
-                                .createHtmlTextBalloonBuilder(htmlContent, type, null)
-                                .setFadeoutTime(5000)
-                                .setAnimationCycle(200)
-                                .createBalloon();
+        ApplicationManager.getApplication().invokeLater(() -> Optional.ofNullable(WindowManager.getInstance().getIdeFrame(p))
+                .map(IdeFrame::getStatusBar)
+                .map(StatusBar::getComponent)
+                .ifPresentOrElse(statusBarComponent -> {
+                            final @NotNull Balloon balloon = JBPopupFactory.getInstance()
+                                    .createHtmlTextBalloonBuilder(htmlContent, type, null)
+                                    .setFadeoutTime(5000)
+                                    .setAnimationCycle(200)
+                                    .createBalloon();
 
-                        final @NotNull Point targetPoint = new Point(statusBarComponent.getWidth() - 30,
-                                statusBarComponent.getHeight() / 2);
-                        balloon.show(new RelativePoint(statusBarComponent, targetPoint), Balloon.Position.above);
-                    },
-                    () -> Logger.info("Nowhere to show this, so it is only here: " + htmlContent));
-        });
+                            final @NotNull Point targetPoint = new Point(statusBarComponent.getWidth() - 30,
+                                    statusBarComponent.getHeight() / 2);
+                            balloon.show(new RelativePoint(statusBarComponent, targetPoint), Balloon.Position.above);
+                        },
+                        () -> Logger.info("Nowhere to show this, so it is only here: " + htmlContent)));
     }
-
-    private static final @NotNull String NO_TITLE = "";
 
     public void error(final @NotNull Project p, final @NotNull String message) {
         notify(p, NO_TITLE, message, NotificationType.ERROR);

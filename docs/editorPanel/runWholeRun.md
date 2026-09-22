@@ -2,14 +2,13 @@
 
 # UC-EDITOR-PANEL-044: Run everything not yet judged
 
-**As a** tester, **I want** to set the whole test run going and come back later,
-**so that** a regression run of 200 test cases happens while I do something
+**As a** tester, **I want** to set the whole test run going and come back later, **so that** a regression run of 200
+test cases happens while I do something
 else.
 
 Testin runs every test case that has no verdict yet, in one go.
 
-There is no key and no button in the editor. It starts from the tree, with
-**Run Tests** on the test run.
+There is no key and no button in the editor. It starts from the tree, with **Run Tests** on the test run.
 
 ## Rules
 
@@ -66,8 +65,8 @@ figure for each verdict the test run now carries, such as *Passed 42, Failed 8*.
 4. All of them are claimed by this editor.
 5. They are handed to TestNG as one configuration.
 6. Results come back one at a time and are written into the test run, silently.
-7. When the last one lands, one message reads the test run's figures, such as
-   *Passed 42, Failed 8*, and the test run is marked **Completed**.
+7. When the last one lands, one message reads the test run's figures, such as *Passed 42, Failed 8*, and the test run is
+   marked **Completed**.
 
 ## What Testin refuses
 

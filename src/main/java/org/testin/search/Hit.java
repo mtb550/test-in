@@ -21,10 +21,11 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.util.Icons;
 
-import javax.swing.*;
+import javax.swing.Icon;
 import java.util.Optional;
 
-public record Hit(@NotNull Icon icon, @NotNull String name, @NotNull String where, @NotNull DirectoryDto node, @NotNull Optional<TestCaseDto> testCase) {
+public record Hit(@NotNull Icon icon, @NotNull String name, @NotNull String where, @NotNull DirectoryDto node,
+                  @NotNull Optional<TestCaseDto> testCase) {
     public static @NotNull Hit of(final @NotNull TestCaseDto tc) {
         return new Hit(Icons.TEST_CASE, tc.getDescription(), where(tc.getParent()),
                 tc.getParent(), Optional.of(tc));

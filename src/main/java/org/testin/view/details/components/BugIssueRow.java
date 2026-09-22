@@ -38,7 +38,8 @@ import org.testin.testrun.RunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
-import java.awt.*;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,6 +49,11 @@ public final class BugIssueRow extends BaseDetails {
 
     private final @NotNull TestRunItems item;
     private final @NotNull List<String> currentPath;
+
+    private static void redraw(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto runDirectory) {
+        ViewToolWindowFactory.refreshIfShowing(p, List.of(dto));
+        Services.getInstance(p, TestinEditors.class).runEditorFor(p, runDirectory).ifPresent(RunEditor::refreshView);
+    }
 
     // UC-VIEW-PANEL-005, UC-VIEW-PANEL-016, Rule-VIEW-PANEL-031, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075
     @Override
@@ -82,10 +88,5 @@ public final class BugIssueRow extends BaseDetails {
         links.add(report);
 
         return addRow(panel, gbc, RunEditorAttributes.BUG_ISSUE.getName(), links, currentRow);
-    }
-
-    private static void redraw(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto runDirectory) {
-        ViewToolWindowFactory.refreshIfShowing(p, List.of(dto));
-        Services.getInstance(p, TestinEditors.class).runEditorFor(p, runDirectory).ifPresent(RunEditor::refreshAfterStatusChange);
     }
 }

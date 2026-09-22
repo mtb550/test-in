@@ -17,10 +17,9 @@
 package org.testin.editor.run;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
-import org.testin.actions.Declared;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.Declared;
 import org.testin.actions.EscapeAction;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
@@ -34,7 +33,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
     private final @NotNull Project p;
     private final @NotNull TestinEditor ui;
 
-    public RunEditorContextMenu(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
+    public RunEditorContextMenu(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
         super();
         this.p = p;
         this.ui = ui;

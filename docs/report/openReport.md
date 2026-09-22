@@ -2,8 +2,8 @@
 
 # UC-REPORT-002: Open the report that was just made
 
-**As a** tester, **I want** to see the document straight away,
-**so that** I can check it before sending it, without hunting through a folder.
+**As a** tester, **I want** to see the document straight away, **so that** I can check it before sending it, without
+hunting through a folder.
 
 This opens the report Testin has just written, from the message about it.
 

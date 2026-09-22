@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public final class ResolveConflictDialog extends AbstractFrameworkDialog<DialogButton> {
+public final class ResolveConflictDialog extends AbstractFrameworkDialog {
     private static final int SHOWN = 70;
 
     private static final @NotNull String LINE = "\n";

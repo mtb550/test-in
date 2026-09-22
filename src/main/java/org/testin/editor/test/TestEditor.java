@@ -16,11 +16,14 @@
 
 package org.testin.editor.test;
 
-import lombok.Getter;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.JBTable;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.AutomationState;
+import org.testin.codegen.GenType;
+import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.BaseCard;
 import org.testin.editor.EditorFilters;
 import org.testin.editor.PageWindow;
@@ -31,32 +34,29 @@ import org.testin.editor.listeners.ModelChangeNotifier;
 import org.testin.editor.listeners.StatusBarListener;
 import org.testin.editor.listeners.TestListRenderer;
 import org.testin.editor.listeners.TransferListener;
-import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.toolbar.TestToolbar;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.TestDetailsPopupBtn;
-import org.testin.codegen.AutomationState;
-import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.notifications.Notifier;
 import org.testin.model.Modules;
-import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.notifications.Notifier;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.TestCaseOrder;
-import org.testin.editor.AbstractTestinEditor;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.util.Bundle;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.DropMode;
+import java.awt.BorderLayout;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestSetDirectoryDto> implements Toolbar {
@@ -67,12 +67,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     private final @NotNull AtomicInteger modelGeneration = new AtomicInteger();
 
     private volatile boolean loading;
-
-    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-119
-    @Override
-    public boolean isLoading() {
-        return loading;
-    }
 
     public TestEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
         super(p, vf.getTestSet());
@@ -100,6 +94,12 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         onToolBarSwitchedToListView();
 
         loadDataAsync();
+    }
+
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-119
+    @Override
+    public boolean isLoading() {
+        return loading;
     }
 
     @Override
@@ -250,7 +250,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
 
     @Override
     protected @NotNull TestEditorContextMenu buildContextMenu() {
-        return new TestEditorContextMenu(p, this, parent, list, model);
+        return new TestEditorContextMenu(p, this, parent, list);
     }
 
     @Override

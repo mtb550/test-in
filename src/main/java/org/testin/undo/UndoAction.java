@@ -26,7 +26,7 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
 public class UndoAction extends AbstractProjectAction {
     private final @NotNull UndoDirection direction;

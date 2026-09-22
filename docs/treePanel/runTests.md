@@ -35,10 +35,10 @@ Testin hands the test cases to the IDE's own test runner.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -87,8 +87,7 @@ opens at the bottom, on a test configuration named after the generated class.
 5. Testin shows *Running* for one test case, or *Running N*, where N is how many
    actually started. Test cases already running are not counted.
 6. The IDE's own Run window opens. Its test configuration is named after the
-   generated class. Where the selection spans several classes, the name reads
-   *\<class\> and N more*.
+   generated class. Where the selection spans several classes, the name reads *\<class\> and N more*.
 
 **From a test run**
 
@@ -99,8 +98,7 @@ opens at the bottom, on a test configuration named after the generated class.
 ## What Testin refuses
 
 **If the node holds no test case that can run** — nothing runs, and *\<name\>
-has no test cases to run* is shown in red. A test run with nothing left
-**Pending** says the same.
+has no test cases to run* is shown in red. A test run with nothing left **Pending** says the same.
 
 **If the test run is already running** — *\<name\> is already running* is shown
 in red.

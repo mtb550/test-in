@@ -16,8 +16,6 @@
 
 package org.testin.editor.statusbar;
 
-import org.testin.editor.EditorColors;
-
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.ui.JBColor;
@@ -28,7 +26,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.TestinEditor;
+import org.testin.editor.EditorColors;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.logger.Logger;
 import org.testin.model.Automated;
@@ -36,8 +34,15 @@ import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunStatus;
 import org.testin.util.Bundle;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import javax.swing.SwingConstants;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
@@ -118,6 +123,51 @@ public class StatusBar extends JBPanel<StatusBar> {
         add(rightRow);
     }
 
+    static @NotNull Widths budget(final int inner, final int arrowsWanted, final int figuresWanted) {
+        final int arrows = Math.clamp(arrowsWanted, 0, inner);
+        final int floor = Math.clamp(SENTENCE_FLOOR, 0, inner - arrows);
+        final int figures = Math.clamp(figuresWanted, 0, inner - arrows - floor);
+
+        final int centered = (inner - arrows) / 2;
+
+        return new Widths(arrows, Math.clamp(centered, floor, inner - figures - arrows), figures);
+    }
+
+    private static @NotNull JBPanel<?> centeredRow(final @NotNull JComponent... items) {
+        final @NotNull JBPanel<?> row = new JBPanel<>(new GridBagLayout());
+        row.setOpaque(false);
+        row.setBackground(JBUI.CurrentTheme.EditorTabs.background());
+
+        final @NotNull GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridy = 0;
+        gbc.insets = JBUI.insets(0, 4, 0, 0);
+
+        for (final JComponent item : items) row.add(item, gbc);
+
+        return row;
+    }
+
+    private static @NotNull JBLabel painted(final @NotNull String text, final @NotNull Color color) {
+        final @NotNull JBLabel label = new JBLabel(text);
+
+        label.setForeground(color);
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text(Bundle.message("statusbar.run.progress.tip")))
+                .installOn(label);
+
+        return label;
+    }
+
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-009
+    private static @NotNull String narrowedFrom(final int shownCount, final int totalCount) {
+        if (shownCount == totalCount) return "";
+
+        return String.format(Locale.ENGLISH, " <font color='#%02x%02x%02x'>%s</font>",
+                EditorColors.FILTER_ACTIVE.getRed(), EditorColors.FILTER_ACTIVE.getGreen(),
+                EditorColors.FILTER_ACTIVE.getBlue(),
+                Bundle.message("statusbar.filtered.from", String.valueOf(totalCount)));
+    }
+
     @Override
     public void doLayout() {
         final @NotNull Insets insets = getInsets();
@@ -131,19 +181,6 @@ public class StatusBar extends JBPanel<StatusBar> {
         rightRow.setBounds(right - widths.figures(), top, widths.figures(), height);
         navigationRow.setBounds(left + widths.arrowsAt(), top, widths.arrows(), height);
         statusLabel.setBounds(left, top, widths.arrowsAt(), height);
-    }
-
-    record Widths(int arrows, int arrowsAt, int figures) {
-    }
-
-    static @NotNull Widths budget(final int inner, final int arrowsWanted, final int figuresWanted) {
-        final int arrows = Math.clamp(arrowsWanted, 0, inner);
-        final int floor = Math.clamp(SENTENCE_FLOOR, 0, inner - arrows);
-        final int figures = Math.clamp(figuresWanted, 0, inner - arrows - floor);
-
-        final int centered = (inner - arrows) / 2;
-
-        return new Widths(arrows, Math.clamp(centered, floor, inner - figures - arrows), figures);
     }
 
     @Override
@@ -160,20 +197,6 @@ public class StatusBar extends JBPanel<StatusBar> {
         final @NotNull Insets insets = getInsets();
 
         return new Dimension(width + insets.left + insets.right, AbstractToolbarPanel.barHeight(height + insets.top + insets.bottom));
-    }
-
-    private static @NotNull JBPanel<?> centeredRow(final @NotNull JComponent... items) {
-        final @NotNull JBPanel<?> row = new JBPanel<>(new GridBagLayout());
-        row.setOpaque(false);
-        row.setBackground(JBUI.CurrentTheme.EditorTabs.background());
-
-        final @NotNull GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridy = 0;
-        gbc.insets = JBUI.insets(0, 4, 0, 0);
-
-        for (final JComponent item : items) row.add(item, gbc);
-
-        return row;
     }
 
     // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-178
@@ -208,17 +231,6 @@ public class StatusBar extends JBPanel<StatusBar> {
 
         revalidate();
         repaint();
-    }
-
-    private static @NotNull JBLabel painted(final @NotNull String text, final @NotNull Color color) {
-        final @NotNull JBLabel label = new JBLabel(text);
-
-        label.setForeground(color);
-        new HelpTooltip()
-                .setDescription(HtmlChunk.text(Bundle.message("statusbar.run.progress.tip")))
-                .installOn(label);
-
-        return label;
     }
 
     // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-179
@@ -258,13 +270,6 @@ public class StatusBar extends JBPanel<StatusBar> {
         }
     }
 
-    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-009
-    private static @NotNull String narrowedFrom(final int shownCount, final int totalCount) {
-        if (shownCount == totalCount) return "";
-
-        return String.format(Locale.ENGLISH, " <font color='#%02x%02x%02x'>%s</font>",
-                EditorColors.FILTER_ACTIVE.getRed(), EditorColors.FILTER_ACTIVE.getGreen(),
-                EditorColors.FILTER_ACTIVE.getBlue(),
-                Bundle.message("statusbar.filtered.from", String.valueOf(totalCount)));
+    record Widths(int arrows, int arrowsAt, int figures) {
     }
 }

@@ -16,7 +16,6 @@
 
 package org.testin.testcase;
 
-import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -29,6 +28,7 @@ import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
@@ -41,17 +41,6 @@ import java.util.UUID;
 
 // UC-EDITOR-PANEL-005
 public class CreateTestCaseAction extends DumbAwareAction {
-    // UC-EDITOR-PANEL-005
-    @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
-        TestinData.editor(e)
-                .filter(editor -> editor.getParent().isTestCaseContainer())
-                .ifPresent(editor -> openCreateDialog(p, editor, (TestSetDirectoryDto) editor.getParent()));
-    }
-
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-008, Rule-EDITOR-PANEL-030
     public static void openCreateDialog(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull TestSetDirectoryDto dir) {
         new CreateTestCaseDialog(p, dir, tc -> {
@@ -72,6 +61,17 @@ public class CreateTestCaseAction extends DumbAwareAction {
             });
             Services.getInstance(p, TestCaseValues.class).addNewItems(affectedNodes);
         }).show();
+    }
+
+    // UC-EDITOR-PANEL-005
+    @Override
+    public void actionPerformed(final @NotNull AnActionEvent e) {
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
+
+        TestinData.editor(e)
+                .filter(editor -> editor.getParent().isTestCaseContainer())
+                .ifPresent(editor -> openCreateDialog(p, editor, (TestSetDirectoryDto) editor.getParent()));
     }
 
     // UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-214

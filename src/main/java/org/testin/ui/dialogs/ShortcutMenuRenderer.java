@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.MenuItem;
 
-import javax.swing.*;
+import javax.swing.JList;
 import java.util.Optional;
 import java.util.function.Function;
 

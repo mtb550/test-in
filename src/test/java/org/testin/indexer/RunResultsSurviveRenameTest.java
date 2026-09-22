@@ -19,16 +19,15 @@ package org.testin.indexer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
+import org.testin.TempTree;
+import org.testin.model.FileKind;
+import org.testin.model.TestRunItems;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.UUID;
-import java.util.stream.Stream;
-import org.testin.model.FileKind;
-import org.testin.model.TestRunItems;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -78,40 +77,6 @@ public class RunResultsSurviveRenameTest {
               "actualResult" : "Signed in and reached the dashboard."
             }""";
 
-    @Test
-    public void aResultIsNamedByItsTestCaseAndNotByItsFolder() {
-        assertEquals(FileKind.RUN_ITEM.fileName(JUDGED_CASE), JUDGED_CASE + ".ri",
-                "A result is named by the case it is about, so there is no folder name in it to keep in step."
-                        + " The moment a result's name is derived from its folder, renaming a run empties it.");
-    }
-
-    /**
-     * The whole defect, end to end, on a real directory: write a run, rename its
-     * folder the way a tester does, and read the results back from where the scan
-     * would look for them.
-     */
-    @Test
-    public void renamingTheFolderKeepsTheResultsWhereTheScanLooks() {
-        final @NotNull Path root = tempRoot();
-
-        try {
-            final @NotNull Path cycle = createRun(root.resolve("Cycle-1"));
-            final @NotNull Path renamed = move(cycle, root.resolve("Cycle-1 (rerun)"));
-
-            final @NotNull Path result = renamed.resolve(FileKind.RUN_ITEM.fileName(JUDGED_CASE));
-            assertTrue(Files.exists(result),
-                    "After a rename the scan looks for " + result.getFileName() + " and it has to be there,"
-                            + " or every verdict in the run is gone at the next index");
-
-            assertEquals(read(result).getStatus().name(), "PASSED",
-                    "The verdict the tester recorded before the rename is the thing this issue was about");
-
-            assertTrue(Files.exists(renamed.resolve(".tr")), "The marker moved with the folder, as it always did");
-        } finally {
-            deleteTree(root);
-        }
-    }
-
     private static @NotNull Path createRun(final @NotNull Path folder) {
         write(folder.resolve(".tr"), "{}");
         write(folder.resolve(FileKind.RUN_ITEM.fileName(JUDGED_CASE)), A_RESULT);
@@ -155,13 +120,37 @@ public class RunResultsSurviveRenameTest {
         }
     }
 
-    private static void deleteTree(final @NotNull Path root) {
-        try (Stream<Path> walk = Files.walk(root)) {
-            walk.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
-        } catch (final IOException ex) {
-            // A leftover temporary directory is litter, not a failed test - and
-            // reporting it as one would hide whichever assertion actually failed.
-            System.err.println("Could not clean up " + root + ": " + ex.getMessage());
+    @Test
+    public void aResultIsNamedByItsTestCaseAndNotByItsFolder() {
+        assertEquals(FileKind.RUN_ITEM.fileName(JUDGED_CASE), JUDGED_CASE + ".ri",
+                "A result is named by the case it is about, so there is no folder name in it to keep in step."
+                        + " The moment a result's name is derived from its folder, renaming a run empties it.");
+    }
+
+    /**
+     * The whole defect, end to end, on a real directory: write a run, rename its
+     * folder the way a tester does, and read the results back from where the scan
+     * would look for them.
+     */
+    @Test
+    public void renamingTheFolderKeepsTheResultsWhereTheScanLooks() {
+        final @NotNull Path root = tempRoot();
+
+        try {
+            final @NotNull Path cycle = createRun(root.resolve("Cycle-1"));
+            final @NotNull Path renamed = move(cycle, root.resolve("Cycle-1 (rerun)"));
+
+            final @NotNull Path result = renamed.resolve(FileKind.RUN_ITEM.fileName(JUDGED_CASE));
+            assertTrue(Files.exists(result),
+                    "After a rename the scan looks for " + result.getFileName() + " and it has to be there,"
+                            + " or every verdict in the run is gone at the next index");
+
+            assertEquals(read(result).getStatus().name(), "PASSED",
+                    "The verdict the tester recorded before the rename is the thing this issue was about");
+
+            assertTrue(Files.exists(renamed.resolve(".tr")), "The marker moved with the folder, as it always did");
+        } finally {
+            TempTree.delete(root);
         }
     }
 }

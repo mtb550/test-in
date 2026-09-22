@@ -16,9 +16,11 @@
 
 package org.testin.util;
 
+import org.intellij.lang.annotations.MagicConstant;
 import org.testng.annotations.Test;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
@@ -33,7 +35,7 @@ import static org.testng.Assert.assertTrue;
  */
 public class ShortcutMatchesTest {
 
-    private static KeyEvent event(final int keyCode, final int modifiersEx) {
+    private static KeyEvent event(final int keyCode, @MagicConstant(flagsFromClass = InputEvent.class) final int modifiersEx) {
         return new KeyEvent(new JPanel(), KeyEvent.KEY_PRESSED, 0L, modifiersEx, keyCode, KeyEvent.CHAR_UNDEFINED);
     }
 

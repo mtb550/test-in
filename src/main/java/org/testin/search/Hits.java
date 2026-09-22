@@ -21,10 +21,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
+import org.testin.testcase.TestEditorAttributes;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -47,10 +47,6 @@ public final class Hits {
         found.addAll(topCases(cases, wanted, SHOWN - found.size()));
 
         return new Found(List.copyOf(found), nodes.size() + cases.size());
-    }
-
-    // UC-INTERNAL-001, Rule-INTERNAL-073
-    public record Found(@NotNull List<Hit> hits, int matched) {
     }
 
     private static @NotNull List<DirectoryDto> everywhereToGo(final @NotNull ProjectIndexer indexer) {
@@ -110,5 +106,9 @@ public final class Hits {
     static @NotNull Comparator<TestCaseDto> byDescriptionMatchThenText(final @NotNull String wanted) {
         return Comparator.comparingInt((TestCaseDto tc) -> contains(tc.getDescription(), wanted) ? 0 : 1)
                 .thenComparing(TestCaseDto::getDescription, String.CASE_INSENSITIVE_ORDER);
+    }
+
+    // UC-INTERNAL-001, Rule-INTERNAL-073
+    public record Found(@NotNull List<Hit> hits, int matched) {
     }
 }

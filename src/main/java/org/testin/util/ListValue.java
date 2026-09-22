@@ -16,11 +16,11 @@
 
 package org.testin.util;
 
-import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.swing.JList;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

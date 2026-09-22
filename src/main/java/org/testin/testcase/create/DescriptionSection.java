@@ -32,7 +32,7 @@ import org.testin.util.NameSanitizer;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 
-import javax.swing.*;
+import javax.swing.Icon;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -89,7 +89,7 @@ public class DescriptionSection extends AbstractOneLineSection {
 
         final @NotNull String methodName = NameSanitizer.methodName(description);
 
-        if (!NameSanitizer.canMakeMethodName(description)) {
+        if (NameSanitizer.cannotMakeMethodName(description)) {
             setError(true);
             Services.getInstance(p, Notifier.class).softRefuse(p,
                     Bundle.message("description.not.a.method.title"),
@@ -122,7 +122,7 @@ public class DescriptionSection extends AbstractOneLineSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto) {
         field.setText(dto.getDescription());
     }
 }

@@ -70,8 +70,8 @@ No key. The card's last button, or the right-click menu.
    Test Method, Run, then **tc**, Navigate to Test Case. The one under the
    pointer grows and names itself.
 
-The test run editor's right-click menu offers **Navigate to Test Case** beside
-**View Test Case Details**. A test set's own cards and menu do not offer it.
+The test run editor's right-click menu offers **Navigate to Test Case** beside **View Test Case Details**. A test set's
+own cards and menu do not offer it.
 
 ## Main flow
 

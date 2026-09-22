@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-022: Page through the test cases
 
-**As a** tester, **I want** to move through a long test set a page at a time,
-**so that** a test set of 2,770 test cases opens as fast as one of ten.
+**As a** tester, **I want** to move through a long test set a page at a time, **so that** a test set of 2,770 test cases
+opens as fast as one of ten.
 
 Testin never draws the whole test set at once. It draws one page.
 

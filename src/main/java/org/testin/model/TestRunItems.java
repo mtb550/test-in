@@ -20,7 +20,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -55,23 +60,6 @@ public class TestRunItems {
     @Setter(AccessLevel.NONE)
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NotJudgedAgainst.class)
     private TestCaseDto testCase = notJudged();
-
-    private static @NotNull TestCaseDto notJudged() {
-        return TestCaseDto.builder().id(NOT_JUDGED).build();
-    }
-
-    static final class NotJudgedAgainst {
-        @Override
-        public boolean equals(final Object value) {
-            return value instanceof TestCaseDto judged && judged.getId().equals(NOT_JUDGED);
-        }
-
-        @Override
-        public int hashCode() {
-            return NOT_JUDGED.hashCode();
-        }
-    }
-
     @NotNull
     @Builder.Default
     private UUID id = new UUID(0L, 0L);
@@ -100,22 +88,27 @@ public class TestRunItems {
     @NotNull
     @Builder.Default
     private String stacktrace = "";
-
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     @NotNull
     @Builder.Default
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> screenshots = List.of();
-
     @NotNull
     @Builder.Default
     private String bugIssueUrl = "";
-
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
     @JsonIgnore
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private boolean removed;
+
+    private static @NotNull TestCaseDto notJudged() {
+        return TestCaseDto.builder().id(NOT_JUDGED).build();
+    }
+
+    private static boolean clears(final @NotNull TestStatus next) {
+        return next == TestStatus.PASSED;
+    }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
     public @NotNull TestRunItems showing(final @NotNull Optional<TestCaseDto> now) {
@@ -174,10 +167,6 @@ public class TestRunItems {
         executedBy = tester;
     }
 
-    private static boolean clears(final @NotNull TestStatus next) {
-        return next == TestStatus.PASSED;
-    }
-
     public @NotNull List<String> wouldClear(final @NotNull TestStatus next, final @NotNull Failure failure) {
         return clears(next) ? FailureDetail.filledIn(this) : failure.wouldClear(this);
     }
@@ -190,5 +179,17 @@ public class TestRunItems {
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
     public @NotNull TestCaseDto liveCase() {
         return live.orElseGet(() -> TestCaseDto.deleted(id));
+    }
+
+    static final class NotJudgedAgainst {
+        @Override
+        public boolean equals(final Object value) {
+            return value instanceof TestCaseDto judged && judged.getId().equals(NOT_JUDGED);
+        }
+
+        @Override
+        public int hashCode() {
+            return NOT_JUDGED.hashCode();
+        }
     }
 }

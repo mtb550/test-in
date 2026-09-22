@@ -20,13 +20,12 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.TestinEditors;
 import org.testin.explorer.TreePanel;
+import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.indexer.DirectoryMapper;
 import org.testin.model.TestRunConfiguration;
-import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -34,21 +33,18 @@ import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.RunConfigurationForm;
 import org.testin.testrun.RunForm;
 import org.testin.testrun.RunFormAction;
 import org.testin.ui.framework.SelectionTree;
-import org.testin.services.BackgroundWork;
-import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
-import java.util.Optional;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -94,34 +90,32 @@ public class CreateTestRun implements NodeCreator {
             return false;
         }
 
-        final @NotNull TestRunDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, savePath, parentDir);
-        saveSelectedToJSON(form, selection, savePath, Services.getInstance(p, TreePanel.class), tr);
+        final @NotNull TestRunDirectoryDto runDir = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, savePath, parentDir);
+        write(form, selection, savePath, runDir);
 
         return true;
     }
 
     // UC-TREE-PANEL-009, Rule-TREE-PANEL-031
-    private void saveSelectedToJSON(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull TreePanel tp, final @NotNull TestRunDirectoryDto trDir) {
+    private void write(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull TestRunDirectoryDto trDir) {
         final @NotNull Map<TestRunConfiguration, String> configuration = form.configuration();
 
-        final @NotNull TestRunDto tr = new TestRunDto();
-
-        final @NotNull List<TestRunItems> items = new ArrayList<>();
-        RunForm.checkedCases(selection).forEach(id -> items.add(new TestRunItems().setId(id).setStatus(TestStatus.PENDING)));
-        tr.setResults(items);
+        final @NotNull TestRunDto tr = new TestRunDto().coverOnly(RunForm.checkedCases(selection));
 
         BackgroundWork.run(p, Bundle.message("run.task.creating", savePath.getFileName()), Bundle.message("run.create.failed.title"), indicator -> {
-            final @NotNull TestRunMarker marker = new TestRunMarker().setConfiguration(TestRunConfiguration.answered(configuration));
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+
+            final @NotNull TestRunMarker marker = new TestRunMarker();
+            marker.setConfiguration(TestRunConfiguration.answered(configuration));
             trDir.setMarker(marker);
 
-            if (!Services.getInstance(p, ProjectIndexer.class).addTestRunDir(trDir)) return;
+            if (!indexer.addTestRunDir(trDir)) return;
 
-            Services.getInstance(p, ProjectIndexer.class).putTestRun(savePath, tr);
-
-            Services.getInstance(p, ProjectIndexer.class).refreshDirectory(savePath);
+            indexer.putTestRun(savePath, tr);
+            indexer.refreshDirectory(savePath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                tp.getProjectTree().refresh();
+                Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
                 Services.getInstance(p, TestinEditors.class).open(p, trDir);
 
                 Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);

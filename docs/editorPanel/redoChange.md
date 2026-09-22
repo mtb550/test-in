@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-013: Redo a change
 
-**As a** tester, **I want** to put back something I just took back,
-**so that** an undo pressed by mistake costs nothing.
+**As a** tester, **I want** to put back something I just took back, **so that** an undo pressed by mistake costs
+nothing.
 
 It only works right after an undo. Any new change clears the list.
 
@@ -45,8 +45,7 @@ It only works right after an undo. Any new change clears the list.
 This opens no screen. The change is made again, and the test cases it touched
 are drawn again with the new values.
 
-A small message then appears at the bottom of the IDE and fades. It reads
-*Redone*.
+A small message then appears at the bottom of the IDE and fades. It reads *Redone*.
 
 ## Main flow
 

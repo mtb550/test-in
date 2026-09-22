@@ -19,7 +19,7 @@ package org.testin.ui.framework;
 import com.intellij.ui.components.JBOptionButton;
 import org.testng.annotations.Test;
 
-import javax.swing.*;
+import javax.swing.Action;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;

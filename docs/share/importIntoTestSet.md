@@ -130,12 +130,12 @@ methods are generated. A message says so once for the whole code project.
 
 ## What is done with a row Testin cannot read
 
-| The row | What happens |
-|---|---|
-| A column is missing, or the row stops early | Those fields are blank |
-| Every value is blank | The row is skipped without a word |
-| A value cannot be read | It is refused, and the test case keeps what it had. One message counts them. See [UC-SHARE-007](chooseWhatToImport.md) |
-| The sheet has no header row | The sheet contributes nothing |
+| The row                                     | What happens                                                                                                           |
+|---------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| A column is missing, or the row stops early | Those fields are blank                                                                                                 |
+| Every value is blank                        | The row is skipped without a word                                                                                      |
+| A value cannot be read                      | It is refused, and the test case keeps what it had. One message counts them. See [UC-SHARE-007](chooseWhatToImport.md) |
+| The sheet has no header row                 | The sheet contributes nothing                                                                                          |
 
 ---
 

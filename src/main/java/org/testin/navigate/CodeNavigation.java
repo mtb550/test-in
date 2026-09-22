@@ -22,22 +22,22 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface CodeNavigation {
     @NotNull ExtensionPointName<CodeNavigation> EP = ExtensionPointName.create("org.testin.codeNavigation");
-
-    void toCode(final @NotNull Project p, final @NotNull TestCaseDto tc);
-
-    @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc);
-
-    @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> cases);
 
     static @NotNull CodeNavigation available() {
         return EP.getExtensionList().stream()
                 .findFirst()
                 .orElseGet(NoCodeNavigation::new);
     }
+
+    void toCode(final @NotNull Project p, final @NotNull TestCaseDto tc);
+
+    @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc);
+
+    @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> cases);
 }

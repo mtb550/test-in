@@ -36,10 +36,10 @@ A test set is the folder that holds test cases. This makes one.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -102,8 +102,8 @@ Its kinds are *Test Run* (*Records execution results*) and *Test Run Package*
 
 1. The tester selects **Test Cases** or a test set package.
 2. The tester presses `Ctrl+M`, or chooses **Create**.
-3. The **Create Test Node** dialog opens. Its first row is selected, and reads
-   *Test Set*, with the hint *Holds test cases* beside it.
+3. The **Create Test Node** dialog opens. Its first row is selected, and reads *Test Set*, with the hint *Holds test
+   cases* beside it.
 4. The tester types a name and presses `Enter`.
 5. Testin creates the test set under the selected parent, refreshes the tree,
    and shows *Created*.
@@ -126,8 +126,8 @@ selected*. Nothing is created.
 closes, nothing is created, and *\<name\> Already Exists* is shown in red.
 
 **If the test project, a test set or a test run is selected** — **Create** is
-gray, and `Ctrl+M` does nothing, and the entry itself reads
-**Create Testin Node (a test set holds what it holds)**, naming the node that
+gray, and `Ctrl+M` does nothing, and the entry itself reads **Create Testin Node (a test set holds what it holds)**,
+naming the node that
 cannot take a child. A popup never shows a gray entry's description, so the
 reason is in the entry.
 

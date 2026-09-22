@@ -24,7 +24,8 @@ import org.testin.model.Priority;
 
 import java.util.Set;
 
-public record EditorFilters(@NotNull String query, @NotNull Set<String> groups, @NotNull Set<Priority> priorities, @NotNull Set<String> modules, @NotNull Set<Automated> automation) {
+public record EditorFilters(@NotNull String query, @NotNull Set<String> groups, @NotNull Set<Priority> priorities,
+                            @NotNull Set<String> modules, @NotNull Set<Automated> automation) {
     public static @NotNull EditorFilters of(final @NotNull AbstractToolbarPanel toolBar) {
         final @NotNull FilterPopupBtn filters = toolBar.getToolbarItem(FilterPopupBtn.class);
 

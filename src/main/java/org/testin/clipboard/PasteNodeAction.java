@@ -16,7 +16,6 @@
 
 package org.testin.clipboard;
 
-import org.testin.util.FailureText;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -28,13 +27,14 @@ import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.explorer.tree.TreeTransferPayload;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.services.Services;
 import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;
 import org.testin.util.ClipboardContents;
+import org.testin.util.FailureText;
 
-import javax.swing.*;
+import javax.swing.TransferHandler;
 import java.awt.datatransfer.Transferable;
 import java.nio.file.Path;
 import java.util.Arrays;

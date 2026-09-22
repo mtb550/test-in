@@ -25,8 +25,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,6 +49,33 @@ import static org.testng.Assert.assertTrue;
  * actions on one key, which is always a mistake and always invisible.
  */
 public class DeclaredShortcutsTest {
+
+    /**
+     * The two keys a pair of Testin actions is meant to share, and exactly which
+     * pair shares each.
+     * <p>
+     * F2 is the only one, and it has three members: Update Test Case in the test
+     * editor, Failed Test Case Details in the run editor, and Edit Test Run in
+     * the tree. It works because each needs a selection in its own surface, so
+     * no two of them can be enabled at once.
+     * <p>
+     * <b>Ctrl+M used to be here too, and is the reason this list is worth
+     * distrusting.</b> Create Test Case and Create Testin Node shared it on the
+     * same argument - one key, one meaning per surface - and it was not true.
+     * Creating a test case needs no selection, only an open editor, so that
+     * action was enabled in the tree as well; it is declared first, so it
+     * answered every press and the tree's action never had its update called.
+     * The key belongs to one action now. Sharing is only safe where the
+     * conditions genuinely cannot both hold.
+     * <p>
+     * <b>Pinned to the exact pair rather than allowed as a key.</b> A list that
+     * said "Ctrl+M may be shared" would keep passing when a third action joined
+     * it, or when one of these two was renamed away and something else took its
+     * place - which is the whole failure this test exists to catch. Written as
+     * the membership, so any change to it fails here and has to be meant.
+     */
+    private static final Map<String, List<String>> SHARED_ON_PURPOSE = Map.of(
+            "F2", List.of("Testin.UpdateTestCase", "Testin.UpdateRunItem", "Testin.EditTestRun"));
 
     /**
      * Every {@code <keyboard-shortcut>} the plugin declares, as key to the ids
@@ -104,7 +131,7 @@ public class DeclaredShortcutsTest {
      */
     private static String normalize(final String keystroke) {
         final List<String> parts = new ArrayList<>(List.of(keystroke.replace("control", "ctrl").trim().split("\\s+")));
-        final String key = parts.remove(parts.size() - 1).toUpperCase(Locale.ROOT);
+        final String key = parts.removeLast().toUpperCase(Locale.ROOT);
 
         parts.sort(String::compareTo);
         parts.add(key);
@@ -119,33 +146,6 @@ public class DeclaredShortcutsTest {
             throw new AssertionError("Could not read " + path.toAbsolutePath(), e);
         }
     }
-
-    /**
-     * The two keys a pair of Testin actions is meant to share, and exactly which
-     * pair shares each.
-     * <p>
-     * F2 is the only one, and it has three members: Update Test Case in the test
-     * editor, Failed Test Case Details in the run editor, and Edit Test Run in
-     * the tree. It works because each needs a selection in its own surface, so
-     * no two of them can be enabled at once.
-     * <p>
-     * <b>Ctrl+M used to be here too, and is the reason this list is worth
-     * distrusting.</b> Create Test Case and Create Testin Node shared it on the
-     * same argument - one key, one meaning per surface - and it was not true.
-     * Creating a test case needs no selection, only an open editor, so that
-     * action was enabled in the tree as well; it is declared first, so it
-     * answered every press and the tree's action never had its update called.
-     * The key belongs to one action now. Sharing is only safe where the
-     * conditions genuinely cannot both hold.
-     * <p>
-     * <b>Pinned to the exact pair rather than allowed as a key.</b> A list that
-     * said "Ctrl+M may be shared" would keep passing when a third action joined
-     * it, or when one of these two was renamed away and something else took its
-     * place - which is the whole failure this test exists to catch. Written as
-     * the membership, so any change to it fails here and has to be meant.
-     */
-    private static final Map<String, List<String>> SHARED_ON_PURPOSE = Map.of(
-            "F2", List.of("Testin.UpdateTestCase", "Testin.UpdateRunItem", "Testin.EditTestRun"));
 
     /**
      * The check itself. Two Testin actions on one key means one of them never

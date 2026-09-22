@@ -19,7 +19,8 @@ package org.testin.model;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 
-public record NodeFigures(long testSets, long packages, long testCases, long runnableTestCases, long testRuns, @NotNull TestRunSummary run) {
+public record NodeFigures(long testSets, long packages, long testCases, long runnableTestCases, long testRuns,
+                          @NotNull TestRunSummary run) {
     public static final @NotNull NodeFigures NONE = new NodeFigures(0, 0, 0, 0, 0, TestRunSummary.EMPTY);
 
     public static @NotNull NodeFigures ofChildren(final long testSets, final long packages, final long testCases, final long runnableTestCases, final long testRuns) {

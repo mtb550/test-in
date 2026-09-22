@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 
-import java.awt.*;
+import java.awt.GridBagConstraints;
 import java.util.function.BiFunction;
 
 // Rule-VIEW-PANEL-061

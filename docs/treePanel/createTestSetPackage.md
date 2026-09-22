@@ -36,10 +36,10 @@ A test set package is a folder that holds test sets. This makes one.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -112,8 +112,8 @@ still in the box, and *'\<name\>' cannot name a Java package* is shown in red.
 itself. (Rule-TREE-PANEL-095)
 
 **If the test project, a test set or a test run is selected** — **Create** is
-gray, and `Ctrl+M` does nothing, and the entry itself reads
-**Create Testin Node (a test set holds what it holds)**, naming the node that
+gray, and `Ctrl+M` does nothing, and the entry itself reads **Create Testin Node (a test set holds what it holds)**,
+naming the node that
 cannot take a child. A popup never shows a gray entry's description, so the
 reason is in the entry.
 

@@ -8,13 +8,13 @@
 > a field means, which are required, and what a reader must do with a field it
 > does not recognize.
 
-| | |
-|---|---|
-| **Part of Testin** | None. This is the shape of the data, not a screen |
-| **Answers** | What is on disk, what may change, and what a version bump promises |
-| **State** | Written |
+|                     |                                                                                                                                                                                                                                                                                                                                                                     |
+|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Part of Testin**  | None. This is the shape of the data, not a screen                                                                                                                                                                                                                                                                                                                   |
+| **Answers**         | What is on disk, what may change, and what a version bump promises                                                                                                                                                                                                                                                                                                  |
+| **State**           | Written                                                                                                                                                                                                                                                                                                                                                             |
 | **Checked against** | `main` at `1270e599`, 20 September 2026 — every marker, the test case, the result and `testin.yml` read field by field against the new file structure (#305), and the committed sample under `samples/testin-root` read against this page. The real tree at `Testin/NAFATH` was read at `f369f1d6`, 9 September 2026, and is still in the format this page replaced |
-| **Written to** | [The standard](standard.md), as far as it applies. A format is not a use case, so it has a shape and an example instead of a flow |
+| **Written to**      | [The standard](standard.md), as far as it applies. A format is not a use case, so it has a shape and an example instead of a flow                                                                                                                                                                                                                                   |
 
 ---
 
@@ -54,14 +54,14 @@ exactly one of each.
 
 ## What is true of every JSON file
 
-| | |
-|---|---|
-| **Encoding** | UTF-8, pretty-printed with two spaces, and a space either side of the colon — Jackson's default pretty printer, unchanged |
-| **Unknown fields** | Ignored, never an error. Every type carries `@JsonIgnoreProperties(ignoreUnknown = true)` |
-| **Missing fields** | Take the field's default, which is always an empty value of its own type — never null |
-| **Dates** | `EEEE dd-MM-yyyy 'At' HH:mm:ss '['VV']'` in `en_US`, for example `Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]`. The zone is part of the value |
-| **"Never happened"** | The Unix epoch in UTC, `Thursday 01-01-1970 At 00:00:00 [Z]` — `Config.NOT_EXECUTED`. Not a missing field, and not null |
-| **Enums** | Written by constant name in capitals. A name this build does not know is a read failure for that file, not a silent default — see *Versioning* |
+|                      |                                                                                                                                                |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Encoding**         | UTF-8, pretty-printed with two spaces, and a space either side of the colon — Jackson's default pretty printer, unchanged                      |
+| **Unknown fields**   | Ignored, never an error. Every type carries `@JsonIgnoreProperties(ignoreUnknown = true)`                                                      |
+| **Missing fields**   | Take the field's default, which is always an empty value of its own type — never null                                                          |
+| **Dates**            | `EEEE dd-MM-yyyy 'At' HH:mm:ss '['VV']'` in `en_US`, for example `Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]`. The zone is part of the value  |
+| **"Never happened"** | The Unix epoch in UTC, `Thursday 01-01-1970 At 00:00:00 [Z]` — `Config.NOT_EXECUTED`. Not a missing field, and not null                        |
+| **Enums**            | Written by constant name in capitals. A name this build does not know is a read failure for that file, not a silent default — see *Versioning* |
 
 ---
 
@@ -72,14 +72,14 @@ Every marker shares the same six fields, from `AbstractMarker`, and most add a
 
 ### Shared by all seven
 
-| Field | Type | Required | Meaning |
-|---|---|---|---|
-| `id` | UUID string | no, **omitted while empty** | The folder's own id. Stamped the first time Testin writes the marker and never changed after — not by a rename, a move, a status or an order change, or a merge — and fresh on a copied folder, because a copy is another folder. A marker written before ids has none and is stamped the next time anything writes it. One marker writer stamps them, and it refuses to write over a marker file that is there and will not parse, so a damaged marker is left for the tester to repair rather than replaced by defaults with an id on top (Rule-INTERNAL-083). Nothing in the plugin reads the id: it names a project, a set or a run for a tool outside the IDE (Rule-INTERNAL-090) |
-| `order` | integer | no | Where the node sits among its siblings. **Omitted entirely when the node is unordered**, which is `Integer.MAX_VALUE` in memory — an absent `order` is the normal case, not a defect |
-| `createdBy` | string | no, defaults `""` | The tester's name as the settings hold it |
-| `createdAt` | date | no, defaults to now | When the directory was made |
-| `modifiedBy` | string | no, defaults `""` | Who last changed it. Also read from `updatedBy`, which is what older markers wrote |
-| `modifiedAt` | date | no, defaults to the epoch | When it last changed. Also read from `updatedAt` |
+| Field        | Type        | Required                    | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|--------------|-------------|-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `id`         | UUID string | no, **omitted while empty** | The folder's own id. Stamped the first time Testin writes the marker and never changed after — not by a rename, a move, a status or an order change, or a merge — and fresh on a copied folder, because a copy is another folder. A marker written before ids has none and is stamped the next time anything writes it. One marker writer stamps them, and it refuses to write over a marker file that is there and will not parse, so a damaged marker is left for the tester to repair rather than replaced by defaults with an id on top (Rule-INTERNAL-083). Nothing in the plugin reads the id: it names a project, a set or a run for a tool outside the IDE (Rule-INTERNAL-090) |
+| `order`      | integer     | no                          | Where the node sits among its siblings. **Omitted entirely when the node is unordered**, which is `Integer.MAX_VALUE` in memory — an absent `order` is the normal case, not a defect                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `createdBy`  | string      | no, defaults `""`           | The tester's name as the settings hold it                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `createdAt`  | date        | no, defaults to now         | When the directory was made                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `modifiedBy` | string      | no, defaults `""`           | Who last changed it. Also read from `updatedBy`, which is what older markers wrote                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `modifiedAt` | date        | no, defaults to the epoch   | When it last changed. Also read from `updatedAt`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 **A blank `modifiedBy` reads back as `createdBy`, and a blank `modifiedAt` as
 `createdAt`** — a node that was never modified was last touched when it was
@@ -88,15 +88,15 @@ for it, and what is written back is that answer rather than an invented one.
 
 ### The seven, and what each adds
 
-| File | Node | Adds | Values |
-|---|---|---|---|
-| `.tp` | Test project | `status`, and `format` - which format this project's files are in, 2 for the one described here | `ACTIVE` `INACTIVE` |
-| `.tcd` | The `Test Cases` directory | — | |
-| `.trd` | The `Test Runs` directory | — | |
-| `.tsp` | Test set package | `status` | `ACTIVE` `ARCHIVED` |
-| `.ts` | Test set | `status` | `ACTIVE` `DEPRECATED` |
-| `.trp` | Test run package | `status` | `ACTIVE` `ARCHIVED` |
-| `.tr` | Test run | `status`, and the run's own facts: `configuration`, `resultAnalysis`, `executionStartedAt`, `executionEndedAt` — see below | `CREATED` `IN_PROGRESS` `COMPLETED` `ASSIGNED` `CLOSED` |
+| File   | Node                       | Adds                                                                                                                       | Values                                                  |
+|--------|----------------------------|----------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------|
+| `.tp`  | Test project               | `status`, and `format` - which format this project's files are in, 2 for the one described here                            | `ACTIVE` `INACTIVE`                                     |
+| `.tcd` | The `Test Cases` directory | —                                                                                                                          |                                                         |
+| `.trd` | The `Test Runs` directory  | —                                                                                                                          |                                                         |
+| `.tsp` | Test set package           | `status`                                                                                                                   | `ACTIVE` `ARCHIVED`                                     |
+| `.ts`  | Test set                   | `status`                                                                                                                   | `ACTIVE` `DEPRECATED`                                   |
+| `.trp` | Test run package           | `status`                                                                                                                   | `ACTIVE` `ARCHIVED`                                     |
+| `.tr`  | Test run                   | `status`, and the run's own facts: `configuration`, `resultAnalysis`, `executionStartedAt`, `executionEndedAt` — see below | `CREATED` `IN_PROGRESS` `COMPLETED` `ASSIGNED` `CLOSED` |
 
 **A directory carrying two markers of one family is read as the more specific
 one.** Under `Test Cases` the order is `.ts` then `.tsp`; under `Test Runs` it is
@@ -120,12 +120,12 @@ rather than about any one result — what it was executed against, what the test
 wrote about the verdicts afterwards, and when execution started and last
 stopped. They are the run's, so they are in the run's own file:
 
-| Field | Type | Required | Meaning |
-|---|---|---|---|
-| `configuration` | map | no, **omitted when empty** | What the run was executed against. Keys are `TEST_TYPE` `CHANGE_LOG` `COMMIT_ID` `PLATFORM` `COMPONENT` `LANGUAGE` `BROWSER` `DEVICE_TYPE`; values are free text |
-| `resultAnalysis` | map | no, **omitted when empty** | What the tester wrote about each group of verdicts. Keys are `PASSED` `FAILED` `BLOCKED` `UNTESTED`; values are free text |
-| `executionStartedAt` | date | no, defaults to the epoch | When Start Execution was first pressed. Kept: a run resumed next week still started when it started |
-| `executionEndedAt` | date | no, defaults to the epoch | When execution last stopped |
+| Field                | Type | Required                   | Meaning                                                                                                                                                          |
+|----------------------|------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `configuration`      | map  | no, **omitted when empty** | What the run was executed against. Keys are `TEST_TYPE` `CHANGE_LOG` `COMMIT_ID` `PLATFORM` `COMPONENT` `LANGUAGE` `BROWSER` `DEVICE_TYPE`; values are free text |
+| `resultAnalysis`     | map  | no, **omitted when empty** | What the tester wrote about each group of verdicts. Keys are `PASSED` `FAILED` `BLOCKED` `UNTESTED`; values are free text                                        |
+| `executionStartedAt` | date | no, defaults to the epoch  | When Start Execution was first pressed. Kept: a run resumed next week still started when it started                                                              |
+| `executionEndedAt`   | date | no, defaults to the epoch  | When execution last stopped                                                                                                                                      |
 
 ```json
 {
@@ -158,22 +158,22 @@ the **file name** is what the tree shows (Rule-INTERNAL-012 — a `name` field
 inside the file would not decide it), and the **`id` field** is what a test run's
 recorded result points at.
 
-| Field | Type | Required | Meaning |
-|---|---|---|---|
-| `id` | UUID string | yes in practice | Identity. A fresh random UUID when absent, which makes the case a new one |
-| `order` | string | no, defaults `""` | The rank that places the case in its set — see below |
-| `description` | string | no | What the case is. The card title |
-| `expectedResult` | string | no | |
-| `steps` | array of strings | no | One step per element. A blank element is skipped when drawn and keeps its place in the file |
-| `status` | enum | no, defaults `PENDING` | `REVIEWED` `PENDING` `DISABLED` `TO_BE_UPDATED` |
-| `priority` | enum | no, defaults `LOW` | `HIGH` `MEDIUM` `LOW` |
-| `group` | array of strings | no | The groups the case is in, each as the tester typed it. Empty for none |
-| `reference` | string | no | A ticket, a requirement — an identifier, never formatted for display |
-| `module` | string | no | |
-| `testData` | string | no | Used rather than read: never reformatted, on any surface |
-| `preConditions` | string | no | |
-| `createdBy` / `updatedBy` | string | no | |
-| `createdAt` / `updatedAt` | date | no | |
+| Field                     | Type             | Required               | Meaning                                                                                     |
+|---------------------------|------------------|------------------------|---------------------------------------------------------------------------------------------|
+| `id`                      | UUID string      | yes in practice        | Identity. A fresh random UUID when absent, which makes the case a new one                   |
+| `order`                   | string           | no, defaults `""`      | The rank that places the case in its set — see below                                        |
+| `description`             | string           | no                     | What the case is. The card title                                                            |
+| `expectedResult`          | string           | no                     |                                                                                             |
+| `steps`                   | array of strings | no                     | One step per element. A blank element is skipped when drawn and keeps its place in the file |
+| `status`                  | enum             | no, defaults `PENDING` | `REVIEWED` `PENDING` `DISABLED` `TO_BE_UPDATED`                                             |
+| `priority`                | enum             | no, defaults `LOW`     | `HIGH` `MEDIUM` `LOW`                                                                       |
+| `group`                   | array of strings | no                     | The groups the case is in, each as the tester typed it. Empty for none                      |
+| `reference`               | string           | no                     | A ticket, a requirement — an identifier, never formatted for display                        |
+| `module`                  | string           | no                     |                                                                                             |
+| `testData`                | string           | no                     | Used rather than read: never reformatted, on any surface                                    |
+| `preConditions`           | string           | no                     |                                                                                             |
+| `createdBy` / `updatedBy` | string           | no                     |                                                                                             |
+| `createdAt` / `updatedAt` | date             | no                     |                                                                                             |
 
 **`order` is a rank, not a number.** `"zo"` is a valid order and sorts as text.
 A case carries where it sits, not who its neighbors are; the earlier design gave
@@ -250,20 +250,20 @@ moves one that no result of the run names any more to the recycle bin after the
 next write. Any PNG in a run folder named that way is taken for a screenshot, so
 one put there by hand under such a name goes too.
 
-| Field | Type | Meaning |
-|---|---|---|
-| `id` | UUID string | The test case this result is about - the same id the file is named by, which is what decides it (Rule-INTERNAL-012). Written so the file says what it is about on its own |
-| `status` | enum | `PASSED` `FAILED` `BLOCKED` as a tester or the automation judged it; `PENDING` until then; `UNTESTED` for a case still pending when the run completed or closed. A case whose test case was deleted since the run keeps its status here; it is shown as Removed if it was never judged, and with its verdict if it was; `REMOVED` is no longer written, and a file written by 2.11.0-alpha or earlier that holds it is read as removed |
-| `duration` | number, seconds | Nanosecond precision, written as a decimal |
-| `executedBy` | string | |
-| `executedAt` | date | |
-| `actualResult` | string | Empty unless the case failed |
-| `stacktrace` | string | Empty unless the case failed. Text only: a pasted screenshot is never in it |
-| `screenshots` | array of strings | The file names of the screenshots pasted with the failure, beside this file, in the order they were pasted. Left out when there are none; cleared by a pass and by an automated failure, and their files go with the next write |
-| `testCase` | object | The test case as it was when the verdict was given, in the shape of a `.tc` (Rule-EDITOR-PANEL-238). Left out until a verdict is given, so a pending result has none, and a result written before 2.13.0-alpha has none either and shows the test case as it is now. A correction keeps it; running the case again replaces it (Rule-EDITOR-PANEL-240, Rule-EDITOR-PANEL-241). Editing or deleting the test case never touches it |
-| `bugSeverity` | enum | `EMPTY` `BLOCKER` `MAJOR` `MINOR` `ENHANCEMENT` |
-| `bugPriority` | enum | `EMPTY` `HIGH` `MEDIUM` `LOW` |
-| `bugIssueUrl` | string | The GitHub issue the failure was reported as, written by [Report Bug](viewPanel/reportBug.md). Empty until then; cleared by a pass, kept by an automated failure |
+| Field          | Type             | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|----------------|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `id`           | UUID string      | The test case this result is about - the same id the file is named by, which is what decides it (Rule-INTERNAL-012). Written so the file says what it is about on its own                                                                                                                                                                                                                                                              |
+| `status`       | enum             | `PASSED` `FAILED` `BLOCKED` as a tester or the automation judged it; `PENDING` until then; `UNTESTED` for a case still pending when the run completed or closed. A case whose test case was deleted since the run keeps its status here; it is shown as Removed if it was never judged, and with its verdict if it was; `REMOVED` is no longer written, and a file written by 2.11.0-alpha or earlier that holds it is read as removed |
+| `duration`     | number, seconds  | Nanosecond precision, written as a decimal                                                                                                                                                                                                                                                                                                                                                                                             |
+| `executedBy`   | string           |                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `executedAt`   | date             |                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `actualResult` | string           | Empty unless the case failed                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `stacktrace`   | string           | Empty unless the case failed. Text only: a pasted screenshot is never in it                                                                                                                                                                                                                                                                                                                                                            |
+| `screenshots`  | array of strings | The file names of the screenshots pasted with the failure, beside this file, in the order they were pasted. Left out when there are none; cleared by a pass and by an automated failure, and their files go with the next write                                                                                                                                                                                                        |
+| `testCase`     | object           | The test case as it was when the verdict was given, in the shape of a `.tc` (Rule-EDITOR-PANEL-238). Left out until a verdict is given, so a pending result has none, and a result written before 2.13.0-alpha has none either and shows the test case as it is now. A correction keeps it; running the case again replaces it (Rule-EDITOR-PANEL-240, Rule-EDITOR-PANEL-241). Editing or deleting the test case never touches it      |
+| `bugSeverity`  | enum             | `EMPTY` `BLOCKER` `MAJOR` `MINOR` `ENHANCEMENT`                                                                                                                                                                                                                                                                                                                                                                                        |
+| `bugPriority`  | enum             | `EMPTY` `HIGH` `MEDIUM` `LOW`                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `bugIssueUrl`  | string           | The GitHub issue the failure was reported as, written by [Report Bug](viewPanel/reportBug.md). Empty until then; cleared by a pass, kept by an automated failure                                                                                                                                                                                                                                                                       |
 
 `EMPTY` is a real constant, not a missing value. A passed case carries
 `"bugSeverity" : "EMPTY"`, and nothing reading it has to test for absence.
@@ -281,12 +281,12 @@ project (Rule-INTERNAL-089, Rule-CODEGEN-082, Decision-013). What it adds is agr
 colleague who clones the repository lands on the same test project with no
 setup. `testin.yaml` is read too.
 
-| Key | Type | Required | Meaning |
-|---|---|---|---|
-| `location` | `local` / `remote` | no, defaults `local` | Whether the test data is on this machine or cloned from Git, the only way a test project is shared |
-| `RepoUrl` | string | only when remote | **Kept as it is written.** Whether the text is a repository address at all is decided where something is about to clone it (Rule-TREE-PANEL-117), so a value Testin does not recognise stays in the file to be seen and corrected rather than being dropped as it is read. Any account and token are dropped as it is read: on an `https://` or `http://` address every account goes, because there it is the secret; on an `ssh://` address only `account:secret` goes, so the conventional `git@` survives (Rule-SHARE-004) |
-| `testinProject` | string | no | Which test project, for everyone who opens the code project. Without it each tester chooses one, kept on their own machine; with it, a tester's own choice still wins until the file names a different project (Rule-TREE-PANEL-106) |
-| `bugRepoUrl` | string | only to report bugs | The GitHub repository [Report Bug](viewPanel/reportBug.md) files issues in, as its address: `https://github.com/owner/repo`, `https://host/owner/repo.git`, `ssh://git@host:2222/owner/repo` or `git@host:owner/repo`. Any account and token in it are dropped as it is read, by the same rule as `RepoUrl`. An address that does not name exactly a host, an owner and a repository - one ending in `/issues`, a file or a local path - is kept, and Report Bug refuses to send with the reason |
+| Key             | Type               | Required             | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+|-----------------|--------------------|----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `location`      | `local` / `remote` | no, defaults `local` | Whether the test data is on this machine or cloned from Git, the only way a test project is shared                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `RepoUrl`       | string             | only when remote     | **Kept as it is written.** Whether the text is a repository address at all is decided where something is about to clone it (Rule-TREE-PANEL-117), so a value Testin does not recognise stays in the file to be seen and corrected rather than being dropped as it is read. Any account and token are dropped as it is read: on an `https://` or `http://` address every account goes, because there it is the secret; on an `ssh://` address only `account:secret` goes, so the conventional `git@` survives (Rule-SHARE-004) |
+| `testinProject` | string             | no                   | Which test project, for everyone who opens the code project. Without it each tester chooses one, kept on their own machine; with it, a tester's own choice still wins until the file names a different project (Rule-TREE-PANEL-106)                                                                                                                                                                                                                                                                                          |
+| `bugRepoUrl`    | string             | only to report bugs  | The GitHub repository [Report Bug](viewPanel/reportBug.md) files issues in, as its address: `https://github.com/owner/repo`, `https://host/owner/repo.git`, `ssh://git@host:2222/owner/repo` or `git@host:owner/repo`. Any account and token in it are dropped as it is read, by the same rule as `RepoUrl`. An address that does not name exactly a host, an owner and a repository - one ending in `/issues`, a file or a local path - is kept, and Report Bug refuses to send with the reason                              |
 
 **No machine and no person appears here.** The Testin folder, the tester's
 name and the log level are application settings, and the test

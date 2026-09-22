@@ -16,7 +16,11 @@
 
 package org.testin.open;
 
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
@@ -26,8 +30,9 @@ import org.testin.explorer.tree.TreeValues;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -57,14 +62,6 @@ public class OpenContextMenuAction extends DumbAwareAction {
         this.registerCustomShortcutSet(Shortcuts.ContextMenu.getCustomShortcut(), owner);
     }
 
-    @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        anchor.get().ifPresent(at -> ActionManager.getInstance()
-                .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, cm)
-                .getComponent()
-                .show(owner, at.x, at.y));
-    }
-
     private static @NotNull Optional<Point> selectedRow(final @NotNull SimpleTree tree) {
         final int[] rows = TreeValues.selectedRows(tree);
         if (rows.length == 0) return Optional.empty();
@@ -88,6 +85,14 @@ public class OpenContextMenuAction extends DumbAwareAction {
 
         return Optional.ofNullable(list.getCellBounds(index, index))
                 .map(bounds -> new Point(bounds.x + bounds.width / 4, bounds.y + bounds.height / 2));
+    }
+
+    @Override
+    public void actionPerformed(final @NotNull AnActionEvent e) {
+        anchor.get().ifPresent(at -> ActionManager.getInstance()
+                .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, cm)
+                .getComponent()
+                .show(owner, at.x, at.y));
     }
 
     @Override

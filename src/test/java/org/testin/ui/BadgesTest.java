@@ -22,13 +22,15 @@ import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * The two rules a badge cannot be allowed to break silently (#79).

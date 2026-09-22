@@ -47,21 +47,6 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
 
     private Path root;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-snapshot");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            deleteTree(root);
-        } finally {
-            super.tearDown();
-        }
-    }
-
     private static void deleteTree(final Path path) {
         if (path == null) return;
 
@@ -75,6 +60,21 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
             });
         } catch (final Exception ignored) {
             // Nothing to walk, or nothing to remove.
+        }
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        root = Files.createTempDirectory("testin-snapshot");
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        try {
+            deleteTree(root);
+        } finally {
+            super.tearDown();
         }
     }
 

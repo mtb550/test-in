@@ -23,28 +23,37 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.util.FailureText;
 import org.testin.actions.TestinData;
 import org.testin.config.TestinYml;
-import org.testin.explorer.tree.TreeValues;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.explorer.TreePanel;
+import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.nio.file.Path;
-import java.util.function.Supplier;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.Supplier;
 
 public class ViewPendingCommitsAction extends DumbAwareAction {
+    // UC-SHARE-009, Rule-SHARE-042
+    public static void reviewFor(final @NotNull Project p, final @NotNull Path path) {
+        new Work(p).openFor(path);
+    }
+
+    private static @NotNull String commitLabel(final @NotNull String commitId) {
+        return commitId.isBlank() ? Bundle.message("git.commit.label.none") : Bundle.message("git.commit.label", commitId);
+    }
+
     // UC-SHARE-010
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -58,7 +67,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
         // Rule-SHARE-105
-        if (!OptionalPlugin.GIT.enableOrExplain(this, e.getPresentation())) return;
+        if (OptionalPlugin.GIT.grayedWithReason(this, e.getPresentation())) return;
 
         e.getPresentation().setEnabled(TestinData.firstSelected(e, TestProjectDirectoryDto.class).isPresent());
     }
@@ -66,15 +75,6 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.EDT;
-    }
-
-    // UC-SHARE-009, Rule-SHARE-042
-    public static void reviewFor(final @NotNull Project p, final @NotNull Path path) {
-        new Work(p).openFor(path);
-    }
-
-    private static @NotNull String commitLabel(final @NotNull String commitId) {
-        return commitId.isBlank() ? Bundle.message("git.commit.label.none") : Bundle.message("git.commit.label", commitId);
     }
 
     private record Work(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits) {
@@ -192,8 +192,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             final @NotNull String waiting = unpushed.isEmpty()
                     ? Bundle.message("git.not.pushed.no.upstream")
                     : unpushed.orElseThrow() == 1
-                            ? Bundle.message("git.not.pushed.one")
-                            : Bundle.message("git.not.pushed.many", String.valueOf(unpushed.orElseThrow()));
+                    ? Bundle.message("git.not.pushed.one")
+                    : Bundle.message("git.not.pushed.many", String.valueOf(unpushed.orElseThrow()));
 
             notifier.warnWithAction(p, Bundle.message("git.not.pushed.title"),
                     waiting,

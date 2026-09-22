@@ -17,20 +17,38 @@
 package org.testin.importexport.imports;
 
 import com.intellij.openapi.project.Project;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
-import org.testin.model.dto.TestCaseDto;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ImportExcel {
+    private static boolean isEmpty(final @NotNull Row row, final @NotNull DataFormatter dataFormatter) {
+        for (int c = 0; c < row.getLastCellNum(); c++) {
+            if (!dataFormatter.formatCellValue(row.getCell(c)).trim().isEmpty()) return false;
+        }
+        return true;
+    }
+
     // UC-SHARE-006
     public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
         final @NotNull Map<String, List<TestCaseDto>> result = new LinkedHashMap<>(parseFile(p, file));
@@ -74,10 +92,6 @@ public class ImportExcel {
         TestEditorAttributes.sayWhatWasRefused(p, refused);
     }
 
-    private record Parsed(@NotNull List<TestCaseDto> cases, int refused) {
-        private static final @NotNull Parsed NOTHING = new Parsed(List.of(), 0);
-    }
-
     private @NotNull Parsed parseSheet(final @NotNull Project p, final @NotNull Sheet sheet, final @NotNull DataFormatter dataFormatter) {
         return Optional.ofNullable(sheet.getRow(0))
                 .map(headerRow -> readRows(p, sheet, headerRow, dataFormatter))
@@ -114,10 +128,7 @@ public class ImportExcel {
         return new Parsed(sheetList, refused);
     }
 
-    private static boolean isEmpty(final @NotNull Row row, final @NotNull DataFormatter dataFormatter) {
-        for (int c = 0; c < row.getLastCellNum(); c++) {
-            if (!dataFormatter.formatCellValue(row.getCell(c)).trim().isEmpty()) return false;
-        }
-        return true;
+    private record Parsed(@NotNull List<TestCaseDto> cases, int refused) {
+        private static final @NotNull Parsed NOTHING = new Parsed(List.of(), 0);
     }
 }

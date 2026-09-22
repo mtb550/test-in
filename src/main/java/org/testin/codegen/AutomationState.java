@@ -43,6 +43,15 @@ public final class AutomationState {
     // UC-CODEGEN-005, Rule-CODEGEN-025
     private final @NotNull Set<UUID> withAMethod = ConcurrentHashMap.newKeySet();
 
+    // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-195, Rule-CODEGEN-002
+    private static @NotNull Automated stateOf(final @NotNull TestCaseDto tc, final @NotNull Map<UUID, Boolean> methods) {
+        final @NotNull Optional<Boolean> method = Optional.ofNullable(methods.get(tc.getId()));
+
+        if (method.isPresent()) return method.orElseThrow() ? Automated.WRITTEN : Automated.NONE;
+
+        return Fqcn.methodNameOf(tc).isEmpty() ? Automated.NONE : Automated.MISSING;
+    }
+
     // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-197
     public @NotNull Automated of(final @NotNull UUID id) {
         return known.getOrDefault(id, Automated.UNKNOWN);
@@ -127,14 +136,5 @@ public final class AutomationState {
         if (wanted.isEmpty()) return cases;
 
         return cases.stream().filter(tc -> wanted.contains(of(tc.getId()))).toList();
-    }
-
-    // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-195, Rule-CODEGEN-002
-    private static @NotNull Automated stateOf(final @NotNull TestCaseDto tc, final @NotNull Map<UUID, Boolean> methods) {
-        final @NotNull Optional<Boolean> method = Optional.ofNullable(methods.get(tc.getId()));
-
-        if (method.isPresent()) return method.orElseThrow() ? Automated.WRITTEN : Automated.NONE;
-
-        return Fqcn.methodNameOf(tc).isEmpty() ? Automated.NONE : Automated.MISSING;
     }
 }

@@ -6,8 +6,8 @@
 > **`1`** is **Assigned**, **`2`** is **Completed** and **`3`** is
 > **Closed**.
 
-**As a** tester, **I want** to mark a test run **Assigned**, **Completed** or
-**Closed** from the tree, **so that** the test run's place in its life is
+**As a** tester, **I want** to mark a test run **Assigned**, **Completed** or **Closed** from the tree, **so that** the
+test run's place in its life is
 visible without opening it.
 
 The status says how far the test run has got.
@@ -38,10 +38,10 @@ The status says how far the test run has got.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -55,10 +55,9 @@ The status says how far the test run has got.
   never. A test run always says its status, because where a cycle stands is what
   the tree is read for.
 - **Rule-TREE-PANEL-067** — **Completed** and **Closed** are final. The test run
-  accepts no more verdicts. Every test case still **Pending** becomes
-  **Untested**. (Rule-TREE-PANEL-009)
-- **Rule-TREE-PANEL-068** — A tester sets **Assigned**, **Completed** and
-  **Closed**. **Created** and **In Progress** are the test run's own record of
+  accepts no more verdicts. Every test case still **Pending** becomes **Untested**. (Rule-TREE-PANEL-009)
+- **Rule-TREE-PANEL-068** — A tester sets **Assigned**, **Completed** and **Closed**. **Created** and **In Progress**
+  are the test run's own record of
   itself.
 - **Rule-TREE-PANEL-092** — The popup offers the statuses this test run can be
   moved to and no others: the three a tester sets, and only those ahead of where
@@ -103,8 +102,7 @@ The status says how far the test run has got.
 
 ## Main flow
 
-1. The tester selects a test run that is **Created**, **In Progress** or
-   **Assigned**.
+1. The tester selects a test run that is **Created**, **In Progress** or **Assigned**.
 2. The tester chooses **Set Status**.
 3. The **Set Test Run Status** popup lists the five statuses. Three of them
    carry a key: `1` **Assigned**, `2` **Completed**, `3` **Closed**.
@@ -115,8 +113,8 @@ The status says how far the test run has got.
 6. Setting **Completed** or **Closed** signs the test run off. Every test case
    still **Pending** becomes **Untested**, except one removed from its test set,
    which stays as the test run recorded it. Testin records the time the test run
-   finished, but only if it had been started. From then on **Set Status**,
-   **Edit Run** and **Run Tests** are gray on it.
+   finished, but only if it had been started. From then on **Set Status**, **Edit Run** and **Run Tests** are gray on
+   it.
 
 **Signing a test run off cannot be undone.** A status change is not on the
 tree's history (Rule-TREE-PANEL-060). Testin asks for no confirmation before it.

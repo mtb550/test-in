@@ -23,7 +23,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import org.testin.util.Bundle;
-import java.awt.*;
+
+import java.awt.Color;
 import java.util.function.LongFunction;
 import java.util.function.ToLongFunction;
 
@@ -115,6 +116,14 @@ public enum NodeCount {
 
     private final @NotNull Color swatch;
 
+    private static @NotNull String plain(final long value) {
+        return String.valueOf(value);
+    }
+
+    private static @NotNull String percentage(final long value) {
+        return value + "%";
+    }
+
     public @NotNull String of(final @NotNull NodeFigures figures) {
         return format.apply(reader.applyAsLong(figures));
     }
@@ -125,13 +134,5 @@ public enum NodeCount {
 
     private static final class Uncharted {
         private static final @NotNull Color COLOR = JBColor.lazy(UIUtil::getContextHelpForeground);
-    }
-
-    private static @NotNull String plain(final long value) {
-        return String.valueOf(value);
-    }
-
-    private static @NotNull String percentage(final long value) {
-        return value + "%";
     }
 }

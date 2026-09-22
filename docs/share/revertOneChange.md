@@ -2,8 +2,8 @@
 
 # UC-SHARE-011: Put one changed field back
 
-**As a** tester, **I want** to undo one field I changed by mistake,
-**so that** I do not have to throw away a morning's work to lose one typo.
+**As a** tester, **I want** to undo one field I changed by mistake, **so that** I do not have to throw away a morning's
+work to lose one typo.
 
 Each row of the review is one changed field. This puts that one field back to
 what was committed, and leaves the rest of the test case alone.
@@ -86,15 +86,15 @@ of those.
 **If the test case is no longer in the test project** — a message reads *That
 test case is no longer in the project*.
 
-**If the file cannot be written or deleted** — the row stays, and nothing reads
-*Reverted*. A message reads *unable to write content:* or *unable to remove:*
+**If the file cannot be written or deleted** — the row stays, and nothing reads *Reverted*. A message reads *unable to
+write content:* or *unable to remove:*
 and the reason, or one titled **Revert Failed** carries it.
 
 ## A new or removed test case
 
 Reverting a **Create Test Case** row removes that new test case, and the test
-method Testin generated for it (Rule-CODEGEN-049). Reverting a
-**Remove Test Case** row puts the removed test case back as it was committed,
+method Testin generated for it (Rule-CODEGEN-049). Reverting a **Remove Test Case** row puts the removed test case back
+as it was committed,
 with who created it and when.
 
 ## What cannot be put back this way

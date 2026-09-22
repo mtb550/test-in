@@ -1,0 +1,40 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+/**
+ * The repository, found by walking up from wherever the tests were started:
+ * Gradle runs them from the module, and a run started from the IDE need not.
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RepositoryRoot {
+    public static @NotNull Path resolve(final @NotNull String entry) {
+        final @NotNull Path start = Path.of("").toAbsolutePath();
+
+        for (Path here = start; here != null; here = here.getParent())
+            if (Files.exists(here.resolve(entry))) return here.resolve(entry);
+
+        throw new AssertionError("No " + entry + " above " + start);
+    }
+}

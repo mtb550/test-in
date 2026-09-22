@@ -16,24 +16,24 @@
 
 package org.testin.report.generators;
 
-import org.testin.model.ResultAnalysis;
-import org.testin.model.TestRunItems;
-import org.testin.model.markers.DetailRow;
-import org.testin.services.Services;
-import org.testin.testproject.BoundTestProject;
-import org.testin.testrun.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.dhatim.fastexcel.HyperLink;
 import org.dhatim.fastexcel.Workbook;
 import org.dhatim.fastexcel.Worksheet;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.BugIssueUrl;
-import org.testin.model.TestRunSummary;
 import org.testin.logger.Logger;
-import org.testin.report.ReportTile;
+import org.testin.model.BugIssueUrl;
+import org.testin.model.ResultAnalysis;
+import org.testin.model.TestRunItems;
+import org.testin.model.TestRunSummary;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.markers.DetailRow;
+import org.testin.report.ReportTile;
+import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
+import org.testin.testrun.RunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 
@@ -46,31 +46,13 @@ public final class TestRunExcelGenerator {
         return value.isEmpty() ? Bundle.message("report.overview.not.recorded") : value;
     }
 
-    // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-020
-    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
-        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-            final @NotNull Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
-            final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
-
-            writeOverview(wb.newWorksheet(Bundle.message("report.excel.sheet.overview")), Services.getInstance(p, BoundTestProject.class).name(), trDir, tr, summary);
-            writeCases(wb.newWorksheet(Bundle.message("report.excel.sheet.cases")), tr);
-
-            wb.finish();
-
-            return os.toByteArray();
-        } catch (final IOException ex) {
-            Logger.error("Excel report generation failed: " + ex.getMessage());
-            throw new RuntimeException(ex);
-        }
-    }
-
     // Rule-REPORT-020
-    private static void writeOverview(final @NotNull Worksheet ws, final @NotNull String projectName, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull TestRunSummary summary) {
+    private static void writeOverview(final @NotNull Worksheet ws, final @NotNull String projectName, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunSummary summary) {
         ws.value(0, 0, Bundle.message("report.title"));
         ws.style(0, 0).bold().fontSize(14).set();
 
         int row = heading(ws, 2, Bundle.message("report.heading.overview"));
-        for (final DetailRow overview : ReportOverview.rowsFor(projectName, trDir, tr, summary)) {
+        for (final DetailRow overview : ReportOverview.rowsFor(projectName, trDir, summary)) {
             ws.value(row, 0, overview.caption());
             ws.style(row, 0).bold().set();
             ws.value(row++, 1, overview.value());
@@ -163,5 +145,23 @@ public final class TestRunExcelGenerator {
         ws.width(6, 15);
         ws.width(7, 40);
         ws.width(8, 15);
+    }
+
+    // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-020
+    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            final @NotNull Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
+            final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
+
+            writeOverview(wb.newWorksheet(Bundle.message("report.excel.sheet.overview")), Services.getInstance(p, BoundTestProject.class).name(), trDir, summary);
+            writeCases(wb.newWorksheet(Bundle.message("report.excel.sheet.cases")), tr);
+
+            wb.finish();
+
+            return os.toByteArray();
+        } catch (final IOException ex) {
+            Logger.error("Excel report generation failed: " + ex.getMessage());
+            throw new RuntimeException(ex);
+        }
     }
 }

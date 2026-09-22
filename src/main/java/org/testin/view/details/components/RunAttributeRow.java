@@ -20,11 +20,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.testrun.RunEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testrun.RunEditorAttributes;
 
-import java.awt.*;
+import java.awt.GridBagConstraints;
 
 @RequiredArgsConstructor
 public final class RunAttributeRow extends BaseDetails {
@@ -34,6 +34,6 @@ public final class RunAttributeRow extends BaseDetails {
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-031
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        return addRow(panel, gbc, attribute.getName(), attribute.getRunValueExtractor().execute(item, p), currentRow);
+        return addRow(panel, gbc, attribute.getName(), attribute.getRunValueExtractor().apply(item), currentRow);
     }
 }

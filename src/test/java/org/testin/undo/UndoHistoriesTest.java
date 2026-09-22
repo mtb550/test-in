@@ -21,7 +21,9 @@ import org.testng.annotations.Test;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * The undo/redo contract: undo runs the reverse, redo runs the forward again, a

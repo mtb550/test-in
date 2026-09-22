@@ -46,73 +46,18 @@ import java.util.stream.IntStream;
 
 @AllArgsConstructor
 public final class GitHubCli {
-    private static final @NotNull List<Integer> OLDEST = List.of(2, 99, 0);
-
     static final @NotNull Duration TIMEOUT = Duration.ofSeconds(120);
-
+    private static final @NotNull List<Integer> OLDEST = List.of(2, 99, 0);
     private static final @NotNull String BODY_FILE = "bug.md";
     private static final @NotNull String DEV_BUILD = "DEV";
     private static final @NotNull Pattern VERSION = Pattern.compile("gh version (\\S+)");
     private static final @NotNull Pattern NUMBER = Pattern.compile("\\d{1,9}");
 
     private static final @NotNull Path ANYWHERE = Path.of(System.getProperty("java.io.tmpdir"));
-
-    @FunctionalInterface
-    interface Launcher {
-        @NotNull Optional<ProcessOutput> run(@NotNull List<String> arguments, @NotNull Path workDirectory);
-    }
-
     private final @NotNull Launcher launcher;
 
     public static @NotNull GitHubCli onPath(final @NotNull ProgressIndicator indicator) {
         return new GitHubCli((arguments, workDirectory) -> start(arguments, workDirectory, indicator));
-    }
-
-    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-071, Rule-VIEW-PANEL-078
-    public @NotNull Optional<String> whyItCannotSend(final @NotNull String bugRepoUrl) {
-        if (bugRepoUrl.isBlank()) return Optional.of(Bundle.message("bug.reason.no.bug.repo.url"));
-
-        return BugRepository.of(bugRepoUrl)
-                .map(this::whyGhCannotSend)
-                .orElseGet(() -> Optional.of(Bundle.message("bug.reason.not.a.repository")));
-    }
-
-    private @NotNull Optional<String> whyGhCannotSend(final @NotNull BugRepository repository) {
-        final @NotNull Optional<String> version = launcher.run(List.of("--version"), ANYWHERE).map(ProcessOutput::getStdout);
-        if (version.isEmpty()) return Optional.of(Bundle.message("bug.reason.no.gh"));
-
-        final @NotNull String said = version.orElse("");
-        if (!isNewEnough(said)) return Optional.of(Bundle.message("bug.reason.old.gh", versionIn(said), oldest()));
-
-        final boolean signedIn = launcher.run(List.of("auth", "status", "--active", "--hostname", repository.host()), ANYWHERE)
-                .filter(answer -> answer.getExitCode() == 0 && !answer.isTimeout() && !answer.isCancelled())
-                .isPresent();
-        return signedIn ? Optional.empty() : Optional.of(Bundle.message("bug.reason.signed.out", repository.host()));
-    }
-
-    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-073, Rule-VIEW-PANEL-076
-    public @NotNull IssueCreation create(final @NotNull BugRepository repository, final @NotNull String title, final @NotNull String body, final @NotNull List<byte[]> screenshots) {
-        final @NotNull Path folder;
-        try {
-            folder = Files.createTempDirectory("testin-bug-");
-        } catch (final IOException ex) {
-            return notWritten(ex);
-        }
-
-        try {
-            Files.writeString(folder.resolve(BODY_FILE), body);
-            for (int number = 1; number <= screenshots.size(); number++) {
-                Files.write(folder.resolve(BugTemplate.screenshotFile(number)), screenshots.get(number - 1));
-            }
-
-            return launcher.run(arguments(repository, title, screenshots.size()), folder)
-                    .map(answer -> IssueCreation.of(answer, repository.host(), screenshots.size()))
-                    .orElseGet(() -> IssueCreation.failed(Bundle.message("bug.reason.no.gh")));
-        } catch (final IOException ex) {
-            return notWritten(ex);
-        } finally {
-            FileUtil.delete(folder.toFile());
-        }
     }
 
     private static @NotNull IssueCreation notWritten(final @NotNull IOException ex) {
@@ -163,5 +108,57 @@ public final class GitHubCli {
             Logger.warn("gh could not be started: " + ex.getMessage());
             return Optional.empty();
         }
+    }
+
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-071, Rule-VIEW-PANEL-078
+    public @NotNull Optional<String> whyItCannotSend(final @NotNull String bugRepoUrl) {
+        if (bugRepoUrl.isBlank()) return Optional.of(Bundle.message("bug.reason.no.bug.repo.url"));
+
+        return BugRepository.of(bugRepoUrl)
+                .map(this::whyGhCannotSend)
+                .orElseGet(() -> Optional.of(Bundle.message("bug.reason.not.a.repository")));
+    }
+
+    private @NotNull Optional<String> whyGhCannotSend(final @NotNull BugRepository repository) {
+        final @NotNull Optional<String> version = launcher.run(List.of("--version"), ANYWHERE).map(ProcessOutput::getStdout);
+        if (version.isEmpty()) return Optional.of(Bundle.message("bug.reason.no.gh"));
+
+        final @NotNull String said = version.orElse("");
+        if (!isNewEnough(said)) return Optional.of(Bundle.message("bug.reason.old.gh", versionIn(said), oldest()));
+
+        final boolean signedIn = launcher.run(List.of("auth", "status", "--active", "--hostname", repository.host()), ANYWHERE)
+                .filter(answer -> answer.getExitCode() == 0 && !answer.isTimeout() && !answer.isCancelled())
+                .isPresent();
+        return signedIn ? Optional.empty() : Optional.of(Bundle.message("bug.reason.signed.out", repository.host()));
+    }
+
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-073, Rule-VIEW-PANEL-076
+    public @NotNull IssueCreation create(final @NotNull BugRepository repository, final @NotNull String title, final @NotNull String body, final @NotNull List<byte[]> screenshots) {
+        final @NotNull Path folder;
+        try {
+            folder = Files.createTempDirectory("testin-bug-");
+        } catch (final IOException ex) {
+            return notWritten(ex);
+        }
+
+        try {
+            Files.writeString(folder.resolve(BODY_FILE), body);
+            for (int number = 1; number <= screenshots.size(); number++) {
+                Files.write(folder.resolve(BugTemplate.screenshotFile(number)), screenshots.get(number - 1));
+            }
+
+            return launcher.run(arguments(repository, title, screenshots.size()), folder)
+                    .map(answer -> IssueCreation.of(answer, repository.host(), screenshots.size()))
+                    .orElseGet(() -> IssueCreation.failed(Bundle.message("bug.reason.no.gh")));
+        } catch (final IOException ex) {
+            return notWritten(ex);
+        } finally {
+            FileUtil.delete(folder.toFile());
+        }
+    }
+
+    @FunctionalInterface
+    interface Launcher {
+        @NotNull Optional<ProcessOutput> run(@NotNull List<String> arguments, @NotNull Path workDirectory);
     }
 }

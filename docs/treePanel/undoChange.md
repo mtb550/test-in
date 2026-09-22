@@ -5,8 +5,8 @@
 > **`Ctrl+Z`**. On the menu: **Actions → Undo**, which names what it will undo,
 > as in *Undo Move 'Login'* or *Undo Remove 3 items*.
 
-**As a** tester, **I want** to take back the last change I made to the tree,
-**so that** a wrong move, rename or removal costs nothing.
+**As a** tester, **I want** to take back the last change I made to the tree, **so that** a wrong move, rename or removal
+costs nothing.
 
 This puts the tree back the way it was before the last change.
 
@@ -36,10 +36,10 @@ This puts the tree back the way it was before the last change.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -92,8 +92,8 @@ To put an undone change back, see [UC-TREE-PANEL-017](redoChange.md).
 **If the tree's history is empty** — the entry reads plain **Undo**, and is
 gray. `Ctrl+Z` does nothing.
 
-**If some removed nodes can no longer be put back** — the rest are restored.
-*Undo Incomplete* is shown in red, with the line *N of M could not be put back*.
+**If some removed nodes can no longer be put back** — the rest are restored. *Undo Incomplete* is shown in red, with the
+line *N of M could not be put back*.
 This happens when something already sits where the node used to be.
 
 > **A rename or a move that failed on disk is still on the history.** The menu

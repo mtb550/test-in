@@ -23,7 +23,7 @@ import org.testin.util.Shortcuts;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ConfirmDialog extends AbstractFrameworkDialog<DialogMessage> {
+public final class ConfirmDialog extends AbstractFrameworkDialog {
     private final @NotNull Runnable onConfirm;
 
     public ConfirmDialog(final @NotNull Project p, final @NotNull String dialogTitle, final @NotNull String message, final @NotNull String from, final @NotNull String to, final @NotNull String confirmName, final @NotNull Runnable onConfirm) {
@@ -52,9 +52,6 @@ public final class ConfirmDialog extends AbstractFrameworkDialog<DialogMessage> 
         shortcuts = List.copyOf(keys);
     }
 
-    public record Alternative(@NotNull Shortcuts key, @NotNull String name, @NotNull Runnable action) {
-    }
-
     @Override
     protected void submit() {
         onConfirm.run();
@@ -65,5 +62,8 @@ public final class ConfirmDialog extends AbstractFrameworkDialog<DialogMessage> 
     @Override
     protected boolean replacesItsKind() {
         return true;
+    }
+
+    public record Alternative(@NotNull Shortcuts key, @NotNull String name, @NotNull Runnable action) {
     }
 }

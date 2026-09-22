@@ -18,16 +18,15 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.testin.TempTree;
 import org.testin.services.Services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Stream;
 
 /**
  * UC-INTERNAL-003, Rule-INTERNAL-021.
@@ -71,10 +70,8 @@ public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        try (Stream<Path> walk = Files.walk(root)) {
-            walk.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
-        } catch (final Exception ignored) {
-            // Left for the operating system.
+        try {
+            TempTree.delete(root);
         } finally {
             super.tearDown();
         }
@@ -147,7 +144,7 @@ public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
         final UUID caseInDeleted = indexer().getTestCasesForTestSet(deleted).getFirst().getId();
         final UUID caseInKept = indexer().getTestCasesForTestSet(kept).getFirst().getId();
 
-        deleteTree(deleted);
+        assertTrue("could not delete " + deleted, TempTree.delete(deleted));
         indexer().scanSingleProject(project);
 
         assertFalse("a test set deleted on disk is still in the index after a rescan",
@@ -163,14 +160,6 @@ public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
         } catch (final InterruptedException interrupted) {
             Thread.currentThread().interrupt();
             throw new AssertionError("interrupted while the rescan ran", interrupted);
-        }
-    }
-
-    private static void deleteTree(final Path path) {
-        try (Stream<Path> walk = Files.walk(path)) {
-            walk.sorted(Comparator.reverseOrder()).forEach(each -> each.toFile().delete());
-        } catch (final Exception ex) {
-            throw new AssertionError("could not delete " + path, ex);
         }
     }
 }

@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-040: Change the failure details on their own
 
-**As a** tester, **I want** to add to what I wrote about a failure,
-**so that** I can paste the error in after I have found it, without touching the
+**As a** tester, **I want** to add to what I wrote about a failure, **so that** I can paste the error in after I have
+found it, without touching the
 verdict.
 
 This reopens the failure form on a test case that is already **Failed**. The

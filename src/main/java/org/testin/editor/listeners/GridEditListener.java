@@ -16,20 +16,20 @@
 
 package org.testin.editor.listeners;
 
-import org.testin.undo.UndoScope;
-import org.testin.notifications.Notifier;
-import org.testin.notifications.Refused;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.testcase.TestEditorAttributes;
-import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
+import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseSnapshot;
+import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes.Can;
+import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 
 import javax.swing.table.DefaultTableModel;
@@ -51,13 +51,14 @@ public class GridEditListener extends AbstractGridEditListener {
 
     private final @NotNull Map<UUID, Changed> changedThisGesture = new LinkedHashMap<>();
 
-    private record Changed(@NotNull TestCaseDto tc, @NotNull TestCaseSnapshot before, @NotNull Set<GenType> generators) {
-    }
-
     public GridEditListener(final @NotNull Project p, final @NotNull List<TestCaseDto> pageItems, final @NotNull Runnable onEdited, final @NotNull Path testSetPath) {
         super(p, pageItems);
         this.onEdited = onEdited;
         this.testSetPath = testSetPath;
+    }
+
+    private static @NotNull String quoted(final @NotNull String typed, final @NotNull TestEditorAttributes attr) {
+        return Bundle.message("grid.refused.as", typed.trim(), attr.getName());
     }
 
     @Override
@@ -98,10 +99,6 @@ public class GridEditListener extends AbstractGridEditListener {
         return GridEdit.WROTE;
     }
 
-    private static @NotNull String quoted(final @NotNull String typed, final @NotNull TestEditorAttributes attr) {
-        return Bundle.message("grid.refused.as", typed.trim(), attr.getName());
-    }
-
     // UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-053
     private void persistAndGenerate(final @NotNull TestCaseDto tc, final @NotNull TestEditorAttributes attr, final @NotNull TestCaseSnapshot undoFrom) {
         if (testSetPath.toString().isEmpty()) {
@@ -139,5 +136,9 @@ public class GridEditListener extends AbstractGridEditListener {
             TestCaseSnapshot.record(p, UndoScope.of(testSetPath), TestCaseSnapshot.describe(Bundle.message("snapshot.verb.edit"), written),
                     before, List.of(TestCaseSnapshot.of(p, testSetPath, TestCaseSnapshot.idsOf(written))));
         });
+    }
+
+    private record Changed(@NotNull TestCaseDto tc, @NotNull TestCaseSnapshot before,
+                           @NotNull Set<GenType> generators) {
     }
 }

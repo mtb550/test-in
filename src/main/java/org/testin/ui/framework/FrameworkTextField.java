@@ -26,11 +26,14 @@ import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
@@ -61,7 +64,7 @@ final class FrameworkTextField {
                     if (!emptyWarningShown) return;
 
                     emptyWarningShown = false;
-                    showPlaceholder(SimpleTextAttributes.GRAYED_ATTRIBUTES);
+                    showPlaceholder();
                 }
             });
         }
@@ -72,6 +75,23 @@ final class FrameworkTextField {
     static void style(final @NotNull JComponent field) {
         field.setFont(JBFont.label().biggerOn(6f));
         field.setBorder(JBUI.Borders.empty(10, 12));
+    }
+
+    static void bindClipboard(final @NotNull JTextComponent component) {
+        bind(component, KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx(), DefaultEditorKit.pasteAction);
+        bindAllButPaste(component);
+    }
+
+    static void bindAllButPaste(final @NotNull JTextComponent component) {
+        final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+
+        bind(component, KeyEvent.VK_C, menuMask, DefaultEditorKit.copyAction);
+        bind(component, KeyEvent.VK_X, menuMask, DefaultEditorKit.cutAction);
+        bind(component, KeyEvent.VK_A, menuMask, DefaultEditorKit.selectAllAction);
+    }
+
+    private static void bind(final @NotNull JTextComponent component, final int keyCode, @MagicConstant(flagsFromClass = InputEvent.class) final int modifiers, final @NotNull String actionName) {
+        component.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(keyCode, modifiers), actionName);
     }
 
     void setLeadingIcon(final @NotNull Icon icon) {
@@ -99,28 +119,11 @@ final class FrameworkTextField {
         EmptyWarning.show(field, placeholder);
     }
 
-    private void showPlaceholder(final @NotNull SimpleTextAttributes attributes) {
+    private void showPlaceholder() {
         if (placeholder.isBlank()) return;
 
         field.getEmptyText().clear();
-        field.getEmptyText().appendText(placeholder, attributes);
+        field.getEmptyText().appendText(placeholder, SimpleTextAttributes.GRAYED_ATTRIBUTES);
         field.repaint();
-    }
-
-    static void bindClipboard(final @NotNull JTextComponent component) {
-        bind(component, KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx(), DefaultEditorKit.pasteAction);
-        bindAllButPaste(component);
-    }
-
-    static void bindAllButPaste(final @NotNull JTextComponent component) {
-        final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
-
-        bind(component, KeyEvent.VK_C, menuMask, DefaultEditorKit.copyAction);
-        bind(component, KeyEvent.VK_X, menuMask, DefaultEditorKit.cutAction);
-        bind(component, KeyEvent.VK_A, menuMask, DefaultEditorKit.selectAllAction);
-    }
-
-    private static void bind(final @NotNull JTextComponent component, final int keyCode, @MagicConstant(flagsFromClass = InputEvent.class) final int modifiers, final @NotNull String actionName) {
-        component.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(keyCode, modifiers), actionName);
     }
 }

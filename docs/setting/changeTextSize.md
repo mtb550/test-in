@@ -2,8 +2,8 @@
 
 # UC-SETTING-011: Change the size of Testin's text
 
-**As a** tester, **I want** Testin's text at the size I read code at,
-**so that** I can read a test case on a projector or on a small laptop screen.
+**As a** tester, **I want** Testin's text at the size I read code at, **so that** I can read a test case on a projector
+or on a small laptop screen.
 
 One gesture changes the size of the text in every Testin panel and in the code
 editor.

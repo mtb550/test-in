@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-039: Record one verdict on many test cases
 
-**As a** tester, **I want** to mark twelve test cases blocked at once,
-**so that** an environment that is down does not cost twelve keystrokes and
+**As a** tester, **I want** to mark twelve test cases blocked at once, **so that** an environment that is down does not
+cost twelve keystrokes and
 twelve dialogs.
 
 One key on a selection judges every test case in it.

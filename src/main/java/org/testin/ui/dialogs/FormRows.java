@@ -21,8 +21,9 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
 public final class FormRows extends JBPanel<FormRows> {
     private final @NotNull GridBagConstraints gbc = new GridBagConstraints();

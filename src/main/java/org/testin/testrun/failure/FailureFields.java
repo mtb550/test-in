@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.testin.testrun.create;
+package org.testin.testrun.failure;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.services.Services;
-import org.testin.testrun.RunEditorAttributes;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.TestRunItems;
+import org.testin.services.Services;
+import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
 import org.testin.ui.framework.SpellCheckedField;

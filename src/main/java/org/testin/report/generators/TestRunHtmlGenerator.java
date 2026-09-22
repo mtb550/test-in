@@ -16,20 +16,20 @@
 
 package org.testin.report.generators;
 
-import org.testin.model.TestRunConfiguration;
 import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.NotNull;
-import org.testin.model.markers.DetailRow;
-import org.testin.model.TestRunSummary;
-import org.testin.report.ReportTile;
-import org.testin.model.TestRunItems;
-import org.testin.model.dto.TestRunDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import com.intellij.openapi.util.text.StringUtil;
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.ResultAnalysis;
+import org.testin.model.TestRunConfiguration;
+import org.testin.model.TestRunItems;
+import org.testin.model.TestRunSummary;
+import org.testin.model.dto.TestRunDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.markers.DetailRow;
+import org.testin.report.ReportTile;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.RunEditorAttributes;
@@ -38,9 +38,9 @@ import org.testin.util.Display;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
-import java.util.Locale;
 
 public final class TestRunHtmlGenerator {
     final String DARK_BLUE = "#1f3864";
@@ -83,7 +83,7 @@ public final class TestRunHtmlGenerator {
 
         html.append("<div class='section-title-bar'><div class='section-title'>").append(Bundle.message("report.heading.overview")).append("</div></div>");
         html.append("<table class='overview-table'>");
-        for (final DetailRow row : ReportOverview.rowsFor(projectName, trDir, tr, summary)) {
+        for (final DetailRow row : ReportOverview.rowsFor(projectName, trDir, summary)) {
             overviewRow(html, row.caption(), row.value());
         }
         html.append("</table>");
@@ -208,65 +208,64 @@ public final class TestRunHtmlGenerator {
     }
 
     private @NotNull String styles() {
-        return new StringBuilder("<style>")
+        return "<style>"
 
-                .append("/* The skin on screen unless the reader asks for white. */")
-                .append(":root {").append(darkTokens()).append(sectionTokens()).append("}")
-                .append("/* The white skin: used only when the reader presses the button. */")
-                .append(":root[data-theme='light'] {").append(lightTokens()).append("}")
+                + "/* The skin on screen unless the reader asks for white. */"
+                + ":root {" + darkTokens() + sectionTokens() + "}"
+                + "/* The white skin: used only when the reader presses the button. */"
+                + ":root[data-theme='light'] {" + lightTokens() + "}"
 
-                .append("* { margin: 0; padding: 0; box-sizing: border-box; }")
-                .append("body { font-family: Calibri, Arial, sans-serif; color: var(--ink); background: var(--page); padding: 40px; }")
+                + "* { margin: 0; padding: 0; box-sizing: border-box; }"
+                + "body { font-family: Calibri, Arial, sans-serif; color: var(--ink); background: var(--page); padding: 40px; }"
 
-                .append(".theme-toggle { position: fixed; top: 16px; right: 16px; font: inherit; font-size: ").append(ReportFont.SMALL.css()).append("; ")
-                .append("padding: 6px 12px; border-radius: 6px; cursor: pointer; ")
-                .append("background: var(--panel); color: var(--ink); border: 1px solid var(--line); }")
-                .append(".theme-toggle:hover { border-color: var(--accent); }")
+                + ".theme-toggle { position: fixed; top: 16px; right: 16px; font: inherit; font-size: " + ReportFont.SMALL.css() + "; "
+                + "padding: 6px 12px; border-radius: 6px; cursor: pointer; "
+                + "background: var(--panel); color: var(--ink); border: 1px solid var(--line); }"
+                + ".theme-toggle:hover { border-color: var(--accent); }"
 
-                .append(".report-title { font-size: ").append(ReportFont.TITLE.css()).append("; font-weight: bold; color: var(--heading); }")
-                .append(".report-subtitle { font-size: ").append(ReportFont.SUBTITLE.css()).append("; color: var(--accent); margin-top: 4px; }")
-                .append(".report-runname { font-size: ").append(ReportFont.LEAD.css()).append("; color: var(--accent); margin-top: 2px; ")
-                .append("padding-bottom: 6px; border-bottom: 2px solid var(--heading); }")
-                .append(".analysis-heading { font-size: ").append(ReportFont.LEAD.css()).append("; font-weight: bold; margin-top: 10px; }")
-                .append(".analysis-text { font-size: ").append(ReportFont.BODY.css()).append("; color: var(--ink); margin-bottom: 8px; white-space: pre-wrap; }")
-                .append(".report-conf { font-size: ").append(ReportFont.CAPTION.css()).append("; color: var(--muted); font-style: italic; margin-top: 6px; margin-bottom: 20px; }")
+                + ".report-title { font-size: " + ReportFont.TITLE.css() + "; font-weight: bold; color: var(--heading); }"
+                + ".report-subtitle { font-size: " + ReportFont.SUBTITLE.css() + "; color: var(--accent); margin-top: 4px; }"
+                + ".report-runname { font-size: " + ReportFont.LEAD.css() + "; color: var(--accent); margin-top: 2px; "
+                + "padding-bottom: 6px; border-bottom: 2px solid var(--heading); }"
+                + ".analysis-heading { font-size: " + ReportFont.LEAD.css() + "; font-weight: bold; margin-top: 10px; }"
+                + ".analysis-text { font-size: " + ReportFont.BODY.css() + "; color: var(--ink); margin-bottom: 8px; white-space: pre-wrap; }"
+                + ".report-conf { font-size: " + ReportFont.CAPTION.css() + "; color: var(--muted); font-style: italic; margin-top: 6px; margin-bottom: 20px; }"
 
-                .append(".section-title { font-size: ").append(ReportFont.SECTION.css()).append("; font-weight: bold; color: var(--heading); margin-top: 28px; margin-bottom: 10px; }")
-                .append(".section-title-bar { border-bottom: 1px solid var(--heading); margin-bottom: 14px; }")
+                + ".section-title { font-size: " + ReportFont.SECTION.css() + "; font-weight: bold; color: var(--heading); margin-top: 28px; margin-bottom: 10px; }"
+                + ".section-title-bar { border-bottom: 1px solid var(--heading); margin-bottom: 14px; }"
 
-                .append(".overview-table { border-collapse: collapse; width: 100%; max-width: 700px; }")
-                .append(".overview-table td { padding: 6px 12px; border: 1px solid var(--line); font-size: ").append(ReportFont.BODY.css()).append("; }")
-                .append(".overview-table td.label { background: var(--panel); font-weight: bold; color: var(--heading); ")
-                .append("width: 240px; white-space: nowrap; }")
-                .append(".overview-table td.value { color: var(--ink); white-space: pre-wrap; }")
+                + ".overview-table { border-collapse: collapse; width: 100%; max-width: 700px; }"
+                + ".overview-table td { padding: 6px 12px; border: 1px solid var(--line); font-size: " + ReportFont.BODY.css() + "; }"
+                + ".overview-table td.label { background: var(--panel); font-weight: bold; color: var(--heading); "
+                + "width: 240px; white-space: nowrap; }"
+                + ".overview-table td.value { color: var(--ink); white-space: pre-wrap; }"
 
-                .append(".summary-text { font-size: ").append(ReportFont.LEAD.css()).append("; color: var(--ink); margin-bottom: 18px; line-height: 1.5; }")
-                .append(".summary-cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }")
-                .append(".summary-card { flex: 1; min-width: 120px; text-align: center; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px 8px; }")
-                .append(".summary-card .card-value { font-size: ").append(ReportFont.FIGURE.css()).append("; font-weight: bold; }")
-                .append(".summary-card .card-label { font-size: ").append(ReportFont.SMALL.css()).append("; color: var(--muted); margin-top: 4px; }")
+                + ".summary-text { font-size: " + ReportFont.LEAD.css() + "; color: var(--ink); margin-bottom: 18px; line-height: 1.5; }"
+                + ".summary-cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }"
+                + ".summary-card { flex: 1; min-width: 120px; text-align: center; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px 8px; }"
+                + ".summary-card .card-value { font-size: " + ReportFont.FIGURE.css() + "; font-weight: bold; }"
+                + ".summary-card .card-label { font-size: " + ReportFont.SMALL.css() + "; color: var(--muted); margin-top: 4px; }"
 
-                .append(".detail-table { border-collapse: collapse; width: 100%; margin-top: 8px; }")
-                .append(".detail-table th { text-align: center; padding: 8px 12px; border: 1px solid var(--line); font-weight: bold; font-size: ").append(ReportFont.HEADING.css()).append("; }")
-                .append(".detail-table td { padding: 8px 12px; border: 1px solid var(--line); font-size: ").append(ReportFont.BODY.css()).append("; vertical-align: top; }")
-                .append(".detail-table tr:nth-child(even) td { background: var(--panel); }")
-                .append(".detail-table tr:nth-child(odd) td { background: var(--page); }")
-                .append(".detail-table td.seq { text-align: center; color: var(--muted); }")
-                .append(".detail-table td.verdict, .detail-table th.verdict { width: 1%; white-space: nowrap; }")
-                .append(".detail-table td.verdict { text-align: center; font-weight: bold; }")
-                .append(".detail-table td.seq, .detail-table th.seq { width: 1%; white-space: nowrap; }")
-                .append(".actual { font-size: ").append(ReportFont.SMALL.css()).append("; color: var(--muted); margin-top: 3px; white-space: pre-wrap; }")
-                .append(".stacktrace { font-family: ui-monospace, Consolas, monospace; font-size: ").append(ReportFont.SMALL.css()).append("; color: var(--muted); margin-top: 6px; white-space: pre-wrap; word-break: break-word; }")
+                + ".detail-table { border-collapse: collapse; width: 100%; margin-top: 8px; }"
+                + ".detail-table th { text-align: center; padding: 8px 12px; border: 1px solid var(--line); font-weight: bold; font-size: " + ReportFont.HEADING.css() + "; }"
+                + ".detail-table td { padding: 8px 12px; border: 1px solid var(--line); font-size: " + ReportFont.BODY.css() + "; vertical-align: top; }"
+                + ".detail-table tr:nth-child(even) td { background: var(--panel); }"
+                + ".detail-table tr:nth-child(odd) td { background: var(--page); }"
+                + ".detail-table td.seq { text-align: center; color: var(--muted); }"
+                + ".detail-table td.verdict, .detail-table th.verdict { width: 1%; white-space: nowrap; }"
+                + ".detail-table td.verdict { text-align: center; font-weight: bold; }"
+                + ".detail-table td.seq, .detail-table th.seq { width: 1%; white-space: nowrap; }"
+                + ".actual { font-size: " + ReportFont.SMALL.css() + "; color: var(--muted); margin-top: 3px; white-space: pre-wrap; }"
+                + ".stacktrace { font-family: ui-monospace, Consolas, monospace; font-size: " + ReportFont.SMALL.css() + "; color: var(--muted); margin-top: 6px; white-space: pre-wrap; word-break: break-word; }"
 
-                .append(".footer { margin-top: 30px; text-align: center; font-size: ").append(ReportFont.CAPTION.css()).append("; color: var(--footer-ink); border-top: 1px solid var(--line); padding-top: 14px; }")
-                .append(".footer a { color: var(--link); text-decoration: none; }")
+                + ".footer { margin-top: 30px; text-align: center; font-size: " + ReportFont.CAPTION.css() + "; color: var(--footer-ink); border-top: 1px solid var(--line); padding-top: 14px; }"
+                + ".footer a { color: var(--link); text-decoration: none; }"
 
-                .append("/* Printing: the white skin again, whichever is on screen. */")
-                .append("@media print { :root, :root[data-theme='dark'] {").append(lightTokens()).append("}")
-                .append(".theme-toggle { display: none; } }")
+                + "/* Printing: the white skin again, whichever is on screen. */"
+                + "@media print { :root, :root[data-theme='dark'] {" + lightTokens() + "}"
+                + ".theme-toggle { display: none; } }"
 
-                .append("</style>")
-                .toString();
+                + "</style>";
     }
 
     private void overviewRow(final @NotNull StringBuilder html, final @NotNull String label, final @NotNull String value) {

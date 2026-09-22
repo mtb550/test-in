@@ -22,7 +22,10 @@ import com.intellij.util.ui.JBFont;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
@@ -30,10 +33,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class ChoiceInput implements DialogComponent {
+    private static final @NotNull String PICK = "testin.choice.pick";
     private final @NotNull JBPanel<?> panel;
     private final @NotNull ComboBox<String> combo;
-
-    private static final @NotNull String PICK = "testin.choice.pick";
 
     ChoiceInput(final @NotNull String caption, final @NotNull List<String> options, final @NotNull String selected) {
         combo = new ComboBox<>(options.toArray(String[]::new));

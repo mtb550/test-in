@@ -18,7 +18,6 @@ package org.testin.editor.listeners;
 
 import org.testng.annotations.Test;
 
-import javax.swing.event.TableModelListener;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

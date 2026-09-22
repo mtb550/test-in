@@ -16,7 +16,6 @@
 
 package org.testin.testng;
 
-import org.testin.util.Bundle;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.openapi.application.ApplicationManager;
@@ -26,18 +25,18 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.theoryinpractice.testng.configuration.TestNGConfiguration;
 import com.theoryinpractice.testng.configuration.TestNGConfigurationType;
 import com.theoryinpractice.testng.model.TestType;
 import org.jetbrains.annotations.NotNull;
-import org.testin.runner.TestNGExecution;
-import org.testin.runner.TestRunner;
-import org.testin.navigate.CodeNavigation;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.navigate.CodeNavigation;
+import org.testin.runner.TestNGExecution;
+import org.testin.runner.TestRunner;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -45,6 +44,22 @@ import java.util.List;
 import java.util.Optional;
 
 public final class TestNGRunner implements TestRunner {
+    private static @NotNull Optional<Module> moduleOf(final @NotNull Project p, final @NotNull List<String> fqcn) {
+        final @NotNull String classFqcn = String.join(".", fqcn.subList(0, fqcn.size() - 1));
+
+        return Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(classFqcn, GlobalSearchScope.projectScope(p)))
+                .map(ModuleUtilCore::findModuleForPsiElement);
+    }
+
+    private static @NotNull String configNameFor(final @NotNull List<Generated> generated) {
+        final @NotNull List<String> classes = generated.stream().map(Generated::simpleClassName).distinct().toList();
+
+        if (generated.size() == 1) return classes.getFirst() + "." + generated.getFirst().fqcn().getLast();
+        if (classes.size() == 1) return classes.getFirst();
+
+        return Bundle.message("codegen.named.and.more", classes.getFirst(), String.valueOf(classes.size() - 1));
+    }
+
     @Override
     public void run(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
         if (cases.isEmpty()) return;
@@ -101,23 +116,6 @@ public final class TestNGRunner implements TestRunner {
         ApplicationManager.getApplication().invokeLater(() -> launch(p, found, runModule));
     }
 
-    private record Generated(@NotNull TestCaseDto tc, @NotNull List<String> fqcn) {
-        private @NotNull String pattern() {
-            return String.join(".", fqcn.subList(0, fqcn.size() - 1)) + "," + fqcn.getLast();
-        }
-
-        private @NotNull String simpleClassName() {
-            return fqcn.get(fqcn.size() - 2);
-        }
-    }
-
-    private static @NotNull Optional<Module> moduleOf(final @NotNull Project p, final @NotNull List<String> fqcn) {
-        final @NotNull String classFqcn = String.join(".", fqcn.subList(0, fqcn.size() - 1));
-
-        return Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(classFqcn, GlobalSearchScope.projectScope(p)))
-                .map(ModuleUtilCore::findModuleForPsiElement);
-    }
-
     private void launch(final @NotNull Project p, final @NotNull List<Generated> found, final @NotNull Optional<Module> module) {
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
@@ -166,12 +164,13 @@ public final class TestNGRunner implements TestRunner {
         execution.launch(cases, settings);
     }
 
-    private static @NotNull String configNameFor(final @NotNull List<Generated> generated) {
-        final @NotNull List<String> classes = generated.stream().map(Generated::simpleClassName).distinct().toList();
+    private record Generated(@NotNull TestCaseDto tc, @NotNull List<String> fqcn) {
+        private @NotNull String pattern() {
+            return String.join(".", fqcn.subList(0, fqcn.size() - 1)) + "," + fqcn.getLast();
+        }
 
-        if (generated.size() == 1) return classes.getFirst() + "." + generated.getFirst().fqcn().getLast();
-        if (classes.size() == 1) return classes.getFirst();
-
-        return Bundle.message("codegen.named.and.more", classes.getFirst(), String.valueOf(classes.size() - 1));
+        private @NotNull String simpleClassName() {
+            return fqcn.get(fqcn.size() - 2);
+        }
     }
 }

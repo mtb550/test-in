@@ -16,9 +16,9 @@
 
 package org.testin.editor.toolbar.components;
 
-import org.testin.editor.run.ExecutionControl;
-import org.testin.editor.AbstractIconButton;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.AbstractIconButton;
+import org.testin.editor.run.ExecutionControl;
 
 public class StopExecutionBtn extends AbstractIconButton implements ToolbarItem {
     // UC-EDITOR-PANEL-035

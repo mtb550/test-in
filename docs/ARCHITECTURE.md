@@ -56,15 +56,15 @@ modules](#the-two-content-modules).
 
 ### The layers, and what each is allowed to do
 
-| Layer | Packages | May touch test data files |
-|---|---|---|
-| Surfaces | `explorer`, `editor`, `view`, `lightmode` | No |
-| Gestures | `actions`, `ui`, `creator`, `clipboard`, `undo`, `search`, `navigate`, `open`, `order`, `rename`, `remove` | No |
-| Operations | `testcase`, `testproject`, `testrun`, `bug` | `bug` only, and only the temporary folder a bug report is sent from |
-| Services | `services`, `notifications`, `setting`, `config` | `config` and `setting` only, and neither touches test data |
-| Data | `indexer`, `model` | `indexer` only |
-| Side modules | `codegen`, `git`, `report`, `importexport`, `runner` | See the exempt list below |
-| Leaves | `logger`, `util` | `logger` only, and only its own log |
+| Layer        | Packages                                                                                                   | May touch test data files                                           |
+|--------------|------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| Surfaces     | `explorer`, `editor`, `view`, `lightmode`                                                                  | No                                                                  |
+| Gestures     | `actions`, `ui`, `creator`, `clipboard`, `undo`, `search`, `navigate`, `open`, `order`, `rename`, `remove` | No                                                                  |
+| Operations   | `testcase`, `testproject`, `testrun`, `bug`                                                                | `bug` only, and only the temporary folder a bug report is sent from |
+| Services     | `services`, `notifications`, `setting`, `config`                                                           | `config` and `setting` only, and neither touches test data          |
+| Data         | `indexer`, `model`                                                                                         | `indexer` only                                                      |
+| Side modules | `codegen`, `git`, `report`, `importexport`, `runner`                                                       | See the exempt list below                                           |
+| Leaves       | `logger`, `util`                                                                                           | `logger` only, and only its own log                                 |
 
 **Four names left this table on 11 September 2026, and the root package emptied.**
 `dialogs` held one class whose only caller is in `ui`, one letter away from
@@ -138,24 +138,24 @@ the table" - and by that definition the real number is about ninety, because the
 three shapes above are everywhere. A number nothing measures is a number that
 goes stale the same week (#66, findings 61 and 77).
 
-| From | To | Why |
-|---|---|---|
-| `indexer/ProjectIndexer` | `editor/LastOpenEditors` | Indexing finishes, and the editors the tester had open are reopened. |
-| `indexer/Rescan` | `explorer/TreePanel`, `editor/TestinEditors` | A rescan has to tell the open surfaces that what they are showing has changed. The alternative is a listener the indexer publishes to, and the reason it has not been done is below this table. |
-| `setting/SettingsConfigurable` | `explorer/TreePanel` | Applying the settings page rebuilds the tree, because the Testin folder it names is what the tree is built from. Not an action, so it is not the first shape above. |
-| `codegen/AutomationState` | `navigate/CodeNavigation` | Whether a case has automation behind it is answered by resolving the generated method, and resolving is what `navigate` knows how to do. |
-| `codegen/ExecutionPosition` | `testcase/TestCaseOrder` | The number a generated method carries is the case's place in its set, and the set's order is `testcase`'s answer. The third shape above, in one import. |
-| `actions/TestinData`, `actions/Declared` | `editor`, `model`, `util`, `logger` | Deliberate, and new with #119. A declared action is built by the platform with a no-arg constructor, so it asks the surface that has the keyboard what is selected - and a data key has to name the type it answers with. `actions` was a leaf until then, and typing the keys as `Object` to keep it one would be worse than the edge. |
-| `testcase/TestEditorAttributes`, `testrun/RunEditorAttributes` | `ui/Badges` | Deliberate. An enum carries its own presentation and its own action rather than being read by an `instanceof` chain at every call site — see the conventions in [CLAUDE.md](https://github.com/mtb550/test-in/blob/main/CLAUDE.md). What is new is where it points *from*: these two were in `model` until 11 September 2026, so the vocabulary every layer speaks pulled the badge painter in behind it (#111). A field of a test case is a fact about `testcase`. What is left is one import each, for the badge a card draws; the other four - `codegen`, `importexport`, `notifications`, `indexer` - are a feature calling a side module and a service, which points down. |
+| From                                                           | To                                           | Why                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+|----------------------------------------------------------------|----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `indexer/ProjectIndexer`                                       | `editor/LastOpenEditors`                     | Indexing finishes, and the editors the tester had open are reopened.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `indexer/Rescan`                                               | `explorer/TreePanel`, `editor/TestinEditors` | A rescan has to tell the open surfaces that what they are showing has changed. The alternative is a listener the indexer publishes to, and the reason it has not been done is below this table.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `setting/SettingsConfigurable`                                 | `explorer/TreePanel`                         | Applying the settings page rebuilds the tree, because the Testin folder it names is what the tree is built from. Not an action, so it is not the first shape above.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `codegen/AutomationState`                                      | `navigate/CodeNavigation`                    | Whether a case has automation behind it is answered by resolving the generated method, and resolving is what `navigate` knows how to do.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `codegen/ExecutionPosition`                                    | `testcase/TestCaseOrder`                     | The number a generated method carries is the case's place in its set, and the set's order is `testcase`'s answer. The third shape above, in one import.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `actions/TestinData`, `actions/Declared`                       | `editor`, `model`, `util`, `logger`          | Deliberate, and new with #119. A declared action is built by the platform with a no-arg constructor, so it asks the surface that has the keyboard what is selected - and a data key has to name the type it answers with. `actions` was a leaf until then, and typing the keys as `Object` to keep it one would be worse than the edge.                                                                                                                                                                                                                                                                                                                                         |
+| `testcase/TestEditorAttributes`, `testrun/RunEditorAttributes` | `ui/Badges`                                  | Deliberate. An enum carries its own presentation and its own action rather than being read by an `instanceof` chain at every call site — see the conventions in [CLAUDE.md](https://github.com/mtb550/test-in/blob/main/CLAUDE.md). What is new is where it points *from*: these two were in `model` until 11 September 2026, so the vocabulary every layer speaks pulled the badge painter in behind it (#111). A field of a test case is a fact about `testcase`. What is left is one import each, for the badge a card draws; the other four - `codegen`, `importexport`, `notifications`, `indexer` - are a feature calling a side module and a service, which points down. |
 
 **Side modules are not quite "none on each other".** The drawing above says they
 are, and three pairs say otherwise:
 
-| | |
-|---|---|
-| `report` -> `importexport` | The report dialog offers four formats and `importexport/FileTypes` is where a format's extension lives. |
-| `importexport` -> `report` | And back: `FileTypes` names the four report generators, one per format. The pair is a cycle, and it is the only one between side modules. |
-| `importexport` -> `codegen` | An import creates test cases, and a created case gets its generated method like any other. |
+|                             |                                                                                                                                           |
+|-----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| `report` -> `importexport`  | The report dialog offers four formats and `importexport/FileTypes` is where a format's extension lives.                                   |
+| `importexport` -> `report`  | And back: `FileTypes` names the four report generators, one per format. The pair is a cycle, and it is the only one between side modules. |
+| `importexport` -> `codegen` | An import creates test cases, and a created case gets its generated method like any other.                                                |
 
 **Why the rescan still calls the surfaces.** `TestCaseExecutionListener` is the
 shape that would fix it - a topic the runner publishes to, with no idea who is
@@ -245,10 +245,10 @@ the success one.
 
 Anything else that runs during a UI action moves off it.
 
-| Work | How | Gets an indicator |
-|---|---|---|
-| Short, no UI of its own — badge recomputes, filtering, sorting | `ApplicationManager.getApplication().executeOnPooledThread(...)`, finishing with `invokeLater` to touch Swing | No |
-| Long, and the tester should be able to cancel it — indexing, Git, report generation | `Task.Backgroundable` | Yes, and it participates in cancellation |
+| Work                                                                                | How                                                                                                           | Gets an indicator                        |
+|-------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|------------------------------------------|
+| Short, no UI of its own — badge recomputes, filtering, sorting                      | `ApplicationManager.getApplication().executeOnPooledThread(...)`, finishing with `invokeLater` to touch Swing | No                                       |
+| Long, and the tester should be able to cancel it — indexing, Git, report generation | `Task.Backgroundable`                                                                                         | Yes, and it participates in cancellation |
 
 If a pooled recompute is slow enough to want a progress bar, cache the result
 instead of backgrounding it harder. Actions declare `ActionUpdateThread.EDT` when
@@ -278,18 +278,18 @@ A tester edits a cell in the grid and presses Enter. Ten steps later the JSON on
 disk is either changed or byte-identical, and which one it is decides whether
 anything else happens at all.
 
-| # | Where | What happens |
-|---|---|---|
-| 1 | `editor/listeners/GridEditListener` | Reads what was typed, parses it for the column's type, and compares it to what the case already held. **Unchanged, and it stops here.** |
-| 2 | `editor/listeners/GridEditListener.persistAndGenerate` | Moves off the EDT with `executeOnPooledThread`, because the codegen in step 10 schedules its own write commands. |
-| 3 | `indexer/ProjectIndexer.putTestCase` | The public door. Returns a boolean: did this have anything to save. |
-| 4 | `indexer/IndexerDataStore.putTestCase` | Delegates the write, then stamps the **set's** marker as modified — but only if the write happened. |
-| 5 | `indexer/TestCaseSequenceStore.put` | The funnel every save arrives at: the update dialog, a grid cell, the details panel, a paste. |
-| 6 | `indexer/TestDataFiles.alreadyHolds` | Serializes the case and compares the bytes to the file. **Identical, and nothing below runs.** |
-| 7 | `indexer/TestCaseSequenceStore.put` | Stamps the audit — `touch` if the index already knows this id, `stampCreated` if it does not. |
-| 8 | `indexer/TestCaseSequenceStore.store` | Updates the two maps, then writes. |
-| 9 | `indexer/TestDataFiles.write` | Refuses a zero-byte write, claims the path in `OwnWrites` **before** `Files.write`, writes, then records what landed. |
-| 10 | back in `GridEditListener` | The attribute's `GenType` regenerates the test method, and `TestCaseSnapshot.record` files the undo entry. |
+| #   | Where                                                  | What happens                                                                                                                            |
+|-----|--------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| 1   | `editor/listeners/GridEditListener`                    | Reads what was typed, parses it for the column's type, and compares it to what the case already held. **Unchanged, and it stops here.** |
+| 2   | `editor/listeners/GridEditListener.persistAndGenerate` | Moves off the EDT with `executeOnPooledThread`, because the codegen in step 10 schedules its own write commands.                        |
+| 3   | `indexer/ProjectIndexer.putTestCase`                   | The public door. Returns a boolean: did this have anything to save.                                                                     |
+| 4   | `indexer/IndexerDataStore.putTestCase`                 | Delegates the write, then stamps the **set's** marker as modified — but only if the write happened.                                     |
+| 5   | `indexer/TestCaseSequenceStore.put`                    | The funnel every save arrives at: the update dialog, a grid cell, the details panel, a paste.                                           |
+| 6   | `indexer/TestDataFiles.alreadyHolds`                   | Serializes the case and compares the bytes to the file. **Identical, and nothing below runs.**                                          |
+| 7   | `indexer/TestCaseSequenceStore.put`                    | Stamps the audit — `touch` if the index already knows this id, `stampCreated` if it does not.                                           |
+| 8   | `indexer/TestCaseSequenceStore.store`                  | Updates the two maps, then writes.                                                                                                      |
+| 9   | `indexer/TestDataFiles.write`                          | Refuses a zero-byte write, claims the path in `OwnWrites` **before** `Files.write`, writes, then records what landed.                   |
+| 10  | back in `GridEditListener`                             | The attribute's `GenType` regenerates the test method, and `TestCaseSnapshot.record` files the undo entry.                              |
 
 **Why the bytes are identical.** Step 6 asks the question the rule states, in the
 rule's own terms: would this write leave the file the same. It has to be asked as
@@ -324,19 +324,19 @@ the tester as having modified a case at the moment they un-modified it (#164,
 The tester right-clicks a test set and picks Run Tests. The plugin does not know
 how to run anything; a content module does.
 
-| # | Where | What happens |
-|---|---|---|
-| 1 | `runner/RunTestsAction` | Asks the selected node which gesture this is. A node that *holds* cases hands them straight to the runner; a **test run** is opened in its editor first, because a verdict reaches a named run only through the editor that claimed the case. |
-| 2 | `runner/RunTestCases.run` | Refuses if the TestNG plugin is absent, drops the cases already running, and starts what is left **as one run** — one compile and one JVM, not twelve. Notifies once, with a count. |
-| 3 | `runner/TestRunner.available()` | The extension point `org.testin.testRunners`. Empty in an IDE where nothing can run — an answer, not a missing one. |
-| 4 | `testin-testng/TestNGRunner.run` | Finds each case's generated method as a `PsiClass`, reports the ones with no generated code, and builds a `TestNGConfiguration` whose pattern set names class and method. |
-| 5 | `runner/TestNGExecution.launch` | Hands the configuration to the platform and remembers which cases this environment covers, so a stop knows what to put back. |
-| 6 | `runner/TestNGExecution.starting` | Broadcasts each case as running before the process exists, so the cards change at the click rather than at the first report. |
-| 7 | the platform | Compiles, starts a JVM, runs TestNG. |
-| 8 | `runner/TestCaseExecutionTracker` | Subscribed to `SMTRunnerEventsListener.TEST_STATUS` for the life of the project. Turns each started and finished event into a `TestCaseExecutionListener.broadcast`. |
-| 9 | `runner/TestCaseExecutionSubscriber.record` | On the EDT. The test name **is** the case's id, because that is what Testin named the generated method — so there is nothing to look up. A name that is not an id is nobody's, and is logged. |
-| 10 | `runner/TestCaseExecutionSubscriber.report` | Decides what the report means: a case the tester stopped reports itself failed, and that is not a failure. Records the verdict against the **id**, then tells the surfaces. |
-| 11 | `editor/test/TestEditor`, `editor/run/RunEditor`, `view/ViewPanel` | Repaint. |
+| #   | Where                                                              | What happens                                                                                                                                                                                                                                  |
+|-----|--------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1   | `runner/RunTestsAction`                                            | Asks the selected node which gesture this is. A node that *holds* cases hands them straight to the runner; a **test run** is opened in its editor first, because a verdict reaches a named run only through the editor that claimed the case. |
+| 2   | `runner/RunTestCases.run`                                          | Refuses if the TestNG plugin is absent, drops the cases already running, and starts what is left **as one run** — one compile and one JVM, not twelve. Notifies once, with a count.                                                           |
+| 3   | `runner/TestRunner.available()`                                    | The extension point `org.testin.testRunners`. Empty in an IDE where nothing can run — an answer, not a missing one.                                                                                                                           |
+| 4   | `testin-testng/TestNGRunner.run`                                   | Finds each case's generated method as a `PsiClass`, reports the ones with no generated code, and builds a `TestNGConfiguration` whose pattern set names class and method.                                                                     |
+| 5   | `runner/TestNGExecution.launch`                                    | Hands the configuration to the platform and remembers which cases this environment covers, so a stop knows what to put back.                                                                                                                  |
+| 6   | `runner/TestNGExecution.starting`                                  | Broadcasts each case as running before the process exists, so the cards change at the click rather than at the first report.                                                                                                                  |
+| 7   | the platform                                                       | Compiles, starts a JVM, runs TestNG.                                                                                                                                                                                                          |
+| 8   | `runner/TestCaseExecutionTracker`                                  | Subscribed to `SMTRunnerEventsListener.TEST_STATUS` for the life of the project. Turns each started and finished event into a `TestCaseExecutionListener.broadcast`.                                                                          |
+| 9   | `runner/TestCaseExecutionSubscriber.record`                        | On the EDT. The test name **is** the case's id, because that is what Testin named the generated method — so there is nothing to look up. A name that is not an id is nobody's, and is logged.                                                 |
+| 10  | `runner/TestCaseExecutionSubscriber.report`                        | Decides what the report means: a case the tester stopped reports itself failed, and that is not a failure. Records the verdict against the **id**, then tells the surfaces.                                                                   |
+| 11  | `editor/test/TestEditor`, `editor/run/RunEditor`, `view/ViewPanel` | Repaint.                                                                                                                                                                                                                                      |
 
 **One recorder per project, not one per surface.** Step 10 runs whether or not
 anything is open. Each surface used to subscribe and record for itself, so the
@@ -364,10 +364,10 @@ The core plugin runs in every IDE. Anything that needs another plugin's classes
 lives in a content module, which the platform loads only where that plugin is
 present.
 
-| Module | Needs | Contributes |
-|---|---|---|
-| `testin-java` | the Java plugin | Writing, moving, renaming and reconciling the generated test classes and methods, and the gutter mark beside a generated method |
-| `testin-testng` | the TestNG plugin | `TestNGRunner`, the one implementation of `runner/TestRunner` |
+| Module          | Needs             | Contributes                                                                                                                     |
+|-----------------|-------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| `testin-java`   | the Java plugin   | Writing, moving, renaming and reconciling the generated test classes and methods, and the gutter mark beside a generated method |
+| `testin-testng` | the TestNG plugin | `TestNGRunner`, the one implementation of `runner/TestRunner`                                                                   |
 
 The core declares the extension point and never learns whether anything answered:
 `TestRunner.available()` returns a runner that logs and starts nothing when the
@@ -378,11 +378,11 @@ contributes to the same point, and nothing in the core changes.
 
 ## What this page does not cover
 
-| | |
-|---|---|
-| What Testin does for a tester | [the documentation](README.md) — 150 use cases, every rule numbered |
-| Why a design that looks wrong is that way | [Standing decisions](decisions.md) |
-| Every file Testin writes, field by field | [The formats on disk](formats.md) |
-| Setup, the checks, and how to contribute | [CONTRIBUTING.md](https://github.com/mtb550/test-in/blob/main/CONTRIBUTING.md) |
-| Naming, nullability and the conventions a change is reviewed against | [CLAUDE.md](https://github.com/mtb550/test-in/blob/main/CLAUDE.md) |
-| What one package does | its own classes — the javadoc is the authority there |
+|                                                                      |                                                                                |
+|----------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| What Testin does for a tester                                        | [the documentation](README.md) — 150 use cases, every rule numbered            |
+| Why a design that looks wrong is that way                            | [Standing decisions](decisions.md)                                             |
+| Every file Testin writes, field by field                             | [The formats on disk](formats.md)                                              |
+| Setup, the checks, and how to contribute                             | [CONTRIBUTING.md](https://github.com/mtb550/test-in/blob/main/CONTRIBUTING.md) |
+| Naming, nullability and the conventions a change is reviewed against | [CLAUDE.md](https://github.com/mtb550/test-in/blob/main/CLAUDE.md)             |
+| What one package does                                                | its own classes — the javadoc is the authority there                           |

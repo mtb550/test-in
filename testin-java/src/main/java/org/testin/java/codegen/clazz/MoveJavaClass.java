@@ -16,19 +16,19 @@
 
 package org.testin.java.codegen.clazz;
 
-import org.testin.codegen.GenType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
+import org.testin.codegen.GenType;
 import org.testin.codegen.JavaSourceRoot;
 import org.testin.codegen.Moved;
 import org.testin.java.codegen.PackageDeclarations;
 import org.testin.logger.Logger;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 public class MoveJavaClass implements GenAction {
     // UC-CODEGEN-016, Rule-CODEGEN-053, Rule-CODEGEN-054

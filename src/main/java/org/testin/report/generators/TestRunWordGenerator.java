@@ -16,26 +16,49 @@
 
 package org.testin.report.generators;
 
-import org.testin.model.TestRunConfiguration;
-import org.testin.testrun.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
-import org.apache.poi.xwpf.usermodel.*;
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
+import org.apache.poi.xwpf.usermodel.TableWidthType;
+import org.apache.poi.xwpf.usermodel.UnderlinePatterns;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFFooter;
+import org.apache.poi.xwpf.usermodel.XWPFHyperlinkRun;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
+import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.markers.DetailRow;
-import org.testin.model.TestRunSummary;
-import org.testin.report.ReportTile;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageMar;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblLayoutType;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcBorders;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcMar;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBorder;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblLayoutType;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
 import org.testin.logger.Logger;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.ResultAnalysis;
+import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
+import org.testin.model.TestRunSummary;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.markers.DetailRow;
+import org.testin.report.ReportTile;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
+import org.testin.testrun.RunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 
@@ -54,9 +77,6 @@ public final class TestRunWordGenerator {
     final String MEDIUM_BLUE = "2E5496";
     final String DARK_GRAY = "595959";
     final String LINK_BLUE = ReportText.LINK_BLUE;
-    final String GREEN = "2E7D32";
-    final String RED = "C0392B";
-    final String DARK_YELLOW = "B8860B";
     final String LIGHT_BG = "F2F5FA";
     final String BORDER_GRAY = "D0D7E5";
     final String WHITE = "FFFFFF";
@@ -87,7 +107,7 @@ public final class TestRunWordGenerator {
                 setTableWidths(overviewTable, 30, 70);
 
                 int overviewRow = 0;
-                for (final DetailRow row : ReportOverview.rowsFor(projectName, trDir, tr, summary)) {
+                for (final DetailRow row : ReportOverview.rowsFor(projectName, trDir, summary)) {
                     addOverviewRow(overviewTable, overviewRow++, row.caption(), row.value());
                 }
 
@@ -96,7 +116,7 @@ public final class TestRunWordGenerator {
                 addHeading(doc, Bundle.message("report.heading.execution"), 20, 12);
 
                 addText(doc, Bundle.message("report.summary.named", trDir.getName(),
-                        String.valueOf(summary.total()), String.valueOf(summary.executed()), summary.passRate() + "%"),
+                                String.valueOf(summary.total()), String.valueOf(summary.executed()), summary.passRate() + "%"),
                         ReportFont.LEAD.ptRounded(), false, BLACK, NO_BORDER, 12);
 
                 final @NotNull List<ReportTile> headline = ReportTile.shownFor(summary);
@@ -246,8 +266,10 @@ public final class TestRunWordGenerator {
         XWPFTableRow headerRow = table.getRow(0);
         addCaseHeader(headerRow, 0, "#", headerBg, headerFg);
         addCaseHeader(headerRow, 1, Bundle.message("caption.test.case"), headerBg, headerFg);
-        if (withFailureDetail) addCaseHeader(headerRow, 2, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg);
-        if (withFailureDetail) addCaseHeader(headerRow, 3, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg);
+        if (withFailureDetail)
+            addCaseHeader(headerRow, 2, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg);
+        if (withFailureDetail)
+            addCaseHeader(headerRow, 3, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg);
 
         int idx = 1;
         boolean alt = true;

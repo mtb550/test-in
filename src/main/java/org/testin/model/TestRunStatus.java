@@ -26,8 +26,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
-import javax.swing.*;
 
 @Getter
 @AllArgsConstructor
@@ -72,25 +74,11 @@ public enum TestRunStatus implements MenuItem {
             SetBy.TESTER
     );
 
-    // UC-TREE-PANEL-020, Rule-TREE-PANEL-068
-    private enum SetBy { TESTER, TESTIN }
-
-    // UC-TREE-PANEL-020, Rule-TREE-PANEL-092
-    private static final class Stage {
-        private static final int MADE = 0;
-        private static final int HANDED_OUT = 1;
-        private static final int RUNNING = 2;
-        private static final int OVER = 3;
-    }
-
     private final @NotNull String label;
-
     private final @NotNull KeyStroke shortcut;
     private final @NotNull Icon icon;
-
     @Getter(AccessLevel.NONE)
     private final int stage;
-
     @Getter(AccessLevel.NONE)
     private final @NotNull SetBy setBy;
 
@@ -131,5 +119,16 @@ public enum TestRunStatus implements MenuItem {
                 onAction.run();
             }
         }.registerCustomShortcutSet(Shortcuts.customShortcut(shortcut), component);
+    }
+
+    // UC-TREE-PANEL-020, Rule-TREE-PANEL-068
+    private enum SetBy {TESTER, TESTIN}
+
+    // UC-TREE-PANEL-020, Rule-TREE-PANEL-092
+    private static final class Stage {
+        private static final int MADE = 0;
+        private static final int HANDED_OUT = 1;
+        private static final int RUNNING = 2;
+        private static final int OVER = 3;
     }
 }

@@ -41,12 +41,10 @@ public class VerdictDonutTest {
 
     private static final List<NodeCount> SLICES = NodeStatistics.VERDICTS.getSlices();
 
-    private static NodeFigures run(final long passed, final long failed, final long blocked, final long untested, final long removed) {
-        final long total = passed + failed + blocked + untested + removed;
-        final long executed = passed + failed + blocked;
+    private static NodeFigures run(final long passed, final long failed, final long blocked, final long untested) {
+        final long total = passed + failed + blocked + untested;
 
-        return NodeFigures.ofRun(new TestRunSummary(total, passed, failed, blocked, untested, removed,
-                executed == 0 ? 0 : (int) (passed * 100 / executed), ""));
+        return NodeFigures.ofRun(new TestRunSummary(total, passed, failed, blocked, untested, 0, ""));
     }
 
     private static double sum(final double[] sweeps) {
@@ -55,7 +53,7 @@ public class VerdictDonutTest {
 
     @Test
     public void oneFailureInFiveHundredIsStillVisible() {
-        final double[] sweeps = VerdictDonut.sweeps(SLICES, run(499, 1, 0, 0, 0));
+        final double[] sweeps = VerdictDonut.sweeps(SLICES, run(499, 1, 0, 0));
 
         // Its true share is 0.72 degrees, which at this size is half a pixel.
         assertTrue(sweeps[1] > 2.0, "a failure somebody recorded has to be visible: " + sweeps[1]);
@@ -63,14 +61,14 @@ public class VerdictDonutTest {
 
     @Test
     public void theRingStillClosesWhenASliverWasEnlarged() {
-        final double[] sweeps = VerdictDonut.sweeps(SLICES, run(497, 1, 1, 1, 0));
+        final double[] sweeps = VerdictDonut.sweeps(SLICES, run(497, 1, 1, 1));
 
         assertEquals(sum(sweeps), 360.0, 0.0001, "the arcs must still add up to a circle");
     }
 
     @Test
     public void aVerdictWithNoCasesTakesNoneOfTheRing() {
-        final double[] sweeps = VerdictDonut.sweeps(SLICES, run(420, 60, 40, 30, 0));
+        final double[] sweeps = VerdictDonut.sweeps(SLICES, run(420, 60, 40, 30));
 
         assertEquals(sweeps[4], 0.0, 0.0, "nothing was removed, so nothing is drawn for it");
         assertEquals(sum(sweeps), 360.0, 0.0001);
@@ -78,7 +76,7 @@ public class VerdictDonutTest {
 
     @Test
     public void theWholeRingGoesToTheOnlyVerdictThereIs() {
-        final double[] sweeps = VerdictDonut.sweeps(SLICES, run(550, 0, 0, 0, 0));
+        final double[] sweeps = VerdictDonut.sweeps(SLICES, run(550, 0, 0, 0));
 
         assertEquals(sweeps[0], 360.0, 0.0001, "every case passed");
     }
@@ -93,7 +91,7 @@ public class VerdictDonutTest {
     @Test
     public void aNodeWithNoSlicesHasNoRing() {
         assertEquals(VerdictDonut.sweeps(NodeStatistics.CHILDREN.getSlices(),
-                NodeFigures.ofChildren(9, 4, 2770, 2770, 2)).length, 0,
+                        NodeFigures.ofChildren(9, 4, 2770, 2770, 2)).length, 0,
                 "a container's counts are not parts of one whole, so nothing is drawn through them");
     }
 }

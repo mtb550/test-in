@@ -45,6 +45,14 @@ public class ForgetOnCloseTest {
     private static final @NotNull UndoScope ANOTHER = UndoScope.of(Path.of("root", "Test Cases", "Payment"));
 
     /**
+     * An operation that holds something aside until somebody says nobody wants
+     * it back, which is what a removal does with the copy it kept.
+     */
+    private static @NotNull UndoHistories.Operation held(final @NotNull AtomicInteger released) {
+        return new UndoHistories.Operation("held", () -> true, () -> true, released::incrementAndGet);
+    }
+
+    /**
      * Every operation in the dropped history is told, both stacks, because that
      * is the moment the copies they hold aside stop being wanted.
      */
@@ -97,13 +105,5 @@ public class ForgetOnCloseTest {
         histories.forget(ONE);
 
         assertFalse(histories.undo(ONE), "an untouched surface has nothing to undo, before or after");
-    }
-
-    /**
-     * An operation that holds something aside until somebody says nobody wants
-     * it back, which is what a removal does with the copy it kept.
-     */
-    private static @NotNull UndoHistories.Operation held(final @NotNull AtomicInteger released) {
-        return new UndoHistories.Operation("held", () -> true, () -> true, released::incrementAndGet);
     }
 }

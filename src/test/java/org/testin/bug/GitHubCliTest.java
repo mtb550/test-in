@@ -50,26 +50,6 @@ public class GitHubCliTest {
         return new ProcessOutput(stdout, stderr, exitCode, false, false);
     }
 
-    /**
-     * A {@code gh} that gives these answers in turn, and is not installed once
-     * they run out.
-     */
-    private static final class FakeGh {
-        private final List<List<String>> asked = new ArrayList<>();
-        private final Deque<ProcessOutput> answers;
-
-        private FakeGh(final ProcessOutput... answers) {
-            this.answers = new ArrayDeque<>(List.of(answers));
-        }
-
-        private GitHubCli cli() {
-            return new GitHubCli((arguments, folder) -> {
-                asked.add(arguments);
-                return Optional.ofNullable(answers.poll());
-            });
-        }
-    }
-
     private static Optional<String> whyNot(final FakeGh gh, final String bugRepoUrl) {
         return gh.cli().whyItCannotSend(bugRepoUrl);
     }
@@ -185,5 +165,25 @@ public class GitHubCliTest {
         assertEquals(IssueCreation.of(answer("", "  attachments are not supported by this host\n", 1), "github.example.com", 1),
                 IssueCreation.failed("attachments are not supported by this host"));
         assertEquals(IssueCreation.of(answer("", "", 1), "github.com", 0), IssueCreation.failed(Bundle.message("bug.send.failed", 1)));
+    }
+
+    /**
+     * A {@code gh} that gives these answers in turn, and is not installed once
+     * they run out.
+     */
+    private static final class FakeGh {
+        private final List<List<String>> asked = new ArrayList<>();
+        private final Deque<ProcessOutput> answers;
+
+        private FakeGh(final ProcessOutput... answers) {
+            this.answers = new ArrayDeque<>(List.of(answers));
+        }
+
+        private GitHubCli cli() {
+            return new GitHubCli((arguments, folder) -> {
+                asked.add(arguments);
+                return Optional.ofNullable(answers.poll());
+            });
+        }
     }
 }

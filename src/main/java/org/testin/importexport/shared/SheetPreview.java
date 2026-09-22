@@ -22,11 +22,11 @@ import com.intellij.ui.components.JBTabbedPane;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.framework.DialogComponent;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

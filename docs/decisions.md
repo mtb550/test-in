@@ -7,14 +7,14 @@
 > broken something the decision exists to protect. They are written here so a
 > contributor reads the reason before writing the fix.
 
-| | |
-|---|---|
-| **Part of Testin** | None. These are decisions about how the plugin is built, not about what a tester sees |
-| **What the numbers mean** | `Decision-001` and up, in the order they were recorded. A number is never reused and never renumbered |
-| **Answers** | Why a design that looks odd is deliberate, and what it costs to change |
-| **State** | Written |
-| **Checked against** | `main` at `fe73596e`, 9 September 2026 |
-| **Written to** | [The standard](standard.md), as far as it applies. A decision is not a use case, so it has context, a decision and consequences instead of a flow |
+|                           |                                                                                                                                                   |
+|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Part of Testin**        | None. These are decisions about how the plugin is built, not about what a tester sees                                                             |
+| **What the numbers mean** | `Decision-001` and up, in the order they were recorded. A number is never reused and never renumbered                                             |
+| **Answers**               | Why a design that looks odd is deliberate, and what it costs to change                                                                            |
+| **State**                 | Written                                                                                                                                           |
+| **Checked against**       | `main` at `fe73596e`, 9 September 2026                                                                                                            |
+| **Written to**            | [The standard](standard.md), as far as it applies. A decision is not a use case, so it has context, a decision and consequences instead of a flow |
 
 ---
 
@@ -22,12 +22,12 @@
 
 Every decision has the same four parts.
 
-| Part | What it gives you |
-|---|---|
-| **Context** | What was true when the decision was made, and what forced it |
-| **Decision** | The decision itself, in one sentence |
-| **Consequences** | What it costs, and what it buys |
-| **If you are about to reverse it** | The specific thing that breaks. Read this one first |
+| Part                               | What it gives you                                            |
+|------------------------------------|--------------------------------------------------------------|
+| **Context**                        | What was true when the decision was made, and what forced it |
+| **Decision**                       | The decision itself, in one sentence                         |
+| **Consequences**                   | What it costs, and what it buys                              |
+| **If you are about to reverse it** | The specific thing that breaks. Read this one first          |
 
 **A decision is superseded, never edited into a different answer.** When one
 stops being true, its section stays exactly as written and a new decision is
@@ -433,11 +433,11 @@ a code project that is about another.
 Each is listed here with the number that replaced it, and its section above is
 left exactly as it was written.
 
-| Decision | Superseded by | When |
-|---|---|---|
-| Decision-004 — SFTP is the maintained JSch fork | Decision-012 | 19 September 2026 |
-| Decision-007 — An unknown SSH host is refused | Decision-012 | 19 September 2026 |
-| Decision-011 — Testin reads `testin.yml` and never writes it | Decision-013 | 19 September 2026 |
+| Decision                                                     | Superseded by | When              |
+|--------------------------------------------------------------|---------------|-------------------|
+| Decision-004 — SFTP is the maintained JSch fork              | Decision-012  | 19 September 2026 |
+| Decision-007 — An unknown SSH host is refused                | Decision-012  | 19 September 2026 |
+| Decision-011 — Testin reads `testin.yml` and never writes it | Decision-013  | 19 September 2026 |
 
 ---
 

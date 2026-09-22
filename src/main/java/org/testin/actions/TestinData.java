@@ -23,8 +23,8 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.editor.TestinEditor;
+import org.testin.editor.run.RunEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 
@@ -49,6 +49,10 @@ public final class TestinData {
     // UC-INTERNAL-001, Rule-INTERNAL-066
     public static @NotNull Optional<TestinEditor> editor(final @NotNull AnActionEvent e) {
         return Optional.ofNullable(EDITOR.getData(e.getDataContext()));
+    }
+
+    public static @NotNull Optional<RunEditor> runEditor(final @NotNull AnActionEvent e) {
+        return editor(e).filter(RunEditor.class::isInstance).map(RunEditor.class::cast);
     }
 
     public static @NotNull List<TestCaseDto> selectedCases(final @NotNull AnActionEvent e) {

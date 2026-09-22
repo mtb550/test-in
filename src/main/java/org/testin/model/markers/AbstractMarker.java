@@ -17,14 +17,13 @@
 package org.testin.model.markers;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
 
@@ -33,7 +32,6 @@ import java.time.temporal.ChronoUnit;
 
 @Setter
 @Getter
-@Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
 public abstract class AbstractMarker implements Marker {
@@ -44,30 +42,14 @@ public abstract class AbstractMarker implements Marker {
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = AbstractMarker.Unordered.class)
     private int order = Marker.NOT_ORDERED;
-
-    static final class Unordered {
-        @Override
-        public boolean equals(final Object value) {
-            return value instanceof Integer order && order == Marker.NOT_ORDERED;
-        }
-
-        @Override
-        public int hashCode() {
-            return Marker.NOT_ORDERED;
-        }
-    }
-
     @NonNull
     private String createdBy = "";
-
     @NonNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
     private ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-
     @JsonAlias("updatedBy")
     @NonNull
     private String modifiedBy = "";
-
     @JsonAlias("updatedAt")
     @NonNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
@@ -79,5 +61,17 @@ public abstract class AbstractMarker implements Marker {
 
     public @NotNull ZonedDateTime getModifiedAt() {
         return Config.isNotExecuted(modifiedAt) ? createdAt : modifiedAt;
+    }
+
+    static final class Unordered {
+        @Override
+        public boolean equals(final Object value) {
+            return value instanceof Integer order && order == Marker.NOT_ORDERED;
+        }
+
+        @Override
+        public int hashCode() {
+            return Marker.NOT_ORDERED;
+        }
     }
 }

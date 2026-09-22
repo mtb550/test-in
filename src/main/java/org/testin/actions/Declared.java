@@ -35,17 +35,6 @@ import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Declared {
-    public static @NotNull AnAction action(final @NotNull String id) {
-        final @Nullable AnAction action = ActionManager.getInstance().getAction(id);
-
-        if (action == null) {
-            Logger.error("No action is registered as '" + id + "', so a menu is missing an entry");
-            throw new IllegalStateException("No action is registered as '" + id + "'");
-        }
-
-        return action;
-    }
-
     // UC-INTERNAL-001, Rule-INTERNAL-066, Rule-INTERNAL-068
     private static final @NotNull Map<String, Shortcuts> SURFACE_KEYS = Map.of(
             "Testin.Open", Shortcuts.Enter,
@@ -56,6 +45,17 @@ public final class Declared {
             "Testin.RemoveNode", Shortcuts.DeletePackage,
             "Testin.CopyTestCase", Shortcuts.CopyItem,
             "Testin.RemoveTestCase", Shortcuts.DeletePackage);
+
+    public static @NotNull AnAction action(final @NotNull String id) {
+        final @Nullable AnAction action = ActionManager.getInstance().getAction(id);
+
+        if (action == null) {
+            Logger.error("No action is registered as '" + id + "', so a menu is missing an entry");
+            throw new IllegalStateException("No action is registered as '" + id + "'");
+        }
+
+        return action;
+    }
 
     public static @NotNull String shortcutText(final @NotNull String id) {
         if (id.isEmpty()) return "";

@@ -2,8 +2,8 @@
 
 # UC-CODEGEN-016: Move a test set
 
-**As a** tester, **I want** the Java class to move with the test set,
-**so that** the package the class is in still matches where the test set sits.
+**As a** tester, **I want** the Java class to move with the test set, **so that** the package the class is in still
+matches where the test set sits.
 
 Move a test set, and its Java class moves to the matching folder.
 

@@ -20,8 +20,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.fields.IntegerField;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.fields.IntegerField;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -36,8 +36,8 @@ import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.util.Bundle;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import java.awt.BorderLayout;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -74,7 +74,7 @@ public class OrderSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto) {
         final @NotNull List<TestCaseDto> inSet = ExecutionPosition.setOf(p, dto);
         final int size = Math.max(1, inSet.size());
         final int current = Math.min(TestCaseOrder.positionOf(inSet, dto), size);

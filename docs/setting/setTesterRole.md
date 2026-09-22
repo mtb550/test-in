@@ -2,8 +2,8 @@
 
 # UC-SETTING-005: Give my role
 
-**As a** tester, **I want** to record what I do,
-**so that** a report or a test case can say it was written by a test engineer.
+**As a** tester, **I want** to record what I do, **so that** a report or a test case can say it was written by a test
+engineer.
 
 The row takes a value and stores it. Nothing in Testin reads it yet, and the
 row is kept for the thing that will: role-based permissions,

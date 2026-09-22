@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-011: Remove test cases
 
-**As a** tester, **I want** to delete test cases that are no longer wanted,
-**so that** the test set is what somebody would actually run.
+**As a** tester, **I want** to delete test cases that are no longer wanted, **so that** the test set is what somebody
+would actually run.
 
 Testin asks first. The test case's file and its generated test method both go.
 

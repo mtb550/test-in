@@ -22,7 +22,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 // UC-EDITOR-PANEL-031, UC-EDITOR-PANEL-035
 @Getter

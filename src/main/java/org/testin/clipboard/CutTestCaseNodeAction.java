@@ -16,8 +16,6 @@
 
 package org.testin.clipboard;
 
-import org.testin.util.FailureText;
-import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
@@ -29,9 +27,11 @@ import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditor;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.awt.datatransfer.StringSelection;

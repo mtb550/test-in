@@ -42,10 +42,10 @@ This changes a test run that is not signed off yet.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -58,8 +58,7 @@ This changes a test run that is not signed off yet.
   because "Active" on every name is a word read a hundred times and needed
   never. A test run always says its status, because where a cycle stands is what
   the tree is read for.
-- **Rule-TREE-PANEL-073** — A signed-off test run cannot be edited.
-  (Rule-TREE-PANEL-009)
+- **Rule-TREE-PANEL-073** — A signed-off test run cannot be edited. (Rule-TREE-PANEL-009)
 - **Rule-TREE-PANEL-074** — Removing a test case from a test run drops
   everything that test case recorded in that test run. Adding a test case adds
   it as **Pending**.
@@ -83,8 +82,8 @@ This changes a test run that is not signed off yet.
 ## What the tester sees
 
 The **Edit Test Run** dialog opens. It is the dialog drawn under
-[UC-TREE-PANEL-009](createTestRun.md), with two differences. Its title reads
-**Edit Test Run**, and its button reads **Save**. It arrives filled in with the
+[UC-TREE-PANEL-009](createTestRun.md), with two differences. Its title reads **Edit Test Run**, and its button reads
+**Save**. It arrives filled in with the
 test run's own name, its test cases and its configuration. After **Save**, the
 tree refreshes and *Updated* shows above the status bar at the bottom right of
 the IDE.

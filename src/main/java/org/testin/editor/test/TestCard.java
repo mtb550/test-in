@@ -18,19 +18,25 @@ package org.testin.editor.test;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.ui.Badges;
 import org.testin.clipboard.CutState;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.BaseCard;
 import org.testin.model.RunStatus;
-import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
+import org.testin.testcase.TestEditorAttributes;
+import org.testin.ui.Badges;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.AlphaComposite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class TestCard extends BaseCard {
     private final @NotNull List<Badges.Badge> badges = new ArrayList<>();

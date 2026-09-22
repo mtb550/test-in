@@ -88,24 +88,169 @@ public class DocumentClaimsTest {
      * case count and its rule count in the last two columns.
      */
     private static final @NotNull Pattern PART_ROW =
-            Pattern.compile("^\\| \\*\\*\\[[^]]+]\\((\\w+)/main\\.md\\)\\*\\* \\|[^|]*\\| (\\d+) \\| (\\d+) \\|$", Pattern.MULTILINE);
+            Pattern.compile("^\\| \\*\\*\\[[^]]+]\\((\\w+)/main\\.md\\)\\*\\* +\\|[^|]*\\| +(\\d+) +\\| +(\\d+) +\\|$", Pattern.MULTILINE);
 
     /**
      * One refusal: its name and the sentence it says.
      */
-    private static final @NotNull Pattern REFUSAL = Pattern.compile("\\n    ([A-Z_]+)\\(\"([^\"]+)\"\\)");
+    private static final @NotNull Pattern REFUSAL = Pattern.compile("\\n {4}([A-Z_]+)\\(\"([^\"]+)\"\\)");
 
-    /** A fenced code block: a screen drawing, a page template, a snippet. */
+    /**
+     * A fenced code block: a screen drawing, a page template, a snippet.
+     */
     private static final @NotNull Pattern FENCED = Pattern.compile("(?s)```.*?```");
 
-    /** An inline code span. Code is not prose, and a link inside it is not a link. */
+    /**
+     * An inline code span. Code is not prose, and a link inside it is not a link.
+     */
     private static final @NotNull Pattern INLINE = Pattern.compile("(?s)`[^`]*`");
 
-    /** Any run of whitespace, so a sentence wrapped across two lines is one sentence. */
-    private static final @NotNull Pattern WHITESPACE = Pattern.compile("[\\s]+");
+    /**
+     * Any run of whitespace, so a sentence wrapped across two lines is one sentence.
+     */
+    private static final @NotNull Pattern WHITESPACE = Pattern.compile("\\s+");
 
-    /** The sentence that adds a part table's two columns up. */
+    /**
+     * The sentence that adds a part table's two columns up.
+     */
     private static final @NotNull Pattern TOTALS = Pattern.compile("(\\d+) use cases and (\\d+) rules");
+
+    /**
+     * The sentence saying how many use cases and rules there are, on a page that
+     * has to carry one.
+     */
+    private static @NotNull Matcher totalsOf(final @NotNull Path page) {
+        final @NotNull Matcher totals = TOTALS.matcher(read(page));
+        if (!totals.find()) fail(page + " no longer says how many use cases and rules there are");
+
+        return totals;
+    }
+
+    /**
+     * The longest stretch of a refusal that is words rather than a slot. A
+     * sentence is mostly literal and the slot is a name, so the longest piece is
+     * the one worth looking for.
+     */
+    private static @NotNull String longestLiteral(final @NotNull String sentence) {
+        @NotNull String longest = "";
+
+        for (final String part : sentence.split("%s")) {
+            // Quote characters at an edge belong to the sentence's own
+            // punctuation around the slot, not to the words - a repository address
+            // is written '%s' and the documents quote it their own way.
+            final @NotNull String trimmed = part.trim().replaceAll("^['\"]+|['\"]+$", "");
+            if (trimmed.length() > longest.length()) longest = trimmed;
+        }
+
+        return longest;
+    }
+
+    /**
+     * One space where there was any run of whitespace, lower-cased. The
+     * documents wrap and the code does not.
+     */
+    private static @NotNull String flattened(final @NotNull String text) {
+        return WHITESPACE.matcher(text).replaceAll(" ").toLowerCase(Locale.ROOT);
+    }
+
+    private static int sum(final @NotNull Map<String, Integer> counts) {
+        return counts.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    private static @NotNull Map<String, Integer> readmeRuleCounts() {
+        return readmeColumn(3);
+    }
+
+    private static @NotNull Map<String, Integer> readmeUseCaseCounts() {
+        return readmeColumn(2);
+    }
+
+    /**
+     * One column of the README's part table, by the folder each row links to.
+     */
+    private static @NotNull Map<String, Integer> readmeColumn(final int group) {
+        final @NotNull Map<String, Integer> counts = new TreeMap<>();
+        final @NotNull Matcher row = PART_ROW.matcher(read(README));
+
+        while (row.find()) counts.put(row.group(1), Integer.parseInt(row.group(group)));
+
+        if (counts.isEmpty()) fail("The README's part table has no rows this test can read - has its shape changed?");
+
+        return counts;
+    }
+
+    /**
+     * How many rules each part's folder writes out.
+     */
+    private static @NotNull Map<String, Integer> measuredRuleCounts() {
+        final @NotNull Map<String, Set<String>> byFolder = new LinkedHashMap<>();
+
+        for (final Path page : markdownFiles()) {
+            final @NotNull Path parent = page.getParent();
+            if (parent.equals(DOCS)) continue;
+
+            final @NotNull Matcher rule = RULE.matcher(read(page));
+            while (rule.find()) {
+                byFolder.computeIfAbsent(parent.getFileName().toString(), any -> new TreeSet<>()).add(rule.group(1));
+            }
+        }
+
+        final @NotNull Map<String, Integer> counts = new TreeMap<>();
+        byFolder.forEach((folder, rules) -> counts.put(folder, rules.size()));
+
+        return counts;
+    }
+
+    /**
+     * How many use case pages each part's folder holds.
+     */
+    private static @NotNull Map<String, Integer> measuredUseCaseCounts() {
+        final @NotNull Map<String, Set<String>> byFolder = new LinkedHashMap<>();
+
+        for (final Path page : markdownFiles()) {
+            final @NotNull Path parent = page.getParent();
+            if (parent.equals(DOCS)) continue;
+
+            final @NotNull Matcher useCase = USE_CASE.matcher(read(page));
+            while (useCase.find()) {
+                byFolder.computeIfAbsent(parent.getFileName().toString(), any -> new TreeSet<>()).add(useCase.group(1));
+            }
+        }
+
+        final @NotNull Map<String, Integer> counts = new TreeMap<>();
+        byFolder.forEach((folder, pages) -> counts.put(folder, pages.size()));
+
+        return counts;
+    }
+
+    /**
+     * The text with code taken out - fenced blocks and inline spans both.
+     * <p>
+     * Code is not prose and a link inside it is not a link. {@code standard.md}
+     * documents what a page looks like, so it writes both: a page template
+     * inside a fence, naming {@code main.md} from a folder it is not in, and an
+     * example citation in backticks - each exactly right for the page it
+     * illustrates and exactly wrong if followed.
+     */
+    private static @NotNull String withoutCode(final @NotNull String text) {
+        return FENCED.matcher(text).replaceAll("").replaceAll(INLINE.pattern(), "");
+    }
+
+    private static @NotNull List<Path> markdownFiles() {
+        try (Stream<Path> tree = Files.walk(DOCS)) {
+            return tree.filter(file -> file.getFileName().toString().endsWith(".md")).toList();
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not read " + DOCS + ": " + ex.getMessage(), ex);
+        }
+    }
+
+    private static @NotNull String read(final @NotNull Path page) {
+        try {
+            return Files.readString(page);
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not read " + page + ": " + ex.getMessage(), ex);
+        }
+    }
 
     /**
      * UC-INTERNAL-006.
@@ -234,18 +379,6 @@ public class DocumentClaimsTest {
     }
 
     /**
-     * The sentence saying how many use cases and rules there are, on a page that
-     * has to carry one.
-     */
-    private static @NotNull Matcher totalsOf(final @NotNull Path page) {
-        final @NotNull Matcher totals = TOTALS.matcher(read(page));
-        if (!totals.find()) fail(page + " no longer says how many use cases and rules there are");
-
-        return totals;
-    }
-
-
-    /**
      * UC-INTERNAL-006.
      * <p>
      * Every refusal Testin has words for is written on a page.
@@ -280,132 +413,6 @@ public class DocumentClaimsTest {
         if (!missing.isEmpty()) {
             fail("These refusals are on no page. A tester who meets one has nothing to read about it:\n  "
                     + String.join("\n  ", missing));
-        }
-    }
-
-    /**
-     * The longest stretch of a refusal that is words rather than a slot. A
-     * sentence is mostly literal and the slot is a name, so the longest piece is
-     * the one worth looking for.
-     */
-    private static @NotNull String longestLiteral(final @NotNull String sentence) {
-        @NotNull String longest = "";
-
-        for (final String part : sentence.split("%s")) {
-            // Quote characters at an edge belong to the sentence's own
-            // punctuation around the slot, not to the words - a repository address
-            // is written '%s' and the documents quote it their own way.
-            final @NotNull String trimmed = part.trim().replaceAll("^['\"]+|['\"]+$", "");
-            if (trimmed.length() > longest.length()) longest = trimmed;
-        }
-
-        return longest;
-    }
-
-    /**
-     * One space where there was any run of whitespace, lower-cased. The
-     * documents wrap and the code does not.
-     */
-    private static @NotNull String flattened(final @NotNull String text) {
-        return WHITESPACE.matcher(text).replaceAll(" ").toLowerCase(Locale.ROOT);
-    }
-
-    private static int sum(final @NotNull Map<String, Integer> counts) {
-        return counts.values().stream().mapToInt(Integer::intValue).sum();
-    }
-
-    private static @NotNull Map<String, Integer> readmeRuleCounts() {
-        return readmeColumn(3);
-    }
-
-    private static @NotNull Map<String, Integer> readmeUseCaseCounts() {
-        return readmeColumn(2);
-    }
-
-    /**
-     * One column of the README's part table, by the folder each row links to.
-     */
-    private static @NotNull Map<String, Integer> readmeColumn(final int group) {
-        final @NotNull Map<String, Integer> counts = new TreeMap<>();
-        final @NotNull Matcher row = PART_ROW.matcher(read(README));
-
-        while (row.find()) counts.put(row.group(1), Integer.parseInt(row.group(group)));
-
-        if (counts.isEmpty()) fail("The README's part table has no rows this test can read - has its shape changed?");
-
-        return counts;
-    }
-
-    /**
-     * How many rules each part's folder writes out.
-     */
-    private static @NotNull Map<String, Integer> measuredRuleCounts() {
-        final @NotNull Map<String, Set<String>> byFolder = new LinkedHashMap<>();
-
-        for (final Path page : markdownFiles()) {
-            final @NotNull Path parent = page.getParent();
-            if (parent.equals(DOCS)) continue;
-
-            final @NotNull Matcher rule = RULE.matcher(read(page));
-            while (rule.find()) {
-                byFolder.computeIfAbsent(parent.getFileName().toString(), any -> new TreeSet<>()).add(rule.group(1));
-            }
-        }
-
-        final @NotNull Map<String, Integer> counts = new TreeMap<>();
-        byFolder.forEach((folder, rules) -> counts.put(folder, rules.size()));
-
-        return counts;
-    }
-
-    /**
-     * How many use case pages each part's folder holds.
-     */
-    private static @NotNull Map<String, Integer> measuredUseCaseCounts() {
-        final @NotNull Map<String, Set<String>> byFolder = new LinkedHashMap<>();
-
-        for (final Path page : markdownFiles()) {
-            final @NotNull Path parent = page.getParent();
-            if (parent.equals(DOCS)) continue;
-
-            final @NotNull Matcher useCase = USE_CASE.matcher(read(page));
-            while (useCase.find()) {
-                byFolder.computeIfAbsent(parent.getFileName().toString(), any -> new TreeSet<>()).add(useCase.group(1));
-            }
-        }
-
-        final @NotNull Map<String, Integer> counts = new TreeMap<>();
-        byFolder.forEach((folder, pages) -> counts.put(folder, pages.size()));
-
-        return counts;
-    }
-
-    /**
-     * The text with code taken out - fenced blocks and inline spans both.
-     * <p>
-     * Code is not prose and a link inside it is not a link. {@code standard.md}
-     * documents what a page looks like, so it writes both: a page template
-     * inside a fence, naming {@code main.md} from a folder it is not in, and an
-     * example citation in backticks - each exactly right for the page it
-     * illustrates and exactly wrong if followed.
-     */
-    private static @NotNull String withoutCode(final @NotNull String text) {
-        return FENCED.matcher(text).replaceAll("").replaceAll(INLINE.pattern(), "");
-    }
-
-    private static @NotNull List<Path> markdownFiles() {
-        try (Stream<Path> tree = Files.walk(DOCS)) {
-            return tree.filter(file -> file.getFileName().toString().endsWith(".md")).toList();
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not read " + DOCS + ": " + ex.getMessage(), ex);
-        }
-    }
-
-    private static @NotNull String read(final @NotNull Path page) {
-        try {
-            return Files.readString(page);
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not read " + page + ": " + ex.getMessage(), ex);
         }
     }
 }

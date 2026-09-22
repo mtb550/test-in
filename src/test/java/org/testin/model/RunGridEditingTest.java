@@ -17,8 +17,8 @@
 package org.testin.model;
 
 import org.testin.model.dto.TestCaseDto;
-import org.testng.annotations.Test;
 import org.testin.testrun.RunEditorAttributes;
+import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;

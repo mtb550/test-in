@@ -17,6 +17,7 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
@@ -47,6 +48,17 @@ import static org.testng.Assert.fail;
 public class ScanProgressTest {
 
     private static final @NotNull Path SOURCE_ROOT = Paths.get("src", "main", "java", "org", "testin", "indexer");
+
+    private static @NotNull String read(final @NotNull String fileName) {
+        final @NotNull Path file = SOURCE_ROOT.resolve(fileName);
+
+        try {
+            return Files.readString(file);
+        } catch (final IOException notThere) {
+            fail("Could not read " + file.toAbsolutePath() + ": " + notThere.getMessage());
+            return "";
+        }
+    }
 
     /**
      * The scan takes an indicator at all - the overload the bar needs. Asked of
@@ -90,39 +102,10 @@ public class ScanProgressTest {
     @Test
     public void bothScanLoopsStopWhenTheTesterCancels() {
         final @NotNull String source = read("IndexingScanner.java");
-        final int checks = countOf(source, "indicator.isCanceled()");
+        final int checks = StringUtil.getOccurrenceCount(source, "indicator.isCanceled()");
 
         assertTrue(checks >= 2,
                 "the test-set loop and the test-run loop must each check indicator.isCanceled(), found "
                         + checks + ": a scan that never asks turns Cancel into a button that does nothing");
-    }
-
-
-    /**
-     * How many times a literal appears. Counted rather than split on, so the
-     * thing being looked for is written exactly as it is in the file instead of
-     * as a regular expression with everything escaped twice.
-     */
-    private static int countOf(final @NotNull String source, final @NotNull String literal) {
-        int found = 0;
-        int at = source.indexOf(literal);
-
-        while (at >= 0) {
-            found++;
-            at = source.indexOf(literal, at + literal.length());
-        }
-
-        return found;
-    }
-
-    private static @NotNull String read(final @NotNull String fileName) {
-        final @NotNull Path file = SOURCE_ROOT.resolve(fileName);
-
-        try {
-            return Files.readString(file);
-        } catch (final IOException notThere) {
-            fail("Could not read " + file.toAbsolutePath() + ": " + notThere.getMessage());
-            return "";
-        }
     }
 }

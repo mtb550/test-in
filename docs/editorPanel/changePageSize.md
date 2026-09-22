@@ -68,12 +68,12 @@ the tester can see what happened.
 **Nothing is refused.** Every value is taken. Testin quietly turns it into
 something it can use.
 
-| The tester types | What the page holds |
-|---|---|
-| A number from 1 to 1000 | That many |
-| Anything above 1000 | 1000 |
-| `0`, or a negative number | 50 |
-| Letters, or nothing at all | 50 |
+| The tester types           | What the page holds |
+|----------------------------|---------------------|
+| A number from 1 to 1000    | That many           |
+| Anything above 1000        | 1000                |
+| `0`, or a negative number  | 50                  |
+| Letters, or nothing at all | 50                  |
 
 The box is corrected in place, so the tester can see what happened. No message
 is raised.

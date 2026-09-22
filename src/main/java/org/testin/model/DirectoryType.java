@@ -32,6 +32,7 @@ import org.testin.model.markers.TestSetPackageMarker;
 import org.testin.util.Bundle;
 import org.testin.util.NameSanitizer;
 
+import javax.swing.Icon;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -39,7 +40,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.swing.*;
 
 @Getter
 @AllArgsConstructor
@@ -121,6 +121,10 @@ public enum DirectoryType {
             List.of(NodeCount.TOTAL)
     );
 
+    public static final @NotNull List<DirectoryType> UNDER_TEST_CASES = List.of(TS, TSP);
+    public static final @NotNull List<DirectoryType> UNDER_TEST_RUNS = List.of(TR, TRP);
+    // UC-TREE-PANEL-008, Rule-TREE-PANEL-095, Rule-CODEGEN-008
+    public static final @NotNull List<DirectoryType> BECOME_JAVA_PACKAGES = List.of(TP, TSP);
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-043, Rule-TREE-PANEL-044
     private static final @NotNull Map<DirectoryType, Set<DirectoryType>> ACCEPTS = Map.of(
             TP, Set.of(),
@@ -130,26 +134,16 @@ public enum DirectoryType {
             TRP, Set.of(TR, TRP),
             TS, Set.of(),
             TR, Set.of());
-
-    public boolean accepts(final @NotNull DirectoryType source) {
-        return ACCEPTS.getOrDefault(this, Set.of()).contains(source);
-    }
-
-    public boolean acceptsAnything() {
-        return !ACCEPTS.getOrDefault(this, Set.of()).isEmpty();
-    }
-
-    public static final @NotNull List<DirectoryType> UNDER_TEST_CASES = List.of(TS, TSP);
-
-    public static final @NotNull List<DirectoryType> UNDER_TEST_RUNS = List.of(TR, TRP);
-
-    // UC-TREE-PANEL-008, Rule-TREE-PANEL-095, Rule-CODEGEN-008
-    public static final @NotNull List<DirectoryType> BECOME_JAVA_PACKAGES = List.of(TP, TSP);
-
-    // UC-TREE-PANEL-008, Rule-TREE-PANEL-095
-    public boolean canTakeName(final @NotNull String name) {
-        return isOneFolderName(name) && (!BECOME_JAVA_PACKAGES.contains(this) || NameSanitizer.canMakePackageName(name));
-    }
+    private final @NotNull String description;
+    // UC-CODEGEN-001, Rule-CODEGEN-008
+    private final @NotNull String folderName;
+    private final @NotNull Icon icon;
+    private final @NotNull String marker;
+    // Rule-INTERNAL-014
+    private final @NotNull Class<? extends AbstractMarker> markerClass;
+    private final @NotNull SimpleTextAttributes attributes;
+    private final @NotNull NodeStatistics statistics;
+    private final @NotNull List<NodeCount> counts;
 
     public static boolean isOneFolderName(final @NotNull String name) {
         final @NotNull String trimmed = name.trim();
@@ -170,23 +164,20 @@ public enum DirectoryType {
         return Arrays.stream(values()).filter(type -> type.marker.equals(fileName)).findFirst();
     }
 
+    public boolean accepts(final @NotNull DirectoryType source) {
+        return ACCEPTS.getOrDefault(this, Set.of()).contains(source);
+    }
+
+    public boolean acceptsAnything() {
+        return !ACCEPTS.getOrDefault(this, Set.of()).isEmpty();
+    }
+
+    // UC-TREE-PANEL-008, Rule-TREE-PANEL-095
+    public boolean canTakeName(final @NotNull String name) {
+        return isOneFolderName(name) && (!BECOME_JAVA_PACKAGES.contains(this) || NameSanitizer.canMakePackageName(name));
+    }
+
     public @NotNull String getMarkerKind() {
         return description.toLowerCase(Locale.ROOT);
     }
-
-    private final @NotNull String description;
-
-    // UC-CODEGEN-001, Rule-CODEGEN-008
-    private final @NotNull String folderName;
-    private final @NotNull Icon icon;
-    private final @NotNull String marker;
-
-    // Rule-INTERNAL-014
-    private final @NotNull Class<? extends AbstractMarker> markerClass;
-
-    private final @NotNull SimpleTextAttributes attributes;
-
-    private final @NotNull NodeStatistics statistics;
-
-    private final @NotNull List<NodeCount> counts;
 }

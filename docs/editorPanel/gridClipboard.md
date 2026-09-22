@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-018: Copy, cut and paste grid cells
 
-**As a** tester, **I want** the grid to behave like a spreadsheet,
-**so that** I can move a column of values between Testin and Excel.
+**As a** tester, **I want** the grid to behave like a spreadsheet, **so that** I can move a column of values between
+Testin and Excel.
 
 Inside the grid these three keys act on cells, not on whole test cases.
 
@@ -53,10 +53,9 @@ This opens no screen. A copy changes nothing on screen at all. A cut empties the
 cells it took, and a paste draws them with their new values.
 
 A cut or a paste raises one small message at the bottom of the IDE, which fades.
-It reads *Updated*, with the number of test cases the gesture changed after it -
-*Updated 3* for a block across three rows, *Updated* for a whole row of one test
-case. It is one step to undo: `Ctrl+Z` puts back every cell it changed
-(Rule-EDITOR-PANEL-226).
+It reads *Updated*, with the number of test cases the gesture changed after it - *Updated 3* for a block across three
+rows, *Updated* for a whole row of one test
+case. It is one step to undo: `Ctrl+Z` puts back every cell it changed (Rule-EDITOR-PANEL-226).
 
 ## Main flow
 
@@ -83,8 +82,8 @@ far as the last row and the last column. The rest is dropped.
 ## These keys are the grid's
 
 `Ctrl+C`, `Ctrl+X` and `Ctrl+V` mean cells in the grid, and test cases on the
-cards. Copying a test case itself is the right-click menu - **Copy Test Case**,
-**Cut Test Case**, **Paste Test Case** - and those entries mean the same thing in
+cards. Copying a test case itself is the right-click menu - **Copy Test Case**, **Cut Test Case**, **Paste Test Case** -
+and those entries mean the same thing in
 both views. They carry no key, so `Ctrl+C` in a grid is always about cells.
 
 ---

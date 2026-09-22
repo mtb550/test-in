@@ -17,21 +17,19 @@
 package org.testin.codegen;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
-import org.testin.logger.Logger;
-import org.testin.navigate.CodeNavigation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import com.intellij.openapi.project.Project;
-
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditor;
-import org.testin.model.Automated;
+import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.navigate.CodeNavigation;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -42,6 +40,29 @@ import java.util.Optional;
 
 // UC-CODEGEN-005
 public class AutomateTestCaseAction extends DumbAwareAction {
+    private static int writtenFor(final @NotNull Project p, final @NotNull List<TestCaseDto> asked) {
+        if (DumbService.isDumb(p)) return 0;
+
+        try {
+            return ApplicationManager.getApplication().runReadAction((Computable<Integer>) () -> CodeNavigation.available().methodsFor(p, asked).size());
+        } catch (final Exception ex) {
+            Logger.warn("Could not count the methods Automate Test Case wrote: " + ex.getMessage());
+            return 0;
+        }
+    }
+
+    // UC-CODEGEN-005, Rule-CODEGEN-025
+    private static @NotNull List<TestCaseDto> withoutAMethod(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
+        final @NotNull AutomationState state = Services.getInstance(p, AutomationState.class);
+
+        return cases.stream().filter(tc -> !state.hasMethod(tc.getId())).toList();
+    }
+
+    // Rule-CODEGEN-002
+    private static boolean canBeNamed(final @NotNull TestCaseDto tc) {
+        return !Fqcn.methodNameOf(tc).isEmpty();
+    }
+
     // UC-CODEGEN-005, Rule-CODEGEN-025
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -68,21 +89,10 @@ public class AutomateTestCaseAction extends DumbAwareAction {
         }));
     }
 
-    private static int writtenFor(final @NotNull Project p, final @NotNull List<TestCaseDto> asked) {
-        if (DumbService.isDumb(p)) return 0;
-
-        try {
-            return ApplicationManager.getApplication().runReadAction((Computable<Integer>) () -> CodeNavigation.available().methodsFor(p, asked).size());
-        } catch (final Exception ex) {
-            Logger.warn("Could not count the methods Automate Test Case wrote: " + ex.getMessage());
-            return 0;
-        }
-    }
-
     // UC-CODEGEN-005, Rule-CODEGEN-071
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (!CodeOn.enableOrExplain(this, e)) return;
+        if (CodeOn.grayedWithReason(this, e)) return;
 
         final @Nullable Project p = e.getProject();
         if (p == null) {
@@ -111,18 +121,6 @@ public class AutomateTestCaseAction extends DumbAwareAction {
         }
 
         e.getPresentation().setEnabled(true);
-    }
-
-    // UC-CODEGEN-005, Rule-CODEGEN-025
-    private static @NotNull List<TestCaseDto> withoutAMethod(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
-        final @NotNull AutomationState state = Services.getInstance(p, AutomationState.class);
-
-        return cases.stream().filter(tc -> !state.hasMethod(tc.getId())).toList();
-    }
-
-    // Rule-CODEGEN-002
-    private static boolean canBeNamed(final @NotNull TestCaseDto tc) {
-        return !Fqcn.methodNameOf(tc).isEmpty();
     }
 
     @Override

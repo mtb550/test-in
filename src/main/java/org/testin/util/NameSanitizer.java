@@ -19,9 +19,9 @@ package org.testin.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import java.util.Locale;
 
 import javax.lang.model.SourceVersion;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -105,8 +105,8 @@ public final class NameSanitizer {
         return methodName.replace("_", "").toLowerCase(Locale.ROOT);
     }
 
-    public static boolean canMakeMethodName(final @NotNull String description) {
-        return SourceVersion.isName(methodName(description));
+    public static boolean cannotMakeMethodName(final @NotNull String description) {
+        return !SourceVersion.isName(methodName(description));
     }
 
     public static @NotNull String removeSpecialChars(final @NotNull String value) {

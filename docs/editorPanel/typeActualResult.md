@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-041: Type an actual result into the grid
 
-**As a** tester, **I want** to write what happened straight into the table,
-**so that** noting five results does not need five dialogs.
+**As a** tester, **I want** to write what happened straight into the table, **so that** noting five results does not
+need five dialogs.
 
 **Actual Result** is the only column of a test run a tester can type into.
 

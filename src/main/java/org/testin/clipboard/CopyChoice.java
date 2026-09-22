@@ -19,14 +19,15 @@ package org.testin.clipboard;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
+import org.testin.model.MenuItem;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.MenuItem;
 import org.testin.util.Bundle;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
@@ -41,11 +42,14 @@ import java.util.stream.Collectors;
 
 // UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-207
 @Getter
+@AllArgsConstructor
 public enum CopyChoice implements MenuItem {
     ALL_DETAILS(
             Bundle.message("copy.all.details"),
             Shortcuts.CopyAll,
-            Icons.fieldLetter("A", Icons.GRAY)
+            Icons.fieldLetter("A", Icons.GRAY),
+            Optional.empty(),
+            CopyChoice::allDetailsOf
     ),
 
     DESCRIPTION(
@@ -141,24 +145,7 @@ public enum CopyChoice implements MenuItem {
     }
 
     CopyChoice(final @NotNull TestEditorAttributes attribute, final @NotNull Shortcuts shortcut, final @NotNull Icon icon, final @NotNull Function<TestCaseDto, String> copied) {
-        this.name = attribute.getName();
-        this.shortcut = shortcut;
-        this.icon = icon;
-        this.attribute = Optional.of(attribute);
-        this.copied = copied;
-    }
-
-    CopyChoice(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull Icon icon) {
-        this.name = name;
-        this.shortcut = shortcut;
-        this.icon = icon;
-        this.attribute = Optional.empty();
-        this.copied = CopyChoice::allDetailsOf;
-    }
-
-    // UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-208
-    public @NotNull String from(final @NotNull TestCaseDto tc) {
-        return copied.apply(tc);
+        this(attribute.getName(), shortcut, icon, Optional.of(attribute), copied);
     }
 
     private static @NotNull String allDetailsOf(final @NotNull TestCaseDto tc) {
@@ -167,6 +154,11 @@ public enum CopyChoice implements MenuItem {
                 .filter(attr -> !attr.gridValue(tc).isBlank())
                 .map(attr -> attr.getName() + ": " + attr.gridValue(tc))
                 .collect(Collectors.joining("\n"));
+    }
+
+    // UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-208
+    public @NotNull String from(final @NotNull TestCaseDto tc) {
+        return copied.apply(tc);
     }
 
     public @NotNull String copiedMessage(final int cases) {

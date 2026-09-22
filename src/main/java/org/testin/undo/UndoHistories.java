@@ -20,12 +20,12 @@ import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BooleanSupplier;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BooleanSupplier;
 
 @Service(Service.Level.PROJECT)
 public final class UndoHistories {
@@ -36,6 +36,10 @@ public final class UndoHistories {
     });
 
     private final @NotNull Map<UndoScope, History> histories = new HashMap<>();
+
+    private static @NotNull Operation next(final @NotNull Deque<Operation> stack) {
+        return Objects.requireNonNullElse(stack.peek(), NOTHING);
+    }
 
     // UC-INTERNAL-005, Rule-INTERNAL-043
     public void push(final @NotNull UndoScope scope, final @NotNull Operation operation) {
@@ -108,16 +112,13 @@ public final class UndoHistories {
         return histories.computeIfAbsent(scope, key -> new History());
     }
 
-    private static @NotNull Operation next(final @NotNull Deque<Operation> stack) {
-        return Objects.requireNonNullElse(stack.peek(), NOTHING);
-    }
-
     private static final class History {
         private final @NotNull Deque<Operation> undoStack = new ArrayDeque<>();
         private final @NotNull Deque<Operation> redoStack = new ArrayDeque<>();
     }
 
-    public record Operation(@NotNull String description, @NotNull BooleanSupplier undo, @NotNull BooleanSupplier redo, @NotNull Runnable forget) {
+    public record Operation(@NotNull String description, @NotNull BooleanSupplier undo, @NotNull BooleanSupplier redo,
+                            @NotNull Runnable forget) {
         // UC-INTERNAL-005, Rule-INTERNAL-063
         public Operation(final @NotNull String description, final @NotNull Runnable undo, final @NotNull Runnable redo) {
             this(description, always(undo), always(redo), () -> {

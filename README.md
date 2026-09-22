@@ -36,12 +36,12 @@ they exercise.
 Everything Testin owns is plain files under the Testin folder you configure, and
 a folder is a node because of the marker inside it:
 
-| Marker | Node |
-|---|---|
-| `.tp` | Test project |
+| Marker          | Node                                    |
+|-----------------|-----------------------------------------|
+| `.tp`           | Test project                            |
 | `.tcd` / `.trd` | The Test Cases and Test Runs containers |
-| `.tsp` / `.ts` | Test set package, test set |
-| `.trp` / `.tr` | Test run package, test run |
+| `.tsp` / `.ts`  | Test set package, test set              |
+| `.trp` / `.tr`  | Test run package, test run              |
 
 The records beside those markers are JSON too, and **each one is named by what it
 is about**: a test case is `<id>.tc`, and one case's result in a test run is
@@ -123,16 +123,16 @@ in it gets a page of its own: the story, its rules, its screens, what happens
 step by step, and every way it can be refused. 151 use cases and 757 rules, each
 checked against the code it describes.
 
-| Document | Covers |
-|---|---|
-| **[The tree panel](docs/treePanel/main.md)** | The tree on the left |
-| **[The editor panel](docs/editorPanel/main.md)** | Writing test cases, and executing a test run |
-| **[The view panel](docs/viewPanel/main.md)** | One test case in full, on the right |
-| **[The settings page](docs/setting/main.md)** | Everything set once per machine |
-| **[Automation code and the gutter](docs/codegen/main.md)** | The test methods Testin writes |
-| **[Reports](docs/report/main.md)** | A test run written out as a document |
-| **[Sharing work with the team](docs/share/main.md)** | Export, import and Git |
-| **[Inside Testin](docs/internal/main.md)** | The search, and the one thing that owns every file |
+| Document                                                   | Covers                                             |
+|------------------------------------------------------------|----------------------------------------------------|
+| **[The tree panel](docs/treePanel/main.md)**               | The tree on the left                               |
+| **[The editor panel](docs/editorPanel/main.md)**           | Writing test cases, and executing a test run       |
+| **[The view panel](docs/viewPanel/main.md)**               | One test case in full, on the right                |
+| **[The settings page](docs/setting/main.md)**              | Everything set once per machine                    |
+| **[Automation code and the gutter](docs/codegen/main.md)** | The test methods Testin writes                     |
+| **[Reports](docs/report/main.md)**                         | A test run written out as a document               |
+| **[Sharing work with the team](docs/share/main.md)**       | Export, import and Git                             |
+| **[Inside Testin](docs/internal/main.md)**                 | The search, and the one thing that owns every file |
 
 Seven pages sit outside the eight parts: [First run](docs/firstRun.md), [every
 shortcut](docs/shortcuts.md), [the formats on disk](docs/formats.md), [the

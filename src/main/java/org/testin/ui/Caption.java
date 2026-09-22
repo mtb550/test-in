@@ -24,8 +24,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import java.awt.Font;
 import java.util.Locale;
 
 // Rule-INTERNAL-087
@@ -45,7 +45,8 @@ public final class Caption {
 
     public static @NotNull BorderLayoutPanel above(final @NotNull String caption, final @NotNull JComponent value) {
         final @NotNull BorderLayoutPanel panel = JBUI.Panels.simplePanel(0, 2).addToCenter(value).withBorder(JBUI.Borders.emptyTop(8)).andTransparent();
-        if (!caption.isEmpty()) panel.addToTop(of(caption, JBUI.Fonts.label().getSize2D()).withBorder(JBUI.Borders.emptyLeft(12)));
+        if (!caption.isEmpty())
+            panel.addToTop(of(caption, JBUI.Fonts.label().getSize2D()).withBorder(JBUI.Borders.emptyLeft(12)));
         return panel;
     }
 }

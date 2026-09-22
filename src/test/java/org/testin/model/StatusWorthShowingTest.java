@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -38,6 +39,13 @@ import static org.testng.Assert.assertTrue;
  * would be drawn - or not drawn - by accident.
  */
 public class StatusWorthShowingTest {
+
+    private static void assertActiveIs(final @NotNull NodeStatus @NotNull [] values, final @NotNull NodeStatus expected) {
+        final @NotNull List<NodeStatus> active = Arrays.stream(values).filter(NodeStatus::isActive).toList();
+
+        assertEquals(List.of(expected), active, expected.getClass().getSimpleName() + " must have exactly one status meaning \"in current work\","
+                + " because the tree draws every other one beside the name. Active: " + active);
+    }
 
     @Test
     public void exactlyOneStatusPerEnumIsTheActiveOne() {
@@ -65,13 +73,5 @@ public class StatusWorthShowingTest {
     public void noStatusAtAllIsNothingToSay() {
         assertTrue(NodeStatus.NONE.isActive(), "a marker with no status has nothing to draw");
         assertTrue(NodeStatus.NONE.getLabel().isEmpty(), "and nothing to draw it with");
-    }
-
-    private static void assertActiveIs(final @NotNull NodeStatus @NotNull [] values, final @NotNull NodeStatus expected) {
-        final @NotNull List<NodeStatus> active = Arrays.stream(values).filter(NodeStatus::isActive).toList();
-
-        assertTrue(active.equals(List.of(expected)),
-                expected.getClass().getSimpleName() + " must have exactly one status meaning \"in current work\","
-                        + " because the tree draws every other one beside the name. Active: " + active);
     }
 }

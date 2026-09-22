@@ -20,36 +20,60 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementFactory;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.util.function.BiConsumer;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import com.intellij.psi.PsiElement;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenType;
 import org.testin.java.codegen.GeneratedClass;
 import org.testin.java.codegen.GeneratedMethod;
-import org.testin.logger.Logger;
 import org.testin.java.codegen.JavaLiteral;
+import org.testin.logger.Logger;
 import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.util.NameSanitizer;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
-import java.util.Arrays;
+import org.testin.util.NameSanitizer;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class UpdateTestBase {
+    private static boolean anotherMethodIsCalled(final @NotNull PsiMethod pm, final @NotNull String methodName) {
+        final @NotNull String key = NameSanitizer.methodKey(methodName);
+
+        return Optional.ofNullable(pm.getContainingClass()).stream()
+                .flatMap(pc -> Arrays.stream(pc.getMethods()))
+                .anyMatch(other -> other != pm && key.equals(NameSanitizer.methodKey(other.getName())));
+    }
+
+    private static void keptItsName(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String why) {
+        Logger.warn("Kept the name of " + pm.getName() + ": " + why);
+
+        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("codegen.rename.kept.title"), why);
+    }
+
+    // UC-CODEGEN-002, Rule-CODEGEN-014, Rule-CODEGEN-021
+    protected static @NotNull Optional<PsiClass> classOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        return GeneratedClass.find(p, Fqcn.ofClass(tc.getParent()));
+    }
+
     protected @NotNull Optional<PsiMethod> findMethodByTestName(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
         return GeneratedMethod.forCase(pc, tc);
     }
@@ -78,7 +102,7 @@ public class UpdateTestBase {
         if (newMethodName.isEmpty() || pm.getName().equals(newMethodName)) return;
 
         // Rule-CODEGEN-079
-        if (!NameSanitizer.canMakeMethodName(tc.getDescription())) {
+        if (NameSanitizer.cannotMakeMethodName(tc.getDescription())) {
             keptItsName(p, pm, Bundle.message("codegen.rename.not.a.method", pm.getName(), newMethodName));
             return;
         }
@@ -91,37 +115,18 @@ public class UpdateTestBase {
         pm.setName(newMethodName);
     }
 
-    private static boolean anotherMethodIsCalled(final @NotNull PsiMethod pm, final @NotNull String methodName) {
-        final @NotNull String key = NameSanitizer.methodKey(methodName);
-
-        return Optional.ofNullable(pm.getContainingClass()).stream()
-                .flatMap(pc -> Arrays.stream(pc.getMethods()))
-                .anyMatch(other -> other != pm && key.equals(NameSanitizer.methodKey(other.getName())));
-    }
-
-    private static void keptItsName(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String why) {
-        Logger.warn("Kept the name of " + pm.getName() + ": " + why);
-
-        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("codegen.rename.kept.title"), why);
-    }
-
     // UC-CODEGEN-002, UC-CODEGEN-012, Rule-CODEGEN-046
     protected void writeGroups(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
         final @NotNull List<String> quoted = tc.getGroup().stream().map(JavaLiteral::of).toList();
 
-        if (quoted.isEmpty()) removeTestAnnotationAttribute(p, pm, "groups");
+        if (quoted.isEmpty()) removeTestAnnotationAttribute(pm, "groups");
         else updateTestAnnotationAttribute(p, pm, "groups", "{" + String.join(", ", quoted) + "}");
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-047, Rule-CODEGEN-048
     protected void writeEnabled(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
         if (tc.getStatus() == TestCaseStatus.DISABLED) updateTestAnnotationAttribute(p, pm, "enabled", "false");
-        else removeTestAnnotationAttribute(p, pm, "enabled");
-    }
-
-    // UC-CODEGEN-002, Rule-CODEGEN-014, Rule-CODEGEN-021
-    protected static @NotNull Optional<PsiClass> classOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        return GeneratedClass.find(p, Fqcn.ofClass(tc.getParent()));
+        else removeTestAnnotationAttribute(pm, "enabled");
     }
 
     protected void updateTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String attrName, final @NotNull String newValue) {
@@ -134,7 +139,7 @@ public class UpdateTestBase {
         CodeStyleManager.getInstance(p).reformat(element);
     }
 
-    protected void removeTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String attrName) {
+    protected void removeTestAnnotationAttribute(final @NotNull PsiMethod pm, final @NotNull String attrName) {
         getTestAnnotation(pm).ifPresentOrElse(testAnnotation -> testAnnotation.setDeclaredAttributeValue(attrName, null),
                 () -> Logger.warn("Update: method has no @Test annotation"));
     }
@@ -157,11 +162,6 @@ public class UpdateTestBase {
         });
     }
 
-    // UC-CODEGEN-011, Rule-CODEGEN-044
-    protected void applyIfGenerated(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater) {
-        applyToMethod(p, tc, title, updater, detail -> Logger.debug("No generated method for '" + tc.getDescription() + "': " + detail));
-    }
-
     // UC-CODEGEN-012, Rule-CODEGEN-045
     protected void applyToEach(final @NotNull Project p, final @NotNull List<?> items, final @NotNull String title, final @NotNull BiConsumer<PsiMethod, TestCaseDto> updater) {
         final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
@@ -169,10 +169,10 @@ public class UpdateTestBase {
         for (final Object item : items) {
             if (!(item instanceof TestCaseDto tc)) continue;
 
-            final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
-            if (fqcn.size() < 2) continue;
+            final @NotNull String classFqcn = Fqcn.classOfMethod(tc);
+            if (classFqcn.isEmpty()) continue;
 
-            byClass.computeIfAbsent(String.join(".", fqcn.subList(0, fqcn.size() - 1)), path -> new ArrayList<>()).add(tc);
+            byClass.computeIfAbsent(classFqcn, path -> new ArrayList<>()).add(tc);
         }
         if (byClass.isEmpty()) return;
 
@@ -209,10 +209,9 @@ public class UpdateTestBase {
         if (written > 0) reformat(p, pc);
     }
 
-    private void applyToMethod(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater, final @NotNull Consumer<String> onMissing) {
-        final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
-        if (fqcn.size() < 2) return;
-        final @NotNull String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
+    protected void applyToMethod(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater, final @NotNull Consumer<String> onMissing) {
+        final @NotNull String path = Fqcn.classOfMethod(tc);
+        if (path.isEmpty()) return;
 
         final @NotNull Runnable inCommand = () ->
                 WriteCommandAction.runWriteCommandAction(p, title, null, () ->

@@ -33,8 +33,8 @@ of adding an import during a small edit, which is exactly when it slips in.
 Qualify only when an import is impossible because the simple name already means
 something else in that file. There is one such place in `src`:
 
-| File | Qualified | Why an import cannot be used |
-|---|---|---|
+| File                    | Qualified                                | Why an import cannot be used                                                        |
+|-------------------------|------------------------------------------|-------------------------------------------------------------------------------------|
 | `logger/LogWriter.java` | `com.intellij.openapi.diagnostic.Logger` | Testin's own `Logger` sits in the same package, so the simple name already means it |
 
 Anything else is not an exception. A wildcard import that also offers the name,

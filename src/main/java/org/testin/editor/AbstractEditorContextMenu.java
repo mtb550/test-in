@@ -20,25 +20,46 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.components.JBList;
+import com.intellij.ui.table.JBTable;
+import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
+import org.testin.editor.grid.GridKeys;
+import org.testin.editor.grid.NotWhileEditing;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.ui.ActionsMenu;
 import org.testin.undo.UndoAction;
 import org.testin.undo.UndoDirection;
 import org.testin.undo.UndoScope;
-import com.intellij.ui.components.JBList;
-import com.intellij.ui.table.JBTable;
-import org.jetbrains.annotations.NotNull;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import org.testin.editor.grid.GridKeys;
+
 import java.util.Arrays;
-import org.testin.editor.grid.NotWhileEditing;
-import org.testin.model.dto.TestCaseDto;
 
 public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
     protected AbstractEditorContextMenu() {
         super("", true);
+    }
+
+    private static void bindGroup(final @NotNull DefaultActionGroup group, final @NotNull JBTable table) {
+        for (final AnAction action : group.getChildren(ActionManager.getInstance())) {
+            if (action instanceof DefaultActionGroup nested) {
+                bindGroup(nested, table);
+                continue;
+            }
+
+            if (claimedByTheGrid(action)) continue;
+
+            NotWhileEditing.bind(table, action);
+        }
+    }
+
+    private static boolean claimedByTheGrid(final @NotNull AnAction action) {
+        return Arrays.stream(action.getShortcutSet().getShortcuts())
+                .filter(KeyboardShortcut.class::isInstance)
+                .map(shortcut -> ((KeyboardShortcut) shortcut).getFirstKeyStroke())
+                .anyMatch(GridKeys.keptFromMenus()::contains);
     }
 
     public abstract void registerShortcuts(final @NotNull JBList<TestCaseDto> list);
@@ -64,26 +85,6 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
     // Rule-EDITOR-PANEL-010
     public void bindShortcutsTo(final @NotNull JBTable table) {
         bindGroup(this, table);
-    }
-
-    private static void bindGroup(final @NotNull DefaultActionGroup group, final @NotNull JBTable table) {
-        for (final AnAction action : group.getChildren(ActionManager.getInstance())) {
-            if (action instanceof DefaultActionGroup nested) {
-                bindGroup(nested, table);
-                continue;
-            }
-
-            if (claimedByTheGrid(action)) continue;
-
-            NotWhileEditing.bind(table, action);
-        }
-    }
-
-    private static boolean claimedByTheGrid(final @NotNull AnAction action) {
-        return Arrays.stream(action.getShortcutSet().getShortcuts())
-                .filter(KeyboardShortcut.class::isInstance)
-                .map(shortcut -> ((KeyboardShortcut) shortcut).getFirstKeyStroke())
-                .anyMatch(GridKeys.keptFromMenus()::contains);
     }
 
     @Override

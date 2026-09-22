@@ -165,13 +165,13 @@ silently does nothing costs more than the setting it was meant to hold.
   pressed the key on the thing in front of them, so naming it back is a word
   they read every time and needed once. A bulk operation notifies once with a
   count — `Removed 4`, never four balloons.
-  <p>
+
   Not around `actionPerformed`: an action that returns early, opens a
   confirmation, or hands off to a background task would report a success that has
   not happened. Put the call after the work, inside whatever `try` could fail.
   Actions that only move the view — paging, escape, opening a details panel —
   stay silent, or the tester learns to ignore all of them (#62).
-  <p>
+
   **Which kind: can it finish while the tester is not looking?** `softShow` is a
   balloon on the status bar that fades and leaves no trace; `info` is a real IDE
   notification that stays in the Notifications log. Work that happens under the
@@ -184,20 +184,21 @@ silently does nothing costs more than the setting it was meant to hold.
   above the signature, and nothing else: no javadoc, no paragraph saying why, no
   line narrating the next one. Muteb, 20 September 2026: *"i want to make my
   classes clear and simple, no more comments accept rule and use case numbers."*
-  <p>
+
   27,483 comment lines came out of `src/main/java` in one commit - 34% of every
   line in it, against 35,130 lines of code. What replaced them is not nothing:
   **the marker says which documented behavior this is, `docs/` says what that
   behavior is, and the commit message says why the code is shaped this way.** A
   reason belongs in the commit body, where `git blame` reaches it and where it
   cannot drift from the code, rather than in a paragraph above the method.
-  <p>
+
   So write the commit message as if it were the comment you did not write: what
   was wrong, what was tried and refused, which trap the shape avoids. That is
   where the next reader looks, and it is the one record that is still true years
   later. Every comment this policy removed is in `af5f3013` and readable with
-  `git show af5f3013:<path>` forever.
-  <p>
+  `git show af5f3013:` and the file's path, forever - for example
+  `git show af5f3013:src/main/java/org/testin/editor/run/RunEditor.java`.
+
   Two exceptions, and only two. A comment a machine reads stays -
   `//noinspection`, `// @formatter:off` - because it is part of the build rather
   than prose. And the Apache notice at the top of every file stays, untouched
@@ -222,8 +223,8 @@ silently does nothing costs more than the setting it was meant to hold.
     for a drag of test cases — AWT's `Transferable` contract is that an
     unsupported flavor throws. Catching it hands the platform a wrong object
     instead of "I do not have that".
-  - `GitTaskWork.run`, `JavaSourceRoot.RootWork.run` and
-    `JavaSourceRoot.RootFile.from` — functional interfaces whose whole point is to let the lambda fail, so that
+  - `JavaSourceRoot.RootWork.run` and `JavaSourceRoot.RootFile.from` —
+    functional interfaces whose whole point is to let the lambda fail, so that
     one owner above them catches. Removing the declaration moves the catch into
     every lambda, which is the duplication `JavaSourceRoot` exists to delete.
   - `SettingsConfigurable.apply`, and `refuseAnImpossibleRoot`, the one check
@@ -305,13 +306,13 @@ silently does nothing costs more than the setting it was meant to hold.
   somebody waits on is a gate that gets skipped. `compileJava test` is the check
   to run while working; `ideTest` when the change reaches the indexer or the
   tree.
-  <p>
+
   Run it locally only for the case CI cannot serve: a sweep that touched
   nullability, annotations or many files at once, before it is pushed at all.
   Then run it after the last edit, on a still tree — editing a file while the
   inspector is reading it produces findings about a version that no longer
   exists, which reads exactly like a real defect.
-  <p>
-  Either way the bar is the same: the eight rules it gates on at zero -
+
+  Either way the bar is the same: the nineteen rules it gates on at zero -
   CONTRIBUTING.md names them, and this file does not keep a second list that
   would fall behind - and every other survivor needs a reason written beside it.

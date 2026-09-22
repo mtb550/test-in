@@ -21,36 +21,35 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.NodeStatus;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
-@SuppressWarnings("UnusedReturnValue")
 public interface Marker {
     int NOT_ORDERED = Integer.MAX_VALUE;
 
     @NotNull String getId();
 
-    Marker setId(@NotNull String id);
+    void setId(@NotNull String id);
 
     int getOrder();
 
-    @NotNull Marker setOrder(int order);
+    void setOrder(int order);
 
     @NotNull String getCreatedBy();
 
-    Marker setCreatedBy(@NotNull String createdBy);
+    void setCreatedBy(@NotNull String createdBy);
 
     @NotNull ZonedDateTime getCreatedAt();
 
-    Marker setCreatedAt(@NotNull ZonedDateTime createdAt);
+    void setCreatedAt(@NotNull ZonedDateTime createdAt);
 
     @NotNull String getModifiedBy();
 
-    Marker setModifiedBy(@NotNull String modifiedBy);
+    void setModifiedBy(@NotNull String modifiedBy);
 
     @NotNull ZonedDateTime getModifiedAt();
 
-    Marker setModifiedAt(@NotNull ZonedDateTime modifiedAt);
+    void setModifiedAt(@NotNull ZonedDateTime modifiedAt);
 
     default void stampCreated(final @NotNull String tester) {
         final @NotNull ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);

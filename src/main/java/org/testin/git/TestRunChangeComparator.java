@@ -16,14 +16,16 @@
 
 package org.testin.git;
 
-import org.testin.model.TestRunConfiguration;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunExecution;
-
-import java.util.*;
 import org.testin.model.markers.TestRunMarker;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class TestRunChangeComparator {

@@ -22,8 +22,6 @@ import org.jetbrains.annotations.NotNull;
 public interface CodeGenerators {
     @NotNull ExtensionPointName<CodeGenerators> EP = ExtensionPointName.create("org.testin.codeGenerators");
 
-    @NotNull GenAction actionFor(final @NotNull GenType type);
-
     // UC-CODEGEN-019, Rule-CODEGEN-005
     static @NotNull GenAction find(final @NotNull GenType type) {
         return EP.getExtensionList().stream()
@@ -31,4 +29,6 @@ public interface CodeGenerators {
                 .map(generators -> generators.actionFor(type))
                 .orElseGet(() -> new NoJavaCode(type.getDescription()));
     }
+
+    @NotNull GenAction actionFor(final @NotNull GenType type);
 }

@@ -41,11 +41,6 @@ public final class TestCaseExecutionSubscriber implements Disposable {
 
     private final @NotNull List<Reported> surfaces = new CopyOnWriteArrayList<>();
 
-    @FunctionalInterface
-    public interface Reported {
-        void accept(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure);
-    }
-
     TestCaseExecutionSubscriber(final @NotNull Project p) {
         this.p = p;
 
@@ -103,5 +98,10 @@ public final class TestCaseExecutionSubscriber implements Disposable {
         } catch (final IllegalArgumentException notAnId) {
             return Optional.empty();
         }
+    }
+
+    @FunctionalInterface
+    public interface Reported {
+        void accept(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure);
     }
 }

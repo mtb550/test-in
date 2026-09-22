@@ -55,8 +55,8 @@ There is no key for this. The figures are in the status bar.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The run status** — with the same icon the tree draws. Its tooltip reads
-   *This run's status. A completed or closed run records no more verdicts*.
+1. **The run status** — with the same icon the tree draws. Its tooltip reads *This run's status. A completed or closed
+   run records no more verdicts*.
 2. **The figures** — one for each verdict any test case carries, each in that
    verdict's own color, separated by a dot. Their tooltip reads *How this run
    is going*.

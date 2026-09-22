@@ -2,8 +2,7 @@
 
 # UC-CODEGEN-009: Stop a running test case
 
-**As a** tester, **I want** to end a run that is going,
-**so that** I can change something and start it again.
+**As a** tester, **I want** to end a run that is going, **so that** I can change something and start it again.
 
 Stopping ends the whole run. Every test case in it goes back to not run.
 

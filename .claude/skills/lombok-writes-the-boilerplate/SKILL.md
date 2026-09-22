@@ -38,14 +38,14 @@ also the odd file out.
 
 ## What Lombok owns here
 
-| Instead of | Write |
-|---|---|
-| `private Foo() {}` on a holder | `@NoArgsConstructor(access = AccessLevel.PRIVATE)` |
-| A constructor assigning every field | `@AllArgsConstructor`, or `@RequiredArgsConstructor` for the `final` ones |
-| `public X getY()` | `@Getter` on the field, or on the class |
-| `public void setY(X y)` | `@Setter`, and only where a setter is genuinely wanted |
+| Instead of                                                            | Write                                                                         |
+|-----------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| `private Foo() {}` on a holder                                        | `@NoArgsConstructor(access = AccessLevel.PRIVATE)`                            |
+| A constructor assigning every field                                   | `@AllArgsConstructor`, or `@RequiredArgsConstructor` for the `final` ones     |
+| `public X getY()`                                                     | `@Getter` on the field, or on the class                                       |
+| `public void setY(X y)`                                               | `@Setter`, and only where a setter is genuinely wanted                        |
 | A field-per-constant enum with a hand-written constructor and getters | `@Getter @AllArgsConstructor` on the enum — see `Done`, `Refused`, `Priority` |
-| `equals`/`hashCode`/`toString` on a value | a `record`, first. `@EqualsAndHashCode` only when a record will not do |
+| `equals`/`hashCode`/`toString` on a value                             | a `record`, first. `@EqualsAndHashCode` only when a record will not do        |
 
 ## What Lombok does not own
 
@@ -65,11 +65,11 @@ also the odd file out.
 
 These are the whole list. Anything else hand-written is a miss.
 
-| | Why it stays |
-|---|---|
-| `util/Bundle` | Calls `super(Bundle.class, BUNDLE)`. `@NoArgsConstructor` writes an empty body, so there is nowhere for the `super` call to go. |
-| `open/OpenContextMenuAction` | Calls `super("Show Context Menu")`, then does four more lines of work. |
-| `ui/Badges.BadgePill` | Its body is real: `setOpaque`, a border, an icon gap. A constructor that configures is not boilerplate. |
+|                              | Why it stays                                                                                                                    |
+|------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| `util/Bundle`                | Calls `super(Bundle.class, BUNDLE)`. `@NoArgsConstructor` writes an empty body, so there is nowhere for the `super` call to go. |
+| `open/OpenContextMenuAction` | Calls `super("Show Context Menu")`, then does four more lines of work.                                                          |
+| `ui/Badges.BadgePill`        | Its body is real: `setOpaque`, a border, an icon gap. A constructor that configures is not boilerplate.                         |
 
 Two of the three are the same rule: **a constructor that calls `super` with
 arguments cannot be generated.** The third is the other rule: **a constructor
@@ -122,33 +122,33 @@ carries the null contract already.
 
 Named so nobody spends an afternoon rediscovering why.
 
-| | Why not |
-|---|---|
-| `@UtilityClass` | Makes every member implicitly `static`. The `static` keyword stops appearing in the source, so a reader cannot tell a static method from an instance one by looking at it. `@NoArgsConstructor(access = PRIVATE)` says the same thing without hiding anything. |
-| `@Data` | Bundles decisions nobody made: a setter for every field, `equals` on a mutable object. Name the two or three you actually want. |
-| `@Value` | A `record` does it, in the language, with no annotation. There are 51 of them. |
-| `val` / `var` from Lombok | The convention is `final @NotNull` on locals, which is a stated null contract. An inferred type states nothing. |
-| `@SneakyThrows` | A method handles its own failures. Zero in the tree. |
-| `@ExtensionMethod`, `@Delegate` | Both make a call site resolve somewhere the reader cannot see from the line in front of them. |
-| `@Synchronized` | It moves the lock to a hidden field, which is exactly the thing the 16 `synchronized` uses here are being explicit about. |
-| `@StandardException` | No custom exception types exist. |
-| `@Builder.Default` sweeps | Only meaningful where a `@Builder` field has an initializer; check the specific class rather than applying it broadly. |
+|                                 | Why not                                                                                                                                                                                                                                                        |
+|---------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `@UtilityClass`                 | Makes every member implicitly `static`. The `static` keyword stops appearing in the source, so a reader cannot tell a static method from an instance one by looking at it. `@NoArgsConstructor(access = PRIVATE)` says the same thing without hiding anything. |
+| `@Data`                         | Bundles decisions nobody made: a setter for every field, `equals` on a mutable object. Name the two or three you actually want.                                                                                                                                |
+| `@Value`                        | A `record` does it, in the language, with no annotation. There are 51 of them.                                                                                                                                                                                 |
+| `val` / `var` from Lombok       | The convention is `final @NotNull` on locals, which is a stated null contract. An inferred type states nothing.                                                                                                                                                |
+| `@SneakyThrows`                 | A method handles its own failures. Zero in the tree.                                                                                                                                                                                                           |
+| `@ExtensionMethod`, `@Delegate` | Both make a call site resolve somewhere the reader cannot see from the line in front of them.                                                                                                                                                                  |
+| `@Synchronized`                 | It moves the lock to a hidden field, which is exactly the thing the 16 `synchronized` uses here are being explicit about.                                                                                                                                      |
+| `@StandardException`            | No custom exception types exist.                                                                                                                                                                                                                               |
+| `@Builder.Default` sweeps       | Only meaningful where a `@Builder` field has an initializer; check the specific class rather than applying it broadly.                                                                                                                                         |
 
 ## What the audit found, 9 September 2026
 
 Measured, not estimated, across `src/main` and `testin-java/src/main`:
 
-| | Count |
-|---|---|
-| `@Getter` | 135 |
-| `@NoArgsConstructor` | 94 |
-| `@AllArgsConstructor` | 73 |
-| `@Builder` / `@SuperBuilder` | 44 / 10 |
-| `records` | 51 |
-| **Hand-written getters** | **0** |
-| Hand-written `equals` / `hashCode` / `toString` | 2 |
-| Hand-written setters that only assign a field | 1 |
-| Pure field-assignment constructors | 22, of which 8 were exactly replaceable |
+|                                                 | Count                                   |
+|-------------------------------------------------|-----------------------------------------|
+| `@Getter`                                       | 135                                     |
+| `@NoArgsConstructor`                            | 94                                      |
+| `@AllArgsConstructor`                           | 73                                      |
+| `@Builder` / `@SuperBuilder`                    | 44 / 10                                 |
+| `records`                                       | 51                                      |
+| **Hand-written getters**                        | **0**                                   |
+| Hand-written `equals` / `hashCode` / `toString` | 2                                       |
+| Hand-written setters that only assign a field   | 1                                       |
+| Pure field-assignment constructors              | 22, of which 8 were exactly replaceable |
 
 The conclusion is the useful part: **Lombok was already doing nearly all of it.**
 Eight constructors became `@RequiredArgsConstructor`; everything else on the list

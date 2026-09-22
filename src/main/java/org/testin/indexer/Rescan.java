@@ -27,10 +27,10 @@ import com.intellij.util.concurrency.AppExecutorUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
-import org.testin.editor.TestinEditors;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;

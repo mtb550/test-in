@@ -22,8 +22,8 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public final class NoCodeNavigation implements CodeNavigation {

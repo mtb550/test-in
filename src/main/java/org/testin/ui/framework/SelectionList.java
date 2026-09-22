@@ -19,7 +19,7 @@ package org.testin.ui.framework;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Icons;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 public record SelectionList<T>(@NotNull Icon icon, @NotNull String name, @NotNull String hint, @NotNull T value) {
     // UC-INTERNAL-007, Rule-INTERNAL-077

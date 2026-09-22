@@ -31,6 +31,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * UC-INTERNAL-002, Rule-INTERNAL-070.
@@ -167,8 +168,8 @@ public class ByteIdenticalSaveTest {
     public void nothingTypedIsNothingStored() {
         final String json = saved();
 
-        assertEquals(json.contains("\"module\" : \"\""), true, "an empty module gained something: " + json);
-        assertEquals(json.contains("\"preConditions\" : \"\""), true, "empty preconditions gained something");
-        assertEquals(json.contains("\"updatedBy\" : \"\""), true, "an empty updatedBy gained something");
+        assertTrue(json.contains("\"module\" : \"\""), "an empty module gained something: " + json);
+        assertTrue(json.contains("\"preConditions\" : \"\""), "empty preconditions gained something");
+        assertTrue(json.contains("\"updatedBy\" : \"\""), "an empty updatedBy gained something");
     }
 }

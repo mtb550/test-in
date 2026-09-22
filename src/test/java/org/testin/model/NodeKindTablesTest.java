@@ -22,13 +22,13 @@ import org.testin.creator.NodeCreators;
 import org.testin.remove.Removals;
 import org.testng.annotations.Test;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.lang.reflect.Field;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -55,8 +55,51 @@ public class NodeKindTablesTest {
     private static final @NotNull List<String> KINDS =
             Arrays.stream(DirectoryType.values()).map(Enum::name).collect(Collectors.toList());
 
-    /** Any id will do: what is being asked is what the name it produces is not. */
+    /**
+     * Any id will do: what is being asked is what the name it produces is not.
+     */
     private static final @NotNull UUID A_CASE = UUID.fromString("11111111-1111-4111-8111-111111111101");
+
+    private static void assertSameNames(final @NotNull Class<?> table, final @NotNull String named) {
+        final @NotNull List<String> names =
+                Arrays.stream(table.getEnumConstants()).map(c -> ((Enum<?>) c).name()).collect(Collectors.toList());
+
+        assertEquals(names, KINDS,
+                named + " no longer has one constant per DirectoryType, named after it and in the same order."
+                        + " A kind of node with no entry throws on valueOf the first time a tester reaches it (#111)");
+    }
+
+    /**
+     * The kinds DirectoryType's private ACCEPTS map has a row for. Reflection because
+     * the table is the class's own business - nothing but this test has any use
+     * for its shape.
+     */
+    private static @NotNull Set<String> kindsWithAnAcceptsRow() {
+        try {
+            final @NotNull Field declared = DirectoryType.class.getDeclaredField("ACCEPTS");
+            declared.setAccessible(true);
+
+            return ((Map<?, ?>) declared.get(null)).keySet().stream()
+                    .map(key -> ((Enum<?>) key).name())
+                    .collect(Collectors.toSet());
+
+        } catch (final ReflectiveOperationException ex) {
+            fail("DirectoryType.ACCEPTS is gone, so nothing checks that every kind has a row");
+            return Set.of();
+        }
+    }
+
+    private static @NotNull Set<String> gatheredWaysOfCounting() {
+        try {
+            return Arrays.stream(Class.forName("org.testin.indexer.NodeCounter$Gathered").getEnumConstants())
+                    .map(c -> ((Enum<?>) c).name())
+                    .collect(Collectors.toSet());
+
+        } catch (final ClassNotFoundException ex) {
+            fail("NodeCounter.Gathered is gone, so nothing checks that the ways of counting still match");
+            return Set.of();
+        }
+    }
 
     /**
      * Rule-INTERNAL-014, Rule-INTERNAL-090. A marker file name answers with the
@@ -106,7 +149,7 @@ public class NodeKindTablesTest {
      */
     @Test
     public void everyWayOfCountingIsGathered() {
-        final @NotNull Set<String> gathered = constantsOf("org.testin.indexer.NodeCounter$Gathered");
+        final @NotNull Set<String> gathered = gatheredWaysOfCounting();
 
         assertEquals(gathered, Arrays.stream(NodeStatistics.values()).map(Enum::name).collect(Collectors.toSet()),
                 "NodeCounter.Gathered and NodeStatistics no longer name the same ways of counting,"
@@ -122,7 +165,7 @@ public class NodeKindTablesTest {
      */
     @Test
     public void everyKindOfNodeSaysWhatItAccepts() {
-        assertEquals(constantsOf(DirectoryType.class, "ACCEPTS"),
+        assertEquals(kindsWithAnAcceptsRow(),
                 Arrays.stream(DirectoryType.values()).map(Enum::name).collect(Collectors.toSet()),
                 "DirectoryType.ACCEPTS does not have a row per kind, and a kind with no row accepts nothing");
     }
@@ -153,46 +196,5 @@ public class NodeKindTablesTest {
         }
 
         assertFalse(DirectoryType.TR.acceptsAnything(), "a test run takes nothing, so the tree must not draw a drop highlight over one");
-    }
-
-    private static void assertSameNames(final @NotNull Class<?> table, final @NotNull String named) {
-        final @NotNull List<String> names =
-                Arrays.stream(table.getEnumConstants()).map(c -> ((Enum<?>) c).name()).collect(Collectors.toList());
-
-        assertEquals(names, KINDS,
-                named + " no longer has one constant per DirectoryType, named after it and in the same order."
-                        + " A kind of node with no entry throws on valueOf the first time a tester reaches it (#111)");
-    }
-
-    /**
-     * The keys of a private static map on a class, by name. Reflection because
-     * the table is the class's own business - nothing but this test has any use
-     * for its shape.
-     */
-    private static @NotNull Set<String> constantsOf(final @NotNull Class<?> owner, final @NotNull String field) {
-        try {
-            final @NotNull Field declared = owner.getDeclaredField(field);
-            declared.setAccessible(true);
-
-            return ((Map<?, ?>) declared.get(null)).keySet().stream()
-                    .map(key -> ((Enum<?>) key).name())
-                    .collect(Collectors.toSet());
-
-        } catch (final ReflectiveOperationException ex) {
-            fail(owner.getSimpleName() + "." + field + " is gone, so nothing checks that every kind has a row");
-            return Set.of();
-        }
-    }
-
-    private static @NotNull Set<String> constantsOf(final @NotNull String className) {
-        try {
-            return Arrays.stream(Class.forName(className).getEnumConstants())
-                    .map(c -> ((Enum<?>) c).name())
-                    .collect(Collectors.toSet());
-
-        } catch (final ClassNotFoundException ex) {
-            fail(className + " is gone, so nothing checks that the ways of counting still match");
-            return Set.of();
-        }
     }
 }

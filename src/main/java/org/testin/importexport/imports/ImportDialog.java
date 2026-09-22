@@ -21,24 +21,26 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.SheetPreview;
-import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
+public final class ImportDialog extends AbstractFrameworkDialog {
+    private final @NotNull SourceForm form;
+
     private final @NotNull Consumer<@NotNull Map<String, List<TestCaseDto>>> onImport;
 
     private final @NotNull SheetPreview preview;
@@ -50,7 +52,7 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
         title = Bundle.message("dialog.import.title");
 
         preview = new SheetPreview(p, importAttributes);
-        final @NotNull SourceForm form = new SourceForm(p, importAttributes, importLoader, preview::show);
+        form = new SourceForm(p, importAttributes, importLoader, preview::show);
 
         components = List.of(
                 ComponentDialogBase.of(form),
@@ -69,7 +71,7 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
     // UC-SHARE-007
     @Override
     protected void submit() {
-        if (component().resolve().isEmpty()) return;
+        if (form.resolve().isEmpty()) return;
 
         if (preview.isEmpty()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("notification.import.empty.title"), Bundle.message("notification.import.empty.nothing.loaded"));

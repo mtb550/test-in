@@ -31,19 +31,22 @@ import org.testin.util.Shortcuts;
 
 import java.util.List;
 
-public final class GlobalSearchDialog extends AbstractFrameworkDialog<TextFieldWithSelections<Hit>> {
+public final class GlobalSearchDialog extends AbstractFrameworkDialog {
+    private final @NotNull TextFieldWithSelections<Hit> search;
+
     // UC-INTERNAL-001
     public GlobalSearchDialog(final @NotNull Project p) {
         super(p);
 
         title = Bundle.message("dialog.search.title");
 
-        components = List.of(
-                ComponentDialogBase.<Hit>textFieldWithSelections()
-                        .icon(AllIcons.Actions.Search)
-                        .placeholder(Bundle.message("dialog.search.placeholder"))
-                        .rows(query -> rowsFor(p, query))
-                        .build());
+        final @NotNull ComponentDialogBase<TextFieldWithSelections<Hit>> built = ComponentDialogBase.<Hit>textFieldWithSelections()
+                .icon(AllIcons.Actions.Search)
+                .placeholder(Bundle.message("dialog.search.placeholder"))
+                .rows(query -> rowsFor(p, query))
+                .build();
+        search = built.getComponent();
+        components = List.of(built);
 
         shortcuts = List.of(
                 StatusBarShortcut.build(Shortcuts.Enter, Bundle.message("dialog.search.shortcut.goto"), this::submit),
@@ -73,7 +76,7 @@ public final class GlobalSearchDialog extends AbstractFrameworkDialog<TextFieldW
     // UC-INTERNAL-001, Rule-INTERNAL-002
     @Override
     protected void submit() {
-        component().selection().ifPresent(hit -> {
+        search.selection().ifPresent(hit -> {
             closeOk();
             GoTo.the(p, hit);
         });

@@ -20,7 +20,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.EditorColors;
 
 import javax.swing.border.Border;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Insets;
 
 record SelectionCellBorder(@NotNull Insets insets) implements Border {
     SelectionCellBorder(final boolean firstColumn) {

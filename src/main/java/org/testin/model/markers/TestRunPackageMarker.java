@@ -20,12 +20,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.testin.model.PackageStatus;
 
 @Setter
 @Getter
-@Accessors(chain = true)
 @ToString(callSuper = true)
 public class TestRunPackageMarker extends AbstractMarker implements PackageMarker {
     @NonNull

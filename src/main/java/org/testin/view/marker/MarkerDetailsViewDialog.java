@@ -26,7 +26,6 @@ import org.testin.model.markers.Marker;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
-import org.testin.ui.framework.DialogDetails;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
@@ -34,7 +33,7 @@ import org.testin.util.Shortcuts;
 
 import java.util.List;
 
-public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<DialogDetails> {
+public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog {
     public MarkerDetailsViewDialog(final @NotNull Project p, final @NotNull DirectoryDto dto) {
         super(p);
 

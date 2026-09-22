@@ -21,7 +21,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.NodeStatus;
 import org.testin.model.ProjectStatus;
@@ -32,7 +31,6 @@ import java.util.Optional;
 
 @Setter
 @Getter
-@Accessors(chain = true)
 @ToString(callSuper = true)
 public class TestProjectMarker extends AbstractMarker {
     // Rule-INTERNAL-091

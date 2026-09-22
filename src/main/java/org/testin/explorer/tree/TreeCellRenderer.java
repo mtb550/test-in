@@ -29,14 +29,21 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Bundle;
 
+import javax.swing.JTree;
 import java.util.Objects;
-import javax.swing.*;
 import java.util.Optional;
 import java.util.Set;
 
 @AllArgsConstructor
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
     private final @NotNull Set<DirectoryDto> selectedNodes;
+
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-099
+    private static @NotNull String statusLabel(final @NotNull DirectoryDto dir) {
+        if (dir instanceof TestRunDirectoryDto) return dir.getMarker().getStatusLabel();
+
+        return dir.getMarker().status().isActive() ? "" : dir.getMarker().getStatusLabel();
+    }
 
     // Rule-TREE-PANEL-008
     @Override
@@ -68,12 +75,5 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
             setIcon(AllIcons.General.Error);
             append(Objects.toString(value, Bundle.message("tree.render.error")), SimpleTextAttributes.ERROR_ATTRIBUTES);
         }
-    }
-
-    // UC-TREE-PANEL-001, Rule-TREE-PANEL-099
-    private static @NotNull String statusLabel(final @NotNull DirectoryDto dir) {
-        if (dir instanceof TestRunDirectoryDto) return dir.getMarker().getStatusLabel();
-
-        return dir.getMarker().status().isActive() ? "" : dir.getMarker().getStatusLabel();
     }
 }

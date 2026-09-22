@@ -62,8 +62,8 @@ final class TestDataFiles {
         return writeBytes(p, path, Services.getInstance(p, Mapper.class).writeValueAsBytes(content));
     }
 
-    boolean write(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
-        return writeBytes(p, path, jsonBytes);
+    void write(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
+        writeBytes(p, path, jsonBytes);
     }
 
     byte @NotNull [] readBytes(final @NotNull Path path) {

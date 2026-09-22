@@ -27,7 +27,7 @@ import org.testin.testcase.CreateTestCaseFields;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
 public class ExpectedResultSection extends AbstractMultiLineSection {
     public ExpectedResultSection(final @NotNull Project p) {
@@ -49,7 +49,7 @@ public class ExpectedResultSection extends AbstractMultiLineSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto) {
         field.setText(dto.getExpectedResult());
     }
 }

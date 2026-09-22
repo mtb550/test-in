@@ -19,10 +19,10 @@ package org.testin.testcase.update.bulk;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.TestEditorAttributes;
-import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Bundle;
 import org.testin.util.NameSanitizer;
 
@@ -42,6 +42,12 @@ import java.util.stream.Collectors;
 public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
     public DescriptionBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
         super(p, selectedItems, updatedItems);
+    }
+
+    private static @NotNull Optional<String> keyOf(final @NotNull String description) {
+        return Optional.of(NameSanitizer.methodName(description))
+                .filter(name -> !name.isEmpty())
+                .map(NameSanitizer::methodKey);
     }
 
     @Override
@@ -92,7 +98,7 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
             final @NotNull String methodName = NameSanitizer.methodName(edited.value());
 
-            if (!NameSanitizer.canMakeMethodName(edited.value())) {
+            if (NameSanitizer.cannotMakeMethodName(edited.value())) {
                 clashing.add(i);
                 notANameYet.add(methodName);
                 continue;
@@ -123,11 +129,5 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
                 .forEach(sibling -> keyOf(sibling.getDescription()).ifPresent(keys::add));
 
         return keys;
-    }
-
-    private static @NotNull Optional<String> keyOf(final @NotNull String description) {
-        return Optional.of(NameSanitizer.methodName(description))
-                .filter(name -> !name.isEmpty())
-                .map(NameSanitizer::methodKey);
     }
 }

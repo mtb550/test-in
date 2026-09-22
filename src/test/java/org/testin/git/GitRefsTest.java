@@ -24,13 +24,21 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * The git naming and selection rules, exercised without an IDE or a repository -
  * which is what {@link GitRefs} was extracted for.
  */
 public class GitRefsTest {
+
+    private static PendingChange diff(final Path relativePath) {
+        return new PendingChange(ChangeSubject.TEST_CASE, "a case", "a test set", UUID.randomUUID().toString(),
+                relativePath, DiffType.MODIFIED,
+                TestCaseDto.builder().build(), List.of());
+    }
 
     /**
      * UC-TREE-PANEL-001, Rule-TREE-PANEL-117.
@@ -41,7 +49,7 @@ public class GitRefsTest {
      * <p>
      * It had no test at all until #301, and that is how a second rule grew in
      * {@code TestinProjectConfig} and disagreed with it for months: this one
-     * said yes to {@code git://host/x} and to {@code http://host/x.git} while
+     * said yes to {@code git://host/x} and to {@code http://localhost/x.git} while
      * the file's rule dropped both without a word, so a tester whose testin.yml
      * held either saw a panel that never mentioned an address.
      */
@@ -50,7 +58,7 @@ public class GitRefsTest {
         assertTrue(GitRefs.isRepositoryUrl("https://github.com/acme/repo.git"));
         assertTrue(GitRefs.isRepositoryUrl("ssh://git@github.com/acme/repo.git"));
         assertTrue(GitRefs.isRepositoryUrl("git@host:acme/repo.git"));
-        assertTrue(GitRefs.isRepositoryUrl("http://host/x.git"), "plain http is a scheme git clone takes");
+        assertTrue(GitRefs.isRepositoryUrl("http://localhost/x.git"), "plain http is a scheme git clone takes");
         assertTrue(GitRefs.isRepositoryUrl("git://host/x"), "the file's own rule used to drop this one");
         assertTrue(GitRefs.isRepositoryUrl("https://host/r.git?ref=main"), "a query is part of the address");
         assertTrue(GitRefs.isRepositoryUrl("  https://github.com/acme/repo.git  "), "surrounding space is trimmed");
@@ -84,12 +92,6 @@ public class GitRefsTest {
         assertFalse(GitRefs.isRepositoryUrl("https://x.com/r a"), "nor is a space inside one");
         assertFalse(GitRefs.isRepositoryUrl("https://x.com/\"r\""), "nor a quote");
         assertFalse(GitRefs.isRepositoryUrl("https://x.com/r|whoami"), "nor a pipe");
-    }
-
-    private static PendingChange diff(final Path relativePath) {
-        return new PendingChange(ChangeSubject.TEST_CASE, "a case", "a test set", UUID.randomUUID().toString(),
-                relativePath, DiffType.MODIFIED,
-                TestCaseDto.builder().build(), List.of());
     }
 
     @Test
@@ -310,7 +312,7 @@ public class GitRefsTest {
         final String escaped = "?? \"Test Cases/\\330\\252\\330\\263\\330\\254\\331\\212\\331\\204/a.json\"";
 
         assertEquals(GitRefs.parseStatus(List.of(escaped)).getFirst().path(),
-                "Test Cases/\u062A\u0633\u062C\u064A\u0644/a.json");
+                "Test Cases/تسجيل/a.json");
     }
 
     /**

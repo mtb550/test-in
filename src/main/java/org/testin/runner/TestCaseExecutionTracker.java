@@ -16,21 +16,20 @@
 
 package org.testin.runner;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsAdapter;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener;
 import com.intellij.execution.testframework.sm.runner.SMTestProxy;
 import com.intellij.execution.testframework.stacktrace.DiffHyperlink;
 import com.intellij.openapi.project.Project;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import java.util.Locale;
 import org.testin.model.Failure;
 import org.testin.model.RunStatus;
 import org.testin.util.Bundle;
 
 import java.time.Duration;
-
+import java.util.Locale;
 import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -52,7 +51,7 @@ public final class TestCaseExecutionTracker {
                 } else if (test.isDefect()) {
                     TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED, durationOf(test), failureOf(test, ""));
 
-                // Rule-CODEGEN-075
+                    // Rule-CODEGEN-075
                 } else {
                     TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED, durationOf(test), failureOf(test, Bundle.message("runner.skipped")));
                 }

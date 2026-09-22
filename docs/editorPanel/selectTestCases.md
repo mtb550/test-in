@@ -53,22 +53,22 @@ happens, and no message appears.
 
 ## How to select
 
-| In the cards | In the grid |
-|---|---|
-| Click a card | Click a cell |
-| `Ctrl`-click to add one | Drag across cells |
-| `Shift`-click to take a range | Click the number column to take a whole row |
-| Click the empty space to clear | `Ctrl`-click the number column to add a row |
-| | `Shift`-click the number column to take a range of rows |
+| In the cards                   | In the grid                                             |
+|--------------------------------|---------------------------------------------------------|
+| Click a card                   | Click a cell                                            |
+| `Ctrl`-click to add one        | Drag across cells                                       |
+| `Shift`-click to take a range  | Click the number column to take a whole row             |
+| Click the empty space to clear | `Ctrl`-click the number column to add a row             |
+|                                | `Shift`-click the number column to take a range of rows |
 
 ## What the status bar says
 
-| The selection | What it reads |
-|---|---|
-| Nothing | *12 test cases*, the count alone |
-| One test case | Its position, then *of 12 test cases* |
-| Several | The count, then *selected of 12 test cases* |
-| Anything, with a filter on | The same, then *(filtered from 120)* |
+| The selection              | What it reads                               |
+|----------------------------|---------------------------------------------|
+| Nothing                    | *12 test cases*, the count alone            |
+| One test case              | Its position, then *of 12 test cases*       |
+| Several                    | The count, then *selected of 12 test cases* |
+| Anything, with a filter on | The same, then *(filtered from 120)*        |
 
 ## What Testin refuses
 

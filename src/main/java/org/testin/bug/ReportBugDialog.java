@@ -34,7 +34,7 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.Optional;
 
-final class ReportBugDialog extends AbstractFrameworkDialog<TextInput> {
+final class ReportBugDialog extends AbstractFrameworkDialog {
     private final @NotNull BugReports.RunItem item;
     private final @NotNull PreparedBug bug;
     private final @NotNull Runnable redraw;

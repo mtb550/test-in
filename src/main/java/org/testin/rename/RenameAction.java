@@ -16,28 +16,37 @@
 
 package org.testin.rename;
 
-import org.testin.actions.GrayWithReason;
-import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import com.intellij.openapi.project.DumbAwareAction;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
+import org.testin.editor.TestinEditors;
 import org.testin.explorer.TreePanel;
-import org.testin.undo.UndoScope;
-import org.testin.undo.UndoHistories;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.editor.TestinEditors;
+import org.testin.undo.UndoHistories;
+import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 
 import java.util.Optional;
 
 // UC-TREE-PANEL-011
 public class RenameAction extends DumbAwareAction {
+    // UC-TREE-PANEL-011, Rule-TREE-PANEL-104, Rule-TREE-PANEL-111
+    private static @NotNull Optional<String> whyNot(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+        if (!dir.isRenamable()) return Optional.of(Bundle.message("rename.disabled.description"));
+        if (Services.getInstance(p, TestinEditors.class).busyUnder(p, dir))
+            return Optional.of(Bundle.message("rename.disabled.busy"));
+
+        return Optional.empty();
+    }
+
     // UC-TREE-PANEL-011
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -84,14 +93,6 @@ public class RenameAction extends DumbAwareAction {
         NodeRename.apply(p, Services.getInstance(p, TreePanel.class), dir, newName, () -> {
         });
         return true;
-    }
-
-    // UC-TREE-PANEL-011, Rule-TREE-PANEL-104, Rule-TREE-PANEL-111
-    private static @NotNull Optional<String> whyNot(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        if (!dir.isRenamable()) return Optional.of(Bundle.message("rename.disabled.description"));
-        if (Services.getInstance(p, TestinEditors.class).busyUnder(p, dir)) return Optional.of(Bundle.message("rename.disabled.busy"));
-
-        return Optional.empty();
     }
 
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-104

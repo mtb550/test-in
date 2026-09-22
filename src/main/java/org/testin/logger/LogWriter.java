@@ -20,14 +20,18 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
-import java.util.Locale;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.*;
-import java.util.Optional;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -45,14 +49,19 @@ public final class LogWriter implements Disposable {
     private final @NotNull BlockingQueue<Object> logQueue = new ArrayBlockingQueue<>(10000);
     private final @NotNull DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
     private final @NotNull Path logFile = Path.of(PathManager.getLogPath(), "testin.log");
+    private final @NotNull AtomicBoolean dropping = new AtomicBoolean();
     private volatile boolean isRunning = true;
     private volatile @NotNull Level currentLogLevel = Level.DISABLED;
     private @NotNull Optional<Thread> writerThread = Optional.empty();
 
-    private final @NotNull AtomicBoolean dropping = new AtomicBoolean();
-
     public LogWriter() {
         startWriterThread();
+    }
+
+    private static void report(final long elapsedNanos, final boolean timedOut) {
+        IDE_LOG.info("Testin logger shutdown took " + elapsedNanos / 1_000_000 + " ms"
+                + (timedOut ? ", and the writer did not finish within " + JOIN_TIMEOUT + " ms - it was interrupted"
+                : ", writer finished on its own"));
     }
 
     // UC-SETTING-007, Rule-SETTING-024
@@ -146,8 +155,7 @@ public final class LogWriter implements Disposable {
 
         isRunning = false;
 
-        //noinspection ResultOfMethodCallIgnored
-        logQueue.offer(SHUTDOWN);
+        if (!logQueue.offer(SHUTDOWN)) writerThread.ifPresent(Thread::interrupt);
 
         boolean timedOut = false;
 
@@ -163,11 +171,5 @@ public final class LogWriter implements Disposable {
         }
 
         report(System.nanoTime() - started, timedOut);
-    }
-
-    private static void report(final long elapsedNanos, final boolean timedOut) {
-        IDE_LOG.info("Testin logger shutdown took " + elapsedNanos / 1_000_000 + " ms"
-                + (timedOut ? ", and the writer did not finish within " + JOIN_TIMEOUT + " ms - it was interrupted"
-                : ", writer finished on its own"));
     }
 }

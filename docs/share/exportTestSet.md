@@ -2,8 +2,8 @@
 
 # UC-SHARE-001: Export one test set
 
-**As a** tester, **I want** the test cases of a test set as a file,
-**so that** somebody without the IDE can read them or review them.
+**As a** tester, **I want** the test cases of a test set as a file, **so that** somebody without the IDE can read them
+or review them.
 
 To export is to write test cases out to a file. The file is a spreadsheet, or
 plain text. No test case is changed.
@@ -84,8 +84,7 @@ There is no key for this. The menu entry is **Export**.
 **If the node cannot hold test cases** — **Export** is gray. Only a test set, a
 test set package and the **Test Cases** folder can be exported.
 
-**If the folder holds no test cases** — a message titled **Export Empty** reads
-*No test cases found.*
+**If the folder holds no test cases** — a message titled **Export Empty** reads *No test cases found.*
 
 **If the tester unticks every test case** — a message titled **Export Empty**
 reads *Select at least one test case to export.* The dialog stays open.

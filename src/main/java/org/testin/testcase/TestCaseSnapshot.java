@@ -21,14 +21,14 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
+import org.testin.editor.TestinEditors;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.undo.UndoScope;
 import org.testin.undo.UndoHistories;
-import org.testin.editor.TestinEditors;
+import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 import org.testin.view.ViewToolWindowFactory;
@@ -38,7 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @NotNull List<TestCaseDto> present, @NotNull List<UUID> absent) {
+public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @NotNull List<TestCaseDto> present,
+                               @NotNull List<UUID> absent) {
     // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-228
     public static @NotNull TestCaseSnapshot of(final @NotNull Project p, final @NotNull Path testSetPath, final @NotNull List<UUID> ids) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -104,20 +105,6 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return allBack;
     }
 
-    private record Written(@NotNull List<TestCaseDto> removed, @NotNull List<TestCaseDto> comingBack, @NotNull List<TestCaseDto> landed) {
-        Written() {
-            this(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-        }
-
-        void generate(final @NotNull Project p) {
-            if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
-            if (!comingBack.isEmpty()) GenType.CREATE_TEST_CASE.executeAll(p, comingBack);
-
-            // UC-CODEGEN-002, Rule-CODEGEN-068
-            if (!landed.isEmpty()) GenType.RECONCILE_TEST_CASE.executeAll(p, landed);
-        }
-    }
-
     private static void tellTheSurfaces(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> written) {
         final @NotNull TestinEditors editors = Services.getInstance(p, TestinEditors.class);
 
@@ -133,6 +120,11 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
             if (!before.get(i).sameAs(after.get(i))) return false;
 
         return true;
+    }
+
+    // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-238
+    public static @NotNull TestCaseDto copy(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        return Services.getInstance(p, Mapper.class).convertValue(tc, TestCaseDto.class).setParent(tc.getParent());
     }
 
     private boolean stillStands() {
@@ -194,8 +186,18 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return allBack;
     }
 
-    // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-238
-    public static @NotNull TestCaseDto copy(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        return Services.getInstance(p, Mapper.class).convertValue(tc, TestCaseDto.class).setParent(tc.getParent());
+    private record Written(@NotNull List<TestCaseDto> removed, @NotNull List<TestCaseDto> comingBack,
+                           @NotNull List<TestCaseDto> landed) {
+        Written() {
+            this(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        }
+
+        void generate(final @NotNull Project p) {
+            if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
+            if (!comingBack.isEmpty()) GenType.CREATE_TEST_CASE.executeAll(p, comingBack);
+
+            // UC-CODEGEN-002, Rule-CODEGEN-068
+            if (!landed.isEmpty()) GenType.RECONCILE_TEST_CASE.executeAll(p, landed);
+        }
     }
 }

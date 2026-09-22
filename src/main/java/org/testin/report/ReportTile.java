@@ -95,6 +95,11 @@ public enum ReportTile {
 
     private final @NotNull String unit;
 
+    // Rule-REPORT-002
+    public static @NotNull List<ReportTile> shownFor(final @NotNull TestRunSummary summary) {
+        return Arrays.stream(values()).filter(tile -> tile.isShownFor(summary)).toList();
+    }
+
     public @NotNull String valueIn(final @NotNull TestRunSummary summary) {
         return amountIn(summary) + unit;
     }
@@ -105,10 +110,5 @@ public enum ReportTile {
 
     public boolean isShownFor(final @NotNull TestRunSummary summary) {
         return true;
-    }
-
-    // Rule-REPORT-002
-    public static @NotNull List<ReportTile> shownFor(final @NotNull TestRunSummary summary) {
-        return Arrays.stream(values()).filter(tile -> tile.isShownFor(summary)).toList();
     }
 }

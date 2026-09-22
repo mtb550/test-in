@@ -21,5 +21,6 @@ import org.testin.config.BugRepository;
 
 import java.util.Optional;
 
-record PreparedBug(@NotNull BugFacts facts, @NotNull String body, @NotNull Optional<BugRepository> repository, @NotNull Optional<String> whyNotReady) {
+record PreparedBug(@NotNull BugFacts facts, @NotNull String body, @NotNull Optional<BugRepository> repository,
+                   @NotNull Optional<String> whyNotReady) {
 }

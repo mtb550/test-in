@@ -16,19 +16,19 @@
 
 package org.testin.indexer;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.Once;
-import org.testin.logger.Logger;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.nio.file.Files;
 import java.nio.file.Path;
 

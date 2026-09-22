@@ -31,8 +31,10 @@ import org.testin.editor.toolbar.components.SearchTxt;
 import org.testin.editor.toolbar.components.ToolbarItem;
 import org.testin.logger.Logger;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,22 +42,26 @@ import java.util.Optional;
 
 public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel> implements Disposable {
     public static final int BAR_HEIGHT = JBUI.scale(30);
+    @Getter
+    protected final @NotNull SearchTxt searchTxt;
+    @Getter
+    private final @NotNull Toolbar callbacks;
+    @Getter
+    private final @NotNull Map<Class<? extends ToolbarItem>, ToolbarItem> toolbarItems = new HashMap<>();
+    @Getter
+    private @NotNull ViewMode currentView = ViewMode.LIST_VIEW;
+
+    public AbstractToolbarPanel(final @NotNull Toolbar callbacks) {
+        super(new GridBagLayout());
+        this.callbacks = callbacks;
+
+        setBackground(JBUI.CurrentTheme.EditorTabs.background());
+        this.searchTxt = new SearchTxt(callbacks::onToolBarSearchValueChanged, callbacks::onToolBarSearchFocusReleased);
+    }
 
     public static int barHeight(final int naturalHeight) {
         return Math.max(naturalHeight, BAR_HEIGHT);
     }
-
-    @Getter
-    protected final @NotNull SearchTxt searchTxt;
-
-    @Getter
-    private final @NotNull Toolbar callbacks;
-
-    @Getter
-    private final @NotNull Map<Class<? extends ToolbarItem>, ToolbarItem> toolbarItems = new HashMap<>();
-
-    @Getter
-    private @NotNull ViewMode currentView = ViewMode.LIST_VIEW;
 
     private void addItems(final @NotNull List<ToolbarItem> items, final @NotNull GridBagConstraints gbc) {
         for (final ToolbarItem item : items) {
@@ -68,14 +74,6 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
             add(component, gbc);
             gbc.gridx++;
         }
-    }
-
-    public AbstractToolbarPanel(final @NotNull Toolbar callbacks) {
-        super(new GridBagLayout());
-        this.callbacks = callbacks;
-
-        setBackground(JBUI.CurrentTheme.EditorTabs.background());
-        this.searchTxt = new SearchTxt(callbacks::onToolBarSearchValueChanged, callbacks::onToolBarSearchFocusReleased);
     }
 
     public <T extends ToolbarItem> @NotNull T getToolbarItem(final @NotNull Class<T> itemClass) {

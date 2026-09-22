@@ -41,11 +41,25 @@ public class ScreenshotsInGitTest {
     private static final String REMOVED = "runs/cycle38/q81zd.png";
     private static final String OTHER_RUN = "runs/cycle39/m4x0c.png";
 
+    /**
+     * Makes the folder a real test run, which is what the marker beside the
+     * picture says.
+     */
+    private static void markARun(final Path root) {
+        try {
+            final Path at = root.resolve("runs/cycle38");
+            Files.createDirectories(at);
+            Files.writeString(at.resolve(DirectoryType.TR.getMarker()), "{}");
+        } catch (final Exception e) {
+            throw new AssertionError("could not write the run's marker", e);
+        }
+    }
+
     @Test
     public void theReviewListsNoScreenshotRow() {
         try {
             final Path root = Files.createTempDirectory("testin-git-screenshots");
-            markARun(root, "runs/cycle38");
+            markARun(root);
 
             assertTrue(GitDiffProcessor.toDiffs(List.of(" D " + REMOVED), root, RealMapper.build(), path -> "", id -> Optional.empty()).isEmpty(),
                     "a screenshot arrives or goes with its run, so it has no row of its own");
@@ -72,20 +86,6 @@ public class ScreenshotsInGitTest {
                     "a PNG in a test set has no run to travel with, so the review has to list it");
         } catch (final Exception e) {
             throw new AssertionError("the review could not be built", e);
-        }
-    }
-
-    /**
-     * Makes the folder a real test run, which is what the marker beside the
-     * picture says.
-     */
-    private static void markARun(final Path root, final String folder) {
-        try {
-            final Path at = root.resolve(folder);
-            Files.createDirectories(at);
-            Files.writeString(at.resolve(DirectoryType.TR.getMarker()), "{}");
-        } catch (final Exception e) {
-            throw new AssertionError("could not write the run's marker", e);
         }
     }
 

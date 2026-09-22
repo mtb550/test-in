@@ -16,27 +16,36 @@
 
 package org.testin.editor.toolbar.components;
 
-import org.testin.editor.AbstractIconButton;
-import org.testin.editor.EditorColors;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.JBColor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.editor.AbstractIconButton;
+import org.testin.editor.EditorColors;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.model.Automated;
 import org.testin.model.Groups;
 import org.testin.model.Priority;
-import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.TestStatus;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Icons;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
@@ -85,6 +94,25 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
 
         addActionListener(e -> showFilterPopup());
         updateToolBarFilterState();
+    }
+
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-098
+    private static @NotNull AnAction nothingToFilterOn(final @NotNull String text) {
+        return new DumbAwareAction(text) {
+            @Override
+            public void update(final @NotNull AnActionEvent e) {
+                e.getPresentation().setEnabled(false);
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
+            }
+
+            @Override
+            public void actionPerformed(final @NotNull AnActionEvent e) {
+            }
+        };
     }
 
     private @NotNull List<Set<?>> filters() {
@@ -216,25 +244,6 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         }
 
         return filterResetBtn;
-    }
-
-    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-098
-    private static @NotNull AnAction nothingToFilterOn(final @NotNull String text) {
-        return new DumbAwareAction(text) {
-            @Override
-            public void update(final @NotNull AnActionEvent e) {
-                e.getPresentation().setEnabled(false);
-            }
-
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.BGT;
-            }
-
-            @Override
-            public void actionPerformed(final @NotNull AnActionEvent e) {
-            }
-        };
     }
 
     private void showFilterPopup() {

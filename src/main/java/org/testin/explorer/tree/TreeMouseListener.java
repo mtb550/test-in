@@ -26,11 +26,11 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.open.OpenAction;
 
-import javax.swing.*;
-import java.util.Optional;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 @AllArgsConstructor
 public class TreeMouseListener extends PopupHandler {

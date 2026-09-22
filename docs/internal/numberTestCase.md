@@ -118,8 +118,7 @@ name is not an id - Testin uses the id written inside the file instead. Testin d
 Making up an identity for it would be worse than believing what it says. The
 first save files it under that name, and the hand-named file goes with it, so
 one test case never becomes two; removing the test case removes the file it is
-in. A hand-named file whose identity another file also claims is left alone
-(Rule-INTERNAL-084).
+in. A hand-named file whose identity another file also claims is left alone (Rule-INTERNAL-084).
 
 **If the hand-named file cannot be deleted** — a locked file, for one — the save
 does not happen. The file written under the name Testin gives is taken back, so
@@ -128,8 +127,8 @@ remove:* and the reason.
 
 **If a test set holding such a file is copied** — the copy gets a new id like
 every other test case in it, and its file is renamed to the way Testin names
-them. The original keeps the name the tester gave it. A copy is a new test case
-(Rule-TREE-PANEL-051), and leaving this one carrying the original's id would
+them. The original keeps the name the tester gave it. A copy is a new test case (Rule-TREE-PANEL-051), and leaving this
+one carrying the original's id would
 make the two one test case in two files.
 
 **If two testers add a test case at the same time** — both are kept. There is

@@ -26,7 +26,6 @@ import org.testng.annotations.Test;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import org.testin.model.TestRunExecution;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -62,9 +61,10 @@ public class MarkerDetailRowsTest {
      */
     @Test
     public void aRunMarkerAnswersForItsExecutionAndItsConfiguration() {
-        final @NotNull List<DetailRow> rows = new TestRunMarker()
-                .setConfiguration(new EnumMap<>(Map.of(TestRunConfiguration.PLATFORM, "Web")))
-                .getDetailRows();
+        final @NotNull TestRunMarker run = new TestRunMarker();
+        run.setConfiguration(new EnumMap<>(Map.of(TestRunConfiguration.PLATFORM, "Web")));
+
+        final @NotNull List<DetailRow> rows = run.getDetailRows();
 
         assertEquals(rows.size(), TestRunExecution.values().length + 1 + TestRunConfiguration.values().length,
                 "every execution row, how long it took, and every question: " + rows);
@@ -77,7 +77,10 @@ public class MarkerDetailRowsTest {
         answers.put(TestRunConfiguration.PLATFORM, "Web");
         answers.put(TestRunConfiguration.BROWSER, "Firefox");
 
-        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(new TestRunMarker().setConfiguration(answers));
+        final @NotNull TestRunMarker run = new TestRunMarker();
+        run.setConfiguration(answers);
+
+        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(run);
 
         assertEquals(rows.size(), TestRunConfiguration.values().length,
                 "every question is offered; a blank answer is dropped when the row is drawn, not here");

@@ -75,7 +75,8 @@ public final class BugFiling {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         final @NotNull Optional<TestRunItems> found = indexer.findTestRun(item.run()).flatMap(item::in);
         if (found.isEmpty()) return Optional.of(Bundle.message("bug.not.stored.moved"));
-        if (found.orElseThrow().getStatus() != TestStatus.FAILED) return Optional.of(Bundle.message("bug.not.stored.no.longer.failed"));
+        if (found.orElseThrow().getStatus() != TestStatus.FAILED)
+            return Optional.of(Bundle.message("bug.not.stored.no.longer.failed"));
 
         indexer.changeRun(item.run(), run -> item.failedIn(run).ifPresentOrElse(result -> result.setBugIssueUrl(url),
                 () -> Logger.warn("The run a sync brought in no longer has this failure, so its bug link was not stored: " + url)));

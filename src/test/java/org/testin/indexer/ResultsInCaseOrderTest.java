@@ -22,7 +22,6 @@ import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,13 +51,19 @@ import static org.testng.Assert.assertEquals;
  */
 public class ResultsInCaseOrderTest {
 
-    /** Ranked "a": first in its test set, whatever a folder listing says. */
+    /**
+     * Ranked "a": first in its test set, whatever a folder listing says.
+     */
     private static final @NotNull UUID FIRST = UUID.fromString("11111111-1111-4111-8111-111111111101");
 
-    /** Ranked "b", so it follows {@link #FIRST}. */
+    /**
+     * Ranked "b", so it follows {@link #FIRST}.
+     */
     private static final @NotNull UUID SECOND = UUID.fromString("11111111-1111-4111-8111-111111111102");
 
-    /** A case the run recorded a verdict for and the project does not hold any more. */
+    /**
+     * A case the run recorded a verdict for and the project does not hold any more.
+     */
     private static final @NotNull UUID DELETED_CASE = UUID.fromString("11111111-1111-4111-8111-111111111103");
 
     /**
@@ -85,7 +90,7 @@ public class ResultsInCaseOrderTest {
         final @NotNull List<TestRunItems> asTheFolderListedThem =
                 List.of(result(SECOND, TestStatus.FAILED), result(FIRST, TestStatus.PASSED));
 
-        final @NotNull List<TestRunItems> ordered = inCaseOrder(asTheFolderListedThem, aProjectHoldingBothCases());
+        final @NotNull List<TestRunItems> ordered = IndexingScanner.inCaseOrder(asTheFolderListedThem, aProjectHoldingBothCases());
 
         assertEquals(idsOf(ordered), List.of(FIRST, SECOND),
                 "A run's results are drawn, printed and exported in this order, so it is the order the cases sit"
@@ -99,7 +104,7 @@ public class ResultsInCaseOrderTest {
                 result(SECOND, TestStatus.PASSED),
                 result(FIRST, TestStatus.PASSED));
 
-        final @NotNull List<TestRunItems> ordered = inCaseOrder(asTheFolderListedThem, aProjectHoldingBothCases());
+        final @NotNull List<TestRunItems> ordered = IndexingScanner.inCaseOrder(asTheFolderListedThem, aProjectHoldingBothCases());
 
         assertEquals(idsOf(ordered), List.of(FIRST, SECOND, DELETED_CASE),
                 "A run outlives the cases it was made from, and a result whose case is gone has no place in their"
@@ -110,20 +115,4 @@ public class ResultsInCaseOrderTest {
                         + " case must not change what the run found");
     }
 
-    /**
-     * {@code IndexingScanner.inCaseOrder}, which is private to the reader that
-     * owns it.
-     */
-    @SuppressWarnings("unchecked")
-    private static @NotNull List<TestRunItems> inCaseOrder(final @NotNull List<TestRunItems> results, final @NotNull ScannedProject scanned) {
-        try {
-            final @NotNull Method ordering = IndexingScanner.class.getDeclaredMethod("inCaseOrder", List.class, ScannedProject.class);
-            ordering.setAccessible(true);
-
-            return (List<TestRunItems>) ordering.invoke(null, results, scanned);
-        } catch (final ReflectiveOperationException ex) {
-            throw new AssertionError("IndexingScanner.inCaseOrder is gone or takes something else now, so nothing"
-                    + " checks the order every run editor, report and export prints: " + ex.getMessage(), ex);
-        }
-    }
 }

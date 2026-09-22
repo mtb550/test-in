@@ -56,11 +56,11 @@ The code runs, and Testin writes down whether each test case passed.
 
 ## The four ways in
 
-| The tester does this | Where |
-|---|---|
-| Presses `F5` | The list of test cases in either editor |
-| Chooses **Run Test Method** | The menu in either editor |
-| Clicks the run button | A card under the pointer, or the view panel |
+| The tester does this                  | Where                                                                     |
+|---------------------------------------|---------------------------------------------------------------------------|
+| Presses `F5`                          | The list of test cases in either editor                                   |
+| Chooses **Run Test Method**           | The menu in either editor                                                 |
+| Clicks the run button                 | A card under the pointer, or the view panel                               |
 | Presses `F5` or clicks the run button | [Light mode](../editorPanel/lightMode.md), on the test case it is showing |
 
 Running everything a test run has not judged yet is different, and is
@@ -133,10 +133,10 @@ is difference 10 on
 
 The name in the IDE's run widget depends on the selection.
 
-| The tester selected | The name |
-|---|---|
-| One test case | The class name, a dot, then the method name |
-| Several in one test set | The class name |
+| The tester selected      | The name                                             |
+|--------------------------|------------------------------------------------------|
+| One test case            | The class name, a dot, then the method name          |
+| Several in one test set  | The class name                                       |
 | Several across test sets | The first class name, then *and*, then how many more |
 
 ---

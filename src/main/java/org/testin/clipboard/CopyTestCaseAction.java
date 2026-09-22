@@ -16,14 +16,14 @@
 
 package org.testin.clipboard;
 
-import org.testin.actions.GrayWithReason;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -35,6 +35,12 @@ import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
 public class CopyTestCaseAction extends DumbAwareAction {
+    private static void copy(final @NotNull Project p, final @NotNull CopyChoice choice, final @NotNull List<TestCaseDto> selected) {
+        CopyPasteManager.getInstance().setContents(new StringSelection(choice.from(selected)));
+
+        Services.getInstance(p, Notifier.class).softShow(p, choice.copiedMessage(selected.size()));
+    }
+
     // UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-207
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -45,12 +51,6 @@ public class CopyTestCaseAction extends DumbAwareAction {
         if (selected.isEmpty()) return;
 
         new ShortcutMenuPopup<>(p, Bundle.message("copy.menu.title"), CopyChoice.values(), choice -> copy(p, choice, selected)).show();
-    }
-
-    private static void copy(final @NotNull Project p, final @NotNull CopyChoice choice, final @NotNull List<TestCaseDto> selected) {
-        CopyPasteManager.getInstance().setContents(new StringSelection(choice.from(selected)));
-
-        Services.getInstance(p, Notifier.class).softShow(p, choice.copiedMessage(selected.size()));
     }
 
     @Override

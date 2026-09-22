@@ -21,7 +21,10 @@ import org.testin.model.StatusBarItem;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String displayText, @NotNull String name, @NotNull Runnable action) implements StatusBarItem {
+public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String displayText, @NotNull String name,
+                                @NotNull Runnable action) implements StatusBarItem {
+    public static final @NotNull String SAVE = Bundle.message("shortcut.save");
+    public static final @NotNull String SELECT = Bundle.message("shortcut.select");
     private static final @NotNull Runnable NOTHING = () -> {
     };
 
@@ -39,8 +42,6 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
         return build(Shortcuts.Enter, Bundle.message("shortcut.confirm"), action);
     }
 
-    public static final @NotNull String SAVE = Bundle.message("shortcut.save");
-
     public static @NotNull StatusBarShortcut save(final @NotNull Runnable action) {
         return build(Shortcuts.Enter, SAVE, action);
     }
@@ -53,8 +54,6 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
     public static @NotNull StatusBarShortcut corrections() {
         return hint(Shortcuts.Corrections.getShortcutText(), Bundle.message("dialog.key.corrections"));
     }
-
-    public static final @NotNull String SELECT = Bundle.message("shortcut.select");
 
     public static @NotNull StatusBarShortcut select() {
         return hint("↑ ↓", SELECT);

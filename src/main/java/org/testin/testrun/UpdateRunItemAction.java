@@ -16,7 +16,6 @@
 
 package org.testin.testrun;
 
-import org.testin.actions.GrayWithReason;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -24,6 +23,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.run.RunEditor;
 import org.testin.logger.Logger;
@@ -32,7 +32,7 @@ import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.testrun.create.FailedResultDialog;
+import org.testin.testrun.failure.FailedResultDialog;
 import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -48,7 +48,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
         if (p == null) return;
 
         final @NotNull Optional<TestCaseDto> selected = TestinData.singleSelectedCase(e);
-        final @NotNull Optional<RunEditor> runEditor = runEditor(e);
+        final @NotNull Optional<RunEditor> runEditor = TestinData.runEditor(e);
         if (selected.isEmpty() || runEditor.isEmpty()) return;
 
         edit(p, runEditor.orElseThrow(), selected.orElseThrow());
@@ -69,7 +69,8 @@ public class UpdateRunItemAction extends DumbAwareAction {
         Logger.trace("update test run item for: " + testCase.getDescription());
 
         new FailedResultDialog(p, runEditor.getParent().getPath(), runItem, fields -> {
-            if (!Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, runEditor.getParent().getPath(), testCase.getId(), fields)) return;
+            if (!Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, runEditor.getParent().getPath(), testCase.getId(), fields))
+                return;
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 runEditor.refreshView();
@@ -84,15 +85,11 @@ public class UpdateRunItemAction extends DumbAwareAction {
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-168
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        GrayWithReason.unless(this, e, runEditor(e)
+        GrayWithReason.unless(this, e, TestinData.runEditor(e)
                         .flatMap(runEditor -> TestinData.singleSelectedCase(e).flatMap(tc -> runEditor.runItem(tc.getId())))
                         .filter(item -> item.shownStatus() == TestStatus.FAILED)
                         .isPresent(),
                 Bundle.message("run.item.details.disabled.description"));
-    }
-
-    private @NotNull Optional<RunEditor> runEditor(final @NotNull AnActionEvent e) {
-        return TestinData.editor(e).filter(RunEditor.class::isInstance).map(RunEditor.class::cast);
     }
 
     @Override

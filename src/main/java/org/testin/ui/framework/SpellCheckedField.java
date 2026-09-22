@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
 import org.testin.util.SpellChecker;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
 // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221
 public final class SpellCheckedField implements DialogComponent {

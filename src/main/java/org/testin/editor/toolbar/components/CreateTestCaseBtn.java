@@ -16,11 +16,11 @@
 
 package org.testin.editor.toolbar.components;
 
-import org.testin.util.Bundle;
-import org.testin.editor.AbstractIconButton;
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
+import org.testin.editor.AbstractIconButton;
+import org.testin.util.Bundle;
 
 public class CreateTestCaseBtn extends AbstractIconButton implements ToolbarItem {
     // UC-EDITOR-PANEL-005

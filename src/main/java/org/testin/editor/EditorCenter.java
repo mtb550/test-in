@@ -21,9 +21,9 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
-import java.awt.*;
+import javax.swing.JComponent;
+import java.awt.BorderLayout;
 import java.util.Optional;
-import javax.swing.*;
 
 @RequiredArgsConstructor
 public final class EditorCenter {

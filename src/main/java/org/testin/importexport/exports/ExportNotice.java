@@ -16,28 +16,28 @@
 
 package org.testin.importexport.exports;
 
-import org.testin.notifications.Done;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.NotificationAction;
-import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.awt.datatransfer.StringSelection;
-import java.util.Locale;
-import java.util.Optional;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ExportNotice {

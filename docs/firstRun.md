@@ -6,13 +6,13 @@
 > method Testin wrote for it, a recorded verdict and a report you can send.
 > Nothing here needs the rest of the documentation.
 
-| | |
-|---|---|
-| **Part of Testin** | All of it, once, in the shortest line through |
-| **Answers** | What the plugin is for, shown rather than described |
-| **State** | Written |
-| **Checked against** | `main` at `6b9a554a`, 17 September 2026 |
-| **You need** | IntelliJ IDEA 2026.1 or later, the Java plugin enabled, and a Java project with a `src/test/java` |
+|                     |                                                                                                   |
+|---------------------|---------------------------------------------------------------------------------------------------|
+| **Part of Testin**  | All of it, once, in the shortest line through                                                     |
+| **Answers**         | What the plugin is for, shown rather than described                                               |
+| **State**           | Written                                                                                           |
+| **Checked against** | `main` at `6b9a554a`, 17 September 2026                                                           |
+| **You need**        | IntelliJ IDEA 2026.1 or later, the Java plugin enabled, and a Java project with a `src/test/java` |
 
 The screens below are drawn rather than photographed, the same way every other
 page in this documentation draws them. They show what is on the screen, not what
@@ -24,10 +24,10 @@ it looks like.
 
 **Two folders, and they are not the same thing.**
 
-| | What it holds | Who owns it |
-|---|---|---|
-| **The Testin folder** | Your test projects: sets, cases, runs, all as JSON | You. It is a setting on this machine |
-| **The automation project** | The Java code — the test methods Testin writes | Your team. It is the repository you already have open |
+|                            | What it holds                                      | Who owns it                                           |
+|----------------------------|----------------------------------------------------|-------------------------------------------------------|
+| **The Testin folder**      | Your test projects: sets, cases, runs, all as JSON | You. It is a setting on this machine                  |
+| **The automation project** | The Java code — the test methods Testin writes     | Your team. It is the repository you already have open |
 
 Testin keeps them apart on purpose: test data changes when a tester writes a
 case, code changes when a developer commits, and putting them in one folder
@@ -67,10 +67,10 @@ Press **Configure Testin settings**, or go to **Settings → Tools → Testin**.
 
 Set two things and leave the rest:
 
-| Setting | What to put |
-|---|---|
-| **Testin folder** | The empty folder you picked |
-| **Tester name** | Your name. It is written into every case and every verdict you record |
+| Setting           | What to put                                                           |
+|-------------------|-----------------------------------------------------------------------|
+| **Testin folder** | The empty folder you picked                                           |
+| **Tester name**   | Your name. It is written into every case and every verdict you record |
 
 Everything on this page belongs to this machine and this person. Nothing here is
 committed — [the settings page](setting/main.md) says where each value lives and
@@ -178,11 +178,11 @@ and pick the `Login` set.
 
 Open the run. Each case is a card, and three keys record what happened:
 
-| Key | Verdict |
-|---|---|
-| `P` | Passed |
+| Key | Verdict                              |
+|-----|--------------------------------------|
+| `P` | Passed                               |
 | `F` | Failed — and it asks what went wrong |
-| `B` | Blocked |
+| `B` | Blocked                              |
 
 Press `P` on the first card. The cursor moves to the next one on its own, so a
 whole run is `P P P` without touching the mouse.
@@ -200,12 +200,12 @@ Select the run and press `Ctrl+P`.
 
 Choose a format:
 
-| Format | What it is for |
-|---|---|
-| **PDF** | The one to attach to a ticket |
-| **Word** | The one to edit before sending |
-| **HTML** | The one to open in a browser — it carries a light and dark switch |
-| **Excel** | The one to filter and sort |
+| Format    | What it is for                                                    |
+|-----------|-------------------------------------------------------------------|
+| **PDF**   | The one to attach to a ticket                                     |
+| **Word**  | The one to edit before sending                                    |
+| **HTML**  | The one to open in a browser — it carries a light and dark switch |
+| **Excel** | The one to filter and sort                                        |
 
 The document holds what the run recorded: the totals, the cases that passed, and
 every failure with what you wrote about it.
@@ -220,13 +220,13 @@ things.
 
 ## Where to go next
 
-| If you want to | Read |
-|---|---|
-| Know every key | [Every shortcut](shortcuts.md) |
-| Understand the tree | [The tree panel](treePanel/main.md) |
-| Write and edit cases in bulk | [The editor panel](editorPanel/main.md) |
+| If you want to                 | Read                                        |
+|--------------------------------|---------------------------------------------|
+| Know every key                 | [Every shortcut](shortcuts.md)              |
+| Understand the tree            | [The tree panel](treePanel/main.md)         |
+| Write and edit cases in bulk   | [The editor panel](editorPanel/main.md)     |
 | Share test data with your team | [Sharing work with the team](share/main.md) |
-| See what the files look like | [The formats on disk](formats.md) |
+| See what the files look like   | [The formats on disk](formats.md)           |
 
 ## If you cloned this repository
 

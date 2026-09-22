@@ -41,21 +41,6 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
 
     private Path root;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-case-file");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            deleteTree(root);
-        } finally {
-            super.tearDown();
-        }
-    }
-
     private static void deleteTree(final Path path) {
         if (path == null) return;
 
@@ -69,6 +54,27 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
             });
         } catch (final Exception ignored) {
             // Nothing to walk, or nothing to remove.
+        }
+    }
+
+    private static TestCaseDto testCase(final TestSetDirectoryDto ts) {
+        final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
+        tc.setParent(ts);
+        return tc;
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        root = Files.createTempDirectory("testin-case-file");
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        try {
+            deleteTree(root);
+        } finally {
+            super.tearDown();
         }
     }
 
@@ -91,12 +97,6 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
             indexer().addTestSet(ts);
             return ts;
         });
-    }
-
-    private static TestCaseDto testCase(final TestSetDirectoryDto ts) {
-        final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
-        tc.setParent(ts);
-        return tc;
     }
 
     public void testACaseIsFoundInsideTheTestProjectThatHoldsIt() {

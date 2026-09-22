@@ -24,21 +24,25 @@ import com.intellij.ui.components.JBTextArea;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
-import lombok.AccessLevel;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunConfiguration;
 import org.testin.ui.framework.DialogComponent;
 import org.testin.util.Bundle;
 
-import java.util.Optional;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.text.JTextComponent;
-import java.awt.*;
+import java.awt.AWTKeyStroke;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class RunConfigurationForm implements DialogComponent {
@@ -51,7 +55,6 @@ public class RunConfigurationForm implements DialogComponent {
     private final @NotNull JBTextField runNameField;
     private final @NotNull Map<TestRunConfiguration, JComponent> fieldMap = new EnumMap<>(TestRunConfiguration.class);
 
-    @Getter(AccessLevel.NONE)
     private final @NotNull Map<TestRunConfiguration, JBLabel> labelMap = new EnumMap<>(TestRunConfiguration.class);
 
     public RunConfigurationForm(final @NotNull String runName) {
@@ -64,6 +67,39 @@ public class RunConfigurationForm implements DialogComponent {
         wrapper.add(CollapsiblePanel.build(Bundle.message("run.form.section"), buildConfigurationPanel(), EXPANDED), BorderLayout.CENTER);
 
         applyVisibility();
+    }
+
+    private static void keepTabForNavigation(final @NotNull JComponent field) {
+        field.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
+                Set.of(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, 0)));
+        field.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
+                Set.of(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK)));
+    }
+
+    private static @NotNull String textIn(final @NotNull JComponent component) {
+        return switch (component) {
+            case JTextComponent typed -> typed.getText().trim();
+
+            case JScrollPane scroller when scroller.getViewport().getView() instanceof JComponent inner ->
+                    textIn(inner);
+            case ComboBox<?> picked ->
+                    Optional.ofNullable(picked.getSelectedItem()).map(Object::toString).map(String::trim).orElse("");
+            default -> "";
+        };
+    }
+
+    private static void textInto(final @NotNull JComponent component, final @NotNull String value) {
+        switch (component) {
+            case JTextComponent typed -> typed.setText(value);
+
+            case JScrollPane scroller when scroller.getViewport().getView() instanceof JComponent inner ->
+                    textInto(inner, value);
+
+            case ComboBox<?> picked -> picked.setSelectedItem(value);
+
+            default -> {
+            }
+        }
     }
 
     private @NotNull JBPanel<?> buildConfigurationPanel() {
@@ -148,13 +184,6 @@ public class RunConfigurationForm implements DialogComponent {
         wrapper.repaint();
     }
 
-    private static void keepTabForNavigation(final @NotNull JComponent field) {
-        field.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
-                Set.of(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, 0)));
-        field.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
-                Set.of(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK)));
-    }
-
     private void register(final @NotNull TestRunConfiguration field, final @NotNull JComponent component, final @NotNull JBLabel label) {
         fieldMap.put(field, component);
         labelMap.put(field, label);
@@ -164,23 +193,11 @@ public class RunConfigurationForm implements DialogComponent {
         return Optional.ofNullable(fieldMap.get(field)).map(RunConfigurationForm::textIn).orElse("");
     }
 
-    private static @NotNull String textIn(final @NotNull JComponent component) {
-        return switch (component) {
-            case JTextComponent typed -> typed.getText().trim();
-
-            case JScrollPane scroller when scroller.getViewport().getView() instanceof JComponent inner ->
-                    textIn(inner);
-            case ComboBox<?> picked ->
-                    Optional.ofNullable(picked.getSelectedItem()).map(Object::toString).map(String::trim).orElse("");
-            default -> "";
-        };
-    }
-
     public @NotNull Map<TestRunConfiguration, String> configuration() {
         final @NotNull Map<TestRunConfiguration, String> answers = new EnumMap<>(TestRunConfiguration.class);
 
         for (final TestRunConfiguration field : TestRunConfiguration.values()) {
-            answers.put(field, getFieldValue(field));
+            answers.put(field, answerTo(field));
         }
 
         return answers;
@@ -196,21 +213,7 @@ public class RunConfigurationForm implements DialogComponent {
         applyVisibility();
     }
 
-    private static void textInto(final @NotNull JComponent component, final @NotNull String value) {
-        switch (component) {
-            case JTextComponent typed -> typed.setText(value);
-
-            case JScrollPane scroller when scroller.getViewport().getView() instanceof JComponent inner ->
-                    textInto(inner, value);
-
-            case ComboBox<?> picked -> picked.setSelectedItem(value);
-
-            default -> {
-            }
-        }
-    }
-
-    public @NotNull String getFieldValue(final @NotNull TestRunConfiguration field) {
+    private @NotNull String answerTo(final @NotNull TestRunConfiguration field) {
         if (!field.isShownFor(this::chosenIn)) return "";
 
         return chosenIn(field);

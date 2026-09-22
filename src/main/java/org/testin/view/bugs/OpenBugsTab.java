@@ -34,8 +34,8 @@ import org.testin.ui.FontSync;
 import org.testin.util.Bundle;
 
 import javax.swing.Box;
-import javax.swing.JComponent;
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionListener;
@@ -44,26 +44,6 @@ import java.util.Optional;
 
 public class OpenBugsTab {
     private static final int GAP = 12;
-
-    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-038, Rule-VIEW-PANEL-064
-    public void load(final @NotNull Project p, final @NotNull JBPanel<?> bugTab, final @NotNull Optional<TestCaseDto> shown) {
-        bugTab.removeAll();
-        bugTab.setLayout(new BorderLayout());
-
-        bugTab.add(contents(p, shown), BorderLayout.NORTH);
-
-        bugTab.revalidate();
-        bugTab.repaint();
-    }
-
-    private @NotNull JComponent contents(final @NotNull Project p, final @NotNull Optional<TestCaseDto> shown) {
-        if (shown.isEmpty()) return note(Bundle.message("view.bugs.no.selection"));
-
-        final @NotNull List<OpenBug> bugs = OpenBug.of(
-                Services.getInstance(p, ProjectIndexer.class).getAllTestRuns(), shown.orElseThrow().getId());
-
-        return bugs.isEmpty() ? note(Bundle.message("view.bugs.none")) : rows(bugs);
-    }
 
     // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-064
     private static @NotNull JBPanel<?> rows(final @NotNull List<OpenBug> bugs) {
@@ -122,5 +102,25 @@ public class OpenBugsTab {
         row.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         return row;
+    }
+
+    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-038, Rule-VIEW-PANEL-064
+    public void load(final @NotNull Project p, final @NotNull JBPanel<?> bugTab, final @NotNull Optional<TestCaseDto> shown) {
+        bugTab.removeAll();
+        bugTab.setLayout(new BorderLayout());
+
+        bugTab.add(contents(p, shown), BorderLayout.NORTH);
+
+        bugTab.revalidate();
+        bugTab.repaint();
+    }
+
+    private @NotNull JComponent contents(final @NotNull Project p, final @NotNull Optional<TestCaseDto> shown) {
+        if (shown.isEmpty()) return note(Bundle.message("view.bugs.no.selection"));
+
+        final @NotNull List<OpenBug> bugs = OpenBug.of(
+                Services.getInstance(p, ProjectIndexer.class).getAllTestRuns(), shown.orElseThrow().getId());
+
+        return bugs.isEmpty() ? note(Bundle.message("view.bugs.none")) : rows(bugs);
     }
 }

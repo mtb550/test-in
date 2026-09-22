@@ -24,7 +24,7 @@ import org.testin.editor.run.RunEditor;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 
-import javax.swing.*;
+import javax.swing.JList;
 
 import java.util.Optional;
 

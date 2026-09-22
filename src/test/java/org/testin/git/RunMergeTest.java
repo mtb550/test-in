@@ -32,12 +32,6 @@ import static org.testng.Assert.assertTrue;
  */
 public class RunMergeTest {
 
-    private static final String BASE_ITEM = """
-            {
-              "id" : "11111111-1111-4111-8111-111111111101",
-              "status" : "PENDING"
-            }""";
-
     private static final String MINE_ITEM = """
             {
               "id" : "11111111-1111-4111-8111-111111111101",
@@ -56,40 +50,6 @@ public class RunMergeTest {
               "executedBy" : "Sara",
               "executedAt" : "Monday 14-09-2026 At 11:30:00 [Asia/Riyadh]"
             }""";
-
-    /**
-     * Q-E. A verdict travels whole: the later one wins with everything it
-     * recorded, so nobody ends up with a Passed carrying the other tester's
-     * stacktrace.
-     */
-    @Test
-    public void theLaterVerdictWinsWhole() {
-        final Merge merge = RunItemMerge.of(RealMapper.build(), BASE_ITEM, MINE_ITEM, THEIRS_ITEM);
-
-        assertTrue(merge.isSettled(), "a verdict is settled by rule, never by asking");
-        assertEquals(merge.merged().path("status").asText(), "FAILED");
-        assertEquals(merge.merged().path("executedBy").asText(), "Sara");
-        assertEquals(merge.merged().path("stacktrace").asText(), "boom", "the failure's evidence comes with it");
-        assertEquals(merge.settled().size(), 1, "and the tester is told a choice was made: " + merge.settled());
-    }
-
-    @Test
-    public void theEarlierVerdictLosesWhole() {
-        final Merge merge = RunItemMerge.of(RealMapper.build(), BASE_ITEM, THEIRS_ITEM, MINE_ITEM);
-
-        assertEquals(merge.merged().path("status").asText(), "FAILED", "which side is mine does not decide it");
-        assertEquals(merge.merged().path("executedBy").asText(), "Sara");
-    }
-
-    @Test
-    public void twoIdenticalVerdictsAreNoDisagreement() {
-        final Merge merge = RunItemMerge.of(RealMapper.build(), BASE_ITEM, MINE_ITEM, MINE_ITEM);
-
-        assertTrue(merge.isSettled());
-        assertTrue(merge.settled().isEmpty(), "nothing was decided, because nothing differed");
-        assertEquals(merge.merged().path("status").asText(), "PASSED");
-    }
-
     private static final String BASE_MARKER = """
             {
               "createdBy" : "Muteb",
@@ -97,7 +57,6 @@ public class RunMergeTest {
               "status" : "CREATED",
               "configuration" : { "PLATFORM" : "Web" }
             }""";
-
     private static final String MINE_MARKER = """
             {
               "createdBy" : "Muteb",
@@ -109,7 +68,6 @@ public class RunMergeTest {
               "executionStartedAt" : "Monday 14-09-2026 At 10:00:00 [Asia/Riyadh]",
               "executionEndedAt" : "Monday 14-09-2026 At 10:20:00 [Asia/Riyadh]"
             }""";
-
     private static final String THEIRS_MARKER = """
             {
               "createdBy" : "Muteb",
@@ -121,6 +79,39 @@ public class RunMergeTest {
               "executionStartedAt" : "Monday 14-09-2026 At 09:30:00 [Asia/Riyadh]",
               "executionEndedAt" : "Monday 14-09-2026 At 11:35:00 [Asia/Riyadh]"
             }""";
+
+    /**
+     * Q-E. A verdict travels whole: the later one wins with everything it
+     * recorded, so nobody ends up with a Passed carrying the other tester's
+     * stacktrace.
+     */
+    @Test
+    public void theLaterVerdictWinsWhole() {
+        final Merge merge = RunItemMerge.of(RealMapper.build(), MINE_ITEM, THEIRS_ITEM);
+
+        assertTrue(merge.isSettled(), "a verdict is settled by rule, never by asking");
+        assertEquals(merge.merged().path("status").asText(), "FAILED");
+        assertEquals(merge.merged().path("executedBy").asText(), "Sara");
+        assertEquals(merge.merged().path("stacktrace").asText(), "boom", "the failure's evidence comes with it");
+        assertEquals(merge.settled().size(), 1, "and the tester is told a choice was made: " + merge.settled());
+    }
+
+    @Test
+    public void theEarlierVerdictLosesWhole() {
+        final Merge merge = RunItemMerge.of(RealMapper.build(), THEIRS_ITEM, MINE_ITEM);
+
+        assertEquals(merge.merged().path("status").asText(), "FAILED", "which side is mine does not decide it");
+        assertEquals(merge.merged().path("executedBy").asText(), "Sara");
+    }
+
+    @Test
+    public void twoIdenticalVerdictsAreNoDisagreement() {
+        final Merge merge = RunItemMerge.of(RealMapper.build(), MINE_ITEM, MINE_ITEM);
+
+        assertTrue(merge.isSettled());
+        assertTrue(merge.settled().isEmpty(), "nothing was decided, because nothing differed");
+        assertEquals(merge.merged().path("status").asText(), "PASSED");
+    }
 
     /**
      * Q-D. A cycle two people executed ran from the first thing either of them

@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-015: Copy test cases
 
-**As a** tester, **I want** to copy test cases into another test set,
-**so that** a set of login tests can be the start of a set of sign-up tests.
+**As a** tester, **I want** to copy test cases into another test set, **so that** a set of login tests can be the start
+of a set of sign-up tests.
 
 This copies the test cases themselves, ready to be pasted. It does not copy
 words a person can read.

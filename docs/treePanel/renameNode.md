@@ -37,10 +37,10 @@ This changes the name of one node. Nothing inside it moves.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -86,8 +86,8 @@ This changes the name of one node. Nothing inside it moves.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **One field**, filled in with the current name. Its gray hint text reads
-   *set new name...*. The cursor sits after the name. So typing **adds to the
+1. **One field**, filled in with the current name. Its gray hint text reads *set new name...*. The cursor sits after the
+   name. So typing **adds to the
    name** instead of replacing it. `Ctrl+A` selects the whole name. Spaces at
    either end are dropped before anything else happens.
 
@@ -107,8 +107,8 @@ This changes the name of one node. Nothing inside it moves.
 8. For a test project, the project chosen for this code project follows the new
    name. When `testin.yml` still names the old one, a notification that stays in
    the log says *testin.yml still names \<old\>. Change testinProject to
-   \<new\> there, or press Save to testin.yml in the Testin panel*, with
-   **Save to testin.yml** and **Open testin.yml**. The rename itself never
+   \<new\> there, or press Save to testin.yml in the Testin panel*, with **Save to testin.yml** and **Open testin.yml**.
+   The rename itself never
    writes the file; only Save to testin.yml does (Rule-TREE-PANEL-112).
 9. Testin refreshes the tree and shows *Renamed*.
 10. `Ctrl+Z` puts the old name back, and Testin shows *Undone*. The automation
@@ -154,16 +154,16 @@ nothing (Rule-TREE-PANEL-002).
 edited: **Rename** is gray, and says *A test run in it is executing, or a cell
 is being edited. Finish it first* (Rule-TREE-PANEL-111).
 
-**If the folder cannot be renamed on disk** — nothing is renamed and no
-*Renamed* is shown. An IDE notification titled *Rename Failed* stays in the
+**If the folder cannot be renamed on disk** — nothing is renamed and no *Renamed* is shown. An IDE notification titled
+*Rename Failed* stays in the
 notification log, reading *Operation failed:* and the reason, or *Could not find
 path on disk:* and the path. The other refusals above are balloons that fade.
 This one is not.
 
 **If several rows are selected** — **Rename** is gray.
 
-**If the Java plugin is not installed** — the first rename in the project shows
-*Java Plugin Not Available*, reading *Automation code generation and navigation
+**If the Java plugin is not installed** — the first rename in the project shows *Java Plugin Not Available*, reading
+*Automation code generation and navigation
 require the Java plugin, which is not available in this IDE.* The rename still
 happens. Testin says this once per project.
 

@@ -16,7 +16,11 @@
 
 package org.testin.model.dto.dirs;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
@@ -35,29 +39,12 @@ import java.util.stream.Stream;
 @SuperBuilder
 @ToString(callSuper = true)
 public class TestRunDirectoryDto extends DirectoryDto {
+    private static final @NotNull String SCREENSHOT_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyz";
+    private static final int SCREENSHOT_NAME_LENGTH = 5;
+    private static final @NotNull Pattern SCREENSHOT_NAME = Pattern.compile("[0-9a-z]{" + SCREENSHOT_NAME_LENGTH + "}\\.png");
     @NotNull
     @Builder.Default
     private TestRunMarker marker = new TestRunMarker();
-
-    @Override
-    public boolean isOpenableInEditor() {
-        return true;
-    }
-
-    public boolean isStillOpen() {
-        return !marker.getStatus().isTerminal();
-    }
-
-    @Override
-    public @NotNull DirectoryType getType() {
-        return DirectoryType.TR;
-    }
-
-    private static final @NotNull String SCREENSHOT_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyz";
-
-    private static final int SCREENSHOT_NAME_LENGTH = 5;
-
-    private static final @NotNull Pattern SCREENSHOT_NAME = Pattern.compile("[0-9a-z]{" + SCREENSHOT_NAME_LENGTH + "}\\.png");
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     public static @NotNull String newScreenshotName(final @NotNull Set<String> taken) {
@@ -79,6 +66,20 @@ public class TestRunDirectoryDto extends DirectoryDto {
 
     public static @NotNull Path screenshotFile(final @NotNull Path runPath, final @NotNull String name) {
         return runPath.resolve(name);
+    }
+
+    @Override
+    public boolean isOpenableInEditor() {
+        return true;
+    }
+
+    public boolean isStillOpen() {
+        return !marker.getStatus().isTerminal();
+    }
+
+    @Override
+    public @NotNull DirectoryType getType() {
+        return DirectoryType.TR;
     }
 
     @Override

@@ -111,11 +111,11 @@ Navigate to Test Method off the end of a list nobody read that far down.
 **The same seven are in the test run editor's menu**, in the same place and
 under the same word. Four of them are gray there, each saying why on the entry:
 
-| Entry | Why it is gray in a test run |
-|---|---|
-| **Copy Test Case** | *A test run records what happened to a test case, not the test case itself. Copy it in its test set.* |
-| **Cut Test Case** | *A test run's test cases were chosen when it was created. Cut the test case in its test set.* |
-| **Paste Test Case** | *A test run's test cases were chosen when it was created. Paste into a test set.* |
+| Entry                | Why it is gray in a test run                                                                                       |
+|----------------------|--------------------------------------------------------------------------------------------------------------------|
+| **Copy Test Case**   | *A test run records what happened to a test case, not the test case itself. Copy it in its test set.*              |
+| **Cut Test Case**    | *A test run's test cases were chosen when it was created. Cut the test case in its test set.*                      |
+| **Paste Test Case**  | *A test run's test cases were chosen when it was created. Paste into a test set.*                                  |
 | **Delete Test Case** | *A test run keeps what it recorded, including for a test case that is gone. Delete the test case in its test set.* |
 
 Shown and refused rather than left out. A menu that changes shape between

@@ -22,10 +22,10 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.SheetPreview;
-import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -33,13 +33,15 @@ import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm> {
+public final class ExportDialog extends AbstractFrameworkDialog {
+    private final @NotNull DestinationForm form;
+
     private final @NotNull SheetPreview preview;
     private final @NotNull BiConsumer<DestinationForm.@NotNull Destination,
             @NotNull Map<String, List<TestCaseDto>>> onExport;
@@ -50,7 +52,7 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
 
         title = Bundle.message("dialog.export.title");
 
-        final @NotNull DestinationForm form = new DestinationForm(p,
+        form = new DestinationForm(p,
                 Arrays.stream(FileTypes.values()).filter(FileTypes::isExportable).toArray(FileTypes[]::new),
                 FileTypes.XLSX,
                 exportTarget.getName(),
@@ -75,7 +77,7 @@ public final class ExportDialog extends AbstractFrameworkDialog<DestinationForm>
     // UC-SHARE-001
     @Override
     protected void submit() {
-        component().resolve().ifPresent(destination -> {
+        form.resolve().ifPresent(destination -> {
             final @NotNull Map<String, List<TestCaseDto>> selected = preview.selected();
             if (selected.isEmpty()) {
                 Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("notification.export.empty.title"), Bundle.message("notification.export.empty.message"));

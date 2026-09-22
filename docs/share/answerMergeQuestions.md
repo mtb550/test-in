@@ -2,8 +2,8 @@
 
 # UC-SHARE-018: Answer which side wins for a field both changed
 
-**As a** tester, **I want** to choose between my wording and a colleague's,
-**so that** a merge does not silently throw away one of them.
+**As a** tester, **I want** to choose between my wording and a colleague's, **so that** a merge does not silently throw
+away one of them.
 
 When two people change the same field, only one value can be kept. This window
 shows both and lets the tester pick.
@@ -15,8 +15,7 @@ row is named as the tester already knows that key - **Platform**, or the heading
 the analysis was written under. A result - one case's
 verdict - is never asked about at all: it is kept whole from whoever gave it
 last, because the status, the actual result, the stacktrace and the screenshots
-are one account of one execution and travel together
-([UC-SHARE-017](resolveConflicts.md)).
+are one account of one execution and travel together ([UC-SHARE-017](resolveConflicts.md)).
 
 There is no key that opens this. It opens during a merge.
 

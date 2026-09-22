@@ -2,8 +2,8 @@
 
 # UC-VIEW-PANEL-008: See the bugs still open on a test case
 
-**As a** tester, **I want** the defects already raised against this test case,
-**so that** I do not raise the same one twice.
+**As a** tester, **I want** the defects already raised against this test case, **so that** I do not raise the same one
+twice.
 
 A bug in Testin is not a thing of its own. It is what a test run's row records
 about a failure — how bad it is, how soon it must be fixed, and the issue it was

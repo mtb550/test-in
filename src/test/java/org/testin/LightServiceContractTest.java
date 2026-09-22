@@ -73,39 +73,6 @@ public class LightServiceContractTest {
             "kotlinx.coroutines.CoroutineScope",
             "com.intellij.openapi.project.Project,kotlinx.coroutines.CoroutineScope");
 
-    @Test
-    public void everyLightServiceCanBeBuiltByThePlatform() {
-        try {
-            final List<Class<?>> services = findServices();
-            if (services.isEmpty()) {
-                fail("No @Service classes found under " + ROOT_PACKAGE + ": the scan is looking in the wrong place");
-            }
-
-            System.out.println("Checked " + services.size() + " light services");
-
-            final List<String> breaches = new ArrayList<>();
-
-            for (final Class<?> service : services) {
-                if (!Modifier.isFinal(service.getModifiers())) {
-                    breaches.add(service.getName() + " is not final");
-                }
-
-                if (Arrays.stream(service.getDeclaredConstructors()).noneMatch(LightServiceContractTest::isAccepted)) {
-                    breaches.add(service.getName() + " declares no constructor the platform will call, only "
-                            + Arrays.stream(service.getDeclaredConstructors())
-                            .map(LightServiceContractTest::signature)
-                            .toList());
-                }
-            }
-
-            if (!breaches.isEmpty()) {
-                fail("Light services the platform will refuse to build:\n  " + String.join("\n  ", breaches));
-            }
-        } catch (final Exception ex) {
-            throw new AssertionError(ex);
-        }
-    }
-
     private static boolean isAccepted(final @NotNull Constructor<?> constructor) {
         return ACCEPTED.contains(signature(constructor));
     }
@@ -161,6 +128,39 @@ public class LightServiceContractTest {
             return Class.forName(name, false, loader);
         } catch (final Throwable t) {
             return null;
+        }
+    }
+
+    @Test
+    public void everyLightServiceCanBeBuiltByThePlatform() {
+        try {
+            final List<Class<?>> services = findServices();
+            if (services.isEmpty()) {
+                fail("No @Service classes found under " + ROOT_PACKAGE + ": the scan is looking in the wrong place");
+            }
+
+            System.out.println("Checked " + services.size() + " light services");
+
+            final List<String> breaches = new ArrayList<>();
+
+            for (final Class<?> service : services) {
+                if (!Modifier.isFinal(service.getModifiers())) {
+                    breaches.add(service.getName() + " is not final");
+                }
+
+                if (Arrays.stream(service.getDeclaredConstructors()).noneMatch(LightServiceContractTest::isAccepted)) {
+                    breaches.add(service.getName() + " declares no constructor the platform will call, only "
+                            + Arrays.stream(service.getDeclaredConstructors())
+                            .map(LightServiceContractTest::signature)
+                            .toList());
+                }
+            }
+
+            if (!breaches.isEmpty()) {
+                fail("Light services the platform will refuse to build:\n  " + String.join("\n  ", breaches));
+            }
+        } catch (final Exception ex) {
+            throw new AssertionError(ex);
         }
     }
 }

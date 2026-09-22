@@ -44,16 +44,16 @@ public final class BoundTestProject {
 
     private final @NotNull Project p;
 
-    // UC-TREE-PANEL-004, Rule-TREE-PANEL-106
-    public @NotNull String name() {
-        return resolve(TestinYml.projectName(p), choice());
-    }
-
     // Rule-TREE-PANEL-106, Rule-TREE-PANEL-119
     static @NotNull String resolve(final @NotNull String inFile, final @NotNull List<String> choice) {
         if (choice.size() != 2) return inFile;
 
         return inFile.isEmpty() || choice.get(1).equals(inFile) ? choice.getFirst() : inFile;
+    }
+
+    // UC-TREE-PANEL-004, Rule-TREE-PANEL-106
+    public @NotNull String name() {
+        return resolve(TestinYml.projectName(p), choice());
     }
 
     public boolean isNamed() {
@@ -82,7 +82,8 @@ public final class BoundTestProject {
         final boolean missing = !underRoot.containsKey(name);
         final boolean fromTheFile = TestinYml.names(p, name);
 
-        if (fromTheFile) return missing ? Bundle.message("bound.not.under.root", name) : Bundle.message("bound.unreadable", name);
+        if (fromTheFile)
+            return missing ? Bundle.message("bound.not.under.root", name) : Bundle.message("bound.unreadable", name);
 
         return missing ? Bundle.message("chosen.not.under.root", name) : Bundle.message("chosen.unreadable", name);
     }

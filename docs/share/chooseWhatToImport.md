@@ -87,12 +87,12 @@ least one test case to import.*
 
 **A value Testin cannot read is refused, not replaced.**
 
-| In the file | What is imported |
-|---|---|
-| A priority Testin does not know | Refused. The row keeps the priority it had |
-| A group | Read as typed. A group is any word, so none is refused |
-| A date Testin cannot read | Refused. The row keeps the date it had |
-| Steps on one line, numbered | Split into separate steps, with the numbers taken off |
+| In the file                     | What is imported                                       |
+|---------------------------------|--------------------------------------------------------|
+| A priority Testin does not know | Refused. The row keeps the priority it had             |
+| A group                         | Read as typed. A group is any word, so none is refused |
+| A date Testin cannot read       | Refused. The row keeps the date it had                 |
+| Steps on one line, numbered     | Split into separate steps, with the numbers taken off  |
 
 Each of them says so, once for the whole file and with a count:
 *Could not read 12 values, so what was there stayed* (Rule-SHARE-106). Take a

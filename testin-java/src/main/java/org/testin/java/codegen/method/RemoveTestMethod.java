@@ -16,7 +16,6 @@
 
 package org.testin.java.codegen.method;
 
-import org.testin.codegen.GenType;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenAction;
@@ -30,10 +29,10 @@ public class RemoveTestMethod extends UpdateTestBase implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        applyIfGenerated(p, tc, "Remove Test Method", pm -> {
+        applyToMethod(p, tc, "Remove Test Method", pm -> {
             final @NotNull String name = pm.getName();
             pm.delete();
             Logger.info("Removed test method: " + name);
-        });
+        }, detail -> Logger.debug("No generated method for '" + tc.getDescription() + "': " + detail));
     }
 }

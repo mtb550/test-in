@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-033: Record that a test case is blocked
 
-**As a** tester, **I want** to say a test case could not be tried at all,
-**so that** it is not counted as a failure of the product.
+**As a** tester, **I want** to say a test case could not be tried at all, **so that** it is not counted as a failure of
+the product.
 
 **Blocked** means the tester could not try it. It is not the product's fault.
 

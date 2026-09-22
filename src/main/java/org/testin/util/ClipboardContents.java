@@ -16,9 +16,9 @@
 
 package org.testin.util;
 
-import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
 import com.intellij.openapi.ide.CopyPasteManager;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.datatransfer.DataFlavor;

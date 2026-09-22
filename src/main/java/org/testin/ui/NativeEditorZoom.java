@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
 
-import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.event.MouseWheelEvent;
 import java.util.Optional;
 
@@ -55,6 +55,12 @@ public final class NativeEditorZoom implements Disposable {
         Services.getInstance(NativeEditorZoom.class);
     }
 
+    private static @NotNull Optional<Editor> editorUnder(final @NotNull MouseWheelEvent wheel) {
+        return Optional.ofNullable(wheel.getComponent())
+                .map(component -> DataManager.getInstance().getDataContext(component))
+                .map(CommonDataKeys.EDITOR::getData);
+    }
+
     // UC-SETTING-011, Rule-SETTING-037
     private void push() {
         try {
@@ -63,12 +69,6 @@ public final class NativeEditorZoom implements Disposable {
         } catch (final Exception ex) {
             Logger.error("Following the editor zoom failed: " + ex.getMessage());
         }
-    }
-
-    private static @NotNull Optional<Editor> editorUnder(final @NotNull MouseWheelEvent wheel) {
-        return Optional.ofNullable(wheel.getComponent())
-                .map(component -> DataManager.getInstance().getDataContext(component))
-                .map(CommonDataKeys.EDITOR::getData);
     }
 
     @Override

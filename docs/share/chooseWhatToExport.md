@@ -109,12 +109,12 @@ groups are written back into the cell, joined by commas.
 
 **A value Testin cannot read is refused, not replaced.**
 
-| The tester types | What is written |
-|---|---|
-| A priority Testin does not know | Refused. The row keeps the priority it had |
-| A status Testin does not know | Refused. The row keeps the status it had |
-| A group | Read as typed. A group is any word, so none is refused |
-| A date Testin cannot read | Refused. The row keeps the date it had |
+| The tester types                | What is written                                        |
+|---------------------------------|--------------------------------------------------------|
+| A priority Testin does not know | Refused. The row keeps the priority it had             |
+| A status Testin does not know   | Refused. The row keeps the status it had               |
+| A group                         | Read as typed. A group is any word, so none is refused |
+| A date Testin cannot read       | Refused. The row keeps the date it had                 |
 
 A refusal is said as soon as it happens, because a correction here is one value:
 *Could not read 1 value, so what was there stayed* (Rule-SHARE-106).

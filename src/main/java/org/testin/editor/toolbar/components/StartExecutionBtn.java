@@ -16,9 +16,9 @@
 
 package org.testin.editor.toolbar.components;
 
-import org.testin.editor.run.ExecutionControl;
-import org.testin.editor.AbstractIconButton;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.AbstractIconButton;
+import org.testin.editor.run.ExecutionControl;
 import org.testin.editor.run.RunEditor;
 import org.testin.model.TestRunStatus;
 import org.testin.util.Bundle;

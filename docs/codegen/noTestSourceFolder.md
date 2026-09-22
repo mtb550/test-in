@@ -2,8 +2,8 @@
 
 # UC-CODEGEN-020: Work in a project with no Java test folder
 
-**As a** tester, **I want** to know why no code is appearing,
-**so that** I can mark a folder as holding tests and have it start working.
+**As a** tester, **I want** to know why no code is appearing, **so that** I can mark a folder as holding tests and have
+it start working.
 
 No folder in the code project is marked as holding Java tests, so no code is
 written. Everything else works: the tree, both editors, the view panel, reports,
@@ -102,8 +102,7 @@ message before anything had been asked of the folder, so a tester who opened the
 IDE to read test cases was told about automation they were not doing, on every
 open, forever - and nothing about it was fixable from where they were standing.
 The check bought nothing either: reading test data is gated on the Testin folder,
-not on this one, and every generator already skips for itself
-([#286](https://github.com/mtb550/test-in/issues/286)).
+not on this one, and every generator already skips for itself ([#286](https://github.com/mtb550/test-in/issues/286)).
 
 ---
 

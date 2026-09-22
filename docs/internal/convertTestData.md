@@ -46,7 +46,7 @@ is one the next open has to finish anyway.
 2. Every `.json` directly inside a folder under `Test Cases` is **moved** to
    `<its id>.tc`, content untouched: marked folders and unmarked ones, active
    projects and inactive ones. A file that will not parse keeps its own base name
-   - `login.json` becomes `login.tc` - so the scan goes on reporting it.
+    - `login.json` becomes `login.tc` - so the scan goes on reporting it.
 3. A second file claiming an id another already took keeps its content and gets
    an id derived from the one it claimed and its own place in the project. The
    place is written the same way on Windows as on Linux, so two machines

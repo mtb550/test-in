@@ -24,7 +24,8 @@ import org.testin.editor.EditorColors;
 import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
 
-import javax.swing.*;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 import javax.swing.border.Border;
 
 @AllArgsConstructor

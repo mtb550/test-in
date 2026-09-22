@@ -33,10 +33,10 @@ import org.testin.util.SpellChecker;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.awt.BorderLayout;
 
 // UC-EDITOR-PANEL-005
 public abstract class AbstractMultiValueSection implements CreateTestCaseSection {
@@ -84,7 +84,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
     public void showSection(final @NotNull JBPanel<?> contentPanel, final @NotNull Runnable repackAction) {
         showSection(contentPanel);
         wrapper.setVisible(true);
-        addField("", repackAction);
+        addField("");
 
         ApplicationManager.getApplication().invokeLater(() -> {
             repackAction.run();
@@ -92,7 +92,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
         });
     }
 
-    public void addField(final @NotNull String text, final @NotNull Runnable repackAction) {
+    public void addField(final @NotNull String text) {
         final @NotNull EditorTextField box = SpellChecker.createCompletionField(p,
                 new TextFieldWithAutoCompletion.StringsCompletionProvider(completions(Services.getInstance(p, TestCaseValues.class)), field().getIcon()), text);
 
@@ -139,15 +139,15 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
         fields.forEach(box -> box.setEnabled(editable));
     }
 
-    public void setData(final @NotNull List<String> values, final @NotNull Runnable repack) {
+    public void setData(final @NotNull List<String> values) {
         container.removeAll();
         fields.clear();
 
-        values.forEach(value -> addField(value, repack));
+        values.forEach(this::addField);
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
-        setData(valuesOf(dto), repackAction);
+    public void fillData(final @NotNull TestCaseDto dto) {
+        setData(valuesOf(dto));
     }
 }

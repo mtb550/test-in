@@ -17,14 +17,16 @@
 package org.testin.ui.framework;
 
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.panels.HorizontalLayout;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
-import com.intellij.ui.components.panels.HorizontalLayout;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JComponent;
+import javax.swing.JRadioButton;
+import java.awt.Font;
 import java.util.List;
 import java.util.Optional;
 

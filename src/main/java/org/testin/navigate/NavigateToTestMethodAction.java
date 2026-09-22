@@ -16,7 +16,6 @@
 
 package org.testin.navigate;
 
-import org.testin.codegen.CodeOn;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -24,13 +23,14 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
+import org.testin.codegen.CodeOn;
 import org.testin.editor.CardHoverAction;
 import org.testin.model.dto.TestCaseDto;
 
 // UC-CODEGEN-006
 public class NavigateToTestMethodAction extends DumbAwareAction {
     public static void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        if (!CodeOn.isOnOrWarn(p)) return;
+        if (CodeOn.isOffAndWarned(p)) return;
 
         CodeNavigation.available().toCode(p, tc);
     }

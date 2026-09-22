@@ -44,6 +44,18 @@ public class RunFieldVisibilityTest {
     private static final @NotNull String FRONTEND = "Frontend";
     private static final @NotNull String BACKEND = "Backend";
 
+    /**
+     * A run described by its platform and component, and nothing chosen
+     * anywhere else - which is all the rules read.
+     */
+    private static @NotNull TestRunConfiguration.Chosen run(final @NotNull String platform, final @NotNull String component) {
+        final @NotNull Map<TestRunConfiguration, String> answers = new EnumMap<>(TestRunConfiguration.class);
+        answers.put(TestRunConfiguration.PLATFORM, platform);
+        answers.put(TestRunConfiguration.COMPONENT, component);
+
+        return field -> answers.getOrDefault(field, "");
+    }
+
     @Test
     public void aWebFrontendIsAskedWhichBrowser() {
         assertTrue(TestRunConfiguration.BROWSER.isShownFor(run(WEB, FRONTEND)));
@@ -128,17 +140,5 @@ public class RunFieldVisibilityTest {
     public void theDeviceListOffersTheThreeHandsets() {
         assertEquals(Arrays.asList(TestRunConfiguration.DEVICE_TYPE.getOptions()),
                 List.of("", "iPhone", "Samsung", "Huawei"));
-    }
-
-    /**
-     * A run described by its platform and component, and nothing chosen
-     * anywhere else - which is all the rules read.
-     */
-    private static @NotNull TestRunConfiguration.Chosen run(final @NotNull String platform, final @NotNull String component) {
-        final @NotNull Map<TestRunConfiguration, String> answers = new EnumMap<>(TestRunConfiguration.class);
-        answers.put(TestRunConfiguration.PLATFORM, platform);
-        answers.put(TestRunConfiguration.COMPONENT, component);
-
-        return field -> answers.getOrDefault(field, "");
     }
 }

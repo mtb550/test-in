@@ -16,19 +16,18 @@
 
 package org.testin.view.details.components;
 
-import com.intellij.util.ui.JBUI;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
-import org.testin.ui.framework.Picture;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.util.List;
 
-public final class ScreenshotDialog extends AbstractFrameworkDialog<Picture> {
+public final class ScreenshotDialog extends AbstractFrameworkDialog {
     private static final int WIDTH = 1000;
     private static final int HEIGHT = 700;
 

@@ -16,12 +16,12 @@
 
 package org.testin.importexport.shared;
 
-import org.testin.testcase.TestEditorAttributes;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Groups;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.SelectionTable;
@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public final class GroupSelectionDialog extends AbstractFrameworkDialog<SelectionTable> {
+public final class GroupSelectionDialog extends AbstractFrameworkDialog {
     private final @NotNull SelectionTable groups;
     private final @NotNull Consumer<@NotNull String> onPicked;
 

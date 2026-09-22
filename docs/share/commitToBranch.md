@@ -2,8 +2,8 @@
 
 # UC-SHARE-014: Commit onto a different branch
 
-**As a** tester, **I want** to put these changes on another branch,
-**so that** work for the next release does not land on the one being tested now.
+**As a** tester, **I want** to put these changes on another branch, **so that** work for the next release does not land
+on the one being tested now.
 
 A branch is one line of work in Git. This picks the branch the commit goes
 onto, without leaving the review dialog.
@@ -61,8 +61,7 @@ The box sits under the table in the review dialog.
 2. The **Branch** box shows the branch they are on.
 3. The tester types a name that does not exist yet.
 4. The tester types a message and presses **Commit & Push**, or `Enter` from
-   any field, the **Branch** box included once its list is closed
-   (Rule-INTERNAL-085).
+   any field, the **Branch** box included once its list is closed (Rule-INTERNAL-085).
 5. A bar reads *Preparing the branch*.
 6. Testin makes the branch and checks it out.
 7. The commit is made on it, and pushed.
@@ -74,8 +73,8 @@ Switched** reads the branch's name, then *could not be checked out, so nothing
 was committed. The changes are still here and still yours.* One link sits under
 it, reading **Review Changes**. It opens the dialog again.
 
-**If the branch cannot be prepared for any other reason** — a message titled
-**Git Error** reads *Could not prepare*, the branch, then the reason.
+**If the branch cannot be prepared for any other reason** — a message titled **Git Error** reads *Could not prepare*,
+the branch, then the reason.
 
 ## Why nothing is committed on a failure
 

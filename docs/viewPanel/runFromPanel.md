@@ -2,8 +2,8 @@
 
 # UC-VIEW-PANEL-012: Run a test case from the panel
 
-**As a** tester, **I want** to start the test case I am reading,
-**so that** I can try it again without going back to the card it came from.
+**As a** tester, **I want** to start the test case I am reading, **so that** I can try it again without going back to
+the card it came from.
 
 The button starts this one test case, on its own.
 

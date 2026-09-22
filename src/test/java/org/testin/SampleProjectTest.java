@@ -22,6 +22,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
+import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.markers.TestRunMarker;
@@ -35,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Stream;
-import org.testin.model.TestRunItems;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -61,24 +61,8 @@ import static org.testng.Assert.assertTrue;
  */
 public class SampleProjectTest {
 
-    /**
-     * The sample, found from the module rather than from the working directory.
-     * Gradle runs tests with the module as the working directory, but a run
-     * started from the IDE need not, so the repository root is walked up to.
-     */
-    private static @NotNull Path samples() {
-        @NotNull Path here = Path.of("").toAbsolutePath();
-
-        while (!Files.isDirectory(here.resolve("samples"))) {
-            here = here.getParent();
-            if (here == null) throw new IllegalStateException("No samples/ directory above " + Path.of("").toAbsolutePath());
-        }
-
-        return here.resolve("samples");
-    }
-
     private static @NotNull Path demo() {
-        return samples().resolve("testin-root").resolve("Demo");
+        return RepositoryRoot.resolve("samples").resolve("testin-root").resolve("Demo");
     }
 
     /**
@@ -106,6 +90,43 @@ public class SampleProjectTest {
             return walk.filter(path -> path.getFileName().toString().equals(name)).toList();
         } catch (final IOException ex) {
             throw new AssertionError("Could not walk the sample at " + root + ": " + ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * The sample's run folders, found by the marker that makes them runs rather
+     * than by the names they happen to have.
+     */
+    private static @NotNull List<Path> runFolders() {
+        return filesNamed(demo(), DirectoryType.TR.getMarker()).stream().map(Path::getParent).toList();
+    }
+
+    /**
+     * The run's results, one file per test case (#305).
+     */
+    private static @NotNull List<Path> resultFilesIn(final @NotNull Path folder) {
+        try (Stream<Path> children = Files.list(folder)) {
+            return children.filter(path -> FileKind.of(path) == FileKind.RUN_ITEM).toList();
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not list the run folder " + folder + ": " + ex.getMessage(), ex);
+        }
+    }
+
+    private static @NotNull List<Path> jsonFilesIn(final @NotNull Path folder) {
+        try (Stream<Path> children = Files.list(folder)) {
+            return children.filter(path -> path.getFileName().toString().endsWith(".json")).toList();
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not list the run folder " + folder + ": " + ex.getMessage(), ex);
+        }
+    }
+
+    private static @NotNull List<Path> caseFiles() {
+        try (Stream<Path> walk = Files.walk(demo().resolve("Test Cases"))) {
+            return walk.filter(Files::isRegularFile)
+                    .filter(path -> FileKind.of(path) == FileKind.TEST_CASE)
+                    .toList();
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not walk the sample's test cases: " + ex.getMessage(), ex);
         }
     }
 
@@ -204,33 +225,6 @@ public class SampleProjectTest {
     }
 
     /**
-     * The sample's run folders, found by the marker that makes them runs rather
-     * than by the names they happen to have.
-     */
-    private static @NotNull List<Path> runFolders() {
-        return filesNamed(demo(), DirectoryType.TR.getMarker()).stream().map(Path::getParent).toList();
-    }
-
-    /**
-     * The run's results, one file per test case (#305).
-     */
-    private static @NotNull List<Path> resultFilesIn(final @NotNull Path folder) {
-        try (Stream<Path> children = Files.list(folder)) {
-            return children.filter(path -> FileKind.of(path) == FileKind.RUN_ITEM).toList();
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not list the run folder " + folder + ": " + ex.getMessage(), ex);
-        }
-    }
-
-    private static @NotNull List<Path> jsonFilesIn(final @NotNull Path folder) {
-        try (Stream<Path> children = Files.list(folder)) {
-            return children.filter(path -> path.getFileName().toString().endsWith(".json")).toList();
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not list the run folder " + folder + ": " + ex.getMessage(), ex);
-        }
-    }
-
-    /**
      * The sample's {@code testin.yml} still names the sample's own project.
      * <p>
      * The plugin writes the file only when a tester presses Save to testin.yml
@@ -241,7 +235,7 @@ public class SampleProjectTest {
      */
     @Test
     public void theSampleStillNamesItsOwnProject() {
-        final @NotNull Path config = samples().resolve("automation").resolve("testin.yml");
+        final @NotNull Path config = RepositoryRoot.resolve("samples").resolve("automation").resolve("testin.yml");
 
         final @NotNull List<String> bindings;
         try {
@@ -255,15 +249,5 @@ public class SampleProjectTest {
 
         assertEquals(bindings, List.of("testinProject: Demo"),
                 "The sample must name its own project.");
-    }
-
-    private static @NotNull List<Path> caseFiles() {
-        try (Stream<Path> walk = Files.walk(demo().resolve("Test Cases"))) {
-            return walk.filter(Files::isRegularFile)
-                    .filter(path -> FileKind.of(path) == FileKind.TEST_CASE)
-                    .toList();
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not walk the sample's test cases: " + ex.getMessage(), ex);
-        }
     }
 }

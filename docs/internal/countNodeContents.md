@@ -36,22 +36,22 @@ them opens.
 
 ## Where the counts appear
 
-| Screen | What it shows |
-|---|---|
+| Screen                           | What it shows                                                                                              |
+|----------------------------------|------------------------------------------------------------------------------------------------------------|
 | The Details popup on a tree node | A row for each count, and a ring for a test run. Drawn on [UC-TREE-PANEL-027](../treePanel/nodeDetails.md) |
-| The removal confirmation | One line saying what goes with the node. Drawn on [UC-TREE-PANEL-012](../treePanel/removeNode.md) |
+| The removal confirmation         | One line saying what goes with the node. Drawn on [UC-TREE-PANEL-012](../treePanel/removeNode.md)          |
 
 ## What each node counts
 
-| The node | The counts it shows |
-|---|---|
-| A test project | Test sets, Packages, Test cases, Test runs |
-| **Test Cases** | Test sets, Packages, Test cases |
-| **Test Runs** | Packages, Test runs |
-| A test set package | Test sets, Packages, Test cases |
-| A test run package | Packages, Test runs |
-| A test set | Test cases |
-| A test run | Total, and a ring of its verdicts |
+| The node           | The counts it shows                        |
+|--------------------|--------------------------------------------|
+| A test project     | Test sets, Packages, Test cases, Test runs |
+| **Test Cases**     | Test sets, Packages, Test cases            |
+| **Test Runs**      | Packages, Test runs                        |
+| A test set package | Test sets, Packages, Test cases            |
+| A test run package | Packages, Test runs                        |
+| A test set         | Test cases                                 |
+| A test run         | Total, and a ring of its verdicts          |
 
 The verdicts on the ring are **Passed**, **Failed**, **Blocked**, **Untested**
 and **Removed**. The pass rate sits in the middle of it.

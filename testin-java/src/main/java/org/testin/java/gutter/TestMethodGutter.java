@@ -16,9 +16,6 @@
 
 package org.testin.java.gutter;
 
-import org.testin.codegen.CodeOn;
-import org.testin.util.FailureText;
-import org.testin.util.Bundle;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.icons.AllIcons;
@@ -27,14 +24,23 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaTokenType;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiJavaToken;
+import com.intellij.psi.PsiLiteralExpression;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.CodeOn;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -51,6 +57,27 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         } catch (final IllegalArgumentException notAnId) {
             return Optional.empty();
         }
+    }
+
+    // UC-CODEGEN-007, Rule-CODEGEN-029
+    private static boolean namesATestCase(final @NotNull PsiLiteralExpression literal) {
+        return Optional.ofNullable(PsiTreeUtil.getParentOfType(literal, PsiNameValuePair.class))
+                .filter(pair -> "testName".equals(pair.getName()))
+                .map(pair -> PsiTreeUtil.getParentOfType(pair, PsiAnnotation.class))
+                .filter(annotation -> annotation.hasQualifiedName("org.testng.annotations.Test"))
+                .isPresent();
+    }
+
+    private static @NotNull String methodName(final @NotNull PsiElement element) {
+        return Optional.ofNullable(PsiTreeUtil.getParentOfType(element, PsiMethod.class)).map(PsiMethod::getName).orElseGet(() -> Bundle.message("gutter.this.method"));
+    }
+
+    // UC-CODEGEN-007, Rule-CODEGEN-069
+    private static void refuseMissingCase(final @NotNull Project p, final @NotNull UUID uuid, final @NotNull String methodName) {
+        Logger.info("No test case behind " + methodName + ": " + uuid);
+
+        ApplicationManager.getApplication().invokeLater(() ->
+                Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NO_TEST_CASE_BEHIND_IT, methodName));
     }
 
     // UC-CODEGEN-007, Rule-CODEGEN-028, Rule-CODEGEN-029
@@ -70,27 +97,14 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 .map(literal -> StringUtil.unquoteString(literal.getText()).trim())
                 .flatMap(TestMethodGutter::parseUuid)
                 .ifPresent(testCaseId -> result.add(new RelatedItemLineMarkerInfo<>(
-                element,
-                element.getTextRange(),
-                AllIcons.Nodes.Related,
-                psiElement -> Bundle.message("gutter.view.details"),
-                (mouseEvent, psiElement) -> openViewPanel(p, testCaseId, methodName(psiElement)),
-                GutterIconRenderer.Alignment.RIGHT,
-                Collections::emptyList
-        )));
-    }
-
-    // UC-CODEGEN-007, Rule-CODEGEN-029
-    private static boolean namesATestCase(final @NotNull PsiLiteralExpression literal) {
-        return Optional.ofNullable(PsiTreeUtil.getParentOfType(literal, PsiNameValuePair.class))
-                .filter(pair -> "testName".equals(pair.getName()))
-                .map(pair -> PsiTreeUtil.getParentOfType(pair, PsiAnnotation.class))
-                .filter(annotation -> annotation.hasQualifiedName("org.testng.annotations.Test"))
-                .isPresent();
-    }
-
-    private static @NotNull String methodName(final @NotNull PsiElement element) {
-        return Optional.ofNullable(PsiTreeUtil.getParentOfType(element, PsiMethod.class)).map(PsiMethod::getName).orElseGet(() -> Bundle.message("gutter.this.method"));
+                        element,
+                        element.getTextRange(),
+                        AllIcons.Nodes.Related,
+                        psiElement -> Bundle.message("gutter.view.details"),
+                        (mouseEvent, psiElement) -> openViewPanel(p, testCaseId, methodName(psiElement)),
+                        GutterIconRenderer.Alignment.RIGHT,
+                        Collections::emptyList
+                )));
     }
 
     // UC-CODEGEN-007, Rule-CODEGEN-030, Rule-CODEGEN-069
@@ -118,13 +132,5 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 );
             }
         });
-    }
-
-    // UC-CODEGEN-007, Rule-CODEGEN-069
-    private static void refuseMissingCase(final @NotNull Project p, final @NotNull UUID uuid, final @NotNull String methodName) {
-        Logger.info("No test case behind " + methodName + ": " + uuid);
-
-        ApplicationManager.getApplication().invokeLater(() ->
-                Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NO_TEST_CASE_BEHIND_IT, methodName));
     }
 }

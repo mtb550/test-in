@@ -40,6 +40,27 @@ import java.util.UUID;
 public final class RunForm {
     private final @NotNull Project p;
 
+    public static @NotNull Set<UUID> checkedCases(final @NotNull SelectionTree selection) {
+        final @NotNull Set<UUID> ids = new LinkedHashSet<>();
+
+        selection.forEachChecked(checked -> {
+            if (checked instanceof TestCaseDto tc) ids.add(tc.getId());
+        });
+
+        return ids;
+    }
+
+    // UC-TREE-PANEL-022, Rule-TREE-PANEL-076
+    public static @NotNull Set<UUID> offeredCases(final @NotNull SelectionTree selection) {
+        final @NotNull Set<UUID> ids = new LinkedHashSet<>();
+
+        selection.forEachLeaf(leaf -> {
+            if (leaf instanceof TestCaseDto tc) ids.add(tc.getId());
+        });
+
+        return ids;
+    }
+
     // UC-TREE-PANEL-009, UC-TREE-PANEL-021, UC-TREE-PANEL-022
     public void open(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull Set<UUID> checked, final @NotNull Map<TestRunConfiguration, String> configuration, final @NotNull RunFormAction action) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -110,26 +131,5 @@ public final class RunForm {
             newNode.add(convertToCheckedNodes((DefaultMutableTreeNode) node.getChildAt(i)));
         }
         return newNode;
-    }
-
-    public static @NotNull Set<UUID> checkedCases(final @NotNull SelectionTree selection) {
-        final @NotNull Set<UUID> ids = new LinkedHashSet<>();
-
-        selection.forEachChecked(checked -> {
-            if (checked instanceof TestCaseDto tc) ids.add(tc.getId());
-        });
-
-        return ids;
-    }
-
-    // UC-TREE-PANEL-022, Rule-TREE-PANEL-076
-    public static @NotNull Set<UUID> offeredCases(final @NotNull SelectionTree selection) {
-        final @NotNull Set<UUID> ids = new LinkedHashSet<>();
-
-        selection.forEachLeaf(leaf -> {
-            if (leaf instanceof TestCaseDto tc) ids.add(tc.getId());
-        });
-
-        return ids;
     }
 }

@@ -25,7 +25,8 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.util.Bundle;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JList;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -82,7 +83,7 @@ public class StatusSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto) {
         status.setSelectedItem(dto.getStatus());
     }
 }

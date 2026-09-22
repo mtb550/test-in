@@ -48,11 +48,11 @@ set at once, and the status bar says the same thing as a number.
 The two icons appear while the pointer is over the card, as they always have.
 The first is the one that jumps to the code, and its shape says what is there:
 
-| | |
-|---|---|
-| a class icon | the generated method has something in it |
-| a class icon with an error mark | the test case names a method and there is none — the automation was written and is gone |
-| a hollow class icon | not automated. Either there is no method, or Testin wrote one and nobody has filled it in |
+|                                 |                                                                                           |
+|---------------------------------|-------------------------------------------------------------------------------------------|
+| a class icon                    | the generated method has something in it                                                  |
+| a class icon with an error mark | the test case names a method and there is none — the automation was written and is gone   |
+| a hollow class icon             | not automated. Either there is no method, or Testin wrote one and nobody has filled it in |
 
 The same icon and the same three shapes are used in the view panel's details.
 

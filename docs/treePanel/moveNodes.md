@@ -37,10 +37,10 @@ The node keeps everything inside it. Only where it sits changes.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -125,8 +125,7 @@ verb, **Move** or **Copy**. Everything else on the dialog is the same.
 4. The tester presses `Ctrl+V`, or chooses **Actions → Paste**.
 5. The **Paste** dialog asks *Move '\<name\>' into '\<folder\>'?*, with *From*
    and *To* rows.
-6. The tester presses `Enter`. The nodes move, and Testin shows *Moved*, or
-   *Moved N*.
+6. The tester presses `Enter`. The nodes move, and Testin shows *Moved*, or *Moved N*.
 
 **Drag and drop**
 
@@ -180,8 +179,8 @@ first of them.
 another application — nothing is dropped there. Test data is moved only by
 Testin (Rule-TREE-PANEL-105).
 
-**If the Java plugin is not installed** — the first move in the project shows
-*Java Plugin Not Available*. The move still happens.
+**If the Java plugin is not installed** — the first move in the project shows *Java Plugin Not Available*. The move
+still happens.
 
 **After a move** — the clipboard is empty and **Paste** is gray again. The
 nodes were moved once; offering to move them a second time from a folder they

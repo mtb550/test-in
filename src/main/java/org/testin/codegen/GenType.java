@@ -144,8 +144,8 @@ public enum GenType {
             "read-only attribute"
     );
 
+    private static final @NotNull Key<Boolean> INDEXING_SAID = Key.create("testin.codegen.indexingSaid");
     private final @NotNull String description;
-
     private final @NotNull GenAction action;
 
     GenType(final @NotNull String description) {
@@ -158,13 +158,15 @@ public enum GenType {
         this.action = new NoOpCodeUpdate(dataOnlyField);
     }
 
-    private static final @NotNull Key<Boolean> INDEXING_SAID = Key.create("testin.codegen.indexingSaid");
+    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+        action.executeAll(p, items);
+    }
 
     private final class JavaCodeUpdate implements GenAction {
         // UC-CODEGEN-019, Rule-CODEGEN-005
         @Override
         public void execute(final @NotNull Project p, final @NotNull Object obj) {
-            if (!canGenerate(p)) return;
+            if (cannotGenerate(p)) return;
 
             CodeGenerators.find(GenType.this).execute(p, obj);
         }
@@ -172,7 +174,7 @@ public enum GenType {
         // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-EDITOR-PANEL-046
         @Override
         public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-            if (!canGenerate(p) || items.isEmpty()) return;
+            if (cannotGenerate(p) || items.isEmpty()) return;
 
             ApplicationManager.getApplication().invokeLater(() ->
                     WriteCommandAction.runWriteCommandAction(p, description, null,
@@ -180,9 +182,9 @@ public enum GenType {
         }
 
         // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-006, Rule-CODEGEN-082
-        private boolean canGenerate(final @NotNull Project p) {
-            if (!CodeOn.isOnOrWarnOnce(p)) return false;
-            if (!DumbService.isDumb(p)) return true;
+        private boolean cannotGenerate(final @NotNull Project p) {
+            if (!CodeOn.isOnOrWarnOnce(p)) return true;
+            if (!DumbService.isDumb(p)) return false;
 
             if (Once.claim(p, INDEXING_SAID)) {
                 Services.getInstance(p, Notifier.class).softRefuse(p, Refused.WHILE_INDEXING, description);
@@ -191,11 +193,7 @@ public enum GenType {
             }
 
             Logger.info("Skipped " + name() + ": the IDE is indexing");
-            return false;
+            return true;
         }
-    }
-
-    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        action.executeAll(p, items);
     }
 }

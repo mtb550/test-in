@@ -22,15 +22,15 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseOrder;
 import org.testin.setting.AppSettingsState;
+import org.testin.testcase.TestCaseOrder;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import java.io.IOException;
 
 /**
  * UC-INTERNAL-004.
@@ -44,22 +44,8 @@ import java.io.IOException;
  */
 public class TestCaseWritesIdeTest extends BasePlatformTestCase {
 
+    private static final String HAND_NAMED = "Log in by hand.tc";
     private Path root;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-writes");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            deleteTree(root);
-        } finally {
-            super.tearDown();
-        }
-    }
 
     private static void deleteTree(final Path path) {
         if (path == null) return;
@@ -75,45 +61,6 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         } catch (final Exception ignored) {
             // Nothing to walk, or nothing to remove.
         }
-    }
-
-    private ProjectIndexer indexer() {
-        return Services.getInstance(getProject(), ProjectIndexer.class);
-    }
-
-    /**
-     * A test project with one test set in it, built the way the create actions
-     * build them: the mapper makes the node, the indexer is told.
-     */
-    private TestSetDirectoryDto testSet() {
-        return WriteAction.computeAndWait(() -> {
-            final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
-
-            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
-            indexer().addTestProject(tp);
-
-            final TestSetDirectoryDto ts = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
-            indexer().addTestSet(ts);
-            return ts;
-        });
-    }
-
-    /**
-     * Two test sets in one test project, for a case to be moved between.
-     */
-    private List<TestSetDirectoryDto> twoTestSets() {
-        return WriteAction.computeAndWait(() -> {
-            final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
-
-            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
-            indexer().addTestProject(tp);
-
-            final TestSetDirectoryDto login = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
-            final TestSetDirectoryDto signUp = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Sign up"), tp.getTestCasesDirectory());
-            indexer().addTestSet(login);
-            indexer().addTestSet(signUp);
-            return List.of(login, signUp);
-        });
     }
 
     /**
@@ -146,7 +93,73 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private static final String HAND_NAMED = "Log in by hand.tc";
+    private static TestCaseDto testCase(final TestSetDirectoryDto ts, final String rank) {
+        final TestCaseDto tc = TestCaseDto.builder()
+                .id(UUID.randomUUID())
+                .description("Log in with a valid user")
+                .order(rank)
+                .build();
+        tc.setParent(ts);
+        return tc;
+    }
+
+    private static Path fileOf(final TestSetDirectoryDto ts, final TestCaseDto tc) {
+        return ts.getPath().resolve(tc.getId() + ".tc");
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        root = Files.createTempDirectory("testin-writes");
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        try {
+            deleteTree(root);
+        } finally {
+            super.tearDown();
+        }
+    }
+
+    private ProjectIndexer indexer() {
+        return Services.getInstance(getProject(), ProjectIndexer.class);
+    }
+
+    /**
+     * A test project with one test set in it, built the way the create actions
+     * build them: the mapper makes the node, the indexer is told.
+     */
+    private TestSetDirectoryDto oneTestSet() {
+        return WriteAction.computeAndWait(() -> {
+            final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
+
+            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
+            indexer().addTestProject(tp);
+
+            final TestSetDirectoryDto ts = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            indexer().addTestSet(ts);
+            return ts;
+        });
+    }
+
+    /**
+     * Two test sets in one test project, for a case to be moved between.
+     */
+    private List<TestSetDirectoryDto> twoTestSets() {
+        return WriteAction.computeAndWait(() -> {
+            final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
+
+            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
+            indexer().addTestProject(tp);
+
+            final TestSetDirectoryDto login = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            final TestSetDirectoryDto signUp = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Sign up"), tp.getTestCasesDirectory());
+            indexer().addTestSet(login);
+            indexer().addTestSet(signUp);
+            return List.of(login, signUp);
+        });
+    }
 
     /**
      * A test set holding one case whose file a tester named by hand, read the
@@ -167,20 +180,6 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         return set;
     }
 
-    private static TestCaseDto testCase(final TestSetDirectoryDto ts, final String rank) {
-        final TestCaseDto tc = TestCaseDto.builder()
-                .id(UUID.randomUUID())
-                .description("Log in with a valid user")
-                .order(rank)
-                .build();
-        tc.setParent(ts);
-        return tc;
-    }
-
-    private static Path fileOf(final TestSetDirectoryDto ts, final TestCaseDto tc) {
-        return ts.getPath().resolve(tc.getId() + ".tc");
-    }
-
     /**
      * Rule-INTERNAL-031.
      * <p>
@@ -191,7 +190,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
      * 112).
      */
     public void testACaseTheSetHasNeverHeldIsWrittenEvenWhenItsRankStays() {
-        final TestSetDirectoryDto ts = testSet();
+        final TestSetDirectoryDto ts = oneTestSet();
         final TestCaseDto pasted = testCase(ts, "m");
 
         indexer().updateSequence(ts.getPath(), List.of(pasted), List.of());
@@ -209,7 +208,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
      * the paster as its creator (#66, finding 114).
      */
     public void testACaseSavedAsItIsBeforeTheOrderKeepsItsCreator() {
-        final TestSetDirectoryDto ts = testSet();
+        final TestSetDirectoryDto ts = oneTestSet();
         final TestCaseDto moved = testCase(ts, "m").setCreatedBy("Sara Al-Otaibi");
         final var createdAt = moved.getCreatedAt();
 
@@ -229,7 +228,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
      * so the file was written twice - first without its rank (#66, finding 115).
      */
     public void testACreatedCaseIsWrittenByTheOrderWriteWithItsRankAndItsCreator() {
-        final TestSetDirectoryDto ts = testSet();
+        final TestSetDirectoryDto ts = oneTestSet();
         final TestCaseDto created = testCase(ts, "");
         final List<TestCaseDto> arranged = List.of(created);
 
@@ -310,7 +309,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
      * disk, and the next scan brought it back (#66, finding 292).
      */
     public void testARemovalWhoseDeleteIsRefusedKeepsTheCase() {
-        final TestSetDirectoryDto ts = testSet();
+        final TestSetDirectoryDto ts = oneTestSet();
         final TestCaseDto tc = testCase(ts, "m");
         indexer().putTestCaseVerbatim(ts.getPath(), tc);
 

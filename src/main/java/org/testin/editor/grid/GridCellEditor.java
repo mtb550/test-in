@@ -22,9 +22,12 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.EditorColors;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.AbstractCellEditor;
+import javax.swing.BorderFactory;
+import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;

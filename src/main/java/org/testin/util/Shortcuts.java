@@ -17,16 +17,15 @@
 package org.testin.util;
 
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.KeyStroke;
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
@@ -269,9 +268,8 @@ public enum Shortcuts {
             KeyStroke.getKeyStroke(KeyEvent.VK_O, 0)
     );
 
-    private final @NotNull KeyStroke key;
-
     public static final @NotNull KeyStroke NO_KEY = EMPTY.key;
+    private final @NotNull KeyStroke key;
 
     @MagicConstant(flagsFromClass = InputEvent.class)
     public static int menuMask() {
@@ -282,28 +280,8 @@ public enum Shortcuts {
         }
     }
 
-    public @NotNull CustomShortcutSet getCustomShortcut() {
-        return customShortcut(key);
-    }
-
-    public @NotNull Shortcut getShortcut() {
-        return keyboardShortcut(key);
-    }
-
-    public @NotNull String getShortcutText() {
-        return shortcutText(key);
-    }
-
-    public boolean matches(final @NotNull KeyEvent e) {
-        return matches(e, key);
-    }
-
     public static @NotNull CustomShortcutSet customShortcut(final @NotNull KeyStroke key) {
         return new CustomShortcutSet(key);
-    }
-
-    public static @NotNull Shortcut keyboardShortcut(final @NotNull KeyStroke key) {
-        return new KeyboardShortcut(key, null);
     }
 
     public static @NotNull String shortcutText(final @NotNull KeyStroke key) {
@@ -316,5 +294,17 @@ public enum Shortcuts {
 
     public static boolean matches(final @NotNull KeyEvent e, final @NotNull KeyStroke key) {
         return key.equals(KeyStroke.getKeyStrokeForEvent(e));
+    }
+
+    public @NotNull CustomShortcutSet getCustomShortcut() {
+        return customShortcut(key);
+    }
+
+    public @NotNull String getShortcutText() {
+        return shortcutText(key);
+    }
+
+    public boolean matches(final @NotNull KeyEvent e) {
+        return matches(e, key);
     }
 }

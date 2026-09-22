@@ -31,7 +31,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public final class GenerateReportDialog extends AbstractFrameworkDialog<DestinationForm> {
+public final class GenerateReportDialog extends AbstractFrameworkDialog {
+    private final @NotNull DestinationForm form;
+
     private final @NotNull BiConsumer<@NotNull FileTypes, @NotNull File> onGenerate;
 
     // UC-REPORT-001
@@ -41,7 +43,7 @@ public final class GenerateReportDialog extends AbstractFrameworkDialog<Destinat
 
         title = Bundle.message("dialog.report.title");
 
-        final @NotNull DestinationForm form = new DestinationForm(p,
+        form = new DestinationForm(p,
                 Arrays.stream(FileTypes.values()).filter(FileTypes::isReportable).toArray(FileTypes[]::new),
                 FileTypes.PDF,
                 suggestedFileName,
@@ -60,7 +62,7 @@ public final class GenerateReportDialog extends AbstractFrameworkDialog<Destinat
     // UC-REPORT-001, Rule-REPORT-009
     @Override
     protected void submit() {
-        component().resolve().ifPresent(destination -> {
+        form.resolve().ifPresent(destination -> {
             closeOk();
             onGenerate.accept(destination.format(), destination.file());
         });

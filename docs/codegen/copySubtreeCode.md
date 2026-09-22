@@ -2,8 +2,8 @@
 
 # UC-CODEGEN-004: Get the whole subtree's code when I copy
 
-**As a** tester, **I want** every class and every method under what I copied,
-**so that** a copied package is as runnable as the one it came from.
+**As a** tester, **I want** every class and every method under what I copied, **so that** a copied package is as
+runnable as the one it came from.
 
 A copy brings the code with it, at every level below what was copied.
 

@@ -141,15 +141,15 @@ else.
 7. It shows what the node holds. The counts are worked out when the tester
    asks, and never saved. Which counts appear depends on the kind of node:
 
-   | Node | Counts |
-   |---|---|
-   | Test project | **Test sets**, **Packages**, **Test cases**, **Test runs** |
-   | **Test Cases** | **Test sets**, **Packages**, **Test cases** |
-   | **Test Runs** | **Packages**, **Test runs** |
-   | Test set package | **Test sets**, **Packages**, **Test cases** |
-   | Test run package | **Packages**, **Test runs** |
-   | Test set | **Test cases** |
-   | Test run | **Total** |
+   | Node             | Counts                                                     |
+   |------------------|------------------------------------------------------------|
+   | Test project     | **Test sets**, **Packages**, **Test cases**, **Test runs** |
+   | **Test Cases**   | **Test sets**, **Packages**, **Test cases**                |
+   | **Test Runs**    | **Packages**, **Test runs**                                |
+   | Test set package | **Test sets**, **Packages**, **Test cases**                |
+   | Test run package | **Packages**, **Test runs**                                |
+   | Test set         | **Test cases**                                             |
+   | Test run         | **Total**                                                  |
 
 8. **A test run, and only a test run**, also shows a verdict chart. It is a
    ring, with **Passed**, **Failed**, **Blocked**, **Untested** and **Removed**

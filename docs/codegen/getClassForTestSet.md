@@ -68,8 +68,7 @@ seconds. Everything else goes to the log alone.
 
 ## Main flow
 
-1. The tester creates a test set named **Login** under a package named
-   **Accounts**.
+1. The tester creates a test set named **Login** under a package named **Accounts**.
 2. Testin works out the class name and the package from the tree path.
 3. Testin makes the package folder under the test source folder.
 4. Testin writes the class file.

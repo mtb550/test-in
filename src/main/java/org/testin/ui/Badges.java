@@ -58,6 +58,7 @@ public final class Badges {
     private static final @NotNull Color TEXT_ON_LIGHT = Gray._30;
 
     private static final @NotNull Color GROUP_COLOR = JBColor.darkGray;
+    private static final @NotNull Icon BUG_MARK = IconUtil.colorize(IconUtil.resizeSquared(AllIcons.Toolwindows.ToolWindowDebugger, 20), Gray._0);
 
     public static void addPriorityBadge(final @NotNull List<Badge> badges, final @NotNull TestCaseDto tc) {
         if (tc.getPriority() == Priority.LOW) return;
@@ -114,6 +115,7 @@ public final class Badges {
     static boolean isLight(final @NotNull Color bg) {
         return 0.2126 * bg.getRed() + 0.7152 * bg.getGreen() + 0.0722 * bg.getBlue() > 140;
     }
+
     public sealed interface Badge permits Pill, Tag, Bug {
     }
 
@@ -125,8 +127,6 @@ public final class Badges {
 
     public record Bug(@NotNull String text, @NotNull Color color) implements Badge {
     }
-
-    private static final @NotNull Icon BUG_MARK = IconUtil.colorize(IconUtil.resizeSquared(AllIcons.Toolwindows.ToolWindowDebugger, 20), Gray._0);
 
     private static final class BadgePill extends JBLabel {
         private @NotNull Badge badge = new Pill("", JBColor.GRAY);

@@ -25,12 +25,17 @@ import org.testin.util.Bundle;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import javax.swing.Icon;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.testin.testcase.TestCaseDialogKey.*;
+import static org.testin.testcase.TestCaseDialogKey.ADD_GROUP;
+import static org.testin.testcase.TestCaseDialogKey.ADD_STEP;
+import static org.testin.testcase.TestCaseDialogKey.AUTO_COMPLETE;
+import static org.testin.testcase.TestCaseDialogKey.CORRECTIONS;
+import static org.testin.testcase.TestCaseDialogKey.NAVIGATE_ARROWS;
+import static org.testin.testcase.TestCaseDialogKey.NAVIGATE_TAB;
 
 @Getter
 public enum CreateTestCaseFields implements StatusBarItem {

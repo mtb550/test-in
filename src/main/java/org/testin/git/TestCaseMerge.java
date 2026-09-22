@@ -30,7 +30,6 @@ import org.testin.util.TestDataParser;
 
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,20 +50,15 @@ public final class TestCaseMerge {
     }
 
     // UC-SHARE-018, Rule-SHARE-080
-    public static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String base, final @NotNull String mine, final @NotNull String theirs) {
-        final @NotNull ObjectNode baseNode = mapper.readTree(base);
-        final @NotNull ObjectNode mineNode = mapper.readTree(mine);
-        final @NotNull ObjectNode theirsNode = mapper.readTree(theirs);
+    static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String base, final @NotNull String mine, final @NotNull String theirs) {
+        final @NotNull Merging merging = Merging.read(mapper, base, mine, theirs);
+        final @NotNull ObjectNode merged = merging.merged();
+        final @NotNull List<String> settled = merging.settled();
 
-        final @NotNull ObjectNode merged = mineNode.deepCopy();
-        final @NotNull List<Merge.Question> questions = new ArrayList<>();
-
-        final @NotNull List<String> settled = new ArrayList<>();
-
-        for (final String field : fields(mineNode, theirsNode)) {
-            final @NotNull JsonNode was = baseNode.path(field);
-            final @NotNull JsonNode ours = mineNode.path(field);
-            final @NotNull JsonNode yours = theirsNode.path(field);
+        for (final String field : fields(merging.mine(), merging.theirs())) {
+            final @NotNull JsonNode was = merging.base().path(field);
+            final @NotNull JsonNode ours = merging.mine().path(field);
+            final @NotNull JsonNode yours = merging.theirs().path(field);
 
             if (same(ours, yours)) continue;
 
@@ -88,12 +82,12 @@ public final class TestCaseMerge {
             }
             if (SETTLED.contains(field)) continue;
 
-            questions.add(new Merge.Question(field, text(ours), text(yours)));
+            merging.questions().add(new Merge.Question(field, text(ours), text(yours)));
         }
 
-        stampTheLaterEdit(merged, mineNode, theirsNode);
+        stampTheLaterEdit(merged, merging.mine(), merging.theirs());
 
-        return new Merge(merged, List.copyOf(questions), List.copyOf(settled));
+        return merging.done();
     }
 
     private static void addOnce(final @NotNull List<String> settled, final @NotNull String said) {

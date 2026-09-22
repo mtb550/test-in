@@ -41,11 +41,16 @@ dependencies {
     compileOnly(project(":"))
 
     // Same rule as the root build: a compile-time tool, never packaged.
-    listOf("compileOnly", "annotationProcessor", "testCompileOnly", "testAnnotationProcessor").forEach { configuration ->
+    listOf(
+        "compileOnly",
+        "annotationProcessor",
+        "testCompileOnly",
+        "testAnnotationProcessor"
+    ).forEach { configuration ->
         add(configuration, libs.lombok)
     }
 
-    // The tests of the classes that live here live here too, and they need the
+    // The tests of this module's classes live here too, and they need the
     // core on the classpath for the same reason the classes do.
     testImplementation(project(":"))
     testImplementation(libs.testng)

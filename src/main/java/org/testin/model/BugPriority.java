@@ -22,7 +22,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,13 +59,12 @@ public enum BugPriority {
 
     public static final @NotNull List<BugPriority> CHOICES =
             Arrays.stream(values()).filter(priority -> priority != EMPTY).toList();
-
-    public static @NotNull BugPriority orDefault(final @NotNull BugPriority stored) {
-        return stored == EMPTY ? LOW : stored;
-    }
-
     private final @NotNull String label;
     private final @NotNull Color color;
     private final @NotNull ReportEmphasis emphasis;
     private final @NotNull String inBugReport;
+
+    public static @NotNull BugPriority orDefault(final @NotNull BugPriority stored) {
+        return stored == EMPTY ? LOW : stored;
+    }
 }

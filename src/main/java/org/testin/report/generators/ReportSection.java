@@ -18,8 +18,8 @@ package org.testin.report.generators;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunSummary;
 import org.testin.model.TestRunItems;
+import org.testin.model.TestRunSummary;
 import org.testin.model.TestStatus;
 import org.testin.util.Bundle;
 
@@ -89,18 +89,6 @@ enum ReportSection {
         this.statuses = EnumSet.copyOf(Arrays.asList(statuses));
     }
 
-    public long count(final @NotNull TestRunSummary summary) {
-        return count.applyAsLong(summary);
-    }
-
-    public @NotNull String description(final @NotNull String renderedCount) {
-        return String.format(descriptionFmt, renderedCount);
-    }
-
-    public @NotNull String textHex() {
-        return contrast(hexColor, "FFFFFF") >= contrast(hexColor, "14171A") ? "FFFFFF" : "14171A";
-    }
-
     private static double contrast(final @NotNull String one, final @NotNull String other) {
         final double first = luminance(one);
         final double second = luminance(other);
@@ -118,11 +106,23 @@ enum ReportSection {
         return raw <= 0.03928 ? raw / 12.92 : Math.pow((raw + 0.055) / 1.055, 2.4);
     }
 
-    public boolean matches(final @NotNull TestRunItems item) {
-        return statuses.contains(item.shownStatus());
-    }
-
     public static @NotNull ReportSection of(final @NotNull TestRunItems item) {
         return Arrays.stream(values()).filter(section -> section.matches(item)).findFirst().orElseThrow();
+    }
+
+    public long count(final @NotNull TestRunSummary summary) {
+        return count.applyAsLong(summary);
+    }
+
+    public @NotNull String description(final @NotNull String renderedCount) {
+        return String.format(descriptionFmt, renderedCount);
+    }
+
+    public @NotNull String textHex() {
+        return contrast(hexColor, "FFFFFF") >= contrast(hexColor, "14171A") ? "FFFFFF" : "14171A";
+    }
+
+    public boolean matches(final @NotNull TestRunItems item) {
+        return statuses.contains(item.shownStatus());
     }
 }

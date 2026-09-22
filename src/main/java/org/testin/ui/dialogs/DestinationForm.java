@@ -32,10 +32,11 @@ import org.testin.ui.framework.DialogComponent;
 import org.testin.ui.framework.EmptyWarning;
 import org.testin.util.Bundle;
 
-import java.util.Optional;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JList;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Optional;
 
 public final class DestinationForm implements DialogComponent {
     private final @NotNull Project p;

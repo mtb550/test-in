@@ -36,10 +36,10 @@ The copy is new and separate. Changing it never changes the original.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -74,10 +74,10 @@ on [UC-TREE-PANEL-013](moveNodes.md).
 
 ## What the tester sees
 
-Nothing in the tree changes when the tester copies. The nodes stay black, and
-*Copied* shows above the status bar at the bottom right of the IDE. Pasting then
-opens the dialog drawn under [UC-TREE-PANEL-013](moveNodes.md). Its title reads
-**Paste**, and it asks *Copy N items into '\<folder\>'?*.
+Nothing in the tree changes when the tester copies. The nodes stay black, and *Copied* shows above the status bar at the
+bottom right of the IDE. Pasting then
+opens the dialog drawn under [UC-TREE-PANEL-013](moveNodes.md). Its title reads **Paste**, and it asks *Copy N items
+into '\<folder\>'?*.
 
 ## Main flow
 
@@ -87,8 +87,7 @@ opens the dialog drawn under [UC-TREE-PANEL-013](moveNodes.md). Its title reads
 3. The tester selects a folder that can hold them.
 4. The tester presses `Ctrl+V`, or chooses **Actions → Paste**.
 5. The **Paste** dialog asks what will be copied, and where to.
-6. The tester presses `Enter`. The nodes are duplicated, and Testin shows
-   *Pasted*, or *Pasted N*.
+6. The tester presses `Enter`. The nodes are duplicated, and Testin shows *Pasted*, or *Pasted N*.
 7. Every test case in the copy gets its own id, and the copy is selected in the
    tree.
 

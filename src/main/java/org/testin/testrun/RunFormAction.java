@@ -22,6 +22,6 @@ import org.testin.ui.framework.SelectionTree;
 public record RunFormAction(@NotNull String title, @NotNull String button, @NotNull Submit submit) {
     @FunctionalInterface
     public interface Submit {
-        boolean of(@NotNull RunConfigurationForm form, @NotNull SelectionTree selection);
+        boolean saved(@NotNull RunConfigurationForm form, @NotNull SelectionTree selection);
     }
 }

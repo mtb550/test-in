@@ -16,7 +16,6 @@
 
 package org.testin.importexport.imports;
 
-import org.testin.util.Html;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
@@ -29,22 +28,24 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.FileDocumentListener;
-import org.testin.testcase.TestEditorAttributes;
-import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.ui.dialogs.FormRows;
 import org.testin.ui.framework.DialogComponent;
 import org.testin.util.Bundle;
+import org.testin.util.Html;
 
-import java.util.Optional;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;

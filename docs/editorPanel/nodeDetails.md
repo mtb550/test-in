@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-028: See the test set's own details
 
-**As a** tester, **I want** to know what this test set holds and who made it,
-**so that** I can answer a question about it without leaving the editor.
+**As a** tester, **I want** to know what this test set holds and who made it, **so that** I can answer a question about
+it without leaving the editor.
 
 This is about the test set or the test run, not about one test case.
 

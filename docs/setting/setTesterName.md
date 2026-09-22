@@ -42,13 +42,13 @@ The whole page is drawn on [the settings page](main.md#the-page).
 
 ## Where the name is stamped
 
-| What the tester does | What carries the name |
-|---|---|
-| Creates any node in the tree | Who created it |
-| Renames a node | Who last changed it |
-| Changes a test project's, a test set's or a package's status | Who last changed it |
-| Saves a test case | Who created it, or who last changed it |
-| Records a verdict in a test run | Who ran it |
+| What the tester does                                         | What carries the name                  |
+|--------------------------------------------------------------|----------------------------------------|
+| Creates any node in the tree                                 | Who created it                         |
+| Renames a node                                               | Who last changed it                    |
+| Changes a test project's, a test set's or a package's status | Who last changed it                    |
+| Saves a test case                                            | Who created it, or who last changed it |
+| Records a verdict in a test run                              | Who ran it                             |
 
 The name appears on the Details popup of any node, and on the **Created** and
 **Updated** rows of the view panel.

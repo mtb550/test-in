@@ -26,6 +26,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
+import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -39,7 +40,6 @@ import org.testin.testcase.TestCaseSnapshot;
 import org.testin.testcase.create.TestCaseUpdateMenuDialog;
 import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
-import org.testin.codegen.GenType;
 
 import java.nio.file.Path;
 import java.util.List;

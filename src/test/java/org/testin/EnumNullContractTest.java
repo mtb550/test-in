@@ -124,7 +124,8 @@ public class EnumNullContractTest {
             final List<String> skipped = new ArrayList<>();
 
             final List<Class<?>> enums = findEnums();
-            if (enums.isEmpty()) fail("No enums found under " + ROOT_PACKAGE + ": the scan is looking in the wrong place");
+            if (enums.isEmpty())
+                fail("No enums found under " + ROOT_PACKAGE + ": the scan is looking in the wrong place");
             System.out.println("Checked " + enums.size() + " enums");
 
             for (final Class<?> type : enums) {

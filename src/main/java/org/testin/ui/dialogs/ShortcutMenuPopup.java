@@ -25,12 +25,14 @@ import com.intellij.ui.components.JBScrollPane;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.MenuItem;
-import org.testin.ui.framework.StatusBarBase;
 import org.testin.model.StatusBarItem;
 import org.testin.ui.framework.DialogKeys;
+import org.testin.ui.framework.StatusBarBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.ListValue;
 
+import javax.swing.JComponent;
+import javax.swing.ListSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -38,7 +40,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import javax.swing.*;
 
 // UC-INTERNAL-007, Rule-INTERNAL-054, Rule-INTERNAL-067
 @RequiredArgsConstructor

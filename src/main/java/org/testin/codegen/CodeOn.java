@@ -57,12 +57,12 @@ public final class CodeOn {
     }
 
     // Rule-CODEGEN-082
-    public static boolean isOnOrWarn(final @NotNull Project p) {
-        if (!OptionalPlugin.JAVA.isAvailableOrWarn(p)) return false;
+    public static boolean isOffAndWarned(final @NotNull Project p) {
+        if (OptionalPlugin.JAVA.isMissingAndWarned(p)) return true;
 
         final @NotNull Optional<String> why = whyOff(p);
         why.ifPresent(reason -> Services.getInstance(p, Notifier.class).softRefuse(p, reason));
-        return why.isEmpty();
+        return why.isPresent();
     }
 
     // Rule-CODEGEN-082, Rule-CODEGEN-005
@@ -83,16 +83,16 @@ public final class CodeOn {
     }
 
     // Rule-CODEGEN-082, Rule-TREE-PANEL-104
-    public static boolean enableOrExplain(final @NotNull AnAction action, final @NotNull AnActionEvent e) {
+    public static boolean grayedWithReason(final @NotNull AnAction action, final @NotNull AnActionEvent e) {
         final @NotNull Presentation presentation = e.getPresentation();
-        if (!OptionalPlugin.JAVA.enableOrExplain(action, presentation)) return false;
+        if (OptionalPlugin.JAVA.grayedWithReason(action, presentation)) return true;
 
         final @NotNull Presentation own = action.getTemplatePresentation();
         final @NotNull Optional<String> why = Optional.ofNullable(e.getProject()).flatMap(CodeOn::whyOff);
         if (why.isEmpty()) {
             presentation.setText(own.getText());
             presentation.setDescription(own.getDescription());
-            return true;
+            return false;
         }
 
         presentation.setEnabled(false);

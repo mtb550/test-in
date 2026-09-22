@@ -24,17 +24,16 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
-import org.testin.editor.TestinEditor;
 import org.testin.editor.run.RunEditor;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.testrun.create.FailedResultDialog;
+import org.testin.testrun.failure.FailedResultDialog;
 import org.testin.util.Bundle;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 public class SetTestCaseStatusAction extends DumbAwareAction {
     @Getter
@@ -52,21 +51,18 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
         final @NotNull List<TestCaseDto> selectedItems = TestinData.selectedCases(e);
         if (p == null || selectedItems.isEmpty()) return;
 
-        final @NotNull Optional<TestinEditor> editor = TestinData.editor(e);
-        if (editor.isEmpty()) return;
-
-        record(p, editor.orElseThrow(), selectedItems);
+        TestinData.runEditor(e).ifPresent(editor -> record(p, editor, selectedItems));
     }
 
     // UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033
-    private void record(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
-        if (status.isCollectsFailureDetails() && editor instanceof RunEditor runEditor && selectedItems.size() == 1) {
-            final @NotNull Optional<TestRunItems> runItem = runEditor.runItem(selectedItems.getFirst().getId())
+    private void record(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+        if (status.isCollectsFailureDetails() && selectedItems.size() == 1) {
+            final @NotNull Optional<TestRunItems> runItem = editor.runItem(selectedItems.getFirst().getId())
                     .filter(item -> !item.isRemoved());
 
             if (runItem.isPresent()) {
-                new FailedResultDialog(p, runEditor.getParent().getPath(), runItem.orElseThrow(), fields -> {
-                    if (Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, runEditor.getParent().getPath(), selectedItems.getFirst().getId(), fields)) {
+                new FailedResultDialog(p, editor.getParent().getPath(), runItem.orElseThrow(), fields -> {
+                    if (Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, editor.getParent().getPath(), selectedItems.getFirst().getId(), fields)) {
                         applyStatus(p, editor, selectedItems);
                     }
                 }).show();
@@ -77,14 +73,14 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
         applyStatus(p, editor, selectedItems);
     }
 
-    private void applyStatus(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+    private void applyStatus(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
         Services.getInstance(p, RunStatusService.class).applyStatus(p, editor, selectedItems, status);
     }
 
     // UC-EDITOR-PANEL-032
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(TestinData.editor(e).filter(RunEditor.class::isInstance).isPresent()
+        e.getPresentation().setEnabled(TestinData.runEditor(e).isPresent()
                 && !TestinData.selectedCases(e).isEmpty());
     }
 

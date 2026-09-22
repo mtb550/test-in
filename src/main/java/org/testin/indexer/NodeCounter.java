@@ -23,7 +23,6 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.NodeFigures;
-import org.testin.model.NodeStatistics;
 import org.testin.model.TestRunSummary;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
@@ -35,19 +34,6 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NodeCounter {
-    @AllArgsConstructor
-    private enum Gathered {
-        CHILDREN(
-                NodeCounter::childCounts
-        ),
-
-        VERDICTS(
-                NodeCounter::runVerdicts
-        );
-
-        private final @NotNull FiguresGatherer gather;
-    }
-
     public static @NotNull NodeFigures figures(final @NotNull Project p, final @NotNull DirectoryDto dto) {
         return Gathered.valueOf(dto.getType().getStatistics().name()).gather.of(p, dto);
     }
@@ -89,5 +75,18 @@ public final class NodeCounter {
 
     private static long counted(final @NotNull Map<DirectoryType, Long> byType, final @NotNull DirectoryType type) {
         return byType.getOrDefault(type, 0L);
+    }
+
+    @AllArgsConstructor
+    private enum Gathered {
+        CHILDREN(
+                NodeCounter::childCounts
+        ),
+
+        VERDICTS(
+                NodeCounter::runVerdicts
+        );
+
+        private final @NotNull FiguresGatherer gather;
     }
 }

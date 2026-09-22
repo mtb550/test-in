@@ -23,10 +23,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
-import org.testin.notifications.Notifier;
-import org.testin.services.Services;
 import org.testin.model.MenuItem;
 import org.testin.model.StatusBarItem;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.testcase.create.CreateTestCaseSection;
 import org.testin.testcase.create.TestCaseBaseDialog;
 import org.testin.testcase.update.bulk.DescriptionBulkSectionDialog;
@@ -42,10 +42,16 @@ import org.testin.util.Bundle;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
 import java.util.function.Function;
 
-import static org.testin.testcase.TestCaseDialogKey.*;
+import static org.testin.testcase.TestCaseDialogKey.ADD_GROUP;
+import static org.testin.testcase.TestCaseDialogKey.ADD_STEP;
+import static org.testin.testcase.TestCaseDialogKey.AUTO_COMPLETE;
+import static org.testin.testcase.TestCaseDialogKey.CORRECTIONS;
+import static org.testin.testcase.TestCaseDialogKey.NAVIGATE_ARROWS;
+import static org.testin.testcase.TestCaseDialogKey.NAVIGATE_TAB;
 
 @Getter
 @AllArgsConstructor

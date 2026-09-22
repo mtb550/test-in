@@ -18,10 +18,9 @@ package org.testin.view.marker;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.view.marker.MarkerDetailsViewDialog;
-import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
 

@@ -47,20 +47,20 @@ panel does the same job by hand, and is on
 
 ## What is picked up, and what is not
 
-| The change | Picked up |
-|---|---|
-| A test case, a test set or a marker file edited by hand | Yes |
-| Files a pull brought in | Yes |
-| Files a branch switch changed | Yes |
-| Forty files at once | Yes, as one read |
-| Anything inside a `.git` folder | No |
-| The Testin folder itself | No |
-| Anything outside the Testin folder | No |
-| Anything at all, when no Testin folder is set | No |
+| The change                                                    | Picked up            |
+|---------------------------------------------------------------|----------------------|
+| A test case, a test set or a marker file edited by hand       | Yes                  |
+| Files a pull brought in                                       | Yes                  |
+| Files a branch switch changed                                 | Yes                  |
+| Forty files at once                                           | Yes, as one read     |
+| Anything inside a `.git` folder                               | No                   |
+| The Testin folder itself                                      | No                   |
+| Anything outside the Testin folder                            | No                   |
+| Anything at all, when no Testin folder is set                 | No                   |
 | What Testin itself just wrote, still saying what Testin wrote | No, for five seconds |
-| A file Testin just wrote, edited by hand since | Yes |
-| A code project whose panel was never opened | No |
-| `testin.yml` | No |
+| A file Testin just wrote, edited by hand since                | Yes                  |
+| A code project whose panel was never opened                   | No                   |
+| `testin.yml`                                                  | No                   |
 
 ## The screen
 

@@ -23,8 +23,9 @@ import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import org.testin.util.Bundle;
-import javax.swing.*;
-import java.awt.*;
+
+import javax.swing.SwingConstants;
+import java.awt.BorderLayout;
 
 public class HistoryTab {
     // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-037

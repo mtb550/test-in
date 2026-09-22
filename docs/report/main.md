@@ -6,24 +6,24 @@ A report is a document about one test run: how many test cases it held, how many
 passed, and what the failures were. It is written to a file, so it can be sent
 to somebody who does not have the IDE.
 
-| | |
-|---|---|
-| **Part of Testin** | Reports |
-| **Answers** | How a report is made, what it contains, and what each format holds |
-| **Numbering** | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` to `Rule-REPORT-021` |
-| **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code |
-| **Written to** | [How a document is written](../standard.md) |
+|                     |                                                                                                    |
+|---------------------|----------------------------------------------------------------------------------------------------|
+| **Part of Testin**  | Reports                                                                                            |
+| **Answers**         | How a report is made, what it contains, and what each format holds                                 |
+| **Numbering**       | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` to `Rule-REPORT-021` |
+| **State**           | **Written** — [#181](https://github.com/mtb550/test-in/issues/181)                                 |
+| **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code         |
+| **Written to**      | [How a document is written](../standard.md)                                                        |
 
 ---
 
 ## The use cases
 
-| | What the tester does | |
-|---|---|---|
-| **UC-REPORT-001** | [Generate a report on a test run](generateReport.md) | Send a run's results to someone who has no IDE. |
-| **UC-REPORT-002** | [Open the report that was just made](openReport.md) | Check the document before sending it. |
-| **UC-REPORT-003** | [Copy the report's path](copyReportPath.md) | Paste the file's location into a ticket or a chat. |
+|                   | What the tester does                                 |                                                    |
+|-------------------|------------------------------------------------------|----------------------------------------------------|
+| **UC-REPORT-001** | [Generate a report on a test run](generateReport.md) | Send a run's results to someone who has no IDE.    |
+| **UC-REPORT-002** | [Open the report that was just made](openReport.md)  | Check the document before sending it.              |
+| **UC-REPORT-003** | [Copy the report's path](copyReportPath.md)          | Paste the file's location into a ticket or a chat. |
 
 ---
 
@@ -49,8 +49,8 @@ a ticket, mailed to a manager, or kept as the record that a release was tested.
 
 ## Every key
 
-| Key | What it does | The page that owns it |
-|---|---|---|
+| Key      | What it does                                | The page that owns it              |
+|----------|---------------------------------------------|------------------------------------|
 | `Ctrl+P` | Generates a report on the selected test run | [UC-REPORT-001](generateReport.md) |
 
 The key works on the tree, and on the list of test cases inside a run editor. It
@@ -60,11 +60,11 @@ is not in the IDE's keymap, so it cannot be changed there.
 
 ## The four formats
 
-| Format | What it is for |
-|---|---|
-| **PDF** | The one to attach to a ticket. The starting choice |
-| **Word** | The one to edit before sending |
-| **HTML** | The one to open in a browser. It carries a light and dark switch |
+| Format    | What it is for                                                                          |
+|-----------|-----------------------------------------------------------------------------------------|
+| **PDF**   | The one to attach to a ticket. The starting choice                                      |
+| **Word**  | The one to edit before sending                                                          |
+| **HTML**  | The one to open in a browser. It carries a light and dark switch                        |
 | **Excel** | The one to work with in a spreadsheet. Its test cases are one table, to sort and filter |
 
 The first three carry the same content. The spreadsheet carries the same
@@ -134,22 +134,22 @@ per verdict.
 
 ## Where the plugin breaks its own rules
 
-| | The rule it breaks | What a tester sees |
-|---|---|---|
+|                  | The rule it breaks                                    | What a tester sees                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+|------------------|-------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Difference 8** | Rule-REPORT-002 — every format reads the same figures | The PDF drops any text outside Latin-1. An Arabic test case description comes out of the PDF as an empty cell, while the HTML, Word and Excel reports print it. It is no longer silent: a message says what was left out and which formats keep it (Rule-REPORT-018). The three fonts the PDF is built from are the standard Helvetica faces, which carry Western encoding only, so the fix is a Unicode font shipped inside the plugin — a decision about what Testin distributes, not a line to change. [#326](https://github.com/mtb550/test-in/issues/326), *The PDF report prints Latin only, and its library is AGPL inside an Apache 2.0 plugin*. |
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.
 
-| Gone | Was |
-|---|---|
-| **Difference 1** | An empty folder, file name or format moved the cursor and said nothing, so the dialog read as a button that does not work. The empty box's own hint turns red now and takes the cursor — *Choose a folder*, *Name the file*, *Choose a format*. Fixed 9 September 2026, [#251](https://github.com/mtb550/test-in/issues/251) |
-| **Difference 2** | `Enter` did nothing in the report dialog, so the tester had to press **Generate**. `Enter` generates the report now, and the status bar says so. Fixed 9 September 2026, [#252](https://github.com/mtb550/test-in/issues/252) |
+| Gone             | Was                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Difference 1** | An empty folder, file name or format moved the cursor and said nothing, so the dialog read as a button that does not work. The empty box's own hint turns red now and takes the cursor — *Choose a folder*, *Name the file*, *Choose a format*. Fixed 9 September 2026, [#251](https://github.com/mtb550/test-in/issues/251)                                                                                                                         |
+| **Difference 2** | `Enter` did nothing in the report dialog, so the tester had to press **Generate**. `Enter` generates the report now, and the status bar says so. Fixed 9 September 2026, [#252](https://github.com/mtb550/test-in/issues/252)                                                                                                                                                                                                                        |
 | **Difference 3** | The report button was offered on a test run still being written, so the document described a state that had already moved on. Every way of asking is gray while a run is **In Progress**, with the reason in the tooltip (Rule-REPORT-016). The row also overstated the defect: the button could never be unavailable, because it is only ever built with a run editor. Fixed 9 September 2026, [#253](https://github.com/mtb550/test-in/issues/253) |
-| **Difference 4** | A test run nobody executed printed **Execution Started** and **Execution Ended** as empty rows, because three rows went round the helper that drops a blank. Fixed 9 September 2026, [#254](https://github.com/mtb550/test-in/issues/254) |
-| **Difference 5** | The message named the format in capitals — *WORD Report Generated*. Formats read as words now, in the message and in the dialog alike. Fixed 9 September 2026, [#255](https://github.com/mtb550/test-in/issues/255) |
-| **Difference 6** | A web page opened in whatever application claimed the file when it was a report, and in the browser when it was an export. Every web page goes to the browser now. Fixed 9 September 2026, [#256](https://github.com/mtb550/test-in/issues/256) |
-| **Difference 7** | The report, export and import bars could not be canceled. All three can be. Fixed 9 September 2026, [#257](https://github.com/mtb550/test-in/issues/257) |
+| **Difference 4** | A test run nobody executed printed **Execution Started** and **Execution Ended** as empty rows, because three rows went round the helper that drops a blank. Fixed 9 September 2026, [#254](https://github.com/mtb550/test-in/issues/254)                                                                                                                                                                                                            |
+| **Difference 5** | The message named the format in capitals — *WORD Report Generated*. Formats read as words now, in the message and in the dialog alike. Fixed 9 September 2026, [#255](https://github.com/mtb550/test-in/issues/255)                                                                                                                                                                                                                                  |
+| **Difference 6** | A web page opened in whatever application claimed the file when it was a report, and in the browser when it was an export. Every web page goes to the browser now. Fixed 9 September 2026, [#256](https://github.com/mtb550/test-in/issues/256)                                                                                                                                                                                                      |
+| **Difference 7** | The report, export and import bars could not be canceled. All three can be. Fixed 9 September 2026, [#257](https://github.com/mtb550/test-in/issues/257)                                                                                                                                                                                                                                                                                             |
 
 ---
 

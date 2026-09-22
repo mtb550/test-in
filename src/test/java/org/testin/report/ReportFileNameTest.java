@@ -24,6 +24,7 @@ import java.time.ZonedDateTime;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -95,7 +96,6 @@ public class ReportFileNameTest {
      */
     @Test
     public void asecondReportOfTheSameRunIsASecondFile() {
-        assertFalse(ReportFileName.of("Nafath", "Sprint 7", AT)
-                .equals(ReportFileName.of("Nafath", "Sprint 7", AT.plusSeconds(1))));
+        assertNotEquals(ReportFileName.of("Nafath", "Sprint 7", AT.plusSeconds(1)), ReportFileName.of("Nafath", "Sprint 7", AT));
     }
 }

@@ -35,10 +35,10 @@ A smaller number sits higher in the list.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -88,8 +88,8 @@ A smaller number sits higher in the list.
 
 1. **One field** — it shows the node's current number, or nothing. It accepts
    digits only, and no leading zero. Anything else is refused as it is typed. An
-   empty field means date order. The cursor sits after the number, so typing
-   **adds to the number**. A node numbered 3 whose tester types 5 ends up at 35.
+   empty field means date order. The cursor sits after the number, so typing **adds to the number**. A node numbered 3
+   whose tester types 5 ends up at 35.
    `Ctrl+A` selects the whole number.
 
 ## Main flow
@@ -112,16 +112,14 @@ one again ([UC-TREE-PANEL-016](undoChange.md)).
 **If the tester types a leading zero, a letter or a space** — the character does
 not appear.
 
-**If the test project or a container is selected** — **Order** is gray.
-(Rule-TREE-PANEL-058)
+**If the test project or a container is selected** — **Order** is gray. (Rule-TREE-PANEL-058)
 
 **If several rows are selected** — **Order** stays black and orders the first of
 them, saying nothing about the rest.
 
 **If the number is too large** — nothing is saved. A message titled **Too
 Large** says what the largest position is, and the dialog stays open with the
-number still in it. The same happens to anything that is not a whole number.
-(Rule-TREE-PANEL-055)
+number still in it. The same happens to anything that is not a whole number. (Rule-TREE-PANEL-055)
 
 ---
 

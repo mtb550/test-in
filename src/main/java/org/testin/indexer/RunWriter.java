@@ -51,6 +51,12 @@ final class RunWriter {
 
     private final @NotNull Map<Path, byte[]> unwritten = new ConcurrentHashMap<>();
 
+    private static @NotNull Set<String> namedScreenshots(final @NotNull TestRunDto tr) {
+        return tr.getResults().stream()
+                .flatMap(item -> item.getScreenshots().stream())
+                .collect(Collectors.toSet());
+    }
+
     void create(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
         store.registerTestRun(runPath, tr);
         write(runPath, tr, Set.of());
@@ -72,7 +78,7 @@ final class RunWriter {
 
         final @NotNull Map<Path, byte[]> results = new LinkedHashMap<>();
         for (final TestRunItems item : tr.getResults()) {
-            snapshot(item, "run item").ifPresent(bytes -> results.put(runPath.resolve(FileKind.RUN_ITEM.fileName(item.getId())), bytes));
+            snapshot(item).ifPresent(bytes -> results.put(runPath.resolve(FileKind.RUN_ITEM.fileName(item.getId())), bytes));
         }
 
         queue.execute(() -> {
@@ -114,12 +120,6 @@ final class RunWriter {
         files.screenshotsIn(runPath).stream()
                 .filter(file -> !named.contains(file.getFileName().toString()))
                 .forEach(file -> files.delete(p, file));
-    }
-
-    private static @NotNull Set<String> namedScreenshots(final @NotNull TestRunDto tr) {
-        return tr.getResults().stream()
-                .flatMap(item -> item.getScreenshots().stream())
-                .collect(Collectors.toSet());
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
@@ -176,11 +176,11 @@ final class RunWriter {
         });
     }
 
-    private @NotNull Optional<byte[]> snapshot(final @NotNull Object value, final @NotNull String what) {
+    private @NotNull Optional<byte[]> snapshot(final @NotNull TestRunItems item) {
         try {
-            return Optional.of(Services.getInstance(p, Mapper.class).writeValueAsBytes(value));
+            return Optional.of(Services.getInstance(p, Mapper.class).writeValueAsBytes(item));
         } catch (final Exception ex) {
-            Logger.error("Failed to snapshot " + what + ": " + ex.getMessage());
+            Logger.error("Failed to snapshot run item: " + ex.getMessage());
             return Optional.empty();
         }
     }

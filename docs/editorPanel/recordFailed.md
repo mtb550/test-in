@@ -96,8 +96,8 @@ form before it records anything.
 1. **Description** and **Expected** — what the test case says, each after its
    icon, **D** and **E**, as the test case form draws them. They show the tester
    what should have happened. Neither can be typed into.
-2. **The first box** — what actually happened. Its caption above it reads
-   **Actual Result**, and its gray hint is inside it. A misspelled word in it is
+2. **The first box** — what actually happened. Its caption above it reads **Actual Result**, and its gray hint is inside
+   it. A misspelled word in it is
    underlined, and `Alt+Enter` offers the corrections.
 3. **Bug Severity** — four choices, with the least serious chosen.
 4. **Bug Priority** — three choices, with the lowest chosen.
@@ -135,8 +135,8 @@ whatever verdict it had.
 case was removed - the run keeps what it recorded.*
 
 **If the test run is no longer there, or no longer covers the test case** — a
-message reads *This test run is no longer here, so nothing was recorded*, or
-*This test run does not cover this test case, so nothing was recorded*. The
+message reads *This test run is no longer here, so nothing was recorded*, or *This test run does not cover this test
+case, so nothing was recorded*. The
 case is not recorded Failed. In light mode the failure form stays open with
 everything typed still in it (Rule-EDITOR-PANEL-225).
 

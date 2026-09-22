@@ -20,7 +20,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testng.annotations.Test;
 
-import javax.swing.*;
+import javax.swing.TransferHandler;
 import java.nio.file.Path;
 
 import static org.testng.Assert.assertEquals;

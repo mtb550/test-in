@@ -25,11 +25,12 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.services.Services;
 import org.testin.testrun.RunStatusService;
-import org.testin.testrun.create.FailureFields;
+import org.testin.testrun.failure.FailureFields;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RowStripe;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 import java.awt.Component;
 import java.awt.Container;
@@ -39,14 +40,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 class FailureForm extends JBPanel<FailureForm> {
+    private static final float PLACEHOLDER_SCALE = 0.7f;
     private final @NotNull FailureFields fields;
     private final @NotNull TestRunItems runItem;
     private final @NotNull Project p;
     private final @NotNull Path runPath;
-
     private final @NotNull Map<Component, Font> baseFonts = new HashMap<>();
-
-    private static final float PLACEHOLDER_SCALE = 0.7f;
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-202
     FailureForm(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem, final float zoom, final @NotNull Runnable resized) {
@@ -84,7 +83,8 @@ class FailureForm extends JBPanel<FailureForm> {
         for (final Component child : parent.getComponents()) {
             if (child.getFont() != null) baseFonts.put(child, child.getFont());
 
-            if (child instanceof JTextComponent || child instanceof EditorTextField) child.setBackground(RowStripe.odd());
+            if (child instanceof JTextComponent || child instanceof EditorTextField)
+                child.setBackground(RowStripe.odd());
 
             if (child instanceof Container container) remember(container);
         }

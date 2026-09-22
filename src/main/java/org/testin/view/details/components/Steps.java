@@ -21,13 +21,15 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.framework.Prose;
-import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Display;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BoxLayout;
+import javax.swing.JTextArea;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
 import java.util.List;
 
 public class Steps extends BaseDetails {

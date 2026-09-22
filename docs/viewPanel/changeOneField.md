@@ -2,8 +2,8 @@
 
 # UC-VIEW-PANEL-011: Change one field without leaving the panel
 
-**As a** tester, **I want** to correct a field I have just noticed is wrong,
-**so that** I do not have to go back to the editor and find the test case
+**As a** tester, **I want** to correct a field I have just noticed is wrong, **so that** I do not have to go back to the
+editor and find the test case
 again.
 
 One field, one small dialog. The rest of the test case is left alone.

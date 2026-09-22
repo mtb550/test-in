@@ -39,24 +39,6 @@ import static org.testng.Assert.assertEquals;
  */
 public class WheelForwardingTest {
 
-    /**
-     * A scroll pane that records the wheel events handed to it instead of
-     * scrolling, so the test asks which pane was chosen and nothing about how the
-     * platform animates a scroll.
-     */
-    private static final class RecordingPane extends JBScrollPane {
-        private final @NotNull List<MouseWheelEvent> received = new ArrayList<>();
-
-        private RecordingPane(final @NotNull Component view) {
-            super(view);
-        }
-
-        @Override
-        protected void processMouseWheelEvent(final @NotNull MouseWheelEvent e) {
-            received.add(e);
-        }
-    }
-
     private static void layOut(final @NotNull Container container) {
         container.doLayout();
         for (final Component child : container.getComponents()) {
@@ -88,5 +70,23 @@ public class WheelForwardingTest {
 
         assertEquals(inner.received.size(), 0, "the wheel went to a scroll pane with nothing to scroll");
         assertEquals(outer.received.size(), 1, "the scroll pane that can scroll never heard the wheel");
+    }
+
+    /**
+     * A scroll pane that records the wheel events handed to it instead of
+     * scrolling, so the test asks which pane was chosen and nothing about how the
+     * platform animates a scroll.
+     */
+    private static final class RecordingPane extends JBScrollPane {
+        private final @NotNull List<MouseWheelEvent> received = new ArrayList<>();
+
+        private RecordingPane(final @NotNull Component view) {
+            super(view);
+        }
+
+        @Override
+        protected void processMouseWheelEvent(final @NotNull MouseWheelEvent e) {
+            received.add(e);
+        }
     }
 }

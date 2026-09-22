@@ -2,8 +2,8 @@
 
 # UC-CODEGEN-013: Turn a test case off
 
-**As a** tester, **I want** a test case's method to stop running,
-**so that** a test I know is broken does not fail every run until I fix it.
+**As a** tester, **I want** a test case's method to stop running, **so that** a test I know is broken does not fail
+every run until I fix it.
 
 Turn a test case off, and TestNG skips its method from then on.
 

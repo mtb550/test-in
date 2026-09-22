@@ -43,8 +43,7 @@ The row is the first one on the page.
 ```
 
 1. **The box** — the one folder that holds every test project.
-2. **The gray example** — shown only while the box is empty. It reads
-   *Example -> C:\Users\{username}\Documents\Testin*.
+2. **The gray example** — shown only while the box is empty. It reads *Example -> C:\Users\{username}\Documents\Testin*.
 3. **The browse button** — opens a folder chooser.
 4. **Open** — opens the folder in the file manager. It is
    [UC-SETTING-003](openTestinFolder.md).
@@ -89,12 +88,11 @@ spaces is the same answer.
 
 ## What happens when no folder is set
 
-**When a code project opens** — a message titled **Testin Setup Required** reads
-*Please set the Testin folder to enable test management features.*
+**When a code project opens** — a message titled **Testin Setup Required** reads *Please set the Testin folder to enable
+test management features.*
 It carries a link reading **Open Settings**.
 
-**In the tree panel** — the empty state is shown, with a link reading
-**Configure Testin settings**.
+**In the tree panel** — the empty state is shown, with a link reading **Configure Testin settings**.
 
 **On the toolbar** — **Select Test Project** is gray.
 

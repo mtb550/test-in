@@ -16,14 +16,14 @@
 
 package org.testin.git;
 
-import org.testin.codegen.GenType;
-import org.testin.notifications.Done;
-import org.testin.model.DirectoryType;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.model.DirectoryType;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseSnapshot;
@@ -37,13 +37,17 @@ import org.testin.ui.framework.TextInput;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 
-public final class PendingCommitsDialog extends AbstractFrameworkDialog<SelectionTable> {
+public final class PendingCommitsDialog extends AbstractFrameworkDialog {
     private static final @NotNull String PUSH = Bundle.message("dialog.pending.button.push");
     private static final @NotNull String COMMIT = Bundle.message("dialog.pending.button.commit");
 
@@ -129,9 +133,6 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             if (row < rowDifferences.size()) selected.add(rowDifferences.get(row).diff());
         }
         return List.copyOf(selected);
-    }
-
-    private record Row(@NotNull PendingChange diff, @NotNull FieldChange change) {
     }
 
     // UC-SHARE-011, Rule-SHARE-051, Rule-SHARE-119
@@ -230,6 +231,10 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         closeOk();
     }
 
-    public record Request(@NotNull List<PendingChange> changes, @NotNull String message, boolean push, @NotNull String branch, boolean newBranch) {
+    private record Row(@NotNull PendingChange diff, @NotNull FieldChange change) {
+    }
+
+    public record Request(@NotNull List<PendingChange> changes, @NotNull String message, boolean push,
+                          @NotNull String branch, boolean newBranch) {
     }
 }

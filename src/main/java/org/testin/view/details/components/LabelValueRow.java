@@ -25,8 +25,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
 import org.testin.ui.framework.Prose;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import javax.swing.JTextArea;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class LabelValueRow {

@@ -22,11 +22,10 @@ import org.testin.model.PackageStatus;
 
 import java.util.List;
 
-@SuppressWarnings("UnusedReturnValue")
 public interface PackageMarker extends Marker {
     @NotNull PackageStatus getStatus();
 
-    PackageMarker setStatus(@NotNull PackageStatus status);
+    void setStatus(@NotNull PackageStatus status);
 
     @Override
     default @NotNull NodeStatus status() {

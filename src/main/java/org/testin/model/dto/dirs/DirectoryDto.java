@@ -16,7 +16,12 @@
 
 package org.testin.model.dto.dirs;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,19 +53,19 @@ public abstract class DirectoryDto {
     @ToString.Exclude
     private @Nullable DirectoryDto parent;
 
+    public static @NotNull ArrayList<String> pathOf(final @NotNull List<String> parentPath, final @NotNull String name) {
+        final @NotNull ArrayList<String> path = new ArrayList<>(parentPath);
+        path.add(name);
+
+        return path;
+    }
+
     public @NotNull List<DirectoryDto> selfAndAncestors() {
         final @NotNull List<DirectoryDto> chain = new ArrayList<>();
         for (DirectoryDto current = this; current != null; current = current.getParent()) {
             chain.add(current);
         }
         return chain;
-    }
-
-    public static @NotNull ArrayList<String> pathOf(final @NotNull List<String> parentPath, final @NotNull String name) {
-        final @NotNull ArrayList<String> path = new ArrayList<>(parentPath);
-        path.add(name);
-
-        return path;
     }
 
     @NonNull

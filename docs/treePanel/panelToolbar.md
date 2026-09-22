@@ -91,16 +91,16 @@ It is the row along the top of the panel, to the right of the word **Testin**.
 Eight buttons, always in this order. The last column is the page that says what
 happens when the tester presses one.
 
-| | Button | Hovering says | Where it is written |
-|---|---|---|---|
-| 1 | **Search Test Project** | *Find a test case, test set, package or run and go to it* | [UC-INTERNAL-001](../internal/globalSearch.md) |
-| 2 | **Settings** | *Configure Testin settings* | Below |
-| 3 | **Expand All** | *Expand all nodes* | Below |
-| 4 | **Collapse All** | *Collapse all nodes* | Below |
-| 5 | **Refresh** | *Re-index and reload tree* | [UC-TREE-PANEL-025](refreshTree.md) |
-| 6 | **Select Test Project** | *Choose the test project this repository exercises* | [UC-TREE-PANEL-004](chooseTestProject.md) |
-| 7 | **New Test Project** | *Create or Clone test project* | [UC-TREE-PANEL-002](createTestProject.md) |
-| 8 | **Save to testin.yml** | *Name this test project in this code project's testin.yml, so its code is generated here and a colleague's clone finds it* | [UC-TREE-PANEL-029](saveTestinYml.md) |
+|     | Button                  | Hovering says                                                                                                              | Where it is written                            |
+|-----|-------------------------|----------------------------------------------------------------------------------------------------------------------------|------------------------------------------------|
+| 1   | **Search Test Project** | *Find a test case, test set, package or run and go to it*                                                                  | [UC-INTERNAL-001](../internal/globalSearch.md) |
+| 2   | **Settings**            | *Configure Testin settings*                                                                                                | Below                                          |
+| 3   | **Expand All**          | *Expand all nodes*                                                                                                         | Below                                          |
+| 4   | **Collapse All**        | *Collapse all nodes*                                                                                                       | Below                                          |
+| 5   | **Refresh**             | *Re-index and reload tree*                                                                                                 | [UC-TREE-PANEL-025](refreshTree.md)            |
+| 6   | **Select Test Project** | *Choose the test project this repository exercises*                                                                        | [UC-TREE-PANEL-004](chooseTestProject.md)      |
+| 7   | **New Test Project**    | *Create or Clone test project*                                                                                             | [UC-TREE-PANEL-002](createTestProject.md)      |
+| 8   | **Save to testin.yml**  | *Name this test project in this code project's testin.yml, so its code is generated here and a colleague's clone finds it* | [UC-TREE-PANEL-029](saveTestinYml.md)          |
 
 **Only the search button has a key.** It is `Ctrl+Alt+F`, and `Cmd+Alt+F` on a
 Mac. It works anywhere in the IDE. The button is how a tester finds out the

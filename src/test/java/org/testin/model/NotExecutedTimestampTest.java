@@ -17,15 +17,17 @@
 package org.testin.model;
 
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.markers.TestRunMarker;
 import org.testin.util.Display;
 import org.testng.annotations.Test;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.UUID;
-import org.testin.model.markers.TestRunMarker;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * "Not executed" is an empty timestamp of the same type, never a null and never

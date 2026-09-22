@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
 public class PreviousTestCaseAction extends DumbAwareAction {
     private final @NotNull ViewPagination controller;

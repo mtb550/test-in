@@ -30,7 +30,9 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.Consumer;
 
-public final class CreateProjectDialog extends AbstractFrameworkDialog<TextInput> {
+public final class CreateProjectDialog extends AbstractFrameworkDialog {
+    private final @NotNull TextInput nameInput;
+
     private final @NotNull Consumer<@NotNull String> onCreate;
 
     // UC-TREE-PANEL-002, UC-TREE-PANEL-003
@@ -40,29 +42,30 @@ public final class CreateProjectDialog extends AbstractFrameworkDialog<TextInput
 
         title = Bundle.message("dialog.create.project.title");
 
-        components = List.of(
-                ComponentDialogBase.textField()
-                        .icon(DirectoryType.TP.getIcon())
-                        .placeholder(Bundle.message("dialog.create.project.placeholder"))
-                        .build());
+        final @NotNull ComponentDialogBase<TextInput> built = ComponentDialogBase.textField()
+                .icon(DirectoryType.TP.getIcon())
+                .placeholder(Bundle.message("dialog.create.project.placeholder"))
+                .build();
+        nameInput = built.getComponent();
+        components = List.of(built);
 
         shortcuts = List.of(
                 StatusBarShortcut.confirm(this::submit),
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
+    // UC-TREE-PANEL-002, UC-TREE-PANEL-003, Rule-TREE-PANEL-095, Rule-TREE-PANEL-107
+    private static boolean isNameOrUrl(final @NotNull String typed) {
+        return GitRefs.isRepositoryUrl(typed) || DirectoryType.TP.canTakeName(typed);
+    }
+
     // UC-TREE-PANEL-002, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095
     @Override
     protected void submit() {
-        final @NotNull String name = accepted(component(), CreateProjectDialog::isNameOrUrl, Refused.NOT_A_JAVA_NAME);
+        final @NotNull String name = accepted(nameInput, CreateProjectDialog::isNameOrUrl, Refused.NOT_A_JAVA_NAME);
         if (name.isEmpty()) return;
 
         onCreate.accept(name);
         closeOk();
-    }
-
-    // UC-TREE-PANEL-002, UC-TREE-PANEL-003, Rule-TREE-PANEL-095, Rule-TREE-PANEL-107
-    private static boolean isNameOrUrl(final @NotNull String typed) {
-        return GitRefs.isRepositoryUrl(typed) || DirectoryType.TP.canTakeName(typed);
     }
 }

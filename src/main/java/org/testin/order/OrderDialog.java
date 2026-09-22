@@ -16,13 +16,12 @@
 
 package org.testin.order;
 
-import org.testin.services.Services;
-import org.testin.notifications.Notifier;
-import java.util.OptionalInt;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.Marker;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -30,9 +29,12 @@ import org.testin.ui.framework.TextInput;
 import org.testin.util.Bundle;
 
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.function.IntConsumer;
 
-final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
+final class OrderDialog extends AbstractFrameworkDialog {
+    private final @NotNull TextInput orderInput;
+
     private final @NotNull IntConsumer onSubmit;
 
     // UC-TREE-PANEL-015, Rule-TREE-PANEL-055
@@ -42,13 +44,14 @@ final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
 
         title = Bundle.message("dialog.order.title");
 
-        components = List.of(
-                ComponentDialogBase.textField()
-                        .icon(AllIcons.Actions.Edit)
-                        .placeholder(Bundle.message("dialog.order.placeholder"))
-                        .value(shown(current))
-                        .accepting("[1-9][0-9]*")
-                        .build());
+        final @NotNull ComponentDialogBase<TextInput> built = ComponentDialogBase.textField()
+                .icon(AllIcons.Actions.Edit)
+                .placeholder(Bundle.message("dialog.order.placeholder"))
+                .value(shown(current))
+                .accepting("[1-9][0-9]*")
+                .build();
+        orderInput = built.getComponent();
+        components = List.of(built);
 
         shortcuts = List.of(
                 StatusBarShortcut.confirm(this::submit),
@@ -57,22 +60,6 @@ final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
 
     private static @NotNull String shown(final int order) {
         return order == Marker.NOT_ORDERED ? "" : String.valueOf(order);
-    }
-
-    // UC-TREE-PANEL-015, Rule-TREE-PANEL-055
-    @Override
-    protected void submit() {
-        final @NotNull String text = component().getText().trim();
-        final @NotNull OptionalInt number = typed(text);
-
-        if (number.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("dialog.order.refused.title"),
-                    Bundle.message("dialog.order.refused.message", Marker.NOT_ORDERED));
-            return;
-        }
-
-        onSubmit.accept(number.getAsInt());
-        closeOk();
     }
 
     private static @NotNull OptionalInt typed(final @NotNull String text) {
@@ -85,5 +72,21 @@ final class OrderDialog extends AbstractFrameworkDialog<TextInput> {
         } catch (final NumberFormatException ex) {
             return OptionalInt.empty();
         }
+    }
+
+    // UC-TREE-PANEL-015, Rule-TREE-PANEL-055
+    @Override
+    protected void submit() {
+        final @NotNull String text = orderInput.getText().trim();
+        final @NotNull OptionalInt number = typed(text);
+
+        if (number.isEmpty()) {
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("dialog.order.refused.title"),
+                    Bundle.message("dialog.order.refused.message", Marker.NOT_ORDERED));
+            return;
+        }
+
+        onSubmit.accept(number.getAsInt());
+        closeOk();
     }
 }

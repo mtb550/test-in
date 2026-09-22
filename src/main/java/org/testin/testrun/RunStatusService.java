@@ -22,13 +22,11 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.TestinEditor;
 import org.testin.editor.run.RunEditor;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.Failure;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestRunStatus;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
@@ -36,7 +34,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.testcase.TestCaseSnapshot;
-import org.testin.testrun.create.FailureFields;
+import org.testin.testrun.failure.FailureFields;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
@@ -48,33 +46,30 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
-import org.testin.model.markers.TestRunMarker;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class RunStatusService {
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-238
+    private static @NotNull TestCaseDto asItIsNow(final @NotNull Project p, final @NotNull TestRunItems item) {
+        return TestCaseSnapshot.copy(p, item.liveCase());
+    }
+
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130
     public void executeNext(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestStatus status) {
         final int executingIndex = editor.getCurrentlyExecutingIndex();
         if (executingIndex == -1) {
             // Rule-EDITOR-PANEL-227
-            if (editor.executingCaseIsHidden()) Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.executing.hidden"));
+            if (editor.executingCaseIsHidden())
+                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.executing.hidden"));
             return;
         }
 
         final @NotNull TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
-        final @NotNull Path runPath = editor.getParent().getPath();
-
-        // Rule-EDITOR-PANEL-225
-        final @NotNull Optional<TestRunDto> held = heldRun(p, runPath);
-        if (held.isEmpty() || liveItem(p, held.orElseThrow(), runPath, currentTc.getId()).isEmpty()) return;
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath,
-                run -> run.resultOf(currentTc.getId()).filter(runItem -> !runItem.isRemoved()).ifPresent(runItem -> runItem.recordVerdict(status, tester, asItIsNow(p, runItem))));
-
-        Logger.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
-
-        triggerFilterRefresh(editor);
+        if (!recordOn(p, editor, currentTc.getId(), status, item -> item.recordVerdict(status, tester, asItIsNow(p, item))))
+            return;
 
         confirmVerdict(p, status, 1);
 
@@ -83,48 +78,39 @@ public final class RunStatusService {
     }
 
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-241, Rule-EDITOR-PANEL-242
-    public boolean recordReported(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
+    public void recordReported(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
         if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
             editor.startTimerForIndex(tcIndex + 1);
         }
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        if (!recordOn(p, editor.getParent().getPath(), tc.getId(), status, item -> {
+        recordOn(p, editor, tc.getId(), status, item -> {
             item.recordDuration(duration);
             failure.recordOn(item);
             item.recordVerdict(status, tester, asItIsNow(p, item));
-        })) return false;
-
-        triggerFilterRefresh(editor);
-        return true;
+        });
     }
 
     // UC-EDITOR-PANEL-038, Rule-EDITOR-PANEL-240
     private boolean correct(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        if (!recordOn(p, editor.getParent().getPath(), tc.getId(), status, item -> item.correctVerdict(status, tester, asItIsNow(p, item)))) return false;
-
-        triggerFilterRefresh(editor);
-        return true;
+        return recordOn(p, editor, tc.getId(), status, item -> item.correctVerdict(status, tester, asItIsNow(p, item)));
     }
 
-    private boolean recordOn(final @NotNull Project p, final @NotNull Path runPath, final @NotNull UUID caseId, final @NotNull TestStatus status, final @NotNull Consumer<TestRunItems> verdict) {
-        final @NotNull TestRunDto run = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(runPath);
-
-        if (liveItem(p, run, runPath, caseId).isEmpty()) return false;
+    // Rule-EDITOR-PANEL-225
+    private boolean recordOn(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull UUID caseId, final @NotNull TestStatus status, final @NotNull Consumer<TestRunItems> verdict) {
+        final @NotNull Path runPath = editor.getParent().getPath();
+        final @NotNull Optional<TestRunDto> held = heldRun(p, runPath);
+        if (held.isEmpty() || liveItem(p, held.orElseThrow(), runPath, caseId).isEmpty()) return false;
 
         Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, current -> current.resultOf(caseId).ifPresentOrElse(verdict,
                 () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + caseId + " - verdict not recorded")));
 
         Logger.trace("[RunStatusService]: Status updated -> " + caseId + " = " + status);
 
+        triggerFilterRefresh(editor);
         return true;
-    }
-
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-238
-    private static @NotNull TestCaseDto asItIsNow(final @NotNull Project p, final @NotNull TestRunItems item) {
-        return TestCaseSnapshot.copy(p, item.liveCase());
     }
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167
@@ -178,9 +164,7 @@ public final class RunStatusService {
         Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.case.removed"));
     }
 
-    public void applyStatus(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull List<TestCaseDto> selectedItems, final @NotNull TestStatus status) {
-        if (!(ui instanceof RunEditor editor)) return;
-
+    public void applyStatus(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems, final @NotNull TestStatus status) {
         if (selectedItems.isEmpty()) return;
 
         final @NotNull List<String> losing = wouldBeErased(editor, selectedItems, status);
@@ -257,39 +241,7 @@ public final class RunStatusService {
         Services.getInstance(p, Notifier.class).softShowCounted(p, status.getLabel(), count);
     }
 
-    public void persistRun(final @NotNull Project p, final @NotNull RunEditor editor) {
-        Services.getInstance(p, ProjectIndexer.class).saveRun(editor.getParent().getPath());
-    }
-
-    public void persistMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunStatus status) {
-        final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-
-        if (status.isTerminal()) finishRun(p, runPath);
-
-        Services.getInstance(p, ProjectIndexer.class).changeRunMarker(runPath, marker -> {
-            marker.setStatus(status);
-            marker.touch(tester);
-        });
-    }
-
-    private void finishRun(final @NotNull Project p, final @NotNull Path runPath) {
-        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, tr -> {
-            int closed = 0;
-            for (final TestRunItems item : tr.getResults()) {
-                if (item.shownStatus() == TestStatus.PENDING) {
-                    item.setStatus(TestStatus.UNTESTED);
-                    closed++;
-                }
-            }
-
-            if (closed > 0)
-                Logger.info("Run finished with " + closed + " case(s) not executed; marked untested: " + runPath);
-        });
-
-        Services.getInstance(p, ProjectIndexer.class).changeRunMarker(runPath, TestRunMarker::markExecutionEnded);
-    }
-
     private void triggerFilterRefresh(final @NotNull RunEditor editor) {
-        ApplicationManager.getApplication().invokeLater(editor::refreshAfterStatusChange);
+        ApplicationManager.getApplication().invokeLater(editor::refreshView);
     }
 }

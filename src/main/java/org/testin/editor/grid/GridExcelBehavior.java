@@ -22,7 +22,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.ListSelectionModel;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -44,7 +49,7 @@ public final class GridExcelBehavior {
     }
 
     private static void installSequenceColumnRowSelection(final @NotNull JBTable table) {
-        final MouseListener @NotNull[] existing = table.getMouseListeners();
+        final MouseListener @NotNull [] existing = table.getMouseListeners();
         for (final MouseListener listener : existing) table.removeMouseListener(listener);
         table.addMouseListener(new SequenceColumnRowSelector(table));
         for (final MouseListener listener : existing) table.addMouseListener(listener);

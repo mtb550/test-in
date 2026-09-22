@@ -26,23 +26,54 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
-import org.testin.testcase.TestEditorAttributes;
-import org.testin.testcase.TestEditorAttributes.Can;
-import org.testin.model.dto.TestCaseDto;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
+import org.testin.testcase.TestCaseSnapshot;
+import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.services.BackgroundWork;
 import org.testin.util.Bundle;
-import org.testin.testcase.TestCaseSnapshot;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class ExportAction extends DumbAwareAction {
     public static final @NotNull String NAME = Bundle.message("export.action.name");
+
+    // UC-SHARE-002, Rule-SHARE-001
+    private static @NotNull String unreadableWarning(final @NotNull List<String> unreadable) {
+        final @NotNull String named = String.join(", ", unreadable.subList(0, Math.min(5, unreadable.size())));
+        final @NotNull String rest = unreadable.size() > 5
+                ? Bundle.message("export.unreadable.more", String.valueOf(unreadable.size() - 5))
+                : "";
+        final @NotNull String count = unreadable.size() == 1
+                ? Bundle.message("export.unreadable.one")
+                : Bundle.message("export.unreadable.many", String.valueOf(unreadable.size()));
+
+        return Bundle.message("export.unreadable.message", count, named, rest);
+    }
+
+    private static @NotNull String uniqueKey(final @NotNull Map<String, ?> taken, final @NotNull List<String> path) {
+        for (int from = path.size() - 1; from >= 0; from--) {
+            final @NotNull String key = String.join(" - ", path.subList(from, path.size()));
+            if (!taken.containsKey(key)) return key;
+        }
+
+        return String.join(" - ", path) + " (" + (taken.size() + 1) + ")";
+    }
+
+    private static @NotNull Optional<VirtualFile> resolveTargetDir(final @NotNull DirectoryDto dirDto) {
+        return Optional.ofNullable(LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString()))
+                .map(target -> target.isDirectory() ? target : target.getParent());
+    }
 
     // UC-SHARE-001, UC-SHARE-002
     @Override
@@ -150,32 +181,5 @@ public class ExportAction extends DumbAwareAction {
     }
 
     private record Sheet(@NotNull List<String> path, @NotNull List<TestCaseDto> cases) {
-    }
-
-    // UC-SHARE-002, Rule-SHARE-001
-    private static @NotNull String unreadableWarning(final @NotNull List<String> unreadable) {
-        final @NotNull String named = String.join(", ", unreadable.subList(0, Math.min(5, unreadable.size())));
-        final @NotNull String rest = unreadable.size() > 5
-                ? Bundle.message("export.unreadable.more", String.valueOf(unreadable.size() - 5))
-                : "";
-        final @NotNull String count = unreadable.size() == 1
-                ? Bundle.message("export.unreadable.one")
-                : Bundle.message("export.unreadable.many", String.valueOf(unreadable.size()));
-
-        return Bundle.message("export.unreadable.message", count, named, rest);
-    }
-
-    private static @NotNull String uniqueKey(final @NotNull Map<String, ?> taken, final @NotNull List<String> path) {
-        for (int from = path.size() - 1; from >= 0; from--) {
-            final @NotNull String key = String.join(" - ", path.subList(from, path.size()));
-            if (!taken.containsKey(key)) return key;
-        }
-
-        return String.join(" - ", path) + " (" + (taken.size() + 1) + ")";
-    }
-
-    private static @NotNull Optional<VirtualFile> resolveTargetDir(final @NotNull DirectoryDto dirDto) {
-        return Optional.ofNullable(LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString()))
-                .map(target -> target.isDirectory() ? target : target.getParent());
     }
 }

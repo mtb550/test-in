@@ -26,15 +26,15 @@ import org.testin.services.OptionalPlugin;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.OptionalInt;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 @AllArgsConstructor
 public final class GitRepositoryService {
     private final @NotNull Project p;
 
-        // UC-SHARE-009
+    // UC-SHARE-009
     public void initialize(final @NotNull Path repositoryPath) {
         GitCommandRunner.execute(p, repositoryPath, "git", "init");
     }
@@ -51,7 +51,7 @@ public final class GitRepositoryService {
         GitCommandRunner.execute(p, repositoryPath, "git", "config", scope, "user.email", email);
     }
 
-// Rule-TREE-PANEL-104
+    // Rule-TREE-PANEL-104
     public boolean isNotRepository(final @NotNull Path path) {
         return !OptionalPlugin.GIT.isAvailable() || !GitUtil.isGitRoot(path);
     }

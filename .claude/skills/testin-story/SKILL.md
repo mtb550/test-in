@@ -138,8 +138,8 @@ trusted. Add the groups up.
   fit their content in every theme" — not "change `setRowHeight`".
 - Include a criterion for what must **not** change. Regressions in the other
   editor, the other theme, or the other platform are the usual failure.
-- When a real design decision is unresolved, add an **Open question** or
-  **Design decision required** section stating the options and a recommendation.
+- When a real design decision is unresolved, add an **Open question** or **Design decision required** section stating
+  the options and a recommendation.
   Do not resolve it silently in the issue text.
 - Respect the architecture rules in `CLAUDE.md` — indexer-only file access,
   Swing on the EDT, display-only formatting. An issue that proposes violating

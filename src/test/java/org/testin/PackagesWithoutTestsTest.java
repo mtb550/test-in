@@ -86,6 +86,24 @@ public class PackagesWithoutTestsTest {
             "rename",
             "an action, a dialog and the order the three steps run in - close the editor, rewrite the code, rename the node. Only a running IDE has all three - ideTest");
 
+    /**
+     * The top-level packages under {@code org.testin} that hold Java, at any
+     * depth. A directory with no Java in it is a leftover rather than a package
+     * - {@code git} does not track one, so it is on this machine only.
+     */
+    private static @NotNull Set<String> topLevel(final @NotNull Path root) {
+        try (Stream<Path> paths = Files.walk(root)) {
+            return paths.filter(path -> path.toString().endsWith(".java"))
+                    .map(root::relativize)
+                    .filter(relative -> relative.getNameCount() > 1)
+                    .map(relative -> relative.getName(0).toString())
+                    .collect(Collectors.toCollection(TreeSet::new));
+
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not read " + root.toAbsolutePath() + ", so nothing was checked", ex);
+        }
+    }
+
     @Test
     public void everyPackageWithoutTestsSaysWhy() {
         final @NotNull Set<String> untested = new TreeSet<>(topLevel(MAIN));
@@ -103,25 +121,8 @@ public class PackagesWithoutTestsTest {
     @Test
     public void everyReasonSaysSomething() {
         WITHOUT_TESTS.forEach((pkg, reason) -> {
-            if (reason.length() < 40) fail(pkg + " is recorded as untested with a reason too short to be one: " + reason);
+            if (reason.length() < 40)
+                fail(pkg + " is recorded as untested with a reason too short to be one: " + reason);
         });
-    }
-
-    /**
-     * The top-level packages under {@code org.testin} that hold Java, at any
-     * depth. A directory with no Java in it is a leftover rather than a package
-     * - {@code git} does not track one, so it is on this machine only.
-     */
-    private static @NotNull Set<String> topLevel(final @NotNull Path root) {
-        try (Stream<Path> paths = Files.walk(root)) {
-            return paths.filter(path -> path.toString().endsWith(".java"))
-                    .map(root::relativize)
-                    .filter(relative -> relative.getNameCount() > 1)
-                    .map(relative -> relative.getName(0).toString())
-                    .collect(Collectors.toCollection(TreeSet::new));
-
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not read " + root.toAbsolutePath() + ", so nothing was checked", ex);
-        }
     }
 }

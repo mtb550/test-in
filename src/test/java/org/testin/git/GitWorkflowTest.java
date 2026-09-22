@@ -16,23 +16,31 @@
 
 package org.testin.git;
 
+import org.testin.TempTree;
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestCaseOrder;
+import org.testin.util.RealMapper;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * The whole workflow against a real repository: write test cases, review what
@@ -52,10 +60,17 @@ import static org.testng.Assert.*;
  */
 public class GitWorkflowTest {
 
+    /**
+     * The Windows command-line limit, in characters. A process whose command
+     * line is longer than this cannot be started at all, and the refusal names
+     * neither the limit nor a path - it arrives as {@code CreateProcess
+     * error=206}, which is what a tester saw instead of their commit.
+     */
+    private static final int WINDOWS_COMMAND_LINE_LIMIT = 32767;
     private Path remote;
-    private Path work;
 
     // ------------------------------------------------------------------ setup
+    private Path work;
 
     /**
      * What the command printed, and empty when it did not succeed - a git that
@@ -112,33 +127,12 @@ public class GitWorkflowTest {
         }
     }
 
-    @AfterMethod
-    public void removeRepositories() {
-        try {
-            if (remote == null) return;
-            final Path base = remote.getParent();
-            if (base == null || !Files.exists(base)) return;
-
-            try (Stream<Path> paths = Files.walk(base)) {
-                paths.sorted(Comparator.reverseOrder()).forEach(path -> {
-                    path.toFile().setWritable(true);
-                    path.toFile().delete();
-                });
-            }
-        } catch (final IOException ex) {
-            throw new AssertionError(ex);
-        }
-    }
-
     // ------------------------------------------------------------ large commits
 
-    /**
-     * The Windows command-line limit, in characters. A process whose command
-     * line is longer than this cannot be started at all, and the refusal names
-     * neither the limit nor a path - it arrives as {@code CreateProcess
-     * error=206}, which is what a tester saw instead of their commit.
-     */
-    private static final int WINDOWS_COMMAND_LINE_LIMIT = 32767;
+    @AfterMethod
+    public void removeRepositories() {
+        if (remote != null) TempTree.delete(remote.getParent());
+    }
 
     /**
      * A commit whose paths would not fit on a command line still lands.
@@ -488,7 +482,7 @@ public class GitWorkflowTest {
             final Path theirCopy = colleague.resolve(relativePath);
             final TestCaseDto theirs = RealMapper.build().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
             Files.writeString(theirCopy, RealMapper.build().writeValueAsString(
-                    theirs.setExpectedResult("the dashboard opens within two seconds").setUpdatedBy("colleague")),
+                            theirs.setExpectedResult("the dashboard opens within two seconds").setUpdatedBy("colleague")),
                     StandardCharsets.UTF_8);
             mustGit(colleague, "commit", "-am", "tightened the expected result");
             mustGit(colleague, "push", "origin", "main");
@@ -497,7 +491,7 @@ public class GitWorkflowTest {
             final Path myCopy = work.resolve(relativePath);
             final TestCaseDto mine = RealMapper.build().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
             Files.writeString(myCopy, RealMapper.build().writeValueAsString(
-                    mine.setDescription("a registered user signs in with a valid password").setUpdatedBy("muteb")),
+                            mine.setDescription("a registered user signs in with a valid password").setUpdatedBy("muteb")),
                     StandardCharsets.UTF_8);
             commit(stagedFor(review()), "reworded the description");
 

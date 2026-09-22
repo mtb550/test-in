@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-019: Search the test cases
 
-**As a** tester, **I want** to find a test case by a word in it,
-**so that** I do not page through 200 of them looking for one.
+**As a** tester, **I want** to find a test case by a word in it, **so that** I do not page through 200 of them looking
+for one.
 
 The search narrows the list. It hides the test cases that do not hold the word.
 

@@ -103,11 +103,11 @@ is [UC-SETTING-006](../setting/setDownloadFolder.md).
 
 ## The three ways in
 
-| The tester does this | Where |
-|---|---|
-| Presses `Ctrl+P` | On a selected test run in the tree, or in a run editor |
-| Chooses **Generate Report** | The tree's menu, or the run editor's menu |
-| Presses the report button | The run editor's toolbar. Its tooltip reads **Generate Test Summary Report** |
+| The tester does this        | Where                                                                        |
+|-----------------------------|------------------------------------------------------------------------------|
+| Presses `Ctrl+P`            | On a selected test run in the tree, or in a run editor                       |
+| Chooses **Generate Report** | The tree's menu, or the run editor's menu                                    |
+| Presses the report button   | The run editor's toolbar. Its tooltip reads **Generate Test Summary Report** |
 
 ## What Testin refuses
 

@@ -38,10 +38,10 @@ creating, cloning, renaming, committing and pushing never do.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -94,8 +94,7 @@ creating, cloning, renaming, committing and pushing never do.
 
 1. **The file** - the one there is, `testin.yml` or `testin.yaml`, or
    `testin.yml` in the code project's folder when there is none.
-2. **Each line as it will be**, and what that changes: *was ...*, *new* or
-   *unchanged*.
+2. **Each line as it will be**, and what that changes: *was ...*, *new* or *unchanged*.
 3. **The reminder** that the file is the team's: it is committed.
 
 ## Main flow
@@ -108,9 +107,8 @@ creating, cloning, renaming, committing and pushing never do.
 3. The preview opens.
 4. The tester presses `Enter`. Testin writes the lines, reads the file again,
    and shows *Saved*.
-5. Code turns on for this test project: generating, **Automate Test Case**,
-   **Navigate to Test Method**, **Run Tests**, the gutter icons and the automated marks
-   (Rule-CODEGEN-082).
+5. Code turns on for this test project: generating, **Automate Test Case**, **Navigate to Test Method**, **Run Tests**,
+   the gutter icons and the automated marks (Rule-CODEGEN-082).
 
 ## When code is off
 

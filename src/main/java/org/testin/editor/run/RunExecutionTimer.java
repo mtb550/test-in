@@ -20,7 +20,7 @@ import com.intellij.openapi.Disposable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 
-import javax.swing.*;
+import javax.swing.Timer;
 import java.time.Duration;
 import java.util.Optional;
 

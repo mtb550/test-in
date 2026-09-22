@@ -42,9 +42,7 @@ final class MarkerFiles {
     private final @NotNull Set<String> damaged = ConcurrentHashMap.newKeySet();
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    @SuppressWarnings("unchecked")
-    <M extends AbstractMarker> @NotNull M read(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name) {
-        final @NotNull Class<M> markerClass = (Class<M>) kind.getMarkerClass();
+    <M extends AbstractMarker> @NotNull M read(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name, final @NotNull Class<M> markerClass) {
         final @NotNull Path markerFile = dirPath.resolve(kind.getMarker());
 
         if (!Files.exists(markerFile)) return defaultFor(markerClass, kind);

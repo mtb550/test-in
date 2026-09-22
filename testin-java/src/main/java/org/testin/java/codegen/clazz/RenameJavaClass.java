@@ -16,7 +16,6 @@
 
 package org.testin.java.codegen.clazz;
 
-import org.testin.codegen.GenType;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
@@ -25,6 +24,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
+import org.testin.codegen.GenType;
 import org.testin.codegen.Renamed;
 import org.testin.logger.Logger;
 import org.testin.util.NameSanitizer;

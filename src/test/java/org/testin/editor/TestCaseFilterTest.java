@@ -21,7 +21,6 @@ import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
-import org.testin.testcase.TestEditorAttributes;
 
 import java.util.List;
 import java.util.Map;

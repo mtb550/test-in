@@ -28,12 +28,36 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
 import java.util.Optional;
 import java.util.function.Function;
 
 // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080
 public final class ViewTabAction extends AbstractProjectAction {
+    private final @NotNull Direction direction;
+
+    ViewTabAction(final @NotNull Project p, final @NotNull JComponent tab, final @NotNull Direction direction) {
+        super(p, direction.text, direction.description, direction.icon);
+        this.direction = direction;
+        registerCustomShortcutSet(direction.key.getCustomShortcut(), tab);
+    }
+
+    // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080
+    @Override
+    public void actionPerformed(final @NotNull AnActionEvent e) {
+        ViewToolWindowFactory.toolWindow(p).ifPresent(tw -> {
+            final @NotNull ContentManager contents = tw.getContentManager();
+            direction.select.apply(contents).doWhenDone(() -> Optional.ofNullable(contents.getSelectedContent())
+                    .ifPresent(front -> contents.setSelectedContent(front, true)));
+        });
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
     @AllArgsConstructor
     enum Direction {
         NEXT(
@@ -57,28 +81,5 @@ public final class ViewTabAction extends AbstractProjectAction {
         private final @NotNull String description;
         private final @NotNull Icon icon;
         private final @NotNull Function<ContentManager, ActionCallback> select;
-    }
-
-    private final @NotNull Direction direction;
-
-    ViewTabAction(final @NotNull Project p, final @NotNull JComponent tab, final @NotNull Direction direction) {
-        super(p, direction.text, direction.description, direction.icon);
-        this.direction = direction;
-        registerCustomShortcutSet(direction.key.getCustomShortcut(), tab);
-    }
-
-    // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080
-    @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        ViewToolWindowFactory.toolWindow(p).ifPresent(tw -> {
-            final @NotNull ContentManager contents = tw.getContentManager();
-            direction.select.apply(contents).doWhenDone(() -> Optional.ofNullable(contents.getSelectedContent())
-                    .ifPresent(front -> contents.setSelectedContent(front, true)));
-        });
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
     }
 }

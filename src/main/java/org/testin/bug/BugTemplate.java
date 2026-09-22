@@ -163,7 +163,8 @@ public final class BugTemplate {
 
     private static @NotNull String load() {
         try (final @Nullable InputStream template = BugTemplate.class.getResourceAsStream(RESOURCE)) {
-            if (template != null) return new String(template.readAllBytes(), StandardCharsets.UTF_8).replace("\r\n", "\n");
+            if (template != null)
+                return new String(template.readAllBytes(), StandardCharsets.UTF_8).replace("\r\n", "\n");
 
             Logger.error("The bug report template is not in the plugin: " + RESOURCE);
         } catch (final IOException ex) {

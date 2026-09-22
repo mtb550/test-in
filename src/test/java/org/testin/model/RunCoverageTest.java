@@ -18,6 +18,7 @@ package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestRunDto;
+import org.testin.model.markers.TestRunMarker;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
@@ -28,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.testin.model.markers.TestRunMarker;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -158,7 +158,8 @@ public class RunCoverageTest {
     public void whatARunCoversSaysNothingAboutItsOwnFacts() {
         final @NotNull ZonedDateTime started = ZonedDateTime.now().minusHours(2);
 
-        final @NotNull TestRunMarker marker = new TestRunMarker().setExecutionStartedAt(started);
+        final @NotNull TestRunMarker marker = new TestRunMarker();
+        marker.setExecutionStartedAt(started);
         marker.getConfiguration().put(TestRunConfiguration.PLATFORM, "Web");
         marker.getResultAnalysis().put(ResultAnalysis.FAILED, "The lockout counter is the one to chase");
 

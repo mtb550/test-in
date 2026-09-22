@@ -21,9 +21,10 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.*;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 final class SequenceColumnRowSelector extends MouseAdapter {

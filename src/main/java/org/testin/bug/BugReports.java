@@ -34,41 +34,6 @@ import java.util.UUID;
 
 @Service(Service.Level.PROJECT)
 public final class BugReports {
-    @Getter
-    @AllArgsConstructor
-    enum Stage {
-        PREPARING(
-                Bundle.message("bug.preparing")
-        ),
-
-        OPEN(
-                Bundle.message("bug.open")
-        ),
-
-        SENDING(
-                Bundle.message("bug.sending")
-        );
-
-        private final @NotNull String reason;
-    }
-
-    public record RunItem(@NotNull Path run, @NotNull UUID id) {
-        public @NotNull Optional<TestRunItems> in(final @NotNull TestRunDto testRun) {
-            return testRun.resultOf(id).filter(result -> !result.isRemoved());
-        }
-
-        public @NotNull Optional<TestRunItems> failedIn(final @NotNull TestRunDto testRun) {
-            return in(testRun).filter(result -> result.getStatus() == TestStatus.FAILED);
-        }
-
-        public @NotNull Optional<TestRunItems> stillFailed(final @NotNull ProjectIndexer indexer) {
-            return indexer.findTestRun(run).flatMap(this::failedIn);
-        }
-    }
-
-    public record Edits(@NotNull String title, @NotNull String body) {
-    }
-
     private final @NotNull Map<RunItem, Stage> onTheWay = new HashMap<>();
     private final @NotNull Map<RunItem, Edits> unsent = new HashMap<>();
 
@@ -109,5 +74,40 @@ public final class BugReports {
         if (anotherIsOpen(item)) return Optional.of(Bundle.message("bug.finish.open.report"));
 
         return Optional.empty();
+    }
+
+    @Getter
+    @AllArgsConstructor
+    enum Stage {
+        PREPARING(
+                Bundle.message("bug.preparing")
+        ),
+
+        OPEN(
+                Bundle.message("bug.open")
+        ),
+
+        SENDING(
+                Bundle.message("bug.sending")
+        );
+
+        private final @NotNull String reason;
+    }
+
+    public record RunItem(@NotNull Path run, @NotNull UUID id) {
+        public @NotNull Optional<TestRunItems> in(final @NotNull TestRunDto testRun) {
+            return testRun.resultOf(id).filter(result -> !result.isRemoved());
+        }
+
+        public @NotNull Optional<TestRunItems> failedIn(final @NotNull TestRunDto testRun) {
+            return in(testRun).filter(result -> result.getStatus() == TestStatus.FAILED);
+        }
+
+        public @NotNull Optional<TestRunItems> stillFailed(final @NotNull ProjectIndexer indexer) {
+            return indexer.findTestRun(run).flatMap(this::failedIn);
+        }
+    }
+
+    public record Edits(@NotNull String title, @NotNull String body) {
     }
 }

@@ -17,6 +17,7 @@
 package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.RepositoryRoot;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -52,8 +53,43 @@ public class TestDataKeepsLfTest {
 
     private static final @NotNull String KEEPS_LF = "text eol=lf";
 
-    /** A picture's bytes are never converted, whatever the platform's newline is. */
+    /**
+     * A picture's bytes are never converted, whatever the platform's newline is.
+     */
     private static final @NotNull String UNTOUCHED = "binary";
+
+    private static void note(final @NotNull List<String> wrong, final @NotNull String pattern, final @NotNull String wanted, final @NotNull Map<String, String> declared) {
+        wrong.add(pattern + " is '" + declared.getOrDefault(pattern, "not declared") + "' and has to be '" + wanted + "'");
+    }
+
+    /**
+     * What {@code .gitattributes} declares, by the pattern each line is about:
+     * the first word of the line, then everything it says about it. Comments and
+     * blank lines are not declarations.
+     */
+    private static @NotNull Map<String, String> declarations() {
+        final @NotNull Map<String, String> byPattern = new LinkedHashMap<>();
+
+        for (final String line : lines()) {
+            final @NotNull String declaration = line.strip();
+            if (declaration.isEmpty() || declaration.startsWith("#")) continue;
+
+            final @NotNull String[] words = declaration.split("\\s+", 2);
+            byPattern.put(words[0], words.length > 1 ? words[1].strip() : "");
+        }
+
+        return byPattern;
+    }
+
+    private static @NotNull List<String> lines() {
+        final @NotNull Path attributes = RepositoryRoot.resolve(".gitattributes");
+
+        try {
+            return Files.readAllLines(attributes);
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not read " + attributes + ": " + ex.getMessage(), ex);
+        }
+    }
 
     @Test
     public void everyMarkerAndEveryRecordIsDeclared() {
@@ -81,7 +117,8 @@ public class TestDataKeepsLfTest {
         final @NotNull List<String> wrong = new ArrayList<>();
 
         for (final DirectoryType kind : DirectoryType.values()) {
-            if (!declared.getOrDefault(kind.getMarker(), "").contains(KEEPS_LF)) note(wrong, kind.getMarker(), KEEPS_LF, declared);
+            if (!declared.getOrDefault(kind.getMarker(), "").contains(KEEPS_LF))
+                note(wrong, kind.getMarker(), KEEPS_LF, declared);
         }
 
         for (final FileKind kind : FileKind.values()) {
@@ -96,49 +133,5 @@ public class TestDataKeepsLfTest {
         assertTrue(wrong.isEmpty(),
                 "A marker and a record are JSON Testin writes with LF, and a screenshot is bytes nothing may"
                         + " convert - .gitattributes has to say which each is: " + wrong);
-    }
-
-    private static void note(final @NotNull List<String> wrong, final @NotNull String pattern, final @NotNull String wanted, final @NotNull Map<String, String> declared) {
-        wrong.add(pattern + " is '" + declared.getOrDefault(pattern, "not declared") + "' and has to be '" + wanted + "'");
-    }
-
-    /**
-     * What {@code .gitattributes} declares, by the pattern each line is about:
-     * the first word of the line, then everything it says about it. Comments and
-     * blank lines are not declarations.
-     */
-    private static @NotNull Map<String, String> declarations() {
-        final @NotNull Map<String, String> byPattern = new LinkedHashMap<>();
-
-        for (final String line : lines()) {
-            final @NotNull String declaration = line.strip();
-            if (declaration.isEmpty() || declaration.startsWith("#")) continue;
-
-            final @NotNull String[] words = declaration.split("\\s+", 2);
-            byPattern.put(words[0], words.length > 1 ? words[1].strip() : "");
-        }
-
-        return byPattern;
-    }
-
-    /**
-     * The repository's own {@code .gitattributes}, found by walking up from
-     * wherever the tests were started - Gradle runs them from the module, and a
-     * run started from the IDE need not.
-     */
-    private static @NotNull List<String> lines() {
-        @NotNull Path here = Path.of("").toAbsolutePath();
-
-        while (!Files.isRegularFile(here.resolve(".gitattributes"))) {
-            here = here.getParent();
-            if (here == null) throw new AssertionError("No .gitattributes above " + Path.of("").toAbsolutePath()
-                    + ", so nothing declares how the test data's files are checked out");
-        }
-
-        try {
-            return Files.readAllLines(here.resolve(".gitattributes"));
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not read " + here.resolve(".gitattributes") + ": " + ex.getMessage(), ex);
-        }
     }
 }

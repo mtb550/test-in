@@ -50,12 +50,12 @@ nothing changed.
 
 ## The four ways in
 
-| The tester does this | Where |
-|---|---|
-| Presses `Enter` | The cards |
-| Double-clicks a card | The cards |
-| Chooses **View Test Case Details** | Either menu |
-| Presses `Enter`, or double-clicks, on the number column | The grid |
+| The tester does this                                    | Where       |
+|---------------------------------------------------------|-------------|
+| Presses `Enter`                                         | The cards   |
+| Double-clicks a card                                    | The cards   |
+| Chooses **View Test Case Details**                      | Either menu |
+| Presses `Enter`, or double-clicks, on the number column | The grid    |
 
 ## Main flow
 

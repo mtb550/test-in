@@ -25,8 +25,11 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.GridBagLayout;
 
 public interface CreateTestCaseSection {
     @NotNull JBPanel<?> getWrapper();
@@ -60,7 +63,7 @@ public interface CreateTestCaseSection {
 
     void setEditable(final boolean editable);
 
-    void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction);
+    void fillData(final @NotNull TestCaseDto dto);
 
     default @NotNull Font fieldFont() {
         return JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);

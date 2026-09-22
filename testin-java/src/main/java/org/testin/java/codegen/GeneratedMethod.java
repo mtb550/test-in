@@ -16,16 +16,15 @@
 
 package org.testin.java.codegen;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiAnnotationMemberValue;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiLiteralValue;
 import com.intellij.psi.PsiMethod;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.openapi.project.Project;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.LinkedHashMap;

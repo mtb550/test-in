@@ -27,12 +27,12 @@ import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.setting.StartupActivity;
 import org.testin.services.Services;
+import org.testin.setting.StartupActivity;
 
-import java.util.Optional;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {

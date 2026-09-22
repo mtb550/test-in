@@ -16,17 +16,11 @@
 
 package org.testin.lightmode;
 
-import org.testin.actions.Declared;
-import org.testin.codegen.AutomationState;
-import org.testin.editor.CardHoverAction;
-import org.testin.editor.HoverButton;
-import org.testin.editor.ShownCaseAction;
-import org.testin.editor.run.ExecutionControl;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.WriteIntentReadAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.WindowStateService;
 import com.intellij.ui.RoundedLineBorder;
@@ -37,31 +31,58 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.Animator;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import java.awt.Toolkit;
+import org.testin.actions.Declared;
+import org.testin.codegen.AutomationState;
+import org.testin.editor.CardHoverAction;
+import org.testin.editor.HoverButton;
+import org.testin.editor.ShownCaseAction;
+import org.testin.editor.run.ExecutionControl;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.components.StartExecutionBtn;
 import org.testin.model.Automated;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.model.StatusBarItem;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseFields;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.testrun.RunStatusService;
-import org.testin.ui.framework.StatusBarBase;
-import org.testin.model.StatusBarItem;
 import org.testin.ui.Motion;
 import org.testin.ui.framework.Prose;
+import org.testin.ui.framework.StatusBarBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JTextArea;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +93,7 @@ final class LightModeWindow {
 
     private static final @NotNull String ZOOM = "testin.lightMode.zoom.v1";
 
-    private static final int WIDTH = 420;
+    private static final int START_WIDTH = 420;
 
     private static final int MIN_WIDTH = 280;
 
@@ -109,31 +130,21 @@ final class LightModeWindow {
 
     private final @NotNull JBLabel chosen = new JBLabel();
     private final @NotNull SlidingPanel caseView = new SlidingPanel(new BorderLayout());
-
-    private @NotNull Optional<UUID> shownCase = Optional.empty();
-
     private final @NotNull Disposable motionScope = Disposer.newDisposable("Testin light mode motion");
-
-    private @NotNull Optional<Animator> heightMotion = Optional.empty();
-    private @NotNull Optional<Animator> slideMotion = Optional.empty();
     private final @NotNull CaseDetails details;
-
     private final @NotNull JBPanel<?> underCase = new JBPanel<>(new BorderLayout());
-
     private final @NotNull JBLabel caseClock = clock(Bundle.message("light.case.clock"));
     private final @NotNull JBLabel runClock = clock(Bundle.message("light.run.clock"));
     private final @NotNull JBPanel<?> strip = new JBPanel<>(new BorderLayout());
     private final @NotNull JBPanel<?> setLine = new JBPanel<>(new GridBagLayout());
     private final @NotNull JBPanel<?> buttons = new JBPanel<>(new GridLayout(1, 0, JBUI.scale(BUTTON_GAP), 0));
-
     private final @NotNull JBPanel<?> footer = new JBPanel<>(new BorderLayout());
-
     private final @NotNull JComponent verdictRow = verdictButtons();
-
     private final @NotNull StatusBarBase statusBar = new StatusBarBase(new StatusBarItem[0]);
-
     private final @NotNull ViewMenuBtn viewMenu = new ViewMenuBtn(this::applyView);
-
+    private @NotNull Optional<UUID> shownCase = Optional.empty();
+    private @NotNull Optional<Animator> heightMotion = Optional.empty();
+    private @NotNull Optional<Animator> slideMotion = Optional.empty();
     private @NotNull Optional<FailureForm> capture = Optional.empty();
 
     private float zoom = Math.clamp(PropertiesComponent.getInstance().getFloat(ZOOM, 1.0f), ZOOM_MIN, ZOOM_MAX);
@@ -144,7 +155,7 @@ final class LightModeWindow {
 
     LightModeWindow(final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
         this.editor = editor;
-        this.details = new CaseDetails(editor.getProject());
+        this.details = new CaseDetails();
         this.onClosed = onClosed;
 
         frame.setUndecorated(true);
@@ -163,6 +174,23 @@ final class LightModeWindow {
         bindResize();
 
         frame.setVisible(true);
+    }
+
+    private static @NotNull String keyOf(final @NotNull TestStatus status) {
+        return Shortcuts.shortcutText(status.getMenuEntry().shortcut());
+    }
+
+    private static @NotNull JComponent iconBefore(final @NotNull Icon icon, final @NotNull JComponent text) {
+        return JBUI.Panels.simplePanel(CaseDetails.GAP, 0).addToLeft(new JBLabel(icon)).addToCenter(text).andTransparent();
+    }
+
+    private static @NotNull JBLabel clock(final @NotNull String meaning) {
+        final @NotNull JBLabel label = new JBLabel();
+        label.setToolTipText(meaning);
+        label.setFont(JBUI.Fonts.smallFont());
+        label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+
+        return label;
     }
 
     boolean shows(final @NotNull TestRunDirectoryDto other) {
@@ -634,7 +662,7 @@ final class LightModeWindow {
         final @NotNull JBPanel<?> panel = new JBPanel<>(new BorderLayout()) {
             @Override
             public @NotNull Dimension getPreferredSize() {
-                return new Dimension(JBUI.scale(WIDTH), super.getPreferredSize().height);
+                return new Dimension(JBUI.scale(START_WIDTH), super.getPreferredSize().height);
             }
         };
 
@@ -657,10 +685,6 @@ final class LightModeWindow {
         }
 
         return verdicts;
-    }
-
-    private static @NotNull String keyOf(final @NotNull TestStatus status) {
-        return Shortcuts.shortcutText(status.getMenuEntry().shortcut());
     }
 
     private @NotNull JComponent footer() {
@@ -709,18 +733,5 @@ final class LightModeWindow {
                 StatusBarShortcut.hint(Shortcuts.Enter.getShortcutText(), Bundle.message("shortcut.save.and.next")),
                 StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), Bundle.message("shortcut.cancel")),
                 StatusBarShortcut.corrections()};
-    }
-
-    private static @NotNull JComponent iconBefore(final @NotNull Icon icon, final @NotNull JComponent text) {
-        return JBUI.Panels.simplePanel(CaseDetails.GAP, 0).addToLeft(new JBLabel(icon)).addToCenter(text).andTransparent();
-    }
-
-    private static @NotNull JBLabel clock(final @NotNull String meaning) {
-        final @NotNull JBLabel label = new JBLabel();
-        label.setToolTipText(meaning);
-        label.setFont(JBUI.Fonts.smallFont());
-        label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
-
-        return label;
     }
 }

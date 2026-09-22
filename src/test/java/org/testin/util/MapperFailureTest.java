@@ -19,8 +19,10 @@ package org.testin.util;
 import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.expectThrows;
 
 /**
  * What the serializer does when it cannot serialize.

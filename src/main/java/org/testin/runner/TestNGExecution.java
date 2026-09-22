@@ -76,6 +76,10 @@ public final class TestNGExecution implements Disposable {
         });
     }
 
+    private static @NotNull String key(final @NotNull UUID id) {
+        return id.toString().toLowerCase();
+    }
+
     @Override
     public void dispose() {
     }
@@ -193,9 +197,5 @@ public final class TestNGExecution implements Disposable {
         return live.entrySet().stream()
                 .filter(one -> names.contains(one.getValue()) && !one.getKey().isProcessTerminated())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    private static @NotNull String key(final @NotNull UUID id) {
-        return id.toString().toLowerCase();
     }
 }

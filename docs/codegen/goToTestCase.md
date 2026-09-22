@@ -2,8 +2,8 @@
 
 # UC-CODEGEN-007: See the test case from the code
 
-**As a** tester, **I want** to see the test case behind a method I am looking at,
-**so that** I can read what the automation is supposed to prove without leaving
+**As a** tester, **I want** to see the test case behind a method I am looking at, **so that** I can read what the
+automation is supposed to prove without leaving
 the code I am reading.
 
 The view panel opens on that test case, showing its details. Nothing else moves:
@@ -83,14 +83,13 @@ still does not move (Rule-VIEW-PANEL-063).
 the message names the method: *logInWithAValidUser was generated from a test
 case that is gone*. It fades (Rule-CODEGEN-069).
 
-**If anything else fails** — a message titled **Test Case Not Opened** reads
-*Could not find test case:* and then the reason.
+**If anything else fails** — a message titled **Test Case Not Opened** reads *Could not find test case:* and then the
+reason.
 
 **If the IDE has no Java plugin** — no mark is drawn anywhere.
 
-**If testin.yml does not name the open test project** — no mark is drawn
-(Rule-CODEGEN-082). The marks come back when Testin reads the file again: after
-**Save to testin.yml**, after **Refresh** in the panel's title bar, and after
+**If testin.yml does not name the open test project** — no mark is drawn (Rule-CODEGEN-082). The marks come back when
+Testin reads the file again: after **Save to testin.yml**, after **Refresh** in the panel's title bar, and after
 choosing or renaming the test project the panel shows.
 
 ## Where the plugin breaks its own rules

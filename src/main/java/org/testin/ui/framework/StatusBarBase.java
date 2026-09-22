@@ -25,9 +25,13 @@ import org.testin.model.StatusBarItem;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 
-import javax.swing.*;
+import javax.swing.Icon;
 import javax.swing.border.Border;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
 public class StatusBarBase {
     private static final @NotNull String INNER_SEPARATOR = " ";

@@ -18,9 +18,9 @@ package org.testin.model;
 
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.ArrayList;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -45,6 +45,14 @@ public class TestRunSummaryTest {
         return TestRunItems.builder().id(UUID.randomUUID()).status(TestStatus.PASSED).executedBy(tester).build();
     }
 
+    private static int rateOf(final int passed, final int failed) {
+        final List<TestRunItems> results = new ArrayList<>();
+        for (int i = 0; i < passed; i++) results.add(item(TestStatus.PASSED));
+        for (int i = 0; i < failed; i++) results.add(item(TestStatus.FAILED));
+
+        return TestRunSummary.of(results).passRate();
+    }
+
     /**
      * UC-REPORT-001, Rule-REPORT-003.
      * <p>
@@ -62,14 +70,6 @@ public class TestRunSummaryTest {
         assertEquals(rateOf(1, 1), 50, "one passed of two is exactly half");
         assertEquals(rateOf(1, 0), 100, "everything that ran passed");
         assertEquals(rateOf(0, 1), 0, "nothing that ran passed");
-    }
-
-    private static int rateOf(final int passed, final int failed) {
-        final List<TestRunItems> results = new ArrayList<>();
-        for (int i = 0; i < passed; i++) results.add(item(TestStatus.PASSED));
-        for (int i = 0; i < failed; i++) results.add(item(TestStatus.FAILED));
-
-        return TestRunSummary.of(results).passRate();
     }
 
     /**

@@ -83,11 +83,11 @@ shows above the status bar at the bottom right of the IDE. It reads *Inactive*,
 2. The tester opens **Actions**. It shows the status entries for that node's
    kind. The status the node already has is gray.
 
-   | Node | Retire it with | Statuses it can have |
-   |---|---|---|
-   | Test project | **Deactivate** | Active, Inactive |
-   | Test set | **Mark Deprecated** | Active, Deprecated |
-   | Package | **Archive** | Active, Archived |
+   | Node         | Retire it with      | Statuses it can have |
+   |--------------|---------------------|----------------------|
+   | Test project | **Deactivate**      | Active, Inactive     |
+   | Test set     | **Mark Deprecated** | Active, Deprecated   |
+   | Package      | **Archive**         | Active, Archived     |
 
 3. The tester chooses one.
 4. Testin writes the status, refreshes the tree, and shows the new status word:

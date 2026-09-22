@@ -74,7 +74,7 @@ public class PageWindowTest {
     public void findsThePageHoldingATestCase() {
         final List<TestCaseDto> cases = casesOf(125);
 
-        assertEquals(PageWindow.pageContaining(cases.get(0).getId(), cases, 50), 1);
+        assertEquals(PageWindow.pageContaining(cases.getFirst().getId(), cases, 50), 1);
         assertEquals(PageWindow.pageContaining(cases.get(49).getId(), cases, 50), 1);
         assertEquals(PageWindow.pageContaining(cases.get(50).getId(), cases, 50), 2);
         assertEquals(PageWindow.pageContaining(cases.get(124).getId(), cases, 50), 3);

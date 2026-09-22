@@ -17,27 +17,27 @@ tester does: `createTestProject.md`.
 
 **`main.md` holds what is true of the whole part:**
 
-| In this order | Holds |
-|---|---|
-| **The use cases** | A table linking every page, grouped the way the work groups |
-| **What the part is for** | Why it exists, in a few sentences |
-| **The words it uses** | Any word the rules lean on, explained before they use it |
-| **How to read these pages** | The shape of a use case page, and what the marks in the drawings stand for |
-| **Every key, in one place** | One table: the key, what it does, and the page that owns it |
-| **The screens that belong to no single use case** | The panel, or the window itself, drawn |
-| **Why it is built this way** | The decisions worth not re-arguing |
-| **Where the plugin breaks its own rules** | Numbered differences a tester can hit today |
-| **Not decided** | Numbered questions, listed instead of guessed |
+| In this order                                     | Holds                                                                      |
+|---------------------------------------------------|----------------------------------------------------------------------------|
+| **The use cases**                                 | A table linking every page, grouped the way the work groups                |
+| **What the part is for**                          | Why it exists, in a few sentences                                          |
+| **The words it uses**                             | Any word the rules lean on, explained before they use it                   |
+| **How to read these pages**                       | The shape of a use case page, and what the marks in the drawings stand for |
+| **Every key, in one place**                       | One table: the key, what it does, and the page that owns it                |
+| **The screens that belong to no single use case** | The panel, or the window itself, drawn                                     |
+| **Why it is built this way**                      | The decisions worth not re-arguing                                         |
+| **Where the plugin breaks its own rules**         | Numbered differences a tester can hit today                                |
+| **Not decided**                                   | Numbered questions, listed instead of guessed                              |
 
 **A use case page holds one thing the tester does:**
 
-| In this order | Holds |
-|---|---|
-| **The story** | One sentence: as a tester, I want, so that |
-| **Rules** | Every rule this use case answers to, written out. The ones that hold for the whole part first, then its own |
-| **The screen** | Drawn, with its parts numbered. A use case that opens no screen has **What the tester sees** instead: what changes, which message appears, and where |
-| **Main flow** | What happens, step by step, when nothing goes wrong |
-| **What Testin refuses** | Every way it can go wrong, and what the tester sees each time |
+| In this order           | Holds                                                                                                                                                |
+|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **The story**           | One sentence: as a tester, I want, so that                                                                                                           |
+| **Rules**               | Every rule this use case answers to, written out. The ones that hold for the whole part first, then its own                                          |
+| **The screen**          | Drawn, with its parts numbered. A use case that opens no screen has **What the tester sees** instead: what changes, which message appears, and where |
+| **Main flow**           | What happens, step by step, when nothing goes wrong                                                                                                  |
+| **What Testin refuses** | Every way it can go wrong, and what the tester sees each time                                                                                        |
 
 **Every use case is listed with its purpose.** A part's `main.md` lists its use
 cases in a table, and the third column says in one short line why a tester would
@@ -91,26 +91,26 @@ rewritten.
 
 Four things are numbered. Each one is written the way it is read:
 
-| Written | What it is |
-|---|---|
-| **UC-TREE-PANEL-001** | One thing a tester does, such as creating a test project. It is the title of its own page |
-| **Rule-TREE-PANEL-001** | Something that must always be true |
-| **Question 1** | Something nobody has answered yet, listed instead of guessed |
-| **Difference 1** | A place where the plugin does not do what its own rules say |
+| Written                 | What it is                                                                                |
+|-------------------------|-------------------------------------------------------------------------------------------|
+| **UC-TREE-PANEL-001**   | One thing a tester does, such as creating a test project. It is the title of its own page |
+| **Rule-TREE-PANEL-001** | Something that must always be true                                                        |
+| **Question 1**          | Something nobody has answered yet, listed instead of guessed                              |
+| **Difference 1**        | A place where the plugin does not do what its own rules say                               |
 
 **A use case and a rule both carry the part of Testin they belong to**, so a
 number read on its own still says where to look:
 
-| Part of Testin | Its use cases | Its rules |
-|---|---|---|
-| The tree panel | `UC-TREE-PANEL-001` and up | `Rule-TREE-PANEL-001` and up |
-| The editor panel | `UC-EDITOR-PANEL-001` and up | `Rule-EDITOR-PANEL-001` and up |
-| The view panel | `UC-VIEW-PANEL-001` and up | `Rule-VIEW-PANEL-001` and up |
-| The settings page | `UC-SETTING-001` and up | `Rule-SETTING-001` and up |
-| Automation code and the gutter | `UC-CODEGEN-001` and up | `Rule-CODEGEN-001` and up |
-| Reports | `UC-REPORT-001` and up | `Rule-REPORT-001` and up |
-| Sharing work with the team | `UC-SHARE-001` and up | `Rule-SHARE-001` and up |
-| Inside Testin | `UC-INTERNAL-001` and up | `Rule-INTERNAL-001` and up |
+| Part of Testin                 | Its use cases                | Its rules                      |
+|--------------------------------|------------------------------|--------------------------------|
+| The tree panel                 | `UC-TREE-PANEL-001` and up   | `Rule-TREE-PANEL-001` and up   |
+| The editor panel               | `UC-EDITOR-PANEL-001` and up | `Rule-EDITOR-PANEL-001` and up |
+| The view panel                 | `UC-VIEW-PANEL-001` and up   | `Rule-VIEW-PANEL-001` and up   |
+| The settings page              | `UC-SETTING-001` and up      | `Rule-SETTING-001` and up      |
+| Automation code and the gutter | `UC-CODEGEN-001` and up      | `Rule-CODEGEN-001` and up      |
+| Reports                        | `UC-REPORT-001` and up       | `Rule-REPORT-001` and up       |
+| Sharing work with the team     | `UC-SHARE-001` and up        | `Rule-SHARE-001` and up        |
+| Inside Testin                  | `UC-INTERNAL-001` and up     | `Rule-INTERNAL-001` and up     |
 
 **A rule is written in full, as one word, everywhere: `Rule-TREE-PANEL-004`.**
 One word can be found in a single search, from the code as well as the
@@ -311,13 +311,13 @@ These documents are for testers. Every sentence is checked against that reader.
 
 ## Every document carries the same header
 
-| | |
-|---|---|
-| **Part of Testin** | Which part this covers |
-| **Answers** | One sentence |
-| **Numbering** | Where this part's numbers start, and what they count |
-| **State** | Written, Draft or Not written, with the issue |
-| **Checked against** | The commit on `main`, and the date |
+|                     |                                                      |
+|---------------------|------------------------------------------------------|
+| **Part of Testin**  | Which part this covers                               |
+| **Answers**         | One sentence                                         |
+| **Numbering**       | Where this part's numbers start, and what they count |
+| **State**           | Written, Draft or Not written, with the issue        |
+| **Checked against** | The commit on `main`, and the date                   |
 
 Only `main.md` carries the header. A use case page starts with its story.
 
@@ -342,12 +342,12 @@ is worth seeing.
 
 Four tests, in the ordinary test run. Each of them has caught something real.
 
-| Test | What it settles |
-|---|---|
-| `RuleNumbersTest` | No number names two rules; every part's `Numbering` row is honest; every rule a marker in the Java cites is one a document writes; every copy of a rule says the same thing |
-| `DifferenceNumbersTest` | No page describes a difference its part has retired; no page points at a number no part lists; no number is live and retired at once; no difference names a rule nobody wrote |
-| `DocumentClaimsTest` | Every internal link goes somewhere; the README's per-part counts are the counts; its total is the sum of its own rows; every refusal Testin has words for is written on a page |
-| `SampleProjectTest` | The committed sample project still parses |
+| Test                    | What it settles                                                                                                                                                                |
+|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `RuleNumbersTest`       | No number names two rules; every part's `Numbering` row is honest; every rule a marker in the Java cites is one a document writes; every copy of a rule says the same thing    |
+| `DifferenceNumbersTest` | No page describes a difference its part has retired; no page points at a number no part lists; no number is live and retired at once; no difference names a rule nobody wrote  |
+| `DocumentClaimsTest`    | Every internal link goes somewhere; the README's per-part counts are the counts; its total is the sum of its own rows; every refusal Testin has words for is written on a page |
+| `SampleProjectTest`     | The committed sample project still parses                                                                                                                                      |
 
 What none of them can settle is whether a sentence is **true** — whether a
 difference names the right rule, whether a refusal's page describes the situation

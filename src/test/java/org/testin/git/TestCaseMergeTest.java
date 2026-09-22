@@ -19,7 +19,6 @@ package org.testin.git;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

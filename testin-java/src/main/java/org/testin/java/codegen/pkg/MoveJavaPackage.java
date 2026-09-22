@@ -16,20 +16,20 @@
 
 package org.testin.java.codegen.pkg;
 
-import org.testin.codegen.GenType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
+import org.testin.codegen.GenType;
 import org.testin.codegen.JavaSourceRoot;
 import org.testin.codegen.Moved;
 import org.testin.java.codegen.PackageDeclarations;
 import org.testin.logger.Logger;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 public class MoveJavaPackage implements GenAction {
     // UC-CODEGEN-017, Rule-CODEGEN-057, Rule-CODEGEN-058

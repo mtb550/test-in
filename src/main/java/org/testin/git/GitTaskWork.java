@@ -21,6 +21,5 @@ import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface
 public interface GitTaskWork {
-    @SuppressWarnings("RedundantThrows")
-    void run(final @NotNull ProgressIndicator indicator) throws Exception;
+    void run(final @NotNull ProgressIndicator indicator);
 }

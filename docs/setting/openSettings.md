@@ -67,12 +67,12 @@ is drawn on [the settings page](main.md#the-page).
 
 ## The four ways in
 
-| The tester does this | Where it is |
-|---|---|
-| Presses the gear button | The tree panel's toolbar. Its tooltip reads **Configure Testin settings** |
-| Opens **Settings**, then **Tools**, then **Testin** | The IDE's own settings window |
-| Clicks **Open Settings** on the setup message | The message shown when no Testin folder is set |
-| Clicks **Configure Testin settings** | The tree panel's empty state, when no Testin folder is set |
+| The tester does this                                | Where it is                                                               |
+|-----------------------------------------------------|---------------------------------------------------------------------------|
+| Presses the gear button                             | The tree panel's toolbar. Its tooltip reads **Configure Testin settings** |
+| Opens **Settings**, then **Tools**, then **Testin** | The IDE's own settings window                                             |
+| Clicks **Open Settings** on the setup message       | The message shown when no Testin folder is set                            |
+| Clicks **Configure Testin settings**                | The tree panel's empty state, when no Testin folder is set                |
 
 ## Main flow
 

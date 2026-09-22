@@ -16,10 +16,10 @@
 
 package org.testin.editor.toolbar.components;
 
-import org.testin.editor.AbstractIconButton;
-import org.testin.util.Bundle;
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.AbstractIconButton;
+import org.testin.util.Bundle;
 
 public class GridViewBtn extends AbstractIconButton implements ToolbarItem {
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-017

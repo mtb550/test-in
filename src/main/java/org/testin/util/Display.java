@@ -20,12 +20,12 @@ import com.intellij.openapi.util.text.StringUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import java.util.Locale;
 import org.testin.model.Config;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Display {

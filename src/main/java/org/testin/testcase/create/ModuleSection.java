@@ -23,8 +23,8 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.util.SpellChecker;
 import org.testin.util.Shortcuts;
+import org.testin.util.SpellChecker;
 
 public class ModuleSection extends AbstractOneLineSection {
     public ModuleSection(final @NotNull Project p) {
@@ -39,7 +39,7 @@ public class ModuleSection extends AbstractOneLineSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto) {
         field.setText(dto.getModule());
     }
 }

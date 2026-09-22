@@ -1,16 +1,33 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
+    <option name="AUTODETECT_INDENTS" value="false" />
+    <option name="DO_NOT_FORMAT">
+      <list>
+        <fileSet type="globPattern" pattern="samples/testin-root/**" />
+        <fileSet type="globPattern" pattern="src/main/resources/org/testin/bug/bugReport.md" />
+        <fileSet type="globPattern" pattern="src/test/resources/**" />
+      </list>
+    </option>
     <JavaCodeStyleSettings>
-      <!-- Record components stay on one line, like method parameters below. -->
+      <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
+      <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
+      <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">
+        <value />
+      </option>
       <option name="RECORD_COMPONENTS_WRAP" value="0" />
     </JavaCodeStyleSettings>
+    <JetCodeStyleSettings>
+      <option name="PACKAGES_TO_USE_STAR_IMPORTS">
+        <value />
+      </option>
+      <option name="NAME_COUNT_TO_USE_STAR_IMPORT" value="2147483647" />
+      <option name="NAME_COUNT_TO_USE_STAR_IMPORT_FOR_MEMBERS" value="2147483647" />
+    </JetCodeStyleSettings>
+    <Properties>
+      <option name="KEEP_BLANK_LINES" value="true" />
+    </Properties>
     <ScalaCodeStyleSettings>
       <option name="MULTILINE_STRING_CLOSING_QUOTES_ON_NEW_LINE" value="true" />
     </ScalaCodeStyleSettings>
-    <codeStyleSettings language="JAVA">
-      <!-- Declaration parameters are never wrapped: one signature, one line,
-           however long it gets. Reformat Code applies this everywhere. -->
-      <option name="METHOD_PARAMETERS_WRAP" value="0" />
-    </codeStyleSettings>
   </code_scheme>
 </component>

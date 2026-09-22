@@ -16,7 +16,6 @@
 
 package org.testin.testproject;
 
-import lombok.AllArgsConstructor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
@@ -24,21 +23,22 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import git4idea.commands.Git;
 import git4idea.commands.GitCommandResult;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.FailureText;
+import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
 import org.testin.git.GitSafeText;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.model.DirectoryType;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
+import org.testin.util.NameSanitizer;
 
 import java.nio.file.Path;
-import org.testin.config.TestinYml;
-import org.testin.model.DirectoryType;
-import org.testin.util.NameSanitizer;
 import java.util.Locale;
 import java.util.Optional;
 

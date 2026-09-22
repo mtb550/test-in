@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import java.awt.event.KeyEvent;
 

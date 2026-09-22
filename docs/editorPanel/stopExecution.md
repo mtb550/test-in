@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-035: Stop executing
 
-**As a** tester, **I want** to stop the walk part way,
-**so that** the clock stops when I go to a meeting and the test run is written
+**As a** tester, **I want** to stop the walk part way, **so that** the clock stops when I go to a meeting and the test
+run is written
 as it stands.
 
 Stopping changes no verdict. It only ends the walk and stops the clock.

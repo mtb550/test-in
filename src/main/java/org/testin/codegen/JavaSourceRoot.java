@@ -31,9 +31,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.Once;
-import org.testin.services.Services;
 
 import java.io.IOException;
 import java.util.List;
@@ -41,15 +41,7 @@ import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JavaSourceRoot {
-    @FunctionalInterface
-    public interface RootWork {
-        void run(final @NotNull VirtualFile root) throws IOException;
-    }
-
-    @FunctionalInterface
-    public interface RootFile {
-        @NotNull Optional<VirtualFile> from(final @NotNull VirtualFile root) throws IOException;
-    }
+    private static final @NotNull Key<Boolean> NO_ROOT_SAID = Key.create("testin.noJavaTestSourceRoot.said");
 
     // UC-CODEGEN-020, Rule-CODEGEN-064, Rule-CODEGEN-066
     public static @NotNull Optional<VirtualFile> find(final @NotNull Project p) {
@@ -72,8 +64,6 @@ public final class JavaSourceRoot {
         Logger.warn("No Java test source root found in the project.");
         return Optional.empty();
     }
-
-    private static final @NotNull Key<Boolean> NO_ROOT_SAID = Key.create("testin.noJavaTestSourceRoot.said");
 
     // UC-CODEGEN-020, Rule-CODEGEN-065, Rule-CODEGEN-072
     public static @NotNull Optional<VirtualFile> findOrWarn(final @NotNull Project p, final @NotNull String className) {
@@ -193,5 +183,15 @@ public final class JavaSourceRoot {
     // UC-CODEGEN-020, Rule-CODEGEN-065
     public static void writeInRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull String whatFailed, final @NotNull RootWork work) {
         WriteAction.run(() -> inRootOrWarn(p, className, whatFailed, work));
+    }
+
+    @FunctionalInterface
+    public interface RootWork {
+        void run(final @NotNull VirtualFile root) throws IOException;
+    }
+
+    @FunctionalInterface
+    public interface RootFile {
+        @NotNull Optional<VirtualFile> from(final @NotNull VirtualFile root) throws IOException;
     }
 }

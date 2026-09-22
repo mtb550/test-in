@@ -21,13 +21,11 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-
-import org.testin.model.markers.TestRunMarker;
-
-import javax.swing.*;
 import org.testin.model.markers.DetailRow;
+import org.testin.model.markers.TestRunMarker;
 import org.testin.util.Bundle;
 
+import javax.swing.Icon;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
@@ -95,25 +93,9 @@ public enum TestRunConfiguration {
 
     private final @NotNull String displayName;
     private final @NotNull Icon icon;
-
-    private static final class Free {
-        private static final String @NotNull[] OPTIONS = new String[0];
-    }
-
-    private static final class Answer {
-        private static final @NotNull String WEB = "Web";
-        private static final @NotNull String MOBILE = "Mobile";
-        private static final @NotNull String FRONTEND = "Frontend";
-    }
-
     private final @NotNull String[] options;
-
     @Getter(AccessLevel.NONE)
     private final @NotNull ShownWhen shownWhen;
-
-    public @NotNull String valueIn(final @NotNull TestRunMarker run) {
-        return run.getConfiguration().getOrDefault(this, "");
-    }
 
     public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunMarker run) {
         return Arrays.stream(values())
@@ -130,6 +112,10 @@ public enum TestRunConfiguration {
         }
 
         return stored;
+    }
+
+    public @NotNull String valueIn(final @NotNull TestRunMarker run) {
+        return run.getConfiguration().getOrDefault(this, "");
     }
 
     public boolean isChoice() {
@@ -154,5 +140,15 @@ public enum TestRunConfiguration {
         default boolean is(final @NotNull TestRunConfiguration field, final @NotNull String answer) {
             return answer.equals(in(field));
         }
+    }
+
+    private static final class Free {
+        private static final String @NotNull [] OPTIONS = new String[0];
+    }
+
+    private static final class Answer {
+        private static final @NotNull String WEB = "Web";
+        private static final @NotNull String MOBILE = "Mobile";
+        private static final @NotNull String FRONTEND = "Frontend";
     }
 }

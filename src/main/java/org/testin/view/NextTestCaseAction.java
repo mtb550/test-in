@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
 // UC-VIEW-PANEL-003
 public class NextTestCaseAction extends DumbAwareAction {

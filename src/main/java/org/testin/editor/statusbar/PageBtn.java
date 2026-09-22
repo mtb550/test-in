@@ -18,7 +18,6 @@ package org.testin.editor.statusbar;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.AbstractIconButton;
-import org.testin.util.Shortcuts;
 
 public class PageBtn extends AbstractIconButton {
     public PageBtn(final @NotNull PageStep step) {

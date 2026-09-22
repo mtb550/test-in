@@ -20,10 +20,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestRunDto;
 
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public record OpenBug(@NotNull Path runPath, @NotNull TestRunItems item) {

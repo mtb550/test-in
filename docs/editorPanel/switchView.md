@@ -84,13 +84,13 @@ page asked for, and a message says the grid could not be drawn and why
 
 ## What is different in each view
 
-| | Cards | Grid |
-|---|---|---|
-| Reading one test case | Every field, one under the other | One row, cut to the column width |
-| Correcting a value | `F2` or the field's letter | Type straight into the cell |
-| Dragging to reorder | Yes | No |
-| `Ctrl+C` | Copies the details as text | Copies the cells |
-| Selecting | One or more cards | Cells, or whole rows from the first column |
+|                       | Cards                            | Grid                                       |
+|-----------------------|----------------------------------|--------------------------------------------|
+| Reading one test case | Every field, one under the other | One row, cut to the column width           |
+| Correcting a value    | `F2` or the field's letter       | Type straight into the cell                |
+| Dragging to reorder   | Yes                              | No                                         |
+| `Ctrl+C`              | Copies the details as text       | Copies the cells                           |
+| Selecting             | One or more cards                | Cells, or whole rows from the first column |
 
 ---
 

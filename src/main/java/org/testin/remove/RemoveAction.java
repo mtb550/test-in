@@ -16,8 +16,6 @@
 
 package org.testin.remove;
 
-import org.testin.actions.GrayWithReason;
-import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.progress.ProgressManager;
@@ -25,25 +23,27 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
+import org.testin.editor.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.NodeCounter;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.undo.UndoScope;
-import org.testin.undo.UndoHistories;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.editor.TestinEditors;
+import org.testin.undo.UndoHistories;
+import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 // UC-TREE-PANEL-012

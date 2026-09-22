@@ -22,7 +22,6 @@ import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
 import java.nio.charset.StandardCharsets;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,11 +49,11 @@ import static org.testng.Assert.assertTrue;
  */
 public class DeletedTestCaseInARunTest {
 
-    private static TestRunItems removedItem(final UUID id, final ZonedDateTime executedAt) {
+    private static TestRunItems removedItem(final UUID id) {
         return TestRunItems.builder()
                 .id(id)
                 .status(TestStatus.REMOVED)
-                .executedAt(executedAt)
+                .executedAt(Config.NOT_EXECUTED)
                 .build();
     }
 
@@ -62,7 +61,7 @@ public class DeletedTestCaseInARunTest {
     public void aRowWhoseCaseIsGoneSaysSoByName() {
         final UUID id = UUID.randomUUID();
 
-        assertTrue(removedItem(id, Config.NOT_EXECUTED).isRemoved(),
+        assertTrue(removedItem(id).isRemoved(),
                 "the verdict path, the details editor and the walker all ask this");
     }
 
@@ -76,7 +75,7 @@ public class DeletedTestCaseInARunTest {
     @Test
     public void theRowStillShowsAndStillNamesItsCase() {
         final UUID id = UUID.randomUUID();
-        final TestRunItems item = removedItem(id, Config.NOT_EXECUTED);
+        final TestRunItems item = removedItem(id);
 
         final TestCaseDto shown = item.shownCase();
 

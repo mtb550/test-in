@@ -5,15 +5,15 @@
 The tree panel is the tree on the left of the IDE. It holds every test project,
 test set and test run. Everything in Testin starts here.
 
-| | |
-|---|---|
-| **Part of Testin** | The tree panel |
-| **Answers** | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like |
-| **Numbering** | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-029`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-119` |
-| **Retired** | `Rule-TREE-PANEL-018` and `Rule-TREE-PANEL-019` said cloning needed the code project to name the test project first, and named the folder by `testin.yml`, never by the address; read Rule-TREE-PANEL-107 instead. `Rule-TREE-PANEL-020` and `Rule-TREE-PANEL-021` said the choice was written into the code project, and said so when it could not be; read Rule-TREE-PANEL-106 instead. `Rule-TREE-PANEL-084` showed the branch box only when `testin.yml` said the project was shared through Git; read Rule-TREE-PANEL-108 instead. All five retired 19 September 2026, when Testin stopped writing `testin.yml` and stopped needing it (#301). `Rule-TREE-PANEL-035` said the test project and the two containers could not be renamed from the tree; retired the same day, when a test project became renamable (#331) - the containers are Rule-TREE-PANEL-002's. `Rule-TREE-PANEL-109` said a test project shared through an SFTP server keeps its name; written for #331 and retired unused the same day, before it shipped, when the SFTP sync was removed (#334). `Rule-TREE-PANEL-089` said only **Select Test Project** and **New Test Project** are ever gray on the toolbar; retired the same day, when **Save to testin.yml** became a third that can be (#335) - read Rule-TREE-PANEL-115 instead. `Rule-TREE-PANEL-075` said an edit of a test run could be undone as one step; retired 22 September 2026, when saving an edit became final - read Rule-TREE-PANEL-060 instead. The numbers are not given to anything else |
-| **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
-| **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-TREE-PANEL-004](chooseTestProject.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. On 20 September 2026, at `0b00da21`, [UC-TREE-PANEL-001](reachTheTree.md) was read against the code again for the six panel screens and the two new rules (#301, pieces 2 and 3). |
-| **Written to** | [How a document is written](../standard.md) |
+|                     |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Part of Testin**  | The tree panel                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| **Answers**         | What the panel is for, what a tester can do in it, exactly what happens step by step, and what every screen looks like                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **Numbering**       | Use cases are `UC-TREE-PANEL-001` to `UC-TREE-PANEL-029`, apart from 024, which went to [UC-INTERNAL-001](../internal/globalSearch.md) with the search. Rules are `Rule-TREE-PANEL-001` to `Rule-TREE-PANEL-119`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Retired**         | `Rule-TREE-PANEL-018` and `Rule-TREE-PANEL-019` said cloning needed the code project to name the test project first, and named the folder by `testin.yml`, never by the address; read Rule-TREE-PANEL-107 instead. `Rule-TREE-PANEL-020` and `Rule-TREE-PANEL-021` said the choice was written into the code project, and said so when it could not be; read Rule-TREE-PANEL-106 instead. `Rule-TREE-PANEL-084` showed the branch box only when `testin.yml` said the project was shared through Git; read Rule-TREE-PANEL-108 instead. All five retired 19 September 2026, when Testin stopped writing `testin.yml` and stopped needing it (#301). `Rule-TREE-PANEL-035` said the test project and the two containers could not be renamed from the tree; retired the same day, when a test project became renamable (#331) - the containers are Rule-TREE-PANEL-002's. `Rule-TREE-PANEL-109` said a test project shared through an SFTP server keeps its name; written for #331 and retired unused the same day, before it shipped, when the SFTP sync was removed (#334). `Rule-TREE-PANEL-089` said only **Select Test Project** and **New Test Project** are ever gray on the toolbar; retired the same day, when **Save to testin.yml** became a third that can be (#335) - read Rule-TREE-PANEL-115 instead. `Rule-TREE-PANEL-075` said an edit of a test run could be undone as one step; retired 22 September 2026, when saving an edit became final - read Rule-TREE-PANEL-060 instead. The numbers are not given to anything else |
+| **State**           | **Written** — [#181](https://github.com/mtb550/test-in/issues/181)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| **Checked against** | `main` at `cddad453`, 6 September 2026 — every rule, key, label and message read from the code. On 14 September 2026, at `e6277ddf`, the messages, names and keys of [UC-TREE-PANEL-004](chooseTestProject.md) were read from the code again. On 18 September 2026, at `d427cde7`, the pages the #328 work changed were read against the code again. On 20 September 2026, at `0b00da21`, [UC-TREE-PANEL-001](reachTheTree.md) was read against the code again for the six panel screens and the two new rules (#301, pieces 2 and 3).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **Written to**      | [How a document is written](../standard.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 ---
 
@@ -21,41 +21,41 @@ test set and test run. Everything in Testin starts here.
 
 Each one is a page of its own: the story, its rules, its screens and its steps.
 
-| | What the tester does | Why a tester would use it |
-|---|---|---|
-| | **Getting to the tree** | |
-| **UC-TREE-PANEL-001** | [Open the panel and reach the tree](reachTheTree.md) | See the test project, or learn what to set up first. |
-| **UC-TREE-PANEL-002** | [Create a test project](createTestProject.md) | Give a new product under test a home. |
-| **UC-TREE-PANEL-003** | [Import a test project that already exists](importTestProject.md) | Copy a test project from Git onto this machine. |
-| **UC-TREE-PANEL-004** | [Choose which test project this code project uses](chooseTestProject.md) | Point this code project at a different test project. |
-| | **Nodes** | |
-| **UC-TREE-PANEL-005** | [Open a test set](openTestSet.md) | Read and write the test cases inside a test set. |
-| **UC-TREE-PANEL-006** | [Open a test run](openTestRun.md) | Record a verdict for each test case in a run. |
-| **UC-TREE-PANEL-007** | [Create a test set](createTestSet.md) | Make a place for the test cases about to be written. |
-| **UC-TREE-PANEL-008** | [Create a test set package](createTestSetPackage.md) | Group test sets so a big tree stays readable. |
-| **UC-TREE-PANEL-009** | [Create a test run](createTestRun.md) | Record one round of testing over chosen test cases. |
-| **UC-TREE-PANEL-010** | [Create a test run package](createTestRunPackage.md) | Group test runs so a year of cycles stays tidy. |
-| **UC-TREE-PANEL-011** | [Rename a node](renameNode.md) | Give a node the name it is called now. |
-| **UC-TREE-PANEL-012** | [Remove a node](removeNode.md) | Take out work that is no longer needed. |
-| | **Arranging the tree** | |
-| **UC-TREE-PANEL-013** | [Move nodes](moveNodes.md) | Put a node into a different folder. |
-| **UC-TREE-PANEL-014** | [Copy nodes](copyNodes.md) | Start from work that already exists. |
-| **UC-TREE-PANEL-015** | [Order nodes among their siblings](orderNodes.md) | Fix where a node sits among its siblings. |
-| **UC-TREE-PANEL-016** | [Undo a change to the tree](undoChange.md) | Take back a wrong move, rename or removal. |
-| **UC-TREE-PANEL-017** | [Redo a change to the tree](redoChange.md) | Put back a change that was just undone. |
-| | **Statuses** | |
-| **UC-TREE-PANEL-018** | [Retire a test project, a test set or a package](retireNode.md) | Keep old work for its history, out of the way. |
-| **UC-TREE-PANEL-019** | [Bring a retired node back](reactivateNode.md) | Pick up work that was put aside. |
-| **UC-TREE-PANEL-020** | [Set a test run's status](setTestRunStatus.md) | Show how far a test run has got. |
-| **UC-TREE-PANEL-021** | [Re-create a test run](reCreateTestRun.md) | Start the next cycle from a finished test run. |
-| **UC-TREE-PANEL-022** | [Edit a test run](editTestRun.md) | Correct a test run without building it again. |
-| | **Working from the tree** | |
-| **UC-TREE-PANEL-023** | [Run the automation for everything a node holds](runTests.md) | Run a whole area of automation in one step. |
-| **UC-TREE-PANEL-025** | [Refresh the tree from disk](refreshTree.md) | See changes that happened outside the IDE. |
-| **UC-TREE-PANEL-026** | [Switch the Git branch of the test project](switchBranch.md) | Follow the Git branch under test. |
-| **UC-TREE-PANEL-027** | [See what a node holds](nodeDetails.md) | See counts, dates and results without opening anything. |
-| **UC-TREE-PANEL-028** | [Use the buttons at the top of the panel](panelToolbar.md) | Reach the things that act on the whole panel. |
-| **UC-TREE-PANEL-029** | [Save the test project to testin.yml](saveTestinYml.md) | Turn the automation code on, and let a colleague's clone find the same test project. |
+|                       | What the tester does                                                     | Why a tester would use it                                                            |
+|-----------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+|                       | **Getting to the tree**                                                  |                                                                                      |
+| **UC-TREE-PANEL-001** | [Open the panel and reach the tree](reachTheTree.md)                     | See the test project, or learn what to set up first.                                 |
+| **UC-TREE-PANEL-002** | [Create a test project](createTestProject.md)                            | Give a new product under test a home.                                                |
+| **UC-TREE-PANEL-003** | [Import a test project that already exists](importTestProject.md)        | Copy a test project from Git onto this machine.                                      |
+| **UC-TREE-PANEL-004** | [Choose which test project this code project uses](chooseTestProject.md) | Point this code project at a different test project.                                 |
+|                       | **Nodes**                                                                |                                                                                      |
+| **UC-TREE-PANEL-005** | [Open a test set](openTestSet.md)                                        | Read and write the test cases inside a test set.                                     |
+| **UC-TREE-PANEL-006** | [Open a test run](openTestRun.md)                                        | Record a verdict for each test case in a run.                                        |
+| **UC-TREE-PANEL-007** | [Create a test set](createTestSet.md)                                    | Make a place for the test cases about to be written.                                 |
+| **UC-TREE-PANEL-008** | [Create a test set package](createTestSetPackage.md)                     | Group test sets so a big tree stays readable.                                        |
+| **UC-TREE-PANEL-009** | [Create a test run](createTestRun.md)                                    | Record one round of testing over chosen test cases.                                  |
+| **UC-TREE-PANEL-010** | [Create a test run package](createTestRunPackage.md)                     | Group test runs so a year of cycles stays tidy.                                      |
+| **UC-TREE-PANEL-011** | [Rename a node](renameNode.md)                                           | Give a node the name it is called now.                                               |
+| **UC-TREE-PANEL-012** | [Remove a node](removeNode.md)                                           | Take out work that is no longer needed.                                              |
+|                       | **Arranging the tree**                                                   |                                                                                      |
+| **UC-TREE-PANEL-013** | [Move nodes](moveNodes.md)                                               | Put a node into a different folder.                                                  |
+| **UC-TREE-PANEL-014** | [Copy nodes](copyNodes.md)                                               | Start from work that already exists.                                                 |
+| **UC-TREE-PANEL-015** | [Order nodes among their siblings](orderNodes.md)                        | Fix where a node sits among its siblings.                                            |
+| **UC-TREE-PANEL-016** | [Undo a change to the tree](undoChange.md)                               | Take back a wrong move, rename or removal.                                           |
+| **UC-TREE-PANEL-017** | [Redo a change to the tree](redoChange.md)                               | Put back a change that was just undone.                                              |
+|                       | **Statuses**                                                             |                                                                                      |
+| **UC-TREE-PANEL-018** | [Retire a test project, a test set or a package](retireNode.md)          | Keep old work for its history, out of the way.                                       |
+| **UC-TREE-PANEL-019** | [Bring a retired node back](reactivateNode.md)                           | Pick up work that was put aside.                                                     |
+| **UC-TREE-PANEL-020** | [Set a test run's status](setTestRunStatus.md)                           | Show how far a test run has got.                                                     |
+| **UC-TREE-PANEL-021** | [Re-create a test run](reCreateTestRun.md)                               | Start the next cycle from a finished test run.                                       |
+| **UC-TREE-PANEL-022** | [Edit a test run](editTestRun.md)                                        | Correct a test run without building it again.                                        |
+|                       | **Working from the tree**                                                |                                                                                      |
+| **UC-TREE-PANEL-023** | [Run the automation for everything a node holds](runTests.md)            | Run a whole area of automation in one step.                                          |
+| **UC-TREE-PANEL-025** | [Refresh the tree from disk](refreshTree.md)                             | See changes that happened outside the IDE.                                           |
+| **UC-TREE-PANEL-026** | [Switch the Git branch of the test project](switchBranch.md)             | Follow the Git branch under test.                                                    |
+| **UC-TREE-PANEL-027** | [See what a node holds](nodeDetails.md)                                  | See counts, dates and results without opening anything.                              |
+| **UC-TREE-PANEL-028** | [Use the buttons at the top of the panel](panelToolbar.md)               | Reach the things that act on the whole panel.                                        |
+| **UC-TREE-PANEL-029** | [Save the test project to testin.yml](saveTestinYml.md)                  | Turn the automation code on, and let a colleague's clone find the same test project. |
 
 ---
 
@@ -170,23 +170,23 @@ A key works only while the tester is clicked into the tree. The search key is
 the exception. It works anywhere in the IDE. A dialog's own keys are drawn on
 its status bar, at the foot of the dialog.
 
-| Key | Does | Page |
-|---|---|---|
-| `Enter` | Opens the selected test set or test run | [UC-TREE-PANEL-005](openTestSet.md) |
-| `Context Menu` | Opens the menu on the selected node, without the mouse | [The menu](#the-menu) |
-| `Ctrl+M` | Creates a node under the selected one | [UC-TREE-PANEL-007](createTestSet.md) |
-| `Shift+F6` | Renames the selected node | [UC-TREE-PANEL-011](renameNode.md) |
-| `Delete` | Removes the selected nodes | [UC-TREE-PANEL-012](removeNode.md) |
-| `Ctrl+X` | Cuts the selected nodes, to move them | [UC-TREE-PANEL-013](moveNodes.md) |
-| `Ctrl+C` | Copies the selected nodes | [UC-TREE-PANEL-014](copyNodes.md) |
-| `Ctrl+V` | Pastes into the selected node | [UC-TREE-PANEL-013](moveNodes.md) |
-| `Escape` | Takes the gray off nodes the tester cut | [UC-TREE-PANEL-013](moveNodes.md) |
-| `Ctrl+Z` | Undoes the last tree change | [UC-TREE-PANEL-016](undoChange.md) |
-| `Ctrl+Y` | Redoes it | [UC-TREE-PANEL-017](redoChange.md) |
-| `1` `2` `3` | Inside the status popup: Assigned, Completed, Closed | [UC-TREE-PANEL-020](setTestRunStatus.md) |
-| `Ctrl+Alt+F`, `Cmd+Alt+F` on a Mac | Opens search, from anywhere in the IDE | [UC-INTERNAL-001](../internal/globalSearch.md) |
-| `Ctrl+P` | Generates a report on the selected test run | [UC-REPORT-001](../report/generateReport.md) |
-| The menu key, beside the right `Ctrl` | Opens the node menu | Below, under **What the tree shows** |
+| Key                                   | Does                                                   | Page                                           |
+|---------------------------------------|--------------------------------------------------------|------------------------------------------------|
+| `Enter`                               | Opens the selected test set or test run                | [UC-TREE-PANEL-005](openTestSet.md)            |
+| `Context Menu`                        | Opens the menu on the selected node, without the mouse | [The menu](#the-menu)                          |
+| `Ctrl+M`                              | Creates a node under the selected one                  | [UC-TREE-PANEL-007](createTestSet.md)          |
+| `Shift+F6`                            | Renames the selected node                              | [UC-TREE-PANEL-011](renameNode.md)             |
+| `Delete`                              | Removes the selected nodes                             | [UC-TREE-PANEL-012](removeNode.md)             |
+| `Ctrl+X`                              | Cuts the selected nodes, to move them                  | [UC-TREE-PANEL-013](moveNodes.md)              |
+| `Ctrl+C`                              | Copies the selected nodes                              | [UC-TREE-PANEL-014](copyNodes.md)              |
+| `Ctrl+V`                              | Pastes into the selected node                          | [UC-TREE-PANEL-013](moveNodes.md)              |
+| `Escape`                              | Takes the gray off nodes the tester cut                | [UC-TREE-PANEL-013](moveNodes.md)              |
+| `Ctrl+Z`                              | Undoes the last tree change                            | [UC-TREE-PANEL-016](undoChange.md)             |
+| `Ctrl+Y`                              | Redoes it                                              | [UC-TREE-PANEL-017](redoChange.md)             |
+| `1` `2` `3`                           | Inside the status popup: Assigned, Completed, Closed   | [UC-TREE-PANEL-020](setTestRunStatus.md)       |
+| `Ctrl+Alt+F`, `Cmd+Alt+F` on a Mac    | Opens search, from anywhere in the IDE                 | [UC-INTERNAL-001](../internal/globalSearch.md) |
+| `Ctrl+P`                              | Generates a report on the selected test run            | [UC-REPORT-001](../report/generateReport.md)   |
+| The menu key, beside the right `Ctrl` | Opens the node menu                                    | Below, under **What the tree shows**           |
 
 Six things a tester might expect have **no key** on the tree. **Order**, the
 statuses, **Re-create**, **Edit Run**, **Run Tests** and **Details** are menu
@@ -210,73 +210,73 @@ filled in with whatever the tester is working on, and *N* with a count.
 A success message fades on the status bar and leaves no trace. It is one word
 in the past tense wherever one word will do. (Rule-TREE-PANEL-007)
 
-| Message | Means | Use case |
-|---|---|---|
-| *Created* | A node was created | [UC-TREE-PANEL-007](createTestSet.md), [UC-TREE-PANEL-009](createTestRun.md) |
-| *Project created* | A test project was created | [UC-TREE-PANEL-002](createTestProject.md) |
-| *Project cloned* | A test project was brought down from Git | [UC-TREE-PANEL-003](importTestProject.md) |
-| *Bound* | This code project now uses the test project that was chosen | [UC-TREE-PANEL-004](chooseTestProject.md) |
-| *Run created* | A test run was created | [UC-TREE-PANEL-009](createTestRun.md), [UC-TREE-PANEL-021](reCreateTestRun.md) |
-| *Renamed* | A node was renamed | [UC-TREE-PANEL-011](renameNode.md) |
-| *Removed*, *Removed N* | One or more nodes went to the recycle bin | [UC-TREE-PANEL-012](removeNode.md) |
-| *Copied*, *Copied N* | Nodes are on the clipboard, to copy | [UC-TREE-PANEL-013](moveNodes.md) |
-| *Cut*, *Cut N* | Nodes are on the clipboard, to move | [UC-TREE-PANEL-013](moveNodes.md) |
-| *Moved*, *Moved N* | The cut nodes have moved | [UC-TREE-PANEL-013](moveNodes.md) |
-| *Pasted*, *Pasted N* | The copied nodes have been duplicated | [UC-TREE-PANEL-013](moveNodes.md) |
-| *Ordered* | A node's number was set or cleared | [UC-TREE-PANEL-015](orderNodes.md) |
-| *Undone* | The last change was taken back | [UC-TREE-PANEL-016](undoChange.md) |
-| *Redone* | The undone change was put back | [UC-TREE-PANEL-016](undoChange.md) |
-| *Active*, *Inactive*, *Archived*, *Deprecated* | The new status of a test project (Active, Inactive), a package (Active, Archived) or a test set (Active, Deprecated) | [UC-TREE-PANEL-018](retireNode.md) |
-| *Assigned*, *Completed*, *Closed* | The new status of a test run | [UC-TREE-PANEL-020](setTestRunStatus.md) |
-| *Updated* | A test run's name, test cases or settings were saved | [UC-TREE-PANEL-022](editTestRun.md) |
-| *Running*, *Running N* | The automation started | [UC-TREE-PANEL-023](runTests.md) |
-| *Refreshed* | The tree was read again from disk | [UC-TREE-PANEL-025](refreshTree.md) |
-| *Switched to \<branch\>* | The test project is on another branch | [UC-TREE-PANEL-026](switchBranch.md) |
+| Message                                        | Means                                                                                                                | Use case                                                                       |
+|------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| *Created*                                      | A node was created                                                                                                   | [UC-TREE-PANEL-007](createTestSet.md), [UC-TREE-PANEL-009](createTestRun.md)   |
+| *Project created*                              | A test project was created                                                                                           | [UC-TREE-PANEL-002](createTestProject.md)                                      |
+| *Project cloned*                               | A test project was brought down from Git                                                                             | [UC-TREE-PANEL-003](importTestProject.md)                                      |
+| *Bound*                                        | This code project now uses the test project that was chosen                                                          | [UC-TREE-PANEL-004](chooseTestProject.md)                                      |
+| *Run created*                                  | A test run was created                                                                                               | [UC-TREE-PANEL-009](createTestRun.md), [UC-TREE-PANEL-021](reCreateTestRun.md) |
+| *Renamed*                                      | A node was renamed                                                                                                   | [UC-TREE-PANEL-011](renameNode.md)                                             |
+| *Removed*, *Removed N*                         | One or more nodes went to the recycle bin                                                                            | [UC-TREE-PANEL-012](removeNode.md)                                             |
+| *Copied*, *Copied N*                           | Nodes are on the clipboard, to copy                                                                                  | [UC-TREE-PANEL-013](moveNodes.md)                                              |
+| *Cut*, *Cut N*                                 | Nodes are on the clipboard, to move                                                                                  | [UC-TREE-PANEL-013](moveNodes.md)                                              |
+| *Moved*, *Moved N*                             | The cut nodes have moved                                                                                             | [UC-TREE-PANEL-013](moveNodes.md)                                              |
+| *Pasted*, *Pasted N*                           | The copied nodes have been duplicated                                                                                | [UC-TREE-PANEL-013](moveNodes.md)                                              |
+| *Ordered*                                      | A node's number was set or cleared                                                                                   | [UC-TREE-PANEL-015](orderNodes.md)                                             |
+| *Undone*                                       | The last change was taken back                                                                                       | [UC-TREE-PANEL-016](undoChange.md)                                             |
+| *Redone*                                       | The undone change was put back                                                                                       | [UC-TREE-PANEL-016](undoChange.md)                                             |
+| *Active*, *Inactive*, *Archived*, *Deprecated* | The new status of a test project (Active, Inactive), a package (Active, Archived) or a test set (Active, Deprecated) | [UC-TREE-PANEL-018](retireNode.md)                                             |
+| *Assigned*, *Completed*, *Closed*              | The new status of a test run                                                                                         | [UC-TREE-PANEL-020](setTestRunStatus.md)                                       |
+| *Updated*                                      | A test run's name, test cases or settings were saved                                                                 | [UC-TREE-PANEL-022](editTestRun.md)                                            |
+| *Running*, *Running N*                         | The automation started                                                                                               | [UC-TREE-PANEL-023](runTests.md)                                               |
+| *Refreshed*                                    | The tree was read again from disk                                                                                    | [UC-TREE-PANEL-025](refreshTree.md)                                            |
+| *Switched to \<branch\>*                       | The test project is on another branch                                                                                | [UC-TREE-PANEL-026](switchBranch.md)                                           |
 
 ### When it refused
 
 A refusal fades too. It says what stopped the action, and nothing was changed.
 
-| Message | Means | Use case |
-|---|---|---|
-| *\<name\> Already Exists* | The name is taken where it was going | [UC-TREE-PANEL-002](createTestProject.md), [UC-TREE-PANEL-007](createTestSet.md), [UC-TREE-PANEL-009](createTestRun.md), [UC-TREE-PANEL-011](renameNode.md), [UC-TREE-PANEL-021](reCreateTestRun.md), [UC-TREE-PANEL-022](editTestRun.md) |
-| *Select a folder* | The selected place cannot take what is on the clipboard | [UC-TREE-PANEL-013](moveNodes.md) |
-| *'\<name\>' already exists in '\<folder\>'*, *N items already exist in '\<folder\>'* | The destination already holds that name. The rest of the paste still moves | [UC-TREE-PANEL-013](moveNodes.md) |
-| *A test run needs a name* | The name box was emptied | [UC-TREE-PANEL-009](createTestRun.md), [UC-TREE-PANEL-021](reCreateTestRun.md), [UC-TREE-PANEL-022](editTestRun.md) |
-| *'\<parent\>' no longer exists - test run not created* | The folder went away while the dialog was open | [UC-TREE-PANEL-009](createTestRun.md) |
-| *'\<run\>' no longer exists - nothing saved* | The test run went away while the dialog was open | [UC-TREE-PANEL-022](editTestRun.md) |
-| *'\<run\>' was \<status\> while this was open - nothing saved* | Someone signed the test run off while the dialog was open | [UC-TREE-PANEL-022](editTestRun.md) |
-| *\<name\> has no test cases to run* | Nothing under the node can be run | [UC-TREE-PANEL-023](runTests.md) |
-| *No Test Projects* | There is nothing to choose. It adds *Create one in the Testin folder first* | [UC-TREE-PANEL-004](chooseTestProject.md) |
-| *Java Test Source Not Found* | The IDE project has no Java test folder, so no automation code is written | [UC-TREE-PANEL-007](createTestSet.md) |
-| *'\<name\>' cannot name a Java package* | The name is a word Java keeps for itself, on a folder that becomes a package | [UC-TREE-PANEL-002](createTestProject.md), [UC-TREE-PANEL-008](createTestSetPackage.md), [UC-TREE-PANEL-011](renameNode.md) |
+| Message                                                                              | Means                                                                        | Use case                                                                                                                                                                                                                                  |
+|--------------------------------------------------------------------------------------|------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| *\<name\> Already Exists*                                                            | The name is taken where it was going                                         | [UC-TREE-PANEL-002](createTestProject.md), [UC-TREE-PANEL-007](createTestSet.md), [UC-TREE-PANEL-009](createTestRun.md), [UC-TREE-PANEL-011](renameNode.md), [UC-TREE-PANEL-021](reCreateTestRun.md), [UC-TREE-PANEL-022](editTestRun.md) |
+| *Select a folder*                                                                    | The selected place cannot take what is on the clipboard                      | [UC-TREE-PANEL-013](moveNodes.md)                                                                                                                                                                                                         |
+| *'\<name\>' already exists in '\<folder\>'*, *N items already exist in '\<folder\>'* | The destination already holds that name. The rest of the paste still moves   | [UC-TREE-PANEL-013](moveNodes.md)                                                                                                                                                                                                         |
+| *A test run needs a name*                                                            | The name box was emptied                                                     | [UC-TREE-PANEL-009](createTestRun.md), [UC-TREE-PANEL-021](reCreateTestRun.md), [UC-TREE-PANEL-022](editTestRun.md)                                                                                                                       |
+| *'\<parent\>' no longer exists - test run not created*                               | The folder went away while the dialog was open                               | [UC-TREE-PANEL-009](createTestRun.md)                                                                                                                                                                                                     |
+| *'\<run\>' no longer exists - nothing saved*                                         | The test run went away while the dialog was open                             | [UC-TREE-PANEL-022](editTestRun.md)                                                                                                                                                                                                       |
+| *'\<run\>' was \<status\> while this was open - nothing saved*                       | Someone signed the test run off while the dialog was open                    | [UC-TREE-PANEL-022](editTestRun.md)                                                                                                                                                                                                       |
+| *\<name\> has no test cases to run*                                                  | Nothing under the node can be run                                            | [UC-TREE-PANEL-023](runTests.md)                                                                                                                                                                                                          |
+| *No Test Projects*                                                                   | There is nothing to choose. It adds *Create one in the Testin folder first*  | [UC-TREE-PANEL-004](chooseTestProject.md)                                                                                                                                                                                                 |
+| *Java Test Source Not Found*                                                         | The IDE project has no Java test folder, so no automation code is written    | [UC-TREE-PANEL-007](createTestSet.md)                                                                                                                                                                                                     |
+| *'\<name\>' cannot name a Java package*                                              | The name is a word Java keeps for itself, on a folder that becomes a package | [UC-TREE-PANEL-002](createTestProject.md), [UC-TREE-PANEL-008](createTestSetPackage.md), [UC-TREE-PANEL-011](renameNode.md)                                                                                                               |
 
 ### When something failed
 
 These stay in the IDE's notification log, because they are real failures rather
 than feedback on what the tester just typed.
 
-| Message | Means | Use case |
-|---|---|---|
-| *Clone Failed* | The repository could not be cloned. The reason follows | [UC-TREE-PANEL-003](importTestProject.md) |
-| *Clone Error* | Something needed for the clone was missing | [UC-TREE-PANEL-003](importTestProject.md) |
-| *Rename Failed* | The folder could not be renamed on disk. The reason follows | [UC-TREE-PANEL-011](renameNode.md) |
-| *Undo Incomplete* | Some removed nodes could not be put back. It says how many of how many | [UC-TREE-PANEL-016](undoChange.md) |
-| *Unable to update status to \<status\>* | A test project's status could not be written | [UC-TREE-PANEL-018](retireNode.md) |
-| *Unable to mark test set \<status\>* | A test set's status could not be written | [UC-TREE-PANEL-018](retireNode.md) |
-| *Unable to mark package \<status\>* | A package's status could not be written | [UC-TREE-PANEL-018](retireNode.md) |
-| *Git Error* | The branches could not be read. The reason follows | [UC-TREE-PANEL-026](switchBranch.md) |
-| *Git Fetch Warning* | The branch list may be out of date | [UC-TREE-PANEL-026](switchBranch.md) |
+| Message                                 | Means                                                                  | Use case                                  |
+|-----------------------------------------|------------------------------------------------------------------------|-------------------------------------------|
+| *Clone Failed*                          | The repository could not be cloned. The reason follows                 | [UC-TREE-PANEL-003](importTestProject.md) |
+| *Clone Error*                           | Something needed for the clone was missing                             | [UC-TREE-PANEL-003](importTestProject.md) |
+| *Rename Failed*                         | The folder could not be renamed on disk. The reason follows            | [UC-TREE-PANEL-011](renameNode.md)        |
+| *Undo Incomplete*                       | Some removed nodes could not be put back. It says how many of how many | [UC-TREE-PANEL-016](undoChange.md)        |
+| *Unable to update status to \<status\>* | A test project's status could not be written                           | [UC-TREE-PANEL-018](retireNode.md)        |
+| *Unable to mark test set \<status\>*    | A test set's status could not be written                               | [UC-TREE-PANEL-018](retireNode.md)        |
+| *Unable to mark package \<status\>*     | A package's status could not be written                                | [UC-TREE-PANEL-018](retireNode.md)        |
+| *Git Error*                             | The branches could not be read. The reason follows                     | [UC-TREE-PANEL-026](switchBranch.md)      |
+| *Git Fetch Warning*                     | The branch list may be out of date                                     | [UC-TREE-PANEL-026](switchBranch.md)      |
 
 ### Shown in the tree itself, not as a message
 
-| What the tester sees | Means |
-|---|---|
-| *Could not load '\<folder name\>'*, in red, as a child row | That folder's contents could not be read |
-| *testin.yml names \<name\>, which is not in the Testin folder*, in red | The code project names a test project the Testin folder does not hold. See [UC-TREE-PANEL-001](reachTheTree.md) |
-| *testin.yml names \<name\>, which could not be read*, in red | The test project's folder is there, but Testin could not read it |
-| *\<name\>, chosen on this machine, is not in the Testin folder*, in red | The test project chosen for this code project on this machine is gone from the Testin folder |
-| *\<name\>, chosen on this machine, could not be read*, in red | The chosen test project's folder is there, but Testin could not read it |
+| What the tester sees                                                    | Means                                                                                                           |
+|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| *Could not load '\<folder name\>'*, in red, as a child row              | That folder's contents could not be read                                                                        |
+| *testin.yml names \<name\>, which is not in the Testin folder*, in red  | The code project names a test project the Testin folder does not hold. See [UC-TREE-PANEL-001](reachTheTree.md) |
+| *testin.yml names \<name\>, which could not be read*, in red            | The test project's folder is there, but Testin could not read it                                                |
+| *\<name\>, chosen on this machine, is not in the Testin folder*, in red | The test project chosen for this code project on this machine is gone from the Testin folder                    |
+| *\<name\>, chosen on this machine, could not be read*, in red           | The chosen test project's folder is there, but Testin could not read it                                         |
 
 ---
 
@@ -437,11 +437,11 @@ one past-tense word. Every entry that only shows something confirms nothing.
 Five items on the tree's menu belong to another part of Testin. They are
 documented there:
 
-| Item | Belongs to |
-|---|---|
-| **Export**, **Import** | Reports, export, import and sync |
-| **Generate Report** (`Ctrl+P`) | The same |
-| **Sync With Remote**, **View Pending Commits** | The same, the Git half |
+| Item                                           | Belongs to                       |
+|------------------------------------------------|----------------------------------|
+| **Export**, **Import**                         | Reports, export, import and sync |
+| **Generate Report** (`Ctrl+P`)                 | The same                         |
+| **Sync With Remote**, **View Pending Commits** | The same, the Git half           |
 
 ---
 
@@ -512,38 +512,38 @@ Dragging would be quicker, but it would leave nothing written down.
 Stated, not hidden. Each one is a real gap, found by reading the code this
 documentation describes. None of them has a bug report yet.
 
-| | The rule it breaks | What a tester sees |
-|---|---|---|
-| **Difference 1** | Rule-TREE-PANEL-007 — one past-tense word | Creating a test run says *Run created*. Creating a test project says *Project created* or *Project cloned*. Every other creation says *Created*. |
-| **Difference 2** | Rule-TREE-PANEL-044 — nothing lands in a test run | Fixed. **Paste** asks the same two questions a drop asks — is this a place things land in, and can anything on the clipboard land here — so it is gray on a test run, as it always was on a test set. The *Select a folder* refusal is no longer reachable from the menu. |
-| **Difference 11** | Rule-TREE-PANEL-006 — nothing changes until the tester confirms | Fixed. All five ask `singleSelectedDirectory`, the question eight other tree entries already asked, so each is gray with more than one row selected instead of acting on the first. **Details** had no `update()` at all and now has one. |
+|                   | The rule it breaks                                              | What a tester sees                                                                                                                                                                                                                                                        |
+|-------------------|-----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Difference 1**  | Rule-TREE-PANEL-007 — one past-tense word                       | Creating a test run says *Run created*. Creating a test project says *Project created* or *Project cloned*. Every other creation says *Created*.                                                                                                                          |
+| **Difference 2**  | Rule-TREE-PANEL-044 — nothing lands in a test run               | Fixed. **Paste** asks the same two questions a drop asks — is this a place things land in, and can anything on the clipboard land here — so it is gray on a test run, as it always was on a test set. The *Select a folder* refusal is no longer reachable from the menu. |
+| **Difference 11** | Rule-TREE-PANEL-006 — nothing changes until the tester confirms | Fixed. All five ask `singleSelectedDirectory`, the question eight other tree entries already asked, so each is gray with more than one row selected instead of acting on the first. **Details** had no `update()` at all and now has one.                                 |
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.
 
-| Gone | Was |
-|---|---|
-| **Difference 3** | A signed-off test run could still be renamed, moved, reordered and removed from the tree. Fixed 7 September 2026, [#184](https://github.com/mtb550/test-in/issues/184) |
-| **Difference 7** | Three of the four ways to bind a test project reported success without checking the write. Fixed 7 September 2026, [#188](https://github.com/mtb550/test-in/issues/188) |
-| **Difference 8** | **New Test Project** stayed gray for the rest of the session once it had been drawn without a Testin folder. Fixed 7 September 2026, [#189](https://github.com/mtb550/test-in/issues/189) |
-| **Difference 15** | A removal whose copy could not be kept aside was not undoable, said nothing, and left CTRL+Z pointing at an unrelated change. Fixed 7 September 2026, [#196](https://github.com/mtb550/test-in/issues/196) |
-| **Difference 9** | An edit deleted the verdicts of test cases removed from their test set. Fixed 7 September 2026, [#190](https://github.com/mtb550/test-in/issues/190) |
-| **Difference 4** | Neither create dialog named its two kinds, so both rows showed only their hints. Fixed 8 September 2026, [#185](https://github.com/mtb550/test-in/issues/185) |
-| **Difference 6** | Neither canceling a cut nor pasting it emptied the clipboard, so the same move was offered again. Fixed 8 September 2026, [#187](https://github.com/mtb550/test-in/issues/187) |
-| **Difference 12** | A position too large to hold silently cleared the order and still said *Ordered*. Fixed 7 September 2026 in `b28e9af7`, and the document did not follow |
-| **Difference 13** | The **Select Test Project** dialog's first column had no heading. Fixed 8 September 2026, [#194](https://github.com/mtb550/test-in/issues/194) |
-| **Difference 14** | The **Uncommitted Changes** dialog read *1 change ... are not committed*. Fixed 9 September 2026, [#195](https://github.com/mtb550/test-in/issues/195) |
-| **Difference 5** | The popup offered all five statuses, including the two that are the run's own record of itself, and let a run go from **Assigned** back to **Created**. It offers what the run can be moved to and nothing else: the three a tester sets, and only those ahead of where it is now (Rule-TREE-PANEL-092). That settles question 1. Fixed 10 September 2026, [#186](https://github.com/mtb550/test-in/issues/186) |
+| Gone              | Was                                                                                                                                                                                                                                                                                                                                                                                                                |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Difference 3**  | A signed-off test run could still be renamed, moved, reordered and removed from the tree. Fixed 7 September 2026, [#184](https://github.com/mtb550/test-in/issues/184)                                                                                                                                                                                                                                             |
+| **Difference 7**  | Three of the four ways to bind a test project reported success without checking the write. Fixed 7 September 2026, [#188](https://github.com/mtb550/test-in/issues/188)                                                                                                                                                                                                                                            |
+| **Difference 8**  | **New Test Project** stayed gray for the rest of the session once it had been drawn without a Testin folder. Fixed 7 September 2026, [#189](https://github.com/mtb550/test-in/issues/189)                                                                                                                                                                                                                          |
+| **Difference 15** | A removal whose copy could not be kept aside was not undoable, said nothing, and left CTRL+Z pointing at an unrelated change. Fixed 7 September 2026, [#196](https://github.com/mtb550/test-in/issues/196)                                                                                                                                                                                                         |
+| **Difference 9**  | An edit deleted the verdicts of test cases removed from their test set. Fixed 7 September 2026, [#190](https://github.com/mtb550/test-in/issues/190)                                                                                                                                                                                                                                                               |
+| **Difference 4**  | Neither create dialog named its two kinds, so both rows showed only their hints. Fixed 8 September 2026, [#185](https://github.com/mtb550/test-in/issues/185)                                                                                                                                                                                                                                                      |
+| **Difference 6**  | Neither canceling a cut nor pasting it emptied the clipboard, so the same move was offered again. Fixed 8 September 2026, [#187](https://github.com/mtb550/test-in/issues/187)                                                                                                                                                                                                                                     |
+| **Difference 12** | A position too large to hold silently cleared the order and still said *Ordered*. Fixed 7 September 2026 in `b28e9af7`, and the document did not follow                                                                                                                                                                                                                                                            |
+| **Difference 13** | The **Select Test Project** dialog's first column had no heading. Fixed 8 September 2026, [#194](https://github.com/mtb550/test-in/issues/194)                                                                                                                                                                                                                                                                     |
+| **Difference 14** | The **Uncommitted Changes** dialog read *1 change ... are not committed*. Fixed 9 September 2026, [#195](https://github.com/mtb550/test-in/issues/195)                                                                                                                                                                                                                                                             |
+| **Difference 5**  | The popup offered all five statuses, including the two that are the run's own record of itself, and let a run go from **Assigned** back to **Created**. It offers what the run can be moved to and nothing else: the three a tester sets, and only those ahead of where it is now (Rule-TREE-PANEL-092). That settles question 1. Fixed 10 September 2026, [#186](https://github.com/mtb550/test-in/issues/186)    |
 | **Difference 10** | Setting a test run's status from the tree did not tell that run's open editor, which kept the old status and the rows that had just become **Untested**. The tree was doing the work itself instead of asking the one place that owns a status change; now both go through it, and the editor and the tree each hear about the other. Fixed 9 September 2026, [#191](https://github.com/mtb550/test-in/issues/191) |
 
 ---
 
 ## Not decided
 
-| | Question | Why it is open |
-|---|---|---|
-| **Question 3** | What should the paste refusal say? | *Select a folder* is shown for six different reasons. Four of them are: the wrong side of the tree, the node itself, another test project, and a test run. Choosing a different folder only fixes one of the six. |
-| **Question 4** | On a Mac, should cut, paste, undo and redo in the tree use the Mac's own key for those actions, the way copy already does? | Today copy does. The other four do not. The keys are named in the key table above. |
+|                | Question                                                                                                                   | Why it is open                                                                                                                                                                                                    |
+|----------------|----------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Question 3** | What should the paste refusal say?                                                                                         | *Select a folder* is shown for six different reasons. Four of them are: the wrong side of the tree, the node itself, another test project, and a test run. Choosing a different folder only fixes one of the six. |
+| **Question 4** | On a Mac, should cut, paste, undo and redo in the tree use the Mac's own key for those actions, the way copy already does? | Today copy does. The other four do not. The keys are named in the key table above.                                                                                                                                |
 
 
 **Settled.** Question 1 asked whether a test run may go backwards, from

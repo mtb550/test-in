@@ -24,7 +24,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 
 /**
  * The runner's bookkeeping survives an editor reload, and a run that ends

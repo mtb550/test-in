@@ -71,8 +71,7 @@ turns to the page holding the first test case with no verdict, and selects its
 row.
 
 The status bar reads **In Progress**, and the clock starts ticking once a
-second. A small message appears at the bottom of the IDE and fades, reading
-*In Progress*.
+second. A small message appears at the bottom of the IDE and fades, reading *In Progress*.
 
 ## Main flow
 
@@ -85,13 +84,11 @@ second. A small message appears at the bottom of the IDE and fades, reading
 7. The walk moves to the next test case waiting for a verdict, passing over
    any that already has one, and times that one.
 8. When the walk runs out of test cases it stops, and the test run is written.
-9. If every test case in the test run now has a verdict, the test run is marked
-   **Completed**.
+9. If every test case in the test run now has a verdict, the test run is marked **Completed**.
 
 ## What Testin refuses
 
-**If a walk is already going** — the button is gray, and its tooltip reads
-*Execution in progress*.
+**If a walk is already going** — the button is gray, and its tooltip reads *Execution in progress*.
 
 **If the test run is completed or closed** — the button is gray, and its tooltip
 reads *Execution disabled — run status is*, then the status.

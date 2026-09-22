@@ -20,23 +20,23 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.Groups;
-import org.testin.model.ToolBarAttribute;
-import org.testin.model.ToolBarDefault;
-import org.testin.model.ValueExtractor;
-import org.testin.util.Bundle;
-import org.testin.ui.Badges;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenType;
 import org.testin.importexport.imports.ImportSetter;
+import org.testin.model.Groups;
+import org.testin.model.ToolBarAttribute;
+import org.testin.model.ToolBarDefault;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
+import org.testin.ui.Badges;
+import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.util.NameSanitizer;
 import org.testin.util.TestDataParser;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -65,8 +65,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     DESCRIPTION(
             Bundle.message("attribute.description"),
             ToolBarDefault.LOCKED_CHECKED,
-            tc -> tc.getDescription(),
-            (p, tc, v) -> always(() -> tc.setDescription(NameSanitizer.description(v))),
+            TestCaseDto::getDescription,
+            always((tc, v) -> tc.setDescription(NameSanitizer.description(v))),
             GenType.UPDATE_TEST_CASE_DESCRIPTION,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
@@ -87,8 +87,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     EXPECTED_RESULT(
             Bundle.message("attribute.expected.result"),
             ToolBarDefault.ON,
-            tc -> tc.getExpectedResult(),
-            (p, tc, v) -> always(() -> tc.setExpectedResult(v)),
+            TestCaseDto::getExpectedResult,
+            always(TestCaseDto::setExpectedResult),
             GenType.UPDATE_TEST_CASE_EXPECTED_RESULT,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
@@ -97,7 +97,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.steps"),
             ToolBarDefault.OFF,
             tc -> String.join(", ", tc.getSteps()),
-            (p, tc, v) -> always(() -> tc.setSteps(TestDataParser.steps(v))),
+            always((tc, v) -> tc.setSteps(TestDataParser.steps(v))),
             GenType.UPDATE_TEST_CASE_STEPS,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
@@ -128,8 +128,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     REFERENCE(
             Bundle.message("attribute.reference"),
             ToolBarDefault.OFF,
-            tc -> tc.getReference(),
-            (p, tc, v) -> always(() -> tc.setReference(v)),
+            TestCaseDto::getReference,
+            always(TestCaseDto::setReference),
             GenType.NO_CODE_CHANGE,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
@@ -137,8 +137,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     TEST_DATA(
             Bundle.message("attribute.test.data"),
             ToolBarDefault.OFF,
-            tc -> tc.getTestData(),
-            (p, tc, v) -> always(() -> tc.setTestData(v)),
+            TestCaseDto::getTestData,
+            always(TestCaseDto::setTestData),
             GenType.UPDATE_TEST_CASE_TEST_DATA,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
@@ -146,8 +146,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     PRE_CONDITIONS(
             Bundle.message("attribute.pre.conditions"),
             ToolBarDefault.OFF,
-            tc -> tc.getPreConditions(),
-            (p, tc, v) -> always(() -> tc.setPreConditions(v)),
+            TestCaseDto::getPreConditions,
+            always(TestCaseDto::setPreConditions),
             GenType.UPDATE_TEST_CASE_PRE_CONDITIONS,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
@@ -178,8 +178,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     MODULE(
             Bundle.message("attribute.module"),
             ToolBarDefault.OFF,
-            tc -> tc.getModule(),
-            (p, tc, v) -> always(() -> tc.setModule(v)),
+            TestCaseDto::getModule,
+            always(TestCaseDto::setModule),
             GenType.UPDATE_TEST_CASE_MODULE,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
@@ -196,8 +196,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     CREATED_BY(
             Bundle.message("attribute.created.by"),
             ToolBarDefault.OFF,
-            tc -> tc.getCreatedBy(),
-            (p, tc, v) -> always(() -> tc.setCreatedBy(v)),
+            TestCaseDto::getCreatedBy,
+            always(TestCaseDto::setCreatedBy),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
     ),
@@ -205,8 +205,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     UPDATED_BY(
             Bundle.message("attribute.updated.by"),
             ToolBarDefault.OFF,
-            tc -> tc.getUpdatedBy(),
-            (p, tc, v) -> always(() -> tc.setUpdatedBy(v)),
+            TestCaseDto::getUpdatedBy,
+            always(TestCaseDto::setUpdatedBy),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
     ),
@@ -229,14 +229,26 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.IMPORT, Can.EXPORT
     );
 
-    public enum Can {
-        EDIT,
+    // Rule-VIEW-PANEL-026, Rule-EDITOR-PANEL-005
+    private static final @NotNull Set<TestEditorAttributes> PROSE =
+            EnumSet.of(DESCRIPTION, EXPECTED_RESULT, STEPS, PRE_CONDITIONS);
+    private static final @NotNull Map<Can, List<TestEditorAttributes>> BY_CAPABILITY = EnumSet.allOf(Can.class).stream()
+            .collect(Collectors.toUnmodifiableMap(capability -> capability, capability -> Arrays.stream(values()).filter(attribute -> attribute.can(capability)).toList()));
+    private final @NotNull String name;
+    private final @NotNull ToolBarDefault toolBarDefault;
+    private final @NotNull Function<TestCaseDto, String> testValueExtractor;
+    private final @NotNull ImportSetter importSetter;
+    private final @NotNull GenType genType;
+    @Getter(AccessLevel.NONE)
+    private final @NotNull Set<Can> can;
 
-        IMPORT,
-
-        COPY,
-
-        EXPORT
+    TestEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull Function<TestCaseDto, String> testValueExtractor, final @NotNull ImportSetter importSetter, final @NotNull GenType genType, final @NotNull Can... can) {
+        this.name = name;
+        this.toolBarDefault = toolBarDefault;
+        this.testValueExtractor = testValueExtractor;
+        this.importSetter = importSetter;
+        this.genType = genType;
+        this.can = can.length == 0 ? EnumSet.noneOf(Can.class) : EnumSet.copyOf(List.of(can));
     }
 
     // UC-EDITOR-PANEL-019, UC-INTERNAL-001, Rule-EDITOR-PANEL-091
@@ -248,41 +260,6 @@ public enum TestEditorAttributes implements ToolBarAttribute {
         }
 
         return false;
-    }
-
-    // Rule-VIEW-PANEL-026, Rule-EDITOR-PANEL-005
-    private static final @NotNull Set<TestEditorAttributes> PROSE =
-            EnumSet.of(DESCRIPTION, EXPECTED_RESULT, STEPS, PRE_CONDITIONS);
-
-    // UC-SHARE-005, UC-SHARE-006, Rule-SHARE-110
-    public boolean isColumn(final @NotNull String header) {
-        final @NotNull String wanted = header.trim();
-
-        return name.equalsIgnoreCase(wanted) || TestDataParser.namesConstant(this, wanted);
-    }
-
-    private final @NotNull String name;
-    private final @NotNull ToolBarDefault toolBarDefault;
-
-    private final @NotNull Function<TestCaseDto, String> testValueExtractor;
-
-    private final @NotNull ImportSetter importSetter;
-
-    private final @NotNull GenType genType;
-
-    @Getter(AccessLevel.NONE)
-    private final @NotNull Set<Can> can;
-
-    private static final @NotNull Map<Can, List<TestEditorAttributes>> BY_CAPABILITY = EnumSet.allOf(Can.class).stream()
-            .collect(Collectors.toUnmodifiableMap(capability -> capability, capability -> List.of(values()).stream().filter(attribute -> attribute.can(capability)).toList()));
-
-    TestEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull Function<TestCaseDto, String> testValueExtractor, final @NotNull ImportSetter importSetter, final @NotNull GenType genType, final @NotNull Can... can) {
-        this.name = name;
-        this.toolBarDefault = toolBarDefault;
-        this.testValueExtractor = testValueExtractor;
-        this.importSetter = importSetter;
-        this.genType = genType;
-        this.can = can.length == 0 ? EnumSet.noneOf(Can.class) : EnumSet.copyOf(List.of(can));
     }
 
     // UC-SHARE-006, Rule-SHARE-106, Rule-EDITOR-PANEL-206
@@ -306,13 +283,20 @@ public enum TestEditorAttributes implements ToolBarAttribute {
                 : Bundle.message("attribute.value.many", String.valueOf(refused)));
     }
 
-    public boolean can(final @NotNull Can capability) {
-        return can.contains(capability);
-    }
-
     // UC-SHARE-002, Rule-SHARE-001
     public static @NotNull List<TestEditorAttributes> all(final @NotNull Can capability) {
         return BY_CAPABILITY.get(capability);
+    }
+
+    // UC-SHARE-005, UC-SHARE-006, Rule-SHARE-110
+    public boolean isColumn(final @NotNull String header) {
+        final @NotNull String wanted = header.trim();
+
+        return name.equalsIgnoreCase(wanted) || TestDataParser.namesConstant(this, wanted);
+    }
+
+    public boolean can(final @NotNull Can capability) {
+        return can.contains(capability);
     }
 
     public @NotNull String gridValue(final @NotNull TestCaseDto tc) {
@@ -328,5 +312,15 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
         details.put(name, displayValue(tc));
+    }
+
+    public enum Can {
+        EDIT,
+
+        IMPORT,
+
+        COPY,
+
+        EXPORT
     }
 }

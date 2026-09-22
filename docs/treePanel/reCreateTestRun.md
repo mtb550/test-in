@@ -37,10 +37,10 @@ This copies a test run's test cases and settings into a new, empty one.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -58,8 +58,8 @@ This copies a test run's test cases and settings into a new, empty one.
 - **Rule-TREE-PANEL-070** — Only the test cases and the configuration are
   carried over. Verdicts, durations and failure details start fresh.
 - **Rule-TREE-PANEL-071** — The next name is suggested by counting up. *cycle-1*
-  becomes *cycle-2*, and a name with no number on it gets one: *smoke* becomes
-  *smoke-2*. A name already taken is skipped.
+  becomes *cycle-2*, and a name with no number on it gets one: *smoke* becomes *smoke-2*. A name already taken is
+  skipped.
 - **Rule-TREE-PANEL-072** — The new test run is created in the same folder as
   the one it was made from.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
@@ -73,10 +73,10 @@ This copies a test run's test cases and settings into a new, empty one.
 ## What the tester sees
 
 The **Create Test Run** dialog opens. It is the dialog drawn under
-[UC-TREE-PANEL-009](createTestRun.md), with the same title and the same
-**Create** button. It arrives filled in. The next name is in *Test Run name*,
-the same test cases are ticked, and the same configuration is set. After
-**Create**, the new test run's editor opens and *Run created* shows above the
+[UC-TREE-PANEL-009](createTestRun.md), with the same title and the same **Create** button. It arrives filled in. The
+next name is in *Test Run name*,
+the same test cases are ticked, and the same configuration is set. After **Create**, the new test run's editor opens and
+*Run created* shows above the
 status bar at the bottom right of the IDE.
 
 ## Main flow

@@ -16,14 +16,13 @@
 
 package org.testin.java.codegen.method.update;
 
-import org.testin.codegen.GenType;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
-import java.util.List;
 import org.testin.codegen.GenAction;
-import org.testin.model.TestCaseStatus;
+import org.testin.codegen.GenType;
 import org.testin.model.dto.TestCaseDto;
+
+import java.util.List;
 
 public class UpdateTestEnabled extends UpdateTestBase implements GenAction {
     // UC-CODEGEN-013, Rule-CODEGEN-047, Rule-CODEGEN-048

@@ -18,10 +18,11 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.testin.indexer.DirectoryMapper;
 import org.testin.model.DirectoryType;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.markers.TestCasesMainDirectoryMarker;
+import org.testin.model.markers.TestProjectMarker;
 import org.testin.services.Services;
 
 import java.nio.file.Files;
@@ -54,21 +55,6 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
 
     private Path root;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-tree");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            deleteTree(root);
-        } finally {
-            super.tearDown();
-        }
-    }
-
     /**
      * A temporary tree, removed as far as the operating system allows. A file
      * the IDE still holds open is its own to clean up, and failing to remove one
@@ -87,6 +73,21 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
             });
         } catch (final Exception ignored) {
             // Nothing to walk, or nothing to remove.
+        }
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        root = Files.createTempDirectory("testin-tree");
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        try {
+            deleteTree(root);
+        } finally {
+            super.tearDown();
         }
     }
 
@@ -159,7 +160,7 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
 
         assertFalse("a folder Testin wrote carries an id", stamped.isEmpty());
         assertFalse("and so do the two containers under it",
-                indexer().readMarker(testProject.resolve(DirectoryType.TCD.getFolderName()), DirectoryType.TCD, "Test Cases").getId().isEmpty());
+                indexer().readMarker(testProject.resolve(DirectoryType.TCD.getFolderName()), DirectoryType.TCD, "Test Cases", TestCasesMainDirectoryMarker.class).getId().isEmpty());
 
         WriteAction.runAndWait(() -> {
             tp.getMarker().setStatus(ProjectStatus.INACTIVE);
@@ -168,7 +169,7 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
 
         assertEquals("the id a folder has is the id it keeps",
                 stamped,
-                indexer().readMarker(testProject, DirectoryType.TP, "NAFATH").getId());
+                indexer().readMarker(testProject, DirectoryType.TP, "NAFATH", TestProjectMarker.class).getId());
     }
 
     /**

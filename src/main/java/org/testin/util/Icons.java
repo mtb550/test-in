@@ -24,8 +24,15 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Icon;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
@@ -38,6 +45,8 @@ public final class Icons {
     public static final @NotNull Color GRAY = new Color(0x6C707E);
     public static final @NotNull Color RED = new Color(0xDB3B4B);
     public static final @NotNull Color GREEN = new Color(0x208A3C);
+    private static final float SCALE_FACTOR = 1.3f;
+    private static final int DOT_SIZE = 10;
 
     // UC-EDITOR-PANEL-005
     public static @NotNull Icon fieldLetter(final @NotNull String letter, final @NotNull Color color) {
@@ -79,9 +88,6 @@ public final class Icons {
     public static @NotNull Icon gray(final @NotNull Icon icon) {
         return IconUtil.desaturate(icon);
     }
-
-    private static final float SCALE_FACTOR = 1.3f;
-    private static final int DOT_SIZE = 10;
 
     public static @NotNull Icon zoomStandardIcon(final @NotNull Icon icon, final @NotNull Component contextComponent) {
         return IconUtil.scale(icon, contextComponent, SCALE_FACTOR);

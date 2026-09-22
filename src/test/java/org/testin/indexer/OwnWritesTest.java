@@ -46,9 +46,37 @@ public class OwnWritesTest {
     private static final byte @NotNull [] OURS = "{\"description\":\"Log in\"}".getBytes();
     private static final byte @NotNull [] THEIRS = "{\"description\":\"Log in as admin\"}".getBytes();
 
+    private static @NotNull Path tempFile() {
+        try {
+            final @NotNull Path file = Files.createTempFile("testin-ownwrites", ".json");
+            Files.write(file, OURS);
+            return file;
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not create a file to watch: " + ex.getMessage(), ex);
+        }
+    }
+
+    private static void testerEdits(final @NotNull Path file) {
+        try {
+            Files.write(file, THEIRS);
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not stand in for the tester's edit: " + ex.getMessage(), ex);
+        }
+    }
+
+    private static void delete(final @NotNull Path file) {
+        try {
+            Files.deleteIfExists(file);
+        } catch (final IOException ex) {
+            // Litter, not a failed test - and reporting it as one would hide
+            // whichever assertion actually failed.
+            System.err.println("Could not clean up " + file + ": " + ex.getMessage());
+        }
+    }
+
     @Test
     public void ourOwnSaveIsIgnored() {
-        final @NotNull Path file = tempFile(OURS);
+        final @NotNull Path file = tempFile();
 
         try {
             final @NotNull OwnWrites ours = new OwnWrites();
@@ -66,14 +94,14 @@ public class OwnWritesTest {
      */
     @Test
     public void aHandEditInsideTheWindowIsNotIgnored() {
-        final @NotNull Path file = tempFile(OURS);
+        final @NotNull Path file = tempFile();
 
         try {
             final @NotNull OwnWrites ours = new OwnWrites();
             ours.record(file);
             ours.wrote(file, OURS);
 
-            write(file, THEIRS);
+            testerEdits(file);
 
             assertFalse(ours.areOurs(file),
                     "a tester edited this file after the plugin wrote it, inside the window - their edit must reach the screen");
@@ -89,7 +117,7 @@ public class OwnWritesTest {
      */
     @Test
     public void aWriteStillInFlightIsOurs() {
-        final @NotNull Path file = tempFile(OURS);
+        final @NotNull Path file = tempFile();
 
         try {
             final @NotNull OwnWrites ours = new OwnWrites();
@@ -103,40 +131,12 @@ public class OwnWritesTest {
 
     @Test
     public void aFileNobodyClaimedIsNeverOurs() {
-        final @NotNull Path file = tempFile(OURS);
+        final @NotNull Path file = tempFile();
 
         try {
             assertFalse(new OwnWrites().areOurs(file));
         } finally {
             delete(file);
-        }
-    }
-
-    private static @NotNull Path tempFile(final byte @NotNull [] content) {
-        try {
-            final @NotNull Path file = Files.createTempFile("testin-ownwrites", ".json");
-            Files.write(file, content);
-            return file;
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not create a file to watch: " + ex.getMessage(), ex);
-        }
-    }
-
-    private static void write(final @NotNull Path file, final byte @NotNull [] content) {
-        try {
-            Files.write(file, content);
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not stand in for the tester's edit: " + ex.getMessage(), ex);
-        }
-    }
-
-    private static void delete(final @NotNull Path file) {
-        try {
-            Files.deleteIfExists(file);
-        } catch (final IOException ex) {
-            // Litter, not a failed test - and reporting it as one would hide
-            // whichever assertion actually failed.
-            System.err.println("Could not clean up " + file + ": " + ex.getMessage());
         }
     }
 }

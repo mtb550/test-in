@@ -16,17 +16,17 @@
 
 package org.testin.services;
 
-import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.FailureText;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
+import org.testin.util.FailureText;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;

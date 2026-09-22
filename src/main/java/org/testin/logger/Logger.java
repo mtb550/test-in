@@ -19,9 +19,9 @@ package org.testin.logger;
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Logger {
@@ -49,11 +49,6 @@ public final class Logger {
 
     public static void error(final @NotNull String message) {
         log(Level.ERROR, WALKER.getCallerClass().getSimpleName(), message);
-    }
-
-    @SuppressWarnings("unused")
-    public static void fatal(final @NotNull String message) {
-        log(Level.FATAL, WALKER.getCallerClass().getSimpleName(), message);
     }
 
     private static void log(final @NotNull Level level, final @NotNull String callerClass, final @NotNull String message) {

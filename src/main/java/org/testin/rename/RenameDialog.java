@@ -31,7 +31,9 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.Consumer;
 
-final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
+final class RenameDialog extends AbstractFrameworkDialog {
+    private final @NotNull TextInput nameInput;
+
     private final @NotNull Consumer<@NotNull String> onSubmit;
 
     private final @NotNull DirectoryType type;
@@ -44,12 +46,13 @@ final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
 
         title = Bundle.message("dialog.rename.title");
 
-        components = List.of(
-                ComponentDialogBase.textField()
-                        .icon(AllIcons.Actions.Edit)
-                        .placeholder(Bundle.message("dialog.rename.placeholder"))
-                        .value(dir.getName())
-                        .build());
+        final @NotNull ComponentDialogBase<TextInput> built = ComponentDialogBase.textField()
+                .icon(AllIcons.Actions.Edit)
+                .placeholder(Bundle.message("dialog.rename.placeholder"))
+                .value(dir.getName())
+                .build();
+        nameInput = built.getComponent();
+        components = List.of(built);
 
         shortcuts = List.of(
                 StatusBarShortcut.confirm(this::submit),
@@ -59,7 +62,7 @@ final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095
     @Override
     protected void submit() {
-        final @NotNull String value = accepted(component(), typed -> Refused.ofName(type, typed));
+        final @NotNull String value = accepted(nameInput, typed -> Refused.ofName(type, typed));
         if (value.isEmpty()) return;
 
         onSubmit.accept(value);

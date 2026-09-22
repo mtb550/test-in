@@ -16,14 +16,14 @@
 
 package org.testin.runner;
 
-import org.testin.codegen.CodeOn;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.CodeOn;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.Services;
 import org.testin.services.OptionalPlugin;
+import org.testin.services.Services;
 
 import java.util.List;
 
@@ -34,8 +34,8 @@ public final class RunTestCases {
         if (testCases.isEmpty()) return;
 
         // Rule-CODEGEN-082
-        if (!CodeOn.isOnOrWarn(p)) return;
-        if (!OptionalPlugin.TESTNG.isAvailableOrWarn(p)) return;
+        if (CodeOn.isOffAndWarned(p)) return;
+        if (OptionalPlugin.TESTNG.isMissingAndWarned(p)) return;
 
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 

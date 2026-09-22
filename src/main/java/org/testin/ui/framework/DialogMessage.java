@@ -16,15 +16,17 @@
 
 package org.testin.ui.framework;
 
-import org.testin.util.Html;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-
 import org.testin.util.Bundle;
-import javax.swing.*;
-import java.awt.*;
+import org.testin.util.Html;
+
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import java.awt.BorderLayout;
+import java.awt.Component;
 
 public final class DialogMessage implements DialogComponent {
     private final @NotNull JBPanel<?> panel;

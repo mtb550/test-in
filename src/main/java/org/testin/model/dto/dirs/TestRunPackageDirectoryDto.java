@@ -16,12 +16,18 @@
 
 package org.testin.model.dto.dirs;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.PackageStatus;
 import org.testin.model.markers.TestRunPackageMarker;
+
 import java.util.List;
 
 @Setter

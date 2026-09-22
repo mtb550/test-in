@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-009: Move a test case by typing its number
 
-**As a** tester, **I want** to say a test case is number three,
-**so that** I can put it where I want without dragging it through 200 rows.
+**As a** tester, **I want** to say a test case is number three, **so that** I can put it where I want without dragging
+it through 200 rows.
 
 The tester types the position they want. Testin moves the test case there.
 

@@ -16,21 +16,23 @@
 
 package org.testin.editor.listeners;
 
-import lombok.AllArgsConstructor;
-import org.testin.notifications.Done;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.TestinEditor;
-import org.testin.testcase.TestCaseSnapshot;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.testcase.TestCaseSnapshot;
 import org.testin.util.Bundle;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.ListModel;
+import javax.swing.TransferHandler;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -46,6 +48,20 @@ public class TransferListener extends TransferHandler {
     private static final @NotNull DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
     private final @NotNull Project p;
     private final @NotNull TestinEditor editor;
+
+    private static int landingIndex(final @NotNull List<TestCaseDto> allItems, final @NotNull Optional<TestCaseDto> above, final @NotNull Optional<TestCaseDto> below) {
+        return above.map(tc -> Math.min(indexOfId(allItems, tc.getId()) + 1, allItems.size()))
+                .or(() -> below.map(tc -> indexOfId(allItems, tc.getId())))
+                .orElse(allItems.size());
+    }
+
+    private static int indexOfId(final @NotNull List<TestCaseDto> items, final @NotNull UUID id) {
+        for (int i = 0; i < items.size(); i++) {
+            if (id.equals(items.get(i).getId())) return i;
+        }
+
+        return items.size();
+    }
 
     // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-058
     @Override
@@ -164,7 +180,8 @@ public class TransferListener extends TransferHandler {
         final @NotNull ListModel<?> rows = target.getModel();
 
         for (int row = Math.max(0, ((JBList.DropLocation) support.getDropLocation()).getIndex()); row < rows.getSize(); row++) {
-            if (rows.getElementAt(row) instanceof TestCaseDto tc && !movedIds.contains(tc.getId())) return Optional.of(tc);
+            if (rows.getElementAt(row) instanceof TestCaseDto tc && !movedIds.contains(tc.getId()))
+                return Optional.of(tc);
         }
 
         return Optional.empty();
@@ -178,23 +195,10 @@ public class TransferListener extends TransferHandler {
         final int drop = Math.min(((JBList.DropLocation) support.getDropLocation()).getIndex(), rows.getSize());
 
         for (int row = drop - 1; row >= 0; row--) {
-            if (rows.getElementAt(row) instanceof TestCaseDto tc && !movedIds.contains(tc.getId())) return Optional.of(tc);
+            if (rows.getElementAt(row) instanceof TestCaseDto tc && !movedIds.contains(tc.getId()))
+                return Optional.of(tc);
         }
 
         return Optional.empty();
-    }
-
-    private static int landingIndex(final @NotNull List<TestCaseDto> allItems, final @NotNull Optional<TestCaseDto> above, final @NotNull Optional<TestCaseDto> below) {
-        return above.map(tc -> Math.min(indexOfId(allItems, tc.getId()) + 1, allItems.size()))
-                .or(() -> below.map(tc -> indexOfId(allItems, tc.getId())))
-                .orElse(allItems.size());
-    }
-
-    private static int indexOfId(final @NotNull List<TestCaseDto> items, final @NotNull UUID id) {
-        for (int i = 0; i < items.size(); i++) {
-            if (id.equals(items.get(i).getId())) return i;
-        }
-
-        return items.size();
     }
 }

@@ -17,18 +17,27 @@
 package org.testin.indexer;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.markers.Marker;
 import org.testin.model.dto.dirs.DirectoryDto;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 final class DirectoryChildrenIndex {
-    private volatile @NotNull Map<Path, List<DirectoryDto>> childrenByParent = Map.of();
-
+    private static final @NotNull Comparator<DirectoryDto> BY_ARRANGEMENT = Comparator
+            .comparing(DirectoryDto::isRetired)
+            .thenComparingInt(DirectoryDto::getOrder)
+            .thenComparing(node -> node.getMarker().getCreatedAt())
+            .thenComparing(DirectoryDto::getName);
     private final @NotNull AtomicLong invalidations = new AtomicLong();
+    private volatile @NotNull Map<Path, List<DirectoryDto>> childrenByParent = Map.of();
     private volatile long builtAfter = -1;
 
     @NotNull
@@ -45,12 +54,6 @@ final class DirectoryChildrenIndex {
         childrenByParent = Map.of();
         invalidate();
     }
-
-    private static final @NotNull Comparator<DirectoryDto> BY_ARRANGEMENT = Comparator
-            .comparing(DirectoryDto::isRetired)
-            .thenComparingInt(DirectoryDto::getOrder)
-            .thenComparing(node -> node.getMarker().getCreatedAt())
-            .thenComparing(DirectoryDto::getName);
 
     private void rebuildIfNeeded(final @NotNull Supplier<Collection<DirectoryDto>> source) {
         if (builtAfter == invalidations.get()) return;

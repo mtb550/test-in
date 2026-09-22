@@ -86,14 +86,14 @@ There is no key for this. It starts on its own.
 A test project of ten thousand test cases, and the results of its test runs,
 measured rather than estimated.
 
-| | Measured | Budget |
-|---|---|---|
-| **Reading one test case** | 21 µs | 40 µs |
-| **Reading ten thousand** | 214 ms | 400 ms |
-| **Held in memory, per case** | 1.5 KB | 4 KB |
-| **Held in memory, ten thousand** | 14.6 MB | 40 MB |
-| **Reading one run result** | 8.8 µs | 20 µs |
-| **Reading four thousand** | 35 ms | 80 ms |
+|                                  | Measured | Budget |
+|----------------------------------|----------|--------|
+| **Reading one test case**        | 21 µs    | 40 µs  |
+| **Reading ten thousand**         | 214 ms   | 400 ms |
+| **Held in memory, per case**     | 1.5 KB   | 4 KB   |
+| **Held in memory, ten thousand** | 14.6 MB  | 40 MB  |
+| **Reading one run result**       | 8.8 µs   | 20 µs  |
+| **Reading four thousand**        | 35 ms    | 80 ms  |
 
 The results are their own line because they are their own files: since #305 a run
 of two thousand cases is two thousand `.ri` files rather than one `run.json`, so
@@ -124,14 +124,14 @@ bar the tester can cancel (Rule-INTERNAL-013).
 
 ## What starts a read
 
-| The tester does this | What Testin reads |
-|---|---|
-| Opens a code project that has a Testin folder set | Every test project |
-| Presses **Refresh** on the panel toolbar | Every test project, from nothing |
-| Changes a file outside the IDE | The one test project that holds it, see [UC-INTERNAL-003](noticeOutsideChange.md) |
-| Finishes a sync with Git | The one test project that was synced |
-| Switches branch | The one test project in that repository |
-| Clones a test project | The one that was cloned |
+| The tester does this                              | What Testin reads                                                                 |
+|---------------------------------------------------|-----------------------------------------------------------------------------------|
+| Opens a code project that has a Testin folder set | Every test project                                                                |
+| Presses **Refresh** on the panel toolbar          | Every test project, from nothing                                                  |
+| Changes a file outside the IDE                    | The one test project that holds it, see [UC-INTERNAL-003](noticeOutsideChange.md) |
+| Finishes a sync with Git                          | The one test project that was synced                                              |
+| Switches branch                                   | The one test project in that repository                                           |
+| Clones a test project                             | The one that was cloned                                                           |
 
 ## The screen
 

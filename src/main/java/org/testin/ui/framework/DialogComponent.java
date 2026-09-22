@@ -18,7 +18,7 @@ package org.testin.ui.framework;
 
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
 public interface DialogComponent {
     @NotNull JComponent getPanel();

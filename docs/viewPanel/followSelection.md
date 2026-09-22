@@ -2,8 +2,8 @@
 
 # UC-VIEW-PANEL-002: Let the panel follow the selection
 
-**As a** tester, **I want** the panel to keep up as I move down the test cases,
-**so that** I can read each one without asking for it every time.
+**As a** tester, **I want** the panel to keep up as I move down the test cases, **so that** I can read each one without
+asking for it every time.
 
 This is what the panel does by itself. There is nothing to turn on.
 

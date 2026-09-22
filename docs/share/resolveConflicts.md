@@ -2,8 +2,8 @@
 
 # UC-SHARE-017: Resolve the conflicts a pull stopped on
 
-**As a** tester, **I want** to settle a file two of us changed,
-**so that** the pull can finish and neither of us loses work.
+**As a** tester, **I want** to settle a file two of us changed, **so that** the pull can finish and neither of us loses
+work.
 
 A conflict is a file two people changed since they last agreed. The pull stops
 until somebody says which change wins.
@@ -50,8 +50,7 @@ There is no key for this. The offer appears on the message.
 
 No window opens first. A warning message appears at the bottom right of the
 IDE, titled **Git Conflicts**, naming the files both sides changed. It waits in
-the IDE's notification list, and three links sit under it: **Resolve**,
-**Continue rebase** and **Abort rebase**.
+the IDE's notification list, and three links sit under it: **Resolve**, **Continue rebase** and **Abort rebase**.
 
 ## Main flow
 
@@ -64,8 +63,8 @@ the IDE's notification list, and three links sit under it: **Resolve**,
 5. For any field both sides rewrote, the tester is asked which one wins. That is
    [UC-SHARE-018](answerMergeQuestions.md).
 6. The merged files are given back to Git and the pull carries on.
-7. The sync ends the way one that never stopped does: a message titled
-   **Synced** reads *Pushed* and the count, or *Up to date with the remote*.
+7. The sync ends the way one that never stopped does: a message titled **Synced** reads *Pushed* and the count, or *Up
+   to date with the remote*.
 
 A push from **Pending Changes** that stops on a conflict ends differently, with a
 message titled **Rebase continued** reading *Changes pushed to the remote*.
@@ -94,8 +93,8 @@ gave it, what they saw, the stacktrace, the screenshots and the bug they filed.
 Those travel together or they say something nobody recorded, so the later
 `executedAt` takes the file and nothing is asked. Nothing is said either: the
 line naming what was settled belongs to the merge window, and that window opens
-only when a question is left. That is difference 20. Two testers judging
-**different** cases of one run never conflict at all: their verdicts are in
+only when a question is left. That is difference 20. Two testers judging **different** cases of one run never conflict
+at all: their verdicts are in
 different files.
 
 **A run two testers executed** — merged by rule, with nothing to answer: the run
@@ -113,8 +112,8 @@ conflicted, because a Testin folder is not a version control root.
 push is refused, reading *This repository has no remote, so there is nothing to
 push to*.
 
-**If a merged file cannot be written** — a message titled **Merge Failed** reads
-*Could not write*, the path, then the reason.
+**If a merged file cannot be written** — a message titled **Merge Failed** reads *Could not write*, the path, then the
+reason.
 
 **If a merged file Git will not take** — a message titled **Merge Not
 Accepted** names the file and says what to do: resolve that file in Git, then
@@ -145,6 +144,7 @@ three-way rule, which is nobody's decision, and nothing is said about it.
 
 Only when the window opens, too. A file the merge settles whole leaves nothing
 to answer, so no window opens and the list is never shown. That is difference
+
 20.
 
 ---

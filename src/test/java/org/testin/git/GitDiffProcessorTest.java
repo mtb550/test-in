@@ -16,20 +16,23 @@
 
 package org.testin.git;
 
+import org.testin.TempTree;
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.RealMapper;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
-import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -64,14 +67,7 @@ public class GitDiffProcessorTest {
 
     @AfterMethod
     public void removeRepositoryRoot() {
-        try {
-            if (root == null || !Files.exists(root)) return;
-            try (Stream<Path> paths = Files.walk(root)) {
-                paths.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
-            }
-        } catch (final IOException ex) {
-            throw new AssertionError(ex);
-        }
+        if (root != null) TempTree.delete(root);
     }
 
     private TestCaseDto testCase(final String description) {

@@ -16,9 +16,8 @@
 
 package org.testin.report.generators;
 
-import org.testin.model.TestRunConfiguration;
-import org.testin.testrun.RunEditorAttributes;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
@@ -32,26 +31,31 @@ import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
-import com.itextpdf.layout.element.*;
+import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Link;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.markers.DetailRow;
-import org.testin.model.TestRunSummary;
-import org.testin.report.ReportTile;
 import org.testin.logger.Logger;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.ResultAnalysis;
+import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
+import org.testin.model.TestRunSummary;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.markers.DetailRow;
 import org.testin.notifications.Notifier;
-import com.intellij.openapi.util.text.StringUtil;
+import org.testin.report.ReportTile;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
+import org.testin.testrun.RunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 
@@ -59,27 +63,22 @@ import java.io.ByteArrayOutputStream;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.List;
 
 public final class TestRunPdfGenerator {
-    private @NotNull Optional<PdfFont> printsWith = Optional.empty();
-
     private final @NotNull Set<String> leftOut = new LinkedHashSet<>();
-
     private final @NotNull DeviceRgb DARK_NAVY = new DeviceRgb(0x1F, 0x38, 0x64);
     private final @NotNull DeviceRgb MEDIUM_BLUE = new DeviceRgb(0x2E, 0x54, 0x96);
     private final @NotNull DeviceRgb DARK_GRAY = new DeviceRgb(0x59, 0x59, 0x59);
-    private final @NotNull DeviceRgb GREEN = new DeviceRgb(0x2E, 0x7D, 0x32);
-    private final @NotNull DeviceRgb RED = new DeviceRgb(0xC0, 0x39, 0x2B);
-    private final @NotNull DeviceRgb DARK_YELLOW = new DeviceRgb(0xB8, 0x86, 0x0B);
     private final @NotNull DeviceRgb LIGHT_BG = new DeviceRgb(0xF2, 0xF5, 0xFA);
     private final @NotNull DeviceRgb BORDER_GRAY = new DeviceRgb(0xD0, 0xD7, 0xE5);
     private final @NotNull DeviceRgb WHITE = new DeviceRgb(0xFF, 0xFF, 0xFF);
     private final @NotNull DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
     private final @NotNull DeviceRgb LINK_BLUE = rgb(ReportText.LINK_BLUE);
+    private @NotNull Optional<PdfFont> printsWith = Optional.empty();
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
     public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
@@ -128,7 +127,7 @@ public final class TestRunPdfGenerator {
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
 
-            for (final DetailRow row : ReportOverview.rowsFor(projectName, trDir, tr, summary)) {
+            for (final DetailRow row : ReportOverview.rowsFor(projectName, trDir, summary)) {
                 addOverviewRow(overviewTable, row.caption(), row.value(), boldFont, regularFont);
             }
 
@@ -267,8 +266,10 @@ public final class TestRunPdfGenerator {
 
         addCaseTableHeader(table, "#", headerBg, headerFg, boldFont);
         addCaseTableHeader(table, Bundle.message("caption.test.case"), headerBg, headerFg, boldFont);
-        if (withFailureDetail) addCaseTableHeader(table, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg, boldFont);
-        if (withFailureDetail) addCaseTableHeader(table, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg, boldFont);
+        if (withFailureDetail)
+            addCaseTableHeader(table, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg, boldFont);
+        if (withFailureDetail)
+            addCaseTableHeader(table, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg, boldFont);
 
         int idx = 1;
         boolean alt = true;

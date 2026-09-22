@@ -17,7 +17,6 @@
 package org.testin.indexer;
 
 import org.testin.model.PackageStatus;
-import org.testin.model.markers.Marker;
 import org.testin.model.TestSetStatus;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestCasesMainDirectoryDto;
@@ -27,6 +26,7 @@ import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
 import org.testin.model.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.model.markers.Marker;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -34,7 +34,9 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * A retired node - a deprecated test set, an archived package - is one thing to
@@ -59,6 +61,15 @@ public class RetiredNodesTest {
         dto.setPath(PARENT.resolve(name));
         dto.getMarker().setStatus(status);
         return dto;
+    }
+
+    /**
+     * Days apart, so the comparison is about the date and not about the second
+     * the test happened to run in.
+     */
+    private static <T extends DirectoryDto> T createdAt(final T node, final int daysAgo) {
+        node.getMarker().setCreatedAt(ZonedDateTime.now().minusDays(daysAgo));
+        return node;
     }
 
     @Test
@@ -204,14 +215,5 @@ public class RetiredNodesTest {
     @Test
     public void aNodeNobodyNumberedSortsAfterEveryNumber() {
         assertEquals(testSet("a", TestSetStatus.ACTIVE).getOrder(), Marker.NOT_ORDERED);
-    }
-
-    /**
-     * Days apart, so the comparison is about the date and not about the second
-     * the test happened to run in.
-     */
-    private static <T extends DirectoryDto> T createdAt(final T node, final int daysAgo) {
-        node.getMarker().setCreatedAt(ZonedDateTime.now().minusDays(daysAgo));
-        return node;
     }
 }

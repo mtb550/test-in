@@ -42,7 +42,8 @@ public final class SaveTestinYml {
     // UC-TREE-PANEL-029, Rule-TREE-PANEL-115
     public static @NotNull Optional<String> whyNot(final @NotNull Project p) {
         if (TestinYml.isUnreadable(p)) return Optional.of(Bundle.message("yml.save.disabled.unreadable"));
-        if (Services.getInstance(p, BoundTestProject.class).get().isEmpty()) return Optional.of(Bundle.message("yml.save.disabled.no.project"));
+        if (Services.getInstance(p, BoundTestProject.class).get().isEmpty())
+            return Optional.of(Bundle.message("yml.save.disabled.no.project"));
 
         return Optional.empty();
     }

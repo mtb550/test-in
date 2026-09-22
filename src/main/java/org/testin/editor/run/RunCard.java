@@ -18,16 +18,21 @@ package org.testin.editor.run;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.ui.Badges;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.BaseCard;
-import org.testin.testrun.RunEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.services.Services;
+import org.testin.testrun.RunEditorAttributes;
+import org.testin.ui.Badges;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public class RunCard extends BaseCard {
     private final @NotNull List<Badges.Badge> badges = new ArrayList<>();
@@ -38,7 +43,7 @@ public class RunCard extends BaseCard {
     }
 
     // UC-EDITOR-PANEL-030
-    public void updateData(final @NotNull Integer index, final @NotNull Set<?> activeDetails, final @NotNull TestRunItems runItem, final @NotNull String title) {
+    public void updateData(final @NotNull Integer index, final @NotNull Set<RunEditorAttributes> activeDetails, final @NotNull TestRunItems runItem, final @NotNull String title) {
         this.automation = Services.getInstance(p, AutomationState.class).of(runItem.getId());
 
         badges.clear();
@@ -46,7 +51,7 @@ public class RunCard extends BaseCard {
 
         Arrays.stream(RunEditorAttributes.values())
                 .filter(activeDetails::contains)
-                .forEach(attr -> attr.applyToUI(runItem, badges, details, p));
+                .forEach(attr -> attr.applyToUI(runItem, badges, details));
 
         updateUI(index, title, badges, details);
 

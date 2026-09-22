@@ -27,7 +27,8 @@ import org.testin.util.Bundle;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,7 +38,7 @@ public class PrioritySection implements CreateTestCaseSection {
     private final @NotNull JBPanel<?> wrapper;
 
     public PrioritySection() {
-        final Priority @NotNull[] activePriorities = Arrays.stream(Priority.values())
+        final Priority @NotNull [] activePriorities = Arrays.stream(Priority.values())
                 .filter(Priority::isActive)
                 .toArray(Priority[]::new);
 
@@ -93,7 +94,7 @@ public class PrioritySection implements CreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto) {
         priority.setSelectedItem(dto.getPriority());
     }
 }

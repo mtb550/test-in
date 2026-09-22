@@ -2,8 +2,8 @@
 
 # UC-SHARE-004: Open the exported file, or copy its path
 
-**As a** tester, **I want** to check the file straight away,
-**so that** I do not send somebody a spreadsheet with a column missing.
+**As a** tester, **I want** to check the file straight away, **so that** I do not send somebody a spreadsheet with a
+column missing.
 
 Every export ends with a message. The message can open the new file, or put
 its full path on the clipboard.
@@ -32,8 +32,8 @@ There is no key for this. The links are on the message.
 
 ## What the tester sees
 
-No window opens. A message appears at the bottom right of the IDE, titled
-**Exported** and carrying the file's name. Two links sit under it, **Open
+No window opens. A message appears at the bottom right of the IDE, titled **Exported** and carrying the file's name. Two
+links sit under it, **Open
 file** and **Copy path**, and the message waits in the IDE's notification list
 until one of them is clicked.
 

@@ -30,10 +30,12 @@ import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
 
 import org.testin.util.Bundle;
-import javax.swing.*;
+
+import javax.swing.JButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -53,6 +55,16 @@ public final class TestinPathPanel {
         setupField();
         setupOpenButton();
         setupValidationListener();
+    }
+
+    private static boolean isFolder(final @NotNull String pathStr) {
+        if (pathStr.isBlank()) return false;
+
+        try {
+            return Files.isDirectory(Path.of(pathStr));
+        } catch (final InvalidPathException ex) {
+            return false;
+        }
     }
 
     private void setupField() {
@@ -115,16 +127,6 @@ public final class TestinPathPanel {
                 if (pathStr.equals(asked.get())) openFolderBtn.setEnabled(folder);
             }, ModalityState.any());
         });
-    }
-
-    private static boolean isFolder(final @NotNull String pathStr) {
-        if (pathStr.isBlank()) return false;
-
-        try {
-            return Files.isDirectory(Path.of(pathStr));
-        } catch (final InvalidPathException ex) {
-            return false;
-        }
     }
 
     // UC-SETTING-002, UC-SETTING-003

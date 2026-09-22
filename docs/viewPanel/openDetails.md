@@ -76,13 +76,13 @@ The panel opens on the right of the IDE, beside the editor.
 
 ## The five ways in
 
-| The tester does this | Test cases handed over | Keyboard moves |
-|---|---|---|
-| Double-clicks a card in an editor | One | Yes |
-| Presses `Enter`, or chooses **View Details** | Every one selected | Yes |
-| Presses `Enter` on the number column of a grid row, or double-clicks it | One | Yes |
-| Clicks the mark beside a generated test method | One | Yes |
-| Chooses a test case in the search | One | No |
+| The tester does this                                                    | Test cases handed over | Keyboard moves |
+|-------------------------------------------------------------------------|------------------------|----------------|
+| Double-clicks a card in an editor                                       | One                    | Yes            |
+| Presses `Enter`, or chooses **View Details**                            | Every one selected     | Yes            |
+| Presses `Enter` on the number column of a grid row, or double-clicks it | One                    | Yes            |
+| Clicks the mark beside a generated test method                          | One                    | Yes            |
+| Chooses a test case in the search                                       | One                    | No             |
 
 ## Main flow
 

@@ -78,8 +78,8 @@ No dialog opens. The cell itself becomes a box.
 
 ## Which columns can be typed into
 
-| Can be typed into | Cannot |
-|---|---|
+| Can be typed into                                                                                          | Cannot                                                                |
+|------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|
 | Description, Expected Result, Steps, Priority, Reference, Test Data, Pre Conditions, Group, Module, Status | Order, ID, FQCN, Path, Created By, Updated By, Created At, Updated At |
 
 In a test run editor only **Actual Result** can be typed into.
@@ -119,13 +119,13 @@ with the old value, and the message names both the text and the column:
 
 ## What Testin makes of what is typed
 
-| The tester types | What is stored |
-|---|---|
-| Steps, one to a line | One step for each line |
-| A priority Testin does not know | Refused. The priority it had already, and Testin says so |
-| A status Testin does not know | Refused. The status it had already, and Testin says so |
-| A group Testin does not know | Refused whole. The groups it had already, and Testin says so |
-| A description with characters Testin will not keep | Those characters removed |
+| The tester types                                   | What is stored                                               |
+|----------------------------------------------------|--------------------------------------------------------------|
+| Steps, one to a line                               | One step for each line                                       |
+| A priority Testin does not know                    | Refused. The priority it had already, and Testin says so     |
+| A status Testin does not know                      | Refused. The status it had already, and Testin says so       |
+| A group Testin does not know                       | Refused whole. The groups it had already, and Testin says so |
+| A description with characters Testin will not keep | Those characters removed                                     |
 
 ## Where the plugin breaks its own rules
 

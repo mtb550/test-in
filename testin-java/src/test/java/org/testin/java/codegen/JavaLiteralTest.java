@@ -19,6 +19,7 @@ package org.testin.java.codegen;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -80,7 +81,7 @@ public class JavaLiteralTest {
     }
 
     private void assertFalseUnescapedNewline(final String literal) {
-        assertTrue(!literal.contains("\n"),
+        assertFalse(literal.contains("\n"),
                 "a raw newline splits the literal across two lines and the annotation stops parsing: " + literal);
     }
 }

@@ -16,15 +16,15 @@
 
 package org.testin.explorer.tree;
 
+import com.intellij.ide.util.treeView.TreeState;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.tree.AsyncTreeModel;
-import com.intellij.ui.tree.TreeVisitor;
 import com.intellij.ui.tree.StructureTreeModel;
+import com.intellij.ui.tree.TreeVisitor;
 import com.intellij.ui.treeStructure.SimpleTree;
-import com.intellij.ide.util.treeView.TreeState;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -35,13 +35,18 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.DropMode;
+import javax.swing.JComponent;
+import javax.swing.JTree;
+import javax.swing.TransferHandler;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
-import java.util.List;
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 

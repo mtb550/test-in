@@ -19,10 +19,9 @@ package org.testin.editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.StandIn;
 import org.testng.annotations.Test;
 
-import javax.swing.*;
-import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -49,30 +48,6 @@ public class CardTitleWrapTest {
 
     private static final String LONG = "Log in with a valid user and check that the dashboard opens with every widget it is supposed to show and nothing else at all";
 
-    /**
-     * A stand-in for the two real cards: {@code BaseCard} is abstract only so
-     * each editor can bring its own data binding, and none of that is involved
-     * in laying out a title.
-     */
-    private static final class Card extends BaseCard {
-        /**
-         * A project nothing asks anything of: it is read only to draw the hover
-         * icons, and no card here is hovered - as CutStateTest stands in for an
-         * editor.
-         */
-        Card() {
-            super((Project) Proxy.newProxyInstance(CardTitleWrapTest.class.getClassLoader(), new Class<?>[]{Project.class}, (proxy, method, args) -> null));
-        }
-
-        void feed(final String title) {
-            updateUI(0, title, List.of(), Map.of());
-        }
-
-        String shown() {
-            return titleArea.getText();
-        }
-    }
-
     private static Card laidOut(final String title) {
         final JBList<String> list = new JBList<>("a");
         list.setSize(900, 400);
@@ -81,6 +56,14 @@ public class CardTitleWrapTest {
         card.feed(title);
         card.applyListLayout(list);
         return card;
+    }
+
+    private static List<CardHoverAction.Offered> everyButton() {
+        return offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD, CardHoverAction.NAVIGATE_TO_TEST_CASE);
+    }
+
+    private static List<CardHoverAction.Offered> offered(final CardHoverAction... actions) {
+        return Arrays.stream(actions).map(action -> new CardHoverAction.Offered(action, Optional.empty())).toList();
     }
 
     /**
@@ -164,11 +147,27 @@ public class CardTitleWrapTest {
         assertEquals(CardTitle.titleColumnWidth(0, 3), Integer.MAX_VALUE);
     }
 
-    private static List<CardHoverAction.Offered> everyButton() {
-        return offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD, CardHoverAction.NAVIGATE_TO_TEST_CASE);
-    }
+    /**
+     * A stand-in for the two real cards: {@code BaseCard} is abstract only so
+     * each editor can bring its own data binding, and none of that is involved
+     * in laying out a title.
+     */
+    private static final class Card extends BaseCard {
+        /**
+         * A project nothing asks anything of: it is read only to draw the hover
+         * icons, and no card here is hovered - as CutStateTest stands in for an
+         * editor.
+         */
+        Card() {
+            super(StandIn.of(Project.class));
+        }
 
-    private static List<CardHoverAction.Offered> offered(final CardHoverAction... actions) {
-        return Arrays.stream(actions).map(action -> new CardHoverAction.Offered(action, Optional.empty())).toList();
+        void feed(final String title) {
+            updateUI(0, title, List.of(), Map.of());
+        }
+
+        String shown() {
+            return titleArea.getText();
+        }
     }
 }

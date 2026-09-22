@@ -26,8 +26,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.ToLongFunction;
 
 @Getter
@@ -74,18 +74,6 @@ public enum ResultAnalysis {
 
     private final @NotNull ToLongFunction<TestRunSummary> count;
 
-    public @NotNull String getLabel() {
-        return onceFinished.getLabel();
-    }
-
-    public @NotNull String labelIn(final @NotNull TestRunStatus run) {
-        return (run.isTerminal() ? onceFinished : whileRunning).getLabel();
-    }
-
-    public @NotNull String heading(final @NotNull TestRunSummary summary) {
-        return getLabel() + " (" + count.applyAsLong(summary) + ")";
-    }
-
     public static @NotNull List<Segment> segments(final @NotNull TestRunSummary summary, final @NotNull TestRunStatus run) {
         final @NotNull List<Segment> segments = new ArrayList<>();
 
@@ -99,17 +87,6 @@ public enum ResultAnalysis {
         }
 
         return segments;
-    }
-
-    public record Segment(@NotNull String text, @NotNull Color color) {
-    }
-
-    private @NotNull JBColor onScreen() {
-        return new JBColor(Color.decode("#" + hexColor), Color.decode("#" + darkHexColor));
-    }
-
-    public @NotNull String writtenIn(final @NotNull Map<ResultAnalysis, String> analysis) {
-        return analysis.getOrDefault(this, "").trim();
     }
 
     public static boolean anyWrittenIn(final @NotNull Map<ResultAnalysis, String> analysis) {
@@ -130,5 +107,28 @@ public enum ResultAnalysis {
         }
 
         return kept;
+    }
+
+    public @NotNull String getLabel() {
+        return onceFinished.getLabel();
+    }
+
+    public @NotNull String labelIn(final @NotNull TestRunStatus run) {
+        return (run.isTerminal() ? onceFinished : whileRunning).getLabel();
+    }
+
+    public @NotNull String heading(final @NotNull TestRunSummary summary) {
+        return getLabel() + " (" + count.applyAsLong(summary) + ")";
+    }
+
+    private @NotNull JBColor onScreen() {
+        return new JBColor(Color.decode("#" + hexColor), Color.decode("#" + darkHexColor));
+    }
+
+    public @NotNull String writtenIn(final @NotNull Map<ResultAnalysis, String> analysis) {
+        return analysis.getOrDefault(this, "").trim();
+    }
+
+    public record Segment(@NotNull String text, @NotNull Color color) {
     }
 }

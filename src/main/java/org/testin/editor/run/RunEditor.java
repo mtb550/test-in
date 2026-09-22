@@ -18,7 +18,6 @@ package org.testin.editor.run;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.table.JBTable;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +27,6 @@ import org.testin.editor.BaseCard;
 import org.testin.editor.EditorFilters;
 import org.testin.editor.PageWindow;
 import org.testin.editor.TestCaseFilter;
-import org.testin.editor.TestinEditor;
 import org.testin.editor.UnifiedVirtualFile;
 import org.testin.editor.listeners.RunGridEditListener;
 import org.testin.editor.listeners.RunListRenderer;
@@ -74,17 +72,20 @@ import org.testin.testrun.TestRunStatusChange;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.time.Duration;
-import java.util.*;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import javax.swing.*;
 
 public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRunDirectoryDto> implements Toolbar {
-    private final @NotNull Map<UUID, TestRunItems> resultsMap;
+    private final @NotNull Map<UUID, TestRunItems> resultsMap = new ConcurrentHashMap<>();
 
     @Getter
     private final @NotNull RunToolbar toolBar;
@@ -94,7 +95,23 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     private final @NotNull Set<UUID> launchedHere = ConcurrentHashMap.newKeySet();
     private final @NotNull AtomicInteger loadGeneration = new AtomicInteger();
 
-    private volatile @NotNull Optional<TestRunDto> tr = Optional.empty();
+    private volatile @NotNull Optional<TestRunDto> run = Optional.empty();
+
+    private @NotNull Optional<UUID> executingCase = Optional.empty();
+
+    private boolean loaded;
+
+    private boolean startWhenLoaded;
+
+    public RunEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
+        super(p, vf.getTestRun());
+
+        TestCaseExecutionSubscriber.onReported(p, projectDisposable, this::executionReported);
+
+        this.toolBar = new RunToolbar(p, this);
+        buildOpeningPanel();
+        loadDataAsync();
+    }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
     @Override
@@ -108,18 +125,18 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
             try {
                 final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.awaitIndexing();
-                final @NotNull TestRunDto run = tr.orElseGet(() -> indexer.getTestRunByPath(parent.getPath()));
+                final @NotNull TestRunDto fromDisk = run.orElseGet(() -> indexer.getTestRunByPath(parent.getPath()));
 
-                final @NotNull Map<UUID, TestRunItems> results = run.getResults().stream()
+                final @NotNull Map<UUID, TestRunItems> results = fromDisk.getResults().stream()
                         .collect(Collectors.toMap(TestRunItems::getId, item -> item,
                                 (existingItem, duplicateItem) -> existingItem));
 
-                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(run.getResults().stream().map(TestRunItems::liveCase).toList());
+                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(fromDisk.getResults().stream().map(TestRunItems::liveCase).toList());
                 Services.getInstance(p, TestCaseValues.class).load(ordered);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (generation != loadGeneration.get()) return;
-                    tr = Optional.of(run);
+                    run = Optional.of(fromDisk);
                     resultsMap.putAll(results);
                     allTestCases.clear();
                     allTestCases.addAll(ordered);
@@ -165,14 +182,14 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         final boolean timing = executingCase.isPresent();
 
         haltExecution();
-        if (timing) Services.getInstance(p, RunStatusService.class).persistRun(p, this);
+        if (timing) saveRun();
     }
 
     @Override
     protected void clearLoadedData() {
         resultsMap.clear();
 
-        tr = Optional.empty();
+        run = Optional.empty();
     }
 
     @Override
@@ -180,16 +197,21 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         teardown(
                 () -> Services.getInstance(p, LightMode.class).editorClosing(parent),
 
-                this::stopAndWriteTheRunDown,
+                () -> {
+                    if (isExecuting()) stopAndWriteTheRunDown();
+                },
                 executionTimer::dispose);
     }
 
+    // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-149
     private void stopAndWriteTheRunDown() {
-        if (!isExecuting()) return;
-
         stopAutomation();
         stopExecution();
-        Services.getInstance(p, RunStatusService.class).persistRun(p, this);
+        saveRun();
+    }
+
+    private void saveRun() {
+        Services.getInstance(p, ProjectIndexer.class).saveRun(parent.getPath());
     }
 
     @Override
@@ -202,10 +224,8 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     }
 
     public @NotNull Optional<TestRunDto> run() {
-        return tr;
+        return run;
     }
-
-    private @NotNull Optional<UUID> executingCase = Optional.empty();
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-227
     public int getCurrentlyExecutingIndex() {
@@ -222,22 +242,6 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         return executingCase.isPresent() && getCurrentlyExecutingIndex() == -1;
     }
 
-    private boolean loaded;
-
-    private boolean startWhenLoaded;
-
-    public RunEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
-        super(p, vf.getTestRun());
-
-        this.resultsMap = new ConcurrentHashMap<>();
-
-        TestCaseExecutionSubscriber.onReported(p, projectDisposable, this::executionReported);
-
-        this.toolBar = new RunToolbar(p, this);
-        buildOpeningPanel();
-        loadDataAsync();
-    }
-
     private void buildOpeningPanel() {
         StatusBarListener.attach(this);
 
@@ -251,10 +255,6 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
         onToolBarSwitchedToListView();
 
-        refreshView();
-    }
-
-    public void refreshAfterStatusChange() {
         refreshView();
     }
 
@@ -284,7 +284,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
     @Override
     protected @NotNull RunEditorContextMenu buildContextMenu() {
-        return new RunEditorContextMenu(p, this, parent, list, model);
+        return new RunEditorContextMenu(p, this, parent, list);
     }
 
     @Override
@@ -316,6 +316,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         onExecutionStateChanged();
     }
 
+    @Override
     public boolean hasRunStatuses() {
         return true;
     }
@@ -337,7 +338,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
     @Override
     protected @NotNull JBTable buildTable(final @NotNull List<TestCaseDto> pageItems, final @NotNull Set<RunEditorAttributes> attributes) {
-        return gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap, this::positionOf);
+        return gridPanelBuilder.buildRunTable(pageItems, attributes, resultsMap, this::positionOf);
     }
 
     @Override
@@ -377,7 +378,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         if (globalIndex >= currentTestCases.size()) {
             stopExecution();
             finishIfEverythingIsJudged();
-            Services.getInstance(p, RunStatusService.class).persistRun(p, this);
+            saveRun();
             return;
         }
 
@@ -427,6 +428,11 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         final @NotNull TestRunStatus status = parent.getMarker().getStatus();
         if (status == TestRunStatus.IN_PROGRESS || status.isTerminal()) return;
 
+        markStarted();
+    }
+
+    // UC-EDITOR-PANEL-031, UC-EDITOR-PANEL-043
+    private void markStarted() {
         Services.getInstance(p, ProjectIndexer.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionStarted);
         Services.getInstance(p, TestRunStatusChange.class).apply(parent, TestRunStatus.IN_PROGRESS);
     }
@@ -448,7 +454,8 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     // UC-EDITOR-PANEL-044, Rule-EDITOR-PANEL-184
     private void runPending() {
         if (!canStartExecution()) {
-            if (isExecuting()) Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_RUNNING, parent.getName());
+            if (isExecuting())
+                Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_RUNNING, parent.getName());
             return;
         }
 
@@ -550,10 +557,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
     // UC-EDITOR-PANEL-046
     public @NotNull Duration getCurrentCaseElapsed() {
-        final int executing = getCurrentlyExecutingIndex();
-        if (executing < 0) return Duration.ZERO;
-
-        return runItem(currentTestCases.get(executing).getId())
+        return executingCase.flatMap(this::runItem)
                 .map(TestRunItems::getDuration)
                 .orElse(Duration.ZERO);
     }
@@ -643,7 +647,6 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
     @Override
     public void onStartExecutionClicked() {
-        final @NotNull Optional<TestRunDto> run = run();
         if (run.isEmpty()) return;
 
         if (!hasSomethingToWalk()) {
@@ -651,18 +654,15 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
             return;
         }
 
-        Services.getInstance(p, ProjectIndexer.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionStarted);
-        Services.getInstance(p, TestRunStatusChange.class).apply(parent, TestRunStatus.IN_PROGRESS);
+        markStarted();
         startTimerForIndex(0);
     }
 
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-149
     @Override
     public void onStopExecutionClicked() {
-        stopAutomation();
-        stopExecution();
+        stopAndWriteTheRunDown();
 
-        Services.getInstance(p, RunStatusService.class).persistRun(p, this);
         Services.getInstance(p, Notifier.class).softShow(p, Done.STOPPED);
     }
 }

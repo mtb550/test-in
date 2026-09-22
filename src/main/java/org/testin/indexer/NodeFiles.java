@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -39,7 +40,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.stream.Stream;
-import org.testin.model.FileKind;
 
 @AllArgsConstructor
 final class NodeFiles {
@@ -178,7 +178,8 @@ final class NodeFiles {
             final @NotNull UUID fresh = UUID.randomUUID();
 
             tc.setId(fresh);
-            if (!Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(FileKind.TEST_CASE.fileName(fresh)), tc)) return false;
+            if (!Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(FileKind.TEST_CASE.fileName(fresh)), tc))
+                return false;
 
             Services.getInstance(OwnWrites.class).record(caseFile);
             Files.delete(caseFile);

@@ -16,7 +16,6 @@
 
 package org.testin.java.navigate;
 
-import org.testin.util.Bundle;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.IndexNotReadyException;
@@ -34,26 +33,28 @@ import org.testin.navigate.CodeNavigation;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 public final class CodeNavigator implements CodeNavigation {
+    private static boolean doesSomething(final @NotNull PsiMethod pm) {
+        return Optional.ofNullable(pm.getBody())
+                .filter(body -> body.getStatements().length > 0)
+                .isPresent();
+    }
+
     // UC-CODEGEN-006, Rule-CODEGEN-026
     private @NotNull Optional<PsiMethod> resolve(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
-        if (fqcn.size() < 2) return Optional.empty();
+        final @NotNull String classFqcn = Fqcn.classOfMethod(tc);
+        if (classFqcn.isEmpty()) return Optional.empty();
 
-        final @NotNull List<String> classPath = fqcn.subList(0, fqcn.size() - 1);
-        final @NotNull String classFqcn = String.join(".", classPath);
-
-        final @NotNull Optional<PsiClass> owner = GeneratedClass.find(p, classPath);
+        final @NotNull Optional<PsiClass> owner = GeneratedClass.byName(p, classFqcn);
 
         if (owner.isEmpty()) {
             Logger.warn("No generated class " + classFqcn + " for '" + tc.getDescription() + "'");
@@ -72,11 +73,10 @@ public final class CodeNavigator implements CodeNavigation {
         final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
 
         for (final TestCaseDto tc : cases) {
-            final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
-            if (fqcn.size() < 2) continue;
+            final @NotNull String classFqcn = Fqcn.classOfMethod(tc);
+            if (classFqcn.isEmpty()) continue;
 
-            byClass.computeIfAbsent(String.join(".", fqcn.subList(0, fqcn.size() - 1)),
-                    ignored -> new ArrayList<>()).add(tc);
+            byClass.computeIfAbsent(classFqcn, ignored -> new ArrayList<>()).add(tc);
         }
 
         final @NotNull Map<UUID, Boolean> found = new LinkedHashMap<>();
@@ -95,12 +95,6 @@ public final class CodeNavigator implements CodeNavigation {
         }
 
         return found;
-    }
-
-    private static boolean doesSomething(final @NotNull PsiMethod pm) {
-        return Optional.ofNullable(pm.getBody())
-                .filter(body -> body.getStatements().length > 0)
-                .isPresent();
     }
 
     // UC-CODEGEN-008, Rule-CODEGEN-032

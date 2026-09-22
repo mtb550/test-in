@@ -16,10 +16,6 @@
 
 package org.testin.testcase;
 
-import org.testin.actions.GrayWithReason;
-import org.testin.editor.TestinEditors;
-import org.testin.indexer.ProjectIndexer;
-import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -27,18 +23,25 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
+import org.testin.clipboard.CutState;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
+import org.testin.editor.TestinEditors;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
-import org.testin.clipboard.CutState;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 public class RemoveTestCaseAction extends DumbAwareAction {
     // UC-EDITOR-PANEL-011
     @Override
@@ -67,10 +70,11 @@ public class RemoveTestCaseAction extends DumbAwareAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p, @NotNull TestinEditor editor, @NotNull DirectoryDto dir, @NotNull List<TestCaseDto> selected) {
+    private record Work(@NotNull Project p, @NotNull TestinEditor editor, @NotNull DirectoryDto dir,
+                        @NotNull List<TestCaseDto> selected) {
         // UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-062
         void remove() {
-                final @NotNull List<TestCaseDto> selectedItems = selected;
+            final @NotNull List<TestCaseDto> selectedItems = selected;
             if (selectedItems.isEmpty()) return;
 
             final @NotNull Runnable delete = () -> ApplicationManager.getApplication().runWriteAction(() -> performDeletion(selectedItems));
@@ -106,7 +110,8 @@ public class RemoveTestCaseAction extends DumbAwareAction {
                     if (removed.size() == selectedItems.size()) editor.refreshView();
                     else Services.getInstance(p, TestinEditors.class).reloadOpen(p, dir.getPath());
 
-                    if (!removed.isEmpty()) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, removed.size());
+                    if (!removed.isEmpty())
+                        Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, removed.size());
                 });
             });
         }

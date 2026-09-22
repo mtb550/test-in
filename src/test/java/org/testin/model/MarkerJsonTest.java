@@ -18,9 +18,9 @@ package org.testin.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.testin.model.markers.Marker;
 import org.testin.model.markers.TestCasesMainDirectoryMarker;
 import org.testin.model.markers.TestProjectMarker;
-import org.testin.model.markers.Marker;
 import org.testin.model.markers.TestSetMarker;
 import org.testng.annotations.Test;
 
@@ -29,7 +29,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * The four rules that keep a marker file readable (#66).
@@ -60,7 +62,10 @@ public class MarkerJsonTest {
         try {
             assertFalse(mapper.writeValueAsString(new TestSetMarker()).contains("\"id\""), "a marker with no id says nothing about one");
 
-            final String json = mapper.writeValueAsString(new TestSetMarker().setId("0bb7f0de-8a59-4a0c-9a2f-0e2ba6a3b8f1"));
+            final TestSetMarker marker = new TestSetMarker();
+            marker.setId("0bb7f0de-8a59-4a0c-9a2f-0e2ba6a3b8f1");
+
+            final String json = mapper.writeValueAsString(marker);
             assertTrue(json.contains("\"id\":\"0bb7f0de-8a59-4a0c-9a2f-0e2ba6a3b8f1\""), json);
             assertEquals(mapper.readValue(json, TestSetMarker.class).getId(), "0bb7f0de-8a59-4a0c-9a2f-0e2ba6a3b8f1");
         } catch (final Exception ex) {
@@ -77,7 +82,10 @@ public class MarkerJsonTest {
     @Test
     public void writesTheAuditBlockAndTheStatusAndNothingElse() {
         try {
-            final String json = mapper.writeValueAsString(new TestSetMarker().setCreatedBy("mtb"));
+            final TestSetMarker marker = new TestSetMarker();
+            marker.setCreatedBy("mtb");
+
+            final String json = mapper.writeValueAsString(marker);
 
             assertTrue(json.contains("\"createdBy\":\"mtb\""), json);
             assertTrue(json.contains("\"modifiedBy\""), json);
@@ -115,7 +123,10 @@ public class MarkerJsonTest {
     @Test
     public void anOrderedMarkerCarriesTheNumberTyped() {
         try {
-            final String json = mapper.writeValueAsString(new TestSetMarker().setOrder(3));
+            final TestSetMarker marker = new TestSetMarker();
+            marker.setOrder(3);
+
+            final String json = mapper.writeValueAsString(marker);
 
             assertTrue(json.contains("\"order\":3"), json);
             assertEquals(mapper.readValue(json, TestSetMarker.class).getOrder(), 3);
@@ -188,7 +199,11 @@ public class MarkerJsonTest {
     @Test
     public void roundTripsTheDateFormatOnDisk() {
         try {
-            final String json = mapper.writeValueAsString(new TestSetMarker().setCreatedAt(when).setModifiedAt(when));
+            final TestSetMarker marker = new TestSetMarker();
+            marker.setCreatedAt(when);
+            marker.setModifiedAt(when);
+
+            final String json = mapper.writeValueAsString(marker);
             assertTrue(json.contains(onDisk), json);
 
             final TestSetMarker read = mapper.readValue(json, TestSetMarker.class);

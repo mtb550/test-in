@@ -39,7 +39,7 @@ public class BugRepositoryTest {
     @Test
     public void aWebAddressNamesItsRepository() {
         assertEquals(gh("https://github.com/mtb550/product"), "github.com/mtb550/product");
-        assertEquals(gh("http://github.com/mtb550/product"), "github.com/mtb550/product");
+        assertEquals(gh("http://localhost/mtb550/product"), "localhost/mtb550/product");
     }
 
     @Test

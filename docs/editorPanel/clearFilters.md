@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-021: Clear the filters
 
-**As a** tester, **I want** every test case back,
-**so that** I can see the whole test set again without undoing four filters one
+**As a** tester, **I want** every test case back, **so that** I can see the whole test set again without undoing four
+filters one
 at a time.
 
 One click clears all five filters. It does not clear the search box.

@@ -4,8 +4,8 @@
 
 > **No key.** Pick a branch from the box above the tree.
 
-**As a** tester, **I want** to switch the test project's branch from the panel,
-**so that** the tree follows the branch I am testing.
+**As a** tester, **I want** to switch the test project's branch from the panel, **so that** the tree follows the branch
+I am testing.
 
 The box above the tree appears for a test project whose folder is a Git
 repository.
@@ -36,10 +36,10 @@ repository.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -114,8 +114,8 @@ The box fills itself from what is on the machine, showing *Reading branches*.
 That is the whole answer to almost every question anyone asks it, and it needs
 no network.
 
-Three things also ask the remote, and then the box fills a second time showing
-*Fetching from remote*, so the list can grow a moment after it appears:
+Three things also ask the remote, and then the box fills a second time showing *Fetching from remote*, so the list can
+grow a moment after it appears:
 **Refresh**, a branch switch, and opening a different test project. Nothing else
 does. A rename, a removal or a status change rebuilds the panel without going
 near the remote - it cannot have moved a branch, and a fetch can stop to ask for
@@ -133,8 +133,8 @@ credentials or sit on a host that is not reachable.
 
 ## What Testin refuses
 
-**If the test project's folder is not a Git repository** — there is no box, and
-*Not a Git repository* is shown in its place.
+**If the test project's folder is not a Git repository** — there is no box, and *Not a Git repository* is shown in its
+place.
 
 **If the Git plugin is not installed** — there is no box, the same as for a
 folder that is not a Git repository: without the plugin no folder is asked.

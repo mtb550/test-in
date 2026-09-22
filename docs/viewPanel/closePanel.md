@@ -2,8 +2,7 @@
 
 # UC-VIEW-PANEL-015: Close the panel
 
-**As a** tester, **I want** the panel out of the way,
-**so that** I have the whole width of the screen for the editor.
+**As a** tester, **I want** the panel out of the way, **so that** I have the whole width of the screen for the editor.
 
 The panel takes width from the editor. Closing it gives that width back.
 

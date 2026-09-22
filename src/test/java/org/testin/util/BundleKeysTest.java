@@ -27,10 +27,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -118,6 +118,12 @@ public class BundleKeysTest {
         return properties;
     }
 
+    private static void assertResolved(final String value, final String what) {
+        assertFalse(value.isBlank(), what + " resolved to nothing at all");
+        assertFalse(value.startsWith("!") && value.endsWith("!"),
+                what + " resolved to " + value + ", which is what the platform returns for a key it cannot find");
+    }
+
     @Test
     public void everyKeyTheCodeAsksForIsInTheBundle() {
         final Properties english = bundle("messages.properties");
@@ -160,12 +166,6 @@ public class BundleKeysTest {
         for (final Refused refused : Refused.values()) {
             assertResolved(refused.getSentence(), "Refused." + refused.name());
         }
-    }
-
-    private static void assertResolved(final String value, final String what) {
-        assertFalse(value.isBlank(), what + " resolved to nothing at all");
-        assertFalse(value.startsWith("!") && value.endsWith("!"),
-                what + " resolved to " + value + ", which is what the platform returns for a key it cannot find");
     }
 
     /**

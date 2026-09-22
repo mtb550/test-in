@@ -20,8 +20,9 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import java.awt.FlowLayout;
 import java.util.Optional;
 
 public final class DialogButton implements DialogComponent {

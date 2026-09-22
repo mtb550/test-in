@@ -20,8 +20,10 @@ import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.util.TimeoutUtil;
+import org.testin.TempTree;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.model.FileKind;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -35,11 +37,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.testin.model.FileKind;
 
 /**
  * Recording the issue a bug report became (#28): only on a run and a run item
@@ -54,6 +54,38 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
 
     private Path root;
 
+    /**
+     * What the file holds once it holds {@code text}, or whatever it holds when
+     * ten seconds have passed - dispatching events meanwhile, in case the writer
+     * needs this thread.
+     * <p>
+     * The write is queued, so the test waits for it. Waited for until the file
+     * exists, it failed now and then: a file is created before its bytes land,
+     * and a read in between found it empty (#312, N21).
+     */
+    private static String awaitFileHoldingTheIssue(final Path file) {
+        final long deadline = System.currentTimeMillis() + 10_000;
+        while (System.currentTimeMillis() < deadline) {
+            final String held = read(file);
+            if (held.contains(ISSUE)) return held;
+
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+            TimeoutUtil.sleep(20);
+        }
+        return read(file);
+    }
+
+    /**
+     * The file's text, and nothing while it does not exist or is being written.
+     */
+    private static String read(final Path file) {
+        try {
+            return Files.exists(file) ? Files.readString(file) : "";
+        } catch (final IOException beingWritten) {
+            return "";
+        }
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -63,25 +95,9 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
     @Override
     protected void tearDown() throws Exception {
         try {
-            deleteTree(root);
+            if (root != null) TempTree.delete(root);
         } finally {
             super.tearDown();
-        }
-    }
-
-    private static void deleteTree(final Path path) {
-        if (path == null) return;
-
-        try (var walk = Files.walk(path)) {
-            walk.sorted(Comparator.reverseOrder()).forEach(each -> {
-                try {
-                    Files.deleteIfExists(each);
-                } catch (final Exception ignored) {
-                    // Left for the operating system.
-                }
-            });
-        } catch (final Exception ignored) {
-            // Nothing to walk, or nothing to remove.
         }
     }
 
@@ -129,38 +145,6 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         return indexer().findTestRun(item.run()).flatMap(item::in).orElseThrow().getBugIssueUrl();
     }
 
-    /**
-     * What the file holds once it holds {@code text}, or whatever it holds when
-     * ten seconds have passed - dispatching events meanwhile, in case the writer
-     * needs this thread.
-     * <p>
-     * The write is queued, so the test waits for it. Waited for until the file
-     * exists, it failed now and then: a file is created before its bytes land,
-     * and a read in between found it empty (#312, N21).
-     */
-    private static String awaitFileHolding(final Path file, final String text) {
-        final long deadline = System.currentTimeMillis() + 10_000;
-        while (System.currentTimeMillis() < deadline) {
-            final String held = read(file);
-            if (held.contains(text)) return held;
-
-            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-            TimeoutUtil.sleep(20);
-        }
-        return read(file);
-    }
-
-    /**
-     * The file's text, and nothing while it does not exist or is being written.
-     */
-    private static String read(final Path file) {
-        try {
-            return Files.exists(file) ? Files.readString(file) : "";
-        } catch (final IOException beingWritten) {
-            return "";
-        }
-    }
-
     public void testAFailedRunItemKeepsTheIssue() {
         final BugReports.RunItem item = indexedRunItem(TestStatus.FAILED);
 
@@ -168,7 +152,7 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         assertEquals("the run item the indexer holds did not take the link", ISSUE, storedLink(item));
 
         final Path result = item.run().resolve(FileKind.RUN_ITEM.fileName(item.id()));
-        assertTrue("the link did not reach the case's own result file", awaitFileHolding(result, ISSUE).contains(ISSUE));
+        assertTrue("the link did not reach the case's own result file", awaitFileHoldingTheIssue(result).contains(ISSUE));
     }
 
     public void testARunItemNoLongerFailedIsNotWritten() {

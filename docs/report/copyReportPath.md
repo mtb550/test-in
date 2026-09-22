@@ -2,8 +2,8 @@
 
 # UC-REPORT-003: Copy the report's path
 
-**As a** tester, **I want** the full path of the report on my clipboard,
-**so that** I can paste it into a ticket or a chat message.
+**As a** tester, **I want** the full path of the report on my clipboard, **so that** I can paste it into a ticket or a
+chat message.
 
 This copies the full location of the report Testin has just written.
 

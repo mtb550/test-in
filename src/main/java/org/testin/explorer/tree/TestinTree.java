@@ -19,8 +19,8 @@ package org.testin.explorer.tree;
 import com.intellij.openapi.actionSystem.DataSink;
 import com.intellij.openapi.actionSystem.UiDataProvider;
 import com.intellij.ui.treeStructure.SimpleTree;
-import org.testin.actions.TestinData;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.TestinData;
 
 import javax.swing.tree.TreeModel;
 

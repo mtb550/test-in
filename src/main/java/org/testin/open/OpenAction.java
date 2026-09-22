@@ -18,15 +18,16 @@ package org.testin.open;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.testin.actions.TestinData;
+import org.testin.editor.TestinEditors;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
-import org.testin.editor.TestinEditors;
-import com.intellij.openapi.project.DumbAwareAction;
-import org.jetbrains.annotations.Nullable;
-import org.testin.actions.TestinData;
+
 import java.util.List;
 
 // UC-TREE-PANEL-005, UC-TREE-PANEL-006

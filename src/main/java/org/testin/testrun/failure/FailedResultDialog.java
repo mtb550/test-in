@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.testrun.create;
+package org.testin.testrun.failure;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +24,6 @@ import org.testin.testcase.CreateTestCaseFields;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
-import org.testin.ui.framework.SpellCheckedField;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
@@ -32,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class FailedResultDialog extends AbstractFrameworkDialog<SpellCheckedField> {
+public class FailedResultDialog extends AbstractFrameworkDialog {
     private final @NotNull Consumer<FailureFields> onSave;
     private final @NotNull FailureFields fields;
 

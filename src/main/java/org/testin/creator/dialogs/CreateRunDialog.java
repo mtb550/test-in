@@ -29,7 +29,9 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWithSelections<DirectoryType>> {
+public final class CreateRunDialog extends AbstractFrameworkDialog {
+    private final @NotNull TextFieldWithSelections<DirectoryType> nameAndType;
+
     private final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onCreate;
 
     // UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-032
@@ -39,13 +41,14 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
 
         title = Bundle.message("dialog.create.run.title");
 
-        components = List.of(
-                ComponentDialogBase.<DirectoryType>textFieldWithSelections()
-                        .icon(DirectoryType.TR.getIcon())
-                        .placeholder(Bundle.message("dialog.create.run.placeholder"))
-                        .selection(DirectoryType.TR.getIcon(), DirectoryType.TR.getDescription(), Bundle.message("dialog.create.run.hint.tr"), DirectoryType.TR)
-                        .selection(DirectoryType.TRP.getIcon(), DirectoryType.TRP.getDescription(), Bundle.message("dialog.create.run.hint.trp"), DirectoryType.TRP)
-                        .build());
+        final @NotNull ComponentDialogBase<TextFieldWithSelections<DirectoryType>> built = ComponentDialogBase.<DirectoryType>textFieldWithSelections()
+                .icon(DirectoryType.TR.getIcon())
+                .placeholder(Bundle.message("dialog.create.run.placeholder"))
+                .selection(DirectoryType.TR.getIcon(), DirectoryType.TR.getDescription(), Bundle.message("dialog.create.run.hint.tr"), DirectoryType.TR)
+                .selection(DirectoryType.TRP.getIcon(), DirectoryType.TRP.getDescription(), Bundle.message("dialog.create.run.hint.trp"), DirectoryType.TRP)
+                .build();
+        nameAndType = built.getComponent();
+        components = List.of(built);
 
         shortcuts = List.of(
                 StatusBarShortcut.confirm(this::submit),
@@ -56,9 +59,9 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
     // UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095
     @Override
     protected void submit() {
-        final @NotNull DirectoryType type = component().getSelectedValue();
+        final @NotNull DirectoryType type = nameAndType.getSelectedValue();
 
-        final @NotNull String name = accepted(component(), value -> Refused.ofName(type, value));
+        final @NotNull String name = accepted(nameAndType, value -> Refused.ofName(type, value));
         if (name.isEmpty()) return;
 
         onCreate.accept(name, type);

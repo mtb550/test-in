@@ -33,7 +33,7 @@ import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -56,13 +56,13 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         onlyEditable(targetSection);
 
         for (final CreateTestCaseSection section : getAllSections()) {
-            section.fillData(existingDto, this::refit);
+            section.fillData(existingDto);
 
             final boolean isTarget = (section == targetSection);
 
             if (isTarget && section instanceof AbstractMultiValueSection s) {
                 if (s.getFields().isEmpty()) {
-                    s.addField("", this::refit);
+                    s.addField("");
                 }
             }
 

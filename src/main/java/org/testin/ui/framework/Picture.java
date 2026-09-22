@@ -26,7 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

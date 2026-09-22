@@ -60,12 +60,11 @@ import java.util.Set;
 // Rule-INTERNAL-089, Rule-CODEGEN-082
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestinYml {
-    private static final @NotNull String[] FILE_NAMES = {"testin.yml", "testin.yaml"};
-
     public static final @NotNull String SCP_PREFIX = "git@";
+    private static final @NotNull String[] FILE_NAMES = {"testin.yml", "testin.yaml"};
+    private static final @NotNull Key<Parsed> READ = Key.create("testin.yml");
 
-    private static final @NotNull Key<TestinProjectConfig> READ = Key.create("testin.yml");
-
+    private static final @NotNull Parsed NOTHING_SAID = new Parsed(TestinProjectConfig.EMPTY, true);
     private static final @NotNull ObjectMapper YAML = new ObjectMapper(new YAMLFactory())
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .addHandler(new DeserializationProblemHandler() {
@@ -93,7 +92,7 @@ public final class TestinYml {
 
     // UC-TREE-PANEL-001
     public static boolean isUnreadable(final @NotNull Project p) {
-        return config(p).isUnreadable();
+        return !parsedFor(p).readable();
     }
 
     public static @NotNull String projectName(final @NotNull Project p) {
@@ -132,7 +131,8 @@ public final class TestinYml {
     public static @NotNull Map<String, String> lines(final @NotNull String projectName, final @NotNull String remote) {
         final @NotNull Map<String, String> lines = lines(projectName);
         lines.put(TestinProjectConfig.LOCATION_KEY, (remote.isEmpty() ? TestinLocation.LOCAL : TestinLocation.REMOTE).written());
-        if (!remote.isEmpty()) lines.put(TestinProjectConfig.REPO_URL_KEY, TestinProjectConfig.withoutCredentials(remote));
+        if (!remote.isEmpty())
+            lines.put(TestinProjectConfig.REPO_URL_KEY, TestinProjectConfig.withoutCredentials(remote));
         return lines;
     }
 
@@ -260,24 +260,28 @@ public final class TestinYml {
     }
 
     private static @NotNull TestinProjectConfig config(final @NotNull Project p) {
+        return parsedFor(p).config();
+    }
+
+    private static @NotNull Parsed parsedFor(final @NotNull Project p) {
         return Optional.ofNullable(p.getUserData(READ)).orElseGet(() -> {
-            final @NotNull TestinProjectConfig read = load(p);
+            final @NotNull Parsed read = load(p);
             p.putUserData(READ, read);
             return read;
         });
     }
 
-    private static @NotNull TestinProjectConfig load(final @NotNull Project p) {
-        final @NotNull TestinProjectConfig config = file(p)
+    private static @NotNull Parsed load(final @NotNull Project p) {
+        final @NotNull Parsed parsed = file(p)
                 .map(TestinYml::read)
                 .orElseGet(() -> {
                     Logger.info("No testin.yml in " + p.getName() + "; Testin goes on without it");
-                    return TestinProjectConfig.EMPTY;
+                    return NOTHING_SAID;
                 });
 
-        if (config.isUnreadable()) sayItCouldNotBeRead(p);
+        if (!parsed.readable()) sayItCouldNotBeRead(p);
 
-        return config;
+        return parsed;
     }
 
     // UC-TREE-PANEL-001, Rule-TREE-PANEL-119
@@ -291,29 +295,34 @@ public final class TestinYml {
         });
     }
 
-    private static @NotNull TestinProjectConfig read(final @NotNull Path file) {
+    private static @NotNull Parsed read(final @NotNull Path file) {
         try {
-            return parse(Files.readString(file), file.toString());
+            return parsed(Files.readString(file), file.toString());
         } catch (final IOException ex) {
             Logger.warn("Could not read " + file + ": " + ex.getMessage());
-            return TestinProjectConfig.EMPTY;
+            return NOTHING_SAID;
         }
     }
 
     static @NotNull TestinProjectConfig parse(final @NotNull String yaml, final @NotNull String source) {
+        return parsed(yaml, source).config();
+    }
+
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-119
+    static @NotNull Parsed parsed(final @NotNull String yaml, final @NotNull String source) {
         if (yaml.isBlank()) {
             Logger.warn("Empty testin.yml: " + source);
-            return TestinProjectConfig.EMPTY;
+            return NOTHING_SAID;
         }
 
         try {
             final @NotNull TestinProjectConfig config = YAML.readValue(yaml, TestinProjectConfig.class);
             Logger.info("Read " + source + ": test project '" + config.projectName() + "'");
-            return config;
+            return new Parsed(config, true);
 
         } catch (final Exception ex) {
             Logger.warn("Malformed " + source + ", ignored: " + ex.getMessage());
-            return TestinProjectConfig.UNREADABLE;
+            return new Parsed(TestinProjectConfig.EMPTY, false);
         }
     }
 
@@ -328,5 +337,9 @@ public final class TestinYml {
         }
 
         return Optional.empty();
+    }
+
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-119
+    record Parsed(@NotNull TestinProjectConfig config, boolean readable) {
     }
 }

@@ -25,7 +25,7 @@ import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.awt.Color;
 
 public final class TestinTabColorProvider implements EditorTabColorProvider {
     private static final @NotNull ColorKey TAB_FOREGROUND =

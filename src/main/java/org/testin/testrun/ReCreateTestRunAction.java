@@ -28,17 +28,15 @@ import org.testin.creator.CreateTestRun;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.TestRunItems;
-import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 
+import javax.swing.tree.TreePath;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.swing.tree.TreePath;
 
 public class ReCreateTestRunAction extends DumbAwareAction {
     // UC-TREE-PANEL-021
@@ -75,8 +73,7 @@ public class ReCreateTestRunAction extends DumbAwareAction {
         private void reCreate(final @NotNull TestRunDirectoryDto source, final @NotNull DirectoryDto parent) {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            final @NotNull TestRunDto run = indexer.getTestRunByPath(source.getPath());
-            final @NotNull Set<UUID> cases = run.getResults().stream().map(TestRunItems::getId).collect(Collectors.toSet());
+            final @NotNull Set<UUID> cases = indexer.getTestRunByPath(source.getPath()).coveredIds();
 
             final @NotNull Set<String> taken = indexer.getChildren(parent.getPath()).stream()
                     .map(DirectoryDto::getName)

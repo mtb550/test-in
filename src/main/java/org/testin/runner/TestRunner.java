@@ -28,13 +28,13 @@ import java.util.List;
 public interface TestRunner {
     @NotNull ExtensionPointName<TestRunner> EP = ExtensionPointName.create("org.testin.testRunners");
 
-    // UC-CODEGEN-008, Rule-CODEGEN-031
-    void run(final @NotNull Project p, final @NotNull List<TestCaseDto> cases);
-
     static @NotNull TestRunner available() {
         return EP.getExtensionList().stream()
                 .findFirst()
                 .orElseGet(() -> (p, cases) -> Logger.debug(
                         Bundle.message("runner.none", String.valueOf(cases.size()))));
     }
+
+    // UC-CODEGEN-008, Rule-CODEGEN-031
+    void run(final @NotNull Project p, final @NotNull List<TestCaseDto> cases);
 }

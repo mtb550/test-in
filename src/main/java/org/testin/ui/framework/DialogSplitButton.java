@@ -21,8 +21,10 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JComponent;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
@@ -41,7 +43,7 @@ public final class DialogSplitButton implements DialogComponent {
         chosen = defaultLabel;
 
         final @NotNull Action main = action(labels.getFirst());
-        final Action @NotNull[] alternatives = labels.stream().skip(1).map(this::action).toArray(Action[]::new);
+        final Action @NotNull [] alternatives = labels.stream().skip(1).map(this::action).toArray(Action[]::new);
 
         button = new JBOptionButton(main, alternatives.length == 0 ? null : alternatives);
 

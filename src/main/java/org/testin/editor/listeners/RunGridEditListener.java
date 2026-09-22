@@ -20,11 +20,11 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.testrun.RunEditorAttributes;
-import org.testin.testrun.RunStatusService;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.testrun.RunEditorAttributes;
+import org.testin.testrun.RunStatusService;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
@@ -56,9 +56,9 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
         final @NotNull Optional<TestRunItems> found = editor.runItem(onThisRow.getId());
         if (found.isEmpty()) return GridEdit.UNCHANGED;
-        final @NotNull TestRunItems item = found.get();
+        final @NotNull TestRunItems item = found.orElseThrow();
 
-        final @NotNull String before = attr.getRunValueExtractor().execute(item, p);
+        final @NotNull String before = attr.getRunValueExtractor().apply(item);
 
         if (item.isRemoved()) {
             model.setValueAt(before, row, col);
@@ -74,7 +74,7 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
         final @NotNull String typed = String.valueOf(model.getValueAt(row, col));
         attr.getRunValueSetter().execute(item, typed);
-        final @NotNull String after = attr.getRunValueExtractor().execute(item, p);
+        final @NotNull String after = attr.getRunValueExtractor().apply(item);
 
         model.setValueAt(after, row, col);
 

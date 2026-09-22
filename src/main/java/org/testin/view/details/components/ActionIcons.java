@@ -29,10 +29,10 @@ import org.testin.services.Services;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
+import javax.swing.Box;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
 import java.util.List;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class ActionIcons extends BaseDetails {
     final int STRUT_WIDTH = 8;

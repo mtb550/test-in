@@ -31,8 +31,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import java.awt.Font;
 
 public abstract class AbstractMultiLineSection implements CreateTestCaseSection {
     protected final @NotNull Project p;
@@ -81,7 +81,7 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
             }
         });
 
-        base.registerShortcut(field, Shortcuts.Enter.getCustomShortcut(), onSave::run);
+        base.registerShortcut(field, Shortcuts.Enter.getCustomShortcut(), onSave);
     }
 
     private void insertNewLine(final @NotNull Editor editor) {

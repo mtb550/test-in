@@ -16,9 +16,9 @@
 
 package org.testin.model;
 
-import org.testng.annotations.Test;
-import org.testin.testrun.RunEditorAttributes;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.testrun.RunEditorAttributes;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertSame;
 

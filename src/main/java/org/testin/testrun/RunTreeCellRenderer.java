@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 
-import javax.swing.*;
+import javax.swing.JTree;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RunTreeCellRenderer {
@@ -40,9 +40,6 @@ public final class RunTreeCellRenderer {
 
                     else if (node.getUserObject() instanceof TestCaseDto tc)
                         getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
-
-                    else if (node.getUserObject() instanceof String str)
-                        getTextRenderer().append(str, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
                 }
             }
         };

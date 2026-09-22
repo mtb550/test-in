@@ -89,12 +89,12 @@ Every test set under the package becomes a sheet, however deep it sits.
 
 ## What each format does with the sheets
 
-| Format | What it makes of several sheets |
-|---|---|
-| **XLSX** | One sheet in the workbook for each |
-| **CSV** | One header line, then every test case from every sheet. The sheet names are not written anywhere |
-| **HTML** | One heading and one table for each sheet, then a total |
-| **JSON** | The sheet names are kept as the keys |
+| Format   | What it makes of several sheets                                                                  |
+|----------|--------------------------------------------------------------------------------------------------|
+| **XLSX** | One sheet in the workbook for each                                                               |
+| **CSV**  | One header line, then every test case from every sheet. The sheet names are not written anywhere |
+| **HTML** | One heading and one table for each sheet, then a total                                           |
+| **JSON** | The sheet names are kept as the keys                                                             |
 
 ---
 

@@ -23,7 +23,12 @@ import org.testng.annotations.Test;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 
 /**
  * The settings contract. Two behaviors matter beyond storing values:
@@ -37,9 +42,9 @@ import static org.testng.Assert.*;
  */
 public class SettingsTest {
 
-    private static AppSettingsState state(final String rootPath, final String testerName, final String testerRole) {
+    private static AppSettingsState state(final String testerName, final String testerRole) {
         final AppSettingsState settings = new AppSettingsState();
-        settings.rootTestinPath = rootPath;
+        settings.rootTestinPath = "C:/testin";
         settings.testerName = testerName;
         settings.testerRole = testerRole;
         return settings;
@@ -77,16 +82,18 @@ public class SettingsTest {
 
     @Test
     public void everyEmptyFormOfARootMeansNoRootConfigured() {
-        assertEquals(TestinRoot.normalize(null), Path.of(""));
-        assertEquals(TestinRoot.normalize(""), Path.of(""));
-        assertEquals(TestinRoot.normalize("   "), Path.of(""));
-        assertEquals(TestinRoot.normalize("\t\n "), Path.of(""));
+        assertEquals(TestinRoot.normalize(null), TestinRoot.NONE);
+        assertEquals(TestinRoot.normalize(""), TestinRoot.NONE);
+        assertEquals(TestinRoot.normalize("   "), TestinRoot.NONE);
+        assertEquals(TestinRoot.normalize("\t\n "), TestinRoot.NONE);
     }
 
     @Test
     public void aStoredRootIsTrimmedBeforeUse() {
-        assertEquals(TestinRoot.normalize("  C:/testin  "), Path.of("C:/testin"));
-        assertEquals(TestinRoot.normalize("C:/testin"), Path.of("C:/testin"));
+        final Path root = Path.of("C:/testin");
+
+        assertEquals(TestinRoot.normalize("  C:/testin  "), root);
+        assertEquals(TestinRoot.normalize("C:/testin"), root);
     }
 
     // -------------------------------------------------- changing the testin folder
@@ -137,8 +144,8 @@ public class SettingsTest {
      */
     @Test
     public void changingTesterNameOrRoleNeverReloadsTheTree() {
-        final AppSettingsState before = state("C:/testin", "Sara", "QA Engineer");
-        final AppSettingsState after = state("C:/testin", "Omar", "Test Lead");
+        final AppSettingsState before = state("Sara", "QA Engineer");
+        final AppSettingsState after = state("Omar", "Test Lead");
 
         assertFalse(TestinRoot.isRootChanged(before.rootTestinPath, after.rootTestinPath));
         assertNotEquals(before.testerName, after.testerName);
@@ -152,7 +159,7 @@ public class SettingsTest {
      */
     @Test
     public void theTesterIsReadLiveSoNoCacheCanGoStale() {
-        final AppSettingsState settings = state("C:/testin", "Sara", "QA Engineer");
+        final AppSettingsState settings = state("Sara", "QA Engineer");
 
         final Supplier<String> nameAtPointOfUse = () -> settings.testerName;
         final Supplier<String> roleAtPointOfUse = () -> settings.testerRole;
@@ -173,10 +180,10 @@ public class SettingsTest {
      */
     @Test
     public void reloadingTheStateReplacesTheTesterForEveryLaterRead() {
-        final AppSettingsState settings = state("C:/testin", "Sara", "QA Engineer");
+        final AppSettingsState settings = state("Sara", "QA Engineer");
         final Supplier<String> nameAtPointOfUse = () -> settings.testerName;
 
-        settings.loadState(state("C:/testin", "Omar", "Test Lead"));
+        settings.loadState(state("Omar", "Test Lead"));
 
         assertEquals(settings.testerName, "Omar");
         assertEquals(settings.testerRole, "Test Lead");
@@ -210,7 +217,7 @@ public class SettingsTest {
         final AppSettingsState settings = new AppSettingsState();
 
         assertEquals(settings.rootTestinPath, "");
-        assertEquals(TestinRoot.normalize(settings.rootTestinPath), Path.of(""));
+        assertEquals(TestinRoot.normalize(settings.rootTestinPath), TestinRoot.NONE);
         assertEquals(settings.logLevel, "INFO");
         assertEquals(settings.testerName, "");
         assertEquals(settings.testerRole, "");
@@ -218,7 +225,7 @@ public class SettingsTest {
 
     @Test
     public void getStateReturnsTheLiveObjectSoWritesArePersisted() {
-        final AppSettingsState settings = state("C:/testin", "Sara", "QA Engineer");
+        final AppSettingsState settings = state("Sara", "QA Engineer");
 
         assertSame(settings.getState(), settings);
     }

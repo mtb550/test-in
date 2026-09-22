@@ -75,6 +75,13 @@ public final class GitCommits {
         return Optional.ofNullable(Path.of(path).getParent()).map(Path::toString).orElse("");
     }
 
+    // UC-SHARE-012, Rule-SHARE-055
+    static @NotNull Set<String> stageable(final @NotNull Path repositoryPath, final @NotNull Set<String> paths) {
+        return paths.stream()
+                .filter(path -> Files.exists(repositoryPath.resolve(path)))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
     // UC-SHARE-012, Rule-SHARE-054
     public void stageAndCommit(final @NotNull Path repositoryPath, final @NotNull String message, final @NotNull Collection<PendingChange> selectedChanges) {
         final @NotNull Set<String> paths = GitRefs.repoRelativePaths(selectedChanges);
@@ -89,13 +96,6 @@ public final class GitCommits {
         }
 
         GitCommandRunner.executeOverPaths(p, repositoryPath, paths, "git", "commit", "--only", "-m", message);
-    }
-
-    // UC-SHARE-012, Rule-SHARE-055
-    static @NotNull Set<String> stageable(final @NotNull Path repositoryPath, final @NotNull Set<String> paths) {
-        return paths.stream()
-                .filter(path -> Files.exists(repositoryPath.resolve(path)))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public @NotNull String headCommitId(final @NotNull Path repositoryPath) {

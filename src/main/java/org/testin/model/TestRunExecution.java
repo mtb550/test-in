@@ -16,12 +16,12 @@
 
 package org.testin.model;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.AccessLevel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.markers.TestRunMarker;
 import org.testin.model.markers.DetailRow;
+import org.testin.model.markers.TestRunMarker;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 
@@ -50,10 +50,6 @@ public enum TestRunExecution {
     @Getter(AccessLevel.NONE)
     private final @NotNull Function<TestRunMarker, ZonedDateTime> at;
 
-    public @NotNull String valueIn(final @NotNull TestRunMarker run) {
-        return Display.formatDate(at.apply(run));
-    }
-
     private static @NotNull String tookIn(final @NotNull TestRunMarker run) {
         final @NotNull ZonedDateTime from = run.getExecutionStartedAt();
         final @NotNull ZonedDateTime to = run.getExecutionEndedAt();
@@ -68,5 +64,9 @@ public enum TestRunExecution {
                         Arrays.stream(values()).map(field -> new DetailRow(field.displayName, field.valueIn(run))),
                         Stream.of(new DetailRow(Bundle.message("execution.time"), tookIn(run))))
                 .toList();
+    }
+
+    public @NotNull String valueIn(final @NotNull TestRunMarker run) {
+        return Display.formatDate(at.apply(run));
     }
 }

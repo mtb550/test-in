@@ -38,7 +38,7 @@ import static org.testng.Assert.assertTrue;
 public class ResultAnalysisSegmentsTest {
 
     private static @NotNull TestRunSummary run(final long passed, final long failed, final long blocked, final long untested, final long removed) {
-        return new TestRunSummary(passed + failed + blocked + untested + removed, passed, failed, blocked, untested, removed, 0, "");
+        return new TestRunSummary(passed + failed + blocked + untested + removed, passed, failed, blocked, untested, removed, "");
     }
 
     private static @NotNull List<ResultAnalysis.Segment> of(final @NotNull TestRunSummary summary, final @NotNull TestRunStatus run) {

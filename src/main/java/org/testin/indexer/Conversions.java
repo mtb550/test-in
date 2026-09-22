@@ -45,6 +45,18 @@ public final class Conversions {
 
     private final @NotNull Set<FormatConverter.Report> said = ConcurrentHashMap.newKeySet();
 
+    private static @NotNull List<Path> projectsIn(final @NotNull Path root) {
+        try (Stream<Path> children = Files.list(root)) {
+            return children.filter(Files::isDirectory)
+                    .filter(folder -> Files.exists(folder.resolve(DirectoryType.TP.getMarker())))
+                    .sorted(Comparator.comparing(Path::toString))
+                    .toList();
+        } catch (final IOException ex) {
+            Logger.warn("Could not list the Testin folder " + root + ": " + ex.getMessage());
+            return List.of();
+        }
+    }
+
     // UC-INTERNAL-008, Rule-INTERNAL-091
     void ensure(final @NotNull Project p, final @NotNull Path project) {
         report(p, convert(p, project).map(List::of).orElse(List.of()));
@@ -66,18 +78,6 @@ public final class Conversions {
     private @NotNull Optional<FormatConverter.Report> convert(final @NotNull Project p, final @NotNull Path project) {
         synchronized (locks.computeIfAbsent(project.toString(), path -> new Object())) {
             return new FormatConverter(p).convert(project);
-        }
-    }
-
-    private static @NotNull List<Path> projectsIn(final @NotNull Path root) {
-        try (Stream<Path> children = Files.list(root)) {
-            return children.filter(Files::isDirectory)
-                    .filter(folder -> Files.exists(folder.resolve(DirectoryType.TP.getMarker())))
-                    .sorted(Comparator.comparing(Path::toString))
-                    .toList();
-        } catch (final IOException ex) {
-            Logger.warn("Could not list the Testin folder " + root + ": " + ex.getMessage());
-            return List.of();
         }
     }
 

@@ -25,7 +25,10 @@ import org.testng.annotations.Test;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 
 /**
  * A run row keeps the test case its verdict was given against (#306, piece 1).

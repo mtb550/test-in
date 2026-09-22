@@ -30,7 +30,7 @@ import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.util.Bundle;
 
-import javax.swing.*;
+import javax.swing.Icon;
 import java.util.function.BiFunction;
 
 @Getter

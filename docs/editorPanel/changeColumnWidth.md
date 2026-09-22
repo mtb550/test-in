@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-004: Change a grid column's width
 
-**As a** tester, **I want** to widen the column I am reading,
-**so that** a long expected result is not cut off every time I open the editor.
+**As a** tester, **I want** to widen the column I am reading, **so that** a long expected result is not cut off every
+time I open the editor.
 
 This is only about the grid. Cards have no columns.
 

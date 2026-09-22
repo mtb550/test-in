@@ -18,8 +18,8 @@ package org.testin.testcase;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.model.StatusBarItem;
+import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 

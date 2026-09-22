@@ -58,15 +58,15 @@ The whole page is drawn on [the settings page](main.md#the-page).
 
 The drop-down offers seven, in this order.
 
-| Level | What is written |
-|---|---|
-| **DISABLED** | Nothing at all |
-| **TRACE** | Everything, including every step of a read |
-| **DEBUG** | Nearly everything |
-| **INFO** | What happened, without the detail. The starting choice |
-| **WARN** | Only what went oddly |
-| **ERROR** | Only what failed |
-| **FATAL** | Only what stopped Testin |
+| Level        | What is written                                        |
+|--------------|--------------------------------------------------------|
+| **DISABLED** | Nothing at all                                         |
+| **TRACE**    | Everything, including every step of a read             |
+| **DEBUG**    | Nearly everything                                      |
+| **INFO**     | What happened, without the detail. The starting choice |
+| **WARN**     | Only what went oddly                                   |
+| **ERROR**    | Only what failed                                       |
+| **FATAL**    | Only what stopped Testin                               |
 
 ## Main flow
 

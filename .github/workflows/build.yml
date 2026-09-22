@@ -35,7 +35,7 @@ on:
     # both here ran every Dependabot branch twice - once for the push that
     # created it and once for the pull request that followed, thirteen minutes
     # apiece. No tags either: a tag is release.yml's.
-    branches: [main]
+    branches: [ main ]
   pull_request:
 
 # A second push to the same branch makes the first run's answer worthless, so it

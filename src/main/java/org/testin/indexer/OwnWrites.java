@@ -39,11 +39,22 @@ public final class OwnWrites {
     private static final byte[] NOTHING_TO_COMPARE = new byte[0];
 
     private static final long SETTLES_IN_MILLIS = 5_000;
+    private final @NotNull Map<String, Claim> written = new ConcurrentHashMap<>();
 
-    private record Claim(long at, byte @NotNull [] content) {
+    private static boolean stillSays(final @NotNull Path path, final byte @NotNull [] ourContent) {
+        try {
+            return Arrays.equals(Files.readAllBytes(path), ourContent);
+        } catch (final IOException stillSettling) {
+            Logger.debug("Could not read " + path.getFileName() + " to tell our write from an edit: " + stillSettling.getMessage());
+            return true;
+        }
     }
 
-    private final @NotNull Map<String, Claim> written = new ConcurrentHashMap<>();
+    private static @NotNull String key(final @NotNull Path path) {
+        final @NotNull String full = path.toAbsolutePath().normalize().toString();
+
+        return SystemInfo.isFileSystemCaseSensitive ? full : full.toLowerCase(Locale.ROOT);
+    }
 
     // UC-INTERNAL-003, Rule-INTERNAL-019
     public void record(final @NotNull Path path) {
@@ -69,23 +80,11 @@ public final class OwnWrites {
         return ourContent.length == 0 || stillSays(path, ourContent);
     }
 
-    private static boolean stillSays(final @NotNull Path path, final byte @NotNull [] ourContent) {
-        try {
-            return Arrays.equals(Files.readAllBytes(path), ourContent);
-        } catch (final IOException stillSettling) {
-            Logger.debug("Could not read " + path.getFileName() + " to tell our write from an edit: " + stillSettling.getMessage());
-            return true;
-        }
-    }
-
     private void forgetOldEntries() {
         final long now = System.currentTimeMillis();
         written.values().removeIf(one -> now - one.at() >= SETTLES_IN_MILLIS);
     }
 
-    private static @NotNull String key(final @NotNull Path path) {
-        final @NotNull String full = path.toAbsolutePath().normalize().toString();
-
-        return SystemInfo.isFileSystemCaseSensitive ? full : full.toLowerCase(Locale.ROOT);
+    private record Claim(long at, byte @NotNull [] content) {
     }
 }

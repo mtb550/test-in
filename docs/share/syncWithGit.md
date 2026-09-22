@@ -42,8 +42,8 @@ There is no key for this. The menu entry is **Sync With Remote**.
 ## What the tester sees
 
 No window opens. A progress bar named *Syncing with remote* runs in the status
-bar, and its line changes as the sync works. At the end a message titled
-**Synced** appears at the bottom right and stays in the IDE's notification
+bar, and its line changes as the sync works. At the end a message titled **Synced** appears at the bottom right and
+stays in the IDE's notification
 list.
 
 ## Main flow

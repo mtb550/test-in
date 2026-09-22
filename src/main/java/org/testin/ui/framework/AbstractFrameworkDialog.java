@@ -20,29 +20,35 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
-import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.ui.popup.JBPopupListener;
+import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.ui.components.JBPanel;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.StatusBarItem;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.model.StatusBarItem;
 import org.testin.ui.dialogs.DialogStyle;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.LayoutFocusTraversalPolicy;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.KeyboardFocusManager;
+import java.awt.Rectangle;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
+public abstract class AbstractFrameworkDialog {
     protected final @NotNull Project p;
 
     protected @NotNull String title = "";
@@ -73,6 +79,18 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
         return stack;
     }
 
+    private static int naturalHeightOf(final @NotNull JComponent content) {
+        final @NotNull Optional<Dimension> told = content.isPreferredSizeSet()
+                ? Optional.of(content.getPreferredSize())
+                : Optional.empty();
+
+        content.setPreferredSize(null);
+        final int natural = content.getPreferredSize().height;
+        told.ifPresent(content::setPreferredSize);
+
+        return natural;
+    }
+
     protected abstract void submit();
 
     // UC-INTERNAL-007, Rule-INTERNAL-067
@@ -98,12 +116,6 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
 
         Services.getInstance(p, Notifier.class).softRefuse(p, refusal.orElseThrow(), value);
         return "";
-    }
-
-    // UC-INTERNAL-007, Rule-INTERNAL-057
-    @SuppressWarnings("unchecked")
-    protected final @NotNull C component() {
-        return (C) primaryComponent();
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-061, Rule-INTERNAL-075
@@ -187,18 +199,6 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
                 }
             });
         });
-    }
-
-    private static int naturalHeightOf(final @NotNull JComponent content) {
-        final @NotNull Optional<Dimension> told = content.isPreferredSizeSet()
-                ? Optional.of(content.getPreferredSize())
-                : Optional.empty();
-
-        content.setPreferredSize(null);
-        final int natural = content.getPreferredSize().height;
-        told.ifPresent(content::setPreferredSize);
-
-        return natural;
     }
 
     protected final void closeOk() {

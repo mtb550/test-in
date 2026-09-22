@@ -16,8 +16,6 @@
 
 package org.testin.clipboard;
 
-import org.testin.actions.GrayWithReason;
-import org.testin.notifications.Done;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -25,6 +23,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.codegen.CopiedCase;
 import org.testin.codegen.GenType;
@@ -33,32 +32,38 @@ import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.testcase.TestCaseSnapshot;
-import org.testin.undo.UndoScope;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.testcase.TestCaseSnapshot;
+import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 import org.testin.util.ClipboardContents;
 import org.testin.util.Mapper;
 
-import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 import java.util.HashSet;
-import java.util.Optional;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class PasteTestCaseNodeAction extends DumbAwareAction {
+    private @NotNull Optional<Answered> answered = Optional.empty();
+
+    private static @NotNull Optional<Work> work(final @NotNull AnActionEvent e) {
+        return Optional.ofNullable(e.getProject()).flatMap(p -> TestinData.editor(e).map(editor -> new Work(p, editor)));
+    }
+
     // UC-EDITOR-PANEL-017
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -77,11 +82,6 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
         GrayWithReason.unless(this, e, work(e).map(this::clipboardHoldsTestCases).orElse(false), Bundle.message("paste.case.nothing.description"));
     }
 
-    private record Answered(@NotNull Transferable contents, boolean holdsTestCases) {
-    }
-
-    private @NotNull Optional<Answered> answered = Optional.empty();
-
     private boolean clipboardHoldsTestCases(final @NotNull Work work) {
         return ClipboardContents.withFlavor(DataFlavor.stringFlavor)
                 .map(contents -> answered.filter(last -> last.contents() == contents).orElseGet(() -> {
@@ -97,13 +97,12 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
         return ActionUpdateThread.EDT;
     }
 
-    private static @NotNull Optional<Work> work(final @NotNull AnActionEvent e) {
-        return Optional.ofNullable(e.getProject()).flatMap(p -> TestinData.editor(e).map(editor -> new Work(p, editor)));
+    private record Answered(@NotNull Transferable contents, boolean holdsTestCases) {
     }
 
     private record Work(@NotNull Project p, @NotNull TestinEditor editor) {
-            void paste() {
-                final @NotNull List<TestCaseDto> pastedCases = getFromClipboard();
+        void paste() {
+            final @NotNull List<TestCaseDto> pastedCases = getFromClipboard();
             if (pastedCases.isEmpty()) return;
 
             ApplicationManager.getApplication().invokeLater(() -> {

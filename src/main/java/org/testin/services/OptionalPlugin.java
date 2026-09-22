@@ -77,15 +77,10 @@ public enum OptionalPlugin {
         return PluginManagerCore.isPluginInstalled(id) && !PluginManagerCore.isDisabled(id);
     }
 
-    private enum Availability {
-        UNKNOWN, PRESENT, ABSENT
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean isAvailableOrWarn(final @NotNull Project p) {
-        if (isAvailable()) return true;
+    public boolean isMissingAndWarned(final @NotNull Project p) {
+        if (isAvailable()) return false;
         warn(p);
-        return false;
+        return true;
     }
 
     public boolean isAvailableOrWarnOnce(final @NotNull Project p) {
@@ -99,8 +94,8 @@ public enum OptionalPlugin {
     }
 
     // UC-SHARE-010, Rule-SHARE-105
-    public boolean enableOrExplain(final @NotNull AnAction action, final @NotNull Presentation presentation) {
-        return enableOrExplain(presentation, Objects.requireNonNullElse(action.getTemplatePresentation().getText(), ""));
+    public boolean grayedWithReason(final @NotNull AnAction action, final @NotNull Presentation presentation) {
+        return !enableOrExplain(presentation, Objects.requireNonNullElse(action.getTemplatePresentation().getText(), ""));
     }
 
     // UC-SHARE-010, Rule-SHARE-105
@@ -117,5 +112,9 @@ public enum OptionalPlugin {
     // UC-CODEGEN-016, Rule-CODEGEN-062
     public @NotNull String needs(final @NotNull String entryName) {
         return Bundle.message("plugin.needs", entryName, label);
+    }
+
+    private enum Availability {
+        UNKNOWN, PRESENT, ABSENT
     }
 }

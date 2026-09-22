@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-032: Record that a test case passed
 
-**As a** tester, **I want** one key to say a test case worked,
-**so that** walking a test run of 80 is 80 keystrokes and nothing else.
+**As a** tester, **I want** one key to say a test case worked, **so that** walking a test run of 80 is 80 keystrokes and
+nothing else.
 
 One key. Testin writes the verdict, the tester's name, the time and the
 duration.

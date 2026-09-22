@@ -162,14 +162,14 @@ header come the screen's own line and its own links.
 The choose screen holds one link per test project, up to six of them. The others
 hold one link each.
 
-| If | The panel shows |
-|---|---|
-| No Testin folder is set | *Welcome to Testin* and the link **Configure Testin settings** |
-| The bound test project is found | The tree |
-| The first index has not finished | *Reading test projects...*, in gray |
-| This code project's `testin.yml` names the test project the tree would show, it is not on this machine, and the file gives its Git address | *\<name\> is not on this machine yet*, the link **Clone \<name\>**, and **Choose another test project** |
-| No test project exists in the Testin folder | The link **Create your first test project** |
-| Otherwise | One link per test project, showing its name and then **Active** or **Inactive**. With more than six test projects, one link instead: **Select the test project for this repository** |
+| If                                                                                                                                         | The panel shows                                                                                                                                                                      |
+|--------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| No Testin folder is set                                                                                                                    | *Welcome to Testin* and the link **Configure Testin settings**                                                                                                                       |
+| The bound test project is found                                                                                                            | The tree                                                                                                                                                                             |
+| The first index has not finished                                                                                                           | *Reading test projects...*, in gray                                                                                                                                                  |
+| This code project's `testin.yml` names the test project the tree would show, it is not on this machine, and the file gives its Git address | *\<name\> is not on this machine yet*, the link **Clone \<name\>**, and **Choose another test project**                                                                              |
+| No test project exists in the Testin folder                                                                                                | The link **Create your first test project**                                                                                                                                          |
+| Otherwise                                                                                                                                  | One link per test project, showing its name and then **Active** or **Inactive**. With more than six test projects, one link instead: **Select the test project for this repository** |
 
 ## What Testin refuses
 

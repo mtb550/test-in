@@ -77,8 +77,8 @@ name.
 
 ## What Testin refuses
 
-**If the email address is not the shape of one** — a message reads
-*'Muteb' is not an email address*, the dialog stays open, and nothing is
+**If the email address is not the shape of one** — a message reads *'Muteb' is not an email address*, the dialog stays
+open, and nothing is
 written to Git. The shape is all that is checked: no address can be proved to
 exist without sending to it, so what is refused is the answer that is plainly
 not one.
@@ -87,8 +87,8 @@ not one.
 
 **If the email is empty** — the same.
 
-**If Git will not take the identity** — a message titled **Config Failed** reads
-*Failed to set Git identity:* and then the reason.
+**If Git will not take the identity** — a message titled **Config Failed** reads *Failed to set Git identity:* and then
+the reason.
 
 ## This is not the tester name
 

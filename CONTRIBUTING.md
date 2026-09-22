@@ -5,11 +5,11 @@ missing, that is a bug in this page — say so.
 
 ## What you need
 
-| | |
-|---|---|
-| **JDK 21** | The toolchain is pinned to it (`build.gradle.kts`). Gradle will fetch one if your machine has none. |
-| **IntelliJ IDEA** | Any recent build. The sandbox the plugin runs in is downloaded by Gradle, not by you. |
-| **PowerShell 7** (`pwsh`) | Only for `./gradlew inspect`. It is cross-platform, and the script asks for version 7. |
+|                           |                                                                                                     |
+|---------------------------|-----------------------------------------------------------------------------------------------------|
+| **JDK 21**                | The toolchain is pinned to it (`build.gradle.kts`). Gradle will fetch one if your machine has none. |
+| **IntelliJ IDEA**         | Any recent build. The sandbox the plugin runs in is downloaded by Gradle, not by you.               |
+| **PowerShell 7** (`pwsh`) | Only for `./gradlew inspect`. It is cross-platform, and the script asks for version 7.              |
 
 Nothing else. There is no local database, no service to start, no account.
 
@@ -65,12 +65,12 @@ Open the project in IntelliJ IDEA and four are already there, for the same reaso
 the inspection profile and the code style are committed — nobody should have to
 retype them:
 
-| | |
-|---|---|
-| **Run IDE with Testin** | `runIde`. The one you want. |
+|                             |                                                                                                            |
+|-----------------------------|------------------------------------------------------------------------------------------------------------|
+| **Run IDE with Testin**     | `runIde`. The one you want.                                                                                |
 | **Run PyCharm with Testin** | `runPyCharm`. Proves the plugin still loads where there is no Java; downloads a second IDE the first time. |
-| **Tests** | `compileJava test` |
-| **Inspection gate** | `inspect` |
+| **Tests**                   | `compileJava test`                                                                                         |
+| **Inspection gate**         | `inspect`                                                                                                  |
 
 ## Two branches at once means two working trees
 
@@ -93,13 +93,13 @@ work had it not been noticed immediately.
 
 ## The checks
 
-| Command | What it settles | When |
-|---|---|---|
-| `./gradlew compileJava test` | It compiles, and the unit tests and the documentation guards pass | Every change, before you offer it |
-| `./gradlew runIde` | It actually works | Anything a tester can see — see below |
-| `./gradlew inspect` | The eight gate rules and the display-string ratchet | Before offering a change for a sandbox test, when it touched nullability, annotations, or many files |
-| `git worktree add ../testin-<what> <branch>` | A second branch, checked out at once | Whenever two pieces of work run at the same time — see below |
-| `./gradlew verifyDistribution` | No test classes and no compile-only dependencies reached the jar | Runs in CI; run it if you touched packaging |
+| Command                                      | What it settles                                                   | When                                                                                                 |
+|----------------------------------------------|-------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| `./gradlew compileJava test`                 | It compiles, and the unit tests and the documentation guards pass | Every change, before you offer it                                                                    |
+| `./gradlew runIde`                           | It actually works                                                 | Anything a tester can see — see below                                                                |
+| `./gradlew inspect`                          | The nineteen gate rules and the display-string ratchet            | Before offering a change for a sandbox test, when it touched nullability, annotations, or many files |
+| `git worktree add ../testin-<what> <branch>` | A second branch, checked out at once                              | Whenever two pieces of work run at the same time — see below                                         |
+| `./gradlew verifyDistribution`               | No test classes and no compile-only dependencies reached the jar  | Runs in CI; run it if you touched packaging                                                          |
 
 ### One build at a time in one checkout
 
@@ -169,10 +169,36 @@ is a gate that gets skipped. Run it after the last edit, on a still tree:
 editing a file while the inspector is reading it produces findings about a
 version that no longer exists, which reads exactly like a real defect.
 
-It exits non-zero for eight rules and no others: `DataFlowIssue`, `ReturnNull`,
-`WrappedMethodDeclaration`, `StaticMutableState`, `HandWrittenPrivateConstructor`,
-`DriftedCaption`, `OrphanedJavadoc` and `MissingCopyright`. Everything else it
-reports is a judgement call and is listed rather than gated.
+It exits non-zero for nineteen rules and no others. Everything else it reports
+is a judgement call and is listed rather than gated.
+
+| Rule                                                                                                                                                                  | What it forbids                                                                                                                                                                                                  |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `DataFlowIssue`, `ReturnNull`                                                                                                                                         | A null contract the checker can prove is broken                                                                                                                                                                  |
+| `Convert2MethodRef`                                                                                                                                                   | A lambda that only hands its parameters to one method: `tc -> tc.getDescription()` where `TestCaseDto::getDescription` says it once                                                                              |
+| `CodeBlock2Expr`                                                                                                                                                      | A lambda whose braces hold one statement: `() -> { notify(); }` is `() -> notify()`                                                                                                                              |
+| `SimplifyStreamApiCallChains`                                                                                                                                         | A stream written the long way round: `List.of(values()).stream()` where `Arrays.stream(values())` says it directly                                                                                               |
+| `StringBufferReplaceableByString`                                                                                                                                     | A `StringBuilder` that is only ever appended to once, in one expression, where `+` says the same                                                                                                                 |
+| `SameParameterValue`                                                                                                                                                  | A parameter every caller passes the same value to, so it is not really a parameter                                                                                                                               |
+| `BooleanMethodIsAlwaysInverted`                                                                                                                                       | A boolean method every caller negates: it answers the opposite of the question its callers ask, so it is renamed to theirs - `isOffAndWarned`, not `!isOnOrWarn`                                                 |
+| `UnusedReturnValue`                                                                                                                                                   | A value a method returns that no caller reads                                                                                                                                                                    |
+| `UNUSED_IMPORT`                                                                                                                                                       | An import nothing in the file uses                                                                                                                                                                               |
+| `OnDemandImport`                                                                                                                                                      | A star import: `import javax.swing.*;` names no class, so the reader cannot tell where `Box` comes from. The committed code style in `.idea/codeStyles/` never writes one, so Optimize Imports keeps it that way |
+| `ConvertToStringTemplate`                                                                                                                                             | A Kotlin string glued together with `+` in the build scripts: `"Copied: " + sample` where the template `"Copied: $sample"` says it in one piece                                                                  |
+| `WrappedMethodDeclaration`, `StaticMutableState`, `HandWrittenPrivateConstructor`, `DriftedCaption`, `OrphanedJavadoc`, `MissingCopyright`, `HtmlParagraphInMarkdown` | This script's own rules, which no IntelliJ inspection makes; `.github/workflows/inspect.yml` says what each one is                                                                                               |
+
+The inspector's rules are named one by one in
+`.idea/inspectionProfiles/Testin.xml`, so the gate does not depend on what a
+default profile happens to switch on. `Convert2MethodRef` was not run from the
+command line until it was named there: eight such lambdas sat on `main` while
+the IDE flagged them and CI reported none.
+
+The Gradle scripts have a gate of their own, and it is not this one.
+`gradle.properties` sets `org.gradle.kotlin.dsl.allWarningsAsErrors=true`, so a
+deprecated call in a `.gradle.kts` file fails every build, locally and in CI.
+The inspector cannot report those warnings: run headless, it never loads the
+scripts' Gradle classpath. `ConvertToStringTemplate` is the one Kotlin rule it
+does see, because it needs no classpath.
 
 `MissingCopyright` is the one that reads the test sources as well: every `.java`
 file opens with the Apache 2.0 notice from `LICENSE`'s own appendix, above
@@ -198,11 +224,11 @@ string a tester reads should have one owner; the number may go down and never up
 
 ## What CI runs
 
-| Workflow | When |
-|---|---|
-| `build.yml` | Every push to `main` and every pull request. Compiles, runs the unit tests, and verifies against **IntelliJ IDEA** - the one verdict that turns a pull request red |
-| `verify.yml` | Every push to `main`, plus every second day and on demand. The same verifier against **all six targets** - IntelliJ IDEA, PyCharm and Rider at 261 and 262 - compared against `.github/verification-baseline.txt`. This is the number the JetBrains Marketplace shows a tester before they install |
-| `inspect.yml` | Every push to `main`, and on demand against a branch |
+| Workflow      | When                                                                                                                                                                                                                                                                                               |
+|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `build.yml`   | Every push to `main` and every pull request. Compiles, runs the unit tests, and verifies against **IntelliJ IDEA** - the one verdict that turns a pull request red                                                                                                                                 |
+| `verify.yml`  | Every push to `main`, plus every second day and on demand. The same verifier against **all six targets** - IntelliJ IDEA, PyCharm and Rider at 261 and 262 - compared against `.github/verification-baseline.txt`. This is the number the JetBrains Marketplace shows a tester before they install |
+| `inspect.yml` | Every push to `main`, and on demand against a branch                                                                                                                                                                                                                                               |
 
 No workflow publishes a release. It is published from a maintainer's machine
 with `./gradlew publishPlugin`, which reads the Marketplace token from
@@ -230,13 +256,13 @@ Marketplace checks.
 The rules this project holds itself to live in the repository, beside the code
 they govern, so they travel with a clone:
 
-| | |
-|---|---|
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | **Start here.** The layer map, the four rules the plugin is built on, and two operations traced class by class |
-| [`CLAUDE.md`](CLAUDE.md) | The code conventions a change is reviewed against — naming, nullability, threading, what belongs in which class |
-| [`docs/`](docs/README.md) | What Testin does, one use case at a time, with every rule numbered |
-| [`docs/standard.md`](docs/standard.md) | How those documents are written, and what a machine checks about them |
-| [`docs/decisions.md`](docs/decisions.md) | Decisions that look wrong until you know why, and what each costs to reverse |
+|                                                |                                                                                                                 |
+|------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | **Start here.** The layer map, the four rules the plugin is built on, and two operations traced class by class  |
+| [`CLAUDE.md`](CLAUDE.md)                       | The code conventions a change is reviewed against — naming, nullability, threading, what belongs in which class |
+| [`docs/`](docs/README.md)                      | What Testin does, one use case at a time, with every rule numbered                                              |
+| [`docs/standard.md`](docs/standard.md)         | How those documents are written, and what a machine checks about them                                           |
+| [`docs/decisions.md`](docs/decisions.md)       | Decisions that look wrong until you know why, and what each costs to reverse                                    |
 
 Three that catch people out:
 
@@ -263,10 +289,10 @@ out of scope.
 
 Two labels on every issue:
 
-| Label | Values |
-|---|---|
-| `priority:` | `critical`, `high`, `medium`, `low` |
-| `cost:` | `nocost`, `minor`, `major`, `expensive` |
+| Label       | Values                                  |
+|-------------|-----------------------------------------|
+| `priority:` | `critical`, `high`, `medium`, `low`     |
+| `cost:`     | `nocost`, `minor`, `major`, `expensive` |
 
 `cost:` is regression scope in the words testers already use — `minor` is
 contained and the mechanism exists, `major` reaches several surfaces, `expensive`

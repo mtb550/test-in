@@ -45,9 +45,6 @@ public final class ConflictResolution {
     private static final int REMOTE = 2;
     private static final int MINE = 3;
 
-    private record Pending(@NotNull String relativePath, @NotNull String name, @NotNull ObjectNode merged, @NotNull List<Merge.Question> questions, @NotNull List<String> settled, @NotNull String theirs) {
-    }
-
     // UC-SHARE-017
     public static void resolveRebase(final @NotNull Project p, final @NotNull Path repositoryPath, final @NotNull Runnable onFinished, final @NotNull Consumer<List<String>> onStuck) {
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);
@@ -88,17 +85,13 @@ public final class ConflictResolution {
         round(p, git, repositoryPath, stepNow, onFinished, onStuck);
     }
 
-    @FunctionalInterface
-    private interface Merger {
-        @NotNull Merge merge(@NotNull Mapper mapper, @NotNull String base, @NotNull String mine, @NotNull String theirs);
-    }
-
     // UC-SHARE-018, Rule-SHARE-080
     private static @NotNull Optional<Merger> mergerFor(final @NotNull String relativePath) {
         final @NotNull Path file = Path.of(relativePath);
 
         if (TestCaseMerge.isTestCase(relativePath)) return Optional.of(TestCaseMerge::of);
-        if (FileKind.of(file) == FileKind.RUN_ITEM) return Optional.of(RunItemMerge::of);
+        if (FileKind.of(file) == FileKind.RUN_ITEM)
+            return Optional.of((mapper, base, mine, theirs) -> RunItemMerge.of(mapper, mine, theirs));
         if (DirectoryType.byMarker(String.valueOf(file.getFileName())).filter(kind -> kind == DirectoryType.TR).isPresent()) {
             return Optional.of(RunMarkerMerge::of);
         }
@@ -210,5 +203,15 @@ public final class ConflictResolution {
         return Optional.ofNullable(path.getParent())
                 .map(folder -> String.valueOf(folder.getFileName()))
                 .orElseGet(() -> String.valueOf(path.getFileName()));
+    }
+
+    @FunctionalInterface
+    private interface Merger {
+        @NotNull Merge merge(@NotNull Mapper mapper, @NotNull String base, @NotNull String mine, @NotNull String theirs);
+    }
+
+    private record Pending(@NotNull String relativePath, @NotNull String name, @NotNull ObjectNode merged,
+                           @NotNull List<Merge.Question> questions, @NotNull List<String> settled,
+                           @NotNull String theirs) {
     }
 }

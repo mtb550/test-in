@@ -16,9 +16,9 @@
 
 package org.testin.testproject;
 
-import org.testin.model.DirectoryType;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.DirectoryType;
 import org.testin.model.ProjectStatus;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 // Rule-TREE-PANEL-106
-public final class BindTestProjectDialog extends AbstractFrameworkDialog<SelectionTable> {
+public final class BindTestProjectDialog extends AbstractFrameworkDialog {
     private final @NotNull SelectionTable projects;
     private final @NotNull Runnable onBound;
 

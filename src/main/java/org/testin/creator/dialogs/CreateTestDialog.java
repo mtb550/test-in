@@ -29,7 +29,9 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWithSelections<DirectoryType>> {
+public final class CreateTestDialog extends AbstractFrameworkDialog {
+    private final @NotNull TextFieldWithSelections<DirectoryType> nameAndType;
+
     private final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onCreate;
 
     // UC-TREE-PANEL-007, UC-TREE-PANEL-008, Rule-TREE-PANEL-024
@@ -39,13 +41,14 @@ public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWit
 
         title = Bundle.message("dialog.create.test.title");
 
-        components = List.of(
-                ComponentDialogBase.<DirectoryType>textFieldWithSelections()
-                        .icon(DirectoryType.TS.getIcon())
-                        .placeholder(Bundle.message("dialog.create.test.placeholder"))
-                        .selection(DirectoryType.TS.getIcon(), DirectoryType.TS.getDescription(), Bundle.message("dialog.create.test.hint.ts"), DirectoryType.TS)
-                        .selection(DirectoryType.TSP.getIcon(), DirectoryType.TSP.getDescription(), Bundle.message("dialog.create.test.hint.tsp"), DirectoryType.TSP)
-                        .build());
+        final @NotNull ComponentDialogBase<TextFieldWithSelections<DirectoryType>> built = ComponentDialogBase.<DirectoryType>textFieldWithSelections()
+                .icon(DirectoryType.TS.getIcon())
+                .placeholder(Bundle.message("dialog.create.test.placeholder"))
+                .selection(DirectoryType.TS.getIcon(), DirectoryType.TS.getDescription(), Bundle.message("dialog.create.test.hint.ts"), DirectoryType.TS)
+                .selection(DirectoryType.TSP.getIcon(), DirectoryType.TSP.getDescription(), Bundle.message("dialog.create.test.hint.tsp"), DirectoryType.TSP)
+                .build();
+        nameAndType = built.getComponent();
+        components = List.of(built);
 
         shortcuts = List.of(
                 StatusBarShortcut.confirm(this::submit),
@@ -57,9 +60,9 @@ public final class CreateTestDialog extends AbstractFrameworkDialog<TextFieldWit
     // UC-TREE-PANEL-007, UC-TREE-PANEL-008, Rule-TREE-PANEL-005, Rule-TREE-PANEL-095
     @Override
     protected void submit() {
-        final @NotNull DirectoryType type = component().getSelectedValue();
+        final @NotNull DirectoryType type = nameAndType.getSelectedValue();
 
-        final @NotNull String name = accepted(component(), value -> Refused.ofName(type, value));
+        final @NotNull String name = accepted(nameAndType, value -> Refused.ofName(type, value));
         if (name.isEmpty()) return;
 
         onCreate.accept(name, type);

@@ -17,46 +17,60 @@
 package org.testin.editor.grid;
 
 import com.intellij.ide.util.PropertiesComponent;
-import org.testin.editor.EditorKind;
-import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.components.JBList;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.WheelForwarding;
-import org.testin.ui.framework.RowStripe;
 import org.testin.editor.EditorColors;
+import org.testin.editor.EditorKind;
+import org.testin.editor.WheelForwarding;
 import org.testin.logger.Logger;
-import org.testin.testrun.RunEditorAttributes;
-import org.testin.testcase.TestEditorAttributes;
-import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.model.TestRunItems;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes.Can;
+import org.testin.testrun.RunEditorAttributes;
+import org.testin.ui.framework.RowStripe;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
-import javax.swing.event.TableColumnModelListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.TableColumnModelEvent;
-import javax.swing.event.ListSelectionEvent;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntPredicate;
 import java.util.function.ToIntFunction;
@@ -72,13 +86,13 @@ public class GridPanelBuilder {
 
     private static final @NotNull Border FIRST_CELL_BORDER = cellBorder(1);
     private static final @NotNull Border CELL_BORDER = cellBorder(0);
+    private static final int ORDER_COLUMN = 0;
 
     private static @NotNull Border cellBorder(final int leftPadding) {
         return BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(1, leftPadding, 0, 0),
                 BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR));
     }
-    private static final int ORDER_COLUMN = 0;
 
     // UC-SETTING-011, Rule-SETTING-039
     public static void resizeToFont(final @NotNull JBTable table) {
@@ -151,36 +165,6 @@ public class GridPanelBuilder {
                 maxHeight = Math.max(maxHeight, comp.getPreferredSize().height);
             }
             table.setRowHeight(r, maxHeight);
-        }
-    }
-
-    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    private static final class RowHeights {
-        private final @NotNull JBTable table;
-        private final @NotNull AtomicBoolean pending = new AtomicBoolean();
-
-        private int from = Integer.MAX_VALUE;
-        private int to = -1;
-
-        private void scheduleAll() {
-            schedule(0, Integer.MAX_VALUE);
-        }
-
-        private void schedule(final int firstRow, final int lastRow) {
-            from = Math.min(from, firstRow);
-            to = Math.max(to, lastRow);
-
-            if (!pending.compareAndSet(false, true)) return;
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-                final int first = from;
-                final int last = to;
-                from = Integer.MAX_VALUE;
-                to = -1;
-                pending.set(false);
-
-                updateRowHeights(table, first, last);
-            });
         }
     }
 
@@ -310,18 +294,18 @@ public class GridPanelBuilder {
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020
-    public @NotNull JBTable buildRunTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<RunEditorAttributes> attributes, final @NotNull Map<UUID, TestRunItems> resultsMap, final @NotNull ToIntFunction<TestCaseDto> position) {
+    public @NotNull JBTable buildRunTable(final @NotNull List<TestCaseDto> testCases, final @NotNull Set<RunEditorAttributes> attributes, final @NotNull Map<UUID, TestRunItems> resultsMap, final @NotNull ToIntFunction<TestCaseDto> position) {
         Logger.debug("[GridPanelBuilder] buildRunTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final @NotNull List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
 
-        final String @NotNull[] columns = buildColumns(ordered);
+        final String @NotNull [] columns = buildColumns(ordered);
         final @NotNull List<String[]> rows = new ArrayList<>();
 
         for (final TestCaseDto tc : testCases) {
             final @NotNull TestRunItems runItem = Optional.ofNullable(resultsMap.get(tc.getId()))
                     .orElseGet(() -> TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc)));
 
-            final String @NotNull[] row = new String[columns.length];
+            final String @NotNull [] row = new String[columns.length];
             final int rowNumber = position.applyAsInt(tc);
 
             for (int c = 0; c < ordered.size(); c++) {
@@ -329,7 +313,7 @@ public class GridPanelBuilder {
 
                 row[c] = attr == RunEditorAttributes.ORDER
                         ? String.valueOf(rowNumber)
-                        : attr.getRunValueExtractor().execute(runItem, p);
+                        : attr.getRunValueExtractor().apply(runItem);
             }
             rows.add(row);
         }
@@ -345,11 +329,11 @@ public class GridPanelBuilder {
         Logger.debug("[GridPanelBuilder] buildTestTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final @NotNull List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values()).toList();
 
-        final String @NotNull[] columns = buildColumns(ordered);
+        final String @NotNull [] columns = buildColumns(ordered);
         final @NotNull List<String[]> rows = new ArrayList<>();
 
         for (final TestCaseDto tc : testCases) {
-            final String @NotNull[] row = new String[columns.length];
+            final String @NotNull [] row = new String[columns.length];
             final int rowNumber = position.applyAsInt(tc);
 
             for (int c = 0; c < ordered.size(); c++) {
@@ -374,7 +358,7 @@ public class GridPanelBuilder {
             cm.removeColumn(cm.getColumn(cm.getColumnCount() - 1));
         }
 
-        final E @NotNull[] allValues = attributes.getEnumConstants();
+        final E @NotNull [] allValues = attributes.getEnumConstants();
         for (int i = 0; i < allValues.length; i++) {
             final @NotNull E attr = allValues[i];
             if (selected.contains(attr)) {
@@ -436,5 +420,35 @@ public class GridPanelBuilder {
 
     private String @NotNull [] buildColumns(final @NotNull List<? extends ToolBarAttribute> attributes) {
         return attributes.stream().map(ToolBarAttribute::getName).toArray(String[]::new);
+    }
+
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    private static final class RowHeights {
+        private final @NotNull JBTable table;
+        private final @NotNull AtomicBoolean pending = new AtomicBoolean();
+
+        private int from = Integer.MAX_VALUE;
+        private int to = -1;
+
+        private void scheduleAll() {
+            schedule(0, Integer.MAX_VALUE);
+        }
+
+        private void schedule(final int firstRow, final int lastRow) {
+            from = Math.min(from, firstRow);
+            to = Math.max(to, lastRow);
+
+            if (!pending.compareAndSet(false, true)) return;
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                final int first = from;
+                final int last = to;
+                from = Integer.MAX_VALUE;
+                to = -1;
+                pending.set(false);
+
+                updateRowHeights(table, first, last);
+            });
+        }
     }
 }

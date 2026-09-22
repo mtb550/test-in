@@ -27,5 +27,5 @@ asked twice.
 ## Acceptance criteria
 
 - [ ] The decision recorded here, and in `docs/decisions.md` if reversing it
-      would break something not obvious at the point of reversal.
+  would break something not obvious at the point of reversal.
 - [ ] Whatever the decision implies for the code or the documents, done.

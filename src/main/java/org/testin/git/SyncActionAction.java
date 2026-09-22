@@ -24,7 +24,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.util.FailureText;
 import org.testin.actions.TestinData;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.logger.Logger;
@@ -33,39 +32,15 @@ import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import javax.swing.tree.TreePath;
-import java.util.Optional;
 import java.nio.file.Path;
-import java.util.OptionalInt;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 public class SyncActionAction extends DumbAwareAction {
-    // UC-SHARE-016
-    @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
-        activeProjectPath(e).ifPresentOrElse(path -> new Work(p).syncRepository(path), () ->
-                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("git.sync.error.title"),
-                        Bundle.message("git.sync.no.project")));
-    }
-
-    // UC-SHARE-016
-    @Override
-    public void update(final @NotNull AnActionEvent e) {
-        // Rule-SHARE-105
-        if (!OptionalPlugin.GIT.enableOrExplain(this, e.getPresentation())) return;
-
-        e.getPresentation().setEnabled(TestinData.firstSelected(e, TestProjectDirectoryDto.class).isPresent());
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.EDT;
-    }
-
     private static @NotNull Optional<Path> activeProjectPath(final @NotNull AnActionEvent e) {
         return TestinData.tree(e).flatMap(SyncActionAction::activeProjectIn);
     }
@@ -86,9 +61,45 @@ public class SyncActionAction extends DumbAwareAction {
         return Optional.empty();
     }
 
+    // UC-SHARE-016
+    @Override
+    public void actionPerformed(final @NotNull AnActionEvent e) {
+        final @Nullable Project p = e.getProject();
+        if (p == null) return;
+
+        activeProjectPath(e).ifPresentOrElse(path -> new Work(p).syncRepository(path), () ->
+                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("git.sync.error.title"),
+                        Bundle.message("git.sync.no.project")));
+    }
+
+    // UC-SHARE-016
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        // Rule-SHARE-105
+        if (OptionalPlugin.GIT.grayedWithReason(this, e.getPresentation())) return;
+
+        e.getPresentation().setEnabled(TestinData.firstSelected(e, TestProjectDirectoryDto.class).isPresent());
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.EDT;
+    }
+
     private record Work(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits) {
         private Work(final @NotNull Project p) {
             this(p, new GitRepositoryService(p), new GitCommits(p));
+        }
+
+        // UC-SHARE-016, Rule-SHARE-070
+        private static @NotNull String pushedMessage(final @NotNull OptionalInt pushed) {
+            if (pushed.isEmpty()) return Bundle.message("git.synced.pushed.upstream");
+
+            if (pushed.getAsInt() == 0) return Bundle.message("git.synced.up.to.date");
+
+            return pushed.getAsInt() == 1
+                    ? Bundle.message("git.synced.pushed.one")
+                    : Bundle.message("git.synced.pushed.many", String.valueOf(pushed.getAsInt()));
         }
 
         // UC-SHARE-016, Rule-SHARE-069
@@ -170,7 +181,8 @@ public class SyncActionAction extends DumbAwareAction {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (!conflicting.isEmpty()) showConflictActions(repoPath, conflicting);
-                else Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), message);
+                else
+                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), message);
             });
         }
 
@@ -248,20 +260,8 @@ public class SyncActionAction extends DumbAwareAction {
         // UC-SHARE-016
         private void refreshAfterSync(final @NotNull Path repoPath, final @NotNull OptionalInt pushed) {
             RepositoryRefresh.after(p, repoPath);
-            ApplicationManager.getApplication().invokeLater(() -> {
-                Services.getInstance(p, Notifier.class).info(p, Bundle.message("git.synced.title"), pushedMessage(pushed));
-            });
-        }
-
-        // UC-SHARE-016, Rule-SHARE-070
-        private static @NotNull String pushedMessage(final @NotNull OptionalInt pushed) {
-            if (pushed.isEmpty()) return Bundle.message("git.synced.pushed.upstream");
-
-            if (pushed.getAsInt() == 0) return Bundle.message("git.synced.up.to.date");
-
-            return pushed.getAsInt() == 1
-                    ? Bundle.message("git.synced.pushed.one")
-                    : Bundle.message("git.synced.pushed.many", String.valueOf(pushed.getAsInt()));
+            ApplicationManager.getApplication().invokeLater(() ->
+                    Services.getInstance(p, Notifier.class).info(p, Bundle.message("git.synced.title"), pushedMessage(pushed)));
         }
 
         private void refreshRepository(final @NotNull Path repoPath) {

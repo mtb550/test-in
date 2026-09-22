@@ -24,15 +24,15 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.WheelForwarding;
-import org.testin.testrun.RunEditorAttributes;
 import org.testin.codegen.ExecutionPosition;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.editor.WheelForwarding;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.TestEditorAttributes;
+import org.testin.testrun.RunEditorAttributes;
+import org.testin.ui.FontSync;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
-import org.testin.ui.FontSync;
 import org.testin.view.details.components.ActionIcons;
 import org.testin.view.details.components.AttributeRow;
 import org.testin.view.details.components.BadgeRow;
@@ -45,10 +45,13 @@ import org.testin.view.details.components.StacktraceRow;
 import org.testin.view.details.components.Steps;
 import org.testin.view.details.components.Title;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Optional;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class DetailsTab {
@@ -57,6 +60,31 @@ public class DetailsTab {
     final int INSETS_DEFAULT = 5;
     final double WEIGHT_X = 1.0;
     final double SPACER_WEIGHT_Y = 1.0;
+
+    private static @NotNull Stream<BaseDetails> runRows(final @NotNull TestRunItems item, final @NotNull List<String> currentPath) {
+        return Stream.of(
+                new RunAttributeRow(RunEditorAttributes.RUN_STATUS, item),
+                new RunAttributeRow(RunEditorAttributes.DURATION, item),
+                new RunAttributeRow(RunEditorAttributes.ACTUAL_RESULT, item),
+                new StacktraceRow(item, currentPath),
+                new RunAttributeRow(RunEditorAttributes.BUG_SEVERITY, item),
+                new RunAttributeRow(RunEditorAttributes.BUG_PRIORITY, item),
+                new BugIssueRow(item, currentPath));
+    }
+
+    private static @NotNull Stream<BaseDetails> caseRows() {
+        return Stream.of(
+                new AttributeRow(TestEditorAttributes.EXPECTED_RESULT.getName(), (p, dto) -> TestEditorAttributes.EXPECTED_RESULT.displayValue(dto)),
+                new Steps(),
+                new AttributeRow(TestEditorAttributes.PRE_CONDITIONS.getName(), (p, dto) -> TestEditorAttributes.PRE_CONDITIONS.displayValue(dto)),
+                new AttributeRow(TestEditorAttributes.TEST_DATA.getName(), (p, dto) -> TestEditorAttributes.TEST_DATA.displayValue(dto)),
+                new AttributeRow(TestEditorAttributes.REFERENCE.getName(), (p, dto) -> TestEditorAttributes.REFERENCE.displayValue(dto)),
+                new AttributeRow(TestEditorAttributes.MODULE.getName(), (p, dto) -> TestEditorAttributes.MODULE.displayValue(dto)),
+                new AttributeRow(TestEditorAttributes.ORDER.getName(), (p, dto) -> String.valueOf(ExecutionPosition.of(p, dto))),
+                new AttributeRow(Bundle.message("details.created"), (p, dto) -> Display.whoAndWhen(dto.getCreatedBy(), dto.getCreatedAt())),
+                new AttributeRow(Bundle.message("details.updated"), (p, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt()))
+        );
+    }
 
     // UC-VIEW-PANEL-004
     public void load(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab, final @NotNull Optional<TestCaseDto> dto, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
@@ -122,31 +150,6 @@ public class DetailsTab {
                 runItem.stream().flatMap(item -> runRows(item, currentPath)),
                 caseRows()
         ).flatMap(rows -> rows).toList();
-    }
-
-    private static @NotNull Stream<BaseDetails> runRows(final @NotNull TestRunItems item, final @NotNull List<String> currentPath) {
-        return Stream.of(
-                new RunAttributeRow(RunEditorAttributes.RUN_STATUS, item),
-                new RunAttributeRow(RunEditorAttributes.DURATION, item),
-                new RunAttributeRow(RunEditorAttributes.ACTUAL_RESULT, item),
-                new StacktraceRow(item, currentPath),
-                new RunAttributeRow(RunEditorAttributes.BUG_SEVERITY, item),
-                new RunAttributeRow(RunEditorAttributes.BUG_PRIORITY, item),
-                new BugIssueRow(item, currentPath));
-    }
-
-    private static @NotNull Stream<BaseDetails> caseRows() {
-        return Stream.of(
-                new AttributeRow(TestEditorAttributes.EXPECTED_RESULT.getName(), (p, dto) -> TestEditorAttributes.EXPECTED_RESULT.displayValue(dto)),
-                new Steps(),
-                new AttributeRow(TestEditorAttributes.PRE_CONDITIONS.getName(), (p, dto) -> TestEditorAttributes.PRE_CONDITIONS.displayValue(dto)),
-                new AttributeRow(TestEditorAttributes.TEST_DATA.getName(), (p, dto) -> TestEditorAttributes.TEST_DATA.displayValue(dto)),
-                new AttributeRow(TestEditorAttributes.REFERENCE.getName(), (p, dto) -> TestEditorAttributes.REFERENCE.displayValue(dto)),
-                new AttributeRow(TestEditorAttributes.MODULE.getName(), (p, dto) -> TestEditorAttributes.MODULE.displayValue(dto)),
-                new AttributeRow(TestEditorAttributes.ORDER.getName(), (p, dto) -> String.valueOf(ExecutionPosition.of(p, dto))),
-                new AttributeRow(Bundle.message("details.created"), (p, dto) -> Display.whoAndWhen(dto.getCreatedBy(), dto.getCreatedAt())),
-                new AttributeRow(Bundle.message("details.updated"), (p, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt()))
-        );
     }
 
     private int setupFixedRows(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {

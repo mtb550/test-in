@@ -16,7 +16,6 @@
 
 package org.testin.editor.list;
 
-import org.testin.util.Bundle;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
@@ -35,8 +34,10 @@ import org.testin.editor.listeners.SelectionListener;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.ui.FontSync;
+import org.testin.util.Bundle;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ListSelectionModel;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;

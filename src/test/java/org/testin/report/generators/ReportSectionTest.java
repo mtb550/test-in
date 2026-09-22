@@ -17,8 +17,8 @@
 package org.testin.report.generators;
 
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
 import org.testin.model.TestRunSummary;
+import org.testin.model.TestStatus;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;

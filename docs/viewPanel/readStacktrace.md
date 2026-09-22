@@ -2,8 +2,8 @@
 
 # UC-VIEW-PANEL-006: Read the whole stacktrace of a failure
 
-**As a** tester, **I want** every line of the error behind a failure,
-**so that** I can paste it into a bug report without going to the log.
+**As a** tester, **I want** every line of the error behind a failure, **so that** I can paste it into a bug report
+without going to the log.
 
 The panel shows only the first three lines. This opens the rest in a window.
 
@@ -96,7 +96,8 @@ screenshot in a window of its own.
 5. The tester selects the text and copies it.
 6. The tester presses `Escape`. Nothing is saved.
 
-To look at a screenshot, the tester clicks its thumbnail instead. The screenshot opens in a window titled with its file name, at its real
+To look at a screenshot, the tester clicks its thumbnail instead. The screenshot opens in a window titled with its file
+name, at its real
 size, and scrolls when it is larger than the window. `Escape` closes it, and
 nothing is saved.
 

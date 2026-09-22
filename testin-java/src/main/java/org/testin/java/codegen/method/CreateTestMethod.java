@@ -16,18 +16,27 @@
 
 package org.testin.java.codegen.method;
 
-import org.testin.codegen.GenType;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementFactory;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiImportList;
+import com.intellij.psi.PsiJavaFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.ExecutionPosition;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
+import org.testin.codegen.GenType;
 import org.testin.codegen.JavaSourceRoot;
 import org.testin.java.codegen.GeneratedClass;
 import org.testin.java.codegen.GeneratedMethod;
@@ -39,7 +48,13 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.NameSanitizer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CreateTestMethod implements GenAction {
@@ -53,6 +68,47 @@ public class CreateTestMethod implements GenAction {
                 fqcn.subList(0, fqcn.size() - 2),
                 fqcn.get(fqcn.size() - 2),
                 fqcn.getLast()));
+    }
+
+    private static @NotNull String noMethodTitle(final @NotNull List<TestCaseDto> without) {
+        return without.size() == 1
+                ? Bundle.message("codegen.no.method.one")
+                : Bundle.message("codegen.no.method.many", String.valueOf(without.size()));
+    }
+
+    private static @NotNull String named(final @NotNull List<TestCaseDto> cases) {
+        final @NotNull String names = cases.stream().limit(3).map(TestCaseDto::getDescription).collect(Collectors.joining("\", \"", "\"", "\""));
+
+        return cases.size() > 3 ? Bundle.message("codegen.named.and.more", names, String.valueOf(cases.size() - 3)) : names;
+    }
+
+    private static boolean alreadyImportsTest(final @NotNull PsiImportList imports) {
+        return imports.findSingleClassImportStatement(TESTNG_TEST) != null;
+    }
+
+    private static @NotNull String testMethods(final int howMany) {
+        return howMany + " test method" + (howMany == 1 ? "" : "s");
+    }
+
+    // UC-CODEGEN-002, Rule-CODEGEN-014, Rule-CODEGEN-046
+    private static @NotNull String methodText(final @NotNull Project p, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
+        final @NotNull StringBuilder attributes = new StringBuilder();
+
+        if (!tc.getGroup().isEmpty()) {
+            final @NotNull List<String> quoted = tc.getGroup().stream().map(JavaLiteral::of).toList();
+
+            attributes.append(", groups = {").append(String.join(", ", quoted)).append("}");
+        }
+
+        attributes.append(", priority = ").append(ExecutionPosition.of(p, tc));
+
+        final @NotNull String annotation = String.format("@Test(description = %s, testName = \"%s\"%s)",
+                JavaLiteral.of(tc.getDescription()),
+                tc.getId(),
+                attributes);
+
+        return annotation + "\npublic void " + methodName + "() {\n    // TODO: Auto-generated test steps for "
+                + methodName + "\n}";
     }
 
     // UC-CODEGEN-002
@@ -135,7 +191,7 @@ public class CreateTestMethod implements GenAction {
                 continue;
             }
 
-            if (!NameSanitizer.canMakeMethodName(tc.getDescription())) {
+            if (NameSanitizer.cannotMakeMethodName(tc.getDescription())) {
                 cannotBeNamed.add(tc);
                 continue;
             }
@@ -152,8 +208,7 @@ public class CreateTestMethod implements GenAction {
                     GeneratedMethod.adopt(p, theTestersOwn.orElseThrow(), tc);
                     owners.put(key, id);
                     adopted++;
-                }
-                else lostTheName.add(tc);
+                } else lostTheName.add(tc);
                 continue;
             }
 
@@ -215,18 +270,6 @@ public class CreateTestMethod implements GenAction {
                 Bundle.message("codegen.name.taken.message", named(lost)));
     }
 
-    private static @NotNull String noMethodTitle(final @NotNull List<TestCaseDto> without) {
-        return without.size() == 1
-                ? Bundle.message("codegen.no.method.one")
-                : Bundle.message("codegen.no.method.many", String.valueOf(without.size()));
-    }
-
-    private static @NotNull String named(final @NotNull List<TestCaseDto> cases) {
-        final @NotNull String names = cases.stream().limit(3).map(TestCaseDto::getDescription).collect(Collectors.joining("\", \"", "\"", "\""));
-
-        return cases.size() > 3 ? Bundle.message("codegen.named.and.more", names, String.valueOf(cases.size() - 3)) : names;
-    }
-
     private void oneAtATime(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> cases, final @NotNull String reason) {
         Logger.warn("Writing " + cases.size() + " methods one at a time into "
                 + targetClass.getQualifiedName() + ": " + reason);
@@ -274,10 +317,6 @@ public class CreateTestMethod implements GenAction {
         }
     }
 
-    private static boolean alreadyImportsTest(final @NotNull PsiImportList imports) {
-        return imports.findSingleClassImportStatement(TESTNG_TEST) != null;
-    }
-
     // UC-CODEGEN-002
     private void addTestImport(final @NotNull Project p, final @NotNull PsiJavaFile javaFile, final @NotNull PsiElementFactory factory) {
         Optional.ofNullable(javaFile.getImportList())
@@ -285,31 +324,6 @@ public class CreateTestMethod implements GenAction {
                 .ifPresent(imports -> Optional
                         .ofNullable(JavaPsiFacade.getInstance(p).findClass(TESTNG_TEST, GlobalSearchScope.allScope(p)))
                         .ifPresent(testClass -> imports.add(factory.createImportStatement(testClass))));
-    }
-
-    private static @NotNull String testMethods(final int howMany) {
-        return howMany + " test method" + (howMany == 1 ? "" : "s");
-    }
-
-    // UC-CODEGEN-002, Rule-CODEGEN-014, Rule-CODEGEN-046
-    private static @NotNull String methodText(final @NotNull Project p, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
-        final @NotNull StringBuilder attributes = new StringBuilder();
-
-        if (!tc.getGroup().isEmpty()) {
-            final @NotNull List<String> quoted = tc.getGroup().stream().map(JavaLiteral::of).toList();
-
-            attributes.append(", groups = {").append(String.join(", ", quoted)).append("}");
-        }
-
-        attributes.append(", priority = ").append(ExecutionPosition.of(p, tc));
-
-        final @NotNull String annotation = String.format("@Test(description = %s, testName = \"%s\"%s)",
-                JavaLiteral.of(tc.getDescription()),
-                tc.getId(),
-                attributes);
-
-        return annotation + "\npublic void " + methodName + "() {\n    // TODO: Auto-generated test steps for "
-                + methodName + "\n}";
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-016
@@ -351,6 +365,7 @@ public class CreateTestMethod implements GenAction {
         }
     }
 
-    record Target(@NotNull String path, @NotNull List<String> packageList, @NotNull String className, @NotNull String methodName) {
+    record Target(@NotNull String path, @NotNull List<String> packageList, @NotNull String className,
+                  @NotNull String methodName) {
     }
 }

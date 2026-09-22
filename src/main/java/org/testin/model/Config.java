@@ -37,6 +37,7 @@ public final class Config {
     public static final @NotNull ZonedDateTime NOT_EXECUTED = Instant.EPOCH.atZone(ZoneOffset.UTC);
     @Getter
     private static final @NotNull DateTimeFormatter dateFormatterPattern = DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN, Locale.US);
+
     public static boolean isNotExecuted(final @NotNull ZonedDateTime at) {
         return at.toInstant().equals(NOT_EXECUTED.toInstant());
     }

@@ -47,8 +47,10 @@ public class BugTemplateTest {
                 .expectedResult("Backend should store the correct value as received from frontend.")
                 .steps(List.of("Activate the app from the frontend with version 11.3", "Read App_Version from the database"))
                 .testData("App_Version = 11.3")
-                .stacktrace("java.lang.AssertionError: expected [11.3] but found [11.300000190734863]\n"
-                        + "    at testProject.ActivateAppTest.version(ActivateAppTest.java:42)\n")
+                .stacktrace("""
+                        java.lang.AssertionError: expected [11.3] but found [11.300000190734863]
+                            at testProject.ActivateAppTest.version(ActivateAppTest.java:42)
+                        """)
                 .screenshots(List.of(SCREENSHOT))
                 .testRun("Sprint 7 Cycle 3")
                 .executed("Muteb · Sunday 13-09-2026 At 14:14:00 [Asia/Riyadh]")
@@ -84,38 +86,38 @@ public class BugTemplateTest {
                 | Severity | Priority | Platform | Environment | Build |
                 |:--|:--|:--|:--|:--|
                 | 🟡 Minor | ⚪ Low | Mobile · Backend | n\\a | n\\a |
-
+                
                 ### Actual result
                 backend does not store correct App_Version value in db after activate app.
-
+                
                 ### Expected result
                 Backend should store the correct value as received from frontend.
-
+                
                 ### Steps to reproduce
                 1. Activate the app from the frontend with version 11.3
                 2. Read App_Version from the database
-
+                
                 ### Test data
                 ```
                 App_Version = 11.3
                 ```
-
+                
                 ### Impact
                 n\\a
-
+                
                 ### Exception
                 <details>
                 <summary>java.lang.AssertionError: expected [11.3] but found [11.300000190734863]</summary>
-
+                
                 ```
                 java.lang.AssertionError: expected [11.3] but found [11.300000190734863]
                     at testProject.ActivateAppTest.version(ActivateAppTest.java:42)
                 ```
                 </details>
-
+                
                 ### Screenshots
                 ![Screenshot 1](./screenshot-1.png)
-
+                
                 ### Where it was found
                 | | |
                 |:--|:--|
@@ -124,7 +126,7 @@ public class BugTemplateTest {
                 | **Browser · Device · Language** | n\\a · Samsung · English |
                 | **Commit** | n\\a |
                 | **Test case** | [07f7e754](LINK) in test set ActivateApp |
-
+                
                 ---
                 <sub>#ActivateApp · Reported with Testin</sub>
                 """.replace("LINK", LINK);

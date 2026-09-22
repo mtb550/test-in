@@ -25,9 +25,9 @@ and after, what a gate reported. "It works" is not a measurement.
 
 - [ ] `./gradlew compileJava test` is green
 - [ ] `./gradlew inspect` run, if this touched nullability, annotations, or many
-      files at once
+  files at once
 - [ ] Run in a sandbox (`./gradlew runIde`), if a tester can see it — **a green
-      build is not evidence of a working plugin**
+  build is not evidence of a working plugin**
 - [ ] The documents changed in this same commit, if what a tester sees changed
 - [ ] Every rule cited in a code marker is one a document writes
 

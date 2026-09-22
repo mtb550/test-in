@@ -77,21 +77,6 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
 
     private Path root;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-run-results");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            deleteTree(root);
-        } finally {
-            super.tearDown();
-        }
-    }
-
     private static void deleteTree(final Path path) {
         if (path == null) return;
 
@@ -108,82 +93,8 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private ProjectIndexer indexer() {
-        return Services.getInstance(getProject(), ProjectIndexer.class);
-    }
-
-    /**
-     * A run the indexer holds, covering these cases, built the way Create Test
-     * Run builds one: the mapper makes the nodes, the indexer is told, and the
-     * run is put in through the one door that registers it.
-     */
-    private Path aRunCovering(final UUID... cases) {
-        final Path runPath = WriteAction.computeAndWait(() -> {
-            final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
-
-            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
-            indexer().addTestProject(tp);
-
-            final Path path = tp.getTestRunsDirectory().getPath().resolve("Cycle-1");
-            final TestRunDirectoryDto tr = mapper.setTestRunNode(getProject(), path, tp.getTestRunsDirectory());
-            indexer().addTestRunDir(tr);
-            return path;
-        });
-
-        final List<TestRunItems> results = new ArrayList<>();
-        for (final UUID testCaseId : cases) {
-            results.add(new TestRunItems().setId(testCaseId).setStatus(TestStatus.PASSED));
-        }
-
-        indexer().putTestRun(runPath, new TestRunDto().setResults(results));
-        return runPath;
-    }
-
     private static Path resultOf(final Path runPath, final UUID testCaseId) {
         return runPath.resolve(FileKind.RUN_ITEM.fileName(testCaseId));
-    }
-
-    /**
-     * Rule-INTERNAL-011, Rule-INTERNAL-012. One file per result, named by the
-     * case it is about - so recording a verdict writes one file, and two testers
-     * judging different cases of one cycle never touch the same file.
-     */
-    public void testEachCaseTheRunCoversGetsAFileOfItsOwn() {
-        final Path run = aRunCovering(JUDGED_CASE, UNTICKED_CASE);
-
-        awaitFile(resultOf(run, JUDGED_CASE), "the run's results never reached disk");
-        awaitFile(resultOf(run, UNTICKED_CASE), "a case the run covers has no result file");
-    }
-
-    /**
-     * UC-TREE-PANEL-022, Rule-INTERNAL-011.
-     * <p>
-     * Unticking a case in Edit Test Run removes that case's result, and only
-     * that one. The result a pull brought is not in the run the index holds, and
-     * that is not evidence anybody stopped covering it - the old sweep read it
-     * as unwanted and deleted a verdict recorded on another machine (#305).
-     */
-    public void testUntickingACaseRemovesItsResultAndLeavesEverythingElse() {
-        final Path run = aRunCovering(JUDGED_CASE, UNTICKED_CASE);
-        awaitFile(resultOf(run, UNTICKED_CASE), "the run's results never reached disk");
-
-        write(resultOf(run, PULLED_CASE), A_PULLED_RESULT);
-
-        indexer().changeRun(run, tr -> tr.setResults(new ArrayList<>(tr.getResults().stream()
-                .filter(item -> item.getId().equals(JUDGED_CASE))
-                .toList())));
-
-        await("the result of the case the tester unticked is still in the run's folder",
-                () -> !Files.exists(resultOf(run, UNTICKED_CASE)));
-
-        assertTrue("the result of a case the change kept went with the one it dropped",
-                Files.isRegularFile(resultOf(run, JUDGED_CASE)));
-
-        assertTrue("a result the run does not cover was swept away although nothing unticked it - which is how a"
-                        + " verdict a pull had just brought, or one whose own write failed, was lost",
-                Files.isRegularFile(resultOf(run, PULLED_CASE)));
-        assertEquals("and the verdict it carries was rewritten rather than left alone",
-                A_PULLED_RESULT, read(resultOf(run, PULLED_CASE)));
     }
 
     /**
@@ -219,12 +130,101 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private static void write(final Path file, final String content) {
+    private static void writePulledResult(final Path file) {
         try {
             Files.createDirectories(file.getParent());
-            Files.writeString(file, content);
+            Files.writeString(file, A_PULLED_RESULT);
         } catch (final IOException ex) {
             throw new AssertionError("could not put " + file.getFileName() + " in the run's folder", ex);
         }
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        root = Files.createTempDirectory("testin-run-results");
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        try {
+            deleteTree(root);
+        } finally {
+            super.tearDown();
+        }
+    }
+
+    private ProjectIndexer indexer() {
+        return Services.getInstance(getProject(), ProjectIndexer.class);
+    }
+
+    /**
+     * A run the indexer holds, covering the judged and the unticked case, built the way Create Test
+     * Run builds one: the mapper makes the nodes, the indexer is told, and the
+     * run is put in through the one door that registers it.
+     */
+    private Path aRun() {
+        final Path runPath = WriteAction.computeAndWait(() -> {
+            final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
+
+            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
+            indexer().addTestProject(tp);
+
+            final Path path = tp.getTestRunsDirectory().getPath().resolve("Cycle-1");
+            final TestRunDirectoryDto tr = mapper.setTestRunNode(getProject(), path, tp.getTestRunsDirectory());
+            indexer().addTestRunDir(tr);
+            return path;
+        });
+
+        final List<TestRunItems> results = new ArrayList<>();
+        for (final UUID testCaseId : List.of(JUDGED_CASE, UNTICKED_CASE)) {
+            results.add(new TestRunItems().setId(testCaseId).setStatus(TestStatus.PASSED));
+        }
+
+        indexer().putTestRun(runPath, new TestRunDto().setResults(results));
+        return runPath;
+    }
+
+    /**
+     * Rule-INTERNAL-011, Rule-INTERNAL-012. One file per result, named by the
+     * case it is about - so recording a verdict writes one file, and two testers
+     * judging different cases of one cycle never touch the same file.
+     */
+    public void testEachCaseTheRunCoversGetsAFileOfItsOwn() {
+        final Path run = aRun();
+
+        awaitFile(resultOf(run, JUDGED_CASE), "the run's results never reached disk");
+        awaitFile(resultOf(run, UNTICKED_CASE), "a case the run covers has no result file");
+    }
+
+    /**
+     * UC-TREE-PANEL-022, Rule-INTERNAL-011.
+     * <p>
+     * Unticking a case in Edit Test Run removes that case's result, and only
+     * that one. The result a pull brought is not in the run the index holds, and
+     * that is not evidence anybody stopped covering it - the old sweep read it
+     * as unwanted and deleted a verdict recorded on another machine (#305).
+     */
+    public void testUntickingACaseRemovesItsResultAndLeavesEverythingElse() {
+        final Path run = aRun();
+        awaitFile(resultOf(run, UNTICKED_CASE), "the run's results never reached disk");
+
+        writePulledResult(resultOf(run, PULLED_CASE));
+
+        indexer().changeRun(run, tr -> tr.setResults(new ArrayList<>(tr.getResults().stream()
+                .filter(item -> item.getId().equals(JUDGED_CASE))
+                .toList())));
+
+        await("the result of the case the tester unticked is still in the run's folder",
+                () -> !Files.exists(resultOf(run, UNTICKED_CASE)));
+
+        assertTrue("the result of a case the change kept went with the one it dropped",
+                Files.isRegularFile(resultOf(run, JUDGED_CASE)));
+
+        assertTrue("a result the run does not cover was swept away although nothing unticked it - which is how a"
+                        + " verdict a pull had just brought, or one whose own write failed, was lost",
+                Files.isRegularFile(resultOf(run, PULLED_CASE)));
+        assertEquals("and the verdict it carries was rewritten rather than left alone",
+                A_PULLED_RESULT, read(resultOf(run, PULLED_CASE)));
     }
 }

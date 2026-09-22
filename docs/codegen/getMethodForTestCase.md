@@ -2,8 +2,8 @@
 
 # UC-CODEGEN-002: Get a method when I create a test case
 
-**As a** tester, **I want** a test method to appear when I write a test case,
-**so that** I can fill in what it does and run it, without writing the
+**As a** tester, **I want** a test method to appear when I write a test case, **so that** I can fill in what it does and
+run it, without writing the
 declaration myself.
 
 A test case becomes a Java test method. The tester fills in what it does.

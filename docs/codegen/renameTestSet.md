@@ -2,8 +2,8 @@
 
 # UC-CODEGEN-015: Rename a test set
 
-**As a** tester, **I want** the Java class to be renamed with the test set,
-**so that** the class name still says what the test set is called.
+**As a** tester, **I want** the Java class to be renamed with the test set, **so that** the class name still says what
+the test set is called.
 
 Rename a test set, and Testin renames its Java class to match.
 

@@ -16,23 +16,25 @@
 
 package org.testin.lightmode;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.panels.HorizontalLayout;
 import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.ui.Badges;
-import org.testin.ui.framework.Prose;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestEditorAttributes;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.ui.Badges;
+import org.testin.ui.framework.Prose;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JTextArea;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,17 +43,14 @@ class CaseDetails extends JBPanel<CaseDetails> {
 
     private @NotNull Optional<TestCaseDto> shown = Optional.empty();
 
-    private final @NotNull Project p;
-
     private float zoom = 1.0f;
 
     private boolean cutOff = false;
 
-    CaseDetails(final @NotNull Project p) {
+    CaseDetails() {
         super(new GridBagLayout());
         setOpaque(false);
 
-        this.p = p;
     }
 
     void show(final @NotNull TestCaseDto tc) {

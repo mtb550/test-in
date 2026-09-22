@@ -25,14 +25,13 @@ import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Rank {
+    public static final @NotNull String MIDDLE = "m";
     private static final char FIRST = 'a';
     private static final char LAST = 'z';
-
     private static final char BELOW_FIRST = FIRST - 1;
-
     private static final char ABOVE_LAST = LAST + 1;
-
-    public static final @NotNull String MIDDLE = "m";
+    private static final char SPREAD_FIRST = 'b';
+    private static final int SPREAD_DIGITS = LAST - SPREAD_FIRST + 1;
 
     public static @NotNull String between(final @NotNull String before, final @NotNull String after) {
         if (after.isEmpty()) return after(before);
@@ -51,9 +50,6 @@ public final class Rank {
 
         return last + MIDDLE;
     }
-
-    private static final char SPREAD_FIRST = 'b';
-    private static final int SPREAD_DIGITS = LAST - SPREAD_FIRST + 1;
 
     public static @NotNull List<String> spread(final int count) {
         if (count <= 0) return List.of();

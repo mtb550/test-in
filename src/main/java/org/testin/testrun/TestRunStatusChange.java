@@ -24,12 +24,18 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditors;
 import org.testin.editor.run.RunEditor;
 import org.testin.explorer.TreePanel;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.model.TestRunItems;
 import org.testin.model.TestRunStatus;
+import org.testin.model.TestStatus;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.setting.AppSettingsState;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 @Service(Service.Level.PROJECT)
@@ -54,10 +60,37 @@ public final class TestRunStatusChange {
     }
 
     private void persist(final @NotNull TestRunDirectoryDto run, final @NotNull Optional<RunEditor> open) {
-        final @NotNull RunStatusService statusService = Services.getInstance(p, RunStatusService.class);
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestRunStatus status = run.getMarker().getStatus();
+        final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
 
-        statusService.persistMarker(p, run.getPath(), run.getMarker().getStatus());
-        open.ifPresent(editor -> statusService.persistRun(p, editor));
+        if (status.isTerminal()) finish(run.getPath());
+
+        indexer.changeRunMarker(run.getPath(), marker -> {
+            marker.setStatus(status);
+            marker.touch(tester);
+        });
+
+        if (open.isPresent()) indexer.saveRun(run.getPath());
+    }
+
+    private void finish(final @NotNull Path runPath) {
+        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+
+        indexer.changeRun(runPath, run -> {
+            int closed = 0;
+            for (final TestRunItems item : run.getResults()) {
+                if (item.shownStatus() == TestStatus.PENDING) {
+                    item.setStatus(TestStatus.UNTESTED);
+                    closed++;
+                }
+            }
+
+            if (closed > 0)
+                Logger.info("Run finished with " + closed + " case(s) not executed; marked untested: " + runPath);
+        });
+
+        indexer.changeRunMarker(runPath, TestRunMarker::markExecutionEnded);
     }
 
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-091

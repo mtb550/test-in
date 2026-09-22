@@ -1,5 +1,5 @@
-import org.gradle.api.tasks.PathSensitivity
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 
@@ -20,7 +20,7 @@ version = "2.12.0-alpha"
  * untilBuild - and is the end the JetBrains Marketplace checks. Move it when a
  * new branch ships, or the sweep goes back to verifying only the past.
  */
-val NEXT_BRANCH = "2026.2.1"
+val nextBranch = "2026.2.1"
 
 repositories {
     mavenCentral()
@@ -58,7 +58,7 @@ dependencies {
         //
         // Packaged, not compiled against: the core calls the extension points it
         // declares itself and never names a class in the module. Wrapping this
-        // in implementation(..) would put the module on the core's compile
+        // in implementation() would put the module on the core's compile
         // classpath and make the two projects depend on each other, since the
         // module compiles against the core.
         pluginModule(project(":testin-java"))
@@ -147,15 +147,19 @@ intellijPlatform {
             // compiles against hid a real defect: the Marketplace reported a
             // renderer scheduled for removal in 262 that our own sweep, running
             // against 261, could not see.
-            listOf(IntelliJPlatformType.IntellijIdea, IntelliJPlatformType.PyCharm, IntelliJPlatformType.Rider).forEach { ide ->
+            listOf(
+                IntelliJPlatformType.IntellijIdea,
+                IntelliJPlatformType.PyCharm,
+                IntelliJPlatformType.Rider
+            ).forEach { ide ->
                 create(ide, providers.gradleProperty("intellij.version"))
-                create(ide, NEXT_BRANCH)
+                create(ide, nextBranch)
             }
 
             if (providers.gradleProperty("verifyAllIdes").isPresent) {
                 listOf(IntelliJPlatformType.GoLand, IntelliJPlatformType.WebStorm).forEach { ide ->
                     create(ide, providers.gradleProperty("intellij.version"))
-                    create(ide, NEXT_BRANCH)
+                    create(ide, nextBranch)
                 }
             }
         }
@@ -171,13 +175,14 @@ intellijPlatform {
         // plugin makes no internal call and the level goes back on (#140).
         //
         // EXPERIMENTAL_API_USAGES is the one level deliberately left off, for
-        // three usages that have no stable equivalent at all:
+        // two usages that have no stable equivalent at all:
         //
         //   - EditorTabColorProvider.getEditorTabForegroundColor, overridden to
         //     color a Testin tab's title. The stable half of that interface
         //     colors the background, which is left to the user's File Colors.
-        //   - WriteIntentReadAction.run, twice, taking the lock the action system
-        //     itself takes before dispatching - a Swing click arrives without it.
+        //   - WriteIntentReadAction.run, once, in light mode's failure form: its
+        //     spell-checked field is an editor, and building one needs the lock
+        //     the action system itself takes before dispatching.
         //
         // Each fails to compile if the platform drops it, which is the warning
         // that matters. Turning this level on would fail the build for three
@@ -272,7 +277,7 @@ tasks {
         // The indexer's parsing budget runs alone: ./gradlew test -Pbudget.
         //
         // It measures time, and a machine that is also compiling or running a
-        // second build is slower - on a developer's machine it failed with no
+        // second build is slower. On a developer's machine it failed with no
         // code change and passed on the next run, which teaches everybody to
         // re-run rather than read (#66, finding 108). CI runs it as its own
         // step, on a runner doing nothing else.
@@ -292,7 +297,7 @@ intellijPlatformTesting {
      * The tests that need a running IDE (#108).
      *
      * An indexer operation, an undo across two test sets and a card that asks a
-     * project service what is running cannot be checked without one - and three
+     * project service what is running cannot be checked without one. Three
      * separate pieces of work wanted this in a single session, which is what
      * settled it.
      *
@@ -310,87 +315,6 @@ intellijPlatformTesting {
         register("runPyCharm") {
             type = IntelliJPlatformType.PyCharm
             version = "2026.1.3"
-            task {
-                jvmArgs("--sun-misc-unsafe-memory-access=allow")
-
-                val sandboxes = layout.projectDirectory.dir(".sandbox/Testin").asFile
-                val committedSample = layout.projectDirectory.dir("samples").asFile
-                val workingSample = layout.projectDirectory.dir(".sandbox/sample").asFile
-                val sampleRoot = workingSample.resolve("testin-root").absolutePath
-                val sampleProject = workingSample.resolve("automation").absolutePath
-
-                doFirst {
-                    // The sandbox opens a COPY of the sample, never the committed one. Opening
-                    // the committed sample is a write to this repository: the plugin binds a
-                    // project to the root it runs under, so a sandbox aimed at anyone's own test
-                    // data resolves nothing for `testinProject: Demo` and rebinds it - writing
-                    // that root's project name straight back into a committed file. It happened
-                    // twice; SampleProjectTest is what caught it.
-                    //
-                    // Copied once and then left alone, so runs created while testing survive to
-                    // the next launch. Deleting .sandbox/sample is how to get the sample back.
-                    if (!workingSample.exists()) {
-                        committedSample.copyRecursively(workingSample)
-
-                        // Everything in the sample's .idea is the IDE's rather than the
-                        // sample's - .gitignore says exactly that - but only vcs.xml is
-                        // written relative to where the project sits. It maps
-                        // $PROJECT_DIR$/../.. to a Git root, which is this repository from
-                        // samples/automation and is .sandbox from the copy, where there is
-                        // no repository and the IDE reports an invalid VCS root on every
-                        // launch. The rest of .idea is path-independent and is kept, so the
-                        // copy opens as an imported Maven project rather than re-importing.
-                        workingSample.walkTopDown()
-                            .filter { it.name == "vcs.xml" && it.parentFile.name == ".idea" }
-                            .toList()
-                            .forEach { it.delete() }
-                        println("Copied the sample into the sandbox, so the committed one stays clean: " + workingSample)
-                    }
-
-                    // Inlined rather than shared with the other run task: the configuration
-                    // cache cannot serialize a reference to a script-level function, so a
-                    // helper here fails the build with "cannot serialize Gradle script object
-                    // references". The duplication is what the cache costs.
-                    //
-                    // The sandbox directory is found rather than composed: the one under
-                    // .sandbox/Testin is named by the platform plugin from the IDE it
-                    // downloaded, so writing that name out would be a second place to update
-                    // on every version bump. prepareSandbox has run by now, so it exists. The
-                    // config directory, though, carries this task's own suffix and is passed
-                    // in - a custom run task gets config_<taskName>, not config.
-                    sandboxes.listFiles().orEmpty()
-                        .filter { it.resolve("config_runPyCharm").isDirectory }
-                        .forEach { sandbox ->
-                            val options = sandbox.resolve("config_runPyCharm/options")
-                            val settings = options.resolve("testinSettings.xml")
-
-                            // Only a fresh sandbox is pointed at the sample data. One somebody
-                            // has aimed at their own test root keeps it, and opens the sample
-                            // copy against it - which rebinds the copy and harms nothing.
-                            if (!settings.exists()) {
-                                options.mkdirs()
-                                settings.writeText(
-                                    """
-                                    <application>
-                                      <component name="testin.settings.AppSettingsState">
-                                        <option name="rootTestinPath" value="$sampleRoot" />
-                                        <option name="logLevel" value="DEBUG" />
-                                        <option name="testerName" value="Testin Sample" />
-                                        <option name="testerRole" value="QA Engineer" />
-                                      </component>
-                                    </application>
-                                    """.trimIndent()
-                                )
-                                println("Pointed a fresh sandbox at the sample data: " + sandbox.name)
-                            }
-
-                            // Every run, not only the first: the IDE reopens its last project on
-                            // its own, and the argument is what makes that the sample copy rather
-                            // than whatever was open before - the committed sample included.
-                            args(sampleProject)
-                        }
-                }
-            }
         }
     }
 }
@@ -416,9 +340,9 @@ tasks.named<Test>("ideTest") {
     testClassesDirs = sourceSets["test"].output.classesDirs
 
     // Three things, and the middle one is the trap. The test classes and their
-    // own dependencies come from the test source set; the platform's test
+    // own dependencies come from the test source set. The platform's test
     // framework - BasePlatformTestCase itself - is in a configuration of the
-    // plugin's own, and without it the scanner cannot resolve the superclass and
+    // plugin's own. Without it the scanner cannot resolve the superclass and
     // skips every IDE test in silence, reporting that it found none.
     classpath += sourceSets["test"].runtimeClasspath
     classpath += configurations["intellijPlatformTestClasspath"]
@@ -433,12 +357,12 @@ configurations.all {
     }
 }
 
-tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
+tasks.named<RunIdeTask>("runIde") {
     jvmArgs("--sun-misc-unsafe-memory-access=allow")
 
-    // ./gradlew runIde -Ptestin.language=fr
+    // ./gradlew runIde -Ptestin.language=hi
     //
-    // The only way to see Testin's French or Hindi bundle. Bundle extends
+    // The only way to see Testin's Hindi or French bundle. Bundle extends
     // DynamicBundle, which takes its locale from the IDE's language setting, and
     // JetBrains ships localization plugins for Chinese, Japanese and Korean only
     // - so Settings has no entry to pick. DynamicBundle falls back to the JVM's
@@ -454,7 +378,7 @@ tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
 
     doFirst {
         // The sandbox opens a COPY of the sample, never the committed one. Opening
-        // the committed sample is a write to this repository: the plugin binds a
+        // the committed sample writes to this repository: the plugin binds a
         // project to the root it runs under, so a sandbox aimed at anyone's own test
         // data resolves nothing for `testinProject: Demo` and rebinds it - writing
         // that root's project name straight back into a committed file. It happened
@@ -477,7 +401,7 @@ tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
                 .filter { it.name == "vcs.xml" && it.parentFile.name == ".idea" }
                 .toList()
                 .forEach { it.delete() }
-            println("Copied the sample into the sandbox, so the committed one stays clean: " + workingSample)
+            println("Copied the sample into the sandbox, so the committed one stays clean: $workingSample")
         }
 
         // Inlined rather than shared with the other run task: the configuration
@@ -514,7 +438,89 @@ tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
                         </application>
                         """.trimIndent()
                     )
-                    println("Pointed a fresh sandbox at the sample data: " + sandbox.name)
+                    println("Pointed a fresh sandbox at the sample data: ${sandbox.name}")
+                }
+
+                // Every run, not only the first: the IDE reopens its last project on
+                // its own, and the argument is what makes that the sample copy rather
+                // than whatever was open before - the committed sample included.
+                args(sampleProject)
+            }
+    }
+}
+
+tasks.named<RunIdeTask>("runPyCharm") {
+    jvmArgs("--sun-misc-unsafe-memory-access=allow")
+
+    val sandboxes = layout.projectDirectory.dir(".sandbox/Testin").asFile
+    val committedSample = layout.projectDirectory.dir("samples").asFile
+    val workingSample = layout.projectDirectory.dir(".sandbox/sample").asFile
+    val sampleRoot = workingSample.resolve("testin-root").absolutePath
+    val sampleProject = workingSample.resolve("automation").absolutePath
+
+    doFirst {
+        // The sandbox opens a COPY of the sample, never the committed one. Opening
+        // the committed sample writes to this repository: the plugin binds a
+        // project to the root it runs under, so a sandbox aimed at anyone's own test
+        // data resolves nothing for `testinProject: Demo` and rebinds it - writing
+        // that root's project name straight back into a committed file. It happened
+        // twice; SampleProjectTest is what caught it.
+        //
+        // Copied once and then left alone, so runs created while testing survive to
+        // the next launch. Deleting .sandbox/sample is how to get the sample back.
+        if (!workingSample.exists()) {
+            committedSample.copyRecursively(workingSample)
+
+            // Everything in the sample's .idea is the IDE's rather than the
+            // sample's - .gitignore says exactly that - but only vcs.xml is
+            // written relative to where the project sits. It maps
+            // $PROJECT_DIR$/../.. to a Git root, which is this repository from
+            // samples/automation and is .sandbox from the copy, where there is
+            // no repository and the IDE reports an invalid VCS root on every
+            // launch. The rest of .idea is path-independent and is kept, so the
+            // copy opens as an imported Maven project rather than re-importing.
+            workingSample.walkTopDown()
+                .filter { it.name == "vcs.xml" && it.parentFile.name == ".idea" }
+                .toList()
+                .forEach { it.delete() }
+            println("Copied the sample into the sandbox, so the committed one stays clean: $workingSample")
+        }
+
+        // Inlined rather than shared with the other run task: the configuration
+        // cache cannot serialize a reference to a script-level function, so a
+        // helper here fails the build with "cannot serialize Gradle script object
+        // references". The duplication is what the cache costs.
+        //
+        // The sandbox directory is found rather than composed: the one under
+        // .sandbox/Testin is named by the platform plugin from the IDE it
+        // downloaded, so writing that name out would be a second place to update
+        // on every version bump. prepareSandbox has run by now, so it exists. The
+        // config directory, though, carries this task's own suffix and is passed
+        // in - a custom run task gets config_<taskName>, not config.
+        sandboxes.listFiles().orEmpty()
+            .filter { it.resolve("config_runPyCharm").isDirectory }
+            .forEach { sandbox ->
+                val options = sandbox.resolve("config_runPyCharm/options")
+                val settings = options.resolve("testinSettings.xml")
+
+                // Only a fresh sandbox is pointed at the sample data. One somebody
+                // has aimed at their own test root keeps it, and opens the sample
+                // copy against it - which rebinds the copy and harms nothing.
+                if (!settings.exists()) {
+                    options.mkdirs()
+                    settings.writeText(
+                        """
+                        <application>
+                          <component name="testin.settings.AppSettingsState">
+                            <option name="rootTestinPath" value="$sampleRoot" />
+                            <option name="logLevel" value="DEBUG" />
+                            <option name="testerName" value="Testin Sample" />
+                            <option name="testerRole" value="QA Engineer" />
+                          </component>
+                        </application>
+                        """.trimIndent()
+                    )
+                    println("Pointed a fresh sandbox at the sample data: ${sandbox.name}")
                 }
 
                 // Every run, not only the first: the IDE reopens its last project on
@@ -531,7 +537,7 @@ tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
  *
  * CLAUDE.md has said so in prose since the beginning, and nothing checked it. It
  * holds today because Gradle's jar takes the main output and nothing has asked it
- * for more - a default, not a decision. A sourceSets edit, a from(..) added to
+ * for more - a default, not a decision. A sourceSets edit, a from() added to
  * bundle a fixture, or a dependency moved off compileOnly would all change it
  * without a word, and the artifact is public and downloaded rather than reviewed.
  *
@@ -622,7 +628,7 @@ tasks.register("verifyDistribution") {
  */
 tasks.register<Exec>("inspect") {
     group = "verification"
-    description = "Runs the IntelliJ inspections over src/main and writes .inspection/ (needs pwsh)"
+    description = "Runs the IntelliJ inspections over the Inspected scope and writes .inspection/ (needs pwsh)"
 
     commandLine("pwsh", "-NoProfile", "-File", file("tools/inspect.ps1").absolutePath)
 

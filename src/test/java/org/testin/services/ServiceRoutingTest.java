@@ -16,11 +16,11 @@
 
 package org.testin.services;
 
+import org.testin.editor.TestinEditors;
 import org.testin.indexer.OwnWrites;
 import org.testin.indexer.Rescan;
 import org.testin.logger.LogWriter;
 import org.testin.setting.AppSettingsState;
-import org.testin.editor.TestinEditors;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -92,13 +92,13 @@ public class ServiceRoutingTest {
         final boolean first = Services.isApplicationLevel(AppSettingsState.class);
         final boolean cached = Services.isApplicationLevel(AppSettingsState.class);
 
-        assertTrue(first, "the settings are the application's on the first ask");
         assertEquals(cached, first, "the cache answered differently the second time");
+        assertTrue(first, "the settings are the application's on the first ask");
 
         final boolean firstProject = Services.isApplicationLevel(TestinEditors.class);
         final boolean cachedProject = Services.isApplicationLevel(TestinEditors.class);
 
-        assertFalse(firstProject, "a project service stays with its project");
         assertEquals(cachedProject, firstProject, "the cache answered differently the second time");
+        assertFalse(firstProject, "a project service stays with its project");
     }
 }

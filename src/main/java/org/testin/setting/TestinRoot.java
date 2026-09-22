@@ -30,9 +30,8 @@ import java.util.Objects;
 @Service(Service.Level.PROJECT)
 @AllArgsConstructor
 public final class TestinRoot {
-    private final @NotNull Project p;
-
     public static final @NotNull Path NONE = Path.of("");
+    private final @NotNull Project p;
 
     // UC-SETTING-002, Rule-SETTING-011
     public static @NotNull Path normalize(final @Nullable String rawPath) {

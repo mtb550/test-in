@@ -20,11 +20,11 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
-import org.testin.util.Bundle;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
+import org.testin.util.Bundle;
 
-import javax.swing.*;
+import javax.swing.Icon;
 import java.util.function.Consumer;
 
 abstract class AbstractTreeAction extends DumbAwareAction {

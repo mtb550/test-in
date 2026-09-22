@@ -16,6 +16,7 @@
 
 package org.testin.report.generators;
 
+import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFFooter;
 import org.apache.poi.xwpf.usermodel.XWPFHyperlinkRun;
@@ -23,7 +24,6 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
-import org.apache.poi.wp.usermodel.HeaderFooterType;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

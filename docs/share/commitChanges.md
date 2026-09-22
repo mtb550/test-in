@@ -2,8 +2,7 @@
 
 # UC-SHARE-012: Commit without pushing
 
-**As a** tester, **I want** to record my work locally,
-**so that** I can decide about the team's copy later.
+**As a** tester, **I want** to record my work locally, **so that** I can decide about the team's copy later.
 
 A commit records the work in Git on this machine. Nothing is sent to the team
 until it is pushed.

@@ -18,12 +18,12 @@ package org.testin.util;
 
 import org.testng.annotations.Test;
 
+import javax.lang.model.SourceVersion;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
-
-import javax.lang.model.SourceVersion;
 
 /**
  * The two things a generated name has to promise (#250).

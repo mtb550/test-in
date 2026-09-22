@@ -71,11 +71,11 @@ and the test run is marked completed.
 
 ## What is kept from before
 
-| Kept | Written again |
-|---|---|
-| Every verdict already recorded | When execution ended |
+| Kept                                   | Written again                     |
+|----------------------------------------|-----------------------------------|
+| Every verdict already recorded         | When execution ended              |
 | How long each test case took, added to | The verdicts recorded from now on |
-| When execution began | |
+| When execution began                   |                                   |
 
 ---
 

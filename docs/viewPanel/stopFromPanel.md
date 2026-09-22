@@ -2,8 +2,7 @@
 
 # UC-VIEW-PANEL-013: Stop a test case from the panel
 
-**As a** tester, **I want** to stop a test case that is running,
-**so that** I can change something and start it again.
+**As a** tester, **I want** to stop a test case that is running, **so that** I can change something and start it again.
 
 While a test case runs, the run button becomes a stop button.
 

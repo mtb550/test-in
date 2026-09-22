@@ -16,7 +16,6 @@
 
 package org.testin.testrun;
 
-import org.testin.actions.GrayWithReason;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -25,25 +24,25 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
+import org.testin.editor.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunConfiguration;
-import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.rename.NodeRename;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.ui.framework.SelectionTree;
-import org.testin.services.BackgroundWork;
-import org.testin.editor.TestinEditors;
+import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 
 import javax.swing.tree.TreePath;
@@ -53,11 +52,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Predicate;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 public class EditTestRunAction extends DumbAwareAction {
+    private static @NotNull Optional<TestRunDirectoryDto> selectedRun(final @NotNull Optional<DirectoryDto> dir) {
+        return dir.filter(TestRunDirectoryDto.class::isInstance)
+                .map(TestRunDirectoryDto.class::cast)
+                .filter(TestRunDirectoryDto::isStillOpen);
+    }
+
     // UC-TREE-PANEL-022
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -80,34 +84,25 @@ public class EditTestRunAction extends DumbAwareAction {
         return ActionUpdateThread.EDT;
     }
 
-    private static @NotNull Optional<TestRunDirectoryDto> selectedRun(final @NotNull Optional<DirectoryDto> dir) {
-        return dir.filter(TestRunDirectoryDto.class::isInstance)
-                .map(TestRunDirectoryDto.class::cast)
-                .filter(TestRunDirectoryDto::isStillOpen);
-    }
-
     private record Work(@NotNull Project p) {
         private void editAt(final @NotNull TreePath path) {
-            selectedRun(TreeValues.directoryAt(path))
-                    .ifPresent(run -> TreeValues.directoryAt(path.getParentPath())
-                            .ifPresent(parent -> edit(run, parent)));
+            selectedRun(TreeValues.directoryAt(path)).ifPresent(this::edit);
         }
 
-        private void edit(final @NotNull TestRunDirectoryDto run, final @NotNull DirectoryDto parent) {
-            final @NotNull TestRunDto current = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(run.getPath());
-            final @NotNull Set<UUID> covered = current.getResults().stream().map(TestRunItems::getId).collect(Collectors.toSet());
+        private void edit(final @NotNull TestRunDirectoryDto run) {
+            final @NotNull Set<UUID> covered = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(run.getPath()).coveredIds();
 
             Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
-                    tp -> new RunForm(p).open(tp.getTestCasesDirectory(), run.getName(), covered, run.getMarker().getConfiguration(), saves(run, parent)),
+                    tp -> new RunForm(p).open(tp.getTestCasesDirectory(), run.getName(), covered, run.getMarker().getConfiguration(), saves(run)),
                     () -> Logger.warn("Edit test run: no test project is bound to " + p.getName()));
         }
 
-        private @NotNull RunFormAction saves(final @NotNull TestRunDirectoryDto run, final @NotNull DirectoryDto parent) {
-            return new RunFormAction(Bundle.message("run.edit.title"), StatusBarShortcut.SAVE, (form, selection) -> save(run, parent, form, selection));
+        private @NotNull RunFormAction saves(final @NotNull TestRunDirectoryDto run) {
+            return new RunFormAction(Bundle.message("run.edit.title"), StatusBarShortcut.SAVE, (form, selection) -> save(run, form, selection));
         }
 
         // UC-TREE-PANEL-022, Rule-TREE-PANEL-074, Rule-TREE-PANEL-076
-        private boolean save(final @NotNull TestRunDirectoryDto run, final @NotNull DirectoryDto parent, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection) {
+        private boolean save(final @NotNull TestRunDirectoryDto run, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection) {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
@@ -136,7 +131,7 @@ public class EditTestRunAction extends DumbAwareAction {
             applyEdit(run, name, runPath -> {
                 indexer.changeRun(runPath, held -> held.setResults(held.coverOnly(wanted(held, checked, offered::contains)).getResults()));
                 indexer.changeRunMarker(runPath, marker -> marker.setConfiguration(configuration));
-            }, () -> Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED));
+            }, () -> notifier.softShow(p, Done.UPDATED));
 
             return true;
         }
@@ -144,8 +139,7 @@ public class EditTestRunAction extends DumbAwareAction {
         // UC-TREE-PANEL-022, Rule-TREE-PANEL-076
         private @NotNull Set<UUID> wanted(final @NotNull TestRunDto from, final @NotNull Set<UUID> checked, final @NotNull Predicate<UUID> couldBeTicked) {
             final @NotNull Set<UUID> wanted = new LinkedHashSet<>(checked);
-            from.getResults().stream()
-                    .map(TestRunItems::getId)
+            from.coveredIds().stream()
                     .filter(couldBeTicked.negate())
                     .forEach(wanted::add);
             return wanted;

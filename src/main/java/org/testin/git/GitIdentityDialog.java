@@ -29,7 +29,7 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.function.Consumer;
 
-final class GitIdentityDialog extends AbstractFrameworkDialog<TextInput> {
+final class GitIdentityDialog extends AbstractFrameworkDialog {
     private final @NotNull TextInput nameField;
     private final @NotNull TextInput emailField;
     private final @NotNull RadioSelection<Boolean> scope;

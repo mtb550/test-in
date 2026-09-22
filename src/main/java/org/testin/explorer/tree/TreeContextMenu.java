@@ -16,19 +16,18 @@
 
 package org.testin.explorer.tree;
 
-import org.testin.ui.ActionsMenu;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
-import org.testin.actions.Declared;
 import org.jetbrains.annotations.NotNull;
-
+import org.testin.actions.Declared;
 import org.testin.actions.EscapeAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.report.GenerateReportAction;
 import org.testin.testrun.SetTestRunStatusAction;
+import org.testin.ui.ActionsMenu;
 import org.testin.undo.UndoAction;
 import org.testin.undo.UndoDirection;
 import org.testin.undo.UndoScope;
@@ -48,16 +47,16 @@ public class TreeContextMenu extends DefaultActionGroup {
         addSeparator();
 
         add(actionsSubMenu(List.of(
-                        Declared.forMenu("Testin.UpdateStatus")), List.of(
-                        new UndoAction(p, tree, UndoScope.TREE, UndoDirection.UNDO),
-                        new UndoAction(p, tree, UndoScope.TREE, UndoDirection.REDO),
-                        Declared.forMenu("Testin.ReCreateTestRun"),
-                        Declared.forMenu("Testin.RemoveNode"),
-                        Declared.forMenu("Testin.Rename"),
-                        Declared.forMenu("Testin.OrderNode"),
-                        Declared.forMenu("Testin.CopyNode"),
-                        Declared.forMenu("Testin.CutNode"),
-                        Declared.forMenu("Testin.PasteNode"))));
+                Declared.forMenu("Testin.UpdateStatus")), List.of(
+                new UndoAction(p, tree, UndoScope.TREE, UndoDirection.UNDO),
+                new UndoAction(p, tree, UndoScope.TREE, UndoDirection.REDO),
+                Declared.forMenu("Testin.ReCreateTestRun"),
+                Declared.forMenu("Testin.RemoveNode"),
+                Declared.forMenu("Testin.Rename"),
+                Declared.forMenu("Testin.OrderNode"),
+                Declared.forMenu("Testin.CopyNode"),
+                Declared.forMenu("Testin.CutNode"),
+                Declared.forMenu("Testin.PasteNode"))));
 
         addSeparator();
         add(Declared.forMenu("Testin.RunTests"));
@@ -82,6 +81,13 @@ public class TreeContextMenu extends DefaultActionGroup {
         add(Declared.forMenu("Testin.ShowNodeDetails"));
     }
 
+    private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends AnAction> statusGroups, final @NotNull List<? extends AnAction> rest) {
+        final @NotNull DefaultActionGroup group = ActionsMenu.group();
+        statusGroups.forEach(group::add);
+        rest.forEach(group::add);
+        return group;
+    }
+
     public void registerShortcuts(final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
         new EscapeAction(p, tree, transferHandler);
         new OpenContextMenuAction(tree, this);
@@ -90,12 +96,5 @@ public class TreeContextMenu extends DefaultActionGroup {
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.EDT;
-    }
-
-    private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends AnAction> statusGroups, final @NotNull List<? extends AnAction> rest) {
-        final @NotNull DefaultActionGroup group = ActionsMenu.group();
-        statusGroups.forEach(group::add);
-        rest.forEach(group::add);
-        return group;
     }
 }

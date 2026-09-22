@@ -16,7 +16,6 @@
 
 package org.testin.report;
 
-import org.testin.actions.GrayWithReason;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -25,29 +24,30 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
+import org.testin.actions.GrayWithReason;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.run.RunEditor;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.importexport.FileTypes;
+import org.testin.importexport.exports.ExportNotice;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.importexport.exports.ExportNotice;
 import org.testin.notifications.Notifier;
-import org.testin.services.Services;
 import org.testin.services.BackgroundWork;
+import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.io.File;
-import java.io.UncheckedIOException;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
-import java.util.Optional;
-import java.util.function.Supplier;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public class GenerateReportAction extends AbstractProjectAction {
     private final @NotNull Supplier<Optional<TestRunDirectoryDto>> selectedRun;
@@ -66,6 +66,14 @@ public class GenerateReportAction extends AbstractProjectAction {
     public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         this(p, editor);
         registerCustomShortcutSet(Shortcuts.GenerateReport.getCustomShortcut(), list);
+    }
+
+    private static void write(final @NotNull File outputFile, final byte @NotNull [] content) {
+        try {
+            Files.write(outputFile.toPath(), content);
+        } catch (final IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
     }
 
     // UC-REPORT-001
@@ -123,13 +131,5 @@ public class GenerateReportAction extends AbstractProjectAction {
                     ExportNotice.copyPath(p, outputFile)
             );
         });
-    }
-
-    private static void write(final @NotNull File outputFile, final byte @NotNull [] content) {
-        try {
-            Files.write(outputFile.toPath(), content);
-        } catch (final IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
     }
 }

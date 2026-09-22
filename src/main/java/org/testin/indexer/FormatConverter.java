@@ -47,10 +47,68 @@ import java.util.stream.Stream;
 final class FormatConverter {
     private final @NotNull Project p;
 
-    record Report(@NotNull String project, int cases, int runs, int ids, @NotNull List<String> toRepair, boolean failed) {
-        boolean changedAnything() {
-            return cases > 0 || runs > 0 || ids > 0;
+    private static @NotNull List<Path> oldCaseFiles(final @NotNull Path testCases) {
+        try (Stream<Path> walk = Files.walk(testCases)) {
+            return walk.filter(Files::isRegularFile)
+                    .filter(file -> String.valueOf(file.getFileName()).endsWith(".json"))
+                    .filter(file -> isOutsideGit(testCases, file))
+                    .sorted(Comparator.comparing(Path::toString))
+                    .toList();
+        } catch (final IOException ex) {
+            Logger.warn("Could not walk " + testCases + ": " + ex.getMessage());
+            return List.of();
         }
+    }
+
+    private static @NotNull List<Path> oldRunFolders(final @NotNull Path testRuns) {
+        try (Stream<Path> walk = Files.walk(testRuns)) {
+            return walk.filter(Files::isDirectory)
+                    .filter(folder -> Files.isRegularFile(folder.resolve("run.json")))
+                    .filter(folder -> Files.exists(folder.resolve(DirectoryType.TR.getMarker()))
+                            || Files.exists(folder.resolve(DirectoryType.TRP.getMarker())))
+                    .sorted(Comparator.comparing(Path::toString))
+                    .toList();
+        } catch (final IOException ex) {
+            Logger.warn("Could not walk " + testRuns + ": " + ex.getMessage());
+            return List.of();
+        }
+    }
+
+    private static @NotNull List<Path> markerFiles(final @NotNull Path project) {
+        try (Stream<Path> walk = Files.walk(project)) {
+            return walk.filter(Files::isRegularFile)
+                    .filter(file -> isOutsideGit(project, file))
+                    .filter(file -> FileKind.of(file) == FileKind.MARKER)
+                    .sorted(Comparator.comparing(Path::toString))
+                    .toList();
+        } catch (final IOException ex) {
+            Logger.warn("Could not walk " + project + ": " + ex.getMessage());
+            return List.of();
+        }
+    }
+
+    private static boolean isOutsideGit(final @NotNull Path root, final @NotNull Path file) {
+        for (final Path segment : root.relativize(file)) {
+            if (String.valueOf(segment).equals(".git")) return false;
+        }
+
+        return true;
+    }
+
+    private static @NotNull UUID derived(final @NotNull String from) {
+        return UUID.nameUUIDFromBytes(from.getBytes(StandardCharsets.UTF_8));
+    }
+
+    // Rule-INTERNAL-082
+    private static @NotNull String placeOf(final @NotNull Path project, final @NotNull Path file) {
+        return String.valueOf(project.relativize(file)).replace(File.separatorChar, '/');
+    }
+
+    private static @NotNull String baseName(final @NotNull Path file) {
+        final @NotNull String name = String.valueOf(file.getFileName());
+        final int dot = name.lastIndexOf('.');
+
+        return dot < 0 ? name : name.substring(0, dot);
     }
 
     // UC-INTERNAL-008, Rule-INTERNAL-091
@@ -93,7 +151,8 @@ final class FormatConverter {
             final @NotNull Optional<UUID> id = identityOf(file);
             if (id.isEmpty()) {
                 toRepair.add(String.valueOf(file.getFileName()));
-                if (!move(file, file.resolveSibling(baseName(file) + FileKind.TEST_CASE.getExtension()))) return -1;
+                if (failedToMove(file, file.resolveSibling(baseName(file) + FileKind.TEST_CASE.getExtension())))
+                    return -1;
 
                 converted++;
                 continue;
@@ -105,7 +164,7 @@ final class FormatConverter {
                     : derived(id.orElseThrow() + "|" + placeOf(project, file));
 
             if (!own.equals(id.orElseThrow()) && !reidentify(file, own)) return -1;
-            if (!move(file, file.resolveSibling(FileKind.TEST_CASE.fileName(own)))) return -1;
+            if (failedToMove(file, file.resolveSibling(FileKind.TEST_CASE.fileName(own)))) return -1;
 
             taken.add(own);
             converted++;
@@ -178,54 +237,6 @@ final class FormatConverter {
         }
     }
 
-    private static @NotNull List<Path> oldCaseFiles(final @NotNull Path testCases) {
-        try (Stream<Path> walk = Files.walk(testCases)) {
-            return walk.filter(Files::isRegularFile)
-                    .filter(file -> String.valueOf(file.getFileName()).endsWith(".json"))
-                    .filter(file -> !isGitsOwn(testCases, file))
-                    .sorted(Comparator.comparing(Path::toString))
-                    .toList();
-        } catch (final IOException ex) {
-            Logger.warn("Could not walk " + testCases + ": " + ex.getMessage());
-            return List.of();
-        }
-    }
-
-    private static @NotNull List<Path> oldRunFolders(final @NotNull Path testRuns) {
-        try (Stream<Path> walk = Files.walk(testRuns)) {
-            return walk.filter(Files::isDirectory)
-                    .filter(folder -> Files.isRegularFile(folder.resolve("run.json")))
-                    .filter(folder -> Files.exists(folder.resolve(DirectoryType.TR.getMarker()))
-                            || Files.exists(folder.resolve(DirectoryType.TRP.getMarker())))
-                    .sorted(Comparator.comparing(Path::toString))
-                    .toList();
-        } catch (final IOException ex) {
-            Logger.warn("Could not walk " + testRuns + ": " + ex.getMessage());
-            return List.of();
-        }
-    }
-
-    private static @NotNull List<Path> markerFiles(final @NotNull Path project) {
-        try (Stream<Path> walk = Files.walk(project)) {
-            return walk.filter(Files::isRegularFile)
-                    .filter(file -> !isGitsOwn(project, file))
-                    .filter(file -> FileKind.of(file) == FileKind.MARKER)
-                    .sorted(Comparator.comparing(Path::toString))
-                    .toList();
-        } catch (final IOException ex) {
-            Logger.warn("Could not walk " + project + ": " + ex.getMessage());
-            return List.of();
-        }
-    }
-
-    private static boolean isGitsOwn(final @NotNull Path root, final @NotNull Path file) {
-        for (final Path segment : root.relativize(file)) {
-            if (String.valueOf(segment).equals(".git")) return true;
-        }
-
-        return false;
-    }
-
     // Rule-INTERNAL-012
     private @NotNull Optional<UUID> identityOf(final @NotNull Path file) {
         try {
@@ -252,23 +263,14 @@ final class FormatConverter {
         }
     }
 
-    private boolean move(final @NotNull Path from, final @NotNull Path to) {
-        return from.equals(to) || Services.getInstance(p, TestDataFiles.class).move(p, from, to);
+    private boolean failedToMove(final @NotNull Path from, final @NotNull Path to) {
+        return !from.equals(to) && !Services.getInstance(p, TestDataFiles.class).move(p, from, to);
     }
 
-    private static @NotNull UUID derived(final @NotNull String from) {
-        return UUID.nameUUIDFromBytes(from.getBytes(StandardCharsets.UTF_8));
-    }
-
-    // Rule-INTERNAL-082
-    private static @NotNull String placeOf(final @NotNull Path project, final @NotNull Path file) {
-        return String.valueOf(project.relativize(file)).replace(File.separatorChar, '/');
-    }
-
-    private static @NotNull String baseName(final @NotNull Path file) {
-        final @NotNull String name = String.valueOf(file.getFileName());
-        final int dot = name.lastIndexOf('.');
-
-        return dot < 0 ? name : name.substring(0, dot);
+    record Report(@NotNull String project, int cases, int runs, int ids, @NotNull List<String> toRepair,
+                  boolean failed) {
+        boolean changedAnything() {
+            return cases > 0 || runs > 0 || ids > 0;
+        }
     }
 }

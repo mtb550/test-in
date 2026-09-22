@@ -21,7 +21,10 @@ import org.testng.annotations.Test;
 import java.util.Map;
 import java.util.Set;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 
 /**
  * The rules that make {@code testin.yml} safe to hand to a tester (#6).
@@ -43,6 +46,15 @@ public class TestinConfigTest {
             testinProject: checkout-testcases
             RepoUrl: https://github.com/acme/checkout-testcases
             """;
+
+    /**
+     * The lines Save to testin.yml writes for a test project cloned from Git -
+     * built by the class that reads them, so a key spelled one way by the
+     * writer and another by the reader fails here.
+     */
+    private static Map<String, String> savedLines() {
+        return TestinYml.lines("NAFATH", "https://github.com/acme/nafath-test-cases.git");
+    }
 
     /**
      * {@code bugRepoUrl} is read like every other key, and the token a copied
@@ -119,10 +131,9 @@ public class TestinConfigTest {
      */
     @Test
     public void brokenFilesOpenUnbound() {
-        assertSame(TestinYml.parse("testinProject: [unclosed\n", "malformed"), TestinProjectConfig.UNREADABLE);
+        assertSame(TestinYml.parse("testinProject: [unclosed\n", "malformed"), TestinProjectConfig.EMPTY);
         assertSame(TestinYml.parse("   \n", "blank"), TestinProjectConfig.EMPTY);
     }
-
 
     /**
      * UC-TREE-PANEL-001.
@@ -139,14 +150,13 @@ public class TestinConfigTest {
      */
     @Test
     public void aBrokenFileIsTheSameValueAndNotTheSameState() {
-        final TestinProjectConfig broken = TestinYml.parse("testinProject: [unclosed\n", "malformed");
-        final TestinProjectConfig absent = TestinYml.parse("   \n", "blank");
+        final TestinYml.Parsed broken = TestinYml.parsed("testinProject: [unclosed\n", "malformed");
+        final TestinYml.Parsed absent = TestinYml.parsed("   \n", "blank");
 
-        assertEquals(broken, absent, "a file that would not parse has told us no more than one that is not there");
+        assertEquals(broken.config(), absent.config(), "a file that would not parse has told us no more than one that is not there");
 
-        assertTrue(broken.isUnreadable(), "the broken file is the one state a caller can act on differently");
-        assertFalse(absent.isUnreadable(), "an absent file is not a broken one, and must not be reported as one");
-        assertFalse(TestinProjectConfig.EMPTY.isUnreadable(), "saying nothing is not the same as failing to be read");
+        assertFalse(broken.readable(), "the broken file is the one state a caller can act on differently");
+        assertTrue(absent.readable(), "an absent file is not a broken one, and must not be reported as one");
     }
 
     /**
@@ -227,9 +237,14 @@ public class TestinConfigTest {
      */
     @Test
     public void aFileThatStillSaysSftpIsReadAsNotShared() {
-        final TestinProjectConfig old = TestinYml.parse(
-                "location: remote\nconnection: sftp\nsftpHost: qa.internal\nsftpPort: 2222\n"
-                        + "sftpPath: /srv/testin\ntestinProject: test-01\n", "sftp");
+        final TestinProjectConfig old = TestinYml.parse("""
+                location: remote
+                connection: sftp
+                sftpHost: qa.internal
+                sftpPort: 2222
+                sftpPath: /srv/testin
+                testinProject: test-01
+                """, "sftp");
 
         assertFalse(old.hasRepoUrl());
         assertEquals(old.projectName(), "test-01", "the server keys must not cost the file its project");
@@ -259,10 +274,11 @@ public class TestinConfigTest {
      */
     @Test
     public void aGitProjectIsNamedByTheKey() {
-        final TestinProjectConfig named = TestinYml.parse(
-                "location: remote\n"
-                        + "RepoUrl: https://github.com/mtb550/test-01.git\n"
-                        + "testinProject: checkout\n", "git");
+        final TestinProjectConfig named = TestinYml.parse("""
+                location: remote
+                RepoUrl: https://github.com/mtb550/test-01.git
+                testinProject: checkout
+                """, "git");
 
         assertEquals(named.projectName(), "checkout", "the file says so, not the URL");
         assertTrue(named.hasRepoUrl());
@@ -270,9 +286,10 @@ public class TestinConfigTest {
 
     @Test
     public void aUrlWithNoNameLeavesTheRepositoryUnbound() {
-        final TestinProjectConfig unnamed = TestinYml.parse(
-                "location: remote\n"
-                        + "RepoUrl: https://github.com/mtb550/test-01.git\n", "no name");
+        final TestinProjectConfig unnamed = TestinYml.parse("""
+                location: remote
+                RepoUrl: https://github.com/mtb550/test-01.git
+                """, "no name");
 
         assertEquals(unnamed.projectName(), "", "the tester picks once, on this machine");
         assertTrue(unnamed.hasRepoUrl(), "and it can still be cloned");
@@ -291,7 +308,6 @@ public class TestinConfigTest {
         assertFalse(here.hasRepoUrl());
     }
 
-
     /**
      * A token never reaches the committed file (#94).
      * <p>
@@ -302,13 +318,14 @@ public class TestinConfigTest {
     @Test
     public void aTokenIsStrippedOutOfACloneUrl() {
         assertEquals(TestinProjectConfig.withoutCredentials(
-                "https://mtb550:ghp_secret@github.com/mtb550/test-01.git"),
+                        "https://mtb550:ghp_secret@github.com/mtb550/test-01.git"),
                 "https://github.com/mtb550/test-01.git");
 
-        assertEquals(TestinYml.parse(
-                "location: remote\ntestinProject: test-01\n"
-                        + "RepoUrl: https://mtb550:ghp_secret@github.com/mtb550/test-01.git\n", "token")
-                .repoUrl(), "https://github.com/mtb550/test-01.git",
+        assertEquals(TestinYml.parse("""
+                        location: remote
+                        testinProject: test-01
+                        RepoUrl: https://mtb550:ghp_secret@github.com/mtb550/test-01.git
+                        """, "token").repoUrl(), "https://github.com/mtb550/test-01.git",
                 "stripped on the way in too, however it got there");
     }
 
@@ -339,15 +356,6 @@ public class TestinConfigTest {
     }
 
     /**
-     * The lines Save to testin.yml writes for a test project cloned from Git -
-     * built by the class that reads them, so a key spelled one way by the
-     * writer and another by the reader fails here.
-     */
-    private static Map<String, String> savedLines(final String project) {
-        return TestinYml.lines(project, "https://github.com/acme/nafath-test-cases.git");
-    }
-
-    /**
      * Rule-TREE-PANEL-113, Rule-SHARE-004. A folder with no remote is local, a
      * remote's token never reaches the committed file, and without Git only the
      * project is written.
@@ -365,7 +373,7 @@ public class TestinConfigTest {
      */
     @Test
     public void aNewFileIsTheThreeLines() {
-        final String written = TestinYml.withLines("", savedLines("NAFATH"));
+        final String written = TestinYml.withLines("", savedLines());
 
         assertEquals(written, "testinProject: NAFATH\nlocation: remote\nRepoUrl: https://github.com/acme/nafath-test-cases.git\n");
         assertEquals(TestinYml.parse(written, "saved").projectName(), "NAFATH");
@@ -388,7 +396,7 @@ public class TestinConfigTest {
                 somethingFromALaterBuild: true
                 """;
 
-        assertEquals(TestinYml.withLines(before, savedLines("NAFATH")), """
+        assertEquals(TestinYml.withLines(before, savedLines()), """
                 # Which test project this repository drives.
                 testinProject: NAFATH
                 bugRepoUrl: https://github.com/acme/app

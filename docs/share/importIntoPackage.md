@@ -76,11 +76,11 @@ Everything else is as [UC-SHARE-005](importIntoTestSet.md).
 
 ## Where the sheet names come from
 
-| The file | The sheet name |
-|---|---|
-| A spreadsheet | The name of the sheet in the workbook |
-| A comma separated file | The file name, without its ending |
-| A JSON file | Whatever keys the file carries |
+| The file               | The sheet name                        |
+|------------------------|---------------------------------------|
+| A spreadsheet          | The name of the sheet in the workbook |
+| A comma separated file | The file name, without its ending     |
+| A JSON file            | Whatever keys the file carries        |
 
 ## What Testin refuses
 

@@ -28,20 +28,20 @@ import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkDialog<BulkJsonEditors> {
+public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkDialog {
+    private static final @NotNull ItemRecorder RECORDS_NOTHING = (start, end, testCaseIndex, itemIndex) -> {
+    };
     private final @NotNull List<TestCaseDto> selectedItems;
     private final @NotNull Consumer<List<TestCaseDto>> updatedItems;
     private final @NotNull BulkJsonEditors editors;
-
     private final @NotNull List<List<String>> originalValues = new ArrayList<>();
     private final @NotNull List<List<String>> activeValues = new ArrayList<>();
-
     private final @NotNull List<int[]> spanOwners = new ArrayList<>();
 
     protected JsonArraySplitBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
@@ -106,14 +106,6 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         });
         editors.focusFirstValue();
     }
-
-    @FunctionalInterface
-    private interface ItemRecorder {
-        void record(int start, int end, int testCaseIndex, int itemIndex);
-    }
-
-    private static final @NotNull ItemRecorder RECORDS_NOTHING = (start, end, testCaseIndex, itemIndex) -> {
-    };
 
     // UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-041
     @Override
@@ -257,5 +249,10 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         final @NotNull List<String> original = originalValues.get(owner[0]);
 
         return owner[1] < original.size() ? BulkJsonEditor.escapeJson(original.get(owner[1])) : "";
+    }
+
+    @FunctionalInterface
+    private interface ItemRecorder {
+        void record(int start, int end, int testCaseIndex, int itemIndex);
     }
 }

@@ -26,7 +26,8 @@ import org.testin.view.bugs.OpenBugsTab;
 import org.testin.view.details.DetailsTab;
 import org.testin.view.history.HistoryTab;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JScrollPane;
 import java.util.function.Consumer;
 import java.util.function.Function;
 

@@ -16,19 +16,18 @@
 
 package org.testin.view.details.components;
 
-import com.intellij.util.ui.JBUI;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
-import org.testin.ui.framework.TextArea;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
 import java.util.List;
 
-public final class ErrorDetailsDialog extends AbstractFrameworkDialog<TextArea> {
+public final class ErrorDetailsDialog extends AbstractFrameworkDialog {
     private static final int VISIBLE_ROWS = 22;
     private static final int WIDTH = 900;
     private static final int HEIGHT = 600;

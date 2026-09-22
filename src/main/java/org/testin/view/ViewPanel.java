@@ -27,22 +27,24 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.actions.EscapeAction;
 import org.testin.editor.WheelForwarding;
-import org.testin.services.Services;
-import org.testin.setting.TestinRoot;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
+import org.testin.services.Services;
+import org.testin.setting.TestinRoot;
 import org.testin.ui.FontSync;
 
 import javax.swing.SwingUtilities;
-import java.awt.*;
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ViewPanel implements Disposable {
@@ -90,7 +92,10 @@ public class ViewPanel implements Disposable {
         new EscapeAction(p, openBugsTab);
 
         tabs().forEach(this::takesTheKeyboard);
-        IdeEventQueue.getInstance().addPostprocessor(this::focusTabPressed, this);
+        IdeEventQueue.getInstance().addPostprocessor(event -> {
+            focusTabPressed(event);
+            return false;
+        }, this);
 
         page = new ViewPagination(this);
 
@@ -113,13 +118,12 @@ public class ViewPanel implements Disposable {
     }
 
     // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-080
-    private boolean focusTabPressed(final @NotNull AWTEvent event) {
-        if (!(event instanceof MouseEvent press) || press.getID() != MouseEvent.MOUSE_PRESSED) return false;
+    private void focusTabPressed(final @NotNull AWTEvent event) {
+        if (!(event instanceof MouseEvent press) || press.getID() != MouseEvent.MOUSE_PRESSED) return;
 
         Optional.ofNullable(SwingUtilities.getDeepestComponentAt(press.getComponent(), press.getX(), press.getY()))
                 .flatMap(pressed -> tabs().filter(tab -> SwingUtilities.isDescendingFrom(pressed, tab)).findFirst())
                 .ifPresent(tab -> IdeFocusManager.getInstance(p).requestFocus(tab, true));
-        return false;
     }
 
     private @NotNull JBScrollPane createScrollPane(final @NotNull Component view) {
@@ -143,13 +147,13 @@ public class ViewPanel implements Disposable {
 
     // UC-VIEW-PANEL-002, Rule-VIEW-PANEL-015, Rule-VIEW-PANEL-016
     public void showIfOpen(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
-        if (!isOpen()) return;
+        if (isClosed()) return;
 
         this.show(testCases, path);
     }
 
-    private boolean isOpen() {
-        return ViewToolWindowFactory.toolWindow(p).filter(ToolWindow::isVisible).isPresent();
+    private boolean isClosed() {
+        return ViewToolWindowFactory.toolWindow(p).filter(ToolWindow::isVisible).isEmpty();
     }
 
     // UC-VIEW-PANEL-015
@@ -178,7 +182,7 @@ public class ViewPanel implements Disposable {
 
     // UC-VIEW-PANEL-015, Rule-VIEW-PANEL-060
     public void hide(final @NotNull List<String> closingPath) {
-        if (!isOpen()) return;
+        if (isClosed()) return;
         if (!page.getCurrentPath().equals(closingPath)) return;
 
         this.reset();

@@ -87,18 +87,18 @@ The fields that complete what has been typed before - Description, Expected
 Result, Module, Steps and Group - and the **Group** list in the filter all read
 one list of the values Testin knows. That list changes only at these moments.
 
-| What the tester does | What happens to the list |
-|---|---|
-| Opens a test set or a test run | The values of the test cases it shows are added |
-| Creates a test case | Its values are added at once |
-| Changes a test case: Update Test Case, a grid cell, the details panel or a bulk edit | Nothing. A value it no longer has is still offered, and a new value is offered only once an editor reloads or the tester presses Refresh |
-| Copies test cases into a test set | Nothing, until an editor reloads or the tester presses Refresh |
-| Imports test cases | The test set's editor opens again, and their values are added |
-| Removes a test case: Delete, cutting it into another test set, undoing its creation, or reverting it in the pending changes review | The list is rebuilt in the background from the test cases left. A value only that test case used is no longer offered |
-| Undoes or redoes a change | The open editors of the test sets it changed reload, and their values are added. A test case the undo takes out rebuilds the list, as removing one does |
-| Presses Refresh on the tree, syncs with Git, or changes a file outside Testin | The open editors reload, and their values are added. Nothing is taken out |
-| Presses **Refresh** on the editor toolbar | The list is rebuilt in the background from every test case. A value no test case uses any more is no longer offered |
-| Starts the IDE again | The list starts empty, and fills as editors open |
+| What the tester does                                                                                                               | What happens to the list                                                                                                                                |
+|------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Opens a test set or a test run                                                                                                     | The values of the test cases it shows are added                                                                                                         |
+| Creates a test case                                                                                                                | Its values are added at once                                                                                                                            |
+| Changes a test case: Update Test Case, a grid cell, the details panel or a bulk edit                                               | Nothing. A value it no longer has is still offered, and a new value is offered only once an editor reloads or the tester presses Refresh                |
+| Copies test cases into a test set                                                                                                  | Nothing, until an editor reloads or the tester presses Refresh                                                                                          |
+| Imports test cases                                                                                                                 | The test set's editor opens again, and their values are added                                                                                           |
+| Removes a test case: Delete, cutting it into another test set, undoing its creation, or reverting it in the pending changes review | The list is rebuilt in the background from the test cases left. A value only that test case used is no longer offered                                   |
+| Undoes or redoes a change                                                                                                          | The open editors of the test sets it changed reload, and their values are added. A test case the undo takes out rebuilds the list, as removing one does |
+| Presses Refresh on the tree, syncs with Git, or changes a file outside Testin                                                      | The open editors reload, and their values are added. Nothing is taken out                                                                               |
+| Presses **Refresh** on the editor toolbar                                                                                          | The list is rebuilt in the background from every test case. A value no test case uses any more is no longer offered                                     |
+| Starts the IDE again                                                                                                               | The list starts empty, and fills as editors open                                                                                                        |
 
 So a group renamed from *Somke* to *Smoke* is still offered as *Somke* until
 the tester presses Refresh. Creating and removing a test case are the only two

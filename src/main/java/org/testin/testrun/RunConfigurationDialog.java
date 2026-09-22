@@ -26,10 +26,10 @@ import org.testin.ui.framework.SelectionTree;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.util.List;
 
-public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunConfigurationForm> {
+public final class RunConfigurationDialog extends AbstractFrameworkDialog {
     private final @NotNull RunFormAction action;
     private final @NotNull RunConfigurationForm form;
     private final @NotNull SelectionTree selection;
@@ -65,6 +65,6 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunCon
     protected void submit() {
         if (!selection.hasChecked()) return;
 
-        if (action.submit().of(form, selection)) closeOk();
+        if (action.submit().saved(form, selection)) closeOk();
     }
 }

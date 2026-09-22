@@ -30,17 +30,17 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.ui.framework.ConfirmDialog;
 import org.testin.services.Services;
+import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.Optional;
-import java.util.Objects;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComponent;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class BranchSelector {
     private final @NotNull Project p;
@@ -69,7 +69,7 @@ public class BranchSelector {
         comboBox.setFocusable(false);
         comboBox.setEnabled(false);
 
-        comboBox.addActionListener(this::onSelection);
+        comboBox.addActionListener(e -> onSelection());
 
         updateProject(testProjectDirectory);
     }
@@ -119,7 +119,7 @@ public class BranchSelector {
     }
 
     // UC-TREE-PANEL-026
-    private void onSelection(final @NotNull ActionEvent e) {
+    private void onSelection() {
         if (isUpdating) return;
 
         final @NotNull String selectedBranch = getSelectedBranch();

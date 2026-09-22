@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public final class ResultAnalysisDialog extends AbstractFrameworkDialog<TextArea> {
+public final class ResultAnalysisDialog extends AbstractFrameworkDialog {
     private final @NotNull Map<ResultAnalysis, TextArea> written = new EnumMap<>(ResultAnalysis.class);
     private final @NotNull Consumer<@NotNull Map<ResultAnalysis, String>> onSave;
 

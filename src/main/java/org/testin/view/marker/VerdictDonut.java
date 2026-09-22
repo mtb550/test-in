@@ -28,8 +28,21 @@ import org.testin.model.NodeCount;
 import org.testin.model.NodeFigures;
 import org.testin.ui.framework.DialogComponent;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.SwingConstants;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.Arc2D;
 import java.util.List;
 
@@ -105,25 +118,6 @@ public final class VerdictDonut implements DialogComponent {
         return row;
     }
 
-    @Override
-    public @NotNull JComponent getPanel() {
-        return panel;
-    }
-
-    @Override
-    public @NotNull JComponent getFocusComponent() {
-        return panel;
-    }
-
-    @Override
-    public void onSubmitRequest(final @NotNull Runnable submit) {
-    }
-
-    @Override
-    public boolean wantsFocus() {
-        return false;
-    }
-
     static double[] sweeps(final @NotNull List<NodeCount> slices, final @NotNull NodeFigures figures) {
         final double[] sweeps = new double[slices.size()];
         final double whole = Math.max(figures.run().total(), 1);
@@ -141,6 +135,25 @@ public final class VerdictDonut implements DialogComponent {
         }
 
         return sweeps;
+    }
+
+    @Override
+    public @NotNull JComponent getPanel() {
+        return panel;
+    }
+
+    @Override
+    public @NotNull JComponent getFocusComponent() {
+        return panel;
+    }
+
+    @Override
+    public void onSubmitRequest(final @NotNull Runnable submit) {
+    }
+
+    @Override
+    public boolean wantsFocus() {
+        return false;
     }
 
     private record Swatch(@NotNull Color color) implements Icon {

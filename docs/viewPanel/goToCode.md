@@ -59,12 +59,12 @@ The two buttons sit between the title and the badges.
 The same icon and the same words as the card in the editor, which is
 [UC-EDITOR-PANEL-047](../editorPanel/seeWhatIsAutomated.md).
 
-| The tooltip reads | What it means |
-|---|---|
+| The tooltip reads           | What it means                                                    |
+|-----------------------------|------------------------------------------------------------------|
 | **Navigate to Test Method** | Testin has not read the code yet, or this IDE has no Java plugin |
-| **Automated** | The generated test method has something in it |
-| **No test method** | The test case names a method and there is none |
-| **Not automated** | There is no method, or Testin wrote one and nobody filled it in |
+| **Automated**               | The generated test method has something in it                    |
+| **No test method**          | The test case names a method and there is none                   |
+| **Not automated**           | There is no method, or Testin wrote one and nobody filled it in  |
 
 ## Main flow
 

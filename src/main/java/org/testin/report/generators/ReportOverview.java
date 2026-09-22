@@ -16,28 +16,27 @@
 
 package org.testin.report.generators;
 
-import org.testin.testrun.RunEditorAttributes;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunExecution;
 import org.testin.model.TestRunSummary;
-import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.DetailRow;
+import org.testin.model.markers.TestRunMarker;
+import org.testin.testrun.RunEditorAttributes;
 import org.testin.util.Bundle;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.testin.model.markers.TestRunMarker;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReportOverview {
     private static final @NotNull String NOT_RECORDED = Bundle.message("report.overview.not.recorded");
 
     // Rule-REPORT-002
-    public static @NotNull List<DetailRow> rowsFor(final @NotNull String projectName, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull TestRunSummary summary) {
+    public static @NotNull List<DetailRow> rowsFor(final @NotNull String projectName, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunSummary summary) {
         final @NotNull TestRunMarker marker = trDir.getMarker();
         final @NotNull List<DetailRow> rows = new ArrayList<>();
 

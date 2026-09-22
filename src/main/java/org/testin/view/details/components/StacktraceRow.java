@@ -16,8 +16,8 @@
 
 package org.testin.view.details.components;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -27,16 +27,22 @@ import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.testrun.RunEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
+import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.Picture;
 import org.testin.util.Bundle;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JTextArea;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.file.Path;
@@ -53,6 +59,15 @@ public final class StacktraceRow extends BaseDetails {
     private final @NotNull TestRunItems item;
 
     private final @NotNull List<String> currentPath;
+
+    private static @NotNull JBPanel<?> line(final @NotNull List<? extends JComponent> parts) {
+        final @NotNull JBPanel<?> line = new JBPanel<>(new HorizontalLayout(JBUI.scale(LINK_GAP)));
+        line.setOpaque(false);
+        line.setBorder(JBUI.Borders.emptyTop(LINK_MARGIN_TOP));
+        line.setAlignmentX(Component.LEFT_ALIGNMENT);
+        parts.forEach(line::add);
+        return line;
+    }
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-035, Rule-VIEW-PANEL-081
     @Override
@@ -109,14 +124,5 @@ public final class StacktraceRow extends BaseDetails {
         });
 
         return square;
-    }
-
-    private static @NotNull JBPanel<?> line(final @NotNull List<? extends JComponent> parts) {
-        final @NotNull JBPanel<?> line = new JBPanel<>(new HorizontalLayout(JBUI.scale(LINK_GAP)));
-        line.setOpaque(false);
-        line.setBorder(JBUI.Borders.emptyTop(LINK_MARGIN_TOP));
-        line.setAlignmentX(Component.LEFT_ALIGNMENT);
-        parts.forEach(line::add);
-        return line;
     }
 }

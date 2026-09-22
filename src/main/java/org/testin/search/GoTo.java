@@ -21,12 +21,12 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreePanelTree;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.editor.TestinEditors;
 
 import java.util.Optional;
 import java.util.function.Consumer;

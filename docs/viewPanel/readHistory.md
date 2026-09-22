@@ -2,8 +2,8 @@
 
 # UC-VIEW-PANEL-007: Read a test case's history
 
-**As a** tester, **I want** to see what changed on a test case and when,
-**so that** I can tell whether a failure follows a change somebody made.
+**As a** tester, **I want** to see what changed on a test case and when, **so that** I can tell whether a failure
+follows a change somebody made.
 
 This tab is not built yet. It shows one line saying so.
 

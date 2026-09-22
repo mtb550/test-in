@@ -16,6 +16,7 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
@@ -50,10 +51,21 @@ public class OpeningRowsTest {
     private static final @NotNull Path FRAMEWORK =
             Paths.get("src", "main", "java", "org", "testin", "ui", "framework");
 
+    private static @NotNull String read(final @NotNull String fileName) {
+        final @NotNull Path file = FRAMEWORK.resolve(fileName);
+
+        try {
+            return Files.readString(file);
+        } catch (final IOException notThere) {
+            fail("Could not read " + file.toAbsolutePath() + ": " + notThere.getMessage());
+            return "";
+        }
+    }
+
     @Test
     public void theQueryIsOnlyEverRunOffThePaintingThread() {
         final @NotNull String source = read("TextFieldWithSelections.java");
-        final int asked = countOf(source, "rows.forQuery(");
+        final int asked = StringUtil.getOccurrenceCount(source, "rows.forQuery(");
 
         assertEquals(asked, 1,
                 "the query should be asked in exactly one place, inside requestRows; found " + asked
@@ -108,34 +120,5 @@ public class OpeningRowsTest {
                 "the fixed-choice picker must be handed its rows as well as its Rows, so it shows them at once");
         assertTrue(builder.contains("placeholder, List.of(), rows.orElseThrow()"),
                 "the searching picker opens with nothing and fills in off the painting thread");
-    }
-
-
-    /**
-     * How many times a literal appears. Counted rather than split on, so the
-     * thing being looked for is written exactly as it is in the file instead of
-     * as a regular expression with everything escaped twice.
-     */
-    private static int countOf(final @NotNull String source, final @NotNull String literal) {
-        int found = 0;
-        int at = source.indexOf(literal);
-
-        while (at >= 0) {
-            found++;
-            at = source.indexOf(literal, at + literal.length());
-        }
-
-        return found;
-    }
-
-    private static @NotNull String read(final @NotNull String fileName) {
-        final @NotNull Path file = FRAMEWORK.resolve(fileName);
-
-        try {
-            return Files.readString(file);
-        } catch (final IOException notThere) {
-            fail("Could not read " + file.toAbsolutePath() + ": " + notThere.getMessage());
-            return "";
-        }
     }
 }

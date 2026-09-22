@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-010: Reorder test cases by dragging
 
-**As a** tester, **I want** to drag a test case where it belongs,
-**so that** the test set reads in the order somebody would work through it.
+**As a** tester, **I want** to drag a test case where it belongs, **so that** the test set reads in the order somebody
+would work through it.
 
 The cards are moved with the mouse. Nothing opens.
 
@@ -50,8 +50,8 @@ This opens no screen. While the tester drags, the card follows the pointer, and
 a line shows where it will land. When the button is released, the cards are
 drawn again in their new order and every number is worked out again.
 
-A small message then appears at the bottom of the IDE and fades. It reads
-*Re-sorted*, with a count after it when more than one card moved.
+A small message then appears at the bottom of the IDE and fades. It reads *Re-sorted*, with a count after it when more
+than one card moved.
 
 ## Main flow
 

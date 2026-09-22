@@ -16,22 +16,29 @@
 
 package org.testin.indexer;
 
-import lombok.Getter;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.FileKind;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.TestCaseOrder;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.testcase.TestCaseOrder;
 
 import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
-import org.testin.model.FileKind;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 final class TestCaseSequenceStore {
@@ -46,6 +53,14 @@ final class TestCaseSequenceStore {
 
     // UC-SHARE-002, Rule-SHARE-001
     private final @NotNull Map<String, Set<String>> unreadable = new ConcurrentHashMap<>();
+
+    static @NotNull List<UUID> caseIds(final @NotNull Collection<UUID> initial) {
+        return new CopyOnWriteArrayList<>(initial);
+    }
+
+    static @NotNull Path named(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
+        return testSetPath.resolve(FileKind.TEST_CASE.fileName(testCaseId));
+    }
 
     // UC-TREE-PANEL-011, Rule-INTERNAL-084
     void renamed(final @NotNull Path oldPath, final @NotNull Path newPath) {
@@ -65,10 +80,6 @@ final class TestCaseSequenceStore {
         return Set.copyOf(unreadable.getOrDefault(testSetPath.toString(), Set.of()));
     }
 
-    static @NotNull List<UUID> caseIds(final @NotNull Collection<UUID> initial) {
-        return new CopyOnWriteArrayList<>(initial);
-    }
-
     // UC-INTERNAL-004, Rule-INTERNAL-030
     @NotNull List<TestCaseDto> getForTestSet(final @NotNull Path testSetPath) {
         final @NotNull List<UUID> ids = testSetCaseIds.getOrDefault(testSetPath.toString(), List.of());
@@ -86,7 +97,8 @@ final class TestCaseSequenceStore {
 
     // UC-INTERNAL-004, Rule-INTERNAL-033, Rule-INTERNAL-034
     boolean put(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
-        if (Services.getInstance(p, TestDataFiles.class).alreadyHolds(p, fileOf(testSetPath, testCase.getId()), testCase)) return false;
+        if (Services.getInstance(p, TestDataFiles.class).alreadyHolds(p, fileOf(testSetPath, testCase.getId()), testCase))
+            return false;
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
         if (testCasesById.containsKey(testCase.getId())) testCase.touch(tester);
@@ -100,10 +112,6 @@ final class TestCaseSequenceStore {
         return Optional.ofNullable(handNamed.get(testCaseId))
                 .filter(file -> testSetPath.equals(file.getParent()))
                 .orElseGet(() -> named(testSetPath, testCaseId));
-    }
-
-    static @NotNull Path named(final @NotNull Path testSetPath, final @NotNull UUID testCaseId) {
-        return testSetPath.resolve(FileKind.TEST_CASE.fileName(testCaseId));
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-035
@@ -133,7 +141,8 @@ final class TestCaseSequenceStore {
     // UC-INTERNAL-004, Rule-INTERNAL-084
     private boolean leftHandNamedFile(final @NotNull UUID id, final @NotNull Path idFile) {
         final @NotNull Optional<Path> original = Optional.ofNullable(handNamed.get(id)).filter(path -> !path.equals(idFile));
-        if (original.isPresent() && !Services.getInstance(p, TestDataFiles.class).delete(p, original.orElseThrow())) return false;
+        if (original.isPresent() && !Services.getInstance(p, TestDataFiles.class).delete(p, original.orElseThrow()))
+            return false;
 
         handNamed.remove(id);
         return true;
@@ -156,12 +165,14 @@ final class TestCaseSequenceStore {
 
         final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
         if (files.delete(p, from)) {
-            if (!fromSet.equals(toSet)) Optional.ofNullable(testSetCaseIds.get(fromSet.toString())).ifPresent(ids -> ids.remove(id));
+            if (!fromSet.equals(toSet))
+                Optional.ofNullable(testSetCaseIds.get(fromSet.toString())).ifPresent(ids -> ids.remove(id));
             return true;
         }
 
         files.delete(p, to);
-        if (!fromSet.equals(toSet)) Optional.ofNullable(testSetCaseIds.get(toSet.toString())).ifPresent(ids -> ids.remove(id));
+        if (!fromSet.equals(toSet))
+            Optional.ofNullable(testSetCaseIds.get(toSet.toString())).ifPresent(ids -> ids.remove(id));
         was.ifPresent(original -> testCasesById.put(id, original));
         if (wasHandNamed) handNamed.put(id, from);
         return false;

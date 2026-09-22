@@ -16,15 +16,16 @@
 
 package org.testin.undo;
 
-import org.testin.util.Bundle;
-import org.testin.util.Shortcuts;
 import com.intellij.icons.AllIcons;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Done;
+import org.testin.util.Bundle;
+import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import javax.swing.Icon;
+import javax.swing.KeyStroke;
 
 @Getter
 @AllArgsConstructor

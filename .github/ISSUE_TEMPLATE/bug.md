@@ -42,4 +42,4 @@ point; the conclusion drawn from it is.
 
 - [ ] One observable outcome per line, checkable without reading the diff.
 - [ ] One line for what must **not** change — the other editor, the other theme,
-      the other platform.
+  the other platform.

@@ -35,12 +35,12 @@ The marker is one line, above the signature. Never on the signature line: a
 method declaration is one line, however long, and a marker must not be the thing
 that wraps it.
 
-| What the method carries | The marker |
-|---|---|
-| One use case | `// UC-TREE-PANEL-012` |
-| A rule inside one use case | `// UC-TREE-PANEL-012, Rule-TREE-PANEL-038` |
-| A rule that holds across a whole part | `// Rule-TREE-PANEL-007` |
-| Several use cases | `// UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033` |
+| What the method carries               | The marker                                    |
+|---------------------------------------|-----------------------------------------------|
+| One use case                          | `// UC-TREE-PANEL-012`                        |
+| A rule inside one use case            | `// UC-TREE-PANEL-012, Rule-TREE-PANEL-038`   |
+| A rule that holds across a whole part | `// Rule-TREE-PANEL-007`                      |
+| Several use cases                     | `// UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033` |
 
 **A rule name carries its part.** `Rule-TREE-PANEL-045` says where it lives, so
 the marker needs nothing else to be findable. It was not always so: rules were
@@ -81,16 +81,16 @@ failure"* - now goes in the commit message, and the behavior itself is in
 
 ## The eight prefixes
 
-| Part | Its use cases and rules | Its folder |
-|---|---|---|
-| The tree panel | `UC-TREE-PANEL-001` and `Rule-TREE-PANEL-001` and up | `docs/treePanel/` |
-| The editor panel | `UC-EDITOR-PANEL-001` and `Rule-EDITOR-PANEL-001` and up | `docs/editorPanel/` |
-| The view panel | `UC-VIEW-PANEL-001` and `Rule-VIEW-PANEL-001` and up | `docs/viewPanel/` |
-| The settings page | `UC-SETTING-001` and `Rule-SETTING-001` and up | `docs/setting/` |
-| Automation code and the gutter | `UC-CODEGEN-001` and `Rule-CODEGEN-001` and up | `docs/codegen/` |
-| Reports | `UC-REPORT-001` and `Rule-REPORT-001` and up | `docs/report/` |
-| Sharing work with the team | `UC-SHARE-001` and `Rule-SHARE-001` and up | `docs/share/` |
-| Inside Testin | `UC-INTERNAL-001` and `Rule-INTERNAL-001` and up | `docs/internal/` |
+| Part                           | Its use cases and rules                                  | Its folder          |
+|--------------------------------|----------------------------------------------------------|---------------------|
+| The tree panel                 | `UC-TREE-PANEL-001` and `Rule-TREE-PANEL-001` and up     | `docs/treePanel/`   |
+| The editor panel               | `UC-EDITOR-PANEL-001` and `Rule-EDITOR-PANEL-001` and up | `docs/editorPanel/` |
+| The view panel                 | `UC-VIEW-PANEL-001` and `Rule-VIEW-PANEL-001` and up     | `docs/viewPanel/`   |
+| The settings page              | `UC-SETTING-001` and `Rule-SETTING-001` and up           | `docs/setting/`     |
+| Automation code and the gutter | `UC-CODEGEN-001` and `Rule-CODEGEN-001` and up           | `docs/codegen/`     |
+| Reports                        | `UC-REPORT-001` and `Rule-REPORT-001` and up             | `docs/report/`      |
+| Sharing work with the team     | `UC-SHARE-001` and `Rule-SHARE-001` and up               | `docs/share/`       |
+| Inside Testin                  | `UC-INTERNAL-001` and `Rule-INTERNAL-001` and up         | `docs/internal/`    |
 
 The numbering is defined once, in `docs/standard.md`. Read it before inventing
 anything.

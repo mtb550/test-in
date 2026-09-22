@@ -68,8 +68,7 @@ There is no key for this. The button's tooltip reads **Filter**.
    [When that list changes](refreshEditor.md#what-completion-and-the-group-filter-offer)
    is written on the refresh page.
 5. **Module** — the modules the test cases in this test set actually carry.
-6. **Status** — the run statuses. In a test set editor the row is gray and reads
-   *Status (only a test run records one)*.
+6. **Status** — the run statuses. In a test set editor the row is gray and reads *Status (only a test run records one)*.
 
 While a filter is on, the button shows the count in brackets. Its tooltip
 becomes **Filter**, then the count, then **active**.

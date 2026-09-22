@@ -17,11 +17,11 @@
 package org.testin.clipboard;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.StandIn;
 import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
-import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,7 +43,7 @@ public class CutStateTest {
      * one the cut came from.
      */
     private static @NotNull TestinEditor anyEditor() {
-        return (TestinEditor) Proxy.newProxyInstance(CutStateTest.class.getClassLoader(), new Class<?>[]{TestinEditor.class}, (proxy, method, args) -> null);
+        return StandIn.of(TestinEditor.class);
     }
 
     private static @NotNull TestCaseDto testCase() {

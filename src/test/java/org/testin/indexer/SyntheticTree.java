@@ -23,9 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 /**
  * A test project on disk, at whatever size the caller asks for.
@@ -42,7 +40,9 @@ import java.util.stream.Stream;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class SyntheticTree {
 
-    /** Every case is the same size; what is being measured is how many there are. */
+    /**
+     * Every case is the same size; what is being measured is how many there are.
+     */
     private static final @NotNull String CASE = """
             {
               "order" : "%s",
@@ -108,16 +108,6 @@ final class SyntheticTree {
             return Files.createTempDirectory("testin-budget");
         } catch (final IOException ex) {
             throw new AssertionError("Could not create a temporary directory to measure in: " + ex.getMessage(), ex);
-        }
-    }
-
-    static void delete(final @NotNull Path root) {
-        try (Stream<Path> walk = Files.walk(root)) {
-            walk.sorted(Comparator.reverseOrder()).forEach(path -> path.toFile().delete());
-        } catch (final IOException ex) {
-            // Litter, not a failed measurement - and reporting it as one would
-            // hide whichever assertion actually failed.
-            System.err.println("Could not clean up " + root + ": " + ex.getMessage());
         }
     }
 

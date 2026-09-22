@@ -23,7 +23,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
 import org.testin.model.ResultAnalysis;
@@ -40,7 +39,6 @@ import java.util.stream.Stream;
 
 @Setter
 @Getter
-@Accessors(chain = true)
 @ToString(callSuper = true)
 public class TestRunMarker extends AbstractMarker {
     @NonNull

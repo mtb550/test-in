@@ -103,17 +103,17 @@ There is no key for this. It is what the **Details** tab shows.
 
 ## The rows, in order
 
-| Caption | What it holds |
-|---|---|
-| **Expected Result** | What should happen |
-| **Steps** | One numbered line for each step |
-| **Pre Conditions** | What must be true before the test case starts |
-| **Test Data** | The data the test case uses, exactly as typed |
-| **Reference** | A link or a ticket number |
-| **Module** | The part of the product this test case covers |
-| **Order** | Where the test case sits in its test set |
-| **Created** | Who made it, and when |
-| **Updated** | Who last changed it, and when |
+| Caption             | What it holds                                 |
+|---------------------|-----------------------------------------------|
+| **Expected Result** | What should happen                            |
+| **Steps**           | One numbered line for each step               |
+| **Pre Conditions**  | What must be true before the test case starts |
+| **Test Data**       | The data the test case uses, exactly as typed |
+| **Reference**       | A link or a ticket number                     |
+| **Module**          | The part of the product this test case covers |
+| **Order**           | Where the test case sits in its test set      |
+| **Created**         | Who made it, and when                         |
+| **Updated**         | Who last changed it, and when                 |
 
 Above the rows sit the path, the identity, the title, the two buttons and the
 badges. They are numbered on the panel drawing on

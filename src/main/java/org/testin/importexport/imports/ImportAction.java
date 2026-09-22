@@ -16,8 +16,6 @@
 
 package org.testin.importexport.imports;
 
-import org.testin.codegen.CodeOn;
-import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -27,26 +25,28 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.JavaCode;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
+import org.testin.codegen.CodeOn;
 import org.testin.codegen.GenType;
+import org.testin.codegen.JavaCode;
 import org.testin.creator.CreateTestSet;
-import org.testin.model.DirectoryType;
+import org.testin.editor.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.testcase.TestEditorAttributes;
-import org.testin.testcase.TestEditorAttributes.Can;
-import org.testin.testcase.Rank;
-import org.testin.testcase.TestCaseOrder;
+import org.testin.model.DirectoryType;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
-import org.testin.services.Services;
 import org.testin.services.BackgroundWork;
-import org.testin.editor.TestinEditors;
+import org.testin.services.Services;
+import org.testin.testcase.Rank;
+import org.testin.testcase.TestCaseOrder;
+import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 import org.testin.util.NameSanitizer;
@@ -54,18 +54,35 @@ import org.testin.util.NameSanitizer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.Optional;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class ImportAction extends DumbAwareAction {
     public static final @NotNull String NAME = Bundle.message("import.action.name");
 
     private static final int METHODS_PER_COMMAND = 200;
+
+    private static void report(final int cases, final long startedAt, final long readyAt) {
+        final long finishedAt = System.currentTimeMillis();
+        Logger.info("Import: " + cases + " cases in " + (finishedAt - startedAt) + "ms"
+                + " (waiting for the index " + (readyAt - startedAt) + "ms,"
+                + " writing and generating " + (finishedAt - readyAt) + "ms)");
+    }
+
+    private static void onEdt(final @NotNull Runnable work) {
+        ApplicationManager.getApplication().invokeAndWait(work, ModalityState.nonModal());
+    }
+
+    private static <T> @NotNull T onEdtCompute(final @NotNull Supplier<T> work) {
+        final @NotNull List<T> answer = new ArrayList<>(1);
+        onEdt(() -> answer.add(work.get()));
+        return answer.getFirst();
+    }
 
     // UC-SHARE-005
     @Override
@@ -109,64 +126,64 @@ public class ImportAction extends DumbAwareAction {
 
             BackgroundWork.run(p, Bundle.message("import.task.importing", String.valueOf(total), selectedDirDto.getName()),
                     Bundle.message("import.failed.title"), indicator -> {
-                indicator.setIndeterminate(false);
-                final long startedAt = System.currentTimeMillis();
+                        indicator.setIndeterminate(false);
+                        final long startedAt = System.currentTimeMillis();
 
-                if (generateCode) {
-                    indicator.setText2(Bundle.message("import.progress.indexing"));
-                    DumbService.getInstance(p).waitForSmartMode();
-                }
-                final long readyAt = System.currentTimeMillis();
+                        if (generateCode) {
+                            indicator.setText2(Bundle.message("import.progress.indexing"));
+                            DumbService.getInstance(p).waitForSmartMode();
+                        }
+                        final long readyAt = System.currentTimeMillis();
 
-                int imported = 0;
+                        int imported = 0;
 
-                final @NotNull Set<String> stillEmpty = new LinkedHashSet<>();
+                        final @NotNull Set<String> stillEmpty = new LinkedHashSet<>();
 
-                try {
-                    final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targets =
-                            targetSets(selectedDirDto, targetPath, selectedCasesBySheet);
-                    targets.keySet().forEach(made -> stillEmpty.add(made.getName()));
+                        try {
+                            final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targets =
+                                    targetSets(selectedDirDto, targetPath, selectedCasesBySheet);
+                            targets.keySet().forEach(made -> stillEmpty.add(made.getName()));
 
-                    for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set : targets.entrySet()) {
-                        final @NotNull TestSetDirectoryDto into = set.getKey();
-                        final @NotNull List<TestCaseDto> cases = set.getValue();
-                        final @NotNull Path setPath = into.getPath();
+                            for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set : targets.entrySet()) {
+                                final @NotNull TestSetDirectoryDto into = set.getKey();
+                                final @NotNull List<TestCaseDto> cases = set.getValue();
+                                final @NotNull Path setPath = into.getPath();
 
-                        final @NotNull List<TestCaseDto> written = linkAndSaveTestCases(setPath, cases, rankOfTail(setPath), indicator, imported, total);
-                        if (!written.isEmpty()) stillEmpty.remove(into.getName());
+                                final @NotNull List<TestCaseDto> written = linkAndSaveTestCases(setPath, cases, rankOfTail(setPath), indicator, imported, total);
+                                if (!written.isEmpty()) stillEmpty.remove(into.getName());
 
-                        for (final TestCaseDto tc : cases) tc.setParent(into);
+                                for (final TestCaseDto tc : cases) tc.setParent(into);
 
-                        if (generateCode) generateTestMethods(written, into.getName(), indicator);
+                                if (generateCode) generateTestMethods(written, into.getName(), indicator);
 
-                        imported += written.size();
+                                imported += written.size();
 
-                        // UC-SHARE-007, Rule-SHARE-037
-                        if (indicator.isCanceled()) break;
-                    }
-                } catch (final Exception ex) {
-                    // UC-SHARE-007, Rule-SHARE-037
-                    Logger.error("Import failed after at least " + imported + " of " + total + ": " + FailureText.of(ex));
+                                // UC-SHARE-007, Rule-SHARE-037
+                                if (indicator.isCanceled()) break;
+                            }
+                        } catch (final Exception ex) {
+                            // UC-SHARE-007, Rule-SHARE-037
+                            Logger.error("Import failed after at least " + imported + " of " + total + ": " + FailureText.of(ex));
 
-                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.failed.title"),
-                            Bundle.message("import.failed.partial", String.valueOf(imported), String.valueOf(total), FailureText.of(ex)));
+                            Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.failed.title"),
+                                    Bundle.message("import.failed.partial", String.valueOf(imported), String.valueOf(total), FailureText.of(ex)));
 
-                    refreshTarget(targetPath);
-                    return;
-                }
+                            refreshTarget(targetPath);
+                            return;
+                        }
 
-                if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                    onEdt(() -> Services.getInstance(p, TestinEditors.class).closeThenOpen(p, ts));
-                }
+                        if (selectedDirDto instanceof TestSetDirectoryDto ts) {
+                            onEdt(() -> Services.getInstance(p, TestinEditors.class).closeThenOpen(p, ts));
+                        }
 
-                Services.getInstance(p, Notifier.class).softShowCounted(p, Done.IMPORTED, imported);
+                        Services.getInstance(p, Notifier.class).softShowCounted(p, Done.IMPORTED, imported);
 
-                reportEmptySets(List.copyOf(stillEmpty));
+                        reportEmptySets(List.copyOf(stillEmpty));
 
-                report(total, startedAt, readyAt);
+                        report(total, startedAt, readyAt);
 
-                refreshTarget(targetPath);
-            });
+                        refreshTarget(targetPath);
+                    });
         }
 
         private void refreshTarget(final @NotNull Path targetPath) {
@@ -276,22 +293,5 @@ public class ImportAction extends DumbAwareAction {
 
             return existing.isEmpty() ? Optional.empty() : Optional.of(existing.getLast());
         }
-    }
-
-    private static void report(final int cases, final long startedAt, final long readyAt) {
-        final long finishedAt = System.currentTimeMillis();
-        Logger.info("Import: " + cases + " cases in " + (finishedAt - startedAt) + "ms"
-                + " (waiting for the index " + (readyAt - startedAt) + "ms,"
-                + " writing and generating " + (finishedAt - readyAt) + "ms)");
-    }
-
-    private static void onEdt(final @NotNull Runnable work) {
-        ApplicationManager.getApplication().invokeAndWait(work, ModalityState.nonModal());
-    }
-
-    private static <T> @NotNull T onEdtCompute(final @NotNull Supplier<T> work) {
-        final @NotNull List<T> answer = new ArrayList<>(1);
-        onEdt(() -> answer.add(work.get()));
-        return answer.getFirst();
     }
 }

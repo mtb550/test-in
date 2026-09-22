@@ -2,8 +2,8 @@
 
 # UC-VIEW-PANEL-009: Copy a test case's identity, or go to it
 
-**As a** tester, **I want** the test case's identity on my clipboard,
-**so that** I can paste it into a bug report and anyone can find the exact test
+**As a** tester, **I want** the test case's identity on my clipboard, **so that** I can paste it into a bug report and
+anyone can find the exact test
 case again.
 
 The identity is a long code. It never changes, even when the title does.

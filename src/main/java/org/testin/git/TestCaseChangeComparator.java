@@ -16,12 +16,12 @@
 
 package org.testin.git;
 
-import org.testin.model.Groups;
-import org.testin.testcase.TestEditorAttributes;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.Groups;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.TestEditorAttributes;
 
 import java.util.ArrayList;
 import java.util.List;

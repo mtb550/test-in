@@ -17,15 +17,14 @@
 package org.testin.testcase.create;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.SpellChecker;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.util.Shortcuts;
+import org.testin.util.SpellChecker;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
 // Rule-EDITOR-PANEL-032
 public class TestDataSection extends AbstractMultiLineSection {
@@ -49,7 +48,7 @@ public class TestDataSection extends AbstractMultiLineSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull Runnable repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto) {
         field.setText(dto.getTestData());
     }
 }

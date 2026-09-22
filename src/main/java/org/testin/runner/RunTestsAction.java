@@ -16,7 +16,6 @@
 
 package org.testin.runner;
 
-import org.testin.codegen.CodeOn;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -24,7 +23,9 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
+import org.testin.codegen.CodeOn;
 import org.testin.editor.TestinEditor;
+import org.testin.editor.TestinEditors;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -34,7 +35,6 @@ import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
-import org.testin.editor.TestinEditors;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,8 +43,8 @@ public class RunTestsAction extends DumbAwareAction {
     // Rule-TREE-PANEL-079
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (!CodeOn.enableOrExplain(this, e)) return;
-        if (!OptionalPlugin.TESTNG.enableOrExplain(this, e.getPresentation())) return;
+        if (CodeOn.grayedWithReason(this, e)) return;
+        if (OptionalPlugin.TESTNG.grayedWithReason(this, e.getPresentation())) return;
 
         e.getPresentation().setEnabled(runnable(e).isPresent() || selectedRun(e).isPresent());
     }

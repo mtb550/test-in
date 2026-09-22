@@ -16,21 +16,21 @@
 
 package org.testin.testcase.create;
 
-import org.testin.codegen.GenType;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.services.Services;
-import org.testin.util.Bundle;
 import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import java.util.List;
 import java.util.function.Consumer;
 

@@ -16,8 +16,6 @@
 
 package org.testin.java.codegen.pkg;
 
-import org.testin.java.codegen.PackageDeclarations;
-import org.testin.util.Bundle;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -26,7 +24,9 @@ import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
 import org.testin.codegen.Renamed;
+import org.testin.java.codegen.PackageDeclarations;
 import org.testin.logger.Logger;
+import org.testin.util.Bundle;
 
 import java.io.IOException;
 import java.util.List;

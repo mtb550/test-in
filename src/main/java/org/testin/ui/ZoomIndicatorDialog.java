@@ -32,19 +32,23 @@ import org.testin.services.Services;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Bundle;
 
-import java.util.Optional;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.Timer;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 @Service(Service.Level.PROJECT)
 public final class ZoomIndicatorDialog implements Disposable {
     private final @NotNull Project p;
-
-    private @NotNull Optional<JBPopup> currentPopup = Optional.empty();
-
     private final @NotNull Timer hideTimer = new Timer(5000, e -> hide());
+    private @NotNull Optional<JBPopup> currentPopup = Optional.empty();
 
     ZoomIndicatorDialog(final @NotNull Project p) {
         this.p = p;

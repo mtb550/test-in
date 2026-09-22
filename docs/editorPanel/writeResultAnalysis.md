@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-045: Write the result analysis
 
-**As a** tester, **I want** to say what the run as a whole showed,
-**so that** the report carries my judgment and not only the figures.
+**As a** tester, **I want** to say what the run as a whole showed, **so that** the report carries my judgment and not
+only the figures.
 
 Four boxes, one for each verdict. What the tester writes goes into the report.
 

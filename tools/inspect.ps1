@@ -25,12 +25,17 @@
     main. It was on a two-day schedule until 2026-09-12: a calendar runs it over
     code nobody touched and misses the push that mattered.
 
-    Exits non-zero for eight findings and no others. Two are the inspector's and
-    are the standing rule, a null contract the checker can prove is broken:
-    DataFlowIssue and ReturnNull. Six are this script's own, each a rule no
+    Exits non-zero for nineteen findings and no others. Twelve are the
+    inspector's. DataFlowIssue and ReturnNull are the standing rule, a null
+    contract the checker can prove is broken. Convert2MethodRef,
+    CodeBlock2Expr, SimplifyStreamApiCallChains, StringBufferReplaceableByString,
+    SameParameterValue, BooleanMethodIsAlwaysInverted, UnusedReturnValue,
+    UNUSED_IMPORT, OnDemandImport and ConvertToStringTemplate forbid
+    code that says something the long way round; CONTRIBUTING.md has a line on
+    each. Seven are this script's own, each a rule no
     IntelliJ inspection makes: WrappedMethodDeclaration, StaticMutableState,
-    HandWrittenPrivateConstructor, DriftedCaption, OrphanedJavadoc and
-    MissingCopyright. The list is written once, in $gate at the foot of this
+    HandWrittenPrivateConstructor, DriftedCaption, OrphanedJavadoc,
+    MissingCopyright and HtmlParagraphInMarkdown. The list is written once, in $gate at the foot of this
     file. Everything else is listed for a person to judge.
 
 .EXAMPLE
@@ -73,10 +78,18 @@ $repo = Split-Path -Parent $PSScriptRoot
 # project root - and a value cannot tell that from having no value at all.
 $narrowed = $PSBoundParameters.ContainsKey('Subdirectory')
 
-# What the inspector analyses. src/main unless narrowed, and never the whole
-# repository by accident: .sandbox holds an entire IDE installation, and
-# inspecting it produced 74,803 spellcheck findings against 33 in src.
-$analysisScope = if ($narrowed) { $Subdirectory } else { 'src/main' }
+# What the inspector analyses: the whole project unless narrowed, and what is
+# kept of it: the files .idea/scopes/Inspected.xml names, which is everything
+# this repository writes. The inspector reads everything because a whole-project
+# check judged on part of the tree is wrong - run on 'src/main' alone, a throws
+# clause testin-java needs was reported redundant, and the content modules, the
+# tests and every Markdown file were never read at all. It cannot be told the
+# scope instead: its -scope option and the idea.analyze.scope property both
+# failed headless, the first matching nothing and the second nothing less than
+# the whole repository. So Select-Inspected drops what lies outside - .sandbox,
+# which holds an entire IDE and produced 74,803 spelling findings, this script's
+# own scratch folder, and the sample data.
+$analysisScope = if ($narrowed) { $Subdirectory } else { '' }
 
 function Resolve-Inspector {
     $props = Get-Content (Join-Path $repo 'gradle.properties')
@@ -139,6 +152,33 @@ idea.log.path=$s/log
         & $inspect @arguments
     } finally {
         Remove-Item Env:\IDEA_PROPERTIES -ErrorAction SilentlyContinue
+    }
+}
+
+function Select-Inspected([object[]] $problems) {
+    <#
+        The findings in files this repository writes, which is what the scope
+        .idea/scopes/Inspected.xml names - the same scope Code | Inspect Code
+        offers in the IDE, so the two lists agree. A folder is written as
+        file:folder//* and a single file as file:name.
+    #>
+    $pattern = ([xml](Get-Content (Join-Path $repo '.idea/scopes/Inspected.xml') -Raw)).component.scope.pattern
+    $folders = @()
+    $files = @()
+    foreach ($part in $pattern -split '\|\|') {
+        $target = $part -replace '^file:', ''
+        if ($target.EndsWith('//*')) { $folders += $target.Substring(0, $target.Length - 3) + '/' } else { $files += $target }
+    }
+
+    # The spell checker knows English. A translation bundle is not English, and
+    # its words are its translator's to check: 1,748 "typos" in messages_fr were
+    # French. Every other check still reads the translations.
+    $translation = '^src/main/resources/messages_[a-z]{2}\.properties$'
+
+    $problems | Where-Object {
+        $path = $_.Path.TrimEnd('/')
+        $inScope = ($files -contains $path) -or @($folders | Where-Object { $path.StartsWith($_) }).Count -gt 0
+        $inScope -and -not ($_.Inspection -eq 'SpellCheckingInspection' -and $path -match $translation)
     }
 }
 
@@ -815,6 +855,37 @@ function Read-OrphanedJavadoc([string[]] $scopes) {
     }
 }
 
+function Read-HtmlParagraphInMarkdown {
+    <#
+        A paragraph break written as HTML in a Markdown file.
+
+        A line holding only <p> opens a raw HTML block that runs to the next
+        blank line. Inside it backticks stop marking code, so a placeholder
+        such as git show af5f3013:<path> is read as an element that is never
+        closed, and the IDE says so. CLAUDE.md carried seven of them until
+        22 September 2026. A blank line is the Markdown for the same break,
+        indented under a list item when the paragraph belongs to one.
+
+        Every tracked Markdown file is read, the repository's root included,
+        which is where CLAUDE.md sits and where the inspector does not look.
+    #>
+    foreach ($relative in @(git -C $repo ls-files '*.md')) {
+        $lines = [System.IO.File]::ReadAllLines((Join-Path $repo $relative))
+
+        for ($i = 0; $i -lt $lines.Count; $i++) {
+            if ($lines[$i].Trim() -ne '<p>') { continue }
+
+            [pscustomobject]@{
+                Path       = $relative
+                Line       = $i + 1
+                Inspection = 'HtmlParagraphInMarkdown'
+                Severity   = 'ERROR'
+                Message    = 'A bare <p> opens a raw HTML block, where backticks stop being code. Separate the paragraphs with a blank line.'
+            }
+        }
+    }
+}
+
 function Read-MissingCopyright([string[]] $scopes) {
     <#
         A file that does not say who owns it or on what terms.
@@ -927,6 +998,7 @@ if (-not $ReportOnly) {
 $scopes = if ($narrowed) { @(Join-Path $repo $Subdirectory) } else { Get-SourceRoots }
 
 $problems = @(Read-Problems $outPath)
+if (-not $narrowed) { $problems = @(Select-Inspected $problems) }
 
 # Two kinds of rule, and they read different trees.
 #
@@ -947,6 +1019,7 @@ foreach ($scope in $everyTree) { $problems += @(Read-WrappedDeclarations $scope)
 $problems += @(Read-HandWrittenPrivateConstructors $everyTree)
 $problems += @(Read-OrphanedJavadoc $everyTree)
 $problems += @(Read-MissingCopyright $everyTree)
+$problems += @(Read-HtmlParagraphInMarkdown)
 
 $problems += @(Read-DuplicatedDisplayStrings $scopes)
 $problems += @(Read-ModelStatics @((Join-Path $repo 'src/main/java/org/testin/model')))
@@ -972,16 +1045,18 @@ Write-DisplayStringInventory $scopes $outPath
 
 # What is not allowed to survive a sweep. The first two are the project's
 # standing rule - a null contract the checker can prove is broken is a defect,
-# not a style note. The rest are this script's own rules, and every one of them
-# is at zero, so each gates outright: the first that appears is the one to look
-# at.
+# not a style note. The next eight forbid code that says something the long way
+# round; CONTRIBUTING.md has a line on each, and the profile names every one,
+# because the inspector did not run Convert2MethodRef until it was named. The
+# rest are this script's own rules. Every one of them is at zero, so each gates
+# outright: the first that appears is the one to look at.
 #
 # Everything else the inspector reports is a judgement call and needs a person,
 # so it is listed and not gated: this exits non-zero for these only, which is
 # what lets the scheduled run in .github/workflows/inspect.yml mean something.
 # DuplicatedDisplayString is not here: it is ratcheted below instead, and
 # .github/display-string-baseline.txt is where its history is written.
-$gate = @('DataFlowIssue', 'ReturnNull', 'WrappedMethodDeclaration', 'StaticMutableState', 'HandWrittenPrivateConstructor', 'DriftedCaption', 'OrphanedJavadoc', 'MissingCopyright')
+$gate = @('DataFlowIssue', 'ReturnNull', 'Convert2MethodRef', 'CodeBlock2Expr', 'SimplifyStreamApiCallChains', 'StringBufferReplaceableByString', 'SameParameterValue', 'BooleanMethodIsAlwaysInverted', 'UnusedReturnValue', 'UNUSED_IMPORT', 'OnDemandImport', 'ConvertToStringTemplate', 'WrappedMethodDeclaration', 'StaticMutableState', 'HandWrittenPrivateConstructor', 'DriftedCaption', 'OrphanedJavadoc', 'MissingCopyright', 'HtmlParagraphInMarkdown')
 $breaches = @($problems | Where-Object { $gate -contains $_.Inspection })
 
 if ($breaches) {

@@ -16,28 +16,24 @@
 
 package org.testin.creator;
 
-import org.testin.actions.GrayWithReason;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
+import org.testin.actions.GrayWithReason;
 import org.testin.creator.dialogs.CreateProjectDialog;
 import org.testin.explorer.TreePanel;
 import org.testin.git.GitRefs;
-import org.testin.notifications.Notifier;
+import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.CloneTestProject;
 import org.testin.testproject.NewTestProject;
-import org.testin.services.OptionalPlugin;
+import org.testin.testproject.TestProjectFolder;
 import org.testin.util.Bundle;
-import org.testin.indexer.ProjectIndexer;
-import org.testin.notifications.Refused;
 
-import java.nio.file.Path;
-import java.util.Optional;
 
 public class CreateTestProjectAction extends AbstractProjectAction {
     private final @NotNull TreePanel tp;
@@ -61,16 +57,11 @@ public class CreateTestProjectAction extends AbstractProjectAction {
                 return;
             }
 
-            if (!OptionalPlugin.GIT.isAvailableOrWarn(p)) return;
+            if (OptionalPlugin.GIT.isMissingAndWarned(p)) return;
 
             // Rule-TREE-PANEL-107
             final @NotNull String projectName = CloneTestProject.nameFor(p, name);
-            final @NotNull Path folder = Services.getInstance(p, TestinRoot.class).getPath().resolve(projectName);
-
-            if (Services.getInstance(p, ProjectIndexer.class).isTaken(folder, Optional.empty())) {
-                Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, projectName);
-                return;
-            }
+            if (TestProjectFolder.free(p, projectName).isEmpty()) return;
 
             new CloneTestProject(p, name, projectName, tp).execute();
 

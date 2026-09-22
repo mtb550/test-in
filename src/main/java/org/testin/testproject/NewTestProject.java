@@ -16,21 +16,18 @@
 
 package org.testin.testproject;
 
-import lombok.AllArgsConstructor;
 import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.DirectoryMapper;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
-import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.setting.TestinRoot;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 // UC-TREE-PANEL-002
 @AllArgsConstructor
@@ -41,13 +38,11 @@ public final class NewTestProject {
 
     // UC-TREE-PANEL-002, Rule-TREE-PANEL-017
     public void execute() {
-        final @NotNull Path tpPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(tpName);
+        TestProjectFolder.free(p, tpName).ifPresent(this::create);
+    }
 
-        if (Services.getInstance(p, ProjectIndexer.class).isTaken(tpPath, Optional.empty())) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, tpName);
-            return;
-        }
-
+    // UC-TREE-PANEL-002, Rule-TREE-PANEL-017
+    private void create(final @NotNull Path tpPath) {
         final @NotNull TestProjectDirectoryDto created = Services.getInstance(p, DirectoryMapper.class).setTestProjectNode(p, tpPath);
 
         if (!Services.getInstance(p, ProjectIndexer.class).addTestProject(created)) return;

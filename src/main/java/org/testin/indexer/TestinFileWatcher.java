@@ -32,20 +32,6 @@ import java.util.Optional;
 import java.util.Set;
 
 public final class TestinFileWatcher implements AsyncFileListener {
-    // UC-INTERNAL-003, Rule-INTERNAL-016
-    @Override
-    public @Nullable ChangeApplier prepareChange(final @NotNull List<? extends VFileEvent> events) {
-        final @NotNull Set<Path> testProjects = changedTestProjects(events);
-        if (testProjects.isEmpty()) return null;
-
-        return new ChangeApplier() {
-            @Override
-            public void afterVfsChange() {
-                Services.getInstance(Rescan.class).of(testProjects);
-            }
-        };
-    }
-
     // UC-INTERNAL-003, Rule-INTERNAL-016, Rule-INTERNAL-019
     private static @NotNull Set<Path> changedTestProjects(final @NotNull List<? extends VFileEvent> events) {
         final @NotNull List<Path> roots = Arrays.stream(ProjectManager.getInstance().getOpenProjects())
@@ -73,5 +59,19 @@ public final class TestinFileWatcher implements AsyncFileListener {
         } catch (final RuntimeException notAFileSystemPath) {
             return Optional.empty();
         }
+    }
+
+    // UC-INTERNAL-003, Rule-INTERNAL-016
+    @Override
+    public @Nullable ChangeApplier prepareChange(final @NotNull List<? extends VFileEvent> events) {
+        final @NotNull Set<Path> testProjects = changedTestProjects(events);
+        if (testProjects.isEmpty()) return null;
+
+        return new ChangeApplier() {
+            @Override
+            public void afterVfsChange() {
+                Services.getInstance(Rescan.class).of(testProjects);
+            }
+        };
     }
 }

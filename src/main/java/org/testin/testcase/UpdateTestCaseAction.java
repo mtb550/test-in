@@ -16,9 +16,6 @@
 
 package org.testin.testcase;
 
-import org.testin.actions.GrayWithReason;
-import org.testin.codegen.GenType;
-import org.testin.notifications.Done;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -26,12 +23,15 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
+import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.create.TestCaseUpdateMenuDialog;
@@ -46,17 +46,17 @@ import java.util.stream.Collectors;
 // UC-EDITOR-PANEL-006
 public class UpdateTestCaseAction extends DumbAwareAction {
     // UC-EDITOR-PANEL-006
+    public static void openField(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull UpdateTestCaseFields field) {
+        new Work(p, editor).overSelection(menu -> menu.open(field));
+    }
+
+    // UC-EDITOR-PANEL-006
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
         TestinData.editor(e).ifPresent(editor -> new Work(p, editor).overSelection(TestCaseUpdateMenuDialog::show));
-    }
-
-    // UC-EDITOR-PANEL-006
-    public static void openField(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull UpdateTestCaseFields field) {
-        new Work(p, editor).overSelection(menu -> menu.open(field));
     }
 
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194

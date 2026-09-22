@@ -21,13 +21,15 @@ import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.time.ZonedDateTime;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Revert is the one destructive button in the pending-commits review, and it is

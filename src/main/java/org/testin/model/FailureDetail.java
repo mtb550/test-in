@@ -21,6 +21,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import org.testin.util.Bundle;
+
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -64,14 +65,11 @@ public enum FailureDetail {
             item -> item.setBugIssueUrl("")
     );
 
-    private final @NotNull String label;
-
-    private final @NotNull Predicate<TestRunItems> filled;
-
-    private final @NotNull Consumer<TestRunItems> clear;
-
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-220
     public static final @NotNull List<FailureDetail> WHAT_HAPPENED = List.of(ACTUAL_RESULT, STACKTRACE, SCREENSHOTS);
+    private final @NotNull String label;
+    private final @NotNull Predicate<TestRunItems> filled;
+    private final @NotNull Consumer<TestRunItems> clear;
 
     // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-064
     public static boolean recordsABug(final @NotNull TestRunItems item) {

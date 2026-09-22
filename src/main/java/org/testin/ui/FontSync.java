@@ -16,8 +16,6 @@
 
 package org.testin.ui;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
@@ -26,10 +24,13 @@ import com.intellij.openapi.editor.colors.EditorColorsListener;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.project.Project;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import java.awt.Component;
+import java.awt.Container;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -40,11 +41,6 @@ public final class FontSync {
 
     public static float getBaseFontSize() {
         return EditorColorsManager.getInstance().getGlobalScheme().getEditorFontSize();
-    }
-
-    @FunctionalInterface
-    public interface Refit {
-        void by(float delta);
     }
 
     public static void syncWithNativeEditor(final @NotNull Project p, final @NotNull JComponent component, final @NotNull Disposable parentDisposable) {
@@ -126,5 +122,10 @@ public final class FontSync {
             if (child instanceof Container)
                 applyDeltaRecursively((Container) child, delta);
         }
+    }
+
+    @FunctionalInterface
+    public interface Refit {
+        void by(float delta);
     }
 }
