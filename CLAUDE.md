@@ -319,9 +319,9 @@ silently has no effect costs more than the setting it was meant to hold.
   the tree. Muteb, 22 September 2026: *"no need to run inspector here anymore,
   let us make it every push."*
 
-  A sweep across many files used to be the exception, and it is not one any
-  more: push the branch and read the run. The IDE shows the same findings while
-  you type, because `.idea/inspectionProfiles/Testin.xml` is the project
+  A sweep across many files used to be the exception, and it is not one
+  anymore: push the branch and read the run. The IDE shows the same findings
+  while you type, because `.idea/inspectionProfiles/Testin.xml` is the project
   profile, and **Code | Inspect Code** over the *Inspected* scope produces the
   list the gate reads.
 

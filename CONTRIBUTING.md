@@ -172,8 +172,10 @@ version that no longer exists, which reads exactly like a real defect.
 It exits non-zero for any finding in the files the repository writes: the scope
 `.idea/scopes/Inspected.xml` names, which **Code | Inspect Code** offers in the
 IDE as *Inspected*. A warning the IDE shows there is a warning CI fails on. The
-exceptions are the rules a headless run cannot be trusted with, and `$notGated`
-in `tools/inspect.ps1` names each one with its reason:
+exceptions are the rules a headless run cannot be trusted with, which
+`tools/inspect.ps1` names with its reason in `$notGated`, or in
+`$notGatedMessages` where only one sentence of an otherwise reliable rule is
+excused:
 
 | Not gated                                                                                          | Why                                                                                                                                                                                                                                                                          |
 |----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -185,10 +187,12 @@ in `tools/inspect.ps1` names each one with its reason:
 | `UndefinedParamsPresent`                                                                           | A workflow action's inputs come from its metadata online, which the headless run does not fetch                                                                                                                                                                              |
 | `JSUnresolvedLibraryURL`                                                                           | It asks whether this machine has downloaded a library that a page loads from a CDN                                                                                                                                                                                           |
 | `DuplicatedDisplayString`                                                                          | Counted against `.github/display-string-baseline.txt` instead of forbidden. It stands at 0                                                                                                                                                                                   |
+| `XmlHighlighting`, where the URI *is not registered*                                               | Both plugin icons declare the SVG namespace, and a headless IDE with no schema catalog and no network cannot look it up. Every other XML finding is gated                                                                                                                    |
+| A finding with no description at all                                                               | The Markdown annotator reports one for each `[*]` in a Mermaid state diagram - the start and end state the syntax is built on - and says nothing about it. A gate cannot ask for a fix it cannot name                                                                        |
 
-The four rules above are the global ones, and the headless run under-reports
-them all: it sees neither Lombok's generated code nor the content modules'
-callers. `UnusedReturnValue` is gated and reported zero on 22 September 2026,
+`unused`, `SameReturnValue`, `RedundantThrows` and `UnusedReturnValue` are the
+global ones, and the headless run under-reports them all: it sees neither
+Lombok's generated code nor the content modules' callers. `UnusedReturnValue` is gated and reported zero on 22 September 2026,
 while the IDE found `FormRows.wideRow`. For these four, **Code | Inspect Code**
 in the IDE is the honest list.
 

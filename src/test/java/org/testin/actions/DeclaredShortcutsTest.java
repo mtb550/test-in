@@ -107,7 +107,7 @@ public class DeclaredShortcutsTest {
         declared.putAll(declaredKeys("Mac OS X 10.5+"));
 
         SHARED_ON_PURPOSE.forEach((key, ids) -> assertEquals(declared.get(key), ids,
-                key + " is excused as shared by " + ids + ", and that is not what plugin.xml says any more."
+                key + " is excused as shared by " + ids + ", and that is not what plugin.xml says anymore."
                         + " Remove the entry, or say which pair shares it now."));
     }
 

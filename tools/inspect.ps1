@@ -29,8 +29,9 @@
     ones .idea/scopes/Inspected.xml names. A warning the IDE shows there is a
     warning the run fails on. The exceptions are the few rules a headless run
     cannot be trusted with, and $notGated at the foot of this file names each
-    one with its reason. DuplicatedDisplayString is counted rather than
-    forbidden, against .github/display-string-baseline.txt.
+    one with its reason - as $notGatedMessages does for the two that are right
+    about everything but one sentence. DuplicatedDisplayString is counted rather
+    than forbidden, against .github/display-string-baseline.txt.
 
     Eight rules are this script's own, because no IntelliJ inspection makes
     them: WrappedMethodDeclaration, StaticMutableState,
@@ -1172,17 +1173,30 @@ $notGated = [ordered]@{
     'DuplicatedDisplayString' = 'counted against .github/display-string-baseline.txt below instead'
 }
 
-# An unused finding is gated, apart from the two kinds the headless run gets
-# wrong. A method "not reachable from the entry points" is one the platform
-# reaches through an interface it implements. A constructor "never used" is one
-# Lombok's @Builder calls. A private member, a parameter or a local that nothing
-# reads is judged correctly, and fails the run like any other finding.
-$misjudgedUnused = @('not reachable from the entry points', 'Constructor is never used')
+# Two inspections are right about everything except one sentence each, so they
+# are excused by what the finding says rather than by its name. An "unused"
+# method "not reachable from the entry points" is one the platform reaches
+# through an interface it implements, and a constructor "never used" is one
+# Lombok's @Builder calls; a private member, a parameter or a local that nothing
+# reads is judged correctly and fails the run. "URI is not registered" asks
+# whether this machine holds the schema for a namespace: both plugin icons
+# declare the SVG one, and a headless IDE with no catalog and no network cannot
+# look it up.
+$notGatedMessages = [ordered]@{
+    'unused'          = @('not reachable from the entry points', 'Constructor is never used')
+    'XmlHighlighting' = @('URI is not registered')
+}
+
+# A finding whose whole description is #loc says nothing at all, and a gate
+# cannot demand a fix it cannot name. The Markdown annotator writes one for
+# every [*] in a Mermaid state diagram - four in docs/product.md - which is the
+# start and end state the syntax is built on.
+$noDescription = '#loc'
 
 function Test-Gated([object] $problem) {
     if ($notGated.Contains($problem.Inspection)) { return $false }
-    if ($problem.Inspection -ne 'unused') { return $true }
-    return -not @($misjudgedUnused | Where-Object { $problem.Message.Contains($_) }).Count
+    if ($problem.Message.Trim() -eq $noDescription) { return $false }
+    return -not @($notGatedMessages[$problem.Inspection] | Where-Object { $problem.Message.Contains($_) }).Count
 }
 
 $breaches = @($problems | Where-Object { Test-Gated $_ })
@@ -1197,7 +1211,7 @@ if ($breaches) {
 }
 
 Write-Host ''
-Write-Host "Gate clear: no finding outside $($notGated.Keys -join ', ') and the misjudged unused kinds." -ForegroundColor Green
+Write-Host "Gate clear: no finding outside $($notGated.Keys -join ', '), the sentences $($notGatedMessages.Keys -join ' and ') are excused for, and findings with no description." -ForegroundColor Green
 
 # And the one that is counted rather than forbidden. Reported after the gate so
 # a hard breach is the first thing read, and it fails the run in its own right:
