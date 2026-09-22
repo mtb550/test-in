@@ -51,7 +51,7 @@ public final class ListPanelBuilder {
         final @NotNull CollectionListModel<TestCaseDto> model = new CollectionListModel<>(new ArrayList<>());
 
         // UC-EDITOR-PANEL-001, UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-003
-        final @NotNull JBList<TestCaseDto> list = new CaseList(model, editor);
+        final @NotNull JBList<TestCaseDto> list = new TestCaseList(model, editor);
         list.setBackground(UIUtil.getPanelBackground());
         list.setOpaque(true);
         list.setPaintBusy(true);

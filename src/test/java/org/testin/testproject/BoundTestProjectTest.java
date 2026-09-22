@@ -22,10 +22,6 @@ import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
-/**
- * Rule-TREE-PANEL-106: the tester's choice on this machine wins over the
- * project {@code testin.yml} names, until the file names a different one.
- */
 public class BoundTestProjectTest {
 
     @Test

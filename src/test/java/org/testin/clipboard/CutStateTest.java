@@ -28,20 +28,8 @@ import java.util.UUID;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Whether a paste is a move, asked of the cases being pasted (#312, A55).
- * <p>
- * The clipboard is the whole IDE's and a cut is one project's, so a copy made
- * after the cut - in another window, or of other cases - is what a paste puts
- * down. Deciding "move" from "a cut is waiting" removed the cut cases and
- * pasted the copied ones as though they had moved.
- */
 public class CutStateTest {
 
-    /**
-     * An editor nothing here asks anything of: the state only remembers which
-     * one the cut came from.
-     */
     private static @NotNull TestinEditor anyEditor() {
         return StandIn.of(TestinEditor.class);
     }
@@ -51,7 +39,7 @@ public class CutStateTest {
     }
 
     @Test
-    public void theCasesThatWereCutArePastedAsAMove() {
+    public void theTestCasesThatWereCutArePastedAsAMove() {
         final @NotNull TestCaseDto first = testCase();
         final @NotNull TestCaseDto second = testCase();
         final @NotNull CutState state = new CutState();
@@ -62,7 +50,7 @@ public class CutStateTest {
     }
 
     @Test
-    public void otherCasesCopiedAfterTheCutArePastedAsACopy() {
+    public void otherTestCasesCopiedAfterTheCutArePastedAsACopy() {
         final @NotNull CutState state = new CutState();
 
         state.cut(anyEditor(), List.of(testCase()));

@@ -182,17 +182,17 @@ Test Project
         └── Test Run Result   (one per test case in the run)
 ```
 
-| Thing                | What it is                                                                                                                  | Notes                                                       |
-|----------------------|-----------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
-| **Test Project**     | The top of one tree, and one folder on disk                                                                                 | Carries a status. Removing it removes everything beneath it |
-| **Test Cases**       | The fixed folder holding everything there is to test                                                                        | Cannot be created, renamed, moved or removed                |
-| **Test Runs**        | The fixed folder holding every test run                                                                                     | Cannot be created, renamed, moved or removed                |
-| **Test Set Package** | A folder that groups test sets. One package can hold another                                                                | Carries a status                                            |
-| **Test Set**         | A named group of test cases. A test run is built from one                                                                   | Carries a status                                            |
-| **Test Case**        | One thing to test: description, preconditions, steps, expected result, test data, module, group, priority                   | The only thing in the tree a tester writes                  |
-| **Test Run Package** | A folder that groups test runs. One package can hold another                                                                | Carries a status                                            |
-| **Test Run**         | One pass through a chosen set of test cases, at one moment                                                                  | Carries a status. Holds one result per test case            |
-| **Test Run Result**  | What happened to one case in one run: verdict, who recorded it, when, how long it took, and the failure detail if it failed | Belongs to the run, not to the case                         |
+| Thing                | What it is                                                                                                                       | Notes                                                       |
+|----------------------|----------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+| **Test Project**     | The top of one tree, and one folder on disk                                                                                      | Carries a status. Removing it removes everything beneath it |
+| **Test Cases**       | The fixed folder holding everything there is to test                                                                             | Cannot be created, renamed, moved or removed                |
+| **Test Runs**        | The fixed folder holding every test run                                                                                          | Cannot be created, renamed, moved or removed                |
+| **Test Set Package** | A folder that groups test sets. One package can hold another                                                                     | Carries a status                                            |
+| **Test Set**         | A named group of test cases. A test run is built from one                                                                        | Carries a status                                            |
+| **Test Case**        | One thing to test: description, preconditions, steps, expected result, test data, module, group, priority                        | The only thing in the tree a tester writes                  |
+| **Test Run Package** | A folder that groups test runs. One package can hold another                                                                     | Carries a status                                            |
+| **Test Run**         | One pass through a chosen set of test cases, at one moment                                                                       | Carries a status. Holds one result per test case            |
+| **Test Run Result**  | What happened to one test case in one run: verdict, who recorded it, when, how long it took, and the failure detail if it failed | Belongs to the run, not to the test case                    |
 
 > **The difference that matters most.** A test case is the *question*. A test
 > run result is one *answer*, at one moment, by one person. A test case can be
@@ -320,9 +320,9 @@ team thinks of the test case itself, across every test run it is ever in.
 | Status            | What it means                                                    |
 |-------------------|------------------------------------------------------------------|
 | **Pending**       | The default. Written, and nobody has said whether it is any good |
-| **Reviewed**      | Someone has checked the case is correct                          |
-| **Disabled**      | The case exists but is not to be used                            |
-| **To Be Updated** | The case is known to be out of date                              |
+| **Reviewed**      | Someone has checked the test case is correct                     |
+| **Disabled**      | The test case exists but is not to be used                       |
+| **To Be Updated** | The test case is known to be out of date                         |
 
 > ** Nothing in the product uses this today.** It can be set in exactly one
 > place. The tester switches on the **Status** column in the grid view, which is
@@ -350,37 +350,38 @@ editor toolbar, or a key. **A capability with no key says so, and says why.**
 | Create a node: test project, package, test set or test case | `Ctrl+M`                        | The dialog offers only what is legal in the selected place                                                |
 | Open the selected node                                      | `Enter`                         |                                                                                                           |
 | Rename                                                      | `F2`                            |                                                                                                           |
-| Rename, carrying the automation code with it                | `Shift+F6`                      | Renames the generated method too, so the case stays runnable                                              |
+| Rename, carrying the automation code with it                | `Shift+F6`                      | Renames the generated method too, so the test case stays runnable                                         |
 | Reorder within the parent                                   | —                               | Drag, or the menu. Order carries meaning: it is the execution order                                       |
 | Copy / Cut / Paste a node                                   | `Ctrl+C` `Ctrl+X` `Ctrl+V`      |                                                                                                           |
 | Copy / Cut / Paste a test case                              | *the right-click menu*          | No key: these are menu entries a tester clicks. `Ctrl+C` in an editor is the grid's, and stays the grid's |
 | Undo / Redo the last tree change                            | `Ctrl+Z` / `Ctrl+Y`             |                                                                                                           |
 | Delete                                                      | `Delete`                        | Refused on the two fixed containers                                                                       |
-| Edit one field of a case directly                           | `D` `E` `M` `T` `B` `S` `P` `G` | Description, expected result, module, test data, preconditions, steps, priority, group                    |
+| Edit one field of a test case directly                      | `D` `E` `M` `T` `B` `S` `P` `G` | Description, expected result, module, test data, preconditions, steps, priority, group                    |
 | Bulk edit in a grid                                         | —                               | The grid takes Excel gestures: `Ctrl+C`, `Ctrl+X`, `Ctrl+V`                                               |
 | Search                                                      | `Ctrl+F`                        |                                                                                                           |
 
 ### 6.2 Execution — the flow the product exists for
 
-| Capability                                    | Key                 | Notes                                                     |
-|-----------------------------------------------|---------------------|-----------------------------------------------------------|
-| Start execution                               | —                   | Toolbar. Begins at the first case the run has not reached |
-| Run the selected cases through the automation | `F5`                |                                                           |
-| Run everything a node holds                   | —                   | Context menu, on a test set or a test run                 |
-| Stop                                          | —                   | Toolbar. Puts every case it started back                  |
-| **Record Passed**                             | **`P`**             |                                                           |
-| **Record Failed**                             | **`F`**             | Opens the failure detail dialog in the same gesture       |
-| **Record Blocked**                            | **`B`**             |                                                           |
-| Move to the next / previous case              | `Ctrl+→` / `Ctrl+←` |                                                           |
-| Set the run's status                          | `1` `2` `3`         | Assigned, Completed, Closed                               |
-| Jump to the generated automation method       | `Shift+F5`          |                                                           |
-| Generate the automation method                | `F12`               |                                                           |
+| Capability                                         | Key                 | Notes                                                          |
+|----------------------------------------------------|---------------------|----------------------------------------------------------------|
+| Start execution                                    | —                   | Toolbar. Begins at the first test case the run has not reached |
+| Run the selected test cases through the automation | `F5`                |                                                                |
+| Run everything a node holds                        | —                   | Context menu, on a test set or a test run                      |
+| Stop                                               | —                   | Toolbar. Puts every test case it started back                  |
+| **Record Passed**                                  | **`P`**             |                                                                |
+| **Record Failed**                                  | **`F`**             | Opens the failure detail dialog in the same gesture            |
+| **Record Blocked**                                 | **`B`**             |                                                                |
+| Move to the next / previous test case              | `Ctrl+→` / `Ctrl+←` |                                                                |
+| Set the run's status                               | `1` `2` `3`         | Assigned, Completed, Closed                                    |
+| Jump to the generated automation method            | `Shift+F5`          |                                                                |
+| Generate the automation method                     | `F12`               |                                                                |
 
 > **ℹ Light mode is missing from this table.** It was built after this draft: a
-> standalone always-on-top window showing one case at a time, so a tester can work
-> with the IDE minimized and still record a verdict. The keys are `P`, `F` and
-> `B`, with `Ctrl+D` for the rest of the test case and `Escape` to close. It is
-> the clearest example of section 2's idea, and it is not described here.
+> standalone always-on-top window showing one test case at a time, so a tester
+> can work with the IDE minimized and still record a verdict. The keys are `P`,
+> `F` and `B`, with `Ctrl+D` for the rest of the test case and `Escape` to
+> close. It is the clearest example of section 2's idea, and it is not
+> described here.
 > See
 > [the light mode document](editorPanel/lightMode.md).
 
@@ -458,8 +459,8 @@ Numbered so an issue or a commit can cite one.
 
 | BR                   | Rule                                                                                                                                                                                                                                                                                    |
 |----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Rule-PRODUCT-007** | A test run is a record of an execution at a point in time, not a live view of the test set. Changing a case after a run has judged it does not change what the run recorded.                                                                                                            |
-| **Rule-PRODUCT-008** | A result is written into the run the tester started, and no other. The same case running in another run does not affect this one.                                                                                                                                                       |
+| **Rule-PRODUCT-007** | A test run is a record of an execution at a point in time, not a live view of the test set. Changing a test case after a run has judged it does not change what the run recorded.                                                                                                       |
+| **Rule-PRODUCT-008** | A result is written into the run the tester started, and no other. The same test case running in another run does not affect this one.                                                                                                                                                  |
 | **Rule-PRODUCT-009** | A test case may belong to any number of runs and carry a different verdict in each. The verdict belongs to the run.                                                                                                                                                                     |
 | **Rule-PRODUCT-010** | Every verdict records who gave it and when, whether a person typed it or the automation reported it.                                                                                                                                                                                    |
 | **Rule-PRODUCT-011** | A signed-off run records nothing further. Once Completed or Closed, execution cannot be started on it and no result arriving from anywhere is written into it. The one exception is the bug issue link a failed test case is reported as, which changes no verdict (UC-VIEW-PANEL-016). |
@@ -535,7 +536,7 @@ answered.
 | Planned actor | What they would do                                                                                                                                                                                                              | Tracked in                                                                                               |
 |---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
 | **Lead**      | Assign a run to a tester and watch its progress without executing it                                                                                                                                                            | [#14](https://github.com/mtb550/test-in/issues/14)                                                       |
-| **Lead**      | Be notified when a run completes or a case fails, without opening the IDE                                                                                                                                                       | [#15](https://github.com/mtb550/test-in/issues/15), [#159](https://github.com/mtb550/test-in/issues/159) |
+| **Lead**      | Be notified when a run completes or a test case fails, without opening the IDE                                                                                                                                                  | [#15](https://github.com/mtb550/test-in/issues/15), [#159](https://github.com/mtb550/test-in/issues/159) |
 | **Any role**  | Gate capabilities by role: who may approve a test case, and who may remove a test project. This is what the stored `Tester role` is reserved for — it is the reason the field stays on the settings page while nothing reads it | [#14](https://github.com/mtb550/test-in/issues/14)                                                       |
 
 ---
@@ -547,16 +548,16 @@ answered.
 | **Test Project**    | The top of one tree. One folder, holding everything below it                                    |
 | **Test Set**        | A named group of test cases. A test run is built from one                                       |
 | **Test Case**       | One testable thing, with its steps and expected result. The question                            |
-| **Test Run**        | One execution of a chosen set of cases at a point in time                                       |
-| **Test Run Result** | What happened to one case in one run. The answer                                                |
+| **Test Run**        | One execution of a chosen set of test cases at a point in time                                  |
+| **Test Run Result** | What happened to one test case in one run. The answer                                           |
 | **Verdict**         | Passed, Failed or Blocked — the three a tester can give                                         |
-| **Pending**         | This run holds the case and has not reached it yet                                              |
-| **Untested**        | The run ended without ever reaching the case                                                    |
+| **Pending**         | This run holds the test case and has not reached it yet                                         |
+| **Untested**        | The run ended without ever reaching the test case                                               |
 | **Removed**         | The test case has been deleted. The test run keeps what it recorded                             |
 | **Signed off**      | Completed or Closed. A signed-off test run records nothing further, apart from a bug issue link |
 | **Deprecated**      | A test set kept for its history but no longer offered for new runs                              |
 | **Archived**        | A package kept but moved out of the way                                                         |
-| **Automation**      | The generated test method that executes a case without a person                                 |
+| **Automation**      | The generated test method that executes a test case without a person                            |
 
 ---
 

@@ -51,7 +51,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     DESCRIPTION(
             TestEditorAttributes.DESCRIPTION.getName(),
             ToolBarDefault.ON,
-            item -> item.shownCase().getDescription()
+            item -> item.shownTestCase().getDescription()
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
@@ -61,34 +61,34 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     EXPECTED_RESULT(
             TestEditorAttributes.EXPECTED_RESULT.getName(),
             ToolBarDefault.ON,
-            item -> item.shownCase().getExpectedResult()
+            item -> item.shownTestCase().getExpectedResult()
     ),
 
     STEPS(
             TestEditorAttributes.STEPS.getName(),
             ToolBarDefault.OFF,
-            item -> String.join(", ", item.shownCase().getSteps())
+            item -> String.join(", ", item.shownTestCase().getSteps())
     ),
 
     PRIORITY(
             TestEditorAttributes.PRIORITY.getName(),
             ToolBarDefault.OFF,
-            item -> item.shownCase().getPriority().getLabel()
+            item -> item.shownTestCase().getPriority().getLabel()
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
-            Badges.addPriorityBadge(badges, runItem.shownCase());
+            Badges.addPriorityBadge(badges, runItem.shownTestCase());
         }
     },
 
     GROUP(
             TestEditorAttributes.GROUP.getName(),
             ToolBarDefault.OFF,
-            item -> Groups.text(item.shownCase().getGroup())
+            item -> Groups.text(item.shownTestCase().getGroup())
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
-            runItem.shownCase().getGroup().stream().map(Badges::createGroupBadge).forEach(badges::add);
+            runItem.shownTestCase().getGroup().stream().map(Badges::createGroupBadge).forEach(badges::add);
         }
     },
 
@@ -160,13 +160,13 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     PATH(
             TestEditorAttributes.PATH.getName(),
             ToolBarDefault.OFF,
-            item -> String.join(" > ", item.liveCase().getParent().getPath2())
+            item -> String.join(" > ", item.liveTestCase().getParent().getPath2())
     ),
 
     FQCN(
             TestEditorAttributes.FQCN.getName(),
             ToolBarDefault.LOCKED_UNCHECKED,
-            item -> String.join(" > ", Fqcn.ofMethod(item.liveCase()))
+            item -> String.join(" > ", Fqcn.ofMethod(item.liveTestCase()))
     );
 
     private final @NotNull String name;

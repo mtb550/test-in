@@ -32,10 +32,10 @@
     one with its reason. DuplicatedDisplayString is counted rather than
     forbidden, against .github/display-string-baseline.txt.
 
-    Seven rules are this script's own, because no IntelliJ inspection makes
+    Eight rules are this script's own, because no IntelliJ inspection makes
     them: WrappedMethodDeclaration, StaticMutableState,
-    HandWrittenPrivateConstructor, DriftedCaption, OrphanedJavadoc,
-    MissingCopyright and HtmlParagraphInMarkdown.
+    HandWrittenPrivateConstructor, NonMarkerComment, DriftedCaption,
+    OrphanedJavadoc, MissingCopyright and HtmlParagraphInMarkdown.
 
 .EXAMPLE
     pwsh tools/inspect.ps1
@@ -122,13 +122,19 @@ function Resolve-Inspector {
 }
 
 function Invoke-Inspector([string] $inspect, [string] $outPath) {
-    # Inside the output folder, so the caller that empties it for a fresh run
-    # empties these caches with it. Starting them from empty every time is the
-    # point: reusing them is tempting - they hold the indexes and make a second
-    # run far quicker - but the VFS snapshot in there can survive a source edit
-    # and be analysed instead of the file on disk, which reports findings that
-    # were already fixed. A slow run beats a stale one.
-    $scratch = Join-Path $outPath 'ide'
+    # Outside the repository, and emptied before every run. Both halves matter.
+    #
+    # Empty, because reusing these caches is tempting - they hold the indexes
+    # and make a second run far quicker - but the VFS snapshot in there can
+    # survive a source edit and be analysed instead of the file on disk, which
+    # reports findings that were already fixed. A slow run beats a stale one.
+    #
+    # Outside, because they used to live in .inspection, inside the very folder
+    # being inspected: 741 MB of an IDE's own caches, indexed by the run that
+    # wrote them. The inspector reads the project from disk, so the scratch has
+    # no reason to sit in it.
+    $scratch = Join-Path ([System.IO.Path]::GetTempPath()) 'testin-inspect'
+    if (Test-Path $scratch) { Remove-Item -Path $scratch -Recurse -Force -ErrorAction SilentlyContinue }
     New-Item -ItemType Directory -Force -Path $scratch | Out-Null
 
     # Forward slashes: idea.properties is read as a Java properties file, where a
@@ -172,10 +178,12 @@ function Select-Inspected([object[]] $problems) {
         if ($target.EndsWith('//*')) { $folders += $target.Substring(0, $target.Length - 3) + '/' } else { $files += $target }
     }
 
-    # The spelling and grammar checkers know English. A translation bundle is
-    # not English, and its words are its translator's to check: 1,748 "typos"
-    # in messages_fr were French, and the grammar checker read a Hindi full stop
-    # as no stop at all. Every other check still reads the translations.
+    # The spelling and grammar checkers know English, and a translation bundle
+    # is not English: 1,746 "typos" in messages_fr and messages_hi were French
+    # and Hindi. The Testin profile switches both off in the Translations scope,
+    # which is what the IDE reads - and the headless run ignores a scope inside
+    # a profile, so the same rule is written here as well. Every other check
+    # still reads the translations.
     $translation = '^src/main/resources/messages_[a-z]{2}\.properties$'
     $language = @('SpellCheckingInspection', 'GrazieInspection', 'GrazieStyle')
 
@@ -893,6 +901,106 @@ function Read-HtmlParagraphInMarkdown {
     }
 }
 
+function Find-CommentStart([string] $line) {
+    <#
+        Where a comment starts on a line of code, or -1. A // inside a string -
+        an address, a regular expression - is not a comment, so the quotes are
+        followed rather than the slashes.
+    #>
+    $quote = ''
+
+    for ($j = 0; $j -lt $line.Length; $j++) {
+        $c = $line[$j]
+
+        if ($quote) {
+            if ($c -eq '\') { $j++; continue }
+            if ($c -eq $quote) { $quote = '' }
+            continue
+        }
+
+        if ($c -eq '"' -or $c -eq "'") { $quote = $c; continue }
+        if ($c -eq '/' -and $j + 1 -lt $line.Length -and ($line[$j + 1] -eq '/' -or $line[$j + 1] -eq '*')) { return $j }
+    }
+
+    return -1
+}
+
+function Read-NonMarkerComments([string[]] $scopes) {
+    <#
+        A comment that is not a marker.
+
+        The code carries a UC- or Rule- marker and nothing else. The marker says
+        which documented behavior this is, docs/ says what that behavior is, and
+        the commit message says why the code is shaped this way - where git
+        blame reaches it and where it cannot drift from the code.
+
+        27,483 comment lines came out of src/main in af5f3013, and 4,256 came
+        out of the tests on 22 September 2026. Nothing stopped the next one
+        until this rule, and a javadoc block was back in src/test the same week.
+
+        Three kinds stay. The Apache notice every file opens with, which
+        MissingCopyright checks instead. The ones a machine reads - //noinspection,
+        // @formatter:off - because they are part of the build rather than prose.
+        And the markers themselves. A // inside a text block or a string is not
+        a comment and is left alone.
+    #>
+    $keep = '^//\s*(UC-|Rule-|noinspection|@formatter)'
+
+    foreach ($scope in $scopes) {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+            $lines = [System.IO.File]::ReadAllLines($file.FullName)
+            $inHeader = $lines.Count -gt 0 -and $lines[0].StartsWith('/*')
+            $inBlock = $false
+            $inTextBlock = $false
+
+            for ($i = 0; $i -lt $lines.Count; $i++) {
+                $text = $lines[$i]
+                $trimmed = $text.Trim()
+
+                if ($inHeader) {
+                    if ($trimmed.EndsWith('*/')) { $inHeader = $false }
+                    continue
+                }
+
+                if ($inBlock) {
+                    if ($trimmed.Contains('*/')) { $inBlock = $false }
+                    continue
+                }
+
+                if ($inTextBlock) {
+                    if ((($text.Split('"""', [System.StringSplitOptions]::None).Count - 1) % 2) -eq 1) { $inTextBlock = $false }
+                    continue
+                }
+
+                $at = -1
+
+                if ($trimmed.StartsWith('//')) {
+                    if ($trimmed -match $keep) { continue }
+                    $at = $text.IndexOf('//')
+                } elseif ($trimmed.StartsWith('/*')) {
+                    $at = $text.IndexOf('/*')
+                    if (-not $trimmed.Contains('*/')) { $inBlock = $true }
+                } else {
+                    $at = Find-CommentStart $text
+                    if ($at -lt 0) {
+                        if ((($text.Split('"""', [System.StringSplitOptions]::None).Count - 1) % 2) -eq 1) { $inTextBlock = $true }
+                        continue
+                    }
+                    if ($text.Substring($at).StartsWith('/*') -and -not $text.Substring($at).Contains('*/')) { $inBlock = $true }
+                }
+
+                [pscustomobject]@{
+                    Path       = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+                    Line       = $i + 1
+                    Inspection = 'NonMarkerComment'
+                    Severity   = 'ERROR'
+                    Message    = "The code carries a UC- or Rule- marker and nothing else: $trimmed"
+                }
+            }
+        }
+    }
+}
+
 function Read-MissingCopyright([string[]] $scopes) {
     <#
         A file that does not say who owns it or on what terms.
@@ -1026,6 +1134,7 @@ foreach ($scope in $everyTree) { $problems += @(Read-WrappedDeclarations $scope)
 $problems += @(Read-HandWrittenPrivateConstructors $everyTree)
 $problems += @(Read-OrphanedJavadoc $everyTree)
 $problems += @(Read-MissingCopyright $everyTree)
+$problems += @(Read-NonMarkerComments $everyTree)
 $problems += @(Read-HtmlParagraphInMarkdown)
 
 $problems += @(Read-DuplicatedDisplayStrings $scopes)
@@ -1054,8 +1163,7 @@ Write-DisplayStringInventory $scopes $outPath
 # headless run cannot be trusted with it. Everything else fails the run: a
 # warning the IDE shows in these files is a defect, not a note for later.
 $notGated = [ordered]@{
-    'unused'                  = 'Lombok writes members the headless run cannot see, and plugin.xml and the content modules call code from outside its scope'
-    'SameReturnValue'         = 'judged across implementations the content modules add, which the headless run does not see'
+    'SameReturnValue'         = 'judged across every implementation, and the enums'' getters are Lombok''s, which the headless run cannot see'
     'RedundantThrows'         = 'the Java module implements JavaSourceRoot''s interfaces and throws what they declare'
     'UsedFromContentModule'   = 'this script''s note that an unused finding has a caller in a content module'
     'UnusedProperty'          = 'the platform reads action, group and tool window keys by name; BundleKeysTest checks every other key has a reader'
@@ -1063,7 +1171,21 @@ $notGated = [ordered]@{
     'JSUnresolvedLibraryURL'  = 'asks whether this machine has downloaded a library a page loads from a CDN'
     'DuplicatedDisplayString' = 'counted against .github/display-string-baseline.txt below instead'
 }
-$breaches = @($problems | Where-Object { -not $notGated.Contains($_.Inspection) })
+
+# An unused finding is gated, apart from the two kinds the headless run gets
+# wrong. A method "not reachable from the entry points" is one the platform
+# reaches through an interface it implements. A constructor "never used" is one
+# Lombok's @Builder calls. A private member, a parameter or a local that nothing
+# reads is judged correctly, and fails the run like any other finding.
+$misjudgedUnused = @('not reachable from the entry points', 'Constructor is never used')
+
+function Test-Gated([object] $problem) {
+    if ($notGated.Contains($problem.Inspection)) { return $false }
+    if ($problem.Inspection -ne 'unused') { return $true }
+    return -not @($misjudgedUnused | Where-Object { $problem.Message.Contains($_) }).Count
+}
+
+$breaches = @($problems | Where-Object { Test-Gated $_ })
 
 if ($breaches) {
     Write-Host ''
@@ -1075,7 +1197,7 @@ if ($breaches) {
 }
 
 Write-Host ''
-Write-Host "Gate clear: no finding outside $($notGated.Keys -join ', ')." -ForegroundColor Green
+Write-Host "Gate clear: no finding outside $($notGated.Keys -join ', ') and the misjudged unused kinds." -ForegroundColor Green
 
 # And the one that is counted rather than forbidden. Reported after the gate so
 # a hard breach is the first thing read, and it fails the run in its own right:

@@ -28,9 +28,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The bug report's body, filled from values (#28).
- */
 public class BugTemplateTest {
 
     private static final UUID ID = UUID.fromString("07f7e754-b849-4b38-9e6e-a2cacd84e927");

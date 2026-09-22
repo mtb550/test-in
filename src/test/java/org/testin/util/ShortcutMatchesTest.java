@@ -27,12 +27,6 @@ import java.awt.event.KeyEvent;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Shortcut matching (#48, MagicConstant).
- * <p>
- * The rule compares a KeyEvent against a KeyStroke, and the two report their
- * modifiers differently — which is what the inspection was pointing at.
- */
 public class ShortcutMatchesTest {
 
     private static KeyEvent event(final int keyCode, @MagicConstant(flags = {InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK, InputEvent.META_DOWN_MASK, InputEvent.ALT_DOWN_MASK}) final int modifiersEx) {

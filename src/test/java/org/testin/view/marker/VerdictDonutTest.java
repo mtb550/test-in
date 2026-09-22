@@ -28,15 +28,6 @@ import java.util.List;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The arithmetic behind the ring (#82).
- * <p>
- * Two things have to hold whatever the run looks like: a verdict somebody
- * recorded is visible, and the ring still closes. They pull against each other
- * - a single failure in five hundred is three quarters of a degree, and giving
- * it enough of the ring to see costs the other arcs their share - so both are
- * checked on the same figures.
- */
 public class VerdictDonutTest {
 
     private static final List<NodeCount> SLICES = NodeStatistics.VERDICTS.getSlices();
@@ -55,7 +46,6 @@ public class VerdictDonutTest {
     public void oneFailureInFiveHundredIsStillVisible() {
         final double[] sweeps = VerdictDonut.sweeps(SLICES, run(499, 1, 0, 0));
 
-        // Its true share is 0.72 degrees, which at this size is half a pixel.
         assertTrue(sweeps[1] > 2.0, "a failure somebody recorded has to be visible: " + sweeps[1]);
     }
 
@@ -67,7 +57,7 @@ public class VerdictDonutTest {
     }
 
     @Test
-    public void aVerdictWithNoCasesTakesNoneOfTheRing() {
+    public void aVerdictWithNoTestCasesTakesNoneOfTheRing() {
         final double[] sweeps = VerdictDonut.sweeps(SLICES, run(420, 60, 40, 30));
 
         assertEquals(sweeps[4], 0.0, 0.0, "nothing was removed, so nothing is drawn for it");

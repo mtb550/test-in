@@ -33,6 +33,7 @@ import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FromContentModule;
 import org.testin.util.Once;
 
 import java.io.IOException;
@@ -82,6 +83,7 @@ public final class JavaSourceRoot {
     }
 
     // UC-CODEGEN-018, Rule-CODEGEN-060
+    @FromContentModule
     public static void deleteUnder(final @NotNull VirtualFile root, final @NotNull String relativePath, final @NotNull Object requestor) {
         final @NotNull Optional<VirtualFile> found = under(root, relativePath).filter(VirtualFile::exists);
         if (found.isEmpty()) return;
@@ -113,6 +115,7 @@ public final class JavaSourceRoot {
     }
 
     // UC-CODEGEN-001, Rule-CODEGEN-009, Rule-CODEGEN-010
+    @FromContentModule
     public static @NotNull Optional<VirtualFile> classFile(final @NotNull VirtualFile root, final @NotNull List<String> packageSegments, final @NotNull String className) {
         final @NotNull Optional<VirtualFile> folder = packageFolder(root, packageSegments);
         if (folder.isEmpty()) return Optional.empty();
@@ -149,6 +152,7 @@ public final class JavaSourceRoot {
     }
 
     // UC-CODEGEN-020, Rule-CODEGEN-064
+    @FromContentModule
     public static @NotNull Optional<VirtualFile> fileInRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull String whatFailed, final @NotNull RootFile work) {
         final @NotNull Optional<VirtualFile> root = findOrWarn(p, className);
         if (root.isEmpty()) return Optional.empty();
@@ -172,15 +176,18 @@ public final class JavaSourceRoot {
     }
 
     // UC-CODEGEN-020, Rule-CODEGEN-065
+    @FromContentModule
     public static void writeInRoot(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
         WriteAction.run(() -> inRoot(p, whatFailed, work));
     }
 
+    @FromContentModule
     public static void commandInRoot(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final @NotNull RootWork work) {
         WriteCommandAction.runWriteCommandAction(p, title, null, () -> inRoot(p, whatFailed, work));
     }
 
     // UC-CODEGEN-020, Rule-CODEGEN-065
+    @FromContentModule
     public static void writeInRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull String whatFailed, final @NotNull RootWork work) {
         WriteAction.run(() -> inRootOrWarn(p, className, whatFailed, work));
     }

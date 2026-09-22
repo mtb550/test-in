@@ -29,12 +29,12 @@ set at once, and the status bar says the same thing as a number.
   like the four filters beside it. Choosing none of them shows everything. It is
   offered in both editors, because a test run holds test cases too.
 - **Rule-EDITOR-PANEL-210** — The test case editor's status bar says how many of
-  the test set's cases have a generated test method behind them.
+  the test set's test cases have a generated test method behind them.
 - **Rule-EDITOR-PANEL-211** — That count says nothing at all until an answer is
   in, and nothing in an IDE that cannot read one. Nobody has looked yet and none
   are automated are the same arithmetic and opposite statements, so the count is
-  written from how many cases the answer covers rather than from how many there
-  are.
+  written from how many test cases the answer covers rather than from how many
+  there are.
 
 ## What the tester sees
 
@@ -102,7 +102,8 @@ rather than claiming a set is un-automated while nobody has looked.
    cases or a thousand.
 4. The status bar's count fills in.
 5. Hovering a card shows its state on the navigate icon.
-6. To see which cases they are, the tester opens the filter and picks a state.
+6. To see which test cases they are, the tester opens the filter and picks a
+   state.
 
 ## What Testin refuses
 

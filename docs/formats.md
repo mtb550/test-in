@@ -99,9 +99,9 @@ for it, and what is written back is that answer rather than an invented one.
 
 **A directory carrying two markers of one family is read as the more specific
 one.** Under `Test Cases` the order is `.ts` then `.tsp`; under `Test Runs` it is
-`.tr` then `.trp` — a set is what holds cases and a package is what holds sets.
-`DirectoryType.UNDER_TEST_CASES` and `UNDER_TEST_RUNS` are that precedence, and
-nothing else may ask in a different order.
+`.tr` then `.trp` — a set is what holds test cases and a package is what holds
+sets. `DirectoryType.UNDER_TEST_CASES` and `UNDER_TEST_RUNS` are that
+precedence, and nothing else may ask in a different order.
 
 ```json
 {
@@ -147,8 +147,9 @@ last stopped. They are the run's, so they are in the run's own file:
 One file per test case, inside its test set. **Any `.tc` file directly inside
 a test set is a test case** (Rule-INTERNAL-011), so `login.tc` written by hand
 is read as one and a copy of it is given an id of its own; a `.tc` sitting in
-`Test Cases` rather than in a set is not a case at all. The file holds JSON; the
-name says what the JSON is, so nothing has to look inside to find out.
+`Test Cases` rather than in a set is not a test case at all. The file holds
+JSON; the name says what the JSON is, so nothing has to look inside to find
+out.
 
 Testin writes the file as `<id>.tc`, and a hand-named one is filed under its
 id the next time anything writes it, the hand-named file going once that write
@@ -159,14 +160,14 @@ recorded result points at.
 
 | Field                     | Type             | Required               | Meaning                                                                                     |
 |---------------------------|------------------|------------------------|---------------------------------------------------------------------------------------------|
-| `id`                      | UUID string      | yes in practice        | Identity. A fresh random UUID when absent, which makes the case a new one                   |
-| `order`                   | string           | no, defaults `""`      | The rank that places the case in its set — see below                                        |
-| `description`             | string           | no                     | What the case is. The card title                                                            |
+| `id`                      | UUID string      | yes in practice        | Identity. A fresh random UUID when absent, which makes the test case a new one              |
+| `order`                   | string           | no, defaults `""`      | The rank that places the test case in its set — see below                                   |
+| `description`             | string           | no                     | What the test case is. The card title                                                       |
 | `expectedResult`          | string           | no                     |                                                                                             |
 | `steps`                   | array of strings | no                     | One step per element. A blank element is skipped when drawn and keeps its place in the file |
 | `status`                  | enum             | no, defaults `PENDING` | `REVIEWED` `PENDING` `DISABLED` `TO_BE_UPDATED`                                             |
 | `priority`                | enum             | no, defaults `LOW`     | `HIGH` `MEDIUM` `LOW`                                                                       |
-| `group`                   | array of strings | no                     | The groups the case is in, each as the tester typed it. Empty for none                      |
+| `group`                   | array of strings | no                     | The groups the test case is in, each as the tester typed it. Empty for none                 |
 | `reference`               | string           | no                     | A ticket, a requirement — an identifier, never formatted for display                        |
 | `module`                  | string           | no                     |                                                                                             |
 | `testData`                | string           | no                     | Used rather than read: never reformatted, on any surface                                    |
@@ -175,20 +176,20 @@ recorded result points at.
 | `createdAt` / `updatedAt` | date             | no                     |                                                                                             |
 
 **`order` is a rank, not a number.** `"zo"` is a valid order and sorts as text.
-A case carries where it sits, not who its neighbors are; the earlier design gave
-each case a `previous` and a `next`, so every insertion, deletion and reorder
-rewrote a file the tester had not touched — which is what made two people
-working in parallel conflict on a third person's case, and what let one lost
-pointer leave a whole set unordered.
+A test case carries where it sits, not who its neighbors are; the earlier
+design gave each test case a `previous` and a `next`, so every insertion,
+deletion and reorder rewrote a file the tester had not touched — which is what
+made two people working in parallel conflict on a third person's test case, and
+what let one lost pointer leave a whole set unordered.
 
 **An empty `order` means "not placed yet"** — imported, copied in, or arrived
-from a merge. Those sort after the placed cases, oldest first, and are given a
-rank the next time anything writes them. It is not an error and must not be
-repaired on read.
+from a merge. Those sort after the placed test cases, oldest first, and are
+given a rank the next time anything writes them. It is not an error and must
+not be repaired on read.
 
 There is **no separate sequence file.** `TestCaseSequenceStore` is an in-memory
 index the plugin builds while scanning; the order on disk is the `order` field
-on each case and nothing else.
+on each test case and nothing else.
 
 ```json
 {
@@ -215,27 +216,28 @@ on each case and nothing else.
 
 ## A result — `<test case id>.ri`
 
-One file per case the run covers, inside the run's folder, beside its `.tr`. A
-case appears in a run once, so the case's id is the file's name and two testers
-adding the same case offline write the same file rather than two.
+One file per test case the run covers, inside the run's folder, beside its
+`.tr`. A test case appears in a run once, so the test case's id is the file's
+name and two testers adding the same test case offline write the same file
+rather than two.
 
-It records what was executed, not what exists: a case removed from the test set
-keeps its result here. What the run itself is - how it was configured, what the
-tester wrote about the verdicts, when it was executed - is in its `.tr`, with its
-status.
+It records what was executed, not what exists: a test case removed from the
+test set keeps its result here. What the run itself is - how it was configured,
+what the tester wrote about the verdicts, when it was executed - is in its
+`.tr`, with its status.
 
-The results are read in the order their cases sit in their test sets, and a
-result whose case the project no longer holds comes last. So a report prints
-them in the order a tester reads the tree, never in the order a folder listing
-happens to give.
+The results are read in the order their test cases sit in their test sets, and
+a result whose test case the project no longer holds comes last. So a report
+prints them in the order a tester reads the tree, never in the order a folder
+listing happens to give.
 
-**A result file goes only when the run stops covering its case.** Unticking a
-case in Edit Test Run removes that one `.ri`, and nothing else in the folder is
-touched. A `.ri` the run in memory does not cover is left exactly where it is:
-it can be one a pull brought a moment ago, or one a failed write could not
-produce, and removing either would lose a verdict nobody asked to lose. Writing
-a verdict writes the one file it is about, so two testers judging different
-cases of one run never touch the same file.
+**A result file goes only when the run stops covering its test case.**
+Unticking a test case in Edit Test Run removes that one `.ri`, and nothing else
+in the folder is touched. A `.ri` the run in memory does not cover is left
+exactly where it is: it can be one a pull brought a moment ago, or one a failed
+write could not produce, and removing either would lose a verdict nobody asked
+to lose. Writing a verdict writes the one file it is about, so two testers
+judging different test cases of one run never touch the same file.
 
 **A result is known by its file name** (Rule-INTERNAL-094). A `.ri` whose name
 is not a test case id, `login-result.ri` renamed by hand for one, is not read:
@@ -249,22 +251,22 @@ moves one that no result of the run names anymore to the recycle bin after the
 next write. Any PNG in a run folder named that way is taken for a screenshot, so
 one put there by hand under such a name goes too.
 
-| Field          | Type             | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                |
-|----------------|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `id`           | UUID string      | The test case this result is about - the same id the file is named by, which is what decides it (Rule-INTERNAL-012). Written so the file says what it is about on its own                                                                                                                                                                                                                                                              |
-| `status`       | enum             | `PASSED` `FAILED` `BLOCKED` as a tester or the automation judged it; `PENDING` until then; `UNTESTED` for a case still pending when the run completed or closed. A case whose test case was deleted since the run keeps its status here; it is shown as Removed if it was never judged, and with its verdict if it was; `REMOVED` is no longer written, and a file written by 2.11.0-alpha or earlier that holds it is read as removed |
-| `duration`     | number, seconds  | Nanosecond precision, written as a decimal                                                                                                                                                                                                                                                                                                                                                                                             |
-| `executedBy`   | string           |                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `executedAt`   | date             |                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `actualResult` | string           | Empty unless the case failed                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `stacktrace`   | string           | Empty unless the case failed. Text only: a pasted screenshot is never in it                                                                                                                                                                                                                                                                                                                                                            |
-| `screenshots`  | array of strings | The file names of the screenshots pasted with the failure, beside this file, in the order they were pasted. Left out when there are none; cleared by a pass and by an automated failure, and their files go with the next write                                                                                                                                                                                                        |
-| `testCase`     | object           | The test case as it was when the verdict was given, in the shape of a `.tc` (Rule-EDITOR-PANEL-238). Left out until a verdict is given, so a pending result has none, and a result written before 2.13.0-alpha has none either and shows the test case as it is now. A correction keeps it; running the case again replaces it (Rule-EDITOR-PANEL-240, Rule-EDITOR-PANEL-241). Editing or deleting the test case never touches it      |
-| `bugSeverity`  | enum             | `EMPTY` `BLOCKER` `MAJOR` `MINOR` `ENHANCEMENT`                                                                                                                                                                                                                                                                                                                                                                                        |
-| `bugPriority`  | enum             | `EMPTY` `HIGH` `MEDIUM` `LOW`                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `bugIssueUrl`  | string           | The GitHub issue the failure was reported as, written by [Report Bug](viewPanel/reportBug.md). Empty until then; cleared by a pass, kept by an automated failure                                                                                                                                                                                                                                                                       |
+| Field          | Type             | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+|----------------|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `id`           | UUID string      | The test case this result is about - the same id the file is named by, which is what decides it (Rule-INTERNAL-012). Written so the file says what it is about on its own                                                                                                                                                                                                                                                                     |
+| `status`       | enum             | `PASSED` `FAILED` `BLOCKED` as a tester or the automation judged it; `PENDING` until then; `UNTESTED` for a test case still pending when the run completed or closed. A result whose test case was deleted since the run keeps its status here; it is shown as Removed if it was never judged, and with its verdict if it was; `REMOVED` is no longer written, and a file written by 2.11.0-alpha or earlier that holds it is read as removed |
+| `duration`     | number, seconds  | Nanosecond precision, written as a decimal                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `executedBy`   | string           |                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `executedAt`   | date             |                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `actualResult` | string           | Empty unless the test case failed                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `stacktrace`   | string           | Empty unless the test case failed. Text only: a pasted screenshot is never in it                                                                                                                                                                                                                                                                                                                                                              |
+| `screenshots`  | array of strings | The file names of the screenshots pasted with the failure, beside this file, in the order they were pasted. Left out when there are none; cleared by a pass and by an automated failure, and their files go with the next write                                                                                                                                                                                                               |
+| `testCase`     | object           | The test case as it was when the verdict was given, in the shape of a `.tc` (Rule-EDITOR-PANEL-238). Left out until a verdict is given, so a pending result has none, and a result written before 2.13.0-alpha has none either and shows the test case as it is now. A correction keeps it; running the test case again replaces it (Rule-EDITOR-PANEL-240, Rule-EDITOR-PANEL-241). Editing or deleting the test case never touches it        |
+| `bugSeverity`  | enum             | `EMPTY` `BLOCKER` `MAJOR` `MINOR` `ENHANCEMENT`                                                                                                                                                                                                                                                                                                                                                                                               |
+| `bugPriority`  | enum             | `EMPTY` `HIGH` `MEDIUM` `LOW`                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `bugIssueUrl`  | string           | The GitHub issue the failure was reported as, written by [Report Bug](viewPanel/reportBug.md). Empty until then; cleared by a pass, kept by an automated failure                                                                                                                                                                                                                                                                              |
 
-`EMPTY` is a real constant, not a missing value. A passed case carries
+`EMPTY` is a real constant, not a missing value. A passed test case carries
 `"bugSeverity" : "EMPTY"`, and nothing reading it has to test for absence.
 
 ---

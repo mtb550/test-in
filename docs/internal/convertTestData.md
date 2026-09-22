@@ -9,8 +9,8 @@ it.
 The format is [formats.md](../formats.md): a test case is `<id>.tc`, a run's
 results are one `<test case id>.ri` each, the run's own facts are in its `.tr`,
 and every folder's marker carries an `id`. A project written before that carries
-`<id>.json` cases and one `run.json` per run, and this is what turns the first
-into the second — **once, per project, with no prompt**.
+`<id>.json` test cases and one `run.json` per run, and this is what turns the
+first into the second — **once, per project, with no prompt**.
 
 **2.13.0-alpha converts. 2.14.0-alpha deletes the conversion code.** From then on
 a project without the format number is not read at all, and the tester is told to

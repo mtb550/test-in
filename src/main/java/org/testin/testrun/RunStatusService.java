@@ -52,7 +52,7 @@ import java.util.function.Consumer;
 public final class RunStatusService {
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-238
     private static @NotNull TestCaseDto asItIsNow(final @NotNull Project p, final @NotNull TestRunItems item) {
-        return TestCaseSnapshot.copy(p, item.liveCase());
+        return TestCaseSnapshot.copy(p, item.liveTestCase());
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130
@@ -60,7 +60,7 @@ public final class RunStatusService {
         final int executingIndex = editor.getCurrentlyExecutingIndex();
         if (executingIndex == -1) {
             // Rule-EDITOR-PANEL-227
-            if (editor.executingCaseIsHidden())
+            if (editor.executingTestCaseIsHidden())
                 Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.executing.hidden"));
             return;
         }
@@ -99,32 +99,32 @@ public final class RunStatusService {
     }
 
     // Rule-EDITOR-PANEL-225
-    private boolean recordOn(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull UUID caseId, final @NotNull TestStatus status, final @NotNull Consumer<TestRunItems> verdict) {
+    private boolean recordOn(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull UUID testCaseId, final @NotNull TestStatus status, final @NotNull Consumer<TestRunItems> verdict) {
         final @NotNull Path runPath = editor.getParent().getPath();
         final @NotNull Optional<TestRunDto> held = heldRun(p, runPath);
-        if (held.isEmpty() || liveItem(p, held.orElseThrow(), runPath, caseId).isEmpty()) return false;
+        if (held.isEmpty() || liveItem(p, held.orElseThrow(), runPath, testCaseId).isEmpty()) return false;
 
-        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, current -> current.resultOf(caseId).ifPresentOrElse(verdict,
-                () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + caseId + " - verdict not recorded")));
+        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, current -> current.resultOf(testCaseId).ifPresentOrElse(verdict,
+                () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + testCaseId + " - verdict not recorded")));
 
-        Logger.trace("[RunStatusService]: Status updated -> " + caseId + " = " + status);
+        Logger.trace("[RunStatusService]: Status updated -> " + testCaseId + " = " + status);
 
         triggerFilterRefresh(editor);
         return true;
     }
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167
-    public boolean recordFailureDetails(final @NotNull Project p, final @NotNull Path runPath, final @NotNull UUID caseId, final @NotNull FailureFields fields) {
+    public boolean recordFailureDetails(final @NotNull Project p, final @NotNull Path runPath, final @NotNull UUID testCaseId, final @NotNull FailureFields fields) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         final @NotNull Optional<TestRunDto> run = heldRun(p, runPath);
         if (run.isEmpty()) return false;
 
-        if (liveItem(p, run.orElseThrow(), runPath, caseId).isEmpty()) return false;
+        if (liveItem(p, run.orElseThrow(), runPath, testCaseId).isEmpty()) return false;
 
         final @NotNull List<String> screenshots = fields.screenshotNames(pasted -> indexer.storeScreenshots(runPath, pasted));
 
-        indexer.changeRun(runPath, current -> current.resultOf(caseId).ifPresentOrElse(item -> fields.applyTo(item, screenshots),
-                () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + caseId + " - failure details not recorded")));
+        indexer.changeRun(runPath, current -> current.resultOf(testCaseId).ifPresentOrElse(item -> fields.applyTo(item, screenshots),
+                () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + testCaseId + " - failure details not recorded")));
 
         return true;
     }
@@ -141,11 +141,11 @@ public final class RunStatusService {
         return run;
     }
 
-    private @NotNull Optional<TestRunItems> liveItem(final @NotNull Project p, final @NotNull TestRunDto run, final @NotNull Path runPath, final @NotNull UUID caseId) {
-        final @NotNull Optional<TestRunItems> found = run.resultOf(caseId);
+    private @NotNull Optional<TestRunItems> liveItem(final @NotNull Project p, final @NotNull TestRunDto run, final @NotNull Path runPath, final @NotNull UUID testCaseId) {
+        final @NotNull Optional<TestRunItems> found = run.resultOf(testCaseId);
 
         if (found.isEmpty()) {
-            Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' does not cover " + caseId + " - nothing recorded");
+            Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' does not cover " + testCaseId + " - nothing recorded");
 
             // Rule-EDITOR-PANEL-225
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.case.not.covered"));

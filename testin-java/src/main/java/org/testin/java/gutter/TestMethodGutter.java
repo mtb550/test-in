@@ -73,7 +73,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
     }
 
     // UC-CODEGEN-007, Rule-CODEGEN-069
-    private static void refuseMissingCase(final @NotNull Project p, final @NotNull UUID uuid, final @NotNull String methodName) {
+    private static void refuseMissingTestCase(final @NotNull Project p, final @NotNull UUID uuid, final @NotNull String methodName) {
         Logger.info("No test case behind " + methodName + ": " + uuid);
 
         ApplicationManager.getApplication().invokeLater(() ->
@@ -123,7 +123,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                             ApplicationManager.getApplication().invokeLater(() ->
                                     ViewToolWindowFactory.showPanel(p, List.of(dto), dto.getParent().getPath2(), ViewPanel::focusDetailsTab));
                         },
-                        () -> refuseMissingCase(p, uuid, methodName));
+                        () -> refuseMissingTestCase(p, uuid, methodName));
 
             } catch (final Exception ex) {
                 Logger.error("Could not open the test case behind this mark: " + ex.getMessage());

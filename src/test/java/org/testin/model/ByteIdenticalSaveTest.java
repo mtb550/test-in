@@ -33,45 +33,10 @@ import java.util.UUID;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * UC-INTERNAL-002, Rule-INTERNAL-070.
- * <p>
- * The rule this project states hardest, held to a file: <b>the stored JSON is
- * byte-identical to what the tester typed.</b> Rendering may reformat a value;
- * saving never does.
- * <p>
- * A golden file rather than a set of assertions about fields, because the rule
- * is about the <em>bytes</em>. Field order and indentation are ways for a save
- * to stop being identical. So are how an empty value is written, how a date is
- * spelled, and whether an enum goes out as its constant or its label. Not one
- * of them is something a per-field assertion would notice. The fixture is the
- * contract; a diff against it is the failure report.
- * <p>
- * <b>It caught one the day it was written.</b> The mapper called
- * {@code setTimeZone(TimeZone.getDefault())}, which Jackson reads as an
- * instruction to convert a {@code ZonedDateTime} into the machine's zone before
- * formatting it - so the same test case saved as {@code 23:29:28 [Asia/Riyadh]}
- * on one machine and {@code 20:29:28 [UTC]} on another. Test data is shared
- * through Git, so a colleague in another zone rewrote every timestamp in a test
- * set just by opening and saving it. See {@code Mapper} for what replaced it.
- */
 public class ByteIdenticalSaveTest {
 
     private static final Path GOLDEN = Path.of("src", "test", "resources", "golden", "test-case.json");
 
-    /**
-     * A case with something awkward in every field a formatter would be tempted
-     * to tidy.
-     * <p>
-     * Nothing here is decorative. A blank field must stay blank rather than
-     * gaining a placeholder - that was #155, where {@code EMPTY_DESCRIPTION} was
-     * stored and then read back as the case's name in every report. Quotes and
-     * backslashes must be escaped and not stripped. A trailing period must
-     * survive, because the details panel adds one for display and the file must
-     * not. Accents must survive as themselves. And the timestamps carry two
-     * different zones on purpose, so a mapper that converts either of them to
-     * one zone fails here.
-     */
     private static TestCaseDto typedByATester() {
         final TestCaseDto tc = new TestCaseDto();
 
@@ -100,14 +65,6 @@ public class ByteIdenticalSaveTest {
                 .replace("\r\n", "\n");
     }
 
-    /**
-     * The fixture, written the first time if it is not there.
-     * <p>
-     * A golden file nobody can regenerate is a golden file somebody deletes the
-     * day it fails. Writing it makes the first run of a new fixture a review
-     * rather than a transcription - and it fails on that run either way, so a
-     * fixture can never be created and passed over in the same breath.
-     */
     private static String golden() {
         try {
             if (!Files.exists(GOLDEN)) {
@@ -132,12 +89,6 @@ public class ByteIdenticalSaveTest {
                         + "and if it was not, something reformatted a value on the way to disk.");
     }
 
-    /**
-     * And the same bytes wherever the machine happens to be.
-     * <p>
-     * Separate from the fixture check so that a failure says which of the two
-     * went wrong: the shape changed, or the machine leaked into it.
-     */
     @Test
     public void theMachineTimeZoneDoesNotReachTheFile() {
         final TimeZone was = TimeZone.getDefault();
@@ -156,14 +107,6 @@ public class ByteIdenticalSaveTest {
         }
     }
 
-    /**
-     * A blank field is written blank.
-     * <p>
-     * Its own test because it is the failure with the longest reach: a
-     * placeholder stored once is read back as the tester's own words by the
-     * card, the grid, the details panel, every report and the generated method
-     * name (#155).
-     */
     @Test
     public void nothingTypedIsNothingStored() {
         final String json = saved();

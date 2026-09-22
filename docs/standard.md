@@ -61,8 +61,9 @@ it.
 **A user story opens each page**, because it forces who wants a change, and why,
 into one sentence and leaves no room for how it is built:
 
-> **As a** tester, **I want** to create a test project from the tree, **so that**
-> a new product under test has a place for its cases before any are written.
+> **As a** tester, **I want** to create a test project from the tree,
+> **so that** a new product under test has a place for its test cases before
+> any are written.
 
 **Numbered steps for the main flow**, because that is the order the tester does
 it in, and because a step that says *"The tester presses `Ctrl+M`"* puts the key

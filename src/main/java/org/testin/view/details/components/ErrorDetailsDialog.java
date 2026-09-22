@@ -33,7 +33,7 @@ public final class ErrorDetailsDialog extends AbstractFrameworkDialog {
     private static final int HEIGHT = 600;
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-036
-    public ErrorDetailsDialog(final @NotNull Project p, final @NotNull String caseDescription, final @NotNull String message, final @NotNull String stacktrace) {
+    public ErrorDetailsDialog(final @NotNull Project p, final @NotNull String testCaseDescription, final @NotNull String message, final @NotNull String stacktrace) {
         super(p);
 
         title = Bundle.message("dialog.error.title");
@@ -42,7 +42,7 @@ public final class ErrorDetailsDialog extends AbstractFrameworkDialog {
 
         components = List.of(
                 ComponentDialogBase.details()
-                        .row(Bundle.message("caption.test.case"), caseDescription)
+                        .row(Bundle.message("caption.test.case"), testCaseDescription)
                         .build(),
                 ComponentDialogBase.textArea()
                         .value(fullText(message, stacktrace))

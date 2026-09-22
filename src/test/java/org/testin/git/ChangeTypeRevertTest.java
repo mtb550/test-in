@@ -31,20 +31,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Revert is the one destructive button in the pending-commits review, and it is
- * driven entirely by data on this enum (#66).
- * <p>
- * The way it can go wrong without anything failing is a revert that writes the
- * wrong field, which silently corrupts a test case the tester was trying to
- * restore. That is what is asserted here.
- */
 public class ChangeTypeRevertTest {
 
-    /**
-     * A committed state to revert back to, with every editable field different
-     * from {@link #edited()} so a revert writing the wrong field is visible.
-     */
     private static TestCaseDto committed() {
         return TestCaseDto.builder()
                 .description("committed description")
@@ -92,11 +80,6 @@ public class ChangeTypeRevertTest {
         assertFalse(ChangeType.REMOVE_TEST_CASE.isRevertible());
     }
 
-    /**
-     * The one that matters: each revert restores its own field and leaves every
-     * other one alone. A revert that wrote a neighboring field would restore
-     * the value the tester asked for and quietly discard one they did not.
-     */
     @Test
     public void eachRevertRestoresItsOwnFieldAndNothingElse() {
         for (final FieldChange change : TestCaseChangeComparator.compare(committed(), edited())) {
@@ -123,15 +106,6 @@ public class ChangeTypeRevertTest {
                 "reverting every listed change leaves nothing to review");
     }
 
-    /**
-     * Rule-SHARE-052.
-     * <p>
-     * Once the last change is reverted, the case takes back the audit it was
-     * committed with. The revert used to stamp the tester as modifying it now, so
-     * the file still differed from what was committed by its audit alone - and a
-     * file that differs by an audit stamp is still a pending change (#66,
-     * finding 128).
-     */
     @Test
     public void revertingTheLastChangePutsBackTheCommittedAudit() {
         final TestCaseDto committed = committed()
@@ -151,10 +125,6 @@ public class ChangeTypeRevertTest {
         assertEquals(current.getUpdatedAt(), committed.getUpdatedAt());
     }
 
-    /**
-     * A revert must not hand the committed state's own list to the working copy:
-     * they would then be the same object, and editing one would change the other.
-     */
     @Test
     public void revertingAListCopiesItRatherThanSharingIt() {
         final TestCaseDto committed = committed();
@@ -172,11 +142,6 @@ public class ChangeTypeRevertTest {
                 "the committed groups were shared, not copied");
     }
 
-    /**
-     * Two constants sharing a label no longer misroutes a revert - the dialog
-     * carries the change rather than parsing its caption back - but two rows
-     * that read the same still leave the tester unable to tell them apart.
-     */
     @Test
     public void noTwoChangeTypesShareALabel() {
         final Set<String> labels = new HashSet<>();

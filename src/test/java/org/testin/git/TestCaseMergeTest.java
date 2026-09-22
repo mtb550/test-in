@@ -23,19 +23,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The rules a conflicted test case is merged by (#90).
- * <p>
- * These are the whole feature. A conflict in Testin is two testers touching the
- * same test case, and what decides whether the tester is asked one question or
- * seventeen - or none - is entirely here.
- */
 public class TestCaseMergeTest {
 
-    /**
-     * A test case as the plugin writes one, with the fields a merge decides
-     * about.
-     */
     private static String testCase(final String description, final String expected, final String priority, final String updatedBy, final String updatedAt, final String rank) {
         return """
                 {
@@ -58,10 +47,6 @@ public class TestCaseMergeTest {
         return "Thursday 20-08-2026 At " + time + " [Asia/Riyadh]";
     }
 
-    /**
-     * The case the feature exists for: two testers changed different fields of
-     * one test case, which is not a disagreement at all.
-     */
     @Test
     public void differentFieldsMergeWithoutAsking() {
         final String base = testCase("sign in", "dashboard opens", "LOW", "", at("09:00:00"), "m");
@@ -75,11 +60,6 @@ public class TestCaseMergeTest {
         assertEquals(merge.merged().get("expectedResult").asText(), "the account dashboard opens");
     }
 
-    /**
-     * Both sides stamp the audit fields on every edit, so they conflict even
-     * when the testers agreed. The later edit is the answer, and the tester is
-     * never shown the question.
-     */
     @Test
     public void theAuditStampsAreNeverAQuestion() {
         final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "m");
@@ -93,9 +73,6 @@ public class TestCaseMergeTest {
         assertEquals(merge.merged().get("updatedAt").asText(), at("11:30:00"));
     }
 
-    /**
-     * The one thing that must be asked: both testers rewrote the same field.
-     */
     @Test
     public void theSameFieldChangedBothWaysIsAskedAbout() {
         final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "m");
@@ -113,9 +90,6 @@ public class TestCaseMergeTest {
         assertEquals(question.theirs(), "a known user signs in");
     }
 
-    /**
-     * Answering takes the remote's value, and only for the field answered.
-     */
     @Test
     public void answeringTakesTheOtherSideForThatFieldOnly() {
         final String base = testCase("sign in", "opens", "LOW", "", at("09:00:00"), "m");
@@ -141,11 +115,6 @@ public class TestCaseMergeTest {
         assertEquals(merge.merged().get("description").asText(), "mine");
     }
 
-    /**
-     * Both testers moved the same case, to different places. Neither answer
-     * means much to the other - the case is one row from where they left it
-     * either way - so it is settled rather than asked about.
-     */
     @Test
     public void aPositionIsSettledWithoutAsking() {
         final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "m");
@@ -158,10 +127,6 @@ public class TestCaseMergeTest {
         assertEquals(merge.merged().get("order").asText(), "s");
     }
 
-    /**
-     * Two testers who created a case at the same path share no history. Every
-     * field then reads as set by both, and the ones that differ are asked about.
-     */
     @Test
     public void aMissingAncestorAsksAboutWhatDiffers() {
         final String mine = testCase("mine", "opens", "LOW", "muteb", at("10:00:00"), "m");
@@ -173,11 +138,6 @@ public class TestCaseMergeTest {
         assertEquals(merge.questions().getFirst().field(), "description");
     }
 
-    /**
-     * A side that fails to parse says nothing rather than throwing: the other
-     * side is then the whole answer, which is what a half-written file during a
-     * rebase amounts to.
-     */
     @Test
     public void anUnreadableSideIsNotAFailure() {
         final String mine = testCase("mine", "", "LOW", "muteb", at("10:00:00"), "m");
@@ -188,12 +148,6 @@ public class TestCaseMergeTest {
         assertEquals(merge.merged().get("description").asText(), "mine");
     }
 
-    /**
-     * Which files this merge can be asked about at all.
-     * <p>
-     * The Git rebase asks it, and it lives here, beside the merge that answers
-     * for the files it says yes to.
-     */
     @Test
     public void aTestCaseIsWhatThisCanMerge() {
         assertTrue(TestCaseMerge.isTestCase("Test Cases/Login/6197ec6e.tc"));

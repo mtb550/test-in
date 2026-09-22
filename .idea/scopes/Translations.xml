@@ -1,0 +1,10 @@
+<component name="DependencyValidationManager">
+  <!--
+    The translated bundles, and not the English one they are made from. The
+    Testin profile switches the spelling and grammar checkers off here, because
+    they know English and these words are the translator's to check: 1,748
+    "typos" in messages_fr were French, and the grammar checker read a Hindi full
+    stop as no stop at all. Every other inspection still reads these files.
+  -->
+  <scope name="Translations" pattern="file:src/main/resources/messages_*.properties" />
+</component>

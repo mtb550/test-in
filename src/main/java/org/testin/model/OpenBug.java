@@ -28,9 +28,9 @@ import java.util.UUID;
 
 public record OpenBug(@NotNull Path runPath, @NotNull TestRunItems item) {
     // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-064
-    public static @NotNull List<OpenBug> of(final @NotNull Map<Path, TestRunDto> runs, final @NotNull UUID caseId) {
+    public static @NotNull List<OpenBug> of(final @NotNull Map<Path, TestRunDto> runs, final @NotNull UUID testCaseId) {
         return runs.entrySet().stream()
-                .flatMap(run -> run.getValue().resultOf(caseId)
+                .flatMap(run -> run.getValue().resultOf(testCaseId)
                         .filter(FailureDetail::recordsABug)
                         .map(item -> new OpenBug(run.getKey(), item))
                         .stream())

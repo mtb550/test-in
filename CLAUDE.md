@@ -142,6 +142,12 @@ silently has no effect costs more than the setting it was meant to hold.
   `Bundle` is the one exception in `src/main`, because its constructor calls
   `super(...)` and Lombok writes an empty body. Read the
   `lombok-writes-the-boilerplate` skill under `.claude/skills/`.
+- **Names say the business word, in full.** A test case is a `TestCase`, never
+  a `Case`: `TestCaseDetails`, `testCaseId`, `testCases`, `A_TEST_CASE`. The
+  same holds for the documentation and for issues - *test case id*, never *case
+  id*. `p` for the `Project` and `tc` for one `TestCaseDto` are the only short
+  names, and there is no third. Read the `names-say-the-business` skill under
+  `.claude/skills/` before naming or renaming anything.
 - **A class is named by its import, never by its package path.** `Optional`,
   not `java.util.Optional`, in code and in tests alike; the only exception is
   a simple name that already means another class in that file. Read the
@@ -185,12 +191,17 @@ silently has no effect costs more than the setting it was meant to hold.
   line narrating the next one. Muteb, 20 September 2026: *"[I] want to make my
   classes clear and simple, no more comments accept rule and use case numbers."*
 
-  27,483 comment lines came out of `src/main/java` in one commit - 34% of every
-  line in it, against 35,130 lines of code. What replaced them is not nothing:
-  **the marker says which documented behavior this is, `docs/` says what that
-  behavior is, and the commit message says why the code is shaped this way.** A
-  reason belongs in the commit body, where `git blame` reaches it and where it
-  cannot drift from the code, rather than in a paragraph above the method.
+  The tests are held to it too. 27,483 comment lines came out of
+  `src/main/java` in one commit - 34% of every line in it, against 35,130 lines
+  of code - and 4,256 more came out of `src/test` on 22 September 2026, when a
+  Javadoc block was found back in a test class. `NonMarkerComment` gates both
+  trees now, so the next one fails the run rather than waiting to be spotted.
+
+  What replaced them is not nothing: **the marker says which documented
+  behavior this is, `docs/` says what that behavior is, and the commit message
+  says why the code is shaped this way.** A reason belongs in the commit body,
+  where `git blame` reaches it and where it cannot drift from the code, rather
+  than in a paragraph above the method.
 
   So write the commit message as if it were the comment you did not write: what
   was wrong, what was tried and refused, which trap the shape avoids. That is
@@ -202,7 +213,8 @@ silently has no effect costs more than the setting it was meant to hold.
   Two exceptions, and only two. A comment a machine reads stays -
   `//noinspection`, `// @formatter:off` - because it is part of the build rather
   than prose. And the Apache notice at the top of every file stays, untouched
-  (`MissingCopyright` gates it).
+  (`MissingCopyright` gates it). A `//` inside a text block or a string is not a
+  comment, and nothing touches it.
 - **American English**, in comments and in text a tester reads. The platform API
   this is written against is American (`Color`, `EditorColors`, `normalize`), so
   British spellings put two dialects in one sentence — a comment about "the caret
@@ -307,7 +319,7 @@ silently has no effect costs more than the setting it was meant to hold.
   to run while working; `ideTest` when the change reaches the indexer or the
   tree.
 
-  Run it locally only for the case CI cannot serve: a sweep that touched
+  Run it locally only for the one job CI cannot do: a sweep that touched
   nullability, annotations or many files at once, before it is pushed at all.
   Then run it after the last edit, on a still tree — editing a file while the
   inspector is reading it produces findings about a version that no longer

@@ -131,13 +131,13 @@ public class ExportAction extends DumbAwareAction {
 
         // UC-SHARE-001, Rule-SHARE-005
         private void writeExport(final DestinationForm.@NotNull Destination destination, final @NotNull Map<String, List<TestCaseDto>> selected) {
-            final int cases = selected.values().stream().mapToInt(List::size).sum();
+            final int testCases = selected.values().stream().mapToInt(List::size).sum();
 
-            BackgroundWork.run(p, Bundle.message("export.task.writing", String.valueOf(cases), destination.file().getName()),
+            BackgroundWork.run(p, Bundle.message("export.task.writing", String.valueOf(testCases), destination.file().getName()),
                     Bundle.message("export.failed.title"), indicator -> {
                         destination.format().exportToFile(p, destination.file(), selected);
 
-                        ExportNotice.show(p, destination.file(), cases);
+                        ExportNotice.show(p, destination.file(), testCases);
                     });
         }
 
@@ -149,14 +149,14 @@ public class ExportAction extends DumbAwareAction {
             walk(node, List.of(node.getName()), found, unreadable);
 
             final @NotNull Map<String, List<TestCaseDto>> sheets = new LinkedHashMap<>();
-            for (final Sheet sheet : found) sheets.put(uniqueKey(sheets, sheet.path()), sheet.cases());
+            for (final Sheet sheet : found) sheets.put(uniqueKey(sheets, sheet.path()), sheet.testCases());
 
             return new Gathered(sheets, unreadable);
         }
 
         // UC-SHARE-003, Rule-SHARE-020
-        private @NotNull List<TestCaseDto> detached(final @NotNull List<TestCaseDto> cases) {
-            return cases.stream()
+        private @NotNull List<TestCaseDto> detached(final @NotNull List<TestCaseDto> testCases) {
+            return testCases.stream()
                     .map(tc -> TestCaseSnapshot.copy(p, tc))
                     .toList();
         }
@@ -167,7 +167,7 @@ public class ExportAction extends DumbAwareAction {
             final @NotNull List<TestCaseDto> here = indexer.getTestCasesForTestSet(node.getPath());
             if (!here.isEmpty()) found.add(new Sheet(path, detached(here)));
 
-            unreadable.addAll(indexer.unreadableCasesIn(node.getPath()).stream().sorted().toList());
+            unreadable.addAll(indexer.unreadableTestCasesIn(node.getPath()).stream().sorted().toList());
 
             for (final DirectoryDto child : indexer.getChildren(node.getPath())) {
                 final @NotNull List<String> under = new ArrayList<>(path);
@@ -180,6 +180,6 @@ public class ExportAction extends DumbAwareAction {
     private record Gathered(@NotNull Map<String, List<TestCaseDto>> sheets, @NotNull List<String> unreadable) {
     }
 
-    private record Sheet(@NotNull List<String> path, @NotNull List<TestCaseDto> cases) {
+    private record Sheet(@NotNull List<String> path, @NotNull List<TestCaseDto> testCases) {
     }
 }

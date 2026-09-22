@@ -30,7 +30,7 @@ import java.util.function.Function;
 @Getter
 @AllArgsConstructor
 public enum ReportTile {
-    TOTAL_CASES(
+    TOTAL_TEST_CASES(
             Bundle.message("report.tile.total.cases"),
             "1F3864",
             "var(--heading)",

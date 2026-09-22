@@ -16,18 +16,21 @@
 # with its reason. The Testin profile names the inspector's rules one by one, so
 # what runs here does not depend on a default.
 #
-# Seven rules are the script's own, because no IntelliJ inspection makes them.
+# Eight rules are the script's own, because no IntelliJ inspection makes them.
 # WrappedMethodDeclaration - a method declaration belongs on one line.
 # StaticMutableState - a static that is not final in the packages that model the
 # data is one slot for the whole IDE, which is how a cached test source root came
 # to be shared between projects. HandWrittenPrivateConstructor - an empty one
-# where @NoArgsConstructor(access = PRIVATE) says it better. DriftedCaption - one
+# where @NoArgsConstructor(access = PRIVATE) says it better. NonMarkerComment -
+# a comment that is not a UC- or Rule- marker, in either tree: the marker says
+# which documented behavior the code carries, and the commit message says why.
+# DriftedCaption - one
 # concept spelled two ways in front of the same tester. OrphanedJavadoc - a doc
 # block followed by a second one, which javac throws away. MissingCopyright - a
 # .java file that does not open with the Apache 2.0 notice, so a file read away
 # from the repository says nothing about who owns it. HtmlParagraphInMarkdown - a
 # bare <p> in a Markdown file, which turns what follows into raw HTML where
-# backticks stop being code. All seven are at zero, so the
+# backticks stop being code. All eight are at zero, so the
 # first one that appears is the one to look at.
 #
 # DuplicatedDisplayString is counted rather than forbidden: a string a tester

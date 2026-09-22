@@ -598,9 +598,10 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
   the worst place to move when somebody has asked for stillness, and the switch
   is the IDE's own rather than a second one of ours that could disagree with it.
 - **Rule-EDITOR-PANEL-217** — Light mode never grows past the display it is on.
-  A case longer than the screen stops at the edge and says so on its last row.
-  This is because the verdict buttons and the status bar finish a case, and a
-  window taller than the screen puts them where nobody can reach them.
+  A test case longer than the screen stops at the edge and says so on its last
+  row. This is because the verdict buttons and the status bar finish a test
+  case, and a window taller than the screen puts them where nobody can reach
+  them.
 - **Rule-EDITOR-PANEL-232** — The test set's name sits in a rounded frame with
   no icon. The name and the frame are in the gray of the letter frames beside
   the description, so it reads as a label above the test case rather than as
@@ -621,9 +622,10 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
   and the status bar lists them after the verdict keys. The buttons and their
   keys go while the failure form is open, as the verdict buttons do.
 
-**Why 200 milliseconds.** `P` is pressed once per test case, so a hundred-case
-run is a hundred of these, and the tester is watching the application under test
-rather than this window. The movement has to be seen without being waited for.
+**Why 200 milliseconds.** `P` is pressed once per test case, so a run of a
+hundred test cases is a hundred of these, and the tester is watching the
+application under test rather than this window. The movement has to be seen
+without being waited for.
 
 **Not everything moves.** Dragging the window's width tracks the pointer exactly —
 that is the tester's hand on the edge, not a state change.

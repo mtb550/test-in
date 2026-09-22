@@ -29,22 +29,6 @@ import java.nio.file.Paths;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-/**
- * A rescan started from a progress bar fills that bar in and stops when the
- * tester presses Cancel (#20).
- * <p>
- * The bar was there before this and reported nothing: the task built an
- * indicator, never handed it to the scan, and the scan was given a fresh
- * {@code EmptyProgressIndicator} instead. So the tester watched a title with no
- * test set named under it, over a Cancel button that did nothing - a promise
- * the window made and the code did not keep.
- * <p>
- * Checked by reading the sources, for the reason {@link
- * org.testin.LightServiceContractTest} gives: what went wrong is a wire that was
- * not connected, and an unconnected wire compiles. There is no seam to assert
- * against at runtime without the platform, a real project on disk and a tester
- * to press the button.
- */
 public class ScanProgressTest {
 
     private static final @NotNull Path SOURCE_ROOT = Paths.get("src", "main", "java", "org", "testin", "indexer");
@@ -60,11 +44,6 @@ public class ScanProgressTest {
         }
     }
 
-    /**
-     * The scan takes an indicator at all - the overload the bar needs. Asked of
-     * the class rather than of its source, because this one the compiler can be
-     * made to care about.
-     */
     @Test
     public void theScanCanBeGivenAProgressBar() {
         try {
@@ -75,15 +54,6 @@ public class ScanProgressTest {
         }
     }
 
-    /**
-     * The rescan passes its own indicator down. Reading the file is the point:
-     * calling the one-argument overload compiles perfectly and silently throws
-     * the bar away, which is exactly the defect.
-     * <p>
-     * Two links of one wire since the rescan first asks whether the folder is a
-     * test project Testin reads (#66, finding 120): the rescan hands the bar to
-     * that question, and the question hands it to the scan.
-     */
     @Test
     public void theRescanHandsItsIndicatorToTheScan() {
         assertTrue(read("Rescan.java").contains("rescanChangedProject(testProject, indicator)"),
@@ -94,11 +64,6 @@ public class ScanProgressTest {
                 "rescanChangedProject must hand the rescan's progress bar to the scan, not start one of its own");
     }
 
-    /**
-     * Both directory loops ask whether the tester has canceled. One check per
-     * loop, because a loop that never asks cannot be stopped however cancellable
-     * the task above it claims to be.
-     */
     @Test
     public void bothScanLoopsStopWhenTheTesterCancels() {
         final @NotNull String source = read("IndexingScanner.java");

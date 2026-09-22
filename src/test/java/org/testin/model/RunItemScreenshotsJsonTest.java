@@ -31,11 +31,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * A run item's screenshots on disk (#50, #313): the run file names PNG files
- * beside it, no picture is written into it, and a run item with none writes no
- * key at all - so a run with no screenshot writes the file it always wrote.
- */
 public class RunItemScreenshotsJsonTest {
 
     private static final String NAME = "k3f9a.png";
@@ -68,10 +63,6 @@ public class RunItemScreenshotsJsonTest {
         }
     }
 
-    /**
-     * Five random letters and digits, never a name the run already holds, and
-     * nothing but such a name is taken for a screenshot.
-     */
     @Test
     public void aNewScreenshotNameIsShortAndNotOneTheRunHolds() {
         final Set<String> taken = new HashSet<>();

@@ -29,24 +29,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * A test run outlives the test cases it was created from, and a case deleted
- * after the run still has a row in it (#71).
- * <p>
- * The row is drawn from what the run recorded, and takes nothing new: a verdict
- * means "we ran it and this is what happened", and a case that is gone cannot be
- * run again. Three things have to hold together for that, and each of them used
- * to be somewhere else's business:
- * <ul>
- *   <li>the item says it is removed, by name, so the verdict path, the details
- *       editor and the execution walker all ask one question;</li>
- *   <li>the placeholder case keeps the id, because it is the only identity left -
- *       two deleted cases in one run are otherwise the same row twice;</li>
- *   <li>the repair that clears execution stamps without a verdict leaves a
- *       removed row alone, because that case really was executed before it was
- *       deleted.</li>
- * </ul>
- */
 public class DeletedTestCaseInARunTest {
 
     private static TestRunItems removedItem(final UUID id) {
@@ -58,7 +40,7 @@ public class DeletedTestCaseInARunTest {
     }
 
     @Test
-    public void aRowWhoseCaseIsGoneSaysSoByName() {
+    public void aRowWhoseTestCaseIsGoneSaysSoByName() {
         final UUID id = UUID.randomUUID();
 
         assertTrue(removedItem(id).isRemoved(),
@@ -67,17 +49,15 @@ public class DeletedTestCaseInARunTest {
 
     @Test
     public void aRemovedRowIsNotAVerdict() {
-        // REMOVED is what happened to the case, not what a tester decided about
-        // it - so it must not be counted as one of the three verdicts.
         assertFalse(TestStatus.REMOVED.isVerdict(), "nobody chose REMOVED from the menu");
     }
 
     @Test
-    public void theRowStillShowsAndStillNamesItsCase() {
+    public void theRowStillShowsAndStillNamesItsTestCase() {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = removedItem(id);
 
-        final TestCaseDto shown = item.shownCase();
+        final TestCaseDto shown = item.shownTestCase();
 
         assertEquals(shown.getId(), id, "the id is the only identity a deleted case has left");
         assertTrue(shown.getDescription().contains(id.toString()),
@@ -85,7 +65,7 @@ public class DeletedTestCaseInARunTest {
     }
 
     @Test
-    public void aRowNeverJudgedOfADeletedCaseIsShownRemoved() {
+    public void aRowNeverJudgedOfADeletedTestCaseIsShownRemoved() {
         final TestRunItems item = TestRunItems.builder()
                 .id(UUID.randomUUID())
                 .status(TestStatus.PENDING)
@@ -95,14 +75,8 @@ public class DeletedTestCaseInARunTest {
         assertEquals(item.shownStatus(), TestStatus.REMOVED, "nothing was executed, and now nothing can be");
     }
 
-    /**
-     * #66, finding 110: a removed row is shown as Removed, while the run written
-     * back still carries the verdict it recorded. Opening a run used to set
-     * REMOVED on the run the indexer holds, and the next save from anywhere wrote
-     * it over the verdict.
-     */
     @Test
-    public void aJudgedRowOfADeletedCaseShowsItsVerdictAndIsWrittenWithIt() {
+    public void aJudgedRowOfADeletedTestCaseShowsItsVerdictAndIsWrittenWithIt() {
         final TestRunItems item = TestRunItems.builder()
                 .id(UUID.randomUUID())
                 .status(TestStatus.PASSED)

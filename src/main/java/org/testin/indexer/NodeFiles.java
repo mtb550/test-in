@@ -99,7 +99,7 @@ final class NodeFiles {
         final @NotNull Runnable operationFinished = () -> {
             if (pending.decrementAndGet() != 0) return;
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                arrived.forEach(this::reidentifyCopiedCases);
+                arrived.forEach(this::reidentifyCopiedTestCases);
 
                 indexer.refreshIndexedProject(targetPath);
                 ApplicationManager.getApplication().invokeLater(() -> onComplete.accept(copied.get()));
@@ -143,15 +143,15 @@ final class NodeFiles {
     }
 
     // UC-TREE-PANEL-014, Rule-TREE-PANEL-051
-    private void reidentifyCopiedCases(final @NotNull Path copiedRoot) {
-        final List<Path> caseFiles;
+    private void reidentifyCopiedTestCases(final @NotNull Path copiedRoot) {
+        final List<Path> testCaseFiles;
         final List<Path> markerFiles;
 
         try (Stream<Path> files = Files.walk(copiedRoot)) {
             final @NotNull List<Path> all = files.filter(Files::isRegularFile).toList();
 
-            caseFiles = all.stream()
-                    .filter(file -> ProjectIndexer.isCaseFile(file, dir -> store.hasMarker(dir, DirectoryType.TS)))
+            testCaseFiles = all.stream()
+                    .filter(file -> ProjectIndexer.isTestCaseFile(file, dir -> store.hasMarker(dir, DirectoryType.TS)))
                     .toList();
 
             markerFiles = all.stream()
@@ -163,8 +163,8 @@ final class NodeFiles {
             return;
         }
 
-        final long given = caseFiles.stream().filter(this::reidentify).count();
-        Logger.info("Gave " + given + " of " + caseFiles.size() + " copied test case(s) new ids under " + copiedRoot.getFileName());
+        final long given = testCaseFiles.stream().filter(this::reidentify).count();
+        Logger.info("Gave " + given + " of " + testCaseFiles.size() + " copied test case(s) new ids under " + copiedRoot.getFileName());
 
         // Rule-INTERNAL-090
         final long folders = markerFiles.stream().filter(store::giveFreshMarkerId).count();
@@ -172,21 +172,21 @@ final class NodeFiles {
     }
 
     // UC-TREE-PANEL-014, Rule-TREE-PANEL-051
-    private boolean reidentify(final @NotNull Path caseFile) {
+    private boolean reidentify(final @NotNull Path testCaseFile) {
         try {
-            final @NotNull TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(caseFile.toFile(), TestCaseDto.class);
+            final @NotNull TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(testCaseFile.toFile(), TestCaseDto.class);
             final @NotNull UUID fresh = UUID.randomUUID();
 
             tc.setId(fresh);
-            if (!Services.getInstance(p, TestDataFiles.class).write(p, caseFile.resolveSibling(FileKind.TEST_CASE.fileName(fresh)), tc))
+            if (!Services.getInstance(p, TestDataFiles.class).write(p, testCaseFile.resolveSibling(FileKind.TEST_CASE.fileName(fresh)), tc))
                 return false;
 
-            Services.getInstance(OwnWrites.class).record(caseFile);
-            Files.delete(caseFile);
+            Services.getInstance(OwnWrites.class).record(testCaseFile);
+            Files.delete(testCaseFile);
             return true;
 
         } catch (final Exception ex) {
-            Logger.error("Could not give the copied case " + caseFile.getFileName() + " a new id: " + ex.getMessage());
+            Logger.error("Could not give the copied case " + testCaseFile.getFileName() + " a new id: " + ex.getMessage());
             return false;
         }
     }

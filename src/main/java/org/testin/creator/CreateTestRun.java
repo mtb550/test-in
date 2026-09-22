@@ -63,8 +63,8 @@ public class CreateTestRun implements NodeCreator {
     }
 
     // UC-TREE-PANEL-009, UC-TREE-PANEL-021
-    public void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Set<UUID> sourceCases, final @NotNull Map<TestRunConfiguration, String> sourceConfiguration) {
-        new RunForm(p).open(testCasesRoot, name, sourceCases, sourceConfiguration,
+    public void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Set<UUID> sourceTestCases, final @NotNull Map<TestRunConfiguration, String> sourceConfiguration) {
+        new RunForm(p).open(testCasesRoot, name, sourceTestCases, sourceConfiguration,
                 new RunFormAction(Bundle.message("run.create.title"), Bundle.message("run.create.button"), (form, selection) -> create(form, selection, parentDir)));
     }
 
@@ -100,7 +100,7 @@ public class CreateTestRun implements NodeCreator {
     private void write(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull TestRunDirectoryDto trDir) {
         final @NotNull Map<TestRunConfiguration, String> configuration = form.configuration();
 
-        final @NotNull TestRunDto tr = new TestRunDto().coverOnly(RunForm.checkedCases(selection));
+        final @NotNull TestRunDto tr = new TestRunDto().coverOnly(RunForm.checkedTestCases(selection));
 
         BackgroundWork.run(p, Bundle.message("run.task.creating", savePath.getFileName()), Bundle.message("run.create.failed.title"), indicator -> {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);

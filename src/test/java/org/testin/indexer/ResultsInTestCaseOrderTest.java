@@ -27,49 +27,15 @@ import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
 
-/**
- * Rule-INTERNAL-011, Rule-INTERNAL-012.
- * <p>
- * A run's results come back in their cases' test-set order (#305, S19).
- * <p>
- * The results are one file per case now. So the only order the scan gets for
- * free is the one the file system happens to list the folder in. That is a
- * different order on another machine, and no order at all to a tester. The run
- * editor draws them in it, every report prints them in it and every export
- * writes them in it. So the order is decided once, where the results are read,
- * and it is the order the cases sit in their test sets.
- * <p>
- * A result whose test case the project no longer holds cannot take a place in
- * that order, and it is still a record of work: it comes last, with the verdict
- * it was given.
- * <p>
- * A unit test because the ordering is pure - a list of results and the cases one
- * pass read, in, an ordered list out - and reached by reflection because it is
- * {@code IndexingScanner}'s own, private to the one reader that needs it. The
- * same reason {@code NodeKindTablesTest} reaches for a private table: nothing
- * but a test has any use for it, and it is worth no production API of its own.
- */
-public class ResultsInCaseOrderTest {
+public class ResultsInTestCaseOrderTest {
 
-    /**
-     * Ranked "a": first in its test set, whatever a folder listing says.
-     */
     private static final @NotNull UUID FIRST = UUID.fromString("11111111-1111-4111-8111-111111111101");
 
-    /**
-     * Ranked "b", so it follows {@link #FIRST}.
-     */
     private static final @NotNull UUID SECOND = UUID.fromString("11111111-1111-4111-8111-111111111102");
 
-    /**
-     * A case the run recorded a verdict for and the project does not hold anymore.
-     */
-    private static final @NotNull UUID DELETED_CASE = UUID.fromString("11111111-1111-4111-8111-111111111103");
+    private static final @NotNull UUID DELETED_TEST_CASE = UUID.fromString("11111111-1111-4111-8111-111111111103");
 
-    /**
-     * The two cases a scan found, ranked, as the index holds them.
-     */
-    private static @NotNull ScannedProject aProjectHoldingBothCases() {
+    private static @NotNull ScannedProject aProjectHoldingBothTestCases() {
         final @NotNull ScannedProject scanned = new ScannedProject();
         scanned.getTestCasesById().put(FIRST, TestCaseDto.builder().id(FIRST).order("a").build());
         scanned.getTestCasesById().put(SECOND, TestCaseDto.builder().id(SECOND).order("b").build());
@@ -86,11 +52,11 @@ public class ResultsInCaseOrderTest {
     }
 
     @Test
-    public void theResultsComeBackInTheirCasesTestSetOrder() {
+    public void theResultsComeBackInTheirTestCasesTestSetOrder() {
         final @NotNull List<TestRunItems> asTheFolderListedThem =
                 List.of(result(SECOND, TestStatus.FAILED), result(FIRST, TestStatus.PASSED));
 
-        final @NotNull List<TestRunItems> ordered = IndexingScanner.inCaseOrder(asTheFolderListedThem, aProjectHoldingBothCases());
+        final @NotNull List<TestRunItems> ordered = IndexingScanner.inTestCaseOrder(asTheFolderListedThem, aProjectHoldingBothTestCases());
 
         assertEquals(idsOf(ordered), List.of(FIRST, SECOND),
                 "A run's results are drawn, printed and exported in this order, so it is the order the cases sit"
@@ -98,15 +64,15 @@ public class ResultsInCaseOrderTest {
     }
 
     @Test
-    public void aResultWhoseCaseIsGoneComesLastWithItsVerdict() {
+    public void aResultWhoseTestCaseIsGoneComesLastWithItsVerdict() {
         final @NotNull List<TestRunItems> asTheFolderListedThem = List.of(
-                result(DELETED_CASE, TestStatus.FAILED),
+                result(DELETED_TEST_CASE, TestStatus.FAILED),
                 result(SECOND, TestStatus.PASSED),
                 result(FIRST, TestStatus.PASSED));
 
-        final @NotNull List<TestRunItems> ordered = IndexingScanner.inCaseOrder(asTheFolderListedThem, aProjectHoldingBothCases());
+        final @NotNull List<TestRunItems> ordered = IndexingScanner.inTestCaseOrder(asTheFolderListedThem, aProjectHoldingBothTestCases());
 
-        assertEquals(idsOf(ordered), List.of(FIRST, SECOND, DELETED_CASE),
+        assertEquals(idsOf(ordered), List.of(FIRST, SECOND, DELETED_TEST_CASE),
                 "A run outlives the cases it was made from, and a result whose case is gone has no place in their"
                         + " order - so it comes after them rather than being dropped or sorted among them");
 

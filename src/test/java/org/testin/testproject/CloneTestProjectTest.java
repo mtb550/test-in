@@ -22,10 +22,6 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Rule-TREE-PANEL-107: a clone is named after its repository, from any form of
- * address, so no {@code testin.yml} is needed to clone one.
- */
 public class CloneTestProjectTest {
 
     @Test
@@ -44,10 +40,6 @@ public class CloneTestProjectTest {
         assertEquals(CloneTestProject.repositoryName("https://muteb@bitbucket.org/acme/tests.git"), "tests");
     }
 
-    /**
-     * The name becomes the first Java package of everything under the project,
-     * so one Java refuses is made into one it accepts (Rule-TREE-PANEL-095).
-     */
     @Test
     public void aNameJavaRefusesIsMadeIntoOneItAccepts() {
         assertTrue(DirectoryType.TP.canTakeName(CloneTestProject.repositoryName("https://github.com/acme/new.git")),

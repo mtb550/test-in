@@ -39,11 +39,11 @@ public final class TestinData {
 
     public static final @NotNull DataKey<TestinEditor> EDITOR = DataKey.create("testin.editor");
 
-    public static final @NotNull DataKey<List<TestCaseDto>> SELECTED_CASES = DataKey.create("testin.selectedCases");
+    public static final @NotNull DataKey<List<TestCaseDto>> SELECTED_TEST_CASES = DataKey.create("testin.selectedCases");
 
     public static void from(final @NotNull DataSink sink, final @NotNull TestinEditor editor, final @NotNull List<TestCaseDto> selected) {
         sink.set(EDITOR, editor);
-        sink.set(SELECTED_CASES, selected);
+        sink.set(SELECTED_TEST_CASES, selected);
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-066
@@ -55,12 +55,12 @@ public final class TestinData {
         return editor(e).filter(RunEditor.class::isInstance).map(RunEditor.class::cast);
     }
 
-    public static @NotNull List<TestCaseDto> selectedCases(final @NotNull AnActionEvent e) {
-        return Optional.ofNullable(SELECTED_CASES.getData(e.getDataContext())).orElse(List.of());
+    public static @NotNull List<TestCaseDto> selectedTestCases(final @NotNull AnActionEvent e) {
+        return Optional.ofNullable(SELECTED_TEST_CASES.getData(e.getDataContext())).orElse(List.of());
     }
 
-    public static @NotNull Optional<TestCaseDto> singleSelectedCase(final @NotNull AnActionEvent e) {
-        final @NotNull List<TestCaseDto> selected = selectedCases(e);
+    public static @NotNull Optional<TestCaseDto> singleSelectedTestCase(final @NotNull AnActionEvent e) {
+        final @NotNull List<TestCaseDto> selected = selectedTestCases(e);
 
         return selected.size() == 1 ? Optional.of(selected.getFirst()) : Optional.empty();
     }

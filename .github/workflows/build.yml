@@ -91,12 +91,16 @@ jobs:
       # verifyPlugin here means IntelliJ IDEA, which is the only one of the four
       # whose verdict is news - build.gradle.kts records why, and how to run the
       # full sweep by hand.
+      #
+      # ideTest runs the tests that need a running IDE: the indexer, the tree,
+      # an undo across two test sets, filing a bug. The unit tests cannot reach
+      # any of them, and until this line they ran only on a developer's machine.
       - name: Build, test and verify
         shell: bash
         # The budget second and alone, so the clock it reads is not shared with
         # compiling and verifying (#66, finding 108).
         run: |
-          ./gradlew compileJava test verifyPlugin verifyDistribution
+          ./gradlew compileJava test ideTest verifyPlugin verifyDistribution
           ./gradlew test -Pbudget
 
       - name: Keep the reports
@@ -107,4 +111,5 @@ jobs:
           if-no-files-found: ignore
           path: |
             build/reports/tests/test
+            build/reports/tests/ideTest
             build/reports/pluginVerifier

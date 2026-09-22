@@ -36,72 +36,24 @@ import java.util.stream.Stream;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-/**
- * A rule number is a name, and everything wearing it says the same thing.
- * <p>
- * A rule that holds for a whole part is written out on every page in it, so one
- * number is written many times on purpose. That buys a page that can be read
- * on its own, and costs the risk that two copies drift apart. Reword one and
- * forget the rest and the pages quietly start telling a tester different things
- * about the same rule. Nothing but this notices.
- * <p>
- * The other way the numbering goes wrong is a collision: two different rules
- * given one number, because whoever wrote the second read the wrong last
- * number. That happened on 7 September 2026, an hour after the scheme was
- * settled, and what caught it was a script nobody would have run again. Both
- * failures look the same from here - one number, two texts.
- * <p>
- * Written as a scan of the documents for the reason
- * {@code GridEditConfirmationTest} gives: what has to hold is a rule about the
- * shape of what is written down, and there is nothing to run it against but the
- * files themselves.
- */
 public class RuleNumbersTest {
 
     private static final Path DOCS = Paths.get("docs");
 
-    /**
-     * The one page at the top of {@code docs} that writes rules of its own.
-     */
     private static final String PRODUCT = "product.md";
     private static final Path SOURCES = Paths.get("src", "main", "java");
 
-    /**
-     * A rule being written out: the bullet that states it, and the words that
-     * follow up to the next rule or the end of the list.
-     * <p>
-     * Read from the pages that write rules, which is every page inside a part
-     * and the product page. The standard is left out because it shows the form
-     * in a template rather than writing a rule.
-     */
     private static final Pattern DEFINITION = Pattern.compile(
             "^\\s*-\\s+\\*\\*Rule-([A-Z][A-Z-]*)-(\\d+)\\*\\*(.*?)(?=\\r?\\n\\s*-\\s+\\*\\*Rule-|\\r?\\n\\r?\\n|$)",
             Pattern.MULTILINE | Pattern.DOTALL);
 
-    /**
-     * The same thing written as a table row, which is how the product page has
-     * always held its rules - a column for the number and a column for the
-     * words, from when the number was a business requirement id.
-     */
     private static final Pattern IN_A_TABLE = Pattern.compile(
             "^\\| \\*\\*Rule-([A-Z][A-Z-]*)-(\\d+)\\*\\* \\|(.*?)\\|\\s*$", Pattern.MULTILINE);
 
-    /**
-     * A rule being named, anywhere at all.
-     */
     private static final Pattern REFERENCE = Pattern.compile("Rule-([A-Z][A-Z-]*)-(\\d+)");
 
-    /**
-     * The range a part's Numbering row claims its rules cover, which is what
-     * anyone writing the next rule reads to choose its number.
-     */
     private static final Pattern RANGE = Pattern.compile("Rules are `Rule-([A-Z][A-Z-]*)-\\d+` to `Rule-[A-Z][A-Z-]*-(\\d+)`");
 
-    /**
-     * Every rule the documents write out, by part, then number, then the words
-     * used - remembering which pages used each wording, so a disagreement can
-     * name both sides of it.
-     */
     private static Map<String, Map<Integer, Map<String, List<String>>>> definitions() {
         final Map<String, Map<Integer, Map<String, List<String>>>> byPart = new TreeMap<>();
 
@@ -123,23 +75,10 @@ public class RuleNumbersTest {
         return byPart;
     }
 
-    /**
-     * A rule's words on one line, so the same rule wrapped differently on two
-     * pages is one wording rather than two - and so a disagreement can be read
-     * in the failure rather than diffed by hand.
-     */
     private static String oneLine(final String text) {
         return text.replaceAll("\\s+", " ").trim();
     }
 
-    /**
-     * The pages inside the parts, and the product page.
-     * <p>
-     * Nothing else at the top of {@code docs}: the standard shows the form of a
-     * rule in a template, and the home page links to every part without writing
-     * a rule of its own. The product page is here because its rules are real -
-     * they belong to no part, which is what {@code PRODUCT} names.
-     */
     private static List<Path> partPages() {
         final List<Path> pages = new ArrayList<>();
 
@@ -169,21 +108,12 @@ public class RuleNumbersTest {
         return files;
     }
 
-    /**
-     * The page carrying a part's Numbering row, from the prefix its rules carry:
-     * {@code TREE-PANEL} is {@code docs/treePanel/main.md}. The product has no
-     * folder, so its own page answers for it.
-     */
     private static Path numberingPage(final String part) {
         if ("PRODUCT".equals(part)) return DOCS.resolve(PRODUCT);
 
         return partFolder(part).resolve("main.md");
     }
 
-    /**
-     * Where a part's pages live, from the prefix its rules carry:
-     * {@code TREE-PANEL} is {@code docs/treePanel}.
-     */
     private static Path partFolder(final String part) {
         final Map<String, String> folders = new LinkedHashMap<>();
         folders.put("TREE-PANEL", "treePanel");
@@ -232,10 +162,6 @@ public class RuleNumbersTest {
         }
     }
 
-    /**
-     * The row a writer reads to pick the next number has to be the truth, or the
-     * next rule takes a number that is already taken.
-     */
     @Test
     public void everyPartSaysItsLastNumber() {
         final Map<String, Map<Integer, Map<String, List<String>>>> byPart = definitions();
@@ -253,10 +179,6 @@ public class RuleNumbersTest {
         }
     }
 
-    /**
-     * A marker naming a rule that is not in the documents is worse than no
-     * marker, because the next reader trusts it and goes looking.
-     */
     @Test
     public void everyRuleTheCodeCitesExists() {
         final Set<String> written = new LinkedHashSet<>();

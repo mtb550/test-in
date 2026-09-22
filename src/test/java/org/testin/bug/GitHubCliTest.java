@@ -35,12 +35,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Asking {@code gh} whether a bug can be sent, and sending it (#28).
- * <p>
- * No test here starts {@code gh}: each hands in a launcher that answers the
- * way {@code gh} would, and records what it was asked.
- */
 public class GitHubCliTest {
 
     private static final String READY_VERSION = "gh version 2.100.0 (2026-09-03)\nhttps://github.com/cli/cli/releases/tag/v2.100.0\n";
@@ -167,10 +161,6 @@ public class GitHubCliTest {
         assertEquals(IssueCreation.of(answer("", "", 1), "github.com", 0), IssueCreation.failed(Bundle.message("bug.send.failed", 1)));
     }
 
-    /**
-     * A {@code gh} that gives these answers in turn, and is not installed once
-     * they run out.
-     */
     private static final class FakeGh {
         private final List<List<String>> asked = new ArrayList<>();
         private final Deque<ProcessOutput> answers;

@@ -22,9 +22,6 @@ import java.util.Optional;
 
 import static org.testng.Assert.assertEquals;
 
-/**
- * How a reported bug's address is read and shown (#28).
- */
 public class BugIssueUrlTest {
 
     @Test

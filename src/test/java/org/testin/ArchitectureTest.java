@@ -35,51 +35,9 @@ import static com.tngtech.archunit.core.domain.properties.HasName.Predicates.nam
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
-/**
- * The architecture rules, read off the bytecode instead of off CLAUDE.md (#114).
- * <p>
- * They were prose, and prose gets re-litigated by hand. #49 is an entire story
- * about auditing indexer-rule callers after the fact, and every sweep since has
- * found drift a test would have refused at commit time. Two of them shaped
- * decisions in a single afternoon: #175's C4 could not put an {@code EditorType}
- * on {@code DirectoryType} and its C11 could put a panel on {@code ViewTab}, and
- * both answers came from reading package names by hand rather than from anything
- * the build would have said.
- * <p>
- * <b>Known violations are frozen by name, with the issue that owns each.</b> A
- * rule that quietly excluded a package would document nothing; a list that names
- * six files says exactly what is wrong and where it is being fixed. Deleting a
- * name from one of these lists is how a story closes.
- * <p>
- * The fourth rule #114 asked for - Swing and AWT types only from the UI families
- * - is deliberately absent. See {@link #theRuleThisFileDoesNotEnforce()}.
- * <p>
- * <b>These read bytecode, so they catch use rather than imports.</b> An unused
- * import of a forbidden package leaves nothing in the class file and passes -
- * which is correct, since it does nothing, but it also means the rules cannot be
- * exercised by adding an import and watching them fail. Add a reference. That
- * mistake was made while writing this file, and both rules "passed" against a
- * violation that was not one.
- */
 public class ArchitectureTest {
 
-    /**
-     * The plugin's own compiled classes, taken from the directory rather than
-     * from the classpath.
-     * <p>
-     * {@code importPackages} walks everything the test classloader can see. Here
-     * that is the tests themselves and the instrumented copies the platform
-     * plugin makes of both. So the rules reported test classes reading their own
-     * fixtures off disk, and no combination of {@code ImportOption} excluded them
-     * without excluding the production classes too. Naming the one directory that
-     * holds what these rules are about is shorter than describing the four that
-     * hold what they are not.
-     */
     private static final @NotNull JavaClasses CLASSES = productionClasses();
-    /**
-     * Everything a leaf may not reach: the feature packages, which is every
-     * package but {@code model}, {@code util} and {@code logger}.
-     */
     private static final String @NotNull [] ABOVE_MODEL = {
             "org.testin.indexer..", "org.testin.editor..", "org.testin.view..", "org.testin.codegen..",
             "org.testin.services..", "org.testin.creator..", "org.testin.explorer..",
@@ -89,43 +47,7 @@ public class ArchitectureTest {
             "org.testin.open..", "org.testin.clipboard..", "org.testin.runner..", "org.testin.notifications..",
             "org.testin.setting..", "org.testin.config..", "org.testin.actions..", "org.testin.bug.."
     };
-    /**
-     * Empty since 11 September 2026, and that is #111 answered rather than a gap
-     * in this file. It held six.
-     * <p>
-     * Two were misfiled: {@code DirectoryMapper} read markers through {@code
-     * ProjectIndexer} and raised balloons, so it is an indexer service and is in
-     * {@code indexer}; {@code TestRunStatus} reached up only to implement {@code
-     * MenuItem}, an interface four enums in four packages implement, which is in
-     * {@code model} beside them now.
-     * <p>
-     * Two were tables: {@code DirectoryType} named a creator, three code
-     * generators and a remove handler per node kind, and {@code NodeStatistics}
-     * named two counting methods. Each is now an enum in the package that knows
-     * the answer, with one constant per kind named after it - {@code
-     * NodeCreators}, {@code JavaCode}, {@code Removals}, {@code
-     * NodeCounter.Gathered} - reached by {@code valueOf(type.name())} rather
-     * than by a switch, and held together by {@code NodeKindTablesTest}.
-     * <p>
-     * Two were in the wrong package outright: {@code TestEditorAttributes} and
-     * {@code RunEditorAttributes} declare what a test case's and a run item's
-     * fields are, which is {@code testcase} and {@code testrun}. Splitting them
-     * would have meant four parallel tables each; moving them whole cost two
-     * lines and kept the declaration in one piece. What they reach up to now -
-     * {@code ui.Badges} while a card is drawn - reaches up from a feature
-     * instead of from the vocabulary, and is written down in ARCHITECTURE.md.
-     */
     private static final @NotNull Set<String> MODEL_LEAF_EXCEPTIONS = Set.of();
-    /**
-     * What {@code util} may not import: the features, but not {@code services} or
-     * {@code notifications}.
-     * <p>
-     * Those two are the plugin's own infrastructure - the service locator and the
-     * one way anything tells a tester something - and every layer calls them,
-     * util included. #112 states this rule as "imports editor, view or dialogs",
-     * and that is the rule enforced. Counting the infrastructure would have
-     * listed three more files and said nothing about any of them.
-     */
     private static final String @NotNull [] FEATURES = {
             "org.testin.indexer..", "org.testin.editor..", "org.testin.view..", "org.testin.codegen..",
             "org.testin.creator..", "org.testin.explorer..", "org.testin.ui..",
@@ -134,28 +56,7 @@ public class ArchitectureTest {
             "org.testin.undo..", "org.testin.rename..", "org.testin.remove..", "org.testin.open..",
             "org.testin.clipboard..", "org.testin.runner..", "org.testin.bug.."
     };
-    /**
-     * Empty, and that is the answer to #112 rather than a gap in this file.
-     * <p>
-     * It held {@code org.testin.util.EditorUtil} and {@code org.testin.util.FontSync},
-     * measured 2026-09-04 and down from the four that story counted. Neither is
-     * in {@code util} anymore - the first is {@code editor/TestinEditors} and
-     * the second {@code ui/FontSync} - so both entries had stopped excusing
-     * anything: the predicate matches on the fully qualified name, and no class
-     * has answered to either of these for some time.
-     * <p>
-     * Two frozen names that freeze nothing read as two violations still
-     * outstanding, which is the opposite of what the package now looks like. No
-     * class under {@code util} depends on a feature package, so the rule holds
-     * unconditionally and the next one to break it fails here (#291).
-     */
     private static final @NotNull Set<String> UTIL_EXCEPTIONS = Set.of();
-    /**
-     * The classes outside the indexer and its exempt list that read or write
-     * files directly (#49), and there are none. The one there was,
-     * {@code sftp.BaselineStore}, went with the SFTP sync, so the next class to
-     * reach a file on its own fails here.
-     */
     private static final @NotNull Set<String> FILE_ACCESS_EXCEPTIONS = Set.of();
 
     private static @NotNull JavaClasses productionClasses() {
@@ -169,16 +70,6 @@ public class ArchitectureTest {
         return new ClassFileImporter().importPath(compiled);
     }
 
-    /**
-     * Matched on the outermost class, so freezing a name covers the anonymous
-     * classes inside it.
-     * <p>
-     * An enum constant with a body compiles to {@code Enum$1}, and the dependency
-     * that breaks a rule usually lives in exactly those bodies -
-     * {@code TestEditorAttributes} declares its per-attribute behavior that way.
-     * Freezing the outer name and missing the six numbered classes beside it was
-     * the first thing this file got wrong.
-     */
     private static @NotNull DescribedPredicate<JavaClass> notOneOf(final @NotNull Set<String> frozen) {
         return new DescribedPredicate<>("not one of the " + frozen.size() + " frozen violations") {
             @Override
@@ -215,16 +106,6 @@ public class ArchitectureTest {
         rule.check(CLASSES);
     }
 
-    /**
-     * The rule CLAUDE.md opens with, and the one #49 exists because nothing
-     * enforced.
-     * <p>
-     * The exempt packages are exempt for one reason: none of them reads or writes
-     * <b>test data</b>. They handle generated source, the automation repository's
-     * own {@code testin.yml}, the Git working tree, files outside the tree,
-     * generated report output, the IDE settings path, the log, and the
-     * temporary folder a bug report is sent from (#28).
-     */
     @Test
     public void onlyTheIndexerAndItsExemptListTouchFiles() {
         final @NotNull ArchRule rule = noClasses()
@@ -241,13 +122,6 @@ public class ArchitectureTest {
         rule.check(CLASSES);
     }
 
-    /**
-     * Rule-INTERNAL-089: one class reads {@code testin.yml} (#301, #335). The
-     * values it parses into are package-private, which the compiler holds; the
-     * parser is a library any class could import, which only this can. That it
-     * is also the only class that <i>writes</i> the file is
-     * {@link #onlyTheSaveButtonWritesTheConfigFile()}.
-     */
     @Test
     public void onlyTestinYmlReadsTheConfigFile() {
         final @NotNull ArchRule rule = noClasses()
@@ -259,23 +133,6 @@ public class ArchitectureTest {
         rule.check(CLASSES);
     }
 
-    /**
-     * Rule-TREE-PANEL-113, Decision-013: the tester's {@code testin.yml} is
-     * written when they press <b>Save to testin.yml</b>, and at no other moment
-     * (#301, D8).
-     * <p>
-     * <b>It was true and nothing held it.</b> Seven places wrote the file before
-     * Decision-011 took it out, and each created it when it was absent, so a
-     * repository ended up carrying a committed file nobody chose to add. The
-     * invariant is two commits old and worth a test rather than a habit.
-     * <p>
-     * Two halves, because one gesture reaching the file needs both to fail.
-     * {@code save} having one caller is what stops a second gesture calling it;
-     * {@code createChildData} being spelled in one place is what stops a class
-     * writing the file without asking {@code TestinYml} at all. {@code JavaSourceRoot}
-     * is the other class allowed to create a file, and what it creates is the
-     * {@code .java} the tester asked Testin to generate.
-     */
     @Test
     public void onlyTheSaveButtonWritesTheConfigFile() {
         final @NotNull ArchRule oneCaller = methods()
@@ -298,25 +155,6 @@ public class ArchitectureTest {
         oneWriter.check(CLASSES);
     }
 
-    /**
-     * <b>Swing and AWT types only from the UI families is not enforced here, on
-     * purpose.</b>
-     * <p>
-     * #114 asked for it. It contradicts a convention CLAUDE.md states in the same
-     * document: <i>"Enums carry their own presentation and actions (see
-     * TestStatus, TestRunStatus)"</i>. Ten classes in {@code model} import Swing
-     * or AWT and every one of them does it deliberately - a status carries its own
-     * color, a directory kind carries its own icon, an attribute carries its own
-     * renderer. That is the design, not drift.
-     * <p>
-     * A rule with ten frozen exceptions out of ten occurrences enforces nothing
-     * and costs a list to maintain. If the convention is ever narrowed - colors
-     * as hex, icons by key - the rule becomes worth writing, and this is where it
-     * goes.
-     * <p>
-     * Kept as a test rather than a comment so it is read: a paragraph in a file
-     * nobody opens is how the prose these rules replaced went stale.
-     */
     @Test
     public void theRuleThisFileDoesNotEnforce() {
         final @NotNull List<String> deliberate = CLASSES.stream()

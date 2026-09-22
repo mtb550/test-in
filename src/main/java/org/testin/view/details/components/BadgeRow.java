@@ -43,7 +43,7 @@ public class BadgeRow extends BaseDetails {
         final @NotNull JBPanel<?> badgesPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
         badgesPanel.setOpaque(false);
 
-        final @NotNull List<Badges.Badge> badges = Badges.caseBadges(dto);
+        final @NotNull List<Badges.Badge> badges = Badges.testCaseBadges(dto);
 
         final @NotNull RunStatus tempStatus = Services.getInstance(p, TestNGExecution.class).statusOf(dto);
         if (tempStatus.hasBadge()) badges.add(Badges.createRunStatusBadge(tempStatus.getBadge()));

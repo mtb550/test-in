@@ -108,19 +108,19 @@ final class RunRegistry {
                 .filter(name -> !name.isEmpty())
                 .collect(Collectors.toSet());
 
-        final @NotNull List<UUID> cases = Stream.concat(
+        final @NotNull List<UUID> testCases = Stream.concat(
                         running.stream(),
                         configOf.entrySet().stream().filter(e -> runs.contains(e.getValue())).map(Map.Entry::getKey))
                 .distinct()
                 .toList();
 
-        cases.forEach(id -> {
+        testCases.forEach(id -> {
             pending.remove(id);
             configOf.remove(id);
             stopped.add(id);
         });
 
-        return new Stop(runs, cases);
+        return new Stop(runs, testCases);
     }
 
     @NotNull List<UUID> ended(final @NotNull String runName) {
@@ -139,7 +139,7 @@ final class RunRegistry {
         return abandoned;
     }
 
-    record Stop(@NotNull Set<String> runs, @NotNull List<UUID> cases) {
+    record Stop(@NotNull Set<String> runs, @NotNull List<UUID> testCases) {
         static final @NotNull Stop NOTHING = new Stop(Set.of(), List.of());
     }
 }

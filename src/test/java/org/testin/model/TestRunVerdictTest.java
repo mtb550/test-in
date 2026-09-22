@@ -26,14 +26,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Recording a verdict on a run item.
- * <p>
- * Bug severity and priority are only ever collected by the failure dialog, so a
- * case that goes from failing to passing must not keep them: they would survive
- * into the run JSON and into every report generated from it, describing a bug
- * nobody is reporting anymore.
- */
 public class TestRunVerdictTest {
 
     private static final String ISSUE = "https://github.com/mtb550/product/issues/123";
@@ -52,7 +44,7 @@ public class TestRunVerdictTest {
     }
 
     @Test
-    public void passingAFailedCaseClearsEverythingTheFailureDescribed() {
+    public void passingAFailedTestCaseClearsEverythingTheFailureDescribed() {
         final TestRunItems item = failedWithBug();
 
         item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
@@ -80,7 +72,7 @@ public class TestRunVerdictTest {
     }
 
     @Test
-    public void passingACaseThatNeverFailedChangesNothingElse() {
+    public void passingATestCaseThatNeverFailedChangesNothingElse() {
         final TestRunItems item = TestRunItems.builder()
                 .id(UUID.randomUUID())
                 .status(TestStatus.PENDING)
@@ -104,11 +96,9 @@ public class TestRunVerdictTest {
     }
 
     @Test
-    public void aCaseBlockedInBetweenStillClearsWhenItFinallyPasses() {
+    public void aTestCaseBlockedInBetweenStillClearsWhenItFinallyPasses() {
         final TestRunItems item = failedWithBug();
 
-        // The route does not matter, only the destination: details collected
-        // while failing are just as stale after a detour through Blocked.
         item.recordVerdict(TestStatus.BLOCKED, "tester", new TestCaseDto());
         item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
 
@@ -120,11 +110,9 @@ public class TestRunVerdictTest {
     }
 
     @Test
-    public void blockingAFailedCaseKeepsTheDetails() {
+    public void blockingAFailedTestCaseKeepsTheDetails() {
         final TestRunItems item = failedWithBug();
 
-        // Blocked is not a pass - the reported bug may still be real, so only
-        // passing clears. See the note on recordVerdict.
         item.recordVerdict(TestStatus.BLOCKED, "tester", new TestCaseDto());
 
         assertEquals(item.getBugSeverity(), BugSeverity.MAJOR);
@@ -134,10 +122,6 @@ public class TestRunVerdictTest {
         assertEquals(item.getBugIssueUrl(), ISSUE);
     }
 
-    /**
-     * A pass names all six; a failure the automation reports names what
-     * happened; a verdict given by hand names nothing (#50).
-     */
     @Test
     public void whatEachVerdictWouldClearIsNamedBeforeItClears() {
         final TestRunItems item = failedWithBug();

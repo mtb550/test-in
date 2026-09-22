@@ -32,11 +32,6 @@ import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
-/**
- * UC-SETTING-011, Rule-SETTING-039.
- * <p>
- * Where a plain wheel goes from a component that does not scroll itself.
- */
 public class WheelForwardingTest {
 
     private static void layOut(final @NotNull Container container) {
@@ -46,12 +41,6 @@ public class WheelForwardingTest {
         }
     }
 
-    /**
-     * The view panel's Details tab: its content sits in a scroll pane of its
-     * own, inside the tab's scroll pane. The outer one lays the tab out at its
-     * full height, so the inner one never has anything to scroll - and the wheel
-     * handed to it moved nothing (#312, A75).
-     */
     @Test
     public void aPlainWheelGoesToTheScrollPaneThatCanScroll() {
         final @NotNull JBPanel<?> content = new JBPanel<>();
@@ -72,11 +61,6 @@ public class WheelForwardingTest {
         assertEquals(outer.received.size(), 1, "the scroll pane that can scroll never heard the wheel");
     }
 
-    /**
-     * A scroll pane that records the wheel events handed to it instead of
-     * scrolling, so the test asks which pane was chosen and nothing about how the
-     * platform animates a scroll.
-     */
     private static final class RecordingPane extends JBScrollPane {
         private final @NotNull List<MouseWheelEvent> received = new ArrayList<>();
 

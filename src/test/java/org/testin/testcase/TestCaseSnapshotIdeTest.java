@@ -34,15 +34,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * UC-INTERNAL-005, Rule-INTERNAL-063.
- * <p>
- * What CTRL+Z does to a cut-and-paste once the set the cases were cut from is
- * no longer indexed.
- * <p>
- * An IDE test because the undo reads and writes through the project's indexer
- * and its undo history, and there is no seam that answers without them.
- */
 public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
 
     private Path root;
@@ -55,11 +46,9 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
                 try {
                     Files.deleteIfExists(each);
                 } catch (final Exception ignored) {
-                    // Left for the operating system.
                 }
             });
         } catch (final Exception ignored) {
-            // Nothing to walk, or nothing to remove.
         }
     }
 
@@ -82,10 +71,6 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
-    /**
-     * A test project with one test set in it, built the way the actions that
-     * create them do: the mapper makes the node, the indexer is told.
-     */
     private TestSetDirectoryDto checkoutSet() {
         return WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
@@ -99,20 +84,9 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
         });
     }
 
-    /**
-     * Rule-EDITOR-PANEL-215.
-     * <p>
-     * The source set of a cut was renamed or removed before the tester pressed
-     * CTRL+Z in the destination. The undo is refused before anything is taken
-     * out, so the cases stay where they are. It used to take them out of the
-     * destination first and then throw putting them back into a set the index
-     * no longer held, leaving them in neither (#312, A82).
-     */
-    public void testUndoingAPasteWhoseSourceSetIsGoneLeavesTheCasesInTheDestination() {
+    public void testUndoingAPasteWhoseSourceSetIsGoneLeavesTheTestCasesInTheDestination() {
         final TestSetDirectoryDto destination = checkoutSet();
 
-        // Where the cases were cut from: a set that has since been renamed, so
-        // nothing is indexed at the path the undo remembers.
         final Path source = destination.getPath().resolveSibling("Login");
 
         final TestCaseDto moved = TestCaseDto.builder()
@@ -140,14 +114,7 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
                 indexer().findTestCase(moved.getId()).isPresent());
     }
 
-    /**
-     * Rule-EDITOR-PANEL-215.
-     * <p>
-     * CTRL+Z after a removal puts the case back, in the index and on disk, and
-     * answers yes. The files are written off the EDT under a bar now, and the
-     * answer is still there for the key to say Undone by (#66, finding 224).
-     */
-    public void testUndoingARemovalPutsTheCaseBack() {
+    public void testUndoingARemovalPutsTheTestCaseBack() {
         final TestSetDirectoryDto ts = checkoutSet();
         final TestCaseDto removed = TestCaseDto.builder()
                 .id(UUID.randomUUID())

@@ -33,30 +33,12 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The four rules that keep a marker file readable (#66).
- * <p>
- * A marker is tester data - it is the only place a node's audit info lives - and
- * every one of these rules is one annotation away from being broken silently: a
- * Lombok change, a dropped {@code @JsonIgnore}, a field renamed without its
- * alias. The plugin keeps running either way and the file quietly loses a value,
- * which is why they are pinned here rather than left to a sandbox pass to notice.
- * <p>
- * The mapper is built the way {@code Mapper} builds its own - Jackson plus the
- * time module - because {@code Mapper} is a project service and these rules are
- * about the marker classes, not about the service that hands them over.
- */
 public class MarkerJsonTest {
 
     private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private final ZonedDateTime when = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS).minusYears(3);
     private final String onDisk = DateTimeFormatter.ofPattern(Config.DATE_FORMAT_PATTERN, Locale.US).format(when);
 
-    /**
-     * Rule-INTERNAL-090. The folder's id is written when it has one and left out
-     * while it has none, so a marker written before ids does not gain an empty
-     * key, and one that has an id keeps it when it is read and written back.
-     */
     @Test
     public void theFoldersIdIsWrittenOnlyOnceItHasOne() {
         try {
@@ -73,12 +55,6 @@ public class MarkerJsonTest {
         }
     }
 
-    /**
-     * The audit block and the status are written; the status label is not. The
-     * label is derived from the status for the Details popup, so writing it would
-     * put a second copy of the same fact in the file - and a stale one the first
-     * time a label is reworded.
-     */
     @Test
     public void writesTheAuditBlockAndTheStatusAndNothingElse() {
         try {
@@ -96,15 +72,6 @@ public class MarkerJsonTest {
         }
     }
 
-    /**
-     * An unordered node says nothing about order.
-     * <p>
-     * "No number" is the largest number there is, so that an unordered node
-     * sorts after every ordered one without anything having to test for it. But
-     * these files are committed and read by people. A marker carrying
-     * 2147483647 would be a number no human wrote and none can explain. It is
-     * left out instead, and a file without the key reads back as unordered.
-     */
     @Test
     public void anUnorderedMarkerCarriesNoOrderAtAll() {
         try {
@@ -117,9 +84,6 @@ public class MarkerJsonTest {
         }
     }
 
-    /**
-     * A node the tester did order carries the number they typed, and only that.
-     */
     @Test
     public void anOrderedMarkerCarriesTheNumberTyped() {
         try {
@@ -135,12 +99,6 @@ public class MarkerJsonTest {
         }
     }
 
-    /**
-     * Markers written before the rename carry updatedBy/updatedAt. The alias used
-     * to sit on the test project marker alone, because it was the only marker
-     * that existed when the fields were renamed; the audit block has one owner
-     * now, so every marker reads an old file.
-     */
     @Test
     public void readsThePreRenameKeysOnEveryMarker() {
         try {
@@ -155,11 +113,6 @@ public class MarkerJsonTest {
         }
     }
 
-    /**
-     * A key the marker does not have is ignored rather than fatal: the same
-     * directory can be read by an older build, and a status belongs to five of
-     * the seven markers but not to the two directory ones.
-     */
     @Test
     public void ignoresAKeyTheMarkerDoesNotHave() {
         try {
@@ -171,12 +124,6 @@ public class MarkerJsonTest {
         }
     }
 
-    /**
-     * A marker file written before the modified pair existed has only the
-     * creation pair, and says so: the node was last touched when it was made.
-     * The default used to be now(), so those nodes reported themselves as
-     * modified at the moment they were read.
-     */
     @Test
     public void aMarkerNeverModifiedReportsItsCreation() {
         try {
@@ -191,11 +138,6 @@ public class MarkerJsonTest {
         }
     }
 
-    /**
-     * The date format is the one every marker file on disk is written in, so it
-     * has to survive both directions - a change to the pattern would make every
-     * existing marker unreadable rather than merely differently formatted.
-     */
     @Test
     public void roundTripsTheDateFormatOnDisk() {
         try {

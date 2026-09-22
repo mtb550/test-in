@@ -9,8 +9,8 @@ case again.
 The identity is a long code. It never changes, even when the title does.
 
 It is also a link: clicking it opens the test case in its own editor. That is
-how a tester who opened this panel from a gutter mark gets to the case itself,
-when they want to.
+how a tester who opened this panel from a gutter mark gets to the test case
+itself, when they want to.
 
 There is no key for either. The pill and the button sit side by side.
 
@@ -41,10 +41,11 @@ There is no key for either. The pill and the button sit side by side.
   confirmation.
 - **Rule-VIEW-PANEL-063** — The identity is a link. Clicking it opens the test
   case's own test set editor and selects it there. The tree does not move: the
-  tester is already looking at the case and asked for the editor, so revealing
-  the node is an answer to a question nobody asked. The path bar above is what
-  moves the tree, and it still does. A test case with no test set to open — one
-  shown from a test run after it was removed from its set — says so instead.
+  tester is already looking at the test case and asked for the editor, so
+  revealing the node is an answer to a question nobody asked. The path bar
+  above is what moves the tree, and it still does. A test case with no test set
+  to open — one shown from a test run after it was removed from its set — says
+  so instead.
 
 ## The screen
 
@@ -86,8 +87,8 @@ Copying refuses nothing. There is no gray state and no way for it to fail.
 **If the test case has no test set to open** — the pointer stays an arrow over
 the pill, its tooltip says why, and clicking it reads *There is no test set to
 open this test case in.* This is the only way to meet it: a test run keeps the
-verdict of a case its test set no longer holds, and the panel shows that case
-from the run.
+verdict of a test case its test set no longer holds, and the panel shows that
+test case from the run.
 
 ## Why it works this way
 

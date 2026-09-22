@@ -57,7 +57,7 @@ public final class TestCaseFilter {
 
     // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-091, Rule-EDITOR-PANEL-239
     private static boolean matches(final @NotNull TestCaseDto testCase, final @NotNull String query, final @NotNull Set<String> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules, final @NotNull Set<TestStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
-        final @NotNull TestCaseDto shown = runItemProvider.apply(testCase.getId()).map(TestRunItems::shownCase).orElse(testCase);
+        final @NotNull TestCaseDto shown = runItemProvider.apply(testCase.getId()).map(TestRunItems::shownTestCase).orElse(testCase);
 
         final boolean matchesSearch = query.isEmpty() || TestEditorAttributes.anyContains(shown, query);
         final boolean matchesPriority = priorities.isEmpty() || priorities.contains(shown.getPriority());

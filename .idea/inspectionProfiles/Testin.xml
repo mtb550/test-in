@@ -1,24 +1,18 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Testin" />
+    <inspection_tool class="ConvertToStringTemplate" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="DataFlowIssue" enabled="true" level="ERROR" enabled_by_default="true">
       <option name="SUGGEST_NULLABLE_ANNOTATIONS" value="false" />
       <option name="DONT_REPORT_TRUE_ASSERT_STATEMENTS" value="false" />
     </inspection_tool>
-    <inspection_tool class="BooleanMethodIsAlwaysInverted" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="CodeBlock2Expr" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="Convert2MethodRef" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ConvertToStringTemplate" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="GrazieInspection" enabled="true" level="GRAMMAR_ERROR" enabled_by_default="true">
+      <scope name="Translations" level="GRAMMAR_ERROR" enabled="false" />
+    </inspection_tool>
+    <inspection_tool class="GrazieStyle" enabled="true" level="STYLE_SUGGESTION" enabled_by_default="true">
+      <scope name="Translations" level="STYLE_SUGGESTION" enabled="false" />
+    </inspection_tool>
     <inspection_tool class="MissingSerialAnnotation" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="OnDemandImport" enabled="true" level="WARNING" enabled_by_default="true" />
-    <!--
-      Off by decision, not by oversight. Optional is how this project says "not
-      set yet": a popup built on first show, a service the application has not
-      started, a run an editor has not loaded. The alternative the inspection
-      argues for is a nullable field, which is the thing the codebase spent a
-      sweep removing. See the nullability convention in CLAUDE.md.
-    -->
-    <inspection_tool class="OptionalUsedAsFieldOrParameterType" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="NullableProblems" enabled="true" level="ERROR" enabled_by_default="true">
       <option name="REPORT_NULLABLE_METHOD_OVERRIDES_NOTNULL" value="true" />
       <option name="REPORT_NOT_ANNOTATED_METHOD_OVERRIDES_NOTNULL" value="true" />
@@ -29,16 +23,30 @@
       <option name="REPORT_ANNOTATION_NOT_PROPAGATED_TO_OVERRIDERS" value="true" />
       <option name="REPORT_NULLS_PASSED_TO_NON_ANNOTATED_METHOD" value="true" />
     </inspection_tool>
-    <inspection_tool class="SameParameterValue" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="SimplifyStreamApiCallChains" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="StringBufferReplaceableByString" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="UNUSED_IMPORT" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="UnusedReturnValue" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="OnDemandImport" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="OptionalUsedAsFieldOrParameterType" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ReturnNull" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_reportObjectMethods" value="true" />
       <option name="m_reportArrayMethods" value="true" />
       <option name="m_reportCollectionMethods" value="true" />
       <option name="m_ignorePrivateMethods" value="false" />
+    </inspection_tool>
+    <inspection_tool class="SpellCheckingInspection" enabled="true" level="TYPO" enabled_by_default="true">
+      <scope name="Translations" level="TYPO" enabled="false">
+        <option name="processCode" value="true" />
+        <option name="processLiterals" value="true" />
+        <option name="processComments" value="true" />
+      </scope>
+      <option name="processCode" value="true" />
+      <option name="processLiterals" value="true" />
+      <option name="processComments" value="true" />
+    </inspection_tool>
+    <inspection_tool class="SuppressionAnnotation" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myAllowedSuppressions">
+        <list>
+          <option value="UnstableApiUsage" />
+        </list>
+      </option>
     </inspection_tool>
     <inspection_tool class="groupsTestNG" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="groups">

@@ -48,7 +48,7 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @Nullable Project p = e.getProject();
-        final @NotNull List<TestCaseDto> selectedItems = TestinData.selectedCases(e);
+        final @NotNull List<TestCaseDto> selectedItems = TestinData.selectedTestCases(e);
         if (p == null || selectedItems.isEmpty()) return;
 
         TestinData.runEditor(e).ifPresent(editor -> record(p, editor, selectedItems));
@@ -81,7 +81,7 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(TestinData.runEditor(e).isPresent()
-                && !TestinData.selectedCases(e).isEmpty());
+                && !TestinData.selectedTestCases(e).isEmpty());
     }
 
     @Override

@@ -28,15 +28,6 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.UUID;
 
-/**
- * Rule-INTERNAL-034.
- * <p>
- * Where a test case's file sits inside its test project, which a bug report
- * links to (#28).
- * <p>
- * An IDE test because the answer comes from the indexed test projects, which
- * are the project's services.
- */
 public class TestCaseFileIdeTest extends BasePlatformTestCase {
 
     private Path root;
@@ -49,11 +40,9 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
                 try {
                     Files.deleteIfExists(each);
                 } catch (final Exception ignored) {
-                    // Left for the operating system.
                 }
             });
         } catch (final Exception ignored) {
-            // Nothing to walk, or nothing to remove.
         }
     }
 
@@ -99,7 +88,7 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
         });
     }
 
-    public void testACaseIsFoundInsideTheTestProjectThatHoldsIt() {
+    public void testATestCaseIsFoundInsideTheTestProjectThatHoldsIt() {
         final TestProjectDirectoryDto tp = testProject("NAFATH");
         testProject("NAFATH2");
         final TestCaseDto tc = testCase(testSet(tp));
@@ -111,7 +100,7 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
                 Path.of(tp.getTestCasesDirectory().getPath().getFileName().toString(), "Login", tc.getId() + ".tc"), file.inProject());
     }
 
-    public void testACaseNoIndexedTestProjectHoldsHasNoFile() {
+    public void testATestCaseNoIndexedTestProjectHoldsHasNoFile() {
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).build();
 
         assertTrue("a case with no test set was given a file", indexer().testCaseFile(tc).isEmpty());

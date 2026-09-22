@@ -54,7 +54,7 @@ public final class GitDiffProcessor {
     }
 
     // UC-SHARE-010
-    static @NotNull List<PendingChange> toDiffs(final @NotNull List<String> statusLines, final @NotNull Path repositoryRoot, final @NotNull Mapper mapper, final @NotNull Function<String, String> committedContent, final @NotNull Function<UUID, Optional<TestCaseDto>> cases) {
+    static @NotNull List<PendingChange> toDiffs(final @NotNull List<String> statusLines, final @NotNull Path repositoryRoot, final @NotNull Mapper mapper, final @NotNull Function<String, String> committedContent, final @NotNull Function<UUID, Optional<TestCaseDto>> testCases) {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
         final @NotNull List<PendingChange> result = new ArrayList<>();
 
@@ -75,7 +75,7 @@ public final class GitDiffProcessor {
                         workingContent(root, relativePath, entry),
                         relativePath,
                         mapper,
-                        cases));
+                        testCases));
 
             } catch (final RuntimeException ex) {
                 Logger.warn("Listing " + relativePath + " without detail: " + ex.getMessage());

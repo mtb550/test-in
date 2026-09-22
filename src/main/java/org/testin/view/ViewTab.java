@@ -38,7 +38,7 @@ public enum ViewTab {
             Bundle.message("view.tab.details"),
             ViewPanel::getDetailsScrollPane,
             ViewPanel::getDetailsTab,
-            panel -> new DetailsTab().load(panel.getP(), panel.getDetailsTab(), panel.shownCase(), panel.shownRunItem(), panel.getPage().getCurrentPath())
+            panel -> new DetailsTab().load(panel.getP(), panel.getDetailsTab(), panel.shownTestCase(), panel.shownRunItem(), panel.getPage().getCurrentPath())
     ),
 
     HISTORY(
@@ -52,7 +52,7 @@ public enum ViewTab {
             Bundle.message("view.tab.open.bugs"),
             ViewPanel::getOpenBugsScrollPane,
             ViewPanel::getOpenBugsTab,
-            panel -> new OpenBugsTab().load(panel.getP(), panel.getOpenBugsTab(), panel.shownCase())
+            panel -> new OpenBugsTab().load(panel.getP(), panel.getOpenBugsTab(), panel.shownTestCase())
     );
 
     private final @NotNull String displayName;

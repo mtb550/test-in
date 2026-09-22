@@ -23,15 +23,6 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 
-/**
- * What a merge calls one field (#305, Rule-SHARE-081).
- * <p>
- * The class exists because two spellings of one field name drifted apart: a
- * question row read {@code configuration.PLATFORM} while the settled line beside
- * it said <b>Platform</b>. So the thing worth asserting is not the words - the
- * three enums own those - but that every answer comes from them, and that a key
- * none of them carries is handed back rather than lost.
- */
 public class FieldNameTest {
 
     @Test

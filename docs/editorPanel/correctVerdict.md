@@ -55,9 +55,9 @@ Press the right verdict's key on the test case.
 │  Passed                                                      │
 ├──────────────────────────────────────────────────────────────┤
 │                                                              │
-│  Passing this case clears the actual result and the          │
-│  stacktrace, because a case that passed has nothing to       │
-│  explain. There is no copy of it anywhere else.              │
+│  Passing this test case clears the actual result and the     │
+│  stacktrace, because a test case that passed has nothing     │
+│  to explain. There is no copy of it anywhere else.           │
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤
 │  [k]  Enter Passed       Escape Cancel                       │
@@ -86,7 +86,7 @@ simply written over.
 **If the tester presses `Escape`** — nothing is changed at all.
 
 **If several test cases are selected** — the confirmation is asked once for the
-whole selection. Its message says *these*, then the count, then *cases*.
+whole selection. Its message says *these*, then the count, then *test cases*.
 
 ## What cannot be undone
 

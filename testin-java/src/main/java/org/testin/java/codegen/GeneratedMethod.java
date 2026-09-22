@@ -36,23 +36,23 @@ public final class GeneratedMethod {
     private static final @NotNull String TEST_NAME = "testName";
 
     // Rule-CODEGEN-001
-    public static @NotNull Optional<PsiMethod> forCase(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
-        return Optional.ofNullable(byCaseId(pc).get(tc.getId().toString()));
+    public static @NotNull Optional<PsiMethod> forTestCase(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
+        return Optional.ofNullable(byTestCaseId(pc).get(tc.getId().toString()));
     }
 
     // Rule-CODEGEN-001
-    public static @NotNull Map<String, PsiMethod> byCaseId(final @NotNull PsiClass pc) {
+    public static @NotNull Map<String, PsiMethod> byTestCaseId(final @NotNull PsiClass pc) {
         final @NotNull Map<String, PsiMethod> byId = new LinkedHashMap<>();
 
         for (final PsiMethod pm : pc.getMethods()) {
-            caseIdOf(pm).ifPresent(id -> byId.putIfAbsent(id, pm));
+            testCaseIdOf(pm).ifPresent(id -> byId.putIfAbsent(id, pm));
         }
 
         return byId;
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-013
-    public static @NotNull Optional<String> caseIdOf(final @NotNull PsiMethod pm) {
+    public static @NotNull Optional<String> testCaseIdOf(final @NotNull PsiMethod pm) {
         return testAnnotationOf(pm)
                 .map(annotation -> annotation.findDeclaredAttributeValue(TEST_NAME))
                 .filter(PsiLiteralValue.class::isInstance)
@@ -63,7 +63,7 @@ public final class GeneratedMethod {
 
     // UC-CODEGEN-002, Rule-CODEGEN-001
     public static void adopt(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
-        if (caseIdOf(pm).isPresent()) return;
+        if (testCaseIdOf(pm).isPresent()) return;
 
         testAnnotationOf(pm).ifPresent(annotation -> {
             final @NotNull PsiAnnotation written = JavaPsiFacade.getElementFactory(p)

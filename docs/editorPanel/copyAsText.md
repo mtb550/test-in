@@ -107,8 +107,8 @@ selected cells instead. The menu does not open. That is
 so. The menu offers every value the test case can hold, not only the ones this
 test case has.
 
-A tester who wants who changed the case and when should export the test set
-instead. That is [UC-SHARE-001](../share/exportTestSet.md).
+A tester who wants who changed the test case and when should export the test
+set instead. That is [UC-SHARE-001](../share/exportTestSet.md).
 
 ---
 

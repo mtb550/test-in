@@ -21,7 +21,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiCodeBlock;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.CopiedCase;
+import org.testin.codegen.CopiedTestCase;
 import org.testin.codegen.GenAction;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.java.codegen.method.update.UpdateTestBase;
@@ -36,19 +36,19 @@ import java.util.Optional;
 public class CopyTestMethod extends UpdateTestBase implements GenAction {
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (obj instanceof CopiedCase copied) executeAll(p, List.of(copied));
+        if (obj instanceof CopiedTestCase copied) executeAll(p, List.of(copied));
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-078
     @Override
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        final @NotNull List<CopiedCase> copies = new ArrayList<>();
+        final @NotNull List<CopiedTestCase> copies = new ArrayList<>();
         for (final Object item : items) {
-            if (item instanceof CopiedCase copied) copies.add(copied);
+            if (item instanceof CopiedTestCase copied) copies.add(copied);
         }
         if (copies.isEmpty()) return;
 
-        new CreateTestMethod().executeAll(p, copies.stream().map(CopiedCase::copy).toList());
+        new CreateTestMethod().executeAll(p, copies.stream().map(CopiedTestCase::copy).toList());
 
         final @NotNull Optional<PsiClass> into = classOf(p, copies.getFirst().copy());
         if (into.isEmpty()) return;
@@ -56,7 +56,7 @@ public class CopyTestMethod extends UpdateTestBase implements GenAction {
         final @NotNull PsiClass target = into.orElseThrow();
 
         int carried = 0;
-        for (final CopiedCase copied : copies) {
+        for (final CopiedTestCase copied : copies) {
             if (carryBody(p, target, copied)) carried++;
         }
 
@@ -66,7 +66,7 @@ public class CopyTestMethod extends UpdateTestBase implements GenAction {
         }
     }
 
-    private boolean carryBody(final @NotNull Project p, final @NotNull PsiClass target, final @NotNull CopiedCase copied) {
+    private boolean carryBody(final @NotNull Project p, final @NotNull PsiClass target, final @NotNull CopiedTestCase copied) {
         final @NotNull TestCaseDto original = copied.original();
 
         if (original.getParent().getPath().toString().isEmpty()) {
@@ -80,7 +80,7 @@ public class CopyTestMethod extends UpdateTestBase implements GenAction {
             return false;
         }
 
-        final @NotNull Optional<PsiCodeBlock> body = GeneratedMethod.forCase(from.orElseThrow(), original)
+        final @NotNull Optional<PsiCodeBlock> body = GeneratedMethod.forTestCase(from.orElseThrow(), original)
                 .map(PsiMethod::getBody);
 
         if (body.isEmpty()) {
@@ -88,7 +88,7 @@ public class CopyTestMethod extends UpdateTestBase implements GenAction {
             return false;
         }
 
-        final @NotNull Optional<PsiCodeBlock> written = GeneratedMethod.forCase(target, copied.copy())
+        final @NotNull Optional<PsiCodeBlock> written = GeneratedMethod.forTestCase(target, copied.copy())
                 .map(PsiMethod::getBody);
 
         if (written.isEmpty()) {

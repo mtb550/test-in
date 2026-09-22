@@ -25,9 +25,9 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
-import org.testin.codegen.CopiedCase;
+import org.testin.codegen.CopiedTestCase;
 import org.testin.codegen.GenType;
-import org.testin.codegen.MovedCase;
+import org.testin.codegen.MovedTestCase;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
 import org.testin.indexer.ProjectIndexer;
@@ -102,14 +102,14 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
 
     private record Work(@NotNull Project p, @NotNull TestinEditor editor) {
         void paste() {
-            final @NotNull List<TestCaseDto> pastedCases = getFromClipboard();
-            if (pastedCases.isEmpty()) return;
+            final @NotNull List<TestCaseDto> pastedTestCases = getFromClipboard();
+            if (pastedTestCases.isEmpty()) return;
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (!(editor instanceof TestEditor destUI)) return;
 
                 final @NotNull CutState cutState = Services.getInstance(p, CutState.class);
-                final boolean isCut = cutState.isCutOf(pastedCases);
+                final boolean isCut = cutState.isCutOf(pastedTestCases);
 
                 final @NotNull Optional<DirectoryDto> cutFromSet =
                         isCut ? cutState.source().map(TestinEditor::getParent) : Optional.empty();
@@ -122,12 +122,12 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 final @NotNull Optional<TestCaseSnapshot> cutFrom = cutState.source()
                         .map(sourceUI -> TestCaseSnapshot.of(p, sourceUI.getParent().getPath(), TestCaseSnapshot.idsOf(cutItems)));
 
-                final @NotNull List<TestCaseDto> pastedHere = new ArrayList<>(pastedCases.size());
+                final @NotNull List<TestCaseDto> pastedHere = new ArrayList<>(pastedTestCases.size());
 
                 // Rule-CODEGEN-078
-                final @NotNull List<CopiedCase> copied = new ArrayList<>(pastedCases.size());
+                final @NotNull List<CopiedTestCase> copied = new ArrayList<>(pastedTestCases.size());
 
-                for (final TestCaseDto tc : pastedCases) {
+                for (final TestCaseDto tc : pastedTestCases) {
                     final @NotNull TestCaseDto clonedTc = cloneForPasting(tc, isCut);
 
                     clonedTc.setParent(destUI.getParent());
@@ -135,7 +135,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                     pastedHere.add(clonedTc);
 
                     if (!isCut) {
-                        copied.add(new CopiedCase(clonedTc,
+                        copied.add(new CopiedTestCase(clonedTc,
                                 Services.getInstance(p, ProjectIndexer.class).findTestCase(tc.getId()).orElse(tc)));
                     }
                 }
@@ -164,7 +164,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                     if (!isCut) GenType.COPY_TEST_CASE.executeAll(p, copied);
 
                     else cutFromSet.ifPresent(source -> GenType.MOVE_TEST_CASE.executeAll(p,
-                            pastedHere.stream().map(moved -> new MovedCase(moved, source)).toList()));
+                            pastedHere.stream().map(moved -> new MovedTestCase(moved, source)).toList()));
 
                     Services.getInstance(p, Notifier.class).softShowCounted(p, Done.PASTED, pasted);
                 });

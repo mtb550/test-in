@@ -26,7 +26,7 @@ import org.testin.ui.FontSync;
 import java.awt.Font;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class CaseFont {
+final class TestCaseFont {
     private static final int BIGGER = 3;
     private static final int SMALLER = 2;
 

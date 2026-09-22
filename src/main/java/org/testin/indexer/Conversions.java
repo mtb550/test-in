@@ -91,7 +91,7 @@ public final class Conversions {
 
         final @NotNull StringBuilder message = new StringBuilder();
         for (final FormatConverter.Report report : worth) {
-            message.append(Bundle.message("convert.project", report.project(), String.valueOf(report.cases()), String.valueOf(report.runs())));
+            message.append(Bundle.message("convert.project", report.project(), String.valueOf(report.testCases()), String.valueOf(report.runs())));
 
             if (!report.toRepair().isEmpty()) {
                 message.append(' ').append(Bundle.message("convert.repair", String.join(", ", report.toRepair())));

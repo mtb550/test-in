@@ -172,12 +172,12 @@ public class TestRunItems {
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-239, Rule-REPORT-021, Rule-VIEW-PANEL-083
-    public @NotNull TestCaseDto shownCase() {
-        return isJudgedAgainst() ? testCase : liveCase();
+    public @NotNull TestCaseDto shownTestCase() {
+        return isJudgedAgainst() ? testCase : liveTestCase();
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
-    public @NotNull TestCaseDto liveCase() {
+    public @NotNull TestCaseDto liveTestCase() {
         return live.orElseGet(() -> TestCaseDto.deleted(id));
     }
 

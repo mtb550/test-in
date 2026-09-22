@@ -20,6 +20,7 @@ import com.intellij.openapi.extensions.ExtensionPointName;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.FromContentModule;
 
 import java.util.List;
 import java.util.Map;
@@ -35,9 +36,12 @@ public interface CodeNavigation {
                 .orElseGet(NoCodeNavigation::new);
     }
 
+    @FromContentModule
     void toCode(final @NotNull Project p, final @NotNull TestCaseDto tc);
 
+    @FromContentModule
     @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc);
 
-    @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> cases);
+    @FromContentModule
+    @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases);
 }

@@ -30,44 +30,22 @@ import static org.testng.Assert.assertNotSame;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The runner's bookkeeping survives an editor reload, and a run that ends
- * without saying anything does not leave cases looking like they are still
- * going (#116).
- * <p>
- * Both defects had the same shape: state kept against a {@code TestCaseDto}
- * instance, when an indexer rescan replaces every instance the editors hold. A
- * stop then found nothing to kill and the run carried on; a badge then found
- * nothing to paint and a case that had just passed went blank. The registry
- * keys by the case's id, which outlives the reload, and these tests build a
- * second DTO with the same id to say so.
- * <p>
- * Testable at all because the registry knows nothing of the platform: there are
- * no IDE fixtures in this test tree, and the half of the runner that launches
- * and kills processes cannot be built without a project.
- */
 public class RunRegistryTest {
 
     private static final String RUN = "Testin: three cases";
 
-    /**
-     * The same case as the editors would hold it after a rescan: a different
-     * object, carrying the same id.
-     */
     private static TestCaseDto reloaded(final TestCaseDto original) {
         return TestCaseDto.builder().id(original.getId()).description(original.getDescription()).build();
     }
 
-    private static TestCaseDto aCase(final String description) {
+    private static TestCaseDto aTestCase(final String description) {
         return TestCaseDto.builder().description(description).build();
     }
 
-    // ------------------------------------------------------------ #116, the stop
-
     @Test
-    public void aStopReachesACaseThroughAnyNumberOfReloads() {
+    public void aStopReachesATestCaseThroughAnyNumberOfReloads() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto original = aCase("logs in");
+        final TestCaseDto original = aTestCase("logs in");
 
         registry.starting(original.getId());
         registry.take(original.getId());
@@ -79,56 +57,56 @@ public class RunRegistryTest {
         assertTrue(registry.isRunning(afterReload.getId()), "the fresh instance is the same running case");
 
         final RunRegistry.Stop stop = registry.stopping(List.of(afterReload.getId()));
-        assertEquals(stop.cases(), List.of(original.getId()), "and the stop reaches it");
+        assertEquals(stop.testCases(), List.of(original.getId()), "and the stop reaches it");
         assertEquals(stop.runs(), Set.of(RUN), "naming the run whose process has to be killed");
     }
 
     @Test
-    public void aCaseThatWasNeverRunningIsNotStopped() {
+    public void aTestCaseThatWasNeverRunningIsNotStopped() {
         final RunRegistry registry = new RunRegistry();
 
         final RunRegistry.Stop stop = registry.stopping(List.of(UUID.randomUUID()));
 
         assertSame(stop, RunRegistry.Stop.NOTHING, "nothing to kill and nothing to repaint");
-        assertTrue(stop.cases().isEmpty(), "so no case is put back");
+        assertTrue(stop.testCases().isEmpty(), "so no case is put back");
     }
 
     @Test
-    public void stoppingOneCaseStopsTheOnesSharingItsProcess() {
+    public void stoppingOneTestCaseStopsTheOnesSharingItsProcess() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto first = aCase("first");
-        final TestCaseDto second = aCase("second");
-        final TestCaseDto alone = aCase("in a run of its own");
+        final TestCaseDto first = aTestCase("first");
+        final TestCaseDto second = aTestCase("second");
+        final TestCaseDto alone = aTestCase("in a run of its own");
 
         registry.launched(List.of(first.getId(), second.getId()), RUN);
         registry.launched(List.of(alone.getId()), "Testin: one case");
 
         final RunRegistry.Stop stop = registry.stopping(List.of(first.getId()));
 
-        assertTrue(stop.cases().contains(second.getId()), "one configuration is one process, so its casemate goes too");
-        assertFalse(stop.cases().contains(alone.getId()), "but a case in another run is left alone");
+        assertTrue(stop.testCases().contains(second.getId()), "one configuration is one process, so its casemate goes too");
+        assertFalse(stop.testCases().contains(alone.getId()), "but a case in another run is left alone");
         assertTrue(registry.isStopped(second.getId()), "and a report arriving for it afterward is not a failure");
     }
 
     @Test
-    public void aCaseThatAlreadyReportedIsNotSweptUpByALaterStop() {
+    public void aTestCaseThatAlreadyReportedIsNotSweptUpByALaterStop() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto finished = aCase("finished early");
-        final TestCaseDto stillGoing = aCase("still going");
+        final TestCaseDto finished = aTestCase("finished early");
+        final TestCaseDto stillGoing = aTestCase("still going");
 
         registry.launched(List.of(finished.getId(), stillGoing.getId()), RUN);
         registry.reported(finished.getId(), RunStatus.PASSED);
 
         final RunRegistry.Stop stop = registry.stopping(List.of(stillGoing.getId()));
 
-        assertFalse(stop.cases().contains(finished.getId()), "its verdict is in, so the stop is not about it");
+        assertFalse(stop.testCases().contains(finished.getId()), "its verdict is in, so the stop is not about it");
         assertEquals(registry.statusOf(finished.getId()), RunStatus.PASSED, "and the verdict it gave still stands");
     }
 
     @Test
-    public void aCaseStoppedBeforeItsLaunchIsLeftOutOfTheRun() {
+    public void aTestCaseStoppedBeforeItsLaunchIsLeftOutOfTheRun() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto tc = aCase("stopped in the second before the process");
+        final TestCaseDto tc = aTestCase("stopped in the second before the process");
 
         registry.starting(tc.getId());
         registry.stopping(List.of(tc.getId()));
@@ -139,7 +117,7 @@ public class RunRegistryTest {
     @Test
     public void runningAgainClearsTheStopThatEndedTheLastRun() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto tc = aCase("run, stopped, run again");
+        final TestCaseDto tc = aTestCase("run, stopped, run again");
 
         registry.launched(List.of(tc.getId()), RUN);
         registry.stopping(List.of(tc.getId()));
@@ -149,12 +127,10 @@ public class RunRegistryTest {
         assertFalse(registry.isStopped(tc.getId()), "but this is a new run, and its reports are real");
     }
 
-    // ------------------------------------------- the verdict outlives the reload
-
     @Test
     public void aVerdictSurvivesAReload() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto original = aCase("passes");
+        final TestCaseDto original = aTestCase("passes");
 
         registry.launched(List.of(original.getId()), RUN);
         registry.reported(original.getId(), RunStatus.PASSED);
@@ -163,15 +139,10 @@ public class RunRegistryTest {
                 "the green badge does not vanish at the tester's next keystroke");
     }
 
-    /**
-     * Run pressed while the IDE indexes, or on a case with no generated code,
-     * reports the case idle because nothing started - and nothing starting does
-     * not take back what the last run said (#312, A12).
-     */
     @Test
-    public void aCaseThatNeverStartedKeepsItsLastVerdict() {
+    public void aTestCaseThatNeverStartedKeepsItsLastVerdict() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto tc = aCase("passed earlier, run again during indexing");
+        final TestCaseDto tc = aTestCase("passed earlier, run again during indexing");
 
         registry.reported(tc.getId(), RunStatus.PASSED);
         registry.notStarting(tc.getId());
@@ -180,14 +151,10 @@ public class RunRegistryTest {
         assertEquals(registry.statusOf(tc.getId()), RunStatus.PASSED, "a run that never started wiped the last verdict");
     }
 
-    /**
-     * Rule-CODEGEN-038: a case the tester stopped is recorded as not run, over
-     * whatever it said before.
-     */
     @Test
-    public void aStoppedCaseIsRecordedAsNotRun() {
+    public void aStoppedTestCaseIsRecordedAsNotRun() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto tc = aCase("passed earlier, stopped this time");
+        final TestCaseDto tc = aTestCase("passed earlier, stopped this time");
 
         registry.reported(tc.getId(), RunStatus.PASSED);
         registry.starting(tc.getId());
@@ -200,7 +167,7 @@ public class RunRegistryTest {
     }
 
     @Test
-    public void aCaseNobodyHasRunIsIdle() {
+    public void aTestCaseNobodyHasRunIsIdle() {
         final RunRegistry registry = new RunRegistry();
 
         final RunStatus status = registry.statusOf(UUID.randomUUID());
@@ -212,7 +179,7 @@ public class RunRegistryTest {
     @Test
     public void runningBeatsWhateverTheLastRunSaid() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto tc = aCase("failed once, running again");
+        final TestCaseDto tc = aTestCase("failed once, running again");
 
         registry.reported(tc.getId(), RunStatus.FAILED);
         registry.starting(tc.getId());
@@ -223,7 +190,7 @@ public class RunRegistryTest {
     @Test
     public void aReportOfRunningIsNotAVerdict() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto tc = aCase("reports itself started");
+        final TestCaseDto tc = aTestCase("reports itself started");
 
         registry.launched(List.of(tc.getId()), RUN);
         registry.reported(tc.getId(), RunStatus.RUNNING);
@@ -231,13 +198,11 @@ public class RunRegistryTest {
         assertTrue(registry.isRunning(tc.getId()), "a case does not stop running by saying that it is");
     }
 
-    // ------------------------------------------- a run that ends without a word
-
     @Test
-    public void aRunThatEndsWithoutReportingPutsItsCasesBack() {
+    public void aRunThatEndsWithoutReportingPutsItsTestCasesBack() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto first = aCase("never reached");
-        final TestCaseDto second = aCase("never reached either");
+        final TestCaseDto first = aTestCase("never reached");
+        final TestCaseDto second = aTestCase("never reached either");
 
         registry.launched(List.of(first.getId(), second.getId()), RUN);
 
@@ -251,7 +216,7 @@ public class RunRegistryTest {
     @Test
     public void aRunThatEndedWithEveryResultInLeavesNothingBehind() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto tc = aCase("passes");
+        final TestCaseDto tc = aTestCase("passes");
 
         registry.launched(List.of(tc.getId()), RUN);
         registry.reported(tc.getId(), RunStatus.PASSED);
@@ -271,7 +236,7 @@ public class RunRegistryTest {
     @Test
     public void aRunStopsBeingHeldOnceItEnds() {
         final RunRegistry registry = new RunRegistry();
-        final TestCaseDto tc = aCase("one run");
+        final TestCaseDto tc = aTestCase("one run");
 
         registry.launched(List.of(tc.getId()), RUN);
         assertTrue(registry.launchedHere(RUN), "the stop may kill this one");

@@ -51,10 +51,10 @@ final class ScannedProject {
     private final @NotNull Map<String, TestRunDirectoryDto> testRunDirs = new ConcurrentHashMap<>();
     private final @NotNull Map<String, TestRunDto> testRuns = new ConcurrentHashMap<>();
     private final @NotNull Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
-    private final @NotNull Map<String, List<UUID>> testSetCaseIds = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, List<UUID>> testCaseIdsByTestSet = new ConcurrentHashMap<>();
 
     // UC-INTERNAL-002, Rule-INTERNAL-082
-    private final @NotNull Set<String> clashingCases = ConcurrentHashMap.newKeySet();
+    private final @NotNull Set<String> clashingTestCases = ConcurrentHashMap.newKeySet();
 
     private final @NotNull Set<UUID> clashingIds = ConcurrentHashMap.newKeySet();
 
@@ -68,7 +68,7 @@ final class ScannedProject {
     private final @NotNull Set<String> handNamedResults = ConcurrentHashMap.newKeySet();
 
     // UC-SHARE-002, Rule-SHARE-001
-    private final @NotNull Map<String, Set<String>> unreadableCases = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, Set<String>> unreadableTestCases = new ConcurrentHashMap<>();
 
     // UC-INTERNAL-004, Rule-INTERNAL-084
     @NotNull Map<UUID, Path> handNamedFilesAlone() {

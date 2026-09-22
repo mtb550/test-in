@@ -40,7 +40,7 @@ import java.util.UUID;
 public final class RunForm {
     private final @NotNull Project p;
 
-    public static @NotNull Set<UUID> checkedCases(final @NotNull SelectionTree selection) {
+    public static @NotNull Set<UUID> checkedTestCases(final @NotNull SelectionTree selection) {
         final @NotNull Set<UUID> ids = new LinkedHashSet<>();
 
         selection.forEachChecked(checked -> {
@@ -51,7 +51,7 @@ public final class RunForm {
     }
 
     // UC-TREE-PANEL-022, Rule-TREE-PANEL-076
-    public static @NotNull Set<UUID> offeredCases(final @NotNull SelectionTree selection) {
+    public static @NotNull Set<UUID> offeredTestCases(final @NotNull SelectionTree selection) {
         final @NotNull Set<UUID> ids = new LinkedHashSet<>();
 
         selection.forEachLeaf(leaf -> {

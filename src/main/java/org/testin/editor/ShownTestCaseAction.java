@@ -33,14 +33,14 @@ import java.util.function.Supplier;
 
 // UC-VIEW-PANEL-012, UC-VIEW-PANEL-013, UC-VIEW-PANEL-014, Rule-VIEW-PANEL-003, Rule-VIEW-PANEL-084, UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-245
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ShownCaseAction extends DumbAwareAction {
+public final class ShownTestCaseAction extends DumbAwareAction {
     private final @NotNull Project p;
     private final @NotNull CardHoverAction button;
     private final @NotNull Supplier<Optional<TestCaseDto>> shown;
     private final @NotNull BiConsumer<CardHoverAction, TestCaseDto> press;
 
     public static void bind(final @NotNull Project p, final @NotNull CardHoverAction button, final @NotNull Supplier<Optional<TestCaseDto>> shown, final @NotNull BiConsumer<CardHoverAction, TestCaseDto> press, final @NotNull JComponent component) {
-        new ShownCaseAction(p, button, shown, press).registerCustomShortcutSet(Declared.shortcutSet(button.getActionId()), component);
+        new ShownTestCaseAction(p, button, shown, press).registerCustomShortcutSet(Declared.shortcutSet(button.getActionId()), component);
     }
 
     @Override

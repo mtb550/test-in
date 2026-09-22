@@ -28,35 +28,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * UC-INTERNAL-003, Rule-INTERNAL-021.
- * <p>
- * Reading a test project again never stops the index holding it.
- * <p>
- * The scan emptied the project out before the pass that read it back. So for as
- * long as the walk took - a real project is thousands of files - the index had
- * no record of a project that was on disk the whole time. A rescan is a Git
- * pull, a branch switch, a hand edit or Refresh, and every one of them happens
- * while a tester is working. In that window the lookups that treat a miss as a
- * mistake in the plugin met one. P or F or B on a row that was not executing
- * raised an internal error. A verdict on the executing row was dropped while
- * the editor went on saying Passed. A test case saved then was stamped as
- * created by whoever was watching (#312, A1).
- * <p>
- * An IDE test because the indexer is a project service, and a threaded one
- * because the defect is a window rather than a result: what has to be true is
- * that nothing disappears <b>while</b> the pass runs, which no single call can
- * answer.
- */
 public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
 
-    /**
-     * Big enough that the second pass takes long enough to catch in the act, and
-     * small enough that the test is not itself the slow one. Before the fix the
-     * project is absent for very nearly all of it.
-     */
     private static final int SETS = 60;
-    private static final int CASES_PER_SET = 10;
+    private static final int TEST_CASES_PER_SET = 10;
 
     private static final int SCAN_TIMEOUT_SECONDS = 120;
 
@@ -81,14 +56,8 @@ public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
-    /**
-     * Rule-INTERNAL-021.
-     * <p>
-     * A test set and a test case that are on disk throughout are in the index
-     * throughout.
-     */
     public void testNothingDisappearsWhileTheProjectIsReadAgain() {
-        final Path project = SyntheticTree.write(root, SETS, CASES_PER_SET);
+        final Path project = SyntheticTree.write(root, SETS, TEST_CASES_PER_SET);
         indexer().scanSingleProject(project);
 
         final Path set = project.resolve("Test Cases").resolve("set-0");
@@ -123,34 +92,23 @@ public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
                 indexer().nodeExists(set) && indexer().findTestCase(testCase).isPresent());
     }
 
-    /**
-     * Rule-INTERNAL-021.
-     * <p>
-     * What a rescan is for: a test set deleted while the plugin was not looking
-     * is gone from the index, with its cases, rather than left in the tree,
-     * global search, the completion values and every export until somebody
-     * presses Refresh (#66, finding 68).
-     * <p>
-     * Here because the swap that keeps the index full is the same code that
-     * empties what is no longer there: the one must not have cost the other.
-     */
     public void testASetDeletedOnDiskIsGoneAfterTheRescan() {
-        final Path project = SyntheticTree.write(root, 3, CASES_PER_SET);
+        final Path project = SyntheticTree.write(root, 3, TEST_CASES_PER_SET);
         indexer().scanSingleProject(project);
 
         final Path deleted = project.resolve("Test Cases").resolve("set-1");
         final Path kept = project.resolve("Test Cases").resolve("set-2");
 
-        final UUID caseInDeleted = indexer().getTestCasesForTestSet(deleted).getFirst().getId();
-        final UUID caseInKept = indexer().getTestCasesForTestSet(kept).getFirst().getId();
+        final UUID testCaseInDeleted = indexer().getTestCasesForTestSet(deleted).getFirst().getId();
+        final UUID testCaseInKept = indexer().getTestCasesForTestSet(kept).getFirst().getId();
 
         assertTrue("could not delete " + deleted, TempTree.delete(deleted));
         indexer().scanSingleProject(project);
 
         assertFalse("a test set deleted on disk is still in the index after a rescan",
                 indexer().nodeExists(deleted));
-        assertTrue("its test cases went with it", indexer().findTestCase(caseInDeleted).isEmpty());
-        assertTrue("the test cases of a set nobody touched went too", indexer().findTestCase(caseInKept).isPresent());
+        assertTrue("its test cases went with it", indexer().findTestCase(testCaseInDeleted).isEmpty());
+        assertTrue("the test cases of a set nobody touched went too", indexer().findTestCase(testCaseInKept).isPresent());
         assertTrue("and the sets that are still there are still there", indexer().nodeExists(kept));
     }
 

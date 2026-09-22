@@ -78,8 +78,8 @@ public enum ResultAnalysis {
         final @NotNull List<Segment> segments = new ArrayList<>();
 
         for (final ResultAnalysis section : values()) {
-            final long cases = section.count.applyAsLong(summary);
-            if (cases > 0) segments.add(new Segment(section.labelIn(run) + " " + cases, section.onScreen()));
+            final long testCases = section.count.applyAsLong(summary);
+            if (testCases > 0) segments.add(new Segment(section.labelIn(run) + " " + testCases, section.onScreen()));
         }
 
         if (summary.hasRemoved()) {

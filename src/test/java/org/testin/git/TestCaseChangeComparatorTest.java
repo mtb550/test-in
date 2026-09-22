@@ -73,11 +73,6 @@ public class TestCaseChangeComparatorTest {
         assertTrue(changes.stream().anyMatch(change -> change.changeType() == ChangeType.CHANGE_PRECONDITIONS));
     }
 
-    /**
-     * The case that decides whether a file is offered for review at all: with
-     * nothing changed the factory answers null and the tester is not shown a row
-     * with no content in it.
-     */
     @Test
     public void twoIdenticalTestCasesHaveNothingToReview() {
         assertEquals(TestCaseChangeComparator.compare(base(), base()), List.of());
@@ -93,10 +88,6 @@ public class TestCaseChangeComparatorTest {
         assertEquals(change.newValue(), "billing");
     }
 
-    /**
-     * A status reads as its label, the way the priority beside it does, rather
-     * than as the constant's name in capitals (#312, A47).
-     */
     @Test
     public void aStatusChangeShowsTheLabels() {
         final FieldChange change = onlyChange(base().setStatus(TestCaseStatus.REVIEWED));
@@ -106,11 +97,6 @@ public class TestCaseChangeComparatorTest {
         assertEquals(change.newValue(), TestCaseStatus.REVIEWED.getLabel());
     }
 
-    /**
-     * Steps are one field, not one row per step: a tester who rewrote the third
-     * of five sees a single Steps change with both versions in it, which is what
-     * the review's before/after panes render.
-     */
     @Test
     public void stepsCompareAsOneBlockRatherThanLineByLine() {
         final FieldChange change = onlyChange(
@@ -131,11 +117,6 @@ public class TestCaseChangeComparatorTest {
         assertEquals(change.newValue(), "Smoke, Regression");
     }
 
-    /**
-     * Groups are compared as an ordered list, so reordering them is a change.
-     * That is deliberate rather than incidental: the order is what is written to
-     * the file, so a reorder is a real difference a reviewer can see in the diff.
-     */
     @Test
     public void reorderingGroupsIsAChangeBecauseTheFileChanged() {
         final TestCaseDto before = base().setGroup(new ArrayList<>(List.of("Smoke", "Regression")));
@@ -147,10 +128,6 @@ public class TestCaseChangeComparatorTest {
         assertEquals(changes.getFirst().changeType(), ChangeType.CHANGE_GROUP);
     }
 
-    /**
-     * Changing a field back to what it was leaves nothing to review, so a tester
-     * who undoes an edit by hand does not have to revert it as well.
-     */
     @Test
     public void editingAFieldBackToItsOldValueLeavesNothing() {
         final TestCaseDto edited = base().setDescription("something else").setDescription("a login case");

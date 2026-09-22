@@ -46,21 +46,21 @@ public class ReconcileTestMethod extends UpdateTestBase implements GenAction {
     // UC-CODEGEN-002, Rule-CODEGEN-068
     @Override
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        final @NotNull List<TestCaseDto> cases = new ArrayList<>();
+        final @NotNull List<TestCaseDto> testCases = new ArrayList<>();
         for (final Object item : items) {
-            if (item instanceof TestCaseDto tc) cases.add(tc);
+            if (item instanceof TestCaseDto tc) testCases.add(tc);
         }
-        if (cases.isEmpty()) return;
+        if (testCases.isEmpty()) return;
 
         final @NotNull Map<Path, List<TestCaseDto>> byClass = new LinkedHashMap<>();
-        for (final TestCaseDto tc : cases) {
+        for (final TestCaseDto tc : testCases) {
             byClass.computeIfAbsent(tc.getParent().getPath(), path -> new ArrayList<>()).add(tc);
         }
 
         final @NotNull Runnable inCommand = () ->
                 WriteCommandAction.runWriteCommandAction(p, GenType.RECONCILE_TEST_CASE.getDescription(), null, () -> {
                     byClass.values().forEach(inClass -> rewrite(p, inClass));
-                    new UpdateTestOrder().executeAll(p, cases);
+                    new UpdateTestOrder().executeAll(p, testCases);
                 });
 
         if (CommandProcessor.getInstance().getCurrentCommand() != null) inCommand.run();
@@ -72,7 +72,7 @@ public class ReconcileTestMethod extends UpdateTestBase implements GenAction {
         if (target.isEmpty()) return;
 
         final @NotNull PsiClass pc = target.orElseThrow();
-        final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byCaseId(pc);
+        final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byTestCaseId(pc);
 
         int written = 0;
         for (final TestCaseDto tc : inClass) {

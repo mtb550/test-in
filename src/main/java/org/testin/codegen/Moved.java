@@ -24,6 +24,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FromContentModule;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -31,11 +32,13 @@ import java.util.Optional;
 
 public record Moved(@NotNull DirectoryDto dir, @NotNull Path newParent) {
     // UC-CODEGEN-016, Rule-CODEGEN-055
+    @FromContentModule
     public @NotNull Optional<List<String>> destinationPackage(final @NotNull Project p) {
         return Services.getInstance(p, ProjectIndexer.class).find(newParent).map(Fqcn::ofPackage);
     }
 
     // UC-CODEGEN-016, Rule-CODEGEN-055
+    @FromContentModule
     public void reportCodeLeftBehind(final @NotNull Project p, final @NotNull String fullName) {
         Logger.warn("Destination is not indexed, so " + fullName + " is left where it is");
 

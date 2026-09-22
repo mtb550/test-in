@@ -62,8 +62,8 @@ A test run is one round of testing, with a verdict for each test case.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is, drawn with Inactive beside its name like any other status. Its test sets,
-  cases and runs are not read, because a project nobody is working on is not
-  worth the walk.
+  test cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 

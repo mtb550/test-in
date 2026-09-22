@@ -38,11 +38,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * A retired node - a deprecated test set, an archived package - is one thing to
- * the plugin: the DTO answers {@code isRetired()} from its own marker's status,
- * and the children index sorts the retired ones after the live ones (#68).
- */
 public class RetiredNodesTest {
 
     private static final Path PARENT = Path.of("root", "Test Cases");
@@ -63,10 +58,6 @@ public class RetiredNodesTest {
         return dto;
     }
 
-    /**
-     * Days apart, so the comparison is about the date and not about the second
-     * the test happened to run in.
-     */
     private static <T extends DirectoryDto> T createdAt(final T node, final int daysAgo) {
         node.getMarker().setCreatedAt(ZonedDateTime.now().minusDays(daysAgo));
         return node;
@@ -111,11 +102,6 @@ public class RetiredNodesTest {
         assertEquals(ordered.stream().map(DirectoryDto::getName).toList(), List.of("beta", "zeta", "alpha", "old"));
     }
 
-    /**
-     * The number a tester typed decides the folder, and the ones they left alone
-     * follow by the date they were made - which is how the folder read before
-     * anybody typed anything.
-     */
     @Test
     public void numberedChildrenComeFirstAndTheRestFollowByDate() {
         final TestCasesMainDirectoryDto parent = new TestCasesMainDirectoryDto();
@@ -140,11 +126,6 @@ public class RetiredNodesTest {
                 "numbers first, in order; then the unnumbered ones oldest first, whatever they are called");
     }
 
-    /**
-     * Two nodes with the same number is not a problem to solve - the date
-     * decides between them, so a tester can put a set third without renumbering
-     * the set that was already third.
-     */
     @Test
     public void theSameNumberTwiceIsSettledByTheDate() {
         final TestCasesMainDirectoryDto parent = new TestCasesMainDirectoryDto();
@@ -165,10 +146,6 @@ public class RetiredNodesTest {
         assertEquals(ordered.stream().map(DirectoryDto::getName).toList(), List.of("zzz-older", "aaa-newer"));
     }
 
-    /**
-     * A number never lifts a retired node above a live one: what is finished
-     * stays out of the way of what is not.
-     */
     @Test
     public void aNumberDoesNotBringARetiredNodeBack() {
         final TestCasesMainDirectoryDto parent = new TestCasesMainDirectoryDto();
@@ -188,11 +165,6 @@ public class RetiredNodesTest {
         assertEquals(ordered.stream().map(DirectoryDto::getName).toList(), List.of("active", "deprecated"));
     }
 
-    /**
-     * Everything a tester puts in a folder can be numbered. What cannot is what
-     * has no arrangement to have: a project's two containers are exactly two and
-     * always the same way round, and the project is what the tree is rooted at.
-     */
     @Test
     public void everythingATesterFilesCanBeOrdered() {
         for (final DirectoryDto node : List.of(testSet("a", TestSetStatus.ACTIVE),
@@ -207,11 +179,6 @@ public class RetiredNodesTest {
         }
     }
 
-    /**
-     * A node nobody numbered carries the largest number there is, so it sorts
-     * after every number a tester did give without anything having to test for
-     * it. A marker written before this existed reads the same way.
-     */
     @Test
     public void aNodeNobodyNumberedSortsAfterEveryNumber() {
         assertEquals(testSet("a", TestSetStatus.ACTIVE).getOrder(), Marker.NOT_ORDERED);

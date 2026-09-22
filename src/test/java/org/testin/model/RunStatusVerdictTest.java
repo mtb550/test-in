@@ -24,14 +24,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
-/**
- * What a TestNG report writes into a test run.
- * <p>
- * The run editor runs a case from its hover icon and records the result on the
- * case, so something has to say which execution report is a verdict and which is
- * not. That is this enum's to answer, not the editor's - otherwise the two
- * vocabularies get mapped by hand at every surface that needs it.
- */
 public class RunStatusVerdictTest {
 
     @Test
@@ -49,7 +41,7 @@ public class RunStatusVerdictTest {
     }
 
     @Test
-    public void aStoppedCaseIsNotAFailure() {
+    public void aStoppedTestCaseIsNotAFailure() {
         assertTrue(RunStatus.IDLE.getVerdict().isEmpty(),
                 "nobody found a defect - the case simply did not finish, so its status is left alone (#34)");
     }
@@ -63,10 +55,6 @@ public class RunStatusVerdictTest {
 
     @Test
     public void aVerdictIsAlwaysOneATesterCouldHaveGivenByHand() {
-        // The automated path goes through the same recordVerdict as the manual
-        // one. So anything this returns has to be a status the run editor's own
-        // menu offers. Otherwise, a run could end up holding a verdict no
-        // tester could have set or cleared.
         for (final RunStatus status : RunStatus.values()) {
             status.getVerdict().ifPresent(verdict -> assertTrue(
                     verdict == TestStatus.PASSED || verdict == TestStatus.FAILED || verdict == TestStatus.BLOCKED,

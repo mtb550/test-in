@@ -44,10 +44,10 @@ There is no key for this. It happens when a test case is created, which is
 - **Rule-CODEGEN-017** — A test case created with no description gets no method.
 - **Rule-CODEGEN-018** — A whole sheet of test cases is written as one change,
   so it is one undo and one write.
-- **Rule-CODEGEN-068** — Undoing a change to a test case writes the case's code
-  again, in every part Testin owns: the description, the method name, the
-  groups, whether it is enabled, and where it sits. A case with no method is
-  passed over, and none is created.
+- **Rule-CODEGEN-068** — Undoing a change to a test case writes the test
+  case's code again, in every part Testin owns: the description, the method
+  name, the groups, whether it is enabled, and where it sits. A test case with
+  no method is passed over, and none is created.
 - **Rule-CODEGEN-077** — A test case cut from one test set and pasted into
   another takes its method with it, body and all: the method is carried into the
   destination class as it is written and removed from the one it came from. Not
@@ -59,8 +59,8 @@ There is no key for this. It happens when a test case is created, which is
 - **Rule-CODEGEN-078** — A test case copied into a test set gets a method of its
   own, carrying the body of the method it was copied from. Only the body comes
   across: the copy's method has the copy's own id, name and attributes, because
-  it is a different test case. A copy of a case that has no method gets the
-  empty one a new case gets.
+  it is a different test case. A copy of a test case that has no method gets
+  the empty one a new test case gets.
 
 ## What is written
 

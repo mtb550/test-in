@@ -19,6 +19,12 @@
 # (#303).
 !.idea/copyright/
 !.idea/scopes/
+# The entry points, which is where @FromContentModule is named. A content module
+# calls into the core, and the core does not depend on it back - it packages it -
+# so the IDE finds no caller and reads nineteen methods as dead. The annotation
+# says otherwise, and this file is what makes the IDE believe it on every clone
+# rather than on the machine that configured it.
+!.idea/misc.xml
 .intellijPlatform/
 .run/
 .sandbox/

@@ -67,7 +67,7 @@ public class UpdateTestCaseAction extends DumbAwareAction {
             return;
         }
 
-        GrayWithReason.unless(this, e, TestinData.editor(e).isPresent() && !TestinData.selectedCases(e).isEmpty(), Bundle.message("action.select.case.description"));
+        GrayWithReason.unless(this, e, TestinData.editor(e).isPresent() && !TestinData.selectedTestCases(e).isEmpty(), Bundle.message("action.select.case.description"));
     }
 
     @Override

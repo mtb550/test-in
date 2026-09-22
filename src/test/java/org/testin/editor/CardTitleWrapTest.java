@@ -30,20 +30,6 @@ import java.util.Optional;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * A card title too long for its card wraps, and the card grows to hold it.
- * <p>
- * The height is the half worth testing, and the reason this file exists. The
- * title was a label given {@code <html><body style='width:818px'>} - the form
- * everybody writes - and it measured 1063x22: the whole sentence on one line,
- * the CSS width silently ignored by the stylesheet a JLabel renders through.
- * The decision to wrap was right, the width was right, the markup looked right,
- * and nothing wrapped. A test asking whether the title had been handed the
- * wrapping instruction would have passed throughout.
- * <p>
- * So this asks how tall the card ended up, which is the only thing the tester
- * can see.
- */
 public class CardTitleWrapTest {
 
     private static final String LONG = "Log in with a valid user and check that the dashboard opens with every widget it is supposed to show and nothing else at all";
@@ -66,11 +52,6 @@ public class CardTitleWrapTest {
         return Arrays.stream(actions).map(action -> new CardHoverAction.Offered(action, Optional.empty())).toList();
     }
 
-    /**
-     * The one that catches a wrap the renderer does not honor: a title that was
-     * told to wrap and ignored it reports the height of a single line, so the
-     * row clips it and the tester sees no wrapping at all.
-     */
     @Test
     public void wrappingMakesTheCardTaller() {
         final int fits = laidOut("Log in").getPreferredSize().height;
@@ -79,21 +60,12 @@ public class CardTitleWrapTest {
         assertTrue(wraps > fits, "a wrapped title has to make the row taller, got " + wraps + " against " + fits);
     }
 
-    /**
-     * Whatever the length, the title stays the words the tester typed. It was
-     * markup for the long case once, which meant a description holding a
-     * {@code <} swallowed the rest of its own line.
-     */
     @Test
     public void theTitleIsAlwaysTheTestersOwnWords() {
         assertEquals(laidOut(LONG).shown(), LONG);
         assertEquals(laidOut("Log in <script>").shown(), "Log in <script>");
     }
 
-    /**
-     * The title stops where the hover icons still fit on the card - the width
-     * the card wraps at, and the one the mouse listener hit-tests against.
-     */
     @Test
     public void theIconsStillFitAfterATitleThatFillsTheColumn() {
         final @NotNull List<CardHoverAction.Offered> buttons = everyButton();
@@ -105,12 +77,6 @@ public class CardTitleWrapTest {
         assertTrue(slots.getLast().at().getMaxX() <= 900, "the icons after a full-width title run off the card");
     }
 
-    /**
-     * UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-235.
-     * <p>
-     * The new button goes last, and the two before it stay exactly where a card
-     * drew them when it held two - the positions testers already know.
-     */
     @Test
     public void theNewButtonGoesLastAndMovesNeitherOfTheOthers() {
         final List<CardTitle.Slot> before = CardTitle.descriptionActionIcons(200, offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD)).slots();
@@ -123,10 +89,6 @@ public class CardTitleWrapTest {
         assertTrue(now.getLast().at().getMinX() > now.get(1).at().getMaxX(), "the new button overlaps Run");
     }
 
-    /**
-     * The point a click lands on and the button it acts on are the same list,
-     * so a click can never reach the wrong button.
-     */
     @Test
     public void aClickLandsOnTheButtonDrawnThere() {
         final CardTitle.ActionIcons icons = CardTitle.descriptionActionIcons(200, everyButton());
@@ -137,27 +99,12 @@ public class CardTitleWrapTest {
         assertTrue(icons.at(0, 0).isEmpty(), "a click on the title reached a button");
     }
 
-    /**
-     * A card measured before its list has been laid out reads as the one-line
-     * card it used to be, rather than wrapping inside a width of zero and
-     * drawing one character per line.
-     */
     @Test
     public void aListWithNoWidthYetLetsTheTitleRun() {
         assertEquals(CardTitle.titleColumnWidth(0, 3), Integer.MAX_VALUE);
     }
 
-    /**
-     * A stand-in for the two real cards: {@code BaseCard} is abstract only so
-     * each editor can bring its own data binding, and none of that is involved
-     * in laying out a title.
-     */
     private static final class Card extends BaseCard {
-        /**
-         * A project nothing asks anything of: it is read only to draw the hover
-         * icons, and no card here is hovered - as CutStateTest stands in for an
-         * editor.
-         */
         Card() {
             super(StandIn.of(Project.class));
         }

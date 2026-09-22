@@ -254,10 +254,10 @@ public class StatusBar extends JBPanel<StatusBar> {
     // UC-EDITOR-PANEL-024
     public void updateSelectionState(final int @NotNull [] selectedIndices, final int firstSelectedPosition, final int shownCount, final int totalCount) {
         final int selectedCount = selectedIndices.length;
-        final @NotNull String cases = shownCount == 1
+        final @NotNull String testCases = shownCount == 1
                 ? Bundle.message("statusbar.cases.one")
                 : Bundle.message("statusbar.cases.many", String.valueOf(shownCount));
-        final @NotNull String of = cases + narrowedFrom(shownCount, totalCount);
+        final @NotNull String of = testCases + narrowedFrom(shownCount, totalCount);
 
         if (selectedCount > 1) {
             statusLabel.setText("<html>" + Bundle.message("statusbar.selected.of", String.valueOf(selectedCount), of) + "</html>");

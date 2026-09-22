@@ -54,14 +54,14 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
     }
 
     // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-067
-    public static @NotNull String describe(final @NotNull String verb, final @NotNull List<TestCaseDto> cases) {
-        return cases.size() == 1
-                ? Bundle.message("snapshot.undo.one", verb, cases.getFirst().getDescription())
-                : Bundle.message("snapshot.undo.many", verb, String.valueOf(cases.size()));
+    public static @NotNull String describe(final @NotNull String verb, final @NotNull List<TestCaseDto> testCases) {
+        return testCases.size() == 1
+                ? Bundle.message("snapshot.undo.one", verb, testCases.getFirst().getDescription())
+                : Bundle.message("snapshot.undo.many", verb, String.valueOf(testCases.size()));
     }
 
-    public static @NotNull List<UUID> idsOf(final @NotNull List<TestCaseDto> cases) {
-        return cases.stream().map(TestCaseDto::getId).toList();
+    public static @NotNull List<UUID> idsOf(final @NotNull List<TestCaseDto> testCases) {
+        return testCases.stream().map(TestCaseDto::getId).toList();
     }
 
     // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-038

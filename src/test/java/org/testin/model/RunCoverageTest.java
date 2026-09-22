@@ -36,29 +36,12 @@ import static org.testng.Assert.assertNotSame;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Changing which test cases a run covers, without losing what already happened
- * (#96).
- * <p>
- * A tester who adds a case to a cycle they are part way through must not pay for
- * it with the verdicts already in that cycle, and a case they take out must
- * actually go. The whole risk of the feature sits between those two: the run is
- * rebuilt from a set of ids, and rebuilding a result from its id rather than
- * carrying the result across would silently blank nine fields per case - the
- * verdict, the actual result, the bug severity and priority, the duration, who
- * ran it and when, and the stack trace.
- * <p>
- * So what is asserted here is mostly that things did <b>not</b> change.
- */
 public class RunCoverageTest {
 
     private static final @NotNull UUID EXECUTED = UUID.fromString("11111111-1111-4111-8111-111111111101");
     private static final @NotNull UUID UNTOUCHED = UUID.fromString("11111111-1111-4111-8111-111111111102");
     private static final @NotNull UUID ADDED = UUID.fromString("11111111-1111-4111-8111-111111111103");
 
-    /**
-     * A case that has been run: every field a tester or a framework filled in.
-     */
     private static @NotNull TestRunItems executed() {
         return new TestRunItems()
                 .setId(EXECUTED)
@@ -85,7 +68,7 @@ public class RunCoverageTest {
     }
 
     @Test
-    public void aCaseThatStaysKeepsEverythingItRecorded() {
+    public void aTestCaseThatStaysKeepsEverythingItRecorded() {
         final @NotNull TestRunItems before = executed();
         final @NotNull TestRunDto after = aRunOf(before).coverOnly(ids(EXECUTED, ADDED));
 
@@ -104,7 +87,7 @@ public class RunCoverageTest {
     }
 
     @Test
-    public void aCaseThatArrivesIsPending() {
+    public void aTestCaseThatArrivesIsPending() {
         final @NotNull TestRunDto after = aRunOf(executed()).coverOnly(ids(EXECUTED, ADDED));
 
         final @NotNull TestRunItems fresh = after.getResults().get(1);
@@ -117,7 +100,7 @@ public class RunCoverageTest {
     }
 
     @Test
-    public void aCaseThatGoesIsGoneWithWhatItRecorded() {
+    public void aTestCaseThatGoesIsGoneWithWhatItRecorded() {
         final @NotNull TestRunDto after = aRunOf(executed(), new TestRunItems().setId(UNTOUCHED)).coverOnly(ids(UNTOUCHED));
 
         assertEquals(coveredBy(after), List.of(UNTOUCHED),
@@ -126,11 +109,9 @@ public class RunCoverageTest {
     }
 
     @Test
-    public void theRunKeepsItsOwnOrderAndNewCasesGoOnTheEnd() {
+    public void theRunKeepsItsOwnOrderAndNewTestCasesGoOnTheEnd() {
         final @NotNull TestRunDto run = aRunOf(new TestRunItems().setId(UNTOUCHED), executed());
 
-        // Asked for in the opposite order, which is the order the selection tree
-        // hands them over in: the run's order is the run's, not the tree's.
         final @NotNull TestRunDto after = run.coverOnly(ids(ADDED, EXECUTED, UNTOUCHED));
 
         assertEquals(coveredBy(after), List.of(UNTOUCHED, EXECUTED, ADDED),
@@ -149,11 +130,6 @@ public class RunCoverageTest {
         assertEquals(coveredBy(after), List.of(EXECUTED));
     }
 
-    /**
-     * The run's own facts are in its marker, not in what it covers, so changing
-     * the scope cannot touch them - there is nothing for coverOnly to carry
-     * across (#305, D6).
-     */
     @Test
     public void whatARunCoversSaysNothingAboutItsOwnFacts() {
         final @NotNull ZonedDateTime started = ZonedDateTime.now().minusHours(2);

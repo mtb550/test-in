@@ -127,7 +127,7 @@ public final class TestRunHtmlGenerator {
             final long count = section.count(summary);
             if (count == 0) continue;
 
-            appendCaseTable(html, sectionNumber++, section.getTitle(),
+            appendTestCaseTable(html, sectionNumber++, section.getTitle(),
                     section.description("<b>" + count + "</b>"),
                     section.name().toLowerCase(Locale.ROOT), section.isWithFailureDetail(),
                     results, section::matches);
@@ -146,7 +146,7 @@ public final class TestRunHtmlGenerator {
     }
 
     // Rule-REPORT-019
-    private void appendCaseTable(final @NotNull StringBuilder html, final int sectionNumber, final @NotNull String title, final @NotNull String blurb, final @NotNull String section, final boolean withFailureDetail, final @NotNull List<TestRunItems> results, final @NotNull Predicate<TestRunItems> filter) {
+    private void appendTestCaseTable(final @NotNull StringBuilder html, final int sectionNumber, final @NotNull String title, final @NotNull String blurb, final @NotNull String section, final boolean withFailureDetail, final @NotNull List<TestRunItems> results, final @NotNull Predicate<TestRunItems> filter) {
         html.append("<div class='section-title-bar'><div class='section-title'>").append(sectionNumber).append(". ").append(title).append("</div></div>");
         html.append("<div class='summary-text'>").append(blurb).append("</div>");
         html.append("<table class='detail-table'>")
@@ -165,7 +165,7 @@ public final class TestRunHtmlGenerator {
         results.stream()
                 .filter(filter)
                 .forEach(item -> {
-                    final @NotNull String desc = item.shownCase().getDescription();
+                    final @NotNull String desc = item.shownTestCase().getDescription();
 
                     html.append("<tr>")
                             .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")

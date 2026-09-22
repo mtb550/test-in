@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.GenType;
-import org.testin.codegen.MovedCase;
+import org.testin.codegen.MovedTestCase;
 import org.testin.java.codegen.GeneratedClass;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.java.codegen.method.update.UpdateTestBase;
@@ -58,23 +58,23 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
     // UC-CODEGEN-002, Rule-CODEGEN-077, Rule-CODEGEN-014
     @Override
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        final @NotNull List<MovedCase> moves = new ArrayList<>();
+        final @NotNull List<MovedTestCase> moves = new ArrayList<>();
         for (final Object item : items) {
-            if (item instanceof MovedCase moved) moves.add(moved);
+            if (item instanceof MovedTestCase moved) moves.add(moved);
         }
         if (moves.isEmpty()) return;
 
         final @NotNull Runnable inCommand = () ->
                 WriteCommandAction.runWriteCommandAction(p, GenType.MOVE_TEST_CASE.getDescription(), null, () -> {
                     moves.forEach(moved -> move(p, moved));
-                    new UpdateTestOrder().executeAll(p, moves.stream().map(MovedCase::tc).toList());
+                    new UpdateTestOrder().executeAll(p, moves.stream().map(MovedTestCase::tc).toList());
                 });
 
         if (CommandProcessor.getInstance().getCurrentCommand() != null) inCommand.run();
         else ApplicationManager.getApplication().invokeLater(inCommand);
     }
 
-    private void move(final @NotNull Project p, final @NotNull MovedCase moved) {
+    private void move(final @NotNull Project p, final @NotNull MovedTestCase moved) {
         final @NotNull TestCaseDto tc = moved.tc();
 
         final @NotNull Optional<PsiClass> from = GeneratedClass.find(p, Fqcn.ofClass(moved.from()));
@@ -83,7 +83,7 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
             return;
         }
 
-        final @NotNull Optional<PsiMethod> method = GeneratedMethod.forCase(from.orElseThrow(), tc);
+        final @NotNull Optional<PsiMethod> method = GeneratedMethod.forTestCase(from.orElseThrow(), tc);
         if (method.isEmpty()) {
             Logger.debug("Nothing to move for '" + tc.getDescription() + "': no method with testName=" + tc.getId());
             return;
@@ -108,7 +108,7 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
             return;
         }
 
-        if (GeneratedMethod.forCase(target, tc).isPresent()) {
+        if (GeneratedMethod.forTestCase(target, tc).isPresent()) {
             Logger.warn("Left the method for '" + tc.getDescription() + "' in " + from.orElseThrow().getQualifiedName()
                     + ": " + target.getQualifiedName() + " already has a method for this test case");
             return;

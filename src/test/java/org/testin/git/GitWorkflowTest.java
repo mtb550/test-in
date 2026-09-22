@@ -42,41 +42,13 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The whole workflow against a real repository: write test cases, review what
- * changed, commit, push, and have a colleague clone what arrived.
- * <p>
- * Nothing is stubbed. Git is the Git on this machine, the repository is a real
- * one in a temporary directory, and the remote is a real bare repository - so a
- * push is a push. What is exercised is the plugin's own logic driving it: the
- * review comes from {@link GitDiffProcessor} reading real {@code git status}
- * output, and what gets staged is what {@link GitRefs} and
- * {@link GitCommits} decide it should be.
- * <p>
- * The parsing tests elsewhere prove the rules are right about text we typed.
- * This proves they are right about text Git produced, which is the difference
- * between a test passing and the feature working - the review was empty for
- * every user of this plugin while its unit tests were green.
- */
 public class GitWorkflowTest {
 
-    /**
-     * The Windows command-line limit, in characters. A process whose command
-     * line is longer than this cannot be started at all, and the refusal names
-     * neither the limit nor a path - it arrives as {@code CreateProcess
-     * error=206}, which is what a tester saw instead of their commit.
-     */
     private static final int WINDOWS_COMMAND_LINE_LIMIT = 32767;
     private Path remote;
 
-    // ------------------------------------------------------------------ setup
     private Path work;
 
-    /**
-     * What the command printed, and empty when it did not succeed - a git that
-     * is not installed and a git that returned non-zero are the same answer to
-     * the caller, and both are ordinary here.
-     */
     private static Optional<String> git(final Path directory, final String... arguments) {
         final List<String> command = new ArrayList<>();
         command.add("git");
@@ -117,8 +89,6 @@ public class GitWorkflowTest {
             mustGit(remote, "init", "--bare", "--initial-branch=main");
             mustGit(work, "init", "--initial-branch=main");
 
-            // Local, so the test never depends on - or touches - the developer's own
-            // Git identity.
             mustGit(work, "config", "user.name", "Testin Test");
             mustGit(work, "config", "user.email", "testin@example.invalid");
             mustGit(work, "remote", "add", "origin", remote.toUri().toString());
@@ -127,26 +97,11 @@ public class GitWorkflowTest {
         }
     }
 
-    // ------------------------------------------------------------ large commits
-
     @AfterMethod
     public void removeRepositories() {
         if (remote != null) TempTree.delete(remote.getParent());
     }
 
-    /**
-     * A commit whose paths would not fit on a command line still lands.
-     * <p>
-     * The size is the test. An import brings in hundreds of test cases at once,
-     * and every one of them is a new file. So the first commit after an import
-     * is the largest one a tester ever makes, and it was the one that could not
-     * be made. 1,200 cases under a name holding a space is roughly what a
-     * spreadsheet import produces, and about three times the limit.
-     * <p>
-     * Driven through {@link GitCommandRunner#pathspecBytes}, so what Git reads
-     * here is what the plugin writes. Running the command is left to real Git
-     * rather than to the runner, which needs a live IDE for {@code git4idea}.
-     */
     @Test
     public void aCommitTooLargeForTheCommandLineStillLands() {
         try {
@@ -186,8 +141,6 @@ public class GitWorkflowTest {
         }
     }
 
-    // ------------------------------------------------------- the test project
-
     private TestCaseDto testCase(final String description) {
         return TestCaseDto.builder()
                 .description(description)
@@ -214,54 +167,33 @@ public class GitWorkflowTest {
 
     }
 
-    /**
-     * A test project as the plugin lays one out: a marker per directory, and the
-     * test cases linked head to tail the way the editor orders them.
-     */
     private List<TestCaseDto> writeTestProject() {
         write(work, ".tp", "{\"status\":\"ACTIVE\"}");
         write(work, "Test Cases/.tcd", "{}");
         write(work, "Test Runs/.trd", "{}");
         write(work, "Test Cases/login flow/.ts", "{}");
 
-        final List<TestCaseDto> cases = List.of(
+        final List<TestCaseDto> testCases = List.of(
                 testCase("a registered user signs in"),
                 testCase("a wrong password is refused"));
 
-        // Ranked in the order the editor would show them.
-        TestCaseOrder.rankAll(cases);
+        TestCaseOrder.rankAll(testCases);
 
-        for (final TestCaseDto testCase : cases) {
+        for (final TestCaseDto testCase : testCases) {
             write(work, "Test Cases/login flow/" + testCase.getId() + ".tc", testCase);
         }
-        return cases;
+        return testCases;
     }
 
-    // --------------------------------------------------------- the plugin bits
-
-    /**
-     * The review, built the way the plugin builds it: from what Git says changed
-     * and what Git has committed.
-     */
     private List<PendingChange> review() {
         final List<String> status = mustGit(work, "status", "--porcelain", "-uall")
                 .lines().filter(line -> !line.isBlank()).toList();
 
         return GitDiffProcessor.toDiffs(status, work, RealMapper.build(),
-                // Empty rather than absent for a path HEAD does not hold, which is
-                // what production feeds this: GitRepositoryService.showAtHead ends
-                // in orElse(""). Handing it a null here tested a shape the plugin
-                // never produces.
                 path -> git(work, "show", "HEAD:" + path).orElse(""),
-                // No index in this test: a result then reads as its file name,
-                // which is the shape a case removed since would take anyway.
                 id -> Optional.empty());
     }
 
-    /**
-     * Everything the plugin would stage for the given review: the selected test
-     * cases, and the markers that make their directories mean anything.
-     */
     private Set<String> stagedFor(final List<PendingChange> review) {
         final Set<String> paths = new LinkedHashSet<>(GitRefs.repoRelativePaths(review));
         paths.addAll(GitCommits.markersAlongside(work, paths));
@@ -269,8 +201,6 @@ public class GitWorkflowTest {
     }
 
     private void commit(final Set<String> paths, final String message) {
-        // Through the plugin's own rule, not a copy of it: which paths git add
-        // may be given is the thing being tested when a rename is involved.
         final Set<String> stageable = GitCommits.stageable(work, paths);
 
         if (!stageable.isEmpty()) {
@@ -290,18 +220,11 @@ public class GitWorkflowTest {
         mustGit(remote.getParent(), "clone", remote.toUri().toString(), colleague.toString());
         return colleague;
 
-
     }
 
-    // ------------------------------------------------------------------ tests
-
-    /**
-     * The first commit of a new test project, which is the case that could not be
-     * made at all: everything is untracked, and untracked was invisible.
-     */
     @Test
     public void aNewTestProjectIsReviewedCommittedAndPushed() {
-        final List<TestCaseDto> cases = writeTestProject();
+        final List<TestCaseDto> testCases = writeTestProject();
 
         final List<PendingChange> pending = review();
         assertEquals(pending.stream().filter(change -> change.subject() == ChangeSubject.TEST_CASE).count(), 2,
@@ -314,16 +237,12 @@ public class GitWorkflowTest {
         assertTrue(git(work, "push", "-u", "origin", "main").isPresent(), "the push to an empty remote succeeded");
 
         final Path colleague = cloneAsColleague();
-        for (final TestCaseDto testCase : cases) {
+        for (final TestCaseDto testCase : testCases) {
             assertTrue(Files.exists(colleague.resolve("Test Cases/login flow/" + testCase.getId() + ".tc")),
                     "the colleague received " + testCase.getDescription());
         }
     }
 
-    /**
-     * The fault that would have made every clone useless: a directory is only a
-     * test set because a marker sits in it, and the review never lists markers.
-     */
     @Test
     public void whatTheColleagueClonesIsAUsableTestProject() {
         writeTestProject();
@@ -339,18 +258,8 @@ public class GitWorkflowTest {
                 "the test set marker travelled - without it the cases are in a directory nothing recognises");
     }
 
-    /**
-     * A run directory is not part of a test case commit, so it must not be
-     * dragged in: the markers that travel with a selection are the ones above
-     * the cases in it.
-     * <p>
-     * Markers are rows of their own now, so a tester can commit one deliberately
-     * - archiving a project is a marker edit and nothing else. This is about the
-     * ones nobody selected: the review is filtered to the test cases, and what
-     * comes along is only what those cases need to mean anything.
-     */
     @Test
-    public void onlyTheMarkersAboveTheSelectedCasesTravel() {
+    public void onlyTheMarkersAboveTheSelectedTestCasesTravel() {
         writeTestProject();
 
         final Set<String> staged = stagedFor(review().stream()
@@ -364,18 +273,14 @@ public class GitWorkflowTest {
                 "no test case sits under Test Runs, so its marker is not part of this commit");
     }
 
-    /**
-     * Editing a case and asking again: the review reads the committed side out of
-     * Git and reports only the field that moved.
-     */
     @Test
-    public void editingACaseShowsExactlyWhatChanged() {
-        final List<TestCaseDto> cases = writeTestProject();
+    public void editingATestCaseShowsExactlyWhatChanged() {
+        final List<TestCaseDto> testCases = writeTestProject();
         commit(stagedFor(review()), "the first commit");
 
         assertEquals(review(), List.of(), "nothing is pending straight after a commit");
 
-        final TestCaseDto edited = cases.getFirst().setModule("payments");
+        final TestCaseDto edited = testCases.getFirst().setModule("payments");
         write(work, "Test Cases/login flow/" + edited.getId() + ".tc", edited);
 
         final List<PendingChange> pending = review();
@@ -389,7 +294,7 @@ public class GitWorkflowTest {
     }
 
     @Test
-    public void addingACaseToACommittedTestSetIsReviewedAsAnAddition() {
+    public void addingATestCaseToACommittedTestSetIsReviewedAsAnAddition() {
         writeTestProject();
         commit(stagedFor(review()), "the first commit");
 
@@ -404,12 +309,12 @@ public class GitWorkflowTest {
     }
 
     @Test
-    public void deletingACaseIsReviewedFromWhatWasCommitted() {
+    public void deletingATestCaseIsReviewedFromWhatWasCommitted() {
         try {
-            final List<TestCaseDto> cases = writeTestProject();
+            final List<TestCaseDto> testCases = writeTestProject();
             commit(stagedFor(review()), "the first commit");
 
-            Files.delete(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".tc"));
+            Files.delete(work.resolve("Test Cases/login flow/" + testCases.getFirst().getId() + ".tc"));
 
             final List<PendingChange> pending = review();
 
@@ -421,23 +326,12 @@ public class GitWorkflowTest {
         }
     }
 
-    /**
-     * A rename the tester staged somewhere else - the IDE's own commit window,
-     * or the command line - and then brought to this review.
-     * <p>
-     * Two things had to be true and neither was. The review has to list both
-     * sides, or the commit carries the new file and leaves the old one behind,
-     * and whoever pulls it has the test case twice. And the old path must be
-     * kept out of {@code git add}, which refuses a path that is in neither the
-     * working tree nor the index - one of those fails the command outright, so
-     * the commit never happens.
-     */
     @Test
     public void aRenameStagedElsewhereCommitsBothSides() {
-        final List<TestCaseDto> cases = writeTestProject();
+        final List<TestCaseDto> testCases = writeTestProject();
         commit(stagedFor(review()), "the first commit");
 
-        final String file = cases.getFirst().getId() + ".tc";
+        final String file = testCases.getFirst().getId() + ".tc";
         mustGit(work, "mv", "Test Cases/login flow/" + file, "Test Cases/" + file);
 
         final List<PendingChange> pending = review();
@@ -454,27 +348,15 @@ public class GitWorkflowTest {
         assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
     }
 
-    /**
-     * The conflict this product actually gets: a colleague edited one field of a
-     * test case and the tester edited another, so Git stops on a file where
-     * nobody disagreed about anything (#90).
-     * <p>
-     * Everything here is real - a remote, a colleague's clone, a rebase that
-     * genuinely stops - because the merge rules being right is not the same as
-     * the merge working. The three stages have to be readable while the rebase
-     * is stopped, the merged file has to be one Git accepts as a resolution, and
-     * the rebase has to finish afterward.
-     */
     @Test
     public void aConflictedTestCaseIsMergedFieldByFieldAndTheRebaseFinishes() {
         try {
-            final List<TestCaseDto> cases = writeTestProject();
+            final List<TestCaseDto> testCases = writeTestProject();
             commit(stagedFor(review()), "the first commit");
             mustGit(work, "push", "-u", "origin", "main");
 
-            final String relativePath = "Test Cases/login flow/" + cases.getFirst().getId() + ".tc";
+            final String relativePath = "Test Cases/login flow/" + testCases.getFirst().getId() + ".tc";
 
-            // The colleague sharpens the expected result.
             final Path colleague = cloneAsColleague();
             mustGit(colleague, "config", "user.name", "Colleague");
             mustGit(colleague, "config", "user.email", "colleague@example.invalid");
@@ -487,7 +369,6 @@ public class GitWorkflowTest {
             mustGit(colleague, "commit", "-am", "tightened the expected result");
             mustGit(colleague, "push", "origin", "main");
 
-            // The tester rewords the description of the same case, and commits.
             final Path myCopy = work.resolve(relativePath);
             final TestCaseDto mine = RealMapper.build().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
             Files.writeString(myCopy, RealMapper.build().writeValueAsString(
@@ -495,8 +376,6 @@ public class GitWorkflowTest {
                     StandardCharsets.UTF_8);
             commit(stagedFor(review()), "reworded the description");
 
-            // Git stops: one file, two commits, no way for it to know the two edits
-            // are in different fields.
             assertTrue(git(work, "pull", "--rebase", "--autostash", "origin", "main").isEmpty(),
                     "the pull is expected to stop on the conflict");
 
@@ -504,8 +383,6 @@ public class GitWorkflowTest {
                     mustGit(work, "status", "--porcelain", "-uall").lines().filter(line -> !line.isBlank()).toList());
             assertEquals(conflicting, List.of(relativePath));
 
-            // What the plugin does with it: read the three sides Git is holding and
-            // merge them field by field.
             final String base = mustGit(work, "show", ":1:" + relativePath);
             final String remote = mustGit(work, "show", ":2:" + relativePath);
             final String replayed = mustGit(work, "show", ":3:" + relativePath);
@@ -517,7 +394,6 @@ public class GitWorkflowTest {
             mustGit(work, "add", "--", relativePath);
             mustGit(work, "-c", "core.editor=true", "rebase", "--continue");
 
-            // Both edits survived, and the repository is not mid-rebase anymore.
             final TestCaseDto merged = RealMapper.build().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
             assertEquals(merged.getDescription(), "a registered user signs in with a valid password");
             assertEquals(merged.getExpectedResult(), "the dashboard opens within two seconds");
@@ -528,42 +404,28 @@ public class GitWorkflowTest {
         }
     }
 
-    /**
-     * Two testers adding a test case to the same test set at the same time -
-     * the thing this product does more than anything else, and the thing that
-     * used to conflict (#90).
-     * <p>
-     * Neither new file conflicts: they are new files with new names. Nothing
-     * else conflicts either, now that a case carries its own position. The case
-     * that happened to be last used to be rewritten by both testers to point at
-     * their own new one, and that third file was the conflict. Git merges this
-     * on its own, with nothing for the plugin to resolve.
-     */
     @Test
-    public void twoTestersAddingCasesToOneSetDoNotConflictAtAll() {
+    public void twoTestersAddingTestCasesToOneSetDoNotConflictAtAll() {
         try {
             writeTestProject();
             commit(stagedFor(review()), "the first commit");
             mustGit(work, "push", "-u", "origin", "main");
 
-            // The colleague appends a case and pushes it.
             final Path colleague = cloneAsColleague();
             mustGit(colleague, "config", "user.name", "Colleague");
             mustGit(colleague, "config", "user.email", "colleague@example.invalid");
 
-            final TestCaseDto theirNewCase = testCase("a locked account cannot sign in").setOrder("s");
-            write(colleague, "Test Cases/login flow/" + theirNewCase.getId() + ".tc", theirNewCase);
+            final TestCaseDto theirNewTestCase = testCase("a locked account cannot sign in").setOrder("s");
+            write(colleague, "Test Cases/login flow/" + theirNewTestCase.getId() + ".tc", theirNewTestCase);
 
             mustGit(colleague, "add", "-A");
             mustGit(colleague, "commit", "-m", "added the locked account case");
             mustGit(colleague, "push", "origin", "main");
 
-            // This tester appends one too, at the same moment.
-            final TestCaseDto myNewCase = testCase("a signed-in user signs out").setOrder("s");
-            write(work, "Test Cases/login flow/" + myNewCase.getId() + ".tc", myNewCase);
+            final TestCaseDto myNewTestCase = testCase("a signed-in user signs out").setOrder("s");
+            write(work, "Test Cases/login flow/" + myNewTestCase.getId() + ".tc", myNewTestCase);
             commit(stagedFor(review()), "added the sign out case");
 
-            // No conflict to resolve: the pull rebases straight through.
             assertTrue(git(work, "pull", "--rebase", "--autostash", "origin", "main").isPresent(),
                     "two appended cases touch two files and merge on their own");
 
@@ -576,27 +438,21 @@ public class GitWorkflowTest {
 
             assertEquals(after.size(), 4, "both testers keep their case");
 
-            // Same rank on both, which is allowed: the order is settled the same way
-            // on every machine, so two testers never see two different lists.
             final List<TestCaseDto> ordered = TestCaseOrder.ordered(after);
             assertEquals(ordered, TestCaseOrder.ordered(new ArrayList<>(after.reversed())),
                     "the order does not depend on what order the files were read in");
-            assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(theirNewCase.getId())));
-            assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(myNewCase.getId())));
+            assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(theirNewTestCase.getId())));
+            assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(myNewTestCase.getId())));
             assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
         } catch (final IOException ex) {
             throw new AssertionError(ex);
         }
     }
 
-    /**
-     * The colleague half of the round trip: they change a case and push, and the
-     * change arrives here on a pull.
-     */
     @Test
     public void aColleaguesChangeArrivesOnAPull() {
         try {
-            final List<TestCaseDto> cases = writeTestProject();
+            final List<TestCaseDto> testCases = writeTestProject();
             commit(stagedFor(review()), "the first commit");
             mustGit(work, "push", "-u", "origin", "main");
 
@@ -604,7 +460,7 @@ public class GitWorkflowTest {
             mustGit(colleague, "config", "user.name", "Colleague");
             mustGit(colleague, "config", "user.email", "colleague@example.invalid");
 
-            final Path theirCopy = colleague.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".tc");
+            final Path theirCopy = colleague.resolve("Test Cases/login flow/" + testCases.getFirst().getId() + ".tc");
             final TestCaseDto theirs = RealMapper.build().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
             Files.writeString(theirCopy, RealMapper.build().writeValueAsString(theirs.setExpectedResult("the dashboard opens within two seconds")),
                     StandardCharsets.UTF_8);
@@ -615,7 +471,7 @@ public class GitWorkflowTest {
             mustGit(work, "pull", "--rebase", "--autostash", "origin", "main");
 
             final TestCaseDto pulled = RealMapper.build().readValue(
-                    Files.readString(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".tc"),
+                    Files.readString(work.resolve("Test Cases/login flow/" + testCases.getFirst().getId() + ".tc"),
                             StandardCharsets.UTF_8), TestCaseDto.class);
 
             assertEquals(pulled.getExpectedResult(), "the dashboard opens within two seconds");
@@ -625,10 +481,6 @@ public class GitWorkflowTest {
         }
     }
 
-    /**
-     * A repository with no commits reports no HEAD branch, which was read as a
-     * branch literally called "(unknown)" and broke every first push.
-     */
     @Test
     public void anEmptyRemoteNamesNoHeadBranch() {
         final String remoteInfo = mustGit(work, "remote", "show", "origin");
@@ -637,10 +489,6 @@ public class GitWorkflowTest {
         assertEquals(GitRefs.parseHeadBranch(remoteInfo), "", "an empty remote names no branch, so the push falls back to the local one");
     }
 
-    /**
-     * The status output the review is built from, straight from Git rather than
-     * typed into a test - quoting, untracked marks and all.
-     */
     @Test
     public void gitReportsNewTestCasesAsUntrackedWithQuotedPaths() {
         writeTestProject();

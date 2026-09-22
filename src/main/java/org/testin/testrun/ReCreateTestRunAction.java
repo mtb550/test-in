@@ -73,14 +73,14 @@ public class ReCreateTestRunAction extends DumbAwareAction {
         private void reCreate(final @NotNull TestRunDirectoryDto source, final @NotNull DirectoryDto parent) {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            final @NotNull Set<UUID> cases = indexer.getTestRunByPath(source.getPath()).coveredIds();
+            final @NotNull Set<UUID> testCases = indexer.getTestRunByPath(source.getPath()).coveredIds();
 
             final @NotNull Set<String> taken = indexer.getChildren(parent.getPath()).stream()
                     .map(DirectoryDto::getName)
                     .collect(Collectors.toSet());
 
             Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
-                    tp -> new CreateTestRun(p).configureRun(tp.getTestCasesDirectory(), NextRunName.after(source.getName(), taken), parent, cases, source.getMarker().getConfiguration()),
+                    tp -> new CreateTestRun(p).configureRun(tp.getTestCasesDirectory(), NextRunName.after(source.getName(), taken), parent, testCases, source.getMarker().getConfiguration()),
                     () -> Logger.warn("Re-create test run: no test project is bound to " + p.getName()));
         }
     }

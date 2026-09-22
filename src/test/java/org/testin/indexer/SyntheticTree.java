@@ -25,25 +25,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
-/**
- * A test project on disk, at whatever size the caller asks for.
- * <p>
- * Written by hand rather than through the indexer, on purpose: the indexer is a
- * project service and this repository has no platform test harness (#107), so a
- * generator that went through it could not run here at all. What it writes is
- * the format {@code docs/formats.md} specifies - the markers, the folder names,
- * and one {@code <uuid>.tc} per case - which is the same thing a scan reads.
- * <p>
- * Small on purpose. It exists so a budget can be measured against a real number
- * of real files instead of estimated, and nothing else should grow onto it.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class SyntheticTree {
 
-    /**
-     * Every case is the same size; what is being measured is how many there are.
-     */
-    private static final @NotNull String CASE = """
+    private static final @NotNull String TEST_CASE = """
             {
               "order" : "%s",
               "id" : "%s",
@@ -72,18 +57,10 @@ final class SyntheticTree {
               "status" : "ACTIVE"
             }""";
 
-    /**
-     * One test case document, the same shape the plugin writes. Public to the
-     * package so the budget can parse it without going anywhere near a disk.
-     */
     static @NotNull String testCase(final @NotNull UUID id, final @NotNull String order) {
-        return CASE.formatted(order, id);
+        return TEST_CASE.formatted(order, id);
     }
 
-    /**
-     * Writes one test project holding {@code sets} test sets of {@code perSet}
-     * test cases each, and answers the folder it wrote it into.
-     */
     static @NotNull Path write(final @NotNull Path root, final int sets, final int perSet) {
         final @NotNull Path project = root.resolve("BENCHMARK");
         write(project.resolve(".tp"), MARKER);

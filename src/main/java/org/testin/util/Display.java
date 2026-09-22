@@ -75,7 +75,7 @@ public final class Display {
         return (index + 1) + "- " + format(step);
     }
 
-    public static @NotNull String formatCaseClock(final @NotNull Duration duration) {
+    public static @NotNull String formatTestCaseClock(final @NotNull Duration duration) {
         final @NotNull String minutes = String.format(Locale.ROOT, "%02d:%02d", duration.toMinutesPart(), duration.toSecondsPart());
 
         return duration.toHours() == 0 ? minutes : duration.toHours() + ":" + minutes;
@@ -86,7 +86,7 @@ public final class Display {
     }
 
     public static @NotNull String formatDuration(final @NotNull Duration duration) {
-        return duration.isZero() ? "" : formatCaseClock(duration);
+        return duration.isZero() ? "" : formatTestCaseClock(duration);
     }
 
     private static boolean endsClosed(final @NotNull String s) {

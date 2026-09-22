@@ -72,16 +72,16 @@ public class RunTestsAction extends DumbAwareAction {
 
     // UC-CODEGEN-008, Rule-CODEGEN-031
     private void run(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        final @NotNull List<TestCaseDto> cases = Services.getInstance(p, ProjectIndexer.class).getTestCasesUnder(dir);
+        final @NotNull List<TestCaseDto> testCases = Services.getInstance(p, ProjectIndexer.class).getTestCasesUnder(dir);
 
-        if (cases.isEmpty()) {
+        if (testCases.isEmpty()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NOTHING_TO_RUN, dir.getName());
             return;
         }
 
-        Logger.info("Running " + dir.getName() + " with " + cases.size() + " test case(s)");
+        Logger.info("Running " + dir.getName() + " with " + testCases.size() + " test case(s)");
 
-        RunTestCases.run(p, cases);
+        RunTestCases.run(p, testCases);
     }
 
     @Override

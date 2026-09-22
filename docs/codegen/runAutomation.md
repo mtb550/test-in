@@ -51,8 +51,8 @@ The code runs, and Testin writes down whether each test case passed.
 - **Rule-CODEGEN-076** — A second run started while the first is still going
   gets a name of its own - the same name with a number after it, such as
   LoginTest (2). The two runs are then separate everywhere: each has its own
-  process, Stop reaches one without touching the other, and each case reports
-  its verdict under the run it belongs to.
+  process, Stop reaches one without touching the other, and each test case
+  reports its verdict under the run it belongs to.
 
 ## The four ways in
 

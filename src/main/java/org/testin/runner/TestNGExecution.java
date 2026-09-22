@@ -35,6 +35,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
+import org.testin.util.FromContentModule;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -85,26 +86,30 @@ public final class TestNGExecution implements Disposable {
     }
 
     // UC-CODEGEN-008, Rule-CODEGEN-034
+    @FromContentModule
     public void starting(final @NotNull TestCaseDto tc) {
         registry.starting(tc.getId());
 
         TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.RUNNING, Duration.ZERO, Failure.NONE);
     }
 
-    public @NotNull List<TestCaseDto> stillWanted(final @NotNull List<TestCaseDto> cases) {
-        return cases.stream().filter(tc -> registry.take(tc.getId())).toList();
+    @FromContentModule
+    public @NotNull List<TestCaseDto> stillWanted(final @NotNull List<TestCaseDto> testCases) {
+        return testCases.stream().filter(tc -> registry.take(tc.getId())).toList();
     }
 
     // UC-CODEGEN-008, Rule-CODEGEN-076
+    @FromContentModule
     public @NotNull String freeRunName(final @NotNull String wanted) {
         return registry.freeName(wanted);
     }
 
     // UC-CODEGEN-008, Rule-CODEGEN-031
-    public void launch(final @NotNull List<TestCaseDto> cases, final @NotNull RunnerAndConfigurationSettings settings) {
-        registry.launched(cases.stream().map(TestCaseDto::getId).toList(), settings.getName());
+    @FromContentModule
+    public void launch(final @NotNull List<TestCaseDto> testCases, final @NotNull RunnerAndConfigurationSettings settings) {
+        registry.launched(testCases.stream().map(TestCaseDto::getId).toList(), settings.getName());
 
-        Logger.info("Starting " + settings.getName() + " with " + cases.size() + " test case(s)");
+        Logger.info("Starting " + settings.getName() + " with " + testCases.size() + " test case(s)");
         ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
     }
 
@@ -115,12 +120,14 @@ public final class TestNGExecution implements Disposable {
     }
 
     // UC-CODEGEN-008
+    @FromContentModule
     public void noGeneratedCode(final @NotNull TestCaseDto tc) {
         Logger.warn("Not running '" + tc.getDescription() + "': it has no generated code");
         notStarting(tc);
     }
 
     // UC-CODEGEN-008, Rule-CODEGEN-033, Rule-CODEGEN-074, Rule-CODEGEN-034
+    @FromContentModule
     public void started(final @NotNull List<TestCaseDto> running, final @NotNull List<TestCaseDto> withoutCode) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
@@ -152,23 +159,23 @@ public final class TestNGExecution implements Disposable {
     }
 
     // UC-CODEGEN-009, Rule-CODEGEN-037
-    public int stop(final @NotNull List<TestCaseDto> cases) {
-        return stopCases(cases.stream().map(TestCaseDto::getId).toList());
+    public int stop(final @NotNull List<TestCaseDto> testCases) {
+        return stopTestCases(testCases.stream().map(TestCaseDto::getId).toList());
     }
 
     // UC-CODEGEN-009, Rule-CODEGEN-037
-    public int stopCases(final @NotNull Collection<UUID> ids) {
+    public int stopTestCases(final @NotNull Collection<UUID> ids) {
         final @NotNull RunRegistry.Stop stop = registry.stopping(List.copyOf(ids));
-        if (stop.cases().isEmpty()) return 0;
+        if (stop.testCases().isEmpty()) return 0;
 
         final @NotNull Map<ProcessHandler, String> theirs = running(stop.runs());
-        Logger.info("Stopping " + stop.cases().size() + " test case(s) in " + stop.runs().size()
+        Logger.info("Stopping " + stop.testCases().size() + " test case(s) in " + stop.runs().size()
                 + " run(s): " + theirs.size() + " had reached a process");
 
         theirs.forEach(this::kill);
-        stop.cases().forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, Duration.ZERO, Failure.NONE));
+        stop.testCases().forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, Duration.ZERO, Failure.NONE));
 
-        return stop.cases().size();
+        return stop.testCases().size();
     }
 
     private void ended(final @NotNull ExecutionEnvironment env) {

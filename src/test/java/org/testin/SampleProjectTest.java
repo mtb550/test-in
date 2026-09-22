@@ -41,34 +41,12 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The committed sample project parses, and keeps parsing (#107).
- * <p>
- * {@code samples/} is documentation as much as data: it is the only committed
- * example of the seven marker formats, and the tree {@code runIde} opens onto.
- * Documentation that nothing reads goes stale, and stale sample data is worse
- * than none - a developer trusts it, and it describes a format the plugin
- * stopped writing two releases ago.
- * <p>
- * So the sample is read here through the same model the plugin reads it with. A
- * field renamed, a marker gaining a value, an enum constant deleted: any of them
- * stops this passing and names the file to fix, at the moment the change is made
- * rather than the next time somebody opens the sandbox.
- * <p>
- * Deliberately not a platform test. This repository has none, and #107 asked for
- * one - writing the first harness is a larger job than the fixture it would
- * check, and every assertion below holds without it.
- */
 public class SampleProjectTest {
 
     private static @NotNull Path demo() {
         return RepositoryRoot.resolve("samples").resolve("testin-root").resolve("Demo");
     }
 
-    /**
-     * The plugin's own mapper settings, so this reads the files the way the
-     * indexer does rather than the way a default Jackson would.
-     */
     private static @NotNull ObjectMapper mapper() {
         return new ObjectMapper()
                 .registerModule(new JavaTimeModule())
@@ -93,17 +71,10 @@ public class SampleProjectTest {
         }
     }
 
-    /**
-     * The sample's run folders, found by the marker that makes them runs rather
-     * than by the names they happen to have.
-     */
     private static @NotNull List<Path> runFolders() {
         return filesNamed(demo(), DirectoryType.TR.getMarker()).stream().map(Path::getParent).toList();
     }
 
-    /**
-     * The run's results, one file per test case (#305).
-     */
     private static @NotNull List<Path> resultFilesIn(final @NotNull Path folder) {
         try (Stream<Path> children = Files.list(folder)) {
             return children.filter(path -> FileKind.of(path) == FileKind.RUN_ITEM).toList();
@@ -120,7 +91,7 @@ public class SampleProjectTest {
         }
     }
 
-    private static @NotNull List<Path> caseFiles() {
+    private static @NotNull List<Path> testCaseFiles() {
         try (Stream<Path> walk = Files.walk(demo().resolve("Test Cases"))) {
             return walk.filter(Files::isRegularFile)
                     .filter(path -> FileKind.of(path) == FileKind.TEST_CASE)
@@ -155,12 +126,6 @@ public class SampleProjectTest {
         }
     }
 
-    /**
-     * Rule-INTERNAL-091. The sample is what a project written by this build looks
-     * like, so it carries the format number this build writes - otherwise opening
-     * it would convert it, and the committed sample would differ from the one a
-     * tester sees (#305).
-     */
     @Test
     public void theSampleCarriesThisBuildsFormat() {
         assertEquals(read(demo().resolve(DirectoryType.TP.getMarker()), TestProjectMarker.class).getFormat(),
@@ -169,10 +134,10 @@ public class SampleProjectTest {
 
     @Test
     public void everyTestCaseParsesAndCarriesARank() {
-        final @NotNull List<Path> cases = caseFiles();
-        assertFalse(cases.isEmpty(), "The sample has no test cases, so it demonstrates nothing");
+        final @NotNull List<Path> testCases = testCaseFiles();
+        assertFalse(testCases.isEmpty(), "The sample has no test cases, so it demonstrates nothing");
 
-        for (final Path file : cases) {
+        for (final Path file : testCases) {
             final @NotNull TestCaseDto tc = read(file, TestCaseDto.class);
 
             assertEquals(tc.getId().toString(), file.getFileName().toString().replace(".tc", ""),
@@ -184,21 +149,9 @@ public class SampleProjectTest {
         }
     }
 
-    /**
-     * The runs parse, and each is where the plugin will look for it.
-     * <p>
-     * The folders are found by their marker and the results by
-     * {@link FileKind#RUN_ITEM}, so this asks what a file is rather than repeating
-     * the answer - repeating it is what lost them. A run's results used to be one
-     * file named after the folder, so renaming a cycle moved the folder and left
-     * them behind, emptying the run at the next index (#177); they are one
-     * {@code <test case id>.ri} per case now, named by what they are about and by
-     * nothing the rename touches (#305). A sample folder still carrying a
-     * {@code <name>.json} is one this change never reached.
-     */
     @Test
-    public void everyRunParsesAndItsResultsNameCasesThatExist() {
-        final @NotNull List<String> caseIds = caseFiles().stream()
+    public void everyRunParsesAndItsResultsNameTestCasesThatExist() {
+        final @NotNull List<String> testCaseIds = testCaseFiles().stream()
                 .map(file -> file.getFileName().toString().replace(".tc", ""))
                 .toList();
 
@@ -218,21 +171,12 @@ public class SampleProjectTest {
 
                 assertEquals(item.getId().toString(), file.getFileName().toString().replace(".ri", ""),
                         "A result's file name is its test case's id, so the sample must agree with itself: " + file);
-                assertTrue(caseIds.contains(item.getId().toString()),
+                assertTrue(testCaseIds.contains(item.getId().toString()),
                         "The result " + file.getFileName() + " names a case the sample does not hold: " + item.getId());
             }
         }
     }
 
-    /**
-     * The sample's {@code testin.yml} still names the sample's own project.
-     * <p>
-     * The plugin writes the file only when a tester presses Save to testin.yml
-     * (Rule-INTERNAL-089), but it once wrote it on its own:
-     * the first time this sample was opened against another Testin root, the file
-     * came back naming a real project on the machine that opened it. A hand edit
-     * can do the same, so the name is asserted rather than trusted.
-     */
     @Test
     public void theSampleStillNamesItsOwnProject() {
         final @NotNull Path config = RepositoryRoot.resolve("samples").resolve("automation").resolve("testin.yml");

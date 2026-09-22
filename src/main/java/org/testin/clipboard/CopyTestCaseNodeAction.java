@@ -43,7 +43,7 @@ public class CopyTestCaseNodeAction extends DumbAwareAction {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        final @NotNull List<TestCaseDto> tcs = TestinData.selectedCases(e);
+        final @NotNull List<TestCaseDto> tcs = TestinData.selectedTestCases(e);
 
         if (!tcs.isEmpty()) {
             try {
@@ -68,7 +68,7 @@ public class CopyTestCaseNodeAction extends DumbAwareAction {
             return;
         }
 
-        e.getPresentation().setEnabled(!TestinData.selectedCases(e).isEmpty());
+        e.getPresentation().setEnabled(!TestinData.selectedTestCases(e).isEmpty());
     }
 
     @Override

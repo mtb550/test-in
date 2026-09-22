@@ -36,81 +36,20 @@ import java.util.stream.Stream;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * What reading a test project costs, per test case, as a number (#125).
- * <p>
- * The indexer is the heart of the plugin and had no stated budget, so a change
- * that doubled the cost of a scan would ship and be discovered as "the tree
- * takes a while now". A number nobody wrote down is not a budget. The number,
- * and what it does and does not cover, is in
- * {@code docs/internal/readTestProject.md}.
- * <p>
- * <b>Two costs, and only one of them is the plugin's.</b> Measuring the whole
- * scan on this machine gave 150 seconds cold and 3.5 seconds warm for ten
- * thousand cases - a forty-fold spread on identical work, because a cold read of
- * ten thousand freshly written files on Windows is the virus scanner's number,
- * not Jackson's. Asserting on that would fail on a loaded runner and pass
- * through a real regression on a fast disk.
- * <p>
- * So the budget is on <b>parsing</b>, which is the part a commit can change,
- * measured from documents already in memory. The disk half is measured too, and
- * reported rather than asserted, because it is worth knowing and worth nobody
- * pretending it is a property of this code.
- * <p>
- * <b>Not {@code scanSingleProject}.</b> That is on a project service and this
- * repository has no platform test harness (#107) - writing the first one is a
- * larger job than the budget it would check. The progress reporting, the cache
- * writes and the VFS refresh around the parse are not measured here, and are not
- * what grows with ten thousand cases.
- */
 public class IndexerBudgetTest {
 
-    /**
-     * The reference size the budget is stated at. Ten thousand is the number
-     * #125 asked for, and it parses in well under a second from memory.
-     */
-    private static final int CASES = 10_000;
+    private static final int TEST_CASES = 10_000;
 
-    /**
-     * Twice the measured cost on an ordinary machine, and deliberately no more:
-     * a change that doubles the real cost has to fail this, or the budget is
-     * decoration. Two is enough headroom because the parse touches no disk and
-     * no network - a loaded runner makes it slower, not erratic.
-     */
-    private static final double BUDGET_MICROS_PER_CASE = 40.0;
+    private static final double BUDGET_MICROS_PER_TEST_CASE = 40.0;
 
-    /**
-     * The results a budget is stated at: one cycle of two thousand cases, and
-     * fifty of forty - the two shapes a real Testin folder has. A result is its
-     * own file now, so a run of two thousand cases is two thousand parses where
-     * it used to be one (#305, G10).
-     */
     private static final int RESULTS = 2_000 + 50 * 40;
 
-    /**
-     * Twice the measured cost, as the case budget is. A result is a smaller
-     * document than a test case - no steps, no groups - so it parses faster, and
-     * the budget says so rather than borrowing the case's number.
-     */
     private static final double BUDGET_MICROS_PER_RESULT = 20.0;
 
-    /**
-     * How many timed passes to take the fastest of. Five costs a second and
-     * turns a measurement that swung three-fold with the rest of the suite into
-     * one that does not move.
-     */
     private static final int PASSES = 5;
 
-    /**
-     * Read the way the indexer reads it, so a format change fails here too
-     * rather than only in the sandbox.
-     */
     private static final @NotNull ObjectMapper MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    /**
-     * A result as the run writer writes one: a verdict, what the tester saw, and
-     * the stamps that come with it.
-     */
     private static @NotNull List<String> results() {
         final @NotNull List<String> documents = new ArrayList<>(RESULTS);
 
@@ -147,24 +86,12 @@ public class IndexerBudgetTest {
         return parsed;
     }
 
-    /**
-     * What ten thousand test cases cost to hold, to the nearest kilobyte.
-     * <p>
-     * A second parse rather than a reading around the timed one: asking for a
-     * collection immediately before the clock starts leaves the next
-     * allocations paying for it, which reported 64 microseconds a case for work
-     * that takes 18. Weighing and timing are separate passes for that reason.
-     * <p>
-     * Reported and never asserted on - a heap reading is a snapshot of a
-     * collector's opinion, and failing a build on one would be failing it on
-     * the weather.
-     */
     private static long heldKilobytes(final @NotNull List<String> documents) {
         final long before = usedBytes();
         final @NotNull List<TestCaseDto> weighed = parse(documents);
         final long after = usedBytes();
 
-        assertEquals(weighed.size(), CASES, "The cases were collected before they could be weighed");
+        assertEquals(weighed.size(), TEST_CASES, "The cases were collected before they could be weighed");
         return Math.max(0, after - before) / 1024;
     }
 
@@ -185,112 +112,82 @@ public class IndexerBudgetTest {
     }
 
     private static @NotNull List<TestCaseDto> readAll(final @NotNull Path project) {
-        final @NotNull List<TestCaseDto> cases = new ArrayList<>();
+        final @NotNull List<TestCaseDto> testCases = new ArrayList<>();
 
         try (Stream<Path> walk = Files.walk(project)) {
             for (final Path file : walk.toList()) {
                 if (!file.getFileName().toString().endsWith(".tc")) continue;
 
-                cases.add(MAPPER.readValue(file.toFile(), TestCaseDto.class));
+                testCases.add(MAPPER.readValue(file.toFile(), TestCaseDto.class));
             }
         } catch (final IOException ex) {
             throw new AssertionError("Could not read the generated tree at " + project + ": " + ex.getMessage(), ex);
         }
 
-        return cases;
+        return testCases;
     }
 
     private static @NotNull List<TestCaseDto> parse(final @NotNull List<String> documents) {
-        final @NotNull List<TestCaseDto> cases = new ArrayList<>(documents.size());
+        final @NotNull List<TestCaseDto> testCases = new ArrayList<>(documents.size());
 
         for (final String document : documents) {
             try {
-                cases.add(MAPPER.readValue(document, TestCaseDto.class));
+                testCases.add(MAPPER.readValue(document, TestCaseDto.class));
             } catch (final IOException ex) {
                 throw new AssertionError("A generated test case no longer parses: " + ex.getMessage(), ex);
             }
         }
 
-        return cases;
+        return testCases;
     }
 
     private static @NotNull List<String> documents() {
-        final @NotNull List<String> documents = new ArrayList<>(CASES);
+        final @NotNull List<String> documents = new ArrayList<>(TEST_CASES);
 
-        for (int i = 0; i < CASES; i++) {
+        for (int i = 0; i < TEST_CASES; i++) {
             documents.add(SyntheticTree.testCase(UUID.randomUUID(), "a" + i));
         }
 
         return documents;
     }
 
-    /**
-     * The budget. Ten thousand documents already in memory, parsed into the DTO
-     * the plugin actually holds.
-     * <p>
-     * <b>In the budget group</b>, which the ordinary test run leaves out and
-     * {@code ./gradlew test -Pbudget} runs on its own. A wall-clock budget measures the
-     * machine as well as the parser: on a developer's machine running a second
-     * build it failed with no code change and passed on the next run. CI runs
-     * it on a runner doing nothing else, where the number means what it says
-     * (#66, finding 108).
-     */
     @Test(groups = "budget")
     public void parsingTenThousandTestCasesStaysInsideTheBudget() {
         final @NotNull List<String> documents = documents();
 
-        // Jackson builds a deserializer for TestCaseDto on first use, and the
-        // JIT has seen nothing yet. Timing that would measure the first hundred
-        // cases of a tester's first project and call it the cost of every case.
         parse(documents.subList(0, 1_000));
 
         long fastest = Long.MAX_VALUE;
         long slowest = 0;
 
-        // The best of several passes, not one pass and not their average.
-        // Measured alone this parse takes 21 microseconds a case; measured
-        // inside the full suite, with six hundred other tests' garbage in the
-        // heap, one pass reported 67. Nothing about the parse changed - the
-        // collector ran during it. The fastest pass is the one least
-        // interrupted, which is the number that answers "did this get slower".
         for (int pass = 0; pass < PASSES; pass++) {
             final long started = System.nanoTime();
             final @NotNull List<TestCaseDto> parsed = parse(documents);
             final long elapsed = System.nanoTime() - started;
 
-            assertEquals(parsed.size(), CASES, "The parse read a different number of cases than it was given");
+            assertEquals(parsed.size(), TEST_CASES, "The parse read a different number of cases than it was given");
 
             fastest = Math.min(fastest, elapsed);
             slowest = Math.max(slowest, elapsed);
         }
 
-        final double micros = fastest / 1_000.0 / CASES;
+        final double micros = fastest / 1_000.0 / TEST_CASES;
 
         System.out.printf(
                 "Indexer budget: parsed %,d test cases in %,.0f ms (%.1f us/case), slowest of %d passes %,.0f ms, holding %,d KB%n",
-                CASES, fastest / 1e6, micros, PASSES, slowest / 1e6, heldKilobytes(documents));
+                TEST_CASES, fastest / 1e6, micros, PASSES, slowest / 1e6, heldKilobytes(documents));
 
-        assertTrue(micros < BUDGET_MICROS_PER_CASE,
+        assertTrue(micros < BUDGET_MICROS_PER_TEST_CASE,
                 "Parsing a test case costs " + String.format("%.1f", micros) + " us, over the "
-                        + BUDGET_MICROS_PER_CASE + " us budget in docs/internal/readTestProject.md."
+                        + BUDGET_MICROS_PER_TEST_CASE + " us budget in docs/internal/readTestProject.md."
                         + " Either the read got slower or the budget needs re-measuring - decide which,"
                         + " and if it is the budget, say why in that document.");
     }
 
-    /**
-     * The budget for a run's results, which are one file each since #305: four
-     * thousand of them, the shape of a Testin folder holding one cycle of two
-     * thousand cases and fifty of forty.
-     * <p>
-     * In the budget group with the case parse, and for the same reason.
-     */
     @Test(groups = "budget")
     public void parsingAProjectsRunResultsStaysInsideTheBudget() {
         final @NotNull List<String> documents = results();
 
-        // The same warm-up the cases take: Jackson builds a deserializer for
-        // TestRunItems on first use, and timing that measures the first run a
-        // tester opens rather than the cost of a result.
         parseResults(documents.subList(0, 1_000));
 
         long fastest = Long.MAX_VALUE;
@@ -320,29 +217,21 @@ public class IndexerBudgetTest {
                         + " and if it is the budget, say why in that document.");
     }
 
-    /**
-     * The disk half, reported and never asserted on. Behind a flag because
-     * writing and then cold-reading ten thousand files takes minutes on a
-     * machine with a virus scanner, and a build should not pay that:
-     * <pre>./gradlew :test --tests "*IndexerBudgetTest*" "-Dtestin.budget.cases=10000"</pre>
-     */
     @Test
     public void walkingATestProjectOnDiskIsMeasuredAndReported() {
-        // Outside the try: a skip is a RuntimeException, and a broad catch would
-        // turn it into a failure on every machine that legitimately skips it.
-        final int cases = Integer.getInteger("testin.budget.cases", 0);
-        if (cases == 0) throw new SkipException("Set -Dtestin.budget.cases to measure the on-disk walk");
+        final int testCases = Integer.getInteger("testin.budget.cases", 0);
+        if (testCases == 0) throw new SkipException("Set -Dtestin.budget.cases to measure the on-disk walk");
 
         final @NotNull Path root = SyntheticTree.tempRoot();
 
         try {
-            final @NotNull Path project = SyntheticTree.write(root, Math.max(1, cases / 100), Math.min(cases, 100));
+            final @NotNull Path project = SyntheticTree.write(root, Math.max(1, testCases / 100), Math.min(testCases, 100));
 
-            final long cold = timeWalk(project, cases);
-            final long warm = timeWalk(project, cases);
+            final long cold = timeWalk(project, testCases);
+            final long warm = timeWalk(project, testCases);
 
             System.out.printf("Indexer budget: %,d cases on disk · cold %,.0f ms (%.1f us/case) · warm %,.0f ms (%.1f us/case)%n",
-                    cases, cold / 1e6, cold / 1_000.0 / cases, warm / 1e6, warm / 1_000.0 / cases);
+                    testCases, cold / 1e6, cold / 1_000.0 / testCases, warm / 1e6, warm / 1_000.0 / testCases);
         } finally {
             TempTree.delete(root);
         }

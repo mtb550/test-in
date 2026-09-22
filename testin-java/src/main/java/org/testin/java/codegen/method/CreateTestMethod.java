@@ -76,10 +76,10 @@ public class CreateTestMethod implements GenAction {
                 : Bundle.message("codegen.no.method.many", String.valueOf(without.size()));
     }
 
-    private static @NotNull String named(final @NotNull List<TestCaseDto> cases) {
-        final @NotNull String names = cases.stream().limit(3).map(TestCaseDto::getDescription).collect(Collectors.joining("\", \"", "\"", "\""));
+    private static @NotNull String named(final @NotNull List<TestCaseDto> testCases) {
+        final @NotNull String names = testCases.stream().limit(3).map(TestCaseDto::getDescription).collect(Collectors.joining("\", \"", "\"", "\""));
 
-        return cases.size() > 3 ? Bundle.message("codegen.named.and.more", names, String.valueOf(cases.size() - 3)) : names;
+        return testCases.size() > 3 ? Bundle.message("codegen.named.and.more", names, String.valueOf(testCases.size() - 3)) : names;
     }
 
     private static boolean alreadyImportsTest(final @NotNull PsiImportList imports) {
@@ -142,27 +142,27 @@ public class CreateTestMethod implements GenAction {
         else Logger.error("FQCN list is too short to generate a method: " + fqcn);
     }
 
-    private void createMethods(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
-        final @NotNull Optional<Target> first = parse(Fqcn.ofMethod(cases.getFirst()));
+    private void createMethods(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        final @NotNull Optional<Target> first = parse(Fqcn.ofMethod(testCases.getFirst()));
         if (first.isEmpty()) return;
 
         final @NotNull Target target = first.orElseThrow();
-        Logger.info("Creating " + testMethods(cases.size()) + " in " + target.path());
+        Logger.info("Creating " + testMethods(testCases.size()) + " in " + target.path());
 
         GeneratedClass.findOrWrite(p, target.packageList(), target.className()).ifPresentOrElse(
-                targetClass -> injectAsText(p, targetClass, cases),
-                () -> cases.forEach(tc -> retryInjectPhysically(p, target.packageList(), target.className(),
+                targetClass -> injectAsText(p, targetClass, testCases),
+                () -> testCases.forEach(tc -> retryInjectPhysically(p, target.packageList(), target.className(),
                         Fqcn.methodNameOf(tc), tc)));
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-016
-    private void injectAsText(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> cases) {
+    private void injectAsText(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> testCases) {
         final @NotNull PsiFile file = targetClass.getContainingFile();
         final @NotNull PsiDocumentManager documents = PsiDocumentManager.getInstance(p);
         final @NotNull Optional<Document> document = Optional.ofNullable(documents.getDocument(file));
 
         if (document.isEmpty()) {
-            oneAtATime(p, targetClass, cases, "it has no document to edit");
+            oneAtATime(p, targetClass, testCases, "it has no document to edit");
             return;
         }
 
@@ -171,11 +171,11 @@ public class CreateTestMethod implements GenAction {
         for (final PsiMethod pm : targetClass.getMethods()) {
             final @NotNull String methodKey = NameSanitizer.methodKey(pm.getName());
 
-            owners.putIfAbsent(methodKey, GeneratedMethod.caseIdOf(pm).orElse(""));
+            owners.putIfAbsent(methodKey, GeneratedMethod.testCaseIdOf(pm).orElse(""));
             byKey.putIfAbsent(methodKey, pm);
         }
 
-        final @NotNull Map<String, PsiMethod> generated = GeneratedMethod.byCaseId(targetClass);
+        final @NotNull Map<String, PsiMethod> generated = GeneratedMethod.byTestCaseId(targetClass);
 
         final @NotNull StringBuilder methods = new StringBuilder();
         final @NotNull List<TestCaseDto> lostTheName = new ArrayList<>();
@@ -183,7 +183,7 @@ public class CreateTestMethod implements GenAction {
         int alreadyThere = 0;
         int adopted = 0;
 
-        for (final TestCaseDto tc : cases) {
+        for (final TestCaseDto tc : testCases) {
             final @NotNull String id = tc.getId().toString();
 
             if (generated.containsKey(id)) {
@@ -217,7 +217,7 @@ public class CreateTestMethod implements GenAction {
         }
 
         if (alreadyThere > 0) {
-            Logger.info(alreadyThere + " of " + testMethods(cases.size())
+            Logger.info(alreadyThere + " of " + testMethods(testCases.size())
                     + " already in " + targetClass.getQualifiedName());
         }
 
@@ -237,7 +237,7 @@ public class CreateTestMethod implements GenAction {
 
         final @NotNull Optional<PsiElement> closingBrace = Optional.ofNullable(targetClass.getRBrace());
         if (closingBrace.isEmpty()) {
-            oneAtATime(p, targetClass, cases, "it has no closing brace to write before");
+            oneAtATime(p, targetClass, testCases, "it has no closing brace to write before");
             return;
         }
 
@@ -270,12 +270,12 @@ public class CreateTestMethod implements GenAction {
                 Bundle.message("codegen.name.taken.message", named(lost)));
     }
 
-    private void oneAtATime(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> cases, final @NotNull String reason) {
-        Logger.warn("Writing " + cases.size() + " methods one at a time into "
+    private void oneAtATime(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> testCases, final @NotNull String reason) {
+        Logger.warn("Writing " + testCases.size() + " methods one at a time into "
                 + targetClass.getQualifiedName() + ": " + reason);
 
         int written = 0;
-        for (final TestCaseDto tc : cases) {
+        for (final TestCaseDto tc : testCases) {
             if (injectMethod(p, targetClass, Fqcn.methodNameOf(tc), tc).isPresent()) written++;
         }
 
@@ -334,7 +334,7 @@ public class CreateTestMethod implements GenAction {
 
             if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, factory);
 
-            if (GeneratedMethod.forCase(targetClass, tc).isPresent()) {
+            if (GeneratedMethod.forTestCase(targetClass, tc).isPresent()) {
                 Logger.info("Method already exists: " + methodName);
                 return Optional.empty();
             }
@@ -345,7 +345,7 @@ public class CreateTestMethod implements GenAction {
                     .findFirst();
 
             if (sameName.isPresent()) {
-                if (GeneratedMethod.caseIdOf(sameName.orElseThrow()).isPresent() || GeneratedMethod.testAnnotationOf(sameName.orElseThrow()).isEmpty())
+                if (GeneratedMethod.testCaseIdOf(sameName.orElseThrow()).isPresent() || GeneratedMethod.testAnnotationOf(sameName.orElseThrow()).isEmpty())
                     reportLostTheName(p, targetClass, List.of(tc));
                 else
                     Logger.info("Method already exists: " + methodName);

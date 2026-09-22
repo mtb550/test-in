@@ -31,20 +31,8 @@ import java.util.Map;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The copy menu's rows, and the one thing about them nothing else can check.
- * <p>
- * Every row is a letter the tester types while the menu is open. Two rows on
- * one letter is the failure this project has a rule against: whichever the
- * menu consults first silently answers for both. It is invisible in review,
- * because the two constants sit twelve lines apart and name different fields
- * (#108).
- */
 public class CopyChoiceTest {
 
-    /**
-     * UC-EDITOR-PANEL-036, Rule-EDITOR-PANEL-158.
-     */
     @Test
     public void noTwoRowsAnswerToTheSameKey() {
         final @NotNull Map<KeyStroke, List<CopyChoice>> byKey = new HashMap<>();
@@ -62,11 +50,6 @@ public class CopyChoiceTest {
                 "two rows of the copy menu answer to one key, so one of them can never be chosen: " + shared);
     }
 
-    /**
-     * Every row but the first copies one attribute, and takes its caption from
-     * it - so a field renamed in {@code TestEditorAttributes} renames the row
-     * with it, rather than leaving this menu saying what it used to be called.
-     */
     @Test
     public void everyRowButAllDetailsIsNamedByTheAttributeItCopies() {
         for (final CopyChoice choice : CopyChoice.values()) {
@@ -81,23 +64,12 @@ public class CopyChoiceTest {
         }
     }
 
-    /**
-     * Every row prints its key, because a menu row that shows no shortcut is one
-     * a tester can only reach with the mouse.
-     */
     @Test
     public void everyRowPrintsItsKey() {
         assertTrue(Arrays.stream(CopyChoice.values()).noneMatch(choice -> choice.getShortcutText().isBlank()),
                 "a copy row has no key to print, so the menu shows a blank where its shortcut goes");
     }
 
-    /**
-     * UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-208.
-     * <p>
-     * The class name is copied as Java writes it. The row copied the grid's
-     * " > " breadcrumb, which matches nothing in a search or a stack trace
-     * (#312, A59).
-     */
     @Test
     public void theClassNameIsCopiedDotted() {
         final @NotNull TestSetDirectoryDto set = new TestSetDirectoryDto();

@@ -18,7 +18,6 @@ package org.testin.git;
 
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.util.Mapper;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
@@ -36,22 +35,10 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Everything the pending-commits review shows comes from this class, and it had
- * no tests. It is deliberately IDE-free - it takes the before and after file
- * contents as plain strings - so the whole review model can be built and
- * asserted here, without a repository or a change list.
- */
 public class PendingChangeFactoryTest {
 
     private static final Path PATH = Path.of("Test Cases", "login", "case.tc");
 
-    /**
-     * {@link Mapper} is a project service with a private constructor, so the
-     * platform normally builds it. It holds nothing but a configured Jackson
-     * mapper, so one built here behaves identically - and reaching for it this
-     * way keeps the production class unchanged for the sake of a test.
-     */
     private static TestCaseDto testCase(final String description) {
         return TestCaseDto.builder()
                 .description(description)
@@ -124,13 +111,6 @@ public class PendingChangeFactoryTest {
                 Set.of(ChangeType.CHANGE_PRIORITY, ChangeType.CHANGE_MODULE));
     }
 
-    /**
-     * Git reports a file as modified for reasons no compared field shows - a
-     * reorder, an audit stamp, a reformat. It is still a change, and the commit
-     * stages only what the review lists, so dropping it would leave a modified
-     * file that nothing in the plugin could ever commit. It gets one row saying
-     * as much (#66).
-     */
     @Test
     public void aModifiedFileWithNoComparedFieldStillGetsARow() {
         final TestCaseDto unchanged = testCase("identical on both sides");
@@ -143,33 +123,24 @@ public class PendingChangeFactoryTest {
         assertEquals(change.fieldChanges().getFirst().changeType(), ChangeType.CHANGE_FILE);
     }
 
-    /**
-     * A verdict is its own change, named by the case it is about: since #305 a
-     * run's results are one file each, so what a tester reviews is the result
-     * that changed rather than a line saying a run changed somehow.
-     */
     @Test
     public void aResultIsItsOwnKindOfChange() {
-        final UUID caseId = UUID.randomUUID();
+        final UUID testCaseId = UUID.randomUUID();
         final String before = """
-                {"id":"%s","status":"PENDING"}""".formatted(caseId);
+                {"id":"%s","status":"PENDING"}""".formatted(testCaseId);
         final String after = """
-                {"id":"%s","status":"PASSED","actualResult":"Signed in"}""".formatted(caseId);
+                {"id":"%s","status":"PASSED","actualResult":"Signed in"}""".formatted(testCaseId);
 
         final PendingChange change = PendingChangeFactory.fromFile(
-                DiffType.MODIFIED, before, after, Path.of("Test Runs", "cycle 4", caseId + ".ri"), RealMapper.build(), id -> Optional.empty());
+                DiffType.MODIFIED, before, after, Path.of("Test Runs", "cycle 4", testCaseId + ".ri"), RealMapper.build(), id -> Optional.empty());
 
         assertEquals(change.subject(), ChangeSubject.RUN_ITEM);
-        assertEquals(change.testCaseId(), caseId.toString(), "the result says which case it is about");
+        assertEquals(change.testCaseId(), testCaseId.toString(), "the result says which case it is about");
         assertFalse(change.isRevertible(), "a verdict is a record of work, not an edit to undo");
         assertFalse(change.fieldChanges().isEmpty(), "and the row says what the verdict became");
         assertEquals(change.fieldChanges().getFirst().newValue(), "Passed");
     }
 
-    /**
-     * A run's own facts are in its marker, so a .tr that changed says which of
-     * them did - what used to be one "the run changed" line (#305, D6).
-     */
     @Test
     public void aRunsMarkerSaysWhichOfItsFactsChanged() {
         final PendingChange change = PendingChangeFactory.fromFile(
@@ -183,11 +154,6 @@ public class PendingChangeFactoryTest {
                 "the configuration the tester changed is a row: " + change.fieldChanges());
     }
 
-    /**
-     * A marker carries no test data, and it is still a change: archiving a
-     * project is a marker edit and nothing else, so a review that hid markers
-     * left the tester unable to commit it.
-     */
     @Test
     public void aMarkerChangeIsListedWithItsStatus() {
         final PendingChange change = PendingChangeFactory.fromFile(
@@ -207,11 +173,6 @@ public class PendingChangeFactoryTest {
         assertEquals(status.newValue(), "ARCHIVED");
     }
 
-    /**
-     * A revision that is absent when it should be there is a broken change, not
-     * an empty one: reading it as a default test case would show the tester a
-     * diff against a case that never existed.
-     */
     @Test
     public void aMissingRevisionFailsByName() {
         final TestCaseDto present = testCase("only one side survived");
@@ -229,11 +190,6 @@ public class PendingChangeFactoryTest {
                 DiffType.DELETED, "", json(present), PATH, RealMapper.build(), id -> Optional.empty()));
     }
 
-    /**
-     * Every diff can name the test case it is about, whichever side of the
-     * change survives it. The review shows that description on every row, so a
-     * diff that could not answer would be a row with no case on it.
-     */
     @Test
     public void everyKindOfChangeCanNameItsTestCase() {
         final TestCaseDto added = testCase("added");
@@ -250,16 +206,10 @@ public class PendingChangeFactoryTest {
                 .name(), "after", "a modification is about the case as it is now");
     }
 
-    /**
-     * The round trip the review depends on: what a test case is written as on
-     * disk has to come back as the same test case, or every diff is noise.
-     */
     @Test
     public void aTestCaseSurvivesBeingWrittenAndReadBack() {
         final TestCaseDto original = testCase("survives the round trip");
 
-        // Read back as the side a change keeps - the committed one, which a
-        // deletion carries.
         final PendingChange diff = PendingChangeFactory.fromFile(
                 DiffType.DELETED, json(original), "", PATH, RealMapper.build(), id -> Optional.empty());
 

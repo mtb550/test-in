@@ -22,18 +22,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * A tester's text, turned into a Java string literal.
- * <p>
- * This exists because the generated {@code @Test} annotation is built as text,
- * and text that is not a legal Java literal does not fail anywhere: the parser
- * keeps what it was given, the class stops compiling, and every case in that
- * test set stops running with nothing said.
- * <p>
- * <b>The quotes are part of the answer.</b> That is the whole of what these
- * assert, and it is what went wrong: a caller wrapped this in quotes of its own
- * and wrote {@code description = ""verify login""} into a real generated class.
- */
 public class JavaLiteralTest {
 
     @Test
@@ -48,23 +36,17 @@ public class JavaLiteralTest {
 
     @Test
     public void aWindowsPathDoesNotBecomeAnIllegalEscape() {
-        // clear C:\Users\temp - \U is not a legal Java escape and the class
-        // stopped compiling; C:\temp silently became a tab.
         assertEquals(JavaLiteral.of("clear C:\\Users\\temp"), "\"clear C:\\\\Users\\\\temp\"");
     }
 
     @Test
     public void aNewlineIsEscapedRatherThanWritten() {
-        // A description typed across two lines. Written raw it splits the
-        // literal in half and the annotation never parses.
         assertEquals(JavaLiteral.of("verify citizen\nlogin successfully"),
                 "\"verify citizen\\nlogin successfully\"");
     }
 
     @Test
     public void punctuationIsCarriedThroughUntouched() {
-        // The comma and the bracket are what the old text-splicing ended the
-        // value at; nothing here has to treat them specially.
         assertEquals(JavaLiteral.of("Login, then log out (as admin)"),
                 "\"Login, then log out (as admin)\"");
     }

@@ -21,16 +21,6 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
-/**
- * The escaping the bulk editors write their JSON in (#64).
- * <p>
- * This is the highest-stakes logic in those dialogs: it decides what goes back
- * into storage. The formatting rule in CLAUDE.md is that stored JSON is
- * byte-identical to what the tester typed. So a value nobody touched has to
- * survive the round trip unchanged. The dialogs rely on that, because they
- * compare the escaped original against the editor text to decide whether a row
- * was edited at all.
- */
 public class BulkJsonEditorTest {
 
     @Test
@@ -49,19 +39,11 @@ public class BulkJsonEditorTest {
 
     @Test
     public void aBackslashBeforeAQuoteSurvivesTheRoundTrip() {
-        // The order the two replacements run in decides this one: unescaping the
-        // quote before the backslash would turn two backslashes followed by a
-        // quote into a quote that was never typed.
         final String original = "ends with a backslash \\ then \"quoted\"";
 
         assertEquals(BulkJsonEditor.unescapeJson(BulkJsonEditor.escapeJson(original)), original);
     }
 
-    /**
-     * The case that used to be lossy on purpose. A line break became a space,
-     * so a tester who edited one row of a multi-line expected result saved it
-     * as one line and was told nothing.
-     */
     @Test
     public void newlinesSurviveTheRoundTrip() {
         final String original = "first line\nsecond line";
@@ -71,12 +53,6 @@ public class BulkJsonEditorTest {
         assertEquals(BulkJsonEditor.unescapeJson(escaped), original);
     }
 
-    /**
-     * The pair that decides whether the escape can be unescaped by replacing.
-     * It cannot: a backslash followed by an n is written as two backslashes and
-     * an n, and a text replacement that looks for the escape finds it inside
-     * that.
-     */
     @Test
     public void aBackslashFollowedByAnNIsNotALineBreak() {
         final String original = "a windows path C:\\next and a real\nbreak";
@@ -93,8 +69,6 @@ public class BulkJsonEditorTest {
 
     @Test
     public void anUntouchedValueComparesEqualToItsEscapedSelf() {
-        // How both dialogs decide a row was not edited. If this ever stops
-        // holding, every row is written back and multi-line values flatten.
         for (final String value : new String[]{"", "plain", "with \"quotes\"", "with \\ backslash", "trailing ", "two\nlines", "a \\n that is not a break"}) {
             final String escaped = BulkJsonEditor.escapeJson(value);
             assertEquals(BulkJsonEditor.escapeJson(BulkJsonEditor.unescapeJson(escaped)), escaped, "for: " + value);
@@ -103,8 +77,6 @@ public class BulkJsonEditorTest {
 
     @Test
     public void anEmptyValueEscapesToNothing() {
-        // A field the tester left blank is "" on the DTO, which is what the
-        // escapes now take. This used to pin a null they no longer accept (#71).
         assertEquals(BulkJsonEditor.escapeJson(""), "");
         assertEquals(BulkJsonEditor.unescapeJson(""), "");
     }

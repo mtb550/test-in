@@ -19,7 +19,8 @@ package org.testin.lightmode;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.application.WriteIntentReadAction;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionUiKind;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.WindowStateService;
@@ -31,11 +32,12 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.Animator;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.ActionSystem;
 import org.testin.actions.Declared;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.CardHoverAction;
 import org.testin.editor.HoverButton;
-import org.testin.editor.ShownCaseAction;
+import org.testin.editor.ShownTestCaseAction;
 import org.testin.editor.run.ExecutionControl;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.components.StartExecutionBtn;
@@ -117,9 +119,9 @@ final class LightModeWindow {
     private final @NotNull TitleBarBtn stop = new TitleBarBtn(ExecutionControl.STOP.getLabel(), ExecutionControl.STOP.getIcon());
     private final @NotNull JBLabel counter = new JBLabel();
 
-    private final @NotNull Font setFont = CaseFont.label();
-    private final @NotNull Font descriptionFont = CaseFont.description();
-    private final @NotNull Font expectedFont = CaseFont.body();
+    private final @NotNull Font setFont = TestCaseFont.label();
+    private final @NotNull Font descriptionFont = TestCaseFont.description();
+    private final @NotNull Font expectedFont = TestCaseFont.body();
 
     private final @NotNull JBLabel set = new JBLabel();
     private final @NotNull JTextArea description = Prose.of(descriptionFont, JBUI.CurrentTheme.Label.foreground());
@@ -129,11 +131,11 @@ final class LightModeWindow {
     private final @NotNull JBLabel idle = new JBLabel(Bundle.message("light.idle"), SwingConstants.CENTER);
 
     private final @NotNull JBLabel chosen = new JBLabel();
-    private final @NotNull SlidingPanel caseView = new SlidingPanel(new BorderLayout());
+    private final @NotNull SlidingPanel testCaseView = new SlidingPanel(new BorderLayout());
     private final @NotNull Disposable motionScope = Disposer.newDisposable("Testin light mode motion");
-    private final @NotNull CaseDetails details;
-    private final @NotNull JBPanel<?> underCase = new JBPanel<>(new BorderLayout());
-    private final @NotNull JBLabel caseClock = clock(Bundle.message("light.case.clock"));
+    private final @NotNull TestCaseDetails details;
+    private final @NotNull JBPanel<?> underTestCase = new JBPanel<>(new BorderLayout());
+    private final @NotNull JBLabel testCaseClock = clock(Bundle.message("light.case.clock"));
     private final @NotNull JBLabel runClock = clock(Bundle.message("light.run.clock"));
     private final @NotNull JBPanel<?> strip = new JBPanel<>(new BorderLayout());
     private final @NotNull JBPanel<?> setLine = new JBPanel<>(new GridBagLayout());
@@ -142,7 +144,7 @@ final class LightModeWindow {
     private final @NotNull JComponent verdictRow = verdictButtons();
     private final @NotNull StatusBarBase statusBar = new StatusBarBase(new StatusBarItem[0]);
     private final @NotNull ViewMenuBtn viewMenu = new ViewMenuBtn(this::applyView);
-    private @NotNull Optional<UUID> shownCase = Optional.empty();
+    private @NotNull Optional<UUID> shownTestCase = Optional.empty();
     private @NotNull Optional<Animator> heightMotion = Optional.empty();
     private @NotNull Optional<Animator> slideMotion = Optional.empty();
     private @NotNull Optional<FailureForm> capture = Optional.empty();
@@ -155,7 +157,7 @@ final class LightModeWindow {
 
     LightModeWindow(final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
         this.editor = editor;
-        this.details = new CaseDetails();
+        this.details = new TestCaseDetails();
         this.onClosed = onClosed;
 
         frame.setUndecorated(true);
@@ -181,7 +183,7 @@ final class LightModeWindow {
     }
 
     private static @NotNull JComponent iconBefore(final @NotNull Icon icon, final @NotNull JComponent text) {
-        return JBUI.Panels.simplePanel(CaseDetails.GAP, 0).addToLeft(new JBLabel(icon)).addToCenter(text).andTransparent();
+        return JBUI.Panels.simplePanel(TestCaseDetails.GAP, 0).addToLeft(new JBLabel(icon)).addToCenter(text).andTransparent();
     }
 
     private static @NotNull JBLabel clock(final @NotNull String meaning) {
@@ -198,16 +200,16 @@ final class LightModeWindow {
     }
 
     void refresh() {
-        final @NotNull List<TestCaseDto> cases = editor.getCurrentTestCases();
+        final @NotNull List<TestCaseDto> testCases = editor.getCurrentTestCases();
         final int index = editor.getCurrentlyExecutingIndex();
-        final boolean executing = index >= 0 && index < cases.size();
+        final boolean executing = index >= 0 && index < testCases.size();
 
         counter.setText(executing
-                ? Bundle.message("light.counter.position", String.valueOf(index + 1), String.valueOf(cases.size()))
-                : Bundle.message("light.counter.cases", String.valueOf(cases.size())));
+                ? Bundle.message("light.counter.position", String.valueOf(index + 1), String.valueOf(testCases.size()))
+                : Bundle.message("light.counter.cases", String.valueOf(testCases.size())));
 
         idle.setVisible(!executing);
-        caseView.setVisible(executing);
+        testCaseView.setVisible(executing);
         footer.setVisible(executing);
 
         start.setVisible(!editor.isExecuting());
@@ -217,10 +219,10 @@ final class LightModeWindow {
         start.setEnabled(editor.canStartManualExecution());
         start.setToolTipText(StartExecutionBtn.tooltipFor(editor));
 
-        final @NotNull Optional<UUID> wasShowing = shownCase;
-        if (executing) showCase(cases.get(index));
+        final @NotNull Optional<UUID> wasShowing = shownTestCase;
+        if (executing) showTestCase(testCases.get(index));
 
-        if (!executing || !shownCase.equals(wasShowing)) capture = Optional.empty();
+        if (!executing || !shownTestCase.equals(wasShowing)) capture = Optional.empty();
 
         if (capture.isPresent()) applyParts();
         else showCapture();
@@ -232,7 +234,7 @@ final class LightModeWindow {
     }
 
     void tick() {
-        caseClock.setText(Display.formatCaseClock(editor.getCurrentCaseElapsed()));
+        testCaseClock.setText(Display.formatTestCaseClock(editor.getCurrentTestCaseElapsed()));
         runClock.setText(Display.formatRunClock(editor.getElapsed()));
     }
 
@@ -271,11 +273,11 @@ final class LightModeWindow {
     }
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-201
-    private void showCase(final @NotNull TestCaseDto tc) {
-        final boolean arrived = shownCase.map(previous -> !previous.equals(tc.getId())).orElse(false);
-        shownCase = Optional.of(tc.getId());
+    private void showTestCase(final @NotNull TestCaseDto tc) {
+        final boolean arrived = shownTestCase.map(previous -> !previous.equals(tc.getId())).orElse(false);
+        shownTestCase = Optional.of(tc.getId());
 
-        if (arrived) caseView.captureLeaving();
+        if (arrived) testCaseView.captureLeaving();
 
         set.setText(tc.getParent().getName());
         description.setText(TestEditorAttributes.DESCRIPTION.displayValue(tc));
@@ -283,18 +285,18 @@ final class LightModeWindow {
 
         details.show(tc);
 
-        if (arrived) slideCaseIn();
+        if (arrived) slideTestCaseIn();
     }
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-201, Rule-EDITOR-PANEL-204
-    private void slideCaseIn() {
-        if (!caseView.hasSomethingToSlide()) return;
+    private void slideTestCaseIn() {
+        if (!testCaseView.hasSomethingToSlide()) return;
 
         slideMotion.ifPresent(Animator::dispose);
 
         slideMotion = Motion.run(motionScope, "Testin light mode case",
-                caseView::setTravelled,
-                () -> caseView.setTravelled(1.0));
+                testCaseView::setTravelled,
+                () -> testCaseView.setTravelled(1.0));
     }
 
     void close() {
@@ -336,7 +338,7 @@ final class LightModeWindow {
             bind(status.getMenuEntry().shortcut(), "testin.lightMode." + status.name(), () -> judge(status));
         }
 
-        KEYED.forEach(button -> ShownCaseAction.bind(editor.getProject(), button, this::caseForButtons, (action, tc) -> action.executeFor(editor, tc), frame.getRootPane()));
+        KEYED.forEach(button -> ShownTestCaseAction.bind(editor.getProject(), button, this::testCaseForButtons, (action, tc) -> action.executeFor(editor, tc), frame.getRootPane()));
 
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
@@ -378,7 +380,7 @@ final class LightModeWindow {
     }
 
     private @NotNull Font scaled(final @NotNull Font base) {
-        return CaseFont.zoomed(base, zoom);
+        return TestCaseFont.zoomed(base, zoom);
     }
 
     private void bind(final @NotNull KeyStroke key, final @NotNull String name, final @NotNull Runnable action) {
@@ -470,13 +472,12 @@ final class LightModeWindow {
     }
 
     // UC-EDITOR-PANEL-046
-    @SuppressWarnings("UnstableApiUsage")
     private void showCapture() {
-        underCase.removeAll();
+        underTestCase.removeAll();
 
-        WriteIntentReadAction.run(() -> underCase.add(capture.map(form -> (JComponent) form).orElse(details), BorderLayout.CENTER));
+        ActionSystem.perform(frame.getRootPane(), ActionPlaces.UNKNOWN, ActionUiKind.NONE, () -> underTestCase.add(capture.map(form -> (JComponent) form).orElse(details), BorderLayout.CENTER));
 
-        statusBar.updateItems(capture.isPresent() ? commitKeys() : caseKeys());
+        statusBar.updateItems(capture.isPresent() ? commitKeys() : testCaseKeys());
 
         applyParts();
     }
@@ -510,7 +511,7 @@ final class LightModeWindow {
     private void showButtons() {
         buttons.removeAll();
 
-        caseForButtons().ifPresent(tc -> {
+        testCaseForButtons().ifPresent(tc -> {
             final @NotNull Project p = editor.getProject();
             final @NotNull Automated automation = Services.getInstance(p, AutomationState.class).of(tc.getId());
 
@@ -523,19 +524,19 @@ final class LightModeWindow {
     }
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-245
-    private @NotNull Optional<TestCaseDto> caseForButtons() {
-        return capture.isPresent() ? Optional.empty() : executingCase();
+    private @NotNull Optional<TestCaseDto> testCaseForButtons() {
+        return capture.isPresent() ? Optional.empty() : executingTestCase();
     }
 
-    private @NotNull Optional<TestCaseDto> executingCase() {
-        final @NotNull List<TestCaseDto> cases = editor.getCurrentTestCases();
+    private @NotNull Optional<TestCaseDto> executingTestCase() {
+        final @NotNull List<TestCaseDto> testCases = editor.getCurrentTestCases();
         final int index = editor.getCurrentlyExecutingIndex();
 
-        return index >= 0 && index < cases.size() ? Optional.of(cases.get(index)) : Optional.empty();
+        return index >= 0 && index < testCases.size() ? Optional.of(testCases.get(index)) : Optional.empty();
     }
 
     private @NotNull Optional<TestRunItems> executingItem() {
-        return executingCase()
+        return executingTestCase()
                 .flatMap(tc -> editor.runItem(tc.getId()))
                 .filter(item -> !item.isRemoved());
     }
@@ -644,7 +645,7 @@ final class LightModeWindow {
         onOneRow.gridy = 0;
 
         setLine.setOpaque(false);
-        setLine.setBorder(JBUI.Borders.emptyBottom(CaseDetails.GAP));
+        setLine.setBorder(JBUI.Borders.emptyBottom(TestCaseDetails.GAP));
         setLine.add(set, onOneRow);
         setLine.add(chosen, onOneRow);
         onOneRow.weightx = 1;
@@ -652,12 +653,12 @@ final class LightModeWindow {
         onOneRow.weightx = 0;
         setLine.add(buttons, onOneRow);
 
-        underCase.setOpaque(false);
+        underTestCase.setOpaque(false);
 
-        caseView.setOpaque(false);
-        caseView.add(setLine, BorderLayout.NORTH);
-        caseView.add(text, BorderLayout.CENTER);
-        caseView.add(underCase, BorderLayout.SOUTH);
+        testCaseView.setOpaque(false);
+        testCaseView.add(setLine, BorderLayout.NORTH);
+        testCaseView.add(text, BorderLayout.CENTER);
+        testCaseView.add(underTestCase, BorderLayout.SOUTH);
 
         final @NotNull JBPanel<?> panel = new JBPanel<>(new BorderLayout()) {
             @Override
@@ -668,7 +669,7 @@ final class LightModeWindow {
 
         panel.setBorder(JBUI.Borders.empty(14));
         panel.add(idle, BorderLayout.CENTER);
-        panel.add(caseView, BorderLayout.NORTH);
+        panel.add(testCaseView, BorderLayout.NORTH);
 
         return panel;
     }
@@ -699,13 +700,13 @@ final class LightModeWindow {
     private @NotNull JComponent durationStrip() {
         strip.setBorder(JBUI.Borders.empty(0, 10, 8, 10));
         strip.setOpaque(false);
-        strip.add(caseClock, BorderLayout.WEST);
+        strip.add(testCaseClock, BorderLayout.WEST);
         strip.add(runClock, BorderLayout.EAST);
 
         return strip;
     }
 
-    private StatusBarItem @NotNull [] caseKeys() {
+    private StatusBarItem @NotNull [] testCaseKeys() {
         final @NotNull List<StatusBarItem> items = new ArrayList<>();
         items.add(StatusBarShortcut.hint(Shortcuts.ToggleDetails.getShortcutText(), Bundle.message("shortcut.details")));
         items.add(StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), Bundle.message("shortcut.close")));
@@ -721,7 +722,7 @@ final class LightModeWindow {
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-245
     private @NotNull StatusBarItem keyHint(final @NotNull CardHoverAction button) {
-        final @NotNull CardHoverAction now = caseForButtons()
+        final @NotNull CardHoverAction now = testCaseForButtons()
                 .map(tc -> button.gestureOn(editor.getProject(), tc))
                 .orElse(button);
 

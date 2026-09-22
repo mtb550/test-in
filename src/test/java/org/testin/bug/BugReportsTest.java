@@ -29,14 +29,10 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Which run items have a bug report on the way, and why Report Bug is off
- * (#28).
- */
 public class BugReportsTest {
 
     private static final BugReports.RunItem ITEM = new BugReports.RunItem(Path.of("NAFATH", "Test Runs", "Sprint 7"), UUID.randomUUID());
-    private static final BugReports.RunItem SAME_CASE_OTHER_RUN = new BugReports.RunItem(Path.of("NAFATH", "Test Runs", "Sprint 8"), ITEM.id());
+    private static final BugReports.RunItem SAME_TEST_CASE_OTHER_RUN = new BugReports.RunItem(Path.of("NAFATH", "Test Runs", "Sprint 8"), ITEM.id());
 
     private static TestRunItems failed() {
         return TestRunItems.builder().id(ITEM.id()).status(TestStatus.FAILED).build();
@@ -74,14 +70,14 @@ public class BugReportsTest {
     @Test
     public void anOpenReportKeepsEveryOtherRunItemWaiting() {
         final BugReports reports = new BugReports();
-        reports.begin(SAME_CASE_OTHER_RUN);
+        reports.begin(SAME_TEST_CASE_OTHER_RUN);
 
         assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.empty(), "one being prepared, even for the same test case in another run, does not hold the others");
 
-        reports.moveTo(SAME_CASE_OTHER_RUN, BugReports.Stage.OPEN);
+        reports.moveTo(SAME_TEST_CASE_OTHER_RUN, BugReports.Stage.OPEN);
         assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.finish.open.report")));
         assertTrue(reports.anotherIsOpen(ITEM));
-        assertFalse(reports.anotherIsOpen(SAME_CASE_OTHER_RUN), "its own dialog is not another one");
+        assertFalse(reports.anotherIsOpen(SAME_TEST_CASE_OTHER_RUN), "its own dialog is not another one");
     }
 
     @Test

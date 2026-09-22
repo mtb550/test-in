@@ -42,10 +42,10 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ExportNotice {
     // UC-SHARE-004, Rule-SHARE-022
-    static void show(final @NotNull Project p, final @NotNull File file, final int cases) {
+    static void show(final @NotNull Project p, final @NotNull File file, final int testCases) {
         ApplicationManager.getApplication().invokeLater(() -> {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-            notifier.infoWithActions(p, Done.counted(Done.EXPORTED.getOutcome(), cases), file.getName(),
+            notifier.infoWithActions(p, Done.counted(Done.EXPORTED.getOutcome(), testCases), file.getName(),
                     notifier.action(Bundle.message("export.open.file"), () -> open(p, file)), copyPath(p, file));
         });
     }

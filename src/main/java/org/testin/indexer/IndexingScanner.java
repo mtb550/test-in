@@ -63,7 +63,7 @@ final class IndexingScanner {
     private final @NotNull Project p;
     private final @NotNull IndexerDataStore store;
 
-    private static boolean looksLikeACaseFile(final @NotNull Path file) {
+    private static boolean looksLikeATestCaseFile(final @NotNull Path file) {
         return FileKind.TEST_CASE.idIn(file).isPresent();
     }
 
@@ -76,16 +76,16 @@ final class IndexingScanner {
     }
 
     // Rule-INTERNAL-011
-    static @NotNull List<TestRunItems> inCaseOrder(final @NotNull List<TestRunItems> results, final @NotNull ScannedProject scanned) {
+    static @NotNull List<TestRunItems> inTestCaseOrder(final @NotNull List<TestRunItems> results, final @NotNull ScannedProject scanned) {
         final @NotNull Map<UUID, TestRunItems> byId = new LinkedHashMap<>();
         results.forEach(item -> byId.put(item.getId(), item));
 
-        final @NotNull List<TestCaseDto> cases = results.stream()
+        final @NotNull List<TestCaseDto> testCases = results.stream()
                 .map(item -> scanned.getTestCasesById().get(item.getId()))
                 .filter(Objects::nonNull)
                 .toList();
 
-        final @NotNull List<TestRunItems> ordered = TestCaseOrder.ordered(cases).stream()
+        final @NotNull List<TestRunItems> ordered = TestCaseOrder.ordered(testCases).stream()
                 .map(tc -> byId.remove(tc.getId()))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -190,7 +190,7 @@ final class IndexingScanner {
             reportDamaged(tp.getName(), Services.getInstance(p, ProjectIndexer.class).takeDamagedMarkers());
             reportUnreadableResults(tp.getName(), scanned.getUnreadableResults());
             reportHandNamedResults(tp.getName(), scanned.getHandNamedResults());
-            reportClashing(tp.getName(), List.copyOf(scanned.getClashingCases()));
+            reportClashing(tp.getName(), List.copyOf(scanned.getClashingTestCases()));
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan project: " + projectPath.getFileName() + " - " + ex.getMessage());
@@ -246,7 +246,7 @@ final class IndexingScanner {
 
             scanned.getTestSets().put(path.toString(), ts);
 
-            final @NotNull List<UUID> caseIds = TestCaseSequenceStore.caseIds(List.of());
+            final @NotNull List<UUID> testCaseIds = TestCaseSequenceStore.testCaseIds(List.of());
             final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
 
             try (Stream<Path> files = Files.list(path)) {
@@ -260,7 +260,7 @@ final class IndexingScanner {
                                 tc.setId(identityOf(filePath, tc));
 
                                 if (scanned.getTestCasesById().put(tc.getId(), tc) != null) {
-                                    scanned.getClashingCases().add(ts.getName() + "/" + filePath.getFileName());
+                                    scanned.getClashingTestCases().add(ts.getName() + "/" + filePath.getFileName());
                                     scanned.getClashingIds().add(tc.getId());
                                 }
 
@@ -269,20 +269,20 @@ final class IndexingScanner {
                                     scanned.getHandNamedFiles().put(tc.getId(), filePath);
                                 }
 
-                                caseIds.add(tc.getId());
+                                testCaseIds.add(tc.getId());
                             } catch (final Exception ex) {
                                 Logger.error("Failed to read test case '" + filePath.toAbsolutePath() +
                                         "': " + ex.getMessage());
 
-                                scanned.getUnreadableCases().computeIfAbsent(path.toString(), ignored -> ConcurrentHashMap.newKeySet())
+                                scanned.getUnreadableTestCases().computeIfAbsent(path.toString(), ignored -> ConcurrentHashMap.newKeySet())
                                         .add(filePath.getFileName().toString());
                             }
                         });
             }
 
-            scanned.getTestSetCaseIds().put(path.toString(), caseIds);
+            scanned.getTestCaseIdsByTestSet().put(path.toString(), testCaseIds);
 
-            indicator.setText(Bundle.message("indexer.progress.test.set", ts.getName(), String.valueOf(caseIds.size())));
+            indicator.setText(Bundle.message("indexer.progress.test.set", ts.getName(), String.valueOf(testCaseIds.size())));
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test set '" +
@@ -340,7 +340,7 @@ final class IndexingScanner {
 
     private boolean holdsTestCases(final @NotNull Path dirPath) {
         try (Stream<Path> files = Files.list(dirPath)) {
-            return files.filter(Files::isRegularFile).anyMatch(IndexingScanner::looksLikeACaseFile);
+            return files.filter(Files::isRegularFile).anyMatch(IndexingScanner::looksLikeATestCaseFile);
         } catch (final Exception unreadable) {
             return false;
         }
@@ -456,6 +456,6 @@ final class IndexingScanner {
             }
         }
 
-        return inCaseOrder(read, scanned);
+        return inTestCaseOrder(read, scanned);
     }
 }

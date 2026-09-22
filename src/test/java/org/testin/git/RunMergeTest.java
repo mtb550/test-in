@@ -22,14 +22,6 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * What happens when two testers execute one cycle and both push (#305, Q-D, Q-E).
- * <p>
- * Judging different cases is no longer a conflict at all - their verdicts are in
- * different files. What is left is the two things they both write: the same
- * case's result, and the run's own marker. Neither asks the tester anything here,
- * and these are the rules that decide instead.
- */
 public class RunMergeTest {
 
     private static final String MINE_ITEM = """
@@ -80,11 +72,6 @@ public class RunMergeTest {
               "executionEndedAt" : "Monday 14-09-2026 At 11:35:00 [Asia/Riyadh]"
             }""";
 
-    /**
-     * Q-E. A verdict travels whole: the later one wins with everything it
-     * recorded, so nobody ends up with a Passed carrying the other tester's
-     * stacktrace.
-     */
     @Test
     public void theLaterVerdictWinsWhole() {
         final Merge merge = RunItemMerge.of(RealMapper.build(), MINE_ITEM, THEIRS_ITEM);
@@ -113,10 +100,6 @@ public class RunMergeTest {
         assertEquals(merge.merged().path("status").asText(), "PASSED");
     }
 
-    /**
-     * Q-D. A cycle two people executed ran from the first thing either of them
-     * did to the last, and a run somebody completed is not created again.
-     */
     @Test
     public void aRunRanFromTheFirstStartToTheLastStop() {
         final Merge merge = RunMarkerMerge.of(RealMapper.build(), BASE_MARKER, MINE_MARKER, THEIRS_MARKER);
@@ -128,10 +111,6 @@ public class RunMergeTest {
         assertEquals(merge.merged().path("modifiedBy").asText(), "Sara", "the audit block takes the later edit");
     }
 
-    /**
-     * What the two testers answered merges key by key: a question only one of
-     * them answered is not a disagreement.
-     */
     @Test
     public void theAnswersTheyEachGaveAreBothKept() {
         final Merge merge = RunMarkerMerge.of(RealMapper.build(), BASE_MARKER, MINE_MARKER, THEIRS_MARKER);
@@ -141,10 +120,6 @@ public class RunMergeTest {
         assertEquals(merge.merged().path("configuration").path("PLATFORM").asText(), "Web", "neither touched it");
     }
 
-    /**
-     * The one thing left for the tester: a question both of them answered, and
-     * differently.
-     */
     @Test
     public void onlyAFieldBothChangedIsAskedAbout() {
         final String theirs = THEIRS_MARKER.replace("\"PLATFORM\" : \"Web\"", "\"PLATFORM\" : \"Mobile\"");

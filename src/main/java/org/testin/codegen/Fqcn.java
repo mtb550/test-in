@@ -23,6 +23,7 @@ import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.util.FromContentModule;
 import org.testin.util.NameSanitizer;
 
 import java.util.ArrayList;
@@ -53,12 +54,14 @@ public final class Fqcn {
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-002
+    @FromContentModule
     public static @NotNull String classOfMethod(final @NotNull TestCaseDto tc) {
         final @NotNull List<String> method = ofMethod(tc);
         return method.isEmpty() ? "" : String.join(".", method.subList(0, method.size() - 1));
     }
 
     // UC-CODEGEN-001, Rule-CODEGEN-007
+    @FromContentModule
     public static @NotNull List<String> ofClass(final @NotNull DirectoryDto dir) {
         final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(dir.getPath2());
 

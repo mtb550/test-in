@@ -26,15 +26,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The headline counts every report format shares (#48).
- * <p>
- * These exist because the three generators counted for themselves and drifted:
- * PDF and Word treated pending as PENDING + UNTESTED, HTML counted PENDING
- * alone. Completing a run turns every PENDING case into UNTESTED, so on exactly
- * the runs a reader cares about - the finished ones - the HTML report claimed
- * nothing was outstanding while the other two reported the truth.
- */
 public class TestRunSummaryTest {
 
     private static TestRunItems item(final TestStatus status) {
@@ -53,16 +44,6 @@ public class TestRunSummaryTest {
         return TestRunSummary.of(results).passRate();
     }
 
-    /**
-     * UC-REPORT-001, Rule-REPORT-003.
-     * <p>
-     * The rate rounds rather than truncating, which is what a reader expects of
-     * a percentage and what every other tool answers.
-     * <p>
-     * It was integer division, so two passed of three read 66% and one of three
-     * read 33% - one whole point short, in every report that divides by three
-     * (#66, finding 35).
-     */
     @Test
     public void thePassRateRoundsRatherThanTruncating() {
         assertEquals(rateOf(2, 1), 67, "two passed of three is 66.67%, which reads 67");
@@ -72,13 +53,8 @@ public class TestRunSummaryTest {
         assertEquals(rateOf(0, 1), 0, "nothing that ran passed");
     }
 
-    /**
-     * A recorded result counts whatever happened to its test case since (#306):
-     * a deleted case's judged row counts under its verdict. Only a row never
-     * judged counts under Removed, and stays outside the pass rate.
-     */
     @Test
-    public void aDeletedCaseCountsUnderItsVerdictOnceJudgedAndUnderRemovedOtherwise() {
+    public void aDeletedTestCaseCountsUnderItsVerdictOnceJudgedAndUnderRemovedOtherwise() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
                 item(TestStatus.PASSED),
                 item(TestStatus.FAILED),
@@ -93,7 +69,6 @@ public class TestRunSummaryTest {
 
     @Test
     public void untestedCountsBothWaysOfNotHavingBeenRun() {
-        // The regression: a completed run holds UNTESTED, not PENDING.
         final TestRunSummary summary = TestRunSummary.of(List.of(
                 item(TestStatus.UNTESTED),
                 item(TestStatus.UNTESTED),
@@ -131,12 +106,6 @@ public class TestRunSummaryTest {
         assertEquals(summary.passRate(), 50, "2 of the 4 that ran");
     }
 
-    /**
-     * The headline the reader adds up. Every case in the run is under exactly one
-     * of the five figures printed beneath the total. So a total that is bigger
-     * than their sum is a case the report never explained. That is what a run
-     * holding removed cases printed before they had a tile.
-     */
     @Test
     public void theFiguresUnderTheTotalAddUpToIt() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
@@ -154,11 +123,6 @@ public class TestRunSummaryTest {
                 + summary.untested() + summary.removed(), summary.total());
     }
 
-    /**
-     * The tile appears because something was removed, not because the format
-     * always prints one. Asked here so four generators cannot disagree about
-     * when it shows.
-     */
     @Test
     public void theRemovedTileShowsOnlyWhenThereIsSomethingToShow() {
         final TestRunSummary ordinary = TestRunSummary.of(List.of(
@@ -173,13 +137,8 @@ public class TestRunSummaryTest {
         assertTrue(withRemoved.hasRemoved());
     }
 
-    /**
-     * A removed case was never run, and counting it as outstanding work would
-     * put it in the untested table as well - nobody can carry it forward, the
-     * test case is gone.
-     */
     @Test
-    public void aRemovedCaseIsNeitherUntestedNorExecuted() {
+    public void aRemovedTestCaseIsNeitherUntestedNorExecuted() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
                 item(TestStatus.PASSED),
                 item(TestStatus.REMOVED)));
@@ -197,16 +156,8 @@ public class TestRunSummaryTest {
         assertEquals(summary.passRate(), 0);
     }
 
-    // ------------------------------------------------------- what the rate is of
-
-    /**
-     * The rate measures the cases that were run, not the size of the run. It used
-     * to divide by every case, so building a hundred and running ten reported 10%
-     * even when all ten passed - a number that described how much work was left
-     * rather than how the tests did.
-     */
     @Test
-    public void untestedCasesDoNotDragThePassRateDown() {
+    public void untestedTestCasesDoNotDragThePassRateDown() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
                 item(TestStatus.PASSED),
                 item(TestStatus.PASSED),
@@ -219,10 +170,6 @@ public class TestRunSummaryTest {
         assertEquals(summary.passRate(), 100);
     }
 
-    /**
-     * Blocked counts as run: it was attempted and something stopped it, which is
-     * a result the rate should reflect.
-     */
     @Test
     public void blockedCountsAgainstThePassRate() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
@@ -243,13 +190,6 @@ public class TestRunSummaryTest {
         assertEquals(summary.passRate(), 0);
     }
 
-    // ------------------------------------------------------------ executed by
-
-    /**
-     * Who ran the tests, not who printed the report. The HTML generator used to
-     * put the current tester's name here while PDF and Word read the run — so a
-     * lead exporting someone else's cycle was credited with executing it.
-     */
     @Test
     public void executedByNamesEveryoneWhoRecordedAVerdict() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
@@ -259,7 +199,7 @@ public class TestRunSummaryTest {
     }
 
     @Test
-    public void executedByIgnoresCasesNobodyRan() {
+    public void executedByIgnoresTestCasesNobodyRan() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
                 ranBy("Omar"), item(TestStatus.UNTESTED), ranBy("   ")));
 

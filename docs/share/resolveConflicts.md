@@ -89,14 +89,15 @@ That was the same situation answered two ways, and the way out on screen only
 once.
 
 **A result two testers judged** — kept whole from whoever judged it last. A
-verdict is one tester's account of executing one case: the status, when they
-gave it, what they saw, the stacktrace, the screenshots and the bug they filed.
+verdict is one tester's account of executing one test case: the status, when
+they gave it, what they saw, the stacktrace, the screenshots and the bug they
+filed.
 Those travel together, or they say something nobody recorded, so the later
 `executedAt` takes the file and nothing is asked. Nothing is said either: the
 line naming what was settled belongs to the merge window, and that window opens
-only when a question is left. That is difference 20. Two testers judging **different** cases of one run never conflict
-at all: their verdicts are in
-different files.
+only when a question is left. That is difference 20. Two testers judging
+**different** test cases of one run never conflict at all: their verdicts are
+in different files.
 
 **A run two testers executed** — merged by rule, with nothing to answer: the run
 started when the earlier of the two says it started, ended when the later says it

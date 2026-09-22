@@ -26,18 +26,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Which statuses the tree draws beside a node's name (#66, finding 7).
- * <p>
- * A node in current work says nothing: "Active" beside every test project,
- * every test set and every package is a word the tester reads a hundred times
- * and needed never. Everything else says which it is - an inactive project, a
- * deprecated test set, an archived package.
- * <p>
- * Pinned here because the renderer asks one question of three enums, and a
- * status added to any of them has to answer it. A new constant that forgot
- * would be drawn - or not drawn - by accident.
- */
 public class StatusWorthShowingTest {
 
     private static void assertActiveIs(final @NotNull NodeStatus @NotNull [] values, final @NotNull NodeStatus expected) {
@@ -54,10 +42,6 @@ public class StatusWorthShowingTest {
         assertActiveIs(PackageStatus.values(), PackageStatus.ACTIVE);
     }
 
-    /**
-     * The three that are worth the space, named so the test says what a tester
-     * would see rather than only that the flags differ.
-     */
     @Test
     public void theStatusesATesterSeesAreTheOnesThatAreNotActive() {
         assertFalse(ProjectStatus.INACTIVE.isActive(), "an inactive test project says so beside its name");
@@ -65,10 +49,6 @@ public class StatusWorthShowingTest {
         assertFalse(PackageStatus.ARCHIVED.isActive(), "an archived package says so");
     }
 
-    /**
-     * The status of a node that has none answers active, so an empty marker
-     * draws nothing rather than being asked about.
-     */
     @Test
     public void noStatusAtAllIsNothingToSay() {
         assertTrue(NodeStatus.NONE.isActive(), "a marker with no status has nothing to draw");

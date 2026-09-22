@@ -38,7 +38,7 @@ import java.awt.GridBagLayout;
 import java.util.List;
 import java.util.Optional;
 
-class CaseDetails extends JBPanel<CaseDetails> {
+class TestCaseDetails extends JBPanel<TestCaseDetails> {
     static final int GAP = 10;
 
     private @NotNull Optional<TestCaseDto> shown = Optional.empty();
@@ -47,7 +47,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
 
     private boolean cutOff = false;
 
-    CaseDetails() {
+    TestCaseDetails() {
         super(new GridBagLayout());
         setOpaque(false);
 
@@ -94,7 +94,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-217
     private void addCutOffNotice() {
         final @NotNull JBLabel notice = new JBLabel(Bundle.message("light.cut.off"));
-        notice.setFont(CaseFont.zoomed(CaseFont.label(), zoom));
+        notice.setFont(TestCaseFont.zoomed(TestCaseFont.label(), zoom));
         notice.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
         addRow(EmptyIcon.ICON_16, notice);
@@ -127,7 +127,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
     }
 
     private void addTags(final @NotNull TestCaseDto tc) {
-        final @NotNull List<Badges.Badge> badges = Badges.caseBadges(tc);
+        final @NotNull List<Badges.Badge> badges = Badges.testCaseBadges(tc);
 
         if (badges.isEmpty()) return;
 
@@ -139,7 +139,7 @@ class CaseDetails extends JBPanel<CaseDetails> {
     }
 
     private @NotNull JTextArea prose(final @NotNull String text) {
-        final @NotNull JTextArea area = Prose.of(CaseFont.zoomed(CaseFont.body(), zoom), JBUI.CurrentTheme.Label.foreground());
+        final @NotNull JTextArea area = Prose.of(TestCaseFont.zoomed(TestCaseFont.body(), zoom), JBUI.CurrentTheme.Label.foreground());
         area.setText(text);
 
         return area;

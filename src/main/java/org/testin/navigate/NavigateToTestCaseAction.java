@@ -62,13 +62,13 @@ public class NavigateToTestCaseAction extends DumbAwareAction {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        TestinData.selectedCases(e).stream().findFirst().ifPresent(tc -> execute(p, tc));
+        TestinData.selectedTestCases(e).stream().findFirst().ifPresent(tc -> execute(p, tc));
     }
 
     // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-236
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final @NotNull Optional<TestCaseDto> first = TestinData.selectedCases(e).stream().findFirst();
+        final @NotNull Optional<TestCaseDto> first = TestinData.selectedTestCases(e).stream().findFirst();
         final @NotNull Optional<String> whyNot = first.flatMap(NavigateToTestCaseAction::whyNot);
 
         GrayWithReason.unless(this, e, first.isPresent() && whyNot.isEmpty(), whyNot.orElse(""));

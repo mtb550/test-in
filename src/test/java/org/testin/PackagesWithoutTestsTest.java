@@ -31,36 +31,11 @@ import java.util.stream.Stream;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
-/**
- * Every top-level package either has tests or says here why it has none (#108).
- * <p>
- * The count on its own says nothing - nineteen packages were untested when that
- * issue was written and most of them were actions, which a unit test cannot
- * reach. What is worth knowing is which ones were <b>decided</b> and which ones
- * nobody has looked at, and there is no way to tell those apart from a number.
- * <p>
- * So a package with no tests is listed below with the reason, and one that is
- * not listed fails this test. Adding a package is then a question - what would
- * a test of this say? - asked once, by the build, rather than never.
- * <p>
- * Recorded rather than quietly allowed, which is the same argument
- * {@code ArchitectureTest} makes for its own exception lists.
- */
 public class PackagesWithoutTestsTest {
 
     private static final @NotNull Path MAIN = Path.of("src", "main", "java", "org", "testin");
     private static final @NotNull Path TEST = Path.of("src", "test", "java", "org", "testin");
 
-    /**
-     * Why each of these has no test of its own, measured 11 September 2026.
-     * <p>
-     * Two kinds of answer, and both are reasons rather than excuses: the logic
-     * is already covered from somewhere else, or what the package does is
-     * something only a running IDE can do - open a dialog, delete through the
-     * VFS, paint a window. The second kind names the route that would reach it,
-     * because "it needs an IDE" stopped being the end of the sentence when
-     * {@code ideTest} arrived with this issue.
-     */
     private static final @NotNull Map<String, String> WITHOUT_TESTS = Map.of(
             "creator",
             "NodeCreators is checked by NodeKindTablesTest; what is left is four dialogs and the actions that open them - ideTest",
@@ -86,11 +61,6 @@ public class PackagesWithoutTestsTest {
             "rename",
             "an action, a dialog and the order the three steps run in - close the editor, rewrite the code, rename the node. Only a running IDE has all three - ideTest");
 
-    /**
-     * The top-level packages under {@code org.testin} that hold Java, at any
-     * depth. A directory with no Java in it is a leftover rather than a package
-     * - {@code git} does not track one, so it is on this machine only.
-     */
     private static @NotNull Set<String> topLevel(final @NotNull Path root) {
         try (Stream<Path> paths = Files.walk(root)) {
             return paths.filter(path -> path.toString().endsWith(".java"))
@@ -114,10 +84,6 @@ public class PackagesWithoutTestsTest {
                         + " right is what was decided: write a test for the new one, or add it above with the reason (#108)");
     }
 
-    /**
-     * A reason that says nothing is worse than no reason, because it reads like
-     * a decision.
-     */
     @Test
     public void everyReasonSaysSomething() {
         WITHOUT_TESTS.forEach((pkg, reason) -> {

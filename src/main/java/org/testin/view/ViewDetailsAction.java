@@ -35,7 +35,7 @@ public class ViewDetailsAction extends DumbAwareAction {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        final @NotNull List<TestCaseDto> selected = TestinData.selectedCases(e);
+        final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
         if (selected.isEmpty()) return;
 
         TestinData.editor(e).ifPresent(editor ->
@@ -45,7 +45,7 @@ public class ViewDetailsAction extends DumbAwareAction {
     // UC-VIEW-PANEL-001
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(!TestinData.selectedCases(e).isEmpty());
+        e.getPresentation().setEnabled(!TestinData.selectedTestCases(e).isEmpty());
     }
 
     @Override

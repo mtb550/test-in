@@ -24,15 +24,6 @@ import java.util.List;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * How a path list reaches Git (#89).
- * <p>
- * Windows refuses to start a process whose command line exceeds 32,767
- * characters, so the paths of a commit travel in a file. What that file holds
- * is checked here, without starting Git: the end-to-end proof that Git reads it
- * back correctly is in {@code GitWorkflowTest}, which needs Git on the machine
- * and is skipped when there is none. This is not.
- */
 public class GitCommandRunnerTest {
 
     @Test

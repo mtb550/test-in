@@ -30,18 +30,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The guard that decides whether Testin has already started for a project.
- * <p>
- * Three doors lead to {@code StartupActivity.execute} and none of them shares a
- * thread with the others: the platform runs its startup extension on a
- * background coroutine while a tool window builds its content on the EDT. What
- * this has to hold is therefore not just "the second caller is refused" but
- * "exactly one of the callers is admitted, however they arrive". The version
- * that read the flag and then set it could admit two. Two admissions is a
- * second scan of the whole Testin root and a second subscription to every test
- * event.
- */
 public class OnceTest {
 
     private static final Key<Boolean> STARTED = Key.create("test.started");

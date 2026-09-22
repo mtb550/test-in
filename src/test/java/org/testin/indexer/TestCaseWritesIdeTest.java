@@ -32,16 +32,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * UC-INTERNAL-004.
- * <p>
- * What reaches disk when a test set's order is saved: the case the tester just
- * pasted or created, and nothing it did not need.
- * <p>
- * An IDE test because the store writes through the project's services and
- * claims its own writes with the file watcher, and there is no seam that answers
- * the question without them.
- */
 public class TestCaseWritesIdeTest extends BasePlatformTestCase {
 
     private static final String HAND_NAMED = "Log in by hand.tc";
@@ -55,17 +45,12 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
                 try {
                     Files.deleteIfExists(each);
                 } catch (final Exception ignored) {
-                    // Left for the operating system.
                 }
             });
         } catch (final Exception ignored) {
-            // Nothing to walk, or nothing to remove.
         }
     }
 
-    /**
-     * The case as a cut pastes it: the same id and audit, in the set it goes to.
-     */
     private static TestCaseDto pastedInto(final TestSetDirectoryDto ts, final TestCaseDto cut) {
         final TestCaseDto pasted = TestCaseDto.builder()
                 .id(cut.getId())
@@ -77,12 +62,6 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         return pasted;
     }
 
-    /**
-     * Puts a folder with something in it where a case's file is, so deleting
-     * that file is refused, the way a locked file refuses it. Under the tests,
-     * deleting never goes through the recycle bin, so it is a plain deletion, and
-     * a plain deletion refuses a folder that is not empty.
-     */
     static void undeletable(final Path file) {
         try {
             Files.deleteIfExists(file);
@@ -126,10 +105,6 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
-    /**
-     * A test project with one test set in it, built the way the actions that
-     * create them do: the mapper makes the node, the indexer is told.
-     */
     private TestSetDirectoryDto oneTestSet() {
         return WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
@@ -143,9 +118,6 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         });
     }
 
-    /**
-     * Two test sets in one test project, for a case to be moved between.
-     */
     private List<TestSetDirectoryDto> twoTestSets() {
         return WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
@@ -161,17 +133,13 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         });
     }
 
-    /**
-     * A test set holding one case whose file a tester named by hand, read the
-     * way the plugin reads one: by a scan of the project.
-     */
-    private Path setWithAHandNamedCase() {
+    private Path setWithAHandNamedTestCase() {
         final Path project = SyntheticTree.write(root, 1, 1);
         final Path set = project.resolve("Test Cases").resolve("set-0");
 
         try (var files = Files.list(set)) {
-            final Path caseFile = files.filter(file -> file.getFileName().toString().endsWith(".tc")).findFirst().orElseThrow();
-            Files.move(caseFile, set.resolve(HAND_NAMED));
+            final Path testCaseFile = files.filter(file -> file.getFileName().toString().endsWith(".tc")).findFirst().orElseThrow();
+            Files.move(testCaseFile, set.resolve(HAND_NAMED));
         } catch (final IOException ex) {
             throw new AssertionError("could not name the case file by hand", ex);
         }
@@ -180,16 +148,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         return set;
     }
 
-    /**
-     * Rule-INTERNAL-031.
-     * <p>
-     * A case the set has never held is written even when its rank did not have
-     * to change. A pasted case keeps the rank it was copied with, and when that
-     * rank already sorts last it is not among the moved. So it used to live in
-     * memory only, and a cut had deleted its file a moment before (#66, finding
-     * 112).
-     */
-    public void testACaseTheSetHasNeverHeldIsWrittenEvenWhenItsRankStays() {
+    public void testATestCaseTheSetHasNeverHeldIsWrittenEvenWhenItsRankStays() {
         final TestSetDirectoryDto ts = oneTestSet();
         final TestCaseDto pasted = testCase(ts, "m");
 
@@ -199,15 +158,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
                 Files.isRegularFile(fileOf(ts, pasted)));
     }
 
-    /**
-     * Rule-INTERNAL-035, Rule-EDITOR-PANEL-082.
-     * <p>
-     * A case saved as it is before its set's order is saved keeps who created
-     * it. That is what a pasted cut now does: the cut had taken the case out of
-     * the index, so the sequence write saw it for the first time and recorded
-     * the paster as its creator (#66, finding 114).
-     */
-    public void testACaseSavedAsItIsBeforeTheOrderKeepsItsCreator() {
+    public void testATestCaseSavedAsItIsBeforeTheOrderKeepsItsCreator() {
         final TestSetDirectoryDto ts = oneTestSet();
         final TestCaseDto moved = testCase(ts, "m").setCreatedBy("Sara Al-Otaibi");
         final var createdAt = moved.getCreatedAt();
@@ -220,14 +171,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         assertEquals("a moved case took a new creation date", createdAt, indexed.getCreatedAt());
     }
 
-    /**
-     * Rule-INTERNAL-031, Rule-INTERNAL-034.
-     * <p>
-     * A new, unranked case is written by the order write alone: ranked, and
-     * stamped as created. Creating a test case used to save it directly as well,
-     * so the file was written twice - first without its rank (#66, finding 115).
-     */
-    public void testACreatedCaseIsWrittenByTheOrderWriteWithItsRankAndItsCreator() {
+    public void testACreatedTestCaseIsWrittenByTheOrderWriteWithItsRankAndItsCreator() {
         final TestSetDirectoryDto ts = oneTestSet();
         final TestCaseDto created = testCase(ts, "");
         final List<TestCaseDto> arranged = List.of(created);
@@ -247,13 +191,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         }
     }
 
-    /**
-     * Rule-INTERNAL-035.
-     * <p>
-     * A cut pasted into another set is written there, keeps who created it, and
-     * leaves the set it came from - in the index and on disk alike.
-     */
-    public void testAMovedCaseIsInItsNewSetAndGoneFromTheOld() {
+    public void testAMovedTestCaseIsInItsNewSetAndGoneFromTheOld() {
         final List<TestSetDirectoryDto> sets = twoTestSets();
         final TestSetDirectoryDto login = sets.get(0);
         final TestSetDirectoryDto signUp = sets.get(1);
@@ -272,22 +210,13 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
                 indexer().getTestCasesForTestSet(login.getPath()).stream().noneMatch(tc -> tc.getId().equals(cut.getId())));
     }
 
-    /**
-     * Rule-INTERNAL-035.
-     * <p>
-     * A move whose write is refused leaves the case where it was. The paste used
-     * to remove the cut first, so a refusal to write left the case in neither set
-     * (#66, finding 284).
-     */
-    public void testAMoveWhoseWriteIsRefusedLeavesTheCaseWhereItWas() {
+    public void testAMoveWhoseWriteIsRefusedLeavesTheTestCaseWhereItWas() {
         final List<TestSetDirectoryDto> sets = twoTestSets();
         final TestSetDirectoryDto login = sets.get(0);
         final TestSetDirectoryDto signUp = sets.get(1);
         final TestCaseDto cut = testCase(login, "m");
         indexer().putTestCaseVerbatim(login.getPath(), cut);
 
-        // A folder where the file has to go makes writing it fail, the way a
-        // locked or read-only file does.
         try {
             Files.createDirectories(fileOf(signUp, cut));
         } catch (final IOException ex) {
@@ -301,14 +230,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
                 login.getPath(), indexer().findTestCase(cut.getId()).orElseThrow().getParent().getPath());
     }
 
-    /**
-     * Rule-EDITOR-PANEL-064.
-     * <p>
-     * A removal whose file will not go leaves the case in its set. The index let
-     * go of the case first, so the tester read Removed over a file still on
-     * disk, and the next scan brought it back (#66, finding 292).
-     */
-    public void testARemovalWhoseDeleteIsRefusedKeepsTheCase() {
+    public void testARemovalWhoseDeleteIsRefusedKeepsTheTestCase() {
         final TestSetDirectoryDto ts = oneTestSet();
         final TestCaseDto tc = testCase(ts, "m");
         indexer().putTestCaseVerbatim(ts.getPath(), tc);
@@ -322,13 +244,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
                 indexer().getTestCasesForTestSet(ts.getPath()).stream().anyMatch(each -> each.getId().equals(tc.getId())));
     }
 
-    /**
-     * Rule-INTERNAL-035.
-     * <p>
-     * A move whose old file will not go takes back the new one, so the case is
-     * in one set rather than on disk in two under one id (#66, finding 292).
-     */
-    public void testAMoveWhoseOldFileWillNotGoLeavesTheCaseWhereItWas() {
+    public void testAMoveWhoseOldFileWillNotGoLeavesTheTestCaseWhereItWas() {
         final List<TestSetDirectoryDto> sets = twoTestSets();
         final TestSetDirectoryDto login = sets.get(0);
         final TestSetDirectoryDto signUp = sets.get(1);
@@ -346,14 +262,8 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
                 indexer().getTestCasesForTestSet(signUp.getPath()).stream().noneMatch(each -> each.getId().equals(cut.getId())));
     }
 
-    /**
-     * Rule-INTERNAL-084.
-     * <p>
-     * Saving a case read from a file named by hand files it under its id, and
-     * the hand-named file goes.
-     */
-    public void testSavingAHandNamedCaseFilesItUnderItsId() {
-        final Path set = setWithAHandNamedCase();
+    public void testSavingAHandNamedTestCaseFilesItUnderItsId() {
+        final Path set = setWithAHandNamedTestCase();
         final TestCaseDto tc = indexer().getTestCasesForTestSet(set).getFirst();
 
         assertTrue("the save said it failed", indexer().putTestCaseVerbatim(set, tc));
@@ -362,16 +272,8 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         assertFalse("the hand-named file was left beside it", Files.exists(set.resolve(HAND_NAMED)));
     }
 
-    /**
-     * Rule-INTERNAL-084.
-     * <p>
-     * A save whose hand-named file will not go takes back the file it wrote, so
-     * the case is not in two files under one id. The deletion used to be asked
-     * nothing, and the next scan found a clash the plugin had made itself (#66,
-     * finding 294).
-     */
     public void testASaveWhoseHandNamedFileWillNotGoIsTakenBack() {
-        final Path set = setWithAHandNamedCase();
+        final Path set = setWithAHandNamedTestCase();
         final TestCaseDto tc = indexer().getTestCasesForTestSet(set).getFirst();
         undeletable(set.resolve(HAND_NAMED));
 

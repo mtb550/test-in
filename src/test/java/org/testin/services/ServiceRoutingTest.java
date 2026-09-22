@@ -27,28 +27,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * An application service is one object for the IDE, whichever way it is asked
- * for.
- * <p>
- * Asking a project container for one does not fetch the application's - it
- * builds a second instance inside the project, and a service that persists
- * state then has two state files. That is what happened to the tester's name:
- * the settings page has no project so it wrote the application's copy, while
- * every run, marker and verdict passed a project and read the project's. Two
- * files called testinSettings.xml, two different names, and the name typed in
- * Settings never reached a test run.
- * <p>
- * The routing reads each class's own {@code @Service} annotation, so what is
- * checked here is that it reads it correctly - a service added later is routed
- * by declaring its level, not by being listed anywhere.
- */
 public class ServiceRoutingTest {
 
-    /**
-     * The one that caused it. Named on its own because it is the regression: if
-     * this ever answers false again, a tester's name stops reaching their runs.
-     */
     @Test
     public void theSettingsBelongToTheApplication() {
         assertTrue(Services.isApplicationLevel(AppSettingsState.class),
@@ -64,10 +44,6 @@ public class ServiceRoutingTest {
         }
     }
 
-    /**
-     * The other direction matters just as much: routing a project service to the
-     * application would give every project one editor bookkeeper between them.
-     */
     @Test
     public void aProjectServiceStaysWithItsProject() {
         assertFalse(Services.isApplicationLevel(TestinEditors.class),
@@ -80,15 +56,8 @@ public class ServiceRoutingTest {
                 "a class with no @Service annotation must not be diverted to the application container");
     }
 
-    /**
-     * Asked twice, because the answer is cached after the first call and a cache
-     * that returns something different the second time would be worse than none.
-     */
     @Test
     public void theCachedAnswerIsTheSameAnswer() {
-        // Held in locals and compared, rather than asked twice inside one
-        // assertion: written that way it compares an expression to itself, which
-        // is true whatever the cache does and so tests nothing at all.
         final boolean first = Services.isApplicationLevel(AppSettingsState.class);
         final boolean cached = Services.isApplicationLevel(AppSettingsState.class);
 

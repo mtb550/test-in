@@ -41,10 +41,10 @@ import java.util.function.Function;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class PendingChangeFactory {
     // UC-SHARE-010, Rule-SHARE-047
-    static @NotNull PendingChange fromFile(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper, final @NotNull Function<UUID, Optional<TestCaseDto>> cases) {
+    static @NotNull PendingChange fromFile(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper, final @NotNull Function<UUID, Optional<TestCaseDto>> testCases) {
         return switch (subjectOf(relativePath)) {
             case TEST_CASE -> testCase(type, beforeJson, afterJson, relativePath, mapper);
-            case RUN_ITEM -> runItem(type, beforeJson, afterJson, relativePath, mapper, cases);
+            case RUN_ITEM -> runItem(type, beforeJson, afterJson, relativePath, mapper, testCases);
             case MARKER -> marker(type, beforeJson, afterJson, relativePath, mapper);
             case OTHER -> other(type, relativePath);
         };
@@ -101,9 +101,9 @@ final class PendingChangeFactory {
     }
 
     // UC-SHARE-010, Rule-SHARE-047
-    private static @NotNull PendingChange runItem(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper, final @NotNull Function<UUID, Optional<TestCaseDto>> cases) {
-        final @NotNull Optional<UUID> caseId = FileKind.RUN_ITEM.idIn(relativePath);
-        final @NotNull Optional<TestCaseDto> tc = caseId.flatMap(cases);
+    private static @NotNull PendingChange runItem(final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson, final @NotNull Path relativePath, final @NotNull Mapper mapper, final @NotNull Function<UUID, Optional<TestCaseDto>> testCases) {
+        final @NotNull Optional<UUID> testCaseId = FileKind.RUN_ITEM.idIn(relativePath);
+        final @NotNull Optional<TestCaseDto> tc = testCaseId.flatMap(testCases);
 
         final @NotNull String name = tc.map(TestCaseDto::getDescription).filter(description -> !description.isBlank())
                 .orElseGet(() -> String.valueOf(relativePath.getFileName()));
@@ -118,7 +118,7 @@ final class PendingChangeFactory {
                     read(mapper, beforeJson, TestRunItems.class), read(mapper, afterJson, TestRunItems.class));
         };
 
-        return new PendingChange(ChangeSubject.RUN_ITEM, name, testSet, caseId.map(UUID::toString).orElse(""),
+        return new PendingChange(ChangeSubject.RUN_ITEM, name, testSet, testCaseId.map(UUID::toString).orElse(""),
                 relativePath, type, nothingCommitted(), changes);
     }
 

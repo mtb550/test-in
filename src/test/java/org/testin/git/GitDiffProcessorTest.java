@@ -37,19 +37,6 @@ import java.util.Optional;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The step between "Git says these files changed" and "here is the review".
- * <p>
- * Everything here is real except Git itself: real files in a real directory, and
- * the status lines Git actually prints. What is stubbed is only the committed
- * side of each change, because reading that is the one thing that needs a
- * repository with history.
- * <p>
- * This is where the two faults that made the feature unusable lived: a new test
- * case never appearing, and the whole review coming back empty. So it is worth
- * asserting against the output Git really produces rather than a tidied version
- * of it.
- */
 public class GitDiffProcessorTest {
 
     private final Map<String, String> committed = new HashMap<>();
@@ -80,9 +67,6 @@ public class GitDiffProcessorTest {
                 .build();
     }
 
-    /**
-     * Writes a file into the working tree exactly as the plugin would.
-     */
     private void onDisk(final String relativePath, final TestCaseDto testCase) {
         try {
             final Path file = root.resolve(relativePath);
@@ -97,10 +81,6 @@ public class GitDiffProcessorTest {
         return GitDiffProcessor.toDiffs(List.of(statusLines), root, RealMapper.build(), committed::get, id -> Optional.empty());
     }
 
-    /**
-     * The fault that made the feature unusable: a test case just written is
-     * untracked, and it has to appear.
-     */
     @Test
     public void aNewlyWrittenTestCaseIsInTheReview() {
         onDisk("Test Cases/login/case.tc", testCase("a brand new case"));
@@ -129,10 +109,6 @@ public class GitDiffProcessorTest {
         assertEquals(review.getFirst().fieldChanges().getFirst().changeType(), ChangeType.CHANGE_MODULE);
     }
 
-    /**
-     * A deleted file is not on disk, so its content can only come from the
-     * committed side.
-     */
     @Test
     public void aDeletedTestCaseIsReviewedFromWhatWasCommitted() {
         final TestCaseDto removed = testCase("a case that is going away");
@@ -145,11 +121,6 @@ public class GitDiffProcessorTest {
         assertEquals(review.getFirst().name(), "a case that is going away");
     }
 
-    /**
-     * Markers travel with a test case commit, and they are also changes in their
-     * own right: archiving a project edits nothing but a marker, and a review
-     * that hid them left the tester unable to commit it (#66).
-     */
     @Test
     public void markersAreListedAsMarkerChanges() {
         try {
@@ -170,11 +141,6 @@ public class GitDiffProcessorTest {
         }
     }
 
-    /**
-     * Git reports a file as modified for reasons no compared field shows - a
-     * reorder, an audit stamp. It is still a change, and the commit stages only
-     * what the review lists, so it gets a row rather than disappearing (#66).
-     */
     @Test
     public void aFileGitCallsModifiedIsAlwaysARow() {
         final TestCaseDto unchanged = testCase("identical on both sides");
@@ -188,12 +154,8 @@ public class GitDiffProcessorTest {
         assertEquals(review.getFirst().fieldChanges().getFirst().changeType(), ChangeType.CHANGE_FILE);
     }
 
-    /**
-     * The whole of a new test set arrives as untracked files, one line each -
-     * which is what {@code -uall} is for. Every one of them is a row.
-     */
     @Test
-    public void aWholeNewTestSetIsReviewedCaseByCase() {
+    public void aWholeNewTestSetIsReviewedTestCaseByTestCase() {
         try {
             for (int index = 1; index <= 3; index++) {
                 onDisk("Test Cases/login flow/case-" + index + ".tc", testCase("case " + index));
@@ -214,11 +176,6 @@ public class GitDiffProcessorTest {
         }
     }
 
-    /**
-     * A path with a space is every Testin repository - the two fixed containers
-     * are called "Test Cases" and "Test Runs" - so the quoted form has to survive
-     * all the way to reading the file off disk.
-     */
     @Test
     public void aQuotedPathStillFindsItsFile() {
         onDisk("Test Cases/login flow/a case.tc", testCase("quoted all the way down"));
@@ -230,12 +187,6 @@ public class GitDiffProcessorTest {
         assertEquals(review.getFirst().name(), "quoted all the way down");
     }
 
-    /**
-     * Git named a new file that is no longer there - it listed the status a
-     * moment before something removed the file. There is nothing to commit and
-     * nothing to show, and one such file must not take the rest of the review
-     * with it: the tester still has to be able to commit everything else (#66).
-     */
     @Test
     public void anUntrackedFileThatVanishedIsSkippedAndTheRestSurvives() {
         onDisk("Test Cases/login/case.tc", testCase("still here"));

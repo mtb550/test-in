@@ -21,5 +21,5 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 
 // UC-CODEGEN-002, Rule-CODEGEN-077
-public record MovedCase(@NotNull TestCaseDto tc, @NotNull DirectoryDto from) {
+public record MovedTestCase(@NotNull TestCaseDto tc, @NotNull DirectoryDto from) {
 }

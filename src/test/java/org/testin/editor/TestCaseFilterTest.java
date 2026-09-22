@@ -67,8 +67,6 @@ public class TestCaseFilterTest {
                 .build()
                 .showing(Optional.of(passed));
 
-        // The filter asks for an answer per id, and a case the run never
-        // recorded answers with nothing rather than with a null.
         final Map<UUID, TestRunItems> recorded = Map.of(passed.getId(), item);
 
         final List<TestCaseDto> result = TestCaseFilter.filter(
@@ -83,16 +81,6 @@ public class TestCaseFilterTest {
         assertEquals(result, List.of(passed));
     }
 
-    /**
-     * The defect #212 reported, and the reason #294 existed: the module has its
-     * own column and its own filter, and the editor's search box could not see
-     * it while the global search could. Both ask
-     * {@link org.testin.testcase.TestEditorAttributes#anyContains} now.
-     * <p>
-     * That this test needs no IDE is the point. Routing the question through the
-     * attributes used to mean handing them a Project, and there is no way to
-     * build one here - which is what kept the two answers apart.
-     */
     @Test
     public void theSearchReadsEveryFieldTheTesterWrites() {
         final TestCaseDto tc = TestCaseDto.builder()

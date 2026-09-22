@@ -159,9 +159,10 @@ already asks.
 **While the test set is still being read** — the entry and `Ctrl+M` are gray,
 reading *This test set is still being read - the new test case would be placed
 against a list nobody has seen yet.* The toolbar button says the same when it is
-pressed. Creating a case sorts the list, and a sort makes a load that is still on
-its way stale: the load then landed on nothing, the spinner never stopped, and
-the new case sat in the middle of the set at the next refresh.
+pressed. Creating a test case sorts the list, and a sort makes a load that is
+still on its way stale: the load then landed on nothing, the spinner never
+stopped, and the new test case sat in the middle of the set at the next
+refresh.
 
 ## Where the plugin breaks its own rules
 

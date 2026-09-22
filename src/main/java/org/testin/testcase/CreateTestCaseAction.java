@@ -78,10 +78,10 @@ public class CreateTestCaseAction extends DumbAwareAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
         final @NotNull Optional<TestinEditor> editor = TestinData.editor(e);
-        final boolean holdsCases = editor.filter(open -> open.getParent().isTestCaseContainer()).isPresent();
+        final boolean holdsTestCases = editor.filter(open -> open.getParent().isTestCaseContainer()).isPresent();
 
         final boolean loading = editor.filter(TestinEditor::isLoading).isPresent();
-        final boolean enabled = holdsCases && !loading;
+        final boolean enabled = holdsTestCases && !loading;
 
         e.getPresentation().setEnabled(enabled);
 

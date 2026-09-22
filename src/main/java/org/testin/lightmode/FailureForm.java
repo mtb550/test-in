@@ -71,11 +71,11 @@ class FailureForm extends JBPanel<FailureForm> {
 
     void setZoom(final float zoom) {
         baseFonts.forEach((component, base) -> {
-            final @NotNull Font scaled = CaseFont.zoomed(base, zoom);
+            final @NotNull Font scaled = TestCaseFont.zoomed(base, zoom);
             component.setFont(scaled);
 
             if (component instanceof ComponentWithEmptyText hinted)
-                hinted.getEmptyText().setFont(CaseFont.zoomed(scaled, PLACEHOLDER_SCALE));
+                hinted.getEmptyText().setFont(TestCaseFont.zoomed(scaled, PLACEHOLDER_SCALE));
         });
     }
 

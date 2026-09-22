@@ -47,7 +47,7 @@ public class CutTestCaseNodeAction extends DumbAwareAction {
         if (p == null || found.isEmpty()) return;
 
         final @NotNull TestinEditor editor = found.orElseThrow();
-        final @NotNull List<TestCaseDto> selectedTestCases = TestinData.selectedCases(e);
+        final @NotNull List<TestCaseDto> selectedTestCases = TestinData.selectedTestCases(e);
 
         if (!selectedTestCases.isEmpty()) {
             try {
@@ -76,7 +76,7 @@ public class CutTestCaseNodeAction extends DumbAwareAction {
             return;
         }
 
-        e.getPresentation().setEnabled(!TestinData.selectedCases(e).isEmpty());
+        e.getPresentation().setEnabled(!TestinData.selectedTestCases(e).isEmpty());
     }
 
     @Override

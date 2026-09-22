@@ -30,43 +30,16 @@ import java.util.Map;
 
 import static org.testng.Assert.assertTrue;
 
-/**
- * Rule-INTERNAL-011, Rule-INTERNAL-012.
- * <p>
- * Every file name the test data format uses is declared in {@code
- * .gitattributes}, and the ones holding JSON keep LF (#305).
- * <p>
- * A test project is a Git repository two testers share, and the markers and
- * records in it carry no extension Git recognizes - {@code .tp}, {@code .tc},
- * {@code .ri}. Left undeclared, a Windows checkout rewrites every line ending in
- * them, so the same verdict written on two machines is two different files and
- * every pull is a conflict over bytes nobody typed. A screenshot is the opposite
- * case: converting a PNG's bytes corrupts the picture.
- * <p>
- * The list is not repeated here. The marker names are {@link DirectoryType}'s and
- * the record extensions are {@link FileKind}'s, so a kind of folder or a kind of
- * file added later is asked about without anybody remembering to add it. That
- * is the only way this can go wrong, because nothing else in the build reads
- * {@code .gitattributes} at all.
- */
 public class TestDataKeepsLfTest {
 
     private static final @NotNull String KEEPS_LF = "text eol=lf";
 
-    /**
-     * A picture's bytes are never converted, whatever the platform's newline is.
-     */
     private static final @NotNull String UNTOUCHED = "binary";
 
     private static void note(final @NotNull List<String> wrong, final @NotNull String pattern, final @NotNull String wanted, final @NotNull Map<String, String> declared) {
         wrong.add(pattern + " is '" + declared.getOrDefault(pattern, "not declared") + "' and has to be '" + wanted + "'");
     }
 
-    /**
-     * What {@code .gitattributes} declares, by the pattern each line is about:
-     * the first word of the line, then everything it says about it. Comments and
-     * blank lines are not declarations.
-     */
     private static @NotNull Map<String, String> declarations() {
         final @NotNull Map<String, String> byPattern = new LinkedHashMap<>();
 

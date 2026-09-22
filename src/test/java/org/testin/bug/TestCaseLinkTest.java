@@ -24,10 +24,6 @@ import java.util.Optional;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The link from a test project's Git remote and branch to a test case's file
- * (#28). Nothing here starts Git: these are the answers it would give.
- */
 public class TestCaseLinkTest {
 
     private static final Path FILE = Path.of("Test Cases", "ts2", "07f7e754-b849-4b38-9e6e-a2cacd84e927.tc");

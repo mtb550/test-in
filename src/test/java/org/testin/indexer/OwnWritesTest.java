@@ -26,21 +26,6 @@ import java.nio.file.Path;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * An edit Testin did not make is never ignored (#278).
- * <p>
- * The plugin ignores its own writes for five seconds, because otherwise every
- * save would re-read the project and rebuild the tree under the tester who
- * caused it. The window could not tell a second change from the first, so a
- * tester who edited the same file by hand inside those five seconds was ignored
- * along with it: their edit sat on disk, absent from the screen, until they
- * pressed Refresh.
- * <p>
- * What is pinned here is the property rather than the mechanism: <b>the answer
- * is about what the file says, not about when it changed</b>. So a later
- * implementation that keeps the promise passes, and one that goes back to a
- * bare clock does not.
- */
 public class OwnWritesTest {
 
     private static final byte @NotNull [] OURS = "{\"description\":\"Log in\"}".getBytes();
@@ -68,8 +53,6 @@ public class OwnWritesTest {
         try {
             Files.deleteIfExists(file);
         } catch (final IOException ex) {
-            // Litter, not a failed test - and reporting it as one would hide
-            // whichever assertion actually failed.
             System.err.println("Could not clean up " + file + ": " + ex.getMessage());
         }
     }
@@ -89,9 +72,6 @@ public class OwnWritesTest {
         }
     }
 
-    /**
-     * The defect, as a test. Same path, same five seconds, different content.
-     */
     @Test
     public void aHandEditInsideTheWindowIsNotIgnored() {
         final @NotNull Path file = tempFile();
@@ -110,11 +90,6 @@ public class OwnWritesTest {
         }
     }
 
-    /**
-     * A write still running has nothing to compare against, and the event can
-     * arrive while it is in flight - which is why the claim is made before the
-     * file is written rather than after.
-     */
     @Test
     public void aWriteStillInFlightIsOurs() {
         final @NotNull Path file = tempFile();

@@ -152,7 +152,7 @@ public final class TestRunWordGenerator {
                     final long count = section.count(summary);
                     if (count == 0) continue;
 
-                    buildCaseTable(doc, String.valueOf(sectionNumber++), section.getTitle(),
+                    buildTestCaseTable(doc, String.valueOf(sectionNumber++), section.getTitle(),
                             section.description(String.valueOf(count)), tr, section.getHexColor(), section.textHex(),
                             section.isWithFailureDetail(), section::matches);
                 }
@@ -254,7 +254,7 @@ public final class TestRunWordGenerator {
         hrun.setColor(headingColor);
     }
 
-    private void buildCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull String headerBg, final @NotNull String headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
+    private void buildTestCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull String headerBg, final @NotNull String headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
         addHeading(doc, sectionNumber + ". " + sectionTitle, 20, 12);
         addText(doc, description, ReportFont.LEAD.ptRounded(), false, BLACK, NO_BORDER, 12);
 
@@ -264,12 +264,12 @@ public final class TestRunWordGenerator {
         table.setWidthType(TableWidthType.PCT);
 
         XWPFTableRow headerRow = table.getRow(0);
-        addCaseHeader(headerRow, 0, "#", headerBg, headerFg);
-        addCaseHeader(headerRow, 1, Bundle.message("caption.test.case"), headerBg, headerFg);
+        addTestCaseHeader(headerRow, 0, "#", headerBg, headerFg);
+        addTestCaseHeader(headerRow, 1, Bundle.message("caption.test.case"), headerBg, headerFg);
         if (withFailureDetail)
-            addCaseHeader(headerRow, 2, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg);
+            addTestCaseHeader(headerRow, 2, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg);
         if (withFailureDetail)
-            addCaseHeader(headerRow, 3, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg);
+            addTestCaseHeader(headerRow, 3, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg);
 
         int idx = 1;
         boolean alt = true;
@@ -289,8 +289,8 @@ public final class TestRunWordGenerator {
             XWPFTableCell tcCell = row.getCell(1);
             shadeCell(tcCell, rowBg);
             setCellPadding(tcCell, 4, 6, 4, 6);
-            final @NotNull String caseName = item.shownCase().getDescription();
-            final @NotNull String tcName = caseName.isEmpty() ? "—" : caseName;
+            final @NotNull String testCaseName = item.shownTestCase().getDescription();
+            final @NotNull String tcName = testCaseName.isEmpty() ? "—" : testCaseName;
             setCellText(tcCell, tcName, ReportFont.BODY.ptRounded(), false, BLACK);
 
             if (withFailureDetail) {
@@ -350,7 +350,7 @@ public final class TestRunWordGenerator {
         }
     }
 
-    private void addCaseHeader(final @NotNull XWPFTableRow headerRow, final int col, final @NotNull String text, final @NotNull String bgColor, final @NotNull String textColor) {
+    private void addTestCaseHeader(final @NotNull XWPFTableRow headerRow, final int col, final @NotNull String text, final @NotNull String bgColor, final @NotNull String textColor) {
         final @NotNull XWPFTableCell cell = headerRow.getCell(col);
         shadeCell(cell, bgColor);
         setCellPadding(cell, 5, 6, 5, 6);

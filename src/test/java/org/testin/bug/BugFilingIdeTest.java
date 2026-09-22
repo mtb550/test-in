@@ -41,28 +41,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * Recording the issue a bug report became (#28): only on a run and a run item
- * found again through the indexer, and only while the run item is still failed.
- * <p>
- * An IDE test because the run is the indexer's, and the write goes through its
- * run writer.
- */
 public class BugFilingIdeTest extends BasePlatformTestCase {
 
     private static final String ISSUE = "https://github.com/mtb550/test-in/issues/412";
 
     private Path root;
 
-    /**
-     * What the file holds once it holds {@code text}, or whatever it holds when
-     * ten seconds have passed - dispatching events meanwhile, in case the writer
-     * needs this thread.
-     * <p>
-     * Writing the file is queued, so the test waits for it. Waited for until the
-     * file exists, it failed now and then: a file is created before its bytes
-     * land, and a read in between found it empty (#312, N21).
-     */
     private static String awaitFileHoldingTheIssue(final Path file) {
         final long deadline = System.currentTimeMillis() + 10_000;
         while (System.currentTimeMillis() < deadline) {
@@ -75,9 +59,6 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         return read(file);
     }
 
-    /**
-     * The file's text, and nothing while it does not exist or is being written.
-     */
     private static String read(final Path file) {
         try {
             return Files.exists(file) ? Files.readString(file) : "";
@@ -109,22 +90,17 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         return root.resolve("NAFATH").resolve("Test Runs").resolve("Sprint 7");
     }
 
-    /**
-     * A run the indexer holds, with one run item in it whose test case the
-     * indexer holds too: a run item whose test case is gone is removed, and
-     * takes no link (#66, finding 110).
-     */
     private BugReports.RunItem indexedRunItem(final TestStatus status) {
-        return runItem(indexedCase(), status);
+        return runItem(indexedTestCase(), status);
     }
 
-    private BugReports.RunItem runItem(final UUID caseId, final TestStatus status) {
-        final TestRunItems item = TestRunItems.builder().id(caseId).status(status).build();
+    private BugReports.RunItem runItem(final UUID testCaseId, final TestStatus status) {
+        final TestRunItems item = TestRunItems.builder().id(testCaseId).status(status).build();
         indexer().putTestRun(runPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
-        return new BugReports.RunItem(runPath(), caseId);
+        return new BugReports.RunItem(runPath(), testCaseId);
     }
 
-    private UUID indexedCase() {
+    private UUID indexedTestCase() {
         final TestSetDirectoryDto ts = WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
             final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
@@ -175,10 +151,6 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), item, ISSUE));
     }
 
-    /**
-     * #66, finding 110: a failed run item whose test case is no longer indexed is
-     * removed, though its file still says Failed, so it takes no link.
-     */
     public void testARunItemWhoseTestCaseIsGoneIsNotWritten() {
         final BugReports.RunItem item = runItem(UUID.randomUUID(), TestStatus.FAILED);
 

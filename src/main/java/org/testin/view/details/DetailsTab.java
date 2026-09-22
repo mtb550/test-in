@@ -72,7 +72,7 @@ public class DetailsTab {
                 new BugIssueRow(item, currentPath));
     }
 
-    private static @NotNull Stream<BaseDetails> caseRows() {
+    private static @NotNull Stream<BaseDetails> testCaseRows() {
         return Stream.of(
                 new AttributeRow(TestEditorAttributes.EXPECTED_RESULT.getName(), (p, dto) -> TestEditorAttributes.EXPECTED_RESULT.displayValue(dto)),
                 new Steps(),
@@ -93,14 +93,14 @@ public class DetailsTab {
         detailsTab.setBorder(BorderFactory.createEmptyBorder());
 
         dto.ifPresentOrElse(
-                testCase -> renderCase(p, detailsTab, testCase, runItem, currentPath),
+                testCase -> renderTestCase(p, detailsTab, testCase, runItem, currentPath),
                 () -> renderPlaceholder(detailsTab));
 
         detailsTab.revalidate();
         detailsTab.repaint();
     }
 
-    private void renderCase(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab, final @NotNull TestCaseDto dto, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
+    private void renderTestCase(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab, final @NotNull TestCaseDto dto, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
         final @NotNull JBPanel<?> contentPanel = new JBPanel<>(new GridBagLayout());
         contentPanel.setOpaque(false);
 
@@ -116,7 +116,7 @@ public class DetailsTab {
 
         detailsTab.add(scrollPane, BorderLayout.CENTER);
 
-        EditShownCase.bindTo(p, detailsTab);
+        EditShownTestCase.bindTo(p, detailsTab);
     }
 
     private void renderPlaceholder(final @NotNull JBPanel<?> panel) {
@@ -148,7 +148,7 @@ public class DetailsTab {
                         new ActionIcons(),
                         new BadgeRow()),
                 runItem.stream().flatMap(item -> runRows(item, currentPath)),
-                caseRows()
+                testCaseRows()
         ).flatMap(rows -> rows).toList();
     }
 

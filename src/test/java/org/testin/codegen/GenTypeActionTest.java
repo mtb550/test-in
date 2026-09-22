@@ -26,25 +26,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Which operations write code and which only write data, as the enum declares
- * it - and that both forms of the same operation, one item or many, go to the
- * same place.
- * <p>
- * They did not. {@code executeAll} went straight to the generator registry while
- * {@code getAction} went through the declared action. So a data-only attribute
- * edited in bulk asked for a Java generator it has no use for. It also warned
- * about the missing Java plugin on the way, in an IDE that was never going to
- * generate anything (#151).
- */
 public class GenTypeActionTest {
 
-    /**
-     * The two constructors are the declaration: three arguments means the third
-     * one names a data-only field and the operation carries the no-op. Pinned by
-     * name rather than by count, so adding an operation does not fail this and
-     * changing what an existing one does will.
-     */
     @Test
     public void aDataOnlyAttributeCarriesTheNoOp() {
         for (final GenType type : List.of(
@@ -78,10 +61,6 @@ public class GenTypeActionTest {
         }
     }
 
-    /**
-     * Every constant has one, which is the reason the field can hold a value
-     * instead of a null standing for "look it up later".
-     */
     @Test
     public void everyOperationCarriesAnAction() {
         assertEquals(Arrays.stream(GenType.values()).filter(type -> false).count(), 0L);

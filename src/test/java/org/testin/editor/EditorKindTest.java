@@ -20,11 +20,6 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 
-/**
- * The keys an editor kind builds are already stored in testers' IDE properties
- * (#312, N20). A changed word or shape would throw away the column widths and
- * Details choices every tester set, so the exact strings are pinned here.
- */
 public class EditorKindTest {
 
     @Test

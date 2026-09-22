@@ -47,7 +47,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        final @NotNull Optional<TestCaseDto> selected = TestinData.singleSelectedCase(e);
+        final @NotNull Optional<TestCaseDto> selected = TestinData.singleSelectedTestCase(e);
         final @NotNull Optional<RunEditor> runEditor = TestinData.runEditor(e);
         if (selected.isEmpty() || runEditor.isEmpty()) return;
 
@@ -86,7 +86,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
         GrayWithReason.unless(this, e, TestinData.runEditor(e)
-                        .flatMap(runEditor -> TestinData.singleSelectedCase(e).flatMap(tc -> runEditor.runItem(tc.getId())))
+                        .flatMap(runEditor -> TestinData.singleSelectedTestCase(e).flatMap(tc -> runEditor.runItem(tc.getId())))
                         .filter(item -> item.shownStatus() == TestStatus.FAILED)
                         .isPresent(),
                 Bundle.message("run.item.details.disabled.description"));

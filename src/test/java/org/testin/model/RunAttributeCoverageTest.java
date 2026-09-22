@@ -26,30 +26,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Everything a run records about a failure has somewhere a tester can see it.
- * <p>
- * The gap this closes was silent for as long as it existed. A run row has always
- * carried a stacktrace, and {@link FailureDetail} has always known to clear it
- * when a case passes. But it had no {@link RunEditorAttributes} constant, so it
- * was not a grid column, not a toolbar attribute, and printed by one report
- * format of four. Nothing failed; the field was simply written and never read.
- * <p>
- * That cost nothing while a tester had to paste into the box by hand, and became
- * the plugin's least visible value the moment automation started filling it.
- */
 public class RunAttributeCoverageTest {
 
-    /**
-     * A tripwire on the count rather than a mapping by name, because the failure
-     * is a new field being added here and nowhere else. Whoever adds it reads
-     * this line and knows what the other half of the work is.
-     * <p>
-     * Six, and five attributes: the screenshots have none of their own (#50). A
-     * screenshot is never text, so it has no grid cell and no report column; it
-     * is shown as a thumbnail in the row the Stacktrace attribute draws in the
-     * details panel (Rule-VIEW-PANEL-081), the one the failure form shows.
-     */
     @Test
     public void everyFailureDetailIsAlsoARunAttribute() {
         assertEquals(FailureDetail.values().length, 6,

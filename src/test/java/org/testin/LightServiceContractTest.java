@@ -33,40 +33,12 @@ import java.util.stream.Stream;
 
 import static org.testng.Assert.fail;
 
-/**
- * Every {@code @Service} class keeps the contract the platform asks of a light
- * service: it is final, and it declares a constructor the platform will call.
- * <p>
- * Neither is visible to the compiler. The platform checks both by reflection the
- * first time something asks for the service, and throws a {@code PluginException}
- * there - which is to say, in front of the tester, in whichever feature happened
- * to ask first. Two shipped that way in one day: a service that was not final,
- * so running a test set died on the menu click, and one whose generated
- * constructor had grown a second parameter, so nothing that touched it worked at
- * all.
- * <p>
- * A generated constructor is the sharper of the two, because it changes shape on
- * its own: Lombok's {@code @AllArgsConstructor} skips a final field with an
- * initializer and includes a non-final one without, so adding an ordinary field
- * silently rewrites the signature the platform is looking for.
- * <p>
- * Written as a scan of the sources rather than of the classpath, and for the
- * same reason as {@link EnumNullContractTest}: tests run under the platform's
- * own class loader, which serves classes but will not enumerate a package
- * directory as a resource.
- */
 public class LightServiceContractTest {
 
     private static final @NotNull Path SOURCE_ROOT = Paths.get("src", "main", "java");
 
     private static final @NotNull String ROOT_PACKAGE = "org.testin";
 
-    /**
-     * The constructors {@code ComponentManagerImpl} will call, as parameter
-     * counts by type name. A coroutine scope is named rather than imported so
-     * this test does not depend on the Kotlin coroutines classes being on the
-     * test classpath.
-     */
     private static final @NotNull List<String> ACCEPTED = List.of(
             "",
             "com.intellij.openapi.project.Project",
@@ -118,11 +90,6 @@ public class LightServiceContractTest {
         return relative.substring(0, relative.length() - ".java".length()).replace('/', '.');
     }
 
-    /**
-     * Loads without running the initializer: this test asks what a class
-     * declares, and a class that cannot initialize outside a running IDE still
-     * has to declare it correctly.
-     */
     private static @Nullable Class<?> loadWithoutInitializing(final @NotNull ClassLoader loader, final @NotNull String name) {
         try {
             return Class.forName(name, false, loader);

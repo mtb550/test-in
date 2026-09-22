@@ -23,9 +23,6 @@ import java.util.Optional;
 
 import static org.testng.Assert.assertEquals;
 
-/**
- * What one issue can hold (#28).
- */
 public class BugLimitsTest {
 
     @Test

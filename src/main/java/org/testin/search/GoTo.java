@@ -42,10 +42,10 @@ public final class GoTo {
     public static void the(final @NotNull Project p, final @NotNull Hit hit) {
         Logger.info("Going to " + hit.name() + " in " + hit.where());
 
-        hit.testCase().ifPresentOrElse(tc -> toCase(p, hit, tc), () -> toNode(p, hit));
+        hit.testCase().ifPresentOrElse(tc -> toTestCase(p, hit, tc), () -> toNode(p, hit));
     }
 
-    private static void toCase(final @NotNull Project p, final @NotNull Hit hit, final @NotNull TestCaseDto tc) {
+    private static void toTestCase(final @NotNull Project p, final @NotNull Hit hit, final @NotNull TestCaseDto tc) {
         showTree(p, WITHOUT_FOCUS, tree -> tree.reveal(hit.node().getPath()));
 
         Services.getInstance(p, TestinEditors.class).openAndSelect(p, hit.node(), tc);

@@ -97,7 +97,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
     private volatile @NotNull Optional<TestRunDto> run = Optional.empty();
 
-    private @NotNull Optional<UUID> executingCase = Optional.empty();
+    private @NotNull Optional<UUID> executingTestCase = Optional.empty();
 
     private boolean loaded;
 
@@ -131,7 +131,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                         .collect(Collectors.toMap(TestRunItems::getId, item -> item,
                                 (existingItem, duplicateItem) -> existingItem));
 
-                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(fromDisk.getResults().stream().map(TestRunItems::liveCase).toList());
+                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(fromDisk.getResults().stream().map(TestRunItems::liveTestCase).toList());
                 Services.getInstance(p, TestCaseValues.class).load(ordered);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
@@ -179,7 +179,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-150
     @Override
     protected void beforeReload() {
-        final boolean timing = executingCase.isPresent();
+        final boolean timing = executingTestCase.isPresent();
 
         haltExecution();
         if (timing) saveRun();
@@ -229,7 +229,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-227
     public int getCurrentlyExecutingIndex() {
-        return executingCase.map(id -> {
+        return executingTestCase.map(id -> {
             for (int i = 0; i < currentTestCases.size(); i++) {
                 if (currentTestCases.get(i).getId().equals(id)) return i;
             }
@@ -238,8 +238,8 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-227
-    public boolean executingCaseIsHidden() {
-        return executingCase.isPresent() && getCurrentlyExecutingIndex() == -1;
+    public boolean executingTestCaseIsHidden() {
+        return executingTestCase.isPresent() && getCurrentlyExecutingIndex() == -1;
     }
 
     private void buildOpeningPanel() {
@@ -275,7 +275,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     @Override
     public @NotNull String cardTitle(final @NotNull TestCaseDto tc) {
         final @NotNull Set<RunEditorAttributes> selected = getSelectedDetails();
-        final @NotNull TestCaseDto shown = runItem(tc.getId()).map(TestRunItems::shownCase).orElse(tc);
+        final @NotNull TestCaseDto shown = runItem(tc.getId()).map(TestRunItems::shownTestCase).orElse(tc);
 
         return BaseCard.titleText(positionOf(tc),
                 selected.contains(RunEditorAttributes.ORDER),
@@ -382,7 +382,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
             return;
         }
 
-        executingCase = Optional.of(currentTestCases.get(globalIndex).getId());
+        executingTestCase = Optional.of(currentTestCases.get(globalIndex).getId());
 
         final int expectedPage = (globalIndex / pageSize) + 1;
         if (currentPage != expectedPage) {
@@ -417,8 +417,8 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     }
 
     @Override
-    public void launching(final @NotNull UUID caseId) {
-        launchedHere.add(caseId);
+    public void launching(final @NotNull UUID testCaseId) {
+        launchedHere.add(testCaseId);
 
         markStartedByAutomation();
     }
@@ -556,14 +556,14 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     }
 
     // UC-EDITOR-PANEL-046
-    public @NotNull Duration getCurrentCaseElapsed() {
-        return executingCase.flatMap(this::runItem)
+    public @NotNull Duration getCurrentTestCaseElapsed() {
+        return executingTestCase.flatMap(this::runItem)
                 .map(TestRunItems::getDuration)
                 .orElse(Duration.ZERO);
     }
 
     public boolean isExecuting() {
-        return executingCase.isPresent() || isAutomationRunning();
+        return executingTestCase.isPresent() || isAutomationRunning();
     }
 
     private boolean isAutomationRunning() {
@@ -631,7 +631,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     private void stopAutomation() {
         if (launchedHere.isEmpty()) return;
 
-        final int stopped = Services.getInstance(p, TestNGExecution.class).stopCases(launchedHere);
+        final int stopped = Services.getInstance(p, TestNGExecution.class).stopTestCases(launchedHere);
         if (stopped == 0) return;
 
         Logger.info("Stopped " + stopped + " test case(s) running from '" + parent.getName() + "'");
@@ -640,7 +640,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-150
     private void haltExecution() {
         executionTimer.stop();
-        executingCase = Optional.empty();
+        executingTestCase = Optional.empty();
         onExecutionStateChanged();
     }
 

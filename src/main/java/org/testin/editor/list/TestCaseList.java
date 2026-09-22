@@ -26,10 +26,10 @@ import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
 
 // UC-EDITOR-PANEL-001, UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-003
-public class CaseList extends JBList<TestCaseDto> implements UiDataProvider {
+public class TestCaseList extends JBList<TestCaseDto> implements UiDataProvider {
     private final @NotNull TestinEditor editor;
 
-    public CaseList(final @NotNull CollectionListModel<TestCaseDto> model, final @NotNull TestinEditor editor) {
+    public TestCaseList(final @NotNull CollectionListModel<TestCaseDto> model, final @NotNull TestinEditor editor) {
         super(model);
         this.editor = editor;
     }

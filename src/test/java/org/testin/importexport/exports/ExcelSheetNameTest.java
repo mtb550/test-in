@@ -28,25 +28,6 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Sheet names an export can actually write.
- * <p>
- * A workbook is one sheet per test set, named after it, and Excel is strict
- * about both: at most 31 characters, none of {@code \ / * ? [ ] :}, and no two
- * sheets sharing a name whatever their case. POI enforces all of it by throwing,
- * so a name this method gets wrong is an export that dies rather than one that
- * looks odd.
- * <p>
- * Two test sets collide more easily than their names suggest. They are distinct
- * on disk and still collide here, because the characters Excel refuses are
- * replaced: "A/B" and "A*B" both become "A_B". Anything past 31 characters is
- * also cut, which collapses names that differ only in their tail.
- * <p>
- * The previous attempt at that retried with {@code name.substring(0, 28) +
- * "..."}, which failed both ways round: a name shorter than 28 characters threw
- * out of substring and killed the export, and a longer one produced the very
- * same string on every pass, so the loop never ended. Both are pinned below.
- */
 public class ExcelSheetNameTest {
 
     @Test
@@ -60,10 +41,6 @@ public class ExcelSheetNameTest {
         }
     }
 
-    /**
-     * The crash: two short names that sanitize alike. "Login" is five
-     * characters, and the old code asked for its first 28.
-     */
     @Test
     public void aSecondShortSheetOfTheSameNameIsNumbered() {
         try {
@@ -78,10 +55,6 @@ public class ExcelSheetNameTest {
         }
     }
 
-    /**
-     * The hang: a name at the limit, retried. Every pass used to rebuild the
-     * same 28 characters and the same ellipsis.
-     */
     @Test
     public void namesAtTheLimitStillGetDistinctSheets() {
         try {
@@ -105,9 +78,6 @@ public class ExcelSheetNameTest {
         }
     }
 
-    /**
-     * Case is not a difference to Excel, so it must not be one here either.
-     */
     @Test
     public void twoNamesDifferingOnlyInCaseAreStillTwoSheets() {
         try {
@@ -125,10 +95,6 @@ public class ExcelSheetNameTest {
         }
     }
 
-    /**
-     * The characters the old regex never removed. A colon is illegal in Excel
-     * and a leading quote is illegal at the ends, and POI throws on both.
-     */
     @Test
     public void theCharactersExcelRefusesAreReplaced() {
         try {

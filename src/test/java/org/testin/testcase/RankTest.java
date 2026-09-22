@@ -24,19 +24,10 @@ import java.util.List;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The one promise ranks make: between any two of them there is another, so
- * moving a test case writes that case and nothing else.
- * <p>
- * Everything the ordering rests on is here. A rank that ordered wrong would put
- * a tester's cases in an order they did not choose. A rank that could not be
- * squeezed between two others would send the plugin back to rewriting a whole
- * test set to move one row.
- */
 public class RankTest {
 
     @Test
-    public void theFirstCaseInAnEmptySetGetsRoomOnBothSides() {
+    public void theFirstTestCaseInAnEmptySetGetsRoomOnBothSides() {
         final String first = Rank.between("", "");
 
         assertTrue(first.compareTo(Rank.between("", first)) > 0, "something fits before it");
@@ -59,8 +50,6 @@ public class RankTest {
         String low = Rank.between("", "");
         String high = Rank.after(low);
 
-        // Dropping a case into the same gap over and over is the worst case a
-        // tester can produce, and it has to keep working.
         for (int i = 0; i < 200; i++) {
             final String middle = Rank.between(low, high);
 
@@ -72,7 +61,7 @@ public class RankTest {
     }
 
     @Test
-    public void aRankFitsBeforeTheFirstCase() {
+    public void aRankFitsBeforeTheFirstTestCase() {
         String first = Rank.between("", "");
 
         for (int i = 0; i < 100; i++) {
@@ -99,11 +88,6 @@ public class RankTest {
         }
     }
 
-    /**
-     * A set bigger than the alphabet still gets distinct ranks in order - a
-     * project with three hundred cases in one set is a real test suite, not an
-     * edge case.
-     */
     @Test
     public void aLargeSpreadStaysDistinctAndOrdered() {
         final List<String> ranks = Rank.spread(300);
@@ -114,13 +98,6 @@ public class RankTest {
         assertEquals(ranks.stream().distinct().count(), 300L, "and holds no duplicates");
     }
 
-    /**
-     * Past the alphabet, appending grows the rank by a character rather than
-     * running out: {@code z} is followed by {@code zm}, which sorts after it
-     * because a longer string with the same prefix does. Not {@code za} -
-     * {@code a} is the zero digit, so {@code za} would be the same position as
-     * {@code z} written twice, with no room between them.
-     */
     @Test
     public void appendingPastTheAlphabetGrowsTheRank() {
         assertEquals(Rank.after("y"), "z");
@@ -130,14 +107,8 @@ public class RankTest {
         assertTrue("z".compareTo(Rank.after("z")) < 0, "and the longer rank still sorts after");
     }
 
-    /**
-     * A set of any size is written with as many characters as it needs and no
-     * more. A thousand cases used to produce a rank seventy-one characters long,
-     * because the spread stepped one letter at a time and then piled zs on the
-     * end once the alphabet ran out.
-     */
     @Test
-    public void aSpreadStaysShortHoweverManyCasesThereAre() {
+    public void aSpreadStaysShortHoweverManyTestCasesThereAre() {
         assertEquals(Rank.spread(20).stream().mapToInt(String::length).max().orElse(0), 1);
         assertEquals(Rank.spread(500).stream().mapToInt(String::length).max().orElse(0), 2);
         assertEquals(Rank.spread(1000).stream().mapToInt(String::length).max().orElse(0), 3);

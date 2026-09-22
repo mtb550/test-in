@@ -67,9 +67,9 @@ public class ImportAction extends DumbAwareAction {
 
     private static final int METHODS_PER_COMMAND = 200;
 
-    private static void report(final int cases, final long startedAt, final long readyAt) {
+    private static void report(final int testCases, final long startedAt, final long readyAt) {
         final long finishedAt = System.currentTimeMillis();
-        Logger.info("Import: " + cases + " cases in " + (finishedAt - startedAt) + "ms"
+        Logger.info("Import: " + testCases + " cases in " + (finishedAt - startedAt) + "ms"
                 + " (waiting for the index " + (readyAt - startedAt) + "ms,"
                 + " writing and generating " + (finishedAt - readyAt) + "ms)");
     }
@@ -112,17 +112,17 @@ public class ImportAction extends DumbAwareAction {
         private void openImportDialog(final @NotNull DirectoryDto dirDto) {
             new ImportDialog(p, TestEditorAttributes.all(Can.IMPORT),
                     (file, format) -> format.importToFile(p, file),
-                    selectedCasesBySheet -> executeImportWriteAction(dirDto, selectedCasesBySheet))
+                    selectedTestCasesBySheet -> executeImportWriteAction(dirDto, selectedTestCasesBySheet))
                     .show();
         }
 
         // UC-SHARE-005, UC-SHARE-006
-        private void executeImportWriteAction(final @NotNull DirectoryDto selectedDirDto, final @NotNull Map<String, List<TestCaseDto>> selectedCasesBySheet) {
+        private void executeImportWriteAction(final @NotNull DirectoryDto selectedDirDto, final @NotNull Map<String, List<TestCaseDto>> selectedTestCasesBySheet) {
             final @NotNull Path targetPath = selectedDirDto.getPath();
 
             final boolean generateCode = CodeOn.isOnOrWarnOnce(p);
 
-            final int total = selectedCasesBySheet.values().stream().mapToInt(List::size).sum();
+            final int total = selectedTestCasesBySheet.values().stream().mapToInt(List::size).sum();
 
             BackgroundWork.run(p, Bundle.message("import.task.importing", String.valueOf(total), selectedDirDto.getName()),
                     Bundle.message("import.failed.title"), indicator -> {
@@ -141,18 +141,18 @@ public class ImportAction extends DumbAwareAction {
 
                         try {
                             final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targets =
-                                    targetSets(selectedDirDto, targetPath, selectedCasesBySheet);
+                                    targetSets(selectedDirDto, targetPath, selectedTestCasesBySheet);
                             targets.keySet().forEach(made -> stillEmpty.add(made.getName()));
 
                             for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set : targets.entrySet()) {
                                 final @NotNull TestSetDirectoryDto into = set.getKey();
-                                final @NotNull List<TestCaseDto> cases = set.getValue();
+                                final @NotNull List<TestCaseDto> testCases = set.getValue();
                                 final @NotNull Path setPath = into.getPath();
 
-                                final @NotNull List<TestCaseDto> written = linkAndSaveTestCases(setPath, cases, rankOfTail(setPath), indicator, imported, total);
+                                final @NotNull List<TestCaseDto> written = linkAndSaveTestCases(setPath, testCases, rankOfTail(setPath), indicator, imported, total);
                                 if (!written.isEmpty()) stillEmpty.remove(into.getName());
 
-                                for (final TestCaseDto tc : cases) tc.setParent(into);
+                                for (final TestCaseDto tc : testCases) tc.setParent(into);
 
                                 if (generateCode) generateTestMethods(written, into.getName(), indicator);
 
@@ -209,16 +209,16 @@ public class ImportAction extends DumbAwareAction {
         }
 
         // UC-SHARE-006, Rule-SHARE-031
-        private @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targetSets(final @NotNull DirectoryDto selectedDirDto, final @NotNull Path targetPath, final @NotNull Map<String, List<TestCaseDto>> casesBySheet) {
+        private @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targetSets(final @NotNull DirectoryDto selectedDirDto, final @NotNull Path targetPath, final @NotNull Map<String, List<TestCaseDto>> testCasesBySheet) {
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
                 final @NotNull List<TestCaseDto> everything = new ArrayList<>();
-                casesBySheet.values().forEach(everything::addAll);
+                testCasesBySheet.values().forEach(everything::addAll);
 
                 return Map.of(ts, everything);
             }
 
             final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> sets = new LinkedHashMap<>();
-            casesBySheet.forEach((sheetName, cases) -> {
+            testCasesBySheet.forEach((sheetName, testCases) -> {
                 final @NotNull String name = NameSanitizer.removeSpecialChars(sheetName);
                 final @NotNull Path path = targetPath.resolve(name);
 
@@ -234,7 +234,7 @@ public class ImportAction extends DumbAwareAction {
                     }
 
                     return made;
-                }), cases);
+                }), testCases);
             });
 
             return sets;

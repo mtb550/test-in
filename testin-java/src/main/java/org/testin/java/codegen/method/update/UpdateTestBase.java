@@ -74,7 +74,7 @@ public class UpdateTestBase {
     }
 
     protected @NotNull Optional<PsiMethod> findMethodByTestName(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
-        return GeneratedMethod.forCase(pc, tc);
+        return GeneratedMethod.forTestCase(pc, tc);
     }
 
     protected @NotNull Optional<PsiAnnotation> getTestAnnotation(final @NotNull PsiMethod pm) {
@@ -177,13 +177,13 @@ public class UpdateTestBase {
 
         final @NotNull Runnable inCommand = () ->
                 WriteCommandAction.runWriteCommandAction(p, title, null,
-                        () -> byClass.forEach((path, cases) -> writeAll(p, path, cases, updater)));
+                        () -> byClass.forEach((path, testCases) -> writeAll(p, path, testCases, updater)));
 
         if (CommandProcessor.getInstance().getCurrentCommand() != null) inCommand.run();
         else ApplicationManager.getApplication().invokeLater(inCommand);
     }
 
-    private void writeAll(final @NotNull Project p, final @NotNull String path, final @NotNull List<TestCaseDto> cases, final @NotNull BiConsumer<PsiMethod, TestCaseDto> updater) {
+    private void writeAll(final @NotNull Project p, final @NotNull String path, final @NotNull List<TestCaseDto> testCases, final @NotNull BiConsumer<PsiMethod, TestCaseDto> updater) {
         final @NotNull Optional<PsiClass> target = GeneratedClass.byName(p, path);
 
         if (target.isEmpty()) {
@@ -193,10 +193,10 @@ public class UpdateTestBase {
 
         final @NotNull PsiClass pc = target.orElseThrow();
 
-        final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byCaseId(pc);
+        final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byTestCaseId(pc);
 
         int written = 0;
-        for (final TestCaseDto tc : cases) {
+        for (final TestCaseDto tc : testCases) {
             final @Nullable PsiMethod pm = methods.get(tc.getId().toString());
             if (pm == null) continue;
 

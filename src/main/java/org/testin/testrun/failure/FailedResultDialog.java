@@ -40,7 +40,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog {
         super(p);
         this.onSave = onSave;
 
-        final @NotNull TestCaseDto tc = runItem.shownCase();
+        final @NotNull TestCaseDto tc = runItem.shownTestCase();
 
         fields = new FailureFields(p, runPath, runItem);
 

@@ -17,18 +17,14 @@
 package org.testin.editor;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.DataManager;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionUiKind;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.ex.ActionUtil;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.ActionSystem;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
@@ -114,17 +110,7 @@ public abstract class AbstractIconButton extends JButton {
 
     @Override
     protected void fireActionPerformed(final @NotNull ActionEvent event) {
-        final @NotNull AnAction clicked = new DumbAwareAction() {
-            @Override
-            public void actionPerformed(final @NotNull AnActionEvent e) {
-                swingClick(event);
-            }
-        };
-
-        ActionUtil.performAction(clicked, AnActionEvent.createEvent(clicked,
-                DataManager.getInstance().getDataContext(this),
-                clicked.getTemplatePresentation().clone(),
-                ActionPlaces.TOOLBAR, ActionUiKind.TOOLBAR, null));
+        ActionSystem.perform(this, ActionPlaces.TOOLBAR, ActionUiKind.TOOLBAR, () -> swingClick(event));
     }
 
     private void swingClick(final @NotNull ActionEvent event) {

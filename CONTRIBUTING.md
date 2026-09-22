@@ -161,7 +161,7 @@ is on the run.
 ./gradlew inspect
 ```
 
-Locally it is for the one case CI cannot serve: checking a change before it is
+Locally it is for the one job CI cannot do: checking a change before it is
 pushed at all, usually because it touched nullability or annotations across many
 files. It costs one indexing pass — ten to twenty minutes — so it is a sweep
 gate rather than a per-commit one, and a gate that takes twenty minutes by hand
@@ -175,30 +175,45 @@ IDE as *Inspected*. A warning the IDE shows there is a warning CI fails on. The
 exceptions are the rules a headless run cannot be trusted with, and `$notGated`
 in `tools/inspect.ps1` names each one with its reason:
 
-| Not gated                                      | Why                                                                                                                          |
-|------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| `unused`, `SameReturnValue`, `RedundantThrows` | Lombok writes members the headless run cannot see, and `plugin.xml` and the content modules call code from outside its scope |
-| `UnusedProperty`                               | The platform reads action, group and tool window keys by name, and `BundleKeysTest` checks that every other key has a reader |
-| `UndefinedParamsPresent`                       | A workflow action's inputs come from its metadata online, which the headless run does not fetch                              |
-| `JSUnresolvedLibraryURL`                       | It asks whether this machine has downloaded a library that a page loads from a CDN                                           |
-| `DuplicatedDisplayString`                      | Counted against `.github/display-string-baseline.txt` instead of forbidden. It stands at 0                                   |
+| Not gated                                                                                          | Why                                                                                                                                                                                                                                                                          |
+|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `unused`, where a method is *not reachable from the entry points* or a constructor is *never used* | The platform reaches the method through an interface it implements, and Lombok's `@Builder` calls the constructor. Every other unused finding is gated                                                                                                                       |
+| `unused`, on a core method a content module calls                                                  | `testin-java` and `testin-testng` depend on the core, and the core packages them rather than depending back, so neither the IDE nor the inspector finds the caller. `@FromContentModule` marks those methods, and `.idea/misc.xml` names it an entry point so the IDE agrees |
+| `SameReturnValue`                                                                                  | Judged across every implementation, and the enums' getters are Lombok's, which the headless run cannot see                                                                                                                                                                   |
+| `RedundantThrows`                                                                                  | The Java module implements `JavaSourceRoot`'s interfaces and throws what they declare                                                                                                                                                                                        |
+| `UnusedProperty`                                                                                   | The platform reads action, group and tool window keys by name, and `BundleKeysTest` checks that every other key has a reader                                                                                                                                                 |
+| `UndefinedParamsPresent`                                                                           | A workflow action's inputs come from its metadata online, which the headless run does not fetch                                                                                                                                                                              |
+| `JSUnresolvedLibraryURL`                                                                           | It asks whether this machine has downloaded a library that a page loads from a CDN                                                                                                                                                                                           |
+| `DuplicatedDisplayString`                                                                          | Counted against `.github/display-string-baseline.txt` instead of forbidden. It stands at 0                                                                                                                                                                                   |
+
+The four rules above are the global ones, and the headless run under-reports
+them all: it sees neither Lombok's generated code nor the content modules'
+callers. `UnusedReturnValue` is gated and reported zero on 22 September 2026,
+while the IDE found `FormRows.wideRow`. For these four, **Code | Inspect Code**
+in the IDE is the honest list.
+
+A new `@SuppressWarnings` or `//noinspection` fails the gate too, through the
+`SuppressionAnnotation` inspection. The profile allows `UnstableApiUsage` only,
+for the one platform call `build.gradle.kts` names.
 
 The spelling and grammar checkers skip the translation bundles, because their
-words are the translator's to check. Two files are outside the scope, because
+words are the translator's to check. The profile does it, through the
+Translations scope in `.idea/scopes/`, so the IDE and CI read the same list. Two files are outside the scope, because
 their bytes are fixed by something else: the Jekyll stylesheet and the bug
 report template. `Inspected.xml` says why.
 
-Seven rules are the script's own, because no IntelliJ inspection makes them:
+Eight rules are the script's own, because no IntelliJ inspection makes them:
 
-| Rule                            | What it forbids                                                                   |
-|---------------------------------|-----------------------------------------------------------------------------------|
-| `WrappedMethodDeclaration`      | A method declaration written over more than one line                              |
-| `StaticMutableState`            | A static that is not final in the packages that model the data                    |
-| `HandWrittenPrivateConstructor` | An empty private constructor where `@NoArgsConstructor(access = PRIVATE)` says it |
-| `DriftedCaption`                | One concept spelled two ways in front of the same tester                          |
-| `OrphanedJavadoc`               | A doc block followed by a second one, which javac throws away                     |
-| `MissingCopyright`              | A `.java` file that does not open with the Apache 2.0 notice                      |
-| `HtmlParagraphInMarkdown`       | A bare `<p>` in a Markdown file, which turns what follows into raw HTML           |
+| Rule                            | What it forbids                                                                                                                                                                                 |
+|---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `WrappedMethodDeclaration`      | A method declaration written over more than one line                                                                                                                                            |
+| `StaticMutableState`            | A static that is not final in the packages that model the data                                                                                                                                  |
+| `HandWrittenPrivateConstructor` | An empty private constructor where `@NoArgsConstructor(access = PRIVATE)` says it                                                                                                               |
+| `NonMarkerComment`              | A comment in a `.java` file that is not a `UC-` or `Rule-` marker, in the tests as well as in `src/main`. The copyright header and the comments a machine reads, such as `//noinspection`, stay |
+| `DriftedCaption`                | One concept spelled two ways in front of the same tester                                                                                                                                        |
+| `OrphanedJavadoc`               | A doc block followed by a second one, which javac throws away                                                                                                                                   |
+| `MissingCopyright`              | A `.java` file that does not open with the Apache 2.0 notice                                                                                                                                    |
+| `HtmlParagraphInMarkdown`       | A bare `<p>` in a Markdown file, which turns what follows into raw HTML                                                                                                                         |
 
 The inspector's rules are named one by one in
 `.idea/inspectionProfiles/Testin.xml`, so the gate does not depend on what a
@@ -239,7 +254,7 @@ string a tester reads should have one owner; the number may go down and never up
 
 | Workflow      | When                                                                                                                                                                                                                                                                                               |
 |---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `build.yml`   | Every push to `main` and every pull request. Compiles, runs the unit tests, and verifies against **IntelliJ IDEA** - the one verdict that turns a pull request red                                                                                                                                 |
+| `build.yml`   | Every push to `main` and every pull request. Compiles, runs the unit tests and the IDE tests, and verifies against **IntelliJ IDEA** - the one verdict that turns a pull request red                                                                                                               |
 | `verify.yml`  | Every push to `main`, plus every second day and on demand. The same verifier against **all six targets** - IntelliJ IDEA, PyCharm and Rider at 261 and 262 - compared against `.github/verification-baseline.txt`. This is the number the JetBrains Marketplace shows a tester before they install |
 | `inspect.yml` | Every push to `main`, and on demand against a branch                                                                                                                                                                                                                                               |
 

@@ -34,8 +34,8 @@ public final class TestCaseOrder {
             .thenComparing(TestCaseDto::getId);
 
     // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-013
-    public static @NotNull List<TestCaseDto> ordered(final @NotNull List<TestCaseDto> cases) {
-        return cases.stream().sorted(BY_RANK).toList();
+    public static @NotNull List<TestCaseDto> ordered(final @NotNull List<TestCaseDto> testCases) {
+        return testCases.stream().sorted(BY_RANK).toList();
     }
 
     // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-014

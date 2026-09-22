@@ -121,8 +121,9 @@ from the menu, or on several test cases at once, is never timed.
 ## The same bug, on the tab beside this one
 
 The **Bug Severity** and **Bug Priority** rows say what *this* run recorded. The
-[Open Bugs tab](seeOpenBugs.md) says what every run recorded, so a case that has
-failed in more than one cycle shows one bug here and all of them there.
+[Open Bugs tab](seeOpenBugs.md) says what every run recorded, so a test case
+that has failed in more than one cycle shows one bug here and all of them
+there.
 
 The two used to disagree rather than differ: this panel read **Blocker** and
 **High** while the tab beside it said no bugs were found, because that tab never

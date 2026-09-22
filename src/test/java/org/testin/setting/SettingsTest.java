@@ -30,16 +30,6 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The settings contract. Two behaviors matter beyond storing values:
- * <p>
- * Moving the Testin root invalidates the tree, so Apply has to rebuild it -
- * and nothing else may, because a rebuild re-indexes every test project.
- * <p>
- * The tester name and role are not cached anywhere: they are read from the
- * state at the moment they are used, and reloading the state (which is how a
- * PersistentStateComponent is restored) replaces them for every later read.
- */
 public class SettingsTest {
 
     private static AppSettingsState state(final String testerName, final String testerRole) {
@@ -50,18 +40,6 @@ public class SettingsTest {
         return settings;
     }
 
-    /**
-     * What actually makes a setting the same in every open project: one
-     * application-level service over one file. Not the scope of
-     * {@link TestinRoot}, which is project-level for the convenience of callers
-     * that already hold a project and reads this same shared object.
-     * <p>
-     * Asserted rather than assumed, because the failure is silent. Change this
-     * to {@code Service.Level.PROJECT} and every setting quietly becomes
-     * per-project: nothing fails to compile, no test about values breaks, and
-     * the tester finds out by setting a root in one project and not seeing it
-     * in another (#70).
-     */
     @Test
     public void settingsAreOneObjectAndOneFileForTheWholeIde() {
         final Service service = AppSettingsState.class.getAnnotation(Service.class);
@@ -78,8 +56,6 @@ public class SettingsTest {
                 "renaming the state loses every existing tester's settings");
     }
 
-    // ---------------------------------------------------------------- root path
-
     @Test
     public void everyEmptyFormOfARootMeansNoRootConfigured() {
         assertEquals(TestinRoot.normalize(null), TestinRoot.NONE);
@@ -95,8 +71,6 @@ public class SettingsTest {
         assertEquals(TestinRoot.normalize("  C:/testin  "), root);
         assertEquals(TestinRoot.normalize("C:/testin"), root);
     }
-
-    // -------------------------------------------------- changing the testin folder
 
     @Test
     public void changingTheTestinFolderRequiresTheTreeToReload() {
@@ -119,10 +93,6 @@ public class SettingsTest {
         assertFalse(TestinRoot.isRootChanged("C:/testin", "C:/testin"));
     }
 
-    /**
-     * Apply runs on every OK, so a value that only differs by surrounding
-     * whitespace must not trigger a full re-index.
-     */
     @Test
     public void whitespaceAroundAnUnchangedRootIsNotAChange() {
         assertFalse(TestinRoot.isRootChanged("C:/testin", "  C:/testin  "));
@@ -136,12 +106,6 @@ public class SettingsTest {
         assertFalse(TestinRoot.isRootChanged(null, null));
     }
 
-    // ------------------------------------------------- tester name and role
-
-    /**
-     * The counterpart of the rule above: renaming the tester must not cost a
-     * re-index of every test project.
-     */
     @Test
     public void changingTesterNameOrRoleNeverReloadsTheTree() {
         final AppSettingsState before = state("Sara", "QA Engineer");
@@ -152,11 +116,6 @@ public class SettingsTest {
         assertNotEquals(before.testerRole, after.testerRole);
     }
 
-    /**
-     * How the indexer and the report generators read the tester: from the state,
-     * at the moment of use. Nothing copies these into a cache, so a change is
-     * visible to the next read without any reload step.
-     */
     @Test
     public void theTesterIsReadLiveSoNoCacheCanGoStale() {
         final AppSettingsState settings = state("Sara", "QA Engineer");
@@ -174,10 +133,6 @@ public class SettingsTest {
         assertEquals(roleAtPointOfUse.get(), "Test Lead");
     }
 
-    /**
-     * Reloading the persisted state is the one moment the settings object is
-     * replaced wholesale - after it, every later read must see the new tester.
-     */
     @Test
     public void reloadingTheStateReplacesTheTesterForEveryLaterRead() {
         final AppSettingsState settings = state("Sara", "QA Engineer");
@@ -189,8 +144,6 @@ public class SettingsTest {
         assertEquals(settings.testerRole, "Test Lead");
         assertEquals(nameAtPointOfUse.get(), "Omar");
     }
-
-    // ------------------------------------------------------------ state itself
 
     @Test
     public void reloadingTheStateCarriesEveryField() {

@@ -25,15 +25,6 @@ import java.util.UUID;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * What a run row keeps when a test framework reports one of its cases.
- * <p>
- * The rule worth a test is the empty one. Every verdict passes a failure now,
- * including the ones a tester gives by hand. So a {@link Failure#NONE} that
- * wrote itself in would quietly wipe what they had typed into
- * {@code FailedResultDialog}. And it would do it on the happy path, on the way
- * to a green Passed.
- */
 public class FailureTest {
 
     private static TestRunItems row() {
@@ -77,7 +68,6 @@ public class FailureTest {
     public void passingAfterwardsClearsWhatTheFailureRecorded() {
         final TestRunItems item = row();
 
-        // The order RunStatusService.recordReported uses: record, then judge.
         new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
         item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
 
@@ -96,11 +86,6 @@ public class FailureTest {
         assertEquals(item.getExecutedBy(), "tester");
     }
 
-    /**
-     * An automated failure replaces what the last failure said and keeps the bug
-     * it was reported as: the same run item failing again in the same run is
-     * most often the same bug, and only a pass clears the link (#28, P26).
-     */
     @Test
     public void anAutomatedFailureKeepsTheBugIssueLink() {
         final TestRunItems item = row().setBugIssueUrl("https://github.com/mtb550/product/issues/123");
@@ -129,10 +114,6 @@ public class FailureTest {
         assertEquals(item.getScreenshots().size(), 1, "a manual verdict must not erase them");
     }
 
-    /**
-     * What a reported failure clears and what it names are one list: what
-     * happened, never the bug (#50).
-     */
     @Test
     public void aReportedFailureNamesWhatHappenedAndNotTheBug() {
         final TestRunItems item = row().setActualResult("typed by hand").setScreenshots(List.of("k3f9a.png")).setBugSeverity(BugSeverity.MAJOR);

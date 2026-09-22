@@ -25,12 +25,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The undo/redo contract: undo runs the reverse, redo runs the forward again, a
- * new operation clears the redo history, the stack is bounded - and each
- * surface keeps its own history, so a test case removed in one editor is not
- * what CTRL+Z reaches for in another (#165).
- */
 public class UndoHistoriesTest {
 
     private static final UndoScope TREE = UndoScope.TREE;
@@ -106,11 +100,6 @@ public class UndoHistoriesTest {
         assertEquals(undone.get(), 20, "the undo stack must be capped");
     }
 
-    /**
-     * Two surfaces, two histories. This is the whole reason the service is keyed:
-     * a tester who removed cases in one editor and in another presses the same
-     * key in both and gets back what they removed there.
-     */
     @Test
     public void eachSurfaceKeepsItsOwnHistory() {
         final UndoHistories service = new UndoHistories();
@@ -130,10 +119,6 @@ public class UndoHistoriesTest {
         assertTrue(service.canUndo(TREE), "the tree still has its own operation to undo");
     }
 
-    /**
-     * An operation that falls out of reach is told so, because some of them are
-     * holding a copy of a removed test set until they are sure nobody wants it.
-     */
     @Test
     public void anOperationPushedOffTheEndIsForgotten() {
         final UndoHistories service = new UndoHistories();
@@ -141,8 +126,6 @@ public class UndoHistoriesTest {
         final AtomicInteger ignored = new AtomicInteger();
 
         for (int i = 0; i < 21; i++) {
-            // Reversals answer whether the whole of the work went, so these say
-            // yes: what is being counted here is that they were reached at all.
             service.push(TREE, new UndoHistories.Operation("op " + i,
                     () -> ignored.incrementAndGet() > 0,
                     () -> ignored.incrementAndGet() > 0,

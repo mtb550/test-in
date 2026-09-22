@@ -26,11 +26,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.expectThrows;
 
-/**
- * The framework's declaration contracts: a forgotten declaration part fails
- * with a message naming it, status bar entries keep the shown-equals-bound
- * invariant, and a selection component cannot be declared empty.
- */
 public class FrameworkDeclarationTest {
 
     @Test

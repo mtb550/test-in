@@ -196,7 +196,7 @@ public final class TestRunPdfGenerator {
                 final long count = section.count(summary);
                 if (count == 0) continue;
 
-                buildCaseTable(document, String.valueOf(sectionNumber++), section.getTitle(),
+                buildTestCaseTable(document, String.valueOf(sectionNumber++), section.getTitle(),
                         section.description(String.valueOf(count)), tr, boldFont, regularFont,
                         rgb(section.getHexColor()), rgb(section.textHex()), section.isWithFailureDetail(), section::matches);
             }
@@ -245,7 +245,7 @@ public final class TestRunPdfGenerator {
                 Integer.parseInt(hex.substring(4, 6), 16));
     }
 
-    private void buildCaseTable(final @NotNull Document document, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont, final @NotNull DeviceRgb headerBg, final @NotNull DeviceRgb headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
+    private void buildTestCaseTable(final @NotNull Document document, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont, final @NotNull DeviceRgb headerBg, final @NotNull DeviceRgb headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
         document.add(para(sectionNumber + ". " + sectionTitle)
                 .setFont(boldFont)
                 .setFontSize(ReportFont.SECTION.pt())
@@ -264,12 +264,12 @@ public final class TestRunPdfGenerator {
                 .setAutoLayout()
                 .setBorder(Border.NO_BORDER);
 
-        addCaseTableHeader(table, "#", headerBg, headerFg, boldFont);
-        addCaseTableHeader(table, Bundle.message("caption.test.case"), headerBg, headerFg, boldFont);
+        addTestCaseTableHeader(table, "#", headerBg, headerFg, boldFont);
+        addTestCaseTableHeader(table, Bundle.message("caption.test.case"), headerBg, headerFg, boldFont);
         if (withFailureDetail)
-            addCaseTableHeader(table, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg, boldFont);
+            addTestCaseTableHeader(table, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg, boldFont);
         if (withFailureDetail)
-            addCaseTableHeader(table, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg, boldFont);
+            addTestCaseTableHeader(table, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg, boldFont);
 
         int idx = 1;
         boolean alt = true;
@@ -287,8 +287,8 @@ public final class TestRunPdfGenerator {
                             .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(DARK_GRAY)
                             .setTextAlignment(TextAlignment.CENTER)));
 
-            final @NotNull String caseName = item.shownCase().getDescription();
-            final @NotNull String tcName = caseName.isEmpty() ? "—" : caseName;
+            final @NotNull String testCaseName = item.shownTestCase().getDescription();
+            final @NotNull String tcName = testCaseName.isEmpty() ? "—" : testCaseName;
             final @NotNull Cell testCaseCell = new Cell()
                     .setBackgroundColor(rowBg)
                     .setBorder(new SolidBorder(BORDER_GRAY, 1))
@@ -344,7 +344,7 @@ public final class TestRunPdfGenerator {
         document.add(table);
     }
 
-    private void addCaseTableHeader(final @NotNull Table table, final @NotNull String text, final @NotNull DeviceRgb bgColor, final @NotNull DeviceRgb textColor, final @NotNull PdfFont boldFont) {
+    private void addTestCaseTableHeader(final @NotNull Table table, final @NotNull String text, final @NotNull DeviceRgb bgColor, final @NotNull DeviceRgb textColor, final @NotNull PdfFont boldFont) {
         table.addCell(new Cell()
                 .setBackgroundColor(bgColor)
                 .setBorder(new SolidBorder(BORDER_GRAY, 1))

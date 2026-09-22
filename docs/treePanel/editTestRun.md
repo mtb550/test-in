@@ -69,13 +69,13 @@ This changes a test run that is not signed off yet.
   the dialog never removes it.
 - **Rule-TREE-PANEL-093** — The dialog opens with every row saying what the run
   actually covers, folders included. A folder is ticked only when everything
-  under it is ticked, so a folder is never ticked over cases the run does not
-  cover.
+  under it is ticked, so a folder is never ticked over test cases the run does
+  not cover.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is, drawn with Inactive beside its name like any other status. Its test sets,
-  cases and runs are not read, because a project nobody is working on is not
-  worth the walk.
+  test cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 

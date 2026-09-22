@@ -7,7 +7,25 @@ import java.util.zip.ZipInputStream
 
 plugins {
     id("java")
+    id("idea")
     id("org.jetbrains.intellij.platform")
+}
+
+// What the IDE and the headless inspector must not index. The sandbox alone is
+// 2.2 GB in 13,308 files - an IDE's own caches, logs and jcef store - and it
+// sits inside the project folder because that is where the platform plugin puts
+// it. Indexing it costs most of an inspection run and buys nothing: the scope
+// in .idea/scopes/Inspected.xml throws every one of those findings away again.
+idea {
+    module {
+        excludeDirs = excludeDirs + listOf(
+            file(".sandbox"),
+            file(".inspection"),
+            file(".intellijPlatform"),
+            file(".gradle"),
+            file("build")
+        )
+    }
 }
 
 group = "org.testin"
@@ -177,18 +195,21 @@ intellijPlatform {
         // plugin makes no internal call and the level goes back on (#140).
         //
         // EXPERIMENTAL_API_USAGES is the one level deliberately left off, for
-        // two usages that have no stable equivalent at all:
+        // one usage that has no stable equivalent at all:
+        // EditorTabColorProvider.getEditorTabForegroundColor, overridden to
+        // color a Testin tab's title. The stable half of that interface colors
+        // the background, and the other route, the VCS file status provider, is
+        // internal. It is still experimental in 2026.2. Drop it, with its
+        // SuppressWarnings, the release JetBrains makes it stable.
         //
-        //   - EditorTabColorProvider.getEditorTabForegroundColor, overridden to
-        //     color a Testin tab's title. The stable half of that interface
-        //     colors the background, which is left to the user's File Colors.
-        //   - WriteIntentReadAction.run, once, in light mode's failure form: its
-        //     spell-checked field is an editor, and building one needs the lock
-        //     the action system itself takes before dispatching.
+        // WriteIntentReadAction.run was the other one, in light mode's failure
+        // form and on the toolbar buttons. Both now hand their work to the
+        // action system through ActionSystem.perform, which takes the lock with
+        // stable calls only.
         //
-        // Each fails to compile if the platform drops it, which is the warning
-        // that matters. Turning this level on would fail the build for three
-        // decisions already made rather than for anything new.
+        // The override fails to compile if the platform drops it, which is the
+        // warning that matters. Turning this level on would fail the build for
+        // a decision already made rather than for anything new.
         //
         // MISSING_DEPENDENCIES is the second, and it is off for the opposite
         // reason - not a decision to live with, but a report of the thing

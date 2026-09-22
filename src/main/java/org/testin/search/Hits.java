@@ -41,12 +41,12 @@ public final class Hits {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         final @NotNull List<DirectoryDto> nodes = wanted.isEmpty() ? everywhereToGo(indexer) : nodesNamed(indexer, wanted);
-        final @NotNull List<TestCaseDto> cases = casesMatching(indexer, wanted);
+        final @NotNull List<TestCaseDto> testCases = testCasesMatching(indexer, wanted);
 
         final @NotNull List<Hit> found = new ArrayList<>(nodes.stream().limit(SHOWN).map(Hit::of).toList());
-        found.addAll(topCases(cases, wanted, SHOWN - found.size()));
+        found.addAll(topTestCases(testCases, wanted, SHOWN - found.size()));
 
-        return new Found(List.copyOf(found), nodes.size() + cases.size());
+        return new Found(List.copyOf(found), nodes.size() + testCases.size());
     }
 
     private static @NotNull List<DirectoryDto> everywhereToGo(final @NotNull ProjectIndexer indexer) {
@@ -63,7 +63,7 @@ public final class Hits {
                 .toList();
     }
 
-    private static @NotNull List<TestCaseDto> casesMatching(final @NotNull ProjectIndexer indexer, final @NotNull String wanted) {
+    private static @NotNull List<TestCaseDto> testCasesMatching(final @NotNull ProjectIndexer indexer, final @NotNull String wanted) {
         if (tooShort(wanted)) return List.of();
 
         return indexer.getAllTestCases().stream()
@@ -71,10 +71,10 @@ public final class Hits {
                 .toList();
     }
 
-    private static @NotNull List<Hit> topCases(final @NotNull List<TestCaseDto> cases, final @NotNull String wanted, final int room) {
+    private static @NotNull List<Hit> topTestCases(final @NotNull List<TestCaseDto> testCases, final @NotNull String wanted, final int room) {
         if (room <= 0) return List.of();
 
-        return cases.stream()
+        return testCases.stream()
                 .sorted(byDescriptionMatchThenText(wanted))
                 .limit(room)
                 .map(Hit::of)

@@ -41,9 +41,9 @@ There is no key for this. The tab is called **Open Bugs**.
 - **Rule-VIEW-PANEL-064** — The Open Bugs tab lists every bug the test case has
   recorded, and which test run recorded it. A bug is what a run row says about a
   failure - how bad it is, how soon it must be fixed, or the issue it was filed
-  as. So a case that has never failed has none, and the same case can carry a
-  different bug in every cycle. A filed issue is shown as its link, and opens
-  when clicked.
+  as. So a test case that has never failed has none, and the same test case can
+  carry a different bug in every cycle. A filed issue is shown as its link, and
+  opens when clicked.
 - **Rule-VIEW-PANEL-065** — The bugs are read from the test runs the indexer
   already holds, so the tab costs a walk over what is in memory and reads
   nothing from disk.
@@ -86,8 +86,8 @@ The newest run comes first.
 ## What Testin refuses
 
 **If the test case has never failed** — the tab reads *No bugs recorded for this
-test case in any test run*. That is an answer, not an apology: a case with no
-bugs is the ordinary case.
+test case in any test run*. That is an answer, not an apology: a test case with
+no bugs is the ordinary case.
 
 **If a row records a failure but no bug** — it is not drawn. An actual result
 without a severity, a priority or a filed issue is somebody saying what

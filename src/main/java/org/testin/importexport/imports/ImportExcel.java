@@ -83,8 +83,8 @@ public class ImportExcel {
             final @NotNull Parsed parsed = parseSheet(p, sheet, dataFormatter);
             refused += parsed.refused();
 
-            if (!parsed.cases().isEmpty()) {
-                result.put(sheet.getSheetName(), parsed.cases());
+            if (!parsed.testCases().isEmpty()) {
+                result.put(sheet.getSheetName(), parsed.testCases());
             }
         }
 
@@ -128,7 +128,7 @@ public class ImportExcel {
         return new Parsed(sheetList, refused);
     }
 
-    private record Parsed(@NotNull List<TestCaseDto> cases, int refused) {
+    private record Parsed(@NotNull List<TestCaseDto> testCases, int refused) {
         private static final @NotNull Parsed NOTHING = new Parsed(List.of(), 0);
     }
 }

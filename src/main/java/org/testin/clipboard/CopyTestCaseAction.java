@@ -47,7 +47,7 @@ public class CopyTestCaseAction extends DumbAwareAction {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        final @NotNull List<TestCaseDto> selected = TestinData.selectedCases(e);
+        final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
         if (selected.isEmpty()) return;
 
         new ShortcutMenuPopup<>(p, Bundle.message("copy.menu.title"), CopyChoice.values(), choice -> copy(p, choice, selected)).show();
@@ -55,7 +55,7 @@ public class CopyTestCaseAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        GrayWithReason.unless(this, e, !TestinData.selectedCases(e).isEmpty(), Bundle.message("action.select.case.description"));
+        GrayWithReason.unless(this, e, !TestinData.selectedTestCases(e).isEmpty(), Bundle.message("action.select.case.description"));
     }
 
     @Override

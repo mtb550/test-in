@@ -29,23 +29,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-/**
- * The picker never runs a query on the thread that paints it (#29).
- * <p>
- * Typing was moved off that thread and opening was left on it: the constructor
- * asked for the rows of an empty query, which for the search is the broadest
- * query there is - every test set and every test run in the project, copied,
- * filtered and sorted. It ran at the one moment the tester is watching, the
- * frame after they pressed the shortcut.
- * <p>
- * A fixed set of choices is not affected and must not become so. Its rows are
- * already in hand, they go on screen in the constructor, and Enter works on the
- * first frame - a create dialog that filled in a moment later could be submitted
- * before it had anything to submit.
- * <p>
- * Read from the source rather than driven through Swing: the defect is which
- * thread a call sits on, and both threads compile.
- */
 public class OpeningRowsTest {
 
     private static final @NotNull Path FRAMEWORK =
@@ -76,11 +59,6 @@ public class OpeningRowsTest {
                         + "the dialog it is filling in");
     }
 
-    /**
-     * The opening rows arrive once the dialog is on screen, and once only.
-     * Without the guard a hierarchy event repeated for one dialog would run the
-     * whole search again for nothing.
-     */
     @Test
     public void theOpeningRowsAreAskedForOnceTheDialogIsShown() {
         final @NotNull String source = read("TextFieldWithSelections.java");
@@ -92,11 +70,6 @@ public class OpeningRowsTest {
                         + "too expensive to run again for it");
     }
 
-    /**
-     * The answer comes back under the dialog's own modality. Posted without it,
-     * it waits behind the open dialog and lands after it closes - which for the
-     * list the dialog exists to show is never.
-     */
     @Test
     public void theAnswerIsPostedUnderTheDialogsModality() {
         final @NotNull String source = read("TextFieldWithSelections.java");
@@ -105,10 +78,6 @@ public class OpeningRowsTest {
                 "the rows must be posted back under the dialog's modality, or they never arrive while it is open");
     }
 
-    /**
-     * A fixed set of choices is still on screen from the constructor, so a
-     * create dialog can be submitted on the frame it opens.
-     */
     @Test
     public void aFixedSetOfChoicesIsShownBeforeAnythingIsAsked() {
         final @NotNull String picker = read("TextFieldWithSelections.java");

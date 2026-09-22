@@ -28,10 +28,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The git naming and selection rules, exercised without an IDE or a repository -
- * which is what {@link GitRefs} was extracted for.
- */
 public class GitRefsTest {
 
     private static PendingChange diff(final Path relativePath) {
@@ -40,19 +36,6 @@ public class GitRefsTest {
                 TestCaseDto.builder().build(), List.of());
     }
 
-    /**
-     * UC-TREE-PANEL-001, Rule-TREE-PANEL-117.
-     * <p>
-     * The one answer to "is this an address a repository can be cloned from",
-     * asked by the create dialog, by the push dialog and by the panel before it
-     * offers a clone.
-     * <p>
-     * It had no test at all until #301, and that is how a second rule grew in
-     * {@code TestinProjectConfig} and disagreed with it for months: this one
-     * said yes to {@code git://host/x} and to {@code http://localhost/x.git} while
-     * the file's rule dropped both without a word, so a tester whose testin.yml
-     * held either saw a panel that never mentioned an address.
-     */
     @Test
     public void everyFormGitCloneTakesIsAnAddress() {
         assertTrue(GitRefs.isRepositoryUrl("https://github.com/acme/repo.git"));
@@ -64,10 +47,6 @@ public class GitRefsTest {
         assertTrue(GitRefs.isRepositoryUrl("  https://github.com/acme/repo.git  "), "surrounding space is trimmed");
     }
 
-    /**
-     * A project name is free text a tester typed, and mistaking one for an
-     * address sends them to a clone they never asked for.
-     */
     @Test
     public void aProjectNameIsNotAnAddress() {
         assertFalse(GitRefs.isRepositoryUrl("NAFATH"));
@@ -76,16 +55,6 @@ public class GitRefsTest {
         assertFalse(GitRefs.isRepositoryUrl("   "));
     }
 
-    /**
-     * Rule-TREE-PANEL-117.
-     * <p>
-     * The characters half of the rule, which came here from
-     * {@code TestinProjectConfig} when the file stopped judging addresses. The
-     * value ends up as an argument to {@code git clone}, and although
-     * {@code git4idea} builds an argument list rather than a shell string, a
-     * list of allowed characters is cheaper to keep than an argument about
-     * whether the next caller still builds one.
-     */
     @Test
     public void textWithCharactersNoAddressHasIsRefused() {
         assertFalse(GitRefs.isRepositoryUrl("https://x.com/r; rm -rf /"), "a semicolon is not in a clone address");
@@ -150,11 +119,6 @@ public class GitRefsTest {
         assertEquals(GitRefs.localNameOf("main"), "main");
     }
 
-    /**
-     * A slash is not a remote prefix. A local branch called feature/login used
-     * to be checked out as a new branch called login, and the review then
-     * committed there and pushed the untouched feature/login (#312, A40).
-     */
     @Test
     public void aLocalBranchWithASlashIsNotARemoteBranch() {
         assertFalse(GitRefs.isRemoteBranch("feature/login", List.of("feature/login", "main"), List.of("origin")));
@@ -194,13 +158,6 @@ public class GitRefsTest {
                 List.of("testCases/login/case-1.json", "testCases/login/case-2.json"));
     }
 
-    // ---------------------------------------------------------- git status
-    //
-    // The lines below are copied from a real `git status --porcelain -uall` run
-    // against a freshly initialized Testin root, not invented. The review reads
-    // this and nothing else, so a parsing mistake here is the review being
-    // silently wrong about what changed.
-
     @Test
     public void anUntrackedFileIsAnAddition() {
         final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of("?? .tp"));
@@ -210,11 +167,6 @@ public class GitRefsTest {
         assertEquals(entries.getFirst().path(), ".tp");
     }
 
-    /**
-     * The case that broke the feature: a brand-new test case is untracked, so if
-     * untracked did not count as added, the first commit of a new test set could
-     * never be made from the plugin.
-     */
     @Test
     public void everyNewTestCaseInANewTestSetIsReported() {
         final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of(
@@ -247,11 +199,6 @@ public class GitRefsTest {
         assertEquals(GitRefs.parseStatus(List.of("A  a.json")).getFirst().type(), DiffType.ADDED);
     }
 
-    /**
-     * A rename is two changes and both belong in the commit. Listing only the
-     * new path leaves the old file behind for whoever pulls it, which is the
-     * whole defect: they get the test case twice, under both names.
-     */
     @Test
     public void aRenameIsBothTheDeletionAndTheAddition() {
         final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(
@@ -266,10 +213,6 @@ public class GitRefsTest {
         assertEquals(entries.get(1).path(), "Test Cases/new/a.json");
     }
 
-    /**
-     * A copy leaves its source exactly where it was, so the arrow means
-     * something else entirely: one row, and no deletion.
-     */
     @Test
     public void aCopyIsOnlyTheNewFile() {
         final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of("C  a.json -> b.json"));
@@ -278,10 +221,6 @@ public class GitRefsTest {
         assertEquals(entries.getFirst().path(), "b.json");
     }
 
-    /**
-     * A rename whose new file was then deleted is a deletion of both sides -
-     * nothing arrives under the new name, so nothing is added.
-     */
     @Test
     public void aRenameThenDeletedIsTwoDeletions() {
         final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of("RD a.json -> b.json"));
@@ -291,36 +230,20 @@ public class GitRefsTest {
         assertEquals(entries.get(1).type(), DiffType.DELETED);
     }
 
-    /**
-     * Every test set with a space in its name arrives quoted, and Testin's own
-     * fixed containers are called "Test Cases" and "Test Runs" - so this is not
-     * an edge case, it is every repository.
-     */
     @Test
     public void aQuotedPathLosesItsQuotes() {
         assertEquals(GitRefs.parseStatus(List.of("?? \"Test Cases/login flow/a.json\"")).getFirst().path(),
                 "Test Cases/login flow/a.json");
     }
 
-    /**
-     * Git escapes non-ASCII bytes as octal, so a test set named in Arabic comes
-     * back as escapes and has to be decoded as UTF-8 to match the file on disk.
-     */
     @Test
     public void aNonAsciiPathIsDecodedBackToItsName() {
-        // "تسجيل" - the UTF-8 bytes of the Arabic word, as git would escape them.
         final String escaped = "?? \"Test Cases/\\330\\252\\330\\263\\330\\254\\331\\212\\331\\204/a.json\"";
 
         assertEquals(GitRefs.parseStatus(List.of(escaped)).getFirst().path(),
                 "Test Cases/تسجيل/a.json");
     }
 
-    /**
-     * A commit has to carry the markers of every directory its test cases sit
-     * under, so the directories a colleague pulls are recognizable as test sets.
-     * The repository root is included as the empty string, because the test
-     * project's own marker lives there.
-     */
     @Test
     public void everyDirectoryAboveASelectedTestCaseIsFound() {
         assertEquals(GitRefs.ancestorDirectories(List.of(
@@ -335,11 +258,6 @@ public class GitRefsTest {
         assertEquals(GitRefs.ancestorDirectories(List.of("a.json")), Set.of(""));
     }
 
-    /**
-     * The line a remote with no commits prints. Taken literally it is a branch
-     * called "(unknown)", which is what a first push tried to pull from -
-     * "couldn't find remote ref (unknown)" - before the push was ever attempted.
-     */
     @Test
     public void aRemoteWithNoBranchesNamesNoHeadBranch() {
         final String output = """
@@ -352,13 +270,6 @@ public class GitRefsTest {
         assertEquals(GitRefs.parseHeadBranch(output), "", "an empty remote has no branch to name");
     }
 
-    // ------------------------------------------------------------ branches
-
-    /**
-     * Taken from a real `git branch -a`. The symbolic ref line names no branch
-     * of its own - checking it out detaches HEAD - so it must not sit in the
-     * list looking like a third branch a tester can pick.
-     */
     @Test
     public void theBranchListDropsTheMarkerAndTheSymbolicRef() {
         assertEquals(GitRefs.parseBranches(List.of(
@@ -379,13 +290,6 @@ public class GitRefsTest {
         assertEquals(GitRefs.parseBranches(List.of("", "   ")), List.of());
     }
 
-    // ----------------------------------------------------------- conflicts
-
-    /**
-     * The seven codes Git uses for a path both sides touched. Getting this wrong
-     * in either direction is bad: miss one, and the tester is never offered the
-     * abort; invent one, and they are offered it on a clean pull.
-     */
     @Test
     public void everyUnmergedCodeCountsAsAConflict() {
         for (final String code : List.of("DD", "AU", "UD", "UA", "DU", "AA", "UU")) {

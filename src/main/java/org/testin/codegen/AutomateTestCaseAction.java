@@ -52,10 +52,10 @@ public class AutomateTestCaseAction extends DumbAwareAction {
     }
 
     // UC-CODEGEN-005, Rule-CODEGEN-025
-    private static @NotNull List<TestCaseDto> withoutAMethod(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
+    private static @NotNull List<TestCaseDto> withoutAMethod(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         final @NotNull AutomationState state = Services.getInstance(p, AutomationState.class);
 
-        return cases.stream().filter(tc -> !state.hasMethod(tc.getId())).toList();
+        return testCases.stream().filter(tc -> !state.hasMethod(tc.getId())).toList();
     }
 
     // Rule-CODEGEN-002
@@ -70,7 +70,7 @@ public class AutomateTestCaseAction extends DumbAwareAction {
         if (p == null) return;
 
         final @NotNull List<TestCaseDto> toWrite =
-                withoutAMethod(p, TestinData.selectedCases(e).stream().filter(AutomateTestCaseAction::canBeNamed).toList());
+                withoutAMethod(p, TestinData.selectedTestCases(e).stream().filter(AutomateTestCaseAction::canBeNamed).toList());
         if (toWrite.isEmpty()) return;
 
         final @NotNull Optional<TestinEditor> editor = TestinData.editor(e);
@@ -100,7 +100,7 @@ public class AutomateTestCaseAction extends DumbAwareAction {
             return;
         }
 
-        final @NotNull List<TestCaseDto> selected = TestinData.selectedCases(e);
+        final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
         if (selected.isEmpty()) {
             e.getPresentation().setEnabled(false);
             return;

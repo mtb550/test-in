@@ -124,8 +124,8 @@ public class EditTestRunAction extends DumbAwareAction {
 
             if (!name.equals(run.getName()) && NodeRename.refused(p, run, name)) return false;
 
-            final @NotNull Set<UUID> checked = RunForm.checkedCases(selection);
-            final @NotNull Set<UUID> offered = RunForm.offeredCases(selection);
+            final @NotNull Set<UUID> checked = RunForm.checkedTestCases(selection);
+            final @NotNull Set<UUID> offered = RunForm.offeredTestCases(selection);
             final @NotNull Map<TestRunConfiguration, String> configuration = TestRunConfiguration.answered(form.configuration());
 
             applyEdit(run, name, runPath -> {

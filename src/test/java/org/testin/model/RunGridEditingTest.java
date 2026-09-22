@@ -28,23 +28,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * What a tester may type into a run grid, and what a verdict takes away (#74).
- * <p>
- * The run grid was read-only and keyboard-dead. Making one column editable puts
- * two rules in tension, and both are checked here rather than on screen.
- * <p>
- * The first is that exactly one column takes typing. Everything else on a row is
- * either the test case's, which the run does not own, or a verdict, which has
- * its own key and clears things as it goes. A status typed into a cell would be
- * a fourth way to record one.
- * <p>
- * The second is what a pass erases. It always erased the four fields that
- * explain a failure, and that was invisible while nothing could be typed into a
- * run grid. Now a tester can write a paragraph into a cell, press P, and watch
- * it go - so the verdict has to know what it is about to take, in the same words
- * it will use to ask.
- */
 public class RunGridEditingTest {
 
     private static TestRunItems item() {

@@ -47,7 +47,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class EditShownCase {
+public final class EditShownTestCase {
     private static final @NotNull String SHORTCUT_REGISTERED_KEY = "DetailsTab.f2.registered";
 
     // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-044

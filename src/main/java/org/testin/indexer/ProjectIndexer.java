@@ -98,7 +98,7 @@ public final class ProjectIndexer {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-011
-    static boolean isCaseFile(final @NotNull Path file, final @NotNull Predicate<Path> isTestSet) {
+    static boolean isTestCaseFile(final @NotNull Path file, final @NotNull Predicate<Path> isTestSet) {
         return FileKind.of(file) == FileKind.TEST_CASE && isTestSet.test(file.getParent());
     }
 
@@ -328,29 +328,29 @@ public final class ProjectIndexer {
     }
 
     // UC-INTERNAL-006, Rule-INTERNAL-046
-    public long caseCountOf(final @NotNull Path testSetPath) {
-        return store.getTestSetCaseIds().getOrDefault(testSetPath.toString(), List.of()).size();
+    public long testCaseCountOf(final @NotNull Path testSetPath) {
+        return store.getTestCaseIdsByTestSet().getOrDefault(testSetPath.toString(), List.of()).size();
     }
 
     // Rule-TREE-PANEL-008
     public @NotNull List<TestCaseDto> getTestCasesUnder(final @NotNull DirectoryDto dir) {
-        final @NotNull List<TestCaseDto> cases = new ArrayList<>(getTestCasesForTestSet(dir.getPath()));
+        final @NotNull List<TestCaseDto> testCases = new ArrayList<>(getTestCasesForTestSet(dir.getPath()));
 
         for (final DirectoryDto child : getChildren(dir.getPath())) {
             if (child.isRetired()) continue;
 
-            cases.addAll(getTestCasesUnder(child));
+            testCases.addAll(getTestCasesUnder(child));
         }
 
-        return cases;
+        return testCases;
     }
 
     public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
-        return withCasesShown(store.getTestRunByPath(testRunPath));
+        return withTestCasesShown(store.getTestRunByPath(testRunPath));
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-REPORT-021, Rule-VIEW-PANEL-083
-    private @NotNull TestRunDto withCasesShown(final @NotNull TestRunDto run) {
+    private @NotNull TestRunDto withTestCasesShown(final @NotNull TestRunDto run) {
         run.getResults().forEach(item -> item.showing(store.findTestCase(item.getId())));
         return run;
     }
@@ -358,12 +358,12 @@ public final class ProjectIndexer {
     // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-065
     public @NotNull Map<Path, TestRunDto> getAllTestRuns() {
         return store.getTestRunsByPath().entrySet().stream()
-                .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), entry -> withCasesShown(entry.getValue())));
+                .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), entry -> withTestCasesShown(entry.getValue())));
     }
 
     // UC-INTERNAL-006, Rule-INTERNAL-051
     public @NotNull Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
-        return store.findTestRun(testRunPath).map(this::withCasesShown);
+        return store.findTestRun(testRunPath).map(this::withTestCasesShown);
     }
 
     public @NotNull Optional<TestCaseDto> findTestCase(final @NotNull UUID id) {
@@ -536,8 +536,8 @@ public final class ProjectIndexer {
     }
 
     // UC-SHARE-002, Rule-SHARE-001
-    public @NotNull Set<String> unreadableCasesIn(final @NotNull Path testSetPath) {
-        return store.unreadableCasesIn(testSetPath);
+    public @NotNull Set<String> unreadableTestCasesIn(final @NotNull Path testSetPath) {
+        return store.unreadableTestCasesIn(testSetPath);
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-034

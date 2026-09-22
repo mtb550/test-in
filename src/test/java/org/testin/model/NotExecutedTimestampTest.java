@@ -29,11 +29,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * "Not executed" is an empty timestamp of the same type, never a null and never
- * "now": a case nobody gave a verdict and a run nobody started show blank
- * wherever their timestamps appear, and one helper decides what blank is.
- */
 public class NotExecutedTimestampTest {
 
     @Test
@@ -45,7 +40,7 @@ public class NotExecutedTimestampTest {
     }
 
     @Test
-    public void aVerdictGivesTheCaseARealTime() {
+    public void aVerdictGivesTheTestCaseARealTime() {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
 
         item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
@@ -56,8 +51,6 @@ public class NotExecutedTimestampTest {
 
     @Test
     public void theEpochIsStillEmptyAfterTheMapperMovesItIntoAnotherZone() {
-        // The mapper adjusts every timestamp it reads to the system zone, so the
-        // epoch comes back from a run file as 03:00 in Riyadh, not as 00:00 UTC.
         final ZonedDateTime readBack = Config.NOT_EXECUTED.withZoneSameInstant(ZoneId.of("Asia/Riyadh"));
 
         assertTrue(Config.isNotExecuted(readBack));
@@ -76,7 +69,6 @@ public class NotExecutedTimestampTest {
     public void aRunThatNeverStartedHasNoEndToStamp() {
         final TestRunMarker run = new TestRunMarker();
 
-        // Completed from the tree without ever pressing Start.
         run.markExecutionEnded();
 
         assertEquals(Display.formatDate(run.getExecutionEndedAt()), "");
@@ -92,8 +84,6 @@ public class NotExecutedTimestampTest {
             run.markExecutionEnded();
             final ZonedDateTime firstEnd = run.getExecutionEndedAt();
 
-            // Both stamps are truncated to the second, so a second must pass for the
-            // difference to be observable at all.
             Thread.sleep(1100);
             run.markExecutionStarted();
             run.markExecutionEnded();

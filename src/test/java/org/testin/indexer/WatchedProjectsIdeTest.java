@@ -27,13 +27,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * UC-INTERNAL-003, Rule-INTERNAL-016.
- * <p>
- * What a change on disk makes the indexer read again. The watcher decides by
- * path alone ({@link WatchedPathTest}); this is the half that needs the disk,
- * because whether a folder is a test project is a marker file in it.
- */
 public class WatchedProjectsIdeTest extends BasePlatformTestCase {
 
     private Path root;
@@ -57,11 +50,6 @@ public class WatchedProjectsIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
-    /**
-     * A folder beside the test projects that holds no {@code .tp} marker is not
-     * made one when something in it changes. It used to be: the scan put any
-     * folder it was given into the index as a test project (#66, finding 120).
-     */
     public void testAChangeInAFolderWithoutAMarkerAddsNothing() {
         final Path notes = root.resolve("notes");
         try {
@@ -76,10 +64,6 @@ public class WatchedProjectsIdeTest extends BasePlatformTestCase {
         assertFalse("a folder with no .tp marker became a test project", indexer().nodeExists(notes));
     }
 
-    /**
-     * A test project is read again, and one whose marker has gone is dropped
-     * rather than read back as a project.
-     */
     public void testATestProjectIsReadAgainAndForgottenOnceItsMarkerIsGone() {
         final Path project = root.resolve("NAFATH");
         WriteAction.runAndWait(() -> indexer().addTestProject(

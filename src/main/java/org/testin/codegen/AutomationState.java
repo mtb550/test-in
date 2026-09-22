@@ -63,8 +63,8 @@ public final class AutomationState {
     }
 
     // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-196
-    public void read(final @NotNull Project p, final @NotNull List<TestCaseDto> cases, final @NotNull Runnable onAnswered) {
-        if (cases.isEmpty()) return;
+    public void read(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Runnable onAnswered) {
+        if (testCases.isEmpty()) return;
 
         // Rule-CODEGEN-082
         if (!CodeOn.isOn(p)) {
@@ -77,11 +77,11 @@ public final class AutomationState {
         }
 
         if (DumbService.isDumb(p)) {
-            DumbService.getInstance(p).runWhenSmart(() -> read(p, cases, onAnswered));
+            DumbService.getInstance(p).runWhenSmart(() -> read(p, testCases, onAnswered));
             return;
         }
 
-        final @NotNull Map<UUID, Automated> asking = cases.stream()
+        final @NotNull Map<UUID, Automated> asking = testCases.stream()
                 .collect(Collectors.toMap(TestCaseDto::getId, tc -> of(tc.getId()), (first, second) -> first));
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -90,14 +90,14 @@ public final class AutomationState {
 
             ApplicationManager.getApplication().runReadAction(() -> {
                 try {
-                    final @NotNull Map<UUID, Boolean> methods = CodeNavigation.available().methodsFor(p, cases);
+                    final @NotNull Map<UUID, Boolean> methods = CodeNavigation.available().methodsFor(p, testCases);
 
-                    for (final TestCaseDto tc : cases) {
+                    for (final TestCaseDto tc : testCases) {
                         answers.put(tc.getId(), stateOf(tc, methods));
                         if (methods.containsKey(tc.getId())) found.add(tc.getId());
                     }
                 } catch (final Exception ex) {
-                    Logger.warn("Could not read the automation state of " + cases.size() + " test case(s): " + ex.getMessage());
+                    Logger.warn("Could not read the automation state of " + testCases.size() + " test case(s): " + ex.getMessage());
                 }
             });
 
@@ -106,7 +106,7 @@ public final class AutomationState {
             ApplicationManager.getApplication().invokeLater(() -> {
                 known.putAll(answers);
 
-                for (final TestCaseDto tc : cases) {
+                for (final TestCaseDto tc : testCases) {
                     if (found.contains(tc.getId())) withAMethod.add(tc.getId());
                     else withAMethod.remove(tc.getId());
                 }
@@ -122,19 +122,19 @@ public final class AutomationState {
     }
 
     // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-210
-    public int writtenIn(final @NotNull List<TestCaseDto> cases) {
-        return (int) cases.stream().filter(tc -> of(tc.getId()) == Automated.WRITTEN).count();
+    public int writtenIn(final @NotNull List<TestCaseDto> testCases) {
+        return (int) testCases.stream().filter(tc -> of(tc.getId()) == Automated.WRITTEN).count();
     }
 
     // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-211
-    public int knownIn(final @NotNull List<TestCaseDto> cases) {
-        return (int) cases.stream().filter(tc -> of(tc.getId()) != Automated.UNKNOWN).count();
+    public int knownIn(final @NotNull List<TestCaseDto> testCases) {
+        return (int) testCases.stream().filter(tc -> of(tc.getId()) != Automated.UNKNOWN).count();
     }
 
     // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-198
-    public @NotNull List<TestCaseDto> matching(final @NotNull List<TestCaseDto> cases, final @NotNull Set<Automated> wanted) {
-        if (wanted.isEmpty()) return cases;
+    public @NotNull List<TestCaseDto> matching(final @NotNull List<TestCaseDto> testCases, final @NotNull Set<Automated> wanted) {
+        if (wanted.isEmpty()) return testCases;
 
-        return cases.stream().filter(tc -> wanted.contains(of(tc.getId()))).toList();
+        return testCases.stream().filter(tc -> wanted.contains(of(tc.getId()))).toList();
     }
 }

@@ -33,63 +33,11 @@ import java.util.regex.Pattern;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * What {@code plugin.xml} declares to the keymap, checked against itself.
- * <p>
- * A keystroke claimed by two actions does not fail, and that is the problem: the
- * platform gathers every action bound to the key, runs whichever one is enabled,
- * and says nothing at all when two are. Testin lost {@code Ctrl+Shift+C} to the
- * IDE for weeks that way. The tester pressed it in a test editor and got
- * <i>Copy Path</i>. That is because a Testin editor is a file editor, and
- * IntelliJ has owned that key since long before this plugin (#119).
- * <p>
- * The collision with the IDE is a decision rather than a defect and is not
- * checked here - the keys are in {@code docs/shortcuts.md} with what each
- * competes against. What is checked is the half nobody chose: two <b>Testin</b>
- * actions on one key, which is always a mistake and always invisible.
- */
 public class DeclaredShortcutsTest {
 
-    /**
-     * The two keys a pair of Testin actions is meant to share, and exactly which
-     * pair shares each.
-     * <p>
-     * F2 is the only one, and it has three members: Update Test Case in the test
-     * editor, Failed Test Case Details in the run editor, and Edit Test Run in
-     * the tree. It works because each needs a selection in its own surface, so
-     * no two of them can be enabled at once.
-     * <p>
-     * <b>Ctrl+M used to be here too, and is the reason this list is worth
-     * distrusting.</b> Create Test Case and Create Testin Node shared it on the
-     * same argument - one key, one meaning per surface - and it was not true.
-     * Creating a test case needs no selection, only an open editor, so that
-     * action was enabled in the tree as well; it is declared first, so it
-     * answered every press and the tree's action never had its update called.
-     * The key belongs to one action now. Sharing is only safe where the
-     * conditions genuinely cannot both hold.
-     * <p>
-     * <b>Pinned to the exact pair rather than allowed as a key.</b> A list that
-     * said "Ctrl+M may be shared" would keep passing when a third action joined
-     * it. It would also pass when one of these two was renamed away and something
-     * else took its place. That is the whole failure this test exists to catch.
-     * Written as the membership, so any change to it fails here and has to be
-     * meant.
-     */
     private static final Map<String, List<String>> SHARED_ON_PURPOSE = Map.of(
             "F2", List.of("Testin.UpdateTestCase", "Testin.UpdateRunItem", "Testin.EditTestRun"));
 
-    /**
-     * Every {@code <keyboard-shortcut>} the plugin declares, as key to the ids
-     * claiming it. Read from the descriptor rather than from a list kept beside
-     * it, so it cannot go stale the first time somebody adds an action.
-     * <p>
-     * Each shortcut belongs to the nearest {@code id} above it, because that is
-     * the element it is written inside. Matching {@code <action ...>...</action>}
-     * as a block does not work and fails quietly: the body is non-greedy, so it
-     * ends at the first {@code />} - which is the first {@code keyboard-shortcut}
-     * child. Written that way, this test read every default key and no Mac key
-     * at all, and reported the Mac keymap as clean.
-     */
     private static Map<String, List<String>> declaredKeys(final String keymap) {
         final String actions = actionsSection();
 
@@ -111,11 +59,6 @@ public class DeclaredShortcutsTest {
         return byKey;
     }
 
-    /**
-     * The {@code <actions>} block alone. Ids live in the extension declarations
-     * too, and one of those would become the owner of whatever shortcut came
-     * after it.
-     */
     private static String actionsSection() {
         final String xml = read();
         final int from = xml.indexOf("<actions>");
@@ -125,11 +68,6 @@ public class DeclaredShortcutsTest {
         return xml.substring(from, to);
     }
 
-    /**
-     * One spelling for one key. The descriptor writes {@code ctrl} and the
-     * platform keymaps write {@code control}, and modifier order is free - so
-     * two entries that are the same key can look like two keys.
-     */
     private static String normalize(final String keystroke) {
         final List<String> parts = new ArrayList<>(List.of(keystroke.replace("control", "ctrl").trim().split("\\s+")));
         final String key = parts.removeLast().toUpperCase(Locale.ROOT);
@@ -148,11 +86,6 @@ public class DeclaredShortcutsTest {
         }
     }
 
-    /**
-     * The check itself. Two Testin actions on one key means one of them never
-     * runs, and which one is decided by whichever happens to be enabled - so
-     * every such key is either on the list above or a mistake.
-     */
     @Test
     public void noKeyIsClaimedByTwoTestinActionsByAccident() {
         for (final String keymap : List.of("$default", "Mac OS X 10.5+")) {
@@ -168,10 +101,6 @@ public class DeclaredShortcutsTest {
         }
     }
 
-    /**
-     * And the list does not outlive what it excuses. An entry for a key nothing
-     * shares any more is a permission nobody reads, still granting itself.
-     */
     @Test
     public void everyDeliberatelySharedKeyIsStillShared() {
         final Map<String, List<String>> declared = declaredKeys("$default");
@@ -182,10 +111,6 @@ public class DeclaredShortcutsTest {
                         + " Remove the entry, or say which pair shares it now."));
     }
 
-    /**
-     * The Mac keymap says the same things as the default one, or a Mac tester
-     * has an action the rest do not (#25).
-     */
     @Test
     public void everyMacKeyBelongsToAnActionThatHasADefaultKey() {
         final Map<String, List<String>> mac = declaredKeys("Mac OS X 10.5+");

@@ -87,8 +87,7 @@ public final class SourceForm implements DialogComponent {
         formatHint.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         formatHint.setVisible(false);
 
-        rows = new FormRows().row(Bundle.message("import.caption.source"), fileField);
-        rows.wideRow(formatHint);
+        rows = new FormRows().row(Bundle.message("import.caption.source"), fileField).wideRow(formatHint);
     }
 
     // UC-SHARE-005, Rule-SETTING-021

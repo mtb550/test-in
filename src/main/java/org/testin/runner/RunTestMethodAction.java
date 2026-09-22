@@ -35,7 +35,7 @@ public class RunTestMethodAction extends DumbAwareAction {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        final @NotNull List<TestCaseDto> selected = TestinData.selectedCases(e);
+        final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
         final @NotNull CardHoverAction gesture = CardHoverAction.runSlot(p, selected);
 
         if (gesture == CardHoverAction.RUN_TEST_METHOD) {
@@ -54,7 +54,7 @@ public class RunTestMethodAction extends DumbAwareAction {
             return;
         }
 
-        final @NotNull List<TestCaseDto> selected = TestinData.selectedCases(e);
+        final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
         final @NotNull CardHoverAction offered = CardHoverAction.runSlot(p, selected);
 
         e.getPresentation().setText(offered.getTooltip());

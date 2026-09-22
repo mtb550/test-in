@@ -34,10 +34,10 @@ uncommitted work.
 - **Rule-SHARE-046** — A file Git says has changed gets a row even when Testin
   can see no difference inside it, so the tester can still commit it.
 - **Rule-SHARE-047** — Testin decides what a file is by its name, not by reading
-  it: a `.tc` is a test case, a `<test case id>.ri` is one case's result, and the
-  seven fixed marker names are markers. A record is identified by the name it is
-  written under, so a file the review cannot parse still gets the right kind of
-  row.
+  it: a `.tc` is a test case, a `<test case id>.ri` is one test case's result,
+  and the seven fixed marker names are markers. A record is identified by the
+  name it is written under, so a file the review cannot parse still gets the
+  right kind of row.
 - **Rule-SHARE-048** — A rename is two rows, the removal first and the addition
   second.
 - **Rule-SHARE-049** — Every row arrives selected.
@@ -76,11 +76,11 @@ uncommitted work.
 
 1. **The tick column** — every row arrives ticked.
 2. **Change Type** — what kind of change this row is.
-3. **Test Set** — filled for a test case, and for a result: the set its case
-   sits in. Blank for a run, a marker, or any other file.
+3. **Test Set** — filled for a test case, and for a result: the set its test
+   case sits in. Blank for a run, a marker, or any other file.
 4. **Name** — the test case's description; for a result, the description of the
-   case it is about; for a marker, the folder it sits in; otherwise the file's
-   name.
+   test case it is about; for a marker, the folder it sits in; otherwise the
+   file's name.
 5. **Before** and **After** — the two values of the field that changed.
 6. **Branch** — the branch the commit goes onto. It can be typed into, and a
    name that is not a branch yet starts one.

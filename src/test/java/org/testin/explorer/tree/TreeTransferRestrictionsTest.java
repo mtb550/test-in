@@ -31,11 +31,6 @@ import java.nio.file.Path;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The tree operation restrictions: which nodes can be cut/copied/dragged,
- * renamed and removed, which targets accept which sources, and which
- * destinations are physically valid.
- */
 public class TreeTransferRestrictionsTest {
 
     private static DirectoryDto project(final String name) {
@@ -71,16 +66,6 @@ public class TreeTransferRestrictionsTest {
         }
     }
 
-    /**
-     * A test project is not moved in the tree - every path under it is built
-     * from where it is - and it can be removed and renamed. A rename moves what
-     * is named after it, and nothing else holds the old name (#331).
-     * <p>
-     * Removing it was switched off with the rest of the restrictions in
-     * 5f6e0a87 and turned back on deliberately: the tester who made a project
-     * is the one who deletes it, behind a confirmation that counts the test
-     * sets, cases and runs going with it.
-     */
     @Test
     public void aTestProjectIsRemovableAndRenamableButNeverMoved() {
         final DirectoryDto testProject = new TestProjectDirectoryDto();
@@ -210,12 +195,12 @@ public class TreeTransferRestrictionsTest {
     public void transfersNeverCrossTestProjects() {
         final DirectoryDto projectA = project("projectA");
         final DirectoryDto packageInA = childPackage(projectA, "pkg");
-        final DirectoryDto casesDirInA = childPackage(projectA, "Test Cases");
+        final DirectoryDto testCasesDirInA = childPackage(projectA, "Test Cases");
 
         final DirectoryDto projectB = project("projectB");
         final DirectoryDto packageInB = childPackage(projectB, "pkg2");
 
-        assertTrue(TreeTransferHandler.sameTestProject(packageInA, casesDirInA),
+        assertTrue(TreeTransferHandler.sameTestProject(packageInA, testCasesDirInA),
                 "within one project must stay allowed");
         assertFalse(TreeTransferHandler.sameTestProject(packageInA, packageInB),
                 "across projects must be rejected, whatever the node types");

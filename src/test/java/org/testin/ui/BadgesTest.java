@@ -32,19 +32,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The two rules a badge cannot be allowed to break silently (#79).
- * <p>
- * A pill draws text on a background chosen by the value it shows, so the two can
- * disagree: white on a yellow severity says nothing at all, and the failure is
- * invisible to every test that only asks what the badge says. And a case that
- * never failed has no severity and no bug priority, so it must draw no pill
- * rather than an empty one.
- * <p>
- * Neither test draws a pill: painting one needs the platform's fonts. They pin
- * the two decisions instead - which text color a background earns, and whether
- * a value becomes a badge at all.
- */
 public class BadgesTest {
 
     @Test
@@ -62,11 +49,6 @@ public class BadgesTest {
         assertFalse(Badges.isLight(Color.DARK_GRAY), "the group badge");
     }
 
-    /**
-     * Green is the one that surprises: it is the brightest channel to the eye,
-     * so a pure green pill reads lighter than a pure blue one even though blue's
-     * channel is at the same value.
-     */
     @Test
     public void brightnessIsWhatTheEyeSeesNotWhatTheChannelSays() {
         assertTrue(Badges.isLight(new Color(0, 255, 0)));
@@ -74,7 +56,7 @@ public class BadgesTest {
     }
 
     @Test
-    public void aCaseThatNeverFailedDrawsNoPill() {
+    public void aTestCaseThatNeverFailedDrawsNoPill() {
         final List<Badges.Badge> badges = new ArrayList<>();
 
         Badges.addBugBadge(badges, BugSeverity.EMPTY.getLabel(), BugSeverity.EMPTY.getColor());
@@ -83,11 +65,6 @@ public class BadgesTest {
         assertEquals(badges.size(), 0, "an empty value is not a badge with no text, it is no badge");
     }
 
-    /**
-     * One half on its own is that half, because the Details toolbar ticks them
-     * separately - severity and bug priority are also two grid columns, so a
-     * tester who unticks Bug Priority wants the priority gone and not the badge.
-     */
     @Test
     public void oneHalfOnItsOwnIsThatHalf() {
         final List<Badges.Badge> severityOnly = new ArrayList<>();
@@ -102,10 +79,6 @@ public class BadgesTest {
                 "the survivor keeps its own color, which is why BugPriority still declares one");
     }
 
-    /**
-     * Both halves add themselves and one badge comes out: the second finds the
-     * first and joins it rather than sitting beside it (#89).
-     */
     @Test
     public void bothHalvesJoinIntoOneBadge() {
         final List<Badges.Badge> badges = new ArrayList<>();
@@ -120,10 +93,6 @@ public class BadgesTest {
                 "the color is the first half's");
     }
 
-    /**
-     * Low is what a case is unless somebody said otherwise, so a Low pill says
-     * on almost every row what the absence of a pill already says (#89).
-     */
     @Test
     public void lowPriorityDrawsNoPill() {
         final List<Badges.Badge> badges = new ArrayList<>();
@@ -136,10 +105,6 @@ public class BadgesTest {
         assertEquals(badges.size(), 2, "a priority somebody chose is still drawn");
     }
 
-    /**
-     * With the caption gone, color is the only thing keeping the three apart -
-     * so the three have to be three.
-     */
     @Test
     public void theThreePrioritiesAreThreeColours() {
         final Set<Color> colors = new HashSet<>();
@@ -151,11 +116,6 @@ public class BadgesTest {
         assertEquals(colors.size(), 3, "three priorities, three colors, no caption to fall back on");
     }
 
-    /**
-     * Four severities that mean four different things, so four colors: two
-     * sharing one would put the same pill on a blocker and on a suggestion, and
-     * the caption is the only thing that would tell them apart.
-     */
     @Test
     public void everySeverityThatDrawsHasItsOwnNameAndColour() {
         final Set<String> names = new HashSet<>();

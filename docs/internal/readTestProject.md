@@ -30,8 +30,8 @@ There is no key for this. It starts on its own.
   a file named `.tr` or a file named `.trp`.
 - **Rule-INTERNAL-011** — A file's name says what it is: every file ending in
   `.tc` directly inside a test set is a test case, and every file ending in `.ri`
-  directly inside a test run is one case's result. Nothing looks inside a file to
-  decide what it is.
+  directly inside a test run is one test case's result. Nothing looks inside a
+  file to decide what it is.
 - **Rule-INTERNAL-012** — A test case is known by its file name. What the file
   says its own name is does not decide.
 - **Rule-INTERNAL-013** — Each test project is read by its own background job.
@@ -51,9 +51,9 @@ There is no key for this. It starts on its own.
   elsewhere does not rewrite a file by opening it.
 - **Rule-INTERNAL-082** — Two test case files claiming one identity are reported
   rather than merged. A test case is identified by its file name, and the index
-  holds one case per identity, so the second file read goes over the first and
-  neither test set can reach its own anymore. The read cannot choose which of
-  the pair keeps the identity, so it names the files and leaves that to the
+  holds one test case per identity, so the second file read goes over the first
+  and neither test set can reach its own anymore. The read cannot choose which
+  of the pair keeps the identity, so it names the files and leaves that to the
   tester.
 - **Rule-INTERNAL-083** — Who created a node, and when, is stamped once: the
   first time its marker is written. After that the creation stays as it was,
@@ -72,10 +72,10 @@ There is no key for this. It starts on its own.
   a set or a run for a tool outside the IDE.
 - **Rule-INTERNAL-093** — A result file Testin could not read is never written
   over and never removed. The scan reports it and leaves it out of the run, so
-  the run covers the cases it could read; a later write touches only the results
-  the run holds, and a removal takes only the file whose case a change stopped
-  covering. A verdict nobody can read is still a verdict somebody recorded, and
-  the tester repairs the file and presses Refresh.
+  the run covers the test cases it could read; a later write touches only the
+  results the run holds, and a removal takes only the file whose test case a
+  change stopped covering. A verdict nobody can read is still a verdict
+  somebody recorded, and the tester repairs the file and presses Refresh.
 - **Rule-INTERNAL-094** — A result is known by its file name, as a test case is.
   A result file whose name is not a test case id is not read, and a warning
   names it; renamed to its test case's id, it is read again at the next Refresh.
@@ -86,39 +86,40 @@ There is no key for this. It starts on its own.
 A test project of ten thousand test cases, and the results of its test runs,
 measured rather than estimated.
 
-|                                  | Measured | Budget |
-|----------------------------------|----------|--------|
-| **Reading one test case**        | 21 µs    | 40 µs  |
-| **Reading ten thousand**         | 214 ms   | 400 ms |
-| **Held in memory, per case**     | 1.5 KB   | 4 KB   |
-| **Held in memory, ten thousand** | 14.6 MB  | 40 MB  |
-| **Reading one run result**       | 8.8 µs   | 20 µs  |
-| **Reading four thousand**        | 35 ms    | 80 ms  |
+|                                   | Measured | Budget |
+|-----------------------------------|----------|--------|
+| **Reading one test case**         | 21 µs    | 40 µs  |
+| **Reading ten thousand**          | 214 ms   | 400 ms |
+| **Held in memory, per test case** | 1.5 KB   | 4 KB   |
+| **Held in memory, ten thousand**  | 14.6 MB  | 40 MB  |
+| **Reading one run result**        | 8.8 µs   | 20 µs  |
+| **Reading four thousand**         | 35 ms    | 80 ms  |
 
 The results are their own line because they are their own files: since #305 a run
-of two thousand cases is two thousand `.ri` files rather than one `run.json`, so
-the question "what does a big cycle cost to read" is a question about four
-thousand small documents - one cycle of two thousand cases and fifty of forty,
-which is the shape of a real Testin folder. Two thousand of them parse in about
-18 milliseconds.
+of two thousand test cases is two thousand `.ri` files rather than one
+`run.json`, so the question "what does a big cycle cost to read" is a question
+about four thousand small documents - one cycle of two thousand test cases and
+fifty of forty, which is the shape of a real Testin folder. Two thousand of
+them parse in about 18 milliseconds.
 
-Measured on 9 September 2026 (the cases) and 20 September 2026 (the results),
-Windows 11 with JBR 25, by `IndexerBudgetTest`. CI asserts the budget on every push, on a runner doing
-nothing else, so a change that doubles the cost fails rather than ships. It is
-its own run - `./gradlew test -Pbudget` - and not part of the ordinary one,
-because a clock on a machine that is also compiling measures the machine.
+Measured on 9 September 2026 (the test cases) and 20 September 2026 (the
+results), Windows 11 with JBR 25, by `IndexerBudgetTest`. CI asserts the budget
+on every push, on a runner doing nothing else, so a change that doubles the
+cost fails rather than ships. It is its own run - `./gradlew test -Pbudget` -
+and not part of the ordinary one, because a clock on a machine that is also
+compiling measures the machine.
 
 **What the budget covers is the reading, not the disk.** The same ten thousand
-cases written out as files and walked took **3.5 seconds warm and 150 seconds
-cold** on the same machine — a forty-fold spread on identical work, because a
-cold read of ten thousand freshly written files is the virus scanner's number
-rather than the plugin's. Those two figures are measured and reported by the
-same test with `-Dtestin.budget.cases=10000`, and deliberately not asserted on:
-a budget that fails on a loaded runner and passes through a real regression on a
-fast disk is worse than none.
+test cases written out as files and walked took **3.5 seconds warm and 150
+seconds cold** on the same machine — a forty-fold spread on identical work,
+because a cold read of ten thousand freshly written files is the virus
+scanner's number rather than the plugin's. Those two figures are measured and
+reported by the same test with `-Dtestin.budget.cases=10000`, and deliberately
+not asserted on: a budget that fails on a loaded runner and passes through a
+real regression on a fast disk is worse than none.
 
 So the honest statement is two sentences. The part Testin controls is 214
-milliseconds for ten thousand cases. The part the machine controls is
+milliseconds for ten thousand test cases. The part the machine controls is
 everything else, and it is why the scan runs in the background with a progress
 bar the tester can cancel (Rule-INTERNAL-013).
 
@@ -142,7 +143,7 @@ the bottom of the IDE, beside the other background jobs.
 ┌──────────────────────────────────────────────────────────────┐
 │  Testin indexing - Checkout                            [ X ] │
 │  ████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  40% │
-│  Test set: Payment (12 cases)                                │
+│  Test set: Payment (12 test cases)                           │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -167,7 +168,7 @@ the bottom of the IDE, beside the other background jobs.
 10. Testin walks `Test Runs`. Each test run reads its own facts from its `.tr`
     - its status, how it was configured, what the tester wrote about the
     verdicts, when it was executed - and one file per result, `<test case
-    id>.ri`, in the order their cases sit in their test sets.
+    id>.ri`, in the order their test cases sit in their test sets.
 11. The bar reads *Done -*, then the test project's name, and closes.
 12. The tree draws itself from memory. Every editor that was open when the IDE
     closed opens again.
@@ -223,11 +224,11 @@ read and nothing removes it, so the repair is to fix the file and press
 
 **If two test case files claim the same identity** — the second one read goes
 over the first, and a notification titled **Test cases sharing an identity in
-\<project\>** names the files. Neither test set can reach its own case while that
-is true: both resolve the identity to whichever file landed last, so an edit in
-one showed in the other. The file name is the identity, so the repair is to
-rename one of them - which of the two keeps it is the tester's to decide, not
-the plugin's.
+\<project\>** names the files. Neither test set can reach its own test case
+while that is true: both resolve the identity to whichever file landed last, so
+an edit in one showed in the other. The file name is the identity, so the
+repair is to rename one of them - which of the two keeps it is the tester's to
+decide, not the plugin's.
 
 **If the tester presses cancel** — the read stops between one test set and the
 next. What was already read stays in memory. The rest of that test project is

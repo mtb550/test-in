@@ -31,10 +31,10 @@ public interface TestRunner {
     static @NotNull TestRunner available() {
         return EP.getExtensionList().stream()
                 .findFirst()
-                .orElseGet(() -> (p, cases) -> Logger.debug(
-                        Bundle.message("runner.none", String.valueOf(cases.size()))));
+                .orElseGet(() -> (p, testCases) -> Logger.debug(
+                        Bundle.message("runner.none", String.valueOf(testCases.size()))));
     }
 
     // UC-CODEGEN-008, Rule-CODEGEN-031
-    void run(final @NotNull Project p, final @NotNull List<TestCaseDto> cases);
+    void run(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases);
 }

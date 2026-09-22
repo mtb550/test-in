@@ -12,9 +12,9 @@ shows both and lets the tester pick.
 about a field both sides rewrote. A test run's own `.tr` asks about a key both
 sides wrote differently into its configuration or its result analysis. The row
 is named as the tester already knows that key - **Platform**, or the heading the
-analysis was written under. A result - one case's verdict - is never asked about
-at all: it is kept whole from whoever gave it last, because the status, the
-actual result, the stacktrace and the screenshots are one account of one
+analysis was written under. A result - one test case's verdict - is never asked
+about at all: it is kept whole from whoever gave it last, because the status,
+the actual result, the stacktrace and the screenshots are one account of one
 execution and travel together ([UC-SHARE-017](resolveConflicts.md)).
 
 There is no key that opens this. It opens during a merge.
@@ -103,8 +103,8 @@ whole value is still what gets written.
 **If the conflicted file is a result** — no window opens. The side whose
 `executedAt` is later takes the file whole, and nothing is asked. Nothing is
 said either, because the settled list is carried by this window and the window
-never opens. That is difference 20. Two testers judging *different* cases of one
-run never conflict at all: their verdicts are in different files.
+never opens. That is difference 20. Two testers judging *different* test cases
+of one run never conflict at all: their verdicts are in different files.
 
 **If two testers only moved a run along** — no window opens either. The start,
 the end, the status and the audit block are settled by rule, and a question comes

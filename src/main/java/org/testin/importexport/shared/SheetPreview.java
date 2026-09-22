@@ -78,14 +78,14 @@ public final class SheetPreview implements DialogComponent {
         for (final Map.Entry<String, List<TestCaseDto>> entry : sheets.entrySet()) {
             final @NotNull DefaultTableModel model = models.getOrDefault(entry.getKey(), NO_MODEL);
 
-            final @NotNull List<TestCaseDto> casesInSheet = entry.getValue();
+            final @NotNull List<TestCaseDto> testCasesInSheet = entry.getValue();
             final @NotNull List<TestCaseDto> selected = new ArrayList<>();
 
             for (int row = 0; row < model.getRowCount(); row++) {
-                if (Boolean.TRUE.equals(model.getValueAt(row, 0))) selected.add(casesInSheet.get(row));
+                if (Boolean.TRUE.equals(model.getValueAt(row, 0))) selected.add(testCasesInSheet.get(row));
             }
 
-            Logger.info("Import preview: sheet '" + entry.getKey() + "' holds " + casesInSheet.size()
+            Logger.info("Import preview: sheet '" + entry.getKey() + "' holds " + testCasesInSheet.size()
                     + " cases, table has " + model.getRowCount() + " rows, " + selected.size() + " ticked");
 
             if (!selected.isEmpty()) selectedBySheet.put(entry.getKey(), selected);

@@ -24,14 +24,6 @@ import java.util.UUID;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
 
-/**
- * What a node reports about itself (#82).
- * <p>
- * The two that matter are here: that a run's figures are the report's figures
- * rather than a second count of the same results, and that a run nobody has
- * given a verdict in says so instead of claiming a rate of zero - which reads
- * as "every case failed" on exactly the runs where nothing has been tried.
- */
 public class NodeFiguresTest {
 
     private static TestRunItems item(final TestStatus status) {
@@ -108,12 +100,6 @@ public class NodeFiguresTest {
                 "an empty node answers zero; an absent row would read as 'not counted'");
     }
 
-    /**
-     * Both numbers are right, and they answer different questions: a container is
-     * the sum of everything beneath it, retired branches included, and a new
-     * test run leaves retired branches out. A tester reading one and being
-     * offered the other had nothing to tell them why (#274).
-     */
     @Test
     public void aCountSaysWhatANewRunWouldTakeWhenThatIsFewer() {
         assertEquals(NodeCount.TEST_CASES.of(NodeFigures.ofChildren(9, 4, 40, 31, 2)), "40 (31 for a new test run)");

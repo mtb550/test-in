@@ -33,15 +33,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * UC-TREE-PANEL-011, Rule-TREE-PANEL-004, Rule-TREE-PANEL-100.
- * <p>
- * Renaming a test project moves everything the index holds under it (#331).
- * <p>
- * A project is the one node whose parent is not indexed, whose containers are in
- * no map while it is inactive, and whose siblings are other projects the index
- * never read. So each of those is asked here, against a real folder.
- */
 public class RenameProjectIdeTest extends BasePlatformTestCase {
 
     private Path root;
@@ -82,10 +73,6 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         });
     }
 
-    /**
-     * Renames through the indexer and waits for it: the VFS work hops to a pooled
-     * thread and back to the EDT, which this test runs on.
-     */
     private void rename(final Path from, final Path to) {
         final AtomicBoolean done = new AtomicBoolean();
         indexer().renameNode(from, to, () -> done.set(true));
@@ -105,11 +92,6 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         assertTrue("its test cases folder did not follow", indexer().nodeExists(to.resolve("Test Cases")));
     }
 
-    /**
-     * An inactive project's containers are in none of the index's maps, so they
-     * used to keep the old path, and a node created after reactivating it was
-     * written into a folder that no longer existed.
-     */
     public void testAnInactiveProjectsContainersFollowIt() {
         final TestProjectDirectoryDto tp = testProject("Checkout");
         WriteAction.runAndWait(() -> {
@@ -127,12 +109,7 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         assertEquals("its test runs folder kept the old path", to.resolve("Test Runs"), renamed.getTestRunsDirectory().getPath());
     }
 
-    /**
-     * Rule-INTERNAL-084. A case in a file named by hand is still found in that
-     * file after the surrounding project is renamed - the store kept the old path,
-     * so saving it could not take the hand-named file away.
-     */
-    public void testAHandNamedCaseKeepsItsFile() {
+    public void testAHandNamedTestCaseKeepsItsFile() {
         final TestProjectDirectoryDto tp = testProject("NAFATH");
         final TestSetDirectoryDto ts = testSet(tp);
         final UUID id = UUID.randomUUID();
@@ -155,11 +132,6 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         assertEquals("the case lost its hand-named file", "login.tc", file.inProject().getFileName().toString());
     }
 
-    /**
-     * Rule-TREE-PANEL-004. A name is taken when anything on disk has it - a
-     * sibling project the index never read - and a rename that only changes case
-     * is not in its own way.
-     */
     public void testANameIsTakenOnDiskButNotByTheNodeItself() {
         final Path other = root.resolve("Payments");
         final Path self = root.resolve("nafath");

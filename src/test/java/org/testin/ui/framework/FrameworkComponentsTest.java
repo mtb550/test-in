@@ -42,11 +42,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Behavior of the framework components themselves: initial selection, arrow
- * navigation with clamping, the cleared-selection fallback, the text input's
- * initial value and placeholder, and the message's From/To rows.
- */
 public class FrameworkComponentsTest {
 
     private static TextFieldWithSelections<Integer> twoSelections() {
@@ -63,11 +58,6 @@ public class FrameworkComponentsTest {
         field.getActionMap().get(actionKey).actionPerformed(new ActionEvent(field, 0, ""));
     }
 
-    /**
-     * The selection list somewhere under this container, and empty when there is
-     * none - which is a real answer for a component that has not been given one,
-     * not a failure. Empty rather than null so the walk itself is unconditional.
-     */
     private static Optional<JList<?>> findList(final Container container) {
         for (final Component child : container.getComponents()) {
             if (child instanceof JList<?> list) return Optional.of(list);
@@ -116,8 +106,6 @@ public class FrameworkComponentsTest {
                 .orElseThrow(() -> new AssertionError("the selection list must be part of the component panel"));
         list.clearSelection();
 
-        // The Ctrl+click case: submitting with an emptied selection must not
-        // crash - the first row is the declared default.
         assertEquals(component.getSelectedValue(), Integer.valueOf(1));
     }
 
@@ -139,8 +127,6 @@ public class FrameworkComponentsTest {
 
         input.showEmptyWarning();
 
-        // The warning re-renders the placeholder in the error color; the text
-        // itself must survive the re-render.
         assertEquals(((ExtendableTextField) input.getFocusComponent()).getEmptyText().getText(), "set new name..");
     }
 
@@ -153,11 +139,6 @@ public class FrameworkComponentsTest {
         assertEquals(rowCount(transfer), 3, "message + From + To");
     }
 
-    /**
-     * A confirmation quotes what the tester typed, and Swing's HTML renderer drops
-     * anything shaped like a tag - so the text is escaped, or it asks about a
-     * description that does not exist (#312, A78).
-     */
     @Test
     public void messageQuotesAngleBracketsInsteadOfDroppingThem() {
         final DialogMessage message = ComponentDialogBase.message("Remove 'Login refuses <empty> password'?\nFor good").getComponent();
@@ -246,12 +227,6 @@ public class FrameworkComponentsTest {
         assertFalse(details.wantsFocus(), "context rows never take the focus");
     }
 
-    /**
-     * A dialog that declares no filler at all - a form and a button - used to
-     * hand the spare space to its last component, which is the button. That put
-     * the button in the middle of the dialog instead of at the bottom. It only
-     * showed on a dialog with a preferredSize, so nothing caught it.
-     */
     @Test
     public void aButtonRowNeverTakesTheDialogSpace() {
         final DialogButton button = ComponentDialogBase.button("Generate").getComponent();
@@ -279,14 +254,6 @@ public class FrameworkComponentsTest {
         assertFalse(entry.getShortcutText().isBlank(), "the keystroke must render as text");
     }
 
-    /**
-     * Rule-INTERNAL-085.
-     * <p>
-     * Enter in a choice box is the list's only while the list is open, and still
-     * so after the box is given a new text field - which a theme change does.
-     * The binding used to go with the old field, and Enter stopped reaching the
-     * dialog (#66, finding 287).
-     */
     @Test
     public void aChoiceBoxGivenANewTextFieldStillLeavesEnterToTheDialog() {
         final ChoiceInput choice = ComponentDialogBase.choice("Branch", List.of("main", "release"), "main").getComponent();

@@ -62,7 +62,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
 
     private static @Nullable PsiMethod firstGenerated(final @NotNull PsiClass pc) {
         for (final PsiMethod pm : pc.getMethods()) {
-            if (GeneratedMethod.caseIdOf(pm).isPresent()) return pm;
+            if (GeneratedMethod.testCaseIdOf(pm).isPresent()) return pm;
         }
 
         return null;
@@ -110,7 +110,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
 
         final @NotNull PsiClass pc = target.get();
 
-        final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byCaseId(pc);
+        final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byTestCaseId(pc);
 
         @Nullable PsiElement after = null;
         int position = 0;

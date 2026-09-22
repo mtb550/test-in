@@ -109,7 +109,7 @@ final class IndexerDataStore {
         return testCaseStore.getTestCasesById();
     }
 
-    @NotNull Set<String> unreadableCasesIn(final @NotNull Path testSetPath) {
+    @NotNull Set<String> unreadableTestCasesIn(final @NotNull Path testSetPath) {
         return testCaseStore.unreadableIn(testSetPath);
     }
 
@@ -117,8 +117,8 @@ final class IndexerDataStore {
         return testCaseStore.fileOf(tc.getParent().getPath(), tc.getId());
     }
 
-    @NotNull Map<String, List<UUID>> getTestSetCaseIds() {
-        return testCaseStore.getTestSetCaseIds();
+    @NotNull Map<String, List<UUID>> getTestCaseIdsByTestSet() {
+        return testCaseStore.getTestCaseIdsByTestSet();
     }
 
     @NotNull List<TestCaseDto> getTestCasesForTestSet(final @NotNull Path testSetPath) {
@@ -271,7 +271,7 @@ final class IndexerDataStore {
         testRunsDirByPath.putAll(scanned.getTestRunDirs());
         testRunsByPath.putAll(scanned.getTestRuns());
 
-        testCaseStore.swapIn(projectPath, scanned.getTestCasesById(), scanned.getTestSetCaseIds(), scanned.handNamedFilesAlone(), scanned.getUnreadableCases());
+        testCaseStore.swapIn(projectPath, scanned.getTestCasesById(), scanned.getTestCaseIdsByTestSet(), scanned.handNamedFilesAlone(), scanned.getUnreadableTestCases());
 
         dropUnseen(testProjectsByPath, projectPath, scanned.getProjects());
         dropUnseen(testCasesMainDirsByPath, projectPath, scanned.getTestCasesMainDirs());
@@ -416,11 +416,11 @@ final class IndexerDataStore {
 
         rebuildPath2Under(newPath);
 
-        renameMapEntry(testCaseStore.getTestSetCaseIds(), oldStr, newStr, ids -> {
+        renameMapEntry(testCaseStore.getTestCaseIdsByTestSet(), oldStr, newStr, ids -> {
         });
         renameMapEntry(testRunsByPath, oldStr, newStr, tr -> {
         });
-        renameDescendantKeys(testCaseStore.getTestSetCaseIds(), oldPath, newPath);
+        renameDescendantKeys(testCaseStore.getTestCaseIdsByTestSet(), oldPath, newPath);
         renameDescendantKeys(testRunsByPath, oldPath, newPath);
         testCaseStore.renamed(oldPath, newPath);
         childrenIndex.invalidate();

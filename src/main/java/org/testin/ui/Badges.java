@@ -67,7 +67,7 @@ public final class Badges {
     }
 
     // UC-EDITOR-PANEL-001
-    public static @NotNull List<Badge> caseBadges(final @NotNull TestCaseDto tc) {
+    public static @NotNull List<Badge> testCaseBadges(final @NotNull TestCaseDto tc) {
         final @NotNull List<Badge> badges = new ArrayList<>();
         addPriorityBadge(badges, tc);
 

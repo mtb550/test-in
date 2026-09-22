@@ -47,7 +47,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @Nullable Project p = e.getProject();
-        final @NotNull List<TestCaseDto> selected = TestinData.selectedCases(e);
+        final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
         if (p == null || selected.isEmpty()) return;
 
         TestinData.editor(e).ifPresent(editor -> new Work(p, editor, editor.getParent(), selected).remove());
@@ -62,7 +62,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
             return;
         }
 
-        GrayWithReason.unless(this, e, !TestinData.selectedCases(e).isEmpty(), Bundle.message("action.select.case.description"));
+        GrayWithReason.unless(this, e, !TestinData.selectedTestCases(e).isEmpty(), Bundle.message("action.select.case.description"));
     }
 
     @Override

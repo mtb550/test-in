@@ -43,7 +43,7 @@ the **Cut Test Case** entry on the right-click menu. It has no key of its own.
   removing test cases, and by anything at all being written to the clipboard.
   There is one clipboard, so a copy in the tree, a copied grid selection, a
   copied id, or a copy made in another application all take the cut with them:
-  what the paste would put down is no longer the cases that are faded.
+  what the paste would put down is no longer the test cases that are faded.
 
 ## What the tester sees
 

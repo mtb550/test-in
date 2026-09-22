@@ -33,8 +33,8 @@ public final class NoCodeNavigation implements CodeNavigation {
     }
 
     @Override
-    public @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
-        Logger.debug("No code navigation in this IDE; no generated methods for " + cases.size() + " test case(s)");
+    public @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        Logger.debug("No code navigation in this IDE; no generated methods for " + testCases.size() + " test case(s)");
 
         return Map.of();
     }

@@ -27,16 +27,6 @@ import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
 
-/**
- * The promise the test editor makes about a test set: every case in the folder
- * is on the screen, in an order that does not depend on the machine reading it.
- * <p>
- * That promise was broken twice in one evening, and neither break was in the
- * sorting. A copied file carrying another case's id took a case out of the
- * indexer. And the copy's empty pointers took the whole set's order with it.
- * Cases carry their own rank now, so neither is possible: there is no chain to
- * lose and nothing to be unreachable from.
- */
 public class TestCaseOrderTest {
 
     private static TestCaseDto testCase(final String description, final String rank) {
@@ -49,7 +39,7 @@ public class TestCaseOrderTest {
     }
 
     @Test
-    public void casesAreShownInRankOrderWhateverOrderTheyWereRead() {
+    public void testCasesAreShownInRankOrderWhateverOrderTheyWereRead() {
         final TestCaseDto first = testCase("sign in", "c");
         final TestCaseDto second = testCase("sign out", "m");
         final TestCaseDto third = testCase("a wrong password is refused", "s");
@@ -58,14 +48,8 @@ public class TestCaseOrderTest {
         assertEquals(TestCaseOrder.ordered(List.of(second, third, first)), List.of(first, second, third));
     }
 
-    /**
-     * A case that arrived without a rank - copied in by hand, imported by an
-     * older build, brought by a merge - is shown, at the end, where a tester
-     * looks for something that just turned up. It is never dropped: what is in
-     * the folder is on the screen.
-     */
     @Test
-    public void aCaseWithNoRankIsShownLastRatherThanHidden() {
+    public void aTestCaseWithNoRankIsShownLastRatherThanHidden() {
         final TestCaseDto ranked = testCase("sign in", "c");
         final TestCaseDto arrived = testCase("copied in from somewhere", "");
 
@@ -75,11 +59,6 @@ public class TestCaseOrderTest {
         assertEquals(ordered, List.of(ranked, arrived));
     }
 
-    /**
-     * Two testers who each appended a case at the same moment produce the same
-     * rank, and that is fine - what must never happen is two machines showing
-     * two different orders.
-     */
     @Test
     public void equalRanksStillGiveEveryMachineTheSameOrder() {
         final TestCaseDto mine = testCase("a signed-in user signs out", "s");
@@ -88,12 +67,8 @@ public class TestCaseOrderTest {
         assertEquals(TestCaseOrder.ordered(List.of(mine, theirs)), TestCaseOrder.ordered(List.of(theirs, mine)));
     }
 
-    /**
-     * What a drag means: the list the tester arranged becomes the order, and
-     * only the case that actually moved is written.
-     */
     @Test
-    public void placingWritesOnlyTheCaseThatMoved() {
+    public void placingWritesOnlyTheTestCaseThatMoved() {
         final TestCaseDto first = testCase("sign in", "c");
         final TestCaseDto second = testCase("sign out", "m");
         final TestCaseDto third = testCase("a wrong password is refused", "s");
@@ -101,16 +76,13 @@ public class TestCaseOrderTest {
         final List<TestCaseDto> arranged = new ArrayList<>(List.of(first, third, second));
         final List<TestCaseDto> moved = TestCaseOrder.place(arranged);
 
-        // One case is written, and which one is not knowable from the list: a
-        // case dragged up and the case it passed swapping down arrange the same
-        // way. What matters is that the set is not rewritten to say so.
         assertEquals(moved.size(), 1, "one drag, one file");
         assertEquals(TestCaseOrder.ordered(new ArrayList<>(arranged)), arranged, "and the list now sorts as arranged");
         assertEquals(first.getOrder(), "c", "the case at the top never moved, so its rank is untouched");
     }
 
     @Test
-    public void placingGivesAnUnrankedCaseARank() {
+    public void placingGivesAnUnrankedTestCaseARank() {
         final TestCaseDto ranked = testCase("sign in", "c");
         final TestCaseDto arrived = testCase("copied in from somewhere", "");
 

@@ -46,7 +46,7 @@ final class TestCaseSequenceStore {
     @Getter(AccessLevel.PACKAGE)
     private final @NotNull Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
     @Getter(AccessLevel.PACKAGE)
-    private final @NotNull Map<String, List<UUID>> testSetCaseIds = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, List<UUID>> testCaseIdsByTestSet = new ConcurrentHashMap<>();
 
     // UC-INTERNAL-004, Rule-INTERNAL-084
     private final @NotNull Map<UUID, Path> handNamed = new ConcurrentHashMap<>();
@@ -54,7 +54,7 @@ final class TestCaseSequenceStore {
     // UC-SHARE-002, Rule-SHARE-001
     private final @NotNull Map<String, Set<String>> unreadable = new ConcurrentHashMap<>();
 
-    static @NotNull List<UUID> caseIds(final @NotNull Collection<UUID> initial) {
+    static @NotNull List<UUID> testCaseIds(final @NotNull Collection<UUID> initial) {
         return new CopyOnWriteArrayList<>(initial);
     }
 
@@ -82,17 +82,17 @@ final class TestCaseSequenceStore {
 
     // UC-INTERNAL-004, Rule-INTERNAL-030
     @NotNull List<TestCaseDto> getForTestSet(final @NotNull Path testSetPath) {
-        final @NotNull List<UUID> ids = testSetCaseIds.getOrDefault(testSetPath.toString(), List.of());
+        final @NotNull List<UUID> ids = testCaseIdsByTestSet.getOrDefault(testSetPath.toString(), List.of());
         if (ids.isEmpty()) return List.of();
 
         final @NotNull Set<UUID> seen = new HashSet<>(ids.size());
-        final @NotNull List<TestCaseDto> cases = new ArrayList<>(ids.size());
+        final @NotNull List<TestCaseDto> testCases = new ArrayList<>(ids.size());
 
         for (final UUID id : ids) {
-            if (seen.add(id)) Optional.ofNullable(testCasesById.get(id)).ifPresent(cases::add);
+            if (seen.add(id)) Optional.ofNullable(testCasesById.get(id)).ifPresent(testCases::add);
         }
 
-        return TestCaseOrder.ordered(cases);
+        return TestCaseOrder.ordered(testCases);
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-033, Rule-INTERNAL-034
@@ -132,7 +132,7 @@ final class TestCaseSequenceStore {
         }
 
         testCasesById.put(testCase.getId(), testCase);
-        final @NotNull List<UUID> ids = testSetCaseIds.computeIfAbsent(testSetPath.toString(), ignored -> caseIds(List.of()));
+        final @NotNull List<UUID> ids = testCaseIdsByTestSet.computeIfAbsent(testSetPath.toString(), ignored -> testCaseIds(List.of()));
         if (!ids.contains(testCase.getId())) ids.add(testCase.getId());
 
         return true;
@@ -166,13 +166,13 @@ final class TestCaseSequenceStore {
         final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
         if (files.delete(p, from)) {
             if (!fromSet.equals(toSet))
-                Optional.ofNullable(testSetCaseIds.get(fromSet.toString())).ifPresent(ids -> ids.remove(id));
+                Optional.ofNullable(testCaseIdsByTestSet.get(fromSet.toString())).ifPresent(ids -> ids.remove(id));
             return true;
         }
 
         files.delete(p, to);
         if (!fromSet.equals(toSet))
-            Optional.ofNullable(testSetCaseIds.get(toSet.toString())).ifPresent(ids -> ids.remove(id));
+            Optional.ofNullable(testCaseIdsByTestSet.get(toSet.toString())).ifPresent(ids -> ids.remove(id));
         was.ifPresent(original -> testCasesById.put(id, original));
         if (wasHandNamed) handNamed.put(id, from);
         return false;
@@ -185,7 +185,7 @@ final class TestCaseSequenceStore {
         if (!Services.getInstance(p, TestDataFiles.class).delete(p, file)) return false;
 
         testCasesById.remove(testCaseId);
-        Optional.ofNullable(testSetCaseIds.get(testSetPath.toString()))
+        Optional.ofNullable(testCaseIdsByTestSet.get(testSetPath.toString()))
                 .ifPresent(ids -> ids.remove(testCaseId));
         handNamed.remove(testCaseId, file);
         return true;
@@ -217,44 +217,44 @@ final class TestCaseSequenceStore {
             store(testSetPath, testCase);
         }
 
-        Optional.ofNullable(testSetCaseIds.get(path)).ifPresent(oldIds -> oldIds.stream()
+        Optional.ofNullable(testCaseIdsByTestSet.get(path)).ifPresent(oldIds -> oldIds.stream()
                 .filter(id -> !newIds.contains(id))
                 .forEach(testCasesById::remove));
-        testSetCaseIds.put(path, caseIds(ids));
+        testCaseIdsByTestSet.put(path, testCaseIds(ids));
     }
 
     void removeForTestSet(final @NotNull String path) {
-        Optional.ofNullable(testSetCaseIds.remove(path))
+        Optional.ofNullable(testCaseIdsByTestSet.remove(path))
                 .ifPresent(ids -> ids.forEach(testCasesById::remove));
         handNamed.values().removeIf(file -> Path.of(path).equals(file.getParent()));
         unreadable.remove(path);
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-021
-    void swapIn(final @NotNull Path projectPath, final @NotNull Map<UUID, TestCaseDto> cases, final @NotNull Map<String, List<UUID>> setCaseIds, final @NotNull Map<UUID, Path> handNamedFiles, final @NotNull Map<String, Set<String>> unreadableCases) {
-        final @NotNull Set<UUID> held = testSetCaseIds.entrySet().stream()
+    void swapIn(final @NotNull Path projectPath, final @NotNull Map<UUID, TestCaseDto> testCases, final @NotNull Map<String, List<UUID>> setTestCaseIds, final @NotNull Map<UUID, Path> handNamedFiles, final @NotNull Map<String, Set<String>> unreadableTestCases) {
+        final @NotNull Set<UUID> held = testCaseIdsByTestSet.entrySet().stream()
                 .filter(entry -> Path.of(entry.getKey()).startsWith(projectPath))
                 .flatMap(entry -> entry.getValue().stream())
                 .collect(Collectors.toCollection(HashSet::new));
 
-        testCasesById.putAll(cases);
-        testSetCaseIds.putAll(setCaseIds);
+        testCasesById.putAll(testCases);
+        testCaseIdsByTestSet.putAll(setTestCaseIds);
 
-        testSetCaseIds.keySet().removeIf(path -> Path.of(path).startsWith(projectPath) && !setCaseIds.containsKey(path));
+        testCaseIdsByTestSet.keySet().removeIf(path -> Path.of(path).startsWith(projectPath) && !setTestCaseIds.containsKey(path));
 
-        held.removeAll(cases.keySet());
+        held.removeAll(testCases.keySet());
         held.forEach(testCasesById::remove);
 
         handNamed.putAll(handNamedFiles);
         handNamed.entrySet().removeIf(entry -> entry.getValue().startsWith(projectPath) && !handNamedFiles.containsKey(entry.getKey()));
 
-        unreadable.putAll(unreadableCases);
-        unreadable.keySet().removeIf(set -> Path.of(set).startsWith(projectPath) && !unreadableCases.containsKey(set));
+        unreadable.putAll(unreadableTestCases);
+        unreadable.keySet().removeIf(set -> Path.of(set).startsWith(projectPath) && !unreadableTestCases.containsKey(set));
     }
 
     void clear() {
         testCasesById.clear();
-        testSetCaseIds.clear();
+        testCaseIdsByTestSet.clear();
         handNamed.clear();
         unreadable.clear();
     }

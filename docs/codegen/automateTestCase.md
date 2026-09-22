@@ -117,9 +117,9 @@ in, ready to be filled.
 ## The other way a missing method appears
 
 Filling in a test case's description writes its method by itself. That is
-[UC-CODEGEN-003](getMissingMethod.md), and it is the way for a case being
-written here. This entry is the way for a case that arrived with its description
-already set, and so never had an edit for that to hang on.
+[UC-CODEGEN-003](getMissingMethod.md), and it is the way for a test case being
+written here. This entry is the way for a test case that arrived with its
+description already set, and so never had an edit for that to hang on.
 
 ---
 

@@ -22,11 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Proxy;
 
-/**
- * An object of an interface nothing in the test asks anything of. It answers
- * the three questions every object answers, and refuses the rest by name, so a
- * test that starts relying on it fails saying which call it made.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StandIn {
     public static <T> @NotNull T of(final @NotNull Class<T> type) {

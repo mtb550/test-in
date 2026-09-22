@@ -47,7 +47,7 @@ import java.util.stream.Stream;
 final class FormatConverter {
     private final @NotNull Project p;
 
-    private static @NotNull List<Path> oldCaseFiles(final @NotNull Path testCases) {
+    private static @NotNull List<Path> oldTestCaseFiles(final @NotNull Path testCases) {
         try (Stream<Path> walk = Files.walk(testCases)) {
             return walk.filter(Files::isRegularFile)
                     .filter(file -> String.valueOf(file.getFileName()).endsWith(".json"))
@@ -129,25 +129,25 @@ final class FormatConverter {
         Logger.info("Converting " + name + " to format " + TestProjectMarker.FORMAT);
 
         final @NotNull List<String> toRepair = new ArrayList<>();
-        final int cases = toTestCaseFiles(project, toRepair);
+        final int testCases = toTestCaseFiles(project, toRepair);
         final int runs = removeOldRuns(project);
         final int ids = stampIds(project, toRepair);
 
-        final boolean failed = cases < 0 || runs < 0 || ids < 0;
+        final boolean failed = testCases < 0 || runs < 0 || ids < 0;
         if (!failed) stampFormat(markerFile);
 
-        return Optional.of(new Report(name, Math.max(cases, 0), Math.max(runs, 0), Math.max(ids, 0), List.copyOf(toRepair), failed));
+        return Optional.of(new Report(name, Math.max(testCases, 0), Math.max(runs, 0), Math.max(ids, 0), List.copyOf(toRepair), failed));
     }
 
     // Rule-INTERNAL-011, Rule-INTERNAL-084
     private int toTestCaseFiles(final @NotNull Path project, final @NotNull List<String> toRepair) {
-        final @NotNull Path cases = project.resolve(DirectoryType.TCD.getFolderName());
-        if (!Files.isDirectory(cases)) return 0;
+        final @NotNull Path testCases = project.resolve(DirectoryType.TCD.getFolderName());
+        if (!Files.isDirectory(testCases)) return 0;
 
         final @NotNull Set<UUID> taken = new HashSet<>();
         int converted = 0;
 
-        for (final Path file : oldCaseFiles(cases)) {
+        for (final Path file : oldTestCaseFiles(testCases)) {
             final @NotNull Optional<UUID> id = identityOf(file);
             if (id.isEmpty()) {
                 toRepair.add(String.valueOf(file.getFileName()));
@@ -267,9 +267,9 @@ final class FormatConverter {
         return !from.equals(to) && !Services.getInstance(p, TestDataFiles.class).move(p, from, to);
     }
 
-    record Report(@NotNull String project, int cases, int runs, int ids, @NotNull List<String> toRepair, boolean failed) {
+    record Report(@NotNull String project, int testCases, int runs, int ids, @NotNull List<String> toRepair, boolean failed) {
         boolean changedAnything() {
-            return cases > 0 || runs > 0 || ids > 0;
+            return testCases > 0 || runs > 0 || ids > 0;
         }
     }
 }

@@ -53,7 +53,7 @@ public enum CardHoverAction {
             "Testin.NavigateToTestMethod",
             List.of(OptionalPlugin.JAVA),
             Icons.TEST_CASE,
-            (p, cases) -> NavigateToTestMethodAction.execute(p, cases.getFirst()),
+            (p, testCases) -> NavigateToTestMethodAction.execute(p, testCases.getFirst()),
             tc -> Optional.empty()
     ),
 
@@ -80,7 +80,7 @@ public enum CardHoverAction {
             "Testin.NavigateToTestCase",
             List.of(),
             Icons.fieldLetter("tc", Icons.GREEN),
-            (p, cases) -> NavigateToTestCaseAction.execute(p, cases.getFirst()),
+            (p, testCases) -> NavigateToTestCaseAction.execute(p, testCases.getFirst()),
             NavigateToTestCaseAction::whyNot
     );
 
@@ -109,8 +109,8 @@ public enum CardHoverAction {
     }
 
     // UC-EDITOR-PANEL-043
-    private static void stopRun(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
-        final int stopped = Services.getInstance(p, TestNGExecution.class).stop(cases);
+    private static void stopRun(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        final int stopped = Services.getInstance(p, TestNGExecution.class).stop(testCases);
 
         if (stopped > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.STOPPED, stopped);
     }
@@ -120,10 +120,10 @@ public enum CardHoverAction {
     }
 
     // UC-EDITOR-PANEL-043
-    public static @NotNull CardHoverAction runSlot(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
+    public static @NotNull CardHoverAction runSlot(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
-        return cases.stream().anyMatch(tc -> execution.isRunning(tc.getId()))
+        return testCases.stream().anyMatch(tc -> execution.isRunning(tc.getId()))
                 ? STOP_TEST_METHOD
                 : RUN_TEST_METHOD;
     }
@@ -161,10 +161,10 @@ public enum CardHoverAction {
         execute(p, List.of(tc));
     }
 
-    public void execute(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
-        if (cases.isEmpty()) return;
+    public void execute(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        if (testCases.isEmpty()) return;
 
-        onClick.accept(p, cases);
+        onClick.accept(p, testCases);
     }
 
     private @NotNull String hint() {

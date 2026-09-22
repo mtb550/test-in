@@ -23,10 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * The repository, found by walking up from wherever the tests were started:
- * Gradle runs them from the module, and a run started from the IDE need not.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RepositoryRoot {
     public static @NotNull Path resolve(final @NotNull String entry) {

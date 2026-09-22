@@ -61,26 +61,26 @@ public final class TestNGRunner implements TestRunner {
     }
 
     @Override
-    public void run(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
-        if (cases.isEmpty()) return;
+    public void run(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        if (testCases.isEmpty()) return;
 
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         if (DumbService.isDumb(p)) {
-            cases.forEach(execution::notStarting);
+            testCases.forEach(execution::notStarting);
 
             DumbService.getInstance(p).showDumbModeNotification(Bundle.message("testng.indexing.wait"));
             return;
         }
 
-        cases.forEach(execution::starting);
+        testCases.forEach(execution::starting);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                ApplicationManager.getApplication().runReadAction(() -> prepare(p, cases));
+                ApplicationManager.getApplication().runReadAction(() -> prepare(p, testCases));
 
             } catch (final IndexNotReadyException ex) {
-                cases.forEach(execution::notStarting);
+                testCases.forEach(execution::notStarting);
 
                 ApplicationManager.getApplication().invokeLater(() -> DumbService.getInstance(p)
                         .showDumbModeNotification(Bundle.message("testng.indexing.interrupted")));
@@ -88,14 +88,14 @@ public final class TestNGRunner implements TestRunner {
         });
     }
 
-    private void prepare(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
+    private void prepare(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         final @NotNull List<Generated> found = new ArrayList<>();
         final @NotNull List<TestCaseDto> withoutCode = new ArrayList<>();
         Optional<Module> module = Optional.empty();
 
-        for (final TestCaseDto tc : cases) {
+        for (final TestCaseDto tc : testCases) {
             final @NotNull Optional<List<String>> method = CodeNavigation.available().methodOf(p, tc);
 
             if (method.isEmpty()) {
@@ -126,7 +126,7 @@ public final class TestNGRunner implements TestRunner {
         }
 
         final @NotNull List<Generated> generated = found.stream().filter(one -> stillWanted.contains(one.tc())).toList();
-        final @NotNull List<TestCaseDto> cases = generated.stream().map(Generated::tc).toList();
+        final @NotNull List<TestCaseDto> testCases = generated.stream().map(Generated::tc).toList();
 
         final @NotNull LinkedHashSet<String> patterns = new LinkedHashSet<>(generated.stream().map(Generated::pattern).toList());
         final @NotNull String name = execution.freeRunName(configNameFor(generated));
@@ -160,8 +160,8 @@ public final class TestNGRunner implements TestRunner {
         Logger.info("Running as '" + name + "': " + patterns);
 
         // Rule-CODEGEN-033
-        execution.started(cases, List.of());
-        execution.launch(cases, settings);
+        execution.started(testCases, List.of());
+        execution.launch(testCases, settings);
     }
 
     private record Generated(@NotNull TestCaseDto tc, @NotNull List<String> fqcn) {

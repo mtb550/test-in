@@ -26,17 +26,8 @@ import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
-/**
- * The split button's contract: the submit reads the label that was pressed, and
- * Enter afterward runs the first label whatever was pressed before it.
- */
 public class DialogSplitButtonTest {
 
-    /**
-     * An alternative pressed on a dialog that refused to submit - an empty
-     * commit message - left the choice on that alternative, so Enter, captioned
-     * "Commit & Push", committed without pushing (#312, A76).
-     */
     @Test
     public void anAlternativePressedOnceDoesNotBecomeWhatEnterRuns() {
         final DialogSplitButton split = ComponentDialogBase.splitButton("Commit & Push", "Commit").getComponent();

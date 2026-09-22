@@ -61,7 +61,7 @@ public final class CodeNavigator implements CodeNavigation {
             return Optional.empty();
         }
 
-        final @NotNull Optional<PsiMethod> method = GeneratedMethod.forCase(owner.orElseThrow(), tc);
+        final @NotNull Optional<PsiMethod> method = GeneratedMethod.forTestCase(owner.orElseThrow(), tc);
         if (method.isEmpty()) Logger.warn("No generated method for '" + tc.getDescription() + "' in " + classFqcn);
 
         return method;
@@ -69,10 +69,10 @@ public final class CodeNavigator implements CodeNavigation {
 
     // UC-CODEGEN-006, Rule-CODEGEN-026
     @Override
-    public @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
+    public @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
 
-        for (final TestCaseDto tc : cases) {
+        for (final TestCaseDto tc : testCases) {
             final @NotNull String classFqcn = Fqcn.classOfMethod(tc);
             if (classFqcn.isEmpty()) continue;
 
@@ -86,7 +86,7 @@ public final class CodeNavigator implements CodeNavigation {
 
             if (owner.isEmpty()) continue;
 
-            final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byCaseId(owner.orElseThrow());
+            final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byTestCaseId(owner.orElseThrow());
 
             for (final TestCaseDto tc : group.getValue()) {
                 Optional.ofNullable(methods.get(tc.getId().toString()))

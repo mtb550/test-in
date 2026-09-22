@@ -98,7 +98,7 @@ public final class TestRunExcelGenerator {
     }
 
     // Rule-REPORT-020
-    private static void writeCases(final @NotNull Worksheet ws, final @NotNull TestRunDto tr) {
+    private static void writeTestCases(final @NotNull Worksheet ws, final @NotNull TestRunDto tr) {
         ws.value(0, 0, Bundle.message("report.excel.caption.id"));
         ws.value(0, 1, RunEditorAttributes.DESCRIPTION.getName());
         ws.value(0, 2, RunEditorAttributes.RUN_STATUS.getName());
@@ -113,7 +113,7 @@ public final class TestRunExcelGenerator {
         int row = 1;
         for (final TestRunItems result : tr.getResults()) {
             final @NotNull UUID id = result.getId();
-            final @NotNull TestCaseDto details = result.shownCase();
+            final @NotNull TestCaseDto details = result.shownTestCase();
 
             ws.value(row, 0, id.toString());
             ws.value(row, 1, orNotAvailable(details.getDescription()));
@@ -154,7 +154,7 @@ public final class TestRunExcelGenerator {
             final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
 
             writeOverview(wb.newWorksheet(Bundle.message("report.excel.sheet.overview")), Services.getInstance(p, BoundTestProject.class).name(), trDir, summary);
-            writeCases(wb.newWorksheet(Bundle.message("report.excel.sheet.cases")), tr);
+            writeTestCases(wb.newWorksheet(Bundle.message("report.excel.sheet.cases")), tr);
 
             wb.finish();
 

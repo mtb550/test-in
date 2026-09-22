@@ -49,8 +49,8 @@ public final class NodeCounter {
         return NodeFigures.ofChildren(
                 counted(byType, DirectoryType.TS),
                 counted(byType, DirectoryType.TSP) + counted(byType, DirectoryType.TRP),
-                indexer.caseCountOf(dto.getPath())
-                        + beneath.stream().mapToLong(node -> indexer.caseCountOf(node.getPath())).sum(),
+                indexer.testCaseCountOf(dto.getPath())
+                        + beneath.stream().mapToLong(node -> indexer.testCaseCountOf(node.getPath())).sum(),
                 indexer.getTestCasesUnder(dto).size(),
                 counted(byType, DirectoryType.TR));
     }

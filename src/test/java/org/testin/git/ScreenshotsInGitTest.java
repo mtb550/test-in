@@ -29,11 +29,6 @@ import java.util.Set;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * A run's screenshots in Git (#313, Rule-SHARE-112): the review lists none of
- * them on its own, and committing a result carries the ones its run's folder
- * gained or lost - and no other run's.
- */
 public class ScreenshotsInGitTest {
 
     private static final String RESULT = "runs/cycle38/4fd2a19b-59c7-44df-8cc4-ec5d293b18e9.ri";
@@ -41,10 +36,6 @@ public class ScreenshotsInGitTest {
     private static final String REMOVED = "runs/cycle38/q81zd.png";
     private static final String OTHER_RUN = "runs/cycle39/m4x0c.png";
 
-    /**
-     * Makes the folder a real test run, which is what the marker beside the
-     * picture says.
-     */
     private static void markARun(final Path root) {
         try {
             final Path at = root.resolve("runs/cycle38");
@@ -68,12 +59,6 @@ public class ScreenshotsInGitTest {
         }
     }
 
-    /**
-     * The other half of the rule, and the reason a marker decides it: a picture
-     * is a screenshot because it sits in a run, not because of what it is called.
-     * A five-character PNG a tester keeps beside a test set is a file like any
-     * other, and hiding it left them unable to commit it at all (#305, S29).
-     */
     @Test
     public void aPictureOutsideARunIsAFileLikeAnyOther() {
         try {

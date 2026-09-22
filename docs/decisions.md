@@ -40,10 +40,10 @@ reason: a decision nobody can find the history of gets made again every year.
 ## Decision-001 — The indexer owns every read and write of test data
 
 **Context.** Test data is JSON on disk, and every panel wants it: the tree draws
-nodes from it, both editors read cases out of it, the view panel shows one case,
-the report writes a run out. When each of them read the disk for itself, "does
-this node exist" was a `Files.exists` in one place, a cache lookup in another,
-and a stale `DirectoryDto` in a third.
+nodes from it, both editors read test cases out of it, the view panel shows one
+test case, the report writes a run out. When each of them read the disk for
+itself, "does this node exist" was a `Files.exists` in one place, a cache
+lookup in another, and a stale `DirectoryDto` in a third.
 
 **Decision.** `org.testin.indexer` is the only package that touches test data.
 Everything else holds `DirectoryDto` and `TestCaseDto` objects the indexer

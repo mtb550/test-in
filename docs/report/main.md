@@ -86,11 +86,11 @@ The PDF, the Word document and the web page each hold these, in this order.
 3. **Execution Summary** — one sentence naming the run and saying how many test
    cases it holds, how many were executed and what share passed. All four
    formats open it with the same sentence. Under it a row of
-   figures: **Total Cases**, **Passed**, **Failed**, **Blocked**, **Untested**,
-   **Removed** and **Pass Rate**. **Removed** appears only when the run has any.
-   A test case deleted before it was judged is counted only under **Removed**,
-   so it is left out of **Pass Rate**; one deleted after its verdict is counted
-   under that verdict, as the run recorded it.
+   figures: **Total Test Cases**, **Passed**, **Failed**, **Blocked**,
+   **Untested**, **Removed** and **Pass Rate**. **Removed** appears only when
+   the run has any. A test case deleted before it was judged is counted only
+   under **Removed**, so it is left out of **Pass Rate**; one deleted after its
+   verdict is counted under that verdict, as the run recorded it.
 4. **Result Analysis** — what the tester wrote about the run, under a heading
    for each verdict with its count. The whole section is left out when the
    tester wrote nothing.
@@ -127,8 +127,8 @@ for passed, amber for blocked, gray for untested and removed.
 
 The last column, **Bug Issue**, holds the issue a test case was reported as, as
 *#12*. Clicking it opens the issue. It is empty for a test case with no issue.
-There is no column for the error, and the cases are one table rather than one
-per verdict.
+There is no column for the error, and the test cases are one table rather than
+one per verdict.
 
 ---
 

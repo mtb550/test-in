@@ -39,16 +39,16 @@ public record NodeFigures(long testSets, long packages, long testCases, long run
     public @NotNull String describe() {
         if (testSets == 0 && testCases == 0 && testRuns == 0) return "";
 
-        final @NotNull String sets = testSets == 1
+        final @NotNull String setsText = testSets == 1
                 ? Bundle.message("figures.test.sets.one")
                 : Bundle.message("figures.test.sets.many", String.valueOf(testSets));
-        final @NotNull String cases = testCases == 1
+        final @NotNull String testCasesText = testCases == 1
                 ? Bundle.message("figures.test.cases.one")
                 : Bundle.message("figures.test.cases.many", String.valueOf(testCases));
-        final @NotNull String runs = testRuns == 1
+        final @NotNull String runsText = testRuns == 1
                 ? Bundle.message("figures.test.runs.one")
                 : Bundle.message("figures.test.runs.many", String.valueOf(testRuns));
 
-        return Bundle.message("figures.holds", sets, cases, runs);
+        return Bundle.message("figures.holds", setsText, testCasesText, runsText);
     }
 }

@@ -161,10 +161,10 @@ public enum CopyChoice implements MenuItem {
         return copied.apply(tc);
     }
 
-    public @NotNull String copiedMessage(final int cases) {
-        return cases == 1
+    public @NotNull String copiedMessage(final int testCases) {
+        return testCases == 1
                 ? Bundle.message("copy.done.one", name)
-                : Bundle.message("copy.done.many", name, String.valueOf(cases));
+                : Bundle.message("copy.done.many", name, String.valueOf(testCases));
     }
 
     @Override
@@ -182,7 +182,7 @@ public enum CopyChoice implements MenuItem {
         }.registerCustomShortcutSet(shortcut.getCustomShortcut(), component);
     }
 
-    public @NotNull String from(final @NotNull List<TestCaseDto> cases) {
-        return cases.stream().map(this::from).collect(Collectors.joining("\n\n"));
+    public @NotNull String from(final @NotNull List<TestCaseDto> testCases) {
+        return testCases.stream().map(this::from).collect(Collectors.joining("\n\n"));
     }
 }

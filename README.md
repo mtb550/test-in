@@ -22,14 +22,15 @@ they exercise.
   and grid views, paging, filtering, search and bulk edits, with completion
   drawn from what you have already written.
 - **Generate** — Testin writes and maintains the TestNG classes and `@Test`
-  methods for your cases, and keeps them in step when you rename or remove one.
-- **Execute** — run a case, a set, or a whole test run from the gutter, the tree
-  or the editor. Results are recorded per case with status, duration and
-  failure details.
+  methods for your test cases, and keeps them in step when you rename or remove
+  one.
+- **Execute** — run a test case, a test set, or a whole test run from the
+  gutter, the tree or the editor. Results are recorded per test case with
+  status, duration and failure details.
 - **Report** — export a run to PDF, Word, Excel or HTML. Test cases export as
   XLSX, CSV, JSON or HTML, and import from XLSX, XLS, CSV or JSON.
 - **Version** — commit and sync test case changes from inside the panel, with a
-  diff of what changed in each case.
+  diff of what changed in each test case.
 
 ## How the data is stored
 

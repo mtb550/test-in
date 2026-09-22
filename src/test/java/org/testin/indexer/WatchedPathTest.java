@@ -24,22 +24,6 @@ import java.util.Optional;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
-/**
- * What the file watcher lets through (#20).
- * <p>
- * This decision runs on every file event in the IDE - a build writing class
- * files, the platform's own indexes, every other plugin - so it has to be
- * arithmetic on paths, and it has to answer "no" for almost everything. Both
- * halves are worth pinning: letting too much through re-reads test projects for
- * changes that were never test data, and letting too little through is the bug
- * the watcher exists to fix, silently.
- * <p>
- * The one that would cost most is Git's own directory. A test project is itself
- * a repository, so {@code .git} sits inside the project rather than beside it.
- * A pull rewrites HEAD, FETCH_HEAD, the index and the logs. Without this, that
- * would look like the project's test data changing, over and over, for the
- * length of the pull.
- */
 public class WatchedPathTest {
 
     private static final Path ROOT = Path.of("C:", "Users", "mtb", "Testin");

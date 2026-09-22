@@ -28,12 +28,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
-/**
- * A temporary folder a test made, and everything in it. What cannot be deleted is
- * reported rather than thrown: a leftover folder is litter, not a failed test, and
- * reporting it as one would hide whichever assertion actually failed. A test that
- * deletes as one of its own steps asserts on the answer instead.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TempTree {
     public static boolean delete(final @NotNull Path root) {

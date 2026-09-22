@@ -37,23 +37,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
-/**
- * The rules behind the search (#29).
- * <p>
- * Two of them are worth pinning here rather than on screen.
- * <p>
- * A test case and a node come out of the search as the same shape, and
- * everything downstream depends on that: the tree is expanded to a node, the
- * editor for that node is opened, and a case is landed on inside it. If a case
- * did not carry the test set that holds it, going to one would have to ask what
- * kind of thing it was looking at, which is the branching this design exists to
- * avoid.
- * <p>
- * And the order, because a search that finds the right thing on line forty has
- * not found it. A tester recognizes a case by its description; one that matched
- * on a step or an id is a real hit and looks unrelated at a glance, so it goes
- * below the ones that explain themselves.
- */
 public class SearchTest {
 
     private static TestSetDirectoryDto testSet(final String name, final String... chain) {
@@ -85,7 +68,7 @@ public class SearchTest {
     }
 
     @Test
-    public void aNodeCarriesItselfAndNoCase() {
+    public void aNodeCarriesItselfAndNoTestCase() {
         final TestSetDirectoryDto login = testSet("Login", "test-01", "Test Cases", "Login");
 
         final Hit hit = Hit.of(login);
@@ -120,7 +103,7 @@ public class SearchTest {
     }
 
     @Test
-    public void casesThatMatchOnTheirDescriptionComeFirst() {
+    public void testCasesThatMatchOnTheirDescriptionComeFirst() {
         final TestSetDirectoryDto set = testSet("Login", "test-01");
         final TestCaseDto onADescription = testCase("Login with a valid user", set);
         final TestCaseDto onSomethingUnseen = testCase("Check the balance", set);
@@ -133,7 +116,7 @@ public class SearchTest {
     }
 
     @Test
-    public void casesMatchingEquallyWellAreAlphabetical() {
+    public void testCasesMatchingEquallyWellAreAlphabetical() {
         final TestSetDirectoryDto set = testSet("Login", "test-01");
         final TestCaseDto second = testCase("Login with a valid user", set);
         final TestCaseDto first = testCase("Login fails on a bad password", set);
@@ -158,12 +141,6 @@ public class SearchTest {
         assertTrue(Hits.byClosestName(testSet("Alpha", "x"), testSet("Bravo", "x")) < 0);
     }
 
-    /**
-     * With nothing typed the search is a way of getting around, so what it lists
-     * is what a tester can actually open. A package is somewhere to look through
-     * rather than somewhere to go, and listing every one of them would be the
-     * tree again, in a dialog.
-     */
     @Test
     public void aTestSetIsSomewhereToGo() {
         assertTrue(testSet("Login", "test-01").isOpenableInEditor(),
@@ -195,18 +172,6 @@ public class SearchTest {
         assertTrue(Hits.inTreeOrder(first, second) < 0);
     }
 
-    /**
-     * What the editor can be opened on, which is the question that crashed.
-     * <p>
-     * The editor type used to be read as "a test run, or else a test set". So
-     * every other node - a package, the Test Cases folder, the Test Runs folder -
-     * was opened as a test set and died casting itself to one. Typing "run" was
-     * enough to find the Test Runs folder and press Enter on it.
-     * <p>
-     * The node declares it now, and these are the two that say yes. If a third
-     * kind ever does, it needs an editor written for it, and this test is where
-     * that is noticed.
-     */
     @Test
     public void onlyTestSetsAndTestRunsHaveAnEditorToOpen() {
         assertTrue(testSet("Login", "test-01").isOpenableInEditor(), "a test set opens the test editor");

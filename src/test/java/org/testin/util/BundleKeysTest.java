@@ -36,30 +36,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * Every key the code asks for exists, and every key the bundle holds is asked
- * for.
- * <p>
- * The plugin is being translated, so a string a tester reads is a key now rather
- * than a literal (#11). A key is a string at bottom, and the two failures it
- * brings are both silent: ask for one that is not there and the tester reads
- * {@code !done.copied!} in a balloon; leave one nothing asks for and a
- * translator is paid to translate a sentence that is never shown.
- * <p>
- * Neither is a compile error and neither shows up in a sandbox unless the exact
- * screen is opened, which is why it is checked here.
- * <p>
- * <b>The vocabulary enums are resolved as well as counted.</b> They call
- * {@code Bundle.message} in a constant's constructor, so the lookup happens
- * while the class initializes - a missing key there is an
- * {@code ExceptionInInitializerError} in front of a tester rather than a wrong
- * word, and every action that notifies anything goes through them.
- */
 public class BundleKeysTest {
 
-    /**
-     * Every {@code Bundle.message("...")} written in the plugin.
-     */
     private static List<String> keysAskedForInCode() {
         final List<String> keys = new ArrayList<>();
         final Pattern call = Pattern.compile("Bundle\\.message\\(\\s*\"([^\"]+)\"");
@@ -73,12 +51,6 @@ public class BundleKeysTest {
         return keys;
     }
 
-    /**
-     * The core and both content modules. The two modules read the same bundle
-     * as the core, and a key only one of them asked for used to read here as
-     * nobody's - so a tester-facing sentence there had nowhere to go but an
-     * English literal (#66, finding 256).
-     */
     private static List<Path> sources() {
         return Stream.of(Path.of("src", "main", "java"),
                         Path.of("testin-java", "src", "main", "java"),
@@ -141,7 +113,6 @@ public class BundleKeysTest {
         final Properties english = bundle("messages.properties");
 
         for (final String key : english.stringPropertyNames()) {
-            // The platform reads these itself, by name, from plugin.xml.
             if (key.startsWith("toolwindow.") || key.startsWith("action.") || key.startsWith("group.")
                     || key.equals("testin.display.name")) {
                 continue;
@@ -153,10 +124,6 @@ public class BundleKeysTest {
         }
     }
 
-    /**
-     * The words every notification is built from, resolved rather than counted -
-     * these are looked up while the enum initializes.
-     */
     @Test
     public void theNotificationVocabularyResolves() {
         for (final Done done : Done.values()) {
@@ -168,20 +135,6 @@ public class BundleKeysTest {
         }
     }
 
-    /**
-     * UC-INTERNAL-001, Rule-INTERNAL-066.
-     * <p>
-     * Every declared action is named in the bundle, because plugin.xml no longer
-     * names it.
-     * <p>
-     * The descriptor used to carry {@code text} and {@code description} on each
-     * element; the platform reads them from here instead now, by id, so that a
-     * tester running the IDE in another language sees that language in Find
-     * Action and in Settings -> Keymap. A key that is missing does not fail
-     * anything - the platform falls
-     * back to the id, so the tester finds an action called
-     * {@code Testin.RunTests} and nothing says why.
-     */
     @Test
     public void everyDeclaredActionIsNamedInTheBundle() {
         final Properties english = bundle("messages.properties");
@@ -203,10 +156,6 @@ public class BundleKeysTest {
         assertTrue(found > 0, "no declared actions were found, so this test is checking nothing");
     }
 
-    /**
-     * A translation answers the same keys as the English, or a tester running in
-     * that language reads a mixture of the two.
-     */
     @Test
     public void everyTranslationAnswersTheSameKeys() {
         final Properties english = bundle("messages.properties");
@@ -220,27 +169,6 @@ public class BundleKeysTest {
         }
     }
 
-    /**
-     * UC-INTERNAL-001, Rule-INTERNAL-066.
-     * <p>
-     * A sentence with a slot in it has its apostrophes doubled, in every
-     * language.
-     * <p>
-     * {@code Bundle.message} runs MessageFormat only when arguments are passed -
-     * without them the value comes back exactly as written. So a key carrying
-     * {@code {0}} is a MessageFormat pattern, and in one of those a lone
-     * apostrophe is the quoting character: it is eaten, and it takes the text
-     * after it with it. "the test case's id" prints as "the test cases id",
-     * and "{0}" inside a quoted run prints as the literal braces.
-     * <p>
-     * Nothing fails when this is wrong. The sentence is simply missing a letter,
-     * in one language, on one screen - which is why it is checked here rather
-     * than left to be noticed.
-     * <p>
-     * A key with {@code %s} and no {@code {0}} is not a MessageFormat pattern -
-     * {@link org.testin.notifications.Refused} formats those itself - so an
-     * apostrophe in one of those is written once and left alone.
-     */
     @Test
     public void everyPatternWithASlotDoublesItsApostrophes() {
         final Pattern slot = Pattern.compile("\\{\\d");

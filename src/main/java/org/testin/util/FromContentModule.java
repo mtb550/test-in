@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package org.testin.codegen;
+package org.testin.util;
 
-import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-// UC-CODEGEN-002, Rule-CODEGEN-078
-public record CopiedCase(@NotNull TestCaseDto copy, @NotNull TestCaseDto original) {
+@Retention(RetentionPolicy.SOURCE)
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR})
+public @interface FromContentModule {
 }

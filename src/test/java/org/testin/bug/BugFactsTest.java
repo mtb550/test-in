@@ -34,14 +34,10 @@ import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
 
-/**
- * What a bug report is made of, read off a run item, its test case and its run
- * (#28).
- */
 public class BugFactsTest {
 
     @Test
-    public void theFactsAreReadOffTheRunItemItsCaseAndItsRun() {
+    public void theFactsAreReadOffTheRunItemItsTestCaseAndItsRun() {
         final UUID id = UUID.randomUUID();
         final TestCaseDto tc = TestCaseDto.builder().id(id).description("  Log in with a valid user ").expectedResult("Welcome")
                 .steps(List.of("Open", "Log in")).testData("user=a").build();

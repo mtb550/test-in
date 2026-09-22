@@ -70,8 +70,8 @@ The node goes to the recycle bin, so nothing is lost for good.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is, drawn with Inactive beside its name like any other status. Its test sets,
-  cases and runs are not read, because a project nobody is working on is not
-  worth the walk.
+  test cases and runs are not read, because a project nobody is working on is
+  not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-102** — Keeping the copy for undo, and putting it back on

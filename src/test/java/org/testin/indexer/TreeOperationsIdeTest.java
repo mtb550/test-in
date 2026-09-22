@@ -29,37 +29,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 
-/**
- * UC-INTERNAL-002.
- * <p>
- * The cache and the disk agree after a tree operation.
- * <p>
- * <b>Architecture rule 2:</b> the VFS operation succeeds first, then the cache
- * is updated - never the other way round, because the cache update persists
- * markers, marker writes create directories, and the reverse order produces
- * phantom directories and "already exists in VFS" errors. Nothing has ever
- * checked it.
- * <p>
- * This is the first test in this repository that needs a running IDE, and the
- * reason the {@code ideTest} task exists (#108). The indexer is a project
- * service over the virtual file system; there is no seam that answers these
- * questions without one, and three separate pieces of work wanted such a fixture
- * in a single session.
- * <p>
- * Named {@code *IdeTest} because that is how the two runners tell the tests
- * apart: {@code test} is TestNG and excludes this, {@code ideTest} is JUnit and
- * takes only this. A {@code BasePlatformTestCase} is a JUnit {@code TestCase},
- * which the TestNG runner would never have seen.
- */
 public class TreeOperationsIdeTest extends BasePlatformTestCase {
 
     private Path root;
 
-    /**
-     * A temporary tree, removed as far as the operating system allows. A file
-     * the IDE still holds open is its own to clean up, and failing to remove one
-     * fails nothing here.
-     */
     private static void deleteTree(final Path path) {
         if (path == null) return;
 
@@ -68,11 +41,9 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
                 try {
                     Files.deleteIfExists(each);
                 } catch (final Exception ignored) {
-                    // Left for the operating system.
                 }
             });
         } catch (final Exception ignored) {
-            // Nothing to walk, or nothing to remove.
         }
     }
 
@@ -95,10 +66,6 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
-    /**
-     * Builds a test project the way the action that creates one does: the mapper
-     * writes the directories and their markers, then the indexer is told.
-     */
     private TestProjectDirectoryDto create(final Path path) {
         return WriteAction.computeAndWait(() -> {
             final TestProjectDirectoryDto tp =
@@ -109,19 +76,6 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
         });
     }
 
-
-    /**
-     * UC-TREE-PANEL-001, Rule-TREE-PANEL-100.
-     * <p>
-     * A test project that is not active is a node, and holds nothing.
-     * <p>
-     * It used to be skipped whole: not in the index at all, so the tree could
-     * not draw it, the binding did not resolve, and the tester was sent to the
-     * welcome screen to read in a sentence what the tree exists to say. It is
-     * indexed now - drawn with "Inactive" beside its name, like any other
-     * status - and its contents are not read, because a project nobody is
-     * working on is not worth a directory walk.
-     */
     public void testAnInactiveProjectIsANodeWithNothingInIt() {
         final Path testProject = root.resolve("NAFATH");
 
@@ -145,13 +99,6 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
                 indexer().find(testProject).orElseThrow().getMarker().status());
     }
 
-    /**
-     * UC-INTERNAL-002, Rule-INTERNAL-090.
-     * <p>
-     * A folder Testin writes carries an id, and the next write keeps it: the id
-     * names one folder for a tool outside the IDE, so a status change, a rename
-     * or a reorder must not hand out a new one (#305, D5).
-     */
     public void testAFoldersIdIsWrittenOnceAndKept() {
         final Path testProject = root.resolve("NAFATH");
 
@@ -172,13 +119,6 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
                 indexer().readMarker(testProject, DirectoryType.TP, "NAFATH", TestProjectMarker.class).getId());
     }
 
-    /**
-     * A node the plugin created is on disk, and the cache knows it.
-     * <p>
-     * Both halves, because either alone is the failure rule 2 is about: a cache
-     * entry with no directory is the phantom it forbids, and a directory the
-     * cache has not heard of is invisible to every surface.
-     */
     public void testACreatedNodeIsOnDiskAndInTheCache() {
         final Path testProject = root.resolve("NAFATH");
 
@@ -190,13 +130,6 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
                 indexer().nodeExists(testProject));
     }
 
-    /**
-     * The two fixed containers arrive with it.
-     * <p>
-     * A test project holds its Test Cases and Test Runs directories and nothing
-     * else, so one without them is a project nothing can be created under - and
-     * the folder names are the ones on disk, never a translated caption.
-     */
     public void testATestProjectArrivesWithItsTwoContainers() {
         final Path testProject = root.resolve("NAFATH");
 
@@ -208,12 +141,6 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
                 Files.isDirectory(testProject.resolve(DirectoryType.TRD.getFolderName())));
     }
 
-    /**
-     * And a node that was never made is not claimed.
-     * <p>
-     * The other half of the same question, and what a cache answers wrongly when
-     * it is written before the file system rather than after.
-     */
     public void testAnAbsentNodeIsNotInTheCache() {
         assertFalse("the cache claims a node that was never created",
                 indexer().nodeExists(root.resolve("never-made")));

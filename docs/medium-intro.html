@@ -59,14 +59,14 @@
 <p>The test cases are in a spreadsheet, or in a test management tool that lives in a browser tab. The automation is in
     IntelliJ IDEA: Java, TestNG, under Git, and reviewed like the rest of the code.</p>
 <p>Nothing connects the two. A test case gets reworded in the spreadsheet and the method keeps the old name. A test case
-    is deleted and the method stays in the class for another year. A new case is written and nobody notices there is no
-    method for it. When somebody asks "is this covered?", the honest answer is that you would have to read both lists
+    is deleted and the method stays in the class for another year. A new test case is written and nobody notices there
+    is no method for it. When somebody asks "is this covered?", the honest answer is that you would have to read both lists
     and compare them by hand.</p>
 <p>There is also the day of it. A test management tool lives in a browser tab, and a browser tab is a mouse. Recording a
-    verdict means opening the run, finding the case, clicking a status, waiting for the page and scrolling back to where
-    you were; saying what actually happened means another dialog and another wait. Fifty cases is a few hundred clicks,
-    and none of it gets faster the tenth time you do it, because there is nothing to learn by hand. Meanwhile, the window
-    you left to get there is driven almost entirely by keys.</p>
+    verdict means opening the run, finding the test case, clicking a status, waiting for the page and scrolling back to
+    where you were; saying what actually happened means another dialog and another wait. Fifty test cases is a few
+    hundred clicks, and none of it gets faster the tenth time you do it, because there is nothing to learn by hand.
+    Meanwhile, the window you left to get there is driven almost entirely by keys.</p>
 <p>The drift is not a discipline problem, and neither is the clicking. Both are what happens when the two artifacts
     share no identity, no history, no screen and no keyboard.</p>
 <img alt="Testin, shot 1" src="assets/medium/shot-1-panel-beside-code.png"
@@ -74,37 +74,37 @@
 <h2>What Testin is</h2>
 <p>Testin is a JetBrains IDE plugin that puts test case management inside the IDE, next to the automation it drives.</p>
 <p>It adds a tool window with a tree: test projects, test sets, test runs. You write test cases in an editor tab. Testin
-    writes and maintains a TestNG class and one <code>@Test</code> method for every case, tied to it by the case's own
-    identity rather than by its name. You execute a run from the tree, the editor or the gutter, recording a verdict per
-    case, and generate a report at the end.</p>
+    writes and maintains a TestNG class and one <code>@Test</code> method for every test case, tied to it by the test
+    case's own identity rather than by its name. You execute a run from the tree, the editor or the gutter, recording a
+    verdict per test case, and generate a report at the end.</p>
 <p>Everything it owns is plain files on disk, under a folder you choose. There is no server, no account, and no
     telemetry.</p>
 <h2>One test case, from written to reported</h2>
 <p>The walkthrough below uses an invented demo: a test project called <code>Checkout</code>, holding a <code>Web</code>
     and a <code>Mobile</code> package. <code>Web</code> holds <code>Login</code> and <code>Register</code>, each with a
     test set of its own - <code>Sign in</code> and <code>Sign up</code> - and <code>Mobile</code> has one more. The run
-    below, <code>Sprint 2 Cycle 1</code>, covers seven cases from them.</p>
+    below, <code>Sprint 2 Cycle 1</code>, covers seven test cases from them.</p>
 <h3>Point Testin at a folder</h3>
 <p>Testin keeps its data out of your code repository on purpose: a test case edit should not show up as a diff in the
     automation project. So the first thing you set, in <strong>Settings → Tools → Testin</strong>, is the Testin folder:
     any empty folder, which becomes the root every open project reads. The second is your tester name, which is written
-    into every case and every verdict you record.</p>
+    into every test case and every verdict you record.</p>
 <img alt="Testin, shot 2" src="assets/medium/shot-2-settings.png" style="max-width:100%;height:auto;border-radius:6px">
 <h3>Write a test case</h3>
 <p>Press <strong>New Test Project</strong> at the top of the panel and name it. It gets two fixed folders: <code>Test
     Cases</code> and <code>Test Runs</code>. Select <code>Test Cases</code>, press <code>Ctrl+M</code> and pick *Test
     Set* — usually one feature.</p>
 <p>A package holds sets, so <code>Web</code> holds <code>Login</code> and <code>Register</code>. Make one the same way
-    and pick *Test Set Package*. Open a set and press <code>Ctrl+M</code> once more to write a case. A case has a
-    description, an expected result, steps, test data, pre-conditions, a module, a priority and groups. You get a card
-    list or a grid view, paging, filtering, search and bulk edits.</p>
+    and pick *Test Set Package*. Open a set and press <code>Ctrl+M</code> once more to write a test case. A test case
+    has a description, an expected result, steps, test data, pre-conditions, a module, a priority and groups. You get a
+    card list or a grid view, paging, filtering, search and bulk edits.</p>
 <img alt="Testin, shot 3" src="assets/medium/shot-3-test-set-editor.png"
      style="max-width:100%;height:auto;border-radius:6px">
 <p>On a card, <code>F2</code> edits a field and single letters jump straight into one: <code>D</code> for the
     description, <code>E</code> for the expected result, <code>S</code> for steps.</p>
 <h3>Read the Java that Testin wrote</h3>
 <p>Right-click the test set and choose <strong>Generate Code</strong>. Testin writes a TestNG class into the project's
-    test source folder, with one method per case:</p>
+    test source folder, with one method per test case:</p>
 <pre>
 @Test(description = "Register with an email nobody has used",
       testName = "d2571ec8-9a3f-4b16-bf04-8c6e17a5d932",
@@ -115,18 +115,18 @@ public void registerWithAnEmailNobodyHasUsed() {
 }
 </pre>
 <p><code>testName</code> carries the test case's identity. It is how Testin finds the method again, which is why
-    renaming a case renames the method instead of orphaning it. <code>priority</code> is the case's position in its test
-    set, counting from one — TestNG runs methods in that order, so the order you drag cards into is the order the suite
-    executes in. The body is a single comment, and it stays yours: Testin writes the annotation and the declaration and
-    never touches what is inside.</p>
-<p>Remove a case and the method goes with it. The class stays.</p>
+    renaming a test case renames the method instead of orphaning it. <code>priority</code> is the test case's position
+    in its test set, counting from one — TestNG runs methods in that order, so the order you drag cards into is the
+    order the suite executes in. The body is a single comment, and it stays yours: Testin writes the annotation and
+    the declaration and never touches what is inside.</p>
+<p>Remove a test case and the method goes with it. The class stays.</p>
 <img alt="Testin, shot 4" src="assets/medium/shot-4-generated-class.png"
      style="max-width:100%;height:auto;border-radius:6px">
-<p><code>Shift+F5</code> jumps from a card to its method, and the gutter mark beside the method leads back to the case.
-</p>
+<p><code>Shift+F5</code> jumps from a card to its method, and the gutter mark beside the method leads back to the test
+    case.</p>
 <h3>Execute a run</h3>
 <p>A test run is one round of testing over the sets you pick. Create it under <code>Test Runs</code> and open it. Each
-    case is a card, and three keys record what happened: <code>P</code> for passed, <code>F</code> for failed,
+    test case is a card, and three keys record what happened: <code>P</code> for passed, <code>F</code> for failed,
     <code>B</code> for blocked. The cursor advances on its own, so a clean run is <code>P P P</code> without the mouse.
 </p>
 <p><code>F</code> is the one verdict that asks first. A form opens for the actual result, a bug severity, a bug
@@ -135,13 +135,14 @@ public void registerWithAnEmailNobodyHasUsed() {
 <img alt="Testin, shot 5" src="assets/medium/shot-5-failure-form.png"
      style="max-width:100%;height:auto;border-radius:6px">
 <p>If you are testing an application rather than running code, light mode is a small always-on-top window showing one
-    case at a time, with the same three keys, so the application under test can have the whole screen.</p>
+    test case at a time, with the same three keys, so the application under test can have the whole screen.</p>
 <img alt="Testin, shot 6" src="assets/medium/shot-6-light-mode.png"
      style="max-width:100%;height:auto;border-radius:6px">
-<p>Cases with automation are not judged by hand: <code>F5</code> on a selection runs the generated methods and records
+<p>Test cases with automation are not judged by hand: <code>F5</code> on a selection runs the generated methods and records
     the verdict TestNG returned.</p>
 <h3>Report the failure as a bug</h3>
-<p>Open the failed case's details on the right. A <strong>Bug Issue</strong> row offers <strong>Report Bug</strong>.</p>
+<p>Open the failed test case's details on the right. A <strong>Bug Issue</strong> row offers <strong>Report
+    Bug</strong>.</p>
 <p>Testin writes the issue from what the run already knows — the description becomes the title; severity, priority,
     platform, actual result, expected result, numbered steps, test data, the folded exception, the screenshots, who
     executed it and when, and a link to the test case's own file. Anything it cannot get reads <code>n\a</code> rather
@@ -200,20 +201,22 @@ public void registerWithAnEmailNobodyHasUsed() {
     hands where they already are.</p>
 <ul>
     <li><code>P</code> <code>F</code> <code>B</code> — passed, failed, blocked, on a run's cards and in light mode. The
-        cursor moves to the next case on its own.
+        cursor moves to the next test case on its own.
     </li>
-    <li><code>F2</code> — change one field of the selected case. <code>D</code>, <code>E</code> and <code>S</code> open
+    <li><code>F2</code> — change one field of the selected test case. <code>D</code>, <code>E</code> and <code>S</code>
+        open
         the description, the expected result and the steps directly.
     </li>
     <li><code>Ctrl+M</code> — a new test set, test run or test case, depending on what is selected.</li>
-    <li><code>F5</code> — run the selected cases, or stop them. <code>Shift+F5</code> jumps to the generated method, and
+    <li><code>F5</code> — run the selected test cases, or stop them. <code>Shift+F5</code> jumps to the generated
+        method, and
         the gutter mark leads back.
     </li>
     <li><code>Ctrl+P</code> — generate the report on the selected run.</li>
-    <li><code>Ctrl+F</code> — the editor's search box. <code>Ctrl+Alt+F</code> finds any case, set or run in the test
-        project from anywhere in the IDE.
+    <li><code>Ctrl+F</code> — the editor's search box. <code>Ctrl+Alt+F</code> finds any test case, set or run in the
+        test project from anywhere in the IDE.
     </li>
-    <li><code>Ctrl+Left</code> and <code>Ctrl+Right</code> — the previous and next page of cases; with
+    <li><code>Ctrl+Left</code> and <code>Ctrl+Right</code> — the previous and next page of test cases; with
         <code>Shift</code>, the first and the last.
     </li>
     <li><code>Ctrl+Z</code> and <code>Ctrl+Y</code> — undo and redo. The tree and each editor keep their own history, so
