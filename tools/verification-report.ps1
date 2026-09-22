@@ -38,6 +38,7 @@ $repo = Split-Path -Parent $PSScriptRoot
 $names = @{
     'IU-262' = 'IntelliJ IDEA 2026.2'
     'PY-262' = 'PyCharm 2026.2'
+    'RD-262' = 'Rider 2026.2'
     'GO-262' = 'GoLand 2026.2'
     'WS-262' = 'WebStorm 2026.2'
 }
