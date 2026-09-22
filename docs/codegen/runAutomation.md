@@ -54,13 +54,14 @@ The code runs, and Testin writes down whether each test case passed.
   process, Stop reaches one without touching the other, and each case reports
   its verdict under the run it belongs to.
 
-## The three ways in
+## The four ways in
 
 | The tester does this | Where |
 |---|---|
 | Presses `F5` | The list of test cases in either editor |
 | Chooses **Run Test Method** | The menu in either editor |
 | Clicks the run button | A card under the pointer, or the view panel |
+| Presses `F5` or clicks the run button | [Light mode](../editorPanel/lightMode.md), on the test case it is showing |
 
 Running everything a test run has not judged yet is different, and is
 [UC-EDITOR-PANEL-044](../editorPanel/runWholeRun.md).

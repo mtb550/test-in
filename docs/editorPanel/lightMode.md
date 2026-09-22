@@ -99,7 +99,7 @@ test run is going.
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  [||]  [pin]  [view]            Cycle-2                        3 / 6       │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  [set] LOGIN                                                               │
+│  (LOGIN)                                                   [m]  [>]  [tc]  │
 │                                                                            │
 │  [D] Sign in with a correct username and password                          │
 │  [E] The dashboard opens and the account name is shown in the header.      │
@@ -117,7 +117,7 @@ test run is going.
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  [||]  [pin]  [view]            Cycle-2                        3 / 6       │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  [set] LOGIN                                                               │
+│  (LOGIN)                                                   [m]  [>]  [tc]  │
 │                                                                            │
 │  [D] Sign in with a correct username and password                          │
 │  [E] The dashboard opens and the account name is shown in the header.      │
@@ -165,12 +165,15 @@ test case by hand runs no code. Stop is a pause symbol rather than a square.
 
 ### 3. The menu that chooses what the window shows
 
-Four checkboxes decide what the window shows:
+Seven checkboxes decide what the window shows:
 
 - the test set name
 - the durations
 - the verdict buttons
 - the status bar
+- Navigate to Test Method
+- Run Test Method
+- Navigate to Test Case
 
 It carries the toolbar's own Details icon, a tick box with a tick in it. It is
 the same picture in the IDE and in the window, and it is a picture of exactly
@@ -191,8 +194,9 @@ sits before it in the middle of its height.
 
 ### 6. The test set name, in small capitals above the description
 
-It carries the test set's icon, in gray, inside a rounded frame drawn in the
-same gray (Rule-EDITOR-PANEL-232), and a line's space under it. It is
+It sits inside a rounded frame, with no icon, the name and the frame in the gray
+of the **D** and **E** letter frames below it (Rule-EDITOR-PANEL-232), and a
+line's space under it. It is
 on by default, because a description alone can be ambiguous. "Sign in with
 a correct username and password" could sit under a Login test set. It could also
 sit under a Checkout test set testing guest sign-in.
@@ -200,6 +204,26 @@ sit under a Checkout test set testing guest sign-in.
 It can be hidden. A tester working through a single test set reads the same
 word on every test case, and a word that never changes is noise. It helps when
 a test run covers several test sets. It does not when the test run covers one.
+
+**The test case's own buttons sit at the right end of the same line**
+(Rule-EDITOR-PANEL-243): **Navigate to Test Method**, **Run Test Method** and
+**Navigate to Test Case** - the three the test run editor's card offers, in the
+card's order, with the card's icons. Each grows under the pointer and does what
+the card's does, and Run is **Stop Test Method** while the test case's
+automation runs. A button that cannot work - no generated method, the Java or
+TestNG plugin missing, a test case with no test set - is gray and says why in
+its tooltip; it is never left out. The tooltip shows only while the pointer is
+on the button: the button's name and its key, or the reason it is gray.
+
+They belong to the test case, so they slide in with it, and the description
+keeps the whole width of a narrow window. Each is an entry of its own in the
+view menu (Rule-EDITOR-PANEL-244). The line shows while the name or any button
+is on it. The buttons go while the failure form is open, as the verdict buttons
+do.
+
+Run claims the test case for this test run first, as the card's Run does
+(Rule-EDITOR-PANEL-180), so its verdict comes back here. When it does, the walk
+moves on exactly as after the tester's own verdict (Rule-EDITOR-PANEL-242).
 
 ### 7. The two clocks
 
@@ -257,7 +281,13 @@ status bar names it as *Show/Hide Details*.
 ### 10. The status bar, which names every key
 
 `Ctrl+D` Show/Hide Details, `Escape` Close, `P` Passed, `F` Failed, `B`
-Blocked.
+Blocked, `Shift+F5` Navigate to Test Method, `F5` Run Test Method - **Stop Test
+Method** while the test case's automation runs.
+
+The last two are the keys the IDE's keymap gives those two actions, so a tester
+who remaps them reads their own keys here and in the buttons' tooltips, and the
+window answers them (Rule-EDITOR-PANEL-245). They go while the failure form is
+open, as the buttons do.
 
 **This is where `Ctrl+D` is taught.** Removing the details button left a
 shortcut that nothing on screen named. That was the one real cost of
@@ -286,9 +316,10 @@ row back for that one state.
 
 **One line, always.** It never wraps and never scrolls. Whatever fits is shown,
 and the rest is simply not there. So the order was chosen, not left to chance.
-The two keys with no button to teach them come first. The three that fall off
-a narrow window are exactly the three with buttons sitting above them. Making
-the window wider brings them back. So the edge of the window has a second job.
+The two keys with no button to teach them come first. The ones that fall off
+a narrow window are exactly the ones with buttons sitting above them - the two
+button keys first, at the window's starting width, then the three verdicts.
+Making the window wider brings them back. So the edge of the window has a second job.
 
 ### 11. The verdict bar
 
@@ -303,15 +334,18 @@ three apart. Color would only say "button".
 
 ## Choosing what shows
 
-Four checkboxes on the title bar, remembered per machine rather than per
+Seven checkboxes on the title bar, remembered per machine rather than per
 project.
 
 - **Test set name**
 - **Duration** — both clocks, one entry
 - **Verdict buttons**
 - **Status bar**
+- **Navigate to Test Method**
+- **Run Test Method** — Run and Stop are one button, so one entry
+- **Navigate to Test Case**
 
-**Four toggles, not a settings screen.** The window has one job. Every one of
+**Seven toggles, not a settings screen.** The window has one job. Every one of
 these is a thing on the window that a tester can already see. So the list cannot
 grow past what the window holds. That is why it is a menu on the title bar
 rather than a page in Settings.
@@ -336,7 +370,7 @@ three keys.
 
 **The status bar itself stays on the list.** A tester who has learned the keys
 does not need a strip repeating them. In a window this small, a row they never
-read is worth reclaiming. Turning off all four is theirs to choose. The failure
+read is worth reclaiming. Turning everything off is theirs to choose. The failure
 form is the one state where it is not. With no buttons on it, that row is the
 only place `Enter` and `Escape` are written down. So the window forces the row
 back for that state, rather than taking the choice away everywhere.
@@ -352,12 +386,12 @@ off is the same argument that kept the description off from the start.
 project. The same tester on the same screen wants the same window, whichever
 project they open.
 
-**The failure form overrides two of the four.** Pressing `F` shows the actual
+**The failure form overrides five of the seven.** Pressing `F` shows the actual
 result, the severity, the priority and the error box, whatever is hidden. If a
 verdict needs detail, the window must show that detail, whatever is switched
 off.
-The verdict buttons go while the form is open. The test case is already judged,
-and the form is the only thing left to do. The status bar comes back,
+The verdict buttons and the three test case buttons go while the form is open.
+The test case is already judged, and the form is the only thing left to do. The status bar comes back,
 because it is what says how the form is finished.
 
 ---
@@ -506,7 +540,7 @@ pieces of wheel-zoom code and try to merge them.
 happens every time, not just the first. The size is read from the IDE's editor
 font as the window opens. So a tester who changes the IDE font gets a window
 that agrees with it. The zoom on top of that is the tester's own. It is
-remembered per machine, alongside the position, the width and the four view
+remembered per machine, alongside the position, the width and the seven view
 toggles. It used to go back to the normal size every time the window opened, so
 the tester had to set it again each time.
 
@@ -569,10 +603,25 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
   A case longer than the screen stops at the edge and says so on its last row,
   because the verdict buttons and the status bar finish a case and a window
   taller than the screen puts them where nobody can reach them.
-- **Rule-EDITOR-PANEL-232** — The test set's name sits in a rounded frame, drawn
-  in the gray the name is set in, so it reads as a label above the test case
-  rather than as part of it. The frame stays quieter than the description, and
-  it goes with the name when the name is turned off.
+- **Rule-EDITOR-PANEL-232** — The test set's name sits in a rounded frame with
+  no icon, the name and the frame in the gray of the letter frames beside the
+  description, so it reads as a label above the test case rather than as part of
+  it. The frame stays quieter than the description, and it goes with the name
+  when the name is turned off.
+- **Rule-EDITOR-PANEL-243** — Light mode offers the test case on screen the
+  buttons the test run editor's card offers it - Navigate to Test Method, Run
+  Test Method, Navigate to Test Case - at the right end of the test set line,
+  always visible. Each does exactly what the card's does, Run claims the test
+  case for this test run first, and a button that cannot work is gray with its
+  reason in its tooltip, never hidden.
+- **Rule-EDITOR-PANEL-244** — Each of the three buttons is an entry of its own
+  in light mode's View menu, named as the button is, and on until the tester
+  turns it off. Run and Stop are one button and one entry.
+- **Rule-EDITOR-PANEL-245** — Light mode answers the keys the IDE's keymap gives
+  Navigate to Test Method and Run Test Method, Shift+F5 and F5 by default, and
+  F5 stops the test case while its automation runs. The tooltips name the keys,
+  and the status bar lists them after the verdict keys. The buttons and their
+  keys go while the failure form is open, as the verdict buttons do.
 
 **Why 200 milliseconds.** `P` is pressed once per test case, so a hundred-case
 run is a hundred of these, and the tester is watching the application under test
@@ -594,10 +643,13 @@ that is the tester's hand on the edge, not a state change.
 | **`Ctrl+V`** | Pastes text into the error box, or adds an image as a picture under it, on the failure form. It does nothing when no failure form is open, so evidence cannot be attached to a test case that is about to be passed and cleared. |
 | **`Escape`** | Closes the window. The test run is untouched. Reopening returns to the first unjudged test case. |
 | **`Ctrl+D`** | Shows the detail fields, or hides them when they are shown. |
+| **`F5`**, or **Run Test Method** | Runs the test case on screen's generated method, claiming it for this test run first. While it runs, the button is **Stop Test Method** and `F5` stops it. The status that comes back is the verdict, and the walk moves on. The key is the one the IDE's keymap gives Run Test Method. |
+| **`Shift+F5`**, or **Navigate to Test Method** | Opens the test case's generated test method in the IDE, behind the window. The key is the one the IDE's keymap gives Navigate to Test Method. |
+| **Navigate to Test Case** | Opens the test case in its own test set's editor, behind the window. It has no key. |
 | **Wheel** | Zooms the test case and the failure form, inside this window only, with no modifier. |
 | **Drag an edge** | Width only. The left and right edges resize. The top and bottom do not. Height is whatever the content needs. |
 | **Show details, or a view toggle** | The window grows or shrinks to fit. That is the only way its height changes. It changes immediately, rather than leaving a gap or a scrollbar. |
-| **Drag the bar** | Moves the window. Its position, width, zoom level and four view toggles are remembered per machine, not per project. |
+| **Drag the bar** | Moves the window. Its position, width, zoom level and seven view toggles are remembered per machine, not per project. |
 | **Light Mode pressed again** | The window closes. The editor carries on from wherever the test run got to. Nothing is saved or discarded on the way out, because every verdict was written as it was recorded. |
 | **Window closed any other way** | The button pops back out. That covers `Escape`, the project closing, and the run editor's tab closing. The button shows whether the window is open, rather than remembering that someone opened it. |
 | **Verdict set in either view** | The other view follows it. Both read the same test run, and neither keeps a copy. So a test case judged in light mode is already judged in the grid behind it, and one judged in the grid moves the window on. |
@@ -683,8 +735,8 @@ offer verdicts that nothing could take.
 [#13](https://github.com/mtb550/test-in/issues/13) asks for a control over which
 test case fields appear. The menu chooses between the things the window itself
 holds instead. What sits behind Details stays fixed: the badges, the steps, the
-test data and the pre-conditions. Four switches over parts of a window cannot grow into
-more. A list of 18 switches over test case fields is a settings screen, inside a
+test data and the pre-conditions. Switches over parts of a window cannot grow past
+what the window holds. A list of 18 switches over test case fields is a settings screen, inside a
 window built to have none. If the wrong four are behind Details, changing those
 four is the fix.
 

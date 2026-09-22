@@ -17,8 +17,10 @@
 package org.testin.view;
 
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.CardHoverAction;
+import org.testin.editor.ShownCaseAction;
 
 import javax.swing.JComponent;
 import java.util.List;
@@ -26,8 +28,10 @@ import java.util.List;
 public class ViewPanelActions {
     // UC-VIEW-PANEL-003, UC-VIEW-PANEL-012, UC-VIEW-PANEL-014
     public @NotNull List<AnAction> create(final @NotNull ViewPanel panel, final @NotNull JComponent component) {
-        ShownCaseAction.bind(panel, CardHoverAction.NAVIGATE_TO_TEST_METHOD, component);
-        ShownCaseAction.bind(panel, CardHoverAction.RUN_TEST_METHOD, component);
+        final @NotNull Project p = panel.getP();
+
+        ShownCaseAction.bind(p, CardHoverAction.NAVIGATE_TO_TEST_METHOD, panel::getCurrentTestCase, (action, tc) -> action.execute(p, tc), component);
+        ShownCaseAction.bind(p, CardHoverAction.RUN_TEST_METHOD, panel::getCurrentTestCase, (action, tc) -> action.execute(p, tc), component);
 
         return List.of(
                 new PreviousTestCaseAction(panel.getPage(), component),

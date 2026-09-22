@@ -16,36 +16,25 @@
 
 package org.testin.view.details.components;
 
-import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.HtmlChunk;
-import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.openapi.util.IconLoader;
-import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.Declared;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.CardHoverAction;
+import org.testin.editor.HoverButton;
 import org.testin.model.Automated;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class ActionIcons extends BaseDetails {
-    final float BASE_SCALE = 1.3f;
-    final float HOVER_SCALE = 1.8f;
     final int STRUT_WIDTH = 8;
     final int INSETS_TOP = 8;
     final int INSETS_LEFT = 16;
@@ -55,8 +44,8 @@ public class ActionIcons extends BaseDetails {
     // UC-VIEW-PANEL-012, UC-VIEW-PANEL-014, Rule-VIEW-PANEL-050, Rule-VIEW-PANEL-056, Rule-VIEW-PANEL-057
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        final @NotNull CardHoverAction navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD;
-        final @NotNull CardHoverAction run = CardHoverAction.runSlot(p, dto);
+        final @NotNull CardHoverAction.Offered navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD.offer(p, dto);
+        final @NotNull CardHoverAction.Offered run = CardHoverAction.RUN_TEST_METHOD.offer(p, dto);
 
         final @NotNull JBPanel<?> actionsPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         actionsPanel.setOpaque(false);
@@ -66,57 +55,11 @@ public class ActionIcons extends BaseDetails {
 
         final @NotNull Automated state = automation.of(dto.getId());
 
-        actionsPanel.add(hoverIcon(navigate, p, dto, state.getIcon(), state.getLabel()));
+        actionsPanel.add(HoverButton.of(p, navigate, state.getIcon(), state.getLabel(), () -> navigate.action().execute(p, dto)));
         actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(STRUT_WIDTH)));
-        actionsPanel.add(hoverIcon(run, p, dto, run.getIcon(), run.getTooltip()));
+        actionsPanel.add(HoverButton.of(p, run, run.action().getIcon(), run.action().getTooltip(), () -> run.action().execute(p, dto)));
 
         return addFullWidthRow(panel, gbc, actionsPanel,
                 JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT), currentRow);
-    }
-
-    private @NotNull JBLabel hoverIcon(final @NotNull CardHoverAction action, final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull Icon drawn, final @NotNull String tooltip) {
-        final @NotNull Optional<String> whyNot = action.whyNotOffered(p);
-
-        final @NotNull JBLabel label = new JBLabel();
-        final @NotNull Icon shown = whyNot.isEmpty() ? drawn : IconLoader.getDisabledIcon(drawn);
-        final @NotNull Icon base = IconUtil.scale(shown, label, BASE_SCALE);
-        final @NotNull Icon hover = IconUtil.scale(shown, label, whyNot.isEmpty() ? HOVER_SCALE : BASE_SCALE);
-        label.setIcon(base);
-        label.setCursor(Cursor.getPredefinedCursor(whyNot.isEmpty() ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
-
-        new HelpTooltip()
-                .setDescription(HtmlChunk.text(whyNot.orElse(tooltip)))
-                .setShortcut(whyNot.isEmpty() ? Declared.shortcutText(action.getActionId()) : "")
-                .installOn(label);
-
-        label.setPreferredSize(new Dimension(hover.getIconWidth(), hover.getIconHeight()));
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        label.setVerticalAlignment(SwingConstants.CENTER);
-
-        label.addMouseListener(new MouseAdapter() {
-            // UC-VIEW-PANEL-012, Rule-VIEW-PANEL-052
-            @Override
-            public void mouseEntered(final MouseEvent e) {
-                label.setIcon(hover);
-            }
-
-            @Override
-            public void mouseExited(final MouseEvent e) {
-                label.setIcon(base);
-            }
-
-            // UC-VIEW-PANEL-012, UC-VIEW-PANEL-014
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                if (whyNot.isPresent()) {
-                    Services.getInstance(p, Notifier.class).softRefuse(p, whyNot.orElseThrow());
-                    return;
-                }
-
-                action.execute(p, dto);
-            }
-        });
-
-        return label;
     }
 }

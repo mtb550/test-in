@@ -14,37 +14,43 @@
  * limitations under the License.
  */
 
-package org.testin.view;
+package org.testin.editor;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
-import org.testin.editor.CardHoverAction;
+import org.testin.model.dto.TestCaseDto;
 
 import javax.swing.JComponent;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
-// UC-VIEW-PANEL-012, UC-VIEW-PANEL-014, Rule-VIEW-PANEL-003
+// UC-VIEW-PANEL-012, UC-VIEW-PANEL-013, UC-VIEW-PANEL-014, Rule-VIEW-PANEL-003, Rule-VIEW-PANEL-084, UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-245
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-final class ShownCaseAction extends DumbAwareAction {
-    private final @NotNull ViewPanel panel;
-    private final @NotNull CardHoverAction action;
+public final class ShownCaseAction extends DumbAwareAction {
+    private final @NotNull Project p;
+    private final @NotNull CardHoverAction button;
+    private final @NotNull Supplier<Optional<TestCaseDto>> shown;
+    private final @NotNull BiConsumer<CardHoverAction, TestCaseDto> press;
 
-    static void bind(final @NotNull ViewPanel panel, final @NotNull CardHoverAction action, final @NotNull JComponent component) {
-        new ShownCaseAction(panel, action).registerCustomShortcutSet(Declared.shortcutSet(action.getActionId()), component);
+    public static void bind(final @NotNull Project p, final @NotNull CardHoverAction button, final @NotNull Supplier<Optional<TestCaseDto>> shown, final @NotNull BiConsumer<CardHoverAction, TestCaseDto> press, final @NotNull JComponent component) {
+        new ShownCaseAction(p, button, shown, press).registerCustomShortcutSet(Declared.shortcutSet(button.getActionId()), component);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        panel.getCurrentTestCase().ifPresent(shown -> action.execute(panel.getP(), shown));
+        shown.get().ifPresent(tc -> press.accept(button.gestureOn(p, tc), tc));
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(panel.getCurrentTestCase().isPresent() && action.enableOrExplain(e.getPresentation()));
+        e.getPresentation().setEnabled(shown.get().isPresent() && button.enableOrExplain(e.getPresentation()));
     }
 
     @Override

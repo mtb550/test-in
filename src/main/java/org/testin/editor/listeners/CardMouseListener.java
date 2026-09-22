@@ -110,9 +110,7 @@ public class CardMouseListener extends MouseAdapter {
                 return;
             }
 
-            if (button.action() == CardHoverAction.RUN_TEST_METHOD) editor.launching(tc.getId());
-
-            button.action().execute(p, tc);
+            button.action().executeFor(editor, tc);
 
             e.consume();
         });

@@ -10,7 +10,7 @@ it.
 |---|---|
 | **Part of Testin** | The view panel |
 | **Answers** | What the panel shows, how a test case gets into it, and what a tester can do from it |
-| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-083` |
+| **Numbering** | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-084` |
 | **State** | **Written** — [#181](https://github.com/mtb550/test-in/issues/181) |
 | **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code. |
 | **Written to** | [How a document is written](../standard.md) |
@@ -76,7 +76,7 @@ in front of them while they write down what actually happened.
 | `Ctrl+Left` | Moves to the previous test case | [UC-VIEW-PANEL-003](pageThroughCases.md) |
 | `Escape` | Closes the panel, pressed in the editor or inside the panel | [UC-VIEW-PANEL-015](closePanel.md) |
 | `Ctrl` and the mouse wheel | Makes every Testin text bigger or smaller | [UC-SETTING-011](../setting/changeTextSize.md) |
-| `F5` | Runs the test case on display | [UC-VIEW-PANEL-012](runFromPanel.md) |
+| `F5` | Runs the test case on display, or stops it while it runs | [UC-VIEW-PANEL-012](runFromPanel.md), [UC-VIEW-PANEL-013](stopFromPanel.md) |
 | `Shift+F5` | Opens its generated test method | [UC-VIEW-PANEL-014](goToCode.md) |
 | `Tab` | Brings the next tab to the front, with the keyboard in it | [UC-VIEW-PANEL-017](moveBetweenTabs.md) |
 | `Shift+Tab` | Brings the previous tab to the front | [UC-VIEW-PANEL-017](moveBetweenTabs.md) |

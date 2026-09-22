@@ -7,7 +7,8 @@
 
 While a test case runs, the run button becomes a stop button.
 
-There is no key for this, and no tooltip claims one.
+`F5`, the key that runs the test case, stops it while it runs, as it does on a
+card in the editor. The stop button's tooltip names no key, as the card's does.
 
 ## Rules
 
@@ -36,6 +37,8 @@ There is no key for this, and no tooltip claims one.
   with it. They share one process.
 - **Rule-VIEW-PANEL-055** — A test case the tester stopped is recorded as not
   run, never as failed.
+- **Rule-VIEW-PANEL-084** — F5, the key that runs the test case on display,
+  stops it while it runs, as it does on a card in the editor and in light mode.
 
 ## The screen
 

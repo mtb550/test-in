@@ -16,6 +16,11 @@
 
 package org.testin.lightmode;
 
+import org.testin.actions.Declared;
+import org.testin.codegen.AutomationState;
+import org.testin.editor.CardHoverAction;
+import org.testin.editor.HoverButton;
+import org.testin.editor.ShownCaseAction;
 import org.testin.editor.run.ExecutionControl;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
@@ -35,7 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.Toolkit;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.components.StartExecutionBtn;
-import org.testin.model.DirectoryType;
+import org.testin.model.Automated;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
@@ -74,6 +79,10 @@ final class LightModeWindow {
     private static final int GRAB = 4;
 
     private static final int SET_FRAME_ARC = 20;
+
+    private static final int BUTTON_GAP = 8;
+
+    private static final @NotNull List<CardHoverAction> KEYED = List.of(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD);
 
     private static final float ZOOM_STEP = 0.1f;
     private static final float ZOOM_MIN = 0.8f;
@@ -114,7 +123,8 @@ final class LightModeWindow {
     private final @NotNull JBLabel caseClock = clock(Bundle.message("light.case.clock"));
     private final @NotNull JBLabel runClock = clock(Bundle.message("light.run.clock"));
     private final @NotNull JBPanel<?> strip = new JBPanel<>(new BorderLayout());
-    private final @NotNull JBPanel<?> setLine = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    private final @NotNull JBPanel<?> setLine = new JBPanel<>(new GridBagLayout());
+    private final @NotNull JBPanel<?> buttons = new JBPanel<>(new GridLayout(1, 0, JBUI.scale(BUTTON_GAP), 0));
 
     private final @NotNull JBPanel<?> footer = new JBPanel<>(new BorderLayout());
 
@@ -298,6 +308,8 @@ final class LightModeWindow {
             bind(status.getMenuEntry().shortcut(), "testin.lightMode." + status.name(), () -> judge(status));
         }
 
+        KEYED.forEach(button -> ShownCaseAction.bind(editor.getProject(), button, this::caseForButtons, (action, tc) -> action.executeFor(editor, tc), frame.getRootPane()));
+
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -452,7 +464,8 @@ final class LightModeWindow {
         set.setVisible(shows(LightModePart.SET_NAME));
         chosen.setVisible(writing);
         chosen.setText(set.isVisible() ? " · " + TestStatus.FAILED.getLabel() : TestStatus.FAILED.getLabel());
-        setLine.setVisible(set.isVisible() || chosen.isVisible());
+        showButtons();
+        setLine.setVisible(set.isVisible() || chosen.isVisible() || buttons.isVisible());
 
         expectedRow.setVisible(!expected.getText().isBlank());
 
@@ -465,13 +478,38 @@ final class LightModeWindow {
         return viewMenu.getSelectedDetails().contains(part);
     }
 
-    private @NotNull Optional<TestRunItems> executingItem() {
+    // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-243, Rule-EDITOR-PANEL-244
+    private void showButtons() {
+        buttons.removeAll();
+
+        caseForButtons().ifPresent(tc -> {
+            final @NotNull Project p = editor.getProject();
+            final @NotNull Automated automation = Services.getInstance(p, AutomationState.class).of(tc.getId());
+
+            CardHoverAction.onCard(p, editor.getParent(), tc).stream()
+                    .filter(offered -> viewMenu.getSelectedDetails().stream().anyMatch(part -> part.governs(offered.action())))
+                    .forEach(offered -> buttons.add(HoverButton.of(p, offered, offered.action().iconOn(automation), offered.action().getTooltip(), () -> offered.action().executeFor(editor, tc))));
+        });
+
+        buttons.setVisible(buttons.getComponentCount() > 0);
+    }
+
+    // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-245
+    private @NotNull Optional<TestCaseDto> caseForButtons() {
+        return capture.isPresent() ? Optional.empty() : executingCase();
+    }
+
+    private @NotNull Optional<TestCaseDto> executingCase() {
         final @NotNull List<TestCaseDto> cases = editor.getCurrentTestCases();
         final int index = editor.getCurrentlyExecutingIndex();
 
-        if (index < 0 || index >= cases.size()) return Optional.empty();
+        return index >= 0 && index < cases.size() ? Optional.of(cases.get(index)) : Optional.empty();
+    }
 
-        return editor.runItem(cases.get(index).getId()).filter(item -> !item.isRemoved());
+    private @NotNull Optional<TestRunItems> executingItem() {
+        return executingCase()
+                .flatMap(tc -> editor.runItem(tc.getId()))
+                .filter(item -> !item.isRemoved());
     }
 
     private @NotNull JComponent content() {
@@ -556,13 +594,10 @@ final class LightModeWindow {
         });
     }
 
-    // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-232
+    // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-232, Rule-EDITOR-PANEL-243
     private @NotNull JComponent body() {
-        final @NotNull Color setGray = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
-        set.setForeground(setGray);
-        set.setIcon(Icons.gray(DirectoryType.TS.getIcon()));
-        set.setIconTextGap(JBUI.scale(CaseDetails.GAP));
-        set.setBorder(JBUI.Borders.compound(new RoundedLineBorder(setGray, JBUI.scale(SET_FRAME_ARC), 1), JBUI.Borders.empty(1, 7)));
+        set.setForeground(Icons.GRAY);
+        set.setBorder(JBUI.Borders.compound(new RoundedLineBorder(Icons.GRAY, JBUI.scale(SET_FRAME_ARC), 1), JBUI.Borders.empty(1, 7)));
         idle.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
         chosen.setForeground(TestStatus.FAILED.getRowColor());
@@ -575,10 +610,19 @@ final class LightModeWindow {
         details.setBorder(JBUI.Borders.emptyTop(14));
         details.setVisible(false);
 
+        buttons.setOpaque(false);
+
+        final @NotNull GridBagConstraints onOneRow = new GridBagConstraints();
+        onOneRow.gridy = 0;
+
         setLine.setOpaque(false);
         setLine.setBorder(JBUI.Borders.emptyBottom(CaseDetails.GAP));
-        setLine.add(set);
-        setLine.add(chosen);
+        setLine.add(set, onOneRow);
+        setLine.add(chosen, onOneRow);
+        onOneRow.weightx = 1;
+        setLine.add(Box.createHorizontalGlue(), onOneRow);
+        onOneRow.weightx = 0;
+        setLine.add(buttons, onOneRow);
 
         underCase.setOpaque(false);
 
@@ -646,7 +690,18 @@ final class LightModeWindow {
             if (status.isVerdict()) items.add(StatusBarShortcut.hint(keyOf(status), status.getLabel()));
         }
 
+        KEYED.forEach(button -> items.add(keyHint(button)));
+
         return items.toArray(new StatusBarItem[0]);
+    }
+
+    // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-245
+    private @NotNull StatusBarItem keyHint(final @NotNull CardHoverAction button) {
+        final @NotNull CardHoverAction now = caseForButtons()
+                .map(tc -> button.gestureOn(editor.getProject(), tc))
+                .orElse(button);
+
+        return StatusBarShortcut.hint(Declared.shortcutText(button.getActionId()), now.getTooltip());
     }
 
     private StatusBarItem @NotNull [] commitKeys() {

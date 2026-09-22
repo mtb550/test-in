@@ -23,7 +23,7 @@ import org.testin.util.Bundle;
 class ViewMenuBtn extends AbstractDetailsPopupBtn<LightModePart> {
     ViewMenuBtn(final @NotNull Runnable onChanged) {
         super(Bundle.message("light.view.menu"),
-                "testin.lightMode.parts.v2",
+                "testin.lightMode.parts.v3",
                 LightModePart.class,
                 onChanged);
     }

@@ -110,12 +110,31 @@ public enum CardHoverAction {
     // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-234, Rule-EDITOR-PANEL-235
     public static @NotNull List<Offered> onCard(final @NotNull Project p, final @NotNull DirectoryDto openOn, final @NotNull TestCaseDto tc) {
         final @NotNull List<CardHoverAction> buttons = openOn.isTestCaseContainer()
-                ? List.of(NAVIGATE_TO_TEST_METHOD, runSlot(p, tc))
-                : List.of(NAVIGATE_TO_TEST_METHOD, runSlot(p, tc), NAVIGATE_TO_TEST_CASE);
+                ? List.of(NAVIGATE_TO_TEST_METHOD, RUN_TEST_METHOD)
+                : List.of(NAVIGATE_TO_TEST_METHOD, RUN_TEST_METHOD, NAVIGATE_TO_TEST_CASE);
 
         return buttons.stream()
-                .map(action -> new Offered(action, action.whyNotOffered(p).or(() -> action.whyNotOnCard.apply(tc))))
+                .map(button -> button.offer(p, tc))
                 .toList();
+    }
+
+    // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-234
+    public @NotNull Offered offer(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        final @NotNull CardHoverAction now = gestureOn(p, tc);
+
+        return new Offered(now, now.whyNotOffered(p).or(() -> now.whyNotOnCard.apply(tc)));
+    }
+
+    // UC-EDITOR-PANEL-043
+    public @NotNull CardHoverAction gestureOn(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        return this == RUN_TEST_METHOD ? runSlot(p, tc) : this;
+    }
+
+    // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-180
+    public void executeFor(final @NotNull TestinEditor editor, final @NotNull TestCaseDto tc) {
+        if (this == RUN_TEST_METHOD) editor.launching(tc.getId());
+
+        execute(editor.getProject(), tc);
     }
 
     private static @NotNull Optional<String> anywhere(final @NotNull TestCaseDto tc) {
