@@ -111,7 +111,7 @@ silently has no effect costs more than the setting it was meant to hold.
   inspection says this, so `tools/inspect.ps1` does: it reports a wrapped
   signature as `WrappedMethodDeclaration` and exits non-zero for one, alongside
   `DataFlowIssue` and `ReturnNull`. `.github/workflows/inspect.yml` runs it on
-  every push to `main`.
+  every push.
 - `final` on parameters and locals wherever possible.
 - Nullability: org.jetbrains `@NotNull`/`@Nullable` everywhere; Lombok
   `@NonNull` only on DTO/marker fields (it generates runtime checks there).
@@ -311,20 +311,21 @@ silently has no effect costs more than the setting it was meant to hold.
   a tester can see is not finished until it has been run in a sandbox, whatever
   the build says.
 
-- **Do not run `./gradlew inspect` by hand.** It runs in CI on every push to
-  `main` and the result is read from the run afterward — twenty minutes of
-  indexing is not something to spend between one edit and the next, and a gate
-  somebody waits on is a gate that gets skipped. `compileJava test` is the check
-  to run while working; `ideTest` when the change reaches the indexer or the
-  tree.
+- **Never run `./gradlew inspect` by hand.** It runs in CI on every push, on
+  every branch, and the result is read from the run afterward — twenty minutes
+  of indexing is not something to spend between one edit and the next, and a
+  gate somebody waits on is a gate that gets skipped. `compileJava test` is the
+  check to run while working; `ideTest` when the change reaches the indexer or
+  the tree. Muteb, 22 September 2026: *"no need to run inspector here anymore,
+  let us make it every push."*
 
-  Run it locally only for the one job CI cannot do: a sweep that touched
-  nullability, annotations or many files at once, before it is pushed at all.
-  Then run it after the last edit, on a still tree — editing a file while the
-  inspector is reading it produces findings about a version that no longer
-  exists, which reads exactly like a real defect.
+  A sweep across many files used to be the exception, and it is not one any
+  more: push the branch and read the run. The IDE shows the same findings while
+  you type, because `.idea/inspectionProfiles/Testin.xml` is the project
+  profile, and **Code | Inspect Code** over the *Inspected* scope produces the
+  list the gate reads.
 
-  Either way the bar is the same: zero findings in the files the repository
-  writes, apart from the few rules a headless run cannot be trusted with.
-  CONTRIBUTING.md names those, and this file does not keep a second list that
-  would fall behind.
+  The bar is the same wherever it is read: zero findings in the files the
+  repository writes, apart from the few rules a headless run cannot be trusted
+  with. CONTRIBUTING.md names those, and this file does not keep a second list
+  that would fall behind.

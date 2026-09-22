@@ -1,4 +1,4 @@
-# The IDE inspections, on a push to main.
+# The IDE inspections, on every push.
 #
 # They cost a full indexing pass - fifteen to twenty minutes - which is why this
 # is not part of build.yml and why nobody runs it by hand: a gate that takes
@@ -6,9 +6,13 @@
 # gate. A push is the right moment for it - the code is finished, and nothing is
 # waiting on the answer.
 #
-# It was on a two-day schedule until 2026-09-12. A calendar runs it over code
-# nobody touched and misses the push that mattered; this runs it over exactly
-# what arrived, and the run is read afterward rather than waited on.
+# It was on a two-day schedule until 2026-09-12, and on pushes to main until
+# 22 September 2026. A calendar runs it over code nobody touched and misses the
+# push that mattered; main alone reads a branch only once it has landed, which
+# is the wrong side of the merge to learn that a sweep left something behind.
+# Every push, every branch, and the run is read afterward rather than waited on.
+# The concurrency group below keeps one run per branch, so a second push
+# replaces the first rather than queueing behind it.
 #
 # It fails on any finding in the files the repository writes, the scope
 # .idea/scopes/Inspected.xml names. The exceptions are the rules a headless run
@@ -42,10 +46,8 @@ name: Inspect
 
 on:
   push:
-    branches:
-      - main
 
-  # So it can be run against a branch before the branch lands.
+  # So it can be run without one - after a change to the profile, say.
   workflow_dispatch:
 
 permissions:

@@ -153,7 +153,7 @@ your change touches one of those, it has not been tested until it has been run.
 
 ### The inspection gate
 
-**It runs in CI on every push to `main`, and that is where to read it.**
+**It runs in CI on every push, on every branch, and that is where to read it.**
 `inspect.yml` does the work and keeps the full list as an artifact; the summary
 is on the run.
 
@@ -256,7 +256,7 @@ string a tester reads should have one owner; the number may go down and never up
 |---------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `build.yml`   | Every push to `main` and every pull request. Compiles, runs the unit tests and the IDE tests, and verifies against **IntelliJ IDEA** - the one verdict that turns a pull request red                                                                                                                               |
 | `verify.yml`  | Every push to `main`, plus every second day and on demand. The same verifier against **all six targets** - IntelliJ IDEA, PyCharm and Rider at both ends of the 262 branch - compared against `.github/verification-baseline.txt`. This is the number the JetBrains Marketplace shows a tester before they install |
-| `inspect.yml` | Every push to `main`, and on demand against a branch                                                                                                                                                                                                                                                               |
+| `inspect.yml` | Every push, on every branch, and on demand                                                                                                                                                                                                                                                                         |
 
 No workflow publishes a release. It is published from a maintainer's machine
 with `./gradlew publishPlugin`, which reads the Marketplace token from
