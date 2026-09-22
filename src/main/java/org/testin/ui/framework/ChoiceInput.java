@@ -20,6 +20,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Fonts;
 
 import javax.swing.AbstractAction;
@@ -40,7 +41,7 @@ public final class ChoiceInput implements DialogComponent {
     ChoiceInput(final @NotNull String caption, final @NotNull List<String> options, final @NotNull String selected) {
         combo = new ComboBox<>(options.toArray(String[]::new));
         combo.setEditable(true);
-        combo.setFont(Fonts.choice());
+        DialogStyle.asChoice(combo);
         combo.setSelectedItem(selected);
 
         // Rule-INTERNAL-087
@@ -74,6 +75,10 @@ public final class ChoiceInput implements DialogComponent {
                 pick.orElseThrow().actionPerformed(e);
             }
         });
+    }
+
+    public void onChange(final @NotNull Runnable changed) {
+        combo.addActionListener(_ -> changed.run());
     }
 
     public @NotNull String getValue() {

@@ -404,7 +404,7 @@
         <action
                 id="Testin.CreateTestCase"
                 class="org.testin.testcase.CreateTestCaseAction"
-                icon="AllIcons.Actions.AddToDictionary"
+                icon="org.testin.util.Icons.TEST_CASE_LETTER"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl M"/>
             <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta M"/>

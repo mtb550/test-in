@@ -16,7 +16,6 @@
 
 package org.testin.ui;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -26,9 +25,6 @@ import org.testin.util.Bundle;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ActionsMenu {
     public static @NotNull DefaultActionGroup group() {
-        final @NotNull DefaultActionGroup group = new DefaultActionGroup(Bundle.message("menu.actions"), true);
-        group.getTemplatePresentation().setIcon(AllIcons.Actions.Edit);
-
-        return group;
+        return new DefaultActionGroup(Bundle.message("menu.actions"), true);
     }
 }

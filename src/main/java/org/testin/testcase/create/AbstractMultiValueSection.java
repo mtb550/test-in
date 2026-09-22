@@ -28,6 +28,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseFields;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Fonts;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
@@ -98,7 +99,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
                 new TextFieldWithAutoCompletion.StringsCompletionProvider(completions(Services.getInstance(p, TestCaseValues.class)), field().getIcon()), text);
 
         box.setOneLineMode(true);
-        box.setFont(Fonts.field());
+        DialogStyle.asChoice(box);
         box.setPlaceholder(placeholderFor(fields.size()));
         box.setShowPlaceholderWhenFocused(true);
         box.setBorder(JBUI.Borders.empty(6, 10));

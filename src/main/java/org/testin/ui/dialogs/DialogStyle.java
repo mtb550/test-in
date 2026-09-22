@@ -16,7 +16,6 @@
 
 package org.testin.ui.dialogs;
 
-import com.intellij.ide.ui.laf.darcula.ui.DarculaTextBorder;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.TextIcon;
@@ -29,6 +28,7 @@ import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.util.ui.ComponentWithEmptyText;
 import org.testin.util.Fonts;
 import org.testin.util.Icons;
 
@@ -42,6 +42,9 @@ import java.util.List;
 public final class DialogStyle {
     public static final @NotNull Icon NO_ICON = EmptyIcon.ICON_0;
 
+    private static final int PADDING_TOP = 10;
+    private static final int PADDING_SIDE = 12;
+
     public static <T extends JComponent> @NotNull T styleContent(final @NotNull T component) {
         component.setOpaque(true);
         component.setBackground(UIUtil.getPanelBackground());
@@ -50,8 +53,27 @@ public final class DialogStyle {
 
     // UC-INTERNAL-001, Rule-INTERNAL-096
     public static <T extends JComponent> @NotNull T framed(final @NotNull T component) {
-        component.setBorder(new DarculaTextBorder());
+        component.setBorder(new FieldFrame());
         return component;
+    }
+
+    // Rule-INTERNAL-095, Rule-INTERNAL-096
+    public static <T extends JComponent> @NotNull T asField(final @NotNull T component) {
+        component.setFont(Fonts.field());
+        component.setBorder(JBUI.Borders.empty(PADDING_TOP, PADDING_SIDE));
+        hint(component);
+        return component;
+    }
+
+    // Rule-INTERNAL-095, Rule-INTERNAL-096
+    public static <T extends JComponent> @NotNull T asChoice(final @NotNull T component) {
+        component.setFont(Fonts.choice());
+        hint(component);
+        return component;
+    }
+
+    private static void hint(final @NotNull JComponent component) {
+        if (component instanceof ComponentWithEmptyText hinted) hinted.getEmptyText().setFont(Fonts.placeholder());
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-073

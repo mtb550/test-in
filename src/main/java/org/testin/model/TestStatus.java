@@ -16,16 +16,13 @@
 
 package org.testin.model;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBColor;
-import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.UIUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 
-import javax.swing.Icon;
 import javax.swing.KeyStroke;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -37,7 +34,7 @@ public enum TestStatus {
             "008000",
             JBColor.GREEN,
             Bundle.message("status.verdict.passed"),
-            new MenuEntry(AllIcons.Actions.Checked, KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
+            new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
             false
     ),
 
@@ -45,7 +42,7 @@ public enum TestStatus {
             "FF0000",
             JBColor.RED.darker(),
             Bundle.message("status.verdict.failed"),
-            new MenuEntry(AllIcons.Actions.Cancel, KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)),
+            new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)),
             true
     ),
 
@@ -53,7 +50,7 @@ public enum TestStatus {
             "FFA500",
             JBColor.ORANGE,
             Bundle.message("status.verdict.blocked"),
-            new MenuEntry(AllIcons.Actions.Pause, KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
+            new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
             false
     ),
 
@@ -93,8 +90,8 @@ public enum TestStatus {
         return menuEntry != MenuEntry.NONE;
     }
 
-    public record MenuEntry(@NotNull Icon icon, @NotNull KeyStroke shortcut) {
+    public record MenuEntry(@NotNull KeyStroke shortcut) {
         public static final @NotNull MenuEntry NONE =
-                new MenuEntry(EmptyIcon.ICON_16, KeyStroke.getKeyStroke(KeyEvent.VK_UNDEFINED, 0));
+                new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_UNDEFINED, 0));
     }
 }

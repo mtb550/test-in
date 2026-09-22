@@ -21,12 +21,12 @@ import com.intellij.ui.components.panels.HorizontalLayout;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Fonts;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
 import javax.swing.JRadioButton;
-import java.awt.Font;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +38,6 @@ public final class RadioSelection<T> implements DialogComponent {
     RadioSelection(final @NotNull String caption, final @NotNull List<Option<T>> options, final @NotNull T initial) {
         this.selected = initial;
 
-        final @NotNull Font radioFont = Fonts.choice();
         final @NotNull ButtonGroup group = new ButtonGroup();
         final @NotNull JBPanel<?> radioRow = new JBPanel<>(new HorizontalLayout(8));
         radioRow.setOpaque(false);
@@ -47,7 +46,7 @@ public final class RadioSelection<T> implements DialogComponent {
         Optional<JRadioButton> first = Optional.empty();
         for (final Option<T> option : options) {
             final @NotNull JRadioButton radio = new JRadioButton(option.name());
-            radio.setFont(radioFont);
+            DialogStyle.asChoice(radio);
             radio.setOpaque(false);
             radio.setSelected(option.value().equals(initial));
             radio.addActionListener(_ -> selected = option.value());

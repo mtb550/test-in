@@ -51,16 +51,14 @@ public final class TextArea implements DialogComponent {
 
     TextArea(final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value, final int rows, final boolean acceptsImages, final @NotNull List<byte[]> images) {
         area = new JBTextArea(value);
-        area.setFont(Fonts.field());
+        DialogStyle.asField(area);
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
         area.setRows(rows);
         area.setColumns(50);
-        area.setBorder(JBUI.Borders.empty(8, 12));
 
         if (!placeholder.isBlank()) {
             area.getEmptyText().setText(placeholder);
-            area.getEmptyText().setFont(Fonts.placeholder());
         }
 
         area.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, null);

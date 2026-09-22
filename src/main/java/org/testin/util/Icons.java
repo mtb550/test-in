@@ -45,6 +45,10 @@ public final class Icons {
     public static final @NotNull Color GRAY = new Color(0x6C707E);
     public static final @NotNull Color RED = new Color(0xDB3B4B);
     public static final @NotNull Color GREEN = new Color(0x208A3C);
+
+    // UC-EDITOR-PANEL-005
+    public static final @NotNull Icon TEST_CASE_LETTER = fieldLetter("tc", GREEN);
+
     private static final float SCALE_FACTOR = 1.3f;
     private static final int DOT_SIZE = 10;
 

@@ -38,7 +38,6 @@ public final class Fonts {
     private static final float LABEL = -2.0f;
     private static final float BADGE = -2.0f;
     private static final float FIELD = 6.0f;
-    private static final float CHOICE = 2.0f;
     private static final float FIGURE = 2.0f;
     private static final float ICON_LETTER = 9.0f;
     private static final @NotNull String CAPTION_FAMILY = "JetBrains Mono";
@@ -94,7 +93,7 @@ public final class Fonts {
     }
 
     public static @NotNull Font choice() {
-        return dialog(CHOICE, Font.PLAIN);
+        return field();
     }
 
     public static @NotNull Font caption() {

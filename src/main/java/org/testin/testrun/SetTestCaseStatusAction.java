@@ -40,8 +40,10 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
     private final @NotNull TestStatus status;
 
     public SetTestCaseStatusAction(final @NotNull TestStatus status) {
-        super(status.getLabel(), Bundle.message("run.case.status.description", status.getLabel()), status.getMenuEntry().icon());
+        super(status.getLabel());
         this.status = status;
+
+        getTemplatePresentation().setDescription(Bundle.message("run.case.status.description", status.getLabel()));
     }
 
     // UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033, UC-EDITOR-PANEL-034

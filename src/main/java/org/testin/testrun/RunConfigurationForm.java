@@ -13,184 +13,119 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.testin.testrun;
 
-import com.intellij.openapi.ui.ComboBox;
-import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.JBTextArea;
-import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunConfiguration;
+import org.testin.ui.framework.ChoiceInput;
+import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogComponent;
+import org.testin.ui.framework.TextArea;
+import org.testin.ui.framework.TextInput;
+import org.testin.ui.framework.TextValue;
 import org.testin.util.Bundle;
 
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
-import javax.swing.text.JTextComponent;
-import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 public class RunConfigurationForm implements DialogComponent {
     private static final boolean EXPANDED = true;
+    private static final int CHANGE_LOG_ROWS = 3;
 
     private final @NotNull JBPanel<?> wrapper;
-    private final @NotNull JBTextArea changeLog;
-    private final @NotNull JBTextField commitIdField;
+    private final @NotNull ComponentDialogBase<TextInput> runName;
+    private final @NotNull Map<TestRunConfiguration, ComponentDialogBase<? extends DialogComponent>> fields = new EnumMap<>(TestRunConfiguration.class);
+    private final @NotNull List<ComponentDialogBase<? extends DialogComponent>> order = new ArrayList<>();
 
-    private final @NotNull JBTextField runNameField;
-    private final @NotNull Map<TestRunConfiguration, JComponent> fieldMap = new EnumMap<>(TestRunConfiguration.class);
+    // UC-TREE-PANEL-021, UC-TREE-PANEL-022
+    public RunConfigurationForm(final @NotNull String name, final @NotNull Map<TestRunConfiguration, String> answers) {
+        runName = ComponentDialogBase.textField()
+                .caption(Bundle.message("run.form.name.caption"))
+                .placeholder(Bundle.message("run.form.name.hint"))
+                .value(name)
+                .build();
+        order.add(runName);
 
-    private final @NotNull Map<TestRunConfiguration, JBLabel> labelMap = new EnumMap<>(TestRunConfiguration.class);
+        add(TestRunConfiguration.CHANGE_LOG, ComponentDialogBase.textArea()
+                .caption(TestRunConfiguration.CHANGE_LOG.getDisplayName())
+                .placeholder(Bundle.message("run.form.change.log.hint"))
+                .value(answers.getOrDefault(TestRunConfiguration.CHANGE_LOG, ""))
+                .rows(CHANGE_LOG_ROWS)
+                .build());
 
-    public RunConfigurationForm(final @NotNull String runName) {
-        changeLog = new JBTextArea();
-        commitIdField = new JBTextField();
-        runNameField = new JBTextField(runName);
+        add(TestRunConfiguration.COMMIT_ID, ComponentDialogBase.textField()
+                .caption(TestRunConfiguration.COMMIT_ID.getDisplayName())
+                .placeholder(Bundle.message("run.form.commit.hint"))
+                .value(answers.getOrDefault(TestRunConfiguration.COMMIT_ID, ""))
+                .build());
+
+        for (final TestRunConfiguration field : TestRunConfiguration.values()) {
+            if (!field.isChoice()) continue;
+
+            final @NotNull ComponentDialogBase<ChoiceInput> choice = ComponentDialogBase.choice(
+                    field.getDisplayName(), List.of(field.getOptions()), answers.getOrDefault(field, ""));
+            choice.getComponent().onChange(this::applyVisibility);
+            add(field, choice);
+        }
 
         wrapper = new JBPanel<>(new BorderLayout());
         wrapper.setOpaque(false);
-        wrapper.add(CollapsiblePanel.build(Bundle.message("run.form.section"), buildConfigurationPanel(), EXPANDED), BorderLayout.CENTER);
+        wrapper.add(CollapsiblePanel.build(Bundle.message("run.form.section"), stacked(), EXPANDED), BorderLayout.CENTER);
 
         applyVisibility();
     }
 
-    private static void keepTabForNavigation(final @NotNull JComponent field) {
-        field.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
-                Set.of(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, 0)));
-        field.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
-                Set.of(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK)));
-    }
-
-    private static @NotNull String textIn(final @NotNull JComponent component) {
+    private static @NotNull String textIn(final @NotNull DialogComponent component) {
         return switch (component) {
-            case JTextComponent typed -> typed.getText().trim();
-
-            case JScrollPane scroller when scroller.getViewport().getView() instanceof JComponent inner ->
-                    textIn(inner);
-            case ComboBox<?> picked ->
-                    Optional.ofNullable(picked.getSelectedItem()).map(Object::toString).map(String::trim).orElse("");
+            case TextValue typed -> typed.getText().trim();
+            case TextArea area -> area.getText().trim();
+            case ChoiceInput picked -> picked.getValue().trim();
             default -> "";
         };
     }
 
-    private static void textInto(final @NotNull JComponent component, final @NotNull String value) {
-        switch (component) {
-            case JTextComponent typed -> typed.setText(value);
-
-            case JScrollPane scroller when scroller.getViewport().getView() instanceof JComponent inner ->
-                    textInto(inner, value);
-
-            case ComboBox<?> picked -> picked.setSelectedItem(value);
-
-            default -> {
-            }
-        }
+    private void add(final @NotNull TestRunConfiguration field, final @NotNull ComponentDialogBase<? extends DialogComponent> component) {
+        fields.put(field, component);
+        order.add(component);
     }
 
-    private @NotNull JBPanel<?> buildConfigurationPanel() {
-        final @NotNull JBPanel<?> configurationPanel = new JBPanel<>(new GridBagLayout());
-
-        final @NotNull GridBagConstraints labelGbc = new GridBagConstraints();
-        labelGbc.gridx = 0;
-        labelGbc.anchor = GridBagConstraints.NORTHWEST;
-        labelGbc.insets = JBUI.insets(4, 4, 4, 10);
-
-        final @NotNull GridBagConstraints fieldGbc = new GridBagConstraints();
-        fieldGbc.gridx = 1;
-        fieldGbc.weightx = 1.0;
-        fieldGbc.anchor = GridBagConstraints.NORTHWEST;
-        fieldGbc.insets = JBUI.insets(4, 0, 4, 4);
-
-        runNameField.setColumns(50);
-        runNameField.getEmptyText().setText(Bundle.message("run.form.name.hint"));
-        addLabeledRow(configurationPanel, labelGbc, fieldGbc, 0, Bundle.message("run.form.name.caption"), runNameField);
-
-        changeLog.setColumns(50);
-        changeLog.setRows(3);
-        changeLog.setLineWrap(true);
-        changeLog.setWrapStyleWord(true);
-        changeLog.getEmptyText().setText(Bundle.message("run.form.change.log.hint"));
-        keepTabForNavigation(changeLog);
-
-        commitIdField.setColumns(50);
-        commitIdField.getEmptyText().setText(Bundle.message("run.form.commit.hint"));
-
-        final @NotNull JBScrollPane changeLogScroller = new JBScrollPane(changeLog);
-        register(TestRunConfiguration.CHANGE_LOG, changeLogScroller,
-                addLabeledRow(configurationPanel, labelGbc, fieldGbc, 1, TestRunConfiguration.CHANGE_LOG.getDisplayName(), changeLogScroller));
-        register(TestRunConfiguration.COMMIT_ID, commitIdField,
-                addLabeledRow(configurationPanel, labelGbc, fieldGbc, 2, TestRunConfiguration.COMMIT_ID.getDisplayName(), commitIdField));
-
-        int row = 3;
-        for (final TestRunConfiguration field : TestRunConfiguration.values()) {
-            if (!field.isChoice()) continue;
-
-            final @NotNull ComboBox<String> comboBox = new ComboBox<>(field.getOptions());
-            comboBox.setEditable(true);
-
-            comboBox.addActionListener(_ -> applyVisibility());
-
-            register(field, comboBox,
-                    addLabeledRow(configurationPanel, labelGbc, fieldGbc, row, field.getDisplayName(), comboBox));
-            row++;
-        }
-
-        configurationPanel.setBorder(JBUI.Borders.compound(
+    private @NotNull JBPanel<?> stacked() {
+        final @NotNull JBPanel<?> panel = new JBPanel<>();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setOpaque(false);
+        panel.setBorder(JBUI.Borders.compound(
                 JBUI.Borders.customLine(UIUtil.getBoundsColor(), 0, 0, 1, 0),
                 JBUI.Borders.empty(10)
         ));
 
-        return configurationPanel;
+        for (final ComponentDialogBase<? extends DialogComponent> component : order) {
+            final @NotNull JComponent shown = component.getComponent().getPanel();
+            shown.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            panel.add(shown);
+        }
+
+        return panel;
     }
 
-    private @NotNull JBLabel addLabeledRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints labelGbc, final @NotNull GridBagConstraints fieldGbc, final int row, final @NotNull String label, final @NotNull JComponent component) {
-        final @NotNull GridBagConstraints lc = (GridBagConstraints) labelGbc.clone();
-        lc.gridy = row;
-        final @NotNull JBLabel labelComp = new JBLabel(label);
-        labelComp.setVerticalAlignment(SwingConstants.TOP);
-        panel.add(labelComp, lc);
-
-        final @NotNull GridBagConstraints fc = (GridBagConstraints) fieldGbc.clone();
-        fc.gridy = row;
-        panel.add(component, fc);
-
-        return labelComp;
-    }
-
+    // Rule-TREE-PANEL-120
     private void applyVisibility() {
-        fieldMap.forEach((field, component) -> {
-            final boolean applies = field.isShownFor(this::chosenIn);
-
-            component.setVisible(applies);
-            labelMap.get(field).setVisible(applies);
-        });
+        fields.forEach((field, component) -> component.getComponent().getPanel().setVisible(field.isShownFor(this::chosenIn)));
 
         wrapper.revalidate();
         wrapper.repaint();
     }
 
-    private void register(final @NotNull TestRunConfiguration field, final @NotNull JComponent component, final @NotNull JBLabel label) {
-        fieldMap.put(field, component);
-        labelMap.put(field, label);
-    }
-
     private @NotNull String chosenIn(final @NotNull TestRunConfiguration field) {
-        return Optional.ofNullable(fieldMap.get(field)).map(RunConfigurationForm::textIn).orElse("");
+        return Optional.ofNullable(fields.get(field)).map(component -> textIn(component.getComponent())).orElse("");
     }
 
     public @NotNull Map<TestRunConfiguration, String> configuration() {
@@ -204,13 +139,7 @@ public class RunConfigurationForm implements DialogComponent {
     }
 
     public @NotNull String getRunName() {
-        return runNameField.getText().trim();
-    }
-
-    public void fillFrom(final @NotNull Map<TestRunConfiguration, String> answers) {
-        answers.forEach((field, value) -> Optional.ofNullable(fieldMap.get(field)).ifPresent(component -> textInto(component, value)));
-
-        applyVisibility();
+        return runName.getComponent().getText().trim();
     }
 
     private @NotNull String answerTo(final @NotNull TestRunConfiguration field) {
@@ -226,7 +155,7 @@ public class RunConfigurationForm implements DialogComponent {
 
     @Override
     public @NotNull JComponent getFocusComponent() {
-        return changeLog;
+        return fields.get(TestRunConfiguration.CHANGE_LOG).getComponent().getFocusComponent();
     }
 
     @Override

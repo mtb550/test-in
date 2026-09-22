@@ -79,7 +79,7 @@ public enum CardHoverAction {
             Bundle.message("action.Testin.NavigateToTestCase.text"),
             "Testin.NavigateToTestCase",
             List.of(),
-            Icons.fieldLetter("tc", Icons.GREEN),
+            Icons.TEST_CASE_LETTER,
             (p, testCases) -> NavigateToTestCaseAction.execute(p, testCases.getFirst()),
             NavigateToTestCaseAction::whyNot
     );

@@ -66,6 +66,10 @@ A test run is one round of testing, with a verdict for each test case.
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
+- **Rule-TREE-PANEL-120** — A configuration row is shown only while the answers
+  above it call for it: pick a kind of run that needs no commit id and the
+  commit id row goes, and comes back the moment the answer changes. A row that
+  is not shown is not asked, so what is saved holds nothing for it.
 
 Rule-TREE-PANEL-032 holds here too. It says what can be created under **Test
 Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).

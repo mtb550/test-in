@@ -27,6 +27,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Fonts;
 import org.testin.util.ListValue;
 
@@ -71,7 +72,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
 
         list = new JBList<>(rowModel);
         list.setBorder(JBUI.Borders.empty(6));
-        list.setFont(Fonts.choice());
+        DialogStyle.asChoice(list);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setVisibleRowCount(visibleRows);
         list.setCellRenderer(new SelectionRenderer<>());

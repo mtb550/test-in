@@ -70,8 +70,7 @@ public final class RunForm {
             if (!checked.isEmpty()) checkOnly(root, checked);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                final @NotNull RunConfigurationForm form = new RunConfigurationForm(name);
-                if (!configuration.isEmpty()) form.fillFrom(configuration);
+                final @NotNull RunConfigurationForm form = new RunConfigurationForm(name, configuration);
 
                 final @NotNull SelectionTree selection = new SelectionTree(root, RunTreeCellRenderer.create());
 

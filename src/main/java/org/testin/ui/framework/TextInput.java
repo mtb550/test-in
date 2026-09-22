@@ -20,6 +20,7 @@ import com.intellij.ui.DocumentAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
+import org.testin.ui.Caption;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -37,10 +38,13 @@ public final class TextInput implements DialogComponent, TextValue {
 
     private final @NotNull FrameworkTextField input;
     private final @NotNull JTextField textField;
+    private final @NotNull JComponent panel;
 
-    TextInput(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull String initialValue, final @NotNull String accepts) {
+    TextInput(final @NotNull Icon icon, final @NotNull String caption, final @NotNull String placeHolderText, final @NotNull String initialValue, final @NotNull String accepts) {
         input = new FrameworkTextField(icon, placeHolderText, initialValue);
         textField = input.component();
+        // Rule-INTERNAL-087
+        panel = caption.isEmpty() ? textField : Caption.above(caption, textField);
 
         if (!ANYTHING.equals(accepts)) accept(Pattern.compile(accepts));
     }
@@ -107,7 +111,7 @@ public final class TextInput implements DialogComponent, TextValue {
 
     @Override
     public @NotNull JComponent getPanel() {
-        return textField;
+        return panel;
     }
 
     @Override

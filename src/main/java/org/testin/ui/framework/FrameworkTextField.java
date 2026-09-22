@@ -56,7 +56,6 @@ final class FrameworkTextField {
 
         if (!placeholder.isBlank()) {
             field.getEmptyText().setText(placeholder);
-            field.getEmptyText().setFont(Fonts.placeholder());
             TextComponentEmptyText.setupPlaceholderVisibility(field);
 
             field.getDocument().addDocumentListener(new DocumentAdapter() {
@@ -74,8 +73,7 @@ final class FrameworkTextField {
     }
 
     static void style(final @NotNull JComponent field) {
-        field.setFont(Fonts.field());
-        field.setBorder(JBUI.Borders.empty(10, 12));
+        DialogStyle.asField(field);
     }
 
     static void bindClipboard(final @NotNull JTextComponent component) {

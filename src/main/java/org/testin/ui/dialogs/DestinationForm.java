@@ -47,7 +47,9 @@ public final class DestinationForm implements DialogComponent {
 
     public DestinationForm(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String fileName, final @NotNull String chooserTitle, final @NotNull String chooserDescription) {
         this.p = p;
-        this.formatCombo = new ComboBox<>(formats);
+        this.formatCombo = DialogStyle.asChoice(new ComboBox<>(formats));
+        DialogStyle.asField(fileNameField);
+        DialogStyle.asField(folderField.getTextField());
 
         fileNameField.setText(fileName);
         formatCombo.setSelectedItem(defaultFormat);

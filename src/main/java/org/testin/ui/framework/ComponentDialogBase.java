@@ -206,12 +206,18 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class TextInputBuilder {
         private @NotNull Icon icon = DialogStyle.NO_ICON;
+        private @NotNull String caption = "";
         private @NotNull String placeholder = "";
         private @NotNull String value = "";
         private @NotNull String accepts = TextInput.ANYTHING;
 
         public @NotNull TextInputBuilder icon(final @NotNull Icon icon) {
             this.icon = icon;
+            return this;
+        }
+
+        public @NotNull TextInputBuilder caption(final @NotNull String caption) {
+            this.caption = caption;
             return this;
         }
 
@@ -231,7 +237,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
 
         public @NotNull ComponentDialogBase<TextInput> build() {
-            return new ComponentDialogBase<>(new TextInput(icon, placeholder, value, accepts));
+            return new ComponentDialogBase<>(new TextInput(icon, caption, placeholder, value, accepts));
         }
     }
 
