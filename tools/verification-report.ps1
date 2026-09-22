@@ -36,10 +36,10 @@ $repo = Split-Path -Parent $PSScriptRoot
 # The prefix of a report folder - IU-261.25134.95 - is what stays the same when
 # the IDE version moves, so it is what the baseline is keyed on.
 $names = @{
-    'IU-261' = 'IntelliJ IDEA 2026.1'; 'IU-262' = 'IntelliJ IDEA 2026.2'
-    'PY-261' = 'PyCharm 2026.1';       'PY-262' = 'PyCharm 2026.2'
-    'GO-261' = 'GoLand 2026.1';        'GO-262' = 'GoLand 2026.2'
-    'WS-261' = 'WebStorm 2026.1';      'WS-262' = 'WebStorm 2026.2'
+    'IU-262' = 'IntelliJ IDEA 2026.2'
+    'PY-262' = 'PyCharm 2026.2'
+    'GO-262' = 'GoLand 2026.2'
+    'WS-262' = 'WebStorm 2026.2'
 }
 
 function Read-Baseline([string] $path) {

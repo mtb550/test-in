@@ -2,8 +2,8 @@
 
 # UC-SETTING-007: Choose how much Testin writes to its log
 
-**As a** tester, **I want** to turn Testin's own log up,
-**so that** I can send a useful log when something goes wrong, and turn it back
+**As a** tester, **I want** to turn Testin's own log up, **so that** I can send a useful log when something goes wrong,
+and turn it back
 down afterward.
 
 The level decides how much Testin writes to its own log file.
@@ -86,8 +86,7 @@ Nothing. The drop-down cannot hold anything but one of the seven.
 Much of what Testin does is only ever written to the log. A folder skipped for
 having no marker. A test case that would not read. An edit dropped because
 there was nowhere to write it. None of those raises a message. At **INFO** most
-of them are not written either. A tester looking for one of them needs
-**TRACE**.
+of them are not written either. A tester looking for one of them needs **TRACE**.
 
 ---
 

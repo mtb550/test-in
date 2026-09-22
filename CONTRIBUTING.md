@@ -5,11 +5,11 @@ missing, that is a bug in this page — say so.
 
 ## What you need
 
-|                           |                                                                                                     |
-|---------------------------|-----------------------------------------------------------------------------------------------------|
-| **JDK 21**                | The toolchain is pinned to it (`build.gradle.kts`). Gradle will fetch one if your machine has none. |
-| **IntelliJ IDEA**         | Any recent build. The sandbox the plugin runs in is downloaded by Gradle, not by you.               |
-| **PowerShell 7** (`pwsh`) | Only for `./gradlew inspect`. It is cross-platform, and the script asks for version 7.              |
+|                           |                                                                                                                                                                                                        |
+|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **JDK 25**                | The toolchain is pinned to it (`build.gradle.kts`). Gradle fetches one if your machine has none. IntelliJ 2026.2 runs on JetBrains Runtime 25, and its class files cannot be read by an older compiler |
+| **IntelliJ IDEA**         | Any recent build. The sandbox the plugin runs in is downloaded by Gradle, not by you.                                                                                                                  |
+| **PowerShell 7** (`pwsh`) | Only for `./gradlew inspect`. It is cross-platform, and the script asks for version 7.                                                                                                                 |
 
 Nothing else. There is no local database, no service to start, no account.
 
@@ -252,11 +252,11 @@ string a tester reads should have one owner; the number may go down and never up
 
 ## What CI runs
 
-| Workflow      | When                                                                                                                                                                                                                                                                                               |
-|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `build.yml`   | Every push to `main` and every pull request. Compiles, runs the unit tests and the IDE tests, and verifies against **IntelliJ IDEA** - the one verdict that turns a pull request red                                                                                                               |
-| `verify.yml`  | Every push to `main`, plus every second day and on demand. The same verifier against **all six targets** - IntelliJ IDEA, PyCharm and Rider at 261 and 262 - compared against `.github/verification-baseline.txt`. This is the number the JetBrains Marketplace shows a tester before they install |
-| `inspect.yml` | Every push to `main`, and on demand against a branch                                                                                                                                                                                                                                               |
+| Workflow      | When                                                                                                                                                                                                                                                                                                               |
+|---------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `build.yml`   | Every push to `main` and every pull request. Compiles, runs the unit tests and the IDE tests, and verifies against **IntelliJ IDEA** - the one verdict that turns a pull request red                                                                                                                               |
+| `verify.yml`  | Every push to `main`, plus every second day and on demand. The same verifier against **all six targets** - IntelliJ IDEA, PyCharm and Rider at both ends of the 262 branch - compared against `.github/verification-baseline.txt`. This is the number the JetBrains Marketplace shows a tester before they install |
+| `inspect.yml` | Every push to `main`, and on demand against a branch                                                                                                                                                                                                                                                               |
 
 No workflow publishes a release. It is published from a maintainer's machine
 with `./gradlew publishPlugin`, which reads the Marketplace token from
@@ -267,8 +267,11 @@ again.
 
 ## Compatibility: `since-build`, never `until-build`
 
-`plugin.xml` declares `sinceBuild 261` and **no** `untilBuild`, and that is a
-policy rather than an oversight.
+`plugin.xml` declares `sinceBuild 262` and **no** `untilBuild`, and that is a
+policy rather than an oversight. It was 261 until 22 September 2026, when the
+plugin moved to IntelliJ 2026.2: that branch runs on JetBrains Runtime 25 and
+ships Java 25 class files, which a 2026.1 IDE cannot load and a Java 21
+compiler cannot read.
 
 An `untilBuild` makes the plugin stop loading the day the IDE crosses it,
 regardless of whether anything actually broke — so every user is blocked by a

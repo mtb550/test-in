@@ -99,13 +99,11 @@ the same rows, a filter, a search, and a key for every gesture.
   its fields under it.
 - The **grid** is the same test cases drawn as a table, one row each.
 - A **field** is one thing a test case carries, such as its expected result.
-- A **verdict** is what a test run records against one test case: **Passed**,
-  **Failed** or **Blocked**.
+- A **verdict** is what a test run records against one test case: **Passed**, **Failed** or **Blocked**.
 - To **execute** a test run is to walk it test case by test case, recording a
   verdict for each.
 
 ---
-
 
 ## Every key the panel answers to
 
@@ -159,8 +157,8 @@ the same rows, a filter, a search, and a key for every gesture.
 | `F12`      | Writes the method for a test case that has none          | [UC-CODEGEN-005](../codegen/automateTestCase.md) |
 | `Ctrl+P`   | Generates a report on this test run                      | [UC-REPORT-001](../report/generateReport.md)     |
 
-**Nothing has a key** for: **Refresh**, **Grid View**, **List View**, the
-**Fields** button, the **Filter** button, the **Details** button, **Start Manual
+**Nothing has a key** for: **Refresh**, **Grid View**, **List View**, the **Fields** button, the **Filter** button, the
+**Details** button, **Start Manual
 Execution**, **Stop Execution**, **Result Analysis** and light mode.
 
 ---

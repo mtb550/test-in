@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-029: Open the menu from the keyboard
 
-**As a** tester, **I want** the menu without reaching for the mouse,
-**so that** a whole test run can be walked with two hands on the keyboard.
+**As a** tester, **I want** the menu without reaching for the mouse, **so that** a whole test run can be walked with two
+hands on the keyboard.
 
 It is the same menu the right button opens. The key just opens it from the
 keyboard.
@@ -102,8 +102,8 @@ Details**, **Update Test Case**, **Actions**, **Automate Test Case**, **Run Test
 Method**, **Navigate to Test Method**.
 
 **Actions** opens onto the seven that act on the test case rather than on the
-automation: **Copy Test Case Value**, **Copy Test Case**, **Cut Test Case**,
-**Paste Test Case**, **Delete Test Case**, then **Undo** and **Redo**. They are
+automation: **Copy Test Case Value**, **Copy Test Case**, **Cut Test Case**, **Paste Test Case**, **Delete Test Case**,
+then **Undo** and **Redo**. They are
 one level down because they all have keys, and none of them is what the menu is
 opened for. At the top level, they pushed Automate Test Case, Run Test Method
 and Navigate to Test Method off the end of a list nobody read that far down.
@@ -137,11 +137,10 @@ print their own key.
 The last group of three is gray in an IDE without the Java plugin or the
 TestNG plugin, and each entry says which plugin it is waiting for.
 
-In a test run editor, the menu holds the three verdicts first: **Passed**,
-**Failed** and **Blocked**. Then come **Failed Test Case Details**, then
-**View Test Case Details** and **Navigate to Test Case**, then **Actions**, then
-**Run Test Method** and **Navigate to Test Method**. **Create Test Case**,
-**Update Test Case** and **Automate Test Case** are not on it. A test run records verdicts
+In a test run editor, the menu holds the three verdicts first: **Passed**, **Failed** and **Blocked**. Then come
+**Failed Test Case Details**, then **View Test Case Details** and **Navigate to Test Case**, then **Actions**, then
+**Run Test Method** and **Navigate to Test Method**. **Create Test Case**, **Update Test Case** and **Automate Test
+Case** are not on it. A test run records verdicts
 rather than the test case, and it covers test cases that already exist.
 
 ---

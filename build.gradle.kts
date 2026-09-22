@@ -32,15 +32,20 @@ group = "org.testin"
 version = "2.12.0-alpha"
 
 /**
- * The newest IDE branch the plugin claims to support, verified alongside the
+ * The oldest IDE branch the plugin claims to support, verified alongside the
  * one it is built against.
  *
  * intellij.version in gradle.properties is what this compiles and runs against.
- * This is the other end of the range plugin.xml declares - sinceBuild 261 and no
- * untilBuild - and is the end the JetBrains Marketplace checks. Move it when a
- * new branch ships, or the sweep goes back to verifying only the past.
+ * This is the other end of the range plugin.xml declares - sinceBuild 262 and
+ * no untilBuild - and it is the end that breaks: code written against the newer
+ * build can call what the first release of the branch does not have, and only
+ * the verifier says so. Move it when sinceBuild moves, and not before.
+ *
+ * 261 is gone from both ends since 22 September 2026. IntelliJ 2026.2 runs on
+ * JetBrains Runtime 25 and ships Java 25 class files, which a plugin compiled
+ * for 21 cannot read and a 2026.1 IDE cannot run.
  */
-val nextBranch = "2026.2.1"
+val oldestBranch = "2026.2"
 
 repositories {
     mavenCentral()
@@ -51,7 +56,7 @@ repositories {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
@@ -126,7 +131,7 @@ intellijPlatform {
         }
 
         ideaVersion {
-            sinceBuild.set("261")
+            sinceBuild.set("262")
             untilBuild.set(null as String?)
         }
     }
@@ -161,25 +166,27 @@ intellijPlatform {
         // prove about an IDE nothing targets - the report is what the sweep is
         // for.
         ides {
-            // Two branches, not one. sinceBuild is 261 with no untilBuild, so
-            // the plugin claims every build from 261 onward - and that is what
+            // Two versions, not one. sinceBuild is 262 with no untilBuild, so
+            // the plugin claims every build from 262 onward - and that is what
             // the Marketplace verifies against. Pinning only the version this
             // compiles against hid a real defect: the Marketplace reported a
             // renderer scheduled for removal in 262 that our own sweep, running
-            // against 261, could not see.
+            // against 261, could not see. The same trap sits inside a branch,
+            // so the first release of it is verified as well as the build this
+            // compiles against.
             listOf(
                 IntelliJPlatformType.IntellijIdea,
                 IntelliJPlatformType.PyCharm,
                 IntelliJPlatformType.Rider
             ).forEach { ide ->
                 create(ide, providers.gradleProperty("intellij.version"))
-                create(ide, nextBranch)
+                create(ide, oldestBranch)
             }
 
             if (providers.gradleProperty("verifyAllIdes").isPresent) {
                 listOf(IntelliJPlatformType.GoLand, IntelliJPlatformType.WebStorm).forEach { ide ->
                     create(ide, providers.gradleProperty("intellij.version"))
-                    create(ide, nextBranch)
+                    create(ide, oldestBranch)
                 }
             }
         }
@@ -337,7 +344,7 @@ intellijPlatformTesting {
     runIde {
         register("runPyCharm") {
             type = IntelliJPlatformType.PyCharm
-            version = "2026.1.3"
+            version = "2026.2.1"
         }
     }
 }

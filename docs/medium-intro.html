@@ -60,7 +60,8 @@
     IntelliJ IDEA: Java, TestNG, under Git, and reviewed like the rest of the code.</p>
 <p>Nothing connects the two. A test case gets reworded in the spreadsheet and the method keeps the old name. A test case
     is deleted and the method stays in the class for another year. A new test case is written and nobody notices there
-    is no method for it. When somebody asks "is this covered?", the honest answer is that you would have to read both lists
+    is no method for it. When somebody asks "is this covered?", the honest answer is that you would have to read both
+    lists
     and compare them by hand.</p>
 <p>There is also the day of it. A test management tool lives in a browser tab, and a browser tab is a mouse. Recording a
     verdict means opening the run, finding the test case, clicking a status, waiting for the page and scrolling back to
@@ -138,7 +139,8 @@ public void registerWithAnEmailNobodyHasUsed() {
     test case at a time, with the same three keys, so the application under test can have the whole screen.</p>
 <img alt="Testin, shot 6" src="assets/medium/shot-6-light-mode.png"
      style="max-width:100%;height:auto;border-radius:6px">
-<p>Test cases with automation are not judged by hand: <code>F5</code> on a selection runs the generated methods and records
+<p>Test cases with automation are not judged by hand: <code>F5</code> on a selection runs the generated methods and
+    records
     the verdict TestNG returned.</p>
 <h3>Report the failure as a bug</h3>
 <p>Open the failed test case's details on the right. A <strong>Bug Issue</strong> row offers <strong>Report
@@ -232,7 +234,7 @@ public void registerWithAnEmailNobodyHasUsed() {
 <h2>Installing it</h2>
 <p>From the IDE: <strong>Settings → Plugins → Marketplace</strong>, search for *Testin*, install, restart. Or install it
     from <a href="https://plugins.jetbrains.com/plugin/31514-testin">the Marketplace listing</a>.</p>
-<p>You need IntelliJ IDEA 2026.1 or later. The Java, TestNG and Git integrations are optional: without them the plugin
+<p>You need IntelliJ IDEA 2026.2 or later. The Java, TestNG and Git integrations are optional: without them the plugin
     still loads and disables the features that need them rather than failing.</p>
 <p>Then set the Testin folder in <strong>Settings → Tools → Testin</strong> and create your first test project.</p>
 <ul>

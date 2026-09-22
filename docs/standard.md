@@ -179,8 +179,8 @@ out.
 Writing a rule and moving that row on is one job, not two - and that row is the
 only thing to check before choosing a number, because nothing else moves.
 
-**The other numbers still start again in each part.** *Question 1* and
-*Difference 1* are read beside the part they are listed in, so they are left
+**The other numbers still start again in each part.** *Question 1* and *Difference 1* are read beside the part they are
+listed in, so they are left
 short. Anywhere else, say which part they belong to: *the tree panel's
 Difference 1*.
 
@@ -274,16 +274,15 @@ These documents are for testers. Every sentence is checked against that reader.
   other tree."*
 - **The same word for the same thing.** *Test set*, never *set*. *Test run*,
   never *run* on its own. *Test case*, *test project*, *package*.
-- **Say who does what.** *"The tester presses `Enter`. The editor opens."* Not
-  *"Pressing `Enter` results in the editor being opened."*
+- **Say who does what.** *"The tester presses `Enter`. The editor opens."* Not *"Pressing `Enter` results in the editor
+  being opened."*
 - **Present tense, active voice.** *"The dialog opens."* Not *"The dialog will
   be opened."*
 - **Explain a word the first time, then use it.** *"Retired means a Deprecated
   test set or an Archived package."*
-- **A heading says what the section is, in plain words.** *What it is for*. Not
-  *Why it exists*.
-- **Numbers: words below 10, digits from 10 up.** *five statuses*, *50 rows*,
-  *13 keys*. A key is written as the key: `1` `2` `3`. A quoted message keeps
+- **A heading says what the section is, in plain words.** *What it is for*. Not *Why it exists*.
+- **Numbers: words below 10, digits from 10 up.** *five statuses*, *50 rows*, *13 keys*. A key is written as the key:
+  `1` `2` `3`. A quoted message keeps
   the product's own digits: *Removed 4*.
 - **American English.** *Behavior* and *gray*, never the British spellings.
   The platform the plugin is written against is American, so anything else puts
@@ -299,8 +298,8 @@ These documents are for testers. Every sentence is checked against that reader.
 - **"The tester", never "the user".** It is who the product is for.
 - **A key is written as the plugin shows it**, in backticks: `Ctrl+M`, `F2`,
   `Shift+F6`, `Delete`, `Enter`. Not "control-M", not "the F2 key".
-- **A menu label is written exactly**, in bold: **Create**, **Rename**,
-  **Remove**. If the label changes, the document changes in the same commit.
+- **A menu label is written exactly**, in bold: **Create**, **Rename**, **Remove**. If the label changes, the document
+  changes in the same commit.
 - **A notification is quoted exactly**, in italics: the tester sees *Removed 4*,
   so the scenario says *Removed 4*.
 - **What is refused is stated as plainly as what is allowed.** *"The two fixed

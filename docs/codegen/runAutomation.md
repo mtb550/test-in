@@ -111,8 +111,8 @@ excluded group, a disabled test and a terminated run all arrive the same way: th
 framework says the test did not pass and gives no verdict. Leaving it Pending
 would report the cycle as finished when part of it never ran.
 
-**If the IDE is indexing** — every test case is put back and a message reads
-*Tests cannot run while the IDE is indexing. Wait a moment and run them again.*
+**If the IDE is indexing** — every test case is put back and a message reads *Tests cannot run while the IDE is
+indexing. Wait a moment and run them again.*
 
 **If indexing starts part way through** — every test case is put back and a
 message reads *Indexing interrupted the test run. Run it again.*

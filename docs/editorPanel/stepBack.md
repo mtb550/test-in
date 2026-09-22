@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-026: Step back
 
-**As a** tester, **I want** one key that undoes whatever state I am in,
-**so that** I can get back to a plain list without thinking about how I got
+**As a** tester, **I want** one key that undoes whatever state I am in, **so that** I can get back to a plain list
+without thinking about how I got
 here.
 
 One key, one step back. The tester does not have to remember which state they

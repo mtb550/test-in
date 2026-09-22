@@ -204,8 +204,8 @@ While the create or update dialog is open.
 Every key above works. They do not all reach the tester the same way, and the
 difference is worth knowing before rebinding one.
 
-**A key in the Keymap.** Testin declares the action to the IDE, so it appears in
-**Find Action** under its own name and in **Settings › Keymap › Plug-ins ›
+**A key in the Keymap.** Testin declares the action to the IDE, so it appears in **Find Action** under its own name and
+in **Settings › Keymap › Plug-ins ›
 Testin**, where any key can be put on it. Thirty-one entries are declared: 29
 actions, and two more that each stand for a list and become one entry per
 status. Nine of them carry a default key, on seven keys:
@@ -230,8 +230,7 @@ on a Mac. Two actions on one keystroke, and the IDE settles it by where the
 cursor is: in a Java file the refactoring answers, in the Testin panel the search
 does. It is kept, because it is the right key for the feature and a tester who
 does not refactor Java never meets the other one. `Ctrl+Alt+Shift+F` is free in
-the default keymap if it ever bites, and either action can be rebound in
-**Settings › Keymap**.
+the default keymap if it ever bites, and either action can be rebound in **Settings › Keymap**.
 
 **`F12` is also IntelliJ's Jump to Last Window.** It is kept for the same
 reason, and for one more: `Ctrl+F12` is worse, because the IDE's File Structure

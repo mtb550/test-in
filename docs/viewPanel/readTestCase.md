@@ -2,8 +2,8 @@
 
 # UC-VIEW-PANEL-004: Read what a test case says
 
-**As a** tester, **I want** every field of the test case in one place,
-**so that** I can follow its steps and judge it against its expected result.
+**As a** tester, **I want** every field of the test case in one place, **so that** I can follow its steps and judge it
+against its expected result.
 
 This is what a tester reads while running a test.
 
@@ -38,8 +38,8 @@ There is no key for this. It is what the **Details** tab shows.
   title.
 - **Rule-VIEW-PANEL-026** — The rows a tester writes as sentences are
   capitalized, and a period is added unless the text already closes itself:
-  **Description**, **Expected Result**, **Steps** and **Pre Conditions**.
-  **Reference**, **Module** and **Test Data** are left exactly as the tester
+  **Description**, **Expected Result**, **Steps** and **Pre Conditions**. **Reference**, **Module** and **Test Data**
+  are left exactly as the tester
   typed them — a reference is an identifier and a module is a label, and a
   period after either reads as a typo. The same four rows are the ones the card
   and light mode capitalize, because all three ask the same question.
@@ -48,8 +48,8 @@ There is no key for this. It is what the **Details** tab shows.
   four.
 - **Rule-VIEW-PANEL-028** — Every value can be selected and copied, and none of
   them can be typed into.
-- **Rule-VIEW-PANEL-061** — Who did something and when are one row, not two.
-  **Created** reads the name, then *on*, then the date.
+- **Rule-VIEW-PANEL-061** — Who did something and when are one row, not two. **Created** reads the name, then *on*, then
+  the date.
 - **Rule-VIEW-PANEL-062** — **Order** is where the test case sits in its test
   set, read from the set rather than from the test case.
 - **Rule-VIEW-PANEL-082** — Every field in the Details tab has its caption on a
@@ -98,8 +98,8 @@ There is no key for this. It is what the **Details** tab shows.
 3. **The values** — each under its caption, across the whole panel, so a narrow
    panel still gives a value all its width. Each one can be selected and
    copied. None of them can be typed into.
-4. **The rows that are missing** — this test case has nothing in its
-   **Reference** field, so that row is not drawn and no gap is left for it.
+4. **The rows that are missing** — this test case has nothing in its **Reference** field, so that row is not drawn and
+   no gap is left for it.
 
 ## The rows, in order
 
@@ -146,8 +146,7 @@ higher priorities get a badge.
 
 **If nobody has run the test case** — no verdict badge is drawn.
 
-**If the test case has no steps, or every step is blank** — there is no
-**Steps** row.
+**If the test case has no steps, or every step is blank** — there is no **Steps** row.
 
 ---
 

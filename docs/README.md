@@ -21,8 +21,8 @@ Four steps. Each one is a link away from the last.
 3. **Open the thing you want to do.** That is a use case page.
 4. **Read the page.** It tells you the whole of that one job.
 
-If you are new and do not know where to start, open
-**[the tree panel](treePanel/main.md)**. Everything in Testin starts there.
+If you are new and do not know where to start, open **[the tree panel](treePanel/main.md)**. Everything in Testin starts
+there.
 
 ## What a use case page tells you
 

@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-002: Switch between cards and a grid
 
-**As a** tester, **I want** the same test cases as a table,
-**so that** I can compare many at once and correct them in columns.
+**As a** tester, **I want** the same test cases as a table, **so that** I can compare many at once and correct them in
+columns.
 
 The grid is the same test cases drawn as a table. One row is one test case.
 
@@ -79,8 +79,7 @@ There is no key for this. The button is on the toolbar.
 ## What Testin refuses
 
 **If the grid cannot be built** — the cards are shown instead, holding the
-page asked for, and a message says the grid could not be drawn and why
-(Rule-EDITOR-PANEL-229).
+page asked for, and a message says the grid could not be drawn and why (Rule-EDITOR-PANEL-229).
 
 ## What is different in each view
 

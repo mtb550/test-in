@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-008: Type straight into a grid cell
 
-**As a** tester, **I want** to correct a value where I can see it,
-**so that** fixing five expected results does not need five dialogs.
+**As a** tester, **I want** to correct a value where I can see it, **so that** fixing five expected results does not
+need five dialogs.
 
 The cell turns into a box the tester can type in, right where it sits in the
 table.

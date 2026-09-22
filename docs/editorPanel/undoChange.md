@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-012: Undo a change
 
-**As a** tester, **I want** to take back what I just did,
-**so that** a wrong bulk edit across 30 test cases costs one keystroke.
+**As a** tester, **I want** to take back what I just did, **so that** a wrong bulk edit across 30 test cases costs one
+keystroke.
 
 One press takes back the whole of the last change, however many test cases it
 touched.
@@ -53,13 +53,12 @@ touched.
 
 ## What the tester sees
 
-This opens no screen. While the test cases are written back, a bar reads
-*Putting back*; it cannot be canceled, because a change half taken back is worse
+This opens no screen. While the test cases are written back, a bar reads *Putting back*; it cannot be canceled, because
+a change half taken back is worse
 than one not taken back at all. The test cases the change touched are then drawn
 again as they were before it.
 
-A small message then appears at the bottom of the IDE and fades. It reads
-*Undone*.
+A small message then appears at the bottom of the IDE and fades. It reads *Undone*.
 
 ## Main flow
 
@@ -82,8 +81,8 @@ them - a sync, a pull, or another IDE - so taking this back would write over
 work that is not yours. Nothing was changed.*
 
 **If a test case cannot be written back, or its file cannot be deleted** — the
-others are still taken back, and a message reads *unable to write content:* or
-*unable to remove:* and the reason. *Undone* is not shown, because not
+others are still taken back, and a message reads *unable to write content:* or *unable to remove:* and the reason.
+*Undone* is not shown, because not
 everything was.
 
 ## What one press takes back

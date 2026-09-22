@@ -73,7 +73,6 @@ through Git, and where it is cloned from.
 
 ---
 
-
 ## Every key
 
 | Key           | What it does                                                                                                                                                                                               | The page that owns it                 |
@@ -109,10 +108,10 @@ Choosing it once produced a file in the newer format under the older name.
 
 ## What one exported row holds
 
-Seventeen columns, in this order: **Description**, **ID**, **Expected Result**,
-**Steps**, **Priority**, **FQCN**, **Reference**, **Test Data**, **Pre
-Conditions**, **Group**, **Path**, **Module**, **Status**, **Created By**,
-**Updated By**, **Created At**, **Updated At**.
+Seventeen columns, in this order: **Description**, **ID**, **Expected Result**, **Steps**, **Priority**, **FQCN**,
+**Reference**, **Test Data**, **Pre
+Conditions**, **Group**, **Path**, **Module**, **Status**, **Created By**, **Updated By**, **Created At**, **Updated
+At**.
 
 The steps are joined by a comma, and so are the groups. A date is written in
 full, with the time zone.
@@ -122,9 +121,8 @@ stores it, not the 17 columns.
 
 ## What an import reads
 
-Thirteen columns: **Description**, **Expected Result**, **Steps**, **Priority**,
-**Reference**, **Test Data**, **Pre Conditions**, **Group**, **Module**,
-**Created By**, **Updated By**, **Created At**, **Updated At**.
+Thirteen columns: **Description**, **Expected Result**, **Steps**, **Priority**, **Reference**, **Test Data**, **Pre
+Conditions**, **Group**, **Module**, **Created By**, **Updated By**, **Created At**, **Updated At**.
 
 **Order**, **ID**, **FQCN**, **Path** and **Status** are never imported. A file
 carrying a status column has it ignored.
@@ -234,10 +232,10 @@ closed up, so an issue that quotes one still points at the right thing.
 **Question 2** — Should an import be able to update a test case that is already
 there, rather than always adding a new one?
 
-Question 1 asked whether an export should walk the whole subtree. It does
-(Rule-SHARE-013). Question 3 asked whether the tester should be told which
-fields were settled for them in a merge. They are, in the merge window
-(Rule-SHARE-109). Neither number is given to anything else.
+Question 1 asked whether an export should walk the whole subtree. It does (Rule-SHARE-013). Question 3 asked whether the
+tester should be told which
+fields were settled for them in a merge. They are, in the merge window (Rule-SHARE-109). Neither number is given to
+anything else.
 
 ---
 

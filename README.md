@@ -57,8 +57,8 @@ else.
 
 ## Requirements
 
-- IntelliJ IDEA **2026.1** or later (build 261+)
-- **Java 21** toolchain
+- IntelliJ IDEA **2026.2** or later (build 262+)
+- **Java 25** toolchain
 - **TestNG** for execution, and the Java plugin for code generation
 
 The Java, TestNG and Git integrations are optional dependencies: Testin loads
@@ -69,7 +69,8 @@ without them and disables the features that need them rather than failing.
 From the IDE: **Settings → Plugins → Marketplace**, search for *Testin*, install
 and restart.
 
-Or install it from the listing: **[Testin on the JetBrains Marketplace](https://plugins.jetbrains.com/plugin/31514-testin)**.
+Or install it from the listing:
+**[Testin on the JetBrains Marketplace](https://plugins.jetbrains.com/plugin/31514-testin)**.
 
 Then set the Testin folder in **Settings → Tools → Testin** — the folder where
 your test cases will live — and create your first test project from the panel.

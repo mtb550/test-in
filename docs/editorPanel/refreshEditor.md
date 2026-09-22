@@ -2,8 +2,7 @@
 
 # UC-EDITOR-PANEL-027: Refresh the editor from disk
 
-**As a** tester, **I want** to read the test set again from disk,
-**so that** I see what a colleague's sync brought in.
+**As a** tester, **I want** to read the test set again from disk, **so that** I see what a colleague's sync brought in.
 
 This reads the test set from disk again. It writes nothing.
 
@@ -53,8 +52,7 @@ This opens no screen. The list empties and reads *Refreshing...* while Testin
 reads the test set from disk again. Then the page holding the selected test case
 is drawn.
 
-A small message appears at the bottom of the IDE and fades. It reads
-*Refreshed*.
+A small message appears at the bottom of the IDE and fades. It reads *Refreshed*.
 
 ## Main flow
 
@@ -77,8 +75,8 @@ Nothing.
 ## In a test run editor
 
 Refresh also stops the execution. The clock stops, the walk ends, and the
-toolbar button turns back into **Start Manual Execution**. The message says
-*Refreshed, and the execution stopped*, so the tester is not left wondering why
+toolbar button turns back into **Start Manual Execution**. The message says *Refreshed, and the execution stopped*, so
+the tester is not left wondering why
 the button changed.
 
 ## What completion and the group filter offer

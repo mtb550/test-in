@@ -4,8 +4,8 @@
 
 > **No key.** On the menu: **Actions → Re-create Test Run**.
 
-**As a** tester, **I want** to make the next cycle from a finished test run,
-**so that** starting the next round of testing takes one step. The new one has
+**As a** tester, **I want** to make the next cycle from a finished test run, **so that** starting the next round of
+testing takes one step. The new one has
 the same test cases and settings and no verdicts, so nobody builds the whole
 test run again by hand.
 
@@ -29,8 +29,8 @@ This copies a test run's test cases and settings into a new, empty one.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  made together confirm with one message and a count: the tester sees
-  *Removed 4*, never four messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees *Removed 4*, never four messages. Looking at
+  something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.

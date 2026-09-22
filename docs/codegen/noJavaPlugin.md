@@ -2,8 +2,8 @@
 
 # UC-CODEGEN-019: Work in an IDE with no Java plugin
 
-**As a** tester, **I want** Testin to work in PyCharm or GoLand,
-**so that** I can manage test cases where my team writes its code, even where
+**As a** tester, **I want** Testin to work in PyCharm or GoLand, **so that** I can manage test cases where my team
+writes its code, even where
 Testin cannot generate anything.
 
 Test management works in full. Only the Java code is missing.

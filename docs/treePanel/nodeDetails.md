@@ -28,18 +28,18 @@ It is a read-only window. Nothing in it can be changed.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  made together confirm with one message and a count: the tester sees
-  *Removed 4*, never four messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees *Removed 4*, never four messages. Looking at
+  something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -110,8 +110,8 @@ It is a read-only window. Nothing in it can be changed.
 1. **Name and Path** — **Path** is the node's full path on disk.
 2. **Who and when** — who created the node, who last changed it, and the dates.
 3. **Status** — left out on **Test Cases** and **Test Runs**, which have none.
-4. **The execution rows** — **Execution Started**, **Execution Ended** and
-   **Execution Time**, which is how long the run took. Only a test run has
+4. **The execution rows** — **Execution Started**, **Execution Ended** and **Execution Time**, which is how long the run
+   took. Only a test run has
    them, and a test run that never started shows none of them. A run that
    started and has not ended shows the first alone: there is no length yet.
 5. **The settings** — every answer the tester gave when the test run was made.
@@ -142,7 +142,7 @@ else.
    asks, and never saved. Which counts appear depends on the kind of node:
 
    | Node             | Counts                                                     |
-   |------------------|------------------------------------------------------------|
+      |------------------|------------------------------------------------------------|
    | Test project     | **Test sets**, **Packages**, **Test cases**, **Test runs** |
    | **Test Cases**   | **Test sets**, **Packages**, **Test cases**                |
    | **Test Runs**    | **Packages**, **Test runs**                                |
@@ -156,10 +156,10 @@ else.
    listed beside it. Each one has a color and a count. Inside the ring is the
    pass rate. It reads **Not run** when nothing in the test run has been
    executed.
-9. A test run also shows **Execution Started**, **Execution Ended** and
-   **Execution Time**. It shows every setting the tester gave when the test run
-   was made: **Test Type**, **Change Log**, **Commit ID**, **Platform**,
-   **Component**, **Language**, **Browser** and **Device Type**.
+9. A test run also shows **Execution Started**, **Execution Ended** and **Execution Time**. It shows every setting the
+   tester gave when the test run
+   was made: **Test Type**, **Change Log**, **Commit ID**, **Platform**, **Component**, **Language**, **Browser** and
+   **Device Type**.
 10. A row with nothing in it is not drawn at all. A test run that never started
     shows none of the three execution rows, and one still running shows only
     the first.

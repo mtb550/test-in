@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-003: Choose which fields are shown
 
-**As a** tester, **I want** to show only the fields I am working with,
-**so that** a card stays short and the grid stays narrow.
+**As a** tester, **I want** to show only the fields I am working with, **so that** a card stays short and the grid stays
+narrow.
 
 A test case carries 18 fields. This is where the tester picks which ones the
 rows show.
@@ -40,8 +40,8 @@ There is no key for this. The button's tooltip reads **Fields**.
   view is on screen.
 - **Rule-EDITOR-PANEL-022** — The choice is remembered, and is separate for a
   test set and a test run.
-- **Rule-EDITOR-PANEL-023** — Three fields cannot be changed. **Order** and
-  **Description** are always shown, and **ID** is never shown. Order is the
+- **Rule-EDITOR-PANEL-023** — Three fields cannot be changed. **Order** and **Description** are always shown, and **ID**
+  is never shown. Order is the
   grid's row header and not a field a tester chooses: clicking it selects the
   row, and `Enter` or double-clicking it opens the details panel.
 - **Rule-EDITOR-PANEL-024** — A burst of ticks costs one redraw, not one for

@@ -95,8 +95,8 @@ filed.
 Those travel together, or they say something nobody recorded, so the later
 `executedAt` takes the file and nothing is asked. Nothing is said either: the
 line naming what was settled belongs to the merge window, and that window opens
-only when a question is left. That is difference 20. Two testers judging
-**different** test cases of one run never conflict at all: their verdicts are
+only when a question is left. That is difference 20. Two testers judging **different** test cases of one run never
+conflict at all: their verdicts are
 in different files.
 
 **A run two testers executed** — merged by rule, with nothing to answer: the run

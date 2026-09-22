@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-025: Open the details panel
 
-**As a** tester, **I want** the whole of one test case beside the list,
-**so that** I can read its steps while the list stays where it is.
+**As a** tester, **I want** the whole of one test case beside the list, **so that** I can read its steps while the list
+stays where it is.
 
 The panel opens beside the list, not on top of it. The list stays where it was.
 

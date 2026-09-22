@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-005: Create a test case
 
-**As a** tester, **I want** to add a test case to the test set I am looking at,
-**so that** an idea is written down before I forget it.
+**As a** tester, **I want** to add a test case to the test set I am looking at, **so that** an idea is written down
+before I forget it.
 
 This is how every test case in Testin begins.
 
@@ -128,8 +128,7 @@ a pull or the tree — nothing is saved. A message says the test set is no longe
 there, and the dialog stays open with what was typed in it.
 
 **If a Create Test Case dialog is already open** — it is brought forward rather
-than a second one opened, so nothing typed into it is lost
-(Rule-INTERNAL-075).
+than a second one opened, so nothing typed into it is lost (Rule-INTERNAL-075).
 
 **If the description cannot name a Java method** — nothing is saved. A message
 titled **That description cannot name a test method** says what the method would

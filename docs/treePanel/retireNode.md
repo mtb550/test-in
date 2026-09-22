@@ -28,18 +28,18 @@ Retiring deletes nothing. It only moves the node out of the way.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  made together confirm with one message and a count: the tester sees
-  *Removed 4*, never four messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees *Removed 4*, never four messages. Looking at
+  something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -74,8 +74,7 @@ Retiring deletes nothing. It only moves the node out of the way.
 Retiring opens no screen of its own, and it asks no question. A retired test set
 or package turns gray at once and moves to the bottom of its folder. A test
 project that is not **Active** shows no children instead. The new status word
-shows above the status bar at the bottom right of the IDE. It reads *Inactive*,
-*Archived* or *Deprecated*.
+shows above the status bar at the bottom right of the IDE. It reads *Inactive*, *Archived* or *Deprecated*.
 
 ## Main flow
 
@@ -84,7 +83,7 @@ shows above the status bar at the bottom right of the IDE. It reads *Inactive*,
    kind. The status the node already has is gray.
 
    | Node         | Retire it with      | Statuses it can have |
-   |--------------|---------------------|----------------------|
+      |--------------|---------------------|----------------------|
    | Test project | **Deactivate**      | Active, Inactive     |
    | Test set     | **Mark Deprecated** | Active, Deprecated   |
    | Package      | **Archive**         | Active, Archived     |
@@ -93,8 +92,8 @@ shows above the status bar at the bottom right of the IDE. It reads *Inactive*,
 4. Testin writes the status, refreshes the tree, and shows the new status word:
    *Inactive*, *Archived* or *Deprecated*.
 
-   A test project takes **Deactivate** and nothing else. Until #66 it took
-   **Archive** as well, which put it aside the same way and asked the tester to
+   A test project takes **Deactivate** and nothing else. Until #66 it took **Archive** as well, which put it aside the
+   same way and asked the tester to
    tell two kinds of "not now" apart.
 
 **What retiring does.** A **Deprecated** test set or an **Archived** package is

@@ -2,8 +2,8 @@
 
 # UC-SHARE-006: Import into a package, one test set for each sheet
 
-**As a** tester, **I want** a workbook of six sheets to become six test sets,
-**so that** a whole test plan written in a spreadsheet arrives in one gesture.
+**As a** tester, **I want** a workbook of six sheets to become six test sets, **so that** a whole test plan written in a
+spreadsheet arrives in one gesture.
 
 A package is a folder that holds test sets. This makes one new test set for
 each sheet in the file, and fills it.

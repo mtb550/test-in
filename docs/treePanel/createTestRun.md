@@ -5,8 +5,8 @@
 > **`Ctrl+M`**, with **Test Runs** or a test run package selected, then pick
 > *Test Run*. On the menu: **Create**.
 
-**As a** tester, **I want** to start a test run over the test cases I choose,
-**so that** a pass through the product is recorded on its own.
+**As a** tester, **I want** to start a test run over the test cases I choose, **so that** a pass through the product is
+recorded on its own.
 
 A test run is one round of testing, with a verdict for each test case.
 
@@ -28,18 +28,18 @@ A test run is one round of testing, with a verdict for each test case.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  made together confirm with one message and a count: the tester sees
-  *Removed 4*, never four messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees *Removed 4*, never four messages. Looking at
+  something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -106,15 +106,14 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
    does not start here. It starts in **Change Log**.
 3. **The fields** — one to a row. Every dropdown starts blank. Blank means the
    tester has not answered it. Every dropdown can also be typed into, so a value
-   the list does not offer is still saved. **Browser** is on the form only while
-   *Platform* is **Web** and *Component* is **Frontend**. **Device Type** takes
-   its place only while *Platform* is **Mobile** and *Component* is
-   **Frontend**. A field that is not on the form is saved empty. So switching
-   *Platform* from **Web** to **Mobile** drops the browser that was picked. The
+   the list does not offer is still saved. **Browser** is on the form only while *Platform* is **Web** and *Component*
+   is **Frontend**. **Device Type** takes
+   its place only while *Platform* is **Mobile** and *Component* is **Frontend**. A field that is not on the form is
+   saved empty. So switching *Platform* from **Web** to **Mobile** drops the browser that was picked. The
    lists are:
 
    | Field       | Offers                                |
-   |-------------|---------------------------------------|
+      |-------------|---------------------------------------|
    | Test Type   | *Functional Test*, *Performance Test* |
    | Platform    | *Web*, *Mobile*                       |
    | Component   | *Frontend*, *Backend*                 |
@@ -138,8 +137,8 @@ with the test run's own name, test cases and settings.
 
 1. The tester selects **Test Runs** or a test run package.
 2. The tester presses `Ctrl+M`, or chooses **Create**.
-3. The **Create Run Node** dialog opens. Its first row is selected, and reads
-   *Records execution results*. Its gray hint text reads *set name, like Sprint
+3. The **Create Run Node** dialog opens. Its first row is selected, and reads *Records execution results*. Its gray hint
+   text reads *set name, like Sprint
    3 Cycle 1...*.
 4. The tester types a name and presses `Enter`.
 5. The **Create Test Run** dialog opens. It holds the typed name in *Test Run
@@ -147,8 +146,7 @@ with the test run's own name, test cases and settings.
    sets with every test case ticked. Three things are left out of that tree:
    retired test sets, anything under an **Archived** package, and empty test
    sets.
-6. The tester ticks and unticks with `Space`, moves with `Tab`, and presses
-   **Create**.
+6. The tester ticks and unticks with `Space`, moves with `Tab`, and presses **Create**.
 7. Testin writes the test run. A progress bar reads *Creating test run
    \<name\>*, and it cannot be canceled. Every ticked test case is **Pending**.
    The test run's status is **Created**.

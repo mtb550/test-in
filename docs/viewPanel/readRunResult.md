@@ -40,8 +40,7 @@ run.
 - **Rule-VIEW-PANEL-032** — Recording a pass clears the actual result, the
   stacktrace, the bug severity, the bug priority and the bug issue link. Five of
   the seven rows go with it.
-- **Rule-VIEW-PANEL-033** — A test case the test run has not reached yet reads
-  **Pending**.
+- **Rule-VIEW-PANEL-033** — A test case the test run has not reached yet reads **Pending**.
 
 ## The screen
 
@@ -125,8 +124,8 @@ The **Bug Severity** and **Bug Priority** rows say what *this* run recorded. The
 that has failed in more than one cycle shows one bug here and all of them
 there.
 
-The two used to disagree rather than differ: this panel read **Blocker** and
-**High** while the tab beside it said no bugs were found, because that tab never
+The two used to disagree rather than differ: this panel read **Blocker** and **High** while the tab beside it said no
+bugs were found, because that tab never
 looked at the test case (#229).
 
 ---

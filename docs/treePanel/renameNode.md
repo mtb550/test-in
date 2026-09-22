@@ -29,8 +29,8 @@ This changes the name of one node. Nothing inside it moves.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  made together confirm with one message and a count: the tester sees
-  *Removed 4*, never four messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees *Removed 4*, never four messages. Looking at
+  something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
@@ -101,8 +101,7 @@ This changes the name of one node. Nothing inside it moves.
    is, and light mode with them.
 6. For a test project, a test set or a test set package, Testin renames the
    automation code next. It does so only while code is on: the Java plugin, and
-   `testin.yml` naming the test project by its old name or its new one
-   (Rule-CODEGEN-082).
+   `testin.yml` naming the test project by its old name or its new one (Rule-CODEGEN-082).
 7. Testin renames the folder.
 8. For a test project, the project chosen for this code project follows the new
    name. When `testin.yml` still names the old one, a notification that stays in

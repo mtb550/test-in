@@ -35,8 +35,8 @@ the Details tab.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
-- **Rule-VIEW-PANEL-066** — A failed test case viewed under a test run has a
-  **Bug Issue** row with a **Report Bug** link. The row stays for as long as the
+- **Rule-VIEW-PANEL-066** — A failed test case viewed under a test run has a **Bug Issue** row with a **Report Bug**
+  link. The row stays for as long as the
   test case has a bug issue link, whatever its verdict.
 - **Rule-VIEW-PANEL-067** — Report Bug prepares the bug under the IDE's progress
   bar, and reads `testin.yml` again first. Then the bug opens. Stopping the
@@ -186,8 +186,8 @@ mention a GitHub user or link another issue either.
 5. The tester edits the title or the body, or leaves them.
 6. The tester clicks **Send**. The dialog closes.
 7. The IDE's progress bar reads *Sending the bug report*.
-8. A message appears and stays in the notification list. Its title is
-   *Reported*. It shows the issue as `owner/repo#123`, with an **Open** link.
+8. A message appears and stays in the notification list. Its title is *Reported*. It shows the issue as
+   `owner/repo#123`, with an **Open** link.
 9. The **Bug Issue** row shows the issue. **Report Bug** is gray, and hovering
    over it reads *Already reported*.
 
@@ -203,8 +203,8 @@ over it reads *bugRepoUrl is not a GitHub repository address*.
 over it reads *GitHub CLI (gh) is not installed, or the IDE cannot see it.
 Install gh, then restart the IDE (and JetBrains Toolbox)*.
 
-**If `gh` is older than 2.99.0** — **Send** is gray. Hovering over it reads
-*gh 2.87.0 is too old to attach screenshots. Report Bug needs 2.99.0 or newer*,
+**If `gh` is older than 2.99.0** — **Send** is gray. Hovering over it reads *gh 2.87.0 is too old to attach screenshots.
+Report Bug needs 2.99.0 or newer*,
 with the numbers of this machine.
 
 **If `gh` is not signed in to the repository's host** — **Send** is gray.
@@ -226,12 +226,12 @@ most*, with the real length. A long stacktrace is the usual reason.
 reads *51 screenshots are pasted, and gh attaches 50 at most*, with the real
 count.
 
-**If the test case is no longer failed when Send is clicked** — nothing is sent.
-**Send** turns gray, and hovering over it reads *This test case is no longer
+**If the test case is no longer failed when Send is clicked** — nothing is sent. **Send** turns gray, and hovering over
+it reads *This test case is no longer
 failed*. The dialog stays open.
 
-**If this test case's report is being prepared, is open or is being sent** —
-**Report Bug** is gray. Hovering over it reads *Preparing the bug report*, *The
+**If this test case's report is being prepared, is open or is being sent** — **Report Bug** is gray. Hovering over it
+reads *Preparing the bug report*, *The
 bug report is open* or *Sending the bug report*.
 
 **If another test case's report is open** — **Report Bug** is gray. Hovering
@@ -240,8 +240,8 @@ over it reads *Finish the open bug report first*.
 **If the test case is already reported** — **Report Bug** is gray. Hovering over
 it reads *Already reported*.
 
-**If `gh` does not answer within 120 seconds** — sending stops. A message titled
-*Report Bug Failed* reads *gh did not answer within 120 seconds. It is not known
+**If `gh` does not answer within 120 seconds** — sending stops. A message titled *Report Bug Failed* reads *gh did not
+answer within 120 seconds. It is not known
 whether the issue was created, so check GitHub before reporting again*. Nothing
 is stored. Report Bug brings the edits back.
 
@@ -249,8 +249,8 @@ is stored. Report Bug brings the edits back.
 When `gh` said nothing, it reads *gh stopped with exit code 1 and said nothing*,
 with the real code. Nothing is stored. Report Bug brings the edits back.
 
-**If the bug cannot be written to a temporary folder** — a message titled
-*Report Bug Failed* reads *The bug report could not be written to a temporary
+**If the bug cannot be written to a temporary folder** — a message titled *Report Bug Failed* reads *The bug report
+could not be written to a temporary
 folder:*, then the reason. Nothing is sent.
 
 **If some screenshots do not upload** — the issue is still created and stored.

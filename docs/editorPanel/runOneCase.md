@@ -83,9 +83,8 @@ the message and the bar cannot count one test run differently.
 **During a walk** ([UC-EDITOR-PANEL-031](startExecution.md)), running the test
 case the walk is on keeps the walk there, its clock counting, until the status
 comes back. The status then moves the walk to the next test case waiting for a
-verdict, as the tester's own verdict does, and execution goes on
-(Rule-EDITOR-PANEL-242). The time recorded is still the framework's own
-(Rule-EDITOR-PANEL-183).
+verdict, as the tester's own verdict does, and execution goes on (Rule-EDITOR-PANEL-242). The time recorded is still the
+framework's own (Rule-EDITOR-PANEL-183).
 
 Everything about how the run is built and named is on
 [UC-CODEGEN-008](../codegen/runAutomation.md).

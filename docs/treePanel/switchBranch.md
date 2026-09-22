@@ -28,8 +28,8 @@ repository.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  made together confirm with one message and a count: the tester sees
-  *Removed 4*, never four messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees *Removed 4*, never four messages. Looking at
+  something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
@@ -114,8 +114,8 @@ The box fills itself from what is on the machine, showing *Reading branches*.
 That is the whole answer to almost every question anyone asks it, and it needs
 no network.
 
-Three things also ask the remote, and then the box fills a second time showing
-*Fetching from remote*, so the list can grow a moment after it appears:
+Three things also ask the remote, and then the box fills a second time showing *Fetching from remote*, so the list can
+grow a moment after it appears:
 **Refresh**, a branch switch, and opening a different test project. Nothing else
 does. A rename, a removal or a status change rebuilds the panel without going
 near the remote. It cannot have moved a branch, and a fetch can stop to ask for

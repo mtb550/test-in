@@ -65,7 +65,6 @@ in front of them while they write down what actually happened.
 
 ---
 
-
 ## Every key the panel answers to
 
 | Key                        | What it does                                                | The page that owns it                                                       |

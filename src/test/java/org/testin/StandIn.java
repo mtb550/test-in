@@ -29,7 +29,8 @@ public final class StandIn {
             case "equals" -> proxy == args[0];
             case "hashCode" -> System.identityHashCode(proxy);
             case "toString" -> "a stand-in " + type.getSimpleName();
-            default -> throw new UnsupportedOperationException("A stand-in " + type.getSimpleName() + " was asked " + method.getName());
+            default ->
+                    throw new UnsupportedOperationException("A stand-in " + type.getSimpleName() + " was asked " + method.getName());
         }));
     }
 }

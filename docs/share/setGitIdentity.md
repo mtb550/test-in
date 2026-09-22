@@ -87,8 +87,8 @@ not one.
 
 **If the email is empty** — the same.
 
-**If Git refuses the identity** — a message titled **Config Failed** reads
-*Failed to set Git identity:* and then the reason.
+**If Git refuses the identity** — a message titled **Config Failed** reads *Failed to set Git identity:* and then the
+reason.
 
 ## This is not the tester name
 

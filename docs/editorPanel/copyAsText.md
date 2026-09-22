@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-014: Copy a test case's details as text
 
-**As a** tester, **I want** a test case as plain text on my clipboard,
-**so that** I can paste it into a chat message or a ticket.
+**As a** tester, **I want** a test case as plain text on my clipboard, **so that** I can paste it into a chat message or
+a ticket.
 
 This copies words a person can read. It does not copy the test case itself.
 

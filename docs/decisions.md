@@ -63,8 +63,8 @@ be the one that goes stale.
 
 **If you are about to reverse it.** Updating the cache before the VFS operation
 is the specific version of this that keeps getting written, because it reads as
-"update the model, then persist". It creates phantom directories and
-*already exists in VFS* errors, because a marker write creates directories on
+"update the model, then persist". It creates phantom directories and *already exists in VFS* errors, because a marker
+write creates directories on
 its way to writing the marker.
 
 ---
@@ -153,8 +153,8 @@ protocol, served by `TestinFileSystem`, which extends
 
 **Consequences.** `TestinFileSystem.findFileByPath` returns nothing, always, and
 cannot do otherwise: a file system is application level, so there is no project
-to ask, and a node's kind lives in a marker file that only the indexer may read
-(Decision-001). Testin therefore closes its own tabs as the project closes, so
+to ask, and a node's kind lives in a marker file that only the indexer may read (Decision-001). Testin therefore closes
+its own tabs as the project closes, so
 the IDE's tab list holds nothing of ours and nobody asks.
 
 **If you are about to reverse it.** "Deprecated" here names the base class, not
@@ -208,7 +208,6 @@ follows by handing every operation to `git4idea`.
 **If you are about to reverse it.** The refusal is the feature. A client that
 connects anyway connects to anything claiming to be the server, and the sync
 would then upload a whole test project to it.
-
 
 ## Decision-008 — The source is Apache 2.0, and a contribution needs an agreement
 
@@ -350,8 +349,8 @@ repository, and the branch box follows the folder's Git. A team that wants
 every colleague on the same test project with no setup writes the file by hand.
 The file's values and parser are package-private, and `ArchitectureTest` keeps
 the YAML parser in the one class. The choice is the second value kept per
-project on this machine, beside the editors that were open
-(`LastOpenEditors`), and, like them, it is a choice, not a setting.
+project on this machine, beside the editors that were open (`LastOpenEditors`), and, like them, it is a choice, not a
+setting.
 
 **If you are about to reverse it.** Writing the file back - to remember a pick,
 a remote, a name - commits one machine's choice into a file the whole team
@@ -409,8 +408,8 @@ shown in explorer toolbar"* (#335).
 Automate Test Case, Navigate to Test Method, Run Tests, the gutter, the automated
 marks - only when `testin.yml` names that test project (`codegen/CodeOn`,
 Rule-CODEGEN-082). One button, **Save to testin.yml**, writes the file: the open
-test project and where it is cloned from, three lines, after showing them
-(Rule-TREE-PANEL-112 to Rule-TREE-PANEL-114). Nothing else writes it. The test
+test project and where it is cloned from, three lines, after showing them (Rule-TREE-PANEL-112 to Rule-TREE-PANEL-114).
+Nothing else writes it. The test
 project a tester chooses is still kept on this machine and wins until the file
 names another (Rule-TREE-PANEL-106).
 

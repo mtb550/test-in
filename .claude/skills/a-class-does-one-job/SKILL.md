@@ -73,8 +73,8 @@ Watch for these while writing, not afterward:
   transports values.** Or formats, to a class that stores. Or decides, to a
   class that executes.
 - **The new method's name repeats a domain noun the class's name does not
-  contain.** `Notifier.softRefuseNothingToRun` — a notifier that knows what a
-  *run* is has learned something about running.
+  contain.** `Notifier.softRefuseNothingToRun` — a notifier that knows what a *run* is has learned something about
+  running.
 - **A Javadoc on the new method explains a rule from another part.**
   `Rule-TREE-PANEL-004` on a method in `notifications` is the rule telling you
   where it belongs.

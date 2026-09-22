@@ -27,8 +27,7 @@ them opens.
 - **Rule-INTERNAL-051** — A test run that could not be read counts as nothing,
   rather than failing. The tree already draws the node, so its Details still
   says what the node is.
-- **Rule-INTERNAL-052** — A test run nobody has judged shows *Not run*, never
-  *0%*.
+- **Rule-INTERNAL-052** — A test run nobody has judged shows *Not run*, never *0%*.
 - **Rule-INTERNAL-065** — When a new test run would not take every test case
   beneath a node, the count says how many it would. Both numbers are right, and
   they answer different questions, so the one on screen names the other rather
@@ -113,8 +112,8 @@ drawn on [UC-TREE-PANEL-012](../treePanel/removeNode.md).
    sorted first. Sorting 2,770 test cases to make a number nobody reads is work
    for nothing.
 5. A test run is not walked. Its recorded verdicts are added up instead.
-6. The screen draws the rows. The removal confirmation draws one line, reading
-   *Holds*, then the test sets, the test cases and the test runs.
+6. The screen draws the rows. The removal confirmation draws one line, reading *Holds*, then the test sets, the test
+   cases and the test runs.
 7. Nothing is saved. The next screen that asks counts again.
 
 ## What Testin refuses

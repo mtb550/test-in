@@ -5,8 +5,8 @@
 > **Only one of the eight buttons has a key.** Search is **`Ctrl+Alt+F`**,
 > and **`Cmd+Alt+F`** on a Mac.
 
-**As a** tester, **I want** the panel's own buttons within reach of the tree,
-**so that** the things I do to the whole panel are not hidden in a menu
+**As a** tester, **I want** the panel's own buttons within reach of the tree, **so that** the things I do to the whole
+panel are not hidden in a menu
 somewhere else.
 
 These eight buttons act on the whole panel, not on one node.
@@ -29,18 +29,18 @@ These eight buttons act on the whole panel, not on one node.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  made together confirm with one message and a count: the tester sees
-  *Removed 4*, never four messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees *Removed 4*, never four messages. Looking at
+  something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -65,8 +65,8 @@ These eight buttons act on the whole panel, not on one node.
 - **Rule-TREE-PANEL-101** — Every button in the panel's title bar works in every
   state the panel can be in, the welcome screen included. The IDE aims a
   title-bar button at whatever component the panel says it is showing, and will
-  not run the button at all when that component is hidden. **Expand All** and
-  **Collapse All** have no tree to act on under the welcome screen, so there
+  not run the button at all when that component is hidden. **Expand All** and **Collapse All** have no tree to act on
+  under the welcome screen, so there
   they are gray, and say why.
 - **Rule-TREE-PANEL-115** — **Select Test Project** and **New Test Project** are
   gray until a Testin folder is set, and **Save to testin.yml** while no test
@@ -91,16 +91,16 @@ It is the row along the top of the panel, to the right of the word **Testin**.
 Eight buttons, always in this order. The last column is the page that says what
 happens when the tester presses one.
 
-|     | Button                  | Hovering says                                                                                                              | Where it is written                            |
-|-----|-------------------------|----------------------------------------------------------------------------------------------------------------------------|------------------------------------------------|
-| 1   | **Search Test Project** | *Find a test case, test set, package or run and go to it*                                                                  | [UC-INTERNAL-001](../internal/globalSearch.md) |
-| 2   | **Settings**            | *Configure Testin settings*                                                                                                | Below                                          |
-| 3   | **Expand All**          | *Expand all nodes*                                                                                                         | Below                                          |
-| 4   | **Collapse All**        | *Collapse all nodes*                                                                                                       | Below                                          |
-| 5   | **Refresh**             | *Re-index and reload tree*                                                                                                 | [UC-TREE-PANEL-025](refreshTree.md)            |
-| 6   | **Select Test Project** | *Choose the test project this repository exercises*                                                                        | [UC-TREE-PANEL-004](chooseTestProject.md)      |
-| 7   | **New Test Project**    | *Create or Clone test project*                                                                                             | [UC-TREE-PANEL-002](createTestProject.md)      |
-| 8   | **Save to testin.yml**  | *Name this test project in this code project's testin.yml, so its code is generated here and a colleague's clone finds it* | [UC-TREE-PANEL-029](saveTestinYml.md)          |
+|   | Button                  | Hovering says                                                                                                              | Where it is written                            |
+|---|-------------------------|----------------------------------------------------------------------------------------------------------------------------|------------------------------------------------|
+| 1 | **Search Test Project** | *Find a test case, test set, package or run and go to it*                                                                  | [UC-INTERNAL-001](../internal/globalSearch.md) |
+| 2 | **Settings**            | *Configure Testin settings*                                                                                                | Below                                          |
+| 3 | **Expand All**          | *Expand all nodes*                                                                                                         | Below                                          |
+| 4 | **Collapse All**        | *Collapse all nodes*                                                                                                       | Below                                          |
+| 5 | **Refresh**             | *Re-index and reload tree*                                                                                                 | [UC-TREE-PANEL-025](refreshTree.md)            |
+| 6 | **Select Test Project** | *Choose the test project this repository exercises*                                                                        | [UC-TREE-PANEL-004](chooseTestProject.md)      |
+| 7 | **New Test Project**    | *Create or Clone test project*                                                                                             | [UC-TREE-PANEL-002](createTestProject.md)      |
+| 8 | **Save to testin.yml**  | *Name this test project in this code project's testin.yml, so its code is generated here and a colleague's clone finds it* | [UC-TREE-PANEL-029](saveTestinYml.md)          |
 
 **Only the search button has a key.** It is `Ctrl+Alt+F`, and `Cmd+Alt+F` on a
 Mac. It works anywhere in the IDE. The button is how a tester finds out the

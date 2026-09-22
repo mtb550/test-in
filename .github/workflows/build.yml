@@ -64,11 +64,11 @@ jobs:
       - name: Check out the commit
         uses: actions/checkout@v7
 
-      - name: Java 21
+      - name: Java 25
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 25
 
       # Caches ~/.gradle, which is where the platform artifacts and every
       # dependency land. Without it each run downloads the whole IDE again.

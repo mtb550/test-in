@@ -48,8 +48,7 @@ Where a value lives is decided by who it belongs to, not by what it is about.
   and everything works without it - except the automation code, which stays off
   until the file names the open test project (Rule-CODEGEN-082, `codegen/CodeOn`).
   One class reads and writes it, `config/TestinYml`; its values are
-  package-private and `ArchitectureTest` keeps the YAML parser there
-  (Rule-INTERNAL-089, Decision-013).
+  package-private and `ArchitectureTest` keeps the YAML parser there (Rule-INTERNAL-089, Decision-013).
 - **The test project a tester chose is kept on this machine.** One value in the
   project's `PropertiesComponent` (the workspace, never committed), owned by
   `BoundTestProject`. It wins over the name `testin.yml` gives until the file
@@ -89,8 +88,8 @@ silently has no effect costs more than the setting it was meant to hold.
 - **A `*Service`, `*Handler`, `*Provider` or `*Manager` suffix has to earn its
   place.** The suffix names no job, so the default answer is to name the job
   instead - #291 renamed seven that way. Four reasons keep one, and there are no
-  others: the class implements a platform or Swing interface of that name
-  (`UnifiedEditorProvider` for `FileEditorProvider`, `TreeTransferHandler` for
+  others: the class implements a platform or Swing interface of that name (`UnifiedEditorProvider` for
+  `FileEditorProvider`, `TreeTransferHandler` for
   `TransferHandler`); it is a `@FunctionalInterface` where the suffix *is* the
   job (`RemoveHandler`, `ImportHandler`); the plain noun would collide with a
   platform type (`GitRepositoryService` against `git4idea`'s `GitRepository`); or

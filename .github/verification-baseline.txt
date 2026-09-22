@@ -3,20 +3,20 @@
 #
 # verify.yml fails when a count goes up and tells you when one goes down.
 #
-# Keyed by IDE and branch, because the sweep now runs both ends of the range
-# the plugin claims - 261, which it is built against, and 262, which is what the
-# Marketplace checks.
+# Keyed by IDE and branch, because the sweep runs both ends of the range the
+# plugin claims: 2026.2, the first release of the branch sinceBuild names, and
+# 2026.2.1, the build this compiles against. Both are 262, so both report under
+# the same key.
+#
+# 261 left on 22 September 2026, when the plugin moved to IntelliJ 2026.2 and
+# Java 25. A 2026.1 IDE runs on Java 21 and cannot load it.
 #
 # All zero since #144 moved the Java and TestNG code into content modules of
 # their own. Before that the three IDEs without those plugins reported 53 apiece
 # - every PSI and TestNG reference in the core jar, which the verifier could not
 # tell was guarded. A number rising above 0 now means a class that needs an
 # optional plugin has been written into the core jar again.
-IU-261 0
 IU-262 0
-PY-261 0
 PY-262 0
-GO-261 0
 GO-262 0
-WS-261 0
 WS-262 0

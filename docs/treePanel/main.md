@@ -62,9 +62,8 @@ Each one is a page of its own: the story, its rules, its screens and its steps.
 ## Where the panel sits in the IDE
 
 Testin puts two tool windows in IntelliJ IDEA. The tree panel is docked on
-the left, beside the places the IDE keeps its own trees, and its stripe reads
-**Testin Tree**. The view panel is docked on the right, and its stripe reads
-**Testin View**. Both keep the plugin's name, so neither reads as a different
+the left, beside the places the IDE keeps its own trees, and its stripe reads **Testin Tree**. The view panel is docked
+on the right, and its stripe reads **Testin View**. Both keep the plugin's name, so neither reads as a different
 plugin, and each says which of the two it is.
 
 ```
@@ -119,8 +118,7 @@ tree. It is always one click away.
   settings page and Testin's own messages call it that too.
 - **Bound** means this code project is set to use one test project. The
   choice is kept on this machine; a `testin.yml` in the code project can name
-  one for everyone, and **Save to testin.yml** writes it there
-  (Rule-TREE-PANEL-106, Rule-TREE-PANEL-112).
+  one for everyone, and **Save to testin.yml** writes it there (Rule-TREE-PANEL-106, Rule-TREE-PANEL-112).
 - **Signed off** means a test run is **Completed** or **Closed**. Its test
   cases, verdicts and settings can no longer change, though the tree can still
   rename, move and remove it.
@@ -162,7 +160,6 @@ it. In every drawing:
 - `(1)` `(2)` `(3)` point at the numbered notes under the drawing
 
 ---
-
 
 ## Every key the tree answers to
 
@@ -322,12 +319,12 @@ are [UC-TREE-PANEL-028](panelToolbar.md).
 9. **The branch box** — shown only for a test project shared through Git. Its
    placeholder reads *Loading branches...* until Git answers.
 10. **The test project row** — drawn bold, with the IDE's project icon. The two
-   folders under it are bold too, and there are always exactly two.
+    folders under it are bold too, and there are always exactly two.
 11. **A package** — a folder icon. **A test set** — the icon the IDE uses for a
-   changelist. Neither is bold.
+    changelist. Neither is bold.
 12. **A test run** — draws its **status** as its icon. The status word follows
-   the name in gray. So the tester reads the status of every test run without
-   opening one. A test run never draws a kind icon.
+    the name in gray. So the tester reads the status of every test run without
+    opening one. A test run never draws a kind icon.
 13. **Gray text** — means retired, or cut and not yet pasted. Both look the
     same on purpose. Both mean the same thing to a tester: not part of the work
     in front of them.
@@ -350,11 +347,9 @@ sibling. (Rule-TREE-PANEL-008)
 
 **The order of siblings.** Live nodes come first, and retired ones last. Inside
 each of those two groups, nodes with a number come first, smallest first. Then
-come the nodes without a number, by the date they were created. Then by name.
-(Rule-TREE-PANEL-010)
+come the nodes without a number, by the date they were created. Then by name. (Rule-TREE-PANEL-010)
 
-**A test project that is not Active** shows no children at all.
-(Rule-TREE-PANEL-063)
+**A test project that is not Active** shows no children at all. (Rule-TREE-PANEL-063)
 
 **Right-click.** Right-clicking a row that is not selected makes it the only
 selection, and opens the menu at the pointer. Right-clicking inside a
@@ -416,13 +411,13 @@ at all depends on which plugins are installed.
 1. **Open** and **Create** — first, because they are the two things done most.
    A dividing line follows them.
 2. **Actions** — a submenu. It holds everything that changes a node in place:
-   - its status
-   - undo and redo
-   - re-create
-   - remove
-   - rename
-   - order
-   - the clipboard
+    - its status
+    - undo and redo
+    - re-create
+    - remove
+    - rename
+    - order
+    - the clipboard
 
    The submenu is one unbroken list. Status entries appear only for the kind
    selected, and the other kinds' entries are not there at all. The three rows
@@ -553,16 +548,14 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Question 3** | What should the paste refusal say?                                                                                         | *Select a folder* is shown for six different reasons. Four of them are: the wrong side of the tree, the node itself, another test project, and a test run. Choosing a different folder only fixes one of the six. |
 | **Question 4** | On a Mac, should cut, paste, undo and redo in the tree use the Mac's own key for those actions, the way copy already does? | Today copy does. The other four do not. The keys are named in the key table above.                                                                                                                                |
 
-
-**Settled.** Question 1 asked whether a test run may go backwards, so that
-**Created** follows **Assigned** or **In Progress**. It may not:
+**Settled.** Question 1 asked whether a test run may go backwards, so that **Created** follows **Assigned** or **In
+Progress**. It may not:
 the popup offers only the statuses ahead of where the run is now, so there is no
 way to ask (Rule-TREE-PANEL-092, [#186](https://github.com/mtb550/test-in/issues/186)).
 
 Question 2 asked whether a signed-off test run should be locked in the tree as
 well as in its editor. It is. A **Completed** or **Closed** run cannot be
-renamed, moved, reordered or removed from the tree
-([#184](https://github.com/mtb550/test-in/issues/184)).
+renamed, moved, reordered or removed from the tree ([#184](https://github.com/mtb550/test-in/issues/184)).
 The same question for the whole product is [question 1 in the product's own
 document](../product.md#9-undecided).
 

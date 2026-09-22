@@ -102,7 +102,6 @@ For a test set, one class holding those methods. For a package, a folder.
 
 ---
 
-
 ## Every key
 
 | Key        | What it does                                    | The page that owns it                 |
@@ -150,8 +149,8 @@ repository drives.
 **Until `testin.yml` names the open test project**, the code is off. Nothing is
 generated, renamed, moved or removed, and no gutter mark is drawn. The tester is
 told once for the code project, with the button that turns it on beside the
-message. **Save to testin.yml**, in the Testin panel's title bar, is that button
-(Rule-CODEGEN-082). Testin reads the file again on **Refresh** as well, so a
+message. **Save to testin.yml**, in the Testin panel's title bar, is that button (Rule-CODEGEN-082). Testin reads the
+file again on **Refresh** as well, so a
 file a colleague changed takes effect without restarting the IDE.
 
 **Without the Java plugin**, nothing is generated at all. A message says so once

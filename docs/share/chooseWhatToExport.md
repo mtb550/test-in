@@ -104,8 +104,7 @@ groups are written back into the cell, joined by commas.
 
 ## What Testin refuses
 
-**If nothing is ticked on any tab** — a message titled **Export Empty** reads
-*Select at least one test case to export.*
+**If nothing is ticked on any tab** — a message titled **Export Empty** reads *Select at least one test case to export.*
 
 **A value Testin cannot read is refused, not replaced.**
 

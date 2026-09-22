@@ -35,7 +35,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 >   this draft, 29 commits later. It is a whole execution capability. It is a
 >   standalone always-on-top window, showing one test case at a time, with `P`,
 >   `F` and `B` on it.
-> Section 6.2 is incomplete without it. See
+>   Section 6.2 is incomplete without it. See
 >   [the light mode document](editorPanel/lightMode.md).
 > - **#74 is closed.** Section 8 names the grid view's missing keyboard path as a
 >   live gap tracked by it. That needs re-checking.
@@ -127,8 +127,8 @@ on. Every other capability is a reason to be in Testin: the tree, the grid, the
 reports, the Git integration. The keyboard is the reason the work is faster
 once the tester is there.
 
-That idea is written down here as a capability, with rules behind it -
-**Rule-PRODUCT-015** to **Rule-PRODUCT-018**, and **Rule-PRODUCT-024**. It is
+That idea is written down here as a capability, with rules behind it - **Rule-PRODUCT-015** to **Rule-PRODUCT-018**, and
+**Rule-PRODUCT-024**. It is
 not left to fall out of whichever keys happen to be bound.
 
 **62 keys are bound**, counted against the product at `0becc8b2`. Of those, 40
@@ -568,4 +568,5 @@ answered.
 
 ---
 
-[Documentation](README.md) › **The product** — the parts have documents of their own, starting with [the tree panel](treePanel/main.md)
+[Documentation](README.md) › **The product** — the parts have documents of their own, starting
+with [the tree panel](treePanel/main.md)

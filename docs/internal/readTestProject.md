@@ -167,7 +167,7 @@ the bottom of the IDE, beside the other background jobs.
 9. The bar reads the test project's name, then *test runs...*.
 10. Testin walks `Test Runs`. Each test run reads its own facts from its `.tr`
     - its status, how it was configured, what the tester wrote about the
-    verdicts, when it was executed - and one file per result, `<test case
+      verdicts, when it was executed - and one file per result, `<test case
     id>.ri`, in the order their test cases sit in their test sets.
 11. The bar reads *Done -*, then the test project's name, and closes.
 12. The tree draws itself from memory. Every editor that was open when the IDE
@@ -182,8 +182,8 @@ shows its empty state instead.
 project, and it is skipped without a word. This is the ordinary case. The
 Testin folder usually holds other things.
 
-**If the `.tp` file cannot be read** — the tester gets a notification titled
-**Read Test Project Failed**, reading *Skipping invalid format:* and the file
+**If the `.tp` file cannot be read** — the tester gets a notification titled **Read Test Project Failed**, reading
+*Skipping invalid format:* and the file
 name. That whole test project is left out.
 
 **If a `.ts`, `.tsp`, `.tr` or `.trp` file cannot be read** — the same
@@ -216,11 +216,10 @@ test set. The others are read. The set is drawn one row shorter, and nothing
 says which row is missing.
 
 **If one result file cannot be read** — the run is drawn without that result,
-and once the read has finished one message names all of them. It is titled
-**Results not read in \<project\>** and it says the file names, up to five of
+and once the read has finished one message names all of them. It is titled **Results not read in \<project\>** and it
+says the file names, up to five of
 them, then how many more there are. Nothing writes over a result Testin cannot
-read and nothing removes it, so the repair is to fix the file and press
-**Refresh**.
+read and nothing removes it, so the repair is to fix the file and press **Refresh**.
 
 **If two test case files claim the same identity** — the second one read goes
 over the first, and a notification titled **Test cases sharing an identity in

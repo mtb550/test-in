@@ -16,11 +16,11 @@ This is the fastest way to reach one test set, one test run or one test case.
 - **Rule-INTERNAL-001** — Nodes are found by name, from the first character
   typed. Test cases are found from the second character on, and every field of a
   test case is searched:
-  1. its description, its id, its steps and its expected result
-  2. its priority, its status, its groups and its module
-  3. its preconditions, its reference and its test data
-  4. where it sits in the tree, and its generated code
-  5. who created or last changed it, and when
+    1. its description, its id, its steps and its expected result
+    2. its priority, its status, its groups and its module
+    3. its preconditions, its reference and its test data
+    4. where it sits in the tree, and its generated code
+    5. who created or last changed it, and when
 
   Case does not matter, and spaces at either end are dropped.
 - **Rule-INTERNAL-002** — Choosing a result always takes the tree to it. Only a

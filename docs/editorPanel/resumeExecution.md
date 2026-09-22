@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-036: Resume a run I stopped
 
-**As a** tester, **I want** to pick a test run up where I left it,
-**so that** a morning's work is not repeated after lunch.
+**As a** tester, **I want** to pick a test run up where I left it, **so that** a morning's work is not repeated after
+lunch.
 
 There is no separate resume button. Starting again is resuming, because the walk
 always begins at the first test case with no verdict.

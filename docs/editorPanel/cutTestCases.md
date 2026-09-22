@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-016: Cut test cases
 
-**As a** tester, **I want** to move test cases into another test set,
-**so that** a test case written in the wrong place ends up in the right one.
+**As a** tester, **I want** to move test cases into another test set, **so that** a test case written in the wrong place
+ends up in the right one.
 
 A cut on its own changes nothing. The test cases move when the tester pastes.
 

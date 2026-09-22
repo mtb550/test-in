@@ -228,8 +228,8 @@ index.
 
 `bug` joined the list with #28. It writes a bug report's body and screenshots
 into a fresh temporary folder, runs `gh` from there, and deletes the folder
-afterward. The test case's own file is asked of the indexer
-(`ProjectIndexer.testCaseFile`), never built. Its other edges point down: `git`
+afterward. The test case's own file is asked of the indexer (`ProjectIndexer.testCaseFile`), never built. Its other
+edges point down: `git`
 for the test project's remote and branch, `report` for `ReportText.joined`, and
 `config` for `bugRepoUrl`.
 
@@ -280,18 +280,18 @@ A tester edits a cell in the grid and presses Enter. Ten steps later the JSON on
 disk is either changed or byte-identical, and which one it is decides whether
 anything else happens at all.
 
-| #   | Where                                                  | What happens                                                                                                                                 |
-|-----|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| 1   | `editor/listeners/GridEditListener`                    | Reads what was typed, parses it for the column's type, and compares it to what the test case already held. **Unchanged, and it stops here.** |
-| 2   | `editor/listeners/GridEditListener.persistAndGenerate` | Moves off the EDT with `executeOnPooledThread`, because the codegen in step 10 schedules its own write commands.                             |
-| 3   | `indexer/ProjectIndexer.putTestCase`                   | The public door. Returns a boolean: did this have anything to save.                                                                          |
-| 4   | `indexer/IndexerDataStore.putTestCase`                 | Delegates the write, then stamps the **set's** marker as modified — but only if the write happened.                                          |
-| 5   | `indexer/TestCaseSequenceStore.put`                    | The funnel every save arrives at: the update dialog, a grid cell, the details panel, a paste.                                                |
-| 6   | `indexer/TestDataFiles.alreadyHolds`                   | Serializes the test case and compares the bytes to the file. **Identical, and nothing below runs.**                                          |
-| 7   | `indexer/TestCaseSequenceStore.put`                    | Stamps the audit — `touch` if the index already knows this id, `stampCreated` if it does not.                                                |
-| 8   | `indexer/TestCaseSequenceStore.store`                  | Updates the two maps, then writes.                                                                                                           |
-| 9   | `indexer/TestDataFiles.write`                          | Refuses a zero-byte write, claims the path in `OwnWrites` **before** `Files.write`, writes, then records what landed.                        |
-| 10  | back in `GridEditListener`                             | The attribute's `GenType` regenerates the test method, and `TestCaseSnapshot.record` files the undo entry.                                   |
+| #  | Where                                                  | What happens                                                                                                                                 |
+|----|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
+| 1  | `editor/listeners/GridEditListener`                    | Reads what was typed, parses it for the column's type, and compares it to what the test case already held. **Unchanged, and it stops here.** |
+| 2  | `editor/listeners/GridEditListener.persistAndGenerate` | Moves off the EDT with `executeOnPooledThread`, because the codegen in step 10 schedules its own write commands.                             |
+| 3  | `indexer/ProjectIndexer.putTestCase`                   | The public door. Returns a boolean: did this have anything to save.                                                                          |
+| 4  | `indexer/IndexerDataStore.putTestCase`                 | Delegates the write, then stamps the **set's** marker as modified — but only if the write happened.                                          |
+| 5  | `indexer/TestCaseSequenceStore.put`                    | The funnel every save arrives at: the update dialog, a grid cell, the details panel, a paste.                                                |
+| 6  | `indexer/TestDataFiles.alreadyHolds`                   | Serializes the test case and compares the bytes to the file. **Identical, and nothing below runs.**                                          |
+| 7  | `indexer/TestCaseSequenceStore.put`                    | Stamps the audit — `touch` if the index already knows this id, `stampCreated` if it does not.                                                |
+| 8  | `indexer/TestCaseSequenceStore.store`                  | Updates the two maps, then writes.                                                                                                           |
+| 9  | `indexer/TestDataFiles.write`                          | Refuses a zero-byte write, claims the path in `OwnWrites` **before** `Files.write`, writes, then records what landed.                        |
+| 10 | back in `GridEditListener`                             | The attribute's `GenType` regenerates the test method, and `TestCaseSnapshot.record` files the undo entry.                                   |
 
 **Why the bytes are identical.** Step 6 puts the rule's question in the rule's
 own terms: would this write leave the file the same. It has to be asked as
@@ -326,19 +326,19 @@ it (#164, #165).
 The tester right-clicks a test set and picks Run Tests. The plugin does not know
 how to run anything; a content module does.
 
-| #   | Where                                                              | What happens                                                                                                                                                                                                                                            |
-|-----|--------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 1   | `runner/RunTestsAction`                                            | Asks the selected node which gesture this is. A node that *holds* test cases hands them straight to the runner; a **test run** is opened in its editor first, because a verdict reaches a named run only through the editor that claimed the test case. |
-| 2   | `runner/RunTestCases.run`                                          | Refuses if the TestNG plugin is absent, drops the test cases already running, and starts what is left **as one run** — one compile and one JVM, not twelve. Notifies once, with a count.                                                                |
-| 3   | `runner/TestRunner.available()`                                    | The extension point `org.testin.testRunners`. Empty in an IDE where nothing can run — an answer, not a missing one.                                                                                                                                     |
-| 4   | `testin-testng/TestNGRunner.run`                                   | Finds each test case's generated method as a `PsiClass`, reports the ones with no generated code, and builds a `TestNGConfiguration` whose pattern set names class and method.                                                                          |
-| 5   | `runner/TestNGExecution.launch`                                    | Hands the configuration to the platform and remembers which test cases this environment covers, so a stop knows what to put back.                                                                                                                       |
-| 6   | `runner/TestNGExecution.starting`                                  | Broadcasts each test case as running before the process exists, so the cards change at the click rather than at the first report.                                                                                                                       |
-| 7   | the platform                                                       | Compiles, starts a JVM, runs TestNG.                                                                                                                                                                                                                    |
-| 8   | `runner/TestCaseExecutionTracker`                                  | Subscribed to `SMTRunnerEventsListener.TEST_STATUS` for the life of the project. Turns each started and finished event into a `TestCaseExecutionListener.broadcast`.                                                                                    |
-| 9   | `runner/TestCaseExecutionSubscriber.record`                        | On the EDT. The test name **is** the test case's id, because that is what Testin named the generated method — so there is nothing to look up. A name that is not an id is nobody's, and is logged.                                                      |
-| 10  | `runner/TestCaseExecutionSubscriber.report`                        | Decides what the report means: a test case the tester stopped reports itself failed, and that is not a failure. Records the verdict against the **id**, then tells the surfaces.                                                                        |
-| 11  | `editor/test/TestEditor`, `editor/run/RunEditor`, `view/ViewPanel` | Repaint.                                                                                                                                                                                                                                                |
+| #  | Where                                                              | What happens                                                                                                                                                                                                                                            |
+|----|--------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1  | `runner/RunTestsAction`                                            | Asks the selected node which gesture this is. A node that *holds* test cases hands them straight to the runner; a **test run** is opened in its editor first, because a verdict reaches a named run only through the editor that claimed the test case. |
+| 2  | `runner/RunTestCases.run`                                          | Refuses if the TestNG plugin is absent, drops the test cases already running, and starts what is left **as one run** — one compile and one JVM, not twelve. Notifies once, with a count.                                                                |
+| 3  | `runner/TestRunner.available()`                                    | The extension point `org.testin.testRunners`. Empty in an IDE where nothing can run — an answer, not a missing one.                                                                                                                                     |
+| 4  | `testin-testng/TestNGRunner.run`                                   | Finds each test case's generated method as a `PsiClass`, reports the ones with no generated code, and builds a `TestNGConfiguration` whose pattern set names class and method.                                                                          |
+| 5  | `runner/TestNGExecution.launch`                                    | Hands the configuration to the platform and remembers which test cases this environment covers, so a stop knows what to put back.                                                                                                                       |
+| 6  | `runner/TestNGExecution.starting`                                  | Broadcasts each test case as running before the process exists, so the cards change at the click rather than at the first report.                                                                                                                       |
+| 7  | the platform                                                       | Compiles, starts a JVM, runs TestNG.                                                                                                                                                                                                                    |
+| 8  | `runner/TestCaseExecutionTracker`                                  | Subscribed to `SMTRunnerEventsListener.TEST_STATUS` for the life of the project. Turns each started and finished event into a `TestCaseExecutionListener.broadcast`.                                                                                    |
+| 9  | `runner/TestCaseExecutionSubscriber.record`                        | On the EDT. The test name **is** the test case's id, because that is what Testin named the generated method — so there is nothing to look up. A name that is not an id is nobody's, and is logged.                                                      |
+| 10 | `runner/TestCaseExecutionSubscriber.report`                        | Decides what the report means: a test case the tester stopped reports itself failed, and that is not a failure. Records the verdict against the **id**, then tells the surfaces.                                                                        |
+| 11 | `editor/test/TestEditor`, `editor/run/RunEditor`, `view/ViewPanel` | Repaint.                                                                                                                                                                                                                                                |
 
 **One recorder per project, not one per surface.** Step 10 runs even when nothing
 is open. Each surface used to subscribe and record for itself, so the model was

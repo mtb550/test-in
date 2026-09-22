@@ -31,8 +31,8 @@ This opens the Java method that runs the selected test case.
 - **Rule-CODEGEN-026** — The method is found by the identity in `testName`, so a
   test case that has been renamed still finds its method.
 - **Rule-CODEGEN-027** — Without the Java plugin the class button on the card
-  and on the view panel is drawn gray, and the menu entry stays, grayed, reading
-  *(needs the Java plugin)*. Nothing is left out.
+  and on the view panel is drawn gray, and the menu entry stays, grayed, reading *(needs the Java plugin)*. Nothing is
+  left out.
 
 ## The three ways in
 

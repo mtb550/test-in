@@ -246,10 +246,11 @@ Renamed to its test case's id, it is read again at the next Refresh.
 
 The screenshots a failure names sit in the same folder, one PNG each, named by
 five random lowercase letters and digits that no result of the run already holds
+
 - `k3f9a.png`. Testin writes a screenshot before the result that names it, and
-moves one that no result of the run names anymore to the recycle bin after the
-next write. Any PNG in a run folder named that way is taken for a screenshot, so
-one put there by hand under such a name goes too.
+  moves one that no result of the run names anymore to the recycle bin after the
+  next write. Any PNG in a run folder named that way is taken for a screenshot, so
+  one put there by hand under such a name goes too.
 
 | Field          | Type             | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 |----------------|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -319,8 +320,8 @@ reason, and those aliases are permanent.
 **The project says which format its files are in**, in its `.tp`: `format`, and
 2 is the format this page describes. A project without the number, or with a
 lower one, is converted once before it is read - test cases moved to `<id>.tc`,
-every marker given an `id`, and its test runs removed
-([UC-INTERNAL-008](internal/convertTestData.md), Rule-INTERNAL-091). A project
+every marker given an `id`, and its test runs removed ([UC-INTERNAL-008](internal/convertTestData.md),
+Rule-INTERNAL-091). A project
 with a **higher** number is not read at all: a format this build does not know is
 refused rather than guessed at, because reading it as format 2 would delete what
 this build cannot see.

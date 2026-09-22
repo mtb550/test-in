@@ -2,8 +2,7 @@
 
 # UC-EDITOR-PANEL-024: Select test cases
 
-**As a** tester, **I want** to pick several test cases at once,
-**so that** one gesture changes all of them.
+**As a** tester, **I want** to pick several test cases at once, **so that** one gesture changes all of them.
 
 Almost every other page here starts with a selection. This is how one is made.
 

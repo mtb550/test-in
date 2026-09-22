@@ -110,8 +110,7 @@ rather than claiming a set is un-automated while nobody has looked.
 **If the IDE has no Java plugin** — the icon is drawn as it always was and no
 test case is reported as un-automated. Testin cannot read Java there, and a
 tester who cannot generate automation has not failed to write it. The filter is
-not offered, and the status bar's corner is empty rather than reading
-**Automated 0 of 15**.
+not offered, and the status bar's corner is empty rather than reading **Automated 0 of 15**.
 
 **If a method is there but empty** — the test case is not automated. Testin
 writes every method as a name and a TODO comment, so a method on its own means

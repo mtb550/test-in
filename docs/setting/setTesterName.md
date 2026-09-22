@@ -2,8 +2,8 @@
 
 # UC-SETTING-004: Give my name
 
-**As a** tester, **I want** my name recorded on the work I do,
-**so that** a colleague reading a test case or a verdict can see who last
+**As a** tester, **I want** my name recorded on the work I do, **so that** a colleague reading a test case or a verdict
+can see who last
 touched it.
 
 Testin writes this name onto everything this machine saves.
@@ -50,8 +50,7 @@ The whole page is drawn on [the settings page](main.md#the-page).
 | Saves a test case                                            | Who created it, or who last changed it |
 | Records a verdict in a test run                              | Who ran it                             |
 
-The name appears on the Details popup of any node, and on the **Created** and
-**Updated** rows of the view panel.
+The name appears on the Details popup of any node, and on the **Created** and **Updated** rows of the view panel.
 
 ## Main flow
 

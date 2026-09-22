@@ -2,8 +2,8 @@
 
 # UC-SETTING-001: Open the settings page
 
-**As a** tester, **I want** to reach Testin's settings quickly,
-**so that** I can tell it where my test data is without searching the IDE's
+**As a** tester, **I want** to reach Testin's settings quickly, **so that** I can tell it where my test data is without
+searching the IDE's
 own settings tree.
 
 This page holds every Testin setting for this machine. It is one page, and it

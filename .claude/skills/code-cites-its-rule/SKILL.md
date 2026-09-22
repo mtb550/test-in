@@ -57,8 +57,8 @@ reworded - `RuleNumbersTest` fails when one number is written two ways.
 number, moves the Numbering row on, and puts a part-wide rule after the shared
 block on each page. Typing 46 copies by hand is how they come to disagree.
 
-**A new rule takes the next number, and nothing else moves.** Read the
-**Numbering** row of that part's `main.md`, take the number after the end of its
+**A new rule takes the next number, and nothing else moves.** Read the **Numbering** row of that part's `main.md`, take
+the number after the end of its
 rule range, write the rule where it belongs on its page, and move the row on. No
 existing rule is ever renumbered to make room: a number that changes is one that
 was already quoted in an issue, a commit and a code marker.

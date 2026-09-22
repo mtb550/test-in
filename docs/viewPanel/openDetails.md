@@ -2,8 +2,8 @@
 
 # UC-VIEW-PANEL-001: Open a test case's details
 
-**As a** tester, **I want** the whole of one test case in front of me,
-**so that** I can read its steps and its expected result without leaving the
+**As a** tester, **I want** the whole of one test case in front of me, **so that** I can read its steps and its expected
+result without leaving the
 screen I am working in.
 
 A card shows only a title. This opens the whole test case beside it.
@@ -65,8 +65,8 @@ The panel opens on the right of the IDE, beside the editor.
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The stripe** — reads **Testin View**. The tree panel's stripe reads
-   **Testin Tree**, so the two are told apart by name.
+1. **The stripe** — reads **Testin View**. The tree panel's stripe reads **Testin Tree**, so the two are told apart by
+   name.
 2. **The two arrows** — move to the previous and the next test case. They are
    gray when the panel was handed only one.
 3. **The tabs** — the panel always opens on **Details**, whichever tab was in

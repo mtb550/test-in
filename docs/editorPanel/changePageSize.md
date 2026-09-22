@@ -2,8 +2,8 @@
 
 # UC-EDITOR-PANEL-023: Change how many a page holds
 
-**As a** tester, **I want** more test cases on a page,
-**so that** I can see a whole test set of 80 without turning pages.
+**As a** tester, **I want** more test cases on a page, **so that** I can see a whole test set of 80 without turning
+pages.
 
 This is the small box at the right of the status bar. It holds 50 until a size
 is typed, and then the size last typed in any editor.

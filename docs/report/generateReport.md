@@ -2,14 +2,14 @@
 
 # UC-REPORT-001: Generate a report on a test run
 
-**As a** tester, **I want** one test run written out as a document,
-**so that** I can attach it to a ticket or send it to someone with no IDE.
+**As a** tester, **I want** one test run written out as a document, **so that** I can attach it to a ticket or send it
+to someone with no IDE.
 
 This turns one test run into a file: a PDF, a Word file, a web page or a
 spreadsheet.
 
-A test run can be reported on in four of its five statuses: **Created**,
-**Assigned**, **Completed** and **Closed**. **In Progress** is the one that
+A test run can be reported on in four of its five statuses: **Created**, **Assigned**, **Completed** and **Closed**.
+**In Progress** is the one that
 cannot.
 
 `Ctrl+P` on the selected test run.
@@ -120,8 +120,7 @@ keep them (Rule-REPORT-018).
 **If the test run is still In Progress** — every way of asking is gray: the
 toolbar button, the tree entry and `Ctrl+P`. The button's tooltip reads *A
 report is written once the run has stopped — it is In Progress*. A report is
-about what a run recorded, and a run still going is still recording
-(Rule-REPORT-016).
+about what a run recorded, and a run still going is still recording (Rule-REPORT-016).
 
 **If the selection is not a test run** — **Generate Report** is gray in the tree
 menu, and its tooltip reads *Select a test run to report on.* A report is about

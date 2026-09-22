@@ -31,18 +31,18 @@ prevent.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  made together confirm with one message and a count: the tester sees
-  *Removed 4*, never four messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees *Removed 4*, never four messages. Looking at
+  something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -89,8 +89,8 @@ prevent.
   file is corrected in an editor and there is no button that does it, so a
   screen holding only that sentence is a screen with no way off it.
 
-Rule-TREE-PANEL-100 also holds here. It says a test project that is not
-**Active** is drawn in the tree and holds nothing. It is written on
+Rule-TREE-PANEL-100 also holds here. It says a test project that is not **Active** is drawn in the tree and holds
+nothing. It is written on
 [UC-TREE-PANEL-018](retireNode.md).
 
 ## No Testin folder
@@ -133,8 +133,8 @@ Rule-TREE-PANEL-100 also holds here. It says a test project that is not
 
 1. **The reason** — in red. It is shown when this code project named a test
    project Testin could not use. The reason is one of:
-   - *not in the Testin folder*
-   - *could not be read*
+    - *not in the Testin folder*
+    - *could not be read*
 2. **One link per test project** — the name, then the status. The tester
    clicks a link. This code project is then set to use that test project, and
    the tree appears. With more than six test projects, Testin shows one link
@@ -144,11 +144,9 @@ Three more screens follow. The sixth is the tree itself.
 
 - *Reading test projects...*, a gray line and nothing else. It is what a cold
   start shows while the first index is being built, and it goes when the index
-  is done. Nothing is offered on it because the only thing to do is wait
-  (Rule-TREE-PANEL-118).
-- *\<name\> is not on this machine yet*, a gray line, then the link
-  **Clone \<name\>**, and under it **Choose another test project** - or
-  **Create your first test project** when the Testin folder holds none. The
+  is done. Nothing is offered on it because the only thing to do is wait (Rule-TREE-PANEL-118).
+- *\<name\> is not on this machine yet*, a gray line, then the link **Clone \<name\>**, and under it **Choose another
+  test project** - or **Create your first test project** when the Testin folder holds none. The
   clone is what the screen is for, and it is not always an offer: without the
   Git plugin it is gray, and the name came from a file a colleague committed.
 - **Create your first test project**, a link with no gray line above it.
@@ -174,8 +172,7 @@ hold one link each.
 ## What Testin refuses
 
 **If the Git plugin is not installed** — the clone line still shows, gray,
-reading *Clone \<name\> (needs the Git plugin)*, and clicking it does nothing
-(Rule-TREE-PANEL-104).
+reading *Clone \<name\> (needs the Git plugin)*, and clicking it does nothing (Rule-TREE-PANEL-104).
 
 **If the tester chose a project the file does not name, and it is missing** -
 no clone is offered: the file's address is for the project it names, not for
@@ -195,8 +192,7 @@ an editor, so that screen had no way off it.
 
 **Testin writes `testin.yml` only when the tester presses Save to testin.yml**
 (Rule-TREE-PANEL-112). It reads it when the code project has one, and goes on
-without it when it does not - only the automation code stays off
-(Rule-INTERNAL-089, Rule-CODEGEN-082).
+without it when it does not - only the automation code stays off (Rule-INTERNAL-089, Rule-CODEGEN-082).
 
 ---
 

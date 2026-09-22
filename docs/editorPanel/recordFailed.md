@@ -136,9 +136,8 @@ whatever verdict it had.
 case was removed - the run keeps what it recorded.*
 
 **If the test run is no longer there, or no longer covers the test case** — a
-message is shown. It reads
-*This test run is no longer here, so nothing was recorded*, or
-*This test run does not cover this test case, so nothing was recorded*. The
+message is shown. It reads *This test run is no longer here, so nothing was recorded*, or *This test run does not cover
+this test case, so nothing was recorded*. The
 test case is not recorded Failed. In light mode the failure form stays open
 with everything typed still in it (Rule-EDITOR-PANEL-225).
 

@@ -6,8 +6,8 @@
 application I am testing, **so that** I can record a verdict without hunting for
 the IDE.
 
-Light mode is a separate window that stays above every other window. It shows
-**one test case at a time**. The tester can work in the application under test
+Light mode is a separate window that stays above every other window. It shows **one test case at a time**. The tester
+can work in the application under test
 with IntelliJ minimized, and still record a verdict without switching windows.
 
 |                     |                                                                                                                                                                                                                  |
@@ -206,8 +206,8 @@ word on every test case, and a word that never changes is noise. It helps when
 a test run covers several test sets. It does not when the test run covers one.
 
 **The test case's own buttons sit at the right end of the same line**
-(Rule-EDITOR-PANEL-243): **Navigate to Test Method**, **Run Test Method** and
-**Navigate to Test Case** - the three the test run editor's card offers, in the
+(Rule-EDITOR-PANEL-243): **Navigate to Test Method**, **Run Test Method** and **Navigate to Test Case** - the three the
+test run editor's card offers, in the
 card's order, with the card's icons. Each grows under the pointer and does what
 the card's does, and Run is **Stop Test Method** while the test case's
 automation runs. A button that cannot work - no generated method, the Java or
@@ -221,8 +221,8 @@ view menu (Rule-EDITOR-PANEL-244). The line shows while the name or any button
 is on it. The buttons go while the failure form is open, as the verdict buttons
 do.
 
-Run claims the test case for this test run first, as the card's Run does
-(Rule-EDITOR-PANEL-180), so its verdict comes back here. When it does, the walk
+Run claims the test case for this test run first, as the card's Run does (Rule-EDITOR-PANEL-180), so its verdict comes
+back here. When it does, the walk
 moves on exactly as after the tester's own verdict (Rule-EDITOR-PANEL-242).
 
 ### 7. The two clocks
@@ -557,8 +557,8 @@ base size.
   icons, **S**, **T** and **B**, as the test case form names them, each in the
   middle of its row's height. The badges come first with no icon, since a badge
   says what it is. The captions on the failure form are set in the caption
-  font, JetBrains Mono in capitals, as every caption in Testin is
-  (Rule-INTERNAL-087). The icons keep their size when the window zooms
+  font, JetBrains Mono in capitals, as every caption in Testin is (Rule-INTERNAL-087). The icons keep their size when
+  the window zooms
 
 No text ever goes below 8 points, which is where the rest of the plugin stops
 too. One number moves, and everything moves together. So the layout cannot come
@@ -718,8 +718,8 @@ needs no confirmation.
 
 ### There is no finished state, because the window is gone
 
-A test run that has judged every test case finishes itself. Testin marks it
-**Completed** as soon as nothing is left waiting. Completed is the end, and
+A test run that has judged every test case finishes itself. Testin marks it **Completed** as soon as nothing is left
+waiting. Completed is the end, and
 three things already ask whether a test run has reached it:
 
 - Start refuses

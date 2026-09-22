@@ -36,8 +36,7 @@ There is no key for this. The menu entry is **Import**.
 - **Rule-SHARE-027** — Every sheet in the file goes into this one test set.
 - **Rule-SHARE-028** — The file is read as soon as the box holds a path Testin
   recognizes.
-- **Rule-SHARE-029** — Thirteen columns are read. **Order**, **ID**, **FQCN**,
-  **Path** and **Status** are not.
+- **Rule-SHARE-029** — Thirteen columns are read. **Order**, **ID**, **FQCN**, **Path** and **Status** are not.
 - **Rule-SHARE-030** — Importing the same file twice makes two copies of
   everything.
 - **Rule-SHARE-110** — A column heading is matched in the language on screen and
@@ -96,11 +95,10 @@ There is no key for this. The menu entry is **Import**.
 
 ## What Testin refuses
 
-**If more than one node is selected, or the node cannot hold test cases** —
-**Import** is gray.
+**If more than one node is selected, or the node cannot hold test cases** — **Import** is gray.
 
-**If nothing can be read out of the file** — a message titled **No Data** reads
-*No test cases found in the selected file.*
+**If nothing can be read out of the file** — a message titled **No Data** reads *No test cases found in the selected
+file.*
 
 **If the file cannot be read at all** — a message titled for the format, such
 as **CSV Parse Error**, carries the reason. The preview stays empty.

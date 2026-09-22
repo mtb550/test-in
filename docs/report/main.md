@@ -38,14 +38,13 @@ a ticket, mailed to a manager, or kept as the record that a release was tested.
 
 **Two words, before the rules use them.**
 
-- A **verdict** is what one test run recorded against one test case: **Passed**,
-  **Failed**, **Blocked**, **Pending**, **Untested** or **Removed**.
+- A **verdict** is what one test run recorded against one test case: **Passed**, **Failed**, **Blocked**, **Pending**,
+  **Untested** or **Removed**.
 - The **result analysis** is what the tester writes about the run as a whole,
   once it is completed. It is written in the run editor, and it appears in the
   report.
 
 ---
-
 
 ## Every key
 
@@ -75,8 +74,7 @@ overview and analysis on a sheet of their own, and is described below.
 The PDF, the Word document and the web page each hold these, in this order.
 
 1. **The heading** — the words **TEST SUMMARY REPORT**, the test project's name,
-   the platform and component, the test run's own name, and a line reading
-   *Confidential — QA Test Execution Summary*.
+   the platform and component, the test run's own name, and a line reading *Confidential — QA Test Execution Summary*.
 2. **Report Overview** — a table of two columns. It holds the project, the test
    run, the test type, the change log, the commit, the platform and component,
    the language, the browser and the device type. It also holds everyone who
@@ -86,8 +84,8 @@ The PDF, the Word document and the web page each hold these, in this order.
 3. **Execution Summary** — one sentence naming the run and saying how many test
    cases it holds, how many were executed and what share passed. All four
    formats open it with the same sentence. Under it a row of
-   figures: **Total Test Cases**, **Passed**, **Failed**, **Blocked**,
-   **Untested**, **Removed** and **Pass Rate**. **Removed** appears only when
+   figures: **Total Test Cases**, **Passed**, **Failed**, **Blocked**, **Untested**, **Removed** and **Pass Rate**.
+   **Removed** appears only when
    the run has any. A test case deleted before it was judged is counted only
    under **Removed**, so it is left out of **Pass Rate**; one deleted after its
    verdict is counted under that verdict, as the run recorded it.
@@ -106,8 +104,8 @@ The web page also prints the whole error under it, as text; the PDF and the Word
 document print no error. No report shows a screenshot pasted with a failure: the
 issue a failure was reported as holds them. (Rule-REPORT-017)
 
-A test case reported as a bug shows its issue right after the actual result, as
-*(#12)*. Clicking it opens the issue. A test case with no issue shows nothing
+A test case reported as a bug shows its issue right after the actual result, as *(#12)*. Clicking it opens the issue. A
+test case with no issue shows nothing
 there. (UC-VIEW-PANEL-016)
 
 ## What the spreadsheet report contains
@@ -125,8 +123,8 @@ so the sheet sorts and filters as one list. Each row is filled with the color
 its verdict's table is headed with in the other formats: red for failed, green
 for passed, amber for blocked, gray for untested and removed.
 
-The last column, **Bug Issue**, holds the issue a test case was reported as, as
-*#12*. Clicking it opens the issue. It is empty for a test case with no issue.
+The last column, **Bug Issue**, holds the issue a test case was reported as, as *#12*. Clicking it opens the issue. It
+is empty for a test case with no issue.
 There is no column for the error, and the test cases are one table rather than
 one per verdict.
 

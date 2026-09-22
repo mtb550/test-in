@@ -29,18 +29,18 @@ This copies a test project from Git onto this machine.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  made together confirm with one message and a count: the tester sees
-  *Removed 4*, never four messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees *Removed 4*, never four messages. Looking at
+  something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
   signed off. Its test cases, verdicts and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
-  1. live nodes, then retired ones
-  2. the number the tester gave the node
-  3. the date the node was created
-  4. the name
+    1. live nodes, then retired ones
+    2. the number the tester gave the node
+    3. the date the node was created
+    4. the name
 - **Rule-TREE-PANEL-011** — A removed node goes to the desktop's recycle bin. It
   can be put back from the tree.
 - **Rule-TREE-PANEL-012** — A test case is not a node in this tree. It is
@@ -96,8 +96,8 @@ drawn under [UC-TREE-PANEL-001](reachTheTree.md), and it does the same thing.
    \<name\>...*. It cannot be canceled.
 5. Testin chooses it for this code project on this machine, and the tree
    appears. Nothing is written into the code project (Rule-TREE-PANEL-106).
-6. Testin shows *Project cloned*. The name can be changed afterward with
-   **Rename** ([UC-TREE-PANEL-011](renameNode.md)).
+6. Testin shows *Project cloned*. The name can be changed afterward with **Rename**
+   ([UC-TREE-PANEL-011](renameNode.md)).
 
 ## What Testin refuses
 

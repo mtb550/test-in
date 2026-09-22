@@ -30,8 +30,7 @@ name should match our correct names in business."*
 | `A_CASE`, `JUDGED_CASE`     | `A_TEST_CASE`, `JUDGED_TEST_CASE` | Constants are names too                                                      |
 | `aCaseThatArrivesIsPending` | `aTestCaseThatArrivesIsPending`   | A test's name is a sentence about the business                               |
 
-It holds for the documentation and for issues as well: *test case id*, never
-*case id*; *run item*, never *item*.
+It holds for the documentation and for issues as well: *test case id*, never *case id*; *run item*, never *item*.
 
 ## The two short names, and there are only two
 

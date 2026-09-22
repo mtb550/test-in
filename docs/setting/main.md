@@ -60,7 +60,6 @@ The two are kept apart on purpose, and the reason is who they belong to.
 
 ---
 
-
 ## The page
 
 The page is at **Settings**, then **Tools**, then **Testin**.
@@ -104,8 +103,8 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 8. **Show keyboard shortcuts in dialogs** — the strip of key hints along the
    bottom of every Testin dialog.
 9. **The gray note** — where a value belongs. It is the
-    table below, said where a tester is looking for a setting rather than only
-    in this document.
+   table below, said where a tester is looking for a setting rather than only
+   in this document.
 
 **OK**, **Apply** and **Cancel** belong to the IDE's own settings window, not to
 this page.

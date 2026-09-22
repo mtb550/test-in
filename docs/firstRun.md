@@ -12,7 +12,7 @@
 | **Answers**         | What the plugin is for, shown rather than described                                               |
 | **State**           | Written                                                                                           |
 | **Checked against** | `main` at `6b9a554a`, 17 September 2026                                                           |
-| **You need**        | IntelliJ IDEA 2026.1 or later, the Java plugin enabled, and a Java project with a `src/test/java` |
+| **You need**        | IntelliJ IDEA 2026.2 or later, the Java plugin enabled, and a Java project with a `src/test/java` |
 
 The screens below are drawn rather than photographed, the same way every other
 page in this documentation draws them. They show what is on the screen, not what
@@ -113,8 +113,7 @@ Double-click it, or press `Enter`, and it opens in an editor.
 
 In the test set editor, press `Ctrl+M`.
 
-Fill in the description — *Log in with a valid user* — and the expected result —
-*The dashboard opens*. Save.
+Fill in the description — *Log in with a valid user* — and the expected result — *The dashboard opens*. Save.
 
 The card appears:
 

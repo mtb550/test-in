@@ -48,8 +48,8 @@ edited by hand. This is how to ask.
 This opens no screen. Nothing on the list changes — the method is in the class
 file, and the card's automation mark says so at the next redraw.
 
-A small message appears at the bottom of the IDE and fades. It reads
-*Automated*, with a count after it for more than one test case. The count is of
+A small message appears at the bottom of the IDE and fades. It reads *Automated*, with a count after it for more than
+one test case. The count is of
 the methods that were written, not of the test cases asked for: a test case the
 generator could not write a method for is left out of it, and one message from
 the generator says why. When none was written, no *Automated* message appears at
