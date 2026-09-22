@@ -47,7 +47,7 @@ public class EditorType extends FakeFileType {
     public static final @NotNull EditorType TEST_CASE = new EditorType(
             "Test Case",
             Bundle.message("editor.type.case.description"),
-            AllIcons.FileTypes.Text,
+            DirectoryType.TS.getIcon(),
             TestEditor::new
     );
 
