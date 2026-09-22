@@ -57,12 +57,12 @@ Nothing. A folder that does not exist is stored exactly as typed.
 
 ## The only way it gets set
 
-This row, and nothing else. The report, export and import dialogs each used to
-carry a **Set as default folder** tick box that wrote this value, drawn only
-while no folder was set - so once one was there they could not change it back,
-and ticking it overwrote what this page said without saying so. The box is gone
-and the use case behind it, *Remember the folder I use*, is retired on
-[the sharing page](../share/main.md#retired).
+This row and nothing else. The report, export and import dialogs each used to
+carry a **Set as default folder** tick box that wrote this value. It was drawn
+only while no folder was set. So once one was there they could not change it
+back, and ticking it overwrote what this page said without saying so. The box
+is gone and the use case behind it, *Remember the folder I use*, is retired on
+[the sharing page](../share/main.md#where-the-plugin-breaks-its-own-rules).
 
 Those dialogs still **open** on this folder. They never write it.
 

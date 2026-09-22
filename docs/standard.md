@@ -58,8 +58,8 @@ it.
 
 ## The three forms
 
-**A user story opens each page**, because it forces the *who* and the *why* into
-one sentence and leaves no room for the *how*:
+**A user story opens each page**, because it forces who wants a change, and why,
+into one sentence and leaves no room for how it is built:
 
 > **As a** tester, **I want** to create a test project from the tree, **so that**
 > a new product under test has a place for its cases before any are written.
@@ -131,7 +131,7 @@ page. No existing rule is renumbered to make room, ever.
 **A number is a name, not a position.** It was the other way round once: the
 rules ran in reading order down each part's `main.md`, so a page's rules were
 always a block and the number told a reader roughly where to look. Adding eight
-rules to that moved 297 others, which is the whole cost of the idea and it is
+rules to that moved 297 others, which is the whole cost of the idea, and it is
 not worth paying. A number that changes is a number that was quoted in an issue,
 a commit message and a code marker, and now points somewhere else.
 
@@ -213,7 +213,7 @@ nobody has written, the rule is written first.
 
 `treePanel/createTestProject.md` looks like this:
 
-```markdown
+```text
 [Documentation](../README.md) › [The tree panel](main.md) › UC-TREE-PANEL-002
 
 # UC-TREE-PANEL-002: Create a test project
@@ -284,9 +284,9 @@ These documents are for testers. Every sentence is checked against that reader.
 - **Numbers: words below 10, digits from 10 up.** *five statuses*, *50 rows*,
   *13 keys*. A key is written as the key: `1` `2` `3`. A quoted message keeps
   the product's own digits: *Removed 4*.
-- **American English.** *Behavior*, not *behaviour*. *Gray*, not *grey*. The
-  platform the plugin is written against is American, so anything else puts two
-  dialects in one page.
+- **American English.** *Behavior* and *gray*, never the British spellings.
+  The platform the plugin is written against is American, so anything else puts
+  two dialects in one page.
 - **No class, method or package names.** A tester does not need them, and they
   date the document the first time the code is refactored. Name one only where
   it is the shortest way to say which thing owns a decision.
@@ -328,8 +328,8 @@ is, whether it is finished, and how far it might have drifted.
 in the row and see that it is old; it cannot know whether anything since then
 touched what the page describes. A part untouched for a month is not stale, and
 one read yesterday against the wrong half of a change is. The row says when a
-person last read the page against the code, so only a person can move it — and a
-test that failed on age alone would be moved by editing the row, which is the one
+person last read the page against the code, so only a person can move it. A test
+that failed on age alone would be moved by editing the row, which is the one
 thing that must mean something.
 
 What holds it up is the rule below instead: behavior changes and its document

@@ -29,7 +29,7 @@ import static org.testng.Assert.assertTrue;
 public class CloneTestProjectTest {
 
     @Test
-    public void everyFormOfAddressGivesTheRepositorysName() {
+    public void everyFormOfAddressGivesTheRepositoryName() {
         assertEquals(CloneTestProject.repositoryName("https://github.com/acme/nafath-test-cases.git"), "nafath-test-cases");
         assertEquals(CloneTestProject.repositoryName("git@github.com:acme/nafath-test-cases.git"), "nafath-test-cases");
         assertEquals(CloneTestProject.repositoryName("ssh://git@host:2222/acme/nafath-test-cases.git"), "nafath-test-cases");

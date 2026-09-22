@@ -113,7 +113,7 @@ nothing is said. Only the log records it.
 
 The message is raised after the test run is written, not before. So an edit that
 was dropped never says *Details updated*. Nothing at all is said, which is the
-half of the trade worth keeping: a confirmation of a write that did not happen
+half of the trade worth keeping: a confirmation of a save that did not happen
 costs more than a silence.
 
 ---

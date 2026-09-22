@@ -53,6 +53,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BinaryOperator;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -209,7 +210,7 @@ final class IndexingScanner {
                             if (marked == DirectoryType.TS) scanTestSet(dirPath, parent, indicator, scanned);
                             else scanTestSetPackage(dirPath, parent, indicator, unread, scanned);
                         },
-                        () -> skipped(dirPath, DirectoryType.UNDER_TEST_CASES, "test cases", unread));
+                        () -> skipped(dirPath, DirectoryType.UNDER_TEST_CASES, unread));
             }
         } catch (final Exception ex) {
             Logger.error("Failed to list test sets: " + ex.getMessage());
@@ -229,7 +230,7 @@ final class IndexingScanner {
                         .forEach(subPath -> store.markedAs(subPath, DirectoryType.UNDER_TEST_CASES).ifPresentOrElse(marked -> {
                             if (marked == DirectoryType.TS) scanTestSet(subPath, tsp, indicator, scanned);
                             else scanTestSetPackage(subPath, tsp, indicator, unread, scanned);
-                        }, () -> skipped(subPath, DirectoryType.UNDER_TEST_CASES, "test cases", unread)));
+                        }, () -> skipped(subPath, DirectoryType.UNDER_TEST_CASES, unread)));
             }
 
         } catch (final Exception ex) {
@@ -302,7 +303,7 @@ final class IndexingScanner {
                             if (marked == DirectoryType.TR) scanTestRun(dirPath, parent, indicator, scanned);
                             else scanTestRunPackageDir(dirPath, parent, indicator, unread, scanned);
                         },
-                        () -> skipped(dirPath, DirectoryType.UNDER_TEST_RUNS, "test runs", unread));
+                        () -> skipped(dirPath, DirectoryType.UNDER_TEST_RUNS, unread));
             }
         } catch (final Exception ex) {
             Logger.error("Failed to list test runs: " + ex.getMessage());
@@ -322,7 +323,7 @@ final class IndexingScanner {
                         .forEach(subPath -> store.markedAs(subPath, DirectoryType.UNDER_TEST_RUNS).ifPresentOrElse(marked -> {
                             if (marked == DirectoryType.TR) scanTestRun(subPath, trp, indicator, scanned);
                             else scanTestRunPackageDir(subPath, trp, indicator, unread, scanned);
-                        }, () -> skipped(subPath, DirectoryType.UNDER_TEST_RUNS, "test runs", unread)));
+                        }, () -> skipped(subPath, DirectoryType.UNDER_TEST_RUNS, unread)));
             }
 
         } catch (final Exception ex) {
@@ -331,8 +332,8 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-015
-    private void skipped(final @NotNull Path dirPath, final @NotNull List<DirectoryType> family, final @NotNull String where, final @NotNull List<Path> unread) {
-        Logger.warn("Skipping unmarked directory under " + where + " (missing " + DirectoryType.markerNames(family) + "): " + dirPath);
+    private void skipped(final @NotNull Path dirPath, final @NotNull List<DirectoryType> family, final @NotNull List<Path> unread) {
+        Logger.warn("Skipping unmarked directory (missing " + DirectoryType.markerNames(family) + "): " + dirPath);
 
         if (holdsTestCases(dirPath)) unread.add(dirPath);
     }
@@ -349,46 +350,51 @@ final class IndexingScanner {
     private void reportUnread(final @NotNull String projectName, final @NotNull List<Path> unread) {
         final @NotNull List<String> names = unread.stream().map(path -> path.getFileName().toString()).toList();
 
-        say(Bundle.message("indexer.unread.title", projectName), names, (named, rest) -> names.size() == 1
-                ? Bundle.message("indexer.unread.one", String.valueOf(names.size()), named, rest)
-                : Bundle.message("indexer.unread.many", String.valueOf(names.size()), named, rest));
+        say(Bundle.message("indexer.unread.title", projectName), names,
+                name -> Bundle.message("indexer.unread.one", name),
+                (named, rest) -> Bundle.message("indexer.unread.many", String.valueOf(names.size()), named, rest));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-011
     private void reportUnreadableResults(final @NotNull String projectName, final @NotNull Set<String> unreadable) {
         final @NotNull List<String> names = unreadable.stream().sorted().toList();
 
-        say(Bundle.message("indexer.results.unread.title", projectName), names, (named, rest) -> names.size() == 1
-                ? Bundle.message("indexer.results.unread.one", String.valueOf(names.size()), named, rest)
-                : Bundle.message("indexer.results.unread.many", String.valueOf(names.size()), named, rest));
+        say(Bundle.message("indexer.results.unread.title", projectName), names,
+                name -> Bundle.message("indexer.results.unread.one", name),
+                (named, rest) -> Bundle.message("indexer.results.unread.many", String.valueOf(names.size()), named, rest));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-094
     private void reportHandNamedResults(final @NotNull String projectName, final @NotNull Set<String> handNamed) {
         final @NotNull List<String> names = handNamed.stream().sorted().toList();
 
-        say(Bundle.message("indexer.results.unnamed.title", projectName), names, (named, rest) -> names.size() == 1
-                ? Bundle.message("indexer.results.unnamed.one", String.valueOf(names.size()), named, rest)
-                : Bundle.message("indexer.results.unnamed.many", String.valueOf(names.size()), named, rest));
+        say(Bundle.message("indexer.results.unnamed.title", projectName), names,
+                name -> Bundle.message("indexer.results.unnamed.one", name),
+                (named, rest) -> Bundle.message("indexer.results.unnamed.many", String.valueOf(names.size()), named, rest));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
     private void reportDamaged(final @NotNull String projectName, final @NotNull List<String> damaged) {
-        say(Bundle.message("indexer.damaged.title", projectName), damaged, (named, rest) -> damaged.size() == 1
-                ? Bundle.message("indexer.damaged.one", String.valueOf(damaged.size()), named, rest)
-                : Bundle.message("indexer.damaged.many", String.valueOf(damaged.size()), named, rest));
+        say(Bundle.message("indexer.damaged.title", projectName), damaged,
+                name -> Bundle.message("indexer.damaged.one", name),
+                (named, rest) -> Bundle.message("indexer.damaged.many", String.valueOf(damaged.size()), named, rest));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-015
-    private void say(final @NotNull String title, final @NotNull List<String> names, final @NotNull BinaryOperator<String> sentence) {
+    private void say(final @NotNull String title, final @NotNull List<String> names, final @NotNull UnaryOperator<String> one, final @NotNull BinaryOperator<String> many) {
         if (names.isEmpty()) return;
+
+        if (names.size() == 1) {
+            Services.getInstance(p, Notifier.class).warn(p, title, one.apply(names.getFirst()));
+            return;
+        }
 
         final @NotNull String named = names.stream().limit(SHOWN).collect(Collectors.joining(", "));
         final @NotNull String rest = names.size() > SHOWN
                 ? Bundle.message("indexer.more", String.valueOf(names.size() - SHOWN))
                 : "";
 
-        Services.getInstance(p, Notifier.class).warn(p, title, sentence.apply(named, rest));
+        Services.getInstance(p, Notifier.class).warn(p, title, many.apply(named, rest));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-082

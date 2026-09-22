@@ -8,20 +8,15 @@
 #
 # It was on a two-day schedule until 2026-09-12. A calendar runs it over code
 # nobody touched and misses the push that mattered; this runs it over exactly
-# what arrived, and the run is read afterwards rather than waited on.
+# what arrived, and the run is read afterward rather than waited on.
 #
-# It gates on nineteen findings, ratchets a twentieth, and lists the rest.
+# It fails on any finding in the files the repository writes, the scope
+# .idea/scopes/Inspected.xml names. The exceptions are the rules a headless run
+# cannot be trusted with, and $notGated in tools/inspect.ps1 names each one
+# with its reason. The Testin profile names the inspector's rules one by one, so
+# what runs here does not depend on a default.
 #
-# DataFlowIssue and ReturnNull are the standing rule: a null contract the checker
-# can prove is broken is a defect, not a style note. Ten more are the
-# inspector's and forbid code that says something the long way round -
-# Convert2MethodRef, CodeBlock2Expr, SimplifyStreamApiCallChains,
-# StringBufferReplaceableByString, SameParameterValue,
-# BooleanMethodIsAlwaysInverted, UnusedReturnValue, UNUSED_IMPORT,
-# OnDemandImport and ConvertToStringTemplate;
-# CONTRIBUTING.md has a line on each.
-#
-# The other seven are the script's own, because no IntelliJ inspection makes them.
+# Seven rules are the script's own, because no IntelliJ inspection makes them.
 # WrappedMethodDeclaration - a method declaration belongs on one line.
 # StaticMutableState - a static that is not final in the packages that model the
 # data is one slot for the whole IDE, which is how a cached test source root came
@@ -37,11 +32,9 @@
 #
 # DuplicatedDisplayString is counted rather than forbidden: a string a tester
 # reads that another file also writes has no owner.
-# .github/display-string-baseline.txt records the number and its history, a rise
-# fails the run and a fall is reported so the number can follow it down - the same
-# ratchet verify.yml gives the Plugin Verifier.
-#
-# Everything else needs a person and is listed in the artifact.
+# display-string-baseline.txt, beside the workflows folder, records the number
+# and its history. A rise fails the run, and a fall is reported so the number can
+# follow it down - the same ratchet verify.yml gives the Plugin Verifier.
 name: Inspect
 
 on:

@@ -28,7 +28,7 @@ edited by hand. This is how to ask.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
-  when `testin.yml` names that test project. Otherwise nothing is generated,
+  when `testin.yml` names that test project. Otherwise, nothing is generated,
   renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
@@ -83,9 +83,10 @@ case, so a test case needs a description before it can have one.* The method
 appears when the description is filled in, which is
 [UC-CODEGEN-003](getMissingMethod.md).
 
-**If a description cannot name a Java method** — a message titled *A test case
-has no automation method*, or *\<how many\> test cases have no automation
-method*, names up to three of them and says to reword and generate again.
+**If a description cannot name a Java method** — a message appears, titled *A
+test case has no automation method*, or *\<how many\> test cases have no
+automation method*. It names up to three of them and says to reword and
+generate again.
 
 **If another test case already answers to that name** — the second gets no
 method. The same title appears, and the message says the name is taken and to

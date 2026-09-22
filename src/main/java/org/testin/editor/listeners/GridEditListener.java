@@ -138,7 +138,6 @@ public class GridEditListener extends AbstractGridEditListener {
         });
     }
 
-    private record Changed(@NotNull TestCaseDto tc, @NotNull TestCaseSnapshot before,
-                           @NotNull Set<GenType> generators) {
+    private record Changed(@NotNull TestCaseDto tc, @NotNull TestCaseSnapshot before, @NotNull Set<GenType> generators) {
     }
 }

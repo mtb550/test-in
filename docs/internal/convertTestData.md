@@ -31,13 +31,13 @@ an earlier one, so the number in the file is what enforces the order.
 
 Nothing, until it is over. Opening a project with test data in the old format
 converts it while the tree is being read, and a notification titled **Test Data
-Converted** stays in the log afterwards: one line per project, saying how many
+Converted** stays in the log afterward: one line per project, saying how many
 test cases were converted and how many test runs were removed.
 
 **The IDE stays usable throughout.** The conversion runs in the background,
 beside the reading rather than in front of it, and nothing waits for it. There
-is no progress bar and no cancel button, because a conversion stopped half way
-is one the next open has to finish anyway.
+is no progress bar and no cancel button, because the next open has to finish a
+conversion stopped half way anyway.
 
 ## Main flow
 
@@ -74,7 +74,7 @@ and the file is named in the notification as one to repair. Writing a format
 number into a file the tester still has to fix would say the conversion
 succeeded.
 
-**If a marker will not parse** — it keeps no id, and it is named in the same
+**If a marker cannot be parsed** — it keeps no id, and it is named in the same
 list. The id is stamped the next time that marker is written, once the tester has
 repaired it (Rule-INTERNAL-083).
 
@@ -85,7 +85,7 @@ nothing in it is read or written.
 
 **If the same failure happens again** — it is reported once, not once per try.
 A conversion that could not finish is tried again on every scan and on every
-change to the Testin folder, and a tester who has already been told about a file
+change to the Testin folder. A tester who has already been told about a file
 only they can repair does not need telling again. A later try that got further
 has different numbers in it, and that one is said (Rule-INTERNAL-092).
 

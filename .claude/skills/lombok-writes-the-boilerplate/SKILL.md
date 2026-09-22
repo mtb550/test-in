@@ -8,7 +8,7 @@ description: Lombok generates the constructors, getters and builders in Testin �
 Testin has Lombok on `compileOnly` + `annotationProcessor` in every module. If
 Lombok generates it, do not type it.
 
-The rule is not about characters saved. Hand-written boilerplate is code a
+The rule is not about characters saved. Handwritten boilerplate is code a
 reader has to check, and checking it means reading it against the annotation
 that would have written it — which is strictly more work than there was before.
 
@@ -33,19 +33,19 @@ public final class CardTitle {
 Two imports instead of three lines, and it reads as a *property of the class*
 sitting with `final` and `public`, rather than as a member the reader has to
 look at and dismiss. Every other holder in the codebase is already written this
-way — `Fqcn`, `Notifier`, `Badges`, `BackgroundWork` — so a hand-written one is
+way — `Fqcn`, `Notifier`, `Badges`, `BackgroundWork` — so a handwritten one is
 also the odd file out.
 
 ## What Lombok owns here
 
-| Instead of                                                            | Write                                                                         |
-|-----------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| `private Foo() {}` on a holder                                        | `@NoArgsConstructor(access = AccessLevel.PRIVATE)`                            |
-| A constructor assigning every field                                   | `@AllArgsConstructor`, or `@RequiredArgsConstructor` for the `final` ones     |
-| `public X getY()`                                                     | `@Getter` on the field, or on the class                                       |
-| `public void setY(X y)`                                               | `@Setter`, and only where a setter is genuinely wanted                        |
-| A field-per-constant enum with a hand-written constructor and getters | `@Getter @AllArgsConstructor` on the enum — see `Done`, `Refused`, `Priority` |
-| `equals`/`hashCode`/`toString` on a value                             | a `record`, first. `@EqualsAndHashCode` only when a record will not do        |
+| Instead of                                                           | Write                                                                         |
+|----------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| `private Foo() {}` on a holder                                       | `@NoArgsConstructor(access = AccessLevel.PRIVATE)`                            |
+| A constructor assigning every field                                  | `@AllArgsConstructor`, or `@RequiredArgsConstructor` for the `final` ones     |
+| `public X getY()`                                                    | `@Getter` on the field, or on the class                                       |
+| `public void setY(X y)`                                              | `@Setter`, and only where a setter is genuinely wanted                        |
+| A field-per-constant enum with a handwritten constructor and getters | `@Getter @AllArgsConstructor` on the enum — see `Done`, `Refused`, `Priority` |
+| `equals`/`hashCode`/`toString` on a value                            | a `record`, first. `@EqualsAndHashCode` only when a record will not do        |
 
 ## What Lombok does not own
 
@@ -63,7 +63,7 @@ also the odd file out.
 
 ## The three constructors Lombok cannot write
 
-These are the whole list. Anything else hand-written is a miss.
+These are the whole list. Anything else handwritten is a miss.
 
 |                              | Why it stays                                                                                                                    |
 |------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
@@ -138,17 +138,17 @@ Named so nobody spends an afternoon rediscovering why.
 
 Measured, not estimated, across `src/main` and `testin-java/src/main`:
 
-|                                                 | Count                                   |
-|-------------------------------------------------|-----------------------------------------|
-| `@Getter`                                       | 135                                     |
-| `@NoArgsConstructor`                            | 94                                      |
-| `@AllArgsConstructor`                           | 73                                      |
-| `@Builder` / `@SuperBuilder`                    | 44 / 10                                 |
-| `records`                                       | 51                                      |
-| **Hand-written getters**                        | **0**                                   |
-| Hand-written `equals` / `hashCode` / `toString` | 2                                       |
-| Hand-written setters that only assign a field   | 1                                       |
-| Pure field-assignment constructors              | 22, of which 8 were exactly replaceable |
+|                                                | Count                                   |
+|------------------------------------------------|-----------------------------------------|
+| `@Getter`                                      | 135                                     |
+| `@NoArgsConstructor`                           | 94                                      |
+| `@AllArgsConstructor`                          | 73                                      |
+| `@Builder` / `@SuperBuilder`                   | 44 / 10                                 |
+| `records`                                      | 51                                      |
+| **Handwritten getters**                        | **0**                                   |
+| Handwritten `equals` / `hashCode` / `toString` | 2                                       |
+| Handwritten setters that only assign a field   | 1                                       |
+| Pure field-assignment constructors             | 22, of which 8 were exactly replaceable |
 
 The conclusion is the useful part: **Lombok was already doing nearly all of it.**
 Eight constructors became `@RequiredArgsConstructor`; everything else on the list
@@ -167,13 +167,13 @@ applying it, check three things:
    parameter nobody passes.
 
 And it cannot generate a **varargs** parameter: `TestCaseDialogKey(String name,
-Shortcuts... keys)` stays hand-written, because the annotation would produce
+Shortcuts... keys)` stays handwritten, because the annotation would produce
 `Shortcuts[]` and every enum constant would stop compiling.
 
 ## Checking it
 
 A grep for `private X() {` finds only the no-arg ones at one indent, which is
-how nine hand-written constructors hid behind an answer of "there is one". Scan
+how nine handwritten constructors hid behind an answer of "there is one". Scan
 for the shape instead — any visibility, any arity, any indent:
 
 ```python

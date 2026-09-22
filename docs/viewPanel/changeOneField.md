@@ -95,7 +95,7 @@ starts working the first time a test case is drawn.
 **If the save would change nothing** — nothing is written, no message is raised,
 and nothing goes on the undo history.
 
-## Closing the panel afterwards
+## Closing the panel afterward
 
 `F2` needs the keyboard to be in the panel, and it leaves it there. `Escape`
 works from there too: it closes the panel from inside a tab exactly as it does

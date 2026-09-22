@@ -248,9 +248,9 @@ public class FrameworkComponentsTest {
 
     /**
      * A dialog that declares no filler at all - a form and a button - used to
-     * hand the spare space to its last component, which is the button, putting it
-     * in the middle of the dialog instead of at the bottom. It only showed on a
-     * dialog with a preferredSize, so nothing caught it.
+     * hand the spare space to its last component, which is the button. That put
+     * the button in the middle of the dialog instead of at the bottom. It only
+     * showed on a dialog with a preferredSize, so nothing caught it.
      */
     @Test
     public void aButtonRowNeverTakesTheDialogSpace() {

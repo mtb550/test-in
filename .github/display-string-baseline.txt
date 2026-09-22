@@ -49,8 +49,8 @@
 # font name and a date locale look exactly like one. They are a floor on this
 # number rather than work to do.
 #
-# 169 after the status bar work. The editor's own clock went - two labels wrote
-# the same corner with different meanings - and the flat hover button moved out
+# 169 after the status bar work. The editor's own clock went: two labels wrote
+# the same corner with different meanings. The flat hover button moved out
 # of the toolbar package to be shared with the status bar's page arrows, which
 # took its captions with it. The filter sets stopped being spelled out three
 # times over.
@@ -101,7 +101,7 @@
 # The other three were left, and the reasons are worth more than the count.
 # "Created" and "Updated" are three concepts sharing a spelling - a
 # notification, a run status, a row caption - so one owner would mean renaming a
-# status renames a balloon; a fourth site is a javadoc the filter cannot tell
+# status renames a balloon; a fourth site is a Javadoc the filter cannot tell
 # from a caption. "test cases" and "test runs" are the circular initialization
 # this file already records. "Navigate to Code" is written on opposite sides of
 # the leaf rule: Automated is in model, CardHoverAction is in editor, and model
@@ -114,12 +114,12 @@
 # being written a second time in a super(...) call. A declared action has no
 # constructor to spell anything in, which is the point: the descriptor is the
 # owner, and there is nowhere else left to say it.
-# 129 after StatusBarShortcut.select(), the third of the confirm/cancel family
-# and the same argument they made at 304. Three dialogs wrote the arrows out as
-# two characters that are easy to get subtly wrong, and a fourth called Enter
-# "Select" in a word that had no owner - so the menu popup could not have taken
-# the hint without becoming a fifth. The word is SELECT beside SAVE now, and the
-# arrows are spelled in one place.
+# 129 after StatusBarShortcut.select(), which joins cancel() and confirm() as a
+# third and makes the same argument they made at 304. Three dialogs wrote the
+# arrows out as two characters that are easy to get subtly wrong, and a fourth
+# called Enter "Select" in a word that had no owner - so the menu popup could not
+# have taken the hint without becoming a fifth. The word is SELECT beside SAVE
+# now, and the arrows are spelled in one place.
 # 17 after the French translation (#11). The largest drop this file has ever
 # recorded, and almost none of it was aimed at this number: a string a tester
 # reads is a key now, and a key is not a display string. About 780 literals over
@@ -144,7 +144,7 @@
 # is unlikely to fall again on its own.
 #
 # 14 on 11 September, and the floor was not quite where that paragraph put it.
-# #111 moved DirectoryType's behaviour columns into tables of their own -
+# #111 moved DirectoryType's behavior columns into tables of their own -
 # codegen/JavaCode and creator/NodeCreators - and the phrases that had been
 # written once in that enum were suddenly written in two files: "Test Cases
 # directory", "Test Runs directory", "test run". The ratchet caught it the same
@@ -158,4 +158,11 @@
 #
 # What is left is the six-line list above minus that one: en_US 6, "test cases"
 # and "test runs" 4 between them, "Testin" 2, "Test Run" 1, "Tab" 1.
-14
+#
+# 0 on 22 September 2026. Every one of those floors had an owner after all.
+# Config.DATE_FORMAT_LOCALE holds the locale Jackson writes dates in.
+# ReportText.PLUGIN_NAME sits beside PLUGIN_URL, and StatusBarShortcut.navigate()
+# beside select(). The indexer's own log lines name the marker or the class they
+# mean instead of a phrase. From here the number can only go up, and the run
+# fails the day it does.
+0

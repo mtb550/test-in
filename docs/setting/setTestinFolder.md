@@ -38,12 +38,12 @@ The row is the first one on the page.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│  Testin folder:       [ Example -> C:\Users\...\Testin ] [...] [Open]    │
+│  Testin folder:       [ Example: C:\Users\...\Testin   ] [...] [Open]    │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
 1. **The box** — the one folder that holds every test project.
-2. **The gray example** — shown only while the box is empty. It reads *Example -> C:\Users\{username}\Documents\Testin*.
+2. **The gray example** — shown only while the box is empty. It reads *Example: C:\Users\{username}\Documents\Testin*.
 3. **The browse button** — opens a folder chooser.
 4. **Open** — opens the folder in the file manager. It is
    [UC-SETTING-003](openTestinFolder.md).

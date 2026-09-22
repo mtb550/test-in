@@ -6,7 +6,7 @@
 > selected. On the menu: **Actions → Rename**.
 
 **As a** tester, **I want** to rename a test project, a test set, a package or
-a test run, **so that** the tree says what things are called now - a project
+a test run, **so that** the tree says what things are called now. A project
 cloned under its repository's name can take the name the team uses.
 
 This changes the name of one node. Nothing inside it moves.
@@ -29,8 +29,8 @@ This changes the name of one node. Nothing inside it moves.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  at once confirm once, with a count: the tester sees *Removed 4*, never four
-  messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees
+  *Removed 4*, never four messages. Looking at something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
@@ -58,9 +58,9 @@ This changes the name of one node. Nothing inside it moves.
 - **Rule-TREE-PANEL-037** — A rename can be undone.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
-  is - drawn with Inactive beside its name like any other status - and its test
-  sets, cases and runs are not read, because a project nobody is working on is
-  not worth the walk.
+  is, drawn with Inactive beside its name like any other status. Its test sets,
+  cases and runs are not read, because a project nobody is working on is not
+  worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-110** — Renaming a test project never writes `testin.yml`.
@@ -99,10 +99,10 @@ This changes the name of one node. Nothing inside it moves.
 4. The tester types the new name and presses `Enter`.
 5. Testin closes every open editor on the node or under it, whatever kind it
    is, and light mode with them.
-6. For a test project, a test set or a test set package, and only while code is
-   on - the Java plugin, and `testin.yml` naming the test project, by its old
-   name or its new one (Rule-CODEGEN-082) - Testin renames the automation code
-   next.
+6. For a test project, a test set or a test set package, Testin renames the
+   automation code next. It does so only while code is on: the Java plugin, and
+   `testin.yml` naming the test project by its old name or its new one
+   (Rule-CODEGEN-082).
 7. Testin renames the folder.
 8. For a test project, the project chosen for this code project follows the new
    name. When `testin.yml` still names the old one, a notification that stays in

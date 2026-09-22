@@ -154,7 +154,7 @@ is how Testin finds this method again after you rename the case. `priority` is
 the case's position in its test set, which is the order TestNG runs methods in —
 not the case's own High, Medium or Low.
 
-The body is empty and it is meant to be: Testin writes the annotation and the
+The body is empty, and it is meant to be: Testin writes the annotation and the
 declaration, and the rest is yours. It keeps the method in step with the tree —
 renaming the case renames the method, and removing the case removes the method
 from the class. The class itself stays.

@@ -43,7 +43,7 @@ There is no key for this. The button's tooltip reads **Stop Execution**.
 - **Rule-EDITOR-PANEL-151** — Stopping stamps when execution ended. That stamp
   is written again by every stop.
 - **Rule-EDITOR-PANEL-152** — The tester's own stop ends any automation this
-  editor started, and so does closing the tab. Nothing else does.
+  editor started, and closing the tab ends it too. Nothing else does.
 
 ## What the tester sees
 

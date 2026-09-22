@@ -133,8 +133,8 @@ public class TestRunSummaryTest {
 
     /**
      * The headline the reader adds up. Every case in the run is under exactly one
-     * of the five figures printed beneath the total, so a total that is bigger
-     * than their sum is a case the report never explained - which is what a run
+     * of the five figures printed beneath the total. So a total that is bigger
+     * than their sum is a case the report never explained. That is what a run
      * holding removed cases printed before they had a tile.
      */
     @Test

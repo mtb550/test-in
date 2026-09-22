@@ -39,7 +39,7 @@ on:
   pull_request:
 
 # A second push to the same branch makes the first run's answer worthless, so it
-# is cancelled rather than left to finish. Never cancels a run on main.
+# is canceled rather than left to finish. Never cancels a run on main.
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
@@ -51,9 +51,9 @@ jobs:
   build:
     name: Build, test and verify
     # Windows because that is where this suite is known to pass. Three tests in
-    # the dialog framework build a real Swing text field, which asks the toolkit
-    # for the menu shortcut mask and throws HeadlessException where there is no
-    # display - so a Linux runner needs xvfb or a change in production code, and
+    # the dialog framework build a real Swing text field. It asks the toolkit for
+    # the menu shortcut mask and throws HeadlessException where there is no
+    # display. So a Linux runner needs xvfb or a change in production code, and
     # neither belongs in the commit that first turns CI on. It also matches the
     # machines the plugin is developed on. The repository is public, so the
     # minutes cost nothing.

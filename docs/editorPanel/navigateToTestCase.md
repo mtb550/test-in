@@ -3,8 +3,8 @@
 # UC-EDITOR-PANEL-048: Go from a test run to a test case
 
 **As a** tester executing a test run, **I want** to open the test case behind a
-row in its own test set, **so that** I can read it or fix it where it lives
-without hunting for it in the tree.
+row in its own test set, **so that** I can read it or fix it where it lives.
+I do not have to hunt for it in the tree.
 
 The test case's own test set editor opens with the test case selected, as
 clicking its identity in the view panel does. The test run editor stays open
@@ -41,12 +41,12 @@ No key. The card's last button, or the right-click menu.
 - **Rule-EDITOR-PANEL-233** — Navigate to Test Case opens the test case's own
   test set editor and selects it there, as clicking its identity in the view
   panel does. The tree does not move.
-- **Rule-EDITOR-PANEL-234** — It is on a test run's cards and on the test run
-  editor's right-click menu. A test set's own cards and menu do not offer it:
-  they are already in the test set.
+- **Rule-EDITOR-PANEL-234** — It is on a test run's cards and in the right-click
+  menu of the test run editor. It is not offered in a test set, on a card or in
+  the menu: those are already in the test set.
 - **Rule-EDITOR-PANEL-235** — On a card it is drawn only while the pointer is on
-  that card, as the card's other buttons are, and it is the last of them, after
-  Run, so the two buttons testers already use keep their places. Its icon is the
+  that card, as the card's other buttons are. It is the last of them, after Run,
+  so the two buttons testers already use keep their places. Its icon is the
   letter frame the Create Test Case dialog uses, reading tc, frame and letters in
   one green, the same in a light theme and a dark one. It sits in the same slot as
   every other button on the card, and grows under the pointer like the others.
@@ -70,8 +70,9 @@ No key. The card's last button, or the right-click menu.
    Test Method, Run, then **tc**, Navigate to Test Case. The one under the
    pointer grows and names itself.
 
-The test run editor's right-click menu offers **Navigate to Test Case** beside **View Test Case Details**. A test set's
-own cards and menu do not offer it.
+The right-click menu of the test run editor offers **Navigate to Test Case**
+beside **View Test Case Details**. It is not offered in a test set, on a card or
+in the menu.
 
 ## Main flow
 

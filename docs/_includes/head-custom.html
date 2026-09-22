@@ -14,7 +14,7 @@
 <script>
     (function () {
         try {
-            var saved = localStorage.getItem('testin-theme');
+            const saved = localStorage.getItem('testin-theme');
             if (saved) document.documentElement.setAttribute('data-theme', saved);
         } catch (e) {
             // Private windows and blocked site data throw on read. The media query
@@ -26,30 +26,31 @@
 <script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
 
 <script>
+    /* global mermaid */
     document.addEventListener('DOMContentLoaded', function () {
         // ---- the toggle -------------------------------------------------------
-        var root = document.documentElement;
+        const root = document.documentElement;
 
         function dark() {
-            var set = root.getAttribute('data-theme');
+            const set = root.getAttribute('data-theme');
             if (set) return set === 'dark';
 
             return window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
 
-        var button = document.createElement('button');
+        const button = document.createElement('button');
         button.id = 'theme-toggle';
         button.type = 'button';
 
         function draw() {
-            var isDark = dark();
+            const isDark = dark();
             button.textContent = isDark ? '☀' : '☽';
             button.title = isDark ? 'Switch to light' : 'Switch to dark';
             button.setAttribute('aria-label', button.title);
         }
 
         button.addEventListener('click', function () {
-            var next = dark() ? 'light' : 'dark';
+            const next = dark() ? 'light' : 'dark';
             root.setAttribute('data-theme', next);
             try {
                 localStorage.setItem('testin-theme', next);
@@ -67,16 +68,16 @@
         // Jekyll emits <pre class="highlight"><code class="language-mermaid">, so the
         // source has to be lifted out of that and put into a plain element mermaid
         // will look at.
-        var sources = [];
+        const sources = [];
 
         Array.prototype.forEach.call(
             document.querySelectorAll('code.language-mermaid'),
             function (code) {
-                var host = document.createElement('div');
+                const host = document.createElement('div');
                 host.className = 'mermaid';
                 host.textContent = code.textContent;
 
-                var block = code.closest('div.highlighter-rouge') || code.closest('pre');
+                const block = code.closest('div.highlighter-rouge') || code.closest('pre');
                 if (!block || !block.parentNode) return;
 
                 block.parentNode.replaceChild(host, block);

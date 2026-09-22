@@ -75,14 +75,14 @@ records it.
 ## What a pasted copy becomes
 
 A copy is a new test case with a new identity, and its description gains the
-word `(Copy)`. It gets a test method of its own, so the two do not collide, and
-that method starts with the body of the one it was copied from — the automation
-comes with the test case, which is what a copy is for. Only the body: the copy's
+word `(Copy)`. It gets a test method of its own, so the two do not collide. That
+method starts with the body of the one it was copied from: the automation comes
+with the test case, which is what a copy is for. Only the body: the copy's
 method carries the copy's own identity, name and attributes, because it is a
 different test case. Pasting is [UC-EDITOR-PANEL-017](pasteTestCases.md).
 
 If the body calls something the destination class does not have, it does not
-compile there and the IDE says so on the line, exactly as it would had you
+compile there and the IDE says so on the line, exactly as it would if you had
 pasted the method by hand. Testin does not rewrite what you wrote.
 
 ## Two different copies

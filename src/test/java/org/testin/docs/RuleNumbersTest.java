@@ -40,7 +40,7 @@ import static org.testng.Assert.fail;
  * A rule number is a name, and everything wearing it says the same thing.
  * <p>
  * A rule that holds for a whole part is written out on every page in it, so one
- * number is written many times on purpose - which buys a page that can be read
+ * number is written many times on purpose. That buys a page that can be read
  * on its own, and costs the risk that two copies drift apart. Reword one and
  * forget the rest and the pages quietly start telling a tester different things
  * about the same rule. Nothing but this notices.

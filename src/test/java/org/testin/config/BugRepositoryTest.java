@@ -26,7 +26,7 @@ import static org.testng.Assert.assertTrue;
  * (#28, P2).
  * <p>
  * Every form a tester is likely to paste is here, because the address comes
- * from a browser's address bar or a clone button and nobody retypes it - and
+ * from a browser's address bar or a clone button and nobody retypes it. And
  * every refusal is here too, because an address that almost names a repository
  * is the one that would file a bug somewhere unexpected.
  */

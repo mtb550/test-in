@@ -230,8 +230,8 @@ public class BundleKeysTest {
      * without them the value comes back exactly as written. So a key carrying
      * {@code {0}} is a MessageFormat pattern, and in one of those a lone
      * apostrophe is the quoting character: it is eaten, and it takes the text
-     * after it with it. "l'exécution est arrêtée" prints as "lexécution est
-     * arrêtée" and "{0}" inside a quoted run prints as the literal braces.
+     * after it with it. "the test case's id" prints as "the test cases id",
+     * and "{0}" inside a quoted run prints as the literal braces.
      * <p>
      * Nothing fails when this is wrong. The sentence is simply missing a letter,
      * in one language, on one screen - which is why it is checked here rather

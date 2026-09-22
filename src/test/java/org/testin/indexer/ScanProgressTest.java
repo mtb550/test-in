@@ -95,7 +95,7 @@ public class ScanProgressTest {
     }
 
     /**
-     * Both directory loops ask whether the tester has cancelled. One check per
+     * Both directory loops ask whether the tester has canceled. One check per
      * loop, because a loop that never asks cannot be stopped however cancellable
      * the task above it claims to be.
      */

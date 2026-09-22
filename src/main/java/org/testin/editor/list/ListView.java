@@ -22,6 +22,5 @@ import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 
-public record ListView(@NotNull CollectionListModel<TestCaseDto> model, @NotNull JBList<TestCaseDto> list,
-                       @NotNull JBScrollPane scrollPane) {
+public record ListView(@NotNull CollectionListModel<TestCaseDto> model, @NotNull JBList<TestCaseDto> list, @NotNull JBScrollPane scrollPane) {
 }

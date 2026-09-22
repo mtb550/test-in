@@ -18,8 +18,9 @@ is cheaper than being wrong.
 
 1. `gh issue list --repo mtb550/test-in --state open --limit 100` — check whether
    this already exists. If it does, edit that issue rather than opening a second.
-2. Ground the write in the code. Read the classes involved and name real paths;
-   an issue that names a class that does not exist costs more time than it saves.
+2. Ground what you write in the code. Read the classes involved and name real
+   paths; an issue that names a class that does not exist costs more time than it
+   saves.
    If the backlog refers to a class by an old name, say so and give the real one.
 3. If recent commits may already have fixed it, add a **Check first** section
    listing the commit hashes and say to close the issue rather than implement it

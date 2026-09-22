@@ -73,7 +73,7 @@ counts them apart. Its blocked section says the test cases *could not complete,
 typically because of an environment or data dependency*.
 
 Blocked asks for no explanation. A tester who wants to write down why can type
-into the **Actual Result** column afterwards. That is
+into the **Actual Result** column afterward. That is
 [UC-EDITOR-PANEL-041](typeActualResult.md).
 
 ---

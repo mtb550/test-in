@@ -23,8 +23,7 @@ import org.testin.util.Mapper;
 import java.util.ArrayList;
 import java.util.List;
 
-record Merging(@NotNull ObjectNode base, @NotNull ObjectNode mine, @NotNull ObjectNode theirs,
-               @NotNull ObjectNode merged, @NotNull List<Merge.Question> questions, @NotNull List<String> settled) {
+record Merging(@NotNull ObjectNode base, @NotNull ObjectNode mine, @NotNull ObjectNode theirs, @NotNull ObjectNode merged, @NotNull List<Merge.Question> questions, @NotNull List<String> settled) {
     // UC-SHARE-018, Rule-SHARE-080
     static @NotNull Merging read(final @NotNull Mapper mapper, final @NotNull String base, final @NotNull String mine, final @NotNull String theirs) {
         final @NotNull ObjectNode ours = mapper.readTree(mine);

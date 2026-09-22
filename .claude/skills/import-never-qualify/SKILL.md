@@ -9,22 +9,28 @@ A class is written by its simple name, and the import says where it comes from:
 
 ```java
 // no
-final TestRunItems item = TestRunItems.builder().build().showing(java.util.Optional.of(passed));
-assertEquals(item.getStatus(), org.testin.model.TestStatus.PENDING);
+void pending(final org.testin.model.TestStatus passed) {
+    final TestRunItems item = TestRunItems.builder().build().showing(java.util.Optional.of(passed));
+    assertEquals(item.getStatus(), org.testin.model.TestStatus.PENDING);
+}
+```
 
+```java
 // yes
 import java.util.Optional;
 import org.testin.model.TestStatus;
 
-final TestRunItems item = TestRunItems.builder().build().showing(Optional.of(passed));
-assertEquals(item.getStatus(), TestStatus.PENDING);
+void pending(final TestStatus passed) {
+    final TestRunItems item = TestRunItems.builder().build().showing(Optional.of(passed));
+    assertEquals(item.getStatus(), TestStatus.PENDING);
+}
 ```
 
 Muteb, 22 September 2026: *"why did you write java.util.Optional, just write
 Optional, make sure our classes not have like this."*
 
 A qualified name in the middle of a line is a package path the reader has to
-skip to find the word that matters, and it hides a dependency the import list
+skip to find the word that matters. It also hides a dependency the import list
 would have shown at the top of the file. It is almost always the quick way out
 of adding an import during a small edit, which is exactly when it slips in.
 

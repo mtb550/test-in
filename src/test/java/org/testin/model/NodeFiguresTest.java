@@ -109,7 +109,7 @@ public class NodeFiguresTest {
     }
 
     /**
-     * Both numbers are right and they answer different questions: a container is
+     * Both numbers are right, and they answer different questions: a container is
      * the sum of everything beneath it, retired branches included, and a new
      * test run leaves retired branches out. A tester reading one and being
      * offered the other had nothing to tell them why (#274).

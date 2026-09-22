@@ -42,7 +42,7 @@ There is no key for this. The box is at the right of the status bar.
 - **Rule-EDITOR-PANEL-107** — Changing it goes back to the first page and
   returns the keyboard to the list.
 - **Rule-EDITOR-PANEL-222** — The page size last typed is remembered. Every test
-  set editor and test run editor opened afterwards starts with it, after a
+  set editor and test run editor opened afterward starts with it, after a
   restart too. An editor already open keeps its own.
 
 ## What the tester sees
@@ -59,7 +59,7 @@ the tester can see what happened.
 2. The tester types 200 and presses `Enter`.
 3. The view is drawn again from the first page, 200 test cases at a time.
 4. The size is remembered. Every test set editor and test run editor opened
-   afterwards starts at 200, after a restart too.
+   afterward starts at 200, after a restart too.
 5. The keyboard goes back to the list.
 6. Nothing is said.
 

@@ -101,8 +101,8 @@ Nothing.
 
 ## What else is on the toolbar
 
-This button is tooltipped **Details** and the fields button beside it is
-tooltipped **Fields**. They used to share the one word.
+The tooltip of this button reads **Details**, and the tooltip of the fields
+button beside it reads **Fields**. They used to share the one word.
 
 ---
 

@@ -28,8 +28,8 @@ A test run is one round of testing, with a verdict for each test case.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  at once confirm once, with a count: the tester sees *Removed 4*, never four
-  messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees
+  *Removed 4*, never four messages. Looking at something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
@@ -61,9 +61,9 @@ A test run is one round of testing, with a verdict for each test case.
   case in it starts **Pending**.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
-  is - drawn with Inactive beside its name like any other status - and its test
-  sets, cases and runs are not read, because a project nobody is working on is
-  not worth the walk.
+  is, drawn with Inactive beside its name like any other status. Its test sets,
+  cases and runs are not read, because a project nobody is working on is not
+  worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 

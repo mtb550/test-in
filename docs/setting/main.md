@@ -70,7 +70,7 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 │  Testin                                                                    │
 ├────────────────────────────────────────────────────────────────────────────┤
 │                                                                            │
-│   Testin folder:           [ Example -> C:\Users\...\Testin ] [...] [Open] │
+│   Testin folder:           [ Example: C:\Users\...\Testin   ] [...] [Open] │
 │                                                                            │
 │   Log level:               [ INFO                                     v ]  │
 │                                                                            │

@@ -67,7 +67,7 @@ A small message appears at the bottom of the IDE and fades. It reads
 7. A message reads *Refreshed*. In a test run editor where an execution was
    running, it reads *Refreshed, and the execution stopped*.
 8. In the background, Testin rebuilds the values the completion fields and the
-   group filter offer from every test case. A group no test case uses any more,
+   group filter offer from every test case. A group no test case uses anymore,
    such as one renamed with Update Test Case, is no longer offered.
 
 ## What Testin refuses
@@ -100,7 +100,7 @@ one list of the values Testin knows. That list changes only at these moments.
 | Presses **Refresh** on the editor toolbar                                                                                          | The list is rebuilt in the background from every test case. A value no test case uses any more is no longer offered                                     |
 | Starts the IDE again                                                                                                               | The list starts empty, and fills as editors open                                                                                                        |
 
-So a group renamed from *Somke* to *Smoke* is still offered as *Somke* until
+So a group renamed from *Smoke* to *Sanity* is still offered as *Smoke* until
 the tester presses Refresh. Creating and removing a test case are the only two
 changes that update the list on their own.
 

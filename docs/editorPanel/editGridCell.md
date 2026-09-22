@@ -43,7 +43,7 @@ table.
 - **Rule-EDITOR-PANEL-050** — Testin stores the value it made of what the tester
   typed, and redraws the cell to match.
 - **Rule-EDITOR-PANEL-051** — A cell that no longer shows what was typed into it
-  says so, whether or not anything was saved.
+  says so, whether anything was saved or not.
 - **Rule-EDITOR-PANEL-052** — A cell that ends up the same as it started writes
   nothing and says nothing.
 - **Rule-EDITOR-PANEL-053** — Every cell saved is one entry on the undo history,
@@ -52,8 +52,8 @@ table.
   test case already had stays, and the tester is told: once for a cell, and once
   with a count for a sheet or a bulk edit. A refused test case is not counted
   among the ones the change touched. Blank is not unreadable — it clears a date
-  and it clears the groups, and it leaves the priority and the status alone,
-  because those have no empty form.
+  and the groups, and it leaves the priority and the status alone, because
+  those have no empty form.
 
 ## The screen
 

@@ -96,8 +96,8 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
     }
 
     /**
-     * Builds a test project the way the create action does: the mapper writes
-     * the directories and their markers, then the indexer is told.
+     * Builds a test project the way the action that creates one does: the mapper
+     * writes the directories and their markers, then the indexer is told.
      */
     private TestProjectDirectoryDto create(final Path path) {
         return WriteAction.computeAndWait(() -> {

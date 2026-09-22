@@ -52,7 +52,7 @@ There is no key for this. It starts on its own.
 - **Rule-INTERNAL-082** — Two test case files claiming one identity are reported
   rather than merged. A test case is identified by its file name, and the index
   holds one case per identity, so the second file read goes over the first and
-  neither test set can reach its own any more. The read cannot choose which of
+  neither test set can reach its own anymore. The read cannot choose which of
   the pair keeps the identity, so it names the files and leaves that to the
   tester.
 - **Rule-INTERNAL-083** — Who created a node, and when, is stamped once: the
@@ -67,7 +67,7 @@ There is no key for this. It starts on its own.
   it says is read in one place, so a missing value means the same thing
   everywhere.
 - **Rule-INTERNAL-090** — Every folder carries an id of its own in its marker:
-  stamped the first time Testin writes that marker, never changed afterwards,
+  stamped the first time Testin writes that marker, never changed afterward,
   and fresh on a copied folder. Nothing in Testin reads it; it names a project,
   a set or a run for a tool outside the IDE.
 - **Rule-INTERNAL-093** — A result file Testin could not read is never written

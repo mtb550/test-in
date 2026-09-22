@@ -27,7 +27,7 @@ nothing about it until something would have written code.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
-  when `testin.yml` names that test project. Otherwise nothing is generated,
+  when `testin.yml` names that test project. Otherwise, nothing is generated,
   renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
@@ -98,9 +98,9 @@ yet, should still be able to use every other part of the plugin. So a missing
 folder is a skip with a message, never an error.
 
 **And nothing to hear about until it matters.** Project open used to raise this
-message before anything had been asked of the folder, so a tester who opened the
+message before anything had been asked of the folder. So a tester who opened the
 IDE to read test cases was told about automation they were not doing, on every
-open, forever - and nothing about it was fixable from where they were standing.
+open, forever. Nothing about it was fixable from where they were standing.
 The check bought nothing either: reading test data is gated on the Testin folder,
 not on this one, and every generator already skips for itself ([#286](https://github.com/mtb550/test-in/issues/286)).
 

@@ -68,7 +68,7 @@ This has been tried and undone. `testin_example/.idea/` was found carrying both
 service is application level, the second because
 `testin.settings.ProjectSettingsState` does not exist in the source or anywhere
 in the git history. Both were deleted on 2026-09-02. A stale config file that
-silently does nothing costs more than the setting it was meant to hold.
+silently has no effect costs more than the setting it was meant to hold.
 
 ## Code conventions
 
@@ -93,7 +93,7 @@ silently does nothing costs more than the setting it was meant to hold.
   (`UnifiedEditorProvider` for `FileEditorProvider`, `TreeTransferHandler` for
   `TransferHandler`); it is a `@FunctionalInterface` where the suffix *is* the
   job (`RemoveHandler`, `ImportHandler`); the plain noun would collide with a
-  platform type (`GitRepositoryService` against git4idea's `GitRepository`); or
+  platform type (`GitRepositoryService` against `git4idea`'s `GitRepository`); or
   it distinguishes the reader from the value it serves. A fifth `*Manager` is
   not a reason, it is a class nobody has read yet.
 
@@ -105,14 +105,14 @@ silently does nothing costs more than the setting it was meant to hold.
   needs `--no-build-cache`: Gradle restores the pre-rename casing and javac
   verifies classpath entries case-sensitively, which surfaces as a
   package-private class being invisible to a test in its own package.
-- **A method declaration is one line.** However many parameters it has, however
-  long the annotations make it - the signature does not wrap. A signature is one
-  thing to read, and split over four lines it is four things to reassemble before
-  the first question about the method can be asked. No IntelliJ inspection says
-  this, so `tools/inspect.ps1` does: it reports a wrapped signature as
-  `WrappedMethodDeclaration` and exits non-zero for one, alongside `DataFlowIssue`
-  and `ReturnNull`. `.github/workflows/inspect.yml` runs it on every push to
-  `main`.
+- **A method declaration is one line.** No matter how many parameters it has or
+  how long the annotations make it, the signature does not wrap. A signature is
+  one thing to read, and split over four lines it is four things to reassemble
+  before the first question about the method can be asked. No IntelliJ
+  inspection says this, so `tools/inspect.ps1` does: it reports a wrapped
+  signature as `WrappedMethodDeclaration` and exits non-zero for one, alongside
+  `DataFlowIssue` and `ReturnNull`. `.github/workflows/inspect.yml` runs it on
+  every push to `main`.
 - `final` on parameters and locals wherever possible.
 - Nullability: org.jetbrains `@NotNull`/`@Nullable` everywhere; Lombok
   `@NonNull` only on DTO/marker fields (it generates runtime checks there).
@@ -177,12 +177,12 @@ silently does nothing costs more than the setting it was meant to hold.
   notification that stays in the Notifications log. Work that happens under the
   tester's hand takes the balloon — that is almost everything. Work that runs in
   the background and completes on its own time takes `info`, so a sync or a push
-  that lands while they are reading a bug report is still there afterwards. Those
+  that lands while they are reading a bug report is still there afterward. Those
   keep a short title and one line of detail — `Synced` / "Up to date with the
   remote" — never a sentence and never an exclamation mark.
 - **The code carries no comments but its markers.** A `UC-` or `Rule-` marker
-  above the signature, and nothing else: no javadoc, no paragraph saying why, no
-  line narrating the next one. Muteb, 20 September 2026: *"i want to make my
+  above the signature, and nothing else: no Javadoc, no paragraph saying why, no
+  line narrating the next one. Muteb, 20 September 2026: *"[I] want to make my
   classes clear and simple, no more comments accept rule and use case numbers."*
 
   27,483 comment lines came out of `src/main/java` in one commit - 34% of every
@@ -206,7 +206,7 @@ silently does nothing costs more than the setting it was meant to hold.
 - **American English**, in comments and in text a tester reads. The platform API
   this is written against is American (`Color`, `EditorColors`, `normalize`), so
   British spellings put two dialects in one sentence — a comment about "the caret
-  row colour" directly above `EditorColors.CARET_ROW_COLOR`. It is a convention
+  row color" directly above `EditorColors.CARET_ROW_COLOR`. It is a convention
   rather than a cleanup because it does not stay fixed otherwise: #48 normalized
   28 of them, and the next few comments written put six back.
 - A method handles its own failures: no `throws` on the signature. Catch inside,
@@ -285,7 +285,7 @@ silently does nothing costs more than the setting it was meant to hold.
   whole directory, so a second piece of work never shares a checkout with the
   first - `git worktree add ../testin-<what> <branch>`, and remove it when the
   work is merged or abandoned. Switching a branch under work in progress
-  destroys it silently, and there is nothing to notice afterwards.
+  destroys it silently, and there is nothing to notice afterward.
 
 - **A hundred compile errors are usually one.** An error in an annotation stops
   Lombok's processing, so every member it would have generated is absent and
@@ -301,7 +301,7 @@ silently does nothing costs more than the setting it was meant to hold.
   the build says.
 
 - **Do not run `./gradlew inspect` by hand.** It runs in CI on every push to
-  `main` and the result is read from the run afterwards — twenty minutes of
+  `main` and the result is read from the run afterward — twenty minutes of
   indexing is not something to spend between one edit and the next, and a gate
   somebody waits on is a gate that gets skipped. `compileJava test` is the check
   to run while working; `ideTest` when the change reaches the indexer or the
@@ -313,6 +313,7 @@ silently does nothing costs more than the setting it was meant to hold.
   inspector is reading it produces findings about a version that no longer
   exists, which reads exactly like a real defect.
 
-  Either way the bar is the same: the nineteen rules it gates on at zero -
-  CONTRIBUTING.md names them, and this file does not keep a second list that
-  would fall behind - and every other survivor needs a reason written beside it.
+  Either way the bar is the same: zero findings in the files the repository
+  writes, apart from the few rules a headless run cannot be trusted with.
+  CONTRIBUTING.md names those, and this file does not keep a second list that
+  would fall behind.

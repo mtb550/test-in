@@ -66,8 +66,8 @@ public class StatusWorthShowingTest {
     }
 
     /**
-     * The status of a node that has none answers active, so a marker carrying
-     * nothing draws nothing rather than being asked about.
+     * The status of a node that has none answers active, so an empty marker
+     * draws nothing rather than being asked about.
      */
     @Test
     public void noStatusAtAllIsNothingToSay() {

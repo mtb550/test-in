@@ -165,7 +165,7 @@ belongs to, and looking a class up by name is a question the index answers - so
 until the index is built there is no answer to give.
 
 The refusal is deliberate, rather than waiting for the index and doing the work
-afterwards. Waiting would be right for creating something and wrong for renaming
+afterward. Waiting would be right for creating something and wrong for renaming
 or moving it: **Rule-CODEGEN-004** has a rename happen while the old name still
 finds the code, and a rename that waited would run after the tree had changed
 and look for a class that no longer answers to that name. So Testin says it

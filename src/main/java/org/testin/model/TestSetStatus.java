@@ -25,16 +25,16 @@ import org.testin.util.Bundle;
 @AllArgsConstructor
 public enum TestSetStatus implements NodeStatus {
     ACTIVE(
-            Bundle.message("status.testset.active"),
-            Bundle.message("status.testset.active.action"),
-            Bundle.message("status.testset.active.description"),
+            Bundle.message("status.test.set.active"),
+            Bundle.message("status.test.set.active.action"),
+            Bundle.message("status.test.set.active.description"),
             true
     ),
 
     DEPRECATED(
-            Bundle.message("status.testset.deprecated"),
-            Bundle.message("status.testset.deprecated.action"),
-            Bundle.message("status.testset.deprecated.description"),
+            Bundle.message("status.test.set.deprecated"),
+            Bundle.message("status.test.set.deprecated.action"),
+            Bundle.message("status.test.set.deprecated.description"),
             false
     );
 

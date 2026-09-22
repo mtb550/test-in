@@ -32,7 +32,7 @@ import static org.testng.Assert.assertTrue;
  * Bug severity and priority are only ever collected by the failure dialog, so a
  * case that goes from failing to passing must not keep them: they would survive
  * into the run JSON and into every report generated from it, describing a bug
- * nobody is reporting any more.
+ * nobody is reporting anymore.
  */
 public class TestRunVerdictTest {
 

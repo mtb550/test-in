@@ -53,11 +53,11 @@ public class TestRunMarker extends AbstractMarker {
     private Map<ResultAnalysis, String> resultAnalysis = new EnumMap<>(ResultAnalysis.class);
 
     @NonNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = Config.DATE_FORMAT_LOCALE)
     private ZonedDateTime executionStartedAt = Config.NOT_EXECUTED;
 
     @NonNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = Config.DATE_FORMAT_LOCALE)
     private ZonedDateTime executionEndedAt = Config.NOT_EXECUTED;
 
     public void markExecutionStarted() {

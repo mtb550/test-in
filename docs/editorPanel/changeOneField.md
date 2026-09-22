@@ -40,8 +40,8 @@ One field, one small dialog. The rest of the test case is left alone.
 - **Rule-EDITOR-PANEL-036** — The dialog always shows the description, and shows
   the expected result when it is not empty, so the tester can see what they are
   changing.
-- **Rule-EDITOR-PANEL-037** — A save that changed nothing writes nothing and
-  says nothing.
+- **Rule-EDITOR-PANEL-037** — A save that left every field as it was writes
+  nothing and says nothing.
 - **Rule-EDITOR-PANEL-038** — One gesture is one entry on the undo history,
   however many test cases it changed.
 - **Rule-EDITOR-PANEL-039** — Undo puts the test case back exactly, including
@@ -111,8 +111,8 @@ dialog shows.
 
 **If another test case in this test set already names that method** — nothing is
 saved, and the same message the create dialog shows. The test case being edited
-is not compared against itself, so a description left as it was is never
-refused.
+is not compared against itself, so a description the tester left unchanged is
+never refused.
 
 **If several test cases are selected** — the menu title becomes **Update**, then
 the count, then **Test Cases**. Picking a field opens the bulk editor instead.

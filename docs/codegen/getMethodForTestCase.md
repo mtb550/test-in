@@ -26,7 +26,7 @@ There is no key for this. It happens when a test case is created, which is
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
-  when `testin.yml` names that test project. Otherwise nothing is generated,
+  when `testin.yml` names that test project. Otherwise, nothing is generated,
   renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
@@ -34,7 +34,7 @@ There is no key for this. It happens when a test case is created, which is
   letters and digits removed, the first word lowercase and later words
   capitalized.
 - **Rule-CODEGEN-013** — `testName` carries the test case's identity. That is
-  what finds the method afterwards.
+  what finds the method afterward.
 - **Rule-CODEGEN-014** — `priority` carries the test case's position in its test
   set, counting from one. TestNG runs methods in that order. It is not the test
   case's own High, Medium or Low, which is a different thing and writes nothing
@@ -105,7 +105,7 @@ description cannot name a test method** says what the method would have been
 called.
 
 **If the class already holds a method with that name** — no method is written
-for the second test case, and a message titled *A test case has no automation
+for the second test case. A message titled *A test case has no automation
 method* names it and says it would be named after a method the class already
 has. Typing such a description is refused before the test case is created, and
 so is editing one into it, so what reaches here comes from an import, a paste,

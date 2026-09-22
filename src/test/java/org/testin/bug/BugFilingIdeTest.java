@@ -59,9 +59,9 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
      * ten seconds have passed - dispatching events meanwhile, in case the writer
      * needs this thread.
      * <p>
-     * The write is queued, so the test waits for it. Waited for until the file
-     * exists, it failed now and then: a file is created before its bytes land,
-     * and a read in between found it empty (#312, N21).
+     * Writing the file is queued, so the test waits for it. Waited for until the
+     * file exists, it failed now and then: a file is created before its bytes
+     * land, and a read in between found it empty (#312, N21).
      */
     private static String awaitFileHoldingTheIssue(final Path file) {
         final long deadline = System.currentTimeMillis() + 10_000;

@@ -38,10 +38,10 @@ import static org.testng.Assert.assertTrue;
  * The results used to be named after the folder holding them -
  * {@code Cycle-1/Cycle-1.json} - which made a run the only node in the tree whose
  * contents were named after it, and so the only node a rename could empty. It
- * did: the write derived that name and the scan's read derived it again, and
- * neither told the rename. Renaming a cycle moved the folder, left the results
- * behind under the old name, and the next index found nothing where a whole
- * cycle had been.
+ * did: the code that wrote the results derived that name, the scan that read
+ * them derived it again, and neither told the rename. Renaming a cycle moved
+ * the folder, left the results behind under the old name, and the next index
+ * found nothing where a whole cycle had been.
  * <p>
  * What actually fixes that is not the rename learning to carry the file, but the
  * name having nothing to keep in step with - so what is pinned here is the
@@ -51,9 +51,10 @@ import static org.testng.Assert.assertTrue;
  * is what makes it the regression test.
  * <p>
  * Deliberately not a test of {@code ProjectIndexer.renameNode} itself. That needs
- * the VFS inside a write action, this repository has no platform test harness
- * (#108), and the rename is now three lines that know nothing about test runs -
- * the part that was ever specific to a run is the naming, and the naming is here.
+ * the VFS inside a write action, and this repository has no platform test
+ * harness (#108). The rename is now three lines that know nothing about test
+ * runs. The part that was ever specific to a run is the naming, and the naming
+ * is here.
  * The folder rename below is therefore a real one on disk, standing in for the
  * VFS operation that performs it in the IDE.
  * <p>

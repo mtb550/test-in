@@ -188,7 +188,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
 
     // UC-SHARE-011, Rule-SHARE-052
     private boolean revertField(final @NotNull ProjectIndexer indexer, final @NotNull Path testSetPath, final @NotNull ChangeType changeType, final @NotNull PendingChange diff) {
-        if (!changeType.isRevertable()) {
+        if (!changeType.isRevertible()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("dialog.pending.revert.not.supported", changeType.getLabel()));
             return false;
         }
@@ -234,7 +234,6 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
     private record Row(@NotNull PendingChange diff, @NotNull FieldChange change) {
     }
 
-    public record Request(@NotNull List<PendingChange> changes, @NotNull String message, boolean push,
-                          @NotNull String branch, boolean newBranch) {
+    public record Request(@NotNull List<PendingChange> changes, @NotNull String message, boolean push, @NotNull String branch, boolean newBranch) {
     }
 }

@@ -73,9 +73,9 @@ with a count after it for more than one test case.
    and removed from the class it came from. It then takes its place in this test
    set's order, so the run executes it where its card sits (Rule-CODEGEN-014).
 8. On a copy, each test case gets a method of its own in this test set's class,
-   because a copy is a new test case - and that method starts with the body of
-   the one it was copied from, which stays where it is. Only the body comes
-   across; the identity, the name and the attributes are the copy's own.
+   because a copy is a new test case. That method starts with the body of the
+   one it was copied from, which stays where it is. Only the body comes across;
+   the identity, the name and the attributes are the copy's own.
 9. A message reads *Pasted*, with a count for more than one.
 
 ## What Testin refuses
@@ -106,7 +106,7 @@ them.
 **If a cut test case cannot be written where it goes** — it stays in the test set
 it was cut from and is not pasted. A message reads *unable to write content:* and
 the reason. The rest of the cut still moves. When none of it could be written,
-the cut is still waiting, and pasting again tries again.
+the cut keeps waiting, and the next paste tries again.
 
 ## Pasting into the same test set
 

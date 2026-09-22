@@ -75,7 +75,7 @@ not move on.
 ## Failing several at once
 
 The failure dialog does not open. All of them are failed with nothing written
-about why. The detail can be filled in afterwards, one at a time, with `F2`,
+about why. The detail can be filled in afterward, one at a time, with `F2`,
 which is [UC-EDITOR-PANEL-040](editFailureDetail.md).
 
 For a real defect this is usually the wrong gesture. Failing one test case at a

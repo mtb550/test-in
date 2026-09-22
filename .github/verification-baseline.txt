@@ -1,7 +1,7 @@
 # How many compatibility problems the Plugin Verifier currently reports for each
 # IDE, and therefore how many the Marketplace will show against the plugin page.
 #
-# verify.yml fails when a number goes up and tells you when one goes down.
+# verify.yml fails when a count goes up and tells you when one goes down.
 #
 # Keyed by IDE and branch, because the sweep now runs both ends of the range
 # the plugin claims - 261, which it is built against, and 262, which is what the

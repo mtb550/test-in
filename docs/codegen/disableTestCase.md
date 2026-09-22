@@ -25,7 +25,7 @@ disabled.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
-  when `testin.yml` names that test project. Otherwise nothing is generated,
+  when `testin.yml` names that test project. Otherwise, nothing is generated,
   renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
@@ -51,7 +51,7 @@ public void logInWithAValidUser() {
 
 ## Main flow
 
-1. The tester sets a test case's status to disabled.
+1. The tester gives a test case the disabled status.
 2. Testin finds the method by the test case's identity.
 3. Testin writes `enabled = false` into the annotation.
 4. TestNG skips the method from then on.

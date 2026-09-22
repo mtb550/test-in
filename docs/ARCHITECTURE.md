@@ -54,7 +54,7 @@ plugin is: `testin-java` writes and reconciles the generated Java, and
 learns whether anything answered — see [The two content
 modules](#the-two-content-modules).
 
-### The layers, and what each is allowed to do
+### The layers and what each is allowed to do
 
 | Layer        | Packages                                                                                                   | May touch test data files                                           |
 |--------------|------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
@@ -78,9 +78,9 @@ in no row of this table at all. They are in `actions` and `view.marker` now -
 where the first already extends `AbstractProjectAction`, and the second opens
 `MarkerDetailsViewDialog` and does nothing else.
 
-`testset` held one action and the group that built it, both of them a copy of
-the package pair two directories away and of the test project pair one
-directory further - three classes setting a status, differing in the name of a
+`testset` held one action and the group that built it. Both were a copy of the
+package pair two directories away and of the test project pair one directory
+further. That made three classes setting a status, differing in the name of a
 DTO and in nothing else. There is one now, in `explorer.tree` where the menu
 that offers it lives: a marker says which statuses its node has and applies the
 one it is given, so the tester sees the statuses of whatever they right-clicked
@@ -116,8 +116,8 @@ belongs beside the feature.
 ### Where the graph is not a tree
 
 Not every import points down that picture. Three shapes account for almost all
-of the ones that do not, and all three are deliberate, so they are described
-here rather than listed one by one:
+the ones that do not, and all three are deliberate, so they are described here
+rather than listed one by one:
 
 - **An action holds the surface it acts on**, and a feature owns the actions
   that invoke it. `git/SyncActionAction` reaching `explorer` is a gesture
@@ -164,9 +164,9 @@ is not a rename, though. `Rescan` asks `Services.isNotCreated(p, TreePanel.class
 before it does anything at all, and that question decides whether the project is
 scanned, not only whether anything is redrawn: a project that never opened the
 Testin tool window must not be indexed behind the tester's back (#77). Moving the
-notification to a topic leaves that decision with nothing to ask, so the move is
-a new question for the indexer to answer about itself plus two subscribers plus
-the ordering - record first, tell the surfaces second - and it is worth doing on
+notification to a topic leaves that decision with nothing to ask. So the move is
+a new question for the indexer to answer about itself, plus two subscribers,
+plus the ordering - record first, tell the surfaces second. It is worth doing on
 its own rather than inside a sweep (#66, finding 60).
 
 What is **not** there: **`model` imports nothing above it at all** - not
@@ -219,14 +219,15 @@ package can reach the writer at all.
 What they have in common is that none of them read or write **test data**. They
 handle generated source, the automation repository's own `testin.yml`, the Git
 working tree, files outside the tree, generated report output, the IDE settings
-path, the log, and the temporary folder a bug report is sent from. `config` in particular reads a file that lives in the
-automation repository rather than under the Testin folder, and it runs before the
-indexer exists — the name it reads is one of the two `BoundTestProject` weighs to
-tell the indexer which project to index.
+path, the log, and the temporary folder a bug report is sent from. `config` in
+particular reads a file that lives in the automation repository rather than
+under the Testin folder. It runs before the indexer exists. The name it reads is
+one of the two `BoundTestProject` weighs to tell the indexer which project to
+index.
 
 `bug` joined the list with #28. It writes a bug report's body and screenshots
 into a fresh temporary folder, runs `gh` from there, and deletes the folder
-afterwards. The test case's own file is asked of the indexer
+afterward. The test case's own file is asked of the indexer
 (`ProjectIndexer.testCaseFile`), never built. Its other edges point down: `git`
 for the test project's remote and branch, `report` for `ReportText.joined`, and
 `config` for `bugRepoUrl`.
@@ -291,10 +292,10 @@ anything else happens at all.
 | 9   | `indexer/TestDataFiles.write`                          | Refuses a zero-byte write, claims the path in `OwnWrites` **before** `Files.write`, writes, then records what landed.                   |
 | 10  | back in `GridEditListener`                             | The attribute's `GenType` regenerates the test method, and `TestCaseSnapshot.record` files the undo entry.                              |
 
-**Why the bytes are identical.** Step 6 asks the question the rule states, in the
-rule's own terms: would this write leave the file the same. It has to be asked as
+**Why the bytes are identical.** Step 6 puts the rule's question in the rule's
+own terms: would this write leave the file the same. It has to be asked as
 bytes, and it has to be asked *before* step 7, because the stamp is itself a
-change — `touch()` writes a new `updatedAt`, and anything compared after it
+change. `touch()` writes a new `updatedAt`, and anything compared after it
 differs by the one field the check exists to avoid writing. It also cannot be
 asked in memory: the index hands out its own objects and the dialogs edit them in
 place, so by the time a save arrives the indexed case and the case being saved
@@ -310,7 +311,7 @@ stamping it would move the lie one level up.
 **Step 9's ordering is a bug fix, not a preference.** The VFS event can arrive
 while the thread is still inside `Files.write`, and a file claimed a moment too
 late looks to the watcher like somebody else's edit (#20). Claim first, record
-what landed afterwards, so an edit the tester makes inside that window is told
+what landed afterward, so an edit the tester makes inside that window is told
 from this write rather than swallowed with it (#278).
 
 There is one deliberate bypass. `putTestCaseVerbatim` stores without stamping: an
@@ -338,12 +339,11 @@ how to run anything; a content module does.
 | 10  | `runner/TestCaseExecutionSubscriber.report`                        | Decides what the report means: a case the tester stopped reports itself failed, and that is not a failure. Records the verdict against the **id**, then tells the surfaces.                                                                   |
 | 11  | `editor/test/TestEditor`, `editor/run/RunEditor`, `view/ViewPanel` | Repaint.                                                                                                                                                                                                                                      |
 
-**One recorder per project, not one per surface.** Step 10 runs whether or not
-anything is open. Each surface used to subscribe and record for itself, so the
-model was updated once per open surface and not at all when none was open —
-running a test set from the tree in a session where no editor had been opened
-stored no verdict at all, and every card afterwards showed no result for a run
-that had passed (#66).
+**One recorder per project, not one per surface.** Step 10 runs even when nothing
+is open. Each surface used to subscribe and record for itself, so the model was
+updated once per open surface and not at all when none was open. Running a test
+set from the tree in a session where no editor had been opened stored no verdict
+at all. Every card afterward showed no result for a run that had passed (#66).
 
 The order in step 10 is guaranteed rather than hoped for. A surface asked to
 redraw reads what is running from `TestNGExecution`, so it must not be told before

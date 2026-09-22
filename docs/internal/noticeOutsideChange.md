@@ -41,7 +41,7 @@ panel does the same job by hand, and is on
   Report Bug before it sends, read it again.
 - **Rule-INTERNAL-081** — A test project stays readable while it is read again.
   The pass reads into a copy and is put in when it is finished, so everything
-  still on disk answers throughout, and a pass that is cancelled or that fails
+  still on disk answers throughout, and a pass that is canceled or that fails
   changes nothing at all. What the pass did not find is dropped when it lands,
   which is how the read forgets what was deleted.
 
@@ -84,7 +84,7 @@ One progress bar, whatever changed and however many test projects it touched.
    the IDE, or another program.
 2. Testin checks the path. It keeps the test project the file belongs to.
 3. Testin waits four tenths of a second, in case more changes are coming.
-4. The progress bar opens, reading *Reading test data that changed on disk*.
+4. The progress bar opens with *Reading test data that changed on disk*.
 5. Each changed test project is read again, exactly as UC-INTERNAL-002 reads it.
 6. The tree redraws. Every open editor reloads.
 7. The bar closes. Nothing else is said.

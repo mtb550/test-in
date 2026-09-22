@@ -38,7 +38,7 @@ import static org.testng.Assert.assertTrue;
  * because the question is on the {@link Marker} contract they all implement.
  * <p>
  * A run's configuration used to be among those answers, held on the marker.
- * It is not any more: the run's own file owns it, and the popup looks the run
+ * It is not anymore: the run's own file owns it, and the popup looks the run
  * up the same way it already looks up the execution timestamps beside it. The
  * marker held a copy, so the reports read one store and the popup read the
  * other, and two owners for one fact is one of them going stale.

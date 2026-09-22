@@ -29,9 +29,9 @@ import static org.testng.Assert.assertTrue;
  * What a run row keeps when a test framework reports one of its cases.
  * <p>
  * The rule worth a test is the empty one. Every verdict passes a failure now,
- * including the ones a tester gives by hand, so a {@link Failure#NONE} that
+ * including the ones a tester gives by hand. So a {@link Failure#NONE} that
  * wrote itself in would quietly wipe what they had typed into
- * {@code FailedResultDialog} - and it would do it on the happy path, on the way
+ * {@code FailedResultDialog}. And it would do it on the happy path, on the way
  * to a green Passed.
  */
 public class FailureTest {

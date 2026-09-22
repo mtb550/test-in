@@ -94,11 +94,11 @@ final class IndexerDataStore {
         this.markers = new MarkerFiles(p);
     }
 
-    private static <T> @NotNull T indexed(final @Nullable T node, final @NotNull String kind, final @NotNull Path path) {
+    private static <T> @NotNull T indexed(final @Nullable T node, final @NotNull Class<T> kind, final @NotNull Path path) {
         if (node != null) return node;
 
-        Logger.error("No " + kind + " indexed at " + path);
-        throw new IllegalStateException("No " + kind + " indexed at " + path);
+        Logger.error("No " + kind.getSimpleName() + " indexed at " + path);
+        throw new IllegalStateException("No " + kind.getSimpleName() + " indexed at " + path);
     }
 
     private static void dropUnseen(final @NotNull Map<String, ?> held, final @NotNull Path projectPath, final @NotNull Map<String, ?> found) {
@@ -136,7 +136,7 @@ final class IndexerDataStore {
 
     @NotNull
     TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
-        return indexed(testRunsByPath.get(testRunPath.toString()), "test run", testRunPath);
+        return indexed(testRunsByPath.get(testRunPath.toString()), TestRunDto.class, testRunPath);
     }
 
     @NotNull
@@ -146,7 +146,7 @@ final class IndexerDataStore {
 
     @NotNull
     TestSetDirectoryDto getTestSetDirByPath(final @NotNull Path path) {
-        return indexed(testSetsDirByPath.get(path.toString()), "test set", path);
+        return indexed(testSetsDirByPath.get(path.toString()), TestSetDirectoryDto.class, path);
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-033

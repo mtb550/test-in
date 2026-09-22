@@ -3,8 +3,8 @@
 # UC-INTERNAL-004: Give a test case its number
 
 **As a** tester, **I want** every test case to carry the same number wherever I
-read it, **so that** the number I quote in a bug report means one test case and
-not a row in whatever list I happened to be looking at.
+read it, **so that** the number in my bug report means one test case, not a row
+in whatever list I was looking at.
 
 The number is the test case's place in its test set, counting from one.
 
@@ -42,8 +42,8 @@ panel.
   A move keeps who created the test case. A test case put back from the review
   keeps the audit it was committed with.
 - **Rule-INTERNAL-084** — A test case read from a file named by hand is filed
-  under its id the first time it is saved, and the hand-named file is removed
-  once that write has landed, so one test case never becomes two files. Removing
+  under its id the first time it is saved. The hand-named file is removed once
+  that write has landed, so one test case never becomes two files. Removing
   the test case removes the file it is in. When another file claims the same
   identity, both files are kept: which one is the test case is for the tester to
   decide.
@@ -62,7 +62,7 @@ The test set before the tester drags anything.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-The same test set afterwards.
+The same test set afterward.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -98,8 +98,8 @@ test case. The test set is not recorded as having changed either.
 
 **If the file cannot be written** — a read-only or locked file, a full disk —
 Testin says so, and treats the save as one that did not happen. The index keeps
-the test case as it was on disk, the test set is not recorded as changed, no
-undo is recorded and the generated method is not rewritten, so nothing goes on
+the test case as it was on disk, and the test set is not recorded as changed. No
+undo is recorded, and the generated method is not rewritten, so nothing goes on
 claiming an edit the file does not hold (Rule-INTERNAL-033).
 
 **If a test case has no place in the order** — it sorts last, with the other

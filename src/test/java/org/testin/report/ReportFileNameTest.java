@@ -31,7 +31,7 @@ import static org.testng.Assert.assertTrue;
  * What a report is called before the tester changes it.
  * <p>
  * The name has to survive being saved, mailed and filed next to reports from
- * other projects, so it carries the project, the run and when it was made - and
+ * other projects, so it carries the project, the run and when it was made. And
  * it has to be a name a file system will actually accept.
  */
 public class ReportFileNameTest {
@@ -95,7 +95,7 @@ public class ReportFileNameTest {
      * verdict should not ask whether to overwrite what was sent an hour ago.
      */
     @Test
-    public void asecondReportOfTheSameRunIsASecondFile() {
+    public void aSecondReportOfTheSameRunIsASecondFile() {
         assertNotEquals(ReportFileName.of("Nafath", "Sprint 7", AT.plusSeconds(1)), ReportFileName.of("Nafath", "Sprint 7", AT));
     }
 }

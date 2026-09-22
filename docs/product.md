@@ -2,7 +2,7 @@
 
 # The product — business requirements
 
-> Testin is test case management that lives inside the IDE instead of inside a
+> Testin is a test case manager that lives inside the IDE instead of inside a
 > browser tab. A tester can execute a whole test run without touching the
 > mouse. That is the product, not a feature of it.
 
@@ -42,7 +42,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 > - **#68 is closed.** Question 2 still calls it open.
 > - **#71 is closed.** Question 3 still calls it open.
 > - **Section 6.1's keys are wrong in three places.** Creating a node has no key
->   of its own any more; `Ctrl+M` creates a test case and nothing else. Renaming
+>   of its own anymore; `Ctrl+M` creates a test case and nothing else. Renaming
 >   is `Shift+F6`, not `F2`, and it is one action rather than two. `Ctrl+F` puts
 >   the cursor in an editor's own search box; searching the whole test project is
 >   `Ctrl+Alt+F`. [Every shortcut](shortcuts.md) is the current list.
@@ -65,9 +65,9 @@ is genuinely undecided it is listed as undecided rather than invented.
 > Nothing above has been corrected in the text below, deliberately: this is
 > Draft 1 as written. The issue that owned correcting it,
 > [#72](https://github.com/mtb550/test-in/issues/72), was closed as not planned
-> on 11 September 2026 — the documentation is being written as the eight parts
+> on 11 September 2026. The documentation is being written as the eight parts
 > listed on [the home page](README.md) rather than as a separate business
-> specification, so those parts are where a current answer lives. Nothing owns
+> specification. So those parts are where a current answer lives. Nothing owns
 > this page now. The document's own rule is that a rule which quietly stops
 > being true is worse than no rule, so the staleness is stated instead of
 > patched over.
@@ -81,7 +81,7 @@ is genuinely undecided it is listed as undecided rather than invented.
 
 ## 1. Purpose and scope
 
-Testin is test case management that lives inside the IDE instead of inside a
+Testin is a test case manager that lives inside the IDE instead of inside a
 browser tab.
 
 This document states what the product **promises**. It says who uses Testin,
@@ -287,7 +287,7 @@ stateDiagram-v2
 > ** Undecided. See section 9.** The diagram shows what the product *allows*.
 > It currently allows every move, including Completed back to In Progress.
 > **Nothing stops a test run moving anywhere at all.** Whether a signed-off test
-> run may be reopened is question **Question 1**.
+> run may be reopened is **Question 1**.
 
 ### 5.3 What a card shows while tests are running — four values
 
@@ -332,8 +332,8 @@ team thinks of the test case itself, across every test run it is ever in.
 > rule reads it, and no capability is withheld because of it.
 >
 > That matters because **Reviewed is the "approved" state the planned role
-> permissions describe.** The state already exists on every test case. What does
-> not exist is who may set it, and anything at all that changes once it is set. See
+> permissions describe.** The state already exists on every test case. Nothing
+> decides who may set it, and nothing at all changes once it is set. See
 > **Question 5**.
 
 ---

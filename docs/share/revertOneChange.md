@@ -8,7 +8,7 @@ work to lose one typo.
 Each row of the review is one changed field. This puts that one field back to
 what was committed, and leaves the rest of the test case alone.
 
-Right click the row in the review.
+Right-click the row in the review.
 
 ## Rules
 
@@ -58,7 +58,7 @@ Right click the row in the review.
 
 1. **The rows** — the changed fields. [UC-SHARE-010](reviewChanges.md) draws
    the whole dialog around them.
-2. **The menu** — right clicking a row opens it. It holds one entry.
+2. **The menu** — right-clicking a row opens it. It holds one entry.
 3. **Revert this change** — puts that one field back, then takes the row away.
    `Ctrl+Z` in that test set's editor takes the revert back (Rule-SHARE-119).
 

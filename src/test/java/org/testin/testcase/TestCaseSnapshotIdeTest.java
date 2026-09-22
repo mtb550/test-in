@@ -83,8 +83,8 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
     }
 
     /**
-     * A test project with one test set in it, built the way the create actions
-     * build them: the mapper makes the node, the indexer is told.
+     * A test project with one test set in it, built the way the actions that
+     * create them do: the mapper makes the node, the indexer is told.
      */
     private TestSetDirectoryDto checkoutSet() {
         return WriteAction.computeAndWait(() -> {

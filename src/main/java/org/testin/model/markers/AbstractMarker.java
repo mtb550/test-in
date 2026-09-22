@@ -45,14 +45,14 @@ public abstract class AbstractMarker implements Marker {
     @NonNull
     private String createdBy = "";
     @NonNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = Config.DATE_FORMAT_LOCALE)
     private ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     @JsonAlias("updatedBy")
     @NonNull
     private String modifiedBy = "";
     @JsonAlias("updatedAt")
     @NonNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = Config.DATE_FORMAT_LOCALE)
     private ZonedDateTime modifiedAt = Config.NOT_EXECUTED;
 
     public @NotNull String getModifiedBy() {

@@ -55,7 +55,7 @@ public class MarkerJsonTest {
     /**
      * Rule-INTERNAL-090. The folder's id is written when it has one and left out
      * while it has none, so a marker written before ids does not gain an empty
-     * key, and one that has an id keeps it through a read and a write.
+     * key, and one that has an id keeps it when it is read and written back.
      */
     @Test
     public void theFoldersIdIsWrittenOnlyOnceItHasOne() {
@@ -97,11 +97,11 @@ public class MarkerJsonTest {
     }
 
     /**
-     * A node nobody ordered says nothing about order.
+     * An unordered node says nothing about order.
      * <p>
      * "No number" is the largest number there is, so that an unordered node
-     * sorts after every ordered one without anything having to test for it - but
-     * these files are committed and read by people, and a marker carrying
+     * sorts after every ordered one without anything having to test for it. But
+     * these files are committed and read by people. A marker carrying
      * 2147483647 would be a number no human wrote and none can explain. It is
      * left out instead, and a file without the key reads back as unordered.
      */

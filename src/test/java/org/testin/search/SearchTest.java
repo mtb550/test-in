@@ -198,7 +198,7 @@ public class SearchTest {
     /**
      * What the editor can be opened on, which is the question that crashed.
      * <p>
-     * The editor type used to be read as "a test run, or else a test set", so
+     * The editor type used to be read as "a test run, or else a test set". So
      * every other node - a package, the Test Cases folder, the Test Runs folder -
      * was opened as a test set and died casting itself to one. Typing "run" was
      * enough to find the Test Runs folder and press Enter on it.

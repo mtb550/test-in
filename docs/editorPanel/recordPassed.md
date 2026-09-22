@@ -92,7 +92,7 @@ in Rule-EDITOR-PANEL-138 is only on the keyboard path. A test case is failed and
 written up by hand. Automation re-runs it later and it passes. The actual
 result, the error, the screenshots, the severity, the priority and the bug issue
 link all go, with no dialog. A message titled *Failure detail cleared* names
-them afterwards. That is difference 26.
+them afterward. That is difference 26.
 
 ---
 

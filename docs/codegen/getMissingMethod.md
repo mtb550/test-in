@@ -25,7 +25,7 @@ There is no button for this. It happens when the description is filled in.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
-  when `testin.yml` names that test project. Otherwise nothing is generated,
+  when `testin.yml` names that test project. Otherwise, nothing is generated,
   renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
@@ -77,10 +77,10 @@ nothing happens at all, and nothing is written anywhere, not even the log.
 
 There are two ways a missing method gets written. Filling in the description is
 this one, and it happens by itself the moment the description is saved. Asking
-for it outright is **Automate Test Case**, [UC-CODEGEN-005](automateTestCase.md),
-which is the way for a test case that arrived with its description already set -
-from a Git pull, a sync, an imported sheet or a branch switch - and so never had
-a description edit for this to hang on.
+for it outright is **Automate Test Case**, [UC-CODEGEN-005](automateTestCase.md).
+That is the way for a test case that arrived with its description already set -
+from a Git pull, a sync, an imported sheet or a branch switch. Such a test case
+never had a description edit for this to hang on.
 
 ---
 

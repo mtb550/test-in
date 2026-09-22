@@ -30,9 +30,9 @@ import static org.testng.Assert.assertTrue;
  * <p>
  * It used to be the manual walk's answer alone: the walk ran off the end of the
  * list and called the run finished. A tester who executed the whole run through
- * automation watched every card fill in and then found the run still In
+ * automation watched every card fill in. Then they found the run still In
  * Progress, with Start Execution offering to begin something that had already
- * happened - because no walk had run off any end.
+ * happened. That was because no walk had run off any end.
  * <p>
  * So the question moved to the run, where it does not depend on which of the two
  * executed it.

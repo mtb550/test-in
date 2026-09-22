@@ -25,7 +25,7 @@ There is no key for this. It happens when a package is renamed or moved.
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
-  when `testin.yml` names that test project. Otherwise nothing is generated,
+  when `testin.yml` names that test project. Otherwise, nothing is generated,
   renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
@@ -71,8 +71,8 @@ the `package` line at the top of every Java file beneath it has been rewritten.
 
 **If the automation code already has the package the new name makes** — for
 example a test project renamed to `Tests` in a code project that has its own
-`tests` package - nothing is renamed, and *Package tests Already Exists* is
-shown in red (Rule-CODEGEN-080). A package whose old folder is gone - a
+`tests` package - nothing is renamed. *Package tests Already Exists* is shown
+in red (Rule-CODEGEN-080). A package whose old folder is gone - a
 colleague's rename already pulled - is not in the way: there is nothing left to
 move, and the tree follows.
 
@@ -83,8 +83,8 @@ finish indexing first* is shown in red (Rule-CODEGEN-081).
 so.
 
 **If the move goes to a place Testin has not read** — the folder is left where
-it is, and a notification that stays, titled *The automation code did not move
-with* and the package's name, names the package and says what to do.
+it is. A notification that stays appears, titled *The automation code did not
+move with* and the package's name. It names the package and says what to do.
 
 **If the code project has no Java test source folder** — nothing happens, and
 nothing is said.

@@ -8,7 +8,8 @@
 # page, so the number here is the number a tester sees before installing.
 #
 # It is not always-green and is not meant to be yet. It fails when a count goes
-# up and reports when one goes down, against .github/verification-baseline.txt.
+# up and reports when one goes down, against verification-baseline.txt, which
+# sits one folder above this file.
 # The target on every line of that file is 0.
 name: Verify
 
@@ -32,7 +33,7 @@ on:
   workflow_dispatch:
 
 # A second push to main makes the first run's answer worthless, so it is
-# cancelled rather than left to finish. Named per workflow and branch, so it
+# canceled rather than left to finish. Named per workflow and branch, so it
 # never cancels the scheduled run or a run of build.yml.
 concurrency:
   group: verify-${{ github.ref }}
@@ -45,7 +46,7 @@ jobs:
   verify:
     name: Verify against every target IDE
     runs-on: windows-latest
-    # Four IDEs to download and analyse. The first run took eighteen minutes
+    # Four IDEs to download and analyze. The first run took eighteen minutes
     # with nothing cached.
     timeout-minutes: 120
 

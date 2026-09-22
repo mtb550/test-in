@@ -28,7 +28,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.Fqcn;
@@ -185,8 +184,7 @@ public class UpdateTestBase {
     }
 
     private void writeAll(final @NotNull Project p, final @NotNull String path, final @NotNull List<TestCaseDto> cases, final @NotNull BiConsumer<PsiMethod, TestCaseDto> updater) {
-        final @NotNull Optional<PsiClass> target =
-                Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)));
+        final @NotNull Optional<PsiClass> target = GeneratedClass.byName(p, path);
 
         if (target.isEmpty()) {
             Logger.warn("Update: class not found: " + path);
@@ -215,7 +213,7 @@ public class UpdateTestBase {
 
         final @NotNull Runnable inCommand = () ->
                 WriteCommandAction.runWriteCommandAction(p, title, null, () ->
-                        Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)))
+                        GeneratedClass.byName(p, path)
                                 .ifPresentOrElse(
                                         targetClass -> findMethodByTestName(targetClass, tc).ifPresentOrElse(updater,
                                                 () -> onMissing.accept("no method with testName=" + tc.getId())),

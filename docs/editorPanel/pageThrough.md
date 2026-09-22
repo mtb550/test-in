@@ -81,8 +81,8 @@ are `Ctrl+Right` and `Ctrl+Shift+Right`.
 
 The four keys work on the cards and in the grid, and they are on no menu. Paging
 moves the view and changes nothing about the test case under the pointer, so a
-menu about that test case is the wrong place to offer it — and the four arrows in
-the status bar are already there, each printing its own key.
+menu about that test case is the wrong place to offer it. The four arrows in the
+status bar are already there, each printing its own key.
 
 In the grid they are refused while a cell is open for editing, like every other
 key that would act on the row: a page turned under a half-typed Actual Result

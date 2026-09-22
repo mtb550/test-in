@@ -39,9 +39,9 @@ import static org.testng.Assert.assertTrue;
  * A keystroke claimed by two actions does not fail, and that is the problem: the
  * platform gathers every action bound to the key, runs whichever one is enabled,
  * and says nothing at all when two are. Testin lost {@code Ctrl+Shift+C} to the
- * IDE for weeks that way - the tester pressed it in a test editor and got
- * <i>Copy Path</i>, because a Testin editor is a file editor and IntelliJ has
- * owned that key since long before this plugin (#119).
+ * IDE for weeks that way. The tester pressed it in a test editor and got
+ * <i>Copy Path</i>. That is because a Testin editor is a file editor, and
+ * IntelliJ has owned that key since long before this plugin (#119).
  * <p>
  * The collision with the IDE is a decision rather than a defect and is not
  * checked here - the keys are in {@code docs/shortcuts.md} with what each
@@ -70,9 +70,10 @@ public class DeclaredShortcutsTest {
      * <p>
      * <b>Pinned to the exact pair rather than allowed as a key.</b> A list that
      * said "Ctrl+M may be shared" would keep passing when a third action joined
-     * it, or when one of these two was renamed away and something else took its
-     * place - which is the whole failure this test exists to catch. Written as
-     * the membership, so any change to it fails here and has to be meant.
+     * it. It would also pass when one of these two was renamed away and something
+     * else took its place. That is the whole failure this test exists to catch.
+     * Written as the membership, so any change to it fails here and has to be
+     * meant.
      */
     private static final Map<String, List<String>> SHARED_ON_PURPOSE = Map.of(
             "F2", List.of("Testin.UpdateTestCase", "Testin.UpdateRunItem", "Testin.EditTestRun"));

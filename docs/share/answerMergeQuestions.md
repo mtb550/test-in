@@ -10,12 +10,12 @@ shows both and lets the tester pick.
 
 **Two kinds of file raise a question, and one never does.** A test case asks
 about a field both sides rewrote. A test run's own `.tr` asks about a key both
-sides wrote differently into its configuration or its result analysis, and the
-row is named as the tester already knows that key - **Platform**, or the heading
-the analysis was written under. A result - one case's
-verdict - is never asked about at all: it is kept whole from whoever gave it
-last, because the status, the actual result, the stacktrace and the screenshots
-are one account of one execution and travel together ([UC-SHARE-017](resolveConflicts.md)).
+sides wrote differently into its configuration or its result analysis. The row
+is named as the tester already knows that key - **Platform**, or the heading the
+analysis was written under. A result - one case's verdict - is never asked about
+at all: it is kept whole from whoever gave it last, because the status, the
+actual result, the stacktrace and the screenshots are one account of one
+execution and travel together ([UC-SHARE-017](resolveConflicts.md)).
 
 There is no key that opens this. It opens during a merge.
 

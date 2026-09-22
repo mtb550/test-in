@@ -37,7 +37,7 @@ This is how every test case in Testin begins.
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-028** — The dialog opens showing the description alone.
   Every other field appears when its key is pressed.
-- **Rule-EDITOR-PANEL-029** — A field the tester never opened writes nothing.
+- **Rule-EDITOR-PANEL-029** — A field the tester left unopened writes nothing.
 - **Rule-EDITOR-PANEL-030** — A new test case has no place in the order yet, so
   it sorts last.
 - **Rule-EDITOR-PANEL-031** — A new test case starts at the lowest priority.
@@ -50,7 +50,7 @@ This is how every test case in Testin begins.
   the tester is in, then **Save** and **Cancel**. The shared two are always
   last, so a tester looks for Save in the same place whichever field they are
   in.
-- **Rule-EDITOR-PANEL-200** — There is one strip and it is never empty, because
+- **Rule-EDITOR-PANEL-200** — There is one strip, and it is never empty, because
   Save and Cancel are always on it. A field with no keys of its own adds
   nothing to it.
 - **Rule-EDITOR-PANEL-218** — A key is stood down only while a popup is actually
@@ -84,7 +84,7 @@ This is how every test case in Testin begins.
    in. A field with no keys of its own adds nothing, and the strip still shows
    those two.
 
-## The fields, and the keys that open them
+## The fields and the keys that open them
 
 | Field           | Key      | The gray hint in the empty box                     |
 |-----------------|----------|----------------------------------------------------|
@@ -95,7 +95,7 @@ This is how every test case in Testin begins.
 | Priority        | `Ctrl+P` | none, it is a list                                 |
 | Group           | `Ctrl+G` | none, and it completes the groups the project uses |
 | Test Data       | `Ctrl+T` | *set test data*                                    |
-| Pre Conditions  | `Ctrl+B` | *set pre conditions*                               |
+| Pre Conditions  | `Ctrl+B` | *set preconditions*                                |
 
 Each field's icon is the letter of its key in a rounded frame, so Pre Conditions
 shows B. The same icon marks the field's values in its completion list.

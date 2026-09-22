@@ -7,7 +7,7 @@ twice.
 
 A bug in Testin is not a thing of its own. It is what a test run's row records
 about a failure — how bad it is, how soon it must be fixed, and the issue it was
-filed as — so a test case's bugs are found by looking through the runs it has
+filed as. So a test case's bugs are found by looking through the runs it has
 been in.
 
 That is why the same test case can carry a **Blocker** from cycle 5 and nothing
@@ -41,7 +41,7 @@ There is no key for this. The tab is called **Open Bugs**.
 - **Rule-VIEW-PANEL-064** — The Open Bugs tab lists every bug the test case has
   recorded, and which test run recorded it. A bug is what a run row says about a
   failure - how bad it is, how soon it must be fixed, or the issue it was filed
-  as - so a case that has never failed has none, and the same case can carry a
+  as. So a case that has never failed has none, and the same case can carry a
   different bug in every cycle. A filed issue is shown as its link, and opens
   when clicked.
 - **Rule-VIEW-PANEL-065** — The bugs are read from the test runs the indexer

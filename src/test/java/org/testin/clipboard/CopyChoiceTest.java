@@ -35,10 +35,10 @@ import static org.testng.Assert.assertTrue;
  * The copy menu's rows, and the one thing about them nothing else can check.
  * <p>
  * Every row is a letter the tester types while the menu is open. Two rows on
- * one letter is the failure this project has a rule against - whichever the
- * menu consults first silently answers for both - and it is invisible in
- * review, because the two constants sit twelve lines apart and name different
- * fields (#108).
+ * one letter is the failure this project has a rule against: whichever the
+ * menu consults first silently answers for both. It is invisible in review,
+ * because the two constants sit twelve lines apart and name different fields
+ * (#108).
  */
 public class CopyChoiceTest {
 

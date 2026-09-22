@@ -28,8 +28,8 @@ import static org.testng.Assert.assertTrue;
 /**
  * A run status either draws a badge or it does not (#48).
  * <p>
- * The label and the color used to be separate fields - a {@code @NotNull} label
- * beside a {@code @Nullable} color - which let IDLE carry the label {@code ""}
+ * The label and the color used to be separate fields: a {@code @NotNull} label
+ * beside a {@code @Nullable} color. That let IDLE carry the label {@code ""}
  * for a badge it never draws, and made "has a label but no color" a state the
  * type allowed. They are one fact, so they are one field, and the card asks
  * {@code hasBadge()} once instead of a predicate the checker could not follow.

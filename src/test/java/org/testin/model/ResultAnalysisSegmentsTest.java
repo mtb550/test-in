@@ -111,11 +111,11 @@ public class ResultAnalysisSegmentsTest {
      * <b>The defect this file exists for.</b> The color has to be one that is
      * asked which theme it is in every time it paints.
      * <p>
-     * It was a hex literal written into an html string, chosen from the theme at
+     * It was a hex literal written into an HTML string, chosen from the theme at
      * the moment the string was built. The label then held that string until
-     * something handed it a new one, so a tester who switched theme kept the old
-     * palette until they turned a page - light to dark left the untouched count
-     * at a grey the enum's own comment calls very nearly the background. A fixed
+     * something handed it a new one. So a tester who switched theme kept the old
+     * palette until they turned a page. Light to dark left the untouched count
+     * at a gray the enum's own comment calls very nearly the background. A fixed
      * {@link Color} here would bring the whole defect back with nothing failing.
      */
     @Test
@@ -142,8 +142,8 @@ public class ResultAnalysisSegmentsTest {
 
     /**
      * The one bucket with two names. A case nobody reached is pending while the
-     * run is open and untested once it is over, which is the run changing it
-     * rather than a tester - so the line has to say whichever is true now, or it
+     * run is open and untested once it is over. That is the run changing it
+     * rather than a tester. So the line has to say whichever is true now, or it
      * tells a tester their untouched cases were given up on while they are still
      * working through them.
      */

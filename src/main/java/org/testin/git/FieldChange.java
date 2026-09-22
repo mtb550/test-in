@@ -18,6 +18,5 @@ package org.testin.git;
 
 import org.jetbrains.annotations.NotNull;
 
-public record FieldChange(@NotNull String fieldName, @NotNull String oldValue, @NotNull String newValue,
-                          @NotNull ChangeType changeType) {
+public record FieldChange(@NotNull String fieldName, @NotNull String oldValue, @NotNull String newValue, @NotNull ChangeType changeType) {
 }

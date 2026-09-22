@@ -30,9 +30,9 @@ import static org.testng.Assert.assertTrue;
  * The editor holds a claim on every case it launched, and that claim is what
  * makes a verdict land in the run the tester started rather than in some other
  * run holding the same case. It is released on the first report that says the
- * case is no longer going - so the question of which reports those are decides
- * whether a claim can outlive its execution, and a claim that does hands its run
- * the next verdict that case earns anywhere else.
+ * case is no longer going. So the question of which reports those are decides
+ * whether a claim can outlive its execution. A claim that outlives it hands its
+ * run the next verdict that case earns anywhere else.
  */
 public class RunStatusReportTest {
 
@@ -50,7 +50,7 @@ public class RunStatusReportTest {
     /**
      * A verdict is the end of the case, so a report carrying one always releases
      * the claim. The pairing is what the editor relies on - it records the
-     * verdict and lets go in the same breath.
+     * verdict and releases the claim in the same breath.
      */
     @Test
     public void everyVerdictEndsTheExecutionItReportsOn() {

@@ -365,7 +365,6 @@ public class CreateTestMethod implements GenAction {
         }
     }
 
-    record Target(@NotNull String path, @NotNull List<String> packageList, @NotNull String className,
-                  @NotNull String methodName) {
+    record Target(@NotNull String path, @NotNull List<String> packageList, @NotNull String className, @NotNull String methodName) {
     }
 }

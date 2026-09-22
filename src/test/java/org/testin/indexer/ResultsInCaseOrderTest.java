@@ -32,11 +32,11 @@ import static org.testng.Assert.assertEquals;
  * <p>
  * A run's results come back in their cases' test-set order (#305, S19).
  * <p>
- * The results are one file per case now, so the only order the scan gets for
- * free is the one the file system happens to list the folder in - which is a
- * different order on another machine and no order at all to a tester. The run
+ * The results are one file per case now. So the only order the scan gets for
+ * free is the one the file system happens to list the folder in. That is a
+ * different order on another machine, and no order at all to a tester. The run
  * editor draws them in it, every report prints them in it and every export
- * writes them in it, so the order is decided once, where the results are read,
+ * writes them in it. So the order is decided once, where the results are read,
  * and it is the order the cases sit in their test sets.
  * <p>
  * A result whose test case the project no longer holds cannot take a place in
@@ -62,7 +62,7 @@ public class ResultsInCaseOrderTest {
     private static final @NotNull UUID SECOND = UUID.fromString("11111111-1111-4111-8111-111111111102");
 
     /**
-     * A case the run recorded a verdict for and the project does not hold any more.
+     * A case the run recorded a verdict for and the project does not hold anymore.
      */
     private static final @NotNull UUID DELETED_CASE = UUID.fromString("11111111-1111-4111-8111-111111111103");
 

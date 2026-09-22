@@ -82,9 +82,9 @@ Git working folder, files chosen outside the Testin folder, generated reports,
 the settings this machine keeps, the folder a bug report is sent from, and the
 log.
 
-**A write is claimed before it happens, not after.** Testin tells itself which
+**A file is claimed before it is written, not after.** Testin tells itself which
 file it is about to write, then writes it. The other order looks the same and is
-not: the change can be noticed while the write is still running, and a file
+not: the change can be noticed while the file is still being written, and a file
 claimed a moment too late looks like somebody else's edit.
 
 **Nothing empty is ever written.** Writing nothing over a marker file empties

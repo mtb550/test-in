@@ -31,8 +31,8 @@ prevent.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  at once confirm once, with a count: the tester sees *Removed 4*, never four
-  messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees
+  *Removed 4*, never four messages. Looking at something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
@@ -61,21 +61,21 @@ prevent.
   If it names none, and exactly one test project exists in the Testin folder,
   Testin binds it to that one without asking.
 - **Rule-TREE-PANEL-097** — Opening the tree panel puts the keyboard in the
-  tree. Without that the IDE has nothing to give focus to and it stays in
+  tree. Without that, the IDE has nothing to give focus to, and it stays in
   whatever was there before, so keys pressed over the tree are answered by the
   editor beside it.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
-  is - drawn with Inactive beside its name like any other status - and its test
-  sets, cases and runs are not read, because a project nobody is working on is
-  not worth the walk.
+  is, drawn with Inactive beside its name like any other status. Its test sets,
+  cases and runs are not read, because a project nobody is working on is not
+  worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-117** — One thing decides whether text is an address a
   repository can be cloned from, and testin.yml is not it. The file keeps the
   address it was given, with any account or token taken out of it; whether that
-  text is an address at all is asked once, where something is about to act on
-  it. A file holding an address Testin does not recognise keeps it, so the
+  text is an address at all is asked once, at the point where something is
+  about to act on it. A file holding an address Testin does not recognize keeps it, so the
   tester can see it and correct it, and is offered no clone.
 - **Rule-TREE-PANEL-118** — While the first index is still running the panel
   says it is reading, in gray, and nothing else. A test project is found in the
@@ -149,8 +149,8 @@ Three more screens follow. The sixth is the tree itself.
 - *\<name\> is not on this machine yet*, a gray line, then the link
   **Clone \<name\>**, and under it **Choose another test project** - or
   **Create your first test project** when the Testin folder holds none. The
-  clone is what the screen is for and it is not always an offer: without the Git
-  plugin it is gray, and the name came from a file a colleague committed.
+  clone is what the screen is for, and it is not always an offer: without the
+  Git plugin it is gray, and the name came from a file a colleague committed.
 - **Create your first test project**, a link with no gray line above it.
 
 ## Main flow

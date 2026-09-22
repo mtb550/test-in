@@ -33,7 +33,7 @@ import static org.testng.Assert.assertEquals;
 public class DialogSplitButtonTest {
 
     /**
-     * An alternative pressed on a dialog that refused the submit - an empty
+     * An alternative pressed on a dialog that refused to submit - an empty
      * commit message - left the choice on that alternative, so Enter, captioned
      * "Commit & Push", committed without pushing (#312, A76).
      */

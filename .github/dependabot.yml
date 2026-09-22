@@ -2,7 +2,7 @@
 # build.yml like any other - which is the point. An update that breaks the
 # plugin says so before it is merged rather than after.
 #
-# Not covered here: the Gradle wrapper. Dependabot's gradle ecosystem reads
+# Not covered here: the Gradle wrapper. Dependabot's Gradle ecosystem reads
 # build files and the version catalog, and does not touch
 # gradle/wrapper/gradle-wrapper.properties, so that one stays a hand edit.
 version: 2

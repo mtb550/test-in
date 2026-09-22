@@ -7,10 +7,16 @@
     tools/inspect.ps1 hands the inspector, so a warning the IDE shows in any of
     these is a warning the gate sees.
 
+    Two files are left out, because their bytes are fixed by something else.
+    docs/assets/css/style.scss opens with the front matter Jekyll needs and
+    imports the theme through Liquid, neither of which is SCSS. The bug report
+    template is the body of every issue Testin files, pinned by BugTemplateTest
+    and kept from the formatter by the code style.
+
     It replaced "-d src/main", which left testin-java, testin-testng, the tests
     and every Markdown file outside the inspector - and a whole-project check
     run on src/main alone judges it without the callers that live in the
     content modules.
   -->
-  <scope name="Inspected" pattern="file:src//*||file:testin-java/src//*||file:testin-testng/src//*||file:docs//*||file:.claude//*||file:.github//*||file:tools//*||file:build.gradle.kts||file:settings.gradle.kts||file:testin-java/build.gradle.kts||file:testin-testng/build.gradle.kts||file:CLAUDE.md||file:CONTRIBUTING.md||file:README.md" />
+  <scope name="Inspected" pattern="(file:src//*||file:testin-java/src//*||file:testin-testng/src//*||file:docs//*||file:.claude//*||file:.github//*||file:tools//*||file:build.gradle.kts||file:settings.gradle.kts||file:testin-java/build.gradle.kts||file:testin-testng/build.gradle.kts||file:CLAUDE.md||file:CONTRIBUTING.md||file:README.md)&amp;&amp;!file:docs/assets/css/style.scss&amp;&amp;!file:src/main/resources/org/testin/bug/bugReport.md" />
 </component>

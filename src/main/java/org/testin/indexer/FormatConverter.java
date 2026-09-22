@@ -267,8 +267,7 @@ final class FormatConverter {
         return !from.equals(to) && !Services.getInstance(p, TestDataFiles.class).move(p, from, to);
     }
 
-    record Report(@NotNull String project, int cases, int runs, int ids, @NotNull List<String> toRepair,
-                  boolean failed) {
+    record Report(@NotNull String project, int cases, int runs, int ids, @NotNull List<String> toRepair, boolean failed) {
         boolean changedAnything() {
             return cases > 0 || runs > 0 || ids > 0;
         }

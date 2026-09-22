@@ -30,7 +30,7 @@ There is no key for this. The same **Import** entry, on a package.
   sheet with special characters removed.
 - **Rule-SHARE-032** — The test sets are made before any test case is written,
   because making one generates a Java class.
-- **Rule-SHARE-033** — No editor is opened afterwards, because a package has no
+- **Rule-SHARE-033** — No editor is opened afterward, because a package has no
   editor of its own.
 
 ## The screen
@@ -97,7 +97,7 @@ and fill, and deleting folders behind a Cancel is not what Cancel means.
 **The test cases already written keep their test methods.** Cancel stops the
 writing; it does not stop the methods being generated for what was written. A
 test case on disk with no method is one nothing can run, and there is no way in
-the plugin to write one for it afterwards.
+the plugin to write one for it afterward.
 
 Every other refusal is the same as importing into one test set.
 

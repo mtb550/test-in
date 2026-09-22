@@ -221,7 +221,7 @@ public final class TestRunPdfGenerator {
                         .setTextAlignment(TextAlignment.CENTER)
                         .add(text(Display.formatDate(ZonedDateTime.now())))
                         .add(text(Bundle.message("report.footer.prefix")))
-                        .add(new Link("Testin", PdfAction.createURI(ReportText.PLUGIN_URL))
+                        .add(new Link(ReportText.PLUGIN_NAME, PdfAction.createURI(ReportText.PLUGIN_URL))
                                 .setFontColor(LINK_BLUE))
                         .add(text(Bundle.message("report.footer.suffix"))));
 

@@ -51,8 +51,8 @@ Select several test cases, then `F2` or the field's own letter.
   test case already had stays, and the tester is told: once for a cell, and once
   with a count for a sheet or a bulk edit. A refused test case is not counted
   among the ones the change touched. Blank is not unreadable — it clears a date
-  and it clears the groups, and it leaves the priority and the status alone,
-  because those have no empty form.
+  and the groups, and it leaves the priority and the status alone, because
+  those have no empty form.
 - **Rule-EDITOR-PANEL-046** — The whole gesture is one entry on the undo
   history.
 - **Rule-EDITOR-PANEL-224** — A description is refused here for the two reasons

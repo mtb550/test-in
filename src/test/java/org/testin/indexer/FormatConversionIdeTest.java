@@ -205,8 +205,8 @@ public class FormatConversionIdeTest extends BasePlatformTestCase {
      * Rule-INTERNAL-091, S3. A {@code .tp} that is there and will not parse:
      * nothing in the project is touched.
      * <p>
-     * The conversion is all or nothing on purpose - a project whose own marker
-     * cannot be read is one where the format number cannot be written either, so
+     * The conversion is all or nothing on purpose. A project whose own marker
+     * cannot be read is one where the format number cannot be written either. So
      * moving its files would leave a half-converted project that says it is in
      * the old format. Which file to repair is the notification's to say.
      */

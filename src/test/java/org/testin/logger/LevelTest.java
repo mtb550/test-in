@@ -74,7 +74,7 @@ public class LevelTest {
     }
 
     /**
-     * Off is below every real level, which is what turns the log off rather than
+     * Off is below every real level, which is what turns logging off rather than
      * choosing a volume for it.
      */
     @Test
@@ -91,7 +91,7 @@ public class LevelTest {
      * UC-SETTING-007, Rule-SETTING-025.
      * <p>
      * A stored level that names nothing comes back INFO, because the reader is
-     * {@code Level.valueOf} in the startup activity and it runs after the
+     * {@code Level.valueOf} in the startup activity, and it runs after the
      * once-per-project claim is spent: a word this enum does not know threw from
      * there, and the tester had an unindexed, empty tree for the session (#66,
      * finding 87).

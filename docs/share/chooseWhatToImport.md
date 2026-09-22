@@ -3,7 +3,7 @@
 # UC-SHARE-007: Choose what is imported, and correct it
 
 **As a** tester, **I want** to fix what the spreadsheet got wrong before it
-becomes test cases, **so that** I am not correcting 40 test cases afterwards.
+becomes test cases, **so that** I am not correcting 40 test cases afterward.
 
 The import dialog shows the file in a table first. The tester unticks rows and
 edits cells there, and only then are the test cases written.
@@ -38,14 +38,14 @@ There is no key for this. The table is in the import dialog.
   stopped.
 - **Rule-SHARE-106** — A value Testin cannot read is refused. The test case keeps
   what it had, and the tester is told once with a count — never once per row.
-  Blank is not unreadable: it clears a date and it clears the groups, and it
+  Blank is not unreadable: it clears a date, it clears the groups, and it
   leaves the priority and the status alone, because those have no empty form.
 - **Rule-SHARE-038** — A correction made here changes what is written, and the
   file on disk is never touched.
 
 ## The screen
 
-The table fills the middle of the import dialog.
+The table takes up the middle of the import dialog.
 [UC-SHARE-005](importIntoTestSet.md) draws the whole dialog around it.
 
 ```

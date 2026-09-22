@@ -81,8 +81,8 @@ editing begins. `Rule-EDITOR-PANEL-005` states it for a tester, and
 
 **Consequences.** `TestEditorAttributes` answers both questions in one place:
 `displayValue` for a reader and `gridValue` for a cell. Reference, module and
-test data are never formatted — an identifier and a label are not sentences, and
-test data is a value that gets used rather than read, so a character the display
+test data are never formatted. An identifier and a label are not sentences. Test
+data is a value that gets used rather than read, so a character the display
 decides to change is a value that no longer works.
 
 **If you are about to reverse it.** The failure is silent and permanent. A cell
@@ -119,8 +119,8 @@ up.
 
 ## Decision-004 — SFTP is the maintained JSch fork, not JSch and not MINA SSHD
 
-*Superseded by Decision-012, 19 September 2026: there is no SFTP sync any
-more. Left as it was written.*
+*Superseded by Decision-012, 19 September 2026: there is no SFTP sync
+anymore. Left as it was written.*
 
 **Context.** The server sync needs an SFTP client inside the plugin.
 `com.jcraft:jsch` last shipped in 2018 and cannot negotiate `rsa-sha2` against a
@@ -178,8 +178,8 @@ static front door and reads the caller's class name from a `StackWalker`.
 
 **Consequences.** *Help → Show Log in Explorer* finds it and *Collect Logs and
 Diagnostic Data* bundles it, because it sits beside `idea.log`. The location
-never depends on an open project. Nothing on a caller's thread waits for a
-write.
+never depends on an open project. Nothing on a caller's thread waits for the
+log to be written.
 
 **If you are about to reverse it.** `Level.FATAL` and `Logger.fatal` have no
 callers and are kept on purpose: the settings combo is built from
@@ -190,8 +190,8 @@ stored setting fail to parse on the next start.
 
 ## Decision-007 — An unknown SSH host is refused, and trusting one is the tester's step
 
-*Superseded by Decision-012, 19 September 2026: there is no SFTP sync any
-more. Left as it was written.*
+*Superseded by Decision-012, 19 September 2026: there is no SFTP sync
+anymore. Left as it was written.*
 
 **Context.** The first sync against a new server always fails with a host-key
 error, and the fix that removes the error in one line is to accept any key.
@@ -235,22 +235,22 @@ contributor license agreement.
 
 **Consequences.**
 
-A licence is not ownership, and that is the whole of why this is safe. Apache
+A license is not ownership, and that is the whole of why this is safe. Apache
 2.0 says what others may do with the code; the copyright stays with the author.
 Testin can be relicensed going forward, offered under a separate commercial
-licence, or sold. What cannot be undone is a version already published: whoever
+license, or sold. What cannot be undone is a version already published: whoever
 received it keeps that grant for that code, forever.
 
 The contributor license agreement is the part that protects the rest. A patch
-sent under Apache 2.0 leaves its author owning it, and Testin holding a licence
+sent under Apache 2.0 leaves its author owning it, and Testin holding a license
 — which is enough to ship and not enough to relicense or to give a buyer clear
-title. Collected at the start it is a sentence; collected afterwards it is every
+title. Collected at the start it is a sentence; collected afterward it is every
 past contributor, one at a time.
 
 Going paid is unaffected and starts elsewhere. The Marketplace product code
 "must be agreed with JetBrains in advance", so the paid route begins with a
-conversation rather than a commit — and the freemium shape, a free plugin with
-paid optional features, is compatible with an Apache-licensed source.
+conversation rather than a commit. The freemium shape, a free plugin with paid
+optional features, is compatible with an Apache-licensed source.
 
 **If you are about to reverse it.** Check who owns the code first. Every
 contribution merged without an agreement narrows what can be done with the whole
@@ -292,8 +292,8 @@ run says. Every run saved before the change keeps the English word, so the rule
 that shows the Browser question stops matching them, and a run created in French
 reads differently in a report generated in English. The way out is the
 `TestStatus` shape - a small enum per field, the constant stored and the label
-shown, plus a read that maps the old stored strings onto the constants - and it
-is that read, not the enums, that is the work.
+shown, plus a read that maps the old stored strings onto the constants. It is
+that read, not the enums, that is the work.
 
 ---
 
@@ -330,7 +330,7 @@ set.
 ## Decision-011 — Testin reads `testin.yml` and never writes it
 
 *Superseded by Decision-013, 19 September 2026: one button writes the file, and
-the automation code needs it. Left as it was written.*
+the automation code needs it. Left as it was written, apart from grammar.*
 
 **Context.** Seven places wrote `testin.yml` - choosing a project, creating one,
 cloning one, drawing the tree, the push prompt - and each created the file when
@@ -341,18 +341,17 @@ what a missing one meant (#301).
 
 **Decision.** One class, `config/TestinYml`, reads `testin.yml` when it is
 there, and nothing writes it. Which test project a tester chooses for a code
-project is kept in the IDE's own storage for that project on this machine,
-never committed, and wins over the project the file names until the file names
-a different one.
+project is kept in the IDE's own storage for that project on this machine, and
+never committed. It wins over the project the file names until the file names a
+different one.
 
 **Consequences.** Every flow works without the file: a clone is named after its
 repository, and the branch box follows the folder's Git. A team that wants
-every colleague
-on the same test project with no setup writes the file by hand. The file's
-values and parser are package-private, and `ArchitectureTest` keeps the YAML
-parser in the one class. The choice is the second value kept per project on
-this machine, beside the editors that were open (`LastOpenEditors`), and like
-them it is a choice, not a setting.
+every colleague on the same test project with no setup writes the file by hand.
+The file's values and parser are package-private, and `ArchitectureTest` keeps
+the YAML parser in the one class. The choice is the second value kept per
+project on this machine, beside the editors that were open
+(`LastOpenEditors`), and, like them, it is a choice, not a setting.
 
 **If you are about to reverse it.** Writing the file back - to remember a pick,
 a remote, a name - commits one machine's choice into a file the whole team
@@ -382,9 +381,10 @@ password of its own. A run change is written the moment it is made, with
 nothing held for a sync. `testin.yml` loses the `connection` key, which only
 ever told Git from SFTP: `location: remote` with a `RepoUrl` is a Git project.
 A file that still has `connection` or the server keys has them skipped as
-unknown keys, each named in the log - so an old Git file still clones, an old
-SFTP file is not shared, and the test project either one names is still read. A password kept for a
-server stays in the IDE's password store, where Testin no longer looks.
+unknown keys, each named in the log. So an old Git file still clones, an old
+SFTP file is not shared, and the test project either one names is still read. A
+password kept for a server stays in the IDE's password store, where Testin no
+longer looks.
 Decision-004 and Decision-007 are superseded.
 
 **If you are about to reverse it.** A second sync is a second answer to how a
@@ -398,11 +398,11 @@ the way Decision-004 and Decision-007 describe.
 
 **Context.** Decision-011 made `testin.yml` something Testin only reads, and
 nothing needed it. Two things followed that Muteb did not want. Code was
-generated into any code project, for whichever test project was open, whether
-or not that code project was about it. And the only way to make the file name a
-project was to edit it by hand. Muteb, 19 September 2026: *"the codegen
-operation must only work and only if yaml is exist and project name match the
-test project name"*, and *"yaml file can be created or updated by use new button
+generated into any code project, for whichever test project was open, even
+when that code project was not about it. And the only way to make the file name
+a project was to edit it by hand. Muteb, 19 September 2026: *"the codegen
+operation must only work and only if [YAML exists] and project name match the
+test project name"*, and *"[YAML] file can be created or updated by use new button
 shown in explorer toolbar"* (#335).
 
 **Decision.** Testin touches a test project's automation code - generating it,
@@ -445,8 +445,8 @@ left exactly as it was written.
 
 A decision belongs here when reversing it would break something that is not
 obvious from the code at the point where the reversal is written — that is the
-whole test. A naming convention is not a decision; a naming convention that a
-persisted key depends on is.
+whole test. A naming convention is not a decision, unless a persisted key
+depends on it.
 
 Take the next number, write the four parts, and link it from
 [the home page](README.md).

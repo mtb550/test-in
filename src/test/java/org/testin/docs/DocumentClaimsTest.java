@@ -48,8 +48,8 @@ import static org.testng.Assert.fail;
  * <p>
  * Both have already gone wrong. The README's total was three behind within a day
  * of {@code tools/add-rule.ps1} being written, because the tool moves a part's
- * Numbering row and knows nothing about the README - and by the time this was
- * written every one of its eight per-part rows was stale as well.
+ * Numbering row and knows nothing about the README. By the time this was
+ * written, every one of its eight per-part rows was stale as well.
  */
 public class DocumentClaimsTest {
 
@@ -68,7 +68,7 @@ public class DocumentClaimsTest {
     private static final @NotNull Path REFUSED = Paths.get("src", "main", "java", "org", "testin", "notifications", "Refused.java");
 
     /**
-     * A markdown link, and the target inside its brackets.
+     * A Markdown link, and the target inside its brackets.
      */
     private static final @NotNull Pattern LINK = Pattern.compile("\\[[^]]*]\\(([^)]+)\\)");
 
@@ -317,7 +317,7 @@ public class DocumentClaimsTest {
      * <p>
      * Counted where a rule is written out, not where its number appears: a
      * citation is a reference, and a retired number is written nowhere and is
-     * not a rule any more.
+     * not a rule anymore.
      */
     @Test
     public void theReadmeCountsTheRulesEachPartWrites() {
@@ -343,9 +343,9 @@ public class DocumentClaimsTest {
      * The sentence under the table adds its own rows up.
      * <p>
      * Its own, deliberately. A breakdown whose parts do not sum to its total is
-     * worse than no breakdown, because the whole table exists to be trusted -
-     * and the two tests above already tie the rows to the documents, so tying
-     * the total to the rows ties it to everything.
+     * worse than no breakdown, because the whole table exists to be trusted.
+     * The two tests above already tie the rows to the documents, so tying the
+     * total to the rows ties it to everything.
      */
     @Test
     public void theReadmeTotalIsTheSumOfItsOwnRows() {
@@ -361,7 +361,7 @@ public class DocumentClaimsTest {
      * The repository front page says the same total, and it is the count the
      * parts actually hold.
      * <p>
-     * It is the page a visitor reads first and it was the one nothing checked:
+     * It is the page a visitor reads first, and it was the one nothing checked:
      * the guard opened {@code docs/README.md} and no other file, so the front
      * page was one use case over and three rules under at the same time. It was
      * corrected by hand four times in one day while rules were being added,

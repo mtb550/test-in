@@ -98,7 +98,7 @@ public class StopTest {
      * <p>
      * A verdict is the whole point of the run. It survives because a reported
      * case is no longer in {@code configOf}, so the sweep that collects the
-     * casemates does not reach it - which is worth pinning, because it is a
+     * casemates does not reach it. That is worth pinning, because it is a
      * property of how the sweep is written rather than a check it performs.
      */
     @Test
@@ -115,7 +115,7 @@ public class StopTest {
     }
 
     /**
-     * Stopping a selection that is not running does nothing at all.
+     * Stopping an idle selection does nothing at all.
      * <p>
      * Its own answer rather than an empty one a caller has to test for: the
      * runs without the cases kills processes and leaves cards showing Running,

@@ -30,8 +30,8 @@ The status says how far the test run has got.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  at once confirm once, with a count: the tester sees *Removed 4*, never four
-  messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees
+  *Removed 4*, never four messages. Looking at something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
@@ -67,9 +67,9 @@ The status says how far the test run has got.
   both follow it, whichever of them the tester used.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
-  is - drawn with Inactive beside its name like any other status - and its test
-  sets, cases and runs are not read, because a project nobody is working on is
-  not worth the walk.
+  is, drawn with Inactive beside its name like any other status. Its test sets,
+  cases and runs are not read, because a project nobody is working on is not
+  worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 
@@ -116,7 +116,7 @@ The status says how far the test run has got.
    finished, but only if it had been started. From then on **Set Status**, **Edit Run** and **Run Tests** are gray on
    it.
 
-**Signing a test run off cannot be undone.** A status change is not on the
+**Signing off a test run cannot be undone.** A status change is not on the
 tree's history (Rule-TREE-PANEL-060). Testin asks for no confirmation before it.
 Every **Pending** verdict becomes **Untested** at that moment, except on a test
 case removed from its test set.

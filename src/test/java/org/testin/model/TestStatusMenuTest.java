@@ -39,8 +39,8 @@ import static org.testng.Assert.assertSame;
  * are verdicts, so {@link TestStatus.MenuEntry#NONE} is what keeps them off it.
  * <p>
  * Asserted because the failure is silent in both directions: give one of the two
- * an entry and it appears in the context menu with a key that sets a state
- * nothing reconciles; take an entry from one of the three and the verdict simply
+ * an entry, and it appears in the context menu with a key that sets a state
+ * nothing reconciles; take an entry from one of the three, and the verdict simply
  * stops being offered, with nothing failing to say so.
  */
 public class TestStatusMenuTest {

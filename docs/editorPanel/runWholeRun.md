@@ -40,8 +40,8 @@ There is no key and no button in the editor. It starts from the tree, with **Run
   case already judged is never run again.
 - **Rule-EDITOR-PANEL-185** — The whole set is one configuration and one
   process.
-- **Rule-EDITOR-PANEL-186** — A test run whose every test case has been judged
-  is marked **Completed** on its own.
+- **Rule-EDITOR-PANEL-186** — A test run in which every test case has been
+  judged is marked **Completed** on its own.
 - **Rule-EDITOR-PANEL-187** — The order the methods run in is the order of the
   test cases in their test set.
 - **Rule-EDITOR-PANEL-188** — A test case with no generated method is dropped,
@@ -88,7 +88,7 @@ test cases to run*.
 up in the morning. It is re-run in the afternoon and passes. The actual result,
 the error, the screenshots, the severity, the priority and the bug issue link
 all go, with no dialog. A message titled *Failure detail cleared* names them
-afterwards. That is difference 26.
+afterward. That is difference 26.
 
 ---
 

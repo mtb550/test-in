@@ -32,10 +32,10 @@ import static org.testng.Assert.assertTrue;
  * same place.
  * <p>
  * They did not. {@code executeAll} went straight to the generator registry while
- * {@code getAction} went through the declared action, so a data-only attribute
- * edited in bulk asked for a Java generator it has no use for, and warned about
- * the missing Java plugin on the way in an IDE that was never going to generate
- * anything (#151).
+ * {@code getAction} went through the declared action. So a data-only attribute
+ * edited in bulk asked for a Java generator it has no use for. It also warned
+ * about the missing Java plugin on the way, in an IDE that was never going to
+ * generate anything (#151).
  */
 public class GenTypeActionTest {
 

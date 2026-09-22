@@ -82,7 +82,7 @@ public class PageWindowTest {
 
     /**
      * Zero, not one: the callers tell "it is on the first page" from "it is not
-     * here any more" by this, and restoring a selection that has gone would put
+     * here anymore" by this, and restoring a selection that has gone would put
      * the editor on a page the tester did not ask for.
      * <p>
      * Nothing remembered at all is no longer a case here - the editors hold the

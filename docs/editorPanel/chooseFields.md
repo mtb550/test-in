@@ -43,7 +43,7 @@ There is no key for this. The button's tooltip reads **Fields**.
 - **Rule-EDITOR-PANEL-023** — Three fields cannot be changed. **Order** and
   **Description** are always shown, and **ID** is never shown. Order is the
   grid's row header and not a field a tester chooses: clicking it selects the
-  row, and `Enter` and the double-click on it open the details panel.
+  row, and `Enter` or double-clicking it opens the details panel.
 - **Rule-EDITOR-PANEL-024** — A burst of ticks costs one redraw, not one for
   each.
 

@@ -49,7 +49,7 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog {
                 confirm);
 
         shortcuts = List.of(
-                StatusBarShortcut.hint("Tab", Bundle.message("shortcut.navigate")),
+                StatusBarShortcut.navigate(),
                 StatusBarShortcut.hint("Space", Bundle.message("shortcut.check")),
                 StatusBarShortcut.cancel(this::closeCancel));
 

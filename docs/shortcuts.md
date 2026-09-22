@@ -288,8 +288,8 @@ that is not finished.
 
 ## Every key on this page is bound
 
-There is no list of declared-and-unbound keys any more, and there should never
-be one again.
+There is no list of declared-and-unbound keys anymore, and there should never be
+one again.
 
 `H` `M` `L` were drawn beside the priorities and `E` beside the empty bug
 priority, and nothing answered to any of them. They were removed rather than

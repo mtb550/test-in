@@ -41,11 +41,11 @@ import static org.testng.Assert.assertTrue;
  * saving never does.
  * <p>
  * A golden file rather than a set of assertions about fields, because the rule
- * is about the <em>bytes</em>. Field order, indentation, how an empty value is
- * written, how a date is spelled, whether an enum goes out as its constant or
- * its label - every one of those is a way for a save to stop being identical,
- * and not one of them is something a per-field assertion would notice. The
- * fixture is the contract; a diff against it is the failure report.
+ * is about the <em>bytes</em>. Field order and indentation are ways for a save
+ * to stop being identical. So are how an empty value is written, how a date is
+ * spelled, and whether an enum goes out as its constant or its label. Not one
+ * of them is something a per-field assertion would notice. The fixture is the
+ * contract; a diff against it is the failure report.
  * <p>
  * <b>It caught one the day it was written.</b> The mapper called
  * {@code setTimeZone(TimeZone.getDefault())}, which Jackson reads as an

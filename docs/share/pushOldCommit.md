@@ -51,8 +51,8 @@ sits under it, reading **Push**.
 route. Git cannot count what is ahead of an upstream that does not exist, so
 there is no number to give: the message reads *This branch is not on the remote
 yet. Pushing it puts it there and makes it track the remote.* and carries the
-same **Push** link. It used to read *No changes* about a branch whose every
-commit was still on this machine.
+same **Push** link. It used to read *No changes* about a branch with every
+commit still on this machine.
 
 ## What Testin refuses
 

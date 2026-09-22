@@ -31,8 +31,8 @@ import static org.testng.Assert.assertTrue;
  * <b>The same name every time.</b> The package fallback was
  * {@code "generated" + currentTimeMillis()}, so a test set whose name sanitized
  * to nothing was in one package when its code was written and in another when
- * anything came looking - and a rename, a move or a remove then found nothing
- * and did nothing, silently.
+ * anything came looking. A rename, a move or a remove then found nothing and
+ * did nothing, silently.
  * <p>
  * <b>Two names, two classes.</b> The class fallback was the opposite fault:
  * every such name answered {@code DefaultTest}, so two test sets wrote into one

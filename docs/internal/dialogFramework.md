@@ -48,7 +48,7 @@ and which keys it answers, and the shell builds the rest.
   forward rather than opened again. Testin dialogs do not close when they lose
   the focus, so nothing else would have stopped a second one. A dialog that holds
   nothing the tester typed - a confirmation, a node's details, a screenshot - is
-  replaced by the newer one instead, closed unanswered, so an older question can
+  replaced by the newer one instead, closed unanswered. So an older question can
   never be answered by the key meant for a newer one.
 - **Rule-INTERNAL-076** — A dialog says whether clicking away closes it. Almost
   none do - one holding what the tester typed must not lose it to a stray click,
@@ -142,7 +142,7 @@ past the editors inside them.
 
 **The shortcut menu is the exception that keeps the promise.** It is still
 hand-built — a menu is rows and nothing else, and each row carries and prints
-its own letter, so the shell would give it nothing. What it does not do any more
+its own letter, so the shell would give it nothing. What it does not do anymore
 is answer a key it never mentions: its `Enter`, `Escape` and arrows come from
 one declaration that both binds the keys and draws the strip, the same two
 halves the shell uses. Rule-INTERNAL-067.

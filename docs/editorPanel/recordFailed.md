@@ -58,9 +58,9 @@ form before it records anything.
   word is underlined, Alt+Enter offers the corrections, and nothing is changed
   unless the tester picks one.
 - **Rule-EDITOR-PANEL-225** — The case is recorded Failed only once what was
-  typed is written. When it cannot be written - the test run is no longer there,
-  or no longer covers the test case - nothing is recorded, a message says why,
-  and in light mode the form stays open with everything typed still in it.
+  typed is written. It cannot be written when the test run is no longer there,
+  or no longer covers the test case. Then nothing is recorded, a message says
+  why, and in light mode the form stays open with everything typed still in it.
 
 ## The screen
 
@@ -72,7 +72,7 @@ form before it records anything.
 │  [E] The dashboard opens.                                    │
 │                                                              │
 │  ACTUAL RESULT                                               │
-│  [ set actual result..                                    ]  │
+│  [ set actual result…                                     ]  │
 │                                                              │
 │  BUG SEVERITY                                                │
 │  ( ) Blocker  ( ) Major  ( ) Minor  (x) Enhancement          │
@@ -103,7 +103,7 @@ form before it records anything.
 4. **Bug Priority** — three choices, with the lowest chosen.
 5. **The big box** — for the error or the exception, as text. Its caption above
    it reads **Stacktrace**, and its gray hint reads *paste error or exception or
-   screenshot..*.
+   screenshot…*.
 6. **The pictures under it** — one small picture for each screenshot pasted
    with `Ctrl+V`, in the order they were pasted: the screenshot itself, 48
    pixels high. Its **x** takes that screenshot out. No picture is ever written
@@ -135,8 +135,9 @@ whatever verdict it had.
 case was removed - the run keeps what it recorded.*
 
 **If the test run is no longer there, or no longer covers the test case** — a
-message reads *This test run is no longer here, so nothing was recorded*, or *This test run does not cover this test
-case, so nothing was recorded*. The
+message is shown. It reads
+*This test run is no longer here, so nothing was recorded*, or
+*This test run does not cover this test case, so nothing was recorded*. The
 case is not recorded Failed. In light mode the failure form stays open with
 everything typed still in it (Rule-EDITOR-PANEL-225).
 
@@ -144,7 +145,7 @@ everything typed still in it (Rule-EDITOR-PANEL-225).
 row reads *No longer in the test set*, and the expected row is not drawn.
 
 **If several test cases are selected** — the dialog does not open at all. All of
-them are failed with no detail. The detail can be filled in afterwards, one test
+them are failed with no detail. The detail can be filled in afterward, one test
 case at a time, with `F2`.
 
 ---

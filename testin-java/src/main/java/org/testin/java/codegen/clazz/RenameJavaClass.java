@@ -18,14 +18,13 @@ package org.testin.java.codegen.clazz;
 
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.GenType;
 import org.testin.codegen.Renamed;
+import org.testin.java.codegen.GeneratedClass;
 import org.testin.logger.Logger;
 import org.testin.util.NameSanitizer;
 
@@ -44,8 +43,7 @@ public class RenameJavaClass implements GenAction {
         final @NotNull String path = String.join(".", fqcn);
 
         WriteCommandAction.runWriteCommandAction(p, GenType.RENAME_TEST_SET.getDescription(), null, () -> {
-            final @NotNull Optional<PsiClass> found = Optional.ofNullable(
-                    JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)));
+            final @NotNull Optional<PsiClass> found = GeneratedClass.byName(p, path);
             if (found.isEmpty()) {
                 Logger.warn("RenameJavaClass: class not found: " + path);
                 return;

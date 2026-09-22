@@ -64,8 +64,8 @@ public class RunStatusVerdictTest {
     @Test
     public void aVerdictIsAlwaysOneATesterCouldHaveGivenByHand() {
         // The automated path goes through the same recordVerdict as the manual
-        // one, so anything this returns has to be a status the run editor's own
-        // menu offers - otherwise a run could end up holding a verdict no
+        // one. So anything this returns has to be a status the run editor's own
+        // menu offers. Otherwise, a run could end up holding a verdict no
         // tester could have set or cleared.
         for (final RunStatus status : RunStatus.values()) {
             status.getVerdict().ifPresent(verdict -> assertTrue(

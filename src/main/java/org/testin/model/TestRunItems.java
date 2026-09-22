@@ -83,7 +83,7 @@ public class TestRunItems {
     private String executedBy = "";
     @NotNull
     @Builder.Default
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = Config.DATE_FORMAT_LOCALE)
     private ZonedDateTime executedAt = Config.NOT_EXECUTED;
     @NotNull
     @Builder.Default

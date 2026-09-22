@@ -39,10 +39,10 @@ There is no key for this. The offer appears on the message.
 - **Rule-SHARE-078** — Where both sides changed different fields of one test
   case, Testin merges them and asks only about the fields that really disagree.
 - **Rule-SHARE-109** — Two fields are settled rather than asked about, and the
-  dialog says so. Who changed the test case last, and when, take the later of
-  the two edits; the order takes the remote's. Neither is a question a tester
-  can usefully answer about a merge, so the answer is given and named rather
-  than asked for.
+  dialog says so. Who changed the test case last, and when, take the more
+  recent of the two edits; the order takes the remote's. Neither is a question
+  a tester can usefully answer about a merge, so the answer is given and named
+  rather than asked for.
 - **Rule-SHARE-079** — A pull that will not move on is said again: the **Git
   Conflicts** message comes back, naming the files still in the way.
 
@@ -56,8 +56,8 @@ the IDE's notification list, and three links sit under it: **Resolve**, **Contin
 
 1. The tester syncs, and the pull stops on a conflict.
 2. A message titled **Git Conflicts** reads *Both sides changed*, names the
-   files, then *Resolve the conflict, then continue - or abort to roll the pull
-   back and keep what is here.*
+   files, then *Resolve the conflict, then continue - or abort to undo the pull
+   and keep what is here.*
 3. The tester chooses to carry on.
 4. Testin merges each conflicting test case, one field at a time.
 5. For any field both sides rewrote, the tester is asked which one wins. That is
@@ -75,7 +75,7 @@ message titled **Rebase continued** reading *Changes pushed to the remote*.
 reads *The pull was rolled back*, or *Nothing was pushed*. Everything that was
 here before the pull is still here.
 
-**If the roll back fails** — a message titled **Git Conflict Operation Failed**
+**If rolling back fails** — a message titled **Git Conflict Operation Failed**
 reads *Could not abort the rebase.*
 
 **If carrying on fails** — the same title, reading *Could not continue the
@@ -84,13 +84,14 @@ rebase.*
 **If conflicts remain after the merge** — the conflict offer opens again, naming
 what is still in the way, with the same three links: Resolve, Continue and
 Abort. It used to name them under a plain warning when the tester had come from
-Pending Commits, and offer the three links only when they had come from Sync -
-the same situation answered two ways, and the way out on screen only once.
+Pending Commits, and offer the three links only when they had come from Sync.
+That was the same situation answered two ways, and the way out on screen only
+once.
 
 **A result two testers judged** — kept whole from whoever judged it last. A
 verdict is one tester's account of executing one case: the status, when they
 gave it, what they saw, the stacktrace, the screenshots and the bug they filed.
-Those travel together or they say something nobody recorded, so the later
+Those travel together, or they say something nobody recorded, so the later
 `executedAt` takes the file and nothing is asked. Nothing is said either: the
 line naming what was settled belongs to the merge window, and that window opens
 only when a question is left. That is difference 20. Two testers judging **different** cases of one run never conflict
@@ -122,8 +123,8 @@ sync again. The sync cannot go on without it.
 ## Some things are settled without asking, and the dialog says which
 
 The order of a test case takes the remote's value. Who changed it last, and
-when, take the later of the two edits. Neither is a question a tester can
-usefully answer about a merge - a position is not something either of them
+when, take the more recent of the two edits. Neither is a question a tester
+can usefully answer about a merge - a position is not something either of them
 chose, and who edited last is already in the two timestamps.
 
 So they are not asked, and the dialog lists what was decided, one line and one
@@ -143,9 +144,8 @@ Only when it happened. A field one side never touched is settled by the ordinary
 three-way rule, which is nobody's decision, and nothing is said about it.
 
 Only when the window opens, too. A file the merge settles whole leaves nothing
-to answer, so no window opens and the list is never shown. That is difference
-
-20.
+to answer, so no window opens and the list is never shown. That is
+difference 20.
 
 ---
 

@@ -9,8 +9,8 @@ labels: bug
   Two labels before this is ready to pick up: priority: (critical|high|medium|low)
   and cost: (nocost|minor|major|expensive). See CONTRIBUTING.md.
 
-  The title is a specific claim, not a category: "Grid rows render oversized in
-  every theme except Darcula", not "Grid bug".
+  The title is a specific claim, not a category:
+  "Grid rows render oversized in every theme except Darcula", not "Grid bug".
 -->
 
 # Bug

@@ -79,9 +79,9 @@ That is every gesture except the two named in Rule-VIEW-PANEL-022.
 `Ctrl+Right` is forward, in whichever surface holds the keyboard. In the panel
 forward is the next test case, because the panel shows one at a time. In an
 editor forward is the next page, because a page is what an editor holds a lot
-of. Both are on one screen, and the place the keyboard is decides which one
-happens. The key is named after the gesture rather than after what it lands on,
-so one key has one meaning and two surfaces answer it.
+of. Both are on one screen, and the surface that holds the keyboard decides
+which one happens. The key is named after the gesture rather than after what it
+lands on, so one key has one meaning and two surfaces answer it.
 
 ---
 

@@ -81,10 +81,10 @@ public class GitRefsTest {
      * <p>
      * The characters half of the rule, which came here from
      * {@code TestinProjectConfig} when the file stopped judging addresses. The
-     * value ends up as an argument to {@code git clone}, and although git4idea
-     * builds an argument list rather than a shell string, a list of allowed
-     * characters is cheaper to keep than an argument about whether the next
-     * caller still builds one.
+     * value ends up as an argument to {@code git clone}, and although
+     * {@code git4idea} builds an argument list rather than a shell string, a
+     * list of allowed characters is cheaper to keep than an argument about
+     * whether the next caller still builds one.
      */
     @Test
     public void textWithCharactersNoAddressHasIsRefused() {
@@ -317,7 +317,7 @@ public class GitRefsTest {
 
     /**
      * A commit has to carry the markers of every directory its test cases sit
-     * under, so the directories a colleague pulls are recognisable as test sets.
+     * under, so the directories a colleague pulls are recognizable as test sets.
      * The repository root is included as the empty string, because the test
      * project's own marker lives there.
      */
@@ -383,8 +383,8 @@ public class GitRefsTest {
 
     /**
      * The seven codes Git uses for a path both sides touched. Getting this wrong
-     * in either direction is bad: miss one and the tester is never offered the
-     * abort, invent one and they are offered it on a clean pull.
+     * in either direction is bad: miss one, and the tester is never offered the
+     * abort; invent one, and they are offered it on a clean pull.
      */
     @Test
     public void everyUnmergedCodeCountsAsAConflict() {

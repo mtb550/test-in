@@ -113,8 +113,8 @@ is [UC-SETTING-006](../setting/setDownloadFolder.md).
 
 **If the PDF cannot print some of the text** — Arabic, Hindi, Cyrillic or
 Chinese, which its font does not hold — the PDF is still written, without
-those characters, and a notification titled *The PDF left some text out* says
-how many texts lost characters, shows one, and says the Word and HTML reports
+those characters. A notification titled *The PDF left some text out* says how
+many texts lost characters and shows one. It says the Word and HTML reports
 keep them (Rule-REPORT-018).
 
 **If the test run is still In Progress** — every way of asking is gray: the

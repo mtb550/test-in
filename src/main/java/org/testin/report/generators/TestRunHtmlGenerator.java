@@ -78,7 +78,7 @@ public final class TestRunHtmlGenerator {
         html.append("<div class='report-title'>").append(Bundle.message("report.title")).append("</div>")
                 .append("<div class='report-subtitle'>")
                 .append(StringUtil.escapeXmlEntities(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(trDir.getMarker()), TestRunConfiguration.COMPONENT.valueIn(trDir.getMarker()))))).append("</div>")
-                .append("<div class='report-runname'>").append(StringUtil.escapeXmlEntities(runName)).append("</div>")
+                .append("<div class='report-run-name'>").append(StringUtil.escapeXmlEntities(runName)).append("</div>")
                 .append("<div class='report-conf'>").append(Bundle.message("report.confidential")).append("</div>");
 
         html.append("<div class='section-title-bar'><div class='section-title'>").append(Bundle.message("report.heading.overview")).append("</div></div>");
@@ -225,7 +225,7 @@ public final class TestRunHtmlGenerator {
 
                 + ".report-title { font-size: " + ReportFont.TITLE.css() + "; font-weight: bold; color: var(--heading); }"
                 + ".report-subtitle { font-size: " + ReportFont.SUBTITLE.css() + "; color: var(--accent); margin-top: 4px; }"
-                + ".report-runname { font-size: " + ReportFont.LEAD.css() + "; color: var(--accent); margin-top: 2px; "
+                + ".report-run-name { font-size: " + ReportFont.LEAD.css() + "; color: var(--accent); margin-top: 2px; "
                 + "padding-bottom: 6px; border-bottom: 2px solid var(--heading); }"
                 + ".analysis-heading { font-size: " + ReportFont.LEAD.css() + "; font-weight: bold; margin-top: 10px; }"
                 + ".analysis-text { font-size: " + ReportFont.BODY.css() + "; color: var(--ink); margin-bottom: 8px; white-space: pre-wrap; }"

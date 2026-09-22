@@ -35,9 +35,9 @@ import static org.testng.Assert.fail;
  * <p>
  * Typing into a grid cell writes a test case or a run to disk. Every other way
  * of changing the same data confirms itself with one soft notification in the
- * past tense - the update dialog says "Updated" - and the grids said nothing at
- * all, so the one surface where a tester changes data fastest was the one
- * surface that never told them it had worked.
+ * past tense: the update dialog says "Updated". The grids said nothing at all.
+ * So the one surface where a tester changes data fastest was the one surface
+ * that never told them it had worked.
  * <p>
  * Written as a scan of the sources for the same reason as
  * {@code LightServiceContractTest}: what has to hold is a rule about the shape

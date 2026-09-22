@@ -2,11 +2,10 @@
 
 # The formats on disk
 
-> Everything Testin stores is a plain file you can open. Ten formats, all of
-> them JSON except one YAML and the screenshots, which are PNG, and this page is
-> the contract for every one — what
-> a field means, which are required, and what a reader must do with a field it
-> does not recognize.
+> Everything Testin stores is a plain file you can open. There are ten formats,
+> all of them JSON except one YAML and the screenshots, which are PNG. This page
+> is the contract for every one — what a field means, which are required, and
+> what a reader must do with a field it does not recognize.
 
 |                     |                                                                                                                                                                                                                                                                                                                                                                     |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -86,7 +85,7 @@ Every marker shares the same six fields, from `AbstractMarker`, and most add a
 made. The answer is given once, in `AbstractMarker`, so nothing downstream tests
 for it, and what is written back is that answer rather than an invented one.
 
-### The seven, and what each adds
+### The seven and what each adds
 
 | File   | Node                       | Adds                                                                                                                       | Values                                                  |
 |--------|----------------------------|----------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------|
@@ -116,9 +115,9 @@ nothing else may ask in a different order.
 ```
 
 **The test run marker adds four more**, because they are facts about the run
-rather than about any one result — what it was executed against, what the tester
-wrote about the verdicts afterwards, and when execution started and last
-stopped. They are the run's, so they are in the run's own file:
+rather than about any one result. They are what it was executed against, what
+the tester wrote about the verdicts afterward, and when execution started and
+last stopped. They are the run's, so they are in the run's own file:
 
 | Field                | Type | Required                   | Meaning                                                                                                                                                          |
 |----------------------|------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -226,7 +225,7 @@ tester wrote about the verdicts, when it was executed - is in its `.tr`, with it
 status.
 
 The results are read in the order their cases sit in their test sets, and a
-result whose case the project no longer holds comes last - so a report prints
+result whose case the project no longer holds comes last. So a report prints
 them in the order a tester reads the tree, never in the order a folder listing
 happens to give.
 
@@ -246,7 +245,7 @@ Renamed to its test case's id, it is read again at the next Refresh.
 The screenshots a failure names sit in the same folder, one PNG each, named by
 five random lowercase letters and digits that no result of the run already holds
 - `k3f9a.png`. Testin writes a screenshot before the result that names it, and
-moves one that no result of the run names any more to the recycle bin after the
+moves one that no result of the run names anymore to the recycle bin after the
 next write. Any PNG in a run folder named that way is taken for a screenshot, so
 one put there by hand under such a name goes too.
 
@@ -284,11 +283,11 @@ setup. `testin.yaml` is read too.
 | Key             | Type               | Required             | Meaning                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 |-----------------|--------------------|----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `location`      | `local` / `remote` | no, defaults `local` | Whether the test data is on this machine or cloned from Git, the only way a test project is shared                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `RepoUrl`       | string             | only when remote     | **Kept as it is written.** Whether the text is a repository address at all is decided where something is about to clone it (Rule-TREE-PANEL-117), so a value Testin does not recognise stays in the file to be seen and corrected rather than being dropped as it is read. Any account and token are dropped as it is read: on an `https://` or `http://` address every account goes, because there it is the secret; on an `ssh://` address only `account:secret` goes, so the conventional `git@` survives (Rule-SHARE-004) |
+| `RepoUrl`       | string             | only when remote     | **Kept as it is written.** Whether the text is a repository address at all is decided where something is about to clone it (Rule-TREE-PANEL-117), so a value Testin does not recognize stays in the file to be seen and corrected rather than being dropped as it is read. Any account and token are dropped as it is read: on an `https://` or `http://` address every account goes, because there it is the secret; on an `ssh://` address only `account:secret` goes, so the conventional `git@` survives (Rule-SHARE-004) |
 | `testinProject` | string             | no                   | Which test project, for everyone who opens the code project. Without it each tester chooses one, kept on their own machine; with it, a tester's own choice still wins until the file names a different project (Rule-TREE-PANEL-106)                                                                                                                                                                                                                                                                                          |
 | `bugRepoUrl`    | string             | only to report bugs  | The GitHub repository [Report Bug](viewPanel/reportBug.md) files issues in, as its address: `https://github.com/owner/repo`, `https://host/owner/repo.git`, `ssh://git@host:2222/owner/repo` or `git@host:owner/repo`. Any account and token in it are dropped as it is read, by the same rule as `RepoUrl`. An address that does not name exactly a host, an owner and a repository - one ending in `/issues`, a file or a local path - is kept, and Report Bug refuses to send with the reason                              |
 
-**No machine and no person appears here.** The Testin folder, the tester's
+**No machine or person appears here.** The Testin folder, the tester's
 name and the log level are application settings, and the test
 project a tester chose is kept on their machine — see `CLAUDE.md`, and
 Decision-011 on [the decisions page](decisions.md). An unknown key is logged
@@ -335,17 +334,17 @@ cannot be mistaken for one.
 **An unknown enum constant fails that file's read.** It is not defaulted,
 because a status quietly becoming `PENDING` loses a tester's decision without
 saying so. This is the one incompatibility that needs a conversion story before
-it ships — [#91 and #92](https://github.com/mtb550/test-in/issues/91) exist
+it ships. [#91 and #92](https://github.com/mtb550/test-in/issues/91) exist
 because a format changed and the rule for old data had to be decided after the
-fact, which is the thing this page is here to prevent.
+fact. That is the thing this page is here to prevent.
 
 **Old data gets wiped, not migrated.** When a change cannot be made compatible,
 the answer is to delete the old data and start again rather than to ship a
-converter — the trees are small, and a converter is a second reader of a format
-nobody writes any more.
+converter. The trees are small, and a converter is a second reader of a format
+nobody writes anymore.
 
 **The one exception is the conversion to format 2**, which 2.13.0-alpha carries
-because the plugin is public: test cases and markers are brought forward, and
+because the plugin is public. Test cases and markers are brought forward, and
 only the test runs are removed (#305, D4). The conversion code is deleted in
 2.14.0-alpha, which is why the number is in the file - from then on a project
 nobody converted is refused, naming the release that can convert it.

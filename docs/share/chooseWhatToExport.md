@@ -35,12 +35,12 @@ There is no key for this. The table is in the export dialog.
 - **Rule-SHARE-021** — Moving away from a cell saves what was typed in it.
 - **Rule-SHARE-106** — A value Testin cannot read is refused. The test case keeps
   what it had, and the tester is told once with a count — never once per row.
-  Blank is not unreadable: it clears a date and it clears the groups, and it
+  Blank is not unreadable: it clears a date, it clears the groups, and it
   leaves the priority and the status alone, because those have no empty form.
 
 ## The screen
 
-The table fills the middle of the export dialog.
+The table takes up the middle of the export dialog.
 [UC-SHARE-001](exportTestSet.md) draws the whole dialog around it.
 
 ```

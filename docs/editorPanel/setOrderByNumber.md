@@ -87,9 +87,9 @@ message says so, in the platform's own words, and nothing is saved.
 **If the number is where the test case already is** — nothing is written at all.
 
 **If several test cases are selected** — the **Order** row on the update menu is
-gray and reads *Order is set one test case at a time* where its key would be, so
-the refusal is read before it is triggered rather than after. Pressing `O` on the
-cards, which has no menu to gray, still answers with that message.
+gray. It reads *Order is set one test case at a time* in place of its key. The
+refusal is read before it is triggered, not after. Pressing `O` on the cards,
+which has no menu to gray, still answers with that message.
 
 ---
 

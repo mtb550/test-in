@@ -1,6 +1,6 @@
 [Documentation](../README.md) › [The editor panel](main.md) › UC-EDITOR-PANEL-018
 
-# UC-EDITOR-PANEL-018: Copy, cut and paste grid cells
+# UC-EDITOR-PANEL-018: Copy, cut and paste the grid's cells
 
 **As a** tester, **I want** the grid to behave like a spreadsheet, **so that** I can move a column of values between
 Testin and Excel.

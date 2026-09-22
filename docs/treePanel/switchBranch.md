@@ -28,8 +28,8 @@ repository.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  at once confirm once, with a count: the tester sees *Removed 4*, never four
-  messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees
+  *Removed 4*, never four messages. Looking at something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
@@ -60,9 +60,9 @@ repository.
   does not have**.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
-  is - drawn with Inactive beside its name like any other status - and its test
-  sets, cases and runs are not read, because a project nobody is working on is
-  not worth the walk.
+  is, drawn with Inactive beside its name like any other status. Its test sets,
+  cases and runs are not read, because a project nobody is working on is not
+  worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-108** — The branch box appears when the test project's
@@ -114,11 +114,11 @@ The box fills itself from what is on the machine, showing *Reading branches*.
 That is the whole answer to almost every question anyone asks it, and it needs
 no network.
 
-Three things also ask the remote, and then the box fills a second time showing *Fetching from remote*, so the list can
-grow a moment after it appears:
+Three things also ask the remote, and then the box fills a second time showing
+*Fetching from remote*, so the list can grow a moment after it appears:
 **Refresh**, a branch switch, and opening a different test project. Nothing else
 does. A rename, a removal or a status change rebuilds the panel without going
-near the remote - it cannot have moved a branch, and a fetch can stop to ask for
+near the remote. It cannot have moved a branch, and a fetch can stop to ask for
 credentials or sit on a host that is not reachable.
 
 **With uncommitted changes**
@@ -152,7 +152,7 @@ cannot be opened. An IDE notification titled *Git Error* gives the reason.
 cannot be opened.
 
 **If Git is on no branch at all** — the box lists the branches and shows none of
-them selected. A checkout of a tag or a commit made outside Testin, a bisect, or
+them selected. A checkout of a tag or a commit made outside Testin, bisecting, or
 a rebase stopped partway all leave the repository like this, and there is no
 branch to name. Picking one from the list switches to it, which is the way out.
 

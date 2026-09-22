@@ -29,7 +29,7 @@ import static org.testng.Assert.assertTrue;
  * moving a test case writes that case and nothing else.
  * <p>
  * Everything the ordering rests on is here. A rank that ordered wrong would put
- * a tester's cases in an order they did not choose, and a rank that could not be
+ * a tester's cases in an order they did not choose. A rank that could not be
  * squeezed between two others would send the plugin back to rewriting a whole
  * test set to move one row.
  */
@@ -116,9 +116,10 @@ public class RankTest {
 
     /**
      * Past the alphabet, appending grows the rank by a character rather than
-     * running out: z is followed by zm, which sorts after it because a longer
-     * string with the same prefix does. Not za - a is the zero digit, so za
-     * would be the same position as z written twice, with no room between them.
+     * running out: {@code z} is followed by {@code zm}, which sorts after it
+     * because a longer string with the same prefix does. Not {@code za} -
+     * {@code a} is the zero digit, so {@code za} would be the same position as
+     * {@code z} written twice, with no room between them.
      */
     @Test
     public void appendingPastTheAlphabetGrowsTheRank() {

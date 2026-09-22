@@ -45,8 +45,8 @@ The `Context Menu` key.
   works, on the cards and in the grid.
 - **Rule-EDITOR-PANEL-214** — Actions holds the same seven entries in both
   editors. Copy Test Case, Cut Test Case, Paste Test Case and Delete Test Case
-  are gray in a test run editor with the reason on the entry, because a test
-  run's test cases were chosen when it was created and it keeps what it
+  are gray in a test run editor, with the reason on the entry. That is because a
+  test run's test cases were chosen when it was created, and it keeps what it
   recorded. They are shown and refused rather than left out, so a tester who
   learns the gesture in one editor can find it in the other.
 - **Rule-EDITOR-PANEL-230** — A menu entry that cannot work on what is selected
@@ -104,9 +104,9 @@ Method**, **Navigate to Test Method**.
 **Actions** opens onto the seven that act on the test case rather than on the
 automation: **Copy Test Case Value**, **Copy Test Case**, **Cut Test Case**,
 **Paste Test Case**, **Delete Test Case**, then **Undo** and **Redo**. They are
-one level down because they all have keys and none of them is what the menu is
-opened for — at the top level they pushed Automate Test Case, Run Test Method and
-Navigate to Test Method off the end of a list nobody read that far down.
+one level down because they all have keys, and none of them is what the menu is
+opened for. At the top level, they pushed Automate Test Case, Run Test Method
+and Navigate to Test Method off the end of a list nobody read that far down.
 
 **The same seven are in the test run editor's menu**, in the same place and
 under the same word. Four of them are gray there, each saying why on the entry:
@@ -137,11 +137,11 @@ print their own key.
 The last group of three is gray in an IDE without the Java plugin or the
 TestNG plugin, and each entry says which plugin it is waiting for.
 
-In a test run editor the menu holds the three verdicts first — **Passed**,
-**Failed** and **Blocked** — then **Failed Test Case Details**, then **View Test
-Case Details** and **Navigate to Test Case**, then **Actions**, then **Run Test
-Method** and **Navigate to Test Method**. **Create Test Case**, **Update Test
-Case** and **Automate Test Case** are not on it. A test run records verdicts
+In a test run editor, the menu holds the three verdicts first: **Passed**,
+**Failed** and **Blocked**. Then come **Failed Test Case Details**, then
+**View Test Case Details** and **Navigate to Test Case**, then **Actions**, then
+**Run Test Method** and **Navigate to Test Method**. **Create Test Case**,
+**Update Test Case** and **Automate Test Case** are not on it. A test run records verdicts
 rather than the test case, and it covers test cases that already exist.
 
 ---

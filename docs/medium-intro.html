@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <title>Testin on Medium</title>
@@ -42,12 +42,6 @@
         font-size: 0.85em
     }
 
-    em.shot {
-        display: block;
-        color: #888;
-        font-style: italic;
-        margin: 18px 0
-    }
 
     ul {
         padding-left: 1.2em
@@ -71,7 +65,7 @@
 <p>There is also the day of it. A test management tool lives in a browser tab, and a browser tab is a mouse. Recording a
     verdict means opening the run, finding the case, clicking a status, waiting for the page and scrolling back to where
     you were; saying what actually happened means another dialog and another wait. Fifty cases is a few hundred clicks,
-    and none of it gets faster the tenth time you do it, because there is nothing to learn by hand. Meanwhile the window
+    and none of it gets faster the tenth time you do it, because there is nothing to learn by hand. Meanwhile, the window
     you left to get there is driven almost entirely by keys.</p>
 <p>The drift is not a discipline problem, and neither is the clicking. Both are what happens when the two artifacts
     share no identity, no history, no screen and no keyboard.</p>
@@ -92,15 +86,15 @@
     below, <code>Sprint 2 Cycle 1</code>, covers seven cases from them.</p>
 <h3>Point Testin at a folder</h3>
 <p>Testin keeps its data out of your code repository on purpose: a test case edit should not show up as a diff in the
-    automation project. So the first thing you set, in <strong>Settings → Tools → Testin</strong>, is the Testin folder
-    — any empty folder, which becomes the root every open project reads — and your tester name, which is written into
-    every case and every verdict you record.</p>
+    automation project. So the first thing you set, in <strong>Settings → Tools → Testin</strong>, is the Testin folder:
+    any empty folder, which becomes the root every open project reads. The second is your tester name, which is written
+    into every case and every verdict you record.</p>
 <img alt="Testin, shot 2" src="assets/medium/shot-2-settings.png" style="max-width:100%;height:auto;border-radius:6px">
 <h3>Write a test case</h3>
 <p>Press <strong>New Test Project</strong> at the top of the panel and name it. It gets two fixed folders: <code>Test
     Cases</code> and <code>Test Runs</code>. Select <code>Test Cases</code>, press <code>Ctrl+M</code> and pick *Test
     Set* — usually one feature.</p>
-<p>A package holds sets, so <code>Web</code> holds <code>Login</code> and <code>Register</code>; make one the same way
+<p>A package holds sets, so <code>Web</code> holds <code>Login</code> and <code>Register</code>. Make one the same way
     and pick *Test Set Package*. Open a set and press <code>Ctrl+M</code> once more to write a case. A case has a
     description, an expected result, steps, test data, pre-conditions, a module, a priority and groups. You get a card
     list or a grid view, paging, filtering, search and bulk edits.</p>
@@ -158,7 +152,7 @@ public void registerWithAnEmailNobodyHasUsed() {
     <code>gh</code>, into the repository named in <code>testin.yml</code>. Testin stores no password and no token;
     <code>gh</code> holds the sign-in. If anything is missing — no repository configured, <code>gh</code> not installed,
     not signed in, title too long — <strong>Send</strong> is disabled and hovering over it says which.</p>
-<p>Afterwards the row shows the issue as <code>owner/repo#123</code> and links to it. So does the report.</p>
+<p>Afterward the row shows the issue as <code>owner/repo#123</code> and links to it. So does the report.</p>
 <img alt="Testin, shot 8" src="assets/medium/shot-8-github-issue.png"
      style="max-width:100%;height:auto;border-radius:6px">
 <h3>Send the result to someone with no IDE</h3>

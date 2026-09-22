@@ -117,8 +117,7 @@ public final class UndoHistories {
         private final @NotNull Deque<Operation> redoStack = new ArrayDeque<>();
     }
 
-    public record Operation(@NotNull String description, @NotNull BooleanSupplier undo, @NotNull BooleanSupplier redo,
-                            @NotNull Runnable forget) {
+    public record Operation(@NotNull String description, @NotNull BooleanSupplier undo, @NotNull BooleanSupplier redo, @NotNull Runnable forget) {
         // UC-INTERNAL-005, Rule-INTERNAL-063
         public Operation(final @NotNull String description, final @NotNull Runnable undo, final @NotNull Runnable redo) {
             this(description, always(undo), always(redo), () -> {

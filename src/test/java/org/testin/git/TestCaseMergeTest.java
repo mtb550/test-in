@@ -159,7 +159,7 @@ public class TestCaseMergeTest {
     }
 
     /**
-     * Two testers who created a case at the same path have no shared past. Every
+     * Two testers who created a case at the same path share no history. Every
      * field then reads as set by both, and the ones that differ are asked about.
      */
     @Test
@@ -174,7 +174,7 @@ public class TestCaseMergeTest {
     }
 
     /**
-     * A side that will not parse says nothing rather than throwing: the other
+     * A side that fails to parse says nothing rather than throwing: the other
      * side is then the whole answer, which is what a half-written file during a
      * rebase amounts to.
      */

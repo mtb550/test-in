@@ -35,7 +35,7 @@ import static org.testng.Assert.assertTrue;
  * <p>
  * Rule-EDITOR-PANEL-238 to 241: an execution records the case as it is at that
  * moment, a correction keeps what was judged, running a row again takes the case
- * as it is now, and a case deleted afterwards keeps its full text in the run.
+ * as it is now, and a case deleted afterward keeps its full text in the run.
  */
 public class CaseAsJudgedTest {
     private static final Mapper MAPPER = RealMapper.build();

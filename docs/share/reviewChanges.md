@@ -2,7 +2,7 @@
 
 # UC-SHARE-010: See what I have not committed
 
-**As a** tester, **I want** to see every change I have made since my last
+**As a** tester, **I want** to see every change I have made after my last
 commit, **so that** I can decide what to send and what to put back.
 
 This lists everything the tester changed since the last commit, one row for

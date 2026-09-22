@@ -39,8 +39,8 @@ import static org.testng.Assert.assertTrue;
  * <p>
  * Two test sets collide more easily than their names suggest. They are distinct
  * on disk and still collide here, because the characters Excel refuses are
- * replaced - "A/B" and "A*B" both become "A_B" - and anything past 31 characters
- * is cut, which collapses names that differ only in their tail.
+ * replaced: "A/B" and "A*B" both become "A_B". Anything past 31 characters is
+ * also cut, which collapses names that differ only in their tail.
  * <p>
  * The previous attempt at that retried with {@code name.substring(0, 28) +
  * "..."}, which failed both ways round: a name shorter than 28 characters threw

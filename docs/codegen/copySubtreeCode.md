@@ -25,7 +25,7 @@ which is [UC-TREE-PANEL-014](../treePanel/copyNodes.md).
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
-  when `testin.yml` names that test project. Otherwise nothing is generated,
+  when `testin.yml` names that test project. Otherwise, nothing is generated,
   renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
@@ -57,7 +57,7 @@ matches the one in the Testin tree.
 Every refusal of [UC-CODEGEN-001](getClassForTestSet.md) and
 [UC-CODEGEN-002](getMethodForTestCase.md), once for each node it applies to.
 
-**A node that generates nothing says nothing.** The two fixed folders, test run
+**A node with no code to generate stays silent.** The two fixed folders, test run
 packages and test runs write no code, and that is not reported.
 
 ## What the tester should expect

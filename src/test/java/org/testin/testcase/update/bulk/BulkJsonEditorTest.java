@@ -26,8 +26,8 @@ import static org.testng.Assert.assertNotEquals;
  * <p>
  * This is the highest-stakes logic in those dialogs: it decides what goes back
  * into storage. The formatting rule in CLAUDE.md is that stored JSON is
- * byte-identical to what the tester typed, so a value nobody touched has to
- * survive the round trip unchanged - and the dialogs rely on that, because they
+ * byte-identical to what the tester typed. So a value nobody touched has to
+ * survive the round trip unchanged. The dialogs rely on that, because they
  * compare the escaped original against the editor text to decide whether a row
  * was edited at all.
  */
@@ -50,8 +50,8 @@ public class BulkJsonEditorTest {
     @Test
     public void aBackslashBeforeAQuoteSurvivesTheRoundTrip() {
         // The order the two replacements run in decides this one: unescaping the
-        // quote before the backslash would turn \\" into a quote that was never
-        // typed.
+        // quote before the backslash would turn two backslashes followed by a
+        // quote into a quote that was never typed.
         final String original = "ends with a backslash \\ then \"quoted\"";
 
         assertEquals(BulkJsonEditor.unescapeJson(BulkJsonEditor.escapeJson(original)), original);
@@ -74,7 +74,8 @@ public class BulkJsonEditorTest {
     /**
      * The pair that decides whether the escape can be unescaped by replacing.
      * It cannot: a backslash followed by an n is written as two backslashes and
-     * an n, and a replace looking for the escape finds it inside that.
+     * an n, and a text replacement that looks for the escape finds it inside
+     * that.
      */
     @Test
     public void aBackslashFollowedByAnNIsNotALineBreak() {

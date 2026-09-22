@@ -28,8 +28,8 @@ The node goes to the recycle bin, so nothing is lost for good.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  at once confirm once, with a count: the tester sees *Removed 4*, never four
-  messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees
+  *Removed 4*, never four messages. Looking at something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
@@ -69,9 +69,9 @@ The node goes to the recycle bin, so nothing is lost for good.
       find it knows exactly that.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
-  is - drawn with Inactive beside its name like any other status - and its test
-  sets, cases and runs are not read, because a project nobody is working on is
-  not worth the walk.
+  is, drawn with Inactive beside its name like any other status. Its test sets,
+  cases and runs are not read, because a project nobody is working on is not
+  worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-102** — Keeping the copy for undo, and putting it back on
@@ -105,7 +105,7 @@ The node goes to the recycle bin, so nothing is lost for good.
    shows no line.
 3. **Where it is** — in gray. It is the node's full path on disk. It uses the
    operating system's own separators, not a trail of node names.
-4. The confirm key is named for what it does. It reads **Remove**, not **OK**.
+4. The key that confirms is named for what it does. It reads **Remove**, not **OK**.
 
 For several nodes, the question is *Remove these N items?*. It shows no counts
 and no path.

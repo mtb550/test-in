@@ -88,7 +88,7 @@ no verdict buttons, and there are no clocks.
 The window would contradict itself if it showed a test case and offered the
 three verdicts while telling the tester to press Start. The tester would be
 right to ignore the prompt and start judging. This is **stricter than the run
-editor**. The run editor records a verdict whether or not execution is running.
+editor**. The run editor records a verdict whether execution is running or not.
 The difference is deliberate. A test case judged before Start carries a zero
 duration. Here that cannot happen, because there is nothing to judge until the
 test run is going.
@@ -238,7 +238,7 @@ clock is a stopwatch, and a tester watching a number climb hurries.
 That tells the tester which is which faster than a word would. A label that
 never changes is noise. Both figures come from the execution timer
 [#27](https://github.com/mtb550/test-in/issues/27) already built. Both are
-recorded whether or not they are shown, so nothing is lost by showing them
+recorded whether they are shown or not, so nothing is lost by showing them
 softly.
 
 **The test run clock carries its hours. The test case clock does not.** That is
@@ -297,7 +297,7 @@ spacing come from.
 
 **Its background is the title bar's, not the body's.** The window uses two
 shades, and they mean something. The working area is the pale one. That is the
-test case, the verdict buttons and the clocks. The frame around it is the gray
+test case, the verdict buttons and the clocks. The surrounding frame is the gray
 one. That is the title bar and this row. So the verdict row and the status bar
 look like the two separate things they are, rather than one band split by a
 hairline.
@@ -413,7 +413,7 @@ back. A failure nobody described is a failure nobody can act on.
 │                                                                            │
 │  ACTUAL RESULT                                                             │
 │  ┌──────────────────────────────────────────────────────────────────────┐  │
-│  │ set actual result..                                                  │  │
+│  │ set actual result…                                                   │  │
 │  └──────────────────────────────────────────────────────────────────────┘  │
 │                                                                            │
 │  BUG SEVERITY                                                              │
@@ -424,7 +424,7 @@ back. A failure nobody described is a failure nobody can act on.
 │                                                                            │
 │  STACKTRACE                                                                │
 │  ┌──────────────────────────────────────────────────────────────────────┐  │
-│  │ paste error or exception or screenshot..                             │  │
+│  │ paste error or exception or screenshot…                              │  │
 │  │                                                                      │  │
 │  └──────────────────────────────────────────────────────────────────────┘  │
 │   ┌────────┐x                                                              │
@@ -482,7 +482,7 @@ list each, so a new severity or priority appears here on its own.
 ### 16. Ctrl+V belongs here and nowhere else
 
 The field says so, rather than the status bar. Its gray hint text reads *"paste
-error or exception or screenshot.."*. That is the same sentence, in the place
+error or exception or screenshot…"*. That is the same sentence, in the place
 the tester is already looking. A pasted screenshot shows as a small picture
 under the box, never as letters in it, and its **x** takes it out.
 
@@ -555,11 +555,10 @@ base size.
 - the expected result and every detail are the base size
 - the test set name is two points smaller. The details are named by their
   icons, **S**, **T** and **B**, as the test case form names them, each in the
-  middle of its row's height, and the badges
-  come first with no icon, since a badge says what it is. The captions
-  on the failure form are set in the caption font, JetBrains Mono in capitals,
-  as every caption in Testin is (Rule-INTERNAL-087). The icons keep their size
-  when the window zooms
+  middle of its row's height. The badges come first with no icon, since a badge
+  says what it is. The captions on the failure form are set in the caption
+  font, JetBrains Mono in capitals, as every caption in Testin is
+  (Rule-INTERNAL-087). The icons keep their size when the window zooms
 
 No text ever goes below 8 points, which is where the rest of the plugin stops
 too. One number moves, and everything moves together. So the layout cannot come
@@ -568,12 +567,11 @@ size on purpose. They are the same kind of thing being read, and setting them
 apart said they were not.
 
 **No other key held down.** Everywhere else in the IDE, and on every other
-Testin screen, zoom is `Ctrl` and the wheel. Here it is the wheel alone, for
-three reasons. The window
-has nothing else a wheel could mean. Its height is fixed to what it shows, so
-there is nothing to scroll. Anything inside it that does scroll would take the
-wheel first anyway. So this is the one window in the plugin where zoom needs no
-other key held down.
+Testin screen, zooming takes `Ctrl` and the wheel. Here it is the wheel alone,
+for three reasons. The window has nothing else a wheel could mean. Its height is
+fixed to what it shows, so there is nothing to scroll. Anything inside it that
+does scroll would take the wheel first anyway. So this is the one window in the
+plugin where zooming needs no other key held down.
 
 ---
 
@@ -600,20 +598,20 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
   the worst place to move when somebody has asked for stillness, and the switch
   is the IDE's own rather than a second one of ours that could disagree with it.
 - **Rule-EDITOR-PANEL-217** — Light mode never grows past the display it is on.
-  A case longer than the screen stops at the edge and says so on its last row,
-  because the verdict buttons and the status bar finish a case and a window
-  taller than the screen puts them where nobody can reach them.
+  A case longer than the screen stops at the edge and says so on its last row.
+  This is because the verdict buttons and the status bar finish a case, and a
+  window taller than the screen puts them where nobody can reach them.
 - **Rule-EDITOR-PANEL-232** — The test set's name sits in a rounded frame with
-  no icon, the name and the frame in the gray of the letter frames beside the
-  description, so it reads as a label above the test case rather than as part of
-  it. The frame stays quieter than the description, and it goes with the name
-  when the name is turned off.
+  no icon. The name and the frame are in the gray of the letter frames beside
+  the description, so it reads as a label above the test case rather than as
+  part of it. The frame stays quieter than the description, and it goes with the
+  name when the name is turned off.
 - **Rule-EDITOR-PANEL-243** — Light mode offers the test case on screen the
-  buttons the test run editor's card offers it - Navigate to Test Method, Run
-  Test Method, Navigate to Test Case - at the right end of the test set line,
-  always visible. Each does exactly what the card's does, Run claims the test
-  case for this test run first, and a button that cannot work is gray with its
-  reason in its tooltip, never hidden.
+  buttons the test run editor's card offers it: Navigate to Test Method, Run
+  Test Method and Navigate to Test Case. They sit at the right end of the test
+  set line, always visible. Each does exactly what the card's does, and Run
+  claims the test case for this test run first. A button that cannot work is
+  gray with its reason in its tooltip, never hidden.
 - **Rule-EDITOR-PANEL-244** — Each of the three buttons is an entry of its own
   in light mode's View menu, named as the button is, and on until the tester
   turns it off. Run and Stop are one button and one entry.
@@ -627,7 +625,7 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
 run is a hundred of these, and the tester is watching the application under test
 rather than this window. The movement has to be seen without being waited for.
 
-**What does not move.** Dragging the window's width tracks the pointer exactly —
+**Not everything moves.** Dragging the window's width tracks the pointer exactly —
 that is the tester's hand on the edge, not a state change.
 
 ---
@@ -735,10 +733,10 @@ offer verdicts that nothing could take.
 [#13](https://github.com/mtb550/test-in/issues/13) asks for a control over which
 test case fields appear. The menu chooses between the things the window itself
 holds instead. What sits behind Details stays fixed: the badges, the steps, the
-test data and the pre-conditions. Switches over parts of a window cannot grow past
-what the window holds. A list of 18 switches over test case fields is a settings screen, inside a
-window built to have none. If the wrong four are behind Details, changing those
-four is the fix.
+test data and the pre-conditions. Switches over parts of a window cannot grow
+past what the window holds. A list of 18 switches over test case fields is a
+settings screen, inside a window built to have none. If the wrong four sit
+behind Details, the fix is to change those four.
 
 ### Details open with a key, and that costs something
 
@@ -776,9 +774,9 @@ So it is written down rather than fixed, as finding 54 in
 
 ### This window keeps its own zoom
 
-Everywhere else in Testin, zoom is one number: the IDE's editor font size. It
-changes the font everywhere in the IDE, so the grid, the details panel and every
-editor move together. This window does not join them.
+Everywhere else in Testin, zooming follows one number: the IDE's editor font
+size. It changes the font everywhere in the IDE, so the grid, the details panel
+and every editor move together. This window does not join them.
 
 The difference is the feature. A tester using light mode is not looking at the
 IDE. That is why the window exists. One size makes a test case readable across a

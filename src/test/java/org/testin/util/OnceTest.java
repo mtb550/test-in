@@ -37,8 +37,8 @@ import static org.testng.Assert.assertTrue;
  * thread with the others: the platform runs its startup extension on a
  * background coroutine while a tool window builds its content on the EDT. What
  * this has to hold is therefore not just "the second caller is refused" but
- * "exactly one of the callers is admitted, however they arrive" - the version
- * that read the flag and then set it could admit two, and two admissions is a
+ * "exactly one of the callers is admitted, however they arrive". The version
+ * that read the flag and then set it could admit two. Two admissions is a
  * second scan of the whole Testin root and a second subscription to every test
  * event.
  */
@@ -83,9 +83,7 @@ public class OnceTest {
             final int doors = 32;
             final CountDownLatch open = new CountDownLatch(1);
             final CountDownLatch done = new CountDownLatch(doors);
-            final ExecutorService threads = Executors.newFixedThreadPool(doors);
-
-            try {
+            try (ExecutorService threads = Executors.newFixedThreadPool(doors)) {
                 for (int i = 0; i < doors; i++) {
                     threads.execute(() -> {
                         try {
@@ -101,8 +99,6 @@ public class OnceTest {
 
                 open.countDown();
                 assertTrue(done.await(10, TimeUnit.SECONDS), "the threads should all have finished");
-            } finally {
-                threads.shutdownNow();
             }
 
             assertEquals(admitted.get(), 1,

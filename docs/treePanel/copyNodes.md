@@ -28,8 +28,8 @@ The copy is new and separate. Changing it never changes the original.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  at once confirm once, with a count: the tester sees *Removed 4*, never four
-  messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees
+  *Removed 4*, never four messages. Looking at something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
@@ -62,9 +62,9 @@ The copy is new and separate. Changing it never changes the original.
   the results the original recorded.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
-  is - drawn with Inactive beside its name like any other status - and its test
-  sets, cases and runs are not read, because a project nobody is working on is
-  not worth the walk.
+  is, drawn with Inactive beside its name like any other status. Its test sets,
+  cases and runs are not read, because a project nobody is working on is not
+  worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 
@@ -104,7 +104,7 @@ in the notification log, with the reason under it.
 
 **If one copied test case cannot be given its new identity** — its file under
 the new id cannot be written — the file it was copied as is kept rather than
-removed, and the writer says the write failed. That file still carries the
+removed, and the writer says that writing it failed. That file still carries the
 original's identity, so the next scan reports the two as one test case in two
 files, which the tester can resolve; removing it would have left the copy one
 test case short with nothing said (Rule-TREE-PANEL-051).

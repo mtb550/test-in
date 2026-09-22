@@ -467,7 +467,7 @@ public final class TestRunWordGenerator {
         styledRun(p.createRun(), date + Bundle.message("report.footer.prefix"), ReportFont.CAPTION, DARK_GRAY);
 
         final @NotNull XWPFHyperlinkRun link = p.createHyperlinkRun(ReportText.PLUGIN_URL);
-        styledRun(link, "Testin", ReportFont.CAPTION, LINK_BLUE);
+        styledRun(link, ReportText.PLUGIN_NAME, ReportFont.CAPTION, LINK_BLUE);
         link.setUnderline(UnderlinePatterns.SINGLE);
 
         styledRun(p.createRun(), Bundle.message("report.footer.suffix"), ReportFont.CAPTION, DARK_GRAY);

@@ -29,8 +29,8 @@ The node keeps everything inside it. Only where it sits changes.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  at once confirm once, with a count: the tester sees *Removed 4*, never four
-  messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees
+  *Removed 4*, never four messages. Looking at something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
@@ -76,9 +76,9 @@ The node keeps everything inside it. Only where it sits changes.
   leaving the test set in one package and its class in another.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
-  is - drawn with Inactive beside its name like any other status - and its test
-  sets, cases and runs are not read, because a project nobody is working on is
-  not worth the walk.
+  is, drawn with Inactive beside its name like any other status. Its test sets,
+  cases and runs are not read, because a project nobody is working on is not
+  worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-105** — A node dragged out of the IDE, onto the desktop or a
@@ -108,7 +108,7 @@ The node keeps everything inside it. Only where it sits changes.
    node names. They let the tester catch a wrong drop before pressing `Enter`.
    When nodes were cut from several folders, **From** names only the first
    folder.
-3. The confirm key is named for the verb.
+3. The key that confirms is named for the verb.
 
 After a paste, the title reads **Paste**. After a drop, the title reads the
 verb, **Move** or **Copy**. Everything else on the dialog is the same.
@@ -170,7 +170,7 @@ in the notification log, reading *Operation failed:* and the reason, or *Could
 not find source or target path on disk.*
 
 **If the test project or a container is selected** — **Copy** and **Cut** are
-gray. Neither can be moved or copied.
+gray. Such a node cannot be moved or copied.
 
 **If several rows are selected** — **Paste** stays black and pastes into the
 first of them.

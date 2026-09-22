@@ -30,7 +30,7 @@ them opens.
 - **Rule-INTERNAL-052** — A test run nobody has judged shows *Not run*, never
   *0%*.
 - **Rule-INTERNAL-065** — When a new test run would not take every test case
-  beneath a node, the count says how many it would. Both numbers are right and
+  beneath a node, the count says how many it would. Both numbers are right, and
   they answer different questions, so the one on screen names the other rather
   than leaving a tester to find the difference by making a run.
 
@@ -97,11 +97,11 @@ drawn on [UC-TREE-PANEL-012](../treePanel/removeNode.md).
 │  Confirm Removing                                            │
 ├──────────────────────────────────────────────────────────────┤
 │  Remove 'Accounts'?                                          │
-│  Holds 2 test sets, 14 test cases and 0 test runs       (3)  │
+│  Holds 2 test sets, 14 test cases and 0 test runs       (1)  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-3. **The Holds line** — one line, and only when the node holds something.
+1. **The Holds line** — one line, and only when the node holds something.
    Packages are not counted on it.
 
 ## Main flow

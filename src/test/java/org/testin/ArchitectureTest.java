@@ -67,9 +67,9 @@ public class ArchitectureTest {
      * The plugin's own compiled classes, taken from the directory rather than
      * from the classpath.
      * <p>
-     * {@code importPackages} walks everything the test classloader can see, which
-     * here is the tests themselves and the instrumented copies the platform
-     * plugin makes of both - so the rules reported test classes reading their own
+     * {@code importPackages} walks everything the test classloader can see. Here
+     * that is the tests themselves and the instrumented copies the platform
+     * plugin makes of both. So the rules reported test classes reading their own
      * fixtures off disk, and no combination of {@code ImportOption} excluded them
      * without excluding the production classes too. Naming the one directory that
      * holds what these rules are about is shorter than describing the four that
@@ -139,7 +139,7 @@ public class ArchitectureTest {
      * <p>
      * It held {@code org.testin.util.EditorUtil} and {@code org.testin.util.FontSync},
      * measured 2026-09-04 and down from the four that story counted. Neither is
-     * in {@code util} any more - the first is {@code editor/TestinEditors} and
+     * in {@code util} anymore - the first is {@code editor/TestinEditors} and
      * the second {@code ui/FontSync} - so both entries had stopped excusing
      * anything: the predicate matches on the fully qualified name, and no class
      * has answered to either of these for some time.

@@ -29,8 +29,8 @@ This copies a test project from Git onto this machine.
   the tree changes until the tester confirms.
 - **Rule-TREE-PANEL-007** — When something changes, Testin says so once, in the
   past tense. The tester sees *Created*, *Renamed* or *Removed*. Several changes
-  at once confirm once, with a count: the tester sees *Removed 4*, never four
-  messages. Looking at something confirms nothing.
+  made together confirm with one message and a count: the tester sees
+  *Removed 4*, never four messages. Looking at something confirms nothing.
 - **Rule-TREE-PANEL-008** — A retired node keeps everything inside it. Retired
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
@@ -55,17 +55,17 @@ This copies a test project from Git onto this machine.
   the tree is read for.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
-  is - drawn with Inactive beside its name like any other status - and its test
-  sets, cases and runs are not read, because a project nobody is working on is
-  not worth the walk.
+  is, drawn with Inactive beside its name like any other status. Its test sets,
+  cases and runs are not read, because a project nobody is working on is not
+  worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-107** — Cloning needs the Git plugin, and nothing else: a
-  code project clones a test project whether or not it has a `testin.yml`. The
-  clone is named after its repository - the last part of the address without
-  `.git`, kept as it is when Testin accepts it as a test project's name, made
-  into one otherwise, and numbered when that name is already in the Testin
-  folder. The one exception is the address `testin.yml` gives: that clone takes
+  code project clones a test project whether it has a `testin.yml` or not. The
+  clone is named after its repository, the last part of the address without
+  `.git`. That name is kept as it is when Testin accepts it as a test project's
+  name, made into one otherwise, and numbered when the Testin folder already
+  has it. The one exception is the address `testin.yml` gives: that clone takes
   the name the file gives beside it.
 
 ## What the tester sees
@@ -96,7 +96,7 @@ drawn under [UC-TREE-PANEL-001](reachTheTree.md), and it does the same thing.
    \<name\>...*. It cannot be canceled.
 5. Testin chooses it for this code project on this machine, and the tree
    appears. Nothing is written into the code project (Rule-TREE-PANEL-106).
-6. Testin shows *Project cloned*. The name can be changed afterwards with
+6. Testin shows *Project cloned*. The name can be changed afterward with
    **Rename** ([UC-TREE-PANEL-011](renameNode.md)).
 
 ## What Testin refuses

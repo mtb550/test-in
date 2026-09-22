@@ -198,10 +198,11 @@ The panel's own eight buttons have no keys either, except search. They are
 
 ---
 
-## Every message, and the use case it belongs to
+## Every message and the use case it belongs to
 
 **This is the exit criteria.** A tester knows an action finished by the message
-Testin shows, and knows it did not by the refusal. Every message the panel can
+Testin shows, and learns from the refusal that it did not. Every message the
+panel can
 show is here, quoted as the plugin writes it. A word in angle brackets is
 filled in with whatever the tester is working on, and *N* with a count.
 
@@ -307,10 +308,17 @@ along its top are the IDE's own. The branch box and the tree are Testin's.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. to 8. **The toolbar** — eight buttons, left to right: **Search Test
-   Project**, **Settings**, **Expand All**, **Collapse All**, **Refresh**,
-   **Select Test Project**, **New Test Project** and **Save to testin.yml**.
-   Each one is [UC-TREE-PANEL-028](panelToolbar.md).
+Parts 1 to 8 are the toolbar's eight buttons, left to right, and all of them
+are [UC-TREE-PANEL-028](panelToolbar.md).
+
+1. **Search Test Project**
+2. **Settings**
+3. **Expand All**
+4. **Collapse All**
+5. **Refresh**
+6. **Select Test Project**
+7. **New Test Project**
+8. **Save to testin.yml**
 9. **The branch box** — shown only for a test project shared through Git. Its
    placeholder reads *Loading branches...* until Git answers.
 10. **The test project row** — drawn bold, with the IDE's project icon. The two
@@ -422,7 +430,7 @@ at all depends on which plugins are installed.
 3. **Run Tests** — only when the TestNG plugin is present.
 4. **Export**, **Import** — these belong to reports, export, import and sync.
 5. **Sync With Remote**, **View Pending Commits** — only when the Git plugin is
-   present. Otherwise the whole section disappears, dividing line included.
+   present. Otherwise, the whole section disappears, dividing line included.
 6. **Edit Run** and **Set Status** — a test run's own two entries. Grayed once
    the test run is signed off.
 7. **Generate Report** and **Details** — last.
@@ -482,8 +490,8 @@ One color for one meaning is easier to learn than three.
 ### Every removal, move and copy asks first
 
 The confirmation names what will happen, as in *Remove 'Login'?* or *Move
-'Login' into 'Smoke'?*. It shows where from and where to. The confirm key is
-named for the verb. Nothing in the tree changes until the tester presses
+'Login' into 'Smoke'?*. It shows where from and where to. The key that
+confirms is named for the verb. Nothing in the tree changes until the tester presses
 `Enter`.
 
 ### The menu is short at the top and deep in Actions
@@ -546,8 +554,8 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Question 4** | On a Mac, should cut, paste, undo and redo in the tree use the Mac's own key for those actions, the way copy already does? | Today copy does. The other four do not. The keys are named in the key table above.                                                                                                                                |
 
 
-**Settled.** Question 1 asked whether a test run may go backwards, from
-**Assigned** to **Created** or from **In Progress** to **Created**. It may not:
+**Settled.** Question 1 asked whether a test run may go backwards, so that
+**Created** follows **Assigned** or **In Progress**. It may not:
 the popup offers only the statuses ahead of where the run is now, so there is no
 way to ask (Rule-TREE-PANEL-092, [#186](https://github.com/mtb550/test-in/issues/186)).
 

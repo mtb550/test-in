@@ -64,7 +64,7 @@ public final class ResultAnalysisDialog extends AbstractFrameworkDialog {
         components = List.copyOf(parts);
 
         shortcuts = List.of(
-                StatusBarShortcut.hint("Tab", Bundle.message("shortcut.navigate")),
+                StatusBarShortcut.navigate(),
                 StatusBarShortcut.cancel(this::closeCancel));
 
         preferredSize = JBUI.size(760, 640);

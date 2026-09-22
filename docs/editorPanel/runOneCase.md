@@ -99,9 +99,9 @@ Everything about how the run is built and named is on
 | The actual result and the error | The framework's message and stacktrace         |
 | Who ran it, and when            | The name on the settings page, and now         |
 
-A failure clears what the last failure said happened first - the actual result,
-the error and the screenshots pasted with it - and keeps the bug severity, the
-bug priority and the bug issue link, because the same test case failing again is
+A failure clears what the last failure said happened first: the actual result,
+the error and the screenshots pasted with it. It keeps the bug severity, the bug
+priority and the bug issue link, because the same test case failing again is
 most often the same bug. A message titled **Failure detail cleared** names what
 went, as it does for a pass.
 
@@ -121,7 +121,7 @@ so. The others still run.
 ## Where the plugin breaks its own rules
 
 **An automated verdict still clears the tester's notes.** A pass clears all of
-them and a failure clears what happened. Each now says so afterwards, in a
+them and a failure clears what happened. Each now says so afterward, in a
 message titled **Failure detail cleared** that names what went and stays in the
 notification list. The dialog that asks first is still on the keyboard path
 only. That is difference 26.

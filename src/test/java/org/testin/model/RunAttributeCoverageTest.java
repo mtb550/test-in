@@ -31,7 +31,7 @@ import static org.testng.Assert.assertTrue;
  * <p>
  * The gap this closes was silent for as long as it existed. A run row has always
  * carried a stacktrace, and {@link FailureDetail} has always known to clear it
- * when a case passes - but it had no {@link RunEditorAttributes} constant, so it
+ * when a case passes. But it had no {@link RunEditorAttributes} constant, so it
  * was not a grid column, not a toolbar attribute, and printed by one report
  * format of four. Nothing failed; the field was simply written and never read.
  * <p>

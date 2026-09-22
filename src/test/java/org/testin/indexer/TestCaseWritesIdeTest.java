@@ -79,9 +79,9 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
 
     /**
      * Puts a folder with something in it where a case's file is, so deleting
-     * that file is refused, the way a locked file refuses it. Under the tests a
-     * delete never goes through the recycle bin, so it is a plain one, and a
-     * plain delete refuses a folder that is not empty.
+     * that file is refused, the way a locked file refuses it. Under the tests,
+     * deleting never goes through the recycle bin, so it is a plain deletion, and
+     * a plain deletion refuses a folder that is not empty.
      */
     static void undeletable(final Path file) {
         try {
@@ -127,8 +127,8 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
     }
 
     /**
-     * A test project with one test set in it, built the way the create actions
-     * build them: the mapper makes the node, the indexer is told.
+     * A test project with one test set in it, built the way the actions that
+     * create them do: the mapper makes the node, the indexer is told.
      */
     private TestSetDirectoryDto oneTestSet() {
         return WriteAction.computeAndWait(() -> {
@@ -185,7 +185,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
      * <p>
      * A case the set has never held is written even when its rank did not have
      * to change. A pasted case keeps the rank it was copied with, and when that
-     * rank already sorts last it is not among the moved - so it used to live in
+     * rank already sorts last it is not among the moved. So it used to live in
      * memory only, and a cut had deleted its file a moment before (#66, finding
      * 112).
      */
@@ -276,7 +276,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
      * Rule-INTERNAL-035.
      * <p>
      * A move whose write is refused leaves the case where it was. The paste used
-     * to remove the cut first, so a refused write left the case in neither set
+     * to remove the cut first, so a refusal to write left the case in neither set
      * (#66, finding 284).
      */
     public void testAMoveWhoseWriteIsRefusedLeavesTheCaseWhereItWas() {
@@ -286,8 +286,8 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         final TestCaseDto cut = testCase(login, "m");
         indexer().putTestCaseVerbatim(login.getPath(), cut);
 
-        // A folder where the file has to go refuses the write, the way a locked
-        // or read-only file does.
+        // A folder where the file has to go makes writing it fail, the way a
+        // locked or read-only file does.
         try {
             Files.createDirectories(fileOf(signUp, cut));
         } catch (final IOException ex) {
@@ -366,7 +366,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
      * Rule-INTERNAL-084.
      * <p>
      * A save whose hand-named file will not go takes back the file it wrote, so
-     * the case is not in two files under one id. The delete used to be asked
+     * the case is not in two files under one id. The deletion used to be asked
      * nothing, and the next scan found a clash the plugin had made itself (#66,
      * finding 294).
      */

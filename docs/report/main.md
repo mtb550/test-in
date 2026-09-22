@@ -79,10 +79,10 @@ The PDF, the Word document and the web page each hold these, in this order.
    *Confidential — QA Test Execution Summary*.
 2. **Report Overview** — a table of two columns. It holds the project, the test
    run, the test type, the change log, the commit, the platform and component,
-   the language, the browser, the device type, everyone who recorded a verdict,
-   when execution started, when it ended, how long it took, and the run's
-   status. A row nobody answered is left out. The commit is the one row that
-   stays when nobody answered it, and reads *n/a*.
+   the language, the browser and the device type. It also holds everyone who
+   recorded a verdict, when execution started, when it ended, how long it took,
+   and the run's status. A row nobody answered is left out. The commit is the
+   one row that stays when nobody answered it, and reads *n/a*.
 3. **Execution Summary** — one sentence naming the run and saying how many test
    cases it holds, how many were executed and what share passed. All four
    formats open it with the same sentence. Under it a row of

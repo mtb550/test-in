@@ -14,7 +14,7 @@ Nothing breaks when this happens. That is why it survives review.
 ## The case it is made of
 
 `Notifier` delivers a message. It knows about balloons and notifications,
-colours, titles, fade times, actions, and the status bar it anchors to. One job:
+colors, titles, fade times, actions, and the status bar it anchors to. One job:
 **hand a message to the platform.**
 
 It also held six methods like this:
@@ -53,7 +53,7 @@ A message and the delivery of a message are related and are not the same job.
 
 ## What this is not
 
-It is not an argument against shared owners. Centralising is right — see
+It is not an argument against shared owners. Centralizing is right — see
 `centralize-shared-design`. The two rules run together:
 
 |                            |                                                        |
@@ -67,7 +67,7 @@ covers all of them.
 
 ## The signals
 
-Watch for these while writing, not afterwards:
+Watch for these while writing, not afterward:
 
 - **You are about to add a method that composes a value, to a class that
   transports values.** Or formats, to a class that stores. Or decides, to a
@@ -75,7 +75,7 @@ Watch for these while writing, not afterwards:
 - **The new method's name repeats a domain noun the class's name does not
   contain.** `Notifier.softRefuseNothingToRun` — a notifier that knows what a
   *run* is has learned something about running.
-- **A javadoc on the new method explains a rule from another part.**
+- **A Javadoc on the new method explains a rule from another part.**
   `Rule-TREE-PANEL-004` on a method in `notifications` is the rule telling you
   where it belongs.
 - **You have to scroll past unrelated methods to compare two related ones.**
@@ -91,7 +91,7 @@ In order. Stop at the first that fits.
 
 1. **A type that already owns this vocabulary.** `Done` owned the past-tense
    outcomes; `Refused` was the missing twin, not a new idea.
-2. **The model the value is about.** A node's behaviour goes on `DirectoryDto`,
+2. **The model the value is about.** A node's behavior goes on `DirectoryDto`,
    an enum's presentation goes on the enum. This is already the house style.
 3. **A new type named for the job.** Cheap and honest. An enum of sentences is
    five lines plus its constants, and it makes the rule enforceable: a

@@ -32,8 +32,8 @@ import static org.testng.Assert.assertEquals;
  * is on the screen, in an order that does not depend on the machine reading it.
  * <p>
  * That promise was broken twice in one evening, and neither break was in the
- * sorting - a copied file carrying another case's id took a case out of the
- * indexer, and the copy's empty pointers took the whole set's order with it.
+ * sorting. A copied file carrying another case's id took a case out of the
+ * indexer. And the copy's empty pointers took the whole set's order with it.
  * Cases carry their own rank now, so neither is possible: there is no chain to
  * lose and nothing to be unreachable from.
  */

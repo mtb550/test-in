@@ -76,10 +76,10 @@ A small message then appears at the bottom of the IDE and fades. It reads
 **If there is nothing to take back** — the menu entry is gray and the key does
 nothing.
 
-**If something else has written those test cases since** — a message titled
-**These test cases changed since** reads *Something else has written them - a
-sync, a pull, or another IDE - so taking this back would write over work that is
-not yours. Nothing was changed.*
+**If something else has written those test cases since** — a message is shown,
+titled **These test cases changed since**. It reads *Something else has written
+them - a sync, a pull, or another IDE - so taking this back would write over
+work that is not yours. Nothing was changed.*
 
 **If a test case cannot be written back, or its file cannot be deleted** — the
 others are still taken back, and a message reads *unable to write content:* or

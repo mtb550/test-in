@@ -36,10 +36,10 @@ import static org.testng.Assert.assertTrue;
  * along with it: their edit sat on disk, absent from the screen, until they
  * pressed Refresh.
  * <p>
- * What is pinned here is the property rather than the mechanism - <b>the answer
- * is about what the file says, not about when it changed</b> - so a later
- * implementation that keeps the promise passes and one that goes back to a bare
- * clock does not.
+ * What is pinned here is the property rather than the mechanism: <b>the answer
+ * is about what the file says, not about when it changed</b>. So a later
+ * implementation that keeps the promise passes, and one that goes back to a
+ * bare clock does not.
  */
 public class OwnWritesTest {
 
@@ -48,7 +48,7 @@ public class OwnWritesTest {
 
     private static @NotNull Path tempFile() {
         try {
-            final @NotNull Path file = Files.createTempFile("testin-ownwrites", ".json");
+            final @NotNull Path file = Files.createTempFile("testin-own-writes", ".json");
             Files.write(file, OURS);
             return file;
         } catch (final IOException ex) {
@@ -113,7 +113,7 @@ public class OwnWritesTest {
     /**
      * A write still running has nothing to compare against, and the event can
      * arrive while it is in flight - which is why the claim is made before the
-     * write rather than after it.
+     * file is written rather than after.
      */
     @Test
     public void aWriteStillInFlightIsOurs() {

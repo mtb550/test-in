@@ -2,9 +2,9 @@
 
 # UC-VIEW-PANEL-016: Report a failed test case as a bug
 
-**As a** tester, **I want** to file a failed test case as a GitHub issue that is
-already written in my team's template, **so that** I do not retype what the test
-run knows, and I never report the same bug twice.
+**As a** tester, **I want** to file a failed test case as a GitHub issue already
+written in my team's template, **so that** I retype nothing the run knows and
+never report a bug twice.
 
 Testin writes the bug from the test case, its test run and what the test run
 recorded. The tester reads it, edits it if they want, and sends it. Testin files
@@ -208,8 +208,8 @@ Install gh, then restart the IDE (and JetBrains Toolbox)*.
 with the numbers of this machine.
 
 **If `gh` is not signed in to the repository's host** — **Send** is gray.
-Hovering over it reads *Not signed in to github.com. Run gh auth login
---hostname github.com*, with the repository's host.
+Hovering over it reads *Not signed in to \<host\>. Run gh auth login
+--hostname \<host\>*, where \<host\> is the repository's host.
 
 **If the title is empty** — **Send** is gray. Hovering over it reads *The title
 is empty*.

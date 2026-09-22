@@ -25,18 +25,17 @@
     main. It was on a two-day schedule until 2026-09-12: a calendar runs it over
     code nobody touched and misses the push that mattered.
 
-    Exits non-zero for nineteen findings and no others. Twelve are the
-    inspector's. DataFlowIssue and ReturnNull are the standing rule, a null
-    contract the checker can prove is broken. Convert2MethodRef,
-    CodeBlock2Expr, SimplifyStreamApiCallChains, StringBufferReplaceableByString,
-    SameParameterValue, BooleanMethodIsAlwaysInverted, UnusedReturnValue,
-    UNUSED_IMPORT, OnDemandImport and ConvertToStringTemplate forbid
-    code that says something the long way round; CONTRIBUTING.md has a line on
-    each. Seven are this script's own, each a rule no
-    IntelliJ inspection makes: WrappedMethodDeclaration, StaticMutableState,
+    Exits non-zero for any finding in the files this repository writes, the
+    ones .idea/scopes/Inspected.xml names. A warning the IDE shows there is a
+    warning the run fails on. The exceptions are the few rules a headless run
+    cannot be trusted with, and $notGated at the foot of this file names each
+    one with its reason. DuplicatedDisplayString is counted rather than
+    forbidden, against .github/display-string-baseline.txt.
+
+    Seven rules are this script's own, because no IntelliJ inspection makes
+    them: WrappedMethodDeclaration, StaticMutableState,
     HandWrittenPrivateConstructor, DriftedCaption, OrphanedJavadoc,
-    MissingCopyright and HtmlParagraphInMarkdown. The list is written once, in $gate at the foot of this
-    file. Everything else is listed for a person to judge.
+    MissingCopyright and HtmlParagraphInMarkdown.
 
 .EXAMPLE
     pwsh tools/inspect.ps1
@@ -46,7 +45,7 @@ param(
     # The one folder this script writes: the XML, the two reports, and the
     # inspector's throwaway IDE directories. Deliberately not under build/:
     # ./gradlew clean deletes that, and the findings list is what you work from
-    # for the next hour. Gitignored instead.
+    # for the next hour. Ignored by Git instead.
     [string] $OutputDir = '.inspection',
 
     # Narrows a run to one place, and passing '' inspects the project root.
@@ -159,26 +158,31 @@ function Select-Inspected([object[]] $problems) {
     <#
         The findings in files this repository writes, which is what the scope
         .idea/scopes/Inspected.xml names - the same scope Code | Inspect Code
-        offers in the IDE, so the two lists agree. A folder is written as
-        file:folder//* and a single file as file:name.
+        offers in the IDE, so the two lists agree. The pattern is
+        (a||b||...)&&!c&&!d: a folder is written as file:folder//* and a single
+        file as file:name, and what follows &&! is left out.
     #>
     $pattern = ([xml](Get-Content (Join-Path $repo '.idea/scopes/Inspected.xml') -Raw)).component.scope.pattern
+    $parts = @($pattern -split '&&!')
+    $excluded = @($parts | Select-Object -Skip 1 | ForEach-Object { $_ -replace '^file:', '' })
     $folders = @()
     $files = @()
-    foreach ($part in $pattern -split '\|\|') {
+    foreach ($part in ($parts[0].Trim('(', ')') -split '\|\|')) {
         $target = $part -replace '^file:', ''
         if ($target.EndsWith('//*')) { $folders += $target.Substring(0, $target.Length - 3) + '/' } else { $files += $target }
     }
 
-    # The spell checker knows English. A translation bundle is not English, and
-    # its words are its translator's to check: 1,748 "typos" in messages_fr were
-    # French. Every other check still reads the translations.
+    # The spelling and grammar checkers know English. A translation bundle is
+    # not English, and its words are its translator's to check: 1,748 "typos"
+    # in messages_fr were French, and the grammar checker read a Hindi full stop
+    # as no stop at all. Every other check still reads the translations.
     $translation = '^src/main/resources/messages_[a-z]{2}\.properties$'
+    $language = @('SpellCheckingInspection', 'GrazieInspection', 'GrazieStyle')
 
     $problems | Where-Object {
         $path = $_.Path.TrimEnd('/')
-        $inScope = ($files -contains $path) -or @($folders | Where-Object { $path.StartsWith($_) }).Count -gt 0
-        $inScope -and -not ($_.Inspection -eq 'SpellCheckingInspection' -and $path -match $translation)
+        $inScope = (($files -contains $path) -or @($folders | Where-Object { $path.StartsWith($_) }).Count -gt 0) -and $excluded -notcontains $path
+        $inScope -and -not ($language -contains $_.Inspection -and $path -match $translation)
     }
 }
 
@@ -745,9 +749,12 @@ function Read-WrappedDeclarations([string] $scope) {
 
         Matched on the modifiers rather than on the parenthesis, which is what
         keeps a wrapped call - stream() on one line and .filter(..) on the next
-        - from being read as a declaration.
+        - from being read as a declaration. A record header is matched with or
+        without them, because "record Name(" is never a call: six package-private
+        records sat wrapped while the gate read clear.
     #>
     $declaration = '^\s*(?:(?:public|protected|private|static|final|abstract|synchronized|native|default|strictfp)\s+)+[^;=()]*?\b\w+\s*\('
+    $record = '^\s*(?:\w+\s+)*record\s+\w+(?:<[^>]*>)?\s*\('
 
     foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
         $number = 0
@@ -756,7 +763,7 @@ function Read-WrappedDeclarations([string] $scope) {
 
             $trimmed = $text.Trim()
             if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
-            if ($text -notmatch $declaration) { continue }
+            if ($text -notmatch $declaration -and $text -notmatch $record) { continue }
 
             # Still open at the end of the line, so the signature carries on to
             # the next one. A declaration that closes on its own line is fine,
@@ -1043,21 +1050,20 @@ Write-Reports $problems $outPath
 # this says what already exists, which is what stops the next duplicate.
 Write-DisplayStringInventory $scopes $outPath
 
-# What is not allowed to survive a sweep. The first two are the project's
-# standing rule - a null contract the checker can prove is broken is a defect,
-# not a style note. The next eight forbid code that says something the long way
-# round; CONTRIBUTING.md has a line on each, and the profile names every one,
-# because the inspector did not run Convert2MethodRef until it was named. The
-# rest are this script's own rules. Every one of them is at zero, so each gates
-# outright: the first that appears is the one to look at.
-#
-# Everything else the inspector reports is a judgement call and needs a person,
-# so it is listed and not gated: this exits non-zero for these only, which is
-# what lets the scheduled run in .github/workflows/inspect.yml mean something.
-# DuplicatedDisplayString is not here: it is ratcheted below instead, and
-# .github/display-string-baseline.txt is where its history is written.
-$gate = @('DataFlowIssue', 'ReturnNull', 'Convert2MethodRef', 'CodeBlock2Expr', 'SimplifyStreamApiCallChains', 'StringBufferReplaceableByString', 'SameParameterValue', 'BooleanMethodIsAlwaysInverted', 'UnusedReturnValue', 'UNUSED_IMPORT', 'OnDemandImport', 'ConvertToStringTemplate', 'WrappedMethodDeclaration', 'StaticMutableState', 'HandWrittenPrivateConstructor', 'DriftedCaption', 'OrphanedJavadoc', 'MissingCopyright', 'HtmlParagraphInMarkdown')
-$breaches = @($problems | Where-Object { $gate -contains $_.Inspection })
+# Nothing survives a sweep except what is named here, each with the reason a
+# headless run cannot be trusted with it. Everything else fails the run: a
+# warning the IDE shows in these files is a defect, not a note for later.
+$notGated = [ordered]@{
+    'unused'                  = 'Lombok writes members the headless run cannot see, and plugin.xml and the content modules call code from outside its scope'
+    'SameReturnValue'         = 'judged across implementations the content modules add, which the headless run does not see'
+    'RedundantThrows'         = 'the Java module implements JavaSourceRoot''s interfaces and throws what they declare'
+    'UsedFromContentModule'   = 'this script''s note that an unused finding has a caller in a content module'
+    'UnusedProperty'          = 'the platform reads action, group and tool window keys by name; BundleKeysTest checks every other key has a reader'
+    'UndefinedParamsPresent'  = 'an action''s inputs come from its metadata online, which the headless run does not fetch'
+    'JSUnresolvedLibraryURL'  = 'asks whether this machine has downloaded a library a page loads from a CDN'
+    'DuplicatedDisplayString' = 'counted against .github/display-string-baseline.txt below instead'
+}
+$breaches = @($problems | Where-Object { -not $notGated.Contains($_.Inspection) })
 
 if ($breaches) {
     Write-Host ''
@@ -1069,7 +1075,7 @@ if ($breaches) {
 }
 
 Write-Host ''
-Write-Host "Gate clear: no $($gate -join ', ')." -ForegroundColor Green
+Write-Host "Gate clear: no finding outside $($notGated.Keys -join ', ')." -ForegroundColor Green
 
 # And the one that is counted rather than forbidden. Reported after the gate so
 # a hard breach is the first thing read, and it fails the run in its own right:

@@ -42,7 +42,7 @@ import static org.testng.Assert.assertTrue;
  * rather than an empty one.
  * <p>
  * Neither test draws a pill: painting one needs the platform's fonts. They pin
- * the two decisions instead - which text colour a background earns, and whether
+ * the two decisions instead - which text color a background earns, and whether
  * a value becomes a badge at all.
  */
 public class BadgesTest {
@@ -142,31 +142,31 @@ public class BadgesTest {
      */
     @Test
     public void theThreePrioritiesAreThreeColours() {
-        final Set<Color> colours = new HashSet<>();
+        final Set<Color> colors = new HashSet<>();
 
         for (final Priority priority : Priority.values()) {
-            assertTrue(colours.add(new Color(priority.getColor().getRGB())), priority + " repeats another priority's colour");
+            assertTrue(colors.add(new Color(priority.getColor().getRGB())), priority + " repeats another priority's color");
         }
 
-        assertEquals(colours.size(), 3, "three priorities, three colours, no caption to fall back on");
+        assertEquals(colors.size(), 3, "three priorities, three colors, no caption to fall back on");
     }
 
     /**
-     * Four severities that mean four different things, so four colours: two
+     * Four severities that mean four different things, so four colors: two
      * sharing one would put the same pill on a blocker and on a suggestion, and
      * the caption is the only thing that would tell them apart.
      */
     @Test
     public void everySeverityThatDrawsHasItsOwnNameAndColour() {
         final Set<String> names = new HashSet<>();
-        final Set<Color> colours = new HashSet<>();
+        final Set<Color> colors = new HashSet<>();
 
         for (final BugSeverity severity : BugSeverity.values()) {
             if (severity == BugSeverity.EMPTY) continue;
 
             assertFalse(severity.getLabel().isBlank(), severity + " is drawn, so it needs a name");
             assertTrue(names.add(severity.getLabel()), severity + " repeats another severity's name");
-            assertTrue(colours.add(new Color(severity.getColor().getRGB())), severity + " repeats another severity's colour");
+            assertTrue(colors.add(new Color(severity.getColor().getRGB())), severity + " repeats another severity's color");
         }
 
         assertEquals(names.size(), 4, "the four severities a tester can choose");

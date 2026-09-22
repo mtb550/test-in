@@ -7,7 +7,7 @@ labels: question
 
 # Question
 
-What has to be decided, in one paragraph, and what is blocked until it is.
+One paragraph on what has to be decided, and on what is blocked until it is.
 
 ## Options
 

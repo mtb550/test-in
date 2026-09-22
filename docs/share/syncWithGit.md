@@ -36,7 +36,7 @@ There is no key for this. The menu entry is **Sync With Remote**.
   rebase and then pushes, and neither can be stopped halfway without leaving the
   repository somewhere nobody asked for — which is Rule-SHARE-005 above, and
   this rule used to say the opposite of it.
-- **Rule-SHARE-073** — Afterwards the working folder, Testin's own reading of
+- **Rule-SHARE-073** — Afterward the working folder, Testin's own reading of
   it, and the tree are all read again.
 
 ## What the tester sees

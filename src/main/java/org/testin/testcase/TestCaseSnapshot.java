@@ -38,8 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @NotNull List<TestCaseDto> present,
-                               @NotNull List<UUID> absent) {
+public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @NotNull List<TestCaseDto> present, @NotNull List<UUID> absent) {
     // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-228
     public static @NotNull TestCaseSnapshot of(final @NotNull Project p, final @NotNull Path testSetPath, final @NotNull List<UUID> ids) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -186,8 +185,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return allBack;
     }
 
-    private record Written(@NotNull List<TestCaseDto> removed, @NotNull List<TestCaseDto> comingBack,
-                           @NotNull List<TestCaseDto> landed) {
+    private record Written(@NotNull List<TestCaseDto> removed, @NotNull List<TestCaseDto> comingBack, @NotNull List<TestCaseDto> landed) {
         Written() {
             this(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         }

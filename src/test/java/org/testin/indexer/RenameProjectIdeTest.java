@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p>
  * A project is the one node whose parent is not indexed, whose containers are in
  * no map while it is inactive, and whose siblings are other projects the index
- * never read - so each of those is asked here, against a real folder.
+ * never read. So each of those is asked here, against a real folder.
  */
 public class RenameProjectIdeTest extends BasePlatformTestCase {
 
@@ -129,7 +129,7 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
 
     /**
      * Rule-INTERNAL-084. A case in a file named by hand is still found in that
-     * file after the project around it is renamed - the store kept the old path,
+     * file after the surrounding project is renamed - the store kept the old path,
      * so saving it could not take the hand-named file away.
      */
     public void testAHandNamedCaseKeepsItsFile() {

@@ -25,7 +25,7 @@ There is no key for this. It happens when a test set is created, which is
 - **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
   tester is not shown it.
 - **Rule-CODEGEN-082** — Testin touches a test project's automation code only
-  when `testin.yml` names that test project. Otherwise nothing is generated,
+  when `testin.yml` names that test project. Otherwise, nothing is generated,
   renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
@@ -37,8 +37,8 @@ There is no key for this. It happens when a test set is created, which is
 - **Rule-CODEGEN-010** — The class is written empty. It holds no blank line
   inside its braces.
 - **Rule-CODEGEN-011** — A test set whose name comes to nothing when the illegal
-  characters are removed is still named after what it was called, so two of them
-  never share a class and each one is in the same class every time. A test set
+  characters are removed is still named after what it was called. So two of them
+  never share a class, and each one is in the same class every time. A test set
   with no name at all — which the tree does not let a tester make — becomes
   `DefaultTest`.
 - **Rule-CODEGEN-073** — A folder whose name is a word Java keeps for itself -

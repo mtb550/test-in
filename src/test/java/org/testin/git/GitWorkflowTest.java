@@ -137,15 +137,15 @@ public class GitWorkflowTest {
     /**
      * A commit whose paths would not fit on a command line still lands.
      * <p>
-     * The size is the test. An import brings in hundreds of test cases at once
-     * and every one of them is a new file, so the first commit after an import
-     * is the largest one a tester ever makes - and it was the one that could not
+     * The size is the test. An import brings in hundreds of test cases at once,
+     * and every one of them is a new file. So the first commit after an import
+     * is the largest one a tester ever makes, and it was the one that could not
      * be made. 1,200 cases under a name holding a space is roughly what a
      * spreadsheet import produces, and about three times the limit.
      * <p>
      * Driven through {@link GitCommandRunner#pathspecBytes}, so what Git reads
      * here is what the plugin writes. Running the command is left to real Git
-     * rather than to the runner, which needs a live IDE for git4idea.
+     * rather than to the runner, which needs a live IDE for {@code git4idea}.
      */
     @Test
     public void aCommitTooLargeForTheCommandLineStillLands() {
@@ -517,7 +517,7 @@ public class GitWorkflowTest {
             mustGit(work, "add", "--", relativePath);
             mustGit(work, "-c", "core.editor=true", "rebase", "--continue");
 
-            // Both edits survived, and the repository is not mid-rebase any more.
+            // Both edits survived, and the repository is not mid-rebase anymore.
             final TestCaseDto merged = RealMapper.build().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
             assertEquals(merged.getDescription(), "a registered user signs in with a valid password");
             assertEquals(merged.getExpectedResult(), "the dashboard opens within two seconds");
@@ -534,7 +534,7 @@ public class GitWorkflowTest {
      * used to conflict (#90).
      * <p>
      * Neither new file conflicts: they are new files with new names. Nothing
-     * else conflicts either, now that a case carries its own position - the case
+     * else conflicts either, now that a case carries its own position. The case
      * that happened to be last used to be rewritten by both testers to point at
      * their own new one, and that third file was the conflict. Git merges this
      * on its own, with nothing for the plugin to resolve.

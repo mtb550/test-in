@@ -27,8 +27,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 // Rule-INTERNAL-089, Rule-TREE-PANEL-106
-record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String repoUrl, @NotNull String testinProject,
-                           @NotNull String bugRepoUrl) {
+record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String repoUrl, @NotNull String testinProject, @NotNull String bugRepoUrl) {
     public static final @NotNull TestinProjectConfig EMPTY = new TestinProjectConfig(
             TestinLocation.LOCAL, "", "", "");
     static final @NotNull String PROJECT_KEY = "testinProject";

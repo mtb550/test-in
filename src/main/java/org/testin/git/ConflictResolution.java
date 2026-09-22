@@ -210,8 +210,6 @@ public final class ConflictResolution {
         @NotNull Merge merge(@NotNull Mapper mapper, @NotNull String base, @NotNull String mine, @NotNull String theirs);
     }
 
-    private record Pending(@NotNull String relativePath, @NotNull String name, @NotNull ObjectNode merged,
-                           @NotNull List<Merge.Question> questions, @NotNull List<String> settled,
-                           @NotNull String theirs) {
+    private record Pending(@NotNull String relativePath, @NotNull String name, @NotNull ObjectNode merged, @NotNull List<Merge.Question> questions, @NotNull List<String> settled, @NotNull String theirs) {
     }
 }

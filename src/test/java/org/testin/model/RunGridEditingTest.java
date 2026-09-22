@@ -36,7 +36,7 @@ import static org.testng.Assert.assertTrue;
  * <p>
  * The first is that exactly one column takes typing. Everything else on a row is
  * either the test case's, which the run does not own, or a verdict, which has
- * its own key and clears things as it goes - a status typed into a cell would be
+ * its own key and clears things as it goes. A status typed into a cell would be
  * a fourth way to record one.
  * <p>
  * The second is what a pass erases. It always erased the four fields that

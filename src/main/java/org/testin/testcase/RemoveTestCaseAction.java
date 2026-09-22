@@ -70,8 +70,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p, @NotNull TestinEditor editor, @NotNull DirectoryDto dir,
-                        @NotNull List<TestCaseDto> selected) {
+    private record Work(@NotNull Project p, @NotNull TestinEditor editor, @NotNull DirectoryDto dir, @NotNull List<TestCaseDto> selected) {
         // UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-062
         void remove() {
             final @NotNull List<TestCaseDto> selectedItems = selected;

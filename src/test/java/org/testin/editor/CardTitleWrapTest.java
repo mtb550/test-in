@@ -68,8 +68,8 @@ public class CardTitleWrapTest {
 
     /**
      * The one that catches a wrap the renderer does not honor: a title that was
-     * told to wrap but did not reports the height of a single line, so the row
-     * clips it and the tester sees no wrapping at all.
+     * told to wrap and ignored it reports the height of a single line, so the
+     * row clips it and the tester sees no wrapping at all.
      */
     @Test
     public void wrappingMakesTheCardTaller() {

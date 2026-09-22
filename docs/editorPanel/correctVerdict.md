@@ -46,7 +46,7 @@ Press the right verdict's key on the test case.
 - **Rule-EDITOR-PANEL-162** — Only passing clears anything. Failing and blocking
   clear nothing.
 - **Rule-EDITOR-PANEL-240** — Correcting a verdict keeps the test case it was
-  given against. Only the verdict, who gave it and when change.
+  given against. Only three things change: the verdict, who gave it and when.
 
 ## The screen
 
@@ -66,7 +66,7 @@ Press the right verdict's key on the test case.
 
 1. **The title** — the verdict being recorded.
 2. **The message** — names exactly what will be cleared, from the six.
-3. **The confirm word** — the verdict, again.
+3. **The confirmation word** — the verdict, again.
 
 ## Main flow
 

@@ -45,9 +45,9 @@ import java.util.function.BooleanSupplier;
  * <p>
  * <b>The regression this pins is what a write removes.</b> The writer used to
  * work out which results were unwanted by listing the folder and dropping every
- * {@code .ri} the snapshot did not name - so a result a pull had brought a
+ * {@code .ri} the snapshot did not name. So a result a pull had brought a
  * moment earlier, or one whose own snapshot had just failed, looked exactly like
- * a case somebody had unticked, and a verdict nobody asked to lose was deleted.
+ * a case somebody had unticked. A verdict nobody asked to lose was deleted.
  * The caller says which cases went, because the caller is the only one that saw
  * the change, and the writer removes those and no others.
  * <p>

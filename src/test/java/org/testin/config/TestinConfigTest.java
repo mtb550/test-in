@@ -163,8 +163,8 @@ public class TestinConfigTest {
      * Rule-TREE-PANEL-117.
      * <p>
      * The file keeps the address it was given. It used to judge it as well, with
-     * a narrower rule than the one thing that decides that, and dropped what it
-     * refused with only a line in the log - so a testin.yml holding
+     * a narrower rule than the one thing that decides that. It dropped what it
+     * refused with only a line in the log. So a testin.yml holding
      * {@code git://host/x} produced a panel that never mentioned an address at
      * all (#301).
      * <p>
@@ -182,7 +182,7 @@ public class TestinConfigTest {
     }
 
     /**
-     * The credential strip is not the judgement and did not move with it: the
+     * The credential strip is not the judgment and did not move with it: the
      * file is committed, so a token that reached it would be in the repository's
      * history forever.
      */
@@ -196,7 +196,7 @@ public class TestinConfigTest {
      * The mode decides, not the addresses (#94).
      * <p>
      * The file can contradict itself - say local and still carry an address - so one
-     * key is the authority and the rest is read against it. Otherwise something
+     * key is the authority and the rest is read against it. Otherwise, something
      * has to choose which half of the file to believe.
      */
     @Test
@@ -218,7 +218,7 @@ public class TestinConfigTest {
 
     /**
      * Git is the only way a project is shared, so {@code connection} says
-     * nothing any more. A file written when it did still clones: the key is
+     * nothing anymore. A file written back then still clones: the key is
      * skipped like any other unknown one, and what the file says around it
      * still counts.
      */

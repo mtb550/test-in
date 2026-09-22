@@ -42,7 +42,7 @@ import static org.testng.Assert.assertTrue;
  * <p>
  * A tester who adds a case to a cycle they are part way through must not pay for
  * it with the verdicts already in that cycle, and a case they take out must
- * actually go. Between those two sits the whole risk of the feature: the run is
+ * actually go. The whole risk of the feature sits between those two: the run is
  * rebuilt from a set of ids, and rebuilding a result from its id rather than
  * carrying the result across would silently blank nine fields per case - the
  * verdict, the actual result, the bug severity and priority, the duration, who

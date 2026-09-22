@@ -45,8 +45,8 @@ import static org.testng.Assert.assertTrue;
  * side of each change, because reading that is the one thing that needs a
  * repository with history.
  * <p>
- * This is where the two faults that made the feature unusable lived - a new test
- * case never appearing, and the whole review coming back empty - so it is worth
+ * This is where the two faults that made the feature unusable lived: a new test
+ * case never appearing, and the whole review coming back empty. So it is worth
  * asserting against the output Git really produces rather than a tidied version
  * of it.
  */
@@ -193,7 +193,7 @@ public class GitDiffProcessorTest {
      * which is what {@code -uall} is for. Every one of them is a row.
      */
     @Test
-    public void awholeNewTestSetIsReviewedCaseByCase() {
+    public void aWholeNewTestSetIsReviewedCaseByCase() {
         try {
             for (int index = 1; index <= 3; index++) {
                 onDisk("Test Cases/login flow/case-" + index + ".tc", testCase("case " + index));

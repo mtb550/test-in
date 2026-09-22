@@ -45,7 +45,7 @@ import static org.testng.Assert.assertTrue;
  * <p>
  * The list is not repeated here. The marker names are {@link DirectoryType}'s and
  * the record extensions are {@link FileKind}'s, so a kind of folder or a kind of
- * file added later is asked about without anybody remembering to add it - which
+ * file added later is asked about without anybody remembering to add it. That
  * is the only way this can go wrong, because nothing else in the build reads
  * {@code .gitattributes} at all.
  */

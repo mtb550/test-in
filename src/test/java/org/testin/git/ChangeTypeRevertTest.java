@@ -81,20 +81,20 @@ public class ChangeTypeRevertTest {
 
         assertEquals(changes.size(), 10, "every editable field differs between the two states");
         for (final FieldChange change : changes) {
-            assertTrue(change.changeType().isRevertable(),
-                    change.changeType() + " appears in a review, so it must be revertable");
+            assertTrue(change.changeType().isRevertible(),
+                    change.changeType() + " appears in a review, so it must be revertible");
         }
     }
 
     @Test
     public void creatingOrRemovingAWholeTestCaseHasNoFieldToRevert() {
-        assertFalse(ChangeType.CREATE_TEST_CASE.isRevertable());
-        assertFalse(ChangeType.REMOVE_TEST_CASE.isRevertable());
+        assertFalse(ChangeType.CREATE_TEST_CASE.isRevertible());
+        assertFalse(ChangeType.REMOVE_TEST_CASE.isRevertible());
     }
 
     /**
      * The one that matters: each revert restores its own field and leaves every
-     * other one alone. A revert that wrote a neighbouring field would restore
+     * other one alone. A revert that wrote a neighboring field would restore
      * the value the tester asked for and quietly discard one they did not.
      */
     @Test
