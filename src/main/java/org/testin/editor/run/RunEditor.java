@@ -129,7 +129,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
                 final @NotNull Map<UUID, TestRunItems> results = fromDisk.getResults().stream()
                         .collect(Collectors.toMap(TestRunItems::getId, item -> item,
-                                (existingItem, duplicateItem) -> existingItem));
+                                (existingItem, _) -> existingItem));
 
                 final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(fromDisk.getResults().stream().map(TestRunItems::liveTestCase).toList());
                 Services.getInstance(p, TestCaseValues.class).load(ordered);

@@ -32,7 +32,7 @@ import java.util.Optional;
 
 @Service(Service.Level.APP)
 public final class NativeEditorZoom implements Disposable {
-    private final @NotNull Timer debounce = new Timer(50, event -> push());
+    private final @NotNull Timer debounce = new Timer(50, _ -> push());
 
     private @NotNull Optional<Editor> wheeled = Optional.empty();
 

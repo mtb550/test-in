@@ -64,10 +64,10 @@ final class DirectoryChildrenIndex {
             final @NotNull Map<Path, List<DirectoryDto>> rebuilt = new HashMap<>();
             for (final DirectoryDto directory : source.get()) {
                 Optional.ofNullable(directory.getParent()).ifPresent(parent ->
-                        rebuilt.computeIfAbsent(parent.getPath(), ignored -> new ArrayList<>()).add(directory));
+                        rebuilt.computeIfAbsent(parent.getPath(), _ -> new ArrayList<>()).add(directory));
             }
             rebuilt.values().forEach(children -> children.sort(BY_ARRANGEMENT));
-            rebuilt.replaceAll((parent, children) -> List.copyOf(children));
+            rebuilt.replaceAll((_, children) -> List.copyOf(children));
 
             childrenByParent = Map.copyOf(rebuilt);
             builtAfter = seen;

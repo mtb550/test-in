@@ -23,7 +23,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 
 @FunctionalInterface
 public interface ReportHandler {
-    ReportHandler UNSUPPORTED = (p, trDir, tr) -> {
+    ReportHandler UNSUPPORTED = (_, _, _) -> {
         throw new IllegalStateException("This format has no report generator");
     };
 

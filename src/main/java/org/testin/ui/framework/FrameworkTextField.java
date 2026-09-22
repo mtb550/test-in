@@ -20,10 +20,10 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.TextComponentEmptyText;
 import com.intellij.ui.components.fields.ExtendableTextField;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Fonts;
 import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.Icon;
@@ -56,6 +56,7 @@ final class FrameworkTextField {
 
         if (!placeholder.isBlank()) {
             field.getEmptyText().setText(placeholder);
+            field.getEmptyText().setFont(Fonts.placeholder());
             TextComponentEmptyText.setupPlaceholderVisibility(field);
 
             field.getDocument().addDocumentListener(new DocumentAdapter() {
@@ -73,7 +74,7 @@ final class FrameworkTextField {
     }
 
     static void style(final @NotNull JComponent field) {
-        field.setFont(JBFont.label().biggerOn(6f));
+        field.setFont(Fonts.field());
         field.setBorder(JBUI.Borders.empty(10, 12));
     }
 

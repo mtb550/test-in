@@ -54,7 +54,7 @@ import java.util.stream.Stream;
 public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog {
     @Getter(AccessLevel.NONE)
     private static final @NotNull StatusBarItem[] NO_ITEMS = new StatusBarItem[0];
-    private static final @NotNull PropertyChangeListener NOTHING_ON_FOCUS = evt -> {
+    private static final @NotNull PropertyChangeListener NOTHING_ON_FOCUS = _ -> {
     };
     protected final @NotNull DescriptionSection descriptionSection;
     protected final @NotNull ExpectedResultSection expectedResultSection;

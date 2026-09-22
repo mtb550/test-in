@@ -21,7 +21,7 @@ import org.testin.model.dto.TestCaseDto;
 
 @FunctionalInterface
 public interface RevertAction {
-    RevertAction NONE = (currentDto, oldDto) -> {
+    RevertAction NONE = (_, _) -> {
     };
 
     void apply(final @NotNull TestCaseDto currentDto, final @NotNull TestCaseDto oldDto);

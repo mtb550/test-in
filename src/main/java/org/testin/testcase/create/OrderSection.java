@@ -34,6 +34,7 @@ import org.testin.services.Services;
 import org.testin.testcase.Rank;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.UpdateTestCaseFields;
+import org.testin.util.Fonts;
 import org.testin.util.Bundle;
 
 import javax.swing.JComponent;
@@ -53,11 +54,11 @@ public class OrderSection implements CreateTestCaseSection {
         this.p = p;
 
         this.position = new IntegerField(Bundle.message("order.section.position"), 1, 1);
-        this.position.setFont(fieldFont());
+        this.position.setFont(Fonts.field());
         this.position.setColumns(4);
 
         this.outOf = new JBLabel(Bundle.message("order.section.of", "1"));
-        this.outOf.setFont(fieldFont());
+        this.outOf.setFont(Fonts.field());
         this.outOf.setBorder(JBUI.Borders.emptyLeft(10));
 
         final @NotNull JBPanel<?> field = new JBPanel<>(new BorderLayout());

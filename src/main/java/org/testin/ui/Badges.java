@@ -24,17 +24,16 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Fonts;
 
 import javax.swing.Icon;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -146,8 +145,7 @@ public final class Badges {
                 case Tag tag -> lay(tag.text(), tag.color(), BADGE_PAD_H + TAG_NOTCH, EmptyIcon.ICON_0);
             }
 
-            final float badgeSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
-            setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD, badgeSize));
+            setFont(Fonts.badge());
 
             setVisible(true);
         }

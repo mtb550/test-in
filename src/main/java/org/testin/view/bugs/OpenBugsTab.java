@@ -21,7 +21,6 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
@@ -30,7 +29,7 @@ import org.testin.model.FailureDetail;
 import org.testin.model.OpenBug;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.ui.FontSync;
+import org.testin.util.Fonts;
 import org.testin.util.Bundle;
 
 import javax.swing.Box;
@@ -67,7 +66,7 @@ public class OpenBugsTab {
 
     private static @NotNull JBLabel heading(final @NotNull OpenBug bug) {
         final @NotNull JBLabel label = new JBLabel(bug.runName());
-        label.setFont(JBFont.label().asBold().deriveFont(FontSync.getBaseFontSize()));
+        label.setFont(Fonts.strong());
 
         return label;
     }
@@ -77,15 +76,15 @@ public class OpenBugsTab {
                 bug.item().getBugSeverity().getLabel() + " / " + bug.item().getBugPriority().getLabel());
 
         label.setForeground(bug.item().getBugSeverity().getColor());
-        label.setFont(JBFont.label().deriveFont(FontSync.getBaseFontSize()));
+        label.setFont(Fonts.body());
 
         return label;
     }
 
     private static @NotNull ActionLink issue(final @NotNull String url) {
-        final @NotNull ActionListener open = event -> BugIssueUrl.open(url);
+        final @NotNull ActionListener open = _ -> BugIssueUrl.open(url);
         final @NotNull ActionLink link = new ActionLink(BugIssueUrl.reference(url), open);
-        link.setFont(JBFont.label().deriveFont(FontSync.getBaseFontSize()));
+        link.setFont(Fonts.body());
 
         return link;
     }
@@ -93,7 +92,7 @@ public class OpenBugsTab {
     private static @NotNull JBLabel note(final @NotNull String text) {
         final @NotNull JBLabel label = new JBLabel(text);
         label.setForeground(JBColor.GRAY);
-        label.setFont(JBFont.label().deriveFont(FontSync.getBaseFontSize()));
+        label.setFont(Fonts.body());
 
         return label;
     }

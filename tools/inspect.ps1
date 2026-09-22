@@ -33,10 +33,16 @@
     about everything but one sentence. DuplicatedDisplayString is counted rather
     than forbidden, against .github/display-string-baseline.txt.
 
-    Eight rules are this script's own, because no IntelliJ inspection makes
-    them: WrappedMethodDeclaration, StaticMutableState,
-    HandWrittenPrivateConstructor, NonMarkerComment, DriftedCaption,
-    OrphanedJavadoc, MissingCopyright and HtmlParagraphInMarkdown.
+    Nine rules are this script's own, because no IntelliJ inspection makes them
+    or the headless run cannot be trusted with the one that does:
+    WrappedMethodDeclaration, StaticMutableState,
+    HandWrittenPrivateConstructor, NonMarkerComment, UnusedLambdaParameter,
+    DriftedCaption, OrphanedJavadoc, MissingCopyright and
+    HtmlParagraphInMarkdown.
+
+    They read the source as text, so -Quick runs them alone in seconds with no
+    IDE. That is the check to run before handing a change over; the full run is
+    CI's, on every push.
 
 .EXAMPLE
     pwsh tools/inspect.ps1
@@ -67,7 +73,18 @@ param(
     # line numbers in it are the ones the inspector saw, so a source edited
     # since then reports against lines that have moved - fine for re-reading a
     # run, wrong for judging the tree as it is now.
-    [switch] $ReportOnly
+    [switch] $ReportOnly,
+
+    # Only this script's own rules, and no IDE at all. Seconds rather than
+    # twenty minutes, because nothing is indexed: the rules below read the
+    # source as text.
+    #
+    # This is what to run before handing a change over. The full run belongs to
+    # CI on every push, and the findings it alone can see - dead code, a
+    # deprecated call, a redundant cast - are read from that run. What it cannot
+    # see is exactly what this mode catches, and what kept arriving in Muteb's
+    # IDE one warning at a time.
+    [switch] $Quick
 )
 
 $ErrorActionPreference = 'Stop'
@@ -745,6 +762,152 @@ function Test-DisplayStringBaseline([object[]] $problems, [string] $baselinePath
     return $true
 }
 
+function Hide-StringsAndComments([string] $source) {
+    <#
+        The same file with every string literal, char literal, text block and
+        comment blanked to spaces, offsets unchanged.
+
+        Written because the first sweep for unused lambda parameters read
+        Logger.debug("[details] selectedDetails changed -> ") as a lambda and
+        renamed the word inside the message. Any rule that matches on Java
+        punctuation has to see the code alone.
+    #>
+    $out = [System.Text.StringBuilder]::new($source)
+    $i = 0
+    $n = $source.Length
+
+    while ($i -lt $n) {
+        $c = $source[$i]
+
+        if ($c -eq '"' -and $i + 3 -le $n -and $source.Substring($i, 3) -eq '"""') {
+            $j = $source.IndexOf('"""', $i + 3)
+            $j = if ($j -lt 0) { $n } else { $j + 3 }
+            for ($k = $i; $k -lt $j; $k++) { if ($source[$k] -ne "`n") { $out[$k] = ' ' } }
+            $i = $j
+            continue
+        }
+
+        if ($c -eq '"' -or $c -eq "'") {
+            $j = $i + 1
+            while ($j -lt $n) {
+                if ($source[$j] -eq '\') { $j += 2; continue }
+                if ($source[$j] -eq $c) { $j++; break }
+                $j++
+            }
+            for ($k = $i; $k -lt [Math]::Min($j, $n); $k++) { $out[$k] = ' ' }
+            $i = $j
+            continue
+        }
+
+        if ($c -eq '/' -and $i + 1 -lt $n -and $source[$i + 1] -eq '/') {
+            $j = $source.IndexOf("`n", $i)
+            if ($j -lt 0) { $j = $n }
+            for ($k = $i; $k -lt $j; $k++) { $out[$k] = ' ' }
+            $i = $j
+            continue
+        }
+
+        if ($c -eq '/' -and $i + 1 -lt $n -and $source[$i + 1] -eq '*') {
+            $j = $source.IndexOf('*/', $i + 2)
+            $j = if ($j -lt 0) { $n } else { $j + 2 }
+            for ($k = $i; $k -lt $j; $k++) { if ($source[$k] -ne "`n") { $out[$k] = ' ' } }
+            $i = $j
+            continue
+        }
+
+        $i++
+    }
+
+    return $out.ToString()
+}
+
+function Get-LambdaBody([string] $masked, [int] $after) {
+    $k = $after
+    while ($k -lt $masked.Length -and [char]::IsWhiteSpace($masked[$k])) { $k++ }
+    if ($k -ge $masked.Length) { return '' }
+
+    $depth = 0
+
+    if ($masked[$k] -eq '{') {
+        for ($j = $k; $j -lt $masked.Length; $j++) {
+            if ($masked[$j] -eq '{') { $depth++ }
+            elseif ($masked[$j] -eq '}') { $depth--; if ($depth -eq 0) { break } }
+        }
+        return $masked.Substring($k + 1, [Math]::Max(0, [Math]::Min($j, $masked.Length) - $k - 1))
+    }
+
+    for ($j = $k; $j -lt $masked.Length; $j++) {
+        $ch = $masked[$j]
+        if ('([{'.Contains($ch)) { $depth++ }
+        elseif (')]}'.Contains($ch)) { if ($depth -eq 0) { break }; $depth-- }
+        elseif (($ch -eq ';' -or $ch -eq ',') -and $depth -eq 0) { break }
+    }
+
+    return $masked.Substring($k, [Math]::Min($j, $masked.Length) - $k)
+}
+
+function Read-UnusedLambdaParameters([string[]] $scopes) {
+    <#
+        A lambda parameter nothing in the body reads. Java has a name for one
+        since 21 - the unnamed variable, _ - so there is a fix that needs no
+        suppression, and the IDE offers it.
+
+        The headless inspector cannot be asked for these: the global "unused"
+        inspection under-reports without Lombok's generated code and the content
+        modules' callers, and parameters never appear in its list at all. They
+        reached Muteb's IDE one at a time instead, which is the whole reason
+        this rule exists: 106 of them were sitting in the tree when it was
+        written.
+
+        Read off the masked source, so a log message holding an arrow is code to
+        nobody. Switch arms - case 'n' -> ... - are skipped: the literal is
+        masked away and what is left looks exactly like a lambda.
+    #>
+    foreach ($scope in $scopes) {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+            $source = [System.IO.File]::ReadAllText($file.FullName)
+            $masked = Hide-StringsAndComments $source
+            $path = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+
+            $unused = [System.Collections.Generic.List[object]]::new()
+
+            foreach ($match in [regex]::Matches($masked, '\(([^()]*)\)\s*->')) {
+                $inner = $match.Groups[1].Value
+                if ($inner -notmatch '^\s*\w+(\s*,\s*\w+)*\s*$') { continue }
+
+                $body = Get-LambdaBody $masked ($match.Index + $match.Length)
+                foreach ($name in [regex]::Matches($inner, '\w+')) {
+                    if ($name.Value -eq '_') { continue }
+                    if ($body -match ('\b' + [regex]::Escape($name.Value) + '\b')) { continue }
+                    $unused.Add(@{ At = $match.Groups[1].Index + $name.Index; Name = $name.Value })
+                }
+            }
+
+            foreach ($match in [regex]::Matches($masked, '(?<![\w.)])(\w+)\s*->')) {
+                $name = $match.Groups[1].Value
+                if ($name -in @('_', 'default', 'case')) { continue }
+
+                $lineStart = $masked.LastIndexOf("`n", [Math]::Max(0, $match.Index - 1)) + 1
+                if ($masked.Substring($lineStart, $match.Index - $lineStart) -match '\bcase\b') { continue }
+
+                $body = Get-LambdaBody $masked ($match.Index + $match.Length)
+                if ($body -match ('\b' + [regex]::Escape($name) + '\b')) { continue }
+                $unused.Add(@{ At = $match.Groups[1].Index; Name = $name })
+            }
+
+            foreach ($found in $unused) {
+                [pscustomobject]@{
+                    Path       = $path
+                    Line       = ($masked.Substring(0, $found.At) -split "`n").Count
+                    Inspection = 'UnusedLambdaParameter'
+                    Severity   = 'ERROR'
+                    Message    = "Parameter '$($found.Name)' is never used. Java 21 named it: write _ instead"
+                }
+            }
+        }
+    }
+}
+
 function Read-WrappedDeclarations([string] $scope) {
     <#
         A method declaration is one line. A signature is one thing to read, and
@@ -1091,7 +1254,7 @@ function Write-Reports([object[]] $problems, [string] $outPath) {
 
 $outPath = Join-Path $repo $OutputDir
 
-if (-not $ReportOnly) {
+if (-not $ReportOnly -and -not $Quick) {
     # The single cleanup: a stale XML file would be counted as part of this run,
     # and a stale index would be analysed in place of the source. Both live here.
     # The contents, not the directory: gradle.properties sets org.gradle.vfs.watch,
@@ -1113,8 +1276,8 @@ if (-not $ReportOnly) {
 # narrowing a run to one place.
 $scopes = if ($narrowed) { @(Join-Path $repo $Subdirectory) } else { Get-SourceRoots }
 
-$problems = @(Read-Problems $outPath)
-if (-not $narrowed) { $problems = @(Select-Inspected $problems) }
+$problems = if ($Quick) { @() } else { @(Read-Problems $outPath) }
+if (-not $narrowed -and -not $Quick) { $problems = @(Select-Inspected $problems) }
 
 # Two kinds of rule, and they read different trees.
 #
@@ -1136,6 +1299,7 @@ $problems += @(Read-HandWrittenPrivateConstructors $everyTree)
 $problems += @(Read-OrphanedJavadoc $everyTree)
 $problems += @(Read-MissingCopyright $everyTree)
 $problems += @(Read-NonMarkerComments $everyTree)
+$problems += @(Read-UnusedLambdaParameters $everyTree)
 $problems += @(Read-HtmlParagraphInMarkdown)
 
 $problems += @(Read-DuplicatedDisplayStrings $scopes)
@@ -1152,13 +1316,26 @@ $problems += @(Read-DriftedCaptions @(
         (Join-Path $repo 'src/main/java/org/testin/testcase/CreateTestCaseFields.java'),
         (Join-Path $repo 'src/main/java/org/testin/testcase/UpdateTestCaseFields.java')))
 
-$problems = Resolve-CrossModuleUsages $problems
+# A quick run writes nothing: its list is partial by design, and findings.txt
+# is what the last full run left to work from. Resolving a content module's
+# callers and taking the vocabulary both read that full list, so both wait for
+# it too.
+if (-not $Quick) {
+    $problems = Resolve-CrossModuleUsages $problems
 
-Write-Reports $problems $outPath
+    Write-Reports $problems $outPath
 
-# The whole vocabulary, beside the findings. findings.txt says what to act on;
-# this says what already exists, which is what stops the next duplicate.
-Write-DisplayStringInventory $scopes $outPath
+    # The whole vocabulary, beside the findings. findings.txt says what to act on;
+    # this says what already exists, which is what stops the next duplicate.
+    Write-DisplayStringInventory $scopes $outPath
+}
+else {
+    Write-Host ''
+    Write-Host "Quick run: this script's own rules only, over $($everyTree.Count) source root(s). The IDE's own findings come from CI." -ForegroundColor Cyan
+    $problems | Sort-Object Path, Line | ForEach-Object {
+        Write-Host ('  {0}:{1} - [{2}] {3}' -f $_.Path, $_.Line, $_.Inspection, $_.Message)
+    }
+}
 
 # Nothing survives a sweep except what is named here, each with the reason a
 # headless run cannot be trusted with it. Everything else fails the run: a

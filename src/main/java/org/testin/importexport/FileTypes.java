@@ -51,7 +51,7 @@ public enum FileTypes {
     XLS(
             "XLS",
             ".xls",
-            columns -> "",
+            _ -> "",
             ExportHandler.UNSUPPORTED,
             (p, importFile) -> new ImportExcel().processImport(p, importFile),
             ReportHandler.UNSUPPORTED
@@ -61,7 +61,7 @@ public enum FileTypes {
             "Excel",
             ".xlsx",
             columns -> Bundle.message("import.hint.xlsx", columns),
-            (p, destFile, sheets) -> new ExportExcel().exportToFile(destFile, sheets),
+            (_, destFile, sheets) -> new ExportExcel().exportToFile(destFile, sheets),
             (p, importFile) -> new ImportExcel().processImport(p, importFile),
             (p, trDir, tr) -> new TestRunExcelGenerator().generate(p, trDir, tr)
     ),
@@ -69,7 +69,7 @@ public enum FileTypes {
     JSON(
             "JSON",
             ".json",
-            columns -> "",
+            _ -> "",
             (p, destFile, sheets) -> new ExportJson().exportToFile(p, destFile, sheets),
             (p, importFile) -> new ImportJson().processImport(p, importFile),
             ReportHandler.UNSUPPORTED
@@ -79,7 +79,7 @@ public enum FileTypes {
             "CSV",
             ".csv",
             columns -> Bundle.message("import.hint.csv", columns),
-            (p, destFile, sheets) -> new ExportCsv().exportToFile(destFile, sheets),
+            (_, destFile, sheets) -> new ExportCsv().exportToFile(destFile, sheets),
             (p, importFile) -> new ImportCsv().processImport(p, importFile),
             ReportHandler.UNSUPPORTED
     ),
@@ -87,8 +87,8 @@ public enum FileTypes {
     HTML(
             "HTML",
             ".html",
-            columns -> "",
-            (p, destFile, sheets) -> new ExportHtml().exportToFile(destFile, sheets),
+            _ -> "",
+            (_, destFile, sheets) -> new ExportHtml().exportToFile(destFile, sheets),
             ImportHandler.UNSUPPORTED,
             (p, trDir, tr) -> new TestRunHtmlGenerator().generate(p, trDir, tr).getBytes(StandardCharsets.UTF_8)
     ),
@@ -96,7 +96,7 @@ public enum FileTypes {
     PDF(
             "PDF",
             ".pdf",
-            columns -> "",
+            _ -> "",
             ExportHandler.UNSUPPORTED,
             ImportHandler.UNSUPPORTED,
             (p, trDir, tr) -> new TestRunPdfGenerator().generate(p, trDir, tr)
@@ -105,7 +105,7 @@ public enum FileTypes {
     WORD(
             "Word",
             ".docx",
-            columns -> "",
+            _ -> "",
             ExportHandler.UNSUPPORTED,
             ImportHandler.UNSUPPORTED,
             (p, trDir, tr) -> new TestRunWordGenerator().generate(p, trDir, tr)

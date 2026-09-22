@@ -21,13 +21,14 @@ import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Fonts;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Keycap {
     public static @NotNull JBLabel of(final @NotNull String text) {
         final @NotNull JBLabel label = new JBLabel(text);
         label.setForeground(JBUI.CurrentTheme.Label.foreground());
-        label.setFont(JBUI.Fonts.smallFont().asBold());
+        label.setFont(Fonts.keycap());
 
         if (text.isBlank()) return label;
 

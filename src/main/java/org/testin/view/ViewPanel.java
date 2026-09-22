@@ -101,7 +101,7 @@ public class ViewPanel implements Disposable {
 
         refreshCurrentView();
 
-        TestCaseExecutionSubscriber.onReported(p, this, (tc, status, duration, failure) -> refreshIfShowing(List.of(tc)));
+        TestCaseExecutionSubscriber.onReported(p, this, (tc, _, _, _) -> refreshIfShowing(List.of(tc)));
     }
 
     private @NotNull Stream<JBPanel<?>> tabs() {
@@ -203,7 +203,7 @@ public class ViewPanel implements Disposable {
     public void refreshIfShowing(final @NotNull Collection<TestCaseDto> updated) {
         getCurrentTestCase()
                 .filter(current -> updated.stream().anyMatch(item -> item.getId().equals(current.getId())))
-                .ifPresent(current -> refreshCurrentView());
+                .ifPresent(_ -> refreshCurrentView());
     }
 
     public @NotNull Optional<TestCaseDto> getCurrentTestCase() {

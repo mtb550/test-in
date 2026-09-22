@@ -232,7 +232,7 @@ public final class TreePanel implements Disposable {
                 AllIcons.General.Settings,
                 Bundle.message("settings.action.description"),
                 SimpleTextAttributes.LINK_ATTRIBUTES,
-                e -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class));
+                _ -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class));
     }
 
     // UC-TREE-PANEL-001, UC-TREE-PANEL-003
@@ -249,7 +249,7 @@ public final class TreePanel implements Disposable {
             emptyText.appendLine(AllIcons.Vcs.Clone, OptionalPlugin.GIT.needs(clone), SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
         } else {
             emptyText.appendLine(AllIcons.Vcs.Clone, clone, SimpleTextAttributes.LINK_ATTRIBUTES,
-                    e -> new CloneTestProject(p, url, boundProject.name(), this).execute());
+                    _ -> new CloneTestProject(p, url, boundProject.name(), this).execute());
         }
 
         emptyText.appendLine("");
@@ -263,7 +263,7 @@ public final class TreePanel implements Disposable {
                 AllIcons.Actions.ModuleDirectory,
                 Bundle.message("welcome.another.project"),
                 SimpleTextAttributes.LINK_ATTRIBUTES,
-                e -> new BindTestProjectDialog(p, underRoot, this::reindex).show());
+                _ -> new BindTestProjectDialog(p, underRoot, this::reindex).show());
     }
 
     // UC-TREE-PANEL-001, UC-TREE-PANEL-002
@@ -272,7 +272,7 @@ public final class TreePanel implements Disposable {
                 AllIcons.General.Add,
                 Bundle.message("welcome.first.project"),
                 SimpleTextAttributes.LINK_ATTRIBUTES,
-                e -> new CreateTestProjectAction(p, this).execute());
+                _ -> new CreateTestProjectAction(p, this).execute());
     }
 
     // UC-TREE-PANEL-001, UC-TREE-PANEL-004
@@ -288,7 +288,7 @@ public final class TreePanel implements Disposable {
                     AllIcons.Actions.ModuleDirectory,
                     name + "  " + status.getLabel(),
                     SimpleTextAttributes.LINK_ATTRIBUTES,
-                    e -> bindTo(name)));
+                    _ -> bindTo(name)));
             return;
         }
 
@@ -296,7 +296,7 @@ public final class TreePanel implements Disposable {
                 AllIcons.Actions.ModuleDirectory,
                 Bundle.message("welcome.select.project"),
                 SimpleTextAttributes.LINK_ATTRIBUTES,
-                e -> new BindTestProjectDialog(p, underRoot, this::reindex).show());
+                _ -> new BindTestProjectDialog(p, underRoot, this::reindex).show());
     }
 
     public void reindex() {

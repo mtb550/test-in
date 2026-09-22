@@ -102,7 +102,7 @@ public class CreateTestRun implements NodeCreator {
 
         final @NotNull TestRunDto tr = new TestRunDto().coverOnly(RunForm.checkedTestCases(selection));
 
-        BackgroundWork.run(p, Bundle.message("run.task.creating", savePath.getFileName()), Bundle.message("run.create.failed.title"), indicator -> {
+        BackgroundWork.run(p, Bundle.message("run.task.creating", savePath.getFileName()), Bundle.message("run.create.failed.title"), _ -> {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             final @NotNull TestRunMarker marker = new TestRunMarker();

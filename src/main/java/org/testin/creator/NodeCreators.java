@@ -26,15 +26,15 @@ import java.util.function.Function;
 @AllArgsConstructor
 public enum NodeCreators {
     TP(
-            p -> new NotCreatableFromTree(DirectoryType.TP.getDescription())
+            _ -> new NotCreatableFromTree(DirectoryType.TP.getDescription())
     ),
 
     TCD(
-            p -> new NotCreatableFromTree(DirectoryType.TCD.getDescription())
+            _ -> new NotCreatableFromTree(DirectoryType.TCD.getDescription())
     ),
 
     TRD(
-            p -> new NotCreatableFromTree(DirectoryType.TRD.getDescription())
+            _ -> new NotCreatableFromTree(DirectoryType.TRD.getDescription())
     ),
 
     TSP(

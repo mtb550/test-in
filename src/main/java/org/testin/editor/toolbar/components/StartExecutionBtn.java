@@ -30,7 +30,7 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
         super(ExecutionControl.START.getLabel(), ExecutionControl.START.getIcon());
         this.editor = editor;
 
-        addActionListener(e -> onStartExecutionClicked.run());
+        addActionListener(_ -> onStartExecutionClicked.run());
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135

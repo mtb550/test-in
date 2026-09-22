@@ -76,7 +76,7 @@ public final class CodeNavigator implements CodeNavigation {
             final @NotNull String classFqcn = Fqcn.classOfMethod(tc);
             if (classFqcn.isEmpty()) continue;
 
-            byClass.computeIfAbsent(classFqcn, ignored -> new ArrayList<>()).add(tc);
+            byClass.computeIfAbsent(classFqcn, _ -> new ArrayList<>()).add(tc);
         }
 
         final @NotNull Map<UUID, Boolean> found = new LinkedHashMap<>();

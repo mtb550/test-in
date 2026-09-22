@@ -28,6 +28,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Automated;
 import org.testin.ui.Badges;
+import org.testin.util.Fonts;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.RowStripe;
 
@@ -37,7 +38,6 @@ import javax.swing.JTextArea;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.List;
@@ -99,18 +99,14 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
 
     // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-003
     public void applyListLayout(final @NotNull JList<?> list) {
-        final @NotNull Font listFont = list.getFont();
-        final float baseSize = listFont.getSize2D();
-
-        titleArea.setFont(CardTitle.titleFont(list));
+        titleArea.setFont(Fonts.title());
 
         for (final JBLabel lbl : attributeLabels.values()) {
-            lbl.setFont(listFont.deriveFont(baseSize));
+            lbl.setFont(Fonts.body());
         }
 
-        final float badgeSize = Math.max(8.0f, baseSize - 2.0f);
         for (final Component c : badgePanel.getComponents()) {
-            c.setFont(listFont.deriveFont(Font.BOLD, badgeSize));
+            c.setFont(Fonts.badge());
         }
 
         titleColumnWidth = CardTitle.titleColumnWidth(list.getWidth(), hoverButtons.size());
@@ -136,7 +132,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         details.forEach((attrName, value) -> {
             if (value.isBlank()) return;
 
-            final @NotNull JBLabel lbl = attributeLabels.computeIfAbsent(attrName, k -> {
+            final @NotNull JBLabel lbl = attributeLabels.computeIfAbsent(attrName, _ -> {
                 final @NotNull JBLabel newLbl = createDetailLabel();
                 content.add(newLbl);
                 return newLbl;

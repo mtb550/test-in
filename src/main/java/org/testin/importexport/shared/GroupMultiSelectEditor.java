@@ -39,7 +39,7 @@ public class GroupMultiSelectEditor extends AbstractCellEditor implements TableC
         button.setBackground(UIManager.getColor("Table.selectionBackground"));
         button.setForeground(UIManager.getColor("Table.selectionForeground"));
 
-        button.addActionListener(e -> {
+        button.addActionListener(_ -> {
             final @NotNull GroupSelectionDialog dialog = new GroupSelectionDialog(p, currentValue, picked -> currentValue = picked);
             if (dialog.show()) dialog.onClosed(this::fireEditingStopped);
             else fireEditingStopped();

@@ -29,6 +29,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
+import org.testin.util.Fonts;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -62,6 +63,7 @@ public class ExportExcel {
         try (Workbook workbook = new XSSFWorkbook()) {
             final @NotNull CellStyle headerStyle = workbook.createCellStyle();
             final @NotNull Font headerFont = workbook.createFont();
+            headerFont.setFontName(Fonts.Report.FAMILY);
             headerFont.setBold(true);
             headerStyle.setFont(headerFont);
 

@@ -36,7 +36,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
-    private static final @NotNull Consumer<ViewPanel> NOTHING_AFTER = viewer -> {
+    private static final @NotNull Consumer<ViewPanel> NOTHING_AFTER = _ -> {
     };
 
     static void onPanelDisposed(final @NotNull Project p, final @NotNull ViewPanel panel) {

@@ -53,7 +53,7 @@ public class DeclaredShortcutsTest {
             }
 
             if (keymap.equals(element.group(2))) {
-                byKey.computeIfAbsent(normalize(element.group(3)), key -> new ArrayList<>()).add(owner);
+                byKey.computeIfAbsent(normalize(element.group(3)), _ -> new ArrayList<>()).add(owner);
             }
         }
         return byKey;

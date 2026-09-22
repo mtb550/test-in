@@ -67,7 +67,7 @@ public class RunItemScreenshotsJsonTest {
     public void aNewScreenshotNameIsShortAndNotOneTheRunHolds() {
         final Set<String> taken = new HashSet<>();
 
-        IntStream.range(0, 1000).forEach(attempt -> {
+        IntStream.range(0, 1000).forEach(_ -> {
             final String name = TestRunDirectoryDto.newScreenshotName(taken);
 
             assertTrue(name.matches("[0-9a-z]{5}\\.png"), name);

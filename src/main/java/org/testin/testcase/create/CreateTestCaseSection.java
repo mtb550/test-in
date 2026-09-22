@@ -19,16 +19,15 @@ package org.testin.testcase.create;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
+import org.testin.util.Fonts;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.awt.GridBagLayout;
 
 public interface CreateTestCaseSection {
@@ -65,12 +64,8 @@ public interface CreateTestCaseSection {
 
     void fillData(final @NotNull TestCaseDto dto);
 
-    default @NotNull Font fieldFont() {
-        return JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
-    }
-
     default void styleField(final @NotNull EditorTextField field, final @NotNull CreateTestCaseFields describes) {
-        field.setFont(fieldFont());
+        field.setFont(Fonts.field());
         field.setPlaceholder(describes.getPlaceholder());
         field.setShowPlaceholderWhenFocused(true);
         field.setBorder(JBUI.Borders.empty(10));

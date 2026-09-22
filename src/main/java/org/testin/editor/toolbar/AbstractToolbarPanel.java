@@ -129,8 +129,8 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         final @NotNull GridViewBtn gridBtn = getToolbarItem(GridViewBtn.class);
         final @NotNull ListViewBtn listBtn = getToolbarItem(ListViewBtn.class);
 
-        gridBtn.addActionListener(e -> setView(ViewMode.GRID_VIEW));
-        listBtn.addActionListener(e -> setView(ViewMode.LIST_VIEW));
+        gridBtn.addActionListener(_ -> setView(ViewMode.GRID_VIEW));
+        listBtn.addActionListener(_ -> setView(ViewMode.LIST_VIEW));
 
         updateViewButtons();
     }

@@ -84,7 +84,7 @@ public final class TestinPathPanel {
         openFolderBtn.setIcon(AllIcons.Actions.MenuOpen);
         openFolderBtn.setDisabledIcon(IconLoader.getDisabledIcon(AllIcons.Actions.MenuOpen));
         openFolderBtn.setEnabled(false);
-        openFolderBtn.addActionListener(e -> {
+        openFolderBtn.addActionListener(_ -> {
             try {
                 Desktop.getDesktop().open(new File(pathField.getText()));
 

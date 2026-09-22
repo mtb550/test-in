@@ -38,7 +38,7 @@ public class CopyChoiceTest {
         final @NotNull Map<KeyStroke, List<CopyChoice>> byKey = new HashMap<>();
 
         for (final CopyChoice choice : CopyChoice.values()) {
-            byKey.computeIfAbsent(choice.getShortcut().getKey(), key -> new ArrayList<>()).add(choice);
+            byKey.computeIfAbsent(choice.getShortcut().getKey(), _ -> new ArrayList<>()).add(choice);
         }
 
         final @NotNull List<String> shared = byKey.entrySet().stream()

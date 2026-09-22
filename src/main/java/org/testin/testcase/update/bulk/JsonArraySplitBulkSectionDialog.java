@@ -35,7 +35,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkDialog {
-    private static final @NotNull ItemRecorder RECORDS_NOTHING = (start, end, testCaseIndex, itemIndex) -> {
+    private static final @NotNull ItemRecorder RECORDS_NOTHING = (_, _, _, _) -> {
     };
     private final @NotNull List<TestCaseDto> selectedItems;
     private final @NotNull Consumer<List<TestCaseDto>> updatedItems;

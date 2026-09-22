@@ -53,8 +53,8 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     ORDER(
             Bundle.message("attribute.order"),
             ToolBarDefault.LOCKED_CHECKED,
-            tc -> "",
-            (p, tc, v) -> true,
+            _ -> "",
+            (_, _, _) -> true,
             GenType.NO_CODE_CHANGE
     ) {
         @Override
@@ -79,7 +79,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.id"),
             ToolBarDefault.LOCKED_UNCHECKED,
             tc -> String.valueOf(tc.getId()),
-            (p, tc, v) -> true,
+            (_, _, _) -> true,
             GenType.NO_CODE_CHANGE,
             Can.EXPORT
     ),
@@ -106,7 +106,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.priority"),
             ToolBarDefault.ON,
             tc -> tc.getPriority().getLabel(),
-            (p, tc, v) -> took(TestDataParser.priority(v, tc.getPriority()), tc::setPriority),
+            (_, tc, v) -> took(TestDataParser.priority(v, tc.getPriority()), tc::setPriority),
             GenType.UPDATE_TEST_CASE_PRIORITY,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
@@ -120,7 +120,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.fqcn"),
             ToolBarDefault.OFF,
             tc -> String.join(" > ", Fqcn.ofMethod(tc)),
-            (p, tc, v) -> true,
+            (_, _, _) -> true,
             GenType.NO_CODE_CHANGE,
             Can.EXPORT
     ),
@@ -156,7 +156,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.group"),
             ToolBarDefault.ON,
             tc -> Groups.text(tc.getGroup()),
-            (p, tc, v) -> took(TestDataParser.groups(v), tc::setGroup),
+            (_, tc, v) -> took(TestDataParser.groups(v), tc::setGroup),
             GenType.UPDATE_TEST_CASE_GROUP,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
@@ -170,7 +170,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.path"),
             ToolBarDefault.OFF,
             tc -> String.join(" > ", tc.getParent().getPath2()),
-            (p, tc, v) -> true,
+            (_, _, _) -> true,
             GenType.NO_CODE_CHANGE,
             Can.EXPORT
     ),
@@ -188,7 +188,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.status"),
             ToolBarDefault.OFF,
             tc -> tc.getStatus().getLabel(),
-            (p, tc, v) -> took(TestDataParser.testCaseStatus(v, tc.getStatus()), tc::setStatus),
+            (_, tc, v) -> took(TestDataParser.testCaseStatus(v, tc.getStatus()), tc::setStatus),
             GenType.UPDATE_TEST_CASE_STATUS,
             Can.EDIT, Can.COPY, Can.EXPORT
     ),
@@ -215,7 +215,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.created.at"),
             ToolBarDefault.OFF,
             tc -> Display.formatDate(tc.getCreatedAt()),
-            (p, tc, v) -> took(TestDataParser.date(v), tc::setCreatedAt),
+            (_, tc, v) -> took(TestDataParser.date(v), tc::setCreatedAt),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
     ),
@@ -224,7 +224,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.updated.at"),
             ToolBarDefault.OFF,
             tc -> Display.formatDate(tc.getUpdatedAt()),
-            (p, tc, v) -> took(TestDataParser.date(v), tc::setUpdatedAt),
+            (_, tc, v) -> took(TestDataParser.date(v), tc::setUpdatedAt),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
     );

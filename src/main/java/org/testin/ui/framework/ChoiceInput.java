@@ -18,9 +18,9 @@ package org.testin.ui.framework;
 
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
+import org.testin.util.Fonts;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -40,7 +40,7 @@ public final class ChoiceInput implements DialogComponent {
     ChoiceInput(final @NotNull String caption, final @NotNull List<String> options, final @NotNull String selected) {
         combo = new ComboBox<>(options.toArray(String[]::new));
         combo.setEditable(true);
-        combo.setFont(JBFont.label().biggerOn(2f));
+        combo.setFont(Fonts.choice());
         combo.setSelectedItem(selected);
 
         // Rule-INTERNAL-087
@@ -48,7 +48,7 @@ public final class ChoiceInput implements DialogComponent {
 
         enterPicksOnlyFromTheOpenList();
 
-        combo.addPropertyChangeListener("editor", changed -> enterPicksOnlyFromTheOpenList());
+        combo.addPropertyChangeListener("editor", _ -> enterPicksOnlyFromTheOpenList());
     }
 
     // Rule-INTERNAL-055, Rule-INTERNAL-085

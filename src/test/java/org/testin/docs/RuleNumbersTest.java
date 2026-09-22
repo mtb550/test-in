@@ -64,9 +64,9 @@ public class RuleNumbersTest {
                 final Matcher written = form.matcher(text);
 
                 while (written.find()) {
-                    byPart.computeIfAbsent(written.group(1), part -> new TreeMap<>())
-                            .computeIfAbsent(Integer.parseInt(written.group(2)), number -> new LinkedHashMap<>())
-                            .computeIfAbsent(oneLine(written.group(3)), words -> new ArrayList<>())
+                    byPart.computeIfAbsent(written.group(1), _ -> new TreeMap<>())
+                            .computeIfAbsent(Integer.parseInt(written.group(2)), _ -> new LinkedHashMap<>())
+                            .computeIfAbsent(oneLine(written.group(3)), _ -> new ArrayList<>())
                             .add(page.getFileName().toString());
                 }
             }

@@ -50,7 +50,7 @@ public final class Icons {
 
     // UC-EDITOR-PANEL-005
     public static @NotNull Icon fieldLetter(final @NotNull String letter, final @NotNull Color color) {
-        final @NotNull Font font = JBUI.Fonts.label(9f).asBold();
+        final @NotNull Font font = Fonts.iconLetter();
         return new Icon() {
             @Override
             public void paintIcon(final Component c, final Graphics g, final int x, final int y) {

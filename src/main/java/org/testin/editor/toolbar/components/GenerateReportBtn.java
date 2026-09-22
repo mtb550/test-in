@@ -34,7 +34,7 @@ public class GenerateReportBtn extends AbstractIconButton implements ToolbarItem
         super(Bundle.message("toolbar.report"), AllIcons.ToolbarDecorator.Export, Shortcuts.GenerateReport);
         this.editor = editor;
 
-        addActionListener(e -> new GenerateReportAction(p, editor).execute());
+        addActionListener(_ -> new GenerateReportAction(p, editor).execute());
 
         updateEnabledState();
     }

@@ -70,7 +70,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
 
         options.forEach(o -> o.getToolBarDefault().enforceLock(o, selectedDetails));
 
-        addActionListener(e -> showDetailsPopup(onToolBarDetailsSelectedChanged));
+        addActionListener(_ -> showDetailsPopup(onToolBarDetailsSelectedChanged));
     }
 
     // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-022

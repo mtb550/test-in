@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.StatusBarItem;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.util.Fonts;
 
 import javax.swing.Icon;
 import javax.swing.border.Border;
@@ -43,7 +44,7 @@ public class StatusBarBase {
     private final @NotNull Color dotColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
     private final @NotNull Color separatorColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
 
-    private final @NotNull Font font = JBUI.Fonts.smallFont();
+    private final @NotNull Font font = Fonts.small();
 
     private final @NotNull Icon icon = AllIcons.General.Keyboard;
     private final @NotNull Border border = JBUI.Borders.emptyRight(6);

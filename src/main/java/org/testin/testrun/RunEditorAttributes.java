@@ -41,7 +41,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     ORDER(
             TestEditorAttributes.ORDER.getName(),
             ToolBarDefault.LOCKED_CHECKED,
-            item -> ""
+            _ -> ""
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {

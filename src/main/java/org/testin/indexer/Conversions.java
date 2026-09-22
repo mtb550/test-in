@@ -76,7 +76,7 @@ public final class Conversions {
     }
 
     private @NotNull Optional<FormatConverter.Report> convert(final @NotNull Project p, final @NotNull Path project) {
-        synchronized (locks.computeIfAbsent(project.toString(), path -> new Object())) {
+        synchronized (locks.computeIfAbsent(project.toString(), _ -> new Object())) {
             return new FormatConverter(p).convert(project);
         }
     }

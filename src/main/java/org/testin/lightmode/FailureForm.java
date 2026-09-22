@@ -26,6 +26,7 @@ import org.testin.model.TestRunItems;
 import org.testin.services.Services;
 import org.testin.testrun.RunStatusService;
 import org.testin.testrun.failure.FailureFields;
+import org.testin.util.Fonts;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RowStripe;
 
@@ -40,7 +41,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 class FailureForm extends JBPanel<FailureForm> {
-    private static final float PLACEHOLDER_SCALE = 0.7f;
     private final @NotNull FailureFields fields;
     private final @NotNull TestRunItems runItem;
     private final @NotNull Project p;
@@ -71,11 +71,10 @@ class FailureForm extends JBPanel<FailureForm> {
 
     void setZoom(final float zoom) {
         baseFonts.forEach((component, base) -> {
-            final @NotNull Font scaled = TestCaseFont.zoomed(base, zoom);
-            component.setFont(scaled);
+            component.setFont(Fonts.zoomed(base, zoom));
 
             if (component instanceof ComponentWithEmptyText hinted)
-                hinted.getEmptyText().setFont(TestCaseFont.zoomed(scaled, PLACEHOLDER_SCALE));
+                hinted.getEmptyText().setFont(Fonts.zoomed(Fonts.placeholder(), zoom));
         });
     }
 

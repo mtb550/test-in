@@ -54,7 +54,7 @@ public enum CardHoverAction {
             List.of(OptionalPlugin.JAVA),
             Icons.TEST_CASE,
             (p, testCases) -> NavigateToTestMethodAction.execute(p, testCases.getFirst()),
-            tc -> Optional.empty()
+            _ -> Optional.empty()
     ),
 
     RUN_TEST_METHOD(
@@ -63,7 +63,7 @@ public enum CardHoverAction {
             List.of(OptionalPlugin.JAVA, OptionalPlugin.TESTNG),
             AllIcons.RunConfigurations.TestState.Run,
             RunTestCases::run,
-            tc -> Optional.empty()
+            _ -> Optional.empty()
     ),
 
     STOP_TEST_METHOD(
@@ -72,7 +72,7 @@ public enum CardHoverAction {
             List.of(OptionalPlugin.TESTNG),
             AllIcons.Actions.Suspend,
             CardHoverAction::stopRun,
-            tc -> Optional.empty()
+            _ -> Optional.empty()
     ),
 
     NAVIGATE_TO_TEST_CASE(

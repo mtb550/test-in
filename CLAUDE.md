@@ -319,6 +319,16 @@ silently has no effect costs more than the setting it was meant to hold.
   the tree. Muteb, 22 September 2026: *"no need to run inspector here anymore,
   let us make it every push."*
 
+- **Run `pwsh tools/inspect.ps1 -Quick` before handing a change over.** It is
+  the same script with the IDE left out: only the rules that read the source as
+  text, five seconds over every source root, and it exits non-zero on a
+  breach. It was built on 23 September 2026 because warnings kept reaching
+  Muteb's IDE one paste at a time — *"many times i told you, still face inspect
+  issues"* — and the worst of them, a lambda parameter nothing reads, is one
+  the headless inspector never reports at all: 113 were sitting in the tree.
+  `compileJava test` says the code runs; this says the IDE will not complain
+  about it.
+
   A sweep across many files used to be the exception, and it is not one
   anymore: push the branch and read the run. The IDE shows the same findings
   while you type, because `.idea/inspectionProfiles/Testin.xml` is the project

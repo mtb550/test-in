@@ -104,7 +104,7 @@ public class ExportAction extends DumbAwareAction {
             if (resolved.isEmpty()) return;
             final @NotNull VirtualFile targetDir = resolved.orElseThrow();
 
-            BackgroundWork.run(p, Bundle.message("export.task.reading", dirDto.getName()), Bundle.message("export.failed.title"), gathering -> {
+            BackgroundWork.run(p, Bundle.message("export.task.reading", dirDto.getName()), Bundle.message("export.failed.title"), _ -> {
                 final @NotNull Gathered gathered = gather(dirDto);
                 final @NotNull Map<String, List<TestCaseDto>> sheets = gathered.sheets();
                 if (sheets.isEmpty()) {
@@ -134,7 +134,7 @@ public class ExportAction extends DumbAwareAction {
             final int testCases = selected.values().stream().mapToInt(List::size).sum();
 
             BackgroundWork.run(p, Bundle.message("export.task.writing", String.valueOf(testCases), destination.file().getName()),
-                    Bundle.message("export.failed.title"), indicator -> {
+                    Bundle.message("export.failed.title"), _ -> {
                         destination.format().exportToFile(p, destination.file(), selected);
 
                         ExportNotice.show(p, destination.file(), testCases);

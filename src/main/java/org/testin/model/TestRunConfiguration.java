@@ -128,7 +128,7 @@ public enum TestRunConfiguration {
 
     @FunctionalInterface
     public interface ShownWhen {
-        @NotNull ShownWhen ALWAYS = chosen -> true;
+        @NotNull ShownWhen ALWAYS = _ -> true;
 
         boolean holds(final @NotNull Chosen chosen);
     }

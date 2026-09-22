@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 @FunctionalInterface
 public interface ImportSetter {
     static @NotNull ImportSetter always(final @NotNull BiConsumer<TestCaseDto, String> write) {
-        return (p, tc, value) -> {
+        return (_, tc, value) -> {
             write.accept(tc, value);
             return true;
         };

@@ -171,7 +171,7 @@ public class UpdateTestBase {
             final @NotNull String classFqcn = Fqcn.classOfMethod(tc);
             if (classFqcn.isEmpty()) continue;
 
-            byClass.computeIfAbsent(classFqcn, path -> new ArrayList<>()).add(tc);
+            byClass.computeIfAbsent(classFqcn, _ -> new ArrayList<>()).add(tc);
         }
         if (byClass.isEmpty()) return;
 

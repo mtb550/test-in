@@ -191,7 +191,7 @@ public class GitWorkflowTest {
 
         return GitDiffProcessor.toDiffs(status, work, RealMapper.build(),
                 path -> git(work, "show", "HEAD:" + path).orElse(""),
-                id -> Optional.empty());
+                _ -> Optional.empty());
     }
 
     private Set<String> stagedFor(final List<PendingChange> review) {

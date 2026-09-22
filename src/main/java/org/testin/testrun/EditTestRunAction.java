@@ -159,7 +159,7 @@ public class EditTestRunAction extends DumbAwareAction {
         private void write(final @NotNull Path runPath, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
             writeTo.accept(runPath);
 
-            BackgroundWork.run(p, Bundle.message("run.task.updating", runPath.getFileName()), Bundle.message("run.update.failed.title"), indicator -> {
+            BackgroundWork.run(p, Bundle.message("run.task.updating", runPath.getFileName()), Bundle.message("run.update.failed.title"), _ -> {
                 Services.getInstance(p, ProjectIndexer.class).refreshDirectory(runPath);
 
                 ApplicationManager.getApplication().invokeLater(() -> {

@@ -25,9 +25,9 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Fonts;
 import org.testin.util.ListValue;
 
 import javax.swing.AbstractAction;
@@ -71,13 +71,13 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
 
         list = new JBList<>(rowModel);
         list.setBorder(JBUI.Borders.empty(6));
-        list.setFont(JBFont.label().biggerOn(2f));
+        list.setFont(Fonts.choice());
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setVisibleRowCount(visibleRows);
         list.setCellRenderer(new SelectionRenderer<>());
         show(shownBeforeAsking);
 
-        list.addListSelectionListener(event -> syncLeadingIcon());
+        list.addListSelectionListener(_ -> syncLeadingIcon());
         syncLeadingIcon();
 
         list.addMouseListener(new MouseAdapter() {
@@ -117,7 +117,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
     }
 
     private void installRowRefresh() {
-        final @NotNull Timer debounce = new Timer(DEBOUNCE_MILLIS, event -> requestRows());
+        final @NotNull Timer debounce = new Timer(DEBOUNCE_MILLIS, _ -> requestRows());
         debounce.setRepeats(false);
 
         textField.getDocument().addDocumentListener(new DocumentAdapter() {

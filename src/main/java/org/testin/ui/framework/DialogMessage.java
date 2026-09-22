@@ -20,6 +20,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Fonts;
 import org.testin.util.Bundle;
 import org.testin.util.Html;
 
@@ -54,7 +55,7 @@ public final class DialogMessage implements DialogComponent {
         if (path.isEmpty()) return;
 
         final @NotNull JBLabel label = new JBLabel(caption + ":  " + path);
-        label.setFont(JBUI.Fonts.label());
+        label.setFont(Fonts.message());
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         label.setBorder(JBUI.Borders.emptyTop(topGap));
         label.setAlignmentX(Component.LEFT_ALIGNMENT);

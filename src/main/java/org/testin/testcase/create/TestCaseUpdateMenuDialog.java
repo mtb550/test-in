@@ -74,7 +74,7 @@ public class TestCaseUpdateMenuDialog {
         Logger.trace("Update field -> " + field.getName() + " | changeType = " + gt);
 
         if (items.size() == 1) {
-            new UpdateTestCaseDialog(p, items.getFirst(), field, tc -> {
+            new UpdateTestCaseDialog(p, items.getFirst(), field, _ -> {
                 Logger.trace("Single Edit Save -> changeType = " + gt);
                 updatedItems.accept(items, gt);
             }).show();

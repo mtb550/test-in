@@ -195,7 +195,7 @@ public class SyncActionAction extends DumbAwareAction {
             final @NotNull String failure = abort ? Bundle.message("git.error.abort.rebase") : Bundle.message("git.error.continue.rebase");
 
             GitBackgroundTask.run(p, abort ? Bundle.message("git.task.aborting.rebase") : Bundle.message("git.task.continuing.rebase"), false,
-                    indicator -> {
+                    _ -> {
                         if (abort) {
                             if (git.couldNotAbortRebase(repoPath)) {
                                 reportRebaseFailure(repoPath, failure);

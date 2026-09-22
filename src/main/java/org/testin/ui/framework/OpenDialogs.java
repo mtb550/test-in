@@ -33,7 +33,7 @@ public final class OpenDialogs {
 
     @NotNull Optional<JBPopup> shown(final @NotNull Class<?> kind) {
         final @NotNull Optional<JBPopup> open = Optional.ofNullable(showing.get(kind));
-        open.filter(JBPopup::isDisposed).ifPresent(gone -> showing.remove(kind));
+        open.filter(JBPopup::isDisposed).ifPresent(_ -> showing.remove(kind));
 
         return open.filter(popup -> !popup.isDisposed());
     }

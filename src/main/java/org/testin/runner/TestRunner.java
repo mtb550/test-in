@@ -31,7 +31,7 @@ public interface TestRunner {
     static @NotNull TestRunner available() {
         return EP.getExtensionList().stream()
                 .findFirst()
-                .orElseGet(() -> (p, testCases) -> Logger.debug(
+                .orElseGet(() -> (_, testCases) -> Logger.debug(
                         Bundle.message("runner.none", String.valueOf(testCases.size()))));
     }
 

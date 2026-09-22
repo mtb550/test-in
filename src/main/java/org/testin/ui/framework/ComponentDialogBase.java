@@ -279,7 +279,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             final @NotNull Rows.Answer<T> always = Rows.Answer.of(fixed);
 
             return new ComponentDialogBase<>(
-                    new TextFieldWithSelections<>(icon, placeholder, fixed, query -> always, fixed.size()));
+                    new TextFieldWithSelections<>(icon, placeholder, fixed, _ -> always, fixed.size()));
         }
     }
 }

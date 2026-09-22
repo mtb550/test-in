@@ -50,7 +50,7 @@ public final class ShortcutMenuPopup<T extends MenuItem> {
     private final @NotNull Consumer<T> onSelection;
 
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-009
-    private @NotNull Function<T, Optional<String>> refusal = item -> Optional.empty();
+    private @NotNull Function<T, Optional<String>> refusal = _ -> Optional.empty();
 
     public @NotNull ShortcutMenuPopup<T> refusing(final @NotNull Function<T, Optional<String>> whyNot) {
         this.refusal = whyNot;

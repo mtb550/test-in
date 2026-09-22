@@ -54,7 +54,7 @@ public class ReconcileTestMethod extends UpdateTestBase implements GenAction {
 
         final @NotNull Map<Path, List<TestCaseDto>> byClass = new LinkedHashMap<>();
         for (final TestCaseDto tc : testCases) {
-            byClass.computeIfAbsent(tc.getParent().getPath(), path -> new ArrayList<>()).add(tc);
+            byClass.computeIfAbsent(tc.getParent().getPath(), _ -> new ArrayList<>()).add(tc);
         }
 
         final @NotNull Runnable inCommand = () ->

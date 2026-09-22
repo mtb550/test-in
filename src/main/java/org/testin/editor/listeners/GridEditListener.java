@@ -107,7 +107,7 @@ public class GridEditListener extends AbstractGridEditListener {
         }
 
         final boolean first = changedThisGesture.isEmpty();
-        changedThisGesture.computeIfAbsent(tc.getId(), id -> new Changed(tc, undoFrom, new LinkedHashSet<>()))
+        changedThisGesture.computeIfAbsent(tc.getId(), _ -> new Changed(tc, undoFrom, new LinkedHashSet<>()))
                 .generators().add(attr.getGenType());
 
         if (first) ApplicationManager.getApplication().invokeLater(this::saveTheGesture);

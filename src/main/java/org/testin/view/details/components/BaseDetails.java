@@ -19,10 +19,9 @@ package org.testin.view.details.components;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.ui.FontSync;
+import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
 import java.awt.GridBagConstraints;
@@ -30,27 +29,23 @@ import java.awt.Insets;
 import java.awt.event.ActionListener;
 
 public abstract class BaseDetails {
-    protected float getValueFontSize() {
-        return FontSync.getBaseFontSize();
-    }
-
     // Rule-VIEW-PANEL-080
     protected @NotNull ActionLink link(final @NotNull String text, final @NotNull ActionListener onClick) {
         final @NotNull ActionLink link = new ActionLink(text, onClick);
         link.setAutoHideOnDisable(false);
         link.setFocusable(false);
-        link.setFont(JBFont.label().deriveFont(getValueFontSize()));
+        link.setFont(Fonts.body());
         return link;
     }
 
     public abstract int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow);
 
     protected int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @NotNull String valueText, final int row) {
-        return LabelValueRow.add(panel, gbc, labelText, valueText, getValueFontSize(), row);
+        return LabelValueRow.add(panel, gbc, labelText, valueText, row);
     }
 
     protected int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @NotNull JComponent valueComponent, final int row) {
-        return LabelValueRow.add(panel, gbc, labelText, valueComponent, getValueFontSize(), row);
+        return LabelValueRow.add(panel, gbc, labelText, valueComponent, row);
     }
 
     protected int addFullWidthRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull JComponent component, final @NotNull Insets insets, final int row) {

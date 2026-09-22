@@ -87,7 +87,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
 
         for (final Object item : items) {
             if (item instanceof TestCaseDto tc)
-                sets.computeIfAbsent(tc.getParent().getPath(), path -> ExecutionPosition.setOf(p, tc));
+                sets.computeIfAbsent(tc.getParent().getPath(), _ -> ExecutionPosition.setOf(p, tc));
         }
         if (sets.isEmpty()) return;
 

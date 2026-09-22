@@ -31,7 +31,7 @@ public class ResultAnalysisBtn extends AbstractIconButton implements ToolbarItem
         super(Bundle.message("toolbar.analysis"), AllIcons.Actions.ProjectWideAnalysisOff);
         this.editor = editor;
 
-        addActionListener(e -> onResultAnalysisClicked.run());
+        addActionListener(_ -> onResultAnalysisClicked.run());
         updateEnabledState();
     }
 

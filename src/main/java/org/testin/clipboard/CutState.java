@@ -41,7 +41,7 @@ public final class CutState {
     public static void initClipboardWatch(final @NotNull Project p) {
         final @NotNull CutState state = Services.getInstance(p, CutState.class);
 
-        CopyPasteManager.getInstance().addContentChangedListener((before, now) -> state.clear(), p);
+        CopyPasteManager.getInstance().addContentChangedListener((_, _) -> state.clear(), p);
     }
 
     public void cut(final @NotNull TestinEditor editor, final @NotNull List<TestCaseDto> testCases) {

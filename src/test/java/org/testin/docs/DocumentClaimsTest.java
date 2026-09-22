@@ -120,7 +120,7 @@ public class DocumentClaimsTest {
 
             final @NotNull Matcher rule = RULE.matcher(read(page));
             while (rule.find()) {
-                byFolder.computeIfAbsent(parent.getFileName().toString(), any -> new TreeSet<>()).add(rule.group(1));
+                byFolder.computeIfAbsent(parent.getFileName().toString(), _ -> new TreeSet<>()).add(rule.group(1));
             }
         }
 
@@ -139,7 +139,7 @@ public class DocumentClaimsTest {
 
             final @NotNull Matcher useCase = USE_CASE.matcher(read(page));
             while (useCase.find()) {
-                byFolder.computeIfAbsent(parent.getFileName().toString(), any -> new TreeSet<>()).add(useCase.group(1));
+                byFolder.computeIfAbsent(parent.getFileName().toString(), _ -> new TreeSet<>()).add(useCase.group(1));
             }
         }
 

@@ -100,8 +100,8 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                         element,
                         element.getTextRange(),
                         AllIcons.Nodes.Related,
-                        psiElement -> Bundle.message("gutter.view.details"),
-                        (mouseEvent, psiElement) -> openViewPanel(p, testCaseId, methodName(psiElement)),
+                        _ -> Bundle.message("gutter.view.details"),
+                        (_, psiElement) -> openViewPanel(p, testCaseId, methodName(psiElement)),
                         GutterIconRenderer.Alignment.RIGHT,
                         Collections::emptyList
                 )));

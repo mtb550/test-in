@@ -22,11 +22,12 @@ import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.ui.Caption;
+import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.Fonts;
 import org.testin.util.ClipboardContents;
 
 import javax.imageio.ImageIO;
@@ -50,7 +51,7 @@ public final class TextArea implements DialogComponent {
 
     TextArea(final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value, final int rows, final boolean acceptsImages, final @NotNull List<byte[]> images) {
         area = new JBTextArea(value);
-        area.setFont(JBFont.label().biggerOn(2f));
+        area.setFont(Fonts.field());
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
         area.setRows(rows);
@@ -59,6 +60,7 @@ public final class TextArea implements DialogComponent {
 
         if (!placeholder.isBlank()) {
             area.getEmptyText().setText(placeholder);
+            area.getEmptyText().setFont(Fonts.placeholder());
         }
 
         area.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, null);
@@ -72,7 +74,8 @@ public final class TextArea implements DialogComponent {
         }
 
         final @NotNull JBScrollPane scroll = new JBScrollPane(area);
-        scroll.setBorder(JBUI.Borders.empty());
+        DialogStyle.framed(scroll);
+        scroll.setViewportBorder(JBUI.Borders.empty());
 
         strip = new ScreenshotStrip(images);
 
@@ -130,7 +133,7 @@ public final class TextArea implements DialogComponent {
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     private void installImagePaste() {
-        DumbAwareAction.create(event -> {
+        DumbAwareAction.create(_ -> {
             if (!addPastedScreenshot()) area.paste();
         }).registerCustomShortcutSet(CommonShortcuts.getPaste(), area);
     }

@@ -30,10 +30,10 @@ public class StatusBarListener {
 
         for (final PageStep step : PageStep.values()) {
             editor.getStatusBar().button(step).addActionListener(
-                    e -> editor.stepPage(step.deltaFrom(editor.getCurrentPage(), editor.getTotalPageCount())));
+                    _ -> editor.stepPage(step.deltaFrom(editor.getCurrentPage(), editor.getTotalPageCount())));
         }
 
-        editor.getStatusBar().getPageSizeField().addActionListener(e -> {
+        editor.getStatusBar().getPageSizeField().addActionListener(_ -> {
             final @NotNull String typed = editor.getStatusBar().getPageSizeField().getText().trim();
             final int size = TestinEditor.pageSizeOf(typed);
             editor.getStatusBar().getPageSizeField().setText(String.valueOf(size));

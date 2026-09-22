@@ -152,7 +152,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Shortcuts.UpdateTestCaseOrder,
             Icons.fieldLetter("O", Icons.GRAY),
             GenType.UPDATE_TEST_CASE_ORDER,
-            (p, items, updatedItems) -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("update.order.one.at.a.time")),
+            (p, _, _) -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("update.order.one.at.a.time")),
             TestCaseBaseDialog::getOrderSection,
             new TestCaseDialogKey[]{}
     );

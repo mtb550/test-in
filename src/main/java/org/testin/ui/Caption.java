@@ -18,7 +18,6 @@ package org.testin.ui;
 
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -27,18 +26,15 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.JComponent;
 import java.awt.Font;
 import java.util.Locale;
+import org.testin.util.Fonts;
 
 // Rule-INTERNAL-087
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Caption {
-    private static final @NotNull String FAMILY = "JetBrains Mono";
-
-    private static final int SMALLER = 2;
-
-    public static @NotNull JBLabel of(final @NotNull String text, final float baseSize) {
+    public static @NotNull JBLabel of(final @NotNull String text, final @NotNull Font font) {
         final @NotNull JBLabel label = new JBLabel(text.toUpperCase(Locale.ROOT));
 
-        label.setFont(UIUtil.getFontWithFallback(new Font(FAMILY, Font.PLAIN, 1)).deriveFont(Math.max(FontSync.FLOOR, baseSize - SMALLER)));
+        label.setFont(font);
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         return label;
     }
@@ -46,7 +42,7 @@ public final class Caption {
     public static @NotNull BorderLayoutPanel above(final @NotNull String caption, final @NotNull JComponent value) {
         final @NotNull BorderLayoutPanel panel = JBUI.Panels.simplePanel(0, 2).addToCenter(value).withBorder(JBUI.Borders.emptyTop(8)).andTransparent();
         if (!caption.isEmpty())
-            panel.addToTop(of(caption, JBUI.Fonts.label().getSize2D()).withBorder(JBUI.Borders.emptyLeft(12)));
+            panel.addToTop(of(caption, Fonts.caption()).withBorder(JBUI.Borders.emptyLeft(12)));
         return panel;
     }
 }

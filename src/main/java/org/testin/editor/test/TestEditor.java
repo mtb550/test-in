@@ -89,7 +89,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         StatusBarListener.attach(this);
 
-        TestCaseExecutionSubscriber.onReported(p, projectDisposable, (tc, status, duration, failure) -> list.repaint());
+        TestCaseExecutionSubscriber.onReported(p, projectDisposable, (_, _, _, _) -> list.repaint());
 
         onToolBarSwitchedToListView();
 

@@ -26,6 +26,6 @@ public class GridViewBtn extends AbstractIconButton implements ToolbarItem {
     public GridViewBtn(final @NotNull Runnable onSwitchToGrid) {
         super(Bundle.message("toolbar.grid.view"), AllIcons.General.Groups);
 
-        addActionListener(e -> onSwitchToGrid.run());
+        addActionListener(_ -> onSwitchToGrid.run());
     }
 }

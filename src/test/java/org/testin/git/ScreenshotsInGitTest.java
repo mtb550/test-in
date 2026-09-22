@@ -52,7 +52,7 @@ public class ScreenshotsInGitTest {
             final Path root = Files.createTempDirectory("testin-git-screenshots");
             markARun(root);
 
-            assertTrue(GitDiffProcessor.toDiffs(List.of(" D " + REMOVED), root, RealMapper.build(), path -> "", id -> Optional.empty()).isEmpty(),
+            assertTrue(GitDiffProcessor.toDiffs(List.of(" D " + REMOVED), root, RealMapper.build(), _ -> "", _ -> Optional.empty()).isEmpty(),
                     "a screenshot arrives or goes with its run, so it has no row of its own");
         } catch (final Exception e) {
             throw new AssertionError("the review could not be built", e);
@@ -67,7 +67,7 @@ public class ScreenshotsInGitTest {
             Files.createDirectories(root.resolve("cases/ts2"));
             Files.writeString(root.resolve(beside), "not really a picture");
 
-            assertEquals(GitDiffProcessor.toDiffs(List.of("?? " + beside), root, RealMapper.build(), path -> "", id -> Optional.empty()).size(), 1,
+            assertEquals(GitDiffProcessor.toDiffs(List.of("?? " + beside), root, RealMapper.build(), _ -> "", _ -> Optional.empty()).size(), 1,
                     "a PNG in a test set has no run to travel with, so the review has to list it");
         } catch (final Exception e) {
             throw new AssertionError("the review could not be built", e);

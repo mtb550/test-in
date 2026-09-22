@@ -58,7 +58,7 @@ public class PendingChangeFactoryTest {
         final TestCaseDto added = testCase("a brand new case");
 
         final PendingChange diff = PendingChangeFactory.fromFile(
-                DiffType.ADDED, "", json(added), PATH, RealMapper.build(), id -> Optional.empty());
+                DiffType.ADDED, "", json(added), PATH, RealMapper.build(), _ -> Optional.empty());
 
         assertNotNull(diff);
         assertEquals(diff.type(), DiffType.ADDED);
@@ -78,7 +78,7 @@ public class PendingChangeFactoryTest {
         final TestCaseDto removed = testCase("a case that is going away");
 
         final PendingChange diff = PendingChangeFactory.fromFile(
-                DiffType.DELETED, json(removed), "", PATH, RealMapper.build(), id -> Optional.empty());
+                DiffType.DELETED, json(removed), "", PATH, RealMapper.build(), _ -> Optional.empty());
 
         assertNotNull(diff);
         assertEquals(diff.type(), DiffType.DELETED);
@@ -100,7 +100,7 @@ public class PendingChangeFactoryTest {
                 .setPriority(Priority.HIGH);
 
         final PendingChange diff = PendingChangeFactory.fromFile(
-                DiffType.MODIFIED, json(before), json(after), PATH, RealMapper.build(), id -> Optional.empty());
+                DiffType.MODIFIED, json(before), json(after), PATH, RealMapper.build(), _ -> Optional.empty());
 
         assertNotNull(diff);
         assertEquals(diff.type(), DiffType.MODIFIED);
@@ -116,7 +116,7 @@ public class PendingChangeFactoryTest {
         final TestCaseDto unchanged = testCase("identical on both sides");
 
         final PendingChange change = PendingChangeFactory.fromFile(
-                DiffType.MODIFIED, json(unchanged), json(unchanged), PATH, RealMapper.build(), id -> Optional.empty());
+                DiffType.MODIFIED, json(unchanged), json(unchanged), PATH, RealMapper.build(), _ -> Optional.empty());
 
         assertNotNull(change, "a file git calls modified is a change to commit");
         assertEquals(change.fieldChanges().size(), 1);
@@ -132,7 +132,7 @@ public class PendingChangeFactoryTest {
                 {"id":"%s","status":"PASSED","actualResult":"Signed in"}""".formatted(testCaseId);
 
         final PendingChange change = PendingChangeFactory.fromFile(
-                DiffType.MODIFIED, before, after, Path.of("Test Runs", "cycle 4", testCaseId + ".ri"), RealMapper.build(), id -> Optional.empty());
+                DiffType.MODIFIED, before, after, Path.of("Test Runs", "cycle 4", testCaseId + ".ri"), RealMapper.build(), _ -> Optional.empty());
 
         assertEquals(change.subject(), ChangeSubject.RUN_ITEM);
         assertEquals(change.testCaseId(), testCaseId.toString(), "the result says which case it is about");
@@ -147,7 +147,7 @@ public class PendingChangeFactoryTest {
                 DiffType.MODIFIED,
                 "{\"status\":\"CREATED\",\"createdBy\":\"mtb\",\"configuration\":{\"PLATFORM\":\"Web\"}}",
                 "{\"status\":\"IN_PROGRESS\",\"createdBy\":\"mtb\",\"configuration\":{\"PLATFORM\":\"Mobile\"}}",
-                Path.of("Test Runs", "cycle 4", ".tr"), RealMapper.build(), id -> Optional.empty());
+                Path.of("Test Runs", "cycle 4", ".tr"), RealMapper.build(), _ -> Optional.empty());
 
         assertEquals(change.subject(), ChangeSubject.MARKER);
         assertTrue(change.fieldChanges().stream().anyMatch(field -> field.newValue().equals("Mobile")),
@@ -160,7 +160,7 @@ public class PendingChangeFactoryTest {
                 DiffType.MODIFIED,
                 "{\"status\":\"ACTIVE\",\"createdBy\":\"mtb\"}",
                 "{\"status\":\"ARCHIVED\",\"createdBy\":\"mtb\"}",
-                Path.of("Test Cases", "login", ".ts"), RealMapper.build(), id -> Optional.empty());
+                Path.of("Test Cases", "login", ".ts"), RealMapper.build(), _ -> Optional.empty());
 
         assertNotNull(change);
         assertEquals(change.subject(), ChangeSubject.MARKER);
@@ -178,16 +178,16 @@ public class PendingChangeFactoryTest {
         final TestCaseDto present = testCase("only one side survived");
 
         assertThrows(IllegalStateException.class, () -> PendingChangeFactory.fromFile(
-                DiffType.MODIFIED, "", json(present), PATH, RealMapper.build(), id -> Optional.empty()));
+                DiffType.MODIFIED, "", json(present), PATH, RealMapper.build(), _ -> Optional.empty()));
 
         assertThrows(IllegalStateException.class, () -> PendingChangeFactory.fromFile(
-                DiffType.MODIFIED, json(present), "", PATH, RealMapper.build(), id -> Optional.empty()));
+                DiffType.MODIFIED, json(present), "", PATH, RealMapper.build(), _ -> Optional.empty()));
 
         assertThrows(IllegalStateException.class, () -> PendingChangeFactory.fromFile(
-                DiffType.ADDED, json(present), "", PATH, RealMapper.build(), id -> Optional.empty()));
+                DiffType.ADDED, json(present), "", PATH, RealMapper.build(), _ -> Optional.empty()));
 
         assertThrows(IllegalStateException.class, () -> PendingChangeFactory.fromFile(
-                DiffType.DELETED, "", json(present), PATH, RealMapper.build(), id -> Optional.empty()));
+                DiffType.DELETED, "", json(present), PATH, RealMapper.build(), _ -> Optional.empty()));
     }
 
     @Test
@@ -196,13 +196,13 @@ public class PendingChangeFactoryTest {
         final TestCaseDto before = testCase("before");
         final TestCaseDto after = testCase("after").setId(before.getId());
 
-        assertEquals(PendingChangeFactory.fromFile(DiffType.ADDED, "", json(added), PATH, RealMapper.build(), id -> Optional.empty())
+        assertEquals(PendingChangeFactory.fromFile(DiffType.ADDED, "", json(added), PATH, RealMapper.build(), _ -> Optional.empty())
                 .name(), "added");
 
-        assertEquals(PendingChangeFactory.fromFile(DiffType.DELETED, json(before), "", PATH, RealMapper.build(), id -> Optional.empty())
+        assertEquals(PendingChangeFactory.fromFile(DiffType.DELETED, json(before), "", PATH, RealMapper.build(), _ -> Optional.empty())
                 .name(), "before", "a deletion is about the case that was there");
 
-        assertEquals(PendingChangeFactory.fromFile(DiffType.MODIFIED, json(before), json(after), PATH, RealMapper.build(), id -> Optional.empty())
+        assertEquals(PendingChangeFactory.fromFile(DiffType.MODIFIED, json(before), json(after), PATH, RealMapper.build(), _ -> Optional.empty())
                 .name(), "after", "a modification is about the case as it is now");
     }
 
@@ -211,7 +211,7 @@ public class PendingChangeFactoryTest {
         final TestCaseDto original = testCase("survives the round trip");
 
         final PendingChange diff = PendingChangeFactory.fromFile(
-                DiffType.DELETED, json(original), "", PATH, RealMapper.build(), id -> Optional.empty());
+                DiffType.DELETED, json(original), "", PATH, RealMapper.build(), _ -> Optional.empty());
 
         assertNotNull(diff);
         final TestCaseDto readBack = diff.committed();

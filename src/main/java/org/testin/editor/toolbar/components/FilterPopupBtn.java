@@ -92,7 +92,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
 
         this.cachedActionGroup = buildActionGroup(onToolBarFilterSelectedChanged);
 
-        addActionListener(e -> showFilterPopup());
+        addActionListener(_ -> showFilterPopup());
         updateToolBarFilterState();
     }
 

@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface
 public interface RunValueSetter {
-    @NotNull RunValueSetter NONE = (item, typed) -> {
+    @NotNull RunValueSetter NONE = (_, _) -> {
     };
 
     void execute(final @NotNull TestRunItems item, final @NotNull String typed);

@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
+import org.testin.util.Fonts;
 import org.testin.util.Bundle;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
@@ -44,7 +45,7 @@ public class PrioritySection implements CreateTestCaseSection {
 
         this.priority = new ComboBox<>(activePriorities);
         this.priority.setSelectedItem(Priority.LOW);
-        this.priority.setFont(fieldFont());
+        this.priority.setFont(Fonts.field());
 
         this.priority.setRenderer(new ColoredListCellRenderer<>() {
             @Override

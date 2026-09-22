@@ -27,6 +27,6 @@ public class CreateTestCaseBtn extends AbstractIconButton implements ToolbarItem
     public CreateTestCaseBtn(final @NotNull Runnable onToolBarCreateTestCaseClicked) {
         super(Bundle.message("action.Testin.CreateTestCase.text"), AllIcons.General.Add, Declared.shortcutText("Testin.CreateTestCase"));
 
-        addActionListener(e -> onToolBarCreateTestCaseClicked.run());
+        addActionListener(_ -> onToolBarCreateTestCaseClicked.run());
     }
 }

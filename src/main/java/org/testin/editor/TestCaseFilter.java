@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 public final class TestCaseFilter {
     public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull String query, final @NotNull Set<String> groups, final @NotNull Set<Priority> priorities, final @NotNull Set<String> modules) {
         return filter(source, query, groups, priorities, modules, Collections.emptySet(),
-                id -> Optional.empty());
+                _ -> Optional.empty());
     }
 
     // UC-EDITOR-PANEL-019, UC-EDITOR-PANEL-020

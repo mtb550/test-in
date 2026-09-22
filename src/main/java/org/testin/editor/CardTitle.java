@@ -23,12 +23,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Automated;
+import org.testin.util.Fonts;
 import org.testin.util.Icons;
 
 import javax.swing.Icon;
 import javax.swing.JList;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.List;
@@ -37,8 +37,6 @@ import java.util.stream.IntStream;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CardTitle {
-    private static final float TITLE_FONT_DELTA = 3.0f;
-
     // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-235
     public static @NotNull ActionIcons descriptionActionIcons(final int titleWidth, final @NotNull List<CardHoverAction.Offered> buttons) {
         final @NotNull Icon slot = Icons.TEST_CASE;
@@ -51,14 +49,9 @@ public final class CardTitle {
                 .toList());
     }
 
-    // Rule-EDITOR-PANEL-003
-    public static @NotNull Font titleFont(final @NotNull JList<?> list) {
-        return list.getFont().deriveFont(Font.BOLD, list.getFont().getSize2D() + TITLE_FONT_DELTA);
-    }
-
     // Rule-EDITOR-PANEL-003, Rule-EDITOR-PANEL-235
     public static int titleWidth(final @NotNull JList<?> list, final @NotNull String title, final int count) {
-        return Math.min(list.getFontMetrics(titleFont(list)).stringWidth(title), titleColumnWidth(list.getWidth(), count));
+        return Math.min(list.getFontMetrics(Fonts.title()).stringWidth(title), titleColumnWidth(list.getWidth(), count));
     }
 
     public static int titleColumnWidth(final int listWidth, final int count) {

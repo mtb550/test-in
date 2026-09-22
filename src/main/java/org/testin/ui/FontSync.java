@@ -32,16 +32,11 @@ import javax.swing.JComponent;
 import java.awt.Component;
 import java.awt.Container;
 import java.util.Optional;
+import org.testin.util.Fonts;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FontSync {
-    public static final float FLOOR = 8.0f;
-
     private static final @NotNull String LAST_BASE_SIZE = "testin.fontSync.lastBaseSize";
-
-    public static float getBaseFontSize() {
-        return EditorColorsManager.getInstance().getGlobalScheme().getEditorFontSize();
-    }
 
     public static void syncWithNativeEditor(final @NotNull Project p, final @NotNull JComponent component, final @NotNull Disposable parentDisposable) {
         syncWithNativeEditor(p, component, parentDisposable, delta -> applyDeltaRecursively(component, delta));
@@ -50,7 +45,7 @@ public final class FontSync {
     public static void syncWithNativeEditor(final @NotNull Project p, final @NotNull JComponent component, final @NotNull Disposable parentDisposable, final @NotNull Refit refit) {
         updateComponentFontSize(component, refit);
 
-        ApplicationManager.getApplication().getMessageBus().connect(parentDisposable).subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) scheme -> updateComponentFontSize(component, refit));
+        ApplicationManager.getApplication().getMessageBus().connect(parentDisposable).subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) _ -> updateComponentFontSize(component, refit));
 
         NativeEditorZoom.ensureWatching();
 
@@ -88,7 +83,7 @@ public final class FontSync {
     // UC-SETTING-011, Rule-SETTING-038
     private static void zoomGlobalIdeEditors(final @NotNull Project p, final @NotNull JComponent component, final @NotNull Refit refit, final boolean zoomIn) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            final float newSize = Math.clamp(getBaseFontSize() + (zoomIn ? 1.0f : -1.0f), FLOOR, 72.0f);
+            final float newSize = Math.clamp(Fonts.panelSize() + (zoomIn ? 1.0f : -1.0f), Fonts.FLOOR, 72.0f);
 
             applyGlobally(newSize);
 
@@ -98,7 +93,7 @@ public final class FontSync {
     }
 
     private static void updateComponentFontSize(final @NotNull JComponent component, final @NotNull Refit refit) {
-        final float newSize = getBaseFontSize();
+        final float newSize = Fonts.panelSize();
         ApplicationManager.getApplication().invokeLater(() -> Optional.ofNullable(component.getFont()).ifPresent(currentFont -> {
             final float lastSize = component.getClientProperty(LAST_BASE_SIZE) instanceof Float previous ? previous : newSize;
 
@@ -117,7 +112,7 @@ public final class FontSync {
     private static void applyDeltaRecursively(final @NotNull Container container, final float delta) {
         for (final Component child : container.getComponents()) {
             Optional.ofNullable(child.getFont()).ifPresent(font ->
-                    child.setFont(font.deriveFont(Math.max(FLOOR, font.getSize2D() + delta))));
+                    child.setFont(font.deriveFont(Math.max(Fonts.FLOOR, font.getSize2D() + delta))));
 
             if (child instanceof Container)
                 applyDeltaRecursively((Container) child, delta);

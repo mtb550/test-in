@@ -124,7 +124,7 @@ public final class SelectionTable implements DialogComponent {
 
     public void onRowAction(final @NotNull String label, final @NotNull IntConsumer action) {
         final @NotNull JMenuItem item = new JMenuItem(label);
-        item.addActionListener(event -> {
+        item.addActionListener(_ -> {
             if (menuRow >= 0 && menuRow < table.getRowCount()) action.accept(table.convertRowIndexToModel(menuRow));
         });
         rowMenu.add(item);

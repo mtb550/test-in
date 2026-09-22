@@ -72,6 +72,22 @@ and which keys it answers, and the shell builds the rest.
   names, in the caption font: JetBrains Mono, two points below the dialog's
   label font, in capitals, in the muted caption gray. There is no caption
   column to line up.
+- **Rule-INTERNAL-095** — Every font a tester reads comes from one owner,
+  `org.testin.util.Fonts`, which names each role - title, strong, body, label,
+  badge, code, caption, message, field, placeholder, value, choice, small,
+  hint, keycap, figure and icon letter - and derives them all from the same two
+  sizes: the editor's, which the panels zoom with, and the IDE's label font,
+  which the dialogs follow. A surface asks for the role it is showing and never
+  derives a font of its own, so a title is the same size in every panel and a
+  placeholder the same in every dialog. The documents Testin writes are in it
+  too: `Fonts.Report` holds the point sizes a PDF and a Word file are set in,
+  the pixel sizes an HTML report uses, and the families all three are written
+  in, so a size changes in one place or it disagrees with itself in three.
+- **Rule-INTERNAL-096** — Every typing surface in a dialog is drawn in the same
+  frame, whether it holds one line or many: a text area sits in the frame a text
+  field has, not in a borderless well. A value the dialog shows read-only is set
+  in the size a field would show it in, so a test case's description above the
+  fields is not smaller than the answer being typed under it.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

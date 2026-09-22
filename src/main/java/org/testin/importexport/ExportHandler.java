@@ -26,7 +26,7 @@ import java.util.Map;
 
 @FunctionalInterface
 public interface ExportHandler {
-    ExportHandler UNSUPPORTED = (p, destFile, sheetsData) -> {
+    ExportHandler UNSUPPORTED = (_, _, _) -> {
         throw new IllegalStateException("This format cannot be exported to");
     };
 

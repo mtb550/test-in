@@ -76,13 +76,13 @@ public final class BugIssueRow extends BaseDetails {
         links.setOpaque(false);
 
         bugIssue.ifPresent(url -> {
-            final @NotNull ActionLink issue = link(BugIssueUrl.reference(url), event -> BugIssueUrl.open(url));
+            final @NotNull ActionLink issue = link(BugIssueUrl.reference(url), _ -> BugIssueUrl.open(url));
             issue.setBorder(JBUI.Borders.emptyRight(LINK_GAP));
             links.add(issue);
         });
 
         final @NotNull ActionLink report = link(Bundle.message("bug.dialog.title"),
-                event -> ReportBug.start(p, runDirectory, item.getId(), dto, () -> redraw(p, dto, runDirectory)));
+                _ -> ReportBug.start(p, runDirectory, item.getId(), dto, () -> redraw(p, dto, runDirectory)));
         report.setEnabled(off.isEmpty());
         report.setToolTipText(off.orElse(""));
         links.add(report);

@@ -292,7 +292,7 @@ public class TreeTransferHandler extends TransferHandler {
 
     private boolean isNameCollision(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
         return target.acceptsTransferred(source)
-                && isValidDestination(source, target, path -> false)
+                && isValidDestination(source, target, _ -> false)
                 && Services.getInstance(p, ProjectIndexer.class).nodeExists(target.getPath().resolve(source.getName()));
     }
 
@@ -378,7 +378,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to) {
-        moveBatch(from, to, moved -> {
+        moveBatch(from, to, _ -> {
         });
     }
 

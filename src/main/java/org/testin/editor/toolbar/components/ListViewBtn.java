@@ -26,6 +26,6 @@ public class ListViewBtn extends AbstractIconButton implements ToolbarItem {
     public ListViewBtn(final @NotNull Runnable onSwitchToList) {
         super(Bundle.message("toolbar.list.view"), AllIcons.General.LayoutEditorOnly);
 
-        addActionListener(e -> onSwitchToList.run());
+        addActionListener(_ -> onSwitchToList.run());
     }
 }

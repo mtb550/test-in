@@ -47,7 +47,7 @@ import java.util.Optional;
 @Service(Service.Level.PROJECT)
 public final class ZoomIndicatorDialog implements Disposable {
     private final @NotNull Project p;
-    private final @NotNull Timer hideTimer = new Timer(5000, e -> hide());
+    private final @NotNull Timer hideTimer = new Timer(5000, _ -> hide());
     private @NotNull Optional<JBPopup> currentPopup = Optional.empty();
 
     ZoomIndicatorDialog(final @NotNull Project p) {

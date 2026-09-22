@@ -28,6 +28,6 @@ public class NodeDetailsBtn extends AbstractIconButton implements ToolbarItem {
     public NodeDetailsBtn(final @NotNull Toolbar editor) {
         super(Bundle.message("toolbar.node.details"), AllIcons.General.IndentDetected);
 
-        addActionListener(e -> new MarkerDetailsViewDialog(editor.getProject(), editor.getEditedNode()).show());
+        addActionListener(_ -> new MarkerDetailsViewDialog(editor.getProject(), editor.getEditedNode()).show());
     }
 }

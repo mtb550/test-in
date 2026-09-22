@@ -29,6 +29,7 @@ import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.testcase.CreateTestCaseFields;
+import org.testin.util.Fonts;
 import org.testin.util.Shortcuts;
 
 import javax.swing.JComponent;
@@ -62,7 +63,7 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
             editor.setBorder(new DarculaEditorTextFieldBorder(field, editor));
 
             final @NotNull EditorColorsScheme themed = editor.createBoundColorSchemeDelegate(EditorColorsManager.getInstance().getSchemeForCurrentUITheme());
-            final @NotNull Font font = fieldFont();
+            final @NotNull Font font = Fonts.field();
             themed.setEditorFontName(font.getFontName());
             themed.setEditorFontSize(font.getSize());
             editor.setColorsScheme(themed);

@@ -36,7 +36,7 @@ final class RunExecutionTimer implements Disposable {
     private @NotNull Duration alreadyCounted = Duration.ZERO;
 
     private static @NotNull Timer notTicking() {
-        return new Timer(REDRAW_MS, ignored -> {
+        return new Timer(REDRAW_MS, _ -> {
         });
     }
 
@@ -48,7 +48,7 @@ final class RunExecutionTimer implements Disposable {
         counting = Optional.of(item);
         startedAt = System.currentTimeMillis();
 
-        timer = new Timer(REDRAW_MS, ignored -> {
+        timer = new Timer(REDRAW_MS, _ -> {
             elapse();
             repaint.run();
         });

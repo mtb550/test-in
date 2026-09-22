@@ -78,7 +78,7 @@ public class GitDiffProcessorTest {
     }
 
     private List<PendingChange> review(final String... statusLines) {
-        return GitDiffProcessor.toDiffs(List.of(statusLines), root, RealMapper.build(), committed::get, id -> Optional.empty());
+        return GitDiffProcessor.toDiffs(List.of(statusLines), root, RealMapper.build(), committed::get, _ -> Optional.empty());
     }
 
     @Test

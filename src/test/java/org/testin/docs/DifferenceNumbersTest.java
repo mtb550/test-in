@@ -140,7 +140,7 @@ public class DifferenceNumbersTest {
     public void everyDifferenceAPagePointsAtIsListed() {
         final Map<String, Set<Integer>> known = differences(false);
         differences(true).forEach((part, numbers) ->
-                known.computeIfAbsent(part, p -> new LinkedHashSet<>()).addAll(numbers));
+                known.computeIfAbsent(part, _ -> new LinkedHashSet<>()).addAll(numbers));
 
         final List<String> dangling = new ArrayList<>();
 

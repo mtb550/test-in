@@ -101,7 +101,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         // UC-SHARE-010, Rule-SHARE-050
         private void scanForChanges(final @NotNull Path path) {
             GitBackgroundTask.run(p, Bundle.message("git.task.scanning"), true,
-                    indicator -> {
+                    _ -> {
                         if (git.hasConflicts(path)) {
                             showConflictActions(path, git.getRemoteName(path), git.syncBranch(path), git.conflictingPaths(path));
                             return;
@@ -236,7 +236,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         // UC-SHARE-009, Rule-SHARE-043
         private void initializeGitRepository(final @NotNull Path repoPath) {
             GitBackgroundTask.run(p, Bundle.message("git.task.init"), false,
-                    indicator -> {
+                    _ -> {
                         git.initialize(repoPath);
                         ApplicationManager.getApplication().invokeLater(() -> {
                             Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("git.initialized"));
@@ -250,7 +250,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         // UC-SHARE-013
         private void pushToRemote(final @NotNull Path repoPath, final @NotNull Supplier<@NotNull String> commitToPush, final @NotNull String committedOn) {
             GitBackgroundTask.run(p, Bundle.message("git.task.checking.remote"), false,
-                    indicator -> {
+                    _ -> {
                         final @NotNull String commitId = commitToPush.get();
                         final @NotNull String remoteName = git.getRemoteName(repoPath);
                         final @NotNull String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
@@ -285,7 +285,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         // UC-SHARE-013, Rule-SHARE-060
         private void addRemoteAndPush(final @NotNull Path repoPath, final @NotNull String remoteName, final @NotNull String branch, final @NotNull String commitId, final @NotNull String remoteUrl) {
             GitBackgroundTask.run(p, Bundle.message("git.task.configuring.remote"), false,
-                    indicator -> {
+                    _ -> {
                         git.configureRemote(repoPath, remoteName, remoteUrl);
                         ApplicationManager.getApplication().invokeLater(() -> executeGitPush(repoPath, remoteName, branch, commitId));
                     },
@@ -336,7 +336,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         // UC-SHARE-017
         private void pushAfterRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
             GitBackgroundTask.run(p, Bundle.message("git.task.pushing.branch", branch), false,
-                    indicator -> {
+                    _ -> {
                         commits.push(repoPath, remote, branch);
                         RepositoryRefresh.after(p, repoPath);
 
@@ -350,7 +350,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         // UC-SHARE-017, Rule-SHARE-077
         private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final boolean abort) {
             GitBackgroundTask.run(p, abort ? Bundle.message("git.task.aborting.rebase") : Bundle.message("git.task.continuing.rebase"), false,
-                    indicator -> {
+                    _ -> {
                         if (abort) {
                             if (git.couldNotAbortRebase(repoPath))
                                 throw new IllegalStateException(Bundle.message("git.error.abort.rebase"));
@@ -379,7 +379,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         private void promptAndSetGitIdentity(final @NotNull Path repoPath, final @NotNull PendingCommitsDialog.Request request, final @NotNull String branch) {
             ApplicationManager.getApplication().invokeLater(() -> new GitIdentityDialog(p, identity ->
                     GitBackgroundTask.run(p, Bundle.message("git.task.configuring.identity"), false,
-                            indicator -> {
+                            _ -> {
                                 git.configureIdentity(repoPath, identity.name(), identity.email(), identity.global());
                                 ApplicationManager.getApplication().invokeLater(() -> {
                                     Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("git.identity.set"));

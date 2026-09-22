@@ -17,17 +17,16 @@
 package org.testin.view.details.components;
 
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
+import org.testin.util.Fonts;
 import org.testin.ui.framework.Prose;
 
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -37,17 +36,17 @@ public final class LabelValueRow {
     private static final int SIDE = 16;
 
     // Rule-VIEW-PANEL-006
-    public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String caption, final @NotNull String valueText, final float fontSize, final int row) {
+    public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String caption, final @NotNull String valueText, final int row) {
         if (valueText.trim().isEmpty()) return row;
 
         final @NotNull JTextArea valueArea = Prose.of(valueText);
-        valueArea.setFont(JBFont.label().deriveFont(Font.PLAIN, fontSize));
+        valueArea.setFont(Fonts.body());
 
-        return add(panel, gbc, caption, valueArea, fontSize, row);
+        return add(panel, gbc, caption, valueArea, row);
     }
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-082
-    public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String caption, final @NotNull JComponent value, final float fontSize, final int row) {
+    public static int add(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String caption, final @NotNull JComponent value, final int row) {
         gbc.gridx = 0;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -55,7 +54,7 @@ public final class LabelValueRow {
 
         gbc.gridy = row;
         gbc.insets = JBUI.insets(SPACE_ABOVE, SIDE, CAPTION_GAP, SIDE);
-        panel.add(Caption.of(caption, fontSize), gbc);
+        panel.add(Caption.of(caption, Fonts.panelCaption()), gbc);
 
         gbc.gridy = row + 1;
         gbc.insets = JBUI.insets(0, SIDE, 0, SIDE);

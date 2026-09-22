@@ -26,6 +26,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.Badges;
+import org.testin.util.Fonts;
 import org.testin.ui.framework.Prose;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
@@ -94,7 +95,7 @@ class TestCaseDetails extends JBPanel<TestCaseDetails> {
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-217
     private void addCutOffNotice() {
         final @NotNull JBLabel notice = new JBLabel(Bundle.message("light.cut.off"));
-        notice.setFont(TestCaseFont.zoomed(TestCaseFont.label(), zoom));
+        notice.setFont(Fonts.zoomed(Fonts.label(), zoom));
         notice.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
         addRow(EmptyIcon.ICON_16, notice);
@@ -139,7 +140,7 @@ class TestCaseDetails extends JBPanel<TestCaseDetails> {
     }
 
     private @NotNull JTextArea prose(final @NotNull String text) {
-        final @NotNull JTextArea area = Prose.of(TestCaseFont.zoomed(TestCaseFont.body(), zoom), JBUI.CurrentTheme.Label.foreground());
+        final @NotNull JTextArea area = Prose.of(Fonts.zoomed(Fonts.body(), zoom), JBUI.CurrentTheme.Label.foreground());
         area.setText(text);
 
         return area;

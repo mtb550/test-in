@@ -22,6 +22,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
+import org.testin.util.Fonts;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -54,9 +55,11 @@ public final class DialogDetails implements DialogComponent {
         panel.add(stack, BorderLayout.NORTH);
     }
 
+    // Rule-INTERNAL-096
     private static @NotNull JBLabel wrappingValue(final @NotNull String value) {
         final @NotNull JBLabel label = new JBLabel("<html><div style='width:" + JBUI.scale(420) + "px'>"
                 + StringUtil.escapeXmlEntities(value) + "</div></html>");
+        label.setFont(Fonts.value());
         label.setBorder(JBUI.Borders.emptyLeft(12));
         return label;
     }

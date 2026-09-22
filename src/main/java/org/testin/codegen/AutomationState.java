@@ -82,7 +82,7 @@ public final class AutomationState {
         }
 
         final @NotNull Map<UUID, Automated> asking = testCases.stream()
-                .collect(Collectors.toMap(TestCaseDto::getId, tc -> of(tc.getId()), (first, second) -> first));
+                .collect(Collectors.toMap(TestCaseDto::getId, tc -> of(tc.getId()), (first, _) -> first));
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Map<UUID, Automated> answers = new LinkedHashMap<>();

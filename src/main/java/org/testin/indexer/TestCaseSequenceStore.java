@@ -64,7 +64,7 @@ final class TestCaseSequenceStore {
 
     // UC-TREE-PANEL-011, Rule-INTERNAL-084
     void renamed(final @NotNull Path oldPath, final @NotNull Path newPath) {
-        handNamed.replaceAll((id, file) -> file.startsWith(oldPath) ? newPath.resolve(oldPath.relativize(file)) : file);
+        handNamed.replaceAll((_, file) -> file.startsWith(oldPath) ? newPath.resolve(oldPath.relativize(file)) : file);
 
         for (final String set : List.copyOf(unreadable.keySet())) {
             final @NotNull Path setPath = Path.of(set);
@@ -132,7 +132,7 @@ final class TestCaseSequenceStore {
         }
 
         testCasesById.put(testCase.getId(), testCase);
-        final @NotNull List<UUID> ids = testCaseIdsByTestSet.computeIfAbsent(testSetPath.toString(), ignored -> testCaseIds(List.of()));
+        final @NotNull List<UUID> ids = testCaseIdsByTestSet.computeIfAbsent(testSetPath.toString(), _ -> testCaseIds(List.of()));
         if (!ids.contains(testCase.getId())) ids.add(testCase.getId());
 
         return true;

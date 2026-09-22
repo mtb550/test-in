@@ -16,19 +16,20 @@
 
 package org.testin.ui.dialogs;
 
+import com.intellij.ide.ui.laf.darcula.ui.DarculaTextBorder;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.TextIcon;
 import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.EmptyIcon;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.NamedColorUtil;
 import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Fonts;
 import org.testin.util.Icons;
 
 import javax.swing.Icon;
@@ -44,6 +45,12 @@ public final class DialogStyle {
     public static <T extends JComponent> @NotNull T styleContent(final @NotNull T component) {
         component.setOpaque(true);
         component.setBackground(UIUtil.getPanelBackground());
+        return component;
+    }
+
+    // UC-INTERNAL-001, Rule-INTERNAL-096
+    public static <T extends JComponent> @NotNull T framed(final @NotNull T component) {
+        component.setBorder(new DarculaTextBorder());
         return component;
     }
 
@@ -84,7 +91,7 @@ public final class DialogStyle {
 
     private static @NotNull ExtendableTextComponent.Extension trailing(final @NotNull String note, final @NotNull ExtendableTextField textField) {
         final @NotNull TextIcon drawn = new TextIcon(note, NamedColorUtil.getInactiveTextColor(), textField.getBackground(), JBUI.scale(2));
-        drawn.setFont(JBFont.label());
+        drawn.setFont(Fonts.keycap());
         drawn.setWithBorders(false);
 
         return new ExtendableTextComponent.Extension() {

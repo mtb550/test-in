@@ -274,7 +274,7 @@ final class IndexingScanner {
                                 Logger.error("Failed to read test case '" + filePath.toAbsolutePath() +
                                         "': " + ex.getMessage());
 
-                                scanned.getUnreadableTestCases().computeIfAbsent(path.toString(), ignored -> ConcurrentHashMap.newKeySet())
+                                scanned.getUnreadableTestCases().computeIfAbsent(path.toString(), _ -> ConcurrentHashMap.newKeySet())
                                         .add(filePath.getFileName().toString());
                             }
                         });

@@ -170,7 +170,7 @@ public class GitHubCliTest {
         }
 
         private GitHubCli cli() {
-            return new GitHubCli((arguments, folder) -> {
+            return new GitHubCli((arguments, _) -> {
                 asked.add(arguments);
                 return Optional.ofNullable(answers.poll());
             });

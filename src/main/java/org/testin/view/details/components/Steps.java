@@ -18,17 +18,16 @@ package org.testin.view.details.components;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.util.Fonts;
 import org.testin.ui.framework.Prose;
 import org.testin.util.Display;
 
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.util.List;
 
@@ -60,7 +59,7 @@ public class Steps extends BaseDetails {
 
     private @NotNull JTextArea createStepComponent(final @NotNull String text, final int marginBottom) {
         final @NotNull JTextArea stepArea = Prose.of(text);
-        stepArea.setFont(JBFont.label().deriveFont(Font.PLAIN, getValueFontSize()));
+        stepArea.setFont(Fonts.body());
 
         stepArea.setBorder(JBUI.Borders.emptyBottom(marginBottom));
         return stepArea;

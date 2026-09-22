@@ -23,19 +23,17 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.NavigateToTestCaseAction;
-import org.testin.ui.FontSync;
+import org.testin.util.Fonts;
 import org.testin.util.Bundle;
 
 import javax.swing.Timer;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -75,8 +73,7 @@ public class Id extends BaseDetails {
             }
         };
 
-        final float badgeSize = Math.max(8.0f, FontSync.getBaseFontSize() - 3.0f);
-        idBadge.setFont(JBFont.label().deriveFont(Font.BOLD, badgeSize));
+        idBadge.setFont(Fonts.badge());
 
         idBadge.setForeground(FG_COLOR);
         idBadge.setBorder(JBUI.Borders.empty(BADGE_BORDER_V, BADGE_BORDER_H));
@@ -104,7 +101,7 @@ public class Id extends BaseDetails {
             public void mouseClicked(final MouseEvent e) {
                 CopyPasteManager.getInstance().setContents(new StringSelection(dto.getId().toString()));
                 copyIcon.setIcon(AllIcons.General.InspectionsOK);
-                final @NotNull Timer timer = new Timer(COPY_SUCCESS_DELAY_MS, evt -> copyIcon.setIcon(AllIcons.Actions.Copy));
+                final @NotNull Timer timer = new Timer(COPY_SUCCESS_DELAY_MS, _ -> copyIcon.setIcon(AllIcons.Actions.Copy));
                 timer.setRepeats(false);
                 timer.start();
             }

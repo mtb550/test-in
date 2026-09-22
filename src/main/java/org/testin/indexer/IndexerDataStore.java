@@ -416,9 +416,9 @@ final class IndexerDataStore {
 
         rebuildPath2Under(newPath);
 
-        renameMapEntry(testCaseStore.getTestCaseIdsByTestSet(), oldStr, newStr, ids -> {
+        renameMapEntry(testCaseStore.getTestCaseIdsByTestSet(), oldStr, newStr, _ -> {
         });
-        renameMapEntry(testRunsByPath, oldStr, newStr, tr -> {
+        renameMapEntry(testRunsByPath, oldStr, newStr, _ -> {
         });
         renameDescendantKeys(testCaseStore.getTestCaseIdsByTestSet(), oldPath, newPath);
         renameDescendantKeys(testRunsByPath, oldPath, newPath);

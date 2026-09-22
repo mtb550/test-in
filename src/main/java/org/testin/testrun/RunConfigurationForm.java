@@ -143,7 +143,7 @@ public class RunConfigurationForm implements DialogComponent {
             final @NotNull ComboBox<String> comboBox = new ComboBox<>(field.getOptions());
             comboBox.setEditable(true);
 
-            comboBox.addActionListener(event -> applyVisibility());
+            comboBox.addActionListener(_ -> applyVisibility());
 
             register(field, comboBox,
                     addLabeledRow(configurationPanel, labelGbc, fieldGbc, row, field.getDisplayName(), comboBox));

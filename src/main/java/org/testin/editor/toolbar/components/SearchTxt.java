@@ -43,7 +43,7 @@ public class SearchTxt extends SearchTextField implements Disposable, ToolbarIte
         getTextEditor().setToolTipText(Bundle.message("search.tooltip",
                 Shortcuts.FocusSearch.getShortcutText(), Shortcuts.Escape.getShortcutText()));
 
-        searchDebounceTimer = new Timer(300, e -> onToolBarSearchValueChanged.run());
+        searchDebounceTimer = new Timer(300, _ -> onToolBarSearchValueChanged.run());
         searchDebounceTimer.setRepeats(false);
 
         addDocumentListener(new DocumentAdapter() {

@@ -63,6 +63,6 @@ public class GenTypeActionTest {
 
     @Test
     public void everyOperationCarriesAnAction() {
-        assertEquals(Arrays.stream(GenType.values()).filter(type -> false).count(), 0L);
+        assertEquals(Arrays.stream(GenType.values()).filter(_ -> false).count(), 0L);
     }
 }

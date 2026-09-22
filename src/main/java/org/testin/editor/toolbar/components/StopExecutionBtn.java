@@ -25,6 +25,6 @@ public class StopExecutionBtn extends AbstractIconButton implements ToolbarItem 
     public StopExecutionBtn(final @NotNull Runnable onStopExecutionClicked) {
         super(ExecutionControl.STOP.getLabel(), ExecutionControl.STOP.getIcon());
 
-        addActionListener(e -> onStopExecutionClicked.run());
+        addActionListener(_ -> onStopExecutionClicked.run());
     }
 }

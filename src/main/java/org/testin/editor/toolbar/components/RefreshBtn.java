@@ -26,6 +26,6 @@ public class RefreshBtn extends AbstractIconButton implements ToolbarItem {
     public RefreshBtn(final @NotNull Runnable onToolBarRefreshClicked) {
         super(Bundle.message("toolbar.refresh"), AllIcons.Actions.Refresh);
 
-        addActionListener(e -> onToolBarRefreshClicked.run());
+        addActionListener(_ -> onToolBarRefreshClicked.run());
     }
 }

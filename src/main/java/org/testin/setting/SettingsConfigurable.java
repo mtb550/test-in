@@ -36,6 +36,7 @@ import org.testin.logger.Level;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
 import org.testin.setting.dialogs.TestinPathPanel;
+import org.testin.util.Fonts;
 import org.testin.util.Bundle;
 
 import javax.swing.JComponent;
@@ -103,7 +104,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         final @NotNull JBLabel note = new JBLabel(Bundle.message("settings.note"));
 
         note.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
-        note.setFont(JBUI.Fonts.smallFont());
+        note.setFont(Fonts.small());
 
         return note;
     }

@@ -24,8 +24,8 @@ import org.testin.model.TestRunItems;
 import org.testin.services.Services;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.Badges;
+import org.testin.util.Fonts;
 
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -56,7 +56,7 @@ public class RunCard extends BaseCard {
         updateUI(index, title, badges, details);
 
         Optional.ofNullable(attributeLabels.get(RunEditorAttributes.RUN_STATUS.getName())).ifPresent(statusLabel -> {
-            statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
+            statusLabel.setFont(Fonts.strong());
             statusLabel.setForeground(runItem.shownStatus().getRowColor());
         });
     }

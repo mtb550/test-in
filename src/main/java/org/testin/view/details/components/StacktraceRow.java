@@ -22,7 +22,6 @@ import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.panels.HorizontalLayout;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +31,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.testrun.RunEditorAttributes;
+import org.testin.util.Fonts;
 import org.testin.ui.framework.Picture;
 import org.testin.util.Bundle;
 
@@ -41,7 +41,6 @@ import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -91,7 +90,7 @@ public final class StacktraceRow extends BaseDetails {
 
     private @NotNull JTextArea preview(final @NotNull List<String> lines) {
         final @NotNull JTextArea area = new JTextArea(String.join("\n", lines.subList(0, Math.min(LINES_SHOWN, lines.size()))));
-        area.setFont(JBFont.create(new Font(Font.MONOSPACED, Font.PLAIN, (int) getValueFontSize())));
+        area.setFont(Fonts.code());
         area.setOpaque(false);
         area.setEditable(false);
         area.setBorder(null);
@@ -101,7 +100,7 @@ public final class StacktraceRow extends BaseDetails {
 
     private @NotNull ActionLink showAllLink(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull String stacktrace, final int total) {
         return link(Bundle.message("view.stacktrace.show.all", String.valueOf(total)),
-                event -> new ErrorDetailsDialog(p, dto.getDescription(), item.getActualResult(), stacktrace).show());
+                _ -> new ErrorDetailsDialog(p, dto.getDescription(), item.getActualResult(), stacktrace).show());
     }
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081

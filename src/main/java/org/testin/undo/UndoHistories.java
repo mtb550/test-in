@@ -109,7 +109,7 @@ public final class UndoHistories {
     }
 
     private @NotNull History of(final @NotNull UndoScope scope) {
-        return histories.computeIfAbsent(scope, key -> new History());
+        return histories.computeIfAbsent(scope, _ -> new History());
     }
 
     private static final class History {

@@ -24,6 +24,7 @@ import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
+import org.testin.util.Fonts;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -62,7 +63,7 @@ public class ExportHtml {
             writer.newLine();
             writer.write("<style>");
             writer.newLine();
-            writer.write("  body { font-family: Arial, sans-serif; margin: 20px; }");
+            writer.write("  body { font-family: " + Fonts.Report.CSS_FAMILY + "; margin: 20px; }");
             writer.newLine();
             writer.write("  h2 { color: #555; margin-top: 30px; }");
             writer.newLine();

@@ -445,7 +445,7 @@ public final class ProjectIndexer {
     }
 
     public void saveRun(final @NotNull Path runPath) {
-        changeRun(runPath, run -> {
+        changeRun(runPath, _ -> {
         });
     }
 

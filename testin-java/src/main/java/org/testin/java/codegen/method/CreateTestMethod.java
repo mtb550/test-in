@@ -129,7 +129,7 @@ public class CreateTestMethod implements GenAction {
 
             final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
             parse(fqcn).ifPresentOrElse(
-                    target -> byClass.computeIfAbsent(target.path(), ignored -> new ArrayList<>()).add(tc),
+                    target -> byClass.computeIfAbsent(target.path(), _ -> new ArrayList<>()).add(tc),
                     () -> noMethodFor(tc, fqcn));
         }
 

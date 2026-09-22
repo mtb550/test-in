@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.UpdateTestCaseFields;
+import org.testin.util.Fonts;
 import org.testin.util.Bundle;
 
 import javax.swing.JComponent;
@@ -37,7 +38,7 @@ public class StatusSection implements CreateTestCaseSection {
     public StatusSection() {
         this.status = new ComboBox<>(TestCaseStatus.values());
         this.status.setSelectedItem(TestCaseStatus.PENDING);
-        this.status.setFont(fieldFont());
+        this.status.setFont(Fonts.field());
 
         this.status.setRenderer(new ColoredListCellRenderer<>() {
             @Override

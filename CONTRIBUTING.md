@@ -97,7 +97,8 @@ work had it not been noticed immediately.
 |----------------------------------------------|----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
 | `./gradlew compileJava test`                 | It compiles, and the unit tests and the documentation guards pass    | Every change, before you offer it                                                                    |
 | `./gradlew runIde`                           | It actually works                                                    | Anything a tester can see — see below                                                                |
-| `./gradlew inspect`                          | Every finding in the Inspected scope, and the display-string ratchet | Before offering a change for a sandbox test, when it touched nullability, annotations, or many files |
+| `./gradlew inspect`                          | Every finding in the Inspected scope, and the display-string ratchet | Never by hand. CI runs it on every push, on every branch, and the run is where it is read            |
+| `pwsh tools/inspect.ps1 -Quick`              | The rules that read the source as text, not what an IDE indexes      | Every change, before you hand it over. Five seconds, no IDE                                          |
 | `git worktree add ../testin-<what> <branch>` | A second branch, checked out at once                                 | Whenever two pieces of work run at the same time — see below                                         |
 | `./gradlew verifyDistribution`               | No test classes and no compile-only dependencies reached the jar     | Runs in CI; run it if you touched packaging                                                          |
 

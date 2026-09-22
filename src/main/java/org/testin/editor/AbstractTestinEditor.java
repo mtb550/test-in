@@ -304,7 +304,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         final @NotNull Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin." + getClass().getSimpleName() + ".gridFontSync");
         try {
             final @NotNull JBTable table = buildTable(pageItems, attributes);
-            FontSync.syncWithNativeEditor(p, table, fontSync, delta -> GridPanelBuilder.resizeToFont(table));
+            FontSync.syncWithNativeEditor(p, table, fontSync, _ -> GridPanelBuilder.resizeToFont(table));
 
             table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, list, pageItems));
             installEditListener(table, pageItems);

@@ -69,7 +69,7 @@ public class BranchSelector {
         comboBox.setFocusable(false);
         comboBox.setEnabled(false);
 
-        comboBox.addActionListener(e -> onSelection());
+        comboBox.addActionListener(_ -> onSelection());
 
         updateProject(testProjectDirectory);
     }

@@ -79,7 +79,7 @@ final class BulkJsonEditors implements DialogComponent {
     private final @NotNull TextAttributes leftLineAttr = new TextAttributes();
     private final @NotNull Disposable docListenerDisposable = Disposer.newDisposable();
 
-    private @NotNull IntFunction<String> originalTextAt = index -> "";
+    private @NotNull IntFunction<String> originalTextAt = _ -> "";
 
     BulkJsonEditors(final @NotNull Project p) {
         this.p = p;
@@ -97,7 +97,7 @@ final class BulkJsonEditors implements DialogComponent {
         });
 
         rightDoc = EditorFactory.getInstance().createDocument("");
-        EditorActionManager.getInstance().setReadonlyFragmentModificationHandler(rightDoc, e -> {
+        EditorActionManager.getInstance().setReadonlyFragmentModificationHandler(rightDoc, _ -> {
         });
         rightEditor = EditorFactory.getInstance().createEditor(rightDoc, p);
         BulkJsonEditor.setupEditorAppearance(rightEditor, p);
@@ -269,7 +269,7 @@ final class BulkJsonEditors implements DialogComponent {
             final int index = i;
             valueAt(index)
                     .filter(current -> !current.equals(originalTextAt.apply(index)))
-                    .ifPresent(current -> {
+                    .ifPresent(_ -> {
                         final @NotNull RangeMarker marker = markers.get(index);
                         markup.addRangeHighlighter(marker.getStartOffset(), marker.getEndOffset(),
                                 HighlighterLayer.SELECTION - 1, diffAttr, HighlighterTargetArea.EXACT_RANGE);

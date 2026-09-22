@@ -35,7 +35,7 @@ public class LightModeBtn extends AbstractIconButton implements ToolbarItem {
         this.p = editor.getProject();
         this.editor = editor;
 
-        addActionListener(e -> Services.getInstance(p, LightMode.class).toggle(editor, this::updateState));
+        addActionListener(_ -> Services.getInstance(p, LightMode.class).toggle(editor, this::updateState));
     }
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-008

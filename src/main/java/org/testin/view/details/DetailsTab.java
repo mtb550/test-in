@@ -21,7 +21,6 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.ExecutionPosition;
@@ -31,6 +30,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.FontSync;
+import org.testin.util.Fonts;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.view.details.components.ActionIcons;
@@ -74,15 +74,15 @@ public class DetailsTab {
 
     private static @NotNull Stream<BaseDetails> testCaseRows() {
         return Stream.of(
-                new AttributeRow(TestEditorAttributes.EXPECTED_RESULT.getName(), (p, dto) -> TestEditorAttributes.EXPECTED_RESULT.displayValue(dto)),
+                new AttributeRow(TestEditorAttributes.EXPECTED_RESULT.getName(), (_, dto) -> TestEditorAttributes.EXPECTED_RESULT.displayValue(dto)),
                 new Steps(),
-                new AttributeRow(TestEditorAttributes.PRE_CONDITIONS.getName(), (p, dto) -> TestEditorAttributes.PRE_CONDITIONS.displayValue(dto)),
-                new AttributeRow(TestEditorAttributes.TEST_DATA.getName(), (p, dto) -> TestEditorAttributes.TEST_DATA.displayValue(dto)),
-                new AttributeRow(TestEditorAttributes.REFERENCE.getName(), (p, dto) -> TestEditorAttributes.REFERENCE.displayValue(dto)),
-                new AttributeRow(TestEditorAttributes.MODULE.getName(), (p, dto) -> TestEditorAttributes.MODULE.displayValue(dto)),
+                new AttributeRow(TestEditorAttributes.PRE_CONDITIONS.getName(), (_, dto) -> TestEditorAttributes.PRE_CONDITIONS.displayValue(dto)),
+                new AttributeRow(TestEditorAttributes.TEST_DATA.getName(), (_, dto) -> TestEditorAttributes.TEST_DATA.displayValue(dto)),
+                new AttributeRow(TestEditorAttributes.REFERENCE.getName(), (_, dto) -> TestEditorAttributes.REFERENCE.displayValue(dto)),
+                new AttributeRow(TestEditorAttributes.MODULE.getName(), (_, dto) -> TestEditorAttributes.MODULE.displayValue(dto)),
                 new AttributeRow(TestEditorAttributes.ORDER.getName(), (p, dto) -> String.valueOf(ExecutionPosition.of(p, dto))),
-                new AttributeRow(Bundle.message("details.created"), (p, dto) -> Display.whoAndWhen(dto.getCreatedBy(), dto.getCreatedAt())),
-                new AttributeRow(Bundle.message("details.updated"), (p, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt()))
+                new AttributeRow(Bundle.message("details.created"), (_, dto) -> Display.whoAndWhen(dto.getCreatedBy(), dto.getCreatedAt())),
+                new AttributeRow(Bundle.message("details.updated"), (_, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt()))
         );
     }
 
@@ -124,7 +124,7 @@ public class DetailsTab {
         panel.setBorder(JBUI.Borders.empty(25, 16, 0, 0));
         final @NotNull JBLabel placeholder = new JBLabel(PLACEHOLDER_TEXT);
         placeholder.setForeground(JBColor.GRAY);
-        placeholder.setFont(JBFont.label().deriveFont(FontSync.getBaseFontSize()));
+        placeholder.setFont(Fonts.body());
         panel.add(placeholder, BorderLayout.NORTH);
     }
 

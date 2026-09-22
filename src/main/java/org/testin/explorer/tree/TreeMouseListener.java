@@ -67,7 +67,7 @@ public class TreeMouseListener extends PopupHandler {
 
         return Optional.ofNullable(tree.getRowBounds(row))
                 .filter(bounds -> y >= bounds.y && y < bounds.y + bounds.height)
-                .map(bounds -> tree.getPathForRow(row))
+                .map(_ -> tree.getPathForRow(row))
                 .filter(path -> TreeValues.directoryAt(path).isPresent());
     }
 }

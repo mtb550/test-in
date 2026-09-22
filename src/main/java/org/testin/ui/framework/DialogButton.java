@@ -33,7 +33,7 @@ public final class DialogButton implements DialogComponent {
 
     DialogButton(final @NotNull String text) {
         button = new JButton(text);
-        button.addActionListener(event -> submitRequest.run());
+        button.addActionListener(_ -> submitRequest.run());
 
         panel = new JBPanel<>(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         panel.setOpaque(false);

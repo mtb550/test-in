@@ -18,16 +18,14 @@ package org.testin.view.details.components;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
-import org.testin.ui.FontSync;
+import org.testin.util.Fonts;
 import org.testin.ui.framework.Prose;
 
 import javax.swing.JTextArea;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 
 public class Title extends BaseDetails {
@@ -44,8 +42,7 @@ public class Title extends BaseDetails {
 
         final @NotNull JTextArea mainTitleArea = Prose.of(finalValue);
 
-        final float titleFontSize = FontSync.getBaseFontSize();
-        mainTitleArea.setFont(JBFont.label().deriveFont(Font.BOLD, titleFontSize));
+        mainTitleArea.setFont(Fonts.title());
 
         gbc.gridx = 0;
         gbc.gridy = currentRow;

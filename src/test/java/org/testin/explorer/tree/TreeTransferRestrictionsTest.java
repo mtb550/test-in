@@ -168,14 +168,14 @@ public class TreeTransferRestrictionsTest {
     public void destinationMustNotBeSelfSubtreeOrParent() {
         final DirectoryDto source = node("test-cases", "pkg");
 
-        assertFalse(TreeTransferHandler.isValidDestination(source, node("test-cases", "pkg"), path -> false),
+        assertFalse(TreeTransferHandler.isValidDestination(source, node("test-cases", "pkg"), _ -> false),
                 "onto itself must be invalid");
-        assertFalse(TreeTransferHandler.isValidDestination(source, node("test-cases", "pkg", "inner"), path -> false),
+        assertFalse(TreeTransferHandler.isValidDestination(source, node("test-cases", "pkg", "inner"), _ -> false),
                 "into its own subtree must be invalid");
-        assertFalse(TreeTransferHandler.isValidDestination(source, node("test-cases"), path -> false),
+        assertFalse(TreeTransferHandler.isValidDestination(source, node("test-cases"), _ -> false),
                 "into its own parent must be invalid - this was the IO-exception copy");
 
-        assertTrue(TreeTransferHandler.isValidDestination(source, node("test-cases", "other"), path -> false),
+        assertTrue(TreeTransferHandler.isValidDestination(source, node("test-cases", "other"), _ -> false),
                 "an unrelated sibling target must stay valid");
     }
 
@@ -187,7 +187,7 @@ public class TreeTransferRestrictionsTest {
 
         assertFalse(TreeTransferHandler.isValidDestination(source, target, occupiedPath::equals),
                 "a target already containing the name must be invalid - the 'already exists in VFS' case");
-        assertTrue(TreeTransferHandler.isValidDestination(source, target, path -> false),
+        assertTrue(TreeTransferHandler.isValidDestination(source, target, _ -> false),
                 "the same target is valid when the name is free");
     }
 

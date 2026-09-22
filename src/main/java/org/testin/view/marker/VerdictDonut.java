@@ -18,7 +18,6 @@ package org.testin.view.marker;
 
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.scale.JBUIScale;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
@@ -26,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.NodeCount;
 import org.testin.model.NodeFigures;
+import org.testin.util.Fonts;
 import org.testin.ui.framework.DialogComponent;
 
 import javax.swing.Box;
@@ -38,7 +38,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -107,10 +106,10 @@ public final class VerdictDonut implements DialogComponent {
         final @NotNull JBLabel name = new JBLabel(slice.getCaption());
         name.setIcon(new Swatch(slice.getSwatch()));
         name.setIconTextGap(JBUI.scale(8));
-        name.setFont(JBUI.Fonts.smallFont());
+        name.setFont(Fonts.small());
 
         final @NotNull JBLabel value = new JBLabel(slice.of(figures), SwingConstants.RIGHT);
-        value.setFont(JBUI.Fonts.smallFont().asBold());
+        value.setFont(Fonts.smallStrong());
 
         row.add(name, BorderLayout.WEST);
         row.add(value, BorderLayout.CENTER);
@@ -217,7 +216,7 @@ public final class VerdictDonut implements DialogComponent {
         private void paintRate(final @NotNull Graphics2D g2, final int side) {
             final @NotNull String label = figures.rateLabel();
 
-            g2.setFont(JBUI.Fonts.label().deriveFont(Font.BOLD, JBUIScale.scaleFontSize(15f)));
+            g2.setFont(Fonts.figure());
             g2.setColor(UIUtil.getLabelForeground());
 
             final @NotNull FontMetrics metrics = g2.getFontMetrics();

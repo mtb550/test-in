@@ -59,7 +59,7 @@ public final class ListPanelBuilder {
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setExpandableItemsEnabled(false);
 
-        FontSync.syncWithNativeEditor(p, list, fontSyncDisposable, delta -> list.updateUI());
+        FontSync.syncWithNativeEditor(p, list, fontSyncDisposable, _ -> list.updateUI());
 
         list.addComponentListener(new ComponentAdapter() {
             private int lastWidth = -1;

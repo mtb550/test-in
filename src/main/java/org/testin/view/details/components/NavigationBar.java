@@ -29,7 +29,7 @@ import org.testin.search.GoTo;
 import org.testin.search.Hit;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
-import org.testin.ui.FontSync;
+import org.testin.util.Fonts;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -66,8 +66,6 @@ public class NavigationBar extends BaseDetails {
         final @NotNull JBPanel<?> pathPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pathPanel.setOpaque(false);
 
-        final float navFontSize = Math.max(8.0f, FontSync.getBaseFontSize() - 1.0f);
-
         {
             for (int i = 0; i < currentPath.size(); i++) {
                 final @NotNull String labelText = currentPath.get(i);
@@ -76,7 +74,7 @@ public class NavigationBar extends BaseDetails {
                 final int index = i;
 
                 final @NotNull JBLabel folderLabel = new JBLabel(labelText);
-                folderLabel.setFont(JBUI.Fonts.label(navFontSize));
+                folderLabel.setFont(Fonts.label());
                 folderLabel.setForeground(DEFAULT_TEXT_COLOR);
                 folderLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 

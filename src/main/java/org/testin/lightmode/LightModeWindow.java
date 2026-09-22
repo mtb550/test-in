@@ -51,6 +51,7 @@ import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testrun.RunStatusService;
+import org.testin.util.Fonts;
 import org.testin.ui.Motion;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.StatusBarBase;
@@ -119,9 +120,9 @@ final class LightModeWindow {
     private final @NotNull TitleBarBtn stop = new TitleBarBtn(ExecutionControl.STOP.getLabel(), ExecutionControl.STOP.getIcon());
     private final @NotNull JBLabel counter = new JBLabel();
 
-    private final @NotNull Font setFont = TestCaseFont.label();
-    private final @NotNull Font descriptionFont = TestCaseFont.description();
-    private final @NotNull Font expectedFont = TestCaseFont.body();
+    private final @NotNull Font setFont = Fonts.label();
+    private final @NotNull Font descriptionFont = Fonts.title();
+    private final @NotNull Font expectedFont = Fonts.body();
 
     private final @NotNull JBLabel set = new JBLabel();
     private final @NotNull JTextArea description = Prose.of(descriptionFont, JBUI.CurrentTheme.Label.foreground());
@@ -189,7 +190,7 @@ final class LightModeWindow {
     private static @NotNull JBLabel clock(final @NotNull String meaning) {
         final @NotNull JBLabel label = new JBLabel();
         label.setToolTipText(meaning);
-        label.setFont(JBUI.Fonts.smallFont());
+        label.setFont(Fonts.small());
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
         return label;
@@ -380,7 +381,7 @@ final class LightModeWindow {
     }
 
     private @NotNull Font scaled(final @NotNull Font base) {
-        return TestCaseFont.zoomed(base, zoom);
+        return Fonts.zoomed(base, zoom);
     }
 
     private void bind(final @NotNull KeyStroke key, final @NotNull String name, final @NotNull Runnable action) {
@@ -562,8 +563,8 @@ final class LightModeWindow {
 
         bar.setBackground(JBUI.CurrentTheme.Advertiser.background());
 
-        start.addActionListener(e -> editor.onStartExecutionClicked());
-        stop.addActionListener(e -> editor.onStopExecutionClicked());
+        start.addActionListener(_ -> editor.onStartExecutionClicked());
+        stop.addActionListener(_ -> editor.onStopExecutionClicked());
 
         final @NotNull JBPanel<?> left = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(2), 0));
         left.setOpaque(false);
@@ -576,7 +577,7 @@ final class LightModeWindow {
 
         bar.add(left, BorderLayout.WEST);
         final @NotNull JBLabel runName = new JBLabel(editor.getParent().getName());
-        runName.setFont(JBUI.Fonts.label().biggerOn(1f));
+        runName.setFont(Fonts.body());
 
         bar.add(runName, BorderLayout.CENTER);
         bar.add(counter, BorderLayout.EAST);
@@ -590,7 +591,7 @@ final class LightModeWindow {
         final @NotNull TitleBarBtn button = new TitleBarBtn(Bundle.message("light.pin"), AllIcons.General.Pin_tab);
 
         button.setOn(frame.isAlwaysOnTop());
-        button.addActionListener(e -> {
+        button.addActionListener(_ -> {
             frame.setAlwaysOnTop(!frame.isAlwaysOnTop());
             button.setOn(frame.isAlwaysOnTop());
         });
