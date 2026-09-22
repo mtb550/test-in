@@ -18,19 +18,16 @@ package org.testin.bug;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.configurations.PathEnvironmentVariableUtil;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.util.io.FileUtil;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.config.BugRepository;
 import org.testin.logger.Logger;
 import org.testin.util.Bundle;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -93,10 +90,7 @@ public final class GitHubCli {
     }
 
     private static @NotNull Optional<ProcessOutput> start(final @NotNull List<String> arguments, final @NotNull Path workDirectory, final @NotNull ProgressIndicator indicator) {
-        final @Nullable File gh = PathEnvironmentVariableUtil.findExecutableInPathOnAnyOS("gh");
-        if (gh == null) return Optional.empty();
-
-        final @NotNull GeneralCommandLine command = new GeneralCommandLine(gh.getPath())
+        final @NotNull GeneralCommandLine command = new GeneralCommandLine("gh")
                 .withParameters(arguments)
                 .withWorkingDirectory(workDirectory)
                 .withCharset(StandardCharsets.UTF_8)

@@ -2,7 +2,7 @@
 
 # Standing decisions
 
-> Thirteen decisions in Testin look wrong until you know why they were made. Each
+> Fourteen decisions in Testin look wrong until you know why they were made. Each
 > one has been proposed for reversal at least once, and each reversal would have
 > broken something the decision exists to protect. They are written here so a
 > contributor reads the reason before writing the fix.
@@ -13,7 +13,7 @@
 | **What the numbers mean** | `Decision-001` and up, in the order they were recorded. A number is never reused and never renumbered                                             |
 | **Answers**               | Why a design that looks odd is deliberate, and what it costs to change                                                                            |
 | **State**                 | Written                                                                                                                                           |
-| **Checked against**       | `main` at `fe73596e`, 9 September 2026                                                                                                            |
+| **Checked against**       | `main` at `d1eaae84`, 22 September 2026                                                                                                           |
 | **Written to**            | [The standard](standard.md), as far as it applies. A decision is not a use case, so it has context, a decision and consequences instead of a flow |
 
 ---
@@ -424,6 +424,38 @@ on a pick, a clone, a rename - commits one machine's choice into the team's
 file without anyone deciding to, which is what Decision-011 was written
 against. Generating code without the file puts one test project's methods into
 a code project that is about another.
+
+---
+
+## Decision-014 — The tab foreground hook is experimental, and Testin uses it
+
+**Context.** A Testin editor opens a file that is not on disk, and the IDE
+paints the tab title of such a file in the "unknown file" color — the brown a
+file with no status gets. Beside an ordinary Java tab it reads as a warning
+about the tab rather than a name, and `7c7688fa` ("Grid view: multi-line steps,
+ESC, details on ENTER") fixed it by overriding
+`EditorTabColorProvider.getEditorTabForegroundColor`. That method is a default
+method marked `@ApiStatus.Experimental`, so every Marketplace verification
+report says *1 usage of experimental API* beside the Compatible verdict. The
+stable way to reach a tab's foreground is the file's status, and the hook for
+that lives in the VCS module.
+
+**Decision.** `TestinTabColorProvider` keeps the override, returning
+`TESTIN_TAB_FOREGROUND` for Testin's own files and nothing for every other
+file, and a release carries the experimental-API line on its plugin page.
+Decided 22 September 2026.
+
+**Consequences.** Each verification report lists one experimental usage, which
+is a warning and not a compatibility problem — the verdict stays Compatible and
+the release publishes. If the platform changes the method or takes it away,
+nothing throws: an override nobody calls leaves the tabs the color they had
+before, so the cost of being wrong is a tab color rather than a failure.
+
+**If you are about to reverse it.** Removing the override puts every Testin tab
+back in the "unknown file" color, in every IDE and both themes. Replacing it
+with a `FileStatusProvider` adds `com.intellij.modules.vcs` to a plugin whose
+only required dependency is `com.intellij.modules.platform` — the reason it
+runs in PyCharm, Rider, GoLand and WebStorm at all.
 
 ---
 
