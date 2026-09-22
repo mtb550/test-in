@@ -29,7 +29,7 @@ idea {
 }
 
 group = "org.testin"
-version = "2.12.0-alpha"
+version = "2.13.0-alpha"
 
 /**
  * The oldest IDE branch the plugin claims to support, verified alongside the
