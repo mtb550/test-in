@@ -65,8 +65,9 @@ There is no key for this. It is what the **Details** tab shows.
   priority as one chip, then the issue and the link that raises one. The
   duration carries a clock and a plain frame with nothing filled in, so it reads
   as a measurement rather than a verdict, and it is not the notched shape a
-  group badge uses. Who ran it and when are not on the panel at all - the test
-  run's own editor holds them.
+  group badge uses. Who ran it and when follow as a row of their own, in the
+  words **Created** already uses (Rule-VIEW-PANEL-061), because a name and a
+  date are read rather than glanced at.
 - **Rule-VIEW-PANEL-087** — The test case's band folds, and it is folded when
   a tester first meets it. Its name carries the arrow that opens it, and opening
   it shows every field the test case has, none of them folded again. The state

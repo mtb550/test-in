@@ -61,10 +61,11 @@ public class DetailsTab {
     final double WEIGHT_X = 1.0;
     final double SPACER_WEIGHT_Y = 1.0;
 
-    // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-086
+    // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-061, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-086
     private static @NotNull Band runBand(final @NotNull TestRunItems item, final @NotNull List<String> currentPath) {
         return Band.of(Bundle.message("details.band.run"), List.of(
                 new RunItemSummary(item, currentPath),
+                new AttributeRow(RunEditorAttributes.EXECUTED_BY.getName(), (_, _) -> Display.whoAndWhen(item.getExecutedBy(), item.getExecutedAt())),
                 new RunAttributeRow(RunEditorAttributes.ACTUAL_RESULT, item),
                 new StacktraceRow(item, currentPath)));
     }
