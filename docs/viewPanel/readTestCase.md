@@ -56,12 +56,12 @@ There is no key for this. It is what the **Details** tab shows.
   line of its own above its value, in the caption font, so the value has the
   whole width of the panel at any width.
 - **Rule-VIEW-PANEL-085** — The panel is three bands, always in this order: who
-  this is - the path with the id at its end, the title, the badges and the
-  action icons; **Execution result**, what one test run recorded; and **Test
-  case details**, what the test case says. A band's name carries a hairline to
-  the panel's edge, level with the middle of the words. A band with
-  nothing to show is not drawn at all, so the test editor, where there is no
-  run, shows the test case's band straight under the identity line.
+  this is - the path, the title, the badges and the action icons; **Execution
+  result**, what one test run recorded; and **Test case details**, what the test
+  case says. A band's name carries a hairline to the panel's edge, level with the
+  middle of the words. A band with nothing to show is not drawn at all, and
+  where only one band has anything to show its name is not drawn either: a
+  heading over the whole panel names nothing.
 - **Rule-VIEW-PANEL-086** — What a run recorded is one line under the band's
   name: the verdict in its own color, how long it took, the bug's severity and
   priority as one chip, then the issue and the link that raises one. The
@@ -70,23 +70,24 @@ There is no key for this. It is what the **Details** tab shows.
   group badge uses. Who ran it and when close the band as a row of their own, in
   the words **Created** already uses (Rule-VIEW-PANEL-061), because a name and a
   date are read after the failure rather than glanced at before it.
-- **Rule-VIEW-PANEL-087** — The test case's band folds, and it is folded when
-  a tester first meets it. Its name carries the arrow that opens it, and opening
-  it shows every field the test case has, none of them folded again. The state
-  is remembered for the IDE rather than for one test case, so a tester who opens
-  it keeps it open for the next test case they read.
+- **Rule-VIEW-PANEL-087** — The test case's band folds only where a run stands
+  above it, and there it is folded when a tester first meets it: its name carries
+  the arrow that opens it, and opening it shows every field the test case has.
+  In the test case editor there is no run, so the fields are drawn straight under
+  the identity line with nothing to open. The state is remembered for the IDE
+  rather than for one test case, so a tester who opens it keeps it open for the
+  next test case they read.
 
 ## The screen
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│   Demo > Test Cases > Accounts > Login   ( 3f2a05c1-...-9c1b ) [copy]    │
+│   Demo > Test Cases > Accounts > Login                                   │
 │                                                                          │
 │   Log in with a valid user                                               │
 │                                                                          │
 │   ( P1 ) ( Smoke )        [ go to code ] [ run ] [ tc ]                  │
 │                                                                          │
-│   ▾ TEST CASE DETAILS ─────────────────────────────────────────────────  │
 │   EXPECTED RESULT                                                        │
 │   The dashboard opens.                                                   │
 │   STEPS                                                                  │
@@ -102,13 +103,13 @@ There is no key for this. It is what the **Details** tab shows.
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The top part** — the path with the identity at its end, then the title,
-   then one line carrying the badges and the three icons
-   (Rule-VIEW-PANEL-085). Each one is numbered on
+1. **The top part** — the path, then the title, then one line carrying the
+   badges and the three icons (Rule-VIEW-PANEL-085). Each one is numbered on
    [the view panel page](main.md#the-panel).
-2. **The arrow** — the test case's band is folded when a tester first meets it.
-   Clicking its name opens it, and it stays open for the next test case they
-   read (Rule-VIEW-PANEL-087).
+2. **No heading, and nothing to open** — in the test case editor the fields are
+   the only thing on the panel, so they are drawn straight under the identity
+   line (Rule-VIEW-PANEL-087). Under a test run they fold behind **Test case
+   details** instead.
 3. **The captions** — the name of the field, on a line of its own above its
    value, in the caption font: JetBrains Mono, smaller than the value, in
    capitals, in gray (Rule-VIEW-PANEL-082).
@@ -132,7 +133,7 @@ There is no key for this. It is what the **Details** tab shows.
 | **Created**         | Who made it, and when                         |
 | **Updated**         | Who last changed it, and when                 |
 
-Above the rows sit the path with the identity at its end, the title and the
+Above the rows sit the path, the title and the
 badges. They are numbered on the panel drawing on
 [the view panel page](main.md#the-panel).
 

@@ -42,6 +42,13 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
     private static final @NotNull String CASE = Bundle.message("details.band.case").toUpperCase(Locale.ROOT);
     private static final @NotNull UUID ID = UUID.fromString("3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b");
     private static final @NotNull String LAST_STEP = "Login";
+    private static final @NotNull String STACKTRACE = """
+            java.lang.AssertionError: expected [true]
+                at one
+                at two
+                at three
+                at four
+                at five""";
 
     private @NotNull List<String> shown(final @NotNull Optional<TestRunItems> runItem) {
         final @NotNull JBPanel<?> tab = new JBPanel<>();
@@ -74,12 +81,22 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
         if (!text.isBlank()) words.add(text.trim());
     }
 
+    private static boolean holds(final @NotNull List<String> words, final @NotNull String text) {
+        return words.stream().anyMatch(word -> word.contains(text));
+    }
+
     private static @NotNull TestCaseDto testCase() {
         return TestCaseDto.builder().id(ID).description("Log in with a valid user").expectedResult("The dashboard opens").module("Accounts").build();
     }
 
     private static @NotNull TestRunItems failed() {
-        return TestRunItems.builder().id(UUID.randomUUID()).status(TestStatus.FAILED).actualResult("The session was dropped").duration(Duration.ofSeconds(134)).executedBy("muteb").build();
+        return TestRunItems.builder().id(ID).status(TestStatus.FAILED).actualResult("The session was dropped").duration(Duration.ofSeconds(134)).executedBy("muteb").stacktrace(STACKTRACE).build();
+    }
+
+    public void testAStacktraceLongerThanThePreviewOffersTheRest() {
+        final @NotNull List<String> words = shown(Optional.of(failed()));
+
+        assertTrue("the link to the rest of the error is missing: " + words, words.contains(Bundle.message("view.stacktrace.show.all", "6")));
     }
 
     public void testTheRunBandComesBeforeTheTestCaseBand() {
@@ -90,24 +107,23 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
         assertTrue("the test case band was drawn above the run band", words.indexOf(RUN) < words.indexOf(CASE));
     }
 
-    public void testATestCaseWithNoRunShowsNoRunBandAtAll() {
+    public void testATestCaseWithNoRunIsDrawnWithNoBandsAtAll() {
         final @NotNull List<String> words = shown(Optional.empty());
 
         assertFalse("the run band was drawn with nothing to put in it: " + words, words.contains(RUN));
-        assertTrue("the test case band was not drawn: " + words, words.contains(CASE));
+        assertFalse("a band's name was drawn over the only thing on the panel: " + words, words.contains(CASE));
+        assertTrue("the test case's fields were not drawn: " + words, holds(words, "The dashboard opens"));
     }
 
-    public void testTheIdIsTheLastStepOfTheBreadcrumb() {
-        final @NotNull List<String> words = shown(Optional.empty());
-
-        assertEquals("the id is not beside the path it belongs to: " + words, ID.toString(), words.get(words.indexOf(LAST_STEP) + 1));
+    public void testThePanelShowsNoTestCaseId() {
+        assertFalse("the panel is still drawing the id", shown(Optional.empty()).contains(ID.toString()));
     }
 
-    public void testTheTestCaseBandIsFoldedUntilItIsAskedFor() {
-        final @NotNull List<String> words = shown(Optional.empty());
+    public void testTheTestCaseBandIsFoldedWhereARunStandsAboveIt() {
+        final @NotNull List<String> words = shown(Optional.of(failed()));
 
         assertTrue("the test case band's name was not drawn: " + words, words.contains(CASE));
-        assertFalse("a test case field was drawn while the band was folded: " + words, words.contains("The dashboard opens"));
-        assertFalse("a test case field was drawn while the band was folded: " + words, words.contains("Accounts"));
+        assertFalse("a test case field was drawn while the band was folded: " + words, holds(words, "The dashboard opens"));
+        assertFalse("a test case field was drawn while the band was folded: " + words, holds(words, "Accounts"));
     }
 }

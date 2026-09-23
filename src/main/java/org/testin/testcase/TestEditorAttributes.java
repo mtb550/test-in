@@ -77,7 +77,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     ID(
             Bundle.message("attribute.id"),
-            ToolBarDefault.LOCKED_UNCHECKED,
+            ToolBarDefault.OFF,
             tc -> String.valueOf(tc.getId()),
             (_, _, _) -> true,
             GenType.NO_CODE_CHANGE,

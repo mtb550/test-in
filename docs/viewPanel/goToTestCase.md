@@ -1,20 +1,24 @@
 [Documentation](../README.md) › [The view panel](main.md) › UC-VIEW-PANEL-009
 
-# UC-VIEW-PANEL-009: Copy a test case's identity, or go to it
+# UC-VIEW-PANEL-009: Go to the test case
 
-**As a** tester, **I want** the test case's identity on my clipboard, **so that** I can paste it into a bug report and
-anyone can find the exact test
-case again.
+**As a** tester reading a test case in the panel, **I want** to open the test
+case itself, **so that** I can change it where it is edited rather than where it
+is read.
 
-The identity is a long code. It never changes, even when the title does. It
-sits at the end of the path, because the path and the identity answer the same
-question: which test case is this.
+The panel is read-only. This is how a tester who reached it from a gutter mark,
+a test run or a search gets to the editor that can change the test case.
 
-Getting to the test case itself is the third icon on the line below. That is
-how a tester who opened this panel from a gutter mark reaches the test case,
-when they want to.
+There is no key for it. It is the third icon on the identity line, beside **go
+to code** and **run**.
 
-There is no key for either. The pill and the button sit side by side.
+**The panel does not show the test case's identity.** It showed it in a pill
+with a copy button until 24 September 2026; the identity is a grid column now,
+off to start with and switched on from **Fields**
+([UC-EDITOR-PANEL-003](../editorPanel/chooseFields.md)). A 36-character code at
+the top of every panel was the loudest thing on it, and the thing it was for -
+naming the exact test case in a bug report - is written into the report by
+**Report a bug** without anyone copying anything.
 
 ## Rules
 
@@ -37,10 +41,6 @@ There is no key for either. The pill and the button sit side by side.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
-- **Rule-VIEW-PANEL-039** — The button turns into a green tick for one and a
-  half seconds, then turns back.
-- **Rule-VIEW-PANEL-040** — Copying raises no message. The tick is the whole
-  confirmation.
 - **Rule-VIEW-PANEL-063** — Going to the test case is an icon of its own,
   the third on the identity line, and the only thing that does it. It opens the
   test case's own test set editor and selects it there. The tree does not move:
@@ -52,40 +52,31 @@ There is no key for either. The pill and the button sit side by side.
 
 ## The screen
 
-The identity sits in a gray pill at the end of the path, with the button to its
-right.
+The icon is the last of the three, on the line under the title.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│   Demo > Test Cases > Login   ( 3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b )     │
-│                                                            [copy]          │
+│   ( P1 )  ( Smoke )          [ go to code ]  [ run ]  [ tc ]               │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The pill** — the test case's identity, in full.
-2. **The button** — its tooltip reads **Copy ID**. The pointer becomes a hand
-   over it.
+1. **The icon** — the same **tc** mark the cards draw on hover, so the gesture
+   looks the same wherever a tester meets it. Its tooltip reads **Navigate to
+   Test Case**.
+2. **The other two** — [UC-VIEW-PANEL-014](goToCode.md) and
+   [UC-VIEW-PANEL-012](runFromPanel.md). All three are always drawn.
 
 ## Main flow
 
-1. The tester clicks the button beside the identity.
-2. The whole identity goes on the clipboard.
-3. The button becomes a green tick.
-4. One and a half seconds later it becomes the copy button again.
-
-## Going to the test case instead
-
-1. The tester clicks the third icon on the identity line, the one that reads
-   **Navigate to Test Case**.
-2. The test set holding it opens in an editor, with the test case selected.
+1. The tester clicks the third icon.
+2. The test set holding the test case opens in an editor, with the test case
+   selected.
 3. Nothing else moves. The tree stays where it was.
 
-The path just above does move the tree, and that is the difference between the
+The path above it does move the tree, and that is the difference between the
 two: a path step names a place, and the icon names the test case.
 
 ## What Testin refuses
-
-Copying refuses nothing. There is no gray state and no way for it to fail.
 
 **If the test case has no test set to open** — the icon is gray, it does not
 grow under the pointer, and clicking it reads *There is no test set to open
@@ -95,10 +86,11 @@ test case from the run.
 
 ## Why it works this way
 
-The identity ties three things to a test case: its generated test method, its
-verdict in a test run, and its file on disk. A bug report that quotes the
-identity still points at the right test case after the description has been
-rewritten.
+The panel follows the tester and shows whatever they are looking at, from
+wherever they are looking at it - a gutter mark, a test run, a search. None of
+those is the place a test case is written. One icon closes that gap, and it
+refuses rather than disappearing when there is nowhere to go
+([Rule-VIEW-PANEL-056](goToCode.md) holds the other two to the same bargain).
 
 ---
 

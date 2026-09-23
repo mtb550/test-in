@@ -40,10 +40,12 @@ There is no key for this. The button's tooltip reads **Fields**.
   view is on screen.
 - **Rule-EDITOR-PANEL-022** — The choice is remembered, and is separate for a
   test set and a test run.
-- **Rule-EDITOR-PANEL-023** — Three fields cannot be changed. **Order** and **Description** are always shown, and **ID**
-  is never shown. Order is the
-  grid's row header and not a field a tester chooses: clicking it selects the
-  row, and `Enter` or double-clicking it opens the details panel.
+- **Rule-EDITOR-PANEL-023** — Two fields cannot be changed: **Order** and
+  **Description** are always shown. Order is the grid's row header and not a
+  field a tester chooses: clicking it selects the row, and `Enter` or
+  double-clicking it opens the details panel. **ID** is off to start with and can
+  be switched on like any other field - it is the only place a tester can read a
+  test case's identity, and the view panel does not show it.
 - **Rule-EDITOR-PANEL-024** — A burst of ticks costs one redraw, not one for
   each.
 
@@ -55,7 +57,7 @@ The list opens under the button. It has no title.
 ┌──────────────────────────────┐
 │ [x] Order            (gray)  │
 │ [x] Description      (gray)  │
-│ [ ] ID               (gray)  │
+│ [ ] ID                       │
 │ [x] Expected Result          │
 │ [ ] Steps                    │
 │ [x] Priority                 │
@@ -68,7 +70,7 @@ The list opens under the button. It has no title.
 1. **The list** — every field, one to a line, each with a tick box. The order is
    always the same.
 2. **A ticked box** — that field is shown, on the cards and in the grid.
-3. **Order, Description and ID** — drawn gray. Their boxes do not answer a click
+3. **Order and Description** — drawn gray. Their boxes do not answer a click
    or the space bar.
 4. **Every tick** — acts at once. The list stays open, so the tester can tick
    several.
@@ -79,7 +81,7 @@ The list opens under the button. It has no title.
 |-----------------|---------------------|----------------|
 | Order           | Yes                 | **No**         |
 | Description     | Yes                 | **No**         |
-| ID              | No                  | **No**         |
+| ID              | No                  | Yes            |
 | Expected Result | Yes                 | Yes            |
 | Steps           | No                  | Yes            |
 | Priority        | Yes                 | Yes            |

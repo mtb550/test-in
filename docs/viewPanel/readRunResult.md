@@ -49,7 +49,7 @@ identity line and above **Test case details** (Rule-VIEW-PANEL-085).
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│   Demo > Test Cases > Accounts > Login   ( 3f2a05c1-...-9c1b ) [copy]    │
+│   Demo > Test Cases > Accounts > Login                                   │
 │                                                                          │
 │   Log in with a valid user                                               │
 │                                                                          │

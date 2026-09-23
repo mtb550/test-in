@@ -32,6 +32,7 @@ import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.Picture;
+import org.testin.ui.framework.Prose;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 
@@ -88,13 +89,13 @@ public final class StacktraceRow extends BaseDetails {
         return addRow(panel, gbc, RunEditorAttributes.STACKTRACE.getName(), container, currentRow);
     }
 
+    // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-035
     private @NotNull JTextArea preview(final @NotNull List<String> lines) {
-        final @NotNull JTextArea area = new JTextArea(String.join("\n", lines.subList(0, Math.min(LINES_SHOWN, lines.size()))));
+        final @NotNull JTextArea area = Prose.of(String.join("\n", lines.subList(0, Math.min(LINES_SHOWN, lines.size()))));
+
         area.setFont(Fonts.code());
-        area.setOpaque(false);
-        area.setEditable(false);
-        area.setBorder(null);
         area.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         return area;
     }
 

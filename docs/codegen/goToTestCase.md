@@ -10,7 +10,7 @@ The view panel opens on that test case, showing its details. Nothing else moves:
 the tree stays where it was, no editor opens, and the caret stays on the method.
 
 Going to the test case is one more click, and it is
-[the identity in that panel](../viewPanel/copyIdentity.md).
+[the third icon in that panel](../viewPanel/goToTestCase.md).
 
 There is no key for this. The mark is in the gutter beside the method.
 

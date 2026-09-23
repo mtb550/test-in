@@ -33,7 +33,7 @@ it.
 | **UC-VIEW-PANEL-008** | [See the bugs still open on a test case](seeOpenBugs.md)        | Avoid raising a bug somebody has already raised.                 |
 | **UC-VIEW-PANEL-017** | [Move between the panel's tabs](moveBetweenTabs.md)             | Reach History and Open Bugs without the mouse.                   |
 |                       | **Working from the panel**                                      |                                                                  |
-| **UC-VIEW-PANEL-009** | [Copy a test case's identity](copyIdentity.md)                  | Name the exact test case in a bug report.                        |
+| **UC-VIEW-PANEL-009** | [Go to the test case](goToTestCase.md)                          | Open the test case's own editor from wherever it is being read.   |
 | **UC-VIEW-PANEL-010** | [Go to the test set the test case lives in](goToTestSet.md)     | Open the test set and see the test cases around it.              |
 | **UC-VIEW-PANEL-011** | [Change one field without leaving the panel](changeOneField.md) | Fix a wrong field without going back to the editor.              |
 | **UC-VIEW-PANEL-012** | [Run a test case from the panel](runFromPanel.md)               | Try the test case again while reading it.                        |
@@ -91,7 +91,7 @@ in front of them while they write down what actually happened.
 │   Details      History      Open Bugs                                      │
 ├────────────────────────────────────────────────────────────────────────────┤
 │                                                                            │
-│   Demo > Test Cases > Accounts > Login    ( 3f2a05c1-...-9c1b ) [copy]     │
+│   Demo > Test Cases > Accounts > Login                                     │
 │                                                                            │
 │   Log in with a valid user                                                 │
 │                                                                            │
@@ -116,8 +116,7 @@ in front of them while they write down what actually happened.
    gray when the panel was handed only one.
 2. **The three tabs** — **Details**, **History** and **Open Bugs**. **History**
    is empty today, because a test case records only its last edit.
-3. **The path** — one step for each folder above the test case, and the test
-   case's own identity at its end with a button that copies it. Only the last
+3. **The path** — one step for each folder above the test case. Only the last
    step opens anything.
 4. **The title** — the test case's description, the largest words on the panel.
 5. **The identity line** — the priority and one badge for each group, then the
@@ -133,7 +132,8 @@ in front of them while they write down what actually happened.
    [UC-VIEW-PANEL-005](readRunResult.md).
 7. **Test case details** — folded until a tester clicks its name, and then every
    field the test case has, with every empty one left out. The state is
-   remembered for the IDE rather than for one test case
+   remembered for the IDE rather than for one test case. In the test case editor
+   there is no run above it, so the fields are drawn with no heading and no fold
    (Rule-VIEW-PANEL-087).
 8. **The captions** — each on a line of its own above its value, in the
    caption font: JetBrains Mono, smaller than the value, in capitals, in gray.

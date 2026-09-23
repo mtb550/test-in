@@ -70,9 +70,9 @@ public class DetailsTab {
                 new AttributeRow(RunEditorAttributes.EXECUTED_BY.getName(), (_, _) -> Display.whoAndWhen(item.getExecutedBy(), item.getExecutedAt()))));
     }
 
-    // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-087
-    private static @NotNull Band testCaseBand() {
-        return Band.folding(Bundle.message("details.band.case"), TEST_CASE_OPEN, List.of(
+    // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-087
+    private static @NotNull List<BaseDetails> testCaseFields() {
+        return List.of(
                 new AttributeRow(TestEditorAttributes.EXPECTED_RESULT.getName(), (_, dto) -> TestEditorAttributes.EXPECTED_RESULT.displayValue(dto)),
                 new Steps(),
                 new AttributeRow(TestEditorAttributes.PRE_CONDITIONS.getName(), (_, dto) -> TestEditorAttributes.PRE_CONDITIONS.displayValue(dto)),
@@ -81,7 +81,7 @@ public class DetailsTab {
                 new AttributeRow(TestEditorAttributes.MODULE.getName(), (_, dto) -> TestEditorAttributes.MODULE.displayValue(dto)),
                 new AttributeRow(TestEditorAttributes.ORDER.getName(), (p, dto) -> String.valueOf(ExecutionPosition.of(p, dto))),
                 new AttributeRow(Bundle.message("details.created"), (_, dto) -> Display.whoAndWhen(dto.getCreatedBy(), dto.getCreatedAt())),
-                new AttributeRow(Bundle.message("details.updated"), (_, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt()))));
+                new AttributeRow(Bundle.message("details.updated"), (_, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt())));
     }
 
     // UC-VIEW-PANEL-004
@@ -137,12 +137,14 @@ public class DetailsTab {
         addVerticalSpacer(panel, row);
     }
 
-    // UC-VIEW-PANEL-004, UC-VIEW-PANEL-005, Rule-VIEW-PANEL-085
+    // UC-VIEW-PANEL-004, UC-VIEW-PANEL-005, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-087
     private @NotNull List<BaseDetails> detailRows(final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
         final @NotNull List<BaseDetails> rows = new ArrayList<>(List.of(new NavigationBar(currentPath), new Title(), new Identity()));
 
-        runItem.ifPresent(item -> rows.add(runBand(item, currentPath)));
-        rows.add(testCaseBand());
+        runItem.ifPresentOrElse(item -> {
+            rows.add(runBand(item, currentPath));
+            rows.add(Band.folding(Bundle.message("details.band.case"), TEST_CASE_OPEN, testCaseFields()));
+        }, () -> rows.addAll(testCaseFields()));
 
         return List.copyOf(rows);
     }

@@ -31,7 +31,6 @@ import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.util.Fonts;
 
-import javax.swing.Box;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
@@ -54,7 +53,6 @@ public class NavigationBar extends BaseDetails {
     final int PANEL_BORDER_LEFT = 16;
     final int PANEL_BORDER_BOTTOM = 5;
     final int PANEL_BORDER_RIGHT = 0;
-    final int ID_GAP = 10;
     final int GBC_INSETS_TOP = 12;
     final int GBC_INSETS_LEFT = 16;
     final int GBC_INSETS_BOTTOM = 0;
@@ -62,7 +60,7 @@ public class NavigationBar extends BaseDetails {
 
     private final @NotNull List<String> currentPath;
 
-    // UC-VIEW-PANEL-009, UC-VIEW-PANEL-010, Rule-VIEW-PANEL-041, Rule-VIEW-PANEL-063
+    // UC-VIEW-PANEL-010, Rule-VIEW-PANEL-041
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final @NotNull JBPanel<?> pathPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -110,9 +108,6 @@ public class NavigationBar extends BaseDetails {
                 }
             }
         }
-
-        pathPanel.add(Box.createHorizontalStrut(JBUI.scale(ID_GAP)));
-        pathPanel.add(IdBadge.of(dto));
 
         pathPanel.setBorder(JBUI.Borders.empty(PANEL_BORDER_TOP, PANEL_BORDER_LEFT, PANEL_BORDER_BOTTOM, PANEL_BORDER_RIGHT));
 
