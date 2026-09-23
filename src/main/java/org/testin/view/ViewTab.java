@@ -20,7 +20,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-
 import org.testin.util.Bundle;
 import org.testin.view.bugs.OpenBugsTab;
 import org.testin.view.details.DetailsTab;

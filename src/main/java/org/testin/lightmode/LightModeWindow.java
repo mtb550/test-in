@@ -51,13 +51,13 @@ import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testrun.RunStatusService;
-import org.testin.util.Fonts;
 import org.testin.ui.Motion;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.StatusBarBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
+import org.testin.util.Fonts;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 

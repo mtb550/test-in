@@ -25,7 +25,6 @@ import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 
 import javax.swing.JList;
-
 import java.util.Optional;
 
 public class RunListRenderer extends AbstractListRenderer<RunEditor> {

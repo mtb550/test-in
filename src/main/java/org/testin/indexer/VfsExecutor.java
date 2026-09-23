@@ -43,13 +43,13 @@ final class VfsExecutor {
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-019
-    private static void claim(final @NotNull Path path) {
-        Services.getInstance(OwnWrites.class).record(path);
+    private static void claim(final @NotNull Project p, final @NotNull Path path) {
+        Services.getInstance(OwnWrites.class).record(p, path);
     }
 
     void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull VfsOperation operation) {
         final @NotNull String errorTitle = Bundle.message("vfs.rename.failed.title");
-        claim(path);
+        claim(p, path);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Optional<VirtualFile> vf = find(path);
@@ -68,8 +68,8 @@ final class VfsExecutor {
     }
 
     void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull VfsBiOperation operation, final @NotNull Runnable onSuccess, final @NotNull Runnable onFailure) {
-        claim(sourcePath);
-        claim(targetPath);
+        claim(p, sourcePath);
+        claim(p, targetPath);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Optional<VirtualFile> sourceVf = find(sourcePath);
@@ -97,7 +97,7 @@ final class VfsExecutor {
 
     // UC-INTERNAL-005, Rule-INTERNAL-036
     void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onDeleted) {
-        claim(path);
+        claim(p, path);
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             if (Trash.accepted(p, path)) {
                 ApplicationManager.getApplication().invokeLater(() -> onDeleted.accept(true));

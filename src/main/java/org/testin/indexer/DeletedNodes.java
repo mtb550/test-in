@@ -18,6 +18,7 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -68,14 +69,14 @@ public final class DeletedNodes {
     }
 
     // UC-INTERNAL-005, Rule-INTERNAL-042
-    public boolean putBack(final @NotNull Path kept, final @NotNull Path original) {
+    public boolean putBack(final @NotNull Project p, final @NotNull Path kept, final @NotNull Path original) {
         if (Files.exists(original)) {
             Logger.warn("Not restoring " + original + ": something is there already.");
             return false;
         }
 
         try {
-            Services.getInstance(OwnWrites.class).record(original);
+            Services.getInstance(OwnWrites.class).record(p, original);
             Files.createDirectories(original.getParent());
 
             if (Files.isDirectory(kept)) FileUtil.copyDir(kept.toFile(), original.toFile());

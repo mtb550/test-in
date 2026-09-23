@@ -36,8 +36,8 @@ import org.testin.logger.Level;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
 import org.testin.setting.dialogs.TestinPathPanel;
-import org.testin.util.Fonts;
 import org.testin.util.Bundle;
+import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
 import java.nio.file.Files;

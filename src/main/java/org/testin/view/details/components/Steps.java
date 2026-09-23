@@ -22,9 +22,9 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
-import org.testin.util.Fonts;
 import org.testin.ui.framework.Prose;
 import org.testin.util.Display;
+import org.testin.util.Fonts;
 
 import javax.swing.BoxLayout;
 import javax.swing.JTextArea;

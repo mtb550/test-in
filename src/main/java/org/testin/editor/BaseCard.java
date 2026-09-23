@@ -28,9 +28,9 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Automated;
 import org.testin.ui.Badges;
-import org.testin.util.Fonts;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.RowStripe;
+import org.testin.util.Fonts;
 
 import javax.swing.BoxLayout;
 import javax.swing.JList;

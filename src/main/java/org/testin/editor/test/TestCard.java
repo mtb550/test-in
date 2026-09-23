@@ -29,8 +29,8 @@ import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.Badges;
 
 import java.awt.AlphaComposite;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;

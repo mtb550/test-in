@@ -20,8 +20,8 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.Fonts;
 import org.testin.util.Bundle;
+import org.testin.util.Fonts;
 import org.testin.util.Html;
 
 import javax.swing.BoxLayout;

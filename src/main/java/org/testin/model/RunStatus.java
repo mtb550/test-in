@@ -21,7 +21,6 @@ import com.intellij.ui.JBColor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-
 import org.testin.util.Bundle;
 
 import javax.swing.Icon;

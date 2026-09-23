@@ -23,9 +23,8 @@ import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-
-import org.testin.util.Fonts;
 import org.testin.util.Bundle;
+import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
 import java.awt.BorderLayout;

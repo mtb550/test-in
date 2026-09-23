@@ -19,7 +19,6 @@ package org.testin.model;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-
 import org.testin.util.Bundle;
 
 import java.util.ArrayList;

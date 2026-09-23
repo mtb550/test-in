@@ -16,6 +16,7 @@
 
 package org.testin.indexer;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.AsyncFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
@@ -34,20 +35,22 @@ import java.util.Set;
 public final class TestinFileWatcher implements AsyncFileListener {
     // UC-INTERNAL-003, Rule-INTERNAL-016, Rule-INTERNAL-019
     private static @NotNull Set<Path> changedTestProjects(final @NotNull List<? extends VFileEvent> events) {
-        final @NotNull List<Path> roots = Arrays.stream(ProjectManager.getInstance().getOpenProjects())
+        final @NotNull List<Project> watching = Arrays.stream(ProjectManager.getInstance().getOpenProjects())
                 .filter(p -> !p.isDisposed())
-                .map(p -> Services.getInstance(p, TestinRoot.class).absolutePath())
-                .filter(TestinRoot::isConfigured)
-                .distinct()
+                .filter(p -> TestinRoot.isConfigured(Services.getInstance(p, TestinRoot.class).absolutePath()))
                 .toList();
         final @NotNull OwnWrites ours = Services.getInstance(OwnWrites.class);
         final @NotNull Set<Path> testProjects = new HashSet<>();
 
         for (final VFileEvent event : events) {
-            changedFile(event)
-                    .filter(file -> !ours.areOurs(file))
-                    .flatMap(file -> roots.stream().flatMap(root -> WatchedPath.testProjectOf(file, root).stream()).findFirst())
-                    .ifPresent(testProjects::add);
+            changedFile(event).ifPresent(file -> {
+                for (final Project p : watching) {
+                    if (ours.areOurs(file, p)) continue;
+
+                    WatchedPath.testProjectOf(file, Services.getInstance(p, TestinRoot.class).absolutePath())
+                            .ifPresent(testProjects::add);
+                }
+            });
         }
 
         return testProjects;

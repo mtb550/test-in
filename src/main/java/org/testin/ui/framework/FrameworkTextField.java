@@ -23,8 +23,8 @@ import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBUI;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.Fonts;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.Fonts;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;

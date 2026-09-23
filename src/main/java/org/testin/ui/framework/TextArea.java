@@ -27,8 +27,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.ui.Caption;
 import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.Fonts;
 import org.testin.util.ClipboardContents;
+import org.testin.util.Fonts;
 
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;

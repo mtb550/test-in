@@ -28,6 +28,10 @@ import static org.testng.Assert.assertTrue;
 
 public class OwnWritesTest {
 
+    private static final @NotNull String THIS_WINDOW = "window-a";
+
+    private static final @NotNull String ANOTHER_WINDOW = "window-b";
+
     private static final byte @NotNull [] OURS = "{\"description\":\"Log in\"}".getBytes();
     private static final byte @NotNull [] THEIRS = "{\"description\":\"Log in as admin\"}".getBytes();
 
@@ -63,10 +67,27 @@ public class OwnWritesTest {
 
         try {
             final @NotNull OwnWrites ours = new OwnWrites();
-            ours.record(file);
-            ours.wrote(file, OURS);
+            ours.record(THIS_WINDOW, file);
+            ours.wrote(THIS_WINDOW, file, OURS);
 
-            assertTrue(ours.areOurs(file), "the plugin's own save must not rebuild the tree under the tester who caused it");
+            assertTrue(ours.areOurs(file, THIS_WINDOW), "the plugin's own save must not rebuild the tree under the tester who caused it");
+        } finally {
+            delete(file);
+        }
+    }
+
+    // UC-INTERNAL-003, Rule-INTERNAL-019
+    @Test
+    public void anotherWindowStillHearsTheWrite() {
+        final @NotNull Path file = tempFile();
+
+        try {
+            final @NotNull OwnWrites ours = new OwnWrites();
+            ours.record(THIS_WINDOW, file);
+            ours.wrote(THIS_WINDOW, file, OURS);
+
+            assertFalse(ours.areOurs(file, ANOTHER_WINDOW),
+                    "a second window on the same test project has not seen this write, so the event is its news to read");
         } finally {
             delete(file);
         }
@@ -78,12 +99,12 @@ public class OwnWritesTest {
 
         try {
             final @NotNull OwnWrites ours = new OwnWrites();
-            ours.record(file);
-            ours.wrote(file, OURS);
+            ours.record(THIS_WINDOW, file);
+            ours.wrote(THIS_WINDOW, file, OURS);
 
             testerEdits(file);
 
-            assertFalse(ours.areOurs(file),
+            assertFalse(ours.areOurs(file, THIS_WINDOW),
                     "a tester edited this file after the plugin wrote it, inside the window - their edit must reach the screen");
         } finally {
             delete(file);
@@ -96,9 +117,9 @@ public class OwnWritesTest {
 
         try {
             final @NotNull OwnWrites ours = new OwnWrites();
-            ours.record(file);
+            ours.record(THIS_WINDOW, file);
 
-            assertTrue(ours.areOurs(file), "the claim is made before the write, so an event during it is still ours");
+            assertTrue(ours.areOurs(file, THIS_WINDOW), "the claim is made before the write, so an event during it is still ours");
         } finally {
             delete(file);
         }
@@ -109,7 +130,7 @@ public class OwnWritesTest {
         final @NotNull Path file = tempFile();
 
         try {
-            assertFalse(new OwnWrites().areOurs(file));
+            assertFalse(new OwnWrites().areOurs(file, THIS_WINDOW));
         } finally {
             delete(file);
         }

@@ -22,8 +22,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
-import org.testin.util.Fonts;
 import org.testin.ui.framework.Prose;
+import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
 import javax.swing.JTextArea;

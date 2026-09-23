@@ -28,7 +28,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
-
 import org.testin.util.Bundle;
 
 import javax.swing.JButton;

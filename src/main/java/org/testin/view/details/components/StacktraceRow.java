@@ -31,9 +31,9 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.testrun.RunEditorAttributes;
-import org.testin.util.Fonts;
 import org.testin.ui.framework.Picture;
 import org.testin.util.Bundle;
+import org.testin.util.Fonts;
 
 import javax.swing.BoxLayout;
 import javax.swing.Icon;

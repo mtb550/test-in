@@ -35,8 +35,8 @@ import org.testin.testcase.Rank;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.Fonts;
 import org.testin.util.Bundle;
+import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
 import java.awt.BorderLayout;

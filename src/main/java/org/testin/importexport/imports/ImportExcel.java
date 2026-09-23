@@ -26,8 +26,8 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
+import org.testin.testcase.TestEditorAttributes;
 
 import java.io.File;
 import java.io.FileInputStream;

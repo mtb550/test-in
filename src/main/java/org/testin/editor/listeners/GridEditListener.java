@@ -27,8 +27,8 @@ import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseSnapshot;
-import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 

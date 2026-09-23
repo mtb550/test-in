@@ -26,9 +26,9 @@ import org.testin.model.TestRunItems;
 import org.testin.services.Services;
 import org.testin.testrun.RunStatusService;
 import org.testin.testrun.failure.FailureFields;
-import org.testin.util.Fonts;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RowStripe;
+import org.testin.util.Fonts;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;

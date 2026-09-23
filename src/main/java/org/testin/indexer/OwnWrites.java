@@ -17,11 +17,11 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.SystemInfo;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-
 import org.testin.logger.Logger;
 
 import java.io.IOException;
@@ -57,21 +57,36 @@ public final class OwnWrites {
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-019
-    public void record(final @NotNull Path path) {
+    public void record(final @NotNull Project p, final @NotNull Path path) {
+        record(p.getLocationHash(), path);
+    }
+
+    void record(final @NotNull String window, final @NotNull Path path) {
         forgetOldEntries();
-        written.put(key(path), new Claim(System.currentTimeMillis(), NOTHING_TO_COMPARE));
+        written.put(key(path), new Claim(System.currentTimeMillis(), NOTHING_TO_COMPARE, window));
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-019, Rule-INTERNAL-064
-    public void wrote(final @NotNull Path path, final byte @NotNull [] content) {
+    public void wrote(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] content) {
+        wrote(p.getLocationHash(), path, content);
+    }
+
+    void wrote(final @NotNull String window, final @NotNull Path path, final byte @NotNull [] content) {
         forgetOldEntries();
-        written.put(key(path), new Claim(System.currentTimeMillis(), content));
+        written.put(key(path), new Claim(System.currentTimeMillis(), content, window));
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-019, Rule-INTERNAL-064
-    public boolean areOurs(final @NotNull Path path) {
+    // UC-INTERNAL-003, Rule-INTERNAL-019
+    public boolean areOurs(final @NotNull Path path, final @NotNull Project p) {
+        return areOurs(path, p.getLocationHash());
+    }
+
+    // UC-INTERNAL-003, Rule-INTERNAL-019
+    boolean areOurs(final @NotNull Path path, final @NotNull String window) {
         final @NotNull Optional<Claim> claim = Optional.ofNullable(written.get(key(path)))
-                .filter(one -> System.currentTimeMillis() - one.at() < SETTLES_IN_MILLIS);
+                .filter(one -> System.currentTimeMillis() - one.at() < SETTLES_IN_MILLIS)
+                .filter(one -> one.by().equals(window));
 
         if (claim.isEmpty()) return false;
 
@@ -85,6 +100,6 @@ public final class OwnWrites {
         written.values().removeIf(one -> now - one.at() >= SETTLES_IN_MILLIS);
     }
 
-    private record Claim(long at, byte @NotNull [] content) {
+    private record Claim(long at, byte @NotNull [] content, @NotNull String by) {
     }
 }

@@ -33,8 +33,8 @@ import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
+import org.testin.testcase.TestEditorAttributes;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.RowStripe;
 

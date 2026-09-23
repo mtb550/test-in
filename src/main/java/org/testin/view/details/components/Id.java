@@ -27,15 +27,15 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.NavigateToTestCaseAction;
-import org.testin.util.Fonts;
 import org.testin.util.Bundle;
+import org.testin.util.Fonts;
 
 import javax.swing.Timer;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.RenderingHints;
 import java.awt.datatransfer.StringSelection;

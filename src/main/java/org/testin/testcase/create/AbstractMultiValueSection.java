@@ -79,8 +79,10 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
         return wrapper;
     }
 
+    // Rule-INTERNAL-057
     @Override
     public void focusOnShow() {
+        if (!fields.isEmpty()) fields.getLast().requestFocus();
     }
 
     public void showSection(final @NotNull JBPanel<?> contentPanel, final @NotNull Runnable repackAction) {
@@ -90,7 +92,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
 
         ApplicationManager.getApplication().invokeLater(() -> {
             repackAction.run();
-            if (!fields.isEmpty()) fields.getLast().requestFocus();
+            focusOnShow();
         });
     }
 

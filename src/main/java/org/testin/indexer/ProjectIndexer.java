@@ -512,7 +512,7 @@ public final class ProjectIndexer {
 
     // UC-INTERNAL-005, Rule-INTERNAL-042
     public boolean restoreNode(final @NotNull Path kept, final @NotNull Path original) {
-        if (!Services.getInstance(DeletedNodes.class).putBack(kept, original)) return false;
+        if (!Services.getInstance(DeletedNodes.class).putBack(p, kept, original)) return false;
 
         refreshDirectory(original);
         refreshIndexedProject(original);

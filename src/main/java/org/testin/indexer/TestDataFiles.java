@@ -103,12 +103,12 @@ final class TestDataFiles {
         }
 
         try {
-            Services.getInstance(OwnWrites.class).record(path);
+            Services.getInstance(OwnWrites.class).record(p, path);
 
             FileUtil.createParentDirs(path.toFile());
             Files.write(path, jsonBytes);
 
-            Services.getInstance(OwnWrites.class).wrote(path, jsonBytes);
+            Services.getInstance(OwnWrites.class).wrote(p, path, jsonBytes);
             return true;
         } catch (final IOException ex) {
             reportWriteFailure(p, path, ex);
@@ -119,8 +119,8 @@ final class TestDataFiles {
     // UC-INTERNAL-008, Rule-INTERNAL-091
     boolean move(final @NotNull Project p, final @NotNull Path from, final @NotNull Path to) {
         try {
-            Services.getInstance(OwnWrites.class).record(from);
-            Services.getInstance(OwnWrites.class).record(to);
+            Services.getInstance(OwnWrites.class).record(p, from);
+            Services.getInstance(OwnWrites.class).record(p, to);
 
             Files.move(from, to);
             return true;
@@ -134,7 +134,7 @@ final class TestDataFiles {
     // UC-INTERNAL-008, Rule-INTERNAL-091, Rule-INTERNAL-036
     boolean removeTree(final @NotNull Project p, final @NotNull Path folder) {
         try (Stream<Path> inside = Files.walk(folder)) {
-            inside.forEach(path -> Services.getInstance(OwnWrites.class).record(path));
+            inside.forEach(each -> Services.getInstance(OwnWrites.class).record(p, each));
         } catch (final IOException ex) {
             Logger.warn("Could not claim what is inside " + folder + ": " + ex.getMessage());
         }
@@ -156,7 +156,7 @@ final class TestDataFiles {
     // UC-INTERNAL-005, Rule-INTERNAL-036
     boolean delete(final @NotNull Project p, final @NotNull Path path) {
         try {
-            Services.getInstance(OwnWrites.class).record(path);
+            Services.getInstance(OwnWrites.class).record(p, path);
 
             if (!Trash.accepted(p, path)) Files.deleteIfExists(path);
         } catch (final IOException ex) {

@@ -29,8 +29,8 @@ import org.testin.model.FailureDetail;
 import org.testin.model.OpenBug;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.util.Fonts;
 import org.testin.util.Bundle;
+import org.testin.util.Fonts;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;

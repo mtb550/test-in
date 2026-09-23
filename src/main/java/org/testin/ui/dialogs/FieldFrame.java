@@ -23,8 +23,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.BasicStroke;
 import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.awt.geom.RoundRectangle2D;
 
 // Rule-INTERNAL-096

@@ -22,7 +22,6 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.DialogComponent;
 
-import java.util.function.Supplier;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.ScrollPaneConstants;
@@ -31,6 +30,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.function.Supplier;
 
 // UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-006
 public final class TestCaseForm implements DialogComponent {

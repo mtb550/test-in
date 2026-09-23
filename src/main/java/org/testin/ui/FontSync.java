@@ -27,12 +27,12 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
 import java.awt.Component;
 import java.awt.Container;
 import java.util.Optional;
-import org.testin.util.Fonts;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FontSync {

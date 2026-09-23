@@ -181,7 +181,7 @@ final class NodeFiles {
             if (!Services.getInstance(p, TestDataFiles.class).write(p, testCaseFile.resolveSibling(FileKind.TEST_CASE.fileName(fresh)), tc))
                 return false;
 
-            Services.getInstance(OwnWrites.class).record(testCaseFile);
+            Services.getInstance(OwnWrites.class).record(p, testCaseFile);
             Files.delete(testCaseFile);
             return true;
 

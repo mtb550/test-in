@@ -21,7 +21,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
-
 import org.testin.util.Bundle;
 
 import javax.swing.SwingConstants;
