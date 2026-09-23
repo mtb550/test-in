@@ -601,15 +601,6 @@ public final class ProjectIndexer {
         return store.readMarker(dirPath, kind, name, markerClass);
     }
 
-    // UC-INTERNAL-008, Rule-INTERNAL-091
-    public void convertEveryProject() {
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            if (p.isDisposed()) return;
-
-            Services.getInstance(Conversions.class).sweep(p);
-        });
-    }
-
     // Rule-INTERNAL-091
     public @NotNull Optional<String> whyNotRead(final @NotNull Path projectPath) {
         return store.whyNotRead(projectPath);

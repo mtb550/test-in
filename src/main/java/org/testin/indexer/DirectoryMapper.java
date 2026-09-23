@@ -57,6 +57,9 @@ public final class DirectoryMapper {
                 .path2(DirectoryDto.pathOf(List.of(), fileName))
                 .build();
 
+        // Rule-INTERNAL-091
+        tp.getMarker().setFormat(TestProjectMarker.FORMAT);
+
         tp.setTestCasesDirectory(getTestCasesRootNode(p, path, tp));
         tp.setTestRunsDirectory(getTestRunsRootNode(p, path, tp));
 

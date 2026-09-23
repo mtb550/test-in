@@ -164,7 +164,7 @@ public class SampleProjectTest {
             assertFalse(results.isEmpty(), "A run with no results shows nothing: " + folder);
             assertTrue(jsonFilesIn(folder).isEmpty(),
                     "A run folder holds one file per result, named by its test case, and no results file of its own."
-                            + " A run.json or a file named after the folder is the old format: " + folder);
+                            + " A JSON file there is the format this build does not read: " + folder);
 
             for (final Path file : results) {
                 final @NotNull TestRunItems item = read(file, TestRunItems.class);

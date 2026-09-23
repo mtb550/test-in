@@ -14,6 +14,12 @@ There is no key for this. It starts on its own.
 
 - **Rule-INTERNAL-003** — A folder is a test project only if it holds a file
   named `.tp`.
+- **Rule-INTERNAL-091** — A test project says which format its files are in, in
+  its `.tp`. This build reads format 2 and nothing else: a project without the
+  number, or with a lower one, is shown refused and named the release that
+  brings it forward - 2.13.0-alpha - and a project with a higher number is
+  refused as written by a newer Testin. A refused project is not read and not
+  written: no file inside it is opened.
 - **Rule-INTERNAL-004** — Only the folders directly inside the Testin folder are
   looked at. A test project one level deeper is not found.
 - **Rule-INTERNAL-005** — A test project that is not **Active** is read,

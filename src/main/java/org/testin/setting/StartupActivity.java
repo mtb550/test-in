@@ -83,10 +83,7 @@ public final class StartupActivity implements ProjectActivity {
             Logger.warn("No test project chosen for " + p.getName());
         }
 
-        // UC-INTERNAL-008, Rule-INTERNAL-091
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        indexer.convertEveryProject();
-        indexer.indexWithProgress();
+        Services.getInstance(p, ProjectIndexer.class).indexWithProgress();
     }
 
     // UC-SETTING-002, Rule-SETTING-014

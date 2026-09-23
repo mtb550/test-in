@@ -1049,7 +1049,12 @@ function Read-HtmlParagraphInMarkdown {
         which is where CLAUDE.md sits and where the inspector does not look.
     #>
     foreach ($relative in @(git -C $repo ls-files '*.md')) {
-        $lines = [System.IO.File]::ReadAllLines((Join-Path $repo $relative))
+        # A page deleted in the working tree is still tracked until the delete is staged,
+        # and a gate that throws on it reports nothing at all.
+        $path = Join-Path $repo $relative
+        if (-not (Test-Path $path)) { continue }
+
+        $lines = [System.IO.File]::ReadAllLines($path)
 
         for ($i = 0; $i -lt $lines.Count; $i++) {
             if ($lines[$i].Trim() -ne '<p>') { continue }

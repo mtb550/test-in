@@ -116,7 +116,7 @@ final class TestDataFiles {
         }
     }
 
-    // UC-INTERNAL-008, Rule-INTERNAL-091
+    // Rule-INTERNAL-091
     boolean move(final @NotNull Project p, final @NotNull Path from, final @NotNull Path to) {
         try {
             Services.getInstance(OwnWrites.class).record(p, from);
@@ -131,7 +131,7 @@ final class TestDataFiles {
         }
     }
 
-    // UC-INTERNAL-008, Rule-INTERNAL-091, Rule-INTERNAL-036
+    // Rule-INTERNAL-091, Rule-INTERNAL-036
     boolean removeTree(final @NotNull Project p, final @NotNull Path folder) {
         try (Stream<Path> inside = Files.walk(folder)) {
             inside.forEach(each -> Services.getInstance(OwnWrites.class).record(p, each));

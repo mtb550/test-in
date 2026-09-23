@@ -130,9 +130,6 @@ final class IndexingScanner {
     // UC-INTERNAL-002, Rule-INTERNAL-005, Rule-INTERNAL-007, Rule-INTERNAL-091
     private void scanProjectContents(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
-            // UC-INTERNAL-008, Rule-INTERNAL-091
-            Services.getInstance(Conversions.class).ensure(p, projectPath);
-
             final @NotNull TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).getTestProjectNode(p, projectPath);
 
             // Rule-INTERNAL-091

@@ -48,7 +48,7 @@ public class WatchedPathTest {
 
     @Test
     public void everyFileOfOneProjectAnswersTheSameProject() {
-        assertEquals(of(PROJECT.resolve("Test Runs/Cycle 1/run.json")), of(PROJECT.resolve(".tp")),
+        assertEquals(of(PROJECT.resolve("Test Runs/Cycle 1/Cycle 1.tr")), of(PROJECT.resolve(".tp")),
                 "forty files changed in one project have to collapse to one scan");
     }
 

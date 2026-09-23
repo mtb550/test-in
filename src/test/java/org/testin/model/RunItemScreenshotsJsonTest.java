@@ -75,7 +75,7 @@ public class RunItemScreenshotsJsonTest {
             assertTrue(TestRunDirectoryDto.isScreenshotName(name));
         });
 
-        assertFalse(TestRunDirectoryDto.isScreenshotName("run.json"));
+        assertFalse(TestRunDirectoryDto.isScreenshotName("Cycle 1.tr"));
         assertFalse(TestRunDirectoryDto.isScreenshotName("my notes.png"), "a PNG put there by hand under another name is not a screenshot");
     }
 }

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
+import org.testin.model.markers.TestProjectMarker;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class SyntheticTree {
@@ -54,8 +55,9 @@ final class SyntheticTree {
               "createdAt" : "Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]",
               "modifiedBy" : "Sara Al-Otaibi",
               "modifiedAt" : "Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]",
-              "status" : "ACTIVE"
-            }""";
+              "status" : "ACTIVE",
+              "format" : %d
+            }""".formatted(TestProjectMarker.FORMAT);
 
     static @NotNull String testCase(final @NotNull UUID id, final @NotNull String order) {
         return TEST_CASE.formatted(order, id);

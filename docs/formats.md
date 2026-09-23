@@ -319,9 +319,10 @@ reason, and those aliases are permanent.
 
 **The project says which format its files are in**, in its `.tp`: `format`, and
 2 is the format this page describes. A project without the number, or with a
-lower one, is converted once before it is read - test cases moved to `<id>.tc`,
-every marker given an `id`, and its test runs removed ([UC-INTERNAL-008](internal/convertTestData.md),
-Rule-INTERNAL-091). A project
+lower one, is not read at all: it is shown refused and named the one release
+that brings it forward, 2.13.0-alpha, which moved its test cases to `<id>.tc`,
+gave every marker an `id` and removed its test runs
+([UC-INTERNAL-002](internal/readTestProject.md), Rule-INTERNAL-091). A project
 with a **higher** number is not read at all: a format this build does not know is
 refused rather than guessed at, because reading it as format 2 would delete what
 this build cannot see.
