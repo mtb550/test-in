@@ -36,10 +36,10 @@ There is no key for this. The link sits where the value would have been.
   short it is. It offers one link, **Exception**, and there is no caption above
   it: the link is its own name.
 - **Rule-VIEW-PANEL-035** — The window is the only place the error is read, so it
-  holds the actual result and the error together, in that order, with a blank
-  line between them.
-- **Rule-VIEW-PANEL-036** — The text in the dialog can be selected and copied.
-  It can also be typed into, and nothing typed there is ever saved.
+  holds the test case and what the tester wrote about it above the error. Those
+  two are read only; the error sits in a box of its own.
+- **Rule-VIEW-PANEL-036** — Everything in the window can be selected and copied.
+  The error's box can also be typed into, and nothing typed there is ever saved.
 - **Rule-VIEW-PANEL-081** — The **Exception** link comes first on its line, then
   one thumbnail for each screenshot pasted with the failure, the one the failure
   form shows. Hovering names the file, and a click opens that screenshot at its
@@ -66,10 +66,10 @@ of its own.
 ├──────────────────────────────────────────────────────────────┤
 │  TEST CASE                                                   │
 │  Log in with a valid user                                    │
+│  ACTUAL RESULT                                               │
+│  The session was dropped.                                    │
 │                                                              │
 │  ┌────────────────────────────────────────────────────────┐  │
-│  │ The session was dropped.                               │  │
-│  │                                                        │  │
 │  │ java.lang.AssertionError: expected [true]              │  │
 │  │   at org.testin.demo.LoginTest.valid(LoginTest:41)     │  │
 │  │   at org.testng.internal.Invoker.invoke(Invoker:583)   │  │
@@ -80,8 +80,10 @@ of its own.
 ```
 
 1. **The title** — always the one word, the same word the link reads.
-2. **Test Case** — the description of the test case that failed.
-3. **The text** — the message, a blank line, then the whole error.
+2. **Test Case** and **Actual Result** — the description of the test case that
+   failed, and what the tester wrote about it. Both are read: they can be
+   selected and copied, and neither can be typed into.
+3. **The box** — the error, and nothing else.
 4. **The bottom line** — `Escape` closes it.
 
 ## Main flow

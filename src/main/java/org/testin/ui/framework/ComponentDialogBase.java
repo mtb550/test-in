@@ -45,8 +45,8 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221
-    public static @NotNull ComponentDialogBase<SpellCheckedField> spellCheckedField(final @NotNull Project p, final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value) {
-        return new ComponentDialogBase<>(new SpellCheckedField(p, caption, placeholder, value));
+    public static @NotNull ComponentDialogBase<SpellCheckedArea> spellCheckedArea(final @NotNull Project p, final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value, final int rows) {
+        return new ComponentDialogBase<>(new SpellCheckedArea(p, caption, placeholder, value, rows));
     }
 
     public static @NotNull ComponentDialogBase<DialogMessage> message(final @NotNull String text) {

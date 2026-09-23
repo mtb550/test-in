@@ -21,6 +21,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
@@ -43,20 +44,14 @@ public final class ErrorDetailsDialog extends AbstractFrameworkDialog {
         components = List.of(
                 ComponentDialogBase.details()
                         .row(Bundle.message("caption.test.case"), testCaseDescription)
+                        .row(RunEditorAttributes.ACTUAL_RESULT.getName(), message)
                         .build(),
                 ComponentDialogBase.textArea()
-                        .value(fullText(message, stacktrace))
+                        .value(stacktrace)
                         .rows(VISIBLE_ROWS)
                         .build());
 
         shortcuts = List.of(StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("shortcut.close"), this::closeCancel));
-    }
-
-    private static @NotNull String fullText(final @NotNull String message, final @NotNull String stacktrace) {
-        if (message.isBlank()) return stacktrace;
-        if (stacktrace.isBlank()) return message;
-
-        return message + "\n\n" + stacktrace;
     }
 
     @Override

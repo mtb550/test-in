@@ -62,6 +62,10 @@ form before it records anything.
   there, or no longer covers the test case. Then nothing is recorded, a
   message says why, and in light mode the form stays open with everything
   typed still in it.
+- **Rule-EDITOR-PANEL-246** — What actually happened is typed into a box several
+  lines tall, not a single line: a tester writing why a test case failed writes
+  sentences. Enter records the failure, and Ctrl+Enter adds a line, the same
+  bargain a grid cell makes (Rule-EDITOR-PANEL-048).
 
 ## The screen
 
@@ -73,7 +77,10 @@ form before it records anything.
 │  [E] The dashboard opens.                                    │
 │                                                              │
 │  ACTUAL RESULT                                               │
-│  [ set actual result…                                     ]  │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ set actual result…                                     │  │
+│  │                                                        │  │
+│  └────────────────────────────────────────────────────────┘  │
 │                                                              │
 │  BUG SEVERITY                                                │
 │  ( ) Blocker  ( ) Major  ( ) Minor  (x) Enhancement          │
@@ -97,9 +104,12 @@ form before it records anything.
 1. **Description** and **Expected** — what the test case says, each after its
    icon, **D** and **E**, as the test case form draws them. They show the tester
    what should have happened. Neither can be typed into.
-2. **The first box** — what actually happened. Its caption above it reads **Actual Result**, and its gray hint is inside
-   it. A misspelled word in it is
-   underlined, and `Alt+Enter` offers the corrections.
+2. **The first box** — what actually happened, three lines tall, because a
+   tester writing why a test case failed writes sentences
+   (Rule-EDITOR-PANEL-246). Its caption above it reads **Actual Result**, and its
+   gray hint is inside it. A misspelled word in it is underlined, and
+   `Alt+Enter` offers the corrections. `Ctrl+Enter` adds a line; `Enter` still
+   saves.
 3. **Bug Severity** — four choices, with the least serious chosen.
 4. **Bug Priority** — three choices, with the lowest chosen.
 5. **The big box** — for the error or the exception, as text. Its caption above

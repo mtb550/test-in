@@ -81,7 +81,8 @@ identity line and above **Test case details** (Rule-VIEW-PANEL-085).
 5. **Actual result** — the one sentence the band holds, its caption on a line of
    its own above it (Rule-VIEW-PANEL-082).
 6. **Exception** — the application's own error, which the panel never shows. The
-   link opens it in a window, beside a thumbnail of each screenshot. That is
+   link opens it in a window that repeats the actual result above it, read only,
+   beside a thumbnail of each screenshot. That is
    [UC-VIEW-PANEL-006](readStacktrace.md) and Rule-VIEW-PANEL-034.
 7. **Executed by** — last in the band, because who ran it is read after what
    happened. One row, in the words **Created** uses on the test case's own band

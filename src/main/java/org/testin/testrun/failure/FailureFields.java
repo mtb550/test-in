@@ -26,7 +26,7 @@ import org.testin.services.Services;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
-import org.testin.ui.framework.SpellCheckedField;
+import org.testin.ui.framework.SpellCheckedArea;
 import org.testin.ui.framework.TextArea;
 import org.testin.util.Bundle;
 
@@ -38,7 +38,9 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 
 public final class FailureFields {
-    private final @NotNull ComponentDialogBase<SpellCheckedField> actualResult;
+    private static final int ACTUAL_RESULT_ROWS = 3;
+
+    private final @NotNull ComponentDialogBase<SpellCheckedArea> actualResult;
     private final @NotNull ComponentDialogBase<RadioSelection<BugSeverity>> severity;
     private final @NotNull ComponentDialogBase<RadioSelection<BugPriority>> priority;
     private final @NotNull ComponentDialogBase<TextArea> errorCapture;
@@ -51,7 +53,7 @@ public final class FailureFields {
         IntStream.range(0, screenshots.size()).forEach(index -> named.put(screenshots.get(index), runItem.getScreenshots().get(index)));
 
         // Rule-EDITOR-PANEL-221
-        actualResult = ComponentDialogBase.spellCheckedField(p, RunEditorAttributes.ACTUAL_RESULT.getName(), Bundle.message("dialog.failure.placeholder.actual"), runItem.getActualResult());
+        actualResult = ComponentDialogBase.spellCheckedArea(p, RunEditorAttributes.ACTUAL_RESULT.getName(), Bundle.message("dialog.failure.placeholder.actual"), runItem.getActualResult(), ACTUAL_RESULT_ROWS);
 
         severity = ComponentDialogBase.<BugSeverity>radios(RunEditorAttributes.BUG_SEVERITY.getName())
                 .options(BugSeverity.CHOICES, BugSeverity::getLabel)
@@ -100,7 +102,7 @@ public final class FailureFields {
         errorCapture.getComponent().onImagesChanged(changed);
     }
 
-    public @NotNull SpellCheckedField firstField() {
+    public @NotNull SpellCheckedArea firstField() {
         return actualResult.getComponent();
     }
 }
