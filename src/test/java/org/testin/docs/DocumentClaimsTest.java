@@ -153,6 +153,24 @@ public class DocumentClaimsTest {
         return FENCED.matcher(text).replaceAll("").replaceAll(INLINE.pattern(), "");
     }
 
+    private static @NotNull String named(final @NotNull Path page) {
+        final @NotNull Path root = Paths.get(".").toAbsolutePath().normalize();
+
+        return String.valueOf(root.relativize(page.toAbsolutePath().normalize()));
+    }
+
+    private static @NotNull List<Path> everyPage() {
+        final @NotNull List<Path> pages = new ArrayList<>(markdownFiles());
+
+        try (Stream<Path> root = Files.list(Paths.get("."))) {
+            root.filter(file -> file.getFileName().toString().endsWith(".md")).forEach(pages::add);
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not read the repository root: " + ex.getMessage(), ex);
+        }
+
+        return pages;
+    }
+
     private static @NotNull List<Path> markdownFiles() {
         try (Stream<Path> tree = Files.walk(DOCS)) {
             return tree.filter(file -> file.getFileName().toString().endsWith(".md")).toList();
@@ -173,7 +191,7 @@ public class DocumentClaimsTest {
     public void everyInternalLinkGoesSomewhere() {
         final @NotNull List<String> broken = new ArrayList<>();
 
-        for (final Path page : markdownFiles()) {
+        for (final Path page : everyPage()) {
             final @NotNull Matcher link = LINK.matcher(withoutCode(read(page)));
 
             while (link.find()) {
@@ -185,10 +203,10 @@ public class DocumentClaimsTest {
 
                 final @NotNull Path resolved = page.getParent().resolve(file).normalize();
 
-                if (!resolved.startsWith(DOCS)) {
-                    broken.add(DOCS.relativize(page) + " points at " + target + ", which is outside docs/");
+                if (!resolved.normalize().toAbsolutePath().startsWith(Paths.get(".").toAbsolutePath().normalize())) {
+                    broken.add(named(page) + " points at " + target + ", which is outside the repository");
                 } else if (!Files.exists(resolved)) {
-                    broken.add(DOCS.relativize(page) + " points at " + target);
+                    broken.add(named(page) + " points at " + target);
                 }
             }
         }

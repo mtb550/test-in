@@ -270,6 +270,13 @@ with `./gradlew publishPlugin`, which reads the Marketplace token from
 promoted to the default channel from the Marketplace page rather than uploaded
 again.
 
+**2.14.0-alpha's change notes have to say that 2.13.0-alpha is installed
+first.** The converter that brought pre-2.13 test data forward was deleted
+after 2.13.0-alpha was published (#333), so a tester who updates from
+2.12.0-alpha straight to 2.14.0-alpha meets a refusal naming that release
+rather than a conversion. JetBrains cannot make one plugin version require an
+earlier one; the notes are the only place that can say it.
+
 ## Compatibility: `since-build`, never `until-build`
 
 `plugin.xml` declares `sinceBuild 262` and **no** `untilBuild`, and that is a
