@@ -59,9 +59,9 @@ still appears, so it does not look broken.
 ## What is not resized
 
 Some text has no size of its own. It is measured against the base size instead.
-A card's title is always three points larger. A badge is always two points
-smaller. The path at the top of the view panel is one point smaller. None of
-them ever goes below eight points.
+A card's title is always three points larger. A badge is always three points
+smaller, and bold. The path at the top of the view panel is one point smaller.
+None of them ever goes below eight points.
 
 ---
 
