@@ -65,9 +65,9 @@ public class DetailsTab {
     private static @NotNull Band runBand(final @NotNull TestRunItems item, final @NotNull List<String> currentPath) {
         return Band.of(Bundle.message("details.band.run"), List.of(
                 new RunItemSummary(item, currentPath),
-                new AttributeRow(RunEditorAttributes.EXECUTED_BY.getName(), (_, _) -> Display.whoAndWhen(item.getExecutedBy(), item.getExecutedAt())),
                 new RunAttributeRow(RunEditorAttributes.ACTUAL_RESULT, item),
-                new StacktraceRow(item, currentPath)));
+                new StacktraceRow(item, currentPath),
+                new AttributeRow(RunEditorAttributes.EXECUTED_BY.getName(), (_, _) -> Display.whoAndWhen(item.getExecutedBy(), item.getExecutedAt()))));
     }
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-087

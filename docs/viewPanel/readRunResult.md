@@ -57,14 +57,14 @@ identity line and above **Test case details** (Rule-VIEW-PANEL-085).
 │                                                                          │
 │   EXECUTION RESULT ────────────────────────────────────────────────────  │
 │   ( Failed ) ( 02:14 ) ( Blocker / High )  mtb550/x#123  Report a bug    │
-│   EXECUTED BY                                                            │
-│   muteb on 7 January 10:05                                               │
 │   ACTUAL RESULT                                                          │
 │   The session was dropped.                                               │
 │   STACKTRACE                                                             │
 │   java.lang.AssertionError: expected [true]                              │
 │     at org.testin.demo.LoginTest.valid                                   │
 │   Show all 42 lines                                                      │
+│   EXECUTED BY                                                            │
+│   muteb on 7 January 10:05                                               │
 │                                                                          │
 │   ▸ TEST CASE DETAILS ─────────────────────────────────────────────────  │
 └──────────────────────────────────────────────────────────────────────────┘
@@ -81,12 +81,13 @@ identity line and above **Test case details** (Rule-VIEW-PANEL-085).
 4. **The bug** — one chip carrying the severity and the priority together, in
    the severity's color, then the issue as `owner/repo#123` and **Report a
    bug**.
-5. **Executed by** — who ran it and when, as one row, in the words **Created**
-   uses on the test case's own band (Rule-VIEW-PANEL-061).
-6. **The two rows that hold sentences** — the actual result and the stacktrace,
+5. **The two rows that hold sentences** — the actual result and the stacktrace,
    each caption on a line of its own above its value (Rule-VIEW-PANEL-082).
-7. **Show all 42 lines** — opens the whole error in a window. That is
+6. **Show all 42 lines** — opens the whole error in a window. That is
    [UC-VIEW-PANEL-006](readStacktrace.md).
+7. **Executed by** — last in the band, because who ran it is read after what
+   happened. One row, in the words **Created** uses on the test case's own band
+   (Rule-VIEW-PANEL-061).
 8. **Test case details** — folded, because a tester reading a failure is
    reading the failure. Clicking its name opens every field the test case has
    (Rule-VIEW-PANEL-087).
@@ -99,9 +100,9 @@ identity line and above **Test case details** (Rule-VIEW-PANEL-085).
 | The second badge  | How long the test case took, with a clock, in a plain frame with nothing filled in                                                                                                                                                   |
 | The bug chip      | The severity and the priority in one chip, as `Blocker / High`, in the severity's color                                                                                                                                              |
 | After the chip    | The GitHub issue the failure was reported as, as `owner/repo#123`, and the **Report a bug** link that files one. That is [UC-VIEW-PANEL-016](reportBug.md). Drawn for a failed test case, and for any test case that has been reported |
-| **Executed By**   | Who ran it and when, as `muteb on 7 January 10:05`. One row, not two — the date has no caption of its own (Rule-VIEW-PANEL-061)                                                                                                    |
 | **Actual Result** | What the tester says actually happened                                                                                                                                                                                              |
 | **Stacktrace**    | The first three lines of the error, a link to the rest, and a thumbnail of each screenshot pasted with the failure. That is [UC-VIEW-PANEL-006](readStacktrace.md)                                                                    |
+| **Executed By**   | Who ran it and when, as `muteb on 7 January 10:05`, last in the band. One row, not two — the date has no caption of its own (Rule-VIEW-PANEL-061)                                                                                    |
 
 ## Main flow
 

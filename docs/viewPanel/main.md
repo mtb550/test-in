@@ -99,14 +99,14 @@ in front of them while they write down what actually happened.
 │                                                                            │
 │   EXECUTION RESULT ──────────────────────────────────────────────────────  │
 │   ( Failed ) ( 02:14 ) ( Blocker / High )  mtb550/x#123  Report a bug      │
-│   EXECUTED BY                                                              │
-│   muteb on 7 January 10:05                                                 │
 │   ACTUAL RESULT                                                            │
 │   The session was dropped.                                                 │
 │   STACKTRACE                                                               │
 │   java.lang.AssertionError: expected [true]                                │
 │     at org.testin.demo.LoginTest.valid                                     │
 │   Show all 42 lines                                                        │
+│   EXECUTED BY                                                              │
+│   muteb on 7 January 10:05                                                 │
 │                                                                            │
 │   ▸ TEST CASE DETAILS ───────────────────────────────────────────────────  │
 └────────────────────────────────────────────────────────────────────────────┘
@@ -129,7 +129,7 @@ in front of them while they write down what actually happened.
    included, is drawn only when the panel was opened from a test run
    (Rule-VIEW-PANEL-085). Its verdict, its duration and its bug are one line
    under the band's name, the duration is framed rather than filled, and who ran
-   it and when follow as a row (Rule-VIEW-PANEL-086). That is
+   it and when close the band as a row (Rule-VIEW-PANEL-086). That is
    [UC-VIEW-PANEL-005](readRunResult.md).
 7. **Test case details** — folded until a tester clicks its name, and then every
    field the test case has, with every empty one left out. The state is
