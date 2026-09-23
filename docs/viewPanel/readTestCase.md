@@ -57,7 +57,9 @@ There is no key for this. It is what the **Details** tab shows.
   whole width of the panel at any width.
 - **Rule-VIEW-PANEL-085** — The panel is three bands, always in this order: who
   this is - the path with the id at its end, the title, the badges and the
-  action icons; what this run recorded; and what the test case says. A band with
+  action icons; **Execution result**, what one test run recorded; and **Test
+  case details**, what the test case says. A band's name carries a hairline to
+  the panel's edge, level with the middle of the words. A band with
   nothing to show is not drawn at all, so the test editor, where there is no
   run, shows the test case's band straight under the identity line.
 - **Rule-VIEW-PANEL-086** — What a run recorded is one line under the band's
@@ -84,7 +86,7 @@ There is no key for this. It is what the **Details** tab shows.
 │                                                                          │
 │   ( P1 ) ( Smoke )        [ go to code ] [ run ] [ tc ]                  │
 │                                                                          │
-│   ▾ THE TEST CASE ────────────────────────────────────────────────────   │
+│   ▾ TEST CASE DETAILS ─────────────────────────────────────────────────  │
 │   EXPECTED RESULT                                                        │
 │   The dashboard opens.                                                   │
 │   STEPS                                                                  │

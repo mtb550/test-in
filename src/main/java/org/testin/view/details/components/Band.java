@@ -36,6 +36,7 @@ import javax.swing.JSeparator;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -88,9 +89,24 @@ public final class Band extends BaseDetails {
         heading.setOpaque(false);
 
         heading.add(caption(p), BorderLayout.WEST);
-        heading.add(new JSeparator(), BorderLayout.CENTER);
+        heading.add(hairline(), BorderLayout.CENTER);
 
         return heading;
+    }
+
+    // Rule-VIEW-PANEL-085
+    private static @NotNull JComponent hairline() {
+        final @NotNull JBPanel<?> holder = new JBPanel<>(new GridBagLayout());
+        holder.setOpaque(false);
+
+        final @NotNull GridBagConstraints centered = new GridBagConstraints();
+        centered.fill = GridBagConstraints.HORIZONTAL;
+        centered.anchor = GridBagConstraints.CENTER;
+        centered.weightx = 1.0;
+
+        holder.add(new JSeparator(), centered);
+
+        return holder;
     }
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-087

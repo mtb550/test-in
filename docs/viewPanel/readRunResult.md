@@ -44,8 +44,8 @@ test run.
 
 ## The screen
 
-What this run recorded is a band of its own, under the identity line and above
-what the test case says (Rule-VIEW-PANEL-085).
+What this run recorded is **Execution result**, a band of its own under the
+identity line and above **Test case details** (Rule-VIEW-PANEL-085).
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -55,7 +55,7 @@ what the test case says (Rule-VIEW-PANEL-085).
 │                                                                          │
 │   ( P1 ) ( Smoke )        [ go to code ] [ run ] [ tc ]                  │
 │                                                                          │
-│   THIS RUN ────────────────────────────────────────────────────────      │
+│   EXECUTION RESULT ────────────────────────────────────────────────────  │
 │   ( Failed ) ( 02:14 ) ( Blocker / High )  mtb550/x#123  Report a bug    │
 │   EXECUTED BY                                                            │
 │   muteb on 7 January 10:05                                               │
@@ -66,12 +66,13 @@ what the test case says (Rule-VIEW-PANEL-085).
 │     at org.testin.demo.LoginTest.valid                                   │
 │   Show all 42 lines                                                      │
 │                                                                          │
-│   ▸ THE TEST CASE ────────────────────────────────────────────────────   │
+│   ▸ TEST CASE DETAILS ─────────────────────────────────────────────────  │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The band's name** — **This run**, in the caption font, with a hairline to
-   the panel's edge (Rule-VIEW-PANEL-085).
+1. **The band's name** — **Execution result**, in the caption font, with a
+   hairline running from it to the panel's edge, level with the middle of the
+   words (Rule-VIEW-PANEL-085).
 2. **The summary line** — everything the run recorded that fits in a word or
    two: the verdict in its own color, the duration, the bug, and the links that
    open the issue or raise one (Rule-VIEW-PANEL-086).
@@ -86,7 +87,7 @@ what the test case says (Rule-VIEW-PANEL-085).
    each caption on a line of its own above its value (Rule-VIEW-PANEL-082).
 7. **Show all 42 lines** — opens the whole error in a window. That is
    [UC-VIEW-PANEL-006](readStacktrace.md).
-8. **The test case's band** — folded, because a tester reading a failure is
+8. **Test case details** — folded, because a tester reading a failure is
    reading the failure. Clicking its name opens every field the test case has
    (Rule-VIEW-PANEL-087).
 
@@ -107,7 +108,7 @@ what the test case says (Rule-VIEW-PANEL-085).
 1. The tester opens a test run and selects a test case in it.
 2. The tester presses `Enter`.
 3. Testin looks for that test case in that test run's recorded results.
-4. **This run** is drawn above what the test case says.
+4. **Execution result** is drawn above what the test case says.
 5. Below it, the test case's own band is drawn as usual.
 
 ## What Testin refuses
