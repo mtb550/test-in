@@ -33,7 +33,7 @@ import java.util.Optional;
 public final class TestProjectFolder {
     // UC-TREE-PANEL-002, UC-TREE-PANEL-003, Rule-TREE-PANEL-017, Rule-TREE-PANEL-107
     public static @NotNull Optional<Path> free(final @NotNull Project p, final @NotNull String name) {
-        final @NotNull Path folder = Services.getInstance(p, TestinRoot.class).getPath().resolve(name);
+        final @NotNull Path folder = Services.getInstance(p, TestinRoot.class).absolutePath().resolve(name);
 
         if (Services.getInstance(p, ProjectIndexer.class).isTaken(folder, Optional.empty())) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, name);

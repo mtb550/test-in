@@ -66,7 +66,7 @@ public final class CloneTestProject {
         if (!named.isEmpty() && TestinYml.isRepoUrl(p, url)) return named;
 
         final @NotNull String base = repositoryName(url);
-        final @NotNull Path root = Services.getInstance(p, TestinRoot.class).getPath();
+        final @NotNull Path root = Services.getInstance(p, TestinRoot.class).absolutePath();
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         @NotNull String name = base;
@@ -107,13 +107,13 @@ public final class CloneTestProject {
                 indicator.setText(Bundle.message("clone.progress", projectName));
 
                 try {
-                    final @NotNull Path parentPath = Services.getInstance(p, TestinRoot.class).getPath();
+                    final @NotNull Path parentPath = Services.getInstance(p, TestinRoot.class).absolutePath();
 
                     // UC-TREE-PANEL-003
                     final @NotNull GitCommandResult result = Git.getInstance().clone(p, parentPath, gitUrl, projectName);
                     result.throwOnError();
 
-                    final @NotNull Path projectPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(projectName);
+                    final @NotNull Path projectPath = Services.getInstance(p, TestinRoot.class).absolutePath().resolve(projectName);
                     keepNoCredentials(projectPath);
                     Services.getInstance(p, ProjectIndexer.class).scanSingleProject(projectPath, indicator);
 

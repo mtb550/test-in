@@ -64,7 +64,7 @@ public final class Conversions {
 
     // UC-INTERNAL-008, Rule-INTERNAL-091
     void sweep(final @NotNull Project p) {
-        final @NotNull Path root = Services.getInstance(p, TestinRoot.class).getPath();
+        final @NotNull Path root = Services.getInstance(p, TestinRoot.class).absolutePath();
         if (root.toString().isEmpty() || !Files.isDirectory(root)) return;
 
         final @NotNull List<FormatConverter.Report> reports = new ArrayList<>();

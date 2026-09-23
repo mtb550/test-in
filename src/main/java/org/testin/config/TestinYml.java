@@ -38,6 +38,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.git.GitRefs;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -140,9 +141,12 @@ public final class TestinYml {
     // UC-TREE-PANEL-029, Rule-TREE-PANEL-113, Rule-SHARE-004
     public static @NotNull Map<String, String> lines(final @NotNull String projectName, final @NotNull String remote) {
         final @NotNull Map<String, String> lines = lines(projectName);
-        lines.put(TestinProjectConfig.LOCATION_KEY, (remote.isEmpty() ? TestinLocation.LOCAL : TestinLocation.REMOTE).written());
-        if (!remote.isEmpty())
-            lines.put(TestinProjectConfig.REPO_URL_KEY, TestinProjectConfig.withoutCredentials(remote));
+        // Rule-TREE-PANEL-117: an address this file's reader would drop is not written as one
+        final @NotNull String address = GitRefs.isRepositoryUrl(remote) ? TestinProjectConfig.withoutCredentials(remote) : "";
+
+        lines.put(TestinProjectConfig.LOCATION_KEY, (address.isEmpty() ? TestinLocation.LOCAL : TestinLocation.REMOTE).written());
+        if (!address.isEmpty()) lines.put(TestinProjectConfig.REPO_URL_KEY, address);
+
         return lines;
     }
 
