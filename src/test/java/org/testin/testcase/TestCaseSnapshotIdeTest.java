@@ -19,6 +19,7 @@ package org.testin.testcase;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.testin.TempTree;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
@@ -30,27 +31,12 @@ import org.testin.undo.UndoScope;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
 public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
 
     private Path root;
-
-    private static void deleteTree(final Path path) {
-        if (path == null) return;
-
-        try (var walk = Files.walk(path)) {
-            walk.sorted(Comparator.reverseOrder()).forEach(each -> {
-                try {
-                    Files.deleteIfExists(each);
-                } catch (final Exception ignored) {
-                }
-            });
-        } catch (final Exception ignored) {
-        }
-    }
 
     @Override
     protected void setUp() throws Exception {
@@ -61,7 +47,7 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
     @Override
     protected void tearDown() throws Exception {
         try {
-            deleteTree(root);
+            TempTree.delete(root);
         } finally {
             super.tearDown();
         }

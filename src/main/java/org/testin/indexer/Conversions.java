@@ -95,8 +95,13 @@ public final class Conversions {
 
             if (!report.toRepair().isEmpty()) {
                 message.append(' ').append(Bundle.message("convert.repair", String.join(", ", report.toRepair())));
+                report.toRepair().forEach(file ->
+                        Logger.warn("Converting " + report.project() + " left " + file + " for the tester to repair"));
             }
-            if (report.failed()) message.append(' ').append(Bundle.message("convert.unfinished"));
+            if (report.failed()) {
+                message.append(' ').append(Bundle.message("convert.unfinished"));
+                Logger.warn("Converting " + report.project() + " did not finish");
+            }
 
             message.append('\n');
         }

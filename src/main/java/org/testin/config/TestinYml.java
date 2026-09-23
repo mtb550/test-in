@@ -153,7 +153,20 @@ public final class TestinYml {
 
     // UC-TREE-PANEL-029, Rule-TREE-PANEL-113
     public static @NotNull Map<String, String> writtenValues(final @NotNull Project p, final @NotNull Set<String> keys) {
-        return valuesIn(file(p).map(TestinYml::textOf).orElse(""), keys);
+        return valuesIn(currentText(p), keys);
+    }
+
+    // UC-TREE-PANEL-029, Rule-TREE-PANEL-114
+    private static @NotNull String currentText(final @NotNull Project p) {
+        final @NotNull Optional<Path> path = file(p);
+        if (path.isEmpty()) return "";
+
+        return openDocument(path.orElseThrow()).map(Document::getText).orElseGet(() -> textOf(path.orElseThrow()));
+    }
+
+    private static @NotNull Optional<Document> openDocument(final @NotNull Path path) {
+        return Optional.ofNullable(LocalFileSystem.getInstance().findFileByNioFile(path))
+                .map(file -> FileDocumentManager.getInstance().getCachedDocument(file));
     }
 
     // UC-TREE-PANEL-029, Rule-TREE-PANEL-112, Rule-TREE-PANEL-114

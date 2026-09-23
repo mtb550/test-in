@@ -18,6 +18,7 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.testin.TempTree;
 import org.testin.model.DirectoryType;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -27,25 +28,10 @@ import org.testin.services.Services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 
 public class TreeOperationsIdeTest extends BasePlatformTestCase {
 
     private Path root;
-
-    private static void deleteTree(final Path path) {
-        if (path == null) return;
-
-        try (var walk = Files.walk(path)) {
-            walk.sorted(Comparator.reverseOrder()).forEach(each -> {
-                try {
-                    Files.deleteIfExists(each);
-                } catch (final Exception ignored) {
-                }
-            });
-        } catch (final Exception ignored) {
-        }
-    }
 
     @Override
     protected void setUp() throws Exception {
@@ -56,7 +42,7 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
     @Override
     protected void tearDown() throws Exception {
         try {
-            deleteTree(root);
+            TempTree.delete(root);
         } finally {
             super.tearDown();
         }

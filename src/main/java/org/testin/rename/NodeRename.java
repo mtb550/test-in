@@ -49,14 +49,14 @@ public final class NodeRename {
         final @NotNull Renamed renamed = new Renamed(dir, newName);
         final @NotNull String oldName = dir.getName();
 
-        // Rule-CODEGEN-082
-        if (renamed.toTheFilesName(p)) Services.getInstance(p, BoundTestProject.class).follow(oldName, newName);
-        JavaCode.of(dir.getType()).getRenamed().execute(p, renamed);
-
         final @NotNull Path oldPath = dir.getPath();
         final @NotNull Path newPath = oldPath.getParent().resolve(newName);
 
         Services.getInstance(p, ProjectIndexer.class).renameNode(oldPath, newPath, () -> {
+            // Rule-CODEGEN-082
+            if (renamed.toTheFilesName(p)) Services.getInstance(p, BoundTestProject.class).follow(oldName, newName);
+            JavaCode.of(dir.getType()).getRenamed().execute(p, renamed);
+
             if (dir instanceof TestProjectDirectoryDto) {
                 projectFollows(p, oldName, newName);
                 tp.refresh();

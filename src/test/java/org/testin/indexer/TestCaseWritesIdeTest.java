@@ -18,6 +18,7 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import org.testin.TempTree;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
@@ -28,7 +29,6 @@ import org.testin.testcase.TestCaseOrder;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,20 +36,6 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
 
     private static final String HAND_NAMED = "Log in by hand.tc";
     private Path root;
-
-    private static void deleteTree(final Path path) {
-        if (path == null) return;
-
-        try (var walk = Files.walk(path)) {
-            walk.sorted(Comparator.reverseOrder()).forEach(each -> {
-                try {
-                    Files.deleteIfExists(each);
-                } catch (final Exception ignored) {
-                }
-            });
-        } catch (final Exception ignored) {
-        }
-    }
 
     private static TestCaseDto pastedInto(final TestSetDirectoryDto ts, final TestCaseDto cut) {
         final TestCaseDto pasted = TestCaseDto.builder()
@@ -95,7 +81,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
     @Override
     protected void tearDown() throws Exception {
         try {
-            deleteTree(root);
+            TempTree.delete(root);
         } finally {
             super.tearDown();
         }

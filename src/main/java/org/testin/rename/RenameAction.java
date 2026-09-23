@@ -25,6 +25,7 @@ import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditors;
 import org.testin.explorer.TreePanel;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
@@ -34,6 +35,7 @@ import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 // UC-TREE-PANEL-011
@@ -72,6 +74,8 @@ public class RenameAction extends DumbAwareAction {
         if (NodeRename.refused(p, dir, newName)) return;
 
         final @NotNull String oldName = dir.getName();
+        final @NotNull Path oldPath = dir.getPath();
+        final @NotNull Path newPath = oldPath.resolveSibling(newName);
         final @NotNull TreePanel tp = Services.getInstance(p, TreePanel.class);
 
         NodeRename.apply(p, tp, dir, newName, () -> {
@@ -79,15 +83,22 @@ public class RenameAction extends DumbAwareAction {
 
             Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
                     Bundle.message("rename.undo", oldName),
-                    () -> applyRename(p, dir, oldName),
-                    () -> applyRename(p, dir, newName),
+                    () -> applyRename(p, newPath, oldName),
+                    () -> applyRename(p, oldPath, newName),
                     () -> {
                     }));
         });
     }
 
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-037
-    private boolean applyRename(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
+    private boolean applyRename(final @NotNull Project p, final @NotNull Path path, final @NotNull String newName) {
+        final @NotNull Optional<DirectoryDto> node = Services.getInstance(p, ProjectIndexer.class).find(path);
+        if (node.isEmpty()) {
+            Logger.warn("Nothing to rename at " + path + ", so the step is refused");
+            return false;
+        }
+
+        final @NotNull DirectoryDto dir = node.orElseThrow();
         if (NodeRename.refused(p, dir, newName)) return false;
 
         NodeRename.apply(p, Services.getInstance(p, TreePanel.class), dir, newName, () -> {

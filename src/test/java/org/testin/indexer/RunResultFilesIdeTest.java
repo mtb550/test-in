@@ -20,6 +20,7 @@ import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.util.TimeoutUtil;
+import org.testin.TempTree;
 import org.testin.model.FileKind;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
@@ -32,7 +33,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
@@ -53,20 +53,6 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
             }""";
 
     private Path root;
-
-    private static void deleteTree(final Path path) {
-        if (path == null) return;
-
-        try (var walk = Files.walk(path)) {
-            walk.sorted(Comparator.reverseOrder()).forEach(each -> {
-                try {
-                    Files.deleteIfExists(each);
-                } catch (final Exception ignored) {
-                }
-            });
-        } catch (final Exception ignored) {
-        }
-    }
 
     private static Path resultOf(final Path runPath, final UUID testCaseId) {
         return runPath.resolve(FileKind.RUN_ITEM.fileName(testCaseId));
@@ -115,7 +101,7 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
     @Override
     protected void tearDown() throws Exception {
         try {
-            deleteTree(root);
+            TempTree.delete(root);
         } finally {
             super.tearDown();
         }
