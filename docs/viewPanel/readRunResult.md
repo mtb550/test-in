@@ -49,11 +49,13 @@ what the test case says (Rule-VIEW-PANEL-085).
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
+│   Demo > Test Cases > Accounts > Login   ( 3f2a05c1-...-9c1b ) [copy]    │
+│                                                                          │
 │   Log in with a valid user                                               │
 │                                                                          │
-│   ( 3f2a05c1-...-9c1b ) [copy]  ( P1 ) ( Smoke )  [ go to code ] [ run ]  │
+│   ( P1 ) ( Smoke )        [ go to code ] [ run ] [ tc ]                  │
 │                                                                          │
-│   THIS RUN ──────────────────────────────────────────────────────────    │
+│   THIS RUN ────────────────────────────────────────────────────────      │
 │   ( Failed )  ( 02:14 )  ( muteb · 7 January 10:05 )                     │
 │   ACTUAL RESULT                                                          │
 │   The session was dropped.                                               │
@@ -63,9 +65,7 @@ what the test case says (Rule-VIEW-PANEL-085).
 │   Show all 42 lines                                                      │
 │   ( Blocker / High )   Report a bug                                      │
 │                                                                          │
-│   THE TEST CASE ─────────────────────────────────────────────────────    │
-│   EXPECTED RESULT                                                        │
-│   The dashboard opens.                                                   │
+│   ▸ THE TEST CASE ────────────────────────────────────────────────────   │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -79,8 +79,9 @@ what the test case says (Rule-VIEW-PANEL-085).
    [UC-VIEW-PANEL-006](readStacktrace.md).
 5. **The bug** — one chip carrying the severity and the priority together, in
    the severity's color, beside **Report a bug** (Rule-VIEW-PANEL-086).
-6. **The test case's band** — what the test case says, below, drawn the same
-   way.
+6. **The test case's band** — folded, because a tester reading a failure is
+   reading the failure. Clicking its name opens every field the test case has
+   (Rule-VIEW-PANEL-087).
 
 ## The band, in order
 

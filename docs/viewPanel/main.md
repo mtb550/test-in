@@ -91,13 +91,13 @@ in front of them while they write down what actually happened.
 │   Details      History      Open Bugs                                      │
 ├────────────────────────────────────────────────────────────────────────────┤
 │                                                                            │
-│   Demo  >  Test Cases  >  Accounts  >  Login                               │
+│   Demo > Test Cases > Accounts > Login    ( 3f2a05c1-...-9c1b ) [copy]     │
 │                                                                            │
 │   Log in with a valid user                                                 │
 │                                                                            │
-│   ( 3f2a05c1-...-9c1b ) [copy]  ( P1 ) ( Smoke )   [ go to code ] [ run ]  │
+│   ( P1 ) ( Smoke )          [ go to code ] [ run ] [ tc ]                  │
 │                                                                            │
-│   THIS RUN ───────────────────────────────────────────────────────────     │
+│   THIS RUN ──────────────────────────────────────────────────────────      │
 │   ( Failed )  ( 02:14 )  ( muteb · 7 January 10:05 )                       │
 │   ACTUAL RESULT                                                            │
 │   The session was dropped.                                                 │
@@ -107,19 +107,7 @@ in front of them while they write down what actually happened.
 │   Show all 42 lines                                                        │
 │   ( Blocker / High )   Report a bug                                        │
 │                                                                            │
-│   THE TEST CASE ──────────────────────────────────────────────────────     │
-│   EXPECTED RESULT                                                          │
-│   The dashboard opens.                                                     │
-│   STEPS                                                                    │
-│   1- Open the login page.                                                  │
-│   2- Type the credentials.                                                 │
-│   3- Press Sign in.                                                        │
-│   PRE CONDITIONS                                                           │
-│   An account exists.                                                       │
-│   TEST DATA                                                                │
-│   user=admin                                                               │
-│                                                                            │
-│   ▸ Reference, module, order, created, updated                             │
+│   ▸ THE TEST CASE ────────────────────────────────────────────────────     │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -127,24 +115,25 @@ in front of them while they write down what actually happened.
    gray when the panel was handed only one.
 2. **The three tabs** — **Details**, **History** and **Open Bugs**. **History**
    is empty today, because a test case records only its last edit.
-3. **The path** — one step for each folder above the test case. Only the last
+3. **The path** — one step for each folder above the test case, and the test
+   case's own identity at its end with a button that copies it. Only the last
    step opens anything.
 4. **The title** — the test case's description, the largest words on the panel.
-5. **The identity line** — the test case's own identity with a button that
-   copies it, then the priority and one badge for each group, then the two
-   buttons: go to the automation code, and run the test case. Both buttons are
-   always drawn; one that cannot work here is gray, does not grow under the
-   pointer, and says what it is waiting for (Rule-VIEW-PANEL-085).
+5. **The identity line** — the priority and one badge for each group, then the
+   three icons: go to the automation code, run the test case, and open the test
+   case's own editor. All three are always drawn; one that cannot work here is
+   gray, does not grow under the pointer, and says what it is waiting for
+   (Rule-VIEW-PANEL-085).
 6. **This run** — what one test run recorded. The whole band, its name
    included, is drawn only when the panel was opened from a test run
    (Rule-VIEW-PANEL-085). Its verdict, its duration and who ran it are pills,
    and its bug is one chip (Rule-VIEW-PANEL-086). That is
    [UC-VIEW-PANEL-005](readRunResult.md).
-7. **The test case** — what the test case says. Every empty field is left out.
-8. **The fold** — reference, module, order, created and updated, behind one
-   line at the end. It is remembered for the IDE rather than for one test case
+7. **The test case** — folded until a tester clicks its name, and then every
+   field the test case has, with every empty one left out. The state is
+   remembered for the IDE rather than for one test case
    (Rule-VIEW-PANEL-087).
-9. **The captions** — each on a line of its own above its value, in the
+8. **The captions** — each on a line of its own above its value, in the
    caption font: JetBrains Mono, smaller than the value, in capitals, in gray.
    The value has the whole width of the panel (Rule-VIEW-PANEL-082).
 

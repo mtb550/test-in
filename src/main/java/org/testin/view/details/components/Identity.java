@@ -30,13 +30,12 @@ public final class Identity extends BaseDetails {
     private static final int INSETS_TOP = 8;
     private static final int INSETS_SIDE = 16;
 
-    // UC-VIEW-PANEL-004, UC-VIEW-PANEL-009, UC-VIEW-PANEL-012, Rule-VIEW-PANEL-085
+    // UC-VIEW-PANEL-004, UC-VIEW-PANEL-012, Rule-VIEW-PANEL-085
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final @NotNull JBPanel<?> line = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(GAP), 0));
         line.setOpaque(false);
 
-        line.add(IdBadge.of(p, dto));
         line.add(TestCaseBadges.of(p, dto));
         line.add(ActionIcons.of(p, dto));
 

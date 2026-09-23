@@ -41,11 +41,11 @@ runs a card in the editor.
 
 ## The screen
 
-The two buttons sit between the title and the badges.
+The three buttons sit on the identity line, beside the badges.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│   [ go to code ]  [ run ]                                                  │
+│   ( P1 ) ( Smoke )        [ go to code ]  [ run ]  [ tc ]                  │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 

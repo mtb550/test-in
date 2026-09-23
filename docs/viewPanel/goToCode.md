@@ -34,16 +34,16 @@ that opens the code from a card in the editor.
 - **Rule-VIEW-PANEL-056** — The button is always drawn. Where it cannot work it
   is gray, it does not grow under the pointer, the pointer stays an arrow, and
   it says what it is waiting for. Nothing is left out (Rule-CODEGEN-062).
-- **Rule-VIEW-PANEL-057** — The button is the first of the two, before the run
-  button.
+- **Rule-VIEW-PANEL-057** — The button is the first of the three, before the
+  run button and the one that opens the test case.
 
 ## The screen
 
-The two buttons sit between the title and the badges.
+The three buttons sit on the identity line, beside the badges.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│   [ go to code ]  [ run ]                                                │
+│   ( P1 ) ( Smoke )        [ go to code ]  [ run ]  [ tc ]                │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 

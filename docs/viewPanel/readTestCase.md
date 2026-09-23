@@ -56,30 +56,31 @@ There is no key for this. It is what the **Details** tab shows.
   line of its own above its value, in the caption font, so the value has the
   whole width of the panel at any width.
 - **Rule-VIEW-PANEL-085** — The panel is three bands, always in this order: who
-  this is - the path, the title, the id, the badges and the action icons; what
-  this run recorded; and what the test case says. A band with nothing to show is
-  not drawn at all, so the test editor, where there is no run, shows the test
-  case's words straight under the title.
+  this is - the path with the id at its end, the title, the badges and the
+  action icons; what this run recorded; and what the test case says. A band with
+  nothing to show is not drawn at all, so the test editor, where there is no
+  run, shows the test case's band straight under the identity line.
 - **Rule-VIEW-PANEL-086** — A run's verdict, how long it took, and who ran it
   and when are one line of pills under the band's name, with the verdict in its
   own color. The bug is one chip carrying its severity and its priority
   together, beside the action that raises it, rather than a row each.
-- **Rule-VIEW-PANEL-087** — Reference, module, order, created and updated are
-  folded behind one line at the end of the test case's band. The fold is
-  remembered for the IDE rather than for one test case, so a tester who opens it
-  keeps it open for the next test case they read.
+- **Rule-VIEW-PANEL-087** — The test case's band folds, and it is folded when
+  a tester first meets it. Its name carries the arrow that opens it, and opening
+  it shows every field the test case has, none of them folded again. The state
+  is remembered for the IDE rather than for one test case, so a tester who opens
+  it keeps it open for the next test case they read.
 
 ## The screen
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│   Demo  >  Test Cases  >  Accounts  >  Login                             │
+│   Demo > Test Cases > Accounts > Login   ( 3f2a05c1-...-9c1b ) [copy]    │
 │                                                                          │
 │   Log in with a valid user                                               │
 │                                                                          │
-│   ( 3f2a05c1-...-9c1b ) [copy]  ( P1 ) ( Smoke )  [ go to code ] [ run ]  │
+│   ( P1 ) ( Smoke )        [ go to code ] [ run ] [ tc ]                  │
 │                                                                          │
-│   THE TEST CASE ─────────────────────────────────────────────────────    │
+│   ▾ THE TEST CASE ────────────────────────────────────────────────────   │
 │   EXPECTED RESULT                                                        │
 │   The dashboard opens.                                                   │
 │   STEPS                                                                  │
@@ -90,22 +91,26 @@ There is no key for this. It is what the **Details** tab shows.
 │   An account exists.                                                     │
 │   TEST DATA                                                              │
 │   user=admin                                                             │
-│                                                                          │
-│   ▸ Reference, module, order, created, updated                           │
+│   MODULE                                                                 │
+│   Accounts                                                               │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The top part** — the path, then the title, then one line carrying the
-   identity, the badges and the two buttons (Rule-VIEW-PANEL-085). Each one is
-   numbered on [the view panel page](main.md#the-panel).
-2. **The captions** — the name of the field, on a line of its own above its
+1. **The top part** — the path with the identity at its end, then the title,
+   then one line carrying the badges and the three icons
+   (Rule-VIEW-PANEL-085). Each one is numbered on
+   [the view panel page](main.md#the-panel).
+2. **The arrow** — the test case's band is folded when a tester first meets it.
+   Clicking its name opens it, and it stays open for the next test case they
+   read (Rule-VIEW-PANEL-087).
+3. **The captions** — the name of the field, on a line of its own above its
    value, in the caption font: JetBrains Mono, smaller than the value, in
    capitals, in gray (Rule-VIEW-PANEL-082).
-3. **The values** — each under its caption, across the whole panel, so a narrow
+4. **The values** — each under its caption, across the whole panel, so a narrow
    panel still gives a value all its width. Each one can be selected and
    copied. None of them can be typed into.
-4. **The rows that are missing** — this test case has nothing in its **Reference** field, so that row is not drawn and
-   no gap is left for it.
+5. **The rows that are missing** — this test case has nothing in its
+   **Reference** field, so that row is not drawn and no gap is left for it.
 
 ## The rows, in order
 
@@ -121,7 +126,7 @@ There is no key for this. It is what the **Details** tab shows.
 | **Created**         | Who made it, and when                         |
 | **Updated**         | Who last changed it, and when                 |
 
-Above the rows sit the path, the identity, the title, the two buttons and the
+Above the rows sit the path with the identity at its end, the title and the
 badges. They are numbered on the panel drawing on
 [the view panel page](main.md#the-panel).
 

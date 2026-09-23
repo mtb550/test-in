@@ -18,7 +18,6 @@ package org.testin.view.details.components;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
@@ -26,7 +25,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.navigate.NavigateToTestCaseAction;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 
@@ -41,7 +39,6 @@ import java.awt.RenderingHints;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Optional;
 
 public final class IdBadge {
     private static final int BADGE_ARC_SIZE = 16;
@@ -50,11 +47,10 @@ public final class IdBadge {
     private static final int FLOW_GAP = 8;
     private static final int COPY_SUCCESS_DELAY_MS = 1500;
     private static final @NotNull String COPY_TOOLTIP = Bundle.message("view.id.copy");
-    private static final @NotNull String GO_TOOLTIP = Bundle.message("action.Testin.NavigateToTestCase.text");
     private static final @NotNull Color BG_COLOR = new JBColor(Gray._230, Gray._80);
     private static final @NotNull Color FG_COLOR = new JBColor(Gray._130, Gray._170);
-    // UC-VIEW-PANEL-009, Rule-VIEW-PANEL-085
-    public static @NotNull JComponent of(final @NotNull Project p, final @NotNull TestCaseDto dto) {
+    // UC-VIEW-PANEL-009, Rule-VIEW-PANEL-041
+    public static @NotNull JComponent of(final @NotNull TestCaseDto dto) {
         final @NotNull JBLabel idBadge = new JBLabel(dto.getId().toString()) {
             @Override
             protected void paintComponent(final Graphics g) {
@@ -72,18 +68,6 @@ public final class IdBadge {
         idBadge.setForeground(FG_COLOR);
         idBadge.setBorder(JBUI.Borders.empty(BADGE_BORDER_V, BADGE_BORDER_H));
         idBadge.setOpaque(false);
-
-        // UC-VIEW-PANEL-009, Rule-VIEW-PANEL-063
-        final @NotNull Optional<String> whyNot = NavigateToTestCaseAction.whyNot(dto);
-
-        idBadge.setToolTipText(whyNot.orElse(GO_TOOLTIP));
-        idBadge.setCursor(Cursor.getPredefinedCursor(whyNot.isEmpty() ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
-        idBadge.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                NavigateToTestCaseAction.execute(p, dto);
-            }
-        });
 
         final @NotNull JBLabel copyIcon = new JBLabel(AllIcons.Actions.Copy);
         copyIcon.setToolTipText(COPY_TOOLTIP);

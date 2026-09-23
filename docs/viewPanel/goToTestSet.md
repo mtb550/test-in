@@ -32,7 +32,7 @@ There is no key for this. The path is at the top of the panel.
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
 - **Rule-VIEW-PANEL-041** — The path shows one step for each folder above the
-  test case.
+  test case, and the test case's own identity at its end.
 - **Rule-VIEW-PANEL-042** — Every step goes to the place it names. The tree
   opens on it and expands to it; a step that names something with an editor —
   the test set, or the test run when the panel was opened from a run — opens
@@ -44,12 +44,14 @@ There is no key for this. The path is at the top of the panel.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
-│   Demo  >  Test Cases  >  Accounts  >  Login                               │
+│   Demo > Test Cases > Accounts > Login    ( 3f2a05c1-...-9c1b ) [copy]     │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
 1. **Every step** — gray, and underlined under the pointer. Every one of them
    goes somewhere.
+2. **The identity** — the end of the path, and the only part of it that goes
+   nowhere. It is [UC-VIEW-PANEL-009](copyIdentity.md).
 
 ## Main flow
 
