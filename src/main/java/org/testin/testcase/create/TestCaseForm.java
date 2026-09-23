@@ -22,6 +22,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.DialogComponent;
 
+import java.util.function.Supplier;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.ScrollPaneConstants;
@@ -35,9 +36,9 @@ import java.awt.event.ComponentEvent;
 public final class TestCaseForm implements DialogComponent {
     private final @NotNull JBPanel<?> sections = new JBPanel<>();
     private final @NotNull JBPanel<?> panel;
-    private final @NotNull JComponent focus;
+    private final @NotNull Supplier<JComponent> focus;
 
-    public TestCaseForm(final @NotNull JComponent focus, final boolean scrollsOnlyWhenOverflowing) {
+    public TestCaseForm(final @NotNull Supplier<JComponent> focus, final boolean scrollsOnlyWhenOverflowing) {
         this.focus = focus;
 
         sections.setLayout(new BoxLayout(sections, BoxLayout.Y_AXIS));
@@ -94,9 +95,10 @@ public final class TestCaseForm implements DialogComponent {
         return panel;
     }
 
+    // Rule-INTERNAL-057
     @Override
     public @NotNull JComponent getFocusComponent() {
-        return focus;
+        return focus.get();
     }
 
     @Override

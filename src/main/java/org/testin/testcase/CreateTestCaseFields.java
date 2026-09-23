@@ -106,7 +106,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             Shortcuts.CreateTestCaseGroup,
             Icons.fieldLetter("G", Icons.GRAY),
             TestCaseBaseDialog::getGroupSection,
-            "",
+            Bundle.message("field.set.group"),
             ADD_GROUP, AUTO_COMPLETE, NAVIGATE_TAB
     );
 

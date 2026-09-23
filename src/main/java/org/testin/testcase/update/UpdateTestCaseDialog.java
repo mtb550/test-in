@@ -50,7 +50,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
         final @NotNull CreateTestCaseSection targetSection = selectedItem.getSectionExtractor().apply(this);
 
-        final @NotNull TestCaseForm form = new TestCaseForm(targetSection.getFocusComponent(), false);
+        final @NotNull TestCaseForm form = new TestCaseForm(targetSection::getFocusComponent, false);
         final @NotNull JComponent keys = form.getPanel();
 
         onlyEditable(targetSection);

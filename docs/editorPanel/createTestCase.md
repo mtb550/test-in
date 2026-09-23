@@ -93,7 +93,7 @@ This is how every test case in Testin begins.
 | Module          | `Ctrl+M` | *set module*                                       |
 | Steps           | `Ctrl+S` | *set step*, then the number                        |
 | Priority        | `Ctrl+P` | none, it is a list                                 |
-| Group           | `Ctrl+G` | none, and it completes the groups the project uses |
+| Group           | `Ctrl+G` | *set group*, completing what the project uses      |
 | Test Data       | `Ctrl+T` | *set test data*                                    |
 | Pre Conditions  | `Ctrl+B` | *set preconditions*                                |
 

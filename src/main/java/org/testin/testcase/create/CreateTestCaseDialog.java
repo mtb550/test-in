@@ -44,7 +44,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
         descriptionSection.compareAgainst(() -> Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(dir.getPath()));
 
-        final @NotNull TestCaseForm form = new TestCaseForm(descriptionSection.getFocusComponent(), true);
+        final @NotNull TestCaseForm form = new TestCaseForm(descriptionSection::getFocusComponent, true);
         final @NotNull JComponent keys = form.getPanel();
 
         initDynamicStatusBar(keys);
