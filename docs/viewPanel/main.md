@@ -98,14 +98,13 @@ in front of them while they write down what actually happened.
 │   ( P1 ) ( Smoke )          [ go to code ] [ run ] [ tc ]                  │
 │                                                                            │
 │   THIS RUN ──────────────────────────────────────────────────────────      │
-│   ( Failed )  ( 02:14 )  ( muteb · 7 January 10:05 )                       │
+│   ( Failed ) ( 02:14 ) ( Blocker / High )  mtb550/x#123  Report a bug      │
 │   ACTUAL RESULT                                                            │
 │   The session was dropped.                                                 │
 │   STACKTRACE                                                               │
 │   java.lang.AssertionError: expected [true]                                │
 │     at org.testin.demo.LoginTest.valid                                     │
 │   Show all 42 lines                                                        │
-│   ( Blocker / High )   Report a bug                                        │
 │                                                                            │
 │   ▸ THE TEST CASE ────────────────────────────────────────────────────     │
 └────────────────────────────────────────────────────────────────────────────┘
@@ -126,9 +125,9 @@ in front of them while they write down what actually happened.
    (Rule-VIEW-PANEL-085).
 6. **This run** — what one test run recorded. The whole band, its name
    included, is drawn only when the panel was opened from a test run
-   (Rule-VIEW-PANEL-085). Its verdict, its duration and who ran it are pills,
-   and its bug is one chip (Rule-VIEW-PANEL-086). That is
-   [UC-VIEW-PANEL-005](readRunResult.md).
+   (Rule-VIEW-PANEL-085). Its verdict, its duration and its bug are one line
+   under the band's name, and the duration is framed rather than filled
+   (Rule-VIEW-PANEL-086). That is [UC-VIEW-PANEL-005](readRunResult.md).
 7. **The test case** — folded until a tester clicks its name, and then every
    field the test case has, with every empty one left out. The state is
    remembered for the IDE rather than for one test case

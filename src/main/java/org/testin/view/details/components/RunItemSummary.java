@@ -17,7 +17,6 @@
 package org.testin.view.details.components;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
@@ -26,7 +25,6 @@ import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.Badges;
-import org.testin.util.Bundle;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -34,22 +32,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
-public final class RunSummary extends BaseDetails {
+public final class RunItemSummary extends BaseDetails {
     private static final int GAP = 6;
     private static final int INSETS_TOP = 8;
     private static final int INSETS_SIDE = 16;
 
     private final @NotNull TestRunItems item;
+    private final @NotNull List<String> currentPath;
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        final @NotNull JBPanel<?> pills = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(GAP), 0));
-        pills.setOpaque(false);
+        final @NotNull JBPanel<?> line = line();
+        final @NotNull JBPanel<?> pills = line();
 
         Badges.showBadges(pills, facts());
+        line.add(pills);
 
-        return addFullWidthRow(panel, gbc, pills, JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
+        BugIssue.of(p, item, currentPath, dto).ifPresent(line::add);
+
+        return addFullWidthRow(panel, gbc, line, JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
+    }
+
+    private static @NotNull JBPanel<?> line() {
+        final @NotNull JBPanel<?> line = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(GAP), 0));
+        line.setOpaque(false);
+
+        return line;
     }
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086
@@ -57,25 +66,9 @@ public final class RunSummary extends BaseDetails {
         final @NotNull List<Badges.Badge> badges = new ArrayList<>();
         badges.add(new Badges.Pill(item.shownStatus().getLabel(), item.shownStatus().getRowColor()));
 
-        tag(badges, RunEditorAttributes.DURATION.getRunValueExtractor().apply(item));
-        tag(badges, ranBy());
+        final @NotNull String duration = RunEditorAttributes.DURATION.getRunValueExtractor().apply(item);
+        if (!duration.isBlank()) badges.add(Badges.createDurationBadge(duration));
 
         return badges;
-    }
-
-    private @NotNull String ranBy() {
-        final @NotNull String who = RunEditorAttributes.EXECUTED_BY.getRunValueExtractor().apply(item).trim();
-        final @NotNull String when = RunEditorAttributes.EXECUTED_AT.getRunValueExtractor().apply(item).trim();
-
-        if (who.isEmpty()) return when;
-        if (when.isEmpty()) return who;
-
-        return Bundle.message("details.ran.by", who, when);
-    }
-
-    private static void tag(final @NotNull List<Badges.Badge> badges, final @NotNull String text) {
-        if (text.isBlank()) return;
-
-        badges.add(new Badges.Tag(text, JBColor.GRAY));
     }
 }

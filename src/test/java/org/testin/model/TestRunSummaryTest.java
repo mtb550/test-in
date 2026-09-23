@@ -32,7 +32,7 @@ public class TestRunSummaryTest {
         return TestRunItems.builder().id(UUID.randomUUID()).status(status).build();
     }
 
-    private static TestRunItems ranBy(final String tester) {
+    private static TestRunItems executedBy(final String tester) {
         return TestRunItems.builder().id(UUID.randomUUID()).status(TestStatus.PASSED).executedBy(tester).build();
     }
 
@@ -193,7 +193,7 @@ public class TestRunSummaryTest {
     @Test
     public void executedByNamesEveryoneWhoRecordedAVerdict() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                ranBy("Omar"), ranBy("Sara"), ranBy("Omar")));
+                executedBy("Omar"), executedBy("Sara"), executedBy("Omar")));
 
         assertEquals(summary.executedBy(), "Omar, Sara", "each tester once, in the order they first appear");
     }
@@ -201,7 +201,7 @@ public class TestRunSummaryTest {
     @Test
     public void executedByIgnoresTestCasesNobodyRan() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                ranBy("Omar"), item(TestStatus.UNTESTED), ranBy("   ")));
+                executedBy("Omar"), item(TestStatus.UNTESTED), executedBy("   ")));
 
         assertEquals(summary.executedBy(), "Omar");
     }

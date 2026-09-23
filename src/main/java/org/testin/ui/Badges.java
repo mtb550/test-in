@@ -24,6 +24,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +40,6 @@ import java.awt.Graphics;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Badges {
@@ -58,6 +58,7 @@ public final class Badges {
 
     private static final @NotNull Color GROUP_COLOR = JBColor.darkGray;
     private static final @NotNull Icon BUG_MARK = IconUtil.colorize(IconUtil.resizeSquared(AllIcons.Toolwindows.ToolWindowDebugger, 20), Gray._0);
+    private static final @NotNull Icon CLOCK = IconUtil.resizeSquared(AllIcons.Vcs.History, 14);
 
     public static void addPriorityBadge(final @NotNull List<Badge> badges, final @NotNull TestCaseDto tc) {
         if (tc.getPriority() == Priority.LOW) return;
@@ -98,6 +99,11 @@ public final class Badges {
         return new Tag(group, GROUP_COLOR);
     }
 
+    // Rule-VIEW-PANEL-086
+    public static @NotNull Badge createDurationBadge(final @NotNull String duration) {
+        return new Framed(duration, CLOCK);
+    }
+
     public static void showBadges(final @NotNull JBPanel<?> panel, final @NotNull List<Badge> badges) {
         while (panel.getComponentCount() < badges.size()) {
             panel.add(new BadgePill());
@@ -115,7 +121,7 @@ public final class Badges {
         return 0.2126 * bg.getRed() + 0.7152 * bg.getGreen() + 0.0722 * bg.getBlue() > 140;
     }
 
-    public sealed interface Badge permits Pill, Tag, Bug {
+    public sealed interface Badge permits Pill, Tag, Bug, Framed {
     }
 
     public record Pill(@NotNull String text, @NotNull Color color) implements Badge {
@@ -125,6 +131,10 @@ public final class Badges {
     }
 
     public record Bug(@NotNull String text, @NotNull Color color) implements Badge {
+    }
+
+    // Rule-VIEW-PANEL-086
+    public record Framed(@NotNull String text, @NotNull Icon icon) implements Badge {
     }
 
     private static final class BadgePill extends JBLabel {
@@ -140,9 +150,10 @@ public final class Badges {
             this.badge = badge;
 
             switch (badge) {
-                case Pill pill -> lay(pill.text(), pill.color(), BADGE_PAD_H, EmptyIcon.ICON_0);
-                case Bug bug -> lay(bug.text(), bug.color(), BADGE_PAD_H, BUG_MARK);
-                case Tag tag -> lay(tag.text(), tag.color(), BADGE_PAD_H + TAG_NOTCH, EmptyIcon.ICON_0);
+                case Pill pill -> lay(pill.text(), readableOn(pill.color()), BADGE_PAD_H, EmptyIcon.ICON_0);
+                case Bug bug -> lay(bug.text(), readableOn(bug.color()), BADGE_PAD_H, BUG_MARK);
+                case Tag tag -> lay(tag.text(), readableOn(tag.color()), BADGE_PAD_H + TAG_NOTCH, EmptyIcon.ICON_0);
+                case Framed framed -> lay(framed.text(), UIUtil.getLabelForeground(), BADGE_PAD_H, framed.icon());
             }
 
             setFont(Fonts.badge());
@@ -150,18 +161,16 @@ public final class Badges {
             setVisible(true);
         }
 
-        private void lay(final @NotNull String text, final @NotNull Color fill, final int rightPad, final @NotNull Icon icon) {
+        // Rule-VIEW-PANEL-086
+        private void lay(final @NotNull String text, final @NotNull Color ink, final int rightPad, final @NotNull Icon icon) {
             setText(text);
-            setBackground(fill);
+            setForeground(ink);
             setIcon(icon);
             setBorder(JBUI.Borders.empty(BADGE_PAD_V, BADGE_PAD_H, BADGE_PAD_V, rightPad));
         }
 
-        @Override
-        public Color getForeground() {
-            return Optional.ofNullable(getBackground())
-                    .map(bg -> isLight(bg) ? TEXT_ON_LIGHT : JBColor.WHITE)
-                    .orElseGet(super::getForeground);
+        private static @NotNull Color readableOn(final @NotNull Color fill) {
+            return isLight(fill) ? TEXT_ON_LIGHT : JBColor.WHITE;
         }
 
         @Override
@@ -173,6 +182,7 @@ public final class Badges {
                 case Pill pill -> fillPill(g2, pill.color());
                 case Bug bug -> fillPill(g2, bug.color());
                 case Tag tag -> fillTag(g2, tag.color());
+                case Framed _ -> drawFrame(g2);
             }
 
             g2.dispose();
@@ -183,6 +193,12 @@ public final class Badges {
         private void fillPill(final @NotNull Graphics2D g2, final @NotNull Color fill) {
             g2.setColor(fill);
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), BADGE_RADIUS, BADGE_RADIUS);
+        }
+
+        // Rule-VIEW-PANEL-086
+        private void drawFrame(final @NotNull Graphics2D g2) {
+            g2.setColor(JBColor.border());
+            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, BADGE_RADIUS, BADGE_RADIUS);
         }
 
         private void fillTag(final @NotNull Graphics2D g2, final @NotNull Color fill) {

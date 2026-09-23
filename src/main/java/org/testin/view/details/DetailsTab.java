@@ -36,11 +36,10 @@ import org.testin.util.Fonts;
 import org.testin.view.details.components.AttributeRow;
 import org.testin.view.details.components.Band;
 import org.testin.view.details.components.BaseDetails;
-import org.testin.view.details.components.BugIssueRow;
 import org.testin.view.details.components.Identity;
 import org.testin.view.details.components.NavigationBar;
 import org.testin.view.details.components.RunAttributeRow;
-import org.testin.view.details.components.RunSummary;
+import org.testin.view.details.components.RunItemSummary;
 import org.testin.view.details.components.StacktraceRow;
 import org.testin.view.details.components.Steps;
 import org.testin.view.details.components.Title;
@@ -65,10 +64,9 @@ public class DetailsTab {
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-086
     private static @NotNull Band runBand(final @NotNull TestRunItems item, final @NotNull List<String> currentPath) {
         return Band.of(Bundle.message("details.band.run"), List.of(
-                new RunSummary(item),
+                new RunItemSummary(item, currentPath),
                 new RunAttributeRow(RunEditorAttributes.ACTUAL_RESULT, item),
-                new StacktraceRow(item, currentPath),
-                new BugIssueRow(item, currentPath)));
+                new StacktraceRow(item, currentPath)));
     }
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-087

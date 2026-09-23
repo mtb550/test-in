@@ -60,10 +60,13 @@ There is no key for this. It is what the **Details** tab shows.
   action icons; what this run recorded; and what the test case says. A band with
   nothing to show is not drawn at all, so the test editor, where there is no
   run, shows the test case's band straight under the identity line.
-- **Rule-VIEW-PANEL-086** — A run's verdict, how long it took, and who ran it
-  and when are one line of pills under the band's name, with the verdict in its
-  own color. The bug is one chip carrying its severity and its priority
-  together, beside the action that raises it, rather than a row each.
+- **Rule-VIEW-PANEL-086** — What a run recorded is one line under the band's
+  name: the verdict in its own color, how long it took, the bug's severity and
+  priority as one chip, then the issue and the link that raises one. The
+  duration carries a clock and a plain frame with nothing filled in, so it reads
+  as a measurement rather than a verdict, and it is not the notched shape a
+  group badge uses. Who ran it and when are not on the panel at all - the test
+  run's own editor holds them.
 - **Rule-VIEW-PANEL-087** — The test case's band folds, and it is folded when
   a tester first meets it. Its name carries the arrow that opens it, and opening
   it shows every field the test case has, none of them folded again. The state

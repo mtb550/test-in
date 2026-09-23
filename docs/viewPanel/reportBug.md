@@ -11,7 +11,8 @@ recorded. The tester reads it, edits it if they want, and sends it. Testin files
 it with the GitHub command line tool, `gh`. The screenshots pasted into the error
 go with it.
 
-There is no key for this. The **Report Bug** link is in the **Bug Issue** row of
+There is no key for this. The **Report Bug** link is on the run band's summary
+line in
 the Details tab.
 
 ## Rules
@@ -35,9 +36,9 @@ the Details tab.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
-- **Rule-VIEW-PANEL-066** — A failed test case viewed under a test run has a **Bug Issue** row with a **Report Bug**
-  link. The row stays for as long as the
-  test case has a bug issue link, whatever its verdict.
+- **Rule-VIEW-PANEL-066** — A failed test case viewed under a test run carries
+  the bug on the run band's summary line, with a **Report Bug** link. It stays
+  for as long as the test case has a bug issue link, whatever its verdict.
 - **Rule-VIEW-PANEL-067** — Report Bug prepares the bug under the IDE's progress
   bar, and reads `testin.yml` again first. Then the bug opens. Stopping the
   progress bar opens nothing.
@@ -74,37 +75,30 @@ the Details tab.
 - **Rule-VIEW-PANEL-078** — Testin stores no password and no token. `gh` holds
   the sign-in. `bugRepoUrl` in `testin.yml` names the repository.
 
-## The Bug Issue row
+## The bug on the summary line
 
 Before the test case is reported:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│   BUG SEVERITY                                               │
-│   Blocker                                                    │
-│   BUG PRIORITY                                               │
-│   High                                                       │
-│   BUG ISSUE                                                  │
-│   Report Bug                                                 │
+│   ( Failed )  ( 02:14 )  ( Blocker / High )   Report Bug     │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 After:
 
 ```
-┌──────────────────────────────────────────────────────────────┐
-│   BUG SEVERITY                                               │
-│   Blocker                                                    │
-│   BUG PRIORITY                                               │
-│   High                                                       │
-│   BUG ISSUE                                                  │
-│   mtb550/product#123    Report Bug                           │
-└──────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│   ( Failed )  ( 02:14 )  ( Blocker / High )  mtb550/x#123  Report Bug   │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **Report Bug** — prepares the bug and opens it. It is gray, with the reason on
+1. **The chip** — the severity and the priority in one, in the severity's color.
+   It is one chip and not two rows, because a severity without its priority is
+   half a sentence (Rule-VIEW-PANEL-086).
+2. **Report Bug** — prepares the bug and opens it. It is gray, with the reason on
    hover, whenever Rule-VIEW-PANEL-072 says so.
-2. **`owner/repo#123`** — the issue this test case was reported as. Clicking it
+3. **`owner/repo#123`** — the issue this test case was reported as. Clicking it
    opens the issue in the browser.
 
 ## The Report Bug dialog
@@ -180,7 +174,7 @@ mention a GitHub user or link another issue either.
 ## Main flow
 
 1. The tester opens a failed test case's details from a test run.
-2. The **Bug Issue** row shows **Report Bug**. The tester clicks it.
+2. The run band's summary line shows **Report Bug**. The tester clicks it.
 3. The IDE's progress bar reads *Preparing the bug report*.
 4. The **Report Bug** dialog opens, with the title and the body written.
 5. The tester edits the title or the body, or leaves them.
@@ -188,8 +182,8 @@ mention a GitHub user or link another issue either.
 7. The IDE's progress bar reads *Sending the bug report*.
 8. A message appears and stays in the notification list. Its title is *Reported*. It shows the issue as
    `owner/repo#123`, with an **Open** link.
-9. The **Bug Issue** row shows the issue. **Report Bug** is gray, and hovering
-   over it reads *Already reported*.
+9. The summary line shows the issue. **Report Bug** is gray, and hovering over
+   it reads *Already reported*.
 
 ## What Testin refuses
 

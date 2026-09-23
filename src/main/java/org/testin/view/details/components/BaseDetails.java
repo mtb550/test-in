@@ -30,7 +30,7 @@ import java.awt.event.ActionListener;
 
 public abstract class BaseDetails {
     // Rule-VIEW-PANEL-080
-    protected @NotNull ActionLink link(final @NotNull String text, final @NotNull ActionListener onClick) {
+    static @NotNull ActionLink link(final @NotNull String text, final @NotNull ActionListener onClick) {
         final @NotNull ActionLink link = new ActionLink(text, onClick);
         link.setAutoHideOnDisable(false);
         link.setFocusable(false);

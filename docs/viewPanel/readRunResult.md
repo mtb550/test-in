@@ -56,14 +56,13 @@ what the test case says (Rule-VIEW-PANEL-085).
 │   ( P1 ) ( Smoke )        [ go to code ] [ run ] [ tc ]                  │
 │                                                                          │
 │   THIS RUN ────────────────────────────────────────────────────────      │
-│   ( Failed )  ( 02:14 )  ( muteb · 7 January 10:05 )                     │
+│   ( Failed ) ( 02:14 ) ( Blocker / High )  mtb550/x#123  Report a bug    │
 │   ACTUAL RESULT                                                          │
 │   The session was dropped.                                               │
 │   STACKTRACE                                                             │
 │   java.lang.AssertionError: expected [true]                              │
 │     at org.testin.demo.LoginTest.valid                                   │
 │   Show all 42 lines                                                      │
-│   ( Blocker / High )   Report a bug                                      │
 │                                                                          │
 │   ▸ THE TEST CASE ────────────────────────────────────────────────────   │
 └──────────────────────────────────────────────────────────────────────────┘
@@ -71,15 +70,19 @@ what the test case says (Rule-VIEW-PANEL-085).
 
 1. **The band's name** — **This run**, in the caption font, with a hairline to
    the panel's edge (Rule-VIEW-PANEL-085).
-2. **The line of pills** — the verdict in its own color, how long it took, and
-   who ran it and when (Rule-VIEW-PANEL-086).
-3. **The two rows that hold sentences** — the actual result and the stacktrace,
+2. **The summary line** — everything the run recorded that fits in a word or
+   two: the verdict in its own color, the duration, the bug, and the links that
+   open the issue or raise one (Rule-VIEW-PANEL-086).
+3. **The duration** — a clock and the time, in a plain frame with nothing
+   filled in. It is a measurement, not a verdict, and the frame says so.
+4. **The bug** — one chip carrying the severity and the priority together, in
+   the severity's color, then the issue as `owner/repo#123` and **Report a
+   bug**.
+5. **The two rows that hold sentences** — the actual result and the stacktrace,
    each caption on a line of its own above its value (Rule-VIEW-PANEL-082).
-4. **Show all 42 lines** — opens the whole error in a window. That is
+6. **Show all 42 lines** — opens the whole error in a window. That is
    [UC-VIEW-PANEL-006](readStacktrace.md).
-5. **The bug** — one chip carrying the severity and the priority together, in
-   the severity's color, beside **Report a bug** (Rule-VIEW-PANEL-086).
-6. **The test case's band** — folded, because a tester reading a failure is
+7. **The test case's band** — folded, because a tester reading a failure is
    reading the failure. Clicking its name opens every field the test case has
    (Rule-VIEW-PANEL-087).
 
@@ -87,13 +90,12 @@ what the test case says (Rule-VIEW-PANEL-085).
 
 | Where it is       | What it holds                                                                                                                                                                                                                       |
 |-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| The first pill    | The verdict: **Passed**, **Failed**, **Blocked**, **Pending**, **Untested** or **Removed**, in the verdict's own color                                                                                                               |
-| The second pill   | How long the test case took                                                                                                                                                                                                         |
-| The third pill    | Who ran it and when, as `muteb · 7 January 10:05`                                                                                                                                                                                   |
+| The first badge   | The verdict: **Passed**, **Failed**, **Blocked**, **Pending**, **Untested** or **Removed**, in the verdict's own color                                                                                                               |
+| The second badge  | How long the test case took, with a clock, in a plain frame with nothing filled in                                                                                                                                                   |
+| The bug chip      | The severity and the priority in one chip, as `Blocker / High`, in the severity's color                                                                                                                                              |
+| After the chip    | The GitHub issue the failure was reported as, as `owner/repo#123`, and the **Report a bug** link that files one. That is [UC-VIEW-PANEL-016](reportBug.md). Drawn for a failed test case, and for any test case that has been reported |
 | **Actual Result** | What the tester says actually happened                                                                                                                                                                                              |
 | **Stacktrace**    | The first three lines of the error, a link to the rest, and a thumbnail of each screenshot pasted with the failure. That is [UC-VIEW-PANEL-006](readStacktrace.md)                                                                    |
-| The bug chip      | The severity and the priority in one chip, as `Blocker / High`, in the severity's color                                                                                                                                              |
-| Beside the chip   | The GitHub issue the failure was reported as, as `owner/repo#123`, and the **Report a bug** link that files one. That is [UC-VIEW-PANEL-016](reportBug.md). Drawn for a failed test case, and for any test case that has been reported |
 
 ## Main flow
 
@@ -114,10 +116,10 @@ That is question 3 on [the view panel page](main.md#not-decided).
 
 **If the test case passed** — five values were cleared when the pass was
 recorded: the actual result, the stacktrace, the bug severity, the bug priority
-and the bug issue link. The band is left holding its line of pills.
+and the bug issue link. The band is left holding the verdict and the duration.
 
-**If nothing was timed** — the duration pill disappears and the two beside it
-close the gap. A verdict recorded from the menu, or on several test cases at
+**If nothing was timed** — the duration badge disappears and what is beside it
+closes the gap. A verdict recorded from the menu, or on several test cases at
 once, is never timed.
 
 ## The same bug, on the tab beside this one
