@@ -10,7 +10,7 @@ it.
 |---------------------|--------------------------------------------------------------------------------------------------------------------|
 | **Part of Testin**  | The view panel                                                                                                     |
 | **Answers**         | What the panel shows, how a test case gets into it, and what a tester can do from it                               |
-| **Numbering**       | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-084` |
+| **Numbering**       | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-087` |
 | **State**           | **Written** — [#181](https://github.com/mtb550/test-in/issues/181)                                                 |
 | **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code.                        |
 | **Written to**      | [How a document is written](../standard.md)                                                                        |
@@ -93,32 +93,21 @@ in front of them while they write down what actually happened.
 │                                                                            │
 │   Demo  >  Test Cases  >  Accounts  >  Login                               │
 │                                                                            │
-│   ( 3f2a05c1-...-9c1b )  [copy]                                            │
-│                                                                            │
 │   Log in with a valid user                                                 │
 │                                                                            │
-│   [ go to code ]  [ run ]                                                  │
+│   ( 3f2a05c1-...-9c1b ) [copy]  ( P1 ) ( Smoke )   [ go to code ] [ run ]  │
 │                                                                            │
-│   ( P1 )  ( Smoke )  ( Regression )  ( Failed )                            │
-│                                                                            │
-│   RUN STATUS                                                               │
-│   Failed                                                                   │
-│   DURATION                                                                 │
-│   02:14                                                                    │
+│   THIS RUN ───────────────────────────────────────────────────────────     │
+│   ( Failed )  ( 02:14 )  ( muteb · 7 January 10:05 )                       │
 │   ACTUAL RESULT                                                            │
 │   The session was dropped.                                                 │
 │   STACKTRACE                                                               │
 │   java.lang.AssertionError: expected [true]                                │
 │     at org.testin.demo.LoginTest.valid                                     │
-│     at org.testng.internal.Invoker.invoke                                  │
 │   Show all 42 lines                                                        │
-│   BUG SEVERITY                                                             │
-│   Blocker                                                                  │
-│   BUG PRIORITY                                                             │
-│   High                                                                     │
-│   BUG ISSUE                                                                │
-│   Report Bug                                                               │
+│   ( Blocker / High )   Report a bug                                        │
 │                                                                            │
+│   THE TEST CASE ──────────────────────────────────────────────────────     │
 │   EXPECTED RESULT                                                          │
 │   The dashboard opens.                                                     │
 │   STEPS                                                                    │
@@ -129,12 +118,8 @@ in front of them while they write down what actually happened.
 │   An account exists.                                                       │
 │   TEST DATA                                                                │
 │   user=admin                                                               │
-│   MODULE                                                                   │
-│   Accounts                                                                 │
-│   ORDER                                                                    │
-│   3                                                                        │
-│   CREATED                                                                  │
-│   muteb on 2 September 2026                                                │
+│                                                                            │
+│   ▸ Reference, module, order, created, updated                             │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -144,20 +129,24 @@ in front of them while they write down what actually happened.
    is empty today, because a test case records only its last edit.
 3. **The path** — one step for each folder above the test case. Only the last
    step opens anything.
-4. **The identity** — the test case's own identity, with a button that copies
-   it.
-5. **The title** — the test case's description.
-6. **The two buttons** — go to the automation code, and run the test case. Both
-   are always drawn. One that cannot work here is gray, does not grow under the
-   pointer, and says what it is waiting for.
-7. **The badges** — the priority, then one for each group, then the verdict.
-8. **The run rows** — what one test run recorded. They are drawn only when the
-   panel was opened from a test run.
-9. **The test case rows** — what the test case says. Every empty one is left
-   out.
-10. **The captions** — each on a line of its own above its value, in the
-    caption font: JetBrains Mono, smaller than the value, in capitals, in gray.
-    The value has the whole width of the panel (Rule-VIEW-PANEL-082).
+4. **The title** — the test case's description, the largest words on the panel.
+5. **The identity line** — the test case's own identity with a button that
+   copies it, then the priority and one badge for each group, then the two
+   buttons: go to the automation code, and run the test case. Both buttons are
+   always drawn; one that cannot work here is gray, does not grow under the
+   pointer, and says what it is waiting for (Rule-VIEW-PANEL-085).
+6. **This run** — what one test run recorded. The whole band, its name
+   included, is drawn only when the panel was opened from a test run
+   (Rule-VIEW-PANEL-085). Its verdict, its duration and who ran it are pills,
+   and its bug is one chip (Rule-VIEW-PANEL-086). That is
+   [UC-VIEW-PANEL-005](readRunResult.md).
+7. **The test case** — what the test case says. Every empty field is left out.
+8. **The fold** — reference, module, order, created and updated, behind one
+   line at the end. It is remembered for the IDE rather than for one test case
+   (Rule-VIEW-PANEL-087).
+9. **The captions** — each on a line of its own above its value, in the
+   caption font: JetBrains Mono, smaller than the value, in capitals, in gray.
+   The value has the whole width of the panel (Rule-VIEW-PANEL-082).
 
 ---
 
@@ -209,7 +198,7 @@ test case's history should hold, or where it would be read from.
 tracks a bug beyond the severity and the priority written on a failed verdict.
 
 **Question 3** — Should the panel show a test case at all when it was opened
-from a test run that does not hold it? It shows the test case with no run rows
+from a test run that does not hold it? It shows the test case with no run band
 today, which reads as a test case nobody has run.
 
 ---

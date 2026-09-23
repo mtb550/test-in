@@ -59,4 +59,18 @@ public abstract class BaseDetails {
 
         return row + 1;
     }
+
+    // Rule-VIEW-PANEL-085
+    protected int addStretchedRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull JComponent component, final @NotNull Insets insets, final int row) {
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = insets;
+
+        panel.add(component, gbc);
+
+        return row + 1;
+    }
 }

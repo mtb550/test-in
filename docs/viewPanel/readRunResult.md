@@ -6,10 +6,10 @@
 case itself, **so that** I can see what happened last time without opening the
 test run.
 
-These rows come from one test run. The rows under them come from the test case.
+This band comes from one test run. The band under it comes from the test case.
 
-There is no key for this. The rows appear when the panel was opened from a test
-run.
+There is no key for this. The band appears when the panel was opened from a
+test run.
 
 ## Rules
 
@@ -32,90 +32,92 @@ run.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
-- **Rule-VIEW-PANEL-029** — The run rows are drawn only when the panel was
+- **Rule-VIEW-PANEL-029** — The run band is drawn only when the panel was
   opened from a test run that holds this test case.
-- **Rule-VIEW-PANEL-030** — The rows come from the test run itself, so the panel
-  and a report on the same test run can never disagree.
-- **Rule-VIEW-PANEL-031** — A run row with nothing in it is not drawn.
+- **Rule-VIEW-PANEL-030** — The band comes from the test run itself, so the
+  panel and a report on the same test run can never disagree.
+- **Rule-VIEW-PANEL-031** — A run value with nothing in it is not drawn.
 - **Rule-VIEW-PANEL-032** — Recording a pass clears the actual result, the
-  stacktrace, the bug severity, the bug priority and the bug issue link. Five of
-  the seven rows go with it.
+  stacktrace, the bug severity, the bug priority and the bug issue link. The
+  band is left holding its line of pills.
 - **Rule-VIEW-PANEL-033** — A test case the test run has not reached yet reads **Pending**.
 
 ## The screen
 
-The run rows sit under the badges and above the test case's own rows.
+What this run recorded is a band of its own, under the identity line and above
+what the test case says (Rule-VIEW-PANEL-085).
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│   ( P1 )  ( Smoke )  ( Failed )                                          │
+│   Log in with a valid user                                               │
 │                                                                          │
-│   RUN STATUS                                                             │
-│   Failed                                                                 │
-│   DURATION                                                               │
-│   02:14                                                                  │
+│   ( 3f2a05c1-...-9c1b ) [copy]  ( P1 ) ( Smoke )  [ go to code ] [ run ]  │
+│                                                                          │
+│   THIS RUN ──────────────────────────────────────────────────────────    │
+│   ( Failed )  ( 02:14 )  ( muteb · 7 January 10:05 )                     │
 │   ACTUAL RESULT                                                          │
 │   The session was dropped.                                               │
 │   STACKTRACE                                                             │
 │   java.lang.AssertionError: expected [true]                              │
 │     at org.testin.demo.LoginTest.valid                                   │
-│     at org.testng.internal.Invoker.invoke                                │
 │   Show all 42 lines                                                      │
-│   BUG SEVERITY                                                           │
-│   Blocker                                                                │
-│   BUG PRIORITY                                                           │
-│   High                                                                   │
-│   BUG ISSUE                                                              │
-│   Report Bug                                                             │
+│   ( Blocker / High )   Report a bug                                      │
 │                                                                          │
+│   THE TEST CASE ─────────────────────────────────────────────────────    │
 │   EXPECTED RESULT                                                        │
 │   The dashboard opens.                                                   │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The badges** — the last badge is the verdict.
-2. **The seven run rows** — what one test run recorded, each caption on a line
-   of its own above its value (Rule-VIEW-PANEL-082).
-3. **Show all 42 lines** — opens the whole error in a window. That is
+1. **The band's name** — **This run**, in the caption font, with a hairline to
+   the panel's edge (Rule-VIEW-PANEL-085).
+2. **The line of pills** — the verdict in its own color, how long it took, and
+   who ran it and when (Rule-VIEW-PANEL-086).
+3. **The two rows that hold sentences** — the actual result and the stacktrace,
+   each caption on a line of its own above its value (Rule-VIEW-PANEL-082).
+4. **Show all 42 lines** — opens the whole error in a window. That is
    [UC-VIEW-PANEL-006](readStacktrace.md).
-4. **The test case rows** — the test case's own fields, below, drawn the same
+5. **The bug** — one chip carrying the severity and the priority together, in
+   the severity's color, beside **Report a bug** (Rule-VIEW-PANEL-086).
+6. **The test case's band** — what the test case says, below, drawn the same
    way.
 
-## The rows, in order
+## The band, in order
 
-| Caption           | What it holds                                                                                                                                                                                                                        |
-|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Run Status**    | The verdict: **Passed**, **Failed**, **Blocked**, **Pending**, **Untested** or **Removed**                                                                                                                                           |
-| **Duration**      | How long the test case took                                                                                                                                                                                                          |
-| **Actual Result** | What the tester says actually happened                                                                                                                                                                                               |
-| **Stacktrace**    | The first three lines of the error, a link to the rest, and a thumbnail of each screenshot pasted with the failure. That is [UC-VIEW-PANEL-006](readStacktrace.md)                                                                   |
-| **Bug Severity**  | **Blocker**, **Major**, **Minor** or **Enhancement**                                                                                                                                                                                 |
-| **Bug Priority**  | **High**, **Medium** or **Low**                                                                                                                                                                                                      |
-| **Bug Issue**     | The GitHub issue the failure was reported as, as `owner/repo#123`, and the **Report Bug** link that files one. That is [UC-VIEW-PANEL-016](reportBug.md). Drawn for a failed test case, and for any test case that has been reported |
+| Where it is       | What it holds                                                                                                                                                                                                                       |
+|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| The first pill    | The verdict: **Passed**, **Failed**, **Blocked**, **Pending**, **Untested** or **Removed**, in the verdict's own color                                                                                                               |
+| The second pill   | How long the test case took                                                                                                                                                                                                         |
+| The third pill    | Who ran it and when, as `muteb · 7 January 10:05`                                                                                                                                                                                   |
+| **Actual Result** | What the tester says actually happened                                                                                                                                                                                              |
+| **Stacktrace**    | The first three lines of the error, a link to the rest, and a thumbnail of each screenshot pasted with the failure. That is [UC-VIEW-PANEL-006](readStacktrace.md)                                                                    |
+| The bug chip      | The severity and the priority in one chip, as `Blocker / High`, in the severity's color                                                                                                                                              |
+| Beside the chip   | The GitHub issue the failure was reported as, as `owner/repo#123`, and the **Report a bug** link that files one. That is [UC-VIEW-PANEL-016](reportBug.md). Drawn for a failed test case, and for any test case that has been reported |
 
 ## Main flow
 
 1. The tester opens a test run and selects a test case in it.
 2. The tester presses `Enter`.
 3. Testin looks for that test case in that test run's recorded results.
-4. The seven run rows are drawn above the test case's own rows.
-5. Below them, the test case's own fields are drawn as usual.
+4. **This run** is drawn above what the test case says.
+5. Below it, the test case's own band is drawn as usual.
 
 ## What Testin refuses
 
-**If the panel was opened from a test set rather than a test run** — no run rows
-are drawn. There is no test run to read from.
+**If the panel was opened from a test set rather than a test run** — the run
+band is not drawn at all, not even its name. There is no test run to read from.
 
-**If the test run does not hold this test case** — no run rows are drawn. The
-test case is drawn on its own. It then looks like a test case nobody has run.
+**If the test run does not hold this test case** — the run band is not drawn.
+The test case is drawn on its own. It then looks like a test case nobody has run.
 That is question 3 on [the view panel page](main.md#not-decided).
 
-**If the test case passed** — five rows were cleared when the pass was
+**If the test case passed** — five values were cleared when the pass was
 recorded: the actual result, the stacktrace, the bug severity, the bug priority
-and the bug issue link. Only **Run Status** and **Duration** are left.
+and the bug issue link. The band is left holding its line of pills.
 
-**If nothing was timed** — the **Duration** row disappears. A verdict recorded
-from the menu, or on several test cases at once, is never timed.
+**If nothing was timed** — the duration pill disappears and the two beside it
+close the gap. A verdict recorded from the menu, or on several test cases at
+once, is never timed.
 
 ## The same bug, on the tab beside this one
 

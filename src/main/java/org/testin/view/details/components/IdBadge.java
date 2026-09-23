@@ -30,37 +30,31 @@ import org.testin.navigate.NavigateToTestCaseAction;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 
+import javax.swing.JComponent;
 import javax.swing.Timer;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
-import java.awt.GridBagConstraints;
 import java.awt.RenderingHints;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Optional;
 
-public class Id extends BaseDetails {
-    final int BADGE_ARC_SIZE = 16;
-    final int BADGE_BORDER_V = 3;
-    final int BADGE_BORDER_H = 10;
-    final int FLOW_GAP = 8;
-    final int COPY_SUCCESS_DELAY_MS = 1500;
-    final @NotNull String COPY_TOOLTIP = Bundle.message("view.id.copy");
-    final @NotNull String GO_TOOLTIP = Bundle.message("action.Testin.NavigateToTestCase.text");
-    final @NotNull Color BG_COLOR = new JBColor(Gray._230, Gray._80);
-    final @NotNull Color FG_COLOR = new JBColor(Gray._130, Gray._170);
-    final int INSETS_TOP = 5;
-    final int INSETS_LEFT = 16;
-    final int INSETS_BOTTOM = 0;
-    final int INSETS_RIGHT = 16;
-
-    // UC-VIEW-PANEL-009
-    @Override
-    public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
+public final class IdBadge {
+    private static final int BADGE_ARC_SIZE = 16;
+    private static final int BADGE_BORDER_V = 3;
+    private static final int BADGE_BORDER_H = 10;
+    private static final int FLOW_GAP = 8;
+    private static final int COPY_SUCCESS_DELAY_MS = 1500;
+    private static final @NotNull String COPY_TOOLTIP = Bundle.message("view.id.copy");
+    private static final @NotNull String GO_TOOLTIP = Bundle.message("action.Testin.NavigateToTestCase.text");
+    private static final @NotNull Color BG_COLOR = new JBColor(Gray._230, Gray._80);
+    private static final @NotNull Color FG_COLOR = new JBColor(Gray._130, Gray._170);
+    // UC-VIEW-PANEL-009, Rule-VIEW-PANEL-085
+    public static @NotNull JComponent of(final @NotNull Project p, final @NotNull TestCaseDto dto) {
         final @NotNull JBLabel idBadge = new JBLabel(dto.getId().toString()) {
             @Override
             protected void paintComponent(final Graphics g) {
@@ -112,13 +106,6 @@ public class Id extends BaseDetails {
         idContainer.add(idBadge);
         idContainer.add(copyIcon);
 
-        gbc.gridx = 0;
-        gbc.gridy = currentRow;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.insets = JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT);
-
-        panel.add(idContainer, gbc);
-        return currentRow + 1;
+        return idContainer;
     }
 }

@@ -35,17 +35,22 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.testrun.RunEditorAttributes;
+import org.testin.ui.Badges;
 import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.swing.JComponent;
 
 @AllArgsConstructor
 public final class BugIssueRow extends BaseDetails {
-    private static final int LINK_GAP = 16;
+    private static final int LINK_GAP = 10;
+    private static final int INSETS_TOP = 8;
+    private static final int INSETS_SIDE = 16;
 
     private final @NotNull TestRunItems item;
     private final @NotNull List<String> currentPath;
@@ -68,25 +73,39 @@ public final class BugIssueRow extends BaseDetails {
                 .orElse(currentRow);
     }
 
+    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-016, Rule-VIEW-PANEL-086, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075
     private int drawLinks(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow, final @NotNull Optional<String> bugIssue, final @NotNull TestRunDirectoryDto runDirectory) {
         final @NotNull Optional<String> off = Services.getInstance(p, BugReports.class)
                 .whyReportBugIsOff(new BugReports.RunItem(runDirectory.getPath(), item.getId()), item);
 
-        final @NotNull JBPanel<?> links = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        links.setOpaque(false);
+        final @NotNull JBPanel<?> line = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(LINK_GAP), 0));
+        line.setOpaque(false);
 
-        bugIssue.ifPresent(url -> {
-            final @NotNull ActionLink issue = link(BugIssueUrl.reference(url), _ -> BugIssueUrl.open(url));
-            issue.setBorder(JBUI.Borders.emptyRight(LINK_GAP));
-            links.add(issue);
-        });
+        chip().ifPresent(line::add);
+
+        bugIssue.ifPresent(url -> line.add(link(BugIssueUrl.reference(url), _ -> BugIssueUrl.open(url))));
 
         final @NotNull ActionLink report = link(Bundle.message("bug.dialog.title"),
                 _ -> ReportBug.start(p, runDirectory, item.getId(), dto, () -> redraw(p, dto, runDirectory)));
         report.setEnabled(off.isEmpty());
         report.setToolTipText(off.orElse(""));
-        links.add(report);
+        line.add(report);
 
-        return addRow(panel, gbc, RunEditorAttributes.BUG_ISSUE.getName(), links, currentRow);
+        return addFullWidthRow(panel, gbc, line, JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
+    }
+
+    // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086
+    private @NotNull Optional<JComponent> chip() {
+        final @NotNull List<Badges.Badge> bug = new ArrayList<>();
+        Badges.addBugBadge(bug, item.getBugSeverity().getLabel(), item.getBugSeverity().getColor());
+        Badges.addBugBadge(bug, item.getBugPriority().getLabel(), item.getBugSeverity().getColor());
+
+        if (bug.isEmpty()) return Optional.empty();
+
+        final @NotNull JBPanel<?> holder = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        holder.setOpaque(false);
+        Badges.showBadges(holder, bug);
+
+        return Optional.of(holder);
     }
 }

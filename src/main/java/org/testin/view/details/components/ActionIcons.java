@@ -29,21 +29,15 @@ import org.testin.services.Services;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
+import javax.swing.JComponent;
 import javax.swing.Box;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
 import java.util.List;
 
-public class ActionIcons extends BaseDetails {
-    final int STRUT_WIDTH = 8;
-    final int INSETS_TOP = 8;
-    final int INSETS_LEFT = 16;
-    final int INSETS_BOTTOM = 0;
-    final int INSETS_RIGHT = 16;
-
+public final class ActionIcons {
+    private static final int STRUT_WIDTH = 8;
     // UC-VIEW-PANEL-012, UC-VIEW-PANEL-014, Rule-VIEW-PANEL-050, Rule-VIEW-PANEL-056, Rule-VIEW-PANEL-057
-    @Override
-    public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
+    public static @NotNull JComponent of(final @NotNull Project p, final @NotNull TestCaseDto dto) {
         final @NotNull CardHoverAction.Offered navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD.offer(p, dto);
         final @NotNull CardHoverAction.Offered run = CardHoverAction.RUN_TEST_METHOD.offer(p, dto);
 
@@ -59,7 +53,6 @@ public class ActionIcons extends BaseDetails {
         actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(STRUT_WIDTH)));
         actionsPanel.add(HoverButton.of(p, run, run.action().getIcon(), run.action().getTooltip(), () -> run.action().execute(p, dto)));
 
-        return addFullWidthRow(panel, gbc, actionsPanel,
-                JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT), currentRow);
+        return actionsPanel;
     }
 }

@@ -19,38 +19,33 @@ package org.testin.view.details.components;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.runner.TestNGExecution;
-import org.testin.services.Services;
-import org.testin.ui.Badges;
+import org.testin.ui.Caption;
+import org.testin.util.Fonts;
 
-import java.awt.FlowLayout;
+import javax.swing.JSeparator;
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
-import java.util.List;
 
-public class BadgeRow extends BaseDetails {
-    final int FLOW_GAP = 6;
-    final int INSETS_TOP = 8;
-    final int INSETS_LEFT = 16;
-    final int INSETS_BOTTOM = 16;
-    final int INSETS_RIGHT = 16;
+@AllArgsConstructor
+public final class BandTitle extends BaseDetails {
+    private static final int GAP = 10;
+    private static final int INSETS_TOP = 18;
+    private static final int INSETS_SIDE = 16;
 
-    // UC-VIEW-PANEL-004
+    private final @NotNull String name;
+
+    // UC-VIEW-PANEL-004, UC-VIEW-PANEL-005, Rule-VIEW-PANEL-085
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        final @NotNull JBPanel<?> badgesPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
-        badgesPanel.setOpaque(false);
+        final @NotNull JBPanel<?> band = new JBPanel<>(new BorderLayout(JBUI.scale(GAP), 0));
+        band.setOpaque(false);
 
-        final @NotNull List<Badges.Badge> badges = Badges.testCaseBadges(dto);
+        band.add(Caption.of(name, Fonts.panelCaption()), BorderLayout.WEST);
+        band.add(new JSeparator(), BorderLayout.CENTER);
 
-        final @NotNull RunStatus tempStatus = Services.getInstance(p, TestNGExecution.class).statusOf(dto);
-        if (tempStatus.hasBadge()) badges.add(Badges.createRunStatusBadge(tempStatus.getBadge()));
-
-        Badges.showBadges(badgesPanel, badges);
-
-        return addFullWidthRow(panel, gbc, badgesPanel,
-                JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT), currentRow);
+        return addStretchedRow(panel, gbc, band, JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
     }
 }
