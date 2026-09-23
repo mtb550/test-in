@@ -93,10 +93,11 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
         return TestRunItems.builder().id(ID).status(TestStatus.FAILED).actualResult("The session was dropped").duration(Duration.ofSeconds(134)).executedBy("muteb").stacktrace(STACKTRACE).build();
     }
 
-    public void testAStacktraceLongerThanThePreviewOffersTheRest() {
+    public void testTheExceptionIsALinkAndNotAValue() {
         final @NotNull List<String> words = shown(Optional.of(failed()));
 
-        assertTrue("the link to the rest of the error is missing: " + words, words.contains(Bundle.message("view.stacktrace.show.all", "6")));
+        assertTrue("the link that opens the exception is missing: " + words, words.contains(Bundle.message("view.stacktrace.link")));
+        assertFalse("the exception itself was drawn on the panel: " + words, holds(words, "java.lang.AssertionError"));
     }
 
     public void testTheRunBandComesBeforeTheTestCaseBand() {

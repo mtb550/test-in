@@ -30,77 +30,56 @@ import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
-import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.Picture;
-import org.testin.ui.framework.Prose;
 import org.testin.util.Bundle;
-import org.testin.util.Fonts;
 
-import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JTextArea;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
 public final class StacktraceRow extends BaseDetails {
-    private static final int LINES_SHOWN = 3;
-
-    private static final int LINK_MARGIN_TOP = 6;
-
-    private static final int LINK_GAP = 12;
+    private static final int GAP = 12;
+    private static final int INSETS_TOP = 8;
+    private static final int INSETS_SIDE = 16;
 
     private final @NotNull TestRunItems item;
 
     private final @NotNull List<String> currentPath;
 
-    private static @NotNull JBPanel<?> line(final @NotNull List<? extends JComponent> parts) {
-        final @NotNull JBPanel<?> line = new JBPanel<>(new HorizontalLayout(JBUI.scale(LINK_GAP)));
-        line.setOpaque(false);
-        line.setBorder(JBUI.Borders.emptyTop(LINK_MARGIN_TOP));
-        line.setAlignmentX(Component.LEFT_ALIGNMENT);
-        parts.forEach(line::add);
-        return line;
-    }
-
-    // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-035, Rule-VIEW-PANEL-081
+    // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-081
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final @NotNull String stacktrace = item.getStacktrace();
         final @NotNull List<String> screenshots = item.getScreenshots();
         if (stacktrace.isBlank() && screenshots.isEmpty()) return currentRow;
 
-        final @NotNull List<String> lines = stacktrace.lines().toList();
+        final @NotNull List<JComponent> parts = new ArrayList<>();
 
-        final @NotNull JBPanel<?> container = new JBPanel<>();
-        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-        container.setOpaque(false);
+        if (!stacktrace.isBlank()) parts.add(exception(p, dto, stacktrace));
+        screenshots.forEach(name -> parts.add(thumbnail(p, name)));
 
-        if (!stacktrace.isBlank()) container.add(preview(lines));
-        if (lines.size() > LINES_SHOWN) container.add(line(List.of(showAllLink(p, dto, stacktrace, lines.size()))));
-        if (!screenshots.isEmpty()) container.add(line(screenshots.stream().map(name -> thumbnail(p, name)).toList()));
-
-        return addRow(panel, gbc, RunEditorAttributes.STACKTRACE.getName(), container, currentRow);
+        return addFullWidthRow(panel, gbc, line(parts), JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
     }
 
-    // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-035
-    private @NotNull JTextArea preview(final @NotNull List<String> lines) {
-        final @NotNull JTextArea area = Prose.of(String.join("\n", lines.subList(0, Math.min(LINES_SHOWN, lines.size()))));
+    private static @NotNull JBPanel<?> line(final @NotNull List<? extends JComponent> parts) {
+        final @NotNull JBPanel<?> line = new JBPanel<>(new HorizontalLayout(JBUI.scale(GAP)));
+        line.setOpaque(false);
 
-        area.setFont(Fonts.code());
-        area.setAlignmentX(Component.LEFT_ALIGNMENT);
+        parts.forEach(line::add);
 
-        return area;
+        return line;
     }
 
-    private @NotNull ActionLink showAllLink(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull String stacktrace, final int total) {
-        return link(Bundle.message("view.stacktrace.show.all", String.valueOf(total)),
+    // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034
+    private @NotNull ActionLink exception(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull String stacktrace) {
+        return link(Bundle.message("view.stacktrace.link"),
                 _ -> new ErrorDetailsDialog(p, dto.getDescription(), item.getActualResult(), stacktrace).show());
     }
 

@@ -1,13 +1,15 @@
 [Documentation](../README.md) › [The view panel](main.md) › UC-VIEW-PANEL-006
 
-# UC-VIEW-PANEL-006: Read the whole stacktrace of a failure
+# UC-VIEW-PANEL-006: Read the exception behind a failure
 
 **As a** tester, **I want** every line of the error behind a failure, **so that** I can paste it into a bug report
 without going to the log.
 
-The panel shows only the first three lines. This opens the rest in a window.
+The panel never shows the error. It is the application's own exception, copied
+out of a log, and it is far longer than anything else the panel holds - so the
+panel offers one link, **Exception**, and the whole thing opens in a window.
 
-There is no key for this. The link is under the first three lines.
+There is no key for this. The link sits where the value would have been.
 
 ## Rules
 
@@ -30,41 +32,37 @@ There is no key for this. The link is under the first three lines.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
-- **Rule-VIEW-PANEL-034** — The panel shows the first three lines of the error,
-  and offers a link to the rest.
-- **Rule-VIEW-PANEL-035** — An error of three lines or fewer is shown whole,
-  with no link.
+- **Rule-VIEW-PANEL-034** — The panel never shows the error itself, however
+  short it is. It offers one link, **Exception**, and there is no caption above
+  it: the link is its own name.
+- **Rule-VIEW-PANEL-035** — The window is the only place the error is read, so it
+  holds the actual result and the error together, in that order, with a blank
+  line between them.
 - **Rule-VIEW-PANEL-036** — The text in the dialog can be selected and copied.
   It can also be typed into, and nothing typed there is ever saved.
-- **Rule-VIEW-PANEL-081** — Under the first lines of the error, the Show all
-  link comes first, then one thumbnail for each screenshot pasted with the
-  failure, the one the failure form shows. Hovering names the file, and a click
-  opens that screenshot at its real size in a window of its own.
+- **Rule-VIEW-PANEL-081** — The **Exception** link comes first on its line, then
+  one thumbnail for each screenshot pasted with the failure, the one the failure
+  form shows. Hovering names the file, and a click opens that screenshot at its
+  real size in a window of its own.
 
 ## The screen
 
-The **Stacktrace** row shows the first three lines, then *Show all* and the
-number of lines the error really has, then a thumbnail of each screenshot
-pasted with the failure: the picture itself, 48 pixels high, as the failure
-form shows it. Hovering over one names its file; clicking it opens that
-screenshot in a window of its own.
+One line holds **Exception**, then a thumbnail of each screenshot pasted with
+the failure: the picture itself, 48 pixels high, as the failure form shows it.
+Hovering over one names its file; clicking it opens that screenshot in a window
+of its own.
 
 ```
-│   STACKTRACE                                                               │
-│   java.lang.AssertionError: expected [true]                                │
-│     at org.testin.demo.LoginTest.valid                                     │
-│     at org.testng.internal.Invoker.invoke                                  │
-│   Show all 42 lines                                                        │
-│   ┌──────┐  ┌──────┐                                                       │
-│   │ pic  │  │ pic  │                                                       │
-│   └──────┘  └──────┘                                                       │
+│   Exception   ┌──────┐  ┌──────┐                                           │
+│               │ pic  │  │ pic  │                                           │
+│               └──────┘  └──────┘                                           │
 ```
 
-*Show all* opens this dialog. It holds the text, and no screenshot.
+**Exception** opens this dialog. It holds the text, and no screenshot.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  Error                                                       │
+│  Exception                                                   │
 ├──────────────────────────────────────────────────────────────┤
 │  TEST CASE                                                   │
 │  Log in with a valid user                                    │
@@ -81,7 +79,7 @@ screenshot in a window of its own.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **The title** — always the one word.
+1. **The title** — always the one word, the same word the link reads.
 2. **Test Case** — the description of the test case that failed.
 3. **The text** — the message, a blank line, then the whole error.
 4. **The bottom line** — `Escape` closes it.
@@ -89,9 +87,9 @@ screenshot in a window of its own.
 ## Main flow
 
 1. The panel shows a failed test case with an error recorded against it.
-2. The **Stacktrace** row shows the first three lines.
-3. The tester clicks *Show all*, then the number of lines.
-4. The **Error** dialog opens. It is wide enough to show a whole line of the
+2. One line reads **Exception**.
+3. The tester clicks it.
+4. The **Exception** dialog opens. It is wide enough to show a whole line of the
    error without wrapping it.
 5. The tester selects the text and copies it.
 6. The tester presses `Escape`. Nothing is saved.
@@ -115,17 +113,13 @@ nothing is saved.
 
 ## What Testin refuses
 
-**If there is no error and no screenshot** — no **Stacktrace** row is drawn at
-all.
+**If there is no error and no screenshot** — the line is not drawn at all.
 
-**If there are screenshots but no error** — the row shows only the
-thumbnails.
+**If there are screenshots but no error** — the line shows only the
+thumbnails, with no **Exception** link.
 
 **If a screenshot's file cannot be read** — its thumbnail is an empty square,
 and a click opens a window that is empty too.
-
-**If the error is three lines or fewer** — the whole error is shown in the panel
-and there is no link.
 
 **If the failure has no message** — the dialog shows only the error, with no
 blank first line.

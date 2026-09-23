@@ -101,10 +101,7 @@ in front of them while they write down what actually happened.
 │   ( Failed ) ( 02:14 ) ( Blocker / High )  mtb550/x#123  Report a bug      │
 │   ACTUAL RESULT                                                            │
 │   The session was dropped.                                                 │
-│   STACKTRACE                                                               │
-│   java.lang.AssertionError: expected [true]                                │
-│     at org.testin.demo.LoginTest.valid                                     │
-│   Show all 42 lines                                                        │
+│   Exception                                                                │
 │   EXECUTED BY                                                              │
 │   muteb on 7 January 10:05                                                 │
 │                                                                            │
