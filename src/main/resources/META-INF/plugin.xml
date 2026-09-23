@@ -44,7 +44,7 @@
 
     <b>Privacy</b>
     <ul>
-        <li>No telemetry, no accounts, no analytics. The only network traffic is to the Git remote you configure yourself.</li>
+        <li>No telemetry, no accounts, no analytics. Testin talks to the Git remote you configure yourself, and - when you press <b>Report Bug</b> - to the GitHub repository your own <b>testin.yml</b> names, through the <b>gh</b> sign-in already on your machine. Nothing reaches the developer.</li>
     </ul>
 
     <b>Team</b>
