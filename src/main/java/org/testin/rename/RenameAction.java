@@ -102,7 +102,7 @@ public class RenameAction extends DumbAwareAction {
                 .flatMap(p -> TestinData.singleSelectedNode(e).map(dir -> whyNot(p, dir)))
                 .orElse(Optional.of(Bundle.message("rename.disabled.description")));
 
-        GrayWithReason.unless(this, e, why.isEmpty(), why.orElse(""));
+        GrayWithReason.unless(this, e, why);
     }
 
     @Override

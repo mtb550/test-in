@@ -32,7 +32,6 @@ import org.testin.util.Bundle;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
-import javax.swing.Icon;
 import javax.swing.JComponent;
 import java.util.Arrays;
 import java.util.List;
@@ -133,18 +132,18 @@ public enum CopyChoice implements MenuItem {
 
     private final @NotNull String name;
     private final @NotNull Shortcuts shortcut;
-    private final @NotNull Icon icon;
+    private final Icons.@NotNull LetterIcon icon;
 
     private final @NotNull Optional<TestEditorAttributes> attribute;
 
     @Getter(AccessLevel.NONE)
     private final @NotNull Function<TestCaseDto, String> copied;
 
-    CopyChoice(final @NotNull TestEditorAttributes attribute, final @NotNull Shortcuts shortcut, final @NotNull Icon icon) {
+    CopyChoice(final @NotNull TestEditorAttributes attribute, final @NotNull Shortcuts shortcut, final Icons.@NotNull LetterIcon icon) {
         this(attribute, shortcut, icon, attribute::gridValue);
     }
 
-    CopyChoice(final @NotNull TestEditorAttributes attribute, final @NotNull Shortcuts shortcut, final @NotNull Icon icon, final @NotNull Function<TestCaseDto, String> copied) {
+    CopyChoice(final @NotNull TestEditorAttributes attribute, final @NotNull Shortcuts shortcut, final Icons.@NotNull LetterIcon icon, final @NotNull Function<TestCaseDto, String> copied) {
         this(attribute.getName(), shortcut, icon, Optional.of(attribute), copied);
     }
 

@@ -45,7 +45,13 @@ public class NavigateToTestMethodAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (!CardHoverAction.NAVIGATE_TO_TEST_METHOD.enableOrExplain(e.getPresentation())) return;
+        final @Nullable Project shownIn = e.getProject();
+        if (shownIn == null) {
+            e.getPresentation().setEnabled(false);
+            return;
+        }
+
+        if (!CardHoverAction.NAVIGATE_TO_TEST_METHOD.enableOrExplain(shownIn, e.getPresentation())) return;
 
         e.getPresentation().setEnabled(!TestinData.selectedTestCases(e).isEmpty());
     }

@@ -41,7 +41,7 @@ public class SaveTestinYmlAction extends DumbAwareAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
         final @NotNull Optional<String> why = SaveTestinYml.whyNot(p);
-        GrayWithReason.unless(this, e, why.isEmpty(), why.orElse(""));
+        GrayWithReason.unless(this, e, why);
     }
 
     // UC-TREE-PANEL-029, Rule-TREE-PANEL-113

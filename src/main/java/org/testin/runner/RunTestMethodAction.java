@@ -60,7 +60,7 @@ public class RunTestMethodAction extends DumbAwareAction {
         e.getPresentation().setText(offered.getTooltip());
         e.getPresentation().setIcon(offered.getIcon());
 
-        if (!offered.enableOrExplain(e.getPresentation())) return;
+        if (!offered.enableOrExplain(p, e.getPresentation())) return;
 
         e.getPresentation().setEnabled(!selected.isEmpty());
     }

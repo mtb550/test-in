@@ -50,7 +50,7 @@ public final class ShownTestCaseAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(shown.get().isPresent() && button.enableOrExplain(e.getPresentation()));
+        e.getPresentation().setEnabled(shown.get().isPresent() && button.enableOrExplain(p, e.getPresentation()));
     }
 
     @Override

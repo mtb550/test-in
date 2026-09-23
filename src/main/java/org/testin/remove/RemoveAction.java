@@ -18,11 +18,13 @@ package org.testin.remove;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.Declared;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditors;
@@ -134,8 +136,8 @@ public class RemoveAction extends DumbAwareAction {
                 if (lost > 0) {
                     Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("remove.not.undoable.title"),
                             lost == 1
-                                    ? Bundle.message("remove.not.undoable.one")
-                                    : Bundle.message("remove.not.undoable.many", String.valueOf(lost)));
+                                    ? Bundle.message("remove.not.undoable.one", Declared.shortcutText(IdeActions.ACTION_UNDO))
+                                    : Bundle.message("remove.not.undoable.many", String.valueOf(lost), Declared.shortcutText(IdeActions.ACTION_UNDO)));
                 }
             });
         }

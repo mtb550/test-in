@@ -32,7 +32,6 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
-import org.testin.testproject.BoundTestProject;
 import org.testin.util.Bundle;
 
 import java.util.Optional;
@@ -66,12 +65,10 @@ public final class ReportBug {
     }
 
     private static @NotNull PreparedBug prepare(final @NotNull Project p, final @NotNull BugFacts facts, final @NotNull Optional<TestCaseFile> file, final @NotNull ProgressIndicator indicator) {
-        Services.getInstance(p, BoundTestProject.class).reread();
-
         final @NotNull Optional<String> link = file.flatMap(where -> TestCaseLink.read(p, where));
         indicator.checkCanceled();
 
-        final @NotNull String bugRepoUrl = TestinYml.bugRepoUrl(p);
+        final @NotNull String bugRepoUrl = TestinYml.bugRepoUrlOnDisk(p);
         final @NotNull Optional<String> whyNotReady = GitHubCli.onPath(indicator).whyItCannotSend(bugRepoUrl);
         indicator.checkCanceled();
 

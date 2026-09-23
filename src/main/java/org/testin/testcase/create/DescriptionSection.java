@@ -39,7 +39,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class DescriptionSection extends AbstractOneLineSection {
-    private static final @NotNull Icon REFUSED = Icons.fieldLetter("D", Icons.RED);
+    private static final @NotNull Icon REFUSED = Icons.fieldLetter(CreateTestCaseFields.DESCRIPTION.getIcon().letter(), Icons.RED);
 
     private final @NotNull Project p;
 

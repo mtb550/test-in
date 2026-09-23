@@ -53,9 +53,14 @@ public final class Icons {
     private static final int DOT_SIZE = 10;
 
     // UC-EDITOR-PANEL-005
-    public static @NotNull Icon fieldLetter(final @NotNull String letter, final @NotNull Color color) {
+    public static @NotNull LetterIcon fieldLetter(final @NotNull String letter, final @NotNull Color color) {
         final @NotNull Font font = Fonts.iconLetter();
-        return new Icon() {
+        return new LetterIcon() {
+            @Override
+            public @NotNull String letter() {
+                return letter;
+            }
+
             @Override
             public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
                 final @NotNull Graphics2D g2 = (Graphics2D) g.create();
@@ -86,6 +91,10 @@ public final class Icons {
                 return JBUI.scale(16);
             }
         };
+    }
+
+    public interface LetterIcon extends Icon {
+        @NotNull String letter();
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-077

@@ -2,7 +2,7 @@
 
 # Standing decisions
 
-> Fourteen decisions in Testin look wrong until you know why they were made. Each
+> Fifteen decisions in Testin look wrong until you know why they were made. Each
 > one has been proposed for reversal at least once, and each reversal would have
 > broken something the decision exists to protect. They are written here so a
 > contributor reads the reason before writing the fix.
@@ -13,7 +13,7 @@
 | **What the numbers mean** | `Decision-001` and up, in the order they were recorded. A number is never reused and never renumbered                                             |
 | **Answers**               | Why a design that looks odd is deliberate, and what it costs to change                                                                            |
 | **State**                 | Written                                                                                                                                           |
-| **Checked against**       | `main` at `d1eaae84`, 22 September 2026                                                                                                           |
+| **Checked against**       | `main` at `b056082c`, 23 September 2026                                                                                                           |
 | **Written to**            | [The standard](standard.md), as far as it applies. A decision is not a use case, so it has context, a decision and consequences instead of a flow |
 
 ---
@@ -456,6 +456,36 @@ back in the "unknown file" color, in every IDE and both themes. Replacing it
 with a `FileStatusProvider` adds `com.intellij.modules.vcs` to a plugin whose
 only required dependency is `com.intellij.modules.platform` — the reason it
 runs in PyCharm, Rider, GoLand and WebStorm at all.
+
+---
+
+## Decision-015 — Escape closes at once, and never asks
+
+**Context.** Rule-INTERNAL-059 says Escape closes a dialog at once and saves
+nothing, and every dialog in the plugin does. A review counted what that throws
+away: Create Test Case, the nine bulk editors and Result Analysis lose
+everything typed, and the create and edit run form, Update Test Case and the
+commit message lose less (#66, finding 296). Two dialogs had already decided
+not to ask - the failure form, where a half-written failure is worse than none
+(Rule-EDITOR-PANEL-144), and Report Bug (Rule-VIEW-PANEL-070). The framework is
+one class, so a question on Escape would have been written once and inherited
+everywhere.
+
+**Decision.** Escape stays immediate in every dialog, and the failure form's
+reasoning is the plugin's: a dialog is escaped on purpose. Decided 23 September
+2026; finding 296 was closed as decided rather than fixed.
+
+**Consequences.** A tester who escapes a full Create Test Case dialog loses
+what they typed, with no second chance. In exchange, Escape means one thing
+everywhere and is answered by habit rather than read: a question that appears
+on most Escapes is dismissed without being read, which costs the typing anyway
+and costs a keystroke every other time. Nothing in the framework has to
+remember which dialogs ask.
+
+**If you are about to reverse it.** Do it in the framework, not in a dialog:
+one dialog that asks while its neighbours do not is the worst of both, because
+Escape then means two things. And keep the failure form and Report Bug out of
+it, which is what Rule-EDITOR-PANEL-144 and Rule-VIEW-PANEL-070 already say.
 
 ---
 

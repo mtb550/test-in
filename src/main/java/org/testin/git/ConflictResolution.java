@@ -106,6 +106,7 @@ public final class ConflictResolution {
 
         final @NotNull List<String> leftOver = new ArrayList<>();
         final @NotNull List<Pending> pending = new ArrayList<>();
+        final @NotNull List<String> settledQuietly = new ArrayList<>();
 
         for (final String relativePath : conflicting) {
             final @NotNull Optional<Merger> merger = mergerFor(relativePath);
@@ -131,11 +132,19 @@ public final class ConflictResolution {
                 continue;
             }
 
-            if (!keep(p, git, repositoryPath, relativePath, merge.merged())) leftOver.add(relativePath);
+            if (keep(p, git, repositoryPath, relativePath, merge.merged())) settledQuietly.addAll(merge.settled());
+            else leftOver.add(relativePath);
         }
 
-        ApplicationManager.getApplication().invokeLater(() ->
-                ask(p, git, mapper, repositoryPath, pending, leftOver, onResolved, onLeftOver));
+        ApplicationManager.getApplication().invokeLater(() -> {
+            // UC-SHARE-017, Rule-SHARE-109
+            if (!settledQuietly.isEmpty()) {
+                Services.getInstance(p, Notifier.class).info(p, Bundle.message("git.merge.settled.title"),
+                        Merge.settledSentence(settledQuietly, System.lineSeparator()));
+            }
+
+            ask(p, git, mapper, repositoryPath, pending, leftOver, onResolved, onLeftOver);
+        });
     }
 
     // UC-SHARE-018, Rule-SHARE-081

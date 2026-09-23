@@ -16,7 +16,6 @@
 
 package org.testin.editor;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.ex.FakeFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -40,7 +39,7 @@ public class EditorType extends FakeFileType {
     public static final @NotNull EditorType TEST_RUN = new EditorType(
             "Test Run",
             Bundle.message("editor.type.run.description"),
-            AllIcons.Nodes.Services,
+            DirectoryType.TR.getIcon(),
             RunEditor::new
     );
 

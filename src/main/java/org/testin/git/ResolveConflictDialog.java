@@ -54,7 +54,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog {
 
         final @NotNull List<ComponentDialogBase<?>> rows = new ArrayList<>();
 
-        if (!settled.isEmpty()) rows.add(ComponentDialogBase.message(settledSentence(settled)));
+        if (!settled.isEmpty()) rows.add(ComponentDialogBase.message(Merge.settledSentence(settled, LINE)));
 
         for (final Merge.Question question : questions) {
             final @NotNull ComponentDialogBase<RadioSelection<Boolean>> row = ComponentDialogBase.<Boolean>radios(FieldName.of(question.field()))
@@ -77,15 +77,6 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog {
                 StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("dialog.conflict.shortcut.skip"), this::skip));
 
         preferredSize = new Dimension(JBUI.scale(700), JBUI.scale(120 + (60 * questions.size())));
-    }
-
-    // UC-SHARE-017, Rule-SHARE-109
-    private static @NotNull String settledSentence(final @NotNull List<String> settled) {
-        final @NotNull String lead = settled.size() == 1
-                ? Bundle.message("dialog.conflict.settled.one")
-                : Bundle.message("dialog.conflict.settled.many");
-
-        return lead + LINE + String.join(LINE, settled);
     }
 
     // UC-SHARE-018, Rule-SHARE-083

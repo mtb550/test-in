@@ -147,9 +147,16 @@ public enum CardHoverAction {
         execute(editor.getProject(), tc);
     }
 
-    // UC-CODEGEN-009, Rule-CODEGEN-005
-    public boolean enableOrExplain(final @NotNull Presentation presentation) {
-        return requires.stream().allMatch(plugin -> plugin.enableOrExplain(presentation, tooltip));
+    // UC-CODEGEN-009, Rule-CODEGEN-005, Rule-CODEGEN-082
+    public boolean enableOrExplain(final @NotNull Project p, final @NotNull Presentation presentation) {
+        if (!requires.stream().allMatch(plugin -> plugin.enableOrExplain(presentation, tooltip))) return false;
+
+        return whyNotOffered(p).map(reason -> {
+            presentation.setEnabled(false);
+            presentation.setDescription(reason);
+
+            return false;
+        }).orElse(true);
     }
 
     // UC-EDITOR-PANEL-047, UC-EDITOR-PANEL-048

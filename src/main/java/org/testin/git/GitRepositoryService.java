@@ -44,6 +44,11 @@ public final class GitRepositoryService {
         GitCommandRunner.execute(p, repositoryPath, "git", "remote", "add", remoteName, remoteUrl);
     }
 
+    // UC-TREE-PANEL-003, Rule-SHARE-062
+    public void changeRemoteUrl(final @NotNull Path repositoryPath, final @NotNull String remoteName, final @NotNull String remoteUrl) {
+        GitCommandRunner.execute(p, repositoryPath, "git", "remote", "set-url", remoteName, remoteUrl);
+    }
+
     // UC-SHARE-008, Rule-SHARE-041
     public void configureIdentity(final @NotNull Path repositoryPath, final @NotNull String name, final @NotNull String email, final boolean global) {
         final @NotNull String scope = global ? "--global" : "--local";

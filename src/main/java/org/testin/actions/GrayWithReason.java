@@ -23,10 +23,15 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.Optional;
 
 // Rule-EDITOR-PANEL-230, Rule-TREE-PANEL-104
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GrayWithReason {
+    public static void unless(final @NotNull AnAction action, final @NotNull AnActionEvent e, final @NotNull Optional<String> why) {
+        unless(action, e, why.isEmpty(), why.orElse(""));
+    }
+
     public static void unless(final @NotNull AnAction action, final @NotNull AnActionEvent e, final boolean works, final @NotNull String reason) {
         e.getPresentation().setEnabled(works);
         e.getPresentation().setDescription(works ? Objects.requireNonNullElse(action.getTemplatePresentation().getDescription(), "") : reason);

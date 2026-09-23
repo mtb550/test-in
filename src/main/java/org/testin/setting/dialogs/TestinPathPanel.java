@@ -17,10 +17,10 @@
 package org.testin.setting.dialogs;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.actions.RevealFileAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.IconLoader;
@@ -35,8 +35,6 @@ import javax.swing.JButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.BorderLayout;
-import java.awt.Desktop;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -84,15 +82,7 @@ public final class TestinPathPanel {
         openFolderBtn.setIcon(AllIcons.Actions.MenuOpen);
         openFolderBtn.setDisabledIcon(IconLoader.getDisabledIcon(AllIcons.Actions.MenuOpen));
         openFolderBtn.setEnabled(false);
-        openFolderBtn.addActionListener(_ -> {
-            try {
-                Desktop.getDesktop().open(new File(pathField.getText()));
-
-            } catch (final Exception ex) {
-                Messages.showErrorDialog(openFolderBtn,
-                        Bundle.message("settings.path.open.failed", ex.getMessage()), Bundle.message("settings.path.open.failed.title"));
-            }
-        });
+        openFolderBtn.addActionListener(_ -> RevealFileAction.openDirectory(Path.of(pathField.getText())));
     }
 
     private void setupValidationListener() {

@@ -23,6 +23,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.creator.CreateTestRun;
 import org.testin.explorer.tree.TreeValues;
@@ -32,6 +33,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
+import org.testin.util.Bundle;
 
 import javax.swing.tree.TreePath;
 import java.util.Set;
@@ -53,7 +55,8 @@ public class ReCreateTestRunAction extends DumbAwareAction {
     // UC-TREE-PANEL-021, Rule-TREE-PANEL-069
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(TestinData.singleSelected(e, TestRunDirectoryDto.class).isPresent());
+        GrayWithReason.unless(this, e, TestinData.singleSelected(e, TestRunDirectoryDto.class).isPresent(),
+                Bundle.message("recreate.run.disabled.description"));
     }
 
     @Override

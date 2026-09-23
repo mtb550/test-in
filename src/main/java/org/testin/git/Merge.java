@@ -19,11 +19,21 @@ package org.testin.git;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
 import java.util.List;
 
 record Merge(@NotNull ObjectNode merged, @NotNull List<Question> questions, @NotNull List<String> settled) {
+    // UC-SHARE-017, Rule-SHARE-109
+    static @NotNull String settledSentence(final @NotNull List<String> settled, final @NotNull String separator) {
+        final @NotNull String lead = settled.size() == 1
+                ? Bundle.message("dialog.conflict.settled.one")
+                : Bundle.message("dialog.conflict.settled.many");
+
+        return lead + separator + String.join(separator, settled);
+    }
+
     public boolean isSettled() {
         return questions.isEmpty();
     }

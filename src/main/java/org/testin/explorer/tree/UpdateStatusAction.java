@@ -23,6 +23,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
@@ -94,7 +95,8 @@ public class UpdateStatusAction extends DumbAwareAction {
         final @NotNull Optional<DirectoryDto> dir = selected(e);
 
         e.getPresentation().setVisible(dir.isPresent());
-        e.getPresentation().setEnabled(dir.filter(node -> node.getMarker().status() != status).isPresent());
+        GrayWithReason.unless(this, e, dir.filter(node -> node.getMarker().status() != status).isPresent(),
+                Bundle.message("status.already.description", status.getLabel()));
     }
 
     @Override

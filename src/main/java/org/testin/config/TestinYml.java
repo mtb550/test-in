@@ -120,6 +120,16 @@ public final class TestinYml {
         return config(p).bugRepoUrl();
     }
 
+    // UC-TREE-PANEL-003, Rule-SHARE-062
+    public static @NotNull String addressWithoutCredentials(final @NotNull String address) {
+        return TestinProjectConfig.withoutCredentials(address);
+    }
+
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-071
+    public static @NotNull String bugRepoUrlOnDisk(final @NotNull Project p) {
+        return load(p).config().bugRepoUrl();
+    }
+
     // UC-TREE-PANEL-029, Rule-TREE-PANEL-113
     public static @NotNull Map<String, String> lines(final @NotNull String projectName) {
         final @NotNull Map<String, String> lines = new LinkedHashMap<>();

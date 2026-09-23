@@ -27,6 +27,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
+import org.testin.git.GitRepositoryService;
 import org.testin.git.GitSafeText;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
@@ -51,6 +52,15 @@ public final class CloneTestProject {
     private final @NotNull TreePanel tp;
 
     // UC-TREE-PANEL-003, Rule-TREE-PANEL-107
+    // UC-TREE-PANEL-003, Rule-SHARE-062
+    private void keepNoCredentials(final @NotNull Path projectPath) {
+        final @NotNull String address = TestinYml.addressWithoutCredentials(gitUrl);
+        if (address.equals(gitUrl.strip())) return;
+
+        final @NotNull GitRepositoryService git = new GitRepositoryService(p);
+        git.changeRemoteUrl(projectPath, git.getRemoteName(projectPath), address);
+    }
+
     public static @NotNull String nameFor(final @NotNull Project p, final @NotNull String url) {
         final @NotNull String named = TestinYml.projectName(p);
         if (!named.isEmpty() && TestinYml.isRepoUrl(p, url)) return named;
@@ -104,6 +114,7 @@ public final class CloneTestProject {
                     result.throwOnError();
 
                     final @NotNull Path projectPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(projectName);
+                    keepNoCredentials(projectPath);
                     Services.getInstance(p, ProjectIndexer.class).scanSingleProject(projectPath, indicator);
 
                     ApplicationManager.getApplication().invokeLater(() -> {

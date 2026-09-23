@@ -21,6 +21,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.JBTable;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.Declared;
 import org.testin.codegen.AutomationState;
 import org.testin.codegen.GenType;
 import org.testin.editor.AbstractTestinEditor;
@@ -290,7 +291,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         if (totalItems > 0 || loading) return;
 
         if (allTestCases.isEmpty()) {
-            list.getEmptyText().setText(Bundle.message("editor.test.empty")).appendLine(Bundle.message("editor.test.empty.hint"));
+            list.getEmptyText().setText(Bundle.message("editor.test.empty")).appendLine(Bundle.message("editor.test.empty.hint", Declared.shortcutText("Testin.CreateTestCase")));
         } else {
             list.getEmptyText().setText(Bundle.message("editor.test.no.match"));
         }
