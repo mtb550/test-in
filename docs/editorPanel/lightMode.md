@@ -422,7 +422,7 @@ back. A failure nobody described is a failure nobody can act on.
 │  BUG PRIORITY                                                              │
 │  ( ) High   ( ) Medium   (•) Low                                           │
 │                                                                            │
-│  STACKTRACE                                                                │
+│  EXCEPTION                                                                 │
 │  ┌──────────────────────────────────────────────────────────────────────┐  │
 │  │ paste error or exception or screenshot…                              │  │
 │  │                                                                      │  │

@@ -38,7 +38,7 @@ public class RunAttributeCoverageTest {
                 .map(RunEditorAttributes::getName)
                 .toList();
 
-        for (final String expected : List.of("Actual Result", "Stacktrace", "Bug Severity", "Bug Priority", "Bug Issue")) {
+        for (final String expected : List.of("Actual Result", "Exception", "Bug Severity", "Bug Priority", "Bug Issue")) {
             assertTrue(named.contains(expected), expected + " is recorded on a run row but has no attribute: " + named);
         }
     }

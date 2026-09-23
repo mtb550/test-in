@@ -90,7 +90,7 @@ once.
 
 **A result two testers judged** — kept whole from whoever judged it last. A
 verdict is one tester's account of executing one test case: the status, when
-they gave it, what they saw, the stacktrace, the screenshots and the bug they
+they gave it, what they saw, the exception, the screenshots and the bug they
 filed.
 Those travel together, or they say something nobody recorded, so the later
 `executedAt` takes the file and nothing is asked. Nothing is said either: the

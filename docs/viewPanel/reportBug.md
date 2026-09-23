@@ -214,7 +214,7 @@ the real length.
 
 **If the body is longer than 65,536 characters** — **Send** is gray. Hovering
 over it reads *The body is 70,000 characters long, and GitHub takes 65,536 at
-most*, with the real length. A long stacktrace is the usual reason.
+most*, with the real length. A long exception is the usual reason.
 
 **If more than 50 screenshots were pasted** — **Send** is gray. Hovering over it
 reads *51 screenshots are pasted, and gh attaches 50 at most*, with the real

@@ -66,7 +66,7 @@ The same dialog the `F` key opens, with what was written already in it.
 │  BUG PRIORITY                                              │
 │  (x) High  ( ) Medium  ( ) Low                             │
 │                                                            │
-│  STACKTRACE                                                │
+│  EXCEPTION                                                 │
 │  ┌──────────────────────────────────────────────────────┐  │
 │  │  Error 500 returned by /api/session                  │  │
 │  └──────────────────────────────────────────────────────┘  │

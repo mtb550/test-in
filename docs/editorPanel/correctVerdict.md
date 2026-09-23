@@ -56,7 +56,7 @@ Press the right verdict's key on the test case.
 ├──────────────────────────────────────────────────────────────┤
 │                                                              │
 │  Passing this test case clears the actual result and the     │
-│  stacktrace, because a test case that passed has nothing     │
+│  exception, because a test case that passed has nothing      │
 │  to explain. There is no copy of it anywhere else.           │
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤

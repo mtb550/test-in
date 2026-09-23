@@ -100,7 +100,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     ),
 
     STACKTRACE(
-            Bundle.message("attribute.run.stacktrace"),
+            Bundle.message("attribute.run.exception"),
             ToolBarDefault.OFF,
             TestRunItems::getStacktrace
     ),

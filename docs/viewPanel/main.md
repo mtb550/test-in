@@ -28,7 +28,7 @@ it.
 |                       | **Reading**                                                     |                                                                  |
 | **UC-VIEW-PANEL-004** | [Read what a test case says](readTestCase.md)                   | Follow the steps and check the expected result.                  |
 | **UC-VIEW-PANEL-005** | [Read what a test run recorded](readRunResult.md)               | See the verdict and what went wrong last time.                   |
-| **UC-VIEW-PANEL-006** | [Read the whole stacktrace of a failure](readStacktrace.md)     | Copy the whole error into a bug report.                          |
+| **UC-VIEW-PANEL-006** | [Read the exception behind a failure](readException.md)        | Copy the whole error into a bug report.                          |
 | **UC-VIEW-PANEL-007** | [Read a test case's history](readHistory.md)                    | See what changed on the test case, and when.                     |
 | **UC-VIEW-PANEL-008** | [See the bugs still open on a test case](seeOpenBugs.md)        | Avoid raising a bug somebody has already raised.                 |
 | **UC-VIEW-PANEL-017** | [Move between the panel's tabs](moveBetweenTabs.md)             | Reach History and Open Bugs without the mouse.                   |

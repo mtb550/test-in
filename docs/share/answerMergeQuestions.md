@@ -14,7 +14,7 @@ sides wrote differently into its configuration or its result analysis. The row
 is named as the tester already knows that key - **Platform**, or the heading the
 analysis was written under. A result - one test case's verdict - is never asked
 about at all: it is kept whole from whoever gave it last, because the status,
-the actual result, the stacktrace and the screenshots are one account of one
+the actual result, the exception and the screenshots are one account of one
 execution and travel together ([UC-SHARE-017](resolveConflicts.md)).
 
 There is no key that opens this. It opens during a merge.
