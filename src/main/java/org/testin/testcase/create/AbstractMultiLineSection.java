@@ -18,7 +18,8 @@ package org.testin.testcase.create;
 
 import com.intellij.ide.ui.laf.darcula.ui.DarculaEditorTextFieldBorder;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.EditorModificationUtil;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.event.DocumentEvent;
@@ -57,7 +58,7 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
         field.addSettingsProvider(editor -> {
             editor.getContentComponent().setFocusTraversalKeysEnabled(true);
 
-            base.registerShortcut(editor.getContentComponent(), Shortcuts.InsertNewLine.getCustomShortcut(), () -> EditorModificationUtil.insertStringAtCaret(editor, "\n"));
+            base.registerShortcut(editor.getContentComponent(), Shortcuts.InsertNewLine.getCustomShortcut(), () -> insertNewLine(editor));
 
             editor.setBorder(new DarculaEditorTextFieldBorder(field, editor));
 
@@ -82,6 +83,14 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
         });
 
         base.registerShortcut(field, Shortcuts.Enter.getCustomShortcut(), onSave);
+    }
+
+    private void insertNewLine(final @NotNull Editor editor) {
+        final int caret = editor.getCaretModel().getOffset();
+        WriteCommandAction.runWriteCommandAction(p, () -> {
+            editor.getDocument().insertString(caret, "\n");
+            editor.getCaretModel().moveToOffset(caret + 1);
+        });
     }
 
     @Override

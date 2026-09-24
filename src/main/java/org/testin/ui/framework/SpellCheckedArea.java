@@ -17,7 +17,8 @@
 package org.testin.ui.framework;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.editor.EditorModificationUtil;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
@@ -36,10 +37,12 @@ import java.awt.Dimension;
 public final class SpellCheckedArea implements DialogComponent {
     private static final int ROW_PADDING = 8;
 
+    private final @NotNull Project p;
     private final @NotNull EditorTextField field;
     private final @NotNull JBPanel<?> panel;
 
     SpellCheckedArea(final @NotNull Project p, final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value, final int rows) {
+        this.p = p;
         field = SpellChecker.createField(p);
         field.setOneLineMode(false);
         field.setText(value);
@@ -71,7 +74,16 @@ public final class SpellCheckedArea implements DialogComponent {
     public void onSubmitRequest(final @NotNull Runnable submit) {
         DumbAwareAction.create(_ -> submit.run()).registerCustomShortcutSet(Shortcuts.Enter.getCustomShortcut(), field);
 
-        field.addSettingsProvider(editor -> DumbAwareAction.create((AnActionEvent _) -> EditorModificationUtil.insertStringAtCaret(editor, "\n"))
+        field.addSettingsProvider(editor -> DumbAwareAction.create((AnActionEvent _) -> insertNewLine(editor))
                 .registerCustomShortcutSet(Shortcuts.InsertNewLine.getCustomShortcut(), editor.getContentComponent()));
+    }
+
+    // Rule-EDITOR-PANEL-246
+    private void insertNewLine(final @NotNull Editor editor) {
+        final int caret = editor.getCaretModel().getOffset();
+        WriteCommandAction.runWriteCommandAction(p, () -> {
+            editor.getDocument().insertString(caret, "\n");
+            editor.getCaretModel().moveToOffset(caret + 1);
+        });
     }
 }
