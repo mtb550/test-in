@@ -41,7 +41,7 @@ public class AgentCommandTest {
     }
 
     private static AgentConnection connection(final String command) {
-        return new AgentConnection(command, "-p", "--version", "", "", Duration.ofSeconds(1));
+        return new AgentConnection(command, "-p", "", Duration.ofSeconds(1));
     }
 
     // Rule-CODEGEN-084
@@ -78,13 +78,6 @@ public class AgentCommandTest {
         assertTrue(connection("pi").isConnected());
     }
 
-    // Rule-CODEGEN-083
-    @Test
-    public void anAgentNobodyStoredReadsAsNoneRatherThanThrowing() {
-        assertEquals(CodeAgent.named("SOMETHING_A_LATER_RELEASE_RENAMED"), CodeAgent.EMPTY);
-        assertEquals(CodeAgent.named("PI"), CodeAgent.PI);
-    }
-
     // Rule-CODEGEN-086
     @Test
     public void thePromptCarriesTheTestCaseAndNothingElse() {
@@ -99,7 +92,7 @@ public class AgentCommandTest {
     // Rule-CODEGEN-086
     @Test
     public void aTemplateNobodyEditedIsTheOneTestinShips() {
-        final AgentConnection typed = new AgentConnection("pi", "-p", "--version", "", "   ", Duration.ofSeconds(1));
+        final AgentConnection typed = new AgentConnection("pi", "-p", "   ", Duration.ofSeconds(1));
 
         assertTrue(typed.promptTemplate().contains("{description}"),
                 "a blank prompt means the shipped one, so a later release's better wording reaches a tester who never edited it");

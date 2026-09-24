@@ -40,6 +40,10 @@ import java.util.Optional;
 public final class AgentCli {
     private static final @NotNull Path ANYWHERE = Path.of(System.getProperty("java.io.tmpdir"));
 
+    private static final @NotNull String VERSION = "--version";
+
+    private static final @NotNull String PROMPT_PLACEHOLDER = "{prompt}";
+
     private final @NotNull Launcher launcher;
 
     public static @NotNull AgentCli onPath(final @NotNull ProgressIndicator indicator) {
@@ -50,7 +54,7 @@ public final class AgentCli {
     static @NotNull List<String> arguments(final @NotNull String arguments, final @NotNull String prompt) {
         final @NotNull List<String> written = new ArrayList<>(arguments.isBlank() ? List.of() : List.of(arguments.trim().split("\\s+")));
 
-        final int placeholder = written.indexOf(CodeAgent.PROMPT_PLACEHOLDER);
+        final int placeholder = written.indexOf(PROMPT_PLACEHOLDER);
         if (placeholder != -1) written.set(placeholder, prompt);
 
         return List.copyOf(written);
@@ -58,7 +62,7 @@ public final class AgentCli {
 
     // UC-CODEGEN-021, Rule-CODEGEN-084
     static boolean wantsThePromptAsAnArgument(final @NotNull String arguments) {
-        return arguments.contains(CodeAgent.PROMPT_PLACEHOLDER);
+        return arguments.contains(PROMPT_PLACEHOLDER);
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-083
@@ -123,7 +127,7 @@ public final class AgentCli {
     public @NotNull Optional<String> check(final @NotNull AgentConnection connection) {
         if (!connection.isConnected()) return Optional.empty();
 
-        return said(connection.command(), arguments(connection.check(), ""), Optional.empty(), connection.timeout());
+        return said(connection.command(), List.of(VERSION), Optional.empty(), connection.timeout());
     }
 
     private @NotNull Optional<String> said(final @NotNull String command, final @NotNull List<String> arguments, final @NotNull Optional<Path> input, final @NotNull Duration timeout) {

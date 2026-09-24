@@ -25,13 +25,13 @@ import java.time.Duration;
 import java.util.Optional;
 
 // UC-CODEGEN-021, Rule-CODEGEN-083
-public record AgentConnection(@NotNull String command, @NotNull String arguments, @NotNull String check, @NotNull String keyVariable, @NotNull String prompt, @NotNull Duration timeout) {
+public record AgentConnection(@NotNull String command, @NotNull String arguments, @NotNull String prompt, @NotNull Duration timeout) {
     // UC-CODEGEN-021, Rule-CODEGEN-083
     public static @NotNull AgentConnection stored() {
         final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
 
-        return new AgentConnection(settings.agentCommand, settings.agentArguments, settings.agentCheck,
-                settings.agentKeyVariable, settings.agentPrompt, Duration.ofSeconds(settings.agentTimeoutSeconds));
+        return new AgentConnection(settings.agentCommand, settings.agentArguments, settings.agentPrompt,
+                Duration.ofSeconds(settings.agentTimeoutSeconds));
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-083
@@ -42,10 +42,5 @@ public record AgentConnection(@NotNull String command, @NotNull String arguments
     // UC-CODEGEN-021, Rule-CODEGEN-086
     public @NotNull String promptTemplate() {
         return prompt.isBlank() ? Bundle.message("agent.prompt.default") : prompt;
-    }
-
-    // UC-CODEGEN-021, Rule-CODEGEN-087
-    public @NotNull Optional<Boolean> keyIsSet() {
-        return keyVariable.isBlank() ? Optional.empty() : Optional.of(!Optional.ofNullable(System.getenv(keyVariable)).orElse("").isBlank());
     }
 }

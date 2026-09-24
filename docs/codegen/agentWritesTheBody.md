@@ -34,11 +34,11 @@ Connecting an agent changes what that gesture produces, not where it lives.
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-083** — An agent is connected by naming the command that runs
-  it, the arguments it takes, what asks whether it is ready, and the environment
-  variable it reads for a key. Picking one of the agents Testin knows fills
-  those in; every one of them stays editable, so an agent Testin has never heard
-  of is connected by typing it. An empty command means no agent, which changes
-  nothing about what Automate Test Case already did.
+  it and the arguments it takes, and by nothing else. There is no list of agents
+  to choose from: the two fields are the whole connection, so an agent published
+  tomorrow is connected by typing it rather than by waiting for a release, and no
+  second place can disagree with what is in them. An empty command means no agent,
+  which changes nothing about what Automate Test Case already did.
 - **Rule-CODEGEN-084** — The agent is asked once per test case, on a background
   task the tester can cancel, and never while the method is being written:
   writing a method is a write action, an agent takes seconds to minutes, and a
@@ -47,24 +47,24 @@ Connecting an agent changes what that gesture produces, not where it lives.
   cut at the first newline by a `.cmd` shim and nothing says so. An agent that
   must have it as an argument says `{prompt}` in its arguments, and then it goes
   exactly there.
-- **Rule-CODEGEN-085** — Check runs the agent's own readiness command and prints
-  the first line it answered, or says the command could not be started. It waits
-  twenty seconds and can be canceled, because a settings page that hangs is
-  worse than one that says nothing.
+- **Rule-CODEGEN-085** — Check runs the command with `--version` and prints the
+  first line it answered, or says the command could not be started. Every agent
+  answers that one, so it is not a field a tester can get wrong. It waits twenty
+  seconds and can be canceled, because a settings page that hangs is worse than
+  one that says nothing.
 - **Rule-CODEGEN-086** — What is sent is one test case - its description,
   expected result, steps, test data, pre-conditions and module - filled into a
   prompt the tester can read and change. Nothing else ever leaves: not the
   class, not another test case, not the test data root. An empty prompt means
   the one Testin ships, so a tester who never edited it gets the better wording
   a later release brings.
-- **Rule-CODEGEN-087** — A key is never Testin's to hold. The agent reads it
-  from the environment the IDE was started in, and Testin only names the variable
-  and says whether it is set - never its value, never in a command line, never in
-  the log. The variable is blank until a tester names one, because an agent signed
-  in with its own account needs none: Claude Code signed in through a Claude
-  account reads no `ANTHROPIC_API_KEY`, and a page that said the variable was
-  missing would be reporting a fault that is not there. A variable set in a
-  terminal does not reach an IDE that was already running.
+- **Rule-CODEGEN-087** — A key is never Testin's to hold, to read, or even to
+  ask about. An agent signs itself in - with its own account, or with a key it
+  reads from the environment the IDE was started in - and Testin has no field for
+  one, writes none to its settings file, and puts none on a command line. A
+  question about a key it never uses is a field that can only be wrong: it named
+  `ANTHROPIC_API_KEY` beside a Claude Code signed in through a Claude account,
+  which reads no such variable, and reported a fault that was not there.
 - **Rule-CODEGEN-088** — What the agent printed is read from standard output,
   and where it fenced a block the largest one is taken. An answer that does not
   end as Java statements do is dropped: the TODO stays, the log says what came
@@ -79,21 +79,21 @@ Two pages, under **Settings › Tools › Testin**. The first is how Testin reac
 the agent; the second is what it asks for.
 
 ```
-┌─ Settings › Tools › Testin › Automation agent ──────────────────────┐
+┌─ Settings › Tools › Testin › Automation agent ──────────────────┐
 │                                                                     │
-│  Agent        [ pi                                     v]           │
 │  Command      [ pi                                      ]           │
+│               The command that runs the agent, found on PATH        │
+│                                                                     │
 │  Arguments    [ -p --no-tools --no-session --no-context-files ]      │
-│               {prompt} marks where the test case goes               │
-│  Check        [ auth                                    ]           │
-│  Key variable [                                         ]           │
+│               {prompt} marks where the test case goes. Without it   │
+│               the test case is sent on standard input.              │
 │                                                                     │
 │  Keys live in your system environment. Testin never reads one.      │
 │  pi 0.85.1                                                          │
 │                                                     [ Check ]       │
-└─────────────────────────────────────────────────────────────────────┘
+└──────────────────────────────────────────────────────────────────┘
 
-┌─ Settings › Tools › Testin › Automation agent › Prompt ─────────────┐
+┌─ Settings › Tools › Testin › Automation agent › Prompt ─────────┐
 │                                                                     │
 │  One test case: its description, expected result, steps, test       │
 │  data, pre-conditions and module. Nothing else ever leaves.         │
@@ -107,8 +107,13 @@ the agent; the second is what it asks for.
 │               {preConditions} {module} {method}      [ Reset ]      │
 │                                                                     │
 │  Timeout      [ 180 ]  seconds one test case may take               │
-└─────────────────────────────────────────────────────────────────────┘
+└──────────────────────────────────────────────────────────────────┘
 ```
+
+What to type for the agents in use today, none of which Testin needs to know
+about: `pi` with `-p --no-tools --no-session --no-context-files`, `claude` with
+`-p`, `codex` with `exec`, `gemini` with `-p`. `-p` is *print*: answer once and
+exit, rather than opening the agent's own window.
 
 ## Main flow
 
