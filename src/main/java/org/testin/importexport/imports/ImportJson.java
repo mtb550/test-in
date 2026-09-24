@@ -36,6 +36,15 @@ public class ImportJson {
         return parseFile(p, file);
     }
 
+    // UC-SHARE-005, Rule-SHARE-029
+    private static @NotNull TestCaseDto asNewTestCase(final @NotNull TestCaseDto read) {
+        final @NotNull TestCaseDto fresh = TestCaseDto.builder().build();
+
+        return read.setId(UUID.randomUUID())
+                .setStatus(fresh.getStatus())
+                .setOrder(fresh.getOrder());
+    }
+
     // UC-SHARE-005, Rule-SHARE-024
     public @NotNull Map<String, List<TestCaseDto>> parseFile(final @NotNull Project p, final @NotNull File file) {
         final @NotNull Map<String, List<TestCaseDto>> data = Services.getInstance(p, Mapper.class).readValue(file, new TypeReference<>() {
@@ -45,8 +54,7 @@ public class ImportJson {
             final @NotNull List<TestCaseDto> sanitized = new ArrayList<>();
 
             for (final TestCaseDto tc : entry.getValue()) {
-                tc.setId(UUID.randomUUID());
-                sanitized.add(tc);
+                sanitized.add(asNewTestCase(tc));
             }
 
             if (!sanitized.isEmpty()) {
