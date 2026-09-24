@@ -23,39 +23,52 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
+import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.ui.dialogs.ShortcutMenuPopup;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
+import org.testin.util.Mapper;
 
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
 public class CopyTestCaseAction extends DumbAwareAction {
-    private static void copy(final @NotNull Project p, final @NotNull CopyChoice choice, final @NotNull List<TestCaseDto> selected) {
-        CopyPasteManager.getInstance().setContents(new StringSelection(choice.from(selected)));
-
-        Services.getInstance(p, Notifier.class).softShow(p, choice.copiedMessage(selected.size()));
-    }
-
-    // UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-207
+    // UC-EDITOR-PANEL-015
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
-        if (selected.isEmpty()) return;
+        final @NotNull List<TestCaseDto> tcs = TestinData.selectedTestCases(e);
 
-        new ShortcutMenuPopup<>(p, Bundle.message("copy.menu.title"), CopyChoice.values(), choice -> copy(p, choice, selected)).show();
+        if (!tcs.isEmpty()) {
+            try {
+                final @NotNull String json = Services.getInstance(p, Mapper.class).writeValueAsString(tcs);
+                CopyPasteManager.getInstance().setContents(new StringSelection(json));
+
+                Services.getInstance(p, Notifier.class).softShowCounted(p, Done.COPIED, tcs.size());
+
+            } catch (final Exception ex) {
+                Logger.error("Copy Node failed: " + FailureText.of(ex));
+                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("clipboard.copy.failed.title"), FailureText.of(ex));
+            }
+        }
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        GrayWithReason.unless(this, e, !TestinData.selectedTestCases(e).isEmpty(), Bundle.message("action.select.case.description"));
+        // Rule-EDITOR-PANEL-214
+        if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
+            e.getPresentation().setEnabled(false);
+            e.getPresentation().setDescription(Bundle.message("copy.case.disabled.description"));
+            return;
+        }
+
+        e.getPresentation().setEnabled(!TestinData.selectedTestCases(e).isEmpty());
     }
 
     @Override

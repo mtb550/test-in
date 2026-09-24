@@ -57,7 +57,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public class PasteTestCaseNodeAction extends DumbAwareAction {
+public class PasteTestCaseAction extends DumbAwareAction {
     private @NotNull Optional<Answered> answered = Optional.empty();
 
     private static @NotNull Optional<Work> work(final @NotNull AnActionEvent e) {

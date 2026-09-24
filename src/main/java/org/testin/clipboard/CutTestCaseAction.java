@@ -38,7 +38,7 @@ import java.awt.datatransfer.StringSelection;
 import java.util.List;
 import java.util.Optional;
 
-public class CutTestCaseNodeAction extends DumbAwareAction {
+public class CutTestCaseAction extends DumbAwareAction {
     // UC-EDITOR-PANEL-016
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {

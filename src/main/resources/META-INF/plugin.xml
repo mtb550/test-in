@@ -443,25 +443,25 @@
 
         <action
                 id="Testin.PasteTestCaseNode"
-                class="org.testin.clipboard.PasteTestCaseNodeAction"
+                class="org.testin.clipboard.PasteTestCaseAction"
                 icon="AllIcons.Actions.MenuPaste"
         />
 
         <action
                 id="Testin.CopyTestCaseNode"
-                class="org.testin.clipboard.CopyTestCaseNodeAction"
+                class="org.testin.clipboard.CopyTestCaseAction"
                 icon="AllIcons.Actions.Copy"
         />
 
         <action
                 id="Testin.CutTestCaseNode"
-                class="org.testin.clipboard.CutTestCaseNodeAction"
+                class="org.testin.clipboard.CutTestCaseAction"
                 icon="AllIcons.Actions.MenuCut"
         />
 
         <action
                 id="Testin.CopyTestCase"
-                class="org.testin.clipboard.CopyTestCaseAction"
+                class="org.testin.clipboard.CopyTestCaseValueAction"
                 icon="AllIcons.Actions.Copy"
         />
 
