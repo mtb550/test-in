@@ -27,6 +27,10 @@ public interface DialogComponent {
 
     void onSubmitRequest(@NotNull Runnable submit);
 
+    // UC-INTERNAL-007, Rule-INTERNAL-097
+    default void hostedBy(final @NotNull AbstractFrameworkDialog base) {
+    }
+
     default boolean wantsFocus() {
         return true;
     }

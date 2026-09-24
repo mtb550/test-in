@@ -16,7 +16,11 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -188,6 +192,30 @@ public abstract class AbstractFrameworkDialog {
         strip.ifPresent(bar -> bar.updateItems(items));
     }
 
+    // UC-INTERNAL-007, Rule-INTERNAL-054
+    public final void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull Runnable action) {
+        new DumbAwareAction() {
+            @Override
+            public void actionPerformed(final @NotNull AnActionEvent e) {
+                action.run();
+            }
+
+            @Override
+            public void update(final @NotNull AnActionEvent e) {
+                e.getPresentation().setEnabled(!claimedElsewhere(shortcutSet));
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.EDT;
+            }
+        }.registerCustomShortcutSet(shortcutSet, component);
+    }
+
+    protected boolean claimedElsewhere(final @NotNull CustomShortcutSet shortcutSet) {
+        return false;
+    }
+
     public final void refit() {
         popup.ifPresent(open -> {
             open.setSize(new Dimension(open.getSize().width, naturalHeightOf(open.getContent())));
@@ -306,6 +334,7 @@ public abstract class AbstractFrameworkDialog {
     // UC-INTERNAL-007, Rule-INTERNAL-060
     private void bindSubmitGesture() {
         for (final DialogComponent dialogComponent : builtComponents()) {
+            dialogComponent.hostedBy(this);
             dialogComponent.onSubmitRequest(this::submit);
         }
     }

@@ -18,11 +18,8 @@ package org.testin.testcase.create;
 
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
@@ -169,23 +166,9 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog {
     }
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-218
-    public void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull Runnable action) {
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(final @NotNull AnActionEvent e) {
-                action.run();
-            }
-
-            @Override
-            public void update(final @NotNull AnActionEvent e) {
-                e.getPresentation().setEnabled(!(aPopupIsOpen() && popupClaims(shortcutSet)));
-            }
-
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.EDT;
-            }
-        }.registerCustomShortcutSet(shortcutSet, component);
+    @Override
+    protected boolean claimedElsewhere(final @NotNull CustomShortcutSet shortcutSet) {
+        return aPopupIsOpen() && popupClaims(shortcutSet);
     }
 
     private boolean completionIsOpen() {
