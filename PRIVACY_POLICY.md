@@ -42,16 +42,32 @@ the dialog it opens.
 * **What the Developer receives:** nothing. No copy is kept, no server of the Developer's is involved, and the traffic
   is between your machine and GitHub.
 
-**4. Third-Party Services**
+**4. Asking an Agent to Write a Test Method Body**
+The Plugin can ask an AI coding agent that you have installed and signed in yourself to write the body of a generated
+test method. This happens only when you press **Automate Test Case** and only while an agent is configured on the
+Settings page; with no agent configured, nothing is sent and nothing runs.
+
+* **What is sent:** one test case - its description, expected result, steps, test data, pre-conditions and module -
+  filled into a prompt you can read and change on the Settings page. Nothing else is sent: not your other test cases,
+  not the class the method sits in, not your test data folder, not your repository.
+* **Where it goes:** to the command you named, running on your own machine, and from there wherever that agent sends
+  it, under your own account with that provider and subject to their terms and privacy policy.
+* **Who sends it:** you do. The Plugin starts the agent's own command line, already installed and signed in on your
+  machine.
+* **Credentials:** the Plugin holds none. An agent reads its API key from your system environment; the Plugin never
+  reads that value, never stores it, never writes it to its log and never puts it on a command line.
+* **What the Developer receives:** nothing. No copy is kept, no server of the Developer's is involved.
+
+**5. Third-Party Services**
 The Plugin does not integrate with or send your data to any external third-party analytics, marketing, or tracking
 services.
 
-**5. Changes to This Privacy Policy**
+**6. Changes to This Privacy Policy**
 The Developer reserves the right to update this Privacy Policy at any time. Any changes will be reflected by an updated
 "Effective Date" at the top of this document. Continued use of the Plugin after any modifications indicates your
 acknowledgment of the updated Privacy Policy.
 
-**5. Contact Information**
+**7. Contact Information**
 If you have any questions, concerns, or requests regarding your privacy and the "Test in" plugin, please contact:
 
 * **Email:** mtb550@gmail.com

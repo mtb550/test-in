@@ -63,19 +63,25 @@ public class AutomateTestCaseAction extends DumbAwareAction {
         return !Fqcn.methodNameOf(tc).isEmpty();
     }
 
+    // Rule-CODEGEN-002
+    private static @NotNull List<TestCaseDto> nameable(final @NotNull AnActionEvent e) {
+        return TestinData.selectedTestCases(e).stream().filter(AutomateTestCaseAction::canBeNamed).toList();
+    }
+
     // UC-CODEGEN-005, Rule-CODEGEN-025
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        final @NotNull List<TestCaseDto> toWrite =
-                withoutAMethod(p, TestinData.selectedTestCases(e).stream().filter(AutomateTestCaseAction::canBeNamed).toList());
-        if (toWrite.isEmpty()) return;
+        final @NotNull List<TestCaseDto> toWrite = withoutAMethod(p, nameable(e));
+        if (toWrite.isEmpty() && !AgentConnection.stored().isConnected()) return;
 
         final @NotNull Optional<TestinEditor> editor = TestinData.editor(e);
 
         GenType.CREATE_TEST_CASE.executeAll(p, toWrite);
+
+        WriteBodies.forAll(p, nameable(e), editor);
 
         ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final int written = writtenFor(p, toWrite);
@@ -114,7 +120,8 @@ public class AutomateTestCaseAction extends DumbAwareAction {
             return;
         }
 
-        if (withoutAMethod(p, nameable).isEmpty()) {
+        // Rule-CODEGEN-003
+        if (withoutAMethod(p, nameable).isEmpty() && !AgentConnection.stored().isConnected()) {
             e.getPresentation().setEnabled(false);
             e.getPresentation().setDescription(Bundle.message("automate.already.written.description"));
             return;

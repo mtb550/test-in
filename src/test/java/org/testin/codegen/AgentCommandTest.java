@@ -1,0 +1,100 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.codegen;
+
+import org.testin.model.dto.TestCaseDto;
+import org.testng.annotations.Test;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.UUID;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+public class AgentCommandTest {
+
+    private static TestCaseDto aTestCase() {
+        return TestCaseDto.builder()
+                .id(UUID.randomUUID())
+                .description("Sign in with a valid account")
+                .expectedResult("The dashboard opens")
+                .testData("1098765432 / Passw0rd!")
+                .preConditions("The account is active")
+                .module("Accounts")
+                .build();
+    }
+
+    private static AgentConnection connection(final String command) {
+        return new AgentConnection(command, "-p", "", Duration.ofSeconds(1));
+    }
+
+    // Rule-CODEGEN-084
+    @Test
+    public void thePromptGoesOnStandardInputWhenNothingSaysOtherwise() {
+        assertEquals(AgentCli.arguments("-p --no-tools", "write it"), List.of("-p", "--no-tools"),
+                "a prompt of several lines handed to a .cmd shim is cut at the first newline, and nothing says so");
+        assertFalse(AgentCli.wantsThePromptAsAnArgument("-p --no-tools"));
+    }
+
+    // Rule-CODEGEN-084
+    @Test
+    public void thePromptGoesWhereThePlaceholderIs() {
+        assertEquals(AgentCli.arguments("run {prompt} --quiet", "write it"), List.of("run", "write it", "--quiet"),
+                "an agent that wants the prompt in the middle is connected by typing it, not by a release");
+    }
+
+    // Rule-CODEGEN-084
+    @Test
+    public void anAgentWithNoArgumentsIsAskedWithNoneOfThem() {
+        assertEquals(AgentCli.arguments("", "write it"), List.of());
+    }
+
+    // Rule-CODEGEN-084
+    @Test
+    public void anAgentThatWantsItAsAnArgumentSaysSo() {
+        assertTrue(AgentCli.wantsThePromptAsAnArgument("run {prompt} --quiet"));
+    }
+
+    // Rule-CODEGEN-083
+    @Test
+    public void anEmptyCommandIsNoAgent() {
+        assertFalse(connection("").isConnected(), "an empty command is how a tester says there is no agent");
+        assertTrue(connection("pi").isConnected());
+    }
+
+    // Rule-CODEGEN-086
+    @Test
+    public void thePromptCarriesTheTestCaseAndNothingElse() {
+        final TestCaseDto tc = aTestCase();
+        final String written = BodyPrompt.of("{method}: {description} / {expectedResult} / {testData} / {preConditions} / {module} / {steps}", tc, "signInWithAValidAccount");
+
+        assertEquals(written, "signInWithAValidAccount: Sign in with a valid account / The dashboard opens"
+                + " / 1098765432 / Passw0rd! / The account is active / Accounts / ");
+        assertFalse(written.contains(tc.getId().toString()), "the test case id is not the agent's business");
+    }
+
+    // Rule-CODEGEN-086
+    @Test
+    public void aTemplateNobodyEditedIsTheOneTestinShips() {
+        final AgentConnection typed = new AgentConnection("pi", "-p", "   ", Duration.ofSeconds(1));
+
+        assertTrue(typed.promptTemplate().contains("{description}"),
+                "a blank prompt means the shipped one, so a later release's better wording reaches a tester who never edited it");
+    }
+}

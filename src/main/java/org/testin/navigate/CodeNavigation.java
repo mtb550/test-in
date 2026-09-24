@@ -44,4 +44,10 @@ public interface CodeNavigation {
 
     @FromContentModule
     @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases);
+
+    @FromContentModule
+    boolean hasTheWrittenBody(@NotNull Project p, @NotNull TestCaseDto tc);
+
+    @FromContentModule
+    boolean fillBody(@NotNull Project p, @NotNull TestCaseDto tc, @NotNull String statements);
 }

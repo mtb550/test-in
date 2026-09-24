@@ -107,8 +107,7 @@ public class CreateTestMethod implements GenAction {
                 tc.getId(),
                 attributes);
 
-        return annotation + "\npublic void " + methodName + "() {\n    // TODO: Auto-generated test steps for "
-                + methodName + "\n}";
+        return annotation + "\npublic void " + methodName + "() " + GeneratedMethod.emptyBody(methodName);
     }
 
     // UC-CODEGEN-002

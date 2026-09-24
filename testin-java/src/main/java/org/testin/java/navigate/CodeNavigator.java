@@ -17,11 +17,16 @@
 package org.testin.java.navigate;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ReadAction;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.pom.Navigatable;
+import com.intellij.util.IncorrectOperationException;
+import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiCodeBlock;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
@@ -95,6 +100,41 @@ public final class CodeNavigator implements CodeNavigation {
         }
 
         return found;
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-003
+    @Override
+    public boolean hasTheWrittenBody(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        if (DumbService.isDumb(p)) return false;
+
+        return ReadAction.compute(() -> resolve(p, tc).map(pm -> !GeneratedMethod.holdsNothingButTheTodo(pm)).orElse(false));
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-003, Rule-CODEGEN-089
+    @Override
+    public boolean fillBody(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
+        if (DumbService.isDumb(p)) return false;
+
+        return WriteCommandAction.writeCommandAction(p)
+                .withName(Bundle.message("agent.body.command"))
+                .compute(() -> written(p, tc, statements));
+    }
+
+    // Rule-CODEGEN-003, Rule-CODEGEN-089
+    private boolean written(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
+        final @NotNull Optional<PsiMethod> method = resolve(p, tc);
+        if (method.isEmpty() || !GeneratedMethod.holdsNothingButTheTodo(method.orElseThrow())) return false;
+
+        try {
+            final @NotNull PsiCodeBlock written = JavaPsiFacade.getElementFactory(p)
+                    .createCodeBlockFromText("{\n" + statements + "\n}", method.orElseThrow());
+
+            Optional.ofNullable(method.orElseThrow().getBody()).ifPresent(body -> body.replace(written));
+            return true;
+        } catch (final IncorrectOperationException notJava) {
+            Logger.warn("The agent's answer for '" + tc.getDescription() + "' is not Java and was dropped: " + notJava.getMessage());
+            return false;
+        }
     }
 
     // UC-CODEGEN-008, Rule-CODEGEN-032
