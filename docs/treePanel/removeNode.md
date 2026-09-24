@@ -91,7 +91,8 @@ The node goes to the recycle bin, so nothing is lost for good.
 │  Remove 'Accounts'?                                     (1)  │
 │  Holds 2 test sets, 14 test cases and 0 test runs       (2)  │
 │                                                              │
-│  From:  C:\Testin\Demo\Test Cases\Accounts             (3)   │
+│  FROM                                                   (3)  │
+│  C:\Testin\Demo\Test Cases\Accounts                          │
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤
 │  Enter Remove    Escape Cancel                          (4)  │
@@ -116,7 +117,7 @@ and no path.
 2. The tester presses `Delete`, or chooses **Actions → Remove**.
 3. The **Confirm Removing** dialog opens. For one node it asks *Remove
    '\<name\>'?*. It then says how many test sets, test cases and test runs the
-   node holds, and shows where it is after *From:*. For several nodes it asks *Remove these N items?*, where N is how
+   node holds, and shows where it is under *FROM*. For several nodes it asks *Remove these N items?*, where N is how
    many.
 4. The tester presses `Enter`.
 5. Testin keeps a copy of each node for undo, under a progress bar reading *Removing*, and then closes every editor open

@@ -49,7 +49,8 @@ There is no key for this. The menu entry is **Import**.
 ┌──────────────────────────────────────────────────────────────┐
 │  Import Test Cases                                           │
 ├──────────────────────────────────────────────────────────────┤
-│  Source:   [ C:\Users\mtb\Downloads\Login.xlsx  ] [ ... ]    │
+│  SOURCE                                                      │
+│  [ C:\Users\mtb\Downloads\Login.xlsx            ] [ ... ]    │
 │  Your file should hold these columns: Description,           │
 │  Expected Result, Steps, Priority, ...                       │
 │                                                              │

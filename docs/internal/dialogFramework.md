@@ -88,6 +88,12 @@ and which keys it answers, and the shell builds the rest.
   field has, not in a borderless well. A value the dialog shows read-only is set
   in the size a field would show it in, so a test case's description above the
   fields is not smaller than the answer being typed under it.
+  A cell inside a table is not a typing surface of the dialog and does not take
+  this: it takes the table's own font, colors and row height, whether it is the
+  tick box in a header, the choice box that opens on a Priority cell or the
+  button that opens the group picker. A field's font is six points above the
+  IDE's label font, and a cell set in it would jump size the moment a tester
+  clicked into it and stand taller than the row that holds it.
 - **Rule-INTERNAL-097** — A box that holds many lines grows as lines are added,
   and whatever draws it grows with it rather than letting it scroll inside a
   fixed box. Every such box is the same box: the same frame, the same font, Tab

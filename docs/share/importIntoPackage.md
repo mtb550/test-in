@@ -42,7 +42,8 @@ sheets gives it six tabs.
 ┌──────────────────────────────────────────────────────────────┐
 │  Import Test Cases                                           │
 ├──────────────────────────────────────────────────────────────┤
-│  Source:   [ C:\Users\mtb\Downloads\Plan.xlsx   ] [ ... ]    │
+│  SOURCE                                                      │
+│  [ C:\Users\mtb\Downloads\Plan.xlsx             ] [ ... ]    │
 │                                                              │
 │  | Login | Checkout | Search | Cart | Profile | Admin |      │
 │  ┌────────────────────────────────────────────────────────┐  │

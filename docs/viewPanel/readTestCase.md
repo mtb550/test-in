@@ -46,8 +46,13 @@ There is no key for this. It is what the **Details** tab shows.
 - **Rule-VIEW-PANEL-027** — A blank step is skipped, and its number is not given
   to the step after it. A test case with a blank third step reads one, two,
   four.
-- **Rule-VIEW-PANEL-028** — Every value can be selected and copied, and none of
-  them can be typed into.
+- **Rule-VIEW-PANEL-028** — No value in the panel can be typed into, and none of
+  them takes the keyboard: the tab holds it, so Escape and the arrows always
+  mean what they mean in the panel rather than inside whichever value was last
+  clicked. A value is copied from where it is written - the test case in its
+  editor, the stacktrace in the window that opens on it. Selecting text in the
+  panel was asked for and refused on 2026-09-23: it costs every value its
+  focus, and the panel is for reading.
 - **Rule-VIEW-PANEL-061** — Who did something and when are one row, not two. **Created** reads the name, then *on*, then
   the date.
 - **Rule-VIEW-PANEL-062** — **Order** is where the test case sits in its test

@@ -50,9 +50,12 @@ The same dialog as [UC-SHARE-001](exportTestSet.md), with more than one tab.
 │  │[x]| 2  | Pay with an expi. | The card is r..| P2       │  │
 │  └────────────────────────────────────────────────────────┘  │
 │                                                              │
-│  Destination:  [ C:\Users\mtb\Downloads           ] [ ... ]  │
-│  File name:    [ Payments                         ]          │
-│  Format:       [ XLSX                            v]          │
+│  DESTINATION                                                 │
+│  [ C:\Users\mtb\Downloads                       ] [ ... ]    │
+│  FILE NAME                                                   │
+│  [ Payments                                ]                 │
+│  FORMAT                                                      │
+│  [ XLSX                                   v]                 │
 │                                                              │
 │                                          [ Export ]          │
 ├──────────────────────────────────────────────────────────────┤

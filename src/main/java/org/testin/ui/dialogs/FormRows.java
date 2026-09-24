@@ -16,10 +16,10 @@
 
 package org.testin.ui.dialogs;
 
-import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Caption;
 
 import javax.swing.JComponent;
 import java.awt.GridBagConstraints;
@@ -37,31 +37,19 @@ public final class FormRows extends JBPanel<FormRows> {
         gbc.insets = JBUI.insets(4);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 0;
+        gbc.weightx = 1.0;
     }
 
+    // Rule-INTERNAL-087
     public @NotNull FormRows row(final @NotNull String label, final @NotNull JComponent field) {
-        gbc.gridx = 0;
-        gbc.gridy = nextRow;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0;
-        add(label.isEmpty() ? new JBPanel<>() : new JBLabel(label), gbc);
+        gbc.gridy = nextRow++;
+        add(label.isEmpty() ? field : Caption.above(label, field), gbc);
 
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        add(field, gbc);
-
-        nextRow++;
         return this;
     }
 
     public @NotNull FormRows wideRow(final @NotNull JComponent component) {
-        gbc.gridx = 0;
-        gbc.gridy = nextRow;
-        gbc.gridwidth = 2;
-        gbc.weightx = 1.0;
-        add(component, gbc);
-
-        nextRow++;
-        return this;
+        return row("", component);
     }
 }

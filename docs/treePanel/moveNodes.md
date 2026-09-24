@@ -94,8 +94,10 @@ The node keeps everything inside it. Only where it sits changes.
 │                                                              │
 │  Move 'Login' into 'Smoke'?                             (1)  │
 │                                                              │
-│  From:  C:\Testin\Demo\Test Cases\Accounts             (2)   │
-│  To:    C:\Testin\Demo\Test Cases\Smoke                      │
+│  FROM                                                   (2)  │
+│  C:\Testin\Demo\Test Cases\Accounts                          │
+│  TO                                                          │
+│  C:\Testin\Demo\Test Cases\Smoke                             │
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤
 │  Enter Move    Escape Cancel                            (3)  │

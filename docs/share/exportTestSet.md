@@ -48,9 +48,12 @@ There is no key for this. The menu entry is **Export**.
 │  │[x]| 2 | Log in with a loc..| The account is..| P2      │  │
 │  └────────────────────────────────────────────────────────┘  │
 │                                                              │
-│  Destination:  [ C:\Users\mtb\Downloads           ] [ ... ]  │
-│  File name:    [ Login                            ]          │
-│  Format:       [ XLSX                            v]          │
+│  DESTINATION                                                 │
+│  [ C:\Users\mtb\Downloads                         ] [ ... ]  │
+│  FILE NAME                                                   │
+│  [ Login                                          ]          │
+│  FORMAT                                                      │
+│  [ XLSX                                          v]          │
 │                                                              │
 │                                          [ Export ]          │
 ├──────────────────────────────────────────────────────────────┤

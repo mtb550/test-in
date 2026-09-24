@@ -19,7 +19,9 @@ package org.testin.ui.framework;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Caption;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 import org.testin.util.Html;
@@ -41,8 +43,8 @@ public final class DialogMessage implements DialogComponent {
         message.setAlignmentX(Component.LEFT_ALIGNMENT);
         content.add(message);
 
-        addPathRow(content, Bundle.message("caption.from"), from, 8);
-        addPathRow(content, Bundle.message("caption.to"), to, 2);
+        addPathRow(content, Bundle.message("caption.from"), from);
+        addPathRow(content, Bundle.message("caption.to"), to);
 
         panel = new JBPanel<>(new BorderLayout());
         panel.setOpaque(false);
@@ -51,15 +53,17 @@ public final class DialogMessage implements DialogComponent {
         panel.add(content, BorderLayout.CENTER);
     }
 
-    private static void addPathRow(final @NotNull JBPanel<?> content, final @NotNull String caption, final @NotNull String path, final int topGap) {
+    // Rule-INTERNAL-087
+    private static void addPathRow(final @NotNull JBPanel<?> content, final @NotNull String caption, final @NotNull String path) {
         if (path.isEmpty()) return;
 
-        final @NotNull JBLabel label = new JBLabel(caption + ":  " + path);
-        label.setFont(Fonts.message());
-        label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
-        label.setBorder(JBUI.Borders.emptyTop(topGap));
-        label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        content.add(label);
+        final @NotNull JBLabel value = new JBLabel(path);
+        value.setFont(Fonts.message());
+        value.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+
+        final @NotNull BorderLayoutPanel row = Caption.above(caption, value);
+        row.setAlignmentX(Component.LEFT_ALIGNMENT);
+        content.add(row);
     }
 
     @Override
