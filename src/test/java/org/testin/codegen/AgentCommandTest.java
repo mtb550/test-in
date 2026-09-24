@@ -46,8 +46,10 @@ public class AgentCommandTest {
 
     // Rule-CODEGEN-084
     @Test
-    public void thePromptGoesOnTheEndWhenNothingSaysWhere() {
-        assertEquals(AgentCli.arguments("-p --no-tools", "write it"), List.of("-p", "--no-tools", "write it"));
+    public void thePromptGoesOnStandardInputWhenNothingSaysOtherwise() {
+        assertEquals(AgentCli.arguments("-p --no-tools", "write it"), List.of("-p", "--no-tools"),
+                "a prompt of several lines handed to a .cmd shim is cut at the first newline, and nothing says so");
+        assertFalse(AgentCli.wantsThePromptAsAnArgument("-p --no-tools"));
     }
 
     // Rule-CODEGEN-084
@@ -59,8 +61,14 @@ public class AgentCommandTest {
 
     // Rule-CODEGEN-084
     @Test
-    public void anAgentWithNoArgumentsIsAskedWithThePromptAlone() {
-        assertEquals(AgentCli.arguments("", "write it"), List.of("write it"));
+    public void anAgentWithNoArgumentsIsAskedWithNoneOfThem() {
+        assertEquals(AgentCli.arguments("", "write it"), List.of());
+    }
+
+    // Rule-CODEGEN-084
+    @Test
+    public void anAgentThatWantsItAsAnArgumentSaysSo() {
+        assertTrue(AgentCli.wantsThePromptAsAnArgument("run {prompt} --quiet"));
     }
 
     // Rule-CODEGEN-083

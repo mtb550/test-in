@@ -48,7 +48,7 @@ public enum CodeAgent {
             "claude",
             "-p",
             "--version",
-            "ANTHROPIC_API_KEY"
+            ""
     ),
 
     CODEX(
@@ -56,7 +56,7 @@ public enum CodeAgent {
             "codex",
             "exec",
             "--version",
-            "OPENAI_API_KEY"
+            ""
     ),
 
     GEMINI_CLI(
@@ -64,7 +64,7 @@ public enum CodeAgent {
             "gemini",
             "-p",
             "--version",
-            "GEMINI_API_KEY"
+            ""
     ),
 
     OTHER(

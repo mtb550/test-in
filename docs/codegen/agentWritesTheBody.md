@@ -42,8 +42,11 @@ Connecting an agent changes what that gesture produces, not where it lives.
 - **Rule-CODEGEN-084** — The agent is asked once per test case, on a background
   task the tester can cancel, and never while the method is being written:
   writing a method is a write action, an agent takes seconds to minutes, and a
-  write action that waits on one freezes the IDE. The prompt is the last
-  argument unless the arguments say {prompt}, and then it goes there.
+  write action that waits on one freezes the IDE. The prompt is sent on standard
+  input, because a prompt of several lines handed to a command as an argument is
+  cut at the first newline by a `.cmd` shim and nothing says so. An agent that
+  must have it as an argument says `{prompt}` in its arguments, and then it goes
+  exactly there.
 - **Rule-CODEGEN-085** — Check runs the agent's own readiness command and prints
   the first line it answered, or says the command could not be started. It waits
   twenty seconds and can be canceled, because a settings page that hangs is
@@ -55,10 +58,13 @@ Connecting an agent changes what that gesture produces, not where it lives.
   the one Testin ships, so a tester who never edited it gets the better wording
   a later release brings.
 - **Rule-CODEGEN-087** — A key is never Testin's to hold. The agent reads it
-  from the environment the IDE was started in, and Testin only names the
-  variable and says whether it is set - never its value, never in a command
-  line, never in the log. A variable set in a terminal does not reach an IDE
-  that was already running.
+  from the environment the IDE was started in, and Testin only names the variable
+  and says whether it is set - never its value, never in a command line, never in
+  the log. The variable is blank until a tester names one, because an agent signed
+  in with its own account needs none: Claude Code signed in through a Claude
+  account reads no `ANTHROPIC_API_KEY`, and a page that said the variable was
+  missing would be reporting a fault that is not there. A variable set in a
+  terminal does not reach an IDE that was already running.
 - **Rule-CODEGEN-088** — What the agent printed is read from standard output,
   and where it fenced a block the largest one is taken. An answer that does not
   end as Java statements do is dropped: the TODO stays, the log says what came
