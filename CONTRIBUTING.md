@@ -93,14 +93,14 @@ work had it not been noticed immediately.
 
 ## The checks
 
-| Command                                      | What it settles                                                      | When                                                                                                 |
-|----------------------------------------------|----------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| `./gradlew compileJava test`                 | It compiles, and the unit tests and the documentation guards pass    | Every change, before you offer it                                                                    |
-| `./gradlew runIde`                           | It actually works                                                    | Anything a tester can see — see below                                                                |
-| `./gradlew inspect`                          | Every finding in the Inspected scope, and the display-string ratchet | Never by hand. CI runs it on every push, on every branch, and the run is where it is read            |
-| `pwsh tools/inspect.ps1 -Quick`              | The rules that read the source as text, not what an IDE indexes      | Every change, before you hand it over. Five seconds, no IDE                                          |
-| `git worktree add ../testin-<what> <branch>` | A second branch, checked out at once                                 | Whenever two pieces of work run at the same time — see below                                         |
-| `./gradlew verifyDistribution`               | No test classes and no compile-only dependencies reached the jar     | Runs in CI; run it if you touched packaging                                                          |
+| Command                                      | What it settles                                                      | When                                                                                      |
+|----------------------------------------------|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| `./gradlew compileJava test`                 | It compiles, and the unit tests and the documentation guards pass    | Every change, before you offer it                                                         |
+| `./gradlew runIde`                           | It actually works                                                    | Anything a tester can see — see below                                                     |
+| `./gradlew inspect`                          | Every finding in the Inspected scope, and the display-string ratchet | Never by hand. CI runs it on every push, on every branch, and the run is where it is read |
+| `pwsh tools/inspect.ps1 -Quick`              | The rules that read the source as text, not what an IDE indexes      | Every change, before you hand it over. Five seconds, no IDE                               |
+| `git worktree add ../testin-<what> <branch>` | A second branch, checked out at once                                 | Whenever two pieces of work run at the same time — see below                              |
+| `./gradlew verifyDistribution`               | No test classes and no compile-only dependencies reached the jar     | Runs in CI; run it if you touched packaging                                               |
 
 ### One build at a time in one checkout
 
@@ -193,7 +193,8 @@ excused:
 
 `unused`, `SameReturnValue`, `RedundantThrows` and `UnusedReturnValue` are the
 global ones, and the headless run under-reports them all: it sees neither
-Lombok's generated code nor the content modules' callers. `UnusedReturnValue` is gated and reported zero on 22 September 2026,
+Lombok's generated code nor the content modules' callers. `UnusedReturnValue` is gated and reported zero on 22 September
+2026,
 while the IDE found `FormRows.wideRow`. For these four, **Code | Inspect Code**
 in the IDE is the honest list.
 

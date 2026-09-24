@@ -51,8 +51,8 @@ form before it records anything.
   in light mode uses.
 - **Rule-EDITOR-PANEL-219** — A picture on the clipboard is a screenshot wherever
   it is pasted in the failure form, and never letters; anything else on the
-  clipboard pastes as text into whichever box has the cursor. The pictures are a
-  **Screenshots** row of their own, which is there only while there is a picture
+  clipboard pastes as text into whichever box has the cursor. The pictures are a **Screenshots** row of their own, which
+  is there only while there is a picture
   to show. Each is kept as a picture file beside the test run, in the order it
   was pasted, and the button on its picture is the one way to take it out.
 - **Rule-EDITOR-PANEL-221** — What actually happened is spell checked as the
@@ -68,8 +68,7 @@ form before it records anything.
   the test case form gives the expected result and the test data, because a
   tester writing why a test case failed writes sentences: it grows as lines are
   added and the dialog grows with it (Rule-INTERNAL-097). Enter records the
-  failure, and Ctrl+Enter adds a line, the same bargain a grid cell makes
-  (Rule-EDITOR-PANEL-048).
+  failure, and Ctrl+Enter adds a line, the same bargain a grid cell makes (Rule-EDITOR-PANEL-048).
 
 ## The screen
 
@@ -111,8 +110,8 @@ form before it records anything.
    what should have happened. Neither can be typed into.
 2. **The first box** — what actually happened, in the same box the test case
    form gives the expected result and the test data: one line to start, growing
-   a line at a time as the tester writes, with the dialog growing with it
-   (Rule-EDITOR-PANEL-246). Its caption above it reads **Actual Result**, and its
+   a line at a time as the tester writes, with the dialog growing with it (Rule-EDITOR-PANEL-246). Its caption above it
+   reads **Actual Result**, and its
    gray hint is inside it and stays there while the box has the cursor. A
    misspelled word in it is underlined, and `Alt+Enter` offers the corrections.
    `Ctrl+Enter` adds a line; `Enter` still saves; `Tab` leaves the box.
@@ -122,8 +121,8 @@ form before it records anything.
    it reads **Stacktrace**, and its gray hint reads *paste error or exception or
    screenshot…*.
 6. **Screenshots** — one small picture for each screenshot pasted with `Ctrl+V`,
-   in the order they were pasted: the screenshot itself, 48 pixels high. Its
-   **x** takes that screenshot out, and the row disappears with the last of them.
+   in the order they were pasted: the screenshot itself, 48 pixels high. Its **x** takes that screenshot out, and the
+   row disappears with the last of them.
    The row is not there at all until the first picture arrives, so a failure
    without one shows no caption and no gap. `Ctrl+V` adds a picture wherever the
    cursor is, because the clipboard decides: a picture is a screenshot and

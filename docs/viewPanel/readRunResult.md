@@ -85,23 +85,21 @@ badges and above **Test case** (Rule-VIEW-PANEL-085).
    only, beside a thumbnail of each screenshot. That is
    [UC-VIEW-PANEL-006](readStacktrace.md) and Rule-VIEW-PANEL-034.
 7. **Executed by** — last in the band, because who ran it is read after what
-   happened. One row, in the words **Created** uses on the test case's own band
-   (Rule-VIEW-PANEL-061).
+   happened. One row, in the words **Created** uses on the test case's own band (Rule-VIEW-PANEL-061).
 8. **Test case** — folded, because a tester reading a failure is
-   reading the failure. Clicking its name opens every field the test case has
-   (Rule-VIEW-PANEL-087).
+   reading the failure. Clicking its name opens every field the test case has (Rule-VIEW-PANEL-087).
 
 ## The band, in order
 
-| Where it is       | What it holds                                                                                                                                                                                                                       |
-|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| The first badge   | The verdict: **Passed**, **Failed**, **Blocked**, **Pending**, **Untested** or **Removed**, in the verdict's own color                                                                                                               |
-| The second badge  | How long the test case took, with a clock, in a plain frame with nothing filled in                                                                                                                                                   |
-| The bug chip      | The severity and the priority in one chip, as `Blocker / High`, in the severity's color                                                                                                                                              |
+| Where it is       | What it holds                                                                                                                                                                                                            |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| The first badge   | The verdict: **Passed**, **Failed**, **Blocked**, **Pending**, **Untested** or **Removed**, in the verdict's own color                                                                                                   |
+| The second badge  | How long the test case took, with a clock, in a plain frame with nothing filled in                                                                                                                                       |
+| The bug chip      | The severity and the priority in one chip, as `Blocker / High`, in the severity's color                                                                                                                                  |
 | After the chip    | The GitHub issue the failure was reported as, as `#123` with the address on hover — or, where nothing has been reported, the **Report a bug** link that files one, never both. That is [UC-VIEW-PANEL-016](reportBug.md) |
-| **Actual Result** | What the tester says actually happened                                                                                                                                                                                              |
-| **Stacktrace**    | A link, never the error itself, and a thumbnail of each screenshot pasted with the failure. That is [UC-VIEW-PANEL-006](readStacktrace.md)                                                                                           |
-| **Executed By**   | Who ran it and when, as `muteb on 7 January 10:05`, last in the band. One row, not two — the date has no caption of its own (Rule-VIEW-PANEL-061)                                                                                    |
+| **Actual Result** | What the tester says actually happened                                                                                                                                                                                   |
+| **Stacktrace**    | A link, never the error itself, and a thumbnail of each screenshot pasted with the failure. That is [UC-VIEW-PANEL-006](readStacktrace.md)                                                                               |
+| **Executed By**   | Who ran it and when, as `muteb on 7 January 10:05`, last in the band. One row, not two — the date has no caption of its own (Rule-VIEW-PANEL-061)                                                                        |
 
 ## Main flow
 
@@ -129,8 +127,7 @@ closes the gap. A verdict recorded from the menu, or on several test cases at
 once, is never timed.
 
 **If nobody is named** — the **Executed By** row holds the date on its own, and
-with neither a name nor a date the row is not drawn at all
-(Rule-VIEW-PANEL-031).
+with neither a name nor a date the row is not drawn at all (Rule-VIEW-PANEL-031).
 
 ## The same bug, on the tab beside this one
 

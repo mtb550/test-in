@@ -53,6 +53,15 @@ public final class StacktraceLine extends AbstractDetails {
 
     private final @NotNull List<String> currentPath;
 
+    private static @NotNull JBPanel<?> line(final @NotNull List<? extends JComponent> parts) {
+        final @NotNull JBPanel<?> line = new JBPanel<>(new HorizontalLayout(JBUI.scale(GAP)));
+        line.setOpaque(false);
+
+        parts.forEach(line::add);
+
+        return line;
+    }
+
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-081
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
@@ -66,15 +75,6 @@ public final class StacktraceLine extends AbstractDetails {
         screenshots.forEach(name -> parts.add(thumbnail(p, name)));
 
         return addFullWidthRow(panel, gbc, line(parts), JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
-    }
-
-    private static @NotNull JBPanel<?> line(final @NotNull List<? extends JComponent> parts) {
-        final @NotNull JBPanel<?> line = new JBPanel<>(new HorizontalLayout(JBUI.scale(GAP)));
-        line.setOpaque(false);
-
-        parts.forEach(line::add);
-
-        return line;
     }
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034

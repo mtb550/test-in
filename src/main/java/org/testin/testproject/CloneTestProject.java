@@ -51,16 +51,6 @@ public final class CloneTestProject {
     private final @NotNull String projectName;
     private final @NotNull TreePanel tp;
 
-    // UC-TREE-PANEL-003, Rule-TREE-PANEL-107
-    // UC-TREE-PANEL-003, Rule-SHARE-062
-    private void keepNoCredentials(final @NotNull Path projectPath) {
-        final @NotNull String address = TestinYml.addressWithoutCredentials(gitUrl);
-        if (address.equals(gitUrl.strip())) return;
-
-        final @NotNull GitRepositoryService git = new GitRepositoryService(p);
-        git.changeRemoteUrl(projectPath, git.getRemoteName(projectPath), address);
-    }
-
     public static @NotNull String nameFor(final @NotNull Project p, final @NotNull String url) {
         final @NotNull String named = TestinYml.projectName(p);
         if (!named.isEmpty() && TestinYml.isRepoUrl(p, url)) return named;
@@ -91,6 +81,16 @@ public final class CloneTestProject {
 
         final @NotNull String last = path.substring(Math.max(path.lastIndexOf('/'), path.lastIndexOf(':')) + 1);
         return DirectoryType.TP.canTakeName(last) ? last : NameSanitizer.packageName(last);
+    }
+
+    // UC-TREE-PANEL-003, Rule-TREE-PANEL-107
+    // UC-TREE-PANEL-003, Rule-SHARE-062
+    private void keepNoCredentials(final @NotNull Path projectPath) {
+        final @NotNull String address = TestinYml.addressWithoutCredentials(gitUrl);
+        if (address.equals(gitUrl.strip())) return;
+
+        final @NotNull GitRepositoryService git = new GitRepositoryService(p);
+        git.changeRemoteUrl(projectPath, git.getRemoteName(projectPath), address);
     }
 
     // UC-TREE-PANEL-003, Rule-TREE-PANEL-107

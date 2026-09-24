@@ -35,8 +35,8 @@ import org.testin.util.Fonts;
 
 import javax.swing.Icon;
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.List;
@@ -146,6 +146,10 @@ public final class Badges {
             setIconTextGap(JBUI.scale(BADGE_ICON_GAP));
         }
 
+        private static @NotNull Color readableOn(final @NotNull Color fill) {
+            return isLight(fill) ? TEXT_ON_LIGHT : JBColor.WHITE;
+        }
+
         private void show(final @NotNull Badge badge) {
             this.badge = badge;
 
@@ -167,10 +171,6 @@ public final class Badges {
             setForeground(ink);
             setIcon(icon);
             setBorder(JBUI.Borders.empty(BADGE_PAD_V, BADGE_PAD_H, BADGE_PAD_V, rightPad));
-        }
-
-        private static @NotNull Color readableOn(final @NotNull Color fill) {
-            return isLight(fill) ? TEXT_ON_LIGHT : JBColor.WHITE;
         }
 
         @Override

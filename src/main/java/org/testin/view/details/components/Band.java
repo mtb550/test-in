@@ -61,6 +61,21 @@ public final class Band extends AbstractDetails {
         return new Band(name, rememberedAs, List.copyOf(rows));
     }
 
+    // Rule-VIEW-PANEL-085
+    private static @NotNull JComponent hairline() {
+        final @NotNull JBPanel<?> holder = new JBPanel<>(new GridBagLayout());
+        holder.setOpaque(false);
+
+        final @NotNull GridBagConstraints centered = new GridBagConstraints();
+        centered.fill = GridBagConstraints.HORIZONTAL;
+        centered.anchor = GridBagConstraints.CENTER;
+        centered.weightx = 1.0;
+
+        holder.add(new JSeparator(), centered);
+
+        return holder;
+    }
+
     // UC-VIEW-PANEL-004, UC-VIEW-PANEL-005, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-087
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
@@ -92,21 +107,6 @@ public final class Band extends AbstractDetails {
         heading.add(hairline(), BorderLayout.CENTER);
 
         return heading;
-    }
-
-    // Rule-VIEW-PANEL-085
-    private static @NotNull JComponent hairline() {
-        final @NotNull JBPanel<?> holder = new JBPanel<>(new GridBagLayout());
-        holder.setOpaque(false);
-
-        final @NotNull GridBagConstraints centered = new GridBagConstraints();
-        centered.fill = GridBagConstraints.HORIZONTAL;
-        centered.anchor = GridBagConstraints.CENTER;
-        centered.weightx = 1.0;
-
-        holder.add(new JSeparator(), centered);
-
-        return holder;
     }
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-087

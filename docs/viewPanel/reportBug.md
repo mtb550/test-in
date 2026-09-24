@@ -101,8 +101,8 @@ After:
 2. **Report Bug** — prepares the bug and opens it. It is gray, with the reason on
    hover, whenever Rule-VIEW-PANEL-072 says so.
 3. **`#123`** — the issue this test case was reported as, with the whole address
-   on hover. Clicking it opens the issue in the browser. It stands where
-   **Report Bug** was, because once a bug is reported there is nothing left to
+   on hover. Clicking it opens the issue in the browser. It stands where **Report Bug** was, because once a bug is
+   reported there is nothing left to
    report (Rule-VIEW-PANEL-072).
 
 ## The Report Bug dialog

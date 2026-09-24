@@ -29,6 +29,10 @@ public class ReadAfterTheFolderIsSetIdeTest extends BasePlatformTestCase {
     private Path root;
     private String wasSet;
 
+    private static AppSettingsState settings() {
+        return Services.getInstance(AppSettingsState.class);
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -45,10 +49,6 @@ public class ReadAfterTheFolderIsSetIdeTest extends BasePlatformTestCase {
         } finally {
             super.tearDown();
         }
-    }
-
-    private static AppSettingsState settings() {
-        return Services.getInstance(AppSettingsState.class);
     }
 
     private ProjectIndexer indexer() {

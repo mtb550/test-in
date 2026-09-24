@@ -29,6 +29,14 @@ public class CardTitleWrapIdeTest extends BasePlatformTestCase {
 
     private static final @NotNull String LONG = "Log in with a valid user and check that the dashboard opens with every widget it is supposed to show and nothing else at all";
 
+    private static @NotNull List<CardHoverAction.Offered> everyButton() {
+        return offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD, CardHoverAction.NAVIGATE_TO_TEST_CASE);
+    }
+
+    private static @NotNull List<CardHoverAction.Offered> offered(final @NotNull CardHoverAction... actions) {
+        return Arrays.stream(actions).map(action -> new CardHoverAction.Offered(action, Optional.empty())).toList();
+    }
+
     private @NotNull Card laidOut(final @NotNull String title) {
         final @NotNull JBList<String> list = new JBList<>("a");
         list.setSize(900, 400);
@@ -37,14 +45,6 @@ public class CardTitleWrapIdeTest extends BasePlatformTestCase {
         card.feed(title);
         card.applyListLayout(list);
         return card;
-    }
-
-    private static @NotNull List<CardHoverAction.Offered> everyButton() {
-        return offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD, CardHoverAction.NAVIGATE_TO_TEST_CASE);
-    }
-
-    private static @NotNull List<CardHoverAction.Offered> offered(final @NotNull CardHoverAction... actions) {
-        return Arrays.stream(actions).map(action -> new CardHoverAction.Offered(action, Optional.empty())).toList();
     }
 
     public void testWrappingMakesTheCardTaller() {

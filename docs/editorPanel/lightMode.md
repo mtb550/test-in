@@ -461,8 +461,7 @@ asks for, with the same starting values and the same wording. A failure
 recorded here and one recorded in the run editor are the same record. The actual
 result underlines a misspelled word here as it does there, and `Alt+Enter`
 offers the corrections. It is the same growing box as well: it starts one line
-tall, grows a line at a time as the tester writes, and the window grows with it
-(Rule-INTERNAL-097).
+tall, grows a line at a time as the tester writes, and the window grows with it (Rule-INTERNAL-097).
 
 ### 14. Inside the window, in a box it already has
 
@@ -490,8 +489,8 @@ picture becomes a screenshot, and anything else is text in whichever box has the
 cursor. The error box still says so in its gray hint text, *"paste error or
 exception or screenshot…"*, because that is where a tester is already looking -
 but the gesture is not tied to that box, so a screenshot arrives wherever they
-happen to be typing. A pasted screenshot shows as a small picture in a
-**Screenshots** row, never as letters, and its **x** takes it out. The row is
+happen to be typing. A pasted screenshot shows as a small picture in a **Screenshots** row, never as letters, and its
+**x** takes it out. The row is
 there only while it holds a picture.
 
 This removes a way to lose work. Passing a test case clears everything recorded
@@ -648,7 +647,7 @@ that is the tester's hand on the edge, not a state change.
 | **Stop**                                       | Ends the execution flow. The test run keeps every verdict already recorded. Only the clock stops.                                                                                                                                                                                                                                                                                                                            |
 | **`P` / `B`**                                  | Records the verdict on the current test case. Advances to the next test case that has not been judged.                                                                                                                                                                                                                                                                                                                       |
 | **`F`**                                        | Opens the failure capture in place. `Enter` saves and advances. `Escape` returns, with the test case still unjudged.                                                                                                                                                                                                                                                                                                         |
-| **`Ctrl+V`**                                   | On the failure form: a picture on the clipboard is added as a screenshot, wherever the cursor is, and anything else is pasted as text into the box that has it. It does nothing when no failure form is open, so evidence cannot be attached to a test case that is about to be passed and cleared.                                                                                                                           |
+| **`Ctrl+V`**                                   | On the failure form: a picture on the clipboard is added as a screenshot, wherever the cursor is, and anything else is pasted as text into the box that has it. It does nothing when no failure form is open, so evidence cannot be attached to a test case that is about to be passed and cleared.                                                                                                                          |
 | **`Escape`**                                   | Closes the window. The test run is untouched. Reopening returns to the first unjudged test case.                                                                                                                                                                                                                                                                                                                             |
 | **`Ctrl+D`**                                   | Shows the detail fields, or hides them when they are shown.                                                                                                                                                                                                                                                                                                                                                                  |
 | **`F5`**, or **Run Test Method**               | Runs the test case on screen's generated method, claiming it for this test run first. While it runs, the button is **Stop Test Method** and `F5` stops it. The status that comes back is the verdict, and the walk moves on. The key is the one the IDE's keymap gives Run Test Method.                                                                                                                                      |

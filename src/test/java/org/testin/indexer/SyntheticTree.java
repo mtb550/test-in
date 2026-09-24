@@ -19,12 +19,12 @@ package org.testin.indexer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.markers.TestProjectMarker;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
-import org.testin.model.markers.TestProjectMarker;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class SyntheticTree {

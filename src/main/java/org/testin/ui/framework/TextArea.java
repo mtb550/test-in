@@ -17,19 +17,16 @@
 package org.testin.ui.framework;
 
 import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
 import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
 import javax.swing.event.DocumentEvent;
 import java.awt.KeyboardFocusManager;
-import java.util.List;
 
 public final class TextArea implements DialogComponent {
     private final @NotNull JBTextArea area;

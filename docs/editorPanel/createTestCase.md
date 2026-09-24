@@ -91,16 +91,16 @@ This is how every test case in Testin begins.
 
 ## The fields and the keys that open them
 
-| Field           | Key      | The gray hint in the empty box                     |
-|-----------------|----------|----------------------------------------------------|
-| Description     | `Ctrl+D` | *set description*                                  |
-| Expected Result | `Ctrl+E` | *set expected result*                              |
-| Module          | `Ctrl+M` | *set module*                                       |
-| Steps           | `Ctrl+S` | *set step*, then the number                        |
-| Priority        | `Ctrl+P` | none, it is three radio buttons                    |
-| Group           | `Ctrl+G` | *set group*, completing what the project uses      |
-| Test Data       | `Ctrl+T` | *set test data*                                    |
-| Pre Conditions  | `Ctrl+B` | *set preconditions*                                |
+| Field           | Key      | The gray hint in the empty box                |
+|-----------------|----------|-----------------------------------------------|
+| Description     | `Ctrl+D` | *set description*                             |
+| Expected Result | `Ctrl+E` | *set expected result*                         |
+| Module          | `Ctrl+M` | *set module*                                  |
+| Steps           | `Ctrl+S` | *set step*, then the number                   |
+| Priority        | `Ctrl+P` | none, it is three radio buttons               |
+| Group           | `Ctrl+G` | *set group*, completing what the project uses |
+| Test Data       | `Ctrl+T` | *set test data*                               |
+| Pre Conditions  | `Ctrl+B` | *set preconditions*                           |
 
 Each field's icon is the letter of its key in a rounded frame, so Pre Conditions
 shows B. The same icon marks the field's values in its completion list.

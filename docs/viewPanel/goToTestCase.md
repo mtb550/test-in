@@ -17,8 +17,8 @@ with a copy button until 24 September 2026; the identity is a grid column now,
 off to start with and switched on from **Fields**
 ([UC-EDITOR-PANEL-003](../editorPanel/chooseFields.md)). A 36-character code at
 the top of every panel was the loudest thing on it, and the thing it was for -
-naming the exact test case in a bug report - is written into the report by
-**Report a bug** without anyone copying anything.
+naming the exact test case in a bug report - is written into the report by **Report a bug** without anyone copying
+anything.
 
 ## Rules
 
@@ -89,8 +89,8 @@ test case from the run.
 The panel follows the tester and shows whatever they are looking at, from
 wherever they are looking at it - a gutter mark, a test run, a search. None of
 those is the place a test case is written. One icon closes that gap, and it
-refuses rather than disappearing when there is nowhere to go
-([Rule-VIEW-PANEL-056](goToCode.md) holds the other two to the same bargain).
+refuses rather than disappearing when there is nowhere to go ([Rule-VIEW-PANEL-056](goToCode.md) holds the other two to
+the same bargain).
 
 ---
 

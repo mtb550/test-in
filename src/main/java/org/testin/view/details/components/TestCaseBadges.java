@@ -32,6 +32,7 @@ import java.util.List;
 
 public final class TestCaseBadges {
     private static final int FLOW_GAP = 6;
+
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-085
     public static @NotNull JComponent of(final @NotNull Project p, final @NotNull TestCaseDto dto) {
         final @NotNull JBPanel<?> badgesPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));

@@ -116,8 +116,8 @@ There is no key for this. It is what the **Details** tab shows.
 4. **The values** — each under its caption, across the whole panel, so a narrow
    panel still gives a value all its width. Each one can be selected and
    copied. None of them can be typed into.
-5. **The rows that are missing** — this test case has nothing in its
-   **Reference** field, so that row is not drawn and no gap is left for it.
+5. **The rows that are missing** — this test case has nothing in its **Reference** field, so that row is not drawn and
+   no gap is left for it.
 
 ## The rows, in order
 

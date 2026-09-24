@@ -29,13 +29,14 @@ import org.testin.services.Services;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
-import javax.swing.JComponent;
 import javax.swing.Box;
+import javax.swing.JComponent;
 import java.awt.FlowLayout;
 import java.util.List;
 
 public final class ActionIcons {
     private static final int STRUT_WIDTH = 8;
+
     // UC-VIEW-PANEL-009, UC-VIEW-PANEL-012, UC-VIEW-PANEL-014, Rule-VIEW-PANEL-050, Rule-VIEW-PANEL-056, Rule-VIEW-PANEL-057, Rule-VIEW-PANEL-063
     public static @NotNull JComponent of(final @NotNull Project p, final @NotNull TestCaseDto dto) {
         final @NotNull CardHoverAction.Offered navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD.offer(p, dto);

@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.Fonts;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;

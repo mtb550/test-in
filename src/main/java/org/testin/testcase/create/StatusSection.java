@@ -25,7 +25,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Bundle;
-import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
 import javax.swing.JList;

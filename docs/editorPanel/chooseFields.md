@@ -40,8 +40,8 @@ There is no key for this. The button's tooltip reads **Fields**.
   view is on screen.
 - **Rule-EDITOR-PANEL-022** — The choice is remembered, and is separate for a
   test set and a test run.
-- **Rule-EDITOR-PANEL-023** — Two fields cannot be changed: **Order** and
-  **Description** are always shown. Order is the grid's row header and not a
+- **Rule-EDITOR-PANEL-023** — Two fields cannot be changed: **Order** and **Description** are always shown. Order is the
+  grid's row header and not a
   field a tester chooses: clicking it selects the row, and `Enter` or
   double-clicking it opens the details panel. **ID** is off to start with and can
   be switched on like any other field - it is the only place a tester can read a

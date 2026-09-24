@@ -29,7 +29,6 @@ import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.Fonts;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 

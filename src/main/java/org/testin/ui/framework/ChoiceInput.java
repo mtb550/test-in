@@ -21,7 +21,6 @@ import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
 import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.Fonts;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;

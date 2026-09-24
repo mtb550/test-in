@@ -28,7 +28,6 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.Fonts;
 import org.testin.util.ListValue;
 
 import javax.swing.AbstractAction;

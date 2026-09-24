@@ -50,15 +50,6 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
                 at four
                 at five""";
 
-    private @NotNull List<String> shown(final @NotNull Optional<TestRunItems> runItem) {
-        final @NotNull JBPanel<?> tab = new JBPanel<>();
-        new DetailsTab().load(getProject(), tab, Optional.of(testCase()), runItem, List.of("Demo", "Test Cases", LAST_STEP));
-
-        final @NotNull List<String> words = new ArrayList<>();
-        collect(tab, words);
-        return words;
-    }
-
     private static void collect(final @NotNull Container container, final @NotNull List<String> words) {
         for (final Component child : container.getComponents()) {
             add(words, text(child));
@@ -91,6 +82,15 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
 
     private static @NotNull TestRunItems failed() {
         return TestRunItems.builder().id(ID).status(TestStatus.FAILED).actualResult("The session was dropped").duration(Duration.ofSeconds(134)).executedBy("muteb").stacktrace(STACKTRACE).build();
+    }
+
+    private @NotNull List<String> shown(final @NotNull Optional<TestRunItems> runItem) {
+        final @NotNull JBPanel<?> tab = new JBPanel<>();
+        new DetailsTab().load(getProject(), tab, Optional.of(testCase()), runItem, List.of("Demo", "Test Cases", LAST_STEP));
+
+        final @NotNull List<String> words = new ArrayList<>();
+        collect(tab, words);
+        return words;
     }
 
     public void testTheExceptionIsALinkAndNotAValue() {

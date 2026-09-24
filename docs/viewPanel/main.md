@@ -28,12 +28,12 @@ it.
 |                       | **Reading**                                                     |                                                                  |
 | **UC-VIEW-PANEL-004** | [Read what a test case says](readTestCase.md)                   | Follow the steps and check the expected result.                  |
 | **UC-VIEW-PANEL-005** | [Read what a test run recorded](readRunResult.md)               | See the verdict and what went wrong last time.                   |
-| **UC-VIEW-PANEL-006** | [Read the stacktrace behind a failure](readStacktrace.md)      | Copy the whole error into a bug report.                          |
+| **UC-VIEW-PANEL-006** | [Read the stacktrace behind a failure](readStacktrace.md)       | Copy the whole error into a bug report.                          |
 | **UC-VIEW-PANEL-007** | [Read a test case's history](readHistory.md)                    | See what changed on the test case, and when.                     |
 | **UC-VIEW-PANEL-008** | [See the bugs still open on a test case](seeOpenBugs.md)        | Avoid raising a bug somebody has already raised.                 |
 | **UC-VIEW-PANEL-017** | [Move between the panel's tabs](moveBetweenTabs.md)             | Reach History and Open Bugs without the mouse.                   |
 |                       | **Working from the panel**                                      |                                                                  |
-| **UC-VIEW-PANEL-009** | [Go to the test case](goToTestCase.md)                          | Open the test case's own editor from wherever it is being read.   |
+| **UC-VIEW-PANEL-009** | [Go to the test case](goToTestCase.md)                          | Open the test case's own editor from wherever it is being read.  |
 | **UC-VIEW-PANEL-010** | [Go to the test set the test case lives in](goToTestSet.md)     | Open the test set and see the test cases around it.              |
 | **UC-VIEW-PANEL-011** | [Change one field without leaving the panel](changeOneField.md) | Fix a wrong field without going back to the editor.              |
 | **UC-VIEW-PANEL-012** | [Run a test case from the panel](runFromPanel.md)               | Try the test case again while reading it.                        |
@@ -119,19 +119,17 @@ in front of them while they write down what actually happened.
 5. **The badges and the actions** — the priority and one badge for each group,
    then the three icons: go to the automation code, run the test case, and open
    the test case's own editor. All three are always drawn; one that cannot work
-   here is gray, does not grow under the pointer, and says what it is waiting for
-   (Rule-VIEW-PANEL-085).
+   here is gray, does not grow under the pointer, and says what it is waiting for (Rule-VIEW-PANEL-085).
 6. **Execution result** — what one test run recorded. The whole band, its name
-   included, is drawn only when the panel was opened from a test run
-   (Rule-VIEW-PANEL-085). Its verdict, its duration and its bug are one line
+   included, is drawn only when the panel was opened from a test run (Rule-VIEW-PANEL-085). Its verdict, its duration
+   and its bug are one line
    under the band's name, the duration is framed rather than filled, and who ran
    it and when close the band as a row (Rule-VIEW-PANEL-086). That is
    [UC-VIEW-PANEL-005](readRunResult.md).
 7. **Test case** — folded until a tester clicks its name, and then every
    field the test case has, with every empty one left out. The state is
    remembered for the IDE rather than for one test case. In the test case editor
-   there is no run above it, so the fields are drawn with no heading and no fold
-   (Rule-VIEW-PANEL-087).
+   there is no run above it, so the fields are drawn with no heading and no fold (Rule-VIEW-PANEL-087).
 8. **The captions** — each on a line of its own above its value, in the
    caption font: JetBrains Mono, smaller than the value, in capitals, in gray.
    The value has the whole width of the panel (Rule-VIEW-PANEL-082).

@@ -40,6 +40,13 @@ public final class RunItemSummary extends AbstractDetails {
     private final @NotNull TestRunItems item;
     private final @NotNull List<String> currentPath;
 
+    private static @NotNull JBPanel<?> line() {
+        final @NotNull JBPanel<?> line = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(GAP), 0));
+        line.setOpaque(false);
+
+        return line;
+    }
+
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
@@ -52,13 +59,6 @@ public final class RunItemSummary extends AbstractDetails {
         BugIssue.of(p, item, currentPath, dto).ifPresent(line::add);
 
         return addFullWidthRow(panel, gbc, line, JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
-    }
-
-    private static @NotNull JBPanel<?> line() {
-        final @NotNull JBPanel<?> line = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(GAP), 0));
-        line.setOpaque(false);
-
-        return line;
     }
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086

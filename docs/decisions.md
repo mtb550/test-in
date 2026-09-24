@@ -466,8 +466,8 @@ nothing, and every dialog in the plugin does. A review counted what that throws
 away: Create Test Case, the nine bulk editors and Result Analysis lose
 everything typed, and the create and edit run form, Update Test Case and the
 commit message lose less (#66, finding 296). Two dialogs had already decided
-not to ask - the failure form, where a half-written failure is worse than none
-(Rule-EDITOR-PANEL-144), and Report Bug (Rule-VIEW-PANEL-070). The framework is
+not to ask - the failure form, where a half-written failure is worse than none (Rule-EDITOR-PANEL-144), and Report Bug
+(Rule-VIEW-PANEL-070). The framework is
 one class, so a question on Escape would have been written once and inherited
 everywhere.
 

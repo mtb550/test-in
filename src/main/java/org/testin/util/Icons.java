@@ -29,8 +29,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.Graphics2D;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.font.TextLayout;
@@ -93,10 +93,6 @@ public final class Icons {
         };
     }
 
-    public interface LetterIcon extends Icon {
-        @NotNull String letter();
-    }
-
     // UC-INTERNAL-007, Rule-INTERNAL-077
     public static @NotNull Icon gray(final @NotNull Icon icon) {
         return IconUtil.desaturate(icon);
@@ -136,5 +132,9 @@ public final class Icons {
                 return JBUI.scale(16);
             }
         };
+    }
+
+    public interface LetterIcon extends Icon {
+        @NotNull String letter();
     }
 }
