@@ -88,6 +88,10 @@ and which keys it answers, and the shell builds the rest.
   field has, not in a borderless well. A value the dialog shows read-only is set
   in the size a field would show it in, so a test case's description above the
   fields is not smaller than the answer being typed under it.
+- **Rule-INTERNAL-097** — A box that holds many lines grows as lines are added,
+  and the dialog grows with it rather than scrolling inside a fixed box. Every
+  such box is the same box: the same frame, the same font, Tab leaves it, Enter
+  is the dialog's key and Ctrl+Enter adds a line.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

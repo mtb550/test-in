@@ -53,7 +53,7 @@ class FailureForm extends JBPanel<FailureForm> {
         this.runPath = runPath;
         this.runItem = runItem;
         this.fields = new FailureFields(p, runPath, runItem);
-        fields.onScreenshotsChanged(resized);
+        fields.onResized(resized);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(false);

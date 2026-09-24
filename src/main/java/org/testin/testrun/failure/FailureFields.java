@@ -25,8 +25,8 @@ import org.testin.model.TestRunItems;
 import org.testin.services.Services;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.MultiLineField;
 import org.testin.ui.framework.RadioSelection;
-import org.testin.ui.framework.SpellCheckedArea;
 import org.testin.ui.framework.TextArea;
 import org.testin.util.Bundle;
 
@@ -38,9 +38,7 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 
 public final class FailureFields {
-    private static final int ACTUAL_RESULT_ROWS = 3;
-
-    private final @NotNull ComponentDialogBase<SpellCheckedArea> actualResult;
+    private final @NotNull ComponentDialogBase<MultiLineField> actualResult;
     private final @NotNull ComponentDialogBase<RadioSelection<BugSeverity>> severity;
     private final @NotNull ComponentDialogBase<RadioSelection<BugPriority>> priority;
     private final @NotNull ComponentDialogBase<TextArea> errorCapture;
@@ -52,8 +50,8 @@ public final class FailureFields {
         final @NotNull List<byte[]> screenshots = Services.getInstance(p, ProjectIndexer.class).screenshots(runPath, runItem);
         IntStream.range(0, screenshots.size()).forEach(index -> named.put(screenshots.get(index), runItem.getScreenshots().get(index)));
 
-        // Rule-EDITOR-PANEL-221
-        actualResult = ComponentDialogBase.spellCheckedArea(p, RunEditorAttributes.ACTUAL_RESULT.getName(), Bundle.message("dialog.failure.placeholder.actual"), runItem.getActualResult(), ACTUAL_RESULT_ROWS);
+        // Rule-EDITOR-PANEL-221, Rule-INTERNAL-097
+        actualResult = ComponentDialogBase.multiLineField(p, RunEditorAttributes.ACTUAL_RESULT.getName(), Bundle.message("dialog.failure.placeholder.actual"), runItem.getActualResult());
 
         severity = ComponentDialogBase.<BugSeverity>radios(RunEditorAttributes.BUG_SEVERITY.getName())
                 .options(BugSeverity.CHOICES, BugSeverity::getLabel)
@@ -98,11 +96,13 @@ public final class FailureFields {
         return screenshots.stream().map(named::get).toList();
     }
 
-    public void onScreenshotsChanged(final @NotNull Runnable changed) {
-        errorCapture.getComponent().onImagesChanged(changed);
+    // Rule-EDITOR-PANEL-202, Rule-INTERNAL-097
+    public void onResized(final @NotNull Runnable resized) {
+        errorCapture.getComponent().onImagesChanged(resized);
+        actualResult.getComponent().growsWith(resized);
     }
 
-    public @NotNull SpellCheckedArea firstField() {
+    public @NotNull MultiLineField firstField() {
         return actualResult.getComponent();
     }
 }

@@ -458,7 +458,9 @@ the error box. They are exactly the fields the run editor's own failure dialog
 asks for, with the same starting values and the same wording. A failure
 recorded here and one recorded in the run editor are the same record. The actual
 result underlines a misspelled word here as it does there, and `Alt+Enter`
-offers the corrections.
+offers the corrections. It is the same growing box as well: it starts one line
+tall, grows a line at a time as the tester writes, and the window grows with it
+(Rule-INTERNAL-097).
 
 ### 14. Inside the window, in a box it already has
 

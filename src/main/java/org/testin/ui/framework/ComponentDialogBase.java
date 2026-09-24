@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.SpellChecker;
 
 import javax.swing.Icon;
 import java.util.ArrayList;
@@ -44,9 +45,12 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         return new TextInputBuilder();
     }
 
-    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221
-    public static @NotNull ComponentDialogBase<SpellCheckedArea> spellCheckedArea(final @NotNull Project p, final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value, final int rows) {
-        return new ComponentDialogBase<>(new SpellCheckedArea(p, caption, placeholder, value, rows));
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-221, Rule-INTERNAL-097
+    public static @NotNull ComponentDialogBase<MultiLineField> multiLineField(final @NotNull Project p, final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value) {
+        final @NotNull MultiLineField field = new MultiLineField(p, SpellChecker.createField(p), caption, placeholder);
+        field.setText(value);
+
+        return new ComponentDialogBase<>(field);
     }
 
     public static @NotNull ComponentDialogBase<DialogMessage> message(final @NotNull String text) {
