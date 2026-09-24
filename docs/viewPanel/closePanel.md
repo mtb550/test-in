@@ -6,7 +6,9 @@
 
 The panel takes width from the editor. Closing it gives that width back.
 
-`Escape` closes it, pressed in the editor or inside the panel.
+`Escape` closes it, pressed in the editor. Pressed inside the panel, `Escape`
+steps back to the editor first - so from the panel it takes two presses, and
+neither of them is a surprise.
 
 ## Rules
 
@@ -36,6 +38,10 @@ The panel takes width from the editor. Closing it gives that width back.
   selection does not open it again.
 - **Rule-VIEW-PANEL-060** — Closing the editor a test case came from closes the
   panel too.
+- **Rule-VIEW-PANEL-088** — Escape inside the panel gives the keyboard back to
+  the editor rather than closing anything. The panel is read, and the editor is
+  where a tester works, so the first press steps back to the work and a second
+  press - now in the editor - closes the panel (Rule-VIEW-PANEL-058).
 
 ## What the tester sees
 
@@ -53,14 +59,29 @@ written.
 4. The tester presses `Escape` again.
 5. The selection is cleared.
 
+## From inside the panel
+
+1. The panel is open and the keyboard is in one of its tabs.
+2. The tester presses `Escape`.
+3. The keyboard goes back to the editor. The panel stays open and nothing is
+   said (Rule-VIEW-PANEL-088).
+4. The tester presses `Escape` again, now in the editor, and the panel closes.
+
+Each press steps back one place: out of the panel, then out of the panel's
+width, then out of the selection.
+
 The tester can also press the IDE's own hide button on the panel.
 
 ## What Testin refuses
 
 **If the panel is already closed** — the press clears the selection instead.
 
-**If a cut is waiting to be pasted** — the first press drops the cut. The panel
-stays open. A second press closes it.
+**If a cut is waiting to be pasted** — the first press in the editor drops the
+cut. The panel stays open. A second press closes it.
+
+**If the keyboard is in the panel and there is nothing to step back to** — the
+press still gives the keyboard to the editor. There is always an editor behind
+the panel, because the panel only opens from one.
 
 ---
 

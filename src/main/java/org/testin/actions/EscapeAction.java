@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.table.JBTable;
@@ -55,11 +56,10 @@ public class EscapeAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), list);
     }
 
-    // UC-VIEW-PANEL-015, Rule-VIEW-PANEL-058
+    // UC-VIEW-PANEL-015, Rule-VIEW-PANEL-088
     public EscapeAction(final @NotNull Project p, final @NotNull JBPanel<?> tab) {
-        super(p, TITLE, Bundle.message("escape.run"), AllIcons.Actions.InlayGear);
-        this.onEscape = () -> stepBack(() -> {
-        });
+        super(p, TITLE, Bundle.message("escape.panel"), AllIcons.Actions.InlayGear);
+        this.onEscape = this::giveTheKeyboardBack;
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), tab);
     }
 
@@ -106,6 +106,11 @@ public class EscapeAction extends AbstractProjectAction {
         Services.getInstance(p, CutState.class).clear();
         CopyPasteManager.getInstance().setContents(new StringSelection(""));
         return true;
+    }
+
+    // UC-VIEW-PANEL-015, Rule-VIEW-PANEL-088
+    private void giveTheKeyboardBack() {
+        ToolWindowManager.getInstance(p).activateEditorComponent();
     }
 
     private boolean hideViewPanelIfVisible() {
