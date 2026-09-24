@@ -42,7 +42,10 @@ own.
 - **Rule-EDITOR-PANEL-082** — A pasted cut keeps its identity and who created it,
   because it is the same test case in a new place. The tester who pasted it is
   recorded as the one who changed it.
-- **Rule-EDITOR-PANEL-083** — Pasted test cases land at the end of the test set.
+- **Rule-EDITOR-PANEL-083** — Pasted test cases land under the test case the
+  tester has selected, in the order they were pasted, so a paste arrives where
+  the tester is looking rather than somewhere they have to scroll to. With
+  nothing selected they land at the end.
 - **Rule-EDITOR-PANEL-084** — A cut and its paste are one entry on the undo
   history.
 - **Rule-EDITOR-PANEL-085** — The clipboard is read as test cases. Anything else
@@ -66,7 +69,8 @@ with a count after it for more than one test case.
 2. The tester opens the test set they want them in.
 3. The tester chooses **Paste Test Case** from the right-click menu.
 4. On a cut, the test cases are taken out of the test set they came from first.
-5. Each test case is written into this test set.
+5. Each test case is written into this test set, under the selected one and in
+   the order they were pasted (Rule-EDITOR-PANEL-083).
 6. The test set's order is worked out again and saved.
 7. On a cut, each test case takes its generated method with it: the method is
    carried into this test set's class exactly as it is written, body and all,
@@ -79,6 +83,10 @@ with a count after it for more than one test case.
 9. A message reads *Pasted*, with a count for more than one.
 
 ## What Testin refuses
+
+**If nothing is selected in the test set** — the test cases land at the end.
+There is nothing to land under, and the end is where a tester looks for what
+just arrived.
 
 **If the clipboard does not hold test cases** — **Paste Test Case** is gray.
 

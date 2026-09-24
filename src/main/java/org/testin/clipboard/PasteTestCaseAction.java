@@ -38,6 +38,8 @@ import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.testcase.Rank;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestCaseSnapshot;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
@@ -151,6 +153,9 @@ public class PasteTestCaseAction extends DumbAwareAction {
 
                 if (pastedHere.isEmpty()) return;
 
+                // Rule-EDITOR-PANEL-083
+                rankUnderTheSelection(destUI, pastedHere);
+
                 final int pasted = pastedHere.size();
 
                 destUI.reorderAndPersist(() -> {
@@ -216,6 +221,24 @@ public class PasteTestCaseAction extends DumbAwareAction {
             } catch (final Exception ex) {
                 Logger.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
                 return List.of();
+            }
+        }
+
+        // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-083
+        private void rankUnderTheSelection(final @NotNull TestEditor destUI, final @NotNull List<TestCaseDto> pastedHere) {
+            final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(destUI.getAllTestCases().stream().filter(tc -> !pastedHere.contains(tc)).toList());
+            final @NotNull Optional<TestCaseDto> anchor = destUI.getSelectedTestCases().stream()
+                    .filter(selected -> !selected.getOrder().isEmpty())
+                    .reduce((_, last) -> last);
+
+            final int under = anchor.map(selected -> TestCaseOrder.positionOf(ordered, selected)).orElse(ordered.size());
+
+            @NotNull String previous = under > 0 && under <= ordered.size() ? ordered.get(under - 1).getOrder() : "";
+            final @NotNull String upperBound = under < ordered.size() ? ordered.get(under).getOrder() : "";
+
+            for (final TestCaseDto pasted : pastedHere) {
+                previous = Rank.between(previous, upperBound);
+                pasted.setOrder(previous);
             }
         }
 
