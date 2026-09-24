@@ -38,9 +38,12 @@ There is no key for this. The link sits where the value would have been.
 - **Rule-VIEW-PANEL-035** — The window is the only place the error is read, so it
   holds the test case and what the tester wrote about it above the error. Those
   two are read only; the error sits in a box of its own.
-- **Rule-VIEW-PANEL-036** — Everything in the window can be selected and copied
-  and nothing in it can be typed into. It is a window for reading a value the
-  framework wrote, and the failure dialog is where a tester changes one.
+- **Rule-VIEW-PANEL-036** — The error can be selected and copied, and nothing in
+  the window can be typed into. It is a window for reading a value the framework
+  wrote, and the failure dialog is where a tester changes one. The test case and
+  the actual result above the error are drawn as the framework draws every
+  details row, which is to be read rather than selected - the error is the part a
+  tester copies into a bug report, and that is the part that selects.
 - **Rule-VIEW-PANEL-081** — The **Stacktrace** link comes first on its line, then
   one thumbnail for each screenshot pasted with the failure, the one the failure
   form shows. Hovering names the file, and a click opens that screenshot at its
@@ -82,8 +85,8 @@ of its own.
 
 1. **The title** — always the one word, the same word the link reads.
 2. **Test Case** and **Actual Result** — the description of the test case that
-   failed, and what the tester wrote about it. Both are read: they can be
-   selected and copied, and neither can be typed into.
+   failed, and what the tester wrote about it. Both are there to be read: neither
+   can be typed into, and neither is selected with the pointer.
 3. **The box** — the error, and nothing else. It scrolls, and it cannot be typed
    into.
 4. **The bottom line** — `Escape` closes it.
