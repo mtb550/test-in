@@ -52,6 +52,11 @@ public final class NoCodeNavigation implements CodeNavigation {
     }
 
     @Override
+    public boolean replaceBody(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
+        return fillBody(p, tc, statements);
+    }
+
+    @Override
     public @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         Logger.debug("No code navigation in this IDE; no generated method for '" + tc.getDescription() + "'");
 

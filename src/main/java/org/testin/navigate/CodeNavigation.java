@@ -50,4 +50,7 @@ public interface CodeNavigation {
 
     @FromContentModule
     boolean fillBody(@NotNull Project p, @NotNull TestCaseDto tc, @NotNull String statements);
+
+    @FromContentModule
+    boolean replaceBody(@NotNull Project p, @NotNull TestCaseDto tc, @NotNull String statements);
 }

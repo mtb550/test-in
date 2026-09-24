@@ -19,6 +19,7 @@ package org.testin.indexer;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import com.intellij.util.TimeoutUtil;
 import org.testin.TempTree;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -76,7 +77,17 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
     private void rename(final Path from, final Path to) {
         final AtomicBoolean done = new AtomicBoolean();
         indexer().renameNode(from, to, () -> done.set(true));
-        PlatformTestUtil.waitWithEventsDispatching("the rename never finished", done::get, 15);
+
+        final long deadline = System.currentTimeMillis() + 15_000;
+
+        while (System.currentTimeMillis() < deadline) {
+            if (done.get()) return;
+
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+            TimeoutUtil.sleep(20);
+        }
+
+        fail("the rename never finished");
     }
 
     public void testARenamedProjectIsFoundUnderItsNewName() {

@@ -107,23 +107,34 @@ public final class CodeNavigator implements CodeNavigation {
     public boolean hasTheWrittenBody(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         if (DumbService.isDumb(p)) return false;
 
-        return ReadAction.compute(() -> resolve(p, tc).map(pm -> !GeneratedMethod.holdsNothingButTheTodo(pm)).orElse(false));
+        return Boolean.TRUE.equals(ReadAction.compute(() -> resolve(p, tc).map(pm -> !GeneratedMethod.holdsNothingButTheTodo(pm)).orElse(false)));
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-003, Rule-CODEGEN-089
     @Override
     public boolean fillBody(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
+        return write(p, tc, statements, true);
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-003, Rule-CODEGEN-091
+    @Override
+    public boolean replaceBody(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
+        return write(p, tc, statements, false);
+    }
+
+    private boolean write(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements, final boolean onlyTheTodo) {
         if (DumbService.isDumb(p)) return false;
 
-        return WriteCommandAction.writeCommandAction(p)
+        return Boolean.TRUE.equals(WriteCommandAction.writeCommandAction(p)
                 .withName(Bundle.message("agent.body.command"))
-                .compute(() -> written(p, tc, statements));
+                .compute(() -> written(p, tc, statements, onlyTheTodo)));
     }
 
     // Rule-CODEGEN-003, Rule-CODEGEN-089
-    private boolean written(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements) {
+    private boolean written(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements, final boolean onlyTheTodo) {
         final @NotNull Optional<PsiMethod> method = resolve(p, tc);
-        if (method.isEmpty() || !GeneratedMethod.holdsNothingButTheTodo(method.orElseThrow())) return false;
+        if (method.isEmpty()) return false;
+        if (onlyTheTodo && !GeneratedMethod.holdsNothingButTheTodo(method.orElseThrow())) return false;
 
         try {
             final @NotNull PsiCodeBlock written = JavaPsiFacade.getElementFactory(p)

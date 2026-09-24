@@ -81,6 +81,12 @@ Connecting an agent changes what that gesture produces, not where it lives.
   ones that were dropped marked. Nothing opens on its own - a tester who only
   wanted the body reads one line and closes it - and the same pair goes to the
   log at debug level, so a run nobody watched can still be read afterwards.
+- **Rule-CODEGEN-091** — A test case whose method already holds a body of its
+  own is not sent to the agent, and the run says so before it starts: one dialog
+  names how many they are and offers Write over them or Leave them as they are,
+  with Escape leaving them. Nothing is replaced without that answer, and what
+  replaces it is one named write command, so Ctrl+Z takes the tester's own body
+  back.
 
 ## The screen
 
@@ -149,8 +155,11 @@ command and why, and the tester is not shown a stack trace (Rule-CODEGEN-006).
 **If the agent answers something that is not Java** — the `// TODO` stays. A
 half-written body is never left behind.
 
-**If the tester has written the body already** — that test case is not sent and
-not changed, whatever the agent would have said.
+**If the tester has written the body already** — that test case is not sent, and
+the run asks first: one dialog says how many such test cases there are, and
+offers **Write over them** or **Leave them as they are**. Escape leaves them.
+Nothing is replaced without that answer, and `Ctrl+Z` takes the tester's own body
+back.
 
 **If the run is canceled** — the bodies already written stay, the rest keep their
 `// TODO`, and the count reports what landed.
