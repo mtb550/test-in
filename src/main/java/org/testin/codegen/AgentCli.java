@@ -67,7 +67,7 @@ public final class AgentCli {
 
     // UC-CODEGEN-021, Rule-CODEGEN-083
     static @NotNull String executable(final @NotNull String command) {
-        return Optional.ofNullable(PathEnvironmentVariableUtil.findInPath(command)).map(File::getAbsolutePath).orElse(command);
+        return Optional.ofNullable(PathEnvironmentVariableUtil.findExecutableInPathOnAnyOS(command)).map(File::getAbsolutePath).orElse(command);
     }
 
     private static @NotNull Optional<ProcessOutput> start(final @NotNull String command, final @NotNull List<String> arguments, final @NotNull Optional<Path> input, final @NotNull Duration timeout, final @NotNull ProgressIndicator indicator) {
