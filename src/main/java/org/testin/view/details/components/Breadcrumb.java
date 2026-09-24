@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Map;
 
 @AllArgsConstructor
-public class NavigationBar extends BaseDetails {
+public class Breadcrumb extends AbstractDetails {
     final @NotNull Color DEFAULT_TEXT_COLOR = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
     final int SEPARATOR_BORDER_V = 0;
     final int SEPARATOR_BORDER_H = 6;

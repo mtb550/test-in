@@ -30,7 +30,7 @@ import javax.swing.JTextArea;
 import java.awt.GridBagConstraints;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class LabelValueRow {
+public final class CaptionValueRow {
     private static final int SPACE_ABOVE = 12;
     private static final int CAPTION_GAP = 2;
     private static final int SIDE = 16;

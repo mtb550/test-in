@@ -1,13 +1,13 @@
 [Documentation](../README.md) › [The view panel](main.md) › UC-VIEW-PANEL-006
 
-# UC-VIEW-PANEL-006: Read the exception behind a failure
+# UC-VIEW-PANEL-006: Read the stacktrace behind a failure
 
 **As a** tester, **I want** every line of the error behind a failure, **so that** I can paste it into a bug report
 without going to the log.
 
-The panel never shows the error. It is the application's own exception, copied
+The panel never shows the error. It is the application's own stacktrace, copied
 out of a log, and it is far longer than anything else the panel holds - so the
-panel offers one link, **Exception**, and the whole thing opens in a window.
+panel offers one link, **Stacktrace**, and the whole thing opens in a window.
 
 There is no key for this. The link sits where the value would have been.
 
@@ -33,36 +33,37 @@ There is no key for this. The link sits where the value would have been.
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
 - **Rule-VIEW-PANEL-034** — The panel never shows the error itself, however
-  short it is. It offers one link, **Exception**, and there is no caption above
+  short it is. It offers one link, **Stacktrace**, and there is no caption above
   it: the link is its own name.
 - **Rule-VIEW-PANEL-035** — The window is the only place the error is read, so it
   holds the test case and what the tester wrote about it above the error. Those
   two are read only; the error sits in a box of its own.
-- **Rule-VIEW-PANEL-036** — Everything in the window can be selected and copied.
-  The error's box can also be typed into, and nothing typed there is ever saved.
-- **Rule-VIEW-PANEL-081** — The **Exception** link comes first on its line, then
+- **Rule-VIEW-PANEL-036** — Everything in the window can be selected and copied
+  and nothing in it can be typed into. It is a window for reading a value the
+  framework wrote, and the failure dialog is where a tester changes one.
+- **Rule-VIEW-PANEL-081** — The **Stacktrace** link comes first on its line, then
   one thumbnail for each screenshot pasted with the failure, the one the failure
   form shows. Hovering names the file, and a click opens that screenshot at its
   real size in a window of its own.
 
 ## The screen
 
-One line holds **Exception**, then a thumbnail of each screenshot pasted with
+One line holds **Stacktrace**, then a thumbnail of each screenshot pasted with
 the failure: the picture itself, 48 pixels high, as the failure form shows it.
 Hovering over one names its file; clicking it opens that screenshot in a window
 of its own.
 
 ```
-│   Exception   ┌──────┐  ┌──────┐                                           │
+│   Stacktrace   ┌──────┐  ┌──────┐                                          │
 │               │ pic  │  │ pic  │                                           │
 │               └──────┘  └──────┘                                           │
 ```
 
-**Exception** opens this dialog. It holds the text, and no screenshot.
+**Stacktrace** opens this dialog. It holds the text, and no screenshot.
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  Exception                                                   │
+│  Stacktrace                                                  │
 ├──────────────────────────────────────────────────────────────┤
 │  TEST CASE                                                   │
 │  Log in with a valid user                                    │
@@ -83,15 +84,16 @@ of its own.
 2. **Test Case** and **Actual Result** — the description of the test case that
    failed, and what the tester wrote about it. Both are read: they can be
    selected and copied, and neither can be typed into.
-3. **The box** — the error, and nothing else.
+3. **The box** — the error, and nothing else. It scrolls, and it cannot be typed
+   into.
 4. **The bottom line** — `Escape` closes it.
 
 ## Main flow
 
 1. The panel shows a failed test case with an error recorded against it.
-2. One line reads **Exception**.
+2. One line reads **Stacktrace**.
 3. The tester clicks it.
-4. The **Exception** dialog opens. It is wide enough to show a whole line of the
+4. The **Stacktrace** dialog opens. It is wide enough to show a whole line of the
    error without wrapping it.
 5. The tester selects the text and copies it.
 6. The tester presses `Escape`. Nothing is saved.
@@ -118,7 +120,7 @@ nothing is saved.
 **If there is no error and no screenshot** — the line is not drawn at all.
 
 **If there are screenshots but no error** — the line shows only the
-thumbnails, with no **Exception** link.
+thumbnails, with no **Stacktrace** link.
 
 **If a screenshot's file cannot be read** — its thumbnail is an empty square,
 and a click opens a window that is empty too.

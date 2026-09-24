@@ -170,6 +170,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         private @NotNull String value = "";
         private int rows = 5;
         private boolean acceptsImages = false;
+        private boolean readOnly = false;
         private @NotNull List<byte[]> images = List.of();
 
         public @NotNull TextAreaBuilder caption(final @NotNull String caption) {
@@ -192,6 +193,12 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             return this;
         }
 
+        // Rule-VIEW-PANEL-036
+        public @NotNull TextAreaBuilder readOnly() {
+            this.readOnly = true;
+            return this;
+        }
+
         public @NotNull TextAreaBuilder images(final @NotNull List<byte[]> images) {
             this.acceptsImages = true;
             this.images = images;
@@ -199,7 +206,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
 
         public @NotNull ComponentDialogBase<TextArea> build() {
-            return new ComponentDialogBase<>(new TextArea(caption, placeholder, value, rows, acceptsImages, images));
+            return new ComponentDialogBase<>(new TextArea(caption, placeholder, value, rows, acceptsImages, readOnly, images));
         }
     }
 

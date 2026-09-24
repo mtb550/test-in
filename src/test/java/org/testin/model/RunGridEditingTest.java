@@ -78,7 +78,7 @@ public class RunGridEditingTest {
         row.setBugPriority(BugPriority.HIGH);
 
         assertEquals(row.wouldClear(TestStatus.PASSED, Failure.NONE),
-                List.of("the actual result", "the exception", "the bug severity", "the bug priority"));
+                List.of("the actual result", "the stacktrace", "the bug severity", "the bug priority"));
     }
 
     @Test

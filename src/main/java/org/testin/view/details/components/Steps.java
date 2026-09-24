@@ -31,7 +31,7 @@ import javax.swing.JTextArea;
 import java.awt.GridBagConstraints;
 import java.util.List;
 
-public class Steps extends BaseDetails {
+public class Steps extends AbstractDetails {
     private static final int MARGIN_BOTTOM_PER_STEP = 8;
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-027

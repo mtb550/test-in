@@ -41,7 +41,7 @@ runs a card in the editor.
 
 ## The screen
 
-The three buttons sit on the identity line, beside the badges.
+The three buttons sit on the line under the title, beside the badges.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐

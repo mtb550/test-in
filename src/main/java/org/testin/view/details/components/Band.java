@@ -42,22 +42,22 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Band extends BaseDetails {
+public final class Band extends AbstractDetails {
     private static final int GAP = 10;
     private static final int INSETS_TOP = 18;
     private static final int INSETS_SIDE = 16;
 
     private final @NotNull String name;
     private final @NotNull String rememberedAs;
-    private final @NotNull List<BaseDetails> rows;
+    private final @NotNull List<AbstractDetails> rows;
 
     // Rule-VIEW-PANEL-085
-    public static @NotNull Band of(final @NotNull String name, final @NotNull List<BaseDetails> rows) {
+    public static @NotNull Band of(final @NotNull String name, final @NotNull List<AbstractDetails> rows) {
         return new Band(name, "", List.copyOf(rows));
     }
 
     // Rule-VIEW-PANEL-087
-    public static @NotNull Band folding(final @NotNull String name, final @NotNull String rememberedAs, final @NotNull List<BaseDetails> rows) {
+    public static @NotNull Band folding(final @NotNull String name, final @NotNull String rememberedAs, final @NotNull List<AbstractDetails> rows) {
         return new Band(name, rememberedAs, List.copyOf(rows));
     }
 
@@ -68,7 +68,7 @@ public final class Band extends BaseDetails {
 
         if (!isOpen()) return row;
 
-        for (final BaseDetails field : rows) {
+        for (final AbstractDetails field : rows) {
             row = field.render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
         }
 

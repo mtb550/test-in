@@ -25,7 +25,7 @@ import org.testin.model.dto.TestCaseDto;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 
-public final class Identity extends BaseDetails {
+public final class BadgesAndActions extends AbstractDetails {
     private static final int GAP = 8;
     private static final int INSETS_TOP = 8;
     private static final int INSETS_SIDE = 16;

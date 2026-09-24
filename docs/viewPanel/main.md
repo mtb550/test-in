@@ -28,7 +28,7 @@ it.
 |                       | **Reading**                                                     |                                                                  |
 | **UC-VIEW-PANEL-004** | [Read what a test case says](readTestCase.md)                   | Follow the steps and check the expected result.                  |
 | **UC-VIEW-PANEL-005** | [Read what a test run recorded](readRunResult.md)               | See the verdict and what went wrong last time.                   |
-| **UC-VIEW-PANEL-006** | [Read the exception behind a failure](readException.md)        | Copy the whole error into a bug report.                          |
+| **UC-VIEW-PANEL-006** | [Read the stacktrace behind a failure](readStacktrace.md)      | Copy the whole error into a bug report.                          |
 | **UC-VIEW-PANEL-007** | [Read a test case's history](readHistory.md)                    | See what changed on the test case, and when.                     |
 | **UC-VIEW-PANEL-008** | [See the bugs still open on a test case](seeOpenBugs.md)        | Avoid raising a bug somebody has already raised.                 |
 | **UC-VIEW-PANEL-017** | [Move between the panel's tabs](moveBetweenTabs.md)             | Reach History and Open Bugs without the mouse.                   |
@@ -101,11 +101,11 @@ in front of them while they write down what actually happened.
 │   ( Failed ) ( 02:14 ) ( Blocker / High )  mtb550/x#123  Report a bug      │
 │   ACTUAL RESULT                                                            │
 │   The session was dropped.                                                 │
-│   Exception                                                                │
+│   Stacktrace                                                               │
 │   EXECUTED BY                                                              │
 │   muteb on 7 January 10:05                                                 │
 │                                                                            │
-│   ▸ TEST CASE DETAILS ───────────────────────────────────────────────────  │
+│   ▸ TEST CASE ───────────────────────────────────────────────────────────  │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -113,13 +113,13 @@ in front of them while they write down what actually happened.
    gray when the panel was handed only one.
 2. **The three tabs** — **Details**, **History** and **Open Bugs**. **History**
    is empty today, because a test case records only its last edit.
-3. **The path** — one step for each folder above the test case. Only the last
-   step opens anything.
+3. **The breadcrumb** — one step for each folder above the test case. Only the
+   last step opens anything.
 4. **The title** — the test case's description, the largest words on the panel.
-5. **The identity line** — the priority and one badge for each group, then the
-   three icons: go to the automation code, run the test case, and open the test
-   case's own editor. All three are always drawn; one that cannot work here is
-   gray, does not grow under the pointer, and says what it is waiting for
+5. **The badges and the actions** — the priority and one badge for each group,
+   then the three icons: go to the automation code, run the test case, and open
+   the test case's own editor. All three are always drawn; one that cannot work
+   here is gray, does not grow under the pointer, and says what it is waiting for
    (Rule-VIEW-PANEL-085).
 6. **Execution result** — what one test run recorded. The whole band, its name
    included, is drawn only when the panel was opened from a test run
@@ -127,7 +127,7 @@ in front of them while they write down what actually happened.
    under the band's name, the duration is framed rather than filled, and who ran
    it and when close the band as a row (Rule-VIEW-PANEL-086). That is
    [UC-VIEW-PANEL-005](readRunResult.md).
-7. **Test case details** — folded until a tester clicks its name, and then every
+7. **Test case** — folded until a tester clicks its name, and then every
    field the test case has, with every empty one left out. The state is
    remembered for the IDE rather than for one test case. In the test case editor
    there is no run above it, so the fields are drawn with no heading and no fold

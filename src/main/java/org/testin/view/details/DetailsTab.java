@@ -35,12 +35,12 @@ import org.testin.util.Display;
 import org.testin.util.Fonts;
 import org.testin.view.details.components.AttributeRow;
 import org.testin.view.details.components.Band;
-import org.testin.view.details.components.BaseDetails;
-import org.testin.view.details.components.Identity;
-import org.testin.view.details.components.NavigationBar;
+import org.testin.view.details.components.AbstractDetails;
+import org.testin.view.details.components.BadgesAndActions;
+import org.testin.view.details.components.Breadcrumb;
 import org.testin.view.details.components.RunAttributeRow;
 import org.testin.view.details.components.RunItemSummary;
-import org.testin.view.details.components.StacktraceRow;
+import org.testin.view.details.components.StacktraceLine;
 import org.testin.view.details.components.Steps;
 import org.testin.view.details.components.Title;
 
@@ -66,12 +66,12 @@ public class DetailsTab {
         return Band.of(Bundle.message("details.band.run"), List.of(
                 new RunItemSummary(item, currentPath),
                 new RunAttributeRow(RunEditorAttributes.ACTUAL_RESULT, item),
-                new StacktraceRow(item, currentPath),
+                new StacktraceLine(item, currentPath),
                 new AttributeRow(RunEditorAttributes.EXECUTED_BY.getName(), (_, _) -> Display.whoAndWhen(item.getExecutedBy(), item.getExecutedAt()))));
     }
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-087
-    private static @NotNull List<BaseDetails> testCaseFields() {
+    private static @NotNull List<AbstractDetails> testCaseFields() {
         return List.of(
                 new AttributeRow(TestEditorAttributes.EXPECTED_RESULT.getName(), (_, dto) -> TestEditorAttributes.EXPECTED_RESULT.displayValue(dto)),
                 new Steps(),
@@ -102,7 +102,7 @@ public class DetailsTab {
         final @NotNull JBPanel<?> contentPanel = new JBPanel<>(new GridBagLayout());
         contentPanel.setOpaque(false);
 
-        renderStoneLayout(p, contentPanel, dto, runItem, currentPath);
+        renderRows(p, contentPanel, dto, runItem, currentPath);
 
         final @NotNull JBScrollPane scrollPane = new JBScrollPane(contentPanel);
         scrollPane.setBorder(null);
@@ -126,7 +126,7 @@ public class DetailsTab {
         panel.add(placeholder, BorderLayout.NORTH);
     }
 
-    private void renderStoneLayout(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull TestCaseDto dto, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
+    private void renderRows(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull TestCaseDto dto, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
         final @NotNull GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = JBUI.insets(INSETS_DEFAULT);
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -138,8 +138,8 @@ public class DetailsTab {
     }
 
     // UC-VIEW-PANEL-004, UC-VIEW-PANEL-005, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-087
-    private @NotNull List<BaseDetails> detailRows(final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
-        final @NotNull List<BaseDetails> rows = new ArrayList<>(List.of(new NavigationBar(currentPath), new Title(), new Identity()));
+    private @NotNull List<AbstractDetails> detailRows(final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
+        final @NotNull List<AbstractDetails> rows = new ArrayList<>(List.of(new Breadcrumb(currentPath), new Title(), new BadgesAndActions()));
 
         runItem.ifPresentOrElse(item -> {
             rows.add(runBand(item, currentPath));
@@ -151,7 +151,7 @@ public class DetailsTab {
 
     private int setupFixedRows(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
         int row = 0;
-        for (final BaseDetails component : detailRows(runItem, currentPath)) {
+        for (final AbstractDetails component : detailRows(runItem, currentPath)) {
             row = component.render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
         }
         return row;

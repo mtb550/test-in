@@ -88,7 +88,7 @@ form before it records anything.
 │  BUG PRIORITY                                                │
 │  ( ) High  ( ) Medium  (x) Low                               │
 │                                                              │
-│  EXCEPTION                                                   │
+│  STACKTRACE                                                  │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │ java.lang.AssertionError: expected [true]              │  │
 │  │   at org.testin.demo.LoginTest.valid(LoginTest:41)     │  │
@@ -113,7 +113,7 @@ form before it records anything.
 3. **Bug Severity** — four choices, with the least serious chosen.
 4. **Bug Priority** — three choices, with the lowest chosen.
 5. **The big box** — for the error or the exception, as text. Its caption above
-   it reads **Exception**, and its gray hint reads *paste error or exception or
+   it reads **Stacktrace**, and its gray hint reads *paste error or exception or
    screenshot…*.
 6. **The pictures under it** — one small picture for each screenshot pasted
    with `Ctrl+V`, in the order they were pasted: the screenshot itself, 48

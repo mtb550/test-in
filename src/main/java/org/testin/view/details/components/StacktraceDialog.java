@@ -28,16 +28,16 @@ import org.testin.util.Shortcuts;
 
 import java.util.List;
 
-public final class ErrorDetailsDialog extends AbstractFrameworkDialog {
+public final class StacktraceDialog extends AbstractFrameworkDialog {
     private static final int VISIBLE_ROWS = 22;
     private static final int WIDTH = 900;
     private static final int HEIGHT = 600;
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-036
-    public ErrorDetailsDialog(final @NotNull Project p, final @NotNull String testCaseDescription, final @NotNull String message, final @NotNull String stacktrace) {
+    public StacktraceDialog(final @NotNull Project p, final @NotNull String testCaseDescription, final @NotNull String message, final @NotNull String stacktrace) {
         super(p);
 
-        title = Bundle.message("dialog.error.title");
+        title = Bundle.message("dialog.stacktrace.title");
 
         preferredSize = JBUI.size(WIDTH, HEIGHT);
 
@@ -49,6 +49,7 @@ public final class ErrorDetailsDialog extends AbstractFrameworkDialog {
                 ComponentDialogBase.textArea()
                         .value(stacktrace)
                         .rows(VISIBLE_ROWS)
+                        .readOnly()
                         .build());
 
         shortcuts = List.of(StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("shortcut.close"), this::closeCancel));

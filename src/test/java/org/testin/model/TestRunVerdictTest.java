@@ -127,9 +127,9 @@ public class TestRunVerdictTest {
         final TestRunItems item = failedWithBug();
 
         assertEquals(item.wouldClear(TestStatus.PASSED, Failure.NONE),
-                List.of("the actual result", "the exception", "the screenshots", "the bug severity", "the bug priority", "the bug issue link"));
+                List.of("the actual result", "the stacktrace", "the screenshots", "the bug severity", "the bug priority", "the bug issue link"));
         assertEquals(item.wouldClear(TestStatus.FAILED, new Failure("boom", "at Login.click")),
-                List.of("the actual result", "the exception", "the screenshots"));
+                List.of("the actual result", "the stacktrace", "the screenshots"));
         assertEquals(item.wouldClear(TestStatus.FAILED, Failure.NONE), List.of(), "the keyboard's F asks nothing");
     }
 }

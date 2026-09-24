@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
-public final class StacktraceRow extends BaseDetails {
+public final class StacktraceLine extends AbstractDetails {
     private static final int GAP = 12;
     private static final int INSETS_TOP = 8;
     private static final int INSETS_SIDE = 16;
@@ -62,7 +62,7 @@ public final class StacktraceRow extends BaseDetails {
 
         final @NotNull List<JComponent> parts = new ArrayList<>();
 
-        if (!stacktrace.isBlank()) parts.add(exception(p, dto, stacktrace));
+        if (!stacktrace.isBlank()) parts.add(stacktraceLink(p, dto, stacktrace));
         screenshots.forEach(name -> parts.add(thumbnail(p, name)));
 
         return addFullWidthRow(panel, gbc, line(parts), JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
@@ -78,9 +78,9 @@ public final class StacktraceRow extends BaseDetails {
     }
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034
-    private @NotNull ActionLink exception(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull String stacktrace) {
+    private @NotNull ActionLink stacktraceLink(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull String stacktrace) {
         return link(Bundle.message("view.stacktrace.link"),
-                _ -> new ErrorDetailsDialog(p, dto.getDescription(), item.getActualResult(), stacktrace).show());
+                _ -> new StacktraceDialog(p, dto.getDescription(), item.getActualResult(), stacktrace).show());
     }
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081

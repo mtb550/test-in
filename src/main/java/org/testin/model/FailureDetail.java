@@ -35,7 +35,7 @@ public enum FailureDetail {
     ),
 
     STACKTRACE(
-            Bundle.message("failure.detail.exception"),
+            Bundle.message("failure.detail.stacktrace"),
             item -> !item.getStacktrace().isBlank(),
             item -> item.setStacktrace("")
     ),

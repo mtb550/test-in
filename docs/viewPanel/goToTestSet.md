@@ -31,8 +31,8 @@ There is no key for this. The path is at the top of the panel.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
-- **Rule-VIEW-PANEL-041** — The path shows one step for each folder above the
-  test case.
+- **Rule-VIEW-PANEL-041** — The breadcrumb shows one step for each folder above
+  the test case.
 - **Rule-VIEW-PANEL-042** — Every step goes to the place it names. The tree
   opens on it and expands to it; a step that names something with an editor —
   the test set, or the test run when the panel was opened from a run — opens
@@ -53,14 +53,14 @@ There is no key for this. The path is at the top of the panel.
 
 ## Main flow
 
-1. The tester moves the pointer over a step of the path.
+1. The tester moves the pointer over a step of the breadcrumb.
 2. The step turns to the link color and underlines itself.
 3. The tester clicks it.
 4. The **Testin Tree** tool window comes up and the tree expands to that step.
 5. If the step names a test set or a test run, its editor opens too, or comes to
    the front if it was already open.
 
-**When the panel was opened from a test run**, the path names that test run, and
+**When the panel was opened from a test run**, the breadcrumb names that test run, and
 its last step opens the test run's editor. The step always opens the place it
 names, so what the tester reads is what they get.
 

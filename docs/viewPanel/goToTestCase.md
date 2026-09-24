@@ -9,7 +9,7 @@ is read.
 The panel is read-only. This is how a tester who reached it from a gutter mark,
 a test run or a search gets to the editor that can change the test case.
 
-There is no key for it. It is the third icon on the identity line, beside **go
+There is no key for it. It is the third icon on the line under the title, beside **go
 to code** and **run**.
 
 **The panel does not show the test case's identity.** It showed it in a pill
@@ -42,7 +42,7 @@ naming the exact test case in a bug report - is written into the report by
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
 - **Rule-VIEW-PANEL-063** — Going to the test case is an icon of its own,
-  the third on the identity line, and the only thing that does it. It opens the
+  the third under the title, and the only thing that does it. It opens the
   test case's own test set editor and selects it there. The tree does not move:
   the tester is already looking at the test case and asked for the editor, so
   revealing the node is an answer to a question nobody asked. The path is what
@@ -73,8 +73,8 @@ The icon is the last of the three, on the line under the title.
    selected.
 3. Nothing else moves. The tree stays where it was.
 
-The path above it does move the tree, and that is the difference between the
-two: a path step names a place, and the icon names the test case.
+The breadcrumb above it does move the tree, and that is the difference between
+the two: a breadcrumb step names a place, and the icon names the test case.
 
 ## What Testin refuses
 

@@ -80,7 +80,7 @@ tab, puts the keyboard in that tab.
 the keyboard does with it. In a dialog it moves between fields.
 
 **If the tester wants a link inside Details from the keyboard** — `Tab` does not
-reach it. The bug issue link, **Report Bug** and **Exception** are clicked.
+reach it. The bug issue link, **Report Bug** and **Stacktrace** are clicked.
 
 **If the panel was handed several test cases** — nothing changes about them.
 `Ctrl+Right` and `Ctrl+Left` still move between them, whichever tab is in front.

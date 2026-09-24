@@ -49,9 +49,10 @@ public final class TextArea implements DialogComponent {
     private final @NotNull ScreenshotStrip strip;
     private final @NotNull JBPanel<?> panel;
 
-    TextArea(final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value, final int rows, final boolean acceptsImages, final @NotNull List<byte[]> images) {
+    TextArea(final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value, final int rows, final boolean acceptsImages, final boolean readOnly, final @NotNull List<byte[]> images) {
         area = new JBTextArea(value);
         DialogStyle.asField(area);
+        area.setEditable(!readOnly);
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
         area.setRows(rows);

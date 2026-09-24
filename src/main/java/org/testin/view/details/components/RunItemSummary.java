@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
-public final class RunItemSummary extends BaseDetails {
+public final class RunItemSummary extends AbstractDetails {
     private static final int GAP = 6;
     private static final int INSETS_TOP = 8;
     private static final int INSETS_SIDE = 16;

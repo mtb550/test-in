@@ -28,7 +28,7 @@ import org.testin.util.Fonts;
 import javax.swing.JTextArea;
 import java.awt.GridBagConstraints;
 
-public class Title extends BaseDetails {
+public class Title extends AbstractDetails {
     final int INSETS_TOP = 20;
     final int INSETS_LEFT = 16;
     final int INSETS_BOTTOM = 0;

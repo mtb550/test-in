@@ -66,7 +66,7 @@ public final class BugIssue {
         line.setOpaque(false);
 
         chip(item).ifPresent(line::add);
-        bugIssue.ifPresent(url -> line.add(BaseDetails.link(BugIssueUrl.reference(url), _ -> BugIssueUrl.open(url))));
+        bugIssue.ifPresent(url -> line.add(AbstractDetails.link(BugIssueUrl.reference(url), _ -> BugIssueUrl.open(url))));
         line.add(report(p, item, dto, runDirectory));
 
         return line;
@@ -77,7 +77,7 @@ public final class BugIssue {
         final @NotNull Optional<String> off = Services.getInstance(p, BugReports.class)
                 .whyReportBugIsOff(new BugReports.RunItem(runDirectory.getPath(), item.getId()), item);
 
-        final @NotNull ActionLink report = BaseDetails.link(Bundle.message("bug.dialog.title"),
+        final @NotNull ActionLink report = AbstractDetails.link(Bundle.message("bug.dialog.title"),
                 _ -> ReportBug.start(p, runDirectory, item.getId(), dto, () -> redraw(p, dto, runDirectory)));
 
         report.setEnabled(off.isEmpty());

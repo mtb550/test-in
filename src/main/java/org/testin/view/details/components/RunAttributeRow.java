@@ -27,7 +27,7 @@ import org.testin.testrun.RunEditorAttributes;
 import java.awt.GridBagConstraints;
 
 @RequiredArgsConstructor
-public final class RunAttributeRow extends BaseDetails {
+public final class RunAttributeRow extends AbstractDetails {
     private final @NotNull RunEditorAttributes attribute;
     private final @NotNull TestRunItems item;
 
