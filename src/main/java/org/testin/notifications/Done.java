@@ -48,10 +48,6 @@ public enum Done {
             Bundle.message("done.automated")
     ),
 
-    WRITTEN(
-            Bundle.message("agent.done.written")
-    ),
-
     BOUND(
             Bundle.message("done.bound")
     ),

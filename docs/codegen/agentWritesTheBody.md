@@ -72,6 +72,13 @@ Connecting an agent changes what that gesture produces, not where it lives.
 - **Rule-CODEGEN-089** — A run reports the bodies that landed, once, with a
   count. Canceling keeps every body already written and leaves the rest with
   their TODO. Each body is one named write command, so Ctrl+Z takes one back.
+- **Rule-CODEGEN-090** — Every exchange is kept while the run lasts and offered
+  once it ends: the notification says how many of how many test cases got a
+  body, and carries Show what the agent said, which opens a read-only window
+  holding what was asked and what came back for each of them, in order, with the
+  ones that were dropped marked. Nothing opens on its own - a tester who only
+  wanted the body reads one line and closes it - and the same pair goes to the
+  log at debug level, so a run nobody watched can still be read afterwards.
 
 ## The screen
 

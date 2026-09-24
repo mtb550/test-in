@@ -75,17 +75,27 @@ public class AutomateTestCaseAction extends DumbAwareAction {
         final @NotNull AgentConnection connection = AgentConnection.stored();
         if (!connection.isConnected() || asked.isEmpty()) return;
 
+        final @NotNull AgentTranscript transcript = new AgentTranscript();
+
         BackgroundWork.run(p, Bundle.message("agent.task.title"), Bundle.message("agent.task.failed"), true,
-                indicator -> bodiesWritten(p, connection, asked, indicator),
-                written -> {
-                    // Rule-CODEGEN-089
-                    if (written > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.WRITTEN, written);
-                },
+                indicator -> bodiesWritten(p, connection, asked, transcript, indicator),
+                written -> sayWhatTheAgentDid(p, written, asked.size(), transcript),
                 () -> editor.ifPresent(TestinEditor::refreshView));
     }
 
+    // UC-CODEGEN-021, Rule-CODEGEN-089, Rule-CODEGEN-090
+    private static void sayWhatTheAgentDid(final @NotNull Project p, final int written, final int asked, final @NotNull AgentTranscript transcript) {
+        if (transcript.isEmpty()) return;
+
+        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+
+        notifier.infoWithActions(p, Bundle.message("agent.done.written"),
+                Bundle.message("agent.done.detail", String.valueOf(written), String.valueOf(asked)),
+                notifier.lastingAction(Bundle.message("agent.said.show"), () -> new AgentSaidDialog(p, transcript.read()).show()));
+    }
+
     // UC-CODEGEN-021, Rule-CODEGEN-084, Rule-CODEGEN-088
-    private static int bodiesWritten(final @NotNull Project p, final @NotNull AgentConnection connection, final @NotNull List<TestCaseDto> asked, final @NotNull ProgressIndicator indicator) {
+    private static int bodiesWritten(final @NotNull Project p, final @NotNull AgentConnection connection, final @NotNull List<TestCaseDto> asked, final @NotNull AgentTranscript transcript, final @NotNull ProgressIndicator indicator) {
         final @NotNull AgentCli agent = AgentCli.onPath(indicator);
         int written = 0;
 
@@ -97,9 +107,14 @@ public class AutomateTestCaseAction extends DumbAwareAction {
             indicator.setFraction((double) written / asked.size());
 
             final @NotNull String prompt = BodyPrompt.of(connection.promptTemplate(), tc, Fqcn.methodNameOf(tc));
-            final @NotNull Optional<String> statements = agent.ask(connection, prompt).flatMap(AgentAnswer::statementsIn);
+            final @NotNull Optional<String> said = agent.ask(connection, prompt);
+            final @NotNull Optional<String> statements = said.flatMap(AgentAnswer::statementsIn);
 
-            if (statements.isPresent() && CodeNavigation.available().fillBody(p, tc, statements.orElseThrow())) written++;
+            final boolean landed = statements.isPresent() && CodeNavigation.available().fillBody(p, tc, statements.orElseThrow());
+            if (landed) written++;
+
+            final @NotNull String outcome = landed ? Bundle.message("agent.said.written") : Bundle.message("agent.said.dropped");
+            transcript.record(tc, prompt, said.orElse(Bundle.message("agent.said.nothing")), outcome);
         }
 
         return written;
