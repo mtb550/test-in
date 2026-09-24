@@ -607,7 +607,7 @@ public final class ProjectIndexer {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    public @NotNull List<String> takeDamagedMarkers() {
+    public @NotNull List<Path> takeDamagedMarkers() {
         return store.takeDamagedMarkers();
     }
 

@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 final class MarkerFiles {
     private final @NotNull Project p;
 
-    private final @NotNull Set<String> damaged = ConcurrentHashMap.newKeySet();
+    private final @NotNull Set<Path> damaged = ConcurrentHashMap.newKeySet();
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
     <M extends AbstractMarker> @NotNull M read(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name, final @NotNull Class<M> markerClass) {
@@ -53,7 +53,7 @@ final class MarkerFiles {
         } catch (final Exception ex) {
             Logger.warn("Unreadable " + kind.getMarkerKind() + " marker '" + name + "', using defaults: " + ex.getMessage());
 
-            damaged.add(name);
+            damaged.add(dirPath);
             return defaultFor(markerClass, kind);
         }
     }
@@ -110,8 +110,8 @@ final class MarkerFiles {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    @NotNull List<String> takeDamaged() {
-        final @NotNull List<String> taken = List.copyOf(damaged);
+    @NotNull List<Path> takeDamaged() {
+        final @NotNull List<Path> taken = List.copyOf(damaged);
         damaged.clear();
 
         return taken;

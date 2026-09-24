@@ -345,11 +345,18 @@ final class IndexingScanner {
 
     // UC-INTERNAL-002, Rule-INTERNAL-015
     private void reportUnread(final @NotNull String projectName, final @NotNull List<Path> unread) {
-        final @NotNull List<String> names = unread.stream().map(path -> path.getFileName().toString()).toList();
+        final @NotNull List<String> nodePaths = unread.stream().map(this::unmarkedPath).sorted().toList();
 
-        say(Bundle.message("indexer.unread.title", projectName), names,
-                name -> Bundle.message("indexer.unread.one", name),
-                (named, rest) -> Bundle.message("indexer.unread.many", String.valueOf(names.size()), named, rest));
+        say(Bundle.message("indexer.unread.title", projectName), nodePaths,
+                nodePath -> Bundle.message("indexer.unread.one", nodePath),
+                (named, rest) -> Bundle.message("indexer.unread.many", String.valueOf(nodePaths.size()), named, rest));
+    }
+
+    // Rule-INTERNAL-015
+    private @NotNull String unmarkedPath(final @NotNull Path folder) {
+        return Optional.ofNullable(folder.getParent())
+                .map(holding -> nodePath(holding) + " > " + folder.getFileName())
+                .orElseGet(folder::toString);
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-011
@@ -371,10 +378,17 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    private void reportDamaged(final @NotNull String projectName, final @NotNull List<String> damaged) {
-        say(Bundle.message("indexer.damaged.title", projectName), damaged,
-                name -> Bundle.message("indexer.damaged.one", name),
-                (named, rest) -> Bundle.message("indexer.damaged.many", String.valueOf(damaged.size()), named, rest));
+    private void reportDamaged(final @NotNull String projectName, final @NotNull List<Path> damaged) {
+        final @NotNull List<String> nodePaths = damaged.stream().map(this::nodePath).sorted().toList();
+
+        say(Bundle.message("indexer.damaged.title", projectName), nodePaths,
+                nodePath -> Bundle.message("indexer.damaged.one", nodePath),
+                (named, rest) -> Bundle.message("indexer.damaged.many", String.valueOf(nodePaths.size()), named, rest));
+    }
+
+    // Rule-INTERNAL-014
+    private @NotNull String nodePath(final @NotNull Path path) {
+        return store.findByPath(path).map(node -> String.join(" > ", node.getPath2())).orElseGet(path::toString);
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-015

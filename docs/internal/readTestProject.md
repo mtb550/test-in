@@ -44,10 +44,15 @@ There is no key for this. It starts on its own.
   The tester can cancel it, and the IDE stays usable while it runs.
 - **Rule-INTERNAL-014** — One thing that cannot be read never stops the rest.
   Testin skips it and carries on, and says which ones it could not read. A node
-  whose marker will not parse is still drawn, and the scan names it.
+  whose marker will not parse is still drawn, and the scan names it by its place
+  in the tree - the test project first, then every folder down to it, joined with
+  ` > ` - because a folder name on its own is in every test project and says
+  nothing about which node the tester should go and look at.
 - **Rule-INTERNAL-015** — A folder skipped for having no marker is reported when
-  it holds test cases. A folder holding none is skipped in silence, because a
-  folder that is deliberately not a test set is the ordinary case.
+  it holds test cases, and named by its place in the tree as a damaged node is,
+  so the tester knows which folder to go to rather than which name to look for.
+  A folder holding none is skipped in silence, because a folder that is
+  deliberately not a test set is the ordinary case.
 - **Rule-INTERNAL-062** — Reading a test case costs no more than 40 microseconds
   and holds no more than 4 kilobytes. Ten thousand test cases is the size the
   budget is stated at.

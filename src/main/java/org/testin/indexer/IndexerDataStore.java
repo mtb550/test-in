@@ -226,7 +226,7 @@ final class IndexerDataStore {
         return markers.read(dirPath, kind, name, markerClass);
     }
 
-    @NotNull List<String> takeDamagedMarkers() {
+    @NotNull List<Path> takeDamagedMarkers() {
         return markers.takeDamaged();
     }
 
