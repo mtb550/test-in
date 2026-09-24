@@ -16,7 +16,6 @@
 
 package org.testin.testrun.failure;
 
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.BugPriority;
 import org.testin.model.TestRunItems;
@@ -24,16 +23,13 @@ import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
 
-public final class BugPrioritySection implements FailureSection {
-    @Getter
-    private final @NotNull ComponentDialogBase<RadioSelection<BugPriority>> component;
-
-    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-147
-    public BugPrioritySection(final @NotNull TestRunItems runItem) {
-        component = ComponentDialogBase.<BugPriority>radios(RunEditorAttributes.BUG_PRIORITY.getName())
+public record BugPrioritySection(@NotNull ComponentDialogBase<RadioSelection<BugPriority>> component) implements FailureSection {
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
+    public static @NotNull BugPrioritySection of(final @NotNull TestRunItems runItem) {
+        return new BugPrioritySection(ComponentDialogBase.<BugPriority>radios(RunEditorAttributes.BUG_PRIORITY.getName())
                 .options(BugPriority.CHOICES, BugPriority::getLabel)
                 .select(BugPriority.orDefault(runItem.getBugPriority()))
-                .build();
+                .build());
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145

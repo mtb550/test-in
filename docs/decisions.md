@@ -483,7 +483,7 @@ and costs a keystroke every other time. Nothing in the framework has to
 remember which dialogs ask.
 
 **If you are about to reverse it.** Do it in the framework, not in a dialog:
-one dialog that asks while its neighbours do not is the worst of both, because
+one dialog that asks while its neighbors do not is the worst of both, because
 Escape then means two things. And keep the failure form and Report Bug out of
 it, which is what Rule-EDITOR-PANEL-144 and Rule-VIEW-PANEL-070 already say.
 

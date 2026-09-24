@@ -84,8 +84,8 @@ public final class Screenshots implements DialogComponent {
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     @Override
-    public void installedOn(final @NotNull JComponent root) {
-        new Paste().registerCustomShortcutSet(CommonShortcuts.getPaste(), root);
+    public void hostedBy(final @NotNull DialogHost host, final @NotNull Runnable submit) {
+        new Paste().registerCustomShortcutSet(CommonShortcuts.getPaste(), host.root());
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219

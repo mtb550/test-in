@@ -55,7 +55,7 @@ public final class RunItemSummary extends AbstractDetails {
         Badges.showBadges(pills, facts());
         line.add(pills);
 
-        BugIssue.of(p, runItem, currentPath, dto).ifPresent(line::add);
+        Bug.of(p, runItem, currentPath, dto).ifPresent(line::add);
 
         return addFullWidthRow(panel, gbc, line, JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
     }

@@ -17,7 +17,6 @@
 package org.testin.testrun.failure;
 
 import com.intellij.openapi.project.Project;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.TestRunItems;
@@ -34,7 +33,6 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 
 public final class ScreenshotsSection implements FailureSection {
-    @Getter
     private final @NotNull ComponentDialogBase<Screenshots> component;
 
     private final @NotNull Map<byte[], String> named = new IdentityHashMap<>();
@@ -45,6 +43,11 @@ public final class ScreenshotsSection implements FailureSection {
         IntStream.range(0, stored.size()).forEach(index -> named.put(stored.get(index), runItem.getScreenshots().get(index)));
 
         component = ComponentDialogBase.screenshots(Bundle.message("dialog.failure.caption.screenshots"), stored);
+    }
+
+    @Override
+    public @NotNull ComponentDialogBase<?> component() {
+        return component;
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145, Rule-EDITOR-PANEL-219

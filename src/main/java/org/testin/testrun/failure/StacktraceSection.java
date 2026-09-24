@@ -16,7 +16,6 @@
 
 package org.testin.testrun.failure;
 
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.testrun.RunEditorAttributes;
@@ -24,20 +23,17 @@ import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.TextArea;
 import org.testin.util.Bundle;
 
-public final class StacktraceSection implements FailureSection {
+public record StacktraceSection(@NotNull ComponentDialogBase<TextArea> component) implements FailureSection {
     private static final int ROWS = 5;
 
-    @Getter
-    private final @NotNull ComponentDialogBase<TextArea> component;
-
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
-    public StacktraceSection(final @NotNull TestRunItems runItem) {
-        component = ComponentDialogBase.textArea()
+    public static @NotNull StacktraceSection of(final @NotNull TestRunItems runItem) {
+        return new StacktraceSection(ComponentDialogBase.textArea()
                 .caption(RunEditorAttributes.STACKTRACE.getName())
                 .placeholder(Bundle.message("dialog.failure.placeholder.error"))
                 .value(runItem.getStacktrace())
                 .rows(ROWS)
-                .build();
+                .build());
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145

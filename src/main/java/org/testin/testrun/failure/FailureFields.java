@@ -37,12 +37,12 @@ public final class FailureFields {
         actualResult = new ActualResultSection(p, runItem);
         screenshots = new ScreenshotsSection(p, runPath, runItem);
 
-        sections = List.of(actualResult, new BugSeveritySection(runItem), new BugPrioritySection(runItem), new StacktraceSection(runItem), screenshots);
+        sections = List.of(actualResult, BugSeveritySection.of(runItem), BugPrioritySection.of(runItem), StacktraceSection.of(runItem), screenshots);
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
     public @NotNull List<? extends ComponentDialogBase<?>> components() {
-        return sections.stream().map(FailureSection::getComponent).toList();
+        return sections.stream().map(FailureSection::component).toList();
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145
@@ -62,6 +62,6 @@ public final class FailureFields {
     }
 
     public @NotNull DialogComponent actualResult() {
-        return actualResult.getComponent().getComponent();
+        return actualResult.component().getComponent();
     }
 }

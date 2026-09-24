@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package org.testin.testrun.failure;
+package org.testin.ui.framework;
 
+import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunItems;
-import org.testin.ui.framework.ComponentDialogBase;
 
-// UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
-public interface FailureSection {
-    @NotNull ComponentDialogBase<?> component();
+import javax.swing.JComponent;
 
-    void applyTo(@NotNull TestRunItems runItem);
+// Rule-INTERNAL-097
+public interface DialogHost {
+    @NotNull JComponent root();
+
+    void registerShortcut(@NotNull JComponent component, @NotNull CustomShortcutSet shortcutSet, @NotNull Runnable action);
+
+    void refit();
 }

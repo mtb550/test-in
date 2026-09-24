@@ -52,7 +52,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractFrameworkDialog {
+public abstract class AbstractFrameworkDialog implements DialogHost {
     protected final @NotNull Project p;
 
     protected @NotNull String title = "";
@@ -69,6 +69,7 @@ public abstract class AbstractFrameworkDialog {
     private @NotNull Optional<DialogDto> dto = Optional.empty();
     private @NotNull Optional<List<DialogComponent>> built = Optional.empty();
     private @NotNull Optional<JBPopup> popup = Optional.empty();
+    private @NotNull Optional<JComponent> content = Optional.empty();
 
     private @NotNull Optional<StatusBarBase> strip = Optional.empty();
     private @NotNull Optional<StatusBarItem[]> keysShown = Optional.empty();
@@ -163,6 +164,8 @@ public abstract class AbstractFrameworkDialog {
 
     private @NotNull JBPopup buildPopup() {
         final @NotNull JBPanel<?> contentPanel = buildContentPanel();
+        content = Optional.of(contentPanel);
+
         bindShortcutKeys(contentPanel);
         bindSubmitGesture();
 
@@ -192,7 +195,14 @@ public abstract class AbstractFrameworkDialog {
         strip.ifPresent(bar -> bar.updateItems(items));
     }
 
+    // Rule-INTERNAL-097
+    @Override
+    public final @NotNull JComponent root() {
+        return content.orElseThrow();
+    }
+
     // UC-INTERNAL-007, Rule-INTERNAL-054
+    @Override
     public final void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull Runnable action) {
         new DumbAwareAction() {
             @Override
@@ -216,6 +226,7 @@ public abstract class AbstractFrameworkDialog {
         return false;
     }
 
+    @Override
     public final void refit() {
         popup.ifPresent(open -> {
             open.setSize(new Dimension(open.getSize().width, naturalHeightOf(open.getContent())));
@@ -325,8 +336,6 @@ public abstract class AbstractFrameworkDialog {
         DialogKeys.install(contentPanel, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, declared);
 
         for (final DialogComponent dialogComponent : builtComponents()) {
-            dialogComponent.installedOn(contentPanel);
-
             if (!dialogComponent.acceptsDialogKeys()) continue;
 
             DialogKeys.install(dialogComponent.getFocusComponent(), JComponent.WHEN_FOCUSED, declared);
@@ -336,8 +345,7 @@ public abstract class AbstractFrameworkDialog {
     // UC-INTERNAL-007, Rule-INTERNAL-060
     private void bindSubmitGesture() {
         for (final DialogComponent dialogComponent : builtComponents()) {
-            dialogComponent.hostedBy(this);
-            dialogComponent.onSubmitRequest(this::submit);
+            dialogComponent.hostedBy(this, this::submit);
         }
     }
 }

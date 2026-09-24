@@ -16,6 +16,9 @@
 
 package org.testin.lightmode;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBPanel;
@@ -27,8 +30,10 @@ import org.testin.services.Services;
 import org.testin.testrun.RunStatusService;
 import org.testin.testrun.failure.FailureFields;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.DialogHost;
 import org.testin.ui.framework.RowStripe;
 import org.testin.util.Fonts;
+import org.testin.util.Shortcuts;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -40,12 +45,13 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-class FailureForm extends JBPanel<FailureForm> {
+class FailureForm extends JBPanel<FailureForm> implements DialogHost {
     private final @NotNull FailureFields fields;
     private final @NotNull TestRunItems runItem;
     private final @NotNull Project p;
     private final @NotNull Path runPath;
     private final @NotNull Map<Component, Font> baseFonts = new HashMap<>();
+    private final @NotNull Runnable resized;
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-202
     FailureForm(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem, final float zoom, final @NotNull Runnable resized) {
@@ -53,6 +59,8 @@ class FailureForm extends JBPanel<FailureForm> {
         this.runPath = runPath;
         this.runItem = runItem;
         this.fields = new FailureFields(p, runPath, runItem);
+        this.resized = resized;
+
         fields.onResized(resized);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -64,12 +72,33 @@ class FailureForm extends JBPanel<FailureForm> {
             panel.setAlignmentX(LEFT_ALIGNMENT);
             add(panel);
 
-            // Rule-EDITOR-PANEL-219
-            component.getComponent().installedOn(this);
+            // Rule-EDITOR-PANEL-219, Rule-INTERNAL-097
+            component.getComponent().hostedBy(this, this::save);
         }
 
         remember(this);
         setZoom(zoom);
+    }
+
+    // Rule-INTERNAL-097
+    @Override
+    public @NotNull JComponent root() {
+        return this;
+    }
+
+    // UC-EDITOR-PANEL-046, Rule-INTERNAL-054, Rule-EDITOR-PANEL-246
+    @Override
+    public void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull Runnable action) {
+        if (Shortcuts.Enter.getCustomShortcut().equals(shortcutSet)) return;
+
+        DumbAwareAction.create((AnActionEvent _) -> action.run()).registerCustomShortcutSet(shortcutSet, component);
+    }
+
+
+    // Rule-EDITOR-PANEL-202
+    @Override
+    public void refit() {
+        resized.run();
     }
 
     void setZoom(final float zoom) {

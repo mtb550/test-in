@@ -25,11 +25,12 @@ public interface DialogComponent {
 
     @NotNull JComponent getFocusComponent();
 
-    void onSubmitRequest(@NotNull Runnable submit);
-
-    // Rule-EDITOR-PANEL-219
-    default void installedOn(final @NotNull JComponent root) {
+    // Rule-INTERNAL-060, Rule-INTERNAL-097
+    default void hostedBy(final @NotNull DialogHost host, final @NotNull Runnable submit) {
+        onSubmitRequest(submit);
     }
+
+    void onSubmitRequest(@NotNull Runnable submit);
 
     // UC-INTERNAL-007, Rule-INTERNAL-097
     default void hostedBy(final @NotNull AbstractFrameworkDialog base) {

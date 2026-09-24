@@ -43,7 +43,6 @@ public final class MultiLineField implements DialogComponent {
     private final @NotNull String caption;
 
     private @NotNull Optional<JComponent> panel = Optional.empty();
-    private @NotNull Optional<AbstractFrameworkDialog> host = Optional.empty();
 
     private int packedHeight;
 
@@ -72,12 +71,12 @@ public final class MultiLineField implements DialogComponent {
     }
 
     // Rule-INTERNAL-060, Rule-EDITOR-PANEL-048, Rule-EDITOR-PANEL-246
-    public void enableMultiLine(final @NotNull AbstractFrameworkDialog base, final @NotNull Runnable onSave) {
-        field.addSettingsProvider(editor -> base.registerShortcut(editor.getContentComponent(), Shortcuts.InsertNewLine.getCustomShortcut(), () -> insertNewLine(editor)));
+    public void enableMultiLine(final @NotNull DialogHost host, final @NotNull Runnable onSave) {
+        field.addSettingsProvider(editor -> host.registerShortcut(editor.getContentComponent(), Shortcuts.InsertNewLine.getCustomShortcut(), () -> insertNewLine(editor)));
 
-        growsWith(base::refit);
+        growsWith(host::refit);
 
-        base.registerShortcut(field, Shortcuts.Enter.getCustomShortcut(), onSave);
+        host.registerShortcut(field, Shortcuts.Enter.getCustomShortcut(), onSave);
     }
 
     // Rule-INTERNAL-097
@@ -115,15 +114,14 @@ public final class MultiLineField implements DialogComponent {
         return field;
     }
 
-    @Override
-    public void hostedBy(final @NotNull AbstractFrameworkDialog base) {
-        host = Optional.of(base);
-    }
-
     // Rule-EDITOR-PANEL-246
     @Override
+    public void hostedBy(final @NotNull DialogHost host, final @NotNull Runnable submit) {
+        enableMultiLine(host, submit);
+    }
+
+    @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
-        host.ifPresent(base -> enableMultiLine(base, submit));
     }
 
     // Rule-EDITOR-PANEL-246

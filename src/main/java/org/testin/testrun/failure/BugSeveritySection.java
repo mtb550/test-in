@@ -16,7 +16,6 @@
 
 package org.testin.testrun.failure;
 
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.BugSeverity;
 import org.testin.model.TestRunItems;
@@ -24,16 +23,13 @@ import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
 
-public final class BugSeveritySection implements FailureSection {
-    @Getter
-    private final @NotNull ComponentDialogBase<RadioSelection<BugSeverity>> component;
-
-    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-147
-    public BugSeveritySection(final @NotNull TestRunItems runItem) {
-        component = ComponentDialogBase.<BugSeverity>radios(RunEditorAttributes.BUG_SEVERITY.getName())
+public record BugSeveritySection(@NotNull ComponentDialogBase<RadioSelection<BugSeverity>> component) implements FailureSection {
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
+    public static @NotNull BugSeveritySection of(final @NotNull TestRunItems runItem) {
+        return new BugSeveritySection(ComponentDialogBase.<BugSeverity>radios(RunEditorAttributes.BUG_SEVERITY.getName())
                 .options(BugSeverity.CHOICES, BugSeverity::getLabel)
                 .select(BugSeverity.orDefault(runItem.getBugSeverity()))
-                .build();
+                .build());
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145

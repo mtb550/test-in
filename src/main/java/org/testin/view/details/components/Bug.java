@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class BugIssue {
+public final class Bug {
     private static final int LINK_GAP = 10;
 
     // UC-VIEW-PANEL-005, UC-VIEW-PANEL-016, Rule-VIEW-PANEL-031, Rule-VIEW-PANEL-086

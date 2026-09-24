@@ -89,9 +89,12 @@ and which keys it answers, and the shell builds the rest.
   in the size a field would show it in, so a test case's description above the
   fields is not smaller than the answer being typed under it.
 - **Rule-INTERNAL-097** — A box that holds many lines grows as lines are added,
-  and the dialog grows with it rather than scrolling inside a fixed box. Every
-  such box is the same box: the same frame, the same font, Tab leaves it, Enter
-  is the dialog's key and Ctrl+Enter adds a line.
+  and whatever draws it grows with it rather than letting it scroll inside a
+  fixed box. Every such box is the same box: the same frame, the same font, Tab
+  leaves it, and Ctrl+Enter adds a line. Enter belongs to whoever draws the box -
+  a dialog saves with it, and light mode's window saves and moves to the next
+  test case - so a box asks its host to bind Enter rather than binding it
+  itself, and a host that has other plans for the key keeps it.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.
