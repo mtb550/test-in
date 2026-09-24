@@ -48,10 +48,12 @@ Connecting an agent changes what that gesture produces, not where it lives.
   must have it as an argument says `{prompt}` in its arguments, and then it goes
   exactly there.
 - **Rule-CODEGEN-085** — Check runs the command with `--version` and prints the
-  first line it answered, or says the command could not be started. Every agent
-  answers that one, so it is not a field a tester can get wrong. It waits twenty
-  seconds and can be canceled, because a settings page that hangs is worse than
-  one that says nothing.
+  first line it answered. Every agent answers that one, so it is not a field a
+  tester can get wrong. A command nothing on PATH answers to is refused by name,
+  and the refusal says what was looked for - `pi.exe, pi.cmd, pi.bat` - because a
+  tester connecting an agent Testin has never heard of needs to know which spelling
+  was tried. It waits twenty seconds and can be canceled, because a settings page
+  that hangs is worse than one that says nothing.
 - **Rule-CODEGEN-086** — What is sent is one test case - its description,
   expected result, steps, test data, pre-conditions and module - filled into a
   prompt the tester can read and change. Nothing else ever leaves: not the

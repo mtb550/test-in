@@ -96,7 +96,7 @@ public final class AgentSettingsConfigurable implements SearchableConfigurable {
         final @NotNull Optional<String> answered = ProgressManager.getInstance().runProcessWithProgressSynchronously(
                 () -> AgentCli.onPath(ProgressManager.getInstance().getProgressIndicator()).check(typed),
                 Bundle.message("agent.check.button"), true, null);
-        if (answered.isEmpty()) return Bundle.message("agent.check.not.found", typed.command());
+        if (answered.isEmpty()) return Bundle.message("agent.check.not.found", typed.command(), AgentCli.triedNames(typed.command()));
 
         return answered.orElseThrow().isBlank()
                 ? Bundle.message("agent.check.said.nothing", typed.command())

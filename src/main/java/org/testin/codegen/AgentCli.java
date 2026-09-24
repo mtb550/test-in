@@ -22,6 +22,7 @@ import com.intellij.execution.configurations.PathEnvironmentVariableUtil;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.util.SystemInfo;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
@@ -35,6 +36,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public final class AgentCli {
@@ -63,6 +65,15 @@ public final class AgentCli {
     // UC-CODEGEN-021, Rule-CODEGEN-084
     static boolean wantsThePromptAsAnArgument(final @NotNull String arguments) {
         return arguments.contains(PROMPT_PLACEHOLDER);
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-085
+    public static @NotNull String triedNames(final @NotNull String command) {
+        if (!SystemInfo.isWindows || command.contains(".")) return command;
+
+        return PathEnvironmentVariableUtil.getWindowsExecutableFileExtensions().stream()
+                .map(extension -> command + extension)
+                .collect(Collectors.joining(", "));
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-083

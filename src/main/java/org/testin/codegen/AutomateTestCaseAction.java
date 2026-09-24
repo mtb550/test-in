@@ -19,7 +19,6 @@ package org.testin.codegen;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
@@ -33,7 +32,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
-import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
@@ -70,56 +68,6 @@ public class AutomateTestCaseAction extends DumbAwareAction {
         return TestinData.selectedTestCases(e).stream().filter(AutomateTestCaseAction::canBeNamed).toList();
     }
 
-    // UC-CODEGEN-021, Rule-CODEGEN-084, Rule-CODEGEN-089
-    private static void askTheAgent(final @NotNull Project p, final @NotNull List<TestCaseDto> asked, final @NotNull Optional<TestinEditor> editor) {
-        final @NotNull AgentConnection connection = AgentConnection.stored();
-        if (!connection.isConnected() || asked.isEmpty()) return;
-
-        final @NotNull AgentTranscript transcript = new AgentTranscript();
-
-        BackgroundWork.run(p, Bundle.message("agent.task.title"), Bundle.message("agent.task.failed"), true,
-                indicator -> bodiesWritten(p, connection, asked, transcript, indicator),
-                written -> sayWhatTheAgentDid(p, written, asked.size(), transcript),
-                () -> editor.ifPresent(TestinEditor::refreshView));
-    }
-
-    // UC-CODEGEN-021, Rule-CODEGEN-089, Rule-CODEGEN-090
-    private static void sayWhatTheAgentDid(final @NotNull Project p, final int written, final int asked, final @NotNull AgentTranscript transcript) {
-        if (transcript.isEmpty()) return;
-
-        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-
-        notifier.infoWithActions(p, Bundle.message("agent.done.written"),
-                Bundle.message("agent.done.detail", String.valueOf(written), String.valueOf(asked)),
-                notifier.lastingAction(Bundle.message("agent.said.show"), () -> new AgentSaidDialog(p, transcript.read()).show()));
-    }
-
-    // UC-CODEGEN-021, Rule-CODEGEN-084, Rule-CODEGEN-088
-    private static int bodiesWritten(final @NotNull Project p, final @NotNull AgentConnection connection, final @NotNull List<TestCaseDto> asked, final @NotNull AgentTranscript transcript, final @NotNull ProgressIndicator indicator) {
-        final @NotNull AgentCli agent = AgentCli.onPath(indicator);
-        int written = 0;
-
-        indicator.setIndeterminate(false);
-        for (final TestCaseDto tc : asked) {
-            if (indicator.isCanceled()) return written;
-
-            indicator.setText2(tc.getDescription());
-            indicator.setFraction((double) written / asked.size());
-
-            final @NotNull String prompt = BodyPrompt.of(connection.promptTemplate(), tc, Fqcn.methodNameOf(tc));
-            final @NotNull Optional<String> said = agent.ask(connection, prompt);
-            final @NotNull Optional<String> statements = said.flatMap(AgentAnswer::statementsIn);
-
-            final boolean landed = statements.isPresent() && CodeNavigation.available().fillBody(p, tc, statements.orElseThrow());
-            if (landed) written++;
-
-            final @NotNull String outcome = landed ? Bundle.message("agent.said.written") : Bundle.message("agent.said.dropped");
-            transcript.record(tc, prompt, said.orElse(Bundle.message("agent.said.nothing")), outcome);
-        }
-
-        return written;
-    }
-
     // UC-CODEGEN-005, Rule-CODEGEN-025
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -133,7 +81,7 @@ public class AutomateTestCaseAction extends DumbAwareAction {
 
         GenType.CREATE_TEST_CASE.executeAll(p, toWrite);
 
-        askTheAgent(p, nameable(e), editor);
+        WriteBodies.forAll(p, nameable(e), editor);
 
         ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final int written = writtenFor(p, toWrite);
