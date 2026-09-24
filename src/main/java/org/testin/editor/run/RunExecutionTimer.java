@@ -23,6 +23,7 @@ import org.testin.model.TestRunItems;
 import javax.swing.Timer;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.UUID;
 
 final class RunExecutionTimer implements Disposable {
     private static final int REDRAW_MS = 1000;
@@ -38,6 +39,11 @@ final class RunExecutionTimer implements Disposable {
     private static @NotNull Timer notTicking() {
         return new Timer(REDRAW_MS, _ -> {
         });
+    }
+
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132
+    boolean isOn(final @NotNull UUID testCaseId) {
+        return counting.filter(item -> item.getId().equals(testCaseId)).isPresent();
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132
@@ -69,12 +75,12 @@ final class RunExecutionTimer implements Disposable {
         timer.stop();
         timer = notTicking();
 
-        counting.ifPresent(item -> item.setDuration(alreadyCounted));
+        counting.ifPresent(item -> item.recordClock(alreadyCounted));
         counting = Optional.empty();
     }
 
     private void elapse() {
-        counting.ifPresent(item -> item.setDuration(alreadyCounted.plusMillis(System.currentTimeMillis() - startedAt)));
+        counting.ifPresent(item -> item.recordClock(alreadyCounted.plusMillis(System.currentTimeMillis() - startedAt)));
     }
 
     @Override

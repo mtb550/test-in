@@ -79,6 +79,8 @@ public final class RunStatusService {
 
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-241, Rule-EDITOR-PANEL-242
     public void recordReported(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
+        final boolean clockCounted = editor.clockIsOn(tc.getId());
+
         final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
         if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
             editor.startTimerForIndex(tcIndex + 1);
@@ -86,7 +88,7 @@ public final class RunStatusService {
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
         recordOn(p, editor, tc.getId(), status, item -> {
-            item.recordDuration(duration);
+            if (!clockCounted) item.recordDuration(duration);
             failure.recordOn(item);
             item.recordVerdict(status, tester, asItIsNow(p, item));
         });

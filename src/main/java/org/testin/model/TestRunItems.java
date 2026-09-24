@@ -142,6 +142,13 @@ public class TestRunItems {
         duration = measured;
     }
 
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132
+    public void recordClock(final @NotNull Duration onTheClock) {
+        if (isJudged()) return;
+
+        duration = onTheClock;
+    }
+
     @JsonIgnore
     public boolean isJudged() {
         return status.isVerdict() || isRemoved();

@@ -42,7 +42,11 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
 - **Rule-EDITOR-PANEL-131** — Starting marks the test run **In Progress**, and
   stamps when execution began. That stamp is set once and never overwritten.
 - **Rule-EDITOR-PANEL-132** — The clock starts on the test case the walk lands
-  on, and ticks once a second.
+  on, and ticks once a second. It stops the moment that test case has a
+  verdict, and what it counted is the duration the test run keeps: a tester who
+  read for ten seconds and then ran the automation spent twenty, and twenty is
+  what the row says. A test case no clock was counting takes the automation's
+  own measure instead, so a row run from its card is still timed.
 - **Rule-EDITOR-PANEL-133** — The button becomes **Stop Execution** while the
   walk is going.
 - **Rule-EDITOR-PANEL-134** — Reaching the end of the list ends the walk, and

@@ -67,14 +67,26 @@ public class TestRunItemsTest {
     }
 
     @Test
-    public void theFrameworksMeasurementOverridesWhatTheClockCounted() {
+    public void aFrameworkMeasurementIsRecordedWhereNoClockCounted() {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
         item.setDuration(Duration.ofSeconds(3));
 
         item.recordDuration(Duration.ofMillis(84));
 
         assertEquals(item.getDuration(), Duration.ofMillis(84),
-                "the clock times a tester reading a case; the framework times the method");
+                "a test case no clock was counting takes the framework's own measure");
+    }
+
+    @Test
+    public void theClockStopsCountingOnceTheVerdictIsIn() {
+        final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
+        item.recordDuration(Duration.ofMillis(10017));
+        item.recordVerdict(TestStatus.PASSED, "Muteb", TestCaseDto.builder().build());
+
+        item.recordClock(Duration.ofSeconds(24));
+
+        assertEquals(item.getDuration(), Duration.ofMillis(10017),
+                "a clock still ticking on a judged case would save the tester's watching time as the method's");
     }
 
     @Test

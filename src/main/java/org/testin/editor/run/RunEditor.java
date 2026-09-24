@@ -416,6 +416,11 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         return currentTestCases.size();
     }
 
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132
+    public boolean clockIsOn(final @NotNull UUID testCaseId) {
+        return executionTimer.isOn(testCaseId);
+    }
+
     @Override
     public void launching(final @NotNull UUID testCaseId) {
         launchedHere.add(testCaseId);
