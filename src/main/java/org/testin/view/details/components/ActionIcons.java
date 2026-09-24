@@ -19,6 +19,8 @@ package org.testin.view.details.components;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.CardHoverAction;
@@ -34,6 +36,7 @@ import javax.swing.JComponent;
 import java.awt.FlowLayout;
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ActionIcons {
     private static final int STRUT_WIDTH = 8;
 
