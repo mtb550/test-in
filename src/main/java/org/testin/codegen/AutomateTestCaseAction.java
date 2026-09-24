@@ -19,6 +19,7 @@ package org.testin.codegen;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
@@ -32,6 +33,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
@@ -63,19 +65,60 @@ public class AutomateTestCaseAction extends DumbAwareAction {
         return !Fqcn.methodNameOf(tc).isEmpty();
     }
 
+    // Rule-CODEGEN-002
+    private static @NotNull List<TestCaseDto> nameable(final @NotNull AnActionEvent e) {
+        return TestinData.selectedTestCases(e).stream().filter(AutomateTestCaseAction::canBeNamed).toList();
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-084, Rule-CODEGEN-089
+    private static void askTheAgent(final @NotNull Project p, final @NotNull List<TestCaseDto> asked, final @NotNull Optional<TestinEditor> editor) {
+        final @NotNull AgentConnection connection = AgentConnection.stored();
+        if (!connection.isConnected() || asked.isEmpty()) return;
+
+        BackgroundWork.run(p, Bundle.message("agent.task.title"), Bundle.message("agent.task.failed"), true,
+                indicator -> bodiesWritten(p, connection, asked, indicator),
+                written -> {
+                    // Rule-CODEGEN-089
+                    if (written > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.WRITTEN, written);
+                },
+                () -> editor.ifPresent(TestinEditor::refreshView));
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-084, Rule-CODEGEN-088
+    private static int bodiesWritten(final @NotNull Project p, final @NotNull AgentConnection connection, final @NotNull List<TestCaseDto> asked, final @NotNull ProgressIndicator indicator) {
+        final @NotNull AgentCli agent = AgentCli.onPath(indicator);
+        int written = 0;
+
+        indicator.setIndeterminate(false);
+        for (final TestCaseDto tc : asked) {
+            if (indicator.isCanceled()) return written;
+
+            indicator.setText2(tc.getDescription());
+            indicator.setFraction((double) written / asked.size());
+
+            final @NotNull String prompt = BodyPrompt.of(connection.promptTemplate(), tc, Fqcn.methodNameOf(tc));
+            final @NotNull Optional<String> statements = agent.ask(connection, prompt).flatMap(AgentAnswer::statementsIn);
+
+            if (statements.isPresent() && CodeNavigation.available().fillBody(p, tc, statements.orElseThrow())) written++;
+        }
+
+        return written;
+    }
+
     // UC-CODEGEN-005, Rule-CODEGEN-025
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final @Nullable Project p = e.getProject();
         if (p == null) return;
 
-        final @NotNull List<TestCaseDto> toWrite =
-                withoutAMethod(p, TestinData.selectedTestCases(e).stream().filter(AutomateTestCaseAction::canBeNamed).toList());
-        if (toWrite.isEmpty()) return;
+        final @NotNull List<TestCaseDto> toWrite = withoutAMethod(p, nameable(e));
+        if (toWrite.isEmpty() && !AgentConnection.stored().isConnected()) return;
 
         final @NotNull Optional<TestinEditor> editor = TestinData.editor(e);
 
         GenType.CREATE_TEST_CASE.executeAll(p, toWrite);
+
+        askTheAgent(p, nameable(e), editor);
 
         ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final int written = writtenFor(p, toWrite);
@@ -114,7 +157,8 @@ public class AutomateTestCaseAction extends DumbAwareAction {
             return;
         }
 
-        if (withoutAMethod(p, nameable).isEmpty()) {
+        // Rule-CODEGEN-003
+        if (withoutAMethod(p, nameable).isEmpty() && !AgentConnection.stored().isConnected()) {
             e.getPresentation().setEnabled(false);
             e.getPresentation().setDescription(Bundle.message("automate.already.written.description"));
             return;

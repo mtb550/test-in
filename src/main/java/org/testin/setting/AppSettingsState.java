@@ -23,6 +23,7 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.codegen.CodeAgent;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
 
@@ -31,6 +32,8 @@ import java.util.Objects;
 @State(name = "testin.settings.AppSettingsState", storages = @Storage("testinSettings.xml"))
 @Service(Service.Level.APP)
 public final class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
+    public static final int DEFAULT_TIMEOUT_SECONDS = 180;
+
     public @NotNull String rootTestinPath = "";
     public @NotNull String logLevel = "INFO";
     public @NotNull String defaultDownloadFolder = "";
@@ -38,6 +41,15 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
     public @NotNull String testerRole = "";
 
     public boolean showShortcutHints = true;
+
+    public @NotNull String agentName = "";
+    public @NotNull String agentCommand = "";
+    public @NotNull String agentArguments = "";
+    public @NotNull String agentCheck = "";
+    public @NotNull String agentKeyVariable = "";
+    public @NotNull String agentPrompt = "";
+
+    public int agentTimeoutSeconds = DEFAULT_TIMEOUT_SECONDS;
 
     private static @NotNull String orEmpty(final @Nullable String value) {
         return Objects.requireNonNullElse(value, "").trim();
@@ -58,6 +70,14 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
         defaultDownloadFolder = orEmpty(defaultDownloadFolder);
         testerName = orEmpty(testerName);
         testerRole = orEmpty(testerRole);
+
+        agentName = CodeAgent.named(orEmpty(agentName)).name();
+        agentCommand = orEmpty(agentCommand);
+        agentArguments = orEmpty(agentArguments);
+        agentCheck = orEmpty(agentCheck);
+        agentKeyVariable = orEmpty(agentKeyVariable);
+        agentPrompt = Objects.requireNonNullElse(agentPrompt, "");
+        agentTimeoutSeconds = agentTimeoutSeconds > 0 ? agentTimeoutSeconds : DEFAULT_TIMEOUT_SECONDS;
 
         applyLogLevel();
     }

@@ -1,0 +1,96 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.codegen;
+
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.process.CapturingProcessHandler;
+import com.intellij.execution.process.ProcessOutput;
+import com.intellij.openapi.progress.ProgressIndicator;
+import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
+
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@AllArgsConstructor
+public final class AgentCli {
+    private static final @NotNull Path ANYWHERE = Path.of(System.getProperty("java.io.tmpdir"));
+
+    private final @NotNull Launcher launcher;
+
+    public static @NotNull AgentCli onPath(final @NotNull ProgressIndicator indicator) {
+        return new AgentCli((command, arguments, timeout) -> start(command, arguments, timeout, indicator));
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-084
+    static @NotNull List<String> arguments(final @NotNull String arguments, final @NotNull String prompt) {
+        final @NotNull List<String> written = new ArrayList<>(arguments.isBlank() ? List.of() : List.of(arguments.trim().split("\\s+")));
+
+        final int placeholder = written.indexOf(CodeAgent.PROMPT_PLACEHOLDER);
+        if (placeholder == -1) written.add(prompt);
+        else written.set(placeholder, prompt);
+
+        return List.copyOf(written);
+    }
+
+    private static @NotNull Optional<ProcessOutput> start(final @NotNull String command, final @NotNull List<String> arguments, final @NotNull Duration timeout, final @NotNull ProgressIndicator indicator) {
+        final @NotNull GeneralCommandLine line = new GeneralCommandLine(command)
+                .withParameters(arguments)
+                .withWorkingDirectory(ANYWHERE)
+                .withCharset(StandardCharsets.UTF_8);
+
+        try {
+            return Optional.of(new CapturingProcessHandler(line).runProcessWithProgressIndicator(indicator, (int) timeout.toMillis()));
+        } catch (final ExecutionException ex) {
+            Logger.warn("The agent '" + command + "' could not be started: " + ex.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-084
+    public @NotNull Optional<String> ask(final @NotNull AgentConnection connection, final @NotNull String prompt) {
+        if (!connection.isConnected()) return Optional.empty();
+
+        return said(connection.command(), arguments(connection.arguments(), prompt), connection.timeout());
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-084
+    public @NotNull Optional<String> check(final @NotNull AgentConnection connection) {
+        if (!connection.isConnected()) return Optional.empty();
+
+        return said(connection.command(), arguments(connection.check(), ""), connection.timeout());
+    }
+
+    private @NotNull Optional<String> said(final @NotNull String command, final @NotNull List<String> arguments, final @NotNull Duration timeout) {
+        return launcher.run(command, arguments, timeout).map(output -> {
+            if (output.getExitCode() != 0) Logger.warn("The agent '" + command + "' ended with " + output.getExitCode() + ": " + output.getStderr().strip());
+
+            return output.getStdout().strip();
+        });
+    }
+
+    @FunctionalInterface
+    interface Launcher {
+        @NotNull Optional<ProcessOutput> run(@NotNull String command, @NotNull List<String> arguments, @NotNull Duration timeout);
+    }
+}

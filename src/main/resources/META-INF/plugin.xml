@@ -44,7 +44,7 @@
 
     <b>Privacy</b>
     <ul>
-        <li>No telemetry, no accounts, no analytics. Testin talks to the Git remote you configure yourself, and - when you press <b>Report Bug</b> - to the GitHub repository your own <b>testin.yml</b> names, through the <b>gh</b> sign-in already on your machine. Nothing reaches the developer.</li>
+        <li>No telemetry, no accounts, no analytics. Testin talks to the Git remote you configure yourself; when you press <b>Report Bug</b>, to the GitHub repository your own <b>testin.yml</b> names, through the <b>gh</b> sign-in already on your machine; and, when you have connected an AI agent and press <b>Automate Test Case</b>, to that agent's own command line on your machine, carrying one test case and nothing else. Testin keeps no API key - an agent reads its own from your system environment. Nothing reaches the developer.</li>
     </ul>
 
     <b>Team</b>
@@ -353,6 +353,22 @@
                 key="testin.display.name"
                 bundle="messages"
                 groupId="tools"
+        />
+
+        <applicationConfigurable
+                instance="org.testin.setting.AgentSettingsConfigurable"
+                id="org.testin.setting.AgentSettingsConfigurable"
+                parentId="org.testin.setting.SettingsConfigurable"
+                key="agent.page.name"
+                bundle="messages"
+        />
+
+        <applicationConfigurable
+                instance="org.testin.setting.AgentPromptConfigurable"
+                id="org.testin.setting.AgentPromptConfigurable"
+                parentId="org.testin.setting.AgentSettingsConfigurable"
+                key="agent.prompt.page.name"
+                bundle="messages"
         />
 
     </extensions>

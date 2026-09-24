@@ -10,7 +10,7 @@ test case they came from.
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Part of Testin**  | Automation code and the gutter                                                                                                                                                                                                   |
 | **Answers**         | What Testin writes into the code, when it rewrites it, and what a tester sees when it cannot                                                                                                                                     |
-| **Numbering**       | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-020`. Rules are `Rule-CODEGEN-001` to `Rule-CODEGEN-082`                                                                                                                           |
+| **Numbering**       | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-021`. Rules are `Rule-CODEGEN-001` to `Rule-CODEGEN-089`                                                                                                                           |
 | **Retired**         | `Rule-CODEGEN-015` said what `Rule-CODEGEN-046` says — the groups attribute is written only when the test case belongs to one. Retired 8 September 2026; read Rule-CODEGEN-046 instead. The number is not given to anything else |
 | **State**           | **Written** — [#181](https://github.com/mtb550/test-in/issues/181)                                                                                                                                                               |
 | **Checked against** | `main` at `1270e599`, 20 September 2026                                                                                                                                                                                          |
@@ -47,6 +47,7 @@ test case they came from.
 |                    | **When it cannot work**                                             |                                                                      |
 | **UC-CODEGEN-019** | [Work in an IDE with no Java plugin](noJavaPlugin.md)               | Manage test cases in PyCharm or GoLand.                              |
 | **UC-CODEGEN-020** | [Work in a project with no Java test folder](noTestSourceFolder.md) | Find out why no code is appearing.                                   |
+| **UC-CODEGEN-021** | [Let an agent write the method body](agentWritesTheBody.md)         | Have the steps written into the method rather than a TODO.           |
 
 ---
 

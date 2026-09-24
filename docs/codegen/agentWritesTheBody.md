@@ -1,0 +1,152 @@
+[Documentation](../README.md) › [Automation code and the gutter](main.md) › UC-CODEGEN-021
+
+# UC-CODEGEN-021: Let an agent write the method body
+
+**As a** tester, **I want** the method Testin writes to arrive with the steps in
+it, **so that** I do not read the test case in one window and type it in another.
+
+Testin writes a method and leaves a `// TODO` in it. Connect a command-line
+agent you already run, and **Automate Test Case** hands it the test case and
+puts what comes back where that `// TODO` was.
+
+`F12`, or the menu entry **Automate Test Case** — the same gesture as before.
+Connecting an agent changes what that gesture produces, not where it lives.
+
+## Rules
+
+- **Rule-CODEGEN-001** — A method is found by the identity in `testName`, never
+  by its name. Renaming a test case never loses its method.
+- **Rule-CODEGEN-002** — A test case with no description gets no method. A
+  description is what names a method.
+- **Rule-CODEGEN-003** — The body belongs to the tester. Testin writes the
+  annotation, the declaration and one `// TODO` line, and never touches a body a
+  tester has written. An agent writes the body only where that `// TODO` still
+  stands, and only when the tester asked for it.
+- **Rule-CODEGEN-004** — A rename or a move happens before the tree changes,
+  while the old name still finds the code.
+- **Rule-CODEGEN-005** — Test management works without any of this. A missing
+  Java plugin or a missing test folder is a skip, never a failure.
+- **Rule-CODEGEN-006** — What goes wrong while writing code goes to the log. The
+  tester is not shown it.
+- **Rule-CODEGEN-082** — Testin touches a test project's automation code only
+  when `testin.yml` names that test project. Otherwise, nothing is generated,
+  renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
+  and **Run Tests** are gray and say why, and no gutter icon or automated mark
+  is shown. **Save to testin.yml**, in the Testin panel, turns code on.
+- **Rule-CODEGEN-083** — An agent is connected by naming the command that runs
+  it, the arguments it takes, what asks whether it is ready, and the environment
+  variable it reads for a key. Picking one of the agents Testin knows fills
+  those in; every one of them stays editable, so an agent Testin has never heard
+  of is connected by typing it. An empty command means no agent, which changes
+  nothing about what Automate Test Case already did.
+- **Rule-CODEGEN-084** — The agent is asked once per test case, on a background
+  task the tester can cancel, and never while the method is being written:
+  writing a method is a write action, an agent takes seconds to minutes, and a
+  write action that waits on one freezes the IDE. The prompt is the last
+  argument unless the arguments say {prompt}, and then it goes there.
+- **Rule-CODEGEN-085** — Check runs the agent's own readiness command and prints
+  the first line it answered, or says the command could not be started. It waits
+  twenty seconds and can be canceled, because a settings page that hangs is
+  worse than one that says nothing.
+- **Rule-CODEGEN-086** — What is sent is one test case - its description,
+  expected result, steps, test data, pre-conditions and module - filled into a
+  prompt the tester can read and change. Nothing else ever leaves: not the
+  class, not another test case, not the test data root. An empty prompt means
+  the one Testin ships, so a tester who never edited it gets the better wording
+  a later release brings.
+- **Rule-CODEGEN-087** — A key is never Testin's to hold. The agent reads it
+  from the environment the IDE was started in, and Testin only names the
+  variable and says whether it is set - never its value, never in a command
+  line, never in the log. A variable set in a terminal does not reach an IDE
+  that was already running.
+- **Rule-CODEGEN-088** — What the agent printed is read from standard output,
+  and where it fenced a block the largest one is taken. An answer that does not
+  end as Java statements do is dropped: the TODO stays, the log says what came
+  back, and the tester is shown nothing.
+- **Rule-CODEGEN-089** — A run reports the bodies that landed, once, with a
+  count. Canceling keeps every body already written and leaves the rest with
+  their TODO. Each body is one named write command, so Ctrl+Z takes one back.
+
+## The screen
+
+Two pages, under **Settings › Tools › Testin**. The first is how Testin reaches
+the agent; the second is what it asks for.
+
+```
+┌─ Settings › Tools › Testin › Automation agent ──────────────────────┐
+│                                                                     │
+│  Agent        [ pi                                     v]           │
+│  Command      [ pi                                      ]           │
+│  Arguments    [ -p --no-tools --no-session --no-context-files ]      │
+│               {prompt} marks where the test case goes               │
+│  Check        [ auth                                    ]           │
+│  Key variable [                                         ]           │
+│                                                                     │
+│  Keys live in your system environment. Testin never reads one.      │
+│  pi 0.85.1                                                          │
+│                                                     [ Check ]       │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─ Settings › Tools › Testin › Automation agent › Prompt ─────────────┐
+│                                                                     │
+│  One test case: its description, expected result, steps, test       │
+│  data, pre-conditions and module. Nothing else ever leaves.         │
+│                                                                     │
+│  Prompt       ┌──────────────────────────────────────────┐          │
+│               │ Write the body of {method}.              │          │
+│               │ Test case: {description}                 │          │
+│               │ Expected result: {expectedResult}        │          │
+│               └──────────────────────────────────────────┘          │
+│               {description} {expectedResult} {steps} {testData}     │
+│               {preConditions} {module} {method}      [ Reset ]      │
+│                                                                     │
+│  Timeout      [ 180 ]  seconds one test case may take               │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+## Main flow
+
+1. The tester selects one test case or several, and presses **Automate Test
+   Case**.
+2. Testin writes the method for every selected test case that has none — the
+   annotation, the declaration and the `// TODO`, exactly as before.
+3. The status bar shows **Writing test method bodies**, with a Cancel.
+4. For each test case in turn, Testin fills the tester's prompt from that test
+   case and runs the agent's command with it.
+5. What the agent printed is read, and the statements in it replace the `// TODO`
+   in that test case's method.
+6. The balloon reads **Written 3**, counting the bodies that landed.
+7. `Ctrl+Z` in the file takes one body back.
+
+## What Testin refuses
+
+**If no agent is connected** — nothing is asked and nothing is said. The methods
+are written with their `// TODO`, which is what happened before any of this.
+
+**If the command cannot be started** — the `// TODO` stays, the log says which
+command and why, and the tester is not shown a stack trace (Rule-CODEGEN-006).
+
+**If the agent answers something that is not Java** — the `// TODO` stays. A
+half-written body is never left behind.
+
+**If the tester has written the body already** — that test case is not sent and
+not changed, whatever the agent would have said.
+
+**If the run is canceled** — the bodies already written stay, the rest keep their
+`// TODO`, and the count reports what landed.
+
+## Why it works this way
+
+The tester's own agent runs the request, under the tester's own account, so
+Testin holds no API key and no credential of any kind — the same bargain
+**Report Bug** makes with `gh`. What an agent needs to sign in lives in the
+system environment, where Testin neither reads it nor writes it.
+
+The agent is never asked while the method is being written. Writing a method is
+a PSI write action; an agent takes seconds to minutes, and a write action that
+waits on one freezes the IDE. So the body is a second edit, made after the answer
+arrives, against the method found again by its identity.
+
+---
+
+[← Automate Test Case](automateTestCase.md) · [Automation code and the gutter](main.md)

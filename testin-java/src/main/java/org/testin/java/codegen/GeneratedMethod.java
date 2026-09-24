@@ -35,6 +35,21 @@ import java.util.Optional;
 public final class GeneratedMethod {
     private static final @NotNull String TEST_NAME = "testName";
 
+    private static final @NotNull String TODO = "// TODO: Auto-generated test steps for ";
+
+    // UC-CODEGEN-002, Rule-CODEGEN-003
+    public static @NotNull String emptyBody(final @NotNull String methodName) {
+        return "{\n    " + TODO + methodName + "\n}";
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-003
+    public static boolean holdsNothingButTheTodo(final @NotNull PsiMethod pm) {
+        return Optional.ofNullable(pm.getBody())
+                .filter(body -> body.getStatements().length == 0)
+                .map(body -> body.getText().contains(TODO))
+                .orElse(false);
+    }
+
     // Rule-CODEGEN-001
     public static @NotNull Optional<PsiMethod> forTestCase(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
         return Optional.ofNullable(byTestCaseId(pc).get(tc.getId().toString()));
