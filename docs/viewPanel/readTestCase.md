@@ -142,12 +142,11 @@ badges. They are numbered on the panel drawing on
 1. The panel is filled with a test case.
 2. Testin reads the test case again from memory, not from the copy it was
    handed.
-3. The path is drawn, one step for each folder above the test case.
-4. The identity is drawn in a gray pill, with a button that copies it.
-5. The description is drawn as the title.
-6. The badges are drawn: the priority, then one for each group, then the
-   verdict.
-7. Each row that has something in it is drawn, in the order above.
+3. The breadcrumb is drawn, one step for each folder above the test case.
+4. The description is drawn as the title.
+5. The badges are drawn - the priority, then one for each group - and the three
+   icons beside them.
+6. Each row that has something in it is drawn, in the order above.
 
 ## What Testin refuses
 
@@ -161,8 +160,6 @@ date in 1970. A row with neither a name nor a date is not drawn at all.
 
 **If the priority is the lowest** — no priority badge is drawn. Only the two
 higher priorities get a badge.
-
-**If nobody has run the test case** — no verdict badge is drawn.
 
 **If the test case has no steps, or every step is blank** — there is no **Steps** row.
 

@@ -81,8 +81,9 @@ badges and above **Test case** (Rule-VIEW-PANEL-085).
 5. **Actual result** — the one sentence the band holds, its caption on a line of
    its own above it (Rule-VIEW-PANEL-082).
 6. **Stacktrace** — the application's own error, which the panel never shows.
-   The link opens it in a window that repeats the actual result above it, read
-   only, beside a thumbnail of each screenshot. That is
+   The link opens it in a window that repeats the test case and the actual result
+   above it, read only. A thumbnail of each screenshot sits beside the link on
+   the panel, not in the window. That is
    [UC-VIEW-PANEL-006](readStacktrace.md) and Rule-VIEW-PANEL-034.
 7. **Executed by** — last in the band, because who ran it is read after what
    happened. One row, in the words **Created** uses on the test case's own band (Rule-VIEW-PANEL-061).

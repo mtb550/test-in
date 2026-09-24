@@ -130,9 +130,9 @@ blank first line.
 
 **If the failure has no error** — the dialog shows only the message.
 
-**If the tester types in the dialog** — the typing goes when the dialog closes,
-and nothing is written. The text accepts typing only so that it can be selected
-and copied.
+**If the tester tries to type in the dialog** — nothing happens. The window is
+for reading a value the framework wrote; the failure dialog is where a tester
+changes one (Rule-VIEW-PANEL-036).
 
 ---
 

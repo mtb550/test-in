@@ -30,7 +30,7 @@ public final class StacktraceSection implements FailureSection {
     @Getter
     private final @NotNull ComponentDialogBase<TextArea> component;
 
-    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-147
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
     public StacktraceSection(final @NotNull TestRunItems runItem) {
         component = ComponentDialogBase.textArea()
                 .caption(RunEditorAttributes.STACKTRACE.getName())

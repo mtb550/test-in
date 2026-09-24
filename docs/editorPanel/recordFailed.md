@@ -47,8 +47,9 @@ form before it records anything.
   once are failed with no detail collected.
 - **Rule-EDITOR-PANEL-147** — The bug severity starts at **Enhancement** and the
   bug priority at **Low**.
-- **Rule-EDITOR-PANEL-148** — The four fields are the same four the failure form
-  in light mode uses.
+- **Rule-EDITOR-PANEL-148** — The five fields - what happened, the bug severity,
+  the bug priority, the stacktrace and the screenshots - are the same five the
+  failure form in light mode uses, and each is drawn by a section of its own.
 - **Rule-EDITOR-PANEL-219** — A picture on the clipboard is a screenshot wherever
   it is pasted in the failure form, and never letters; anything else on the
   clipboard pastes as text into whichever box has the cursor. The pictures are a **Screenshots** row of their own, which
