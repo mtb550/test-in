@@ -29,15 +29,13 @@ import javax.swing.JComponent;
 
 // Rule-EDITOR-PANEL-247
 public class PrioritySection implements CreateTestCaseSection {
-    private static final @NotNull String NO_CAPTION = "";
-
     private final @NotNull RadioSelection<Priority> priority;
     private final @NotNull JBPanel<?> wrapper;
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-031, Rule-EDITOR-PANEL-247
     public PrioritySection() {
-        priority = ComponentDialogBase.<Priority>radios(NO_CAPTION)
-                .options(Priority.CHOICES, Priority::getChoice)
+        priority = ComponentDialogBase.<Priority>radios("")
+                .options(Priority.CHOICES, Priority::getNumberAndWord)
                 .select(Priority.LOW)
                 .build()
                 .getComponent();
@@ -70,7 +68,7 @@ public class PrioritySection implements CreateTestCaseSection {
 
     @Override
     public void setEditable(final boolean editable) {
-        priority.setEditable(editable);
+        priority.setEnabled(editable);
     }
 
     @Override

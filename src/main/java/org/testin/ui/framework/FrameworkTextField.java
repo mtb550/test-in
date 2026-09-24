@@ -50,7 +50,7 @@ final class FrameworkTextField {
         this.icon = icon;
         DialogStyle.setDecorations(field, icon, note);
 
-        style(field);
+        DialogStyle.asField(field);
 
         if (!placeholder.isBlank()) {
             field.getEmptyText().setText(placeholder);
@@ -70,18 +70,10 @@ final class FrameworkTextField {
         bindClipboard(field);
     }
 
-    static void style(final @NotNull JComponent field) {
-        DialogStyle.asField(field);
-    }
-
     static void bindClipboard(final @NotNull JTextComponent component) {
-        bind(component, KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx(), DefaultEditorKit.pasteAction);
-        bindAllButPaste(component);
-    }
-
-    static void bindAllButPaste(final @NotNull JTextComponent component) {
         final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
 
+        bind(component, KeyEvent.VK_V, menuMask, DefaultEditorKit.pasteAction);
         bind(component, KeyEvent.VK_C, menuMask, DefaultEditorKit.copyAction);
         bind(component, KeyEvent.VK_X, menuMask, DefaultEditorKit.cutAction);
         bind(component, KeyEvent.VK_A, menuMask, DefaultEditorKit.selectAllAction);

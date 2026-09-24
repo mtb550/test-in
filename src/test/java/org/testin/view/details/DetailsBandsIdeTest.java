@@ -39,7 +39,7 @@ import java.util.UUID;
 public class DetailsBandsIdeTest extends BasePlatformTestCase {
 
     private static final @NotNull String RUN = Bundle.message("details.band.run").toUpperCase(Locale.ROOT);
-    private static final @NotNull String CASE = Bundle.message("details.band.case").toUpperCase(Locale.ROOT);
+    private static final @NotNull String TEST_CASE = Bundle.message("details.band.case").toUpperCase(Locale.ROOT);
     private static final @NotNull UUID ID = UUID.fromString("3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b");
     private static final @NotNull String LAST_STEP = "Login";
     private static final @NotNull String STACKTRACE = """
@@ -93,26 +93,26 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
         return words;
     }
 
-    public void testTheExceptionIsALinkAndNotAValue() {
+    public void testTheStacktraceIsALinkAndNotAValue() {
         final @NotNull List<String> words = shown(Optional.of(failed()));
 
-        assertTrue("the link that opens the exception is missing: " + words, words.contains(Bundle.message("view.stacktrace.link")));
-        assertFalse("the exception itself was drawn on the panel: " + words, holds(words, "java.lang.AssertionError"));
+        assertTrue("the link that opens the stacktrace is missing: " + words, words.contains(Bundle.message("view.stacktrace.link")));
+        assertFalse("the stacktrace itself was drawn on the panel: " + words, holds(words, "java.lang.AssertionError"));
     }
 
     public void testTheRunBandComesBeforeTheTestCaseBand() {
         final @NotNull List<String> words = shown(Optional.of(failed()));
 
         assertTrue("the run band was not drawn for a test case the run holds: " + words, words.contains(RUN));
-        assertTrue("the test case band was not drawn: " + words, words.contains(CASE));
-        assertTrue("the test case band was drawn above the run band", words.indexOf(RUN) < words.indexOf(CASE));
+        assertTrue("the test case band was not drawn: " + words, words.contains(TEST_CASE));
+        assertTrue("the test case band was drawn above the run band", words.indexOf(RUN) < words.indexOf(TEST_CASE));
     }
 
     public void testATestCaseWithNoRunIsDrawnWithNoBandsAtAll() {
         final @NotNull List<String> words = shown(Optional.empty());
 
         assertFalse("the run band was drawn with nothing to put in it: " + words, words.contains(RUN));
-        assertFalse("a band's name was drawn over the only thing on the panel: " + words, words.contains(CASE));
+        assertFalse("a band's name was drawn over the only thing on the panel: " + words, words.contains(TEST_CASE));
         assertTrue("the test case's fields were not drawn: " + words, holds(words, "The dashboard opens"));
     }
 
@@ -123,7 +123,7 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
     public void testTheTestCaseBandIsFoldedWhereARunStandsAboveIt() {
         final @NotNull List<String> words = shown(Optional.of(failed()));
 
-        assertTrue("the test case band's name was not drawn: " + words, words.contains(CASE));
+        assertTrue("the test case band's name was not drawn: " + words, words.contains(TEST_CASE));
         assertFalse("a test case field was drawn while the band was folded: " + words, holds(words, "The dashboard opens"));
         assertFalse("a test case field was drawn while the band was folded: " + words, holds(words, "Accounts"));
     }

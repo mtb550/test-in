@@ -43,8 +43,7 @@ public final class ActionIcons {
         final @NotNull CardHoverAction.Offered run = CardHoverAction.RUN_TEST_METHOD.offer(p, dto);
         final @NotNull CardHoverAction.Offered testCase = CardHoverAction.NAVIGATE_TO_TEST_CASE.offer(p, dto);
 
-        final @NotNull JBPanel<?> actionsPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        actionsPanel.setOpaque(false);
+        final @NotNull JBPanel<?> actionsPanel = AbstractDetails.row(0);
 
         final @NotNull AutomationState automation = Services.getInstance(p, AutomationState.class);
         automation.read(p, List.of(dto), () -> ViewToolWindowFactory.panel(p).ifPresent(ViewPanel::refreshCurrentView));

@@ -59,7 +59,7 @@ public enum Priority {
     private final boolean active;
 
     // Rule-EDITOR-PANEL-247
-    public @NotNull String getChoice() {
+    public @NotNull String getNumberAndWord() {
         return Bundle.message("priority.choice", label, word);
     }
 }

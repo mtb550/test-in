@@ -50,17 +50,15 @@ public final class ScreenshotsSection implements FailureSection {
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145, Rule-EDITOR-PANEL-219
     @Override
     public void applyTo(final @NotNull TestRunItems runItem) {
-        runItem.setScreenshots(shown().stream().map(named::get).toList());
+        runItem.setScreenshots(screenshots().stream().map(named::get).toList());
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
-    public @NotNull List<String> names(final @NotNull Function<List<byte[]>, List<String>> store) {
-        final @NotNull List<byte[]> pasted = shown().stream().filter(png -> !named.containsKey(png)).toList();
+    public void storePasted(final @NotNull Function<List<byte[]>, List<String>> store) {
+        final @NotNull List<byte[]> pasted = screenshots().stream().filter(png -> !named.containsKey(png)).toList();
         final @NotNull List<String> names = store.apply(pasted);
 
         IntStream.range(0, pasted.size()).forEach(index -> named.put(pasted.get(index), names.get(index)));
-
-        return shown().stream().map(named::get).toList();
     }
 
     // Rule-EDITOR-PANEL-202, Rule-EDITOR-PANEL-219
@@ -68,7 +66,7 @@ public final class ScreenshotsSection implements FailureSection {
         component.getComponent().onChange(changed);
     }
 
-    private @NotNull List<byte[]> shown() {
-        return component.getComponent().pictures();
+    private @NotNull List<byte[]> screenshots() {
+        return component.getComponent().screenshots();
     }
 }

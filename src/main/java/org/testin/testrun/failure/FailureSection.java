@@ -25,7 +25,4 @@ public interface FailureSection {
     @NotNull ComponentDialogBase<?> getComponent();
 
     void applyTo(@NotNull TestRunItems runItem);
-
-    default void fillData(final @NotNull TestRunItems runItem) {
-    }
 }

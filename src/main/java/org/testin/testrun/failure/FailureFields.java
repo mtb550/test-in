@@ -22,7 +22,6 @@ import org.testin.model.TestRunItems;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogComponent;
 
-import javax.swing.JComponent;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
@@ -47,15 +46,13 @@ public final class FailureFields {
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145
-    public void applyTo(final @NotNull TestRunItems runItem, final @NotNull List<String> screenshotNames) {
+    public void applyTo(final @NotNull TestRunItems runItem) {
         sections.forEach(section -> section.applyTo(runItem));
-
-        runItem.setScreenshots(screenshotNames);
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
-    public @NotNull List<String> screenshotNames(final @NotNull Function<List<byte[]>, List<String>> store) {
-        return screenshots.names(store);
+    public void storePasted(final @NotNull Function<List<byte[]>, List<String>> store) {
+        screenshots.storePasted(store);
     }
 
     // Rule-EDITOR-PANEL-202, Rule-EDITOR-PANEL-219, Rule-INTERNAL-097
@@ -64,12 +61,7 @@ public final class FailureFields {
         actualResult.growsWith(resized);
     }
 
-    // Rule-EDITOR-PANEL-219
-    public void installPasteOn(final @NotNull JComponent root) {
-        screenshots.getComponent().getComponent().installedOn(root);
-    }
-
-    public @NotNull DialogComponent firstField() {
+    public @NotNull DialogComponent actualResult() {
         return actualResult.getComponent().getComponent();
     }
 }

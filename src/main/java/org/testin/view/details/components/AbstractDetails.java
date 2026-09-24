@@ -24,12 +24,24 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
+import com.intellij.util.ui.JBUI;
+
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 
 public abstract class AbstractDetails {
     // Rule-VIEW-PANEL-080
+    // Rule-VIEW-PANEL-082
+    static @NotNull JBPanel<?> row(final int gap) {
+        final @NotNull JBPanel<?> row = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(gap), 0));
+
+        row.setOpaque(false);
+
+        return row;
+    }
+
     static @NotNull ActionLink link(final @NotNull String text, final @NotNull ActionListener onClick) {
         final @NotNull ActionLink link = new ActionLink(text, onClick);
         link.setAutoHideOnDisable(false);

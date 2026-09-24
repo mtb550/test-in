@@ -29,11 +29,11 @@ import java.awt.GridBagConstraints;
 @RequiredArgsConstructor
 public final class RunAttributeRow extends AbstractDetails {
     private final @NotNull RunEditorAttributes attribute;
-    private final @NotNull TestRunItems item;
+    private final @NotNull TestRunItems runItem;
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-031
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        return addRow(panel, gbc, attribute.getName(), attribute.getRunValueExtractor().apply(item), currentRow);
+        return addRow(panel, gbc, attribute.getName(), attribute.getRunValueExtractor().apply(runItem), currentRow);
     }
 }

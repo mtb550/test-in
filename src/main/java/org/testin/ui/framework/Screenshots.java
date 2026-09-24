@@ -26,15 +26,11 @@ import org.testin.logger.Logger;
 import org.testin.ui.Caption;
 import org.testin.util.ClipboardContents;
 
-import javax.imageio.ImageIO;
 import javax.swing.JComponent;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -55,39 +51,11 @@ public final class Screenshots implements DialogComponent {
         panel.setVisible(!strip.screenshots().isEmpty());
     }
 
-    private static byte @NotNull [] toPng(final @NotNull Image image) {
-        final BufferedImage buffered;
-        if (image instanceof BufferedImage alreadyBuffered) {
-            buffered = alreadyBuffered;
-        } else {
-            final int width = image.getWidth(null);
-            final int height = image.getHeight(null);
-            if (width <= 0 || height <= 0) return new byte[0];
-
-            buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            final @NotNull Graphics2D g = buffered.createGraphics();
-            try {
-                g.drawImage(image, 0, 0, null);
-            } finally {
-                g.dispose();
-            }
-        }
-
-        try {
-            final @NotNull ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ImageIO.write(buffered, "png", out);
-            return out.toByteArray();
-        } catch (final IOException ex) {
-            Logger.error("Could not encode a pasted image as PNG: " + ex.getMessage());
-            return new byte[0];
-        }
-    }
-
     private static boolean onClipboard() {
         return ClipboardContents.withFlavor(DataFlavor.imageFlavor).isPresent();
     }
 
-    public @NotNull List<byte[]> pictures() {
+    public @NotNull List<byte[]> screenshots() {
         return strip.screenshots();
     }
 
@@ -123,7 +91,7 @@ public final class Screenshots implements DialogComponent {
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     private void add(final @NotNull Transferable contents) {
         try {
-            final byte @NotNull [] png = toPng((Image) contents.getTransferData(DataFlavor.imageFlavor));
+            final byte @NotNull [] png = Picture.toPng((Image) contents.getTransferData(DataFlavor.imageFlavor));
             if (png.length > 0) strip.add(png);
         } catch (final UnsupportedFlavorException | IOException ex) {
             Logger.warn("Could not read the pasted image: " + ex.getMessage());

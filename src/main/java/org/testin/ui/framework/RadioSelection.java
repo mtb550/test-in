@@ -74,8 +74,8 @@ public final class RadioSelection<T> implements DialogComponent {
         });
     }
 
-    public void setEditable(final boolean editable) {
-        buttons.values().forEach(radio -> radio.setEnabled(editable));
+    public void setEnabled(final boolean enabled) {
+        buttons.values().forEach(radio -> radio.setEnabled(enabled));
     }
 
     @Override

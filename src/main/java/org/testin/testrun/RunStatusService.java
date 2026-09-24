@@ -121,9 +121,9 @@ public final class RunStatusService {
 
         if (liveItem(p, run.orElseThrow(), runPath, testCaseId).isEmpty()) return false;
 
-        final @NotNull List<String> screenshots = fields.screenshotNames(pasted -> indexer.storeScreenshots(runPath, pasted));
+        fields.storePasted(pasted -> indexer.storeScreenshots(runPath, pasted));
 
-        indexer.changeRun(runPath, current -> current.resultOf(testCaseId).ifPresentOrElse(item -> fields.applyTo(item, screenshots),
+        indexer.changeRun(runPath, current -> current.resultOf(testCaseId).ifPresentOrElse(item -> fields.applyTo(item),
                 () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + testCaseId + " - failure details not recorded")));
 
         return true;

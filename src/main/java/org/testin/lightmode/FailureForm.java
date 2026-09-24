@@ -63,9 +63,10 @@ class FailureForm extends JBPanel<FailureForm> {
             final @NotNull JComponent panel = component.getComponent().getPanel();
             panel.setAlignmentX(LEFT_ALIGNMENT);
             add(panel);
-        }
 
-        fields.installPasteOn(this);
+            // Rule-EDITOR-PANEL-219
+            component.getComponent().installedOn(this);
+        }
 
         remember(this);
         setZoom(zoom);
@@ -97,6 +98,6 @@ class FailureForm extends JBPanel<FailureForm> {
     }
 
     void focusFirstField() {
-        fields.firstField().getFocusComponent().requestFocusInWindow();
+        fields.actualResult().getFocusComponent().requestFocusInWindow();
     }
 }

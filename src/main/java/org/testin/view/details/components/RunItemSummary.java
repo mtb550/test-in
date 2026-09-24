@@ -37,12 +37,11 @@ public final class RunItemSummary extends AbstractDetails {
     private static final int INSETS_TOP = 8;
     private static final int INSETS_SIDE = 16;
 
-    private final @NotNull TestRunItems item;
+    private final @NotNull TestRunItems runItem;
     private final @NotNull List<String> currentPath;
 
     private static @NotNull JBPanel<?> line() {
-        final @NotNull JBPanel<?> line = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(GAP), 0));
-        line.setOpaque(false);
+        final @NotNull JBPanel<?> line = row(GAP);
 
         return line;
     }
@@ -56,7 +55,7 @@ public final class RunItemSummary extends AbstractDetails {
         Badges.showBadges(pills, facts());
         line.add(pills);
 
-        BugIssue.of(p, item, currentPath, dto).ifPresent(line::add);
+        BugIssue.of(p, runItem, currentPath, dto).ifPresent(line::add);
 
         return addFullWidthRow(panel, gbc, line, JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
     }
@@ -64,9 +63,9 @@ public final class RunItemSummary extends AbstractDetails {
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086
     private @NotNull List<Badges.Badge> facts() {
         final @NotNull List<Badges.Badge> badges = new ArrayList<>();
-        badges.add(new Badges.Pill(item.shownStatus().getLabel(), item.shownStatus().getRowColor()));
+        badges.add(new Badges.Pill(runItem.shownStatus().getLabel(), runItem.shownStatus().getRowColor()));
 
-        final @NotNull String duration = RunEditorAttributes.DURATION.getRunValueExtractor().apply(item);
+        final @NotNull String duration = RunEditorAttributes.DURATION.getRunValueExtractor().apply(runItem);
         if (!duration.isBlank()) badges.add(Badges.createDurationBadge(duration));
 
         return badges;

@@ -62,12 +62,12 @@ public class DetailsTab {
     final double SPACER_WEIGHT_Y = 1.0;
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-061, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-086
-    private static @NotNull Band runBand(final @NotNull TestRunItems item, final @NotNull List<String> currentPath) {
+    private static @NotNull Band runBand(final @NotNull TestRunItems runItem, final @NotNull List<String> currentPath) {
         return Band.of(Bundle.message("details.band.run"), List.of(
-                new RunItemSummary(item, currentPath),
-                new RunAttributeRow(RunEditorAttributes.ACTUAL_RESULT, item),
-                new StacktraceLine(item, currentPath),
-                new AttributeRow(RunEditorAttributes.EXECUTED_BY.getName(), (_, _) -> Display.whoAndWhen(item.getExecutedBy(), item.getExecutedAt()))));
+                new RunItemSummary(runItem, currentPath),
+                new RunAttributeRow(RunEditorAttributes.ACTUAL_RESULT, runItem),
+                new StacktraceLine(runItem, currentPath),
+                new AttributeRow(RunEditorAttributes.EXECUTED_BY.getName(), (_, _) -> Display.whoAndWhen(runItem.getExecutedBy(), runItem.getExecutedAt()))));
     }
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-087
@@ -141,8 +141,8 @@ public class DetailsTab {
     private @NotNull List<AbstractDetails> detailRows(final @NotNull Optional<TestRunItems> runItem, final @NotNull List<String> currentPath) {
         final @NotNull List<AbstractDetails> rows = new ArrayList<>(List.of(new Breadcrumb(currentPath), new Title(), new BadgesAndActions()));
 
-        runItem.ifPresentOrElse(item -> {
-            rows.add(runBand(item, currentPath));
+        runItem.ifPresentOrElse(shown -> {
+            rows.add(runBand(shown, currentPath));
             rows.add(Band.folding(Bundle.message("details.band.case"), TEST_CASE_OPEN, testCaseFields()));
         }, () -> rows.addAll(testCaseFields()));
 

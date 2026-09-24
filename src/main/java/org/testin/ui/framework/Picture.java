@@ -28,8 +28,10 @@ import org.testin.logger.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -41,6 +43,19 @@ public final class Picture implements DialogComponent {
     Picture(final byte @NotNull [] png) {
         panel = new JBScrollPane(new JBLabel(read(png).<Icon>map(JBImageIcon::new).orElse(EmptyIcon.ICON_0)));
         panel.setBorder(JBUI.Borders.empty());
+    }
+
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
+    public static byte @NotNull [] toPng(final @NotNull Image image) {
+        try {
+            final @NotNull ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ImageIO.write(ImageUtil.toBufferedImage(image), "png", out);
+
+            return out.toByteArray();
+        } catch (final IOException ex) {
+            Logger.error("Could not encode a pasted image as PNG: " + ex.getMessage());
+            return new byte[0];
+        }
     }
 
     static @NotNull Optional<BufferedImage> read(final byte @NotNull [] png) {

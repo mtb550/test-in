@@ -35,8 +35,7 @@ public final class TestCaseBadges {
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-085
     public static @NotNull JComponent of(final @NotNull Project p, final @NotNull TestCaseDto dto) {
-        final @NotNull JBPanel<?> badgesPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
-        badgesPanel.setOpaque(false);
+        final @NotNull JBPanel<?> badgesPanel = AbstractDetails.row(FLOW_GAP);
 
         final @NotNull List<Badges.Badge> badges = Badges.testCaseBadges(dto);
 

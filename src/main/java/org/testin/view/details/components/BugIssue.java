@@ -50,25 +50,24 @@ public final class BugIssue {
     private static final int LINK_GAP = 10;
 
     // UC-VIEW-PANEL-005, UC-VIEW-PANEL-016, Rule-VIEW-PANEL-031, Rule-VIEW-PANEL-086
-    public static @NotNull Optional<JComponent> of(final @NotNull Project p, final @NotNull TestRunItems item, final @NotNull List<String> currentPath, final @NotNull TestCaseDto dto) {
-        final @NotNull Optional<String> bugIssue = item.bugIssue();
-        if (item.shownStatus() != TestStatus.FAILED && bugIssue.isEmpty()) return Optional.empty();
+    public static @NotNull Optional<JComponent> of(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull List<String> currentPath, final @NotNull TestCaseDto dto) {
+        final @NotNull Optional<String> bugIssue = runItem.bugIssue();
+        if (runItem.shownStatus() != TestStatus.FAILED && bugIssue.isEmpty()) return Optional.empty();
 
         return Services.getInstance(p, ProjectIndexer.class).find(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
                 .filter(TestRunDirectoryDto.class::isInstance)
                 .map(TestRunDirectoryDto.class::cast)
-                .map(runDirectory -> drawn(p, item, dto, bugIssue, runDirectory));
+                .map(runDirectory -> drawn(p, runItem, dto, bugIssue, runDirectory));
     }
 
     // UC-VIEW-PANEL-005, UC-VIEW-PANEL-016, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075, Rule-VIEW-PANEL-086
-    private static @NotNull JComponent drawn(final @NotNull Project p, final @NotNull TestRunItems item, final @NotNull TestCaseDto dto, final @NotNull Optional<String> bugIssue, final @NotNull TestRunDirectoryDto runDirectory) {
-        final @NotNull JBPanel<?> line = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(LINK_GAP), 0));
-        line.setOpaque(false);
+    private static @NotNull JComponent drawn(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull TestCaseDto dto, final @NotNull Optional<String> bugIssue, final @NotNull TestRunDirectoryDto runDirectory) {
+        final @NotNull JBPanel<?> line = AbstractDetails.row(LINK_GAP);
 
-        chip(item).ifPresent(line::add);
+        chip(runItem).ifPresent(line::add);
         bugIssue.ifPresentOrElse(
                 url -> line.add(issue(url)),
-                () -> line.add(report(p, item, dto, runDirectory)));
+                () -> line.add(report(p, runItem, dto, runDirectory)));
 
         return line;
     }
@@ -83,12 +82,12 @@ public final class BugIssue {
     }
 
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075
-    private static @NotNull ActionLink report(final @NotNull Project p, final @NotNull TestRunItems item, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto runDirectory) {
+    private static @NotNull ActionLink report(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto runDirectory) {
         final @NotNull Optional<String> off = Services.getInstance(p, BugReports.class)
-                .whyReportBugIsOff(new BugReports.RunItem(runDirectory.getPath(), item.getId()), item);
+                .whyReportBugIsOff(new BugReports.RunItem(runDirectory.getPath(), runItem.getId()), runItem);
 
         final @NotNull ActionLink report = AbstractDetails.link(Bundle.message("bug.dialog.title"),
-                _ -> ReportBug.start(p, runDirectory, item.getId(), dto, () -> redraw(p, dto, runDirectory)));
+                _ -> ReportBug.start(p, runDirectory, runItem.getId(), dto, () -> redraw(p, dto, runDirectory)));
 
         report.setEnabled(off.isEmpty());
         report.setToolTipText(off.orElse(""));
@@ -97,15 +96,14 @@ public final class BugIssue {
     }
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086
-    private static @NotNull Optional<JComponent> chip(final @NotNull TestRunItems item) {
+    private static @NotNull Optional<JComponent> chip(final @NotNull TestRunItems runItem) {
         final @NotNull List<Badges.Badge> bug = new ArrayList<>();
-        Badges.addBugBadge(bug, item.getBugSeverity().getLabel(), item.getBugSeverity().getColor());
-        Badges.addBugBadge(bug, item.getBugPriority().getLabel(), item.getBugSeverity().getColor());
+        Badges.addBugBadge(bug, runItem.getBugSeverity().getLabel(), runItem.getBugSeverity().getColor());
+        Badges.addBugBadge(bug, runItem.getBugPriority().getLabel(), runItem.getBugSeverity().getColor());
 
         if (bug.isEmpty()) return Optional.empty();
 
-        final @NotNull JBPanel<?> holder = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        holder.setOpaque(false);
+        final @NotNull JBPanel<?> holder = AbstractDetails.row(0);
         Badges.showBadges(holder, bug);
 
         return Optional.of(holder);

@@ -18,6 +18,7 @@ package org.testin.ui.framework;
 
 import com.intellij.ui.components.fields.ExtendableTextField;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -194,11 +195,11 @@ public class FrameworkComponentsTest {
     @Test
     public void theScreenshotsRowHoldsThePicturesAndIsNotDrawnWithoutOne() {
         final byte[] screenshot = {1, 2, 3};
-        final Screenshots shown = ComponentDialogBase.screenshots("Screenshots", List.of(screenshot)).getComponent();
+        final Screenshots shown = ComponentDialogBase.screenshots(Bundle.message("dialog.failure.caption.screenshots"), List.of(screenshot)).getComponent();
 
-        assertEquals(shown.pictures(), List.of(screenshot), "a picture comes back as it was given, even one that cannot be drawn");
+        assertEquals(shown.screenshots(), List.of(screenshot), "a picture comes back as it was given, even one that cannot be drawn");
         assertTrue(shown.getPanel().isVisible(), "a row holding a picture is drawn");
-        assertFalse(ComponentDialogBase.screenshots("Screenshots", List.of()).getComponent().getPanel().isVisible(),
+        assertFalse(ComponentDialogBase.screenshots(Bundle.message("dialog.failure.caption.screenshots"), List.of()).getComponent().getPanel().isVisible(),
                 "a failure with no screenshot draws no Screenshots row at all, and no gap where one would be");
     }
 

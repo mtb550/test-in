@@ -38,6 +38,7 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
     }
 
     // Rule-INTERNAL-097
+    @Override
     public void enableMultiLine(final @NotNull TestCaseBaseDialog base, final @NotNull Runnable onSave) {
         field.enableMultiLine(base, onSave);
     }
