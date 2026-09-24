@@ -22,7 +22,9 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testcase.TestEditorAttributes;
 
@@ -30,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Hits {
@@ -43,10 +46,13 @@ public final class Hits {
         final @NotNull List<DirectoryDto> nodes = wanted.isEmpty() ? everywhereToGo(indexer) : nodesNamed(indexer, wanted);
         final @NotNull List<TestCaseDto> testCases = testCasesMatching(indexer, wanted);
 
+        final @NotNull List<Hit> inTestRuns = inTestRuns(indexer, testCases);
+
         final @NotNull List<Hit> found = new ArrayList<>(nodes.stream().limit(SHOWN).map(Hit::of).toList());
         found.addAll(topTestCases(testCases, wanted, SHOWN - found.size()));
+        found.addAll(inTestRuns.stream().limit(Math.max(SHOWN - found.size(), 0)).toList());
 
-        return new Found(List.copyOf(found), nodes.size() + testCases.size());
+        return new Found(List.copyOf(found), nodes.size() + testCases.size() + inTestRuns.size());
     }
 
     private static @NotNull List<DirectoryDto> everywhereToGo(final @NotNull ProjectIndexer indexer) {
@@ -69,6 +75,27 @@ public final class Hits {
         return indexer.getAllTestCases().stream()
                 .filter(tc -> TestEditorAttributes.anyContains(tc, wanted))
                 .toList();
+    }
+
+    // UC-INTERNAL-001, Rule-INTERNAL-098
+    private static @NotNull List<Hit> inTestRuns(final @NotNull ProjectIndexer indexer, final @NotNull List<TestCaseDto> testCases) {
+        if (testCases.isEmpty()) return List.of();
+
+        final @NotNull List<Hit> rows = new ArrayList<>();
+
+        for (final DirectoryDto node : indexer.getAllNodes()) {
+            if (!(node instanceof TestRunDirectoryDto)) continue;
+
+            final @NotNull Optional<TestRunDto> recorded = indexer.findTestRun(node.getPath());
+            if (recorded.isEmpty()) continue;
+
+            testCases.stream()
+                    .filter(tc -> recorded.orElseThrow().resultOf(tc.getId()).isPresent())
+                    .map(tc -> Hit.of(tc, node))
+                    .forEach(rows::add);
+        }
+
+        return List.copyOf(rows);
     }
 
     private static @NotNull List<Hit> topTestCases(final @NotNull List<TestCaseDto> testCases, final @NotNull String wanted, final int room) {

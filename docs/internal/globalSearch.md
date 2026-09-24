@@ -59,6 +59,12 @@ This is the fastest way to reach one test set, one test run or one test case.
   was typed. That is not how many it shows: the list stops at fifty.
 - **Rule-INTERNAL-074** — Nothing in a search row is lined up into a column.
   The path sits against the name it belongs to, whatever length the name is.
+- **Rule-INTERNAL-098** — A test case id also finds the test runs that ran it:
+  one row for each test run holding a verdict for a test case that matched,
+  after the test cases themselves. The row carries the test run's icon and the
+  test run's path, because Rule-INTERNAL-072 says the icon is the tree's icon
+  for the node the row opens, and the path is what tells one run from another. A
+  run that does not cover the test case is not a row.
 
 The tree panel's own rules do not govern this dialog. It opens from anywhere in
 the IDE, and the tree is only where it lands.
@@ -78,6 +84,8 @@ the IDE, and the tree is only where it lands.
 │         Demo > Test Runs > Sprint 7 > cycle-2                              │
 │  [tc]   Sign in with a correct username and password             (3)       │
 │         Demo > Test Cases > Accounts > Login                               │
+│  [run]  Sign in with a correct username and password             (4)       │
+│         Demo > Test Runs > Sprint 7 > cycle-2                              │
 │                                                                            │
 ├────────────────────────────────────────────────────────────────────────────┤
 │  Enter Go To    ↑ ↓ Select    Escape Cancel                                │
@@ -95,7 +103,11 @@ the IDE, and the tree is only where it lands.
    the field changes to the icon of whichever row is selected.
 3. **Nothing is lined up into columns.** The path sits against the name it
    belongs to, whatever length the name is.
-4. **At most 50 rows in all.** Nodes are taken first, so 50 matching nodes leave
+4. **A test run that ran it.** Searching a test case id lists the test case,
+   then one row for every test run that recorded a verdict for it. The row reads
+   the same as the test case's own, so the path under it is what says which run
+   it was, and the icon is the test run's.
+5. **At most 50 rows in all.** Nodes are taken first, so 50 matching nodes leave
    no room for test cases. The count beside the field is what matched, so a
    common word reads *612 found* over a list of fifty — which is how the tester
    can tell there is more. The top row is selected as soon as the list refills,
@@ -110,13 +122,17 @@ the IDE, and the tree is only where it lands.
 3. The tester types.
 4. Testin lists every node whose name holds what was typed, from the first
    character on. It lists test cases from the second character on. Nodes come
-   first, shortest name first. Test cases come after them.
+   first, shortest name first. Test cases come after them, and after those, a
+   row for every test run holding a verdict for a test case that matched.
 5. The tester moves with `↑` `↓` and presses `Enter`, or clicks a row.
 6. The panel comes forward, and the tree expands to that node and selects it.
 7. A test set or a test run opens in its editor. Any other node is only revealed
    in the tree.
 8. A test case opens its test set's editor with that test case selected, and
    fills the view panel on the right with it.
+9. A test run row opens that test run's editor instead, with the same test case
+   selected, so the panel shows what that run recorded rather than the test
+   case alone.
 
 ## What Testin refuses
 
