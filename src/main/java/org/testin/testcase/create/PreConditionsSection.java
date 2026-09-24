@@ -17,21 +17,34 @@
 package org.testin.testcase.create;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 
-public class PreConditionsSection extends AbstractOneLineSection {
+import javax.swing.JComponent;
+
+// Rule-EDITOR-PANEL-032, Rule-INTERNAL-097
+public class PreConditionsSection extends AbstractMultiLineSection {
     public PreConditionsSection(final @NotNull Project p) {
-        super(SpellChecker.createField(p), CreateTestCaseFields.PRE_CONDITIONS, Shortcuts.CreateTestCasePreConditions);
+        super(p, SpellChecker.createField(p), CreateTestCaseFields.PRE_CONDITIONS);
     }
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
         dto.setPreConditions(field.getText().trim());
+    }
+
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-028
+    @Override
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction) {
+        base.registerShortcut(mainPanel, Shortcuts.CreateTestCasePreConditions.getCustomShortcut(), () -> {
+            showSection(slot);
+            repackAction.run();
+        });
     }
 
     @Override

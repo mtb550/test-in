@@ -192,13 +192,14 @@ public class FrameworkComponentsTest {
     }
 
     @Test
-    public void aTextAreaTakingImagesKeepsTheScreenshotsBesideTheText() {
+    public void theScreenshotsRowHoldsThePicturesAndIsNotDrawnWithoutOne() {
         final byte[] screenshot = {1, 2, 3};
-        final TextArea area = ComponentDialogBase.textArea().value("boom").images(List.of(screenshot)).build().getComponent();
+        final Screenshots shown = ComponentDialogBase.screenshots("Screenshots", List.of(screenshot)).getComponent();
 
-        assertEquals(area.getText(), "boom", "the box holds the text only (#50)");
-        assertEquals(area.getImages(), List.of(screenshot), "and the screenshot comes back as it was given, even one that cannot be drawn");
-        assertEquals(ComponentDialogBase.textArea().value("x").build().getComponent().getImages(), List.of(), "a box that takes none answers none");
+        assertEquals(shown.pictures(), List.of(screenshot), "a picture comes back as it was given, even one that cannot be drawn");
+        assertTrue(shown.getPanel().isVisible(), "a row holding a picture is drawn");
+        assertFalse(ComponentDialogBase.screenshots("Screenshots", List.of()).getComponent().getPanel().isVisible(),
+                "a failure with no screenshot draws no Screenshots row at all, and no gap where one would be");
     }
 
     @Test

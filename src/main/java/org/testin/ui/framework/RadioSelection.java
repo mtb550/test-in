@@ -27,12 +27,15 @@ import org.testin.util.Fonts;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
 import javax.swing.JRadioButton;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public final class RadioSelection<T> implements DialogComponent {
     private final @NotNull JBPanel<?> panel;
     private final @NotNull JRadioButton firstButton;
+    private final @NotNull Map<T, JRadioButton> buttons = new LinkedHashMap<>();
     private @NotNull T selected;
 
     RadioSelection(final @NotNull String caption, final @NotNull List<Option<T>> options, final @NotNull T initial) {
@@ -52,6 +55,7 @@ public final class RadioSelection<T> implements DialogComponent {
             radio.addActionListener(_ -> selected = option.value());
             group.add(radio);
             radioRow.add(radio);
+            buttons.put(option.value(), radio);
             if (first.isEmpty()) first = Optional.of(radio);
         }
         this.firstButton = first.orElseThrow();
@@ -62,6 +66,17 @@ public final class RadioSelection<T> implements DialogComponent {
 
     public @NotNull T getSelected() {
         return selected;
+    }
+
+    public void select(final @NotNull T value) {
+        Optional.ofNullable(buttons.get(value)).ifPresent(radio -> {
+            radio.setSelected(true);
+            selected = value;
+        });
+    }
+
+    public void setEditable(final boolean editable) {
+        buttons.values().forEach(radio -> radio.setEnabled(editable));
     }
 
     @Override

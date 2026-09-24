@@ -98,7 +98,7 @@ in front of them while they write down what actually happened.
 │   ( P1 ) ( Smoke )          [ go to code ] [ run ] [ tc ]                  │
 │                                                                            │
 │   EXECUTION RESULT ──────────────────────────────────────────────────────  │
-│   ( Failed ) ( 02:14 ) ( Blocker / High )  mtb550/x#123  Report a bug      │
+│   ( Failed ) ( 02:14 ) ( Blocker / High )  #123                            │
 │   ACTUAL RESULT                                                            │
 │   The session was dropped.                                                 │
 │   Stacktrace                                                               │

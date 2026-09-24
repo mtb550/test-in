@@ -65,6 +65,8 @@ class FailureForm extends JBPanel<FailureForm> {
             add(panel);
         }
 
+        fields.installPasteOn(this);
+
         remember(this);
         setZoom(zoom);
     }

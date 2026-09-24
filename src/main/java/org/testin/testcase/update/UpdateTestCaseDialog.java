@@ -23,6 +23,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testcase.UpdateTestCaseFields;
+import org.testin.testcase.create.AbstractMultiLineSection;
 import org.testin.testcase.create.AbstractMultiValueSection;
 import org.testin.testcase.create.CreateTestCaseSection;
 import org.testin.testcase.create.DescriptionSection;
@@ -83,8 +84,9 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         title = Bundle.message("update.dialog.title.field", selectedItem.getName());
         components = List.of(ComponentDialogBase.of(form));
 
-        expectedResultSection.enableMultiLine(this, this::submit);
-        testDataSection.enableMultiLine(this, this::submit);
+        getAllSections().stream()
+                .filter(AbstractMultiLineSection.class::isInstance)
+                .forEach(section -> ((AbstractMultiLineSection) section).enableMultiLine(this, this::submit));
 
         registerShortcut(keys, Shortcuts.Enter.getCustomShortcut(), this::submit);
 

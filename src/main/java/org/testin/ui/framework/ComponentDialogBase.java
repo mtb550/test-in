@@ -81,6 +81,11 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         return new TextAreaBuilder();
     }
 
+    // Rule-EDITOR-PANEL-219
+    public static @NotNull ComponentDialogBase<Screenshots> screenshots(final @NotNull String caption, final @NotNull List<byte[]> stored) {
+        return new ComponentDialogBase<>(new Screenshots(caption, stored));
+    }
+
     public static @NotNull ComponentDialogBase<Picture> picture(final byte @NotNull [] png) {
         return new ComponentDialogBase<>(new Picture(png));
     }
@@ -173,9 +178,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         private @NotNull String placeholder = "";
         private @NotNull String value = "";
         private int rows = 5;
-        private boolean acceptsImages = false;
         private boolean readOnly = false;
-        private @NotNull List<byte[]> images = List.of();
 
         public @NotNull TextAreaBuilder caption(final @NotNull String caption) {
             this.caption = caption;
@@ -203,14 +206,8 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             return this;
         }
 
-        public @NotNull TextAreaBuilder images(final @NotNull List<byte[]> images) {
-            this.acceptsImages = true;
-            this.images = images;
-            return this;
-        }
-
         public @NotNull ComponentDialogBase<TextArea> build() {
-            return new ComponentDialogBase<>(new TextArea(caption, placeholder, value, rows, acceptsImages, readOnly, images));
+            return new ComponentDialogBase<>(new TextArea(caption, placeholder, value, rows, readOnly));
         }
     }
 

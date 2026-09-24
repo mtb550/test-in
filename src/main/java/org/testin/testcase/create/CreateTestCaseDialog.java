@@ -64,8 +64,9 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
         components = List.of(ComponentDialogBase.of(form));
         resizable = true;
 
-        expectedResultSection.enableMultiLine(this, this::submit);
-        testDataSection.enableMultiLine(this, this::submit);
+        getAllSections().stream()
+                .filter(AbstractMultiLineSection.class::isInstance)
+                .forEach(section -> ((AbstractMultiLineSection) section).enableMultiLine(this, this::submit));
 
         registerShortcut(keys, Shortcuts.Enter.getCustomShortcut(), this::submit);
 

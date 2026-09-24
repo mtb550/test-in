@@ -81,10 +81,13 @@ public class OpenBugsTab {
         return label;
     }
 
+    // Rule-VIEW-PANEL-075
     private static @NotNull ActionLink issue(final @NotNull String url) {
         final @NotNull ActionListener open = _ -> BugIssueUrl.open(url);
-        final @NotNull ActionLink link = new ActionLink(BugIssueUrl.reference(url), open);
+        final @NotNull ActionLink link = new ActionLink(BugIssueUrl.shortReference(url), open);
+
         link.setFont(Fonts.body());
+        link.setToolTipText(url);
 
         return link;
     }

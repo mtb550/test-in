@@ -427,6 +427,8 @@ back. A failure nobody described is a failure nobody can act on.
 │  │ paste error or exception or screenshot…                              │  │
 │  │                                                                      │  │
 │  └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                            │
+│  SCREENSHOTS                                                               │
 │   ┌────────┐x                                                              │
 │   │ picture│                                                               │
 │   └────────┘                                                               │
@@ -481,12 +483,16 @@ once and shared with the run editor's own dialog, so the same four fields can
 never end up looking different in the two places. The choices come from one
 list each, so a new severity or priority appears here on its own.
 
-### 16. Ctrl+V belongs here and nowhere else
+### 16. Ctrl+V reads the clipboard, not the cursor
 
-The field says so, rather than the status bar. Its gray hint text reads *"paste
-error or exception or screenshot…"*. That is the same sentence, in the place
-the tester is already looking. A pasted screenshot shows as a small picture
-under the box, never as letters in it, and its **x** takes it out.
+The form answers one paste gesture and the clipboard decides what it means: a
+picture becomes a screenshot, and anything else is text in whichever box has the
+cursor. The error box still says so in its gray hint text, *"paste error or
+exception or screenshot…"*, because that is where a tester is already looking -
+but the gesture is not tied to that box, so a screenshot arrives wherever they
+happen to be typing. A pasted screenshot shows as a small picture in a
+**Screenshots** row, never as letters, and its **x** takes it out. The row is
+there only while it holds a picture.
 
 This removes a way to lose work. Passing a test case clears everything recorded
 about a failure on it. So pasting evidence onto a test case and then pressing
@@ -642,7 +648,7 @@ that is the tester's hand on the edge, not a state change.
 | **Stop**                                       | Ends the execution flow. The test run keeps every verdict already recorded. Only the clock stops.                                                                                                                                                                                                                                                                                                                            |
 | **`P` / `B`**                                  | Records the verdict on the current test case. Advances to the next test case that has not been judged.                                                                                                                                                                                                                                                                                                                       |
 | **`F`**                                        | Opens the failure capture in place. `Enter` saves and advances. `Escape` returns, with the test case still unjudged.                                                                                                                                                                                                                                                                                                         |
-| **`Ctrl+V`**                                   | Pastes text into the error box, or adds an image as a picture under it, on the failure form. It does nothing when no failure form is open, so evidence cannot be attached to a test case that is about to be passed and cleared.                                                                                                                                                                                             |
+| **`Ctrl+V`**                                   | On the failure form: a picture on the clipboard is added as a screenshot, wherever the cursor is, and anything else is pasted as text into the box that has it. It does nothing when no failure form is open, so evidence cannot be attached to a test case that is about to be passed and cleared.                                                                                                                           |
 | **`Escape`**                                   | Closes the window. The test run is untouched. Reopening returns to the first unjudged test case.                                                                                                                                                                                                                                                                                                                             |
 | **`Ctrl+D`**                                   | Shows the detail fields, or hides them when they are shown.                                                                                                                                                                                                                                                                                                                                                                  |
 | **`F5`**, or **Run Test Method**               | Runs the test case on screen's generated method, claiming it for this test run first. While it runs, the button is **Stop Test Method** and `F5` stops it. The status that comes back is the verdict, and the walk moves on. The key is the one the IDE's keymap gives Run Test Method.                                                                                                                                      |

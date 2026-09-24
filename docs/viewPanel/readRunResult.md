@@ -56,7 +56,7 @@ badges and above **Test case** (Rule-VIEW-PANEL-085).
 │   ( P1 ) ( Smoke )        [ go to code ] [ run ] [ tc ]                  │
 │                                                                          │
 │   EXECUTION RESULT ────────────────────────────────────────────────────  │
-│   ( Failed ) ( 02:14 ) ( Blocker / High )  mtb550/x#123  Report a bug    │
+│   ( Failed ) ( 02:14 ) ( Blocker / High )  #123                          │
 │   ACTUAL RESULT                                                          │
 │   The session was dropped.                                               │
 │   Stacktrace                                                             │
@@ -76,8 +76,8 @@ badges and above **Test case** (Rule-VIEW-PANEL-085).
 3. **The duration** — a clock and the time, in a plain frame with nothing
    filled in. It is a measurement, not a verdict, and the frame says so.
 4. **The bug** — one chip carrying the severity and the priority together, in
-   the severity's color, then the issue as `owner/repo#123` and **Report a
-   bug**.
+   the severity's color, then the issue as `#123` - the whole address is on
+   hover - or **Report a bug** where there is no issue yet.
 5. **Actual result** — the one sentence the band holds, its caption on a line of
    its own above it (Rule-VIEW-PANEL-082).
 6. **Stacktrace** — the application's own error, which the panel never shows.
@@ -98,7 +98,7 @@ badges and above **Test case** (Rule-VIEW-PANEL-085).
 | The first badge   | The verdict: **Passed**, **Failed**, **Blocked**, **Pending**, **Untested** or **Removed**, in the verdict's own color                                                                                                               |
 | The second badge  | How long the test case took, with a clock, in a plain frame with nothing filled in                                                                                                                                                   |
 | The bug chip      | The severity and the priority in one chip, as `Blocker / High`, in the severity's color                                                                                                                                              |
-| After the chip    | The GitHub issue the failure was reported as, as `owner/repo#123`, and the **Report a bug** link that files one. That is [UC-VIEW-PANEL-016](reportBug.md). Drawn for a failed test case, and for any test case that has been reported |
+| After the chip    | The GitHub issue the failure was reported as, as `#123` with the address on hover — or, where nothing has been reported, the **Report a bug** link that files one, never both. That is [UC-VIEW-PANEL-016](reportBug.md) |
 | **Actual Result** | What the tester says actually happened                                                                                                                                                                                              |
 | **Stacktrace**    | A link, never the error itself, and a thumbnail of each screenshot pasted with the failure. That is [UC-VIEW-PANEL-006](readStacktrace.md)                                                                                           |
 | **Executed By**   | Who ran it and when, as `muteb on 7 January 10:05`, last in the band. One row, not two — the date has no caption of its own (Rule-VIEW-PANEL-061)                                                                                    |

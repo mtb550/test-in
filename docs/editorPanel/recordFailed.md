@@ -49,10 +49,12 @@ form before it records anything.
   bug priority at **Low**.
 - **Rule-EDITOR-PANEL-148** — The four fields are the same four the failure form
   in light mode uses.
-- **Rule-EDITOR-PANEL-219** — A screenshot pasted into the error box shows as a
-  small picture under it, never as letters. It is kept as a picture file beside
-  the test run, in the order it was pasted, and the button on its picture is the
-  one way to take it out.
+- **Rule-EDITOR-PANEL-219** — A picture on the clipboard is a screenshot wherever
+  it is pasted in the failure form, and never letters; anything else on the
+  clipboard pastes as text into whichever box has the cursor. The pictures are a
+  **Screenshots** row of their own, which is there only while there is a picture
+  to show. Each is kept as a picture file beside the test run, in the order it
+  was pasted, and the button on its picture is the one way to take it out.
 - **Rule-EDITOR-PANEL-221** — What actually happened is spell checked as the
   tester types, in the failure dialog and in light mode's form. A misspelled
   word is underlined, Alt+Enter offers the corrections, and nothing is changed
@@ -94,6 +96,8 @@ form before it records anything.
 │  │ java.lang.AssertionError: expected [true]              │  │
 │  │   at org.testin.demo.LoginTest.valid(LoginTest:41)     │  │
 │  └────────────────────────────────────────────────────────┘  │
+│                                                              │
+│  SCREENSHOTS                                                 │
 │   ┌────────┐x  ┌────────┐x                                   │
 │   │ picture│   │ picture│                                    │
 │   └────────┘   └────────┘                                    │
@@ -117,10 +121,13 @@ form before it records anything.
 5. **The big box** — for the error or the exception, as text. Its caption above
    it reads **Stacktrace**, and its gray hint reads *paste error or exception or
    screenshot…*.
-6. **The pictures under it** — one small picture for each screenshot pasted
-   with `Ctrl+V`, in the order they were pasted: the screenshot itself, 48
-   pixels high. Its **x** takes that screenshot out. No picture is ever written
-   into the box as letters.
+6. **Screenshots** — one small picture for each screenshot pasted with `Ctrl+V`,
+   in the order they were pasted: the screenshot itself, 48 pixels high. Its
+   **x** takes that screenshot out, and the row disappears with the last of them.
+   The row is not there at all until the first picture arrives, so a failure
+   without one shows no caption and no gap. `Ctrl+V` adds a picture wherever the
+   cursor is, because the clipboard decides: a picture is a screenshot and
+   anything else is text (Rule-EDITOR-PANEL-219).
 7. There is no button. `Enter` saves and `Escape` cancels.
 
 ## Main flow

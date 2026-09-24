@@ -57,6 +57,11 @@ This is how every test case in Testin begins.
   using it. An open suggestion list takes Enter and Escape; every other key
   reaches the field underneath, which is what lets CTRL+ENTER add a line while
   the list is up.
+- **Rule-EDITOR-PANEL-247** — Priority is radio buttons, not a list, so a tester
+  sees every choice at once and picks one in a single click. Each reads its
+  number and its word - P3 (Low), P2 (Medium), P1 (High) - because a number
+  alone says nothing about which end is urgent, and the lowest is chosen to
+  start with.
 
 ## The screen
 
@@ -92,7 +97,7 @@ This is how every test case in Testin begins.
 | Expected Result | `Ctrl+E` | *set expected result*                              |
 | Module          | `Ctrl+M` | *set module*                                       |
 | Steps           | `Ctrl+S` | *set step*, then the number                        |
-| Priority        | `Ctrl+P` | none, it is a list                                 |
+| Priority        | `Ctrl+P` | none, it is three radio buttons                    |
 | Group           | `Ctrl+G` | *set group*, completing what the project uses      |
 | Test Data       | `Ctrl+T` | *set test data*                                    |
 | Pre Conditions  | `Ctrl+B` | *set preconditions*                                |
@@ -103,6 +108,11 @@ shows B. The same icon marks the field's values in its completion list.
 Description, Expected Result, Module, Steps and Group complete the values Testin
 knows. [When that list changes](refreshEditor.md#what-completion-and-the-group-filter-offer)
 is written on the refresh page.
+
+**Expected Result, Test Data and Pre Conditions hold many lines.** They are the
+three fields a tester writes sentences into, so each is the same growing box:
+`Ctrl+Enter` adds a line, `Enter` still saves, and the dialog grows with the box
+rather than scrolling inside it (Rule-INTERNAL-097).
 
 ## Main flow
 

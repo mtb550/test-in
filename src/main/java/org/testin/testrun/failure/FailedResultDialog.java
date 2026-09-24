@@ -43,6 +43,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog {
         final @NotNull TestCaseDto tc = runItem.shownTestCase();
 
         fields = new FailureFields(p, runPath, runItem);
+        fields.onResized(this::refit);
 
         title = Bundle.message("dialog.failed.result.title");
 

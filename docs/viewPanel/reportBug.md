@@ -64,9 +64,11 @@ the Details tab.
   address was not stored. A completed or closed test run takes the address too.
   It is the one change a signed-off test run accepts, because it changes no
   verdict.
-- **Rule-VIEW-PANEL-075** — A reported test case shows its issue as
-  `owner/repo#123`. It is a link, and it opens the issue in the browser.
-- **Rule-VIEW-PANEL-076** — Every screenshot pasted into the error is attached
+- **Rule-VIEW-PANEL-075** — A reported test case shows its issue as `#123`, the
+  number and nothing else, with the whole address on hover. It is a link, and it
+  opens the issue in the browser. The repository is not repeated on every row:
+  `testin.yml` names one, and a tester reading a run already knows which.
+- **Rule-VIEW-PANEL-076** — Every screenshot pasted with the failure is attached
   to the issue and shown under **Screenshots**. The error's text is folded under
   its first line.
 - **Rule-VIEW-PANEL-077** — Edits that were not sent are kept for the test case
@@ -88,9 +90,9 @@ Before the test case is reported:
 After:
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│   ( Failed )  ( 02:14 )  ( Blocker / High )  mtb550/x#123  Report Bug   │
-└─────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│   ( Failed )  ( 02:14 )  ( Blocker / High )  #123            │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 1. **The chip** — the severity and the priority in one, in the severity's color.
@@ -98,8 +100,10 @@ After:
    half a sentence (Rule-VIEW-PANEL-086).
 2. **Report Bug** — prepares the bug and opens it. It is gray, with the reason on
    hover, whenever Rule-VIEW-PANEL-072 says so.
-3. **`owner/repo#123`** — the issue this test case was reported as. Clicking it
-   opens the issue in the browser.
+3. **`#123`** — the issue this test case was reported as, with the whole address
+   on hover. Clicking it opens the issue in the browser. It stands where
+   **Report Bug** was, because once a bug is reported there is nothing left to
+   report (Rule-VIEW-PANEL-072).
 
 ## The Report Bug dialog
 

@@ -66,10 +66,20 @@ public final class BugIssue {
         line.setOpaque(false);
 
         chip(item).ifPresent(line::add);
-        bugIssue.ifPresent(url -> line.add(AbstractDetails.link(BugIssueUrl.reference(url), _ -> BugIssueUrl.open(url))));
-        line.add(report(p, item, dto, runDirectory));
+        bugIssue.ifPresentOrElse(
+                url -> line.add(issue(url)),
+                () -> line.add(report(p, item, dto, runDirectory)));
 
         return line;
+    }
+
+    // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-075
+    private static @NotNull ActionLink issue(final @NotNull String url) {
+        final @NotNull ActionLink link = AbstractDetails.link(BugIssueUrl.shortReference(url), _ -> BugIssueUrl.open(url));
+
+        link.setToolTipText(url);
+
+        return link;
     }
 
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075

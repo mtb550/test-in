@@ -20,31 +20,46 @@ import com.intellij.ui.JBColor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 
 import java.awt.Color;
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public enum Priority {
     HIGH(
             "P1",
+            Bundle.message("priority.high"),
             JBColor.RED.brighter().brighter(),
             true
     ),
 
     MEDIUM(
             "P2",
+            Bundle.message("priority.medium"),
             JBColor.BLUE.brighter(),
             true
     ),
 
     LOW(
             "P3",
+            Bundle.message("priority.low"),
             JBColor.GRAY.brighter(),
             true
     );
 
+    // Rule-EDITOR-PANEL-031
+    public static final @NotNull List<Priority> CHOICES = Arrays.stream(values()).filter(Priority::isActive).toList();
+
     private final @NotNull String label;
+    private final @NotNull String word;
     private final @NotNull Color color;
     private final boolean active;
+
+    // Rule-EDITOR-PANEL-247
+    public @NotNull String getChoice() {
+        return Bundle.message("priority.choice", label, word);
+    }
 }

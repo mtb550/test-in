@@ -325,6 +325,8 @@ public abstract class AbstractFrameworkDialog {
         DialogKeys.install(contentPanel, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, declared);
 
         for (final DialogComponent dialogComponent : builtComponents()) {
+            dialogComponent.installedOn(contentPanel);
+
             if (!dialogComponent.acceptsDialogKeys()) continue;
 
             DialogKeys.install(dialogComponent.getFocusComponent(), JComponent.WHEN_FOCUSED, declared);

@@ -16,50 +16,33 @@
 
 package org.testin.testcase.create;
 
-import com.intellij.openapi.ui.ComboBox;
-import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.Bundle;
-import org.testin.util.Fonts;
-import org.testin.util.Icons;
+import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.RadioSelection;
 import org.testin.util.Shortcuts;
 
 import javax.swing.JComponent;
-import javax.swing.JList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
 
+// Rule-EDITOR-PANEL-247
 public class PrioritySection implements CreateTestCaseSection {
-    private final @NotNull ComboBox<Priority> priority;
+    private static final @NotNull String NO_CAPTION = "";
+
+    private final @NotNull RadioSelection<Priority> priority;
     private final @NotNull JBPanel<?> wrapper;
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-031, Rule-EDITOR-PANEL-247
     public PrioritySection() {
-        final Priority @NotNull [] activePriorities = Arrays.stream(Priority.values())
-                .filter(Priority::isActive)
-                .toArray(Priority[]::new);
+        priority = ComponentDialogBase.<Priority>radios(NO_CAPTION)
+                .options(Priority.CHOICES, Priority::getChoice)
+                .select(Priority.LOW)
+                .build()
+                .getComponent();
 
-        this.priority = new ComboBox<>(activePriorities);
-        this.priority.setSelectedItem(Priority.LOW);
-        DialogStyle.asChoice(this.priority);
-
-        this.priority.setRenderer(new ColoredListCellRenderer<>() {
-            @Override
-            protected void customizeCellRenderer(final @NotNull JList<? extends Priority> list, final Priority value, final int index, final boolean selected, final boolean hasFocus) {
-                Optional.ofNullable(value).ifPresent(priority -> {
-                    setIcon(Icons.dot(priority.getColor()));
-                    append(Bundle.message("section.priority.caption"));
-                    append(priority.getLabel());
-                });
-            }
-        });
-
-        this.wrapper = createWrapper(CreateTestCaseFields.PRIORITY.getIcon(), this.priority);
+        wrapper = createWrapper(CreateTestCaseFields.PRIORITY.getIcon(), priority.getPanel());
     }
 
     @Override
@@ -68,13 +51,8 @@ public class PrioritySection implements CreateTestCaseSection {
     }
 
     @Override
-    public boolean isPopupOpen() {
-        return priority.isPopupVisible();
-    }
-
-    @Override
     public void applyTo(final @NotNull TestCaseDto dto) {
-        dto.setPriority((Priority) Objects.requireNonNull(priority.getSelectedItem()));
+        dto.setPriority(priority.getSelected());
     }
 
     @Override
@@ -87,16 +65,16 @@ public class PrioritySection implements CreateTestCaseSection {
 
     @Override
     public @NotNull JComponent getFocusComponent() {
-        return priority;
+        return priority.getFocusComponent();
     }
 
     @Override
     public void setEditable(final boolean editable) {
-        priority.setEnabled(editable);
+        priority.setEditable(editable);
     }
 
     @Override
     public void fillData(final @NotNull TestCaseDto dto) {
-        priority.setSelectedItem(dto.getPriority());
+        priority.select(dto.getPriority());
     }
 }
