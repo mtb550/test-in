@@ -16,11 +16,16 @@
 
 package org.testin.ui.dialogs;
 
+import com.intellij.ide.ui.laf.darcula.ui.DarculaButtonUI;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.ui.ColorUtil;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.TextIcon;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.util.IconUtil;
 import com.intellij.util.ui.ComponentWithEmptyText;
 import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.JBUI;
@@ -33,7 +38,10 @@ import org.testin.util.Fonts;
 import org.testin.util.Icons;
 
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,33 +52,72 @@ public final class DialogStyle {
 
     private static final int PADDING_TOP = 10;
     private static final int PADDING_SIDE = 12;
+    private static final int HEADER_GAP = 8;
+
+    // Rule-INTERNAL-105
+    private static final @NotNull Color ACCENT = JBUI.CurrentTheme.Button.defaultButtonColorStart();
+
+    // Rule-INTERNAL-099
+    private static final @NotNull Color CONTENT = JBColor.namedColor("Recap.cardBackground", JBColor.namedColor("WelcomeScreen.Details.background", UIUtil.getPanelBackground()));
 
     public static <T extends JComponent> @NotNull T styleContent(final @NotNull T component) {
         component.setOpaque(true);
-        component.setBackground(UIUtil.getPanelBackground());
+        component.setBackground(ground());
         return component;
     }
 
     // Rule-INTERNAL-099
-    public static <T extends JComponent> @NotNull T asSection(final @NotNull T component) {
-        component.setOpaque(true);
-        component.setBackground(UIUtil.getTextFieldBackground());
-        component.setBorder(JBUI.Borders.customLine(UIUtil.getBoundsColor(), 1, 1, 1, 1));
+    static @NotNull Color card() {
+        return panelIsTheContent() ? UIUtil.getPanelBackground() : CONTENT;
+    }
+
+    // Rule-INTERNAL-099
+    private static @NotNull Color ground() {
+        return panelIsTheContent() ? CONTENT : UIUtil.getPanelBackground();
+    }
+
+    private static boolean panelIsTheContent() {
+        final boolean panelIsLighter = ColorUtil.getLuminance(UIUtil.getPanelBackground()) >= ColorUtil.getLuminance(CONTENT);
+
+        return panelIsLighter == JBColor.isBright();
+    }
+
+    // Rule-INTERNAL-099
+    public static @NotNull JBPanel<?> section(final @NotNull JComponent header, final @NotNull JComponent content) {
+        final @NotNull JBPanel<?> panel = asSection(new JBPanel<>(new BorderLayout(0, JBUI.scale(HEADER_GAP))));
+        panel.add(header, BorderLayout.NORTH);
+        panel.add(content, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    // Rule-INTERNAL-099
+    private static <T extends JComponent> @NotNull T asSection(final @NotNull T component) {
+        component.setOpaque(false);
+        component.setBorder(new SectionFill());
         return component;
+    }
+
+    // Rule-INTERNAL-105
+    public static void asPrimary(final @NotNull JButton button) {
+        button.putClientProperty(DarculaButtonUI.DEFAULT_STYLE_KEY, true);
+    }
+
+    // Rule-INTERNAL-105
+    public static @NotNull Icon asAction(final @NotNull Icon icon) {
+        return IconUtil.colorize(icon, ACCENT);
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-096
-    public static <T extends JComponent> @NotNull T framed(final @NotNull T component) {
+    public static void framed(final @NotNull JComponent component) {
         component.setBorder(new FieldFrame());
-        return component;
     }
 
     // Rule-INTERNAL-095, Rule-INTERNAL-096
-    public static <T extends JComponent> @NotNull T asField(final @NotNull T component) {
+    public static void asField(final @NotNull JComponent component) {
         component.setFont(Fonts.field());
         component.setBorder(JBUI.Borders.empty(PADDING_TOP, PADDING_SIDE));
         hint(component);
-        return component;
     }
 
     // Rule-INTERNAL-095, Rule-INTERNAL-096
@@ -81,9 +128,8 @@ public final class DialogStyle {
     }
 
     // Rule-INTERNAL-095
-    public static <T extends JComponent> @NotNull T asOption(final @NotNull T component) {
+    public static void asOption(final @NotNull JComponent component) {
         component.setFont(Fonts.option());
-        return component;
     }
 
     private static void hint(final @NotNull JComponent component) {

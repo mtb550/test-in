@@ -71,7 +71,10 @@ and which keys it answers, and the shell builds the rest.
 - **Rule-INTERNAL-087** — A caption sits on its own line above the field it
   names, in the caption font: JetBrains Mono, two points below the dialog's
   label font, in capitals, in the muted caption gray. There is no caption
-  column to line up.
+  column to line up: a caption starts where its field's frame starts, so one
+  edge runs down everything in a card. A card's own caption carries a hairline
+  from the end of its text to the card's far edge, and that is the only line
+  inside a dialog.
 - **Rule-INTERNAL-095** — Every font a tester reads comes from one owner,
   `org.testin.util.Fonts`, which names each role - title, strong, body, label,
   badge, code, caption, message, field, placeholder, value, choice, option, row, small,
@@ -101,10 +104,18 @@ and which keys it answers, and the shell builds the rest.
   A dialog saves with it, and light mode's window saves and moves to the next
   test case. So a box asks its host to bind Enter rather than binding it itself,
   and a host with other plans for the key keeps it.
-- **Rule-INTERNAL-099** — A section inside a dialog sits on its own background,
-  one step from the dialog it is on, so the form and the surrounding dialog are
-  told apart at a glance. One place decides both colors, for every dialog and
-  both themes.
+- **Rule-INTERNAL-099** — A section inside a dialog is a card: rounded, with the
+  dialog's ground showing around it and between it and the next card, and a
+  hairline at its edge. A theme names two surfaces, its panel and its content
+  color. The card takes the content one - the darker of the two in a dark theme,
+  the lighter in a light one - and the ground takes whichever is left, so the
+  card reads as content in every theme without either color being invented here.
+  Which of the two is darker is the theme's business and it differs: the Islands
+  themes paint their panel darker than their content, every other bundled theme
+  the other way. The edge is what tells a card from the ground rather than the
+  fill, because a theme may paint both surfaces nearly the same and Islands
+  light does. One place decides the surfaces, the edge, the corner and the gap,
+  for every dialog and every theme.
 - **Rule-INTERNAL-100** — A dialog the tester can resize is six tenths of the IDE
   frame wide, every one of them, because a width chosen per dialog is a number
   nobody chose with the others. What a dialog names is how tall it is: half the
@@ -124,7 +135,10 @@ and which keys it answers, and the shell builds the rest.
   and has no taskbar entry of its own to minimize into.
 - **Rule-INTERNAL-102** — A dialog made smaller than its content scrolls rather
   than clipping it: a vertical scrollbar appears and the status bar stays where
-  it is. While the dialog has room, the content takes the whole height and the
+  it is. Only a dialog whose size the tester owns can be made smaller than its
+  content, so only that dialog scrolls; one that opens at the height its content
+  needs and cannot be resized has nothing to scroll, and a scrollbar there is a
+  stray. While the dialog has room, the content takes the whole height and the
   tree or table inside it scrolls on its own. A tree or table asks for eight
   rows, so a dialog opens at the height its form needs rather than the height
   its rows would take. A box that takes several lines shows six of them and
@@ -139,6 +153,12 @@ and which keys it answers, and the shell builds the rest.
   wider. They stay on one line and a key with no room is simply not drawn,
   because a dialog is sized by what the tester fills in, not by how many keys it
   can be answered with. Widening the dialog shows the rest.
+- **Rule-INTERNAL-105** — Color marks what acts, and nothing else. The one
+  accent a dialog has goes on the things a tester touches: the button that
+  confirms it, the field holding the keyboard, the answer that is picked, the
+  row that is selected. Every surface stays neutral. A dialog that colors its
+  furniture has to explain itself with hints; one that colors only what acts
+  tells the tester where to click and what to fill without a word.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

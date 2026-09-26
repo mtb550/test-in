@@ -20,13 +20,15 @@ import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CheckboxTreeBase;
 import com.intellij.ui.CheckboxTreeListener;
 import com.intellij.ui.CheckedTreeNode;
-import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public final class SelectionTree implements DialogComponent {
@@ -45,8 +47,8 @@ public final class SelectionTree implements DialogComponent {
         tree.setVisibleRowCount(VISIBLE_ROWS);
         TreeUtil.expandAll(tree);
 
-        // Rule-INTERNAL-087
-        panel = Caption.above(caption, new JBScrollPane(tree));
+        // Rule-INTERNAL-087, Rule-INTERNAL-099
+        panel = DialogStyle.section(Caption.header(Caption.of(caption, Fonts.caption()), Optional.empty()), ScrollPaneFactory.createScrollPane(tree, true));
     }
 
     public void forEachChecked(final @NotNull Consumer<Object> visitor) {

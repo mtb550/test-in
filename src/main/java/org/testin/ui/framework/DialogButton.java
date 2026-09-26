@@ -17,6 +17,7 @@
 package org.testin.ui.framework;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -31,6 +32,8 @@ public final class DialogButton implements DialogComponent {
     DialogButton(final @NotNull String text) {
         button = new JButton(text);
         button.addActionListener(_ -> submitRequest.run());
+
+        DialogStyle.asPrimary(button);
 
         footer = new ButtonFooter(button);
     }

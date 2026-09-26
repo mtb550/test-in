@@ -43,6 +43,7 @@ public final class LogWriter implements Disposable {
 
     private static final int JOIN_TIMEOUT = 2000;
 
+    //noinspection QualifiedClassName
     private static final com.intellij.openapi.diagnostic.@NotNull Logger IDE_LOG =
             com.intellij.openapi.diagnostic.Logger.getInstance(LogWriter.class);
     private static final @NotNull Object SHUTDOWN = new Object();

@@ -66,3 +66,35 @@ finding.
 The sweep of 22 September 2026 found 44 qualified names in 24 files, 10 in
 `src/main` and 14 in `src/test`, and replaced 43 of them with imports. The one
 left is the `LogWriter` row above.
+
+## The gate enforces it
+
+`tools/inspect.ps1` reports a package path written in the middle of a line as
+`QualifiedClassName` and exits non-zero for it, beside `WrappedMethodDeclaration`
+and the other rules no IntelliJ inspection has. `-Quick` runs it in seconds, so a
+qualified name never reaches a review.
+
+Three things are not code, and the rule skips them:
+
+- a string, because a persisted key reads like a package path and is one:
+  `@State(name = "testin.settings.AppSettingsState")`;
+- a text block, because the sample stack traces the bug and details tests are
+  built from are full of `java.lang.AssertionError` and none of it is a
+  reference;
+- a statement under `//noinspection`, which is how the one exception below is
+  written down.
+
+## The one exception, and how it is marked
+
+A simple name that already means another class in that file. `org.testin.logger`
+has Testin's own `Logger`, so the platform's has to be written out - Java has no
+import alias. That line carries the marker:
+
+```java
+//noinspection QualifiedClassName
+private static final com.intellij.openapi.diagnostic.@NotNull Logger IDE_LOG =
+        com.intellij.openapi.diagnostic.Logger.getInstance(LogWriter.class);
+```
+
+The marker covers the statement it stands over, to its semicolon. It is a comment
+a machine reads, which is one of the two kinds this codebase keeps.

@@ -52,6 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class TextFieldWithSelections<T> implements DialogComponent, TextValue {
     private static final int DEBOUNCE_MILLIS = 300;
+    private static final int PADDING = 6;
 
     private final @NotNull FrameworkTextField input;
     private final @NotNull JTextField textField;
@@ -70,7 +71,6 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
         textField = input.component();
 
         list = new JBList<>(rowModel);
-        list.setBorder(JBUI.Borders.empty(6));
         DialogStyle.asChoice(list);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setVisibleRowCount(visibleRows);
@@ -93,7 +93,8 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
         listWrapper.add(list, BorderLayout.CENTER);
 
         final @NotNull JBScrollPane scrollPane = new JBScrollPane(listWrapper);
-        scrollPane.setBorder(JBUI.Borders.empty());
+        // Rule-INTERNAL-102
+        scrollPane.setBorder(JBUI.Borders.empty(PADDING));
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 

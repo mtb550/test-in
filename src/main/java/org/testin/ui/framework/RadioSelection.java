@@ -18,7 +18,6 @@ package org.testin.ui.framework;
 
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.panels.HorizontalLayout;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
 import org.testin.ui.dialogs.DialogStyle;
@@ -45,7 +44,6 @@ public final class RadioSelection<T> implements DialogComponent {
         final @NotNull ButtonGroup group = new ButtonGroup();
         final @NotNull JBPanel<?> radioRow = new JBPanel<>(new HorizontalLayout(8));
         radioRow.setOpaque(false);
-        radioRow.setBorder(JBUI.Borders.emptyLeft(12));
 
         Optional<JRadioButton> first = Optional.empty();
         for (final Option<T> option : options) {

@@ -1094,6 +1094,69 @@ function Find-CommentStart([string] $line) {
     return -1
 }
 
+function Read-QualifiedClassNames([string[]] $scopes) {
+    <#
+        A class is named by its import, never by its package path.
+
+        No IntelliJ inspection says this. The platform offers to add the import
+        and never refuses the long form, so a one-line fix that writes
+        new java.awt.Color(...) rather than importing Color compiles, reviews
+        clean, and reads as a different house style from every line around it.
+
+        Three things are not code and are skipped. A string, because a persisted
+        key reads like a package path and is one - @State(name =
+        "testin.settings.AppSettingsState"). A text block, because the sample
+        stack traces the bug and details tests are built from are full of
+        java.lang.AssertionError and none of it is a reference. And a line under
+        //noinspection, up to the semicolon that ends its statement, which is
+        how the one exception the skill allows is written down: a simple name
+        that already means another class in that file, as Testin's own Logger
+        does in org.testin.logger.
+    #>
+    $qualified = '(?<![\w."])(?:[a-z][a-z0-9_]*\.){2,}[A-Z]\w*'
+
+    foreach ($scope in $scopes) {
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+            $number = 0
+            $inTextBlock = $false
+            $excused = $false
+
+            foreach ($text in [System.IO.File]::ReadAllLines($file.FullName)) {
+                $number++
+                $trimmed = $text.Trim()
+
+                $fences = [regex]::Matches($text, '"""').Count
+                if ($inTextBlock) {
+                    if ($fences % 2 -eq 1) { $inTextBlock = $false }
+                    continue
+                }
+                if ($fences % 2 -eq 1) { $inTextBlock = $true; continue }
+
+                if ($trimmed.StartsWith('//noinspection')) { $excused = $true; continue }
+                if ($excused) {
+                    if ($trimmed.EndsWith(';')) { $excused = $false }
+                    continue
+                }
+
+                if ($trimmed.StartsWith('import ') -or $trimmed.StartsWith('package ')) { continue }
+                if ($trimmed.StartsWith('*') -or $trimmed.StartsWith('//') -or $trimmed.StartsWith('/*')) { continue }
+
+                $bare = [regex]::Replace($text, '"[^"]*"', '""')
+                $match = [regex]::Match($bare, $qualified)
+                if (-not $match.Success) { continue }
+
+                [pscustomobject]@{
+                    Path       = $file.FullName.Substring($repo.Length + 1).Replace('\', '/')
+                    Line       = $number
+                    Inspection = 'QualifiedClassName'
+                    Severity   = 'ERROR'
+                    Message    = "A class is named by its import, never by its package path: $($match.Value)"
+                }
+            }
+        }
+    }
+}
+
 function Read-NonMarkerComments([string[]] $scopes) {
     <#
         A comment that is not a marker.
@@ -1305,6 +1368,7 @@ $problems += @(Read-OrphanedJavadoc $everyTree)
 $problems += @(Read-MissingCopyright $everyTree)
 $problems += @(Read-NonMarkerComments $everyTree)
 $problems += @(Read-UnusedLambdaParameters $everyTree)
+$problems += @(Read-QualifiedClassNames $everyTree)
 $problems += @(Read-HtmlParagraphInMarkdown)
 
 $problems += @(Read-DuplicatedDisplayStrings $scopes)

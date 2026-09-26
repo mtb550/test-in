@@ -23,42 +23,37 @@ import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Caption;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
-import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CollapsiblePanel {
     // Rule-INTERNAL-099
     public static @NotNull JBPanel<?> build(final @NotNull String title, final @NotNull JComponent content, final boolean initiallyVisible) {
-        final @NotNull JBPanel<?> wrapper = DialogStyle.asSection(new JBPanel<>(new BorderLayout()));
-
         final @NotNull JBLabel titleLabel = new JBLabel(title);
 
         final @NotNull JBLabel hintLabel = new JBLabel();
         hintLabel.setFont(Fonts.hint());
         hintLabel.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
-        hintLabel.setBorder(JBUI.Borders.emptyLeft(6));
 
-        final @NotNull JBPanel<?> header = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        header.setOpaque(false);
-        header.setBorder(JBUI.Borders.empty(4));
+        final @NotNull JBPanel<?> header = Caption.header(titleLabel, Optional.of(hintLabel));
         header.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        header.add(titleLabel);
-        header.add(hintLabel);
 
         content.setVisible(initiallyVisible);
 
+        final @NotNull JBPanel<?> wrapper = DialogStyle.section(header, content);
+
         final @NotNull Runnable syncHeader = () -> {
             final boolean expanded = content.isVisible();
-            titleLabel.setIcon(expanded ? AllIcons.General.ArrowDown : AllIcons.General.ArrowRight);
+            titleLabel.setIcon(DialogStyle.asAction(expanded ? AllIcons.General.ArrowDown : AllIcons.General.ArrowRight));
             hintLabel.setText(expanded ? Bundle.message("panel.collapse") : Bundle.message("panel.expand"));
         };
         syncHeader.run();
@@ -72,9 +67,6 @@ public final class CollapsiblePanel {
                 wrapper.repaint();
             }
         });
-
-        wrapper.add(header, BorderLayout.NORTH);
-        wrapper.add(content, BorderLayout.CENTER);
 
         return wrapper;
     }

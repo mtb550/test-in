@@ -149,8 +149,11 @@ silently has no effect costs more than the setting it was meant to hold.
   `.claude/skills/` before naming or renaming anything.
 - **A class is named by its import, never by its package path.** `Optional`,
   not `java.util.Optional`, in code and in tests alike; the only exception is
-  a simple name that already means another class in that file. Read the
-  `import-never-qualify` skill under `.claude/skills/`.
+  a simple name that already means another class in that file, and it carries
+  `//noinspection QualifiedClassName` over the statement that needs it. No
+  IntelliJ inspection says this either, so `tools/inspect.ps1` does: it reports
+  a package path written mid-line as `QualifiedClassName` and exits non-zero
+  for one. Read the `import-never-qualify` skill under `.claude/skills/`.
 - **A class does one job, and its name says which.** Before adding a method to
   an existing class, say the class's job in one sentence, then the method's. If
   the second is not the first, the method belongs elsewhere — even when the

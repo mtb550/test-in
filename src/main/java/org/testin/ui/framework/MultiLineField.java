@@ -20,12 +20,14 @@ import com.intellij.ide.ui.laf.darcula.ui.DarculaEditorTextFieldBorder;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
 import org.testin.ui.dialogs.DialogStyle;
@@ -35,6 +37,8 @@ import org.testin.util.Shortcuts;
 import javax.swing.JComponent;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 // Rule-INTERNAL-096, Rule-INTERNAL-097
@@ -44,6 +48,8 @@ public final class MultiLineField implements DialogComponent {
     private final @NotNull Project p;
     private final @NotNull EditorTextField field;
     private final @NotNull String caption;
+
+    private final @NotNull List<Runnable> onGrow = new ArrayList<>();
 
     private @NotNull Optional<JComponent> panel = Optional.empty();
 
@@ -56,6 +62,8 @@ public final class MultiLineField implements DialogComponent {
         this.caption = caption;
 
         DialogStyle.asField(field);
+        // Rule-INTERNAL-087
+        field.setBorder(JBUI.Borders.empty());
         field.setPlaceholder(placeholder);
         field.setShowPlaceholderWhenFocused(true);
         field.setOneLineMode(false);
@@ -64,6 +72,7 @@ public final class MultiLineField implements DialogComponent {
             @Override
             public void documentChanged(final @NotNull DocumentEvent event) {
                 capToVisibleLines();
+                ApplicationManager.getApplication().invokeLater(MultiLineField.this::grew);
             }
         });
 
@@ -87,7 +96,6 @@ public final class MultiLineField implements DialogComponent {
     // Rule-INTERNAL-060, Rule-EDITOR-PANEL-048, Rule-EDITOR-PANEL-246
     public void enableMultiLine(final @NotNull DialogHost host, final @NotNull Runnable onSave) {
         insertsNewLine(host);
-        growsWith(host::refit);
 
         host.registerShortcut(field, Shortcuts.Enter.getCustomShortcut(), onSave);
     }
@@ -98,19 +106,16 @@ public final class MultiLineField implements DialogComponent {
         });
     }
 
-    // Rule-EDITOR-PANEL-048
+    // Rule-EDITOR-PANEL-048, Rule-INTERNAL-097
     public void insertsNewLine(final @NotNull DialogHost host) {
+        growsWith(host::refit);
+
         field.addSettingsProvider(editor -> host.registerShortcut(editor.getContentComponent(), Shortcuts.InsertNewLine.getCustomShortcut(), () -> insertNewLine(editor)));
     }
 
     // Rule-INTERNAL-097
     public void growsWith(final @NotNull Runnable refit) {
-        field.addDocumentListener(new DocumentListener() {
-            @Override
-            public void documentChanged(final @NotNull DocumentEvent event) {
-                ApplicationManager.getApplication().invokeLater(() -> grew(refit));
-            }
-        });
+        onGrow.add(refit);
     }
 
     public @NotNull String getText() {
@@ -155,6 +160,8 @@ public final class MultiLineField implements DialogComponent {
             editor.getDocument().insertString(caret, "\n");
             editor.getCaretModel().moveToOffset(caret + 1);
         });
+
+        editor.getScrollingModel().scrollToCaret(ScrollType.RELATIVE);
     }
 
     // Rule-INTERNAL-102
@@ -170,11 +177,11 @@ public final class MultiLineField implements DialogComponent {
     }
 
     // Rule-INTERNAL-097
-    private void grew(final @NotNull Runnable refit) {
+    private void grew() {
         final int height = field.getPreferredSize().height;
         if (height == packedHeight) return;
 
         packedHeight = height;
-        refit.run();
+        onGrow.forEach(Runnable::run);
     }
 }

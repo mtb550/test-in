@@ -97,7 +97,6 @@ public class RunConfigurationForm implements DialogComponent {
         final @NotNull JBPanel<?> panel = new JBPanel<>();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
-        panel.setBorder(JBUI.Borders.empty(10));
 
         for (final List<ComponentDialogBase<?>> row : rows) {
             final @NotNull JComponent shown = laidOut(row);
