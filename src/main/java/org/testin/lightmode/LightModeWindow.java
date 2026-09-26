@@ -432,7 +432,7 @@ final class LightModeWindow {
 
     private void openCapture() {
         executingItem().ifPresent(item -> {
-            capture = Optional.of(new FailureForm(editor.getProject(), editor.getParent().getPath(), item, zoom, this::fitHeight));
+            capture = Optional.of(new FailureForm(editor.getProject(), editor.getParent().getPath(), item, zoom, this::fitHeight, this::saveCapture));
 
             showCapture();
             fitHeight();
@@ -455,10 +455,8 @@ final class LightModeWindow {
 
             capture = Optional.empty();
 
-            showCapture();
-            fitHeight();
-
             record(TestStatus.FAILED);
+            refresh();
         });
     }
 

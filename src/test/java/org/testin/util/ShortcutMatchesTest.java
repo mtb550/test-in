@@ -56,4 +56,11 @@ public class ShortcutMatchesTest {
         assertFalse(Shortcuts.matches(event(KeyEvent.VK_C, 0),
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
     }
+
+    // Rule-INTERNAL-054
+    @Test
+    public void aShortcutKnowsItsOwnSetFromAnother() {
+        assertTrue(Shortcuts.Enter.is(Shortcuts.Enter.getCustomShortcut()));
+        assertFalse(Shortcuts.Enter.is(Shortcuts.InsertNewLine.getCustomShortcut()));
+    }
 }

@@ -30,11 +30,24 @@ import javax.swing.Icon;
 import javax.swing.border.Border;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 public class StatusBarBase {
+    // Rule-INTERNAL-104
+    private static final class OneLine extends JBPanel<OneLine> {
+        private OneLine() {
+            super(new BorderLayout());
+        }
+
+        @Override
+        public @NotNull Dimension getPreferredSize() {
+            return new Dimension(0, super.getPreferredSize().height);
+        }
+    }
+
     private static final @NotNull String INNER_SEPARATOR = " ";
     private static final @NotNull String OUTER_SEPARATOR = "       ";
 
@@ -51,7 +64,7 @@ public class StatusBarBase {
 
     // UC-INTERNAL-007, Rule-INTERNAL-079
     public StatusBarBase(final StatusBarItem @NotNull [] items) {
-        this.statusBar = new JBPanel<>(new BorderLayout());
+        this.statusBar = new OneLine();
         this.statusBar.setBorder(JBUI.Borders.empty(4, 10));
         this.statusBar.setOpaque(true);
         this.statusBar.setBackground(JBUI.CurrentTheme.Advertiser.background());

@@ -52,14 +52,16 @@ class FailureForm extends JBPanel<FailureForm> implements DialogHost {
     private final @NotNull Path runPath;
     private final @NotNull Map<Component, Font> baseFonts = new HashMap<>();
     private final @NotNull Runnable resized;
+    private final @NotNull Runnable onEnter;
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-202
-    FailureForm(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem, final float zoom, final @NotNull Runnable resized) {
+    FailureForm(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem, final float zoom, final @NotNull Runnable resized, final @NotNull Runnable onEnter) {
         this.p = p;
         this.runPath = runPath;
         this.runItem = runItem;
         this.fields = new FailureFields(p, runPath, runItem);
         this.resized = resized;
+        this.onEnter = onEnter;
 
         fields.onResized(resized);
 
@@ -89,9 +91,9 @@ class FailureForm extends JBPanel<FailureForm> implements DialogHost {
     // UC-EDITOR-PANEL-046, Rule-INTERNAL-054, Rule-EDITOR-PANEL-246
     @Override
     public void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull Runnable action) {
-        if (Shortcuts.Enter.getCustomShortcut().equals(shortcutSet)) return;
+        final @NotNull Runnable claimed = Shortcuts.Enter.is(shortcutSet) ? onEnter : action;
 
-        DumbAwareAction.create((AnActionEvent _) -> action.run()).registerCustomShortcutSet(shortcutSet, component);
+        DumbAwareAction.create((AnActionEvent _) -> claimed.run()).registerCustomShortcutSet(shortcutSet, component);
     }
 
 

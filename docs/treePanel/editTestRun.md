@@ -93,8 +93,10 @@ the IDE.
 1. The tester selects a test run that is not signed off.
 2. The tester chooses **Edit Test Run**.
 3. The **Edit Test Run** dialog opens. It shows the test run's name, its test
-   cases already ticked, and its configuration already filled in. Test cases
-   added to a test set since the test run was created appear unticked.
+   cases already ticked, and its configuration already answered. Test cases
+   added to a test set since the test run was created appear unticked. A test run
+   created before a row had to be answered holds nothing for it, and that row
+   opens with no answer picked. (Rule-TREE-PANEL-121)
 4. The tester changes any of it and presses **Save**.
 5. If the name was changed, Testin closes the test run's editor first. It then
    renames the folder, and only then saves the test run.
@@ -124,6 +126,11 @@ a clash.
 
 **If the last test case is unticked** — **Save** is disabled. **Create** does
 the same on an empty new test run.
+
+**If a row on the form has no answer** — **Save** is disabled, and *Pick a
+\<field\>* beside it names the first row that has none. The test run's own file is
+not touched until **Save**, so a run left unanswered is left exactly as it was.
+(Rule-TREE-PANEL-121)
 
 **If several rows are selected** — **Edit Test Run** is gray. It needs exactly one.
 

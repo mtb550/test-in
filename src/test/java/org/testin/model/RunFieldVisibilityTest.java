@@ -104,6 +104,6 @@ public class RunFieldVisibilityTest {
     @Test
     public void theDeviceListOffersTheThreeHandsets() {
         assertEquals(Arrays.asList(TestRunConfiguration.DEVICE_TYPE.getOptions()),
-                List.of("", "iPhone", "Samsung", "Huawei"));
+                List.of("iPhone", "Samsung", "Huawei"));
     }
 }

@@ -40,9 +40,11 @@ There is no key for this. The link sits where the value would have been.
   two are read only; the error sits in a box of its own.
 - **Rule-VIEW-PANEL-036** — The error can be selected and copied, and nothing in
   the window can be typed into. It is a window for reading a value the framework
-  wrote, and the failure dialog is where a tester changes one. The test case and
-  the actual result above the error are drawn as the framework draws every
-  details row, which is to be read rather than selected - the error is the part a
+  wrote, and the failure dialog is where a tester changes one. The test case, the
+  expected result and the actual result above the error are drawn as the framework
+  draws every details row - the first two after their own icon, as the failure
+  dialog draws them, and the actual result after its caption - which is to be read
+  rather than selected - the error is the part a
   tester copies into a bug report, and that is the part that selects.
 - **Rule-VIEW-PANEL-081** — The **Stacktrace** link comes first on its line, then
   one thumbnail for each screenshot pasted with the failure, the one the failure
@@ -68,8 +70,8 @@ of its own.
 ┌──────────────────────────────────────────────────────────────┐
 │  Stacktrace                                                  │
 ├──────────────────────────────────────────────────────────────┤
-│  TEST CASE                                                   │
-│  Log in with a valid user                                    │
+│  D  Log in with a valid user                                 │
+│  E  The session stays until the tester signs out.            │
 │  ACTUAL RESULT                                               │
 │  The session was dropped.                                    │
 │                                                              │
@@ -84,8 +86,10 @@ of its own.
 ```
 
 1. **The title** — always the one word, the same word the link reads.
-2. **Test Case** and **Actual Result** — the description of the test case that
-   failed, and what the tester wrote about it. Both are there to be read: neither
+2. **The test case, the expected result and Actual Result** — the description
+   after its **D** icon and what should have happened after its **E**, as the
+   failure dialog draws them, then what the tester wrote about the failure under
+   its caption. All three are there to be read: none
    can be typed into, and neither is selected with the pointer.
 3. **The box** — the error, and nothing else. It scrolls, and it cannot be typed
    into.

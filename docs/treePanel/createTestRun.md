@@ -70,6 +70,13 @@ A test run is one round of testing, with a verdict for each test case.
   above it call for it: pick a kind of run that needs no commit id and the
   commit id row goes, and comes back the moment the answer changes. A row that
   is not shown is not asked, so what is saved holds nothing for it.
+- **Rule-TREE-PANEL-121** — Every configuration row that is shown is answered
+  before a test run is created. The answers a row offers are the only answers it
+  has: nothing can be typed into one, and none of them offers a blank.
+- **Rule-TREE-PANEL-122** — The change log takes as many lines as the tester
+  needs: Ctrl+Enter inserts a line break, the same bargain a grid cell makes.
+  Enter does nothing at all here - it neither breaks the line nor creates the
+  test run - whichever field holds the keyboard.
 
 Rule-TREE-PANEL-032 holds here too. It says what can be created under **Test
 Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
@@ -80,22 +87,25 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  Create Test Run                                                           │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  v Configuration details                                 Collapse   (1)    │
-│     Test Run name   [ cycle-2                              ]       (2)     │
-│     Change Log      [ Story-002 (register new user), Sto...]               │
-│     Commit ID       [ Commit hash, like 9f3c1ab...         ]               │
-│     Test Type       [                                    v ]               │
-│     Platform        [ Web                                 v ]              │
-│     Component       [ Frontend                            v ]              │
-│     Language        [                                     v ]              │
-│     Browser         [                                     v ]       (3)    │
-│                                                                            │
-│  [x] v Test Cases                                                  (4)     │
-│  [x]   v Accounts                                                          │
-│  [x]       Login                                                           │
-│  [x]       Registration                                                    │
-│  [ ]     Checkout                                                          │
-│                                                                            │
+│ ┌────────────────────────────────────────────────────────────────────────┐ │
+│ │ v Configuration details                                Collapse  (1)  │ │
+│ │   TEST RUN NAME:  [ cycle-2          ]  COMMIT ID [ 9f3c1ab      ] (2)│ │
+│ │   CHANGE LOG      [ Story-002 (register new user), Story-003...     ] │ │
+│ │   TEST TYPE                             PLATFORM                      │ │
+│ │     (o) Functional Test ( ) Performance   (o) Web  ( ) Mobile          │ │
+│ │   COMPONENT                             LANGUAGE                      │ │
+│ │     (o) Frontend  ( ) Backend             (o) English ( ) Arabic       │ │
+│ │                                           ( ) French                  │ │
+│ │   BROWSER                                                        (3)  │ │
+│ │     ( ) Chrome (o) Firefox ( ) Safari ( ) Edge                        │ │
+│ └────────────────────────────────────────────────────────────────────────┘ │
+│ ┌────────────────────────────────────────────────────────────────────────┐ │
+│ │ [x] v Test Cases                                                 (4)  │ │
+│ │ [x]   v Accounts                                                      │ │
+│ │ [x]       Login                                                       │ │
+│ │ [x]       Registration                                                │ │
+│ │ [ ]     Checkout                                                      │ │
+│ └────────────────────────────────────────────────────────────────────────┘ │
 │                                                     [ Create ]      (5)    │
 ├────────────────────────────────────────────────────────────────────────────┤
 │  Tab Navigate    Space Check    Escape Cancel                              │
@@ -107,14 +117,19 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
    it takes every field below with it, the name included.
 2. **Test Run name** — filled in with what the tester typed in the first
    dialog. When it is emptied, its gray hint text reads *Cycle-1*. The keyboard
-   does not start here. It starts in **Change Log**.
-3. **The fields** — one to a row. Every dropdown starts blank. Blank means the
-   tester has not answered it. Every dropdown can also be typed into, so a value
-   the list does not offer is still saved. **Browser** is on the form only while *Platform* is **Web** and *Component*
-   is **Frontend**. **Device Type** takes
-   its place only while *Platform* is **Mobile** and *Component* is **Frontend**. A field that is not on the form is
-   saved empty. So switching *Platform* from **Web** to **Mobile** drops the browser that was picked. The
-   lists are:
+   does not start here. It starts in **Change Log**, which takes as many lines as
+   the tester needs: `Ctrl+Enter` inserts a line break, and `Enter` does nothing at
+   all - it neither breaks the line nor creates the test run. (Rule-TREE-PANEL-122)
+3. **The fields** — one to a row, with every answer on the row. A row shows all of
+   its answers and one of them has to be picked: no row offers a blank answer, and
+   nothing can be typed into one. Each row carries the icon of the field it asks
+   about. **Browser** is on the form only while *Platform* is **Web** and
+   *Component* is **Frontend**. **Device Type** takes its place only while
+   *Platform* is **Mobile** and *Component* is **Frontend**. A field that is not on
+   the form is not asked and is saved empty. So switching *Platform* from **Web**
+   to **Mobile** drops the browser that was picked. **Browser** arrives with
+   *Chrome* already picked, because a run on the web is on Chrome until the tester
+   says otherwise; every other row arrives with nothing picked. The answers are:
 
    | Field       | Offers                                |
          |-------------|---------------------------------------|
@@ -130,9 +145,12 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
    set, and each test case. The tree opens fully expanded. Ticking a folder
    ticks everything under it. An empty test set is left out, and so is a package
    that holds only empty test sets.
-5. **Create** — enabled only while at least one test case is ticked. `Enter`
-   does nothing here. The button is the only way to confirm. A click outside the
-   dialog does not close it either. Only `Escape` closes it.
+5. **Create** — enabled only while at least one test case is ticked and every row
+   on the form is answered. While it is disabled, the line to its left says what is
+   missing: *Check at least one test case*, or *Pick a Platform*, naming the first
+   row with no answer. `Enter` does nothing here. The button is the only way to
+   confirm. A click outside the dialog does not close it either. Only `Escape`
+   closes it.
 
 **Edit Test Run** is this same dialog with the button **Save**. It opens filled
 with the test run's own name, test cases and settings.
@@ -158,7 +176,11 @@ with the test run's own name, test cases and settings.
 
 ## What Testin refuses
 
-**If no test case is ticked** — the **Create** button is disabled.
+**If no test case is ticked** — the **Create** button is disabled, and reads
+*Check at least one test case* beside it.
+
+**If a row on the form has no answer** — the **Create** button is disabled, and
+*Pick a \<field\>* beside it names the first row that has none. (Rule-TREE-PANEL-121)
 
 **If the name has been emptied** — the dialog stays open, and *A test run needs
 a name* is shown in red.

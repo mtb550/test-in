@@ -51,6 +51,7 @@ final class FrameworkTextField {
         DialogStyle.setDecorations(field, icon, note);
 
         DialogStyle.asField(field);
+        DialogStyle.framed(field);
 
         if (!placeholder.isBlank()) {
             field.getEmptyText().setText(placeholder);

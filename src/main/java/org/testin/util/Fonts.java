@@ -36,8 +36,11 @@ public final class Fonts {
 
     private static final float TITLE = 3.0f;
     private static final float LABEL = -2.0f;
+    private static final float CAPTION = -1.0f;
+    private static final float ROW = 1.0f;
     private static final float BADGE = -3.0f;
     private static final float FIELD = 6.0f;
+    private static final float OPTION = 3.0f;
     private static final float FIGURE = 2.0f;
     private static final float ICON_LETTER = 9.0f;
     private static final @NotNull String CAPTION_FAMILY = "JetBrains Mono";
@@ -72,7 +75,7 @@ public final class Fonts {
     }
 
     public static @NotNull Font panelCaption() {
-        return mono(panelSize());
+        return mono(panelSize(), LABEL);
     }
 
     public static @NotNull Font message() {
@@ -96,8 +99,16 @@ public final class Fonts {
         return field();
     }
 
+    public static @NotNull Font option() {
+        return dialog(OPTION, Font.PLAIN);
+    }
+
     public static @NotNull Font caption() {
-        return mono(dialogSize());
+        return mono(dialogSize(), CAPTION);
+    }
+
+    public static @NotNull Font row() {
+        return dialog(ROW, Font.PLAIN);
     }
 
     public static @NotNull Font small() {
@@ -132,8 +143,8 @@ public final class Fonts {
         return JBUI.Fonts.label().getSize2D();
     }
 
-    private static @NotNull Font mono(final float base) {
-        return UIUtil.getFontWithFallback(new Font(CAPTION_FAMILY, Font.PLAIN, 1)).deriveFont(sizeOn(base, LABEL));
+    private static @NotNull Font mono(final float base, final float delta) {
+        return UIUtil.getFontWithFallback(new Font(CAPTION_FAMILY, Font.PLAIN, 1)).deriveFont(sizeOn(base, delta));
     }
 
     private static @NotNull Font panel(final float delta, @MagicConstant(flags = {Font.PLAIN, Font.BOLD, Font.ITALIC}) final int style) {

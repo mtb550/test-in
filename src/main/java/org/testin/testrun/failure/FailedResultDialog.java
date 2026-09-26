@@ -47,6 +47,9 @@ public class FailedResultDialog extends AbstractFrameworkDialog {
 
         title = Bundle.message("dialog.failed.result.title");
 
+        // Rule-INTERNAL-101
+        resizable = true;
+
         final @NotNull List<ComponentDialogBase<?>> all = new ArrayList<>();
         all.add(ComponentDialogBase.details()
                 .row(CreateTestCaseFields.DESCRIPTION.getIcon(), tc.getDescription())

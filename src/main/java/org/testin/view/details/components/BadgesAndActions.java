@@ -22,7 +22,6 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 
 public final class BadgesAndActions extends AbstractDetails {

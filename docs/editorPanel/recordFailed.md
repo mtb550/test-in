@@ -68,7 +68,8 @@ form before it records anything.
 - **Rule-EDITOR-PANEL-246** — What actually happened is typed into the same box
   the test case form gives the expected result and the test data, because a
   tester writing why a test case failed writes sentences: it grows as lines are
-  added and the dialog grows with it (Rule-INTERNAL-097). Enter records the
+  added, up to six of them, and the dialog grows with it (Rule-INTERNAL-097,
+  Rule-INTERNAL-102). Enter records the
   failure, and Ctrl+Enter adds a line, the same bargain a grid cell makes (Rule-EDITOR-PANEL-048).
 
 ## The screen
@@ -111,16 +112,19 @@ form before it records anything.
    what should have happened. Neither can be typed into.
 2. **The first box** — what actually happened, in the same box the test case
    form gives the expected result and the test data: one line to start, growing
-   a line at a time as the tester writes, with the dialog growing with it (Rule-EDITOR-PANEL-246). Its caption above it
+   a line at a time as the tester writes, up to six lines and then scrolling,
+   with the dialog growing with it (Rule-EDITOR-PANEL-246, Rule-INTERNAL-102). Its caption above it
    reads **Actual Result**, and its
    gray hint is inside it and stays there while the box has the cursor. A
    misspelled word in it is underlined, and `Alt+Enter` offers the corrections.
    `Ctrl+Enter` adds a line; `Enter` still saves; `Tab` leaves the box.
 3. **Bug Severity** — four choices, with the least serious chosen.
 4. **Bug Priority** — three choices, with the lowest chosen.
-5. **The big box** — for the error or the exception, as text. Its caption above
-   it reads **Stacktrace**, and its gray hint reads *paste error or exception or
-   screenshot…*.
+5. **The stacktrace box** — for the error or the exception, in the same box the
+   others use: one line to start, growing as the error is pasted in, six lines at
+   most and scrolling after that. Its caption above it reads **Stacktrace**, and
+   its gray hint reads *paste error or exception or screenshot…*. `Ctrl+Enter`
+   adds a line; `Enter` still saves.
 6. **Screenshots** — one small picture for each screenshot pasted with `Ctrl+V`,
    in the order they were pasted: the screenshot itself, 48 pixels high. Its **x** takes that screenshot out, and the
    row disappears with the last of them.

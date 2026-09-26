@@ -17,11 +17,13 @@
 package org.testin.view.details.components;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.DialogSize;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
@@ -30,21 +32,20 @@ import java.util.List;
 
 public final class StacktraceDialog extends AbstractFrameworkDialog {
     private static final int VISIBLE_ROWS = 22;
-    private static final int WIDTH = 900;
-    private static final int HEIGHT = 600;
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-036
-    public StacktraceDialog(final @NotNull Project p, final @NotNull String testCaseDescription, final @NotNull String message, final @NotNull String stacktrace) {
+    public StacktraceDialog(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String actualResult, final @NotNull String stacktrace) {
         super(p);
 
         title = Bundle.message("dialog.stacktrace.title");
 
-        preferredSize = JBUI.size(WIDTH, HEIGHT);
+        size = DialogSize.TALL;
 
         components = List.of(
                 ComponentDialogBase.details()
-                        .row(Bundle.message("caption.test.case"), testCaseDescription)
-                        .row(RunEditorAttributes.ACTUAL_RESULT.getName(), message)
+                        .row(CreateTestCaseFields.DESCRIPTION.getIcon(), tc.getDescription())
+                        .row(CreateTestCaseFields.EXPECTED_RESULT.getIcon(), tc.getExpectedResult())
+                        .row(RunEditorAttributes.ACTUAL_RESULT.getName(), actualResult)
                         .build(),
                 ComponentDialogBase.textArea()
                         .value(stacktrace)

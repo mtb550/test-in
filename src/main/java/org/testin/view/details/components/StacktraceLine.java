@@ -82,7 +82,7 @@ public final class StacktraceLine extends AbstractDetails {
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034
     private @NotNull ActionLink stacktraceLink(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull String stacktrace) {
         return link(Bundle.message("view.stacktrace.link"),
-                _ -> new StacktraceDialog(p, dto.getDescription(), runItem.getActualResult(), stacktrace).show());
+                _ -> new StacktraceDialog(p, dto, runItem.getActualResult(), stacktrace).show());
     }
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081

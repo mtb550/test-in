@@ -37,7 +37,7 @@ public final class FailureFields {
         actualResult = new ActualResultSection(p, runItem);
         screenshots = new ScreenshotsSection(p, runPath, runItem);
 
-        sections = List.of(actualResult, BugSeveritySection.of(runItem), BugPrioritySection.of(runItem), StacktraceSection.of(runItem), screenshots);
+        sections = List.of(actualResult, BugSeveritySection.of(runItem), BugPrioritySection.of(runItem), StacktraceSection.of(p, runItem), screenshots);
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148

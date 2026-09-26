@@ -33,11 +33,14 @@ import org.testin.util.Fonts;
 import org.testin.util.Shortcuts;
 
 import javax.swing.JComponent;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.util.Optional;
 
 // Rule-INTERNAL-096, Rule-INTERNAL-097
 public final class MultiLineField implements DialogComponent {
+    private static final int VISIBLE_LINES = 6;
+
     private final @NotNull Project p;
     private final @NotNull EditorTextField field;
     private final @NotNull String caption;
@@ -57,10 +60,21 @@ public final class MultiLineField implements DialogComponent {
         field.setShowPlaceholderWhenFocused(true);
         field.setOneLineMode(false);
 
+        field.addDocumentListener(new DocumentListener() {
+            @Override
+            public void documentChanged(final @NotNull DocumentEvent event) {
+                capToVisibleLines();
+            }
+        });
+
         field.addSettingsProvider(editor -> {
             editor.getContentComponent().setFocusTraversalKeysEnabled(true);
 
             editor.setBorder(new DarculaEditorTextFieldBorder(field, editor));
+            // Rule-INTERNAL-102
+            editor.setVerticalScrollbarVisible(true);
+            // Rule-INTERNAL-103
+            editor.getSettings().setShowIntentionBulb(false);
 
             final @NotNull EditorColorsScheme themed = editor.createBoundColorSchemeDelegate(EditorColorsManager.getInstance().getSchemeForCurrentUITheme());
             final @NotNull Font font = Fonts.field();
@@ -72,11 +86,21 @@ public final class MultiLineField implements DialogComponent {
 
     // Rule-INTERNAL-060, Rule-EDITOR-PANEL-048, Rule-EDITOR-PANEL-246
     public void enableMultiLine(final @NotNull DialogHost host, final @NotNull Runnable onSave) {
-        field.addSettingsProvider(editor -> host.registerShortcut(editor.getContentComponent(), Shortcuts.InsertNewLine.getCustomShortcut(), () -> insertNewLine(editor)));
-
+        insertsNewLine(host);
         growsWith(host::refit);
 
         host.registerShortcut(field, Shortcuts.Enter.getCustomShortcut(), onSave);
+    }
+
+    // Rule-TREE-PANEL-122
+    public void ignoresEnter(final @NotNull DialogHost host) {
+        host.registerShortcut(field, Shortcuts.Enter.getCustomShortcut(), () -> {
+        });
+    }
+
+    // Rule-EDITOR-PANEL-048
+    public void insertsNewLine(final @NotNull DialogHost host) {
+        field.addSettingsProvider(editor -> host.registerShortcut(editor.getContentComponent(), Shortcuts.InsertNewLine.getCustomShortcut(), () -> insertNewLine(editor)));
     }
 
     // Rule-INTERNAL-097
@@ -131,6 +155,18 @@ public final class MultiLineField implements DialogComponent {
             editor.getDocument().insertString(caret, "\n");
             editor.getCaretModel().moveToOffset(caret + 1);
         });
+    }
+
+    // Rule-INTERNAL-102
+    private void capToVisibleLines() {
+        field.setPreferredSize(null);
+
+        final @NotNull Dimension natural = field.getPreferredSize();
+        final int cap = field.getFontMetrics(Fonts.field()).getHeight() * VISIBLE_LINES;
+        if (natural.height <= cap) return;
+
+        field.setPreferredSize(new Dimension(natural.width, cap));
+        field.revalidate();
     }
 
     // Rule-INTERNAL-097

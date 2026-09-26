@@ -17,12 +17,12 @@
 package org.testin.testrun;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunSummary;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.DialogSize;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextArea;
 import org.testin.util.Bundle;
@@ -67,7 +67,7 @@ public final class ResultAnalysisDialog extends AbstractFrameworkDialog {
                 StatusBarShortcut.navigate(),
                 StatusBarShortcut.cancel(this::closeCancel));
 
-        preferredSize = JBUI.size(760, 640);
+        size = DialogSize.TALL;
     }
 
     // UC-EDITOR-PANEL-045

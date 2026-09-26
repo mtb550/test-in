@@ -18,7 +18,6 @@ package org.testin.importexport.exports;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.SheetPreview;
@@ -29,11 +28,11 @@ import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.DialogSize;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +70,7 @@ public final class ExportDialog extends AbstractFrameworkDialog {
                 StatusBarShortcut.build(Shortcuts.Enter, ExportAction.NAME, this::submit),
                 StatusBarShortcut.cancel(this::closeCancel));
 
-        preferredSize = new Dimension(JBUI.scale(900), JBUI.scale(600));
+        size = DialogSize.HALF;
     }
 
     // UC-SHARE-001

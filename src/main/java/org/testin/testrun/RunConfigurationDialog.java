@@ -17,17 +17,17 @@
 package org.testin.testrun;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogButton;
+import org.testin.ui.framework.DialogSize;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 
-import java.awt.Dimension;
 import java.util.List;
+import java.util.Optional;
 
 public final class RunConfigurationDialog extends AbstractFrameworkDialog {
     private final @NotNull RunFormAction action;
@@ -53,17 +53,27 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog {
                 StatusBarShortcut.hint("Space", Bundle.message("shortcut.check")),
                 StatusBarShortcut.cancel(this::closeCancel));
 
-        preferredSize = new Dimension(JBUI.scale(900), JBUI.scale(600));
+        size = DialogSize.HALF;
 
         final @NotNull DialogButton confirmButton = confirm.getComponent();
-        confirmButton.setEnabled(selection.hasChecked());
-        selection.onCheckChanged(() -> confirmButton.setEnabled(selection.hasChecked()));
+        final @NotNull Runnable refresh = () -> confirmButton.enableUnless(whyNot());
+
+        refresh.run();
+        selection.onCheckChanged(refresh);
+        form.onAnswerChanged(refresh);
     }
 
-    // UC-TREE-PANEL-009, Rule-TREE-PANEL-029
+    // UC-TREE-PANEL-009, Rule-TREE-PANEL-029, Rule-TREE-PANEL-121
+    private @NotNull Optional<String> whyNot() {
+        if (!selection.hasChecked()) return Optional.of(Bundle.message("run.form.no.test.case"));
+
+        return form.unanswered();
+    }
+
+    // UC-TREE-PANEL-009, Rule-TREE-PANEL-029, Rule-TREE-PANEL-121
     @Override
     protected void submit() {
-        if (!selection.hasChecked()) return;
+        if (whyNot().isPresent()) return;
 
         if (action.submit().saved(form, selection)) closeOk();
     }

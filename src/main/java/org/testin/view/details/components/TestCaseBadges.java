@@ -18,7 +18,6 @@ package org.testin.view.details.components;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -27,7 +26,6 @@ import org.testin.services.Services;
 import org.testin.ui.Badges;
 
 import javax.swing.JComponent;
-import java.awt.FlowLayout;
 import java.util.List;
 
 public final class TestCaseBadges {

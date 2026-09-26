@@ -171,12 +171,30 @@ public class FrameworkComponentsTest {
     }
 
     @Test
-    public void radiosRejectEmptyOptionsAndForeignSelection() {
+    public void radiosNeedOptionsAndAValueToOpenOn() {
         Assert.expectThrows(IllegalStateException.class, () ->
                 ComponentDialogBase.<String>radios("x").build());
 
         Assert.expectThrows(IllegalStateException.class, () ->
-                ComponentDialogBase.<String>radios("x").option("A", "A").select("B").build());
+                ComponentDialogBase.<String>radios("x").option("A", "A").build());
+    }
+
+    // Rule-TREE-PANEL-121
+    @Test
+    public void radiosOpenUnansweredWhenTheStoredValueIsNotOffered() {
+        final RadioSelection<String> group = ComponentDialogBase.<String>radios("x")
+                .option("A", "A")
+                .select("")
+                .build()
+                .getComponent();
+
+        assertFalse(group.isAnswered());
+        assertEquals(group.getSelected(), "");
+
+        group.select("A");
+
+        assertTrue(group.isAnswered());
+        assertEquals(group.getSelected(), "A");
     }
 
     @Test

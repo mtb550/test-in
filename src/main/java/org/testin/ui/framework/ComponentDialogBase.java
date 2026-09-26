@@ -165,8 +165,8 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             if (options.isEmpty()) {
                 throw new IllegalStateException("radios needs at least one .option(...)");
             }
-            if (options.stream().noneMatch(option -> selected.filter(option.value()::equals).isPresent())) {
-                throw new IllegalStateException("radios needs .select(...) with one of the declared options");
+            if (selected.isEmpty()) {
+                throw new IllegalStateException("radios needs .select(...) with the value it opens on");
             }
             return new ComponentDialogBase<>(new RadioSelection<>(caption, List.copyOf(options), selected.orElseThrow()));
         }

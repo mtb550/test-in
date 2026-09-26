@@ -23,21 +23,30 @@ import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Caption;
+import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
 import java.util.function.Consumer;
 
 public final class SelectionTree implements DialogComponent {
+    private static final int VISIBLE_ROWS = 8;
+
     private final @NotNull CheckboxTree tree;
     private final @NotNull CheckedTreeNode root;
-    private final @NotNull JBScrollPane panel;
+    private final @NotNull JComponent panel;
 
-    public SelectionTree(final @NotNull CheckedTreeNode root, final @NotNull CheckboxTree.CheckboxTreeCellRenderer renderer) {
+    public SelectionTree(final @NotNull String caption, final @NotNull CheckedTreeNode root, final @NotNull CheckboxTree.CheckboxTreeCellRenderer renderer) {
         this.root = root;
         tree = new CheckboxTree(renderer, root, new CheckboxTreeBase.CheckPolicy(true, true, true, true));
+        // Rule-INTERNAL-095
+        tree.setFont(Fonts.row());
+        // Rule-INTERNAL-102
+        tree.setVisibleRowCount(VISIBLE_ROWS);
         TreeUtil.expandAll(tree);
 
-        panel = new JBScrollPane(tree);
+        // Rule-INTERNAL-087
+        panel = Caption.above(caption, new JBScrollPane(tree));
     }
 
     public void forEachChecked(final @NotNull Consumer<Object> visitor) {

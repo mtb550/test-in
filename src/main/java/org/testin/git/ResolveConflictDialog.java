@@ -17,17 +17,16 @@
 package org.testin.git;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogButton;
+import org.testin.ui.framework.DialogSize;
 import org.testin.ui.framework.RadioSelection;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -76,7 +75,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog {
                 StatusBarShortcut.build(Shortcuts.Enter, Bundle.message("dialog.conflict.button.keep"), this::submit),
                 StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("dialog.conflict.shortcut.skip"), this::skip));
 
-        preferredSize = new Dimension(JBUI.scale(700), JBUI.scale(120 + (60 * questions.size())));
+        size = DialogSize.SHORT;
     }
 
     // UC-SHARE-018, Rule-SHARE-083

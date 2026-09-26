@@ -17,7 +17,6 @@
 package org.testin.git;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
@@ -30,6 +29,7 @@ import org.testin.testcase.TestCaseSnapshot;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ChoiceInput;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.DialogSize;
 import org.testin.ui.framework.DialogSplitButton;
 import org.testin.ui.framework.SelectionTable;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -37,7 +37,6 @@ import org.testin.ui.framework.TextInput;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import java.awt.Dimension;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -93,14 +92,14 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
                 StatusBarShortcut.hint(Bundle.message("gesture.right.click"), Bundle.message("dialog.pending.hint.revert")),
                 StatusBarShortcut.cancel(this::closeCancel));
 
-        preferredSize = new Dimension(JBUI.scale(1000), JBUI.scale(500));
+        size = DialogSize.SHORT;
 
         fillRows(differences);
         changes.selectAll();
         changes.onRowAction(Bundle.message("dialog.pending.revert.row"), row -> revertRow(p, row));
 
-        changes.onSelectionChanged(() -> commit.setEnabled(!changes.getSelectedRows().isEmpty()));
-        commit.setEnabled(!changes.getSelectedRows().isEmpty());
+        changes.onSelectionChanged(this::refreshCommit);
+        refreshCommit();
     }
 
     private static @NotNull List<String> offered(final @NotNull List<String> branches, final @NotNull String current) {
@@ -214,7 +213,14 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
     private void removeRow(final int row) {
         changes.removeRow(row);
         rowDifferences.remove(row);
-        commit.setEnabled(!changes.getSelectedRows().isEmpty());
+        refreshCommit();
+    }
+
+    // UC-INTERNAL-007, Rule-INTERNAL-080
+    private void refreshCommit() {
+        commit.enableUnless(changes.getSelectedRows().isEmpty()
+                ? Optional.of(Bundle.message("dialog.pending.nothing.chosen"))
+                : Optional.empty());
     }
 
     // UC-SHARE-012, UC-SHARE-013

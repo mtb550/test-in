@@ -26,7 +26,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.Badges;
 
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
 import java.util.List;

@@ -17,6 +17,7 @@
 package org.testin.util;
 
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.actionSystem.ShortcutSet;
 import com.intellij.openapi.keymap.KeymapUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +29,7 @@ import java.awt.HeadlessException;
 import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 
 @Getter
 @AllArgsConstructor
@@ -306,5 +308,10 @@ public enum Shortcuts {
 
     public boolean matches(final @NotNull KeyEvent e) {
         return matches(e, key);
+    }
+
+    // Rule-INTERNAL-054
+    public boolean is(final @NotNull ShortcutSet shortcutSet) {
+        return Arrays.equals(shortcutSet.getShortcuts(), getCustomShortcut().getShortcuts());
     }
 }

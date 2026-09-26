@@ -33,7 +33,6 @@ import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.Box;
 import javax.swing.JComponent;
-import java.awt.FlowLayout;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

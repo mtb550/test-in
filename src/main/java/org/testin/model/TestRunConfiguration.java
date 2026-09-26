@@ -38,57 +38,65 @@ public enum TestRunConfiguration {
     TEST_TYPE(
             Bundle.message("config.test.type"),
             AllIcons.Nodes.Type,
-            new String[]{"", "Functional Test", "Performance Test"},
-            ShownWhen.ALWAYS
+            new String[]{"Functional Test", "Performance Test"},
+            ShownWhen.ALWAYS,
+            ""
     ),
 
     CHANGE_LOG(
             Bundle.message("config.change.log"),
             AllIcons.Nodes.Type,
             Free.OPTIONS,
-            ShownWhen.ALWAYS
+            ShownWhen.ALWAYS,
+            ""
     ),
 
     COMMIT_ID(
             Bundle.message("config.commit.id"),
             AllIcons.Nodes.Type,
             Free.OPTIONS,
-            ShownWhen.ALWAYS
+            ShownWhen.ALWAYS,
+            ""
     ),
 
     PLATFORM(
             Bundle.message("config.platform"),
             AllIcons.Nodes.PpLib,
-            new String[]{"", Answer.WEB, Answer.MOBILE},
-            ShownWhen.ALWAYS
+            new String[]{Answer.WEB, Answer.MOBILE},
+            ShownWhen.ALWAYS,
+            ""
     ),
 
     COMPONENT(
             Bundle.message("config.component"),
             AllIcons.Nodes.PpLib,
-            new String[]{"", Answer.FRONTEND, "Backend"},
-            ShownWhen.ALWAYS
+            new String[]{Answer.FRONTEND, "Backend"},
+            ShownWhen.ALWAYS,
+            ""
     ),
 
     LANGUAGE(
             Bundle.message("config.language"),
             AllIcons.Nodes.Lambda,
-            new String[]{"", "English", "Arabic", "French"},
-            ShownWhen.ALWAYS
+            new String[]{"English", "Arabic", "French"},
+            ShownWhen.ALWAYS,
+            ""
     ),
 
     BROWSER(
             Bundle.message("config.browser"),
             AllIcons.Nodes.WebFolder,
-            new String[]{"", "Chrome", "Firefox", "Safari", "Edge"},
-            chosen -> chosen.is(PLATFORM, Answer.WEB) && chosen.is(COMPONENT, Answer.FRONTEND)
+            new String[]{"Chrome", "Firefox", "Safari", "Edge"},
+            chosen -> chosen.is(PLATFORM, Answer.WEB) && chosen.is(COMPONENT, Answer.FRONTEND),
+            "Chrome"
     ),
 
     DEVICE_TYPE(
             Bundle.message("config.device.type"),
             AllIcons.Nodes.Include,
-            new String[]{"", "iPhone", "Samsung", "Huawei"},
-            chosen -> chosen.is(PLATFORM, Answer.MOBILE) && chosen.is(COMPONENT, Answer.FRONTEND)
+            new String[]{"iPhone", "Samsung", "Huawei"},
+            chosen -> chosen.is(PLATFORM, Answer.MOBILE) && chosen.is(COMPONENT, Answer.FRONTEND),
+            ""
     );
 
     private final @NotNull String displayName;
@@ -96,6 +104,7 @@ public enum TestRunConfiguration {
     private final @NotNull String[] options;
     @Getter(AccessLevel.NONE)
     private final @NotNull ShownWhen shownWhen;
+    private final @NotNull String defaultAnswer;
 
     public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunMarker run) {
         return Arrays.stream(values())

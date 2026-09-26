@@ -17,20 +17,18 @@
 package org.testin.ui.framework;
 
 import com.intellij.ui.components.JBOptionButton;
-import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.Optional;
 
 public final class DialogSplitButton implements DialogComponent {
     private final @NotNull JBOptionButton button;
-    private final @NotNull JBPanel<?> panel;
+    private final @NotNull ButtonFooter footer;
     private final @NotNull String defaultLabel;
     private @NotNull String chosen;
     private @NotNull Runnable submitRequest = () -> {
@@ -47,18 +45,17 @@ public final class DialogSplitButton implements DialogComponent {
 
         button = new JBOptionButton(main, alternatives.length == 0 ? null : alternatives);
 
-        panel = new JBPanel<>(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        panel.setOpaque(false);
-        panel.setBorder(JBUI.Borders.empty(8, 12));
-        panel.add(button);
+        footer = new ButtonFooter(button);
     }
 
     public @NotNull String getChosen() {
         return chosen;
     }
 
-    public void setEnabled(final boolean enabled) {
-        button.setEnabled(enabled);
+    // UC-INTERNAL-007, Rule-INTERNAL-080
+    public void enableUnless(final @NotNull Optional<String> reason) {
+        button.setEnabled(reason.isEmpty());
+        footer.showReason(reason);
     }
 
     private @NotNull Action action(final @NotNull String label) {
@@ -76,7 +73,7 @@ public final class DialogSplitButton implements DialogComponent {
 
     @Override
     public @NotNull JComponent getPanel() {
-        return panel;
+        return footer.getPanel();
     }
 
     @Override

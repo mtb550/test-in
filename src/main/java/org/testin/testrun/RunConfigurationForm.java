@@ -15,22 +15,20 @@
  */
 package org.testin.testrun;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunConfiguration;
-import org.testin.ui.framework.ChoiceInput;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogComponent;
-import org.testin.ui.framework.TextArea;
-import org.testin.ui.framework.TextInput;
-import org.testin.ui.framework.TextValue;
+import org.testin.ui.framework.DialogHost;
 import org.testin.util.Bundle;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -39,43 +37,40 @@ import java.util.Optional;
 
 public class RunConfigurationForm implements DialogComponent {
     private static final boolean EXPANDED = true;
-    private static final int CHANGE_LOG_ROWS = 3;
+    private static final int COLUMN_GAP = 12;
 
     private final @NotNull JBPanel<?> wrapper;
-    private final @NotNull ComponentDialogBase<TextInput> runName;
-    private final @NotNull Map<TestRunConfiguration, ComponentDialogBase<? extends DialogComponent>> fields = new EnumMap<>(TestRunConfiguration.class);
-    private final @NotNull List<ComponentDialogBase<? extends DialogComponent>> order = new ArrayList<>();
+    private final @NotNull RunNameSection runName;
+    private final @NotNull ChangeLogSection changeLog;
+    private final @NotNull Map<TestRunConfiguration, ChoiceSection> choices = new EnumMap<>(TestRunConfiguration.class);
+    private final @NotNull List<RunSection> sections = new ArrayList<>();
+    private final @NotNull List<List<ComponentDialogBase<?>>> rows = new ArrayList<>();
+    private @NotNull Runnable answered = () -> {
+    };
 
     // UC-TREE-PANEL-021, UC-TREE-PANEL-022
-    public RunConfigurationForm(final @NotNull String name, final @NotNull Map<TestRunConfiguration, String> answers) {
-        runName = ComponentDialogBase.textField()
-                .caption(Bundle.message("run.form.name.caption"))
-                .placeholder(Bundle.message("run.form.name.hint"))
-                .value(name)
-                .build();
-        order.add(runName);
+    public RunConfigurationForm(final @NotNull Project p, final @NotNull String name, final @NotNull Map<TestRunConfiguration, String> answers) {
+        runName = RunNameSection.of(name);
+        changeLog = ChangeLogSection.of(p, answers.getOrDefault(TestRunConfiguration.CHANGE_LOG, ""));
 
-        add(TestRunConfiguration.CHANGE_LOG, ComponentDialogBase.textArea()
-                .caption(TestRunConfiguration.CHANGE_LOG.getDisplayName())
-                .placeholder(Bundle.message("run.form.change.log.hint"))
-                .value(answers.getOrDefault(TestRunConfiguration.CHANGE_LOG, ""))
-                .rows(CHANGE_LOG_ROWS)
-                .build());
-
-        add(TestRunConfiguration.COMMIT_ID, ComponentDialogBase.textField()
-                .caption(TestRunConfiguration.COMMIT_ID.getDisplayName())
-                .placeholder(Bundle.message("run.form.commit.hint"))
-                .value(answers.getOrDefault(TestRunConfiguration.COMMIT_ID, ""))
-                .build());
+        final @NotNull CommitIdSection commitId = CommitIdSection.of(answers.getOrDefault(TestRunConfiguration.COMMIT_ID, ""));
 
         for (final TestRunConfiguration field : TestRunConfiguration.values()) {
             if (!field.isChoice()) continue;
 
-            final @NotNull ComponentDialogBase<ChoiceInput> choice = ComponentDialogBase.choice(
-                    field.getDisplayName(), List.of(field.getOptions()), answers.getOrDefault(field, ""));
-            choice.getComponent().onChange(this::applyVisibility);
-            add(field, choice);
+            choices.put(field, ChoiceSection.of(field, answers.getOrDefault(field, field.getDefaultAnswer()), this::answerChanged));
         }
+
+        sections.add(changeLog);
+        sections.add(commitId);
+        sections.addAll(choices.values());
+
+        rows.add(List.of(runName.component(), commitId.component()));
+        rows.add(List.of(changeLog.component()));
+        rows.add(List.of(choice(TestRunConfiguration.TEST_TYPE).component(), choice(TestRunConfiguration.PLATFORM).component()));
+        rows.add(List.of(choice(TestRunConfiguration.COMPONENT).component(), choice(TestRunConfiguration.LANGUAGE).component()));
+        rows.add(List.of(choice(TestRunConfiguration.BROWSER).component()));
+        rows.add(List.of(choice(TestRunConfiguration.DEVICE_TYPE).component()));
 
         wrapper = new JBPanel<>(new BorderLayout());
         wrapper.setOpaque(false);
@@ -84,31 +79,28 @@ public class RunConfigurationForm implements DialogComponent {
         applyVisibility();
     }
 
-    private static @NotNull String textIn(final @NotNull DialogComponent component) {
-        return switch (component) {
-            case TextValue typed -> typed.getText().trim();
-            case TextArea area -> area.getText().trim();
-            case ChoiceInput picked -> picked.getValue().trim();
-            default -> "";
-        };
+    private static @NotNull JComponent laidOut(final @NotNull List<ComponentDialogBase<?>> row) {
+        if (row.size() == 1) return row.getFirst().getComponent().getPanel();
+
+        final @NotNull JBPanel<?> line = new JBPanel<>(new GridLayout(1, row.size(), JBUI.scale(COLUMN_GAP), 0));
+        line.setOpaque(false);
+        row.forEach(component -> line.add(component.getComponent().getPanel()));
+
+        return line;
     }
 
-    private void add(final @NotNull TestRunConfiguration field, final @NotNull ComponentDialogBase<? extends DialogComponent> component) {
-        fields.put(field, component);
-        order.add(component);
+    private @NotNull ChoiceSection choice(final @NotNull TestRunConfiguration field) {
+        return Optional.ofNullable(choices.get(field)).orElseThrow();
     }
 
     private @NotNull JBPanel<?> stacked() {
         final @NotNull JBPanel<?> panel = new JBPanel<>();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
-        panel.setBorder(JBUI.Borders.compound(
-                JBUI.Borders.customLine(UIUtil.getBoundsColor(), 0, 0, 1, 0),
-                JBUI.Borders.empty(10)
-        ));
+        panel.setBorder(JBUI.Borders.empty(10));
 
-        for (final ComponentDialogBase<? extends DialogComponent> component : order) {
-            final @NotNull JComponent shown = component.getComponent().getPanel();
+        for (final List<ComponentDialogBase<?>> row : rows) {
+            final @NotNull JComponent shown = laidOut(row);
             shown.setAlignmentX(JComponent.LEFT_ALIGNMENT);
             panel.add(shown);
         }
@@ -116,36 +108,47 @@ public class RunConfigurationForm implements DialogComponent {
         return panel;
     }
 
+    public void onAnswerChanged(final @NotNull Runnable answered) {
+        this.answered = answered;
+    }
+
+    // Rule-TREE-PANEL-121
+    public @NotNull Optional<String> unanswered() {
+        for (final ChoiceSection section : choices.values()) {
+            if (!section.needsAnAnswer()) continue;
+
+            return Optional.of(Bundle.message("run.form.unanswered", section.field().getDisplayName()));
+        }
+
+        return Optional.empty();
+    }
+
+    private void answerChanged() {
+        applyVisibility();
+        answered.run();
+    }
+
     // Rule-TREE-PANEL-120
     private void applyVisibility() {
-        fields.forEach((field, component) -> component.getComponent().getPanel().setVisible(field.isShownFor(this::chosenIn)));
+        choices.values().forEach(section -> section.showIf(section.field().isShownFor(this::chosenIn)));
 
         wrapper.revalidate();
         wrapper.repaint();
     }
 
     private @NotNull String chosenIn(final @NotNull TestRunConfiguration field) {
-        return Optional.ofNullable(fields.get(field)).map(component -> textIn(component.getComponent())).orElse("");
+        return Optional.ofNullable(choices.get(field)).map(ChoiceSection::value).orElse("");
     }
 
     public @NotNull Map<TestRunConfiguration, String> configuration() {
         final @NotNull Map<TestRunConfiguration, String> answers = new EnumMap<>(TestRunConfiguration.class);
-
-        for (final TestRunConfiguration field : TestRunConfiguration.values()) {
-            answers.put(field, answerTo(field));
-        }
+        sections.forEach(section -> section.applyTo(answers));
 
         return answers;
     }
 
     public @NotNull String getRunName() {
-        return runName.getComponent().getText().trim();
-    }
-
-    private @NotNull String answerTo(final @NotNull TestRunConfiguration field) {
-        if (!field.isShownFor(this::chosenIn)) return "";
-
-        return chosenIn(field);
+        return runName.name();
     }
 
     @Override
@@ -155,7 +158,13 @@ public class RunConfigurationForm implements DialogComponent {
 
     @Override
     public @NotNull JComponent getFocusComponent() {
-        return fields.get(TestRunConfiguration.CHANGE_LOG).getComponent().getFocusComponent();
+        return changeLog.component().getComponent().getFocusComponent();
+    }
+
+    // Rule-TREE-PANEL-122
+    @Override
+    public void hostedBy(final @NotNull DialogHost host, final @NotNull Runnable submit) {
+        changeLog.takesLineBreaks(host);
     }
 
     @Override

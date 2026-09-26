@@ -16,6 +16,7 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
@@ -23,10 +24,15 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
+import com.intellij.openapi.ui.popup.IconButton;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
+import com.intellij.ui.ActiveComponent;
+import com.intellij.ui.InplaceButton;
+import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -34,12 +40,17 @@ import org.testin.model.StatusBarItem;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 import javax.swing.LayoutFocusTraversalPolicy;
+import javax.swing.Scrollable;
+import javax.swing.ScrollPaneConstants;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -59,13 +70,14 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
     protected @NotNull List<? extends ComponentDialogBase<?>> components = List.of();
     protected @NotNull List<StatusBarShortcut> shortcuts = List.of();
 
-    protected @NotNull Dimension preferredSize = new Dimension();
+    protected @NotNull DialogSize size = DialogSize.CONTENT;
 
     // UC-INTERNAL-007, Rule-INTERNAL-076
     protected boolean dismissOnClickOutside;
 
     protected boolean resizable;
 
+    private @NotNull Optional<Rectangle> restoreTo = Optional.empty();
     private @NotNull Optional<DialogDto> dto = Optional.empty();
     private @NotNull Optional<List<DialogComponent>> built = Optional.empty();
     private @NotNull Optional<JBPopup> popup = Optional.empty();
@@ -84,6 +96,23 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         return stack;
     }
 
+    private static void resize(final @NotNull JBPopup open, final @NotNull Rectangle bounds) {
+        open.setSize(bounds.getSize());
+        open.setLocation(bounds.getLocation());
+    }
+
+    // UC-INTERNAL-007, Rule-INTERNAL-102
+    private static @NotNull JScrollPane scrolling(final @NotNull JComponent stack) {
+        final @NotNull JScrollPane scroll = ScrollPaneFactory.createScrollPane(stack, true);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        return scroll;
+    }
+
+    // Rule-INTERNAL-100
     private static int naturalHeightOf(final @NotNull JComponent content) {
         final @NotNull Optional<Dimension> told = content.isPreferredSizeSet()
                 ? Optional.of(content.getPreferredSize())
@@ -145,6 +174,13 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
 
         open.remember(getClass(), getPopup());
         getPopup().showCenteredInCurrentWindow(p);
+
+        // Rule-INTERNAL-100
+        if (sizeIsTheTesters() && !size.namesAHeight()) {
+            final @NotNull Dimension shown = getPopup().getSize();
+            getPopup().setSize(new Dimension(DialogSize.widthOn(p, shown.width), shown.height));
+        }
+
         return true;
     }
 
@@ -170,11 +206,10 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         bindSubmitGesture();
 
         final @NotNull ComponentPopupBuilder builder = DialogStyle.createPopupBuilder(contentPanel, focusComponent(), dto().title(), dismissOnClickOutside);
-        if (preferredSize.width > 0) {
-            contentPanel.setPreferredSize(preferredSize);
-            builder.setResizable(true).setMovable(true);
-        }
-        if (resizable) builder.setResizable(true).setMovable(true);
+        size.applyTo(p, contentPanel);
+
+        // Rule-INTERNAL-101
+        if (sizeIsTheTesters()) builder.setResizable(true).setMovable(true).setCommandButton(maximizeToggle());
 
         builder.addListener(new JBPopupListener() {
             @Override
@@ -184,6 +219,41 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         });
 
         return builder.createPopup();
+    }
+
+    // Rule-INTERNAL-101
+    private boolean sizeIsTheTesters() {
+        return resizable || size.namesAHeight();
+    }
+
+    // UC-INTERNAL-007, Rule-INTERNAL-101
+    private @NotNull ActiveComponent maximizeToggle() {
+        final @NotNull InplaceButton button = new InplaceButton(new IconButton(Bundle.message("dialog.maximize"), AllIcons.General.ExpandComponent, AllIcons.General.ExpandComponentHover), _ -> toggleMaximized());
+
+        return new ActiveComponent() {
+            @Override
+            public void setActive(final boolean active) {
+            }
+
+            @Override
+            public @NotNull JComponent getComponent() {
+                return button;
+            }
+        };
+    }
+
+    // UC-INTERNAL-007, Rule-INTERNAL-101
+    private void toggleMaximized() {
+        final @NotNull JBPopup open = getPopup();
+
+        if (restoreTo.isPresent()) {
+            resize(open, restoreTo.orElseThrow());
+            restoreTo = Optional.empty();
+            return;
+        }
+
+        restoreTo = Optional.of(new Rectangle(open.getLocationOnScreen(), open.getSize()));
+        resize(open, DialogSize.frameOn(p));
     }
 
     protected void closed() {
@@ -226,10 +296,13 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         return false;
     }
 
+    // Rule-INTERNAL-101
     @Override
     public final void refit() {
+        if (restoreTo.isPresent()) return;
+
         popup.ifPresent(open -> {
-            open.setSize(new Dimension(open.getSize().width, naturalHeightOf(open.getContent())));
+            open.setSize(new Dimension(open.getSize().width, DialogSize.withinFrame(p, naturalHeightOf(open.getContent()))));
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 final @NotNull Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
@@ -305,8 +378,7 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
 
         if (fillIndex < 0) fillIndex = all.size() - 1;
 
-        final @NotNull JBPanel<?> stack = new JBPanel<>(new BorderLayout());
-        stack.setOpaque(false);
+        final @NotNull ContentStack stack = new ContentStack();
         if (fillIndex > 0) {
             stack.add(verticalStack(all.subList(0, fillIndex)), BorderLayout.NORTH);
         }
@@ -320,7 +392,7 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
 
         final @NotNull JBPanel<?> contentPanel = DialogStyle.styleContent(new JBPanel<>(new BorderLayout()));
         contentPanel.setBorder(BorderFactory.createEmptyBorder());
-        contentPanel.add(stack, BorderLayout.CENTER);
+        contentPanel.add(scrolling(stack), BorderLayout.CENTER);
         contentPanel.add(statusBar.getPanel(), BorderLayout.SOUTH);
 
         contentPanel.setFocusCycleRoot(true);
@@ -346,6 +418,41 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
     private void bindSubmitGesture() {
         for (final DialogComponent dialogComponent : builtComponents()) {
             dialogComponent.hostedBy(this, this::submit);
+        }
+    }
+
+    // Rule-INTERNAL-102
+    private static final class ContentStack extends JBPanel<ContentStack> implements Scrollable {
+        private static final int STEP = 16;
+
+        private ContentStack() {
+            super(new BorderLayout());
+            setOpaque(false);
+        }
+
+        @Override
+        public @NotNull Dimension getPreferredScrollableViewportSize() {
+            return getPreferredSize();
+        }
+
+        @Override
+        public int getScrollableUnitIncrement(final @NotNull Rectangle visible, final int orientation, final int direction) {
+            return JBUI.scale(STEP);
+        }
+
+        @Override
+        public int getScrollableBlockIncrement(final @NotNull Rectangle visible, final int orientation, final int direction) {
+            return visible.height;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
+            return true;
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportHeight() {
+            return getParent() instanceof JViewport viewport && viewport.getHeight() >= getPreferredSize().height;
         }
     }
 }

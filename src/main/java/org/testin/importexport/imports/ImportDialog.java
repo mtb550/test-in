@@ -17,7 +17,6 @@
 package org.testin.importexport.imports;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.SheetPreview;
@@ -27,11 +26,11 @@ import org.testin.services.Services;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.DialogSize;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
-import java.awt.Dimension;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +62,7 @@ public final class ImportDialog extends AbstractFrameworkDialog {
                 StatusBarShortcut.build(Shortcuts.Enter, ImportAction.NAME, this::submit),
                 StatusBarShortcut.cancel(this::closeCancel));
 
-        preferredSize = new Dimension(JBUI.scale(900), JBUI.scale(600));
+        size = DialogSize.HALF;
 
         form.selectSourceFile();
     }

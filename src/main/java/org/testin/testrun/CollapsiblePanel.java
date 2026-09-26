@@ -23,6 +23,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 
@@ -35,8 +36,9 @@ import java.awt.event.MouseEvent;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CollapsiblePanel {
+    // Rule-INTERNAL-099
     public static @NotNull JBPanel<?> build(final @NotNull String title, final @NotNull JComponent content, final boolean initiallyVisible) {
-        final @NotNull JBPanel<?> wrapper = new JBPanel<>(new BorderLayout());
+        final @NotNull JBPanel<?> wrapper = DialogStyle.asSection(new JBPanel<>(new BorderLayout()));
 
         final @NotNull JBLabel titleLabel = new JBLabel(title);
 

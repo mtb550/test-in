@@ -17,10 +17,10 @@
 package org.testin.view.details.components;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.DialogSize;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
@@ -28,8 +28,6 @@ import org.testin.util.Shortcuts;
 import java.util.List;
 
 public final class ScreenshotDialog extends AbstractFrameworkDialog {
-    private static final int WIDTH = 1000;
-    private static final int HEIGHT = 700;
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081
     public ScreenshotDialog(final @NotNull Project p, final @NotNull String name, final byte @NotNull [] png) {
@@ -37,7 +35,7 @@ public final class ScreenshotDialog extends AbstractFrameworkDialog {
 
         title = name;
 
-        preferredSize = JBUI.size(WIDTH, HEIGHT);
+        size = DialogSize.TALL;
 
         components = List.of(ComponentDialogBase.picture(png));
 

@@ -51,6 +51,14 @@ public final class DialogStyle {
         return component;
     }
 
+    // Rule-INTERNAL-099
+    public static <T extends JComponent> @NotNull T asSection(final @NotNull T component) {
+        component.setOpaque(true);
+        component.setBackground(UIUtil.getTextFieldBackground());
+        component.setBorder(JBUI.Borders.customLine(UIUtil.getBoundsColor(), 1, 1, 1, 1));
+        return component;
+    }
+
     // UC-INTERNAL-001, Rule-INTERNAL-096
     public static <T extends JComponent> @NotNull T framed(final @NotNull T component) {
         component.setBorder(new FieldFrame());
@@ -69,6 +77,12 @@ public final class DialogStyle {
     public static <T extends JComponent> @NotNull T asChoice(final @NotNull T component) {
         component.setFont(Fonts.choice());
         hint(component);
+        return component;
+    }
+
+    // Rule-INTERNAL-095
+    public static <T extends JComponent> @NotNull T asOption(final @NotNull T component) {
+        component.setFont(Fonts.option());
         return component;
     }
 

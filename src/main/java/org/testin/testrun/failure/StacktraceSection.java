@@ -16,24 +16,18 @@
 
 package org.testin.testrun.failure;
 
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.ComponentDialogBase;
-import org.testin.ui.framework.TextArea;
+import org.testin.ui.framework.MultiLineField;
 import org.testin.util.Bundle;
 
-public record StacktraceSection(@NotNull ComponentDialogBase<TextArea> component) implements FailureSection {
-    private static final int ROWS = 5;
-
+public record StacktraceSection(@NotNull ComponentDialogBase<MultiLineField> component) implements FailureSection {
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
-    public static @NotNull StacktraceSection of(final @NotNull TestRunItems runItem) {
-        return new StacktraceSection(ComponentDialogBase.textArea()
-                .caption(RunEditorAttributes.STACKTRACE.getName())
-                .placeholder(Bundle.message("dialog.failure.placeholder.error"))
-                .value(runItem.getStacktrace())
-                .rows(ROWS)
-                .build());
+    public static @NotNull StacktraceSection of(final @NotNull Project p, final @NotNull TestRunItems runItem) {
+        return new StacktraceSection(ComponentDialogBase.multiLineField(p, RunEditorAttributes.STACKTRACE.getName(), Bundle.message("dialog.failure.placeholder.error"), runItem.getStacktrace()));
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145

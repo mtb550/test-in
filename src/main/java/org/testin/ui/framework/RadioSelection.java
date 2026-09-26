@@ -36,6 +36,8 @@ public final class RadioSelection<T> implements DialogComponent {
     private final @NotNull JRadioButton firstButton;
     private final @NotNull Map<T, JRadioButton> buttons = new LinkedHashMap<>();
     private @NotNull T selected;
+    private @NotNull Runnable changed = () -> {
+    };
 
     RadioSelection(final @NotNull String caption, final @NotNull List<Option<T>> options, final @NotNull T initial) {
         this.selected = initial;
@@ -48,10 +50,13 @@ public final class RadioSelection<T> implements DialogComponent {
         Optional<JRadioButton> first = Optional.empty();
         for (final Option<T> option : options) {
             final @NotNull JRadioButton radio = new JRadioButton(option.name());
-            DialogStyle.asChoice(radio);
+            DialogStyle.asOption(radio);
             radio.setOpaque(false);
             radio.setSelected(option.value().equals(initial));
-            radio.addActionListener(_ -> selected = option.value());
+            radio.addActionListener(_ -> {
+                selected = option.value();
+                changed.run();
+            });
             group.add(radio);
             radioRow.add(radio);
             buttons.put(option.value(), radio);
@@ -65,6 +70,15 @@ public final class RadioSelection<T> implements DialogComponent {
 
     public @NotNull T getSelected() {
         return selected;
+    }
+
+    // Rule-TREE-PANEL-121
+    public boolean isAnswered() {
+        return buttons.containsKey(selected);
+    }
+
+    public void onChange(final @NotNull Runnable changed) {
+        this.changed = changed;
     }
 
     public void select(final @NotNull T value) {

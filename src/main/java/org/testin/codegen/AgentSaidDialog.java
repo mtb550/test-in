@@ -17,8 +17,8 @@
 package org.testin.codegen;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.framework.DialogSize;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -30,8 +30,6 @@ import java.util.List;
 // UC-CODEGEN-021, Rule-CODEGEN-090
 public final class AgentSaidDialog extends AbstractFrameworkDialog {
     private static final int VISIBLE_ROWS = 24;
-    private static final int WIDTH = 900;
-    private static final int HEIGHT = 620;
 
     // UC-CODEGEN-021, Rule-CODEGEN-090
     public AgentSaidDialog(final @NotNull Project p, final @NotNull String transcript) {
@@ -39,7 +37,7 @@ public final class AgentSaidDialog extends AbstractFrameworkDialog {
 
         title = Bundle.message("agent.said.title");
 
-        preferredSize = JBUI.size(WIDTH, HEIGHT);
+        size = DialogSize.HALF;
 
         components = List.of(ComponentDialogBase.textArea()
                 .value(transcript)

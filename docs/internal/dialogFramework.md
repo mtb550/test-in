@@ -74,7 +74,7 @@ and which keys it answers, and the shell builds the rest.
   column to line up.
 - **Rule-INTERNAL-095** — Every font a tester reads comes from one owner,
   `org.testin.util.Fonts`, which names each role - title, strong, body, label,
-  badge, code, caption, message, field, placeholder, value, choice, small,
+  badge, code, caption, message, field, placeholder, value, choice, option, row, small,
   hint, keycap, figure and icon letter - and derives them all from the same two
   sizes: the editor's, which the panels zoom with, and the IDE's label font,
   which the dialogs follow. A surface asks for the role it is showing and never
@@ -101,6 +101,44 @@ and which keys it answers, and the shell builds the rest.
   a dialog saves with it, and light mode's window saves and moves to the next
   test case - so a box asks its host to bind Enter rather than binding it
   itself, and a host that has other plans for the key keeps it.
+- **Rule-INTERNAL-099** — A section inside a dialog sits on its own background,
+  one step from the dialog it is on, so the form and the dialog around it are
+  told apart at a glance. One place decides both colors, for every dialog and
+  both themes.
+- **Rule-INTERNAL-100** — A dialog the tester can resize is six tenths of the IDE
+  frame wide, every one of them, because a width chosen per dialog is a number
+  nobody chose with the others. What a dialog names is how tall it is: half the
+  frame for a form with a list under it, seven tenths for an image or a document
+  read top to bottom, or nothing at all, which means as tall as its content needs
+  and growing as the tester opens more of it. The share is clamped: never
+  narrower or shorter than the dialog needs to show its content, never past the
+  frame less a margin. A dialog the tester cannot resize names no size and is as
+  big as its content, so a confirmation holding one sentence stays the size of
+  that sentence.
+- **Rule-INTERNAL-101** — A dialog whose size the tester can change can be maximized, from a
+  button in its title bar. Maximize fills the IDE frame and the button pressed
+  again returns the dialog to the size and place it opened at, with everything
+  typed and checked still in it. A dialog that grows as it is typed into stops
+  growing while it is maximized, because a dialog filling the frame is the size
+  the tester asked for. No dialog can be minimized: a dialog is a popup
+  and has no taskbar entry of its own to minimize into.
+- **Rule-INTERNAL-102** — A dialog made smaller than its content scrolls rather
+  than clipping it: a vertical scrollbar appears and the status bar stays where
+  it is. While the dialog has room, the content takes the whole height and the
+  tree or table inside it scrolls on its own. A tree or table asks for eight
+  rows, so a dialog opens at the height its form needs rather than the height
+  its rows would take. A box that takes several lines shows six of them and
+  scrolls past that, so one long value cannot push the rest of the dialog out of
+  sight.
+- **Rule-INTERNAL-103** — A box that spell-checks what is typed into it
+  underlines a misspelled word and shows nothing else. No bulb, no icon and no
+  button offers the corrections: the underline says there is something to
+  correct and Alt+Enter offers it, the same key that offers a correction
+  anywhere in the IDE.
+- **Rule-INTERNAL-104** — The keys along the bottom of a dialog never make it
+  wider. They stay on one line and a key with no room is simply not drawn,
+  because a dialog is sized by what the tester fills in, not by how many keys it
+  can be answered with. Widening the dialog shows the rest.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

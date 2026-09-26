@@ -16,18 +16,15 @@
 
 package org.testin.ui.framework;
 
-import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import java.awt.FlowLayout;
 import java.util.Optional;
 
 public final class DialogButton implements DialogComponent {
     private final @NotNull JButton button;
-    private final @NotNull JBPanel<?> panel;
+    private final @NotNull ButtonFooter footer;
     private @NotNull Runnable submitRequest = () -> {
     };
 
@@ -35,25 +32,18 @@ public final class DialogButton implements DialogComponent {
         button = new JButton(text);
         button.addActionListener(_ -> submitRequest.run());
 
-        panel = new JBPanel<>(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        panel.setOpaque(false);
-        panel.setBorder(JBUI.Borders.empty(8, 12));
-        panel.add(button);
-    }
-
-    public void setEnabled(final boolean enabled) {
-        button.setEnabled(enabled);
+        footer = new ButtonFooter(button);
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-080
     public void enableUnless(final @NotNull Optional<String> reason) {
         button.setEnabled(reason.isEmpty());
-        button.setToolTipText(reason.orElse(""));
+        footer.showReason(reason);
     }
 
     @Override
     public @NotNull JComponent getPanel() {
-        return panel;
+        return footer.getPanel();
     }
 
     @Override

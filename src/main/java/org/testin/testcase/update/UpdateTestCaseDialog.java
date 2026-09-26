@@ -23,7 +23,6 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testcase.UpdateTestCaseFields;
-import org.testin.testcase.create.AbstractMultiLineSection;
 import org.testin.testcase.create.AbstractMultiValueSection;
 import org.testin.testcase.create.CreateTestCaseSection;
 import org.testin.testcase.create.DescriptionSection;
@@ -82,6 +81,9 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         showSectionKeys(selectedItem.getStatusBarItems());
 
         title = Bundle.message("update.dialog.title.field", selectedItem.getName());
+
+        // Rule-INTERNAL-101
+        resizable = true;
         components = List.of(ComponentDialogBase.of(form));
 
         getAllSections().forEach(section -> section.enableMultiLine(this, this::submit));

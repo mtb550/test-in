@@ -104,7 +104,10 @@ public final class Badges {
         return new Framed(duration, CLOCK);
     }
 
+    // Rule-VIEW-PANEL-085
     public static void showBadges(final @NotNull JBPanel<?> panel, final @NotNull List<Badge> badges) {
+        panel.setVisible(!badges.isEmpty());
+
         while (panel.getComponentCount() < badges.size()) {
             panel.add(new BadgePill());
         }

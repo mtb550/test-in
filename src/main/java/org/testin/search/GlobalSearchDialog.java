@@ -18,10 +18,10 @@ package org.testin.search;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.DialogSize;
 import org.testin.ui.framework.Rows;
 import org.testin.ui.framework.SelectionList;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -54,7 +54,7 @@ public final class GlobalSearchDialog extends AbstractFrameworkDialog {
                 StatusBarShortcut.cancel(this::closeCancel)
         );
 
-        preferredSize = JBUI.size(700, 460);
+        size = DialogSize.SHORT;
 
         // Rule-INTERNAL-076
         dismissOnClickOutside = true;
