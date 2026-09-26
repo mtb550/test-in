@@ -19,6 +19,24 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}  # to check out the actual pull request commit, not the merge commit
           fetch-depth: 0  # a full history is required for pull request analysis
+
+      - name: Java 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      # The two content modules compile against the core jar, so the scan
+      # resolves them to a jar that nothing had built. Their classes came out
+      # unresolved, which is where the unchecked warnings and the Java sanity
+      # errors in the first report came from. This is the same command
+      # inspect.yml runs, and it builds that jar on the way.
+      - name: Build the jar the content modules compile against
+        run: ./gradlew compileJava
+
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2026.1
         with:
