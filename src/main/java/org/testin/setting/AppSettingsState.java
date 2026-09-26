@@ -69,7 +69,7 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
 
         agentCommand = orEmpty(agentCommand);
         agentArguments = orEmpty(agentArguments);
-        agentPrompt = Objects.requireNonNullElse(agentPrompt, "");
+        agentPrompt = orEmpty(agentPrompt);
         agentTimeoutSeconds = agentTimeoutSeconds > 0 ? agentTimeoutSeconds : DEFAULT_TIMEOUT_SECONDS;
 
         applyLogLevel();

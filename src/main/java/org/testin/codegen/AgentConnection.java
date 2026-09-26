@@ -22,7 +22,6 @@ import org.testin.setting.AppSettingsState;
 import org.testin.util.Bundle;
 
 import java.time.Duration;
-import java.util.Optional;
 
 // UC-CODEGEN-021, Rule-CODEGEN-083
 public record AgentConnection(@NotNull String command, @NotNull String arguments, @NotNull String prompt, @NotNull Duration timeout) {

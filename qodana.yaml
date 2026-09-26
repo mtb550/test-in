@@ -4,7 +4,22 @@
 
 version: "1.0"
 linter: qodana-jvm
+
+# The project's own profile, the one the IDE selects through
+# .idea/inspectionProfiles/profiles_settings.xml and the one tools/inspect.ps1
+# hands the headless inspector. Qodana reads an IntelliJ XML profile from a path
+# as readily as it reads one of its own by name, so the three now ask the same
+# question of the same rules.
+#
+# It was qodana.recommended until then, and that profile turns on inspections
+# this project has switched off on purpose. The first cloud report was 91
+# findings, 86 of them OptionalUsedAsFieldOrParameterType - a field holding an
+# Optional is how a Testin field says "not set yet", which is why the profile
+# below disables that inspection and why CLAUDE.md says turning it back on
+# means reversing the decision rather than tidying up. A gate that reports 86
+# things nobody will ever change is a gate nobody reads.
 profile:
-  name: qodana.recommended
+  path: .idea/inspectionProfiles/Testin.xml
+
 include:
   - name: CheckDependencyLicenses
