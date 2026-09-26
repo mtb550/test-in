@@ -82,7 +82,7 @@ and which keys it answers, and the shell builds the rest.
   placeholder the same in every dialog. The documents Testin writes are in it
   too: `Fonts.Report` holds the point sizes a PDF and a Word file are set in,
   the pixel sizes an HTML report uses, and the families all three are written
-  in, so a size changes in one place or it disagrees with itself in three.
+  in, so a size changes in one place, or it disagrees with itself in three.
 - **Rule-INTERNAL-096** — Every typing surface in a dialog is drawn in the same
   frame, whether it holds one line or many: a text area sits in the frame a text
   field has, not in a borderless well. A value the dialog shows read-only is set
@@ -97,12 +97,12 @@ and which keys it answers, and the shell builds the rest.
 - **Rule-INTERNAL-097** — A box that holds many lines grows as lines are added,
   and whatever draws it grows with it rather than letting it scroll inside a
   fixed box. Every such box is the same box: the same frame, the same font, Tab
-  leaves it, and Ctrl+Enter adds a line. Enter belongs to whoever draws the box -
-  a dialog saves with it, and light mode's window saves and moves to the next
-  test case - so a box asks its host to bind Enter rather than binding it
-  itself, and a host that has other plans for the key keeps it.
+  leaves it, and Ctrl+Enter adds a line. Enter belongs to whoever draws the box.
+  A dialog saves with it, and light mode's window saves and moves to the next
+  test case. So a box asks its host to bind Enter rather than binding it itself,
+  and a host with other plans for the key keeps it.
 - **Rule-INTERNAL-099** — A section inside a dialog sits on its own background,
-  one step from the dialog it is on, so the form and the dialog around it are
+  one step from the dialog it is on, so the form and the surrounding dialog are
   told apart at a glance. One place decides both colors, for every dialog and
   both themes.
 - **Rule-INTERNAL-100** — A dialog the tester can resize is six tenths of the IDE

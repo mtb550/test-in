@@ -323,8 +323,8 @@ silently has no effect costs more than the setting it was meant to hold.
   the same script with the IDE left out: only the rules that read the source as
   text, five seconds over every source root, and it exits non-zero on a
   breach. It was built on 23 September 2026 because warnings kept reaching
-  Muteb's IDE one paste at a time — *"many times i told you, still face inspect
-  issues"* — and the worst of them, a lambda parameter nothing reads, is one
+  Muteb's IDE one paste at a time — *"many times I told you, still face inspect
+  issues"* — and the worst of them, a lambda parameter nothing reads, is one that
   the headless inspector never reports at all: 113 were sitting in the tree.
   `compileJava test` says the code runs; this says the IDE will not complain
   about it.

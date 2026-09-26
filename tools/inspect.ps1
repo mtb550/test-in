@@ -888,7 +888,7 @@ function Read-UnusedLambdaParameters([string[]] $scopes) {
                 if ($name -in @('_', 'default', 'case')) { continue }
 
                 $lineStart = $masked.LastIndexOf("`n", [Math]::Max(0, $match.Index - 1)) + 1
-                if ($masked.Substring($lineStart, $match.Index - $lineStart) -match '\bcase\b') { continue }
+                if ($masked.Substring($lineStart, $match.Index - $lineStart) -match '\b(case)\b') { continue }
 
                 $body = Get-LambdaBody $masked ($match.Index + $match.Length)
                 if ($body -match ('\b' + [regex]::Escape($name) + '\b')) { continue }

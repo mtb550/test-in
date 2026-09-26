@@ -16,9 +16,9 @@ to code** and **run**.
 with a copy button until 24 September 2026; the identity is a grid column now,
 off to start with and switched on from **Fields**
 ([UC-EDITOR-PANEL-003](../editorPanel/chooseFields.md)). A 36-character code at
-the top of every panel was the loudest thing on it, and the thing it was for -
-naming the exact test case in a bug report - is written into the report by **Report a bug** without anyone copying
-anything.
+the top of every panel was the loudest thing on it. The thing it was for - naming
+the exact test case in a bug report - is written into the report by **Report a
+bug** without anyone copying anything.
 
 ## Rules
 

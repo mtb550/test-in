@@ -61,9 +61,9 @@ Connecting an agent changes what that gesture produces, not where it lives.
   the one Testin ships, so a tester who never edited it gets the better wording
   a later release brings.
 - **Rule-CODEGEN-087** — A key is never Testin's to hold, to read, or even to
-  ask about. An agent signs itself in - with its own account, or with a key it
-  reads from the environment the IDE was started in - and Testin has no field for
-  one, writes none to its settings file, and puts none on a command line. A
+  ask about. An agent signs itself in, with its own account or with a key it
+  reads from the environment the IDE was started in. Testin has no field for one,
+  writes none to its settings file, and puts none on a command line. A
   question about a key it never uses is a field that can only be wrong: it named
   `ANTHROPIC_API_KEY` beside a Claude Code signed in through a Claude account,
   which reads no such variable, and reported a fault that was not there.
@@ -80,7 +80,7 @@ Connecting an agent changes what that gesture produces, not where it lives.
   holding what was asked and what came back for each of them, in order, with the
   ones that were dropped marked. Nothing opens on its own - a tester who only
   wanted the body reads one line and closes it - and the same pair goes to the
-  log at debug level, so a run nobody watched can still be read afterwards.
+  log at debug level, so a run nobody watched can still be read afterward.
 - **Rule-CODEGEN-091** — A test case whose method already holds a body of its
   own is not sent to the agent, and the run says so before it starts: one dialog
   names how many they are and offers Write over them or Leave them as they are,
