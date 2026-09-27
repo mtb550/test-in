@@ -32,6 +32,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.ui.Tooltip;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -137,7 +138,7 @@ public class CardMouseListener extends MouseAdapter {
             editor.setHoveredIconAction(actionName);
             needsRepaint = true;
 
-            list.setToolTipText(currentAction.map(CardHoverAction.Offered::hintText).orElse(null));
+            Tooltip.set(list, currentAction.map(CardHoverAction.Offered::hintText).orElse(""));
         }
 
         if (needsRepaint)
@@ -149,7 +150,7 @@ public class CardMouseListener extends MouseAdapter {
         if (editor.getHoveredIndex() != -1 || !editor.getHoveredIconAction().isEmpty()) {
             editor.setHoveredIndex(-1);
             editor.setHoveredIconAction("");
-            list.setToolTipText(null);
+            Tooltip.set(list, "");
             list.repaint();
         }
     }

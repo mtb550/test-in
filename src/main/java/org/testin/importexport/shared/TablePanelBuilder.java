@@ -27,6 +27,7 @@ import org.testin.logger.Logger;
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
 
 import javax.swing.DefaultCellEditor;
@@ -90,7 +91,7 @@ public class TablePanelBuilder {
         final @NotNull JBCheckBox headerCheckbox = new JBCheckBox();
         headerCheckbox.setSelected(true);
         headerCheckbox.setHorizontalAlignment(SwingConstants.CENTER);
-        headerCheckbox.setToolTipText(Bundle.message("import.select.all"));
+        Tooltip.set(headerCheckbox, Bundle.message("import.select.all"));
 
         importColumn.setHeaderRenderer(new CheckboxHeaderRenderer(headerCheckbox));
 

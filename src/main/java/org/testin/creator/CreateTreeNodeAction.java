@@ -16,6 +16,7 @@
 
 package org.testin.creator;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -86,6 +87,11 @@ public class CreateTreeNodeAction extends DumbAwareAction {
         e.getPresentation().setText(enabled
                 ? Bundle.message("action.Testin.CreateNode.text")
                 : Bundle.message("action.Testin.CreateNode.text.full", shortWhyNot(selected)));
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.EDT;
     }
 
     private record Work(@NotNull Project p) {

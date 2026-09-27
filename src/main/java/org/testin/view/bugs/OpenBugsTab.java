@@ -29,6 +29,7 @@ import org.testin.model.FailureDetail;
 import org.testin.model.OpenBug;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 
@@ -87,7 +88,7 @@ public class OpenBugsTab {
         final @NotNull ActionLink link = new ActionLink(BugIssueUrl.shortReference(url), open);
 
         link.setFont(Fonts.body());
-        link.setToolTipText(url);
+        Tooltip.set(link, url);
 
         return link;
     }

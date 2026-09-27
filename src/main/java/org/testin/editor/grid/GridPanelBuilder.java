@@ -23,6 +23,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -90,7 +91,7 @@ public class GridPanelBuilder {
 
     private static @NotNull Border cellBorder(final int leftPadding) {
         return BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(1, leftPadding, 0, 0),
+                JBUI.Borders.empty(1, leftPadding, 0, 0),
                 BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR));
     }
 
@@ -111,7 +112,7 @@ public class GridPanelBuilder {
             {
                 textArea.setLineWrap(true);
                 textArea.setWrapStyleWord(true);
-                textArea.setBorder(BorderFactory.createEmptyBorder(CELL_PADDING, CELL_PADDING, CELL_PADDING, CELL_PADDING));
+                textArea.setBorder(JBUI.Borders.empty(CELL_PADDING));
                 textArea.setOpaque(false);
                 wrapper.setOpaque(true);
                 c.gridx = 0;

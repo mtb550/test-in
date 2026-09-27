@@ -18,7 +18,9 @@ package org.testin.java.codegen;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import lombok.AccessLevel;
@@ -32,14 +34,14 @@ import java.util.Objects;
 public final class PackageDeclarations {
     // UC-CODEGEN-017, Rule-CODEGEN-056, Rule-CODEGEN-057
     public static void retarget(final @NotNull Project p, final @NotNull VirtualFile sourceRoot, final @NotNull VirtualFile moved) {
-        for (final VirtualFile child : moved.getChildren()) {
-            if (child.isDirectory()) {
-                retarget(p, sourceRoot, child);
-                continue;
-            }
+        VfsUtilCore.visitChildrenRecursively(moved, new VirtualFileVisitor<Void>() {
+            @Override
+            public boolean visitFile(final @NotNull VirtualFile file) {
+                if (!file.isDirectory() && "java".equals(file.getExtension())) retarget(p, sourceRoot, file, file.getParent());
 
-            if ("java".equals(child.getExtension())) retarget(p, sourceRoot, child, moved);
-        }
+                return true;
+            }
+        });
     }
 
     // UC-CODEGEN-016, Rule-CODEGEN-053

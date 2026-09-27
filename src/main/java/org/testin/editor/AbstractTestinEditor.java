@@ -51,6 +51,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.open.OpenContextMenuAction;
+import org.testin.services.ProjectLifetime;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.ui.FontSync;
@@ -121,7 +122,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         this.parent = parent;
 
         final @NotNull Disposable projectDisposable = Disposer.newDisposable();
-        Disposer.register(p, projectDisposable);
+        Disposer.register(ProjectLifetime.of(p), projectDisposable);
         this.projectDisposable = projectDisposable;
 
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());

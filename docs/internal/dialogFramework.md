@@ -108,9 +108,9 @@ and which keys it answers, and the shell builds the rest.
   dialog's ground showing around it and between it and the next card, and a
   hairline at its edge. A theme names two surfaces, its panel and its content
   color. The card takes the content one - the darker of the two in a dark theme,
-  the lighter in a light one - and the ground takes whichever is left, so the
-  card reads as content in every theme without either color being invented here.
-  Which of the two is darker is the theme's business and it differs: the Islands
+  the lighter in a light one - and the ground takes whichever is left. The card
+  then reads as content in every theme without either color being invented here.
+  Which of the two is darker is the theme's business, and it differs: the Islands
   themes paint their panel darker than their content, every other bundled theme
   the other way. The edge is what tells a card from the ground rather than the
   fill, because a theme may paint both surfaces nearly the same and Islands

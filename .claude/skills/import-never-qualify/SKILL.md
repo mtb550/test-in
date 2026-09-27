@@ -88,9 +88,10 @@ Three things are not code, and the rule skips them:
 
 A simple name that already means another class in that file. `org.testin.logger`
 has Testin's own `Logger`, so the platform's has to be written out - Java has no
-import alias. That line carries the marker:
+import alias. That line carries the marker, written here as text rather than as
+Java, because it is an example of a suppression and a suppression is reported:
 
-```java
+```text
 //noinspection QualifiedClassName
 private static final com.intellij.openapi.diagnostic.@NotNull Logger IDE_LOG =
         com.intellij.openapi.diagnostic.Logger.getInstance(LogWriter.class);

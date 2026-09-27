@@ -39,7 +39,7 @@ public class ImportJsonIdeTest extends BasePlatformTestCase {
     private @NotNull TestCaseDto imported() {
         try {
             final @NotNull Path file = Files.createTempFile("testin-import", ".json");
-            Files.write(file, EXPORTED.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(file, EXPORTED, StandardCharsets.UTF_8);
 
             final @NotNull Map<String, List<TestCaseDto>> read = new ImportJson().parseFile(getProject(), new File(file.toString()));
 
