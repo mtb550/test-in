@@ -107,7 +107,7 @@ public final class CodeNavigator implements CodeNavigation {
     public boolean hasTheWrittenBody(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         if (DumbService.isDumb(p)) return false;
 
-        return ReadAction.computeBlocking(() -> resolve(p, tc).map(GeneratedMethod::holdsAWrittenBody).orElse(false));
+        return Boolean.TRUE.equals(ReadAction.computeBlocking(() -> resolve(p, tc).map(GeneratedMethod::holdsAWrittenBody).orElse(false)));
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-003, Rule-CODEGEN-089
