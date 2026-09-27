@@ -18,6 +18,7 @@ package org.testin.model.markers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.NoStatus;
 import org.testin.model.NodeStatus;
 
 import java.time.ZonedDateTime;
@@ -65,7 +66,7 @@ public interface Marker {
     }
 
     default @NotNull NodeStatus status() {
-        return NodeStatus.NONE;
+        return NoStatus.NONE;
     }
 
     default @NotNull List<NodeStatus> statuses() {

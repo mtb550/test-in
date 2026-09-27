@@ -16,15 +16,23 @@
 
 package org.testin.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-public interface NodeStatus {
-    // UC-TREE-PANEL-001, Rule-TREE-PANEL-099
-    boolean isActive();
+@Getter
+@AllArgsConstructor
+public enum NoStatus implements NodeStatus {
+    NONE(
+            "",
+            "",
+            "",
+            true
+    );
 
-    @NotNull String getLabel();
+    private final @NotNull String label;
+    private final @NotNull String buttonName;
+    private final @NotNull String buttonDescription;
 
-    @NotNull String getButtonName();
-
-    @NotNull String getButtonDescription();
+    private final boolean active;
 }

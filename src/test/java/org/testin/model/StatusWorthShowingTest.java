@@ -51,7 +51,7 @@ public class StatusWorthShowingTest {
 
     @Test
     public void noStatusAtAllIsNothingToSay() {
-        assertTrue(NodeStatus.NONE.isActive(), "a marker with no status has nothing to draw");
-        assertTrue(NodeStatus.NONE.getLabel().isEmpty(), "and nothing to draw it with");
+        assertTrue(NoStatus.NONE.isActive(), "a marker with no status has nothing to draw");
+        assertTrue(NoStatus.NONE.getLabel().isEmpty(), "and nothing to draw it with");
     }
 }
