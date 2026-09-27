@@ -59,7 +59,7 @@ public final class Caption {
 
         placed.weightx = 1;
         placed.fill = GridBagConstraints.HORIZONTAL;
-        placed.insets = JBUI.insets(0, GAP, 0, GAP);
+        placed.insets = JBUI.insets(0, GAP);
         row.add(new SeparatorComponent(JBColor.border(), SeparatorOrientation.HORIZONTAL), placed);
 
         placed.weightx = 0;

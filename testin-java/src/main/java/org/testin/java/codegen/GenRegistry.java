@@ -45,32 +45,36 @@ import java.util.Optional;
 
 @NoArgsConstructor
 public final class GenRegistry implements CodeGenerators {
-    private static final @NotNull Map<GenType, GenAction> ACTIONS = new EnumMap<>(GenType.class);
+    private final @NotNull Map<GenType, GenAction> actions = byType();
 
-    static {
-        ACTIONS.put(GenType.RENAME_TEST_PROJECT, new RenameJavaPackage());
-        ACTIONS.put(GenType.REMOVE_TEST_PROJECT, new RemoveJavaPackage());
-        ACTIONS.put(GenType.REMOVE_TEST_SET_PACKAGE, new RemoveJavaPackage());
-        ACTIONS.put(GenType.RENAME_TEST_SET_PACKAGE, new RenameJavaPackage());
-        ACTIONS.put(GenType.MOVE_TEST_SET_PACKAGE, new MoveJavaPackage());
-        ACTIONS.put(GenType.CREATE_TEST_SET, new CreateJavaClass());
-        ACTIONS.put(GenType.REMOVE_TEST_SET, new RemoveJavaClass());
-        ACTIONS.put(GenType.RENAME_TEST_SET, new RenameJavaClass());
-        ACTIONS.put(GenType.MOVE_TEST_SET, new MoveJavaClass());
-        ACTIONS.put(GenType.CREATE_TEST_CASE, new CreateTestMethod());
-        ACTIONS.put(GenType.REMOVE_TEST_CASE, new RemoveTestMethod());
-        ACTIONS.put(GenType.MOVE_TEST_CASE, new MoveTestMethod());
-        ACTIONS.put(GenType.COPY_TEST_CASE, new CopyTestMethod());
-        ACTIONS.put(GenType.UPDATE_TEST_CASE_DESCRIPTION, new UpdateTestDescription());
-        ACTIONS.put(GenType.UPDATE_TEST_CASE_GROUP, new UpdateTestGroup());
-        ACTIONS.put(GenType.UPDATE_TEST_CASE_ORDER, new UpdateTestOrder());
-        ACTIONS.put(GenType.UPDATE_TEST_CASE_STATUS, new UpdateTestEnabled());
-        ACTIONS.put(GenType.RECONCILE_TEST_CASE, new ReconcileTestMethod());
+    private static @NotNull Map<GenType, GenAction> byType() {
+        final @NotNull Map<GenType, GenAction> byType = new EnumMap<>(GenType.class);
+
+        byType.put(GenType.RENAME_TEST_PROJECT, new RenameJavaPackage());
+        byType.put(GenType.REMOVE_TEST_PROJECT, new RemoveJavaPackage());
+        byType.put(GenType.REMOVE_TEST_SET_PACKAGE, new RemoveJavaPackage());
+        byType.put(GenType.RENAME_TEST_SET_PACKAGE, new RenameJavaPackage());
+        byType.put(GenType.MOVE_TEST_SET_PACKAGE, new MoveJavaPackage());
+        byType.put(GenType.CREATE_TEST_SET, new CreateJavaClass());
+        byType.put(GenType.REMOVE_TEST_SET, new RemoveJavaClass());
+        byType.put(GenType.RENAME_TEST_SET, new RenameJavaClass());
+        byType.put(GenType.MOVE_TEST_SET, new MoveJavaClass());
+        byType.put(GenType.CREATE_TEST_CASE, new CreateTestMethod());
+        byType.put(GenType.REMOVE_TEST_CASE, new RemoveTestMethod());
+        byType.put(GenType.MOVE_TEST_CASE, new MoveTestMethod());
+        byType.put(GenType.COPY_TEST_CASE, new CopyTestMethod());
+        byType.put(GenType.UPDATE_TEST_CASE_DESCRIPTION, new UpdateTestDescription());
+        byType.put(GenType.UPDATE_TEST_CASE_GROUP, new UpdateTestGroup());
+        byType.put(GenType.UPDATE_TEST_CASE_ORDER, new UpdateTestOrder());
+        byType.put(GenType.UPDATE_TEST_CASE_STATUS, new UpdateTestEnabled());
+        byType.put(GenType.RECONCILE_TEST_CASE, new ReconcileTestMethod());
+
+        return byType;
     }
 
     @Override
     public @NotNull GenAction actionFor(final @NotNull GenType type) {
-        return Optional.ofNullable(ACTIONS.get(type))
+        return Optional.ofNullable(actions.get(type))
                 .orElseGet(() -> new NoJavaCode(type.getDescription()));
     }
 }

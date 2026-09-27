@@ -40,13 +40,13 @@ already ship this?** Only the first group is a candidate for removal.
 
 These are recorded decisions. They are listed so nobody "cleans" them.
 
-| What                                                       | Where                                   | The decision                                                                            |
-|------------------------------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------|
-| `GRAY`, `RED`, `GREEN` as raw `Color`, not `JBColor` pairs | `util/Icons.java:45-47`                 | Testin's icons are one color in both themes, on purpose                                 |
-| `@SuppressWarnings("UnstableApiUsage")`                    | `editor/TestinTabColorProvider.java:39` | The tab title color is the experimental half of the tab color interface. Open in #324   |
-| `//noinspection QualifiedClassName`                        | `logger/LogWriter.java:46`              | `Logger` collides with the plugin's own; CLAUDE.md names this as the one exception      |
-| Run status badge colors                                    | `model/RunStatus.java:41,47,53`         | Passed, failed and running read as green, red and amber to a tester regardless of theme |
-| The dialog surfaces                                        | `ui/dialogs/DialogStyle.java:61`        | Two named theme colors, chosen per theme by luminance. Rule-INTERNAL-099                |
+| What                                                          | Where                                   | The decision                                                                            |
+|---------------------------------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------|
+| `GRAY`, `RED`, `GREEN` are a `JBColor` whose halves are equal | `util/Icons.java:45-47`                 | Testin's icons are one color in both themes, on purpose - the pair says so              |
+| `@SuppressWarnings("UnstableApiUsage")`                       | `editor/TestinTabColorProvider.java:39` | The tab title color is the experimental half of the tab color interface. Open in #324   |
+| `//noinspection QualifiedClassName`                           | `logger/LogWriter.java:46`              | `Logger` collides with the plugin's own; CLAUDE.md names this as the one exception      |
+| Run status badge colors                                       | `model/RunStatus.java:41,47,53`         | Passed, failed and running read as green, red and amber to a tester regardless of theme |
+| The dialog surfaces                                           | `ui/dialogs/DialogStyle.java:61`        | Two named theme colors, chosen per theme by luminance. Rule-INTERNAL-099                |
 
 ## Not customizations at all
 
