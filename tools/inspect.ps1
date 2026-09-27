@@ -739,6 +739,7 @@ function Test-DisplayStringBaseline([object[]] $problems, [string] $baselinePath
     if ($now -gt $expected) {
         Write-Host ''
         Write-Host "Display strings written in more than one place: $now, up from $expected." -ForegroundColor Red
+        if ($env:GITHUB_STEP_SUMMARY) { "**Display strings written in more than one place: $now, up from $expected.** See findings.txt in the inspection artifact." | Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding utf8 }
         Write-Host 'A string a tester reads belongs to the type that owns the concept. See the findings list.'
         return $false
     }
@@ -1443,6 +1444,11 @@ if ($breaches) {
     $breaches | Sort-Object Path, Line | ForEach-Object {
         Write-Host ('  {0}:{1} - [{2}] {3}' -f $_.Path, $_.Line, $_.Inspection, $_.Message)
     }
+
+    # The run page, so a red main names its cause without opening the log (#323).
+    $told = @("**$($breaches.Count) finding(s) the gate does not allow:**", '') +
+        ($breaches | Sort-Object Path, Line | ForEach-Object { '- `{0}:{1}` [{2}] {3}' -f $_.Path, $_.Line, $_.Inspection, $_.Message })
+    if ($env:GITHUB_STEP_SUMMARY) { $told | Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding utf8 }
     exit 1
 }
 
