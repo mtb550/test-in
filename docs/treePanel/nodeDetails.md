@@ -63,6 +63,12 @@ It is a read-only window. Nothing in it can be changed.
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
+- **Rule-TREE-PANEL-125** — A test set's **Updated** row changes whenever one of
+  its test cases is added, saved, moved in or out, reordered or removed, and
+  names the tester who did it.
+- **Rule-TREE-PANEL-126** — Every verdict that at least one test case carries
+  takes at least a sliver of the ring, so a single failure among a thousand
+  passes is still there to see.
 
 ## The Details dialog
 

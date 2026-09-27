@@ -35,6 +35,9 @@ There is no key of its own. `F5` on a running test case stops it.
   with it. One run is one process.
 - **Rule-CODEGEN-038** — A test case the tester stopped is recorded as not run,
   never as failed.
+- **Rule-CODEGEN-094** — Stop ends only runs Testin started. A run the tester
+  started outside Testin, from a run configuration or the IDE's own gutter icon,
+  is left running.
 
 ## What the tester sees
 

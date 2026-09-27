@@ -201,6 +201,7 @@ public final class TestNGExecution implements Disposable {
         }
     }
 
+    // UC-CODEGEN-009, Rule-CODEGEN-094
     private @NotNull Map<ProcessHandler, String> running(final @NotNull Set<String> names) {
         return live.entrySet().stream()
                 .filter(one -> names.contains(one.getValue()) && !one.getKey().isProcessTerminated())

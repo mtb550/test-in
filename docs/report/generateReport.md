@@ -30,10 +30,10 @@ cannot.
   hide a control that cannot work just now.
 - **Rule-REPORT-005** — The project named in a report is the test project, not
   the code project the IDE has open.
-- **Rule-REPORT-019** — Every format prints its words in the language the IDE is
-  set to. The headings, the column names and the Actual result label come from
-  the same translations in the web page, the PDF, the Word document and the
-  spreadsheet, so no report switches language halfway down.
+- **Rule-REPORT-019** — Every format takes its words from one place. The
+  headings, the column names and the Actual result label read the same in the
+  web page, the PDF, the Word document and the spreadsheet, so no two formats
+  name one thing two ways.
 - **Rule-REPORT-006** — The file name is filled in already. It names the test
   project, the test run, the date and the time.
 - **Rule-REPORT-007** — Spaces and special characters are taken out of the
@@ -59,6 +59,11 @@ cannot.
   printed as a dash.
 - **Rule-REPORT-022** — Words printed on a verdict's color, in every format, are
   white or near-black, whichever contrasts more with that color.
+- **Rule-REPORT-023** — A line break in what the tester wrote stays a line break
+  in every format, so nothing is run together onto one line.
+- **Rule-REPORT-024** — In the web page and the PDF, a test case table's columns
+  are as wide as what they hold: the number and the verdict take only their own
+  width, and the description gets the rest.
 
 ## The screen
 

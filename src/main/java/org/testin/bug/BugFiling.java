@@ -54,6 +54,7 @@ public final class BugFiling {
                 });
     }
 
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-089
     static void record(final @NotNull Project p, final @NotNull BugReports.RunItem item, final @NotNull IssueCreation answer) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 

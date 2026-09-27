@@ -117,6 +117,7 @@ public final class VerdictDonut implements DialogComponent {
         return row;
     }
 
+    // UC-TREE-PANEL-027, Rule-TREE-PANEL-126
     static double[] sweeps(final @NotNull List<NodeCount> slices, final @NotNull NodeFigures figures) {
         final double[] sweeps = new double[slices.size()];
         final double whole = Math.max(figures.run().total(), 1);

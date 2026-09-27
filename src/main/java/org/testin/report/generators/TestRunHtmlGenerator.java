@@ -208,6 +208,7 @@ public final class TestRunHtmlGenerator {
         html.append("</table>");
     }
 
+    // UC-REPORT-001, Rule-REPORT-023, Rule-REPORT-024
     private @NotNull String styles() {
         return "<style>"
 

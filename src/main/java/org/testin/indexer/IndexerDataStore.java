@@ -187,6 +187,7 @@ final class IndexerDataStore {
         markTestSetModified(testSetPath);
     }
 
+    // UC-TREE-PANEL-027, Rule-TREE-PANEL-125
     private void markTestSetModified(final @NotNull Path testSetPath) {
         Optional.ofNullable(testSetsDirByPath.get(testSetPath.toString()))
                 .ifPresent(ts -> markers.touched(testSetPath, DirectoryType.TS.getMarker(), ts.getMarker()));

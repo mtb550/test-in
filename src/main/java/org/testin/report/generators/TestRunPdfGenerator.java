@@ -245,6 +245,7 @@ public final class TestRunPdfGenerator {
                 Integer.parseInt(hex.substring(4, 6), 16));
     }
 
+    // UC-REPORT-001, Rule-REPORT-024
     private void buildTestCaseTable(final @NotNull Document document, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont, final @NotNull DeviceRgb headerBg, final @NotNull DeviceRgb headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
         document.add(para(sectionNumber + ". " + sectionTitle)
                 .setFont(boldFont)

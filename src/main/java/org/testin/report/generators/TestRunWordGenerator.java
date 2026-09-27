@@ -358,6 +358,7 @@ public final class TestRunWordGenerator {
         setCellText(cell, text, Fonts.Report.HEADING.ptRounded(), true, textColor);
     }
 
+    // UC-REPORT-001, Rule-REPORT-023
     private void writeLines(final @NotNull XWPFRun run, final @NotNull String text, final boolean replaceFirst) {
         final @NotNull List<String> lines = text.lines().toList();
 

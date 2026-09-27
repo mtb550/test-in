@@ -76,6 +76,9 @@ the Details tab.
   brings them back.
 - **Rule-VIEW-PANEL-078** — Testin stores no password and no token. `gh` holds
   the sign-in. `bugRepoUrl` in `testin.yml` names the repository.
+- **Rule-VIEW-PANEL-089** — The message that says a bug was reported keeps its
+  **Open** after it is pressed, so the issue can be opened again from the same
+  message.
 
 ## The bug on the summary line
 
