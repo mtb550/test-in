@@ -231,8 +231,11 @@ silently has no effect costs more than the setting it was meant to hold.
   *outside* the try, because a skip is a `RuntimeException` and a broad catch
   swallows it into a failure on every machine that legitimately cannot run it.
 - **The rule is about methods, and the whole tree obeys it.** The `throws`
-  that remain are declarations rather than work, each with a comment saying
-  so, and this list is all of them. Do not sweep them again:
+  that remain are declarations rather than work, and this list is the record of
+  why - not a comment above each one, which the no-comment rule forbids and the
+  September sweep removed. Counted on 27 September 2026: six in `src/main`,
+  twenty-two in `src/test`, none in `testin-java` or `testin-testng`, and every
+  one of them is below. Do not sweep them again:
   - `NodesTransferable.getTransferData`, and the one `TransferListener` builds
     for a drag of test cases — AWT's `Transferable` contract is that an
     unsupported flavor throws. Catching it hands the platform a wrong object
@@ -247,8 +250,8 @@ silently has no effect costs more than the setting it was meant to hold.
     catches it: throwing is how the platform is told to stay open and print the
     message under the field. Catching it and notifying instead would hand the
     dialog a success it did not have, and close it over a refused value.
-  - The 20 `protected void setUp() throws Exception` and `tearDown() throws
-    Exception` overrides in the ten `*IdeTest` classes — `BasePlatformTestCase`
+  - The 22 `protected void setUp() throws Exception` and `tearDown() throws
+    Exception` overrides in the eleven `*IdeTest` classes — `BasePlatformTestCase`
     declares both that way, so an override cannot narrow them. The test framework
     is the one owner above, and it is the right one: a fixture that failed to set
     up or to clean up is an error about the test rather than something to report
