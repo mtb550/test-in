@@ -19,6 +19,7 @@ package org.testin;
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.logger.Logger;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Constructor;
@@ -106,7 +107,7 @@ public class LightServiceContractTest {
                 fail("No @Service classes found under " + ROOT_PACKAGE + ": the scan is looking in the wrong place");
             }
 
-            System.out.println("Checked " + services.size() + " light services");
+            Logger.info("Checked " + services.size() + " light services");
 
             final List<String> breaches = new ArrayList<>();
 

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
 import org.testin.TempTree;
+import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testng.SkipException;
@@ -173,9 +174,9 @@ public class IndexerBudgetTest {
 
         final double micros = fastest / 1_000.0 / TEST_CASES;
 
-        System.out.printf(
-                "Indexer budget: parsed %,d test cases in %,.0f ms (%.1f us/case), slowest of %d passes %,.0f ms, holding %,d KB%n",
-                TEST_CASES, fastest / 1e6, micros, PASSES, slowest / 1e6, heldKilobytes(documents));
+        Logger.info(String.format(
+                "Indexer budget: parsed %,d test cases in %,.0f ms (%.1f us/case), slowest of %d passes %,.0f ms, holding %,d KB",
+                TEST_CASES, fastest / 1e6, micros, PASSES, slowest / 1e6, heldKilobytes(documents)));
 
         assertTrue(micros < BUDGET_MICROS_PER_TEST_CASE,
                 "Parsing a test case costs " + String.format("%.1f", micros) + " us, over the "
@@ -206,9 +207,9 @@ public class IndexerBudgetTest {
 
         final double micros = fastest / 1_000.0 / RESULTS;
 
-        System.out.printf(
-                "Indexer budget: parsed %,d run results in %,.0f ms (%.1f us/result), slowest of %d passes %,.0f ms%n",
-                RESULTS, fastest / 1e6, micros, PASSES, slowest / 1e6);
+        Logger.info(String.format(
+                "Indexer budget: parsed %,d run results in %,.0f ms (%.1f us/result), slowest of %d passes %,.0f ms",
+                RESULTS, fastest / 1e6, micros, PASSES, slowest / 1e6));
 
         assertTrue(micros < BUDGET_MICROS_PER_RESULT,
                 "Parsing a run result costs " + String.format("%.1f", micros) + " us, over the "
@@ -230,8 +231,8 @@ public class IndexerBudgetTest {
             final long cold = timeWalk(project, testCases);
             final long warm = timeWalk(project, testCases);
 
-            System.out.printf("Indexer budget: %,d cases on disk · cold %,.0f ms (%.1f us/case) · warm %,.0f ms (%.1f us/case)%n",
-                    testCases, cold / 1e6, cold / 1_000.0 / testCases, warm / 1e6, warm / 1_000.0 / testCases);
+            Logger.info(String.format("Indexer budget: %,d cases on disk · cold %,.0f ms (%.1f us/case) · warm %,.0f ms (%.1f us/case)",
+                    testCases, cold / 1e6, cold / 1_000.0 / testCases, warm / 1e6, warm / 1_000.0 / testCases));
         } finally {
             TempTree.delete(root);
         }

@@ -19,6 +19,7 @@ package org.testin;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
@@ -37,7 +38,7 @@ public final class TempTree {
         try (Stream<Path> walk = Files.walk(root)) {
             deepestFirst = walk.sorted(Comparator.reverseOrder()).toList();
         } catch (final IOException ex) {
-            System.err.println("Could not clean up " + root + ": " + ex.getMessage());
+            Logger.warn("Could not clean up " + root + ": " + ex.getMessage());
             return false;
         }
 
@@ -51,7 +52,7 @@ public final class TempTree {
         } catch (final AccessDeniedException readOnly) {
             deleteReadOnly(path);
         } catch (final IOException ex) {
-            System.err.println("Could not delete " + path + ": " + ex.getMessage());
+            Logger.warn("Could not delete " + path + ": " + ex.getMessage());
         }
     }
 
@@ -60,7 +61,7 @@ public final class TempTree {
             Files.setAttribute(path, "dos:readonly", false);
             Files.deleteIfExists(path);
         } catch (final IOException | UnsupportedOperationException ex) {
-            System.err.println("Could not delete the read-only " + path + ": " + ex.getMessage());
+            Logger.warn("Could not delete the read-only " + path + ": " + ex.getMessage());
         }
     }
 }

@@ -447,7 +447,7 @@ mapOf("runIde" to "config", "runPyCharm" to "config_runPyCharm").forEach { (runT
                     .filter { it.name == "vcs.xml" && it.parentFile.name == ".idea" }
                     .toList()
                     .forEach { it.delete() }
-                println("Copied the sample into the sandbox, so the committed one stays clean: $workingSample")
+                logger.lifecycle("Copied the sample into the sandbox, so the committed one stays clean: $workingSample")
             }
 
             // The sandbox directory is found rather than composed: the one under
@@ -479,7 +479,7 @@ mapOf("runIde" to "config", "runPyCharm" to "config_runPyCharm").forEach { (runT
                             </application>
                             """.trimIndent()
                         )
-                        println("Pointed a fresh sandbox at the sample data: ${sandbox.name}")
+                        logger.lifecycle("Pointed a fresh sandbox at the sample data: ${sandbox.name}")
                     }
 
                     // Every run, not only the first: the IDE reopens its last project on
