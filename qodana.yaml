@@ -46,9 +46,9 @@ include:
 # file. Nothing can be done about the name - .ts is the marker Testin writes and
 # .ts is what TypeScript claims.
 #
-# gradlew.bat is Gradle's, and its cmd keywords - setlocal, endlocal, COMSPEC,
-# ERRORLEVEL - are five more. EULA.md is JetBrains' agreement quoted verbatim,
-# so its Czech address and its four 50-word sentences stay exactly as written.
+# gradlew.bat is Gradle's, and the Windows command keywords in it are five more.
+# EULA.md is JetBrains' agreement quoted verbatim, so its Czech address and its
+# four 50-word sentences stay exactly as written.
 exclude:
   - name: All
     paths:
@@ -58,10 +58,10 @@ exclude:
       - EULA.md
       - PRIVACY_POLICY.md
 
-  # The four temurin findings in .github. temurin is the JDK distribution
+  # Four findings in the workflow files are one word, the JDK distribution
   # actions/setup-java is given. It is in .idea/dictionaries/project.xml, which
   # fc6f46a3 added and which this run ignored: all ten words it added were
-  # reported again, while the Linkedin typo the same commit fixed was not. The
+  # reported again, while the misspelling the same commit fixed was not. The
   # IDE and tools/inspect.ps1 read that dictionary and still spell-check these
   # files, so only Qodana's copy of the question is switched off.
   - name: SpellCheckingInspection

@@ -94,7 +94,7 @@ Two pages, under **Settings › Tools › Testin**. The first is how Testin reac
 the agent; the second is what it asks for.
 
 ```
-┌─ Settings › Tools › Testin › Automation agent ──────────────────┐
+┌─ Settings › Tools › Testin › Automation Agent ──────────────────┐
 │                                                                     │
 │  Command      [ pi                                      ]           │
 │               The command that runs the agent, found on PATH        │
@@ -108,7 +108,7 @@ the agent; the second is what it asks for.
 │                                                     [ Check ]       │
 └──────────────────────────────────────────────────────────────────┘
 
-┌─ Settings › Tools › Testin › Automation agent › Prompt ─────────┐
+┌─ Settings › Tools › Testin › Automation Agent › Prompt ─────────┐
 │                                                                     │
 │  One test case: its description, expected result, steps, test       │
 │  data, pre-conditions and module. Nothing else ever leaves.         │

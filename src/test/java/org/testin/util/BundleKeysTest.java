@@ -75,11 +75,11 @@ public class BundleKeysTest {
         }
     }
 
-    private static Properties bundle(final String name) {
+    private static Properties english() {
         final Properties properties = new Properties();
-        final Path path = Path.of("src", "main", "resources", name);
+        final Path path = Path.of("src", "main", "resources", "messages.properties");
 
-        assertTrue(Files.exists(path), path + " is missing, so nothing is translated into it");
+        assertTrue(Files.exists(path), path + " is missing, so every message reads as its key");
 
         try (Reader in = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             properties.load(in);
@@ -97,7 +97,7 @@ public class BundleKeysTest {
 
     @Test
     public void everyKeyTheCodeAsksForIsInTheBundle() {
-        final Properties english = bundle("messages.properties");
+        final Properties english = english();
 
         for (final String key : keysAskedForInCode()) {
             assertTrue(english.containsKey(key),
@@ -109,7 +109,7 @@ public class BundleKeysTest {
     @Test
     public void everyKeyInTheBundleIsAskedForSomewhere() {
         final List<String> asked = keysAskedForInCode();
-        final Properties english = bundle("messages.properties");
+        final Properties english = english();
 
         for (final String key : english.stringPropertyNames()) {
             if (key.startsWith("toolwindow.") || key.startsWith("action.") || key.startsWith("group.")
@@ -136,7 +136,7 @@ public class BundleKeysTest {
 
     @Test
     public void everyDeclaredActionIsNamedInTheBundle() {
-        final Properties english = bundle("messages.properties");
+        final Properties english = english();
         final String xml = read(Path.of("src", "main", "resources", "META-INF", "plugin.xml"));
 
         final String actions = xml.substring(xml.indexOf("<actions>"), xml.indexOf("</actions>"));
@@ -159,7 +159,7 @@ public class BundleKeysTest {
     public void everyPatternWithASlotDoublesItsApostrophes() {
         final Pattern slot = Pattern.compile("\\{\\d");
 
-        final Properties english = bundle("messages.properties");
+        final Properties english = english();
 
         for (final String key : english.stringPropertyNames()) {
             final String value = english.getProperty(key);
