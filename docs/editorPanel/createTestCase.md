@@ -62,6 +62,12 @@ This is how every test case in Testin begins.
   number and its word - P3 (Low), P2 (Medium), P1 (High) - because a number
   alone says nothing about which end is urgent, and the lowest is chosen to
   start with.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## The screen
 

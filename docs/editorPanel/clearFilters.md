@@ -39,6 +39,12 @@ There is no key for this. The entry is at the top of the filter menu.
 - **Rule-EDITOR-PANEL-099** — **Reset Filters** clears the priority, the
   automation, the group, the module and the run status together.
 - **Rule-EDITOR-PANEL-100** — It does not clear the search text.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## What the tester sees
 

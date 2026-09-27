@@ -45,6 +45,12 @@ There is no key for this. The figures are in the status bar.
   clock, not a row of zeros.
 - **Rule-EDITOR-PANEL-179** — The three run labels are hidden, not blank, when
   there is nothing to say. A test set editor never shows them.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## The screen
 

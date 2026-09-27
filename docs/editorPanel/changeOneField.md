@@ -49,6 +49,12 @@ One field, one small dialog. The rest of the test case is left alone.
 - **Rule-EDITOR-PANEL-194** — Status is on the update menu and has no letter of
   its own. It is the one field with no key, because every letter that would name
   it is taken by a field a tester reaches more often.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## The screen
 

@@ -71,6 +71,12 @@ form before it records anything.
   added, up to six of them, and the dialog grows with it (Rule-INTERNAL-097,
   Rule-INTERNAL-102). Enter records the
   failure, and Ctrl+Enter adds a line, the same bargain a grid cell makes (Rule-EDITOR-PANEL-048).
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## The screen
 

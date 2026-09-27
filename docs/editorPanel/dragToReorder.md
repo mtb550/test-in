@@ -43,6 +43,12 @@ There is no key for this. Drag the cards.
   the filter is hiding between the two move down rather than staying above it.
 - **Rule-EDITOR-PANEL-060** — Only the test cases that really moved are written.
 - **Rule-EDITOR-PANEL-061** — The whole drag is one entry on the undo history.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## What the tester sees
 

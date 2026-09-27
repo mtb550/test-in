@@ -88,6 +88,9 @@ prevent.
   were absent: the test project this machine picked, or the choose screen. A
   file is corrected in an editor and there is no button that does it, so a
   screen holding only that sentence is a screen with no way off it.
+- **Rule-TREE-PANEL-124** — A `location` that is neither `local` nor `remote` is
+  read as `local`, and `location: remote` with no `RepoUrl` is read as it is
+  written. Neither refuses the file, and each is noted in Testin's log.
 
 Rule-TREE-PANEL-100 also holds here. It says a test project that is not **Active** is drawn in the tree and holds
 nothing. It is written on

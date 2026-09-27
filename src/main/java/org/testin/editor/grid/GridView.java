@@ -38,6 +38,7 @@ public record GridView(@NotNull JBTable table, @NotNull JBScrollPane scrollPane,
         return table.hasFocus() || isCellOpen();
     }
 
+    // Rule-EDITOR-PANEL-249
     public boolean handOver() {
         final boolean keyboard = hasKeyboard();
 

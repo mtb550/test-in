@@ -45,6 +45,12 @@ verdict is not touched.
   so an edit that was dropped never reports itself as saved.
 - **Rule-EDITOR-PANEL-170** — The dialog is the same one `F` opens, filled in
   with what is there.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## The screen
 

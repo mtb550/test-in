@@ -60,6 +60,12 @@ Select several test cases, then `F2` or the field's own letter.
   same method as another test case in the test set - one edited in this same
   dialog or one left as it was. A refused row is left as it was, and one
   message says why, in the words the update dialog uses.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## The screen
 

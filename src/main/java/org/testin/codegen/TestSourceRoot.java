@@ -26,6 +26,7 @@ import java.util.Optional;
 public final class TestSourceRoot {
     private volatile @NotNull Optional<VirtualFile> cached = Optional.empty();
 
+    // UC-CODEGEN-020, Rule-CODEGEN-093
     public @NotNull Optional<VirtualFile> get() {
         return cached.filter(VirtualFile::isValid);
     }

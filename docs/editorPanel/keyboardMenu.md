@@ -53,6 +53,12 @@ The `Context Menu` key.
   is gray, and says why when the pointer rests on it. Nothing selected, a test
   run where only a test set will do, and a clipboard with no test cases each
   have their own reason.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## The screen
 

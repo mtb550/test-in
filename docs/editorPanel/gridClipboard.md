@@ -46,6 +46,12 @@ Inside the grid these three keys act on cells, not on whole test cases.
 - **Rule-EDITOR-PANEL-226** — A cut or a paste over cells is one change, however
   many cells it touches. Each test case it changed is saved once, one message
   counts those test cases, and Ctrl+Z takes the whole of it back in one press.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## What the tester sees
 

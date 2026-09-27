@@ -26,6 +26,7 @@ public enum TestinLocation {
 
     REMOTE;
 
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-124
     public static @NotNull TestinLocation of(final @NotNull String value) {
         if (value.isEmpty()) return LOCAL;
 

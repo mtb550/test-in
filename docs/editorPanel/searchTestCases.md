@@ -44,6 +44,12 @@ The search narrows the list. It hides the test cases that do not hold the word.
 - **Rule-EDITOR-PANEL-092** — Searching goes back to the first page.
 - **Rule-EDITOR-PANEL-093** — `Escape` in the box returns the keyboard to the
   list and leaves the text where it is.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## What the tester sees
 

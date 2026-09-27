@@ -67,6 +67,12 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
 - **Rule-EDITOR-PANEL-238** — A verdict records a copy of the test case as it is
   at that moment, so a fix made to the test case while running it is what the
   verdict keeps.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## What the tester sees
 

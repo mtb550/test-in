@@ -56,6 +56,12 @@ No key. The card's last button, or the right-click menu.
   The menu entry, the card's button and the view panel's identity all say
   Navigate to Test Case; the method's entries and buttons say Navigate to Test
   Method and Run Test Method, because the method is what they reach and run.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## The screen
 

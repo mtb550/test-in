@@ -44,6 +44,12 @@ There is no key for this. The button's tooltip reads **Stop Execution**.
   is written again by every stop.
 - **Rule-EDITOR-PANEL-152** — The tester's own stop ends any automation this
   editor started, and closing the tab ends it too. Nothing else does.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## What the tester sees
 

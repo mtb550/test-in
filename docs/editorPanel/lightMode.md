@@ -628,6 +628,12 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
   F5 stops the test case while its automation runs. The tooltips name the keys,
   and the status bar lists them after the verdict keys. The buttons and their
   keys go while the failure form is open, as the verdict buttons do.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 **Why 200 milliseconds.** `P` is pressed once per test case, so a run of a
 hundred test cases is a hundred of these, and the tester is watching the

@@ -41,6 +41,9 @@ There is no key for this. The menu entry is **Sync With Remote**.
 - **Rule-SHARE-120** — A remote that has no branch of that name yet is pushed to
   without a pull first. There is nothing to pull, and a pull would fail the sync
   before the push was tried.
+- **Rule-SHARE-122** — Where the repository has several remotes, the one named
+  `origin` is used, and with no `origin` the first one Git lists. **Commit &
+  Push** chooses the same way.
 
 ## What the tester sees
 

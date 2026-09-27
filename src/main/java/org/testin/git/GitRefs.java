@@ -169,6 +169,7 @@ public final class GitRefs {
         return NO_HEAD_BRANCH.equals(branch) ? "" : branch;
     }
 
+    // UC-SHARE-016, Rule-SHARE-122
     public static @NotNull String chooseRemote(final @NotNull List<String> remotes) {
         final @NotNull List<String> names = remotes.stream()
                 .map(String::trim)

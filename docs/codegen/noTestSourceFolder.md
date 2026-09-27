@@ -43,6 +43,9 @@ nothing about it until something would have written code.
   source folder. The first thing that would have written code says it, names
   what was skipped, and says it once for that project however many test cases
   follow.
+- **Rule-CODEGEN-093** — A remembered test source folder that has since been
+  deleted is forgotten, and the next thing that needs one looks again as though
+  none had been found.
 
 ## The screen
 

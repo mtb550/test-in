@@ -43,6 +43,12 @@ There is no key for this. Press **Start Manual Execution** again.
   carried, rather than starting it again.
 - **Rule-EDITOR-PANEL-155** — The stamp saying when execution began is kept.
   Only the stamp saying when it ended is written again.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## What the tester sees
 

@@ -42,6 +42,12 @@ need five dialogs.
   says nothing.
 - **Rule-EDITOR-PANEL-174** — What is stored is written back into the cell,
   whatever the tester typed.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## The screen
 

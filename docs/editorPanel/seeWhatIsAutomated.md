@@ -35,6 +35,12 @@ set at once, and the status bar says the same thing as a number.
   are automated are the same arithmetic and opposite statements, so the count is
   written from how many test cases the answer covers rather than from how many
   there are.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## What the tester sees
 

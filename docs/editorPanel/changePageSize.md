@@ -44,6 +44,12 @@ There is no key for this. The box is at the right of the status bar.
 - **Rule-EDITOR-PANEL-222** — The page size last typed is remembered. Every test
   set editor and test run editor opened afterward starts with it, after a
   restart too. An editor already open keeps its own.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## What the tester sees
 

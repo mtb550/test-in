@@ -43,6 +43,12 @@ Testin asks first. The test case's file and its generated test method both go.
   own.
 - **Rule-EDITOR-PANEL-065** — A test case that is waiting to be pasted is asked
   about like any other, and removing it calls off the waiting cut.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## The screen
 

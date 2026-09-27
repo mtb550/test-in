@@ -43,6 +43,12 @@ its own.
   the faded cards come back.
 - **Rule-EDITOR-PANEL-077** — The entry works in both views, on a card and in
   the grid.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## What the tester sees
 

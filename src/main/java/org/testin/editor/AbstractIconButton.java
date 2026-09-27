@@ -124,6 +124,7 @@ public abstract class AbstractIconButton extends JButton {
         repaint();
     }
 
+    // Rule-EDITOR-PANEL-248
     @Override
     public void setEnabled(final boolean enabled) {
         super.setEnabled(enabled);

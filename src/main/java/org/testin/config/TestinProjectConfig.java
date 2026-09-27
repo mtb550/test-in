@@ -44,6 +44,7 @@ record TestinProjectConfig(@NotNull TestinLocation location, @NotNull String rep
         report(location, repoUrl);
     }
 
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-124
     private static void report(final @NotNull TestinLocation location, final @NotNull String repoUrl) {
         if (location.isRemote() && repoUrl.isEmpty()) Logger.warn(Bundle.message("config.warn.remote.no.repo.url"));
     }

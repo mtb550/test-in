@@ -47,6 +47,12 @@ The tester types the position they want. Testin moves the test case there.
   places first, the same way a drag gives them, and those files are written too.
   Without it a position between two unplaced test cases means nothing, and the
   test case lands where it already was.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## The screen
 

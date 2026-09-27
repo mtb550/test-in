@@ -39,6 +39,12 @@ There is no key for this. The button is at the far right of the toolbar.
   showing, not about the test case that is selected.
 - **Rule-EDITOR-PANEL-122** — The counts are worked out as the dialog opens and
   stored nowhere.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterwards, so the next key lands in the grid rather than
+  nowhere.
 
 ## The screen
 
