@@ -33,7 +33,7 @@ up here rather than left to the code.
 | **UC-INTERNAL-006** | [Count what a node holds](countNodeContents.md)                 | See what a node holds before removing it.         | Rule-INTERNAL-046 to Rule-INTERNAL-052, Rule-INTERNAL-065                                                                                                    |
 | **UC-INTERNAL-007** | [Answer any Testin dialog](dialogFramework.md)                  | Learn one dialog and know them all.               | Rule-INTERNAL-053 to Rule-INTERNAL-061, Rule-INTERNAL-067, Rule-INTERNAL-075 to Rule-INTERNAL-080, Rule-INTERNAL-085, Rule-INTERNAL-087                      |
 
-Beside the use cases, one reference page: [What Testin draws itself](customizations.md) - every colour, icon, border, painting, popup and size the plugin builds instead of taking the platform's, and which of them the platform already ships.
+Beside the use cases, one reference page: [What Testin draws itself](customizations.md) - every color, icon, border, painting, popup and size the plugin builds instead of taking the platform's, and which of them the platform already ships.
 
 
 ---

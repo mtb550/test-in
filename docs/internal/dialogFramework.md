@@ -1,6 +1,6 @@
 [Documentation](../README.md) › [Inside Testin](main.md) › UC-INTERNAL-007
 
-Every colour, border and painting this framework does itself, and what the platform
+Every color, border and painting this framework does itself, and what the platform
 ships instead, is listed in [What Testin draws itself](customizations.md).
 
 # UC-INTERNAL-007: Answer any Testin dialog
