@@ -75,10 +75,6 @@ public final class Fonts {
         return mono(panelSize(), LABEL);
     }
 
-    public static @NotNull Font message() {
-        return dialog(0.0f, Font.PLAIN);
-    }
-
     public static @NotNull Font field() {
         return dialog(FIELD, Font.PLAIN);
     }

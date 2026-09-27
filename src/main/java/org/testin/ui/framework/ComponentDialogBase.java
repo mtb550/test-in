@@ -175,7 +175,6 @@ public final class ComponentDialogBase<C extends DialogComponent> {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class TextAreaBuilder {
-        private @NotNull String caption = "";
         private @NotNull String placeholder = "";
         private @NotNull String value = "";
         private int rows = 5;
@@ -203,7 +202,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
 
         public @NotNull ComponentDialogBase<TextArea> build() {
-            return new ComponentDialogBase<>(new TextArea(caption, placeholder, value, rows, readOnly));
+            return new ComponentDialogBase<>(new TextArea("", placeholder, value, rows, readOnly));
         }
     }
 

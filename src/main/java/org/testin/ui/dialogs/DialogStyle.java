@@ -121,10 +121,9 @@ public final class DialogStyle {
     }
 
     // Rule-INTERNAL-095, Rule-INTERNAL-096
-    public static <T extends JComponent> @NotNull T asChoice(final @NotNull T component) {
+    public static void asChoice(final @NotNull JComponent component) {
         component.setFont(Fonts.choice());
         hint(component);
-        return component;
     }
 
     // Rule-INTERNAL-095
