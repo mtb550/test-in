@@ -118,6 +118,7 @@ enum ReportSection {
         return String.format(descriptionFmt, renderedCount);
     }
 
+    // UC-REPORT-001, Rule-REPORT-022
     public @NotNull String textHex() {
         return contrast(hexColor, "FFFFFF") >= contrast(hexColor, "14171A") ? "FFFFFF" : "14171A";
     }

@@ -47,6 +47,14 @@ There is no key for this. Drag the divider in the header.
 - **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
   holds it again afterwards, so the next key lands in the grid rather than
   nowhere.
+- **Rule-EDITOR-PANEL-250** — A grid row is drawn in its stripe, or in the
+  selection color while it is selected, and in nothing else. The pointer passing
+  over it changes nothing.
+- **Rule-EDITOR-PANEL-251** — When the status bar is too narrow for everything,
+  the figures on the right give way first, then the sentence on the left down to
+  a short floor, and the page arrows keep their width to the last.
+- **Rule-EDITOR-PANEL-252** — A badge's words are printed white or dark,
+  whichever reads on its color, so a pale badge never carries white text.
 
 ## What the tester sees
 

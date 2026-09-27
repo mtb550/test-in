@@ -57,6 +57,8 @@ cannot.
   it, in every format. A test case deleted since the run was made is named as
   the run names it, Deleted test case and its id; no row is left blank or
   printed as a dash.
+- **Rule-REPORT-022** — Words printed on a verdict's color, in every format, are
+  white or near-black, whichever contrasts more with that color.
 
 ## The screen
 

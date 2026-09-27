@@ -123,6 +123,7 @@ public class GridPanelBuilder {
                 c.anchor = GridBagConstraints.WEST;
             }
 
+            // Rule-EDITOR-PANEL-250
             @Override
             public @NotNull Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
                 final @NotNull String raw = Objects.toString(value, "");
@@ -390,6 +391,7 @@ public class GridPanelBuilder {
         }
 
         final @NotNull JBTable table = new JBTable(model) {
+            // Rule-EDITOR-PANEL-250
             @Override
             public @NotNull Component prepareRenderer(final @NotNull TableCellRenderer renderer, final int row, final int column) {
                 final @NotNull Component component = super.prepareRenderer(renderer, row, column);

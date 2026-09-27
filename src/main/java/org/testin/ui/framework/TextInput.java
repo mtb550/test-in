@@ -49,6 +49,7 @@ public final class TextInput implements DialogComponent, TextValue {
         if (!ANYTHING.equals(accepts)) accept(Pattern.compile(accepts));
     }
 
+    // UC-INTERNAL-007, Rule-INTERNAL-110
     private void accept(final @NotNull Pattern pattern) {
         ((AbstractDocument) textField.getDocument()).setDocumentFilter(new DocumentFilter() {
             @Override

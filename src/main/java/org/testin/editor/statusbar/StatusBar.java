@@ -124,6 +124,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         add(rightRow);
     }
 
+    // Rule-EDITOR-PANEL-251
     static @NotNull Widths budget(final int inner, final int arrowsWanted, final int figuresWanted) {
         final int arrows = Math.clamp(arrowsWanted, 0, inner);
         final int floor = Math.clamp(SENTENCE_FLOOR, 0, inner - arrows);

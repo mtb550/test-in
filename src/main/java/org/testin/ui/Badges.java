@@ -82,6 +82,7 @@ public final class Badges {
         return new Pill(runStatus.label(), runStatus.color());
     }
 
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-253
     public static void addBugBadge(final @NotNull List<Badge> badges, final @NotNull String value, final @NotNull Color color) {
         if (value.isBlank()) return;
 
@@ -149,6 +150,7 @@ public final class Badges {
             setIconTextGap(JBUI.scale(BADGE_ICON_GAP));
         }
 
+        // Rule-EDITOR-PANEL-252
         private static @NotNull Color readableOn(final @NotNull Color fill) {
             return isLight(fill) ? TEXT_ON_LIGHT : JBColor.WHITE;
         }

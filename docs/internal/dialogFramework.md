@@ -185,6 +185,9 @@ and which keys it answers, and the shell builds the rest.
 - **Rule-INTERNAL-109** — Where something is going is one row: where it is, an
   arrow, then where it lands, with the segment it gains in the ordinary text
   color while the rest stays gray.
+- **Rule-INTERNAL-110** — A field that takes one shape of value, such as a
+  position that is a whole number from 1, refuses any keystroke that would break
+  the shape. What it holds is never wrong, so it is never refused afterwards.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.
