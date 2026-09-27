@@ -60,7 +60,7 @@ disappears from the filter button. Nothing is said.
 
 ## What Testin refuses
 
-**If no filter is on** — the entry reads *Reset Filters (nothing is filtered)*
+**If no filter is on** — the entry reads *Reset Filters (Nothing Is Filtered)*
 and is gray. It is always there: a popup that changes shape is one a tester
 cannot learn, and the entry is also how they find out filters live here at all.
 

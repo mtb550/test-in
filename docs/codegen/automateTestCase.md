@@ -101,7 +101,7 @@ Java Test Source Root** appears, and nothing is written.
 reading *(needs the Java plugin)*.
 
 **If testin.yml does not name the open test project** — the entry is still on
-the menu, grayed, reading *Automate Test Case (needs testin.yml)*. Hovering it
+the menu, grayed, reading *Automate Test Case (Needs testin.yml)*. Hovering it
 says *testin.yml does not name this test project. Save to testin.yml, in the
 Testin panel, turns code on.* (Rule-CODEGEN-082)
 
