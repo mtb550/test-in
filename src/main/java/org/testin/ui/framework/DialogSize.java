@@ -38,10 +38,6 @@ public record DialogSize(double heightPart) {
     private static final double WIDTH = 0.60;
     private static final int MARGIN = 32;
 
-    private static int clamped(final int least, final int wanted, final int most) {
-        return Math.min(most, Math.max(least, wanted));
-    }
-
     // Rule-INTERNAL-100
     static @NotNull Rectangle frameOn(final @NotNull Project p) {
         return Optional.ofNullable(WindowManager.getInstance().getIdeFrame(p))
@@ -56,7 +52,7 @@ public record DialogSize(double heightPart) {
     static int widthOn(final @NotNull Project p, final int natural) {
         final @NotNull Rectangle frame = frameOn(p);
 
-        return clamped(natural, (int) (frame.width * WIDTH), frame.width - JBUI.scale(MARGIN));
+        return Math.clamp(natural, (int) (frame.width * WIDTH), frame.width - JBUI.scale(MARGIN));
     }
 
     // Rule-INTERNAL-102
@@ -78,6 +74,6 @@ public record DialogSize(double heightPart) {
 
         content.setPreferredSize(new Dimension(
                 widthOn(p, natural.width),
-                clamped(natural.height, (int) (frame.height * heightPart), frame.height - JBUI.scale(MARGIN))));
+                Math.clamp(natural.height, (int) (frame.height * heightPart), frame.height - JBUI.scale(MARGIN))));
     }
 }
