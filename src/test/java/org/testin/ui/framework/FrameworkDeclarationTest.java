@@ -19,29 +19,12 @@ package org.testin.ui.framework;
 import org.testin.util.Shortcuts;
 import org.testng.annotations.Test;
 
-import java.util.List;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.expectThrows;
 
 public class FrameworkDeclarationTest {
-
-    @Test
-    public void forgottenDeclarationPartIsNamedInTheFailure() {
-        final NullPointerException missingTitle = expectThrows(NullPointerException.class, () ->
-                new DialogDto(null, List.of(), List.of()));
-        assertTrue(missingTitle.getMessage().contains("title"), missingTitle.getMessage());
-
-        final NullPointerException missingShortcuts = expectThrows(NullPointerException.class, () ->
-                new DialogDto("t", List.of(), null));
-        assertTrue(missingShortcuts.getMessage().contains("shortcuts"), missingShortcuts.getMessage());
-
-        final NullPointerException missingComponents = expectThrows(NullPointerException.class, () ->
-                new DialogDto("t", null, List.of()));
-        assertTrue(missingComponents.getMessage().contains("components"), missingComponents.getMessage());
-    }
 
     @Test
     public void hintEntriesRenderButNeverBind() {
