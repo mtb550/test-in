@@ -18,6 +18,7 @@ package org.testin.editor.grid;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.components.JBTextArea;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.EditorColors;
 import org.testin.util.Shortcuts;
@@ -73,7 +74,7 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
         textArea.setForeground(table.getForeground());
         textArea.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(EditorColors.SELECTION_BORDER, 1),
-                BorderFactory.createEmptyBorder(GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING)));
+                JBUI.Borders.empty(GridPanelBuilder.CELL_PADDING)));
 
         ApplicationManager.getApplication().invokeLater(textArea::requestFocusInWindow);
         return textArea;

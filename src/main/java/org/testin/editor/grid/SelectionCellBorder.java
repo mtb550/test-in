@@ -16,6 +16,7 @@
 
 package org.testin.editor.grid;
 
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.EditorColors;
 
@@ -27,7 +28,7 @@ import java.awt.Insets;
 
 record SelectionCellBorder(@NotNull Insets insets) implements Border {
     SelectionCellBorder(final boolean firstColumn) {
-        this(new Insets(1, firstColumn ? 1 : 0, 1, 1));
+        this(JBUI.insets(1, firstColumn ? 1 : 0, 1, 1));
     }
 
     @Override
