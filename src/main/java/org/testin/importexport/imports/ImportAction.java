@@ -24,6 +24,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.concurrency.ThreadingAssertions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
@@ -75,6 +76,7 @@ public class ImportAction extends DumbAwareAction {
     }
 
     private static void onEdt(final @NotNull Runnable work) {
+        ThreadingAssertions.assertBackgroundThread();
         ApplicationManager.getApplication().invokeAndWait(work, ModalityState.nonModal());
     }
 

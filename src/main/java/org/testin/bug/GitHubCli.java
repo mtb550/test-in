@@ -22,6 +22,7 @@ import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.util.concurrency.ThreadingAssertions;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.BugRepository;
@@ -128,6 +129,7 @@ public final class GitHubCli {
 
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-073, Rule-VIEW-PANEL-076
     public @NotNull IssueCreation create(final @NotNull BugRepository repository, final @NotNull String title, final @NotNull String body, final @NotNull List<byte[]> screenshots) {
+        ThreadingAssertions.assertBackgroundThread();
         final @NotNull Path folder;
         try {
             folder = Files.createTempDirectory("testin-bug-");

@@ -27,6 +27,7 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.ui.content.Content;
+import com.intellij.util.concurrency.ThreadingAssertions;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -131,6 +132,7 @@ public final class TreePanel implements Disposable {
     }
 
     private void draw(final @NotNull PanelState state, final @NotNull Optional<TestProjectDirectoryDto> boundProject) {
+        ThreadingAssertions.assertEventDispatchThread();
         treeView.setVisible(boundProject.isPresent());
         aimTheTitleBar();
         panel.getEmptyText().clear();

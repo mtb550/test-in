@@ -17,6 +17,7 @@
 package org.testin.bug;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.util.concurrency.ThreadingAssertions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +38,7 @@ import java.util.stream.StreamSupport;
 public final class TestCaseLink {
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068
     public static @NotNull Optional<String> read(final @NotNull Project p, final @NotNull TestCaseFile file) {
+        ThreadingAssertions.assertBackgroundThread();
         if (!OptionalPlugin.GIT.isAvailable()) return Optional.empty();
 
         final @NotNull GitRepositoryService git = new GitRepositoryService(p);

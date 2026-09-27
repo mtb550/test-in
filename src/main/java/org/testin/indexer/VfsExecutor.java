@@ -22,6 +22,7 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.concurrency.ThreadingAssertions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +40,7 @@ import java.util.function.Consumer;
 @Service(Service.Level.PROJECT)
 final class VfsExecutor {
     private static @NotNull Optional<VirtualFile> find(final @NotNull Path path) {
+        ThreadingAssertions.assertBackgroundThread();
         return Optional.ofNullable(LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path));
     }
 

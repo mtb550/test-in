@@ -22,6 +22,7 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.concurrency.ThreadingAssertions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -161,6 +162,7 @@ public final class TestinEditors {
     }
 
     private boolean openNow(final @NotNull Project p, final @NotNull DirectoryDto dir, final boolean focus) {
+        ThreadingAssertions.assertEventDispatchThread();
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
         final @NotNull Optional<VirtualFile> already = openFileAt(p, dir.getPath());
