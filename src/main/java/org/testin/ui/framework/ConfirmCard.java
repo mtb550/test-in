@@ -18,21 +18,22 @@ package org.testin.ui.framework;
 
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Html;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.util.List;
 
-public final class DialogMessage implements DialogComponent {
-    private static final int PADDING = 12;
-
+// UC-INTERNAL-007, Rule-INTERNAL-099
+public final class ConfirmCard implements DialogComponent {
     private final @NotNull JBPanel<?> panel;
 
-    DialogMessage(final @NotNull String text) {
+    // UC-INTERNAL-007, Rule-INTERNAL-099, Rule-INTERNAL-108
+    ConfirmCard(final @NotNull String text, final @NotNull List<String> from, final @NotNull List<String> to) {
         final @NotNull JBPanel<?> content = new JBPanel<>();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setOpaque(false);
@@ -41,9 +42,9 @@ public final class DialogMessage implements DialogComponent {
         message.setAlignmentX(Component.LEFT_ALIGNMENT);
         content.add(message);
 
-        panel = new JBPanel<>(new BorderLayout());
-        panel.setOpaque(false);
-        panel.setBorder(JBUI.Borders.empty(PADDING));
+        DialogPlace.row(from, to).ifPresent(content::add);
+
+        panel = DialogStyle.asSection(new JBPanel<>(new BorderLayout()));
         panel.setFocusable(true);
         panel.add(content, BorderLayout.CENTER);
     }

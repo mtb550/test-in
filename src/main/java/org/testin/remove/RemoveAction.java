@@ -44,6 +44,7 @@ import org.testin.util.Bundle;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -91,7 +92,7 @@ public class RemoveAction extends DumbAwareAction {
                     : Bundle.message("remove.confirm.many", String.valueOf(nodesToRemove.size())))
                     + (holds.isEmpty() ? "" : System.lineSeparator() + holds);
 
-            final @NotNull String from = nodesToRemove.size() == 1 ? nodesToRemove.getFirst().getPath().toString() : "";
+            final @NotNull String from = nodesToRemove.size() == 1 ? Objects.toString(nodesToRemove.getFirst().getPath().getParent(), "") : "";
             new ConfirmDialog(p, Bundle.message("remove.confirm.title"), msg, from, "", Bundle.message("remove.confirm.button"), () -> removeNodes(nodesToRemove)).show();
         }
 

@@ -54,11 +54,12 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     }
 
     public static @NotNull ComponentDialogBase<DialogMessage> message(final @NotNull String text) {
-        return message(text, "", "");
+        return new ComponentDialogBase<>(new DialogMessage(text));
     }
 
-    public static @NotNull ComponentDialogBase<DialogMessage> message(final @NotNull String text, final @NotNull String from, final @NotNull String to) {
-        return new ComponentDialogBase<>(new DialogMessage(text, from, to));
+    // UC-INTERNAL-007, Rule-INTERNAL-099, Rule-INTERNAL-108
+    public static @NotNull ComponentDialogBase<ConfirmCard> confirmCard(final @NotNull String text, final @NotNull List<String> from, final @NotNull List<String> to) {
+        return new ComponentDialogBase<>(new ConfirmCard(text, from, to));
     }
 
     public static <C extends DialogComponent> @NotNull ComponentDialogBase<C> of(final @NotNull C component) {

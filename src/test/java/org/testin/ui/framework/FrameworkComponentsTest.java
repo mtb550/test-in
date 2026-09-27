@@ -72,8 +72,8 @@ public class FrameworkComponentsTest {
         return Optional.empty();
     }
 
-    private static int rowCount(final DialogMessage message) {
-        final Container content = (Container) message.getPanel().getComponent(0);
+    private static int rowCount(final DialogComponent shown) {
+        final Container content = (Container) shown.getPanel().getComponent(0);
         return content.getComponentCount();
     }
 
@@ -132,12 +132,14 @@ public class FrameworkComponentsTest {
     }
 
     @Test
-    public void messageShowsFromToRowsOnlyWhenGiven() {
-        final DialogMessage plain = ComponentDialogBase.message("Remove 'X'?").getComponent();
-        final DialogMessage transfer = ComponentDialogBase.message("Move 'X' into 'Y'?", "a/b", "a/c").getComponent();
+    public void confirmCardSaysWherePlacesAreGivenAndNothingWhereTheyAreNot() {
+        final ConfirmCard asked = ComponentDialogBase.confirmCard("Save to testin.yml?", List.of(), List.of()).getComponent();
+        final ConfirmCard removing = ComponentDialogBase.confirmCard("Remove 'X'?", List.of("demo", "Test Cases"), List.of()).getComponent();
+        final ConfirmCard moving = ComponentDialogBase.confirmCard("Move 'X' into 'Y'?", List.of("demo", "Test Cases"), List.of("demo", "Test Cases", "Smoke")).getComponent();
 
-        assertEquals(rowCount(plain), 1, "message only");
-        assertEquals(rowCount(transfer), 3, "message + From + To");
+        assertEquals(rowCount(asked), 1, "the question alone, with no empty captioned block under it");
+        assertEquals(rowCount(removing), 2, "the question and where the node is");
+        assertEquals(rowCount(moving), 2, "the question and one row from where to where, not two blocks");
     }
 
     @Test
