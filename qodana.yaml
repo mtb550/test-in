@@ -39,17 +39,47 @@ include:
 # .idea/scopes/Translations.xml owns this decision and says why: the translated
 # bundles hold the translator's words, and the spelling and grammar checkers
 # know English. The Testin profile switches all three off in that scope, and the
-# IDE and tools/inspect.ps1 honour it. Qodana does not. It reads the profile's
+# IDE and tools/inspect.ps1 honor it. Qodana does not. It reads the profile's
 # own entries, which is how UnusedProperty went quiet, and ignores the named
 # scopes inside them. That is why messages_fr.properties was 2,152 of the 2,408
 # findings in the 27 September report: 2,106 French words spelled wrongly in
 # English, and 46 sentences of French read as English grammar.
 #
-# So the same exclusion is restated here in the one form this linter honours.
+# So the same exclusion is restated here in the one form this linter honors.
 # A third translation needs adding to both files.
+# .idea/scopes/Inspected.xml is the other thing Qodana cannot read, and it is
+# the list of what this repository writes. Everything below is outside it, so
+# tools/inspect.ps1 has never looked at any of it, and the 27 September report
+# was 40 findings deep in files whose bytes are fixed by something else.
+#
+# samples/testin-root is 30 of those 40, and all one collision: a Testin test
+# set is marked by a file named .ts, which is also TypeScript's extension. The
+# marker is JSON, so reading it as TypeScript gives five "newline or semicolon
+# expected" errors, four comma expressions and six bad expression statements per
+# file. Nothing can be done about the name - .ts is the marker Testin writes and
+# .ts is what TypeScript claims.
+#
+# gradlew.bat is Gradle's, and its cmd keywords - setlocal, endlocal, COMSPEC,
+# ERRORLEVEL - are five more. EULA.md is JetBrains' agreement quoted verbatim,
+# so its Czech address and its four 50-word sentences stay exactly as written.
 exclude:
+  - name: All
+    paths:
+      - samples
+      - gradlew
+      - gradlew.bat
+      - EULA.md
+      - PRIVACY_POLICY.md
+
+  # The four temurin findings in .github. temurin is the JDK distribution
+  # actions/setup-java is given. It is in .idea/dictionaries/project.xml, which
+  # fc6f46a3 added and which this run ignored: all ten words it added were
+  # reported again, while the Linkedin typo the same commit fixed was not. The
+  # IDE and tools/inspect.ps1 read that dictionary and still spell-check these
+  # files, so only Qodana's copy of the question is switched off.
   - name: SpellCheckingInspection
     paths:
+      - .github
       - src/main/resources/messages_fr.properties
       - src/main/resources/messages_hi.properties
   - name: GrazieInspection

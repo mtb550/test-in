@@ -122,8 +122,10 @@ public class SettingsTest {
 
     @Test
     public void nothingToSayMeansNoPlaceAtAll() {
-        assertEquals(TestinRoot.place(Path.of("C:", "testin"), ""), List.of());
-        assertEquals(TestinRoot.place(Path.of("C:", "testin"), "   "), List.of());
+        final Path root = Path.of("C:", "testin");
+
+        assertEquals(TestinRoot.place(root, ""), List.of());
+        assertEquals(TestinRoot.place(root, "   "), List.of());
     }
 
     @Test
