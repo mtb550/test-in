@@ -52,7 +52,7 @@ public final class DialogStyle {
 
     private static final int PADDING_TOP = 10;
     private static final int PADDING_SIDE = 12;
-    private static final int HEADER_GAP = 8;
+    private static final int SECTION_GAP = 8;
 
     // Rule-INTERNAL-105
     private static final @NotNull Color ACCENT = JBUI.CurrentTheme.Button.defaultButtonColorStart();
@@ -83,9 +83,9 @@ public final class DialogStyle {
     }
 
     // Rule-INTERNAL-099
-    public static @NotNull JBPanel<?> section(final @NotNull JComponent header, final @NotNull JComponent content) {
-        final @NotNull JBPanel<?> panel = asSection(new JBPanel<>(new BorderLayout(0, JBUI.scale(HEADER_GAP))));
-        panel.add(header, BorderLayout.NORTH);
+    public static @NotNull JBPanel<?> section(final @NotNull JComponent top, final @NotNull JComponent content) {
+        final @NotNull JBPanel<?> panel = asSection(new JBPanel<>(new BorderLayout(0, JBUI.scale(SECTION_GAP))));
+        panel.add(top, BorderLayout.NORTH);
         panel.add(content, BorderLayout.CENTER);
 
         return panel;
@@ -125,6 +125,12 @@ public final class DialogStyle {
         component.setFont(Fonts.choice());
         hint(component);
         return component;
+    }
+
+    // Rule-INTERNAL-095
+    public static void asRow(final @NotNull JComponent component) {
+        component.setFont(Fonts.row());
+        hint(component);
     }
 
     // Rule-INTERNAL-095

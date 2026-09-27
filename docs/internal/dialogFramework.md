@@ -159,6 +159,11 @@ and which keys it answers, and the shell builds the rest.
   row that is selected. Every surface stays neutral. A dialog that colors its
   furniture has to explain itself with hints; one that colors only what acts
   tells the tester where to click and what to fill without a word.
+- **Rule-INTERNAL-106** — A row a tester picks out of a list is marked by a
+  rounded band inside the card that holds it, never a bar running edge to edge,
+  because the band is the thing being chosen and the card is not. What a row
+  says about itself starts in its own column, so the descriptions read down the
+  list instead of trailing each name at a different place.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

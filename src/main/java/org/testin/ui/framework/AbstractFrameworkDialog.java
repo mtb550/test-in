@@ -54,7 +54,6 @@ import javax.swing.ScrollPaneConstants;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -426,20 +425,14 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
     // Rule-INTERNAL-102
     private static final class ContentStack extends JBPanel<ContentStack> implements Scrollable {
         private static final int STEP = 16;
-        private static final int GUTTER = 50;
+        private static final int GUTTER = 12;
         private static final int GAP = 12;
 
+        // Rule-INTERNAL-099
         private ContentStack() {
             super(new BorderLayout(0, JBUI.scale(GAP)));
             setOpaque(false);
-        }
-
-        // Rule-INTERNAL-099
-        @Override
-        public @NotNull Insets getInsets() {
-            final int side = getWidth() / GUTTER;
-
-            return new Insets(side, side, side, side);
+            setBorder(JBUI.Borders.empty(GUTTER));
         }
 
         @Override

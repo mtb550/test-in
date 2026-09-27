@@ -42,7 +42,7 @@ public final class SelectionTree implements DialogComponent {
         this.root = root;
         tree = new CheckboxTree(renderer, root, new CheckboxTreeBase.CheckPolicy(true, true, true, true));
         // Rule-INTERNAL-095
-        tree.setFont(Fonts.row());
+        DialogStyle.asRow(tree);
         // Rule-INTERNAL-102
         tree.setVisibleRowCount(VISIBLE_ROWS);
         TreeUtil.expandAll(tree);

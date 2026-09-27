@@ -25,7 +25,10 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.scale.JBUIScale;
+import com.intellij.util.ui.GraphicsUtil;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.ListValue;
@@ -41,24 +44,28 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import java.awt.BorderLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.RoundRectangle2D;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class TextFieldWithSelections<T> implements DialogComponent, TextValue {
     private static final int DEBOUNCE_MILLIS = 300;
-    private static final int PADDING = 6;
 
     private final @NotNull FrameworkTextField input;
     private final @NotNull JTextField textField;
     private final @NotNull CollectionListModel<SelectionList<T>> rowModel = new CollectionListModel<>();
     private final @NotNull JBList<SelectionList<T>> list;
     private final @NotNull JBPanel<?> panel;
+    private final @NotNull JBScrollPane scrollPane;
+    private final int visibleRows;
     private final @NotNull Rows<T> rows;
     private final @NotNull AtomicInteger queryGeneration = new AtomicInteger();
     private @NotNull Runnable submitRequest = () -> {
@@ -67,18 +74,19 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
 
     TextFieldWithSelections(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull List<SelectionList<T>> shownBeforeAsking, final @NotNull Rows<T> rows, final int visibleRows) {
         this.rows = rows;
+        this.visibleRows = visibleRows;
         input = new FrameworkTextField(icon, placeHolderText, "");
         textField = input.component();
 
         list = new JBList<>(rowModel);
-        DialogStyle.asChoice(list);
+        list.setOpaque(false);
+        // Rule-INTERNAL-095
+        DialogStyle.asRow(list);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setVisibleRowCount(visibleRows);
         list.setCellRenderer(new SelectionRenderer<>());
-        show(shownBeforeAsking);
 
         list.addListSelectionListener(_ -> syncLeadingIcon());
-        syncLeadingIcon();
 
         list.addMouseListener(new MouseAdapter() {
             @Override
@@ -90,18 +98,21 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
         installNavigation();
 
         final @NotNull JBPanel<?> listWrapper = new JBPanel<>(new BorderLayout());
+        listWrapper.setOpaque(false);
         listWrapper.add(list, BorderLayout.CENTER);
 
-        final @NotNull JBScrollPane scrollPane = new JBScrollPane(listWrapper);
-        // Rule-INTERNAL-102
-        scrollPane.setBorder(JBUI.Borders.empty(PADDING));
+        scrollPane = new JBScrollPane(listWrapper);
+        scrollPane.setBorder(JBUI.Borders.empty());
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        fitScrollbar();
 
-        panel = new JBPanel<>(new BorderLayout());
-        panel.setOpaque(false);
-        panel.add(textField, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
+        // Rule-INTERNAL-099
+        panel = DialogStyle.section(textField, scrollPane);
+
+        show(shownBeforeAsking);
+        syncLeadingIcon();
 
         installRowRefresh();
         installFirstFill();
@@ -149,10 +160,18 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
         });
     }
 
+    // Rule-INTERNAL-102
+    private void fitScrollbar() {
+        scrollPane.setVerticalScrollBarPolicy(rowModel.getSize() > visibleRows
+                ? ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
+                : ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+    }
+
     private void show(final @NotNull List<SelectionList<T>> found) {
         if (found.equals(rowModel.getItems())) return;
 
         rowModel.replaceAll(found);
+        fitScrollbar();
 
         if (found.isEmpty()) return;
 
@@ -225,16 +244,45 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
         list.ensureIndexIsVisible(newIdx);
     }
 
+    // Rule-INTERNAL-106
     private static final class SelectionRenderer<T> extends ColoredListCellRenderer<SelectionList<T>> {
+        private static final int COLUMN = 170;
+        private static final float ARC = 8;
+
+        private boolean picked;
+
         @Override
         protected void customizeCellRenderer(final @NotNull JList<? extends SelectionList<T>> list, final SelectionList<T> value, final int index, final boolean selected, final boolean hasFocus) {
+            picked = selected;
+            setOpaque(false);
+
             setIcon(value.icon());
             setIconTextGap(JBUI.scale(8));
             append(value.name());
             if (!value.hint().isEmpty()) {
-                append("   " + value.hint(), SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES);
+                appendTextPadding(JBUI.scale(COLUMN));
+                append(value.hint(), SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES);
             }
             setBorder(JBUI.Borders.empty(8, 12));
+        }
+
+        @Override
+        protected void paintComponent(final @NotNull Graphics g) {
+            if (picked) {
+                final @NotNull Graphics2D g2 = (Graphics2D) g.create();
+                try {
+                    GraphicsUtil.setupAAPainting(g2);
+
+                    final float arc = JBUIScale.scale(ARC);
+
+                    g2.setColor(UIUtil.getListSelectionBackground(true));
+                    g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), arc, arc));
+                } finally {
+                    g2.dispose();
+                }
+            }
+
+            super.paintComponent(g);
         }
     }
 }
