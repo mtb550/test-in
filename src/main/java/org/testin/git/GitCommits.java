@@ -107,6 +107,7 @@ public final class GitCommits {
         }
     }
 
+    // UC-SHARE-013, Rule-SHARE-123
     public void pullAndPush(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
         pullWhereTheRemoteHasBranch(repositoryPath, remote, branch);
         push(repositoryPath, remote, branch);

@@ -34,6 +34,10 @@ There is no key for this. **Commit & Push** is the face of the split button.
   list, because a push finishes on its own time.
 - **Rule-SHARE-062** — Any password inside the remote address is taken out of
   anything Testin shows or logs.
+- **Rule-SHARE-123** — **Commit & Push** pulls before it pushes, rebasing and
+  stashing the way a sync does, so the tester's commits land on top of what the
+  remote already holds. A remote with no branch of that name yet is pushed to
+  without the pull.
 
 ## What the tester sees
 
