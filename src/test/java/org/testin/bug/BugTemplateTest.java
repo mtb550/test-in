@@ -80,8 +80,8 @@ public class BugTemplateTest {
     @Test
     public void theIssueReadsAsTheDesignSays() {
         final String expected = """
-                | Severity | Priority | Platform | Environment | Build |
-                |:--|:--|:--|:--|:--|
+                | Severity     | Priority     | Platform     | Environment      | Build            |
+                |:-------------|:-------------|:-------------|:-----------------|:-----------------|
                 | 🟡 Minor | ⚪ Low | Mobile · Backend | n\\a | n\\a |
                 
                 ### Actual result
@@ -116,13 +116,13 @@ public class BugTemplateTest {
                 ![Screenshot 1](./screenshot-1.png)
                 
                 ### Where it was found
-                | | |
-                |:--|:--|
-                | **Test run** | Sprint 7 Cycle 3 |
-                | **Executed** | Muteb · Sunday 13-09-2026 At 14:14:00 [Asia/Riyadh] |
-                | **Browser · Device · Language** | n\\a · Samsung · English |
-                | **Commit** | n\\a |
-                | **Test case** | [07f7e754](LINK) in test set ActivateApp |
+                |                                 |                                      |
+                |:--------------------------------|:-------------------------------------|
+                | **Test run**                    | Sprint 7 Cycle 3                          |
+                | **Executed**                    | Muteb · Sunday 13-09-2026 At 14:14:00 [Asia/Riyadh]                         |
+                | **Browser · Device · Language** | n\\a · Samsung · English            |
+                | **Commit**                      | n\\a                           |
+                | **Test case**                   | [07f7e754](LINK) in test set ActivateApp |
                 
                 ---
                 <sub>#ActivateApp · Reported with Testin</sub>
@@ -137,7 +137,7 @@ public class BugTemplateTest {
 
         assertEquals(body.split("n\\\\a", -1).length - 1, 17,
                 "5 in the summary, 7 sections and 5 in where it was found - 3 of them always");
-        assertTrue(body.contains("| **Test case** | 07f7e754 in test set ActivateApp |"), "the test case shows without its link");
+        assertTrue(body.contains("| **Test case**                   | 07f7e754 in test set ActivateApp |"), "the test case shows without its link");
     }
 
     @Test
