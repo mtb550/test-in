@@ -39,9 +39,14 @@ There is no key for this. The menu entry is **Import**.
 - **Rule-SHARE-029** — Thirteen columns are read. **Order**, **ID**, **FQCN**, **Path** and **Status** are not.
 - **Rule-SHARE-030** — Importing the same file twice makes two copies of
   everything.
-- **Rule-SHARE-110** — A column heading is matched in the language on screen and
-  in English. A file exported by a colleague whose IDE runs in another language
-  still finds its columns, and so does the sample workbook the plugin ships.
+- **Rule-SHARE-110** — A column heading is matched by the name Testin shows for
+  that column and by the column's name in the code, with or without its
+  underscores and in any letter case, so a heading typed as *created at* finds
+  **Created At**.
+- **Rule-SHARE-121** — Created At and Updated At are read in the shape Testin
+  exports them and in Excel's own date shape, so a sheet exported and imported
+  unchanged keeps its dates. An empty cell leaves the date empty, and any other
+  shape is refused and counted in the one message.
 
 ## The screen
 

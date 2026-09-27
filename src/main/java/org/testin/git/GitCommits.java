@@ -112,7 +112,7 @@ public final class GitCommits {
         push(repositoryPath, remote, branch);
     }
 
-    // UC-SHARE-016, Rule-SHARE-069
+    // UC-SHARE-016, Rule-SHARE-069, Rule-SHARE-120
     public void pullWhereTheRemoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
         if (!remoteHasBranch(repositoryPath, remote, branch)) {
             Logger.info("Remote " + remote + " has no branch " + branch + " yet; pushing without pulling first");

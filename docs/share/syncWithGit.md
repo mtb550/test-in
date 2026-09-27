@@ -38,6 +38,9 @@ There is no key for this. The menu entry is **Sync With Remote**.
   this rule used to say the opposite of it.
 - **Rule-SHARE-073** — Afterward the working folder, Testin's own reading of
   it, and the tree are all read again.
+- **Rule-SHARE-120** — A remote that has no branch of that name yet is pushed to
+  without a pull first. There is nothing to pull, and a pull would fail the sync
+  before the push was tried.
 
 ## What the tester sees
 

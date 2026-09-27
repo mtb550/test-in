@@ -55,6 +55,10 @@ The code runs, and Testin writes down whether each test case passed.
   LoginTest (2). The two runs are then separate everywhere: each has its own
   process, Stop reaches one without touching the other, and each test case
   reports its verdict under the run it belongs to.
+- **Rule-CODEGEN-092** — A run that ends without reporting a test case, whether
+  its build failed, its JVM crashed or the IDE's own Stop ended it, takes that
+  test case out of Running with no verdict recorded. Nothing is left running
+  after the run has ended.
 
 ## The four ways in
 

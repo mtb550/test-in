@@ -178,6 +178,7 @@ public final class TestNGExecution implements Disposable {
         return stop.testCases().size();
     }
 
+    // UC-CODEGEN-008, Rule-CODEGEN-092
     private void ended(final @NotNull ExecutionEnvironment env) {
         final @NotNull String runName = env.getRunProfile().getName();
         final @NotNull List<UUID> abandoned = registry.ended(runName);
