@@ -40,9 +40,8 @@ There is no key for this. The menu entry is **Import**.
 - **Rule-SHARE-030** — Importing the same file twice makes two copies of
   everything.
 - **Rule-SHARE-110** — A column heading is matched by the name Testin shows for
-  that column and by the column's name in the code, with or without its
-  underscores and in any letter case, so a heading typed as *created at* finds
-  **Created At**.
+  that column and by the column's name in the code. Underscores and letter case
+  do not matter, so a heading typed as *created at* finds **Created At**.
 - **Rule-SHARE-121** — Created At and Updated At are read in the shape Testin
   exports them and in Excel's own date shape, so a sheet exported and imported
   unchanged keeps its dates. An empty cell leaves the date empty, and any other

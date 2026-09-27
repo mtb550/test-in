@@ -48,7 +48,7 @@ There is no key for this. The button's tooltip reads **Stop Execution**.
   it loses its hover look at once, so a control that has stopped working never
   looks ready to press.
 - **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
-  holds it again afterwards, so the next key lands in the grid rather than
+  holds it again afterward, so the next key lands in the grid rather than
   nowhere.
 - **Rule-EDITOR-PANEL-250** — A grid row is drawn in its stripe, or in the
   selection color while it is selected, and in nothing else. The pointer passing
