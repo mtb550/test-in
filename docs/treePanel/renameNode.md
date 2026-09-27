@@ -71,6 +71,9 @@ This changes the name of one node. Nothing inside it moves.
   under it, light mode included, before anything moves. While one of them is
   busy - a test run executing, a cell being edited - **Rename** is gray and says
   why.
+- **Rule-TREE-PANEL-123** — The rename dialog says what it is renaming and where
+  it sits, above the field, so the name being replaced can still be read once
+  typing has begun.
 
 ## The Rename dialog
 
@@ -79,24 +82,41 @@ This changes the name of one node. Nothing inside it moves.
 │  Rename                                                      │
 ├──────────────────────────────────────────────────────────────┤
 │                                                              │
-│  [edit]  Accounts                                       (1)  │
-│                                                              │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │  RENAMING              IN                         (1)  │  │
+│  │  [set] Accounts        Demo › Test Cases               │  │
+│  │                                                        │  │
+│  │  NEW NAME ─────────────────────────────────────── (2)  │  │
+│  │  [edit]  Accounts                                 (3)  │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                            [ Rename ]   (4)  │
 ├──────────────────────────────────────────────────────────────┤
-│  Enter Confirm    Escape Cancel                              │
+│  Enter Rename    Escape Cancel                          (5)  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **One field**, filled in with the current name. Its gray hint text reads *set new name...*. The cursor sits after the
+1. **What is being renamed, and where it sits** — two captioned facts side by
+   side: the node's own kind of icon with its name, and its place in the test
+   project. The tester can still read the name being replaced after typing has
+   started (Rule-TREE-PANEL-123). The place leaves the drive, the download folder
+   and the Testin folder off, with a chevron between the segments
+   (Rule-INTERNAL-108).
+2. **The caption over the field**, carrying the one hairline a dialog draws
+   (Rule-INTERNAL-087).
+3. **One field**, filled in with the current name. Its gray hint text reads *set new name...*. The cursor sits after the
    name. So typing **adds to the
    name** instead of replacing it. `Ctrl+A` selects the whole name. Spaces at
    either end are dropped before anything else happens.
+4. **The button** — colored, and named for what it does (Rule-INTERNAL-105).
+5. The key that confirms is named for the same thing the button is.
 
 ## Main flow
 
 1. The tester selects a test project, a test set, a package or a test run.
 2. The tester presses `Shift+F6`, or chooses **Actions → Rename**.
-3. The **Rename** dialog opens, with the current name filled in.
-4. The tester types the new name and presses `Enter`.
+3. The **Rename** dialog opens. It says what it is renaming and where that sits,
+   with the current name filled in below.
+4. The tester types the new name and presses `Enter`, or the **Rename** button.
 5. Testin closes every open editor on the node or under it, whatever kind it
    is, and light mode with them.
 6. For a test project, a test set or a test set package, Testin renames the

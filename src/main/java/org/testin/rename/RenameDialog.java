@@ -22,13 +22,17 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Refused;
+import org.testin.services.Services;
+import org.testin.setting.TestinRoot;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextInput;
 import org.testin.util.Bundle;
+import org.testin.util.Shortcuts;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 final class RenameDialog extends AbstractFrameworkDialog {
@@ -38,7 +42,7 @@ final class RenameDialog extends AbstractFrameworkDialog {
 
     private final @NotNull DirectoryType type;
 
-    // UC-TREE-PANEL-011
+    // UC-TREE-PANEL-011, Rule-INTERNAL-099, Rule-INTERNAL-105, Rule-INTERNAL-108, Rule-TREE-PANEL-123
     RenameDialog(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull Consumer<@NotNull String> onSubmit) {
         super(p);
         this.onSubmit = onSubmit;
@@ -52,10 +56,14 @@ final class RenameDialog extends AbstractFrameworkDialog {
                 .value(dir.getName())
                 .build();
         nameInput = built.getComponent();
-        components = List.of(built);
+
+        final @NotNull List<String> place = Services.getInstance(p, TestinRoot.class).place(Objects.toString(dir.getPath().getParent(), ""));
+        components = List.of(
+                ComponentDialogBase.of(new RenameCard(dir, place, nameInput)),
+                ComponentDialogBase.button(Bundle.message("dialog.rename.confirm")));
 
         shortcuts = List.of(
-                StatusBarShortcut.confirm(this::submit),
+                StatusBarShortcut.build(Shortcuts.Enter, Bundle.message("dialog.rename.confirm"), this::submit),
                 StatusBarShortcut.cancel(this::closeCancel));
     }
 
