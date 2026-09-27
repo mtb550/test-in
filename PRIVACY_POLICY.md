@@ -71,4 +71,4 @@ acknowledgment of the updated Privacy Policy.
 If you have any questions, concerns, or requests regarding your privacy and the "Test in" plugin, please contact:
 
 * **Email:** mtb550@gmail.com
-* **Linkedin:** https://www.linkedin.com/in/mtb550
+* **LinkedIn:** https://www.linkedin.com/in/mtb550

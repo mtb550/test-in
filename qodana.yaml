@@ -34,3 +34,28 @@ profile:
 
 include:
   - name: CheckDependencyLicenses
+
+# .idea/scopes/Translations.xml owns this decision and says why: the translated
+# bundles hold the translator's words, and the spelling and grammar checkers know
+# English. The Testin profile switches all three off in that scope, and the IDE
+# and tools/inspect.ps1 honour it. Qodana does not - it reads the profile's own
+# entries, which is how UnusedProperty went quiet, and ignores the named scopes
+# inside them, which is why messages_fr.properties was 2,152 of the 2,408
+# findings in the 27 September report: 2,106 French words spelled wrongly in
+# English, and 46 sentences of French read as English grammar.
+#
+# So the same exclusion is restated here in the one form this linter honours.
+# A third translation needs adding to both files.
+exclude:
+  - name: SpellCheckingInspection
+    paths:
+      - src/main/resources/messages_fr.properties
+      - src/main/resources/messages_hi.properties
+  - name: GrazieInspection
+    paths:
+      - src/main/resources/messages_fr.properties
+      - src/main/resources/messages_hi.properties
+  - name: GrazieStyle
+    paths:
+      - src/main/resources/messages_fr.properties
+      - src/main/resources/messages_hi.properties

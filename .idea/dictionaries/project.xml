@@ -2,6 +2,10 @@
   <dictionary name="project">
     <words>
       <w>CDPATH</w>
+      <w>COMSPEC</w>
+      <w>Dorg</w>
+      <w>ERRORLEVEL</w>
+      <w>Hřebenech</w>
       <w>JAVACMD</w>
       <w>Muteb's</w>
       <w>Otaibi</w>
@@ -16,6 +20,7 @@
       <w>calibri</w>
       <w>cmatch</w>
       <w>dtos</w>
+      <w>endlocal</w>
       <w>ffffff</w>
       <w>fqcn</w>
       <w>hrun</w>
@@ -41,8 +46,10 @@
       <w>pwsh</w>
       <w>readarray</w>
       <w>sara</w>
+      <w>setlocal</w>
       <w>shellness</w>
       <w>snapshotted</w>
+      <w>temurin</w>
       <w>testin</w>
       <w>testin's</w>
       <w>testrun</w>
