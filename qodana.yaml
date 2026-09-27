@@ -27,27 +27,14 @@ linter: qodana-jvm
 # everyKeyInTheBundleIsAskedForSomewhere fails on an unreferenced key and skips
 # exactly those three prefixes; everyDeclaredActionIsNamedInTheBundle fails when
 # a declared action has no action.<id>.text key at all. So the inspection was
-# reporting as dead the keys a test demands exist. It was not even consistent
-# about it: two toolwindow keys resolved in the English and Hindi bundles and
-# not the French.
+# reporting as dead the keys a test demands exist.
 profile:
   path: .idea/inspectionProfiles/Testin.xml
 
 include:
   - name: CheckDependencyLicenses
 
-# .idea/scopes/Translations.xml owns this decision and says why: the translated
-# bundles hold the translator's words, and the spelling and grammar checkers
-# know English. The Testin profile switches all three off in that scope, and the
-# IDE and tools/inspect.ps1 honor it. Qodana does not. It reads the profile's
-# own entries, which is how UnusedProperty went quiet, and ignores the named
-# scopes inside them. That is why messages_fr.properties was 2,152 of the 2,408
-# findings in the 27 September report: 2,106 French words spelled wrongly in
-# English, and 46 sentences of French read as English grammar.
-#
-# So the same exclusion is restated here in the one form this linter honors.
-# A third translation needs adding to both files.
-# .idea/scopes/Inspected.xml is the other thing Qodana cannot read, and it is
+# .idea/scopes/Inspected.xml is a thing Qodana cannot read, and it is
 # the list of what this repository writes. Everything below is outside it, so
 # tools/inspect.ps1 has never looked at any of it, and the 27 September report
 # was 40 findings deep in files whose bytes are fixed by something else.
@@ -80,13 +67,3 @@ exclude:
   - name: SpellCheckingInspection
     paths:
       - .github
-      - src/main/resources/messages_fr.properties
-      - src/main/resources/messages_hi.properties
-  - name: GrazieInspection
-    paths:
-      - src/main/resources/messages_fr.properties
-      - src/main/resources/messages_hi.properties
-  - name: GrazieStyle
-    paths:
-      - src/main/resources/messages_fr.properties
-      - src/main/resources/messages_hi.properties

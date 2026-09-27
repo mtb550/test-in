@@ -77,6 +77,7 @@
         <li><b>A revert can be taken back:</b> reverting a change in Pending Changes is itself undoable, and reverting a test case that was never committed removes the test method generated for it.</li>
         <li><b>The gutter follows the test project you chose</b>, not only the one <b>testin.yml</b> names, so the run icons appear beside the generated methods as soon as a project is bound.</li>
         <li><b>The tree reads a folder set after the IDE started:</b> setting the Testin folder and then opening the panel used to leave it reading forever, until a Refresh. It reads on the first open now.</li>
+        <li><b>English only:</b> the French and Hindi translations are gone. Nobody who reads either language had checked them, and no tool could, so Testin now shows only words that have been read.</li>
         <li><b>Words a tester reads:</b> a test case is called a test case everywhere &mdash; the report's <b>Total Test Cases</b> tile, the bulk verdict's confirmation, light mode's counter. The failure form's hints end in an ellipsis, the preconditions hint reads <i>set preconditions</i>, the folder example reads <i>Example: C:\Users\...</i>, and a pull that stops on a conflict offers to undo the pull.</li>
         <li>Tested by <b>Mohammed AlZamil</b>.</li>
     </ul>

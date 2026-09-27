@@ -406,16 +406,6 @@ mapOf("runIde" to "config", "runPyCharm" to "config_runPyCharm").forEach { (runT
     tasks.named<RunIdeTask>(runTask) {
         jvmArgs("--sun-misc-unsafe-memory-access=allow")
 
-        // ./gradlew runIde -Ptestin.language=hi
-        //
-        // The only way to see Testin's Hindi or French bundle. Bundle extends
-        // DynamicBundle, which takes its locale from the IDE's language setting, and
-        // JetBrains ships localization plugins for Chinese, Japanese and Korean only
-        // - so Settings has no entry to pick. DynamicBundle falls back to the JVM's
-        // default locale, which is what this sets. Decision-010 says why the plugin
-        // does not register a language of its own (#66, finding 96).
-        providers.gradleProperty("testin.language").orNull?.let { jvmArgs("-Duser.language=$it") }
-
         val sandboxes = layout.projectDirectory.dir(".sandbox/Testin").asFile
         val committedSample = layout.projectDirectory.dir("samples").asFile
         val workingSample = layout.projectDirectory.dir(".sandbox/sample").asFile

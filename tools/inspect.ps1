@@ -196,19 +196,9 @@ function Select-Inspected([object[]] $problems) {
         if ($target.EndsWith('//*')) { $folders += $target.Substring(0, $target.Length - 3) + '/' } else { $files += $target }
     }
 
-    # The spelling and grammar checkers know English, and a translation bundle
-    # is not English: 1,746 "typos" in messages_fr and messages_hi were French
-    # and Hindi. The Testin profile switches both off in the Translations scope,
-    # which is what the IDE reads - and the headless run ignores a scope inside
-    # a profile, so the same rule is written here as well. Every other check
-    # still reads the translations.
-    $translation = '^src/main/resources/messages_[a-z]{2}\.properties$'
-    $language = @('SpellCheckingInspection', 'GrazieInspection', 'GrazieStyle')
-
     $problems | Where-Object {
         $path = $_.Path.TrimEnd('/')
-        $inScope = (($files -contains $path) -or @($folders | Where-Object { $path.StartsWith($_) }).Count -gt 0) -and $excluded -notcontains $path
-        $inScope -and -not ($language -contains $_.Inspection -and $path -match $translation)
+        (($files -contains $path) -or @($folders | Where-Object { $path.StartsWith($_) }).Count -gt 0) -and $excluded -notcontains $path
     }
 }
 

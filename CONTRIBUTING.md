@@ -25,20 +25,6 @@ cd test-in
 `runIde` opens a second IDE with the plugin loaded. It keeps its own settings and
 its own logs under `.sandbox/`, so nothing it does touches the IDE you work in.
 
-**To see Testin in French or Hindi, start the sandbox with the locale.** The
-IDE's own language setting cannot reach either bundle: JetBrains ships
-localization plugins for Chinese, Japanese and Korean only, so Settings offers no
-French or Hindi entry to pick. The bundles resolve from the JVM's default locale
-instead.
-
-```bash
-./gradlew runIde -Ptestin.language=fr     # or hi
-```
-
-A sandbox started the ordinary way reads English, and that is correct rather
-than a broken translation. [Decision-010](docs/decisions.md) says why the plugin
-does not register a language of its own.
-
 **If `prepareSandbox` fails with *"cannot be performed on a file with a
 user-mapped section open"***, a sandbox IDE is still running and holding the
 jars. Close it; nothing else clears it.
@@ -202,11 +188,9 @@ A new `@SuppressWarnings` or `//noinspection` fails the gate too, through the
 `SuppressionAnnotation` inspection. The profile allows `UnstableApiUsage` only,
 for the one platform call `build.gradle.kts` names.
 
-The spelling and grammar checkers skip the translation bundles, because their
-words are the translator's to check. The profile does it, through the
-Translations scope in `.idea/scopes/`, so the IDE and CI read the same list. Two files are outside the scope, because
-their bytes are fixed by something else: the Jekyll stylesheet and the bug
-report template. `Inspected.xml` says why.
+Two files are outside the scope in `.idea/scopes/Inspected.xml`, because their
+bytes are fixed by something else: the Jekyll stylesheet and the bug report
+template. `Inspected.xml` says why.
 
 Eight rules are the script's own, because no IntelliJ inspection makes them:
 

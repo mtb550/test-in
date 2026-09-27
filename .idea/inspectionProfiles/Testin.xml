@@ -6,12 +6,8 @@
       <option name="SUGGEST_NULLABLE_ANNOTATIONS" value="false" />
       <option name="DONT_REPORT_TRUE_ASSERT_STATEMENTS" value="false" />
     </inspection_tool>
-    <inspection_tool class="GrazieInspection" enabled="true" level="GRAMMAR_ERROR" enabled_by_default="true">
-      <scope name="Translations" level="GRAMMAR_ERROR" enabled="false" />
-    </inspection_tool>
-    <inspection_tool class="GrazieStyle" enabled="true" level="STYLE_SUGGESTION" enabled_by_default="true">
-      <scope name="Translations" level="STYLE_SUGGESTION" enabled="false" />
-    </inspection_tool>
+    <inspection_tool class="GrazieInspection" enabled="true" level="GRAMMAR_ERROR" enabled_by_default="true" />
+    <inspection_tool class="GrazieStyle" enabled="true" level="STYLE_SUGGESTION" enabled_by_default="true" />
     <inspection_tool class="MissingSerialAnnotation" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="NullableProblems" enabled="true" level="ERROR" enabled_by_default="true">
       <option name="REPORT_NULLABLE_METHOD_OVERRIDES_NOTNULL" value="true" />
@@ -32,11 +28,6 @@
       <option name="m_ignorePrivateMethods" value="false" />
     </inspection_tool>
     <inspection_tool class="SpellCheckingInspection" enabled="true" level="TYPO" enabled_by_default="true">
-      <scope name="Translations" level="TYPO" enabled="false">
-        <option name="processCode" value="true" />
-        <option name="processLiterals" value="true" />
-        <option name="processComments" value="true" />
-      </scope>
       <option name="processCode" value="true" />
       <option name="processLiterals" value="true" />
       <option name="processComments" value="true" />

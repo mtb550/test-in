@@ -298,6 +298,9 @@ that read, not the enums, that is the work.
 
 ## Decision-010 — Testin's own translations are reached by the IDE's locale, not by a language plugin
 
+*Superseded by Decision-016, 27 September 2026: Testin ships in English only, so
+there is no translation to reach. Left as it was written.*
+
 **Context.** `Bundle` extends `DynamicBundle`, which picks its locale from the
 IDE's language. JetBrains ships localization plugins for Chinese, Japanese and
 Korean only, so Settings offers no French entry and no Hindi entry: no amount of
@@ -489,16 +492,49 @@ it, which is what Rule-EDITOR-PANEL-144 and Rule-VIEW-PANEL-070 already say.
 
 ---
 
+## Decision-016 — Testin ships in English only
+
+**Context.** Testin carried French and Hindi bundles beside the English one,
+1,061 keys each (#11). Nothing could say whether a translated value meant what
+its English original meant (#349). The platform downloads spelling dictionaries
+for Russian, German and Ukrainian only, so neither language could be
+spell-checked. Grazie checks French grammar and not Hindi, and only on the
+machine that downloaded the model, so CI could check neither. And no tester saw
+them: Decision-010 put them behind a JVM option nobody passes. In the 16 days
+after the Hindi bundle landed, 116 of the 119 commits that changed the English
+bundle also changed the French one, and 372 English lines became 1,101 across
+the three.
+
+**Decision.** Both translated bundles are deleted, and `messages.properties` is
+the only bundle. Decided 27 September 2026.
+
+**Consequences.** A bundle change is one file again, and every word Testin shows
+can be read and checked by the gates it runs. A tester whose IDE runs in
+another language reads Testin in English, which is what nearly every tester
+already saw. The Translations scope, the Qodana exclusion for the bundles and
+the `-Ptestin.language` sandbox property went with them, because each existed
+only for the translations.
+
+**If you are about to reverse it.** Bring a reviewer first, not a file. The
+13,789 translated words are in git history at the commit before this decision,
+and one revert brings them back. Every English key added since has to be
+translated before they build, and `BundleKeysTest` has to assert again that
+every translation answers the same keys. A translation nobody who reads the language has checked
+is what this decision removed.
+
+---
+
 ## Superseded decisions
 
 Each is listed here with the number that replaced it, and its section above is
 left exactly as it was written.
 
-| Decision                                                     | Superseded by | When              |
-|--------------------------------------------------------------|---------------|-------------------|
-| Decision-004 — SFTP is the maintained JSch fork              | Decision-012  | 19 September 2026 |
-| Decision-007 — An unknown SSH host is refused                | Decision-012  | 19 September 2026 |
-| Decision-011 — Testin reads `testin.yml` and never writes it | Decision-013  | 19 September 2026 |
+| Decision                                                             | Superseded by | When              |
+|----------------------------------------------------------------------|---------------|-------------------|
+| Decision-004 — SFTP is the maintained JSch fork                      | Decision-012  | 19 September 2026 |
+| Decision-007 — An unknown SSH host is refused                        | Decision-012  | 19 September 2026 |
+| Decision-011 — Testin reads `testin.yml` and never writes it         | Decision-013  | 19 September 2026 |
+| Decision-010 — Testin's translations are reached by the IDE's locale | Decision-016  | 27 September 2026 |
 
 ---
 

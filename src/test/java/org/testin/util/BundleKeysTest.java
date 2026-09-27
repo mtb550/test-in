@@ -32,7 +32,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -157,34 +156,19 @@ public class BundleKeysTest {
     }
 
     @Test
-    public void everyTranslationAnswersTheSameKeys() {
-        final Properties english = bundle("messages.properties");
-
-        for (final String language : List.of("fr", "hi")) {
-            final Properties other = bundle("messages_" + language + ".properties");
-
-            assertEquals(other.stringPropertyNames(), english.stringPropertyNames(),
-                    "messages_" + language + ".properties does not answer the same keys as the English bundle,"
-                            + " so a tester in that language reads some of each");
-        }
-    }
-
-    @Test
     public void everyPatternWithASlotDoublesItsApostrophes() {
         final Pattern slot = Pattern.compile("\\{\\d");
 
-        for (final String name : List.of("messages.properties", "messages_fr.properties", "messages_hi.properties")) {
-            final Properties properties = bundle(name);
+        final Properties english = bundle("messages.properties");
 
-            for (final String key : properties.stringPropertyNames()) {
-                final String value = properties.getProperty(key);
-                if (!slot.matcher(value).find()) continue;
+        for (final String key : english.stringPropertyNames()) {
+            final String value = english.getProperty(key);
+            if (!slot.matcher(value).find()) continue;
 
-                assertFalse(value.replace("''", "").contains("'"),
-                        name + " has " + key + "=" + value + ", which carries a {0} and so is read as a"
-                                + " MessageFormat pattern - a lone apostrophe there is swallowed along with"
-                                + " whatever follows it. Write it as ''.");
-            }
+            assertFalse(value.replace("''", "").contains("'"),
+                    "messages.properties has " + key + "=" + value + ", which carries a {0} and so is read as a"
+                            + " MessageFormat pattern - a lone apostrophe there is swallowed along with"
+                            + " whatever follows it. Write it as ''.");
         }
     }
 }
