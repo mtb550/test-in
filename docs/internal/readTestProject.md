@@ -91,6 +91,12 @@ There is no key for this. It starts on its own.
   A result file whose name is not a test case id is not read, and a warning
   names it; renamed to its test case's id, it is read again at the next Refresh.
   Nothing writes a second file for it.
+- **Rule-INTERNAL-111** — Waiting for the index is refused under a read lock. It
+  logs an error and returns at once, because a read action that waits holds up
+  every write in the IDE, the one that finishes indexing included.
+- **Rule-INTERNAL-112** — A node is moved, renamed or removed on disk, and the
+  file system refreshed, before Testin's own reading of it changes, so that
+  reading never names something the disk does not have yet.
 
 ## The budget
 

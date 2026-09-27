@@ -209,6 +209,7 @@ public final class ProjectIndexer {
         return indexed.get();
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-111
     public void awaitIndexing() {
         if (indexed.get()) return;
 

@@ -233,17 +233,21 @@ silently has no effect costs more than the setting it was meant to hold.
 - **The rule is about methods, and the whole tree obeys it.** The `throws`
   that remain are declarations rather than work, and this list is the record of
   why - not a comment above each one, which the no-comment rule forbids and the
-  September sweep removed. Counted on 27 September 2026: six in `src/main`,
+  September sweep removed. Counted on 27 September 2026: five in `src/main`,
   twenty-two in `src/test`, none in `testin-java` or `testin-testng`, and every
-  one of them is below. Do not sweep them again:
+  one of them is below. `DeclaredContractsTest` holds the same five with their
+  reasons and fails on a sixth, so this list can no longer drift from the code
+  unnoticed. Do not sweep them again:
   - `NodesTransferable.getTransferData`, and the one `TransferListener` builds
     for a drag of test cases — AWT's `Transferable` contract is that an
     unsupported flavor throws. Catching it hands the platform a wrong object
     instead of "I do not have that".
-  - `JavaSourceRoot.RootWork.run` and `JavaSourceRoot.RootFile.from` —
-    functional interfaces whose whole point is to let the lambda fail, so that
-    one owner above them catches. Removing the declaration moves the catch into
-    every lambda, which is the duplication `JavaSourceRoot` exists to delete.
+  - `JavaSourceRoot.RootWork.run` — a functional interface whose whole point is
+    to let the lambda fail, so that one owner above it catches: `MoveJavaClass`
+    and `MoveJavaPackage` pass lambdas that call `VirtualFile.move`. Removing the
+    declaration moves the catch into every lambda, which is the duplication
+    `JavaSourceRoot` exists to delete. Its sibling `RootFile.from` lost its
+    `throws` on 27 September 2026, when no lambda passed to it threw.
   - `SettingsConfigurable.apply`, and `refuseAnImpossibleRoot`, the one check
     it hands the refusal to — `Configurable.apply` declares
     `ConfigurationException`, and the settings dialog is the one owner that
@@ -260,8 +264,12 @@ silently has no effect costs more than the setting it was meant to hold.
     `@Override` is the whole reason.
 
   Adding another is a decision, not a shortcut: it needs the same shape (a
-  declaration, one owner catching above it), a comment saying which, and a
-  line here. The list said five while seven stood (#66, finding 268).
+  declaration, one owner catching above it), an entry in
+  `DeclaredContractsTest.MAY_THROW` naming the contract, and a line here. The
+  list said five while seven stood (#66, finding 268), which is why the test now
+  owns the count. Its twin, `MAY_RETURN_NULL`, does the same for a `@Nullable`
+  return: nine are platform overrides whose contract uses null, and three are
+  Testin's own and are debt.
 
 ## Process
 

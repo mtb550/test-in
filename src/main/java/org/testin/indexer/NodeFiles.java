@@ -47,6 +47,7 @@ final class NodeFiles {
     private final @NotNull ProjectIndexer indexer;
     private final @NotNull IndexerDataStore store;
 
+    // UC-INTERNAL-002, Rule-INTERNAL-112
     void remove(final @NotNull Path path, final @NotNull Runnable cacheUpdate, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         Services.getInstance(p, VfsExecutor.class).removeVf(p, indexer, path,
                 deleted -> VirtualFileManager.getInstance().asyncRefresh(() -> {
@@ -78,6 +79,7 @@ final class NodeFiles {
         }), () -> onFinished.accept(false));
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-112
     private void followOnDisk(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable then) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             store.renameNode(oldPath, newPath);
@@ -171,7 +173,7 @@ final class NodeFiles {
         Logger.info("Gave " + folders + " of " + markerFiles.size() + " copied folder(s) ids of their own under " + copiedRoot.getFileName());
     }
 
-    // UC-TREE-PANEL-014, Rule-TREE-PANEL-051
+    // UC-TREE-PANEL-014, Rule-TREE-PANEL-051, Rule-INTERNAL-113
     private boolean reidentify(final @NotNull Path testCaseFile) {
         try {
             final @NotNull TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(testCaseFile.toFile(), TestCaseDto.class);

@@ -44,6 +44,9 @@ panel does the same job by hand, and is on
   still on disk answers throughout, and a pass that is canceled or that fails
   changes nothing at all. What the pass did not find is dropped when it lands,
   which is how the read forgets what was deleted.
+- **Rule-INTERNAL-113** — A file Testin writes or deletes is claimed as its own
+  before the change starts, because the file system can report the change while
+  it is still running.
 
 ## What is picked up, and what is not
 

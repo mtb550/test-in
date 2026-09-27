@@ -68,7 +68,7 @@ public final class DeletedNodes {
         }
     }
 
-    // UC-INTERNAL-005, Rule-INTERNAL-042
+    // UC-INTERNAL-005, Rule-INTERNAL-042, Rule-INTERNAL-113
     public boolean putBack(final @NotNull Project p, final @NotNull Path kept, final @NotNull Path original) {
         if (Files.exists(original)) {
             Logger.warn("Not restoring " + original + ": something is there already.");

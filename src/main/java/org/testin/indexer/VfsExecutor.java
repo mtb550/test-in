@@ -42,7 +42,7 @@ final class VfsExecutor {
         return Optional.ofNullable(LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path));
     }
 
-    // UC-INTERNAL-003, Rule-INTERNAL-019
+    // UC-INTERNAL-003, Rule-INTERNAL-019, Rule-INTERNAL-113
     private static void claim(final @NotNull Project p, final @NotNull Path path) {
         Services.getInstance(OwnWrites.class).record(p, path);
     }

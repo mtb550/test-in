@@ -93,7 +93,7 @@ final class TestDataFiles {
         }
     }
 
-    // UC-INTERNAL-003, Rule-INTERNAL-019
+    // UC-INTERNAL-003, Rule-INTERNAL-019, Rule-INTERNAL-113
     private boolean writeBytes(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
         if (jsonBytes.length == 0) {
             Logger.error("Refusing to write an empty file, which would erase it: " + path);
@@ -115,7 +115,7 @@ final class TestDataFiles {
         }
     }
 
-    // UC-INTERNAL-005, Rule-INTERNAL-036
+    // UC-INTERNAL-005, Rule-INTERNAL-036, Rule-INTERNAL-113
     boolean delete(final @NotNull Project p, final @NotNull Path path) {
         try {
             Services.getInstance(OwnWrites.class).record(p, path);

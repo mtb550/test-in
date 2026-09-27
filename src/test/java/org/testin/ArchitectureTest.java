@@ -134,6 +134,18 @@ public class ArchitectureTest {
     }
 
     @Test
+    public void theTreeNeverWaitsForTheIndex() {
+        final @NotNull ArchRule rule = noClasses()
+                .that().resideInAPackage("org.testin.explorer.tree..")
+                .should().callMethod("org.testin.indexer.ProjectIndexer", "awaitIndexing")
+                .because("the platform asks the tree for its nodes inside a read action, and a read action that"
+                        + " waits holds up every write in the IDE, the one that finishes indexing included"
+                        + " (Rule-INTERNAL-111)");
+
+        rule.check(CLASSES);
+    }
+
+    @Test
     public void onlyTheSaveButtonWritesTheConfigFile() {
         final @NotNull ArchRule oneCaller = methods()
                 .that().areDeclaredIn("org.testin.config.TestinYml")

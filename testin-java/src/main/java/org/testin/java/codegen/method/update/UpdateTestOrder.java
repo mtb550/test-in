@@ -42,7 +42,7 @@ import java.util.Optional;
 // Rule-CODEGEN-014
 public class UpdateTestOrder extends UpdateTestBase implements GenAction {
     // UC-CODEGEN-011, Rule-CODEGEN-067
-    private static @Nullable PsiElement place(final @NotNull PsiClass pc, final @NotNull PsiMethod pm, final @Nullable PsiElement after) {
+    private static @NotNull PsiElement place(final @NotNull PsiClass pc, final @NotNull PsiMethod pm, final @Nullable PsiElement after) {
         if (after == null) {
             final @Nullable PsiMethod first = firstGenerated(pc);
 
