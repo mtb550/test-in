@@ -23,9 +23,12 @@ import org.testin.ui.Caption;
 
 import javax.swing.JComponent;
 import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
 import java.awt.GridBagLayout;
 
 public final class FormRows extends JBPanel<FormRows> {
+    private static final int COLUMN_GAP = 12;
+
     private final @NotNull GridBagConstraints gbc = new GridBagConstraints();
 
     private int nextRow;
@@ -51,5 +54,15 @@ public final class FormRows extends JBPanel<FormRows> {
 
     public @NotNull FormRows wideRow(final @NotNull JComponent component) {
         return row("", component);
+    }
+
+    // Rule-INTERNAL-087
+    public @NotNull FormRows pair(final @NotNull JComponent left, final @NotNull JComponent right) {
+        final @NotNull JBPanel<?> line = new JBPanel<>(new GridLayout(1, 2, JBUI.scale(COLUMN_GAP), 0));
+        line.setOpaque(false);
+        line.add(left);
+        line.add(right);
+
+        return wideRow(line);
     }
 }

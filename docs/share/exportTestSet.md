@@ -74,7 +74,8 @@ There is no key for this. The menu entry is **Export**.
 2. A progress bar reads *Reading test cases in*, then the test set's name.
 3. The **Export Test Cases** dialog opens, every test case ticked.
 4. The tester unticks two, and corrects a typo in a third.
-5. The tester picks a folder, a name and a format, then presses **Export**.
+5. The tester picks a folder and a name, then presses **Export**. The format is
+   four radios - Excel, JSON, CSV and HTML - and Excel is already picked.
 6. The dialog closes. A bar reads *Exporting*, then the count, then *test
    cases to*, then the file name.
 7. One message, titled *Exported 8*, names the file and carries **Open file**
@@ -98,9 +99,6 @@ open. The file name is checked first, so it is the box that speaks when more
 than one is empty.
 
 **If the folder is empty** — the same, reading *Choose a folder*.
-
-**If no format is chosen** — the format list takes the cursor and nothing turns
-red. A list the tester can see is not a box that looks filled in.
 
 **If the file cannot be written** — a message titled **Export Failed** carries
 the reason.

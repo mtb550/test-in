@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.table.JBTable;
+import org.testin.ui.dialogs.DialogStyle;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.logger.Logger;
@@ -78,6 +79,8 @@ public class TablePanelBuilder {
     // UC-SHARE-003
     public @NotNull JBTable buildTable(final @NotNull DefaultTableModel model, final @NotNull Project p) {
         final @NotNull JBTable table = new JBTable(model);
+        // Rule-INTERNAL-095
+        DialogStyle.asRow(table);
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);

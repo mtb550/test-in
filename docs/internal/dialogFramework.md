@@ -164,6 +164,13 @@ and which keys it answers, and the shell builds the rest.
   because the band is the thing being chosen and the card is not. What a row
   says about itself starts in its own column, so the descriptions read down the
   list instead of trailing each name at a different place.
+- **Rule-INTERNAL-107** — A closed set of answers is shown as radios with the
+  ordinary answer already picked, never a combo box a tester has to open to
+  learn what the answers are. The set is closed when the code names it - a
+  report of four formats, an export of four, a test run of platforms and
+  browsers - and a tester then reads every answer at once and clicks nothing for
+  the ordinary one. Because an answer is always picked, there is no refusal for
+  not picking.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

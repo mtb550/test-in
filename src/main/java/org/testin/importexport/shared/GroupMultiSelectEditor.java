@@ -17,8 +17,17 @@
 package org.testin.importexport.shared;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.popup.JBPopup;
+import com.intellij.openapi.ui.popup.JBPopupListener;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.LightweightWindowEvent;
+import com.intellij.ui.CheckBoxList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.model.Groups;
+import org.testin.services.Services;
+import org.testin.services.TestCaseValues;
+import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
@@ -27,23 +36,61 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellEditor;
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class GroupMultiSelectEditor extends AbstractCellEditor implements TableCellEditor {
     private final @NotNull JButton button = new JButton();
+    private final @NotNull Project p;
+
     private @NotNull String currentValue = "";
 
     public GroupMultiSelectEditor(final @NotNull Project p) {
+        this.p = p;
+
         button.setBorderPainted(false);
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setBackground(UIManager.getColor("Table.selectionBackground"));
         button.setForeground(UIManager.getColor("Table.selectionForeground"));
 
-        button.addActionListener(_ -> {
-            final @NotNull GroupSelectionDialog dialog = new GroupSelectionDialog(p, currentValue, picked -> currentValue = picked);
-            if (dialog.show()) dialog.onClosed(this::fireEditingStopped);
-            else fireEditingStopped();
+        button.addActionListener(_ -> showGroups());
+    }
+
+    // UC-SHARE-003, Rule-INTERNAL-095
+    private void showGroups() {
+        final @NotNull List<String> picked = new ArrayList<>(Groups.read(currentValue));
+
+        final @NotNull CheckBoxList<String> list = new CheckBoxList<>();
+        DialogStyle.styleContent(list);
+        DialogStyle.asRow(list);
+
+        Services.getInstance(p, TestCaseValues.class).getGroups().stream().sorted()
+                .forEach(group -> list.addItem(group, group, picked.contains(group)));
+
+        list.setCheckBoxListListener((index, state) -> {
+            final @NotNull String group = Objects.toString(list.getItemAt(index), "");
+
+            if (state) picked.add(group);
+            else picked.remove(group);
+
+            currentValue = Groups.text(picked);
+            button.setText(currentValue);
         });
+
+        final @NotNull JBPopup popup = JBPopupFactory.getInstance()
+                .createComponentPopupBuilder(list, list)
+                .setRequestFocus(true)
+                .createPopup();
+
+        popup.addListener(new JBPopupListener() {
+            @Override
+            public void onClosed(final @NotNull LightweightWindowEvent event) {
+                fireEditingStopped();
+            }
+        });
+
+        popup.showUnderneathOf(button);
     }
 
     @Override

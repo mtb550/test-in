@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.testrun;
+package org.testin.ui.dialogs;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.components.JBLabel;
@@ -24,7 +24,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
-import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 

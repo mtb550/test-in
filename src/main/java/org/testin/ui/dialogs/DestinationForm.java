@@ -16,60 +16,46 @@
 
 package org.testin.ui.dialogs;
 
-import com.intellij.openapi.fileChooser.FileChooserDescriptor;
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComboBox;
-import com.intellij.openapi.ui.TextComponentAccessor;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.ui.SimpleListCellRenderer;
-import com.intellij.ui.components.JBTextField;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
-import org.testin.services.Services;
-import org.testin.setting.AppSettingsState;
 import org.testin.ui.framework.DialogComponent;
-import org.testin.ui.framework.EmptyWarning;
-import org.testin.util.Bundle;
 
 import javax.swing.JComponent;
-import javax.swing.JList;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Optional;
 
 public final class DestinationForm implements DialogComponent {
-    private final @NotNull Project p;
-    private final @NotNull FormRows rows;
-    private final @NotNull TextFieldWithBrowseButton folderField = new TextFieldWithBrowseButton();
-    private final @NotNull JBTextField fileNameField = new JBTextField(30);
-    private final @NotNull ComboBox<FileTypes> formatCombo;
+    private static final boolean EXPANDED = true;
 
-    public DestinationForm(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String fileName, final @NotNull String chooserTitle, final @NotNull String chooserDescription) {
-        this.p = p;
-        this.formatCombo = DialogStyle.asChoice(new ComboBox<>(formats));
-        DialogStyle.asField(fileNameField);
-        DialogStyle.asField(folderField.getTextField());
+    private final @NotNull FolderSection folder;
+    private final @NotNull FileNameSection fileName;
+    private final @NotNull FormatSection format;
+    private final @NotNull JComponent panel;
 
-        fileNameField.setText(fileName);
-        formatCombo.setSelectedItem(defaultFormat);
-        formatCombo.setRenderer(new SimpleListCellRenderer<>() {
-            @Override
-            public void customize(final @NotNull JList<? extends FileTypes> list, final FileTypes format, final int index, final boolean selected, final boolean focused) {
-                setText(format == null ? "" : format.getLabel());
-            }
-        });
+    // UC-REPORT-001, Rule-INTERNAL-099
+    public static @NotNull DestinationForm stacked(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String suggestedName, final @NotNull String chooserTitle, final @NotNull String chooserDescription) {
+        return new DestinationForm(p, formats, defaultFormat, suggestedName, chooserTitle, chooserDescription, "");
+    }
 
-        final @NotNull FileChooserDescriptor descriptor = FileChooserDescriptorFactory
-                .singleDir()
-                .withTitle(chooserTitle)
-                .withDescription(chooserDescription);
+    // UC-SHARE-001, Rule-INTERNAL-099
+    public static @NotNull DestinationForm inSection(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String suggestedName, final @NotNull String chooserTitle, final @NotNull String chooserDescription, final @NotNull String section) {
+        return new DestinationForm(p, formats, defaultFormat, suggestedName, chooserTitle, chooserDescription, section);
+    }
 
-        folderField.addBrowseFolderListener(p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
+    private DestinationForm(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String suggestedName, final @NotNull String chooserTitle, final @NotNull String chooserDescription, final @NotNull String section) {
+        folder = FolderSection.of(p, chooserTitle, chooserDescription);
+        fileName = FileNameSection.of(suggestedName);
+        format = FormatSection.of(formats, defaultFormat);
 
-        folderField.setText(defaultFolder());
+        final boolean roomy = !section.isEmpty();
 
-        rows = buildRows();
+        final @NotNull FormRows rows = roomy
+                ? new FormRows().pair(folder.panel(), fileName.panel()).wideRow(format.panel())
+                : new FormRows().wideRow(folder.panel()).wideRow(fileName.panel()).wideRow(format.panel());
+
+        panel = roomy ? CollapsiblePanel.build(section, rows, EXPANDED) : DialogStyle.asSection(rows);
     }
 
     static @NotNull String withExtension(final @NotNull String fileName, final @NotNull String extension) {
@@ -85,53 +71,27 @@ public final class DestinationForm implements DialogComponent {
         return tailIsAnExtension ? fileName.substring(0, dot) + extension : fileName + extension;
     }
 
-    private @NotNull FormRows buildRows() {
-        final @NotNull FormRows formRows = new FormRows()
-                .row(Bundle.message("destination.caption.folder"), folderField)
-                .row(Bundle.message("destination.caption.file"), fileNameField)
-                .row(Bundle.message("destination.caption.format"), formatCombo);
-
-        return formRows;
-    }
-
     // UC-SHARE-001
     public @NotNull Optional<Destination> resolve() {
-        final @NotNull String folder = folderField.getText().trim();
-        final @NotNull String fileName = fileNameField.getText().trim();
+        final @NotNull Optional<String> named = fileName.accepted();
+        if (named.isEmpty()) return Optional.empty();
 
-        if (fileName.isEmpty()) {
-            EmptyWarning.show(fileNameField, Bundle.message("destination.name.the.file"));
-            return Optional.empty();
-        }
-        if (folder.isEmpty()) {
-            EmptyWarning.show(folderField.getTextField(), Bundle.message("destination.choose.folder"));
-            return Optional.empty();
-        }
+        final @NotNull Optional<String> chosenFolder = folder.accepted();
+        if (chosenFolder.isEmpty()) return Optional.empty();
 
-        final @NotNull Optional<FileTypes> selectedFormat = Optional.ofNullable((FileTypes) formatCombo.getSelectedItem());
-        if (selectedFormat.isEmpty()) {
-            EmptyWarning.show(formatCombo, Bundle.message("destination.choose.format"));
-            return Optional.empty();
-        }
+        final @NotNull FileTypes chosen = format.chosen();
 
-        final @NotNull FileTypes format = selectedFormat.orElseThrow();
-
-        return Optional.of(new Destination(new File(folder, withExtension(fileName, format.getExtension())), format));
-    }
-
-    // Rule-SETTING-021, Rule-SETTING-023
-    private @NotNull String defaultFolder() {
-        return Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
+        return Optional.of(new Destination(new File(chosenFolder.orElseThrow(), withExtension(named.orElseThrow(), chosen.getExtension())), chosen));
     }
 
     @Override
     public @NotNull JComponent getPanel() {
-        return rows;
+        return panel;
     }
 
     @Override
     public @NotNull JComponent getFocusComponent() {
-        return fileNameField;
+        return fileName.field();
     }
 
     @Override

@@ -92,7 +92,7 @@ public final class DialogStyle {
     }
 
     // Rule-INTERNAL-099
-    private static <T extends JComponent> @NotNull T asSection(final @NotNull T component) {
+    public static <T extends JComponent> @NotNull T asSection(final @NotNull T component) {
         component.setOpaque(false);
         component.setBorder(new SectionFill());
         return component;

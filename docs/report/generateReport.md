@@ -90,7 +90,8 @@ is [UC-SETTING-006](../setting/setDownloadFolder.md).
 
 1. The tester selects a test run in the tree and presses `Ctrl+P`.
 2. The **Generate Report** dialog opens with the name already filled in.
-3. The tester picks a folder, and a format.
+3. The tester picks a folder. The format is four radios - Excel, HTML, PDF and
+   Word - and PDF is already picked.
 4. The tester presses **Generate**, or `Enter`.
 5. The dialog closes.
 6. A progress bar reads *Generating the*, the format, then *report for*, then
@@ -131,8 +132,6 @@ and reads *Name the file*, the cursor moves into it, and the dialog stays open.
 
 **If the folder is empty** — the same, with the folder box reading *Choose a
 folder*.
-
-**If no format is chosen** — the same again, reading *Choose a format*.
 
 **If the file cannot be written** — a message titled *Could not generate the*,
 the format, *report* gives the reason under it.

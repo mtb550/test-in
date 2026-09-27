@@ -43,7 +43,7 @@ public final class GenerateReportDialog extends AbstractFrameworkDialog {
 
         title = Bundle.message("dialog.report.title");
 
-        form = new DestinationForm(p,
+        form = DestinationForm.stacked(p,
                 Arrays.stream(FileTypes.values()).filter(FileTypes::isReportable).toArray(FileTypes[]::new),
                 FileTypes.PDF,
                 suggestedFileName,

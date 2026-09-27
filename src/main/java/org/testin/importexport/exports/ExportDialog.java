@@ -51,12 +51,13 @@ public final class ExportDialog extends AbstractFrameworkDialog {
 
         title = Bundle.message("dialog.export.title");
 
-        form = new DestinationForm(p,
+        form = DestinationForm.inSection(p,
                 Arrays.stream(FileTypes.values()).filter(FileTypes::isExportable).toArray(FileTypes[]::new),
                 FileTypes.XLSX,
                 exportTarget.getName(),
                 Bundle.message("dialog.export.folder.title"),
-                Bundle.message("dialog.export.folder.message"));
+                Bundle.message("dialog.export.folder.message"),
+                Bundle.message("destination.section"));
 
         preview = new SheetPreview(p, exportAttributes);
         preview.show(sheetsData);
