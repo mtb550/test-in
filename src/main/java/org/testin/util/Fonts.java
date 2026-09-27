@@ -70,9 +70,6 @@ public final class Fonts {
         return panel(BADGE, Font.BOLD);
     }
 
-    public static @NotNull Font code() {
-        return JBFont.create(new Font(Font.MONOSPACED, Font.PLAIN, (int) sizeOn(panelSize(), 0.0f)));
-    }
 
     public static @NotNull Font panelCaption() {
         return mono(panelSize(), LABEL);

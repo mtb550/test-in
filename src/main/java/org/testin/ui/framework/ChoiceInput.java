@@ -76,10 +76,6 @@ public final class ChoiceInput implements DialogComponent {
         });
     }
 
-    public void onChange(final @NotNull Runnable changed) {
-        combo.addActionListener(_ -> changed.run());
-    }
-
     public @NotNull String getValue() {
         return Objects.toString(combo.getEditor().getItem(), "").trim();
     }

@@ -184,15 +184,6 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         return true;
     }
 
-    public final void onClosed(final @NotNull Runnable action) {
-        getPopup().addListener(new JBPopupListener() {
-            @Override
-            public void onClosed(final @NotNull LightweightWindowEvent event) {
-                action.run();
-            }
-        });
-    }
-
     // UC-INTERNAL-007, Rule-INTERNAL-075
     protected boolean replacesItsKind() {
         return false;

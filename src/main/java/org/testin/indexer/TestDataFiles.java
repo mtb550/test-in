@@ -116,43 +116,6 @@ final class TestDataFiles {
         }
     }
 
-    // Rule-INTERNAL-091
-    boolean move(final @NotNull Project p, final @NotNull Path from, final @NotNull Path to) {
-        try {
-            Services.getInstance(OwnWrites.class).record(p, from);
-            Services.getInstance(OwnWrites.class).record(p, to);
-
-            Files.move(from, to);
-            return true;
-        } catch (final IOException ex) {
-            Logger.error("Could not move " + from + " to " + to + ": " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", ex.getMessage()));
-            return false;
-        }
-    }
-
-    // Rule-INTERNAL-091, Rule-INTERNAL-036
-    boolean removeTree(final @NotNull Project p, final @NotNull Path folder) {
-        try (Stream<Path> inside = Files.walk(folder)) {
-            inside.forEach(each -> Services.getInstance(OwnWrites.class).record(p, each));
-        } catch (final IOException ex) {
-            Logger.warn("Could not claim what is inside " + folder + ": " + ex.getMessage());
-        }
-
-        if (Trash.accepted(p, folder)) return true;
-
-        try (Stream<Path> inside = Files.walk(folder)) {
-            for (final Path path : inside.sorted(Comparator.reverseOrder()).toList()) {
-                Files.deleteIfExists(path);
-            }
-            return true;
-        } catch (final IOException ex) {
-            Logger.error("Could not remove " + folder + ": " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", ex.getMessage()));
-            return false;
-        }
-    }
-
     // UC-INTERNAL-005, Rule-INTERNAL-036
     boolean delete(final @NotNull Project p, final @NotNull Path path) {
         try {

@@ -180,11 +180,6 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         private int rows = 5;
         private boolean readOnly = false;
 
-        public @NotNull TextAreaBuilder caption(final @NotNull String caption) {
-            this.caption = caption;
-            return this;
-        }
-
         public @NotNull TextAreaBuilder placeholder(final @NotNull String placeholder) {
             this.placeholder = placeholder;
             return this;
