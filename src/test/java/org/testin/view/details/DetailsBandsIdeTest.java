@@ -76,7 +76,7 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
         return words.stream().anyMatch(word -> word.contains(text));
     }
 
-    private static @NotNull TestCaseDto testCase() {
+    private static @NotNull TestCaseDto aTestCase() {
         return TestCaseDto.builder().id(ID).description("Log in with a valid user").expectedResult("The dashboard opens").module("Accounts").build();
     }
 
@@ -86,7 +86,7 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
 
     private @NotNull List<String> shown(final @NotNull Optional<TestRunItems> runItem) {
         final @NotNull JBPanel<?> tab = new JBPanel<>();
-        new DetailsTab().load(getProject(), tab, Optional.of(testCase()), runItem, List.of("Demo", "Test Cases", LAST_STEP));
+        new DetailsTab().load(getProject(), tab, Optional.of(aTestCase()), runItem, List.of("Demo", "Test Cases", LAST_STEP));
 
         final @NotNull List<String> words = new ArrayList<>();
         collect(tab, words);
