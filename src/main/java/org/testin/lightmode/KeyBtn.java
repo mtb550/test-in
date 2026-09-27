@@ -21,6 +21,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Tooltip;
 import org.testin.ui.framework.Keycap;
 import org.testin.util.Bundle;
 
@@ -45,7 +46,7 @@ class KeyBtn extends JBPanel<KeyBtn> {
         super(new FlowLayout(FlowLayout.CENTER, JBUI.scale(6), JBUI.scale(PADDING)));
         this.onClick = onClick;
 
-        setToolTipText(Bundle.message("light.record.verdict", text.toLowerCase(Locale.ROOT)));
+        Tooltip.set(this, Bundle.message("light.record.verdict", text.toLowerCase(Locale.ROOT)));
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1));
         setOpaque(false);

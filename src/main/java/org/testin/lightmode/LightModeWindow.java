@@ -52,6 +52,7 @@ import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testrun.RunStatusService;
 import org.testin.ui.Motion;
+import org.testin.ui.Tooltip;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.StatusBarBase;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -189,7 +190,7 @@ final class LightModeWindow {
 
     private static @NotNull JBLabel clock(final @NotNull String meaning) {
         final @NotNull JBLabel label = new JBLabel();
-        label.setToolTipText(meaning);
+        Tooltip.set(label, meaning);
         label.setFont(Fonts.small());
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
@@ -218,7 +219,7 @@ final class LightModeWindow {
 
         // Rule-EDITOR-PANEL-135
         start.setEnabled(editor.canStartManualExecution());
-        start.setToolTipText(StartExecutionBtn.tooltipFor(editor));
+        Tooltip.set(start, StartExecutionBtn.tooltipFor(editor));
 
         final @NotNull Optional<UUID> wasShowing = shownTestCase;
         if (executing) showTestCase(testCases.get(index));

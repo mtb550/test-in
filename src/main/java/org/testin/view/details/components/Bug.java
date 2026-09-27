@@ -35,6 +35,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.ui.Badges;
+import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
@@ -74,7 +75,7 @@ public final class Bug {
     private static @NotNull ActionLink issue(final @NotNull String url) {
         final @NotNull ActionLink link = AbstractDetails.link(BugIssueUrl.shortReference(url), _ -> BugIssueUrl.open(url));
 
-        link.setToolTipText(url);
+        Tooltip.set(link, url);
 
         return link;
     }
@@ -88,7 +89,7 @@ public final class Bug {
                 _ -> ReportBug.start(p, runDirectory, runItem.getId(), dto, () -> redraw(p, dto, runDirectory)));
 
         report.setEnabled(off.isEmpty());
-        report.setToolTipText(off.orElse(""));
+        Tooltip.set(report, off.orElse(""));
 
         return report;
     }

@@ -30,6 +30,7 @@ import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
+import org.testin.ui.Tooltip;
 import org.testin.ui.framework.Picture;
 import org.testin.util.Bundle;
 
@@ -90,7 +91,7 @@ public final class StacktraceLine extends AbstractDetails {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         final @NotNull JBLabel square = new JBLabel(Picture.noThumbnail());
-        square.setToolTipText(name);
+        Tooltip.set(square, name);
         square.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         square.addMouseListener(new MouseAdapter() {
             @Override

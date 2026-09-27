@@ -32,6 +32,7 @@ import org.testin.logger.Logger;
 import org.testin.model.Automated;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunStatus;
+import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
 
 import javax.swing.JComponent;
@@ -110,7 +111,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         automatedLabel.setVisible(false);
 
         pageSizeField.setHorizontalAlignment(SwingConstants.CENTER);
-        pageSizeField.setToolTipText(Bundle.message("statusbar.page.size.tip"));
+        Tooltip.set(pageSizeField, Bundle.message("statusbar.page.size.tip"));
 
         for (final PageStep step : PageStep.values()) pageButtons.put(step, new PageBtn(step));
 

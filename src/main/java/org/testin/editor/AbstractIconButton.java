@@ -25,6 +25,7 @@ import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.ActionSystem;
+import org.testin.ui.Tooltip;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
@@ -53,7 +54,7 @@ public abstract class AbstractIconButton extends JButton {
 
     public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon) {
         super(null, icon);
-        setToolTipText(tooltip.isEmpty() ? null : tooltip);
+        Tooltip.set(this, tooltip);
         setFocusable(false);
         setBorderPainted(false);
         setContentAreaFilled(false);
@@ -105,7 +106,7 @@ public abstract class AbstractIconButton extends JButton {
                     .setDescription(HtmlChunk.text(text))
                     .setShortcut(key)
                     .installOn(this);
-        }, () -> setToolTipText(text.isEmpty() ? null : text));
+        }, () -> Tooltip.set(this, text));
     }
 
     @Override
