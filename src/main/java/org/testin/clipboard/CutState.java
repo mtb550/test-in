@@ -16,6 +16,7 @@
 
 package org.testin.clipboard;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
@@ -32,7 +33,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service(Service.Level.PROJECT)
-public final class CutState {
+public final class CutState implements Disposable {
     private final @NotNull Set<UUID> pending = new HashSet<>();
 
     private @NotNull Optional<TestinEditor> source = Optional.empty();
@@ -41,7 +42,7 @@ public final class CutState {
     public static void initClipboardWatch(final @NotNull Project p) {
         final @NotNull CutState state = Services.getInstance(p, CutState.class);
 
-        CopyPasteManager.getInstance().addContentChangedListener((_, _) -> state.clear(), p);
+        CopyPasteManager.getInstance().addContentChangedListener((_, _) -> state.clear(), state);
     }
 
     public void cut(final @NotNull TestinEditor editor, final @NotNull List<TestCaseDto> testCases) {
@@ -71,5 +72,10 @@ public final class CutState {
         pending.clear();
         source.map(TestinEditor::getPreferredFocusedComponent).ifPresent(JComponent::repaint);
         source = Optional.empty();
+    }
+
+    @Override
+    public void dispose() {
+        clear();
     }
 }

@@ -33,6 +33,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
+import org.testin.services.ProjectLifetime;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.ui.FontSync;
@@ -70,7 +71,7 @@ public class ViewPanel implements Disposable {
 
     public ViewPanel(final @NotNull Project p) {
         this.p = p;
-        Disposer.register(p, this);
+        Disposer.register(ProjectLifetime.of(p), this);
         detailsTab = new JBPanel<>(new BorderLayout());
         historyTab = new JBPanel<>(new BorderLayout());
         openBugsTab = new JBPanel<>(new BorderLayout());

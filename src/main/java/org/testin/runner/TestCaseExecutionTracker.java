@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Failure;
 import org.testin.model.RunStatus;
+import org.testin.services.ProjectLifetime;
 import org.testin.util.Bundle;
 
 import java.time.Duration;
@@ -35,7 +36,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestCaseExecutionTracker {
     public static void initGlobalListener(final @NotNull Project p) {
-        p.getMessageBus().connect(p).subscribe(SMTRunnerEventsListener.TEST_STATUS, new SMTRunnerEventsAdapter() {
+        p.getMessageBus().connect(ProjectLifetime.of(p)).subscribe(SMTRunnerEventsListener.TEST_STATUS, new SMTRunnerEventsAdapter() {
             @Override
             public void onTestStarted(final @NotNull SMTestProxy test) {
                 TestCaseExecutionListener.broadcast(p, test.getPresentableName().toLowerCase(Locale.ROOT), RunStatus.RUNNING, Duration.ZERO, Failure.NONE);

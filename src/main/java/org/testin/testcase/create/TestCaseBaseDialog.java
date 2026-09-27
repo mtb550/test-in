@@ -28,6 +28,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.StatusBarItem;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.services.ProjectLifetime;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestCaseDialogKey;
 import org.testin.testcase.UpdateTestCaseFields;
@@ -78,7 +79,7 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog {
         this.dto = dto;
         this.onSave = onSave;
         this.dialogDisposable = Disposer.newDisposable("testin.testCaseDialog");
-        Disposer.register(p, dialogDisposable);
+        Disposer.register(ProjectLifetime.of(p), dialogDisposable);
 
         this.descriptionSection = new DescriptionSection(p);
         this.expectedResultSection = new ExpectedResultSection(p);
