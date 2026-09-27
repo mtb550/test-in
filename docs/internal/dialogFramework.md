@@ -68,7 +68,7 @@ and which keys it answers, and the shell builds the rest.
   as half of a pair, so no dialog is two tinted rows tall to say six words.
 - **Rule-INTERNAL-080** — A button a dialog will not act on yet is drawn
   disabled, and the line beside it says why. That line is the dialog's one place
-  for a word about its button, and it carries two things: while the button is
+  for a word about its button. It carries two things: while the button is
   refused, the reason; while it is ready, what pressing it would act on - *5 test
   cases in 2 test sets*. The reason wins whenever both apply, because a tester
   who cannot press the button needs to know why more than they need the tally.
@@ -160,17 +160,17 @@ and which keys it answers, and the shell builds the rest.
   wider. They stay on one line and a key with no room is simply not drawn,
   because a dialog is sized by what the tester fills in, not by how many keys it
   can be answered with. Widening the dialog shows the rest.
-- **Rule-INTERNAL-105** — Color marks what acts, and nothing else. The one
-  accent a dialog has goes on the things a tester touches: the button that
-  confirms it, the field holding the keyboard, the answer that is picked, the
-  row that is selected. Every surface stays neutral. A dialog that colors its
+- **Rule-INTERNAL-105** — Color marks what acts, and nothing else. A dialog has
+  one accent. It goes on the things a tester touches: the button that confirms
+  it, the field holding the keyboard, the answer picked, the row selected. Every
+  surface stays neutral. A dialog that colors its
   furniture has to explain itself with hints; one that colors only what acts
   tells the tester where to click and what to fill without a word.
 - **Rule-INTERNAL-106** — A row a tester picks out of a list is marked by a
-  rounded band inside the card that holds it, never a bar running edge to edge,
-  because the band is the thing being chosen and the card is not. What a row
-  says about itself starts in its own column, so the descriptions read down the
-  list instead of trailing each name at a different place.
+  rounded band inside the card that holds it, never a bar running edge to edge.
+  The band is the thing being chosen; the card is not. What a row says about
+  itself starts in its own column, so the descriptions read down the list rather
+  than trailing each name wherever it ends.
 - **Rule-INTERNAL-107** — A closed set of answers is shown as radios with the
   ordinary answer already picked, never a combo box a tester has to open to
   learn what the answers are. The set is closed when the code names it - a

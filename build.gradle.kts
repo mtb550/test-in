@@ -54,6 +54,16 @@ repositories {
     }
 }
 
+// #323: the compiler is one of the sources `tools/warnings.ps1` gathers, and it
+// reported nothing because -Xlint was off - one `Note:` and no names. deprecation
+// and removal are the two the Marketplace also reports, so the gate, the report
+// and the plugin page now count the same things. -Xlint:all is deliberately not
+// taken: on a tree that has never had it on it is hundreds of findings, which is
+// a sweep rather than a gate.
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-Xlint:removal"))
+}
+
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(25))
