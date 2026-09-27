@@ -31,15 +31,15 @@ public class FrameworkDeclarationTest {
     @Test
     public void forgottenDeclarationPartIsNamedInTheFailure() {
         final NullPointerException missingTitle = expectThrows(NullPointerException.class, () ->
-                DialogDto.builder().components(List.of()).shortcuts(List.of()).build());
+                new DialogDto(null, List.of(), List.of()));
         assertTrue(missingTitle.getMessage().contains("title"), missingTitle.getMessage());
 
         final NullPointerException missingShortcuts = expectThrows(NullPointerException.class, () ->
-                DialogDto.builder().title("t").components(List.of()).build());
+                new DialogDto("t", List.of(), null));
         assertTrue(missingShortcuts.getMessage().contains("shortcuts"), missingShortcuts.getMessage());
 
         final NullPointerException missingComponents = expectThrows(NullPointerException.class, () ->
-                DialogDto.builder().title("t").shortcuts(List.of()).build());
+                new DialogDto("t", null, List.of()));
         assertTrue(missingComponents.getMessage().contains("components"), missingComponents.getMessage());
     }
 

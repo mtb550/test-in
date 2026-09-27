@@ -319,11 +319,7 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
 
     private @NotNull DialogDto dto() {
         if (dto.isEmpty()) {
-            dto = Optional.of(DialogDto.builder()
-                    .title(title)
-                    .components(components)
-                    .shortcuts(shortcuts)
-                    .build());
+            dto = Optional.of(new DialogDto(title, components, shortcuts));
         }
         return dto.orElseThrow();
     }

@@ -16,11 +16,9 @@
 
 package org.testin.ui.framework;
 
-import lombok.Builder;
 import lombok.NonNull;
 
 import java.util.List;
 
-@Builder
 record DialogDto(@NonNull String title, @NonNull List<? extends ComponentDialogBase<?>> components, @NonNull List<StatusBarShortcut> shortcuts) {
 }
