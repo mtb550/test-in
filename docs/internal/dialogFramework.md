@@ -1,5 +1,8 @@
 [Documentation](../README.md) › [Inside Testin](main.md) › UC-INTERNAL-007
 
+Every colour, border and painting this framework does itself, and what the platform
+ships instead, is listed in [What Testin draws itself](customizations.md).
+
 # UC-INTERNAL-007: Answer any Testin dialog
 
 > There is no key for this. It is what happens in every dialog Testin opens.
@@ -64,7 +67,11 @@ and which keys it answers, and the shell builds the rest.
 - **Rule-INTERNAL-079** — A surface has one shortcut strip. It cannot be built
   as half of a pair, so no dialog is two tinted rows tall to say six words.
 - **Rule-INTERNAL-080** — A button a dialog will not act on yet is drawn
-  disabled, and hovering over it says why.
+  disabled, and the line beside it says why. That line is the dialog's one place
+  for a word about its button, and it carries two things: while the button is
+  refused, the reason; while it is ready, what pressing it would act on - *5 test
+  cases in 2 test sets*. The reason wins whenever both apply, because a tester
+  who cannot press the button needs to know why more than they need the tally.
 - **Rule-INTERNAL-085** — In a box that offers a list and can also be typed
   into, Enter picks the value under it while the list is open. While the list is
   closed, Enter is the dialog's own key, as it is in every other field.

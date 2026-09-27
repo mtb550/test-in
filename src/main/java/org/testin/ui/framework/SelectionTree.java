@@ -59,6 +59,36 @@ public final class SelectionTree implements DialogComponent {
         visitLeaves(root, visitor);
     }
 
+    public int checkedLeaves() {
+        final int[] counted = {0};
+        forEachChecked(_ -> counted[0]++);
+
+        return counted[0];
+    }
+
+    public int branchesHoldingChecked() {
+        return countBranches(root);
+    }
+
+    private int countBranches(final @NotNull CheckedTreeNode node) {
+        if (node.isLeaf()) return 0;
+
+        int branches = hasCheckedLeaf(node) && holdsALeaf(node) ? 1 : 0;
+        for (int i = 0; i < node.getChildCount(); i++) {
+            branches += countBranches((CheckedTreeNode) node.getChildAt(i));
+        }
+
+        return branches;
+    }
+
+    private boolean holdsALeaf(final @NotNull CheckedTreeNode node) {
+        for (int i = 0; i < node.getChildCount(); i++) {
+            if (node.getChildAt(i).isLeaf()) return true;
+        }
+
+        return false;
+    }
+
     public boolean hasChecked() {
         return hasCheckedLeaf(root);
     }

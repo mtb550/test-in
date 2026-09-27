@@ -29,17 +29,19 @@ import java.util.Optional;
 
 // UC-INTERNAL-007, Rule-INTERNAL-080
 final class ButtonFooter {
-    private final @NotNull JBLabel reason = new JBLabel();
+    private final @NotNull JBLabel said = new JBLabel();
     private final @NotNull JBPanel<?> panel;
 
+    private @NotNull Optional<String> reason = Optional.empty();
+    private @NotNull String tally = "";
+
     ButtonFooter(final @NotNull JComponent button) {
-        reason.setFont(Fonts.small());
-        reason.setForeground(SimpleTextAttributes.ERROR_ATTRIBUTES.getFgColor());
+        said.setFont(Fonts.small());
 
         panel = new JBPanel<>(new BorderLayout());
         panel.setOpaque(false);
         panel.setBorder(JBUI.Borders.empty(8, 12));
-        panel.add(reason, BorderLayout.WEST);
+        panel.add(said, BorderLayout.WEST);
         panel.add(button, BorderLayout.EAST);
     }
 
@@ -49,6 +51,20 @@ final class ButtonFooter {
 
     // Rule-INTERNAL-080
     void showReason(final @NotNull Optional<String> text) {
-        reason.setText(text.orElse(""));
+        reason = text;
+        say();
+    }
+
+    // Rule-INTERNAL-080
+    void showTally(final @NotNull String text) {
+        tally = text;
+        say();
+    }
+
+    private void say() {
+        said.setText(reason.orElse(tally));
+        said.setForeground(reason.isPresent()
+                ? SimpleTextAttributes.ERROR_ATTRIBUTES.getFgColor()
+                : JBUI.CurrentTheme.ContextHelp.FOREGROUND);
     }
 }

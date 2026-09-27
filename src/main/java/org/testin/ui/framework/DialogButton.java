@@ -44,6 +44,11 @@ public final class DialogButton implements DialogComponent {
         footer.showReason(reason);
     }
 
+    // Rule-INTERNAL-080
+    public void tally(final @NotNull String text) {
+        footer.showTally(text);
+    }
+
     @Override
     public @NotNull JComponent getPanel() {
         return footer.getPanel();

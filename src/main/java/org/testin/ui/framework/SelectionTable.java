@@ -21,6 +21,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
@@ -51,6 +52,8 @@ public final class SelectionTable implements DialogComponent {
         };
 
         table = new JBTable(model);
+        // Rule-INTERNAL-095
+        DialogStyle.asRow(table);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setFillsViewportHeight(true);
 

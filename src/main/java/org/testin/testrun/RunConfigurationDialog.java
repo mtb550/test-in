@@ -56,7 +56,10 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog {
         size = DialogSize.HALF;
 
         final @NotNull DialogButton confirmButton = confirm.getComponent();
-        final @NotNull Runnable refresh = () -> confirmButton.enableUnless(whyNot());
+        final @NotNull Runnable refresh = () -> {
+            confirmButton.tally(Bundle.message("run.form.tally", selection.checkedLeaves(), selection.branchesHoldingChecked()));
+            confirmButton.enableUnless(whyNot());
+        };
 
         refresh.run();
         selection.onCheckChanged(refresh);
