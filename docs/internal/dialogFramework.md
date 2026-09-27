@@ -178,6 +178,13 @@ and which keys it answers, and the shell builds the rest.
   browsers - and a tester then reads every answer at once and clicks nothing for
   the ordinary one. Because an answer is always picked, there is no refusal for
   not picking.
+- **Rule-INTERNAL-108** — A dialog names a node by its place in the test
+  project, not by its path on disk: the segments below the Testin root, a
+  chevron between them. The root itself is its folder name, and anything
+  outside it is shown in full.
+- **Rule-INTERNAL-109** — Where something is going is one row: where it is, an
+  arrow, then where it lands, with the segment it gains in the ordinary text
+  color while the rest stays gray.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.
