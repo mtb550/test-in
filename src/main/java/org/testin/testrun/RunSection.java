@@ -17,13 +17,10 @@ package org.testin.testrun;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunConfiguration;
-import org.testin.ui.framework.ComponentDialogBase;
 
 import java.util.Map;
 
 // UC-TREE-PANEL-021, UC-TREE-PANEL-022
 public interface RunSection {
-    @NotNull ComponentDialogBase<?> component();
-
     void applyTo(@NotNull Map<TestRunConfiguration, String> answers);
 }

@@ -153,16 +153,8 @@ public final class JavaSourceRoot {
 
     // UC-CODEGEN-020, Rule-CODEGEN-064
     @FromContentModule
-    public static @NotNull Optional<VirtualFile> fileInRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull String whatFailed, final @NotNull RootFile work) {
-        final @NotNull Optional<VirtualFile> root = findOrWarn(p, className);
-        if (root.isEmpty()) return Optional.empty();
-
-        try {
-            return work.from(root.orElseThrow());
-        } catch (final IOException ex) {
-            Logger.info("Error " + whatFailed + ": " + ex.getMessage());
-            return Optional.empty();
-        }
+    public static @NotNull Optional<VirtualFile> fileInRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull RootFile work) {
+        return findOrWarn(p, className).flatMap(work::from);
     }
 
     private static void run(final @NotNull Optional<VirtualFile> root, final @NotNull String whatFailed, final @NotNull RootWork work) {
@@ -199,6 +191,6 @@ public final class JavaSourceRoot {
 
     @FunctionalInterface
     public interface RootFile {
-        @NotNull Optional<VirtualFile> from(final @NotNull VirtualFile root) throws IOException;
+        @NotNull Optional<VirtualFile> from(final @NotNull VirtualFile root);
     }
 }

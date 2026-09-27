@@ -32,7 +32,7 @@ public final class TextArea implements DialogComponent {
     private final @NotNull JBTextArea area;
     private final @NotNull JComponent panel;
 
-    TextArea(final @NotNull String caption, final @NotNull String placeholder, final @NotNull String value, final int rows, final boolean readOnly) {
+    TextArea(final @NotNull String placeholder, final @NotNull String value, final int rows, final boolean readOnly) {
         area = new JBTextArea(value);
         DialogStyle.asField(area);
         area.setEditable(!readOnly);
@@ -55,7 +55,7 @@ public final class TextArea implements DialogComponent {
         scroll.setViewportBorder(JBUI.Borders.empty());
 
         // Rule-INTERNAL-087
-        panel = Caption.above(caption, scroll);
+        panel = Caption.above("", scroll);
     }
 
     public @NotNull String getText() {

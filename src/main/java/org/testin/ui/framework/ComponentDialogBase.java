@@ -202,7 +202,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
 
         public @NotNull ComponentDialogBase<TextArea> build() {
-            return new ComponentDialogBase<>(new TextArea("", placeholder, value, rows, readOnly));
+            return new ComponentDialogBase<>(new TextArea(placeholder, value, rows, readOnly));
         }
     }
 
