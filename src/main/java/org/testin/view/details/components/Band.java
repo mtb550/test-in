@@ -90,13 +90,13 @@ public final class Band extends AbstractDetails {
         return row;
     }
 
-    private boolean folds() {
-        return !rememberedAs.isEmpty();
+    private boolean alwaysOpen() {
+        return rememberedAs.isEmpty();
     }
 
     // Rule-VIEW-PANEL-087
     private boolean isOpen() {
-        return !folds() || PropertiesComponent.getInstance().getBoolean(rememberedAs, false);
+        return alwaysOpen() || PropertiesComponent.getInstance().getBoolean(rememberedAs, false);
     }
 
     private @NotNull JComponent heading(final @NotNull Project p) {
@@ -113,7 +113,7 @@ public final class Band extends AbstractDetails {
     private @NotNull JBLabel caption(final @NotNull Project p) {
         final @NotNull JBLabel caption = Caption.of(name, Fonts.panelCaption());
 
-        if (!folds()) return caption;
+        if (alwaysOpen()) return caption;
 
         caption.setIcon(isOpen() ? AllIcons.General.ArrowDown : AllIcons.General.ArrowRight);
         caption.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));

@@ -43,11 +43,10 @@ public final class GeneratedMethod {
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-003
-    public static boolean holdsNothingButTheTodo(final @NotNull PsiMethod pm) {
+    public static boolean holdsAWrittenBody(final @NotNull PsiMethod pm) {
         return Optional.ofNullable(pm.getBody())
-                .filter(body -> body.getStatements().length == 0)
-                .map(body -> body.getText().contains(TODO))
-                .orElse(false);
+                .map(body -> body.getStatements().length > 0 || !body.getText().contains(TODO))
+                .orElse(true);
     }
 
     // Rule-CODEGEN-001

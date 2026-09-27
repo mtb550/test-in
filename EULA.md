@@ -111,4 +111,4 @@ AND YOU.
 If you have any questions, concerns, or requests regarding the "Testin" plugin, please contact:
 
 * **Email:** mtb550@gmail.com
-* **Linkedin:** https://www.linkedin.com/in/mtb550
+* **LinkedIn:** https://www.linkedin.com/in/mtb550

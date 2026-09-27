@@ -9,6 +9,7 @@
       <w>almughyiri</w>
       <w>alnum</w>
       <w>alzamil</w>
+      <w>appname</w>
       <w>baos</w>
       <w>bfinal</w>
       <w>bstatic</w>
@@ -18,12 +19,14 @@
       <w>ffffff</w>
       <w>fqcn</w>
       <w>hrun</w>
+      <w>idletimeout</w>
       <w>instrumenter</w>
       <w>itext</w>
       <w>jackson</w>
       <w>jblabel</w>
       <w>jbtable</w>
       <w>jetbrains</w>
+      <w>jvmargs</w>
       <w>lightmode</w>
       <w>lrun</w>
       <w>monday</w>
@@ -38,6 +41,7 @@
       <w>pwsh</w>
       <w>readarray</w>
       <w>sara</w>
+      <w>shellness</w>
       <w>snapshotted</w>
       <w>testin</w>
       <w>testin's</w>

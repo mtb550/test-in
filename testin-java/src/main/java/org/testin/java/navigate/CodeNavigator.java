@@ -107,7 +107,7 @@ public final class CodeNavigator implements CodeNavigation {
     public boolean hasTheWrittenBody(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         if (DumbService.isDumb(p)) return false;
 
-        return ReadAction.computeBlocking(() -> resolve(p, tc).map(pm -> !GeneratedMethod.holdsNothingButTheTodo(pm)).orElse(false));
+        return ReadAction.computeBlocking(() -> resolve(p, tc).map(GeneratedMethod::holdsAWrittenBody).orElse(false));
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-003, Rule-CODEGEN-089
@@ -134,7 +134,7 @@ public final class CodeNavigator implements CodeNavigation {
     private boolean written(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String statements, final boolean onlyTheTodo) {
         final @NotNull Optional<PsiMethod> method = resolve(p, tc);
         if (method.isEmpty()) return false;
-        if (onlyTheTodo && !GeneratedMethod.holdsNothingButTheTodo(method.orElseThrow())) return false;
+        if (onlyTheTodo && GeneratedMethod.holdsAWrittenBody(method.orElseThrow())) return false;
 
         try {
             final @NotNull PsiCodeBlock written = JavaPsiFacade.getElementFactory(p)
