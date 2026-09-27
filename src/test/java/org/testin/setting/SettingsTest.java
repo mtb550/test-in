@@ -21,6 +21,7 @@ import com.intellij.openapi.components.State;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static org.testng.Assert.assertEquals;
@@ -97,6 +98,32 @@ public class SettingsTest {
     public void whitespaceAroundAnUnchangedRootIsNotAChange() {
         assertFalse(TestinRoot.isRootChanged("C:/testin", "  C:/testin  "));
         assertFalse(TestinRoot.isRootChanged("  C:/testin", "C:/testin\t"));
+    }
+
+    @Test
+    public void aPlaceIsWhatIsLeftOfThePathOnceTheTestinRootIsTakenOff() {
+        final Path root = Path.of("C:", "Users", "mtb", "Downloads", "Testin");
+
+        assertEquals(TestinRoot.place(root, root.resolve("test-02").resolve("Test Cases").toString()),
+                List.of("test-02", "Test Cases"));
+        assertEquals(TestinRoot.place(root, root.resolve("test-02").toString()), List.of("test-02"));
+        assertEquals(TestinRoot.place(root, root.toString()), List.of("Testin"), "the root has nothing below it, so it is its own folder name");
+    }
+
+    @Test
+    public void aPathOutsideTheRootIsStillSaidInFullRatherThanNotAtAll() {
+        final Path root = Path.of("C:", "Users", "mtb", "Downloads", "Testin");
+        final String elsewhere = Path.of("D:", "work", "other").toString();
+
+        assertEquals(TestinRoot.place(root, elsewhere), List.of(elsewhere), "outside the root");
+        assertEquals(TestinRoot.place(TestinRoot.NONE, elsewhere), List.of(elsewhere), "no root configured");
+        assertEquals(TestinRoot.place(root, "feature/checkout"), List.of("feature/checkout"), "not a path at all");
+    }
+
+    @Test
+    public void nothingToSayMeansNoPlaceAtAll() {
+        assertEquals(TestinRoot.place(Path.of("C:", "testin"), ""), List.of());
+        assertEquals(TestinRoot.place(Path.of("C:", "testin"), "   "), List.of());
     }
 
     @Test

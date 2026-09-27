@@ -92,25 +92,29 @@ The node keeps everything inside it. Only where it sits changes.
 │  Paste                                                       │
 ├──────────────────────────────────────────────────────────────┤
 │                                                              │
-│  Move 'Login' into 'Smoke'?                             (1)  │
-│                                                              │
-│  FROM                                                   (2)  │
-│  C:\Testin\Demo\Test Cases\Accounts                          │
-│  TO                                                          │
-│  C:\Testin\Demo\Test Cases\Smoke                             │
-│                                                              │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │  Move 'Login' into 'Smoke'?                       (1)  │  │
+│  │                                                        │  │
+│  │  Demo › Test Cases → Demo › Test Cases › Smoke    (2)  │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                              [ Move ]   (3)  │
 ├──────────────────────────────────────────────────────────────┤
-│  Enter Move    Escape Cancel                            (3)  │
+│  Enter Move    Escape Cancel                            (4)  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 1. **The question** — says the verb and the names. The verb is *Move* after a
-   cut. It is *Copy* after a copy.
-2. **From** and **To** — in gray. They are full paths on disk, not trails of
-   node names. They let the tester catch a wrong drop before pressing `Enter`.
-   When nodes were cut from several folders, **From** names only the first
-   folder.
-3. The key that confirms is named for the verb.
+   cut. It is *Copy* after a copy. It sits on a card
+   (Rule-INTERNAL-099).
+2. **Where it is going** — one row, not two labeled blocks: where the nodes are
+   now, an arrow, then where they land. Both are said as places in the test
+   project rather than as paths on disk, and the segment the destination gains is
+   the one in ordinary text while the rest stays gray, so the tester reads the
+   difference instead of comparing two long lines (Rule-INTERNAL-108,
+   Rule-INTERNAL-109). When nodes were cut from several folders, the left side
+   names only the first folder.
+3. **The button** — colored, and named for the verb (Rule-INTERNAL-105).
+4. The key that confirms is named for the verb too.
 
 After a paste, the title reads **Paste**. After a drop, the title reads the
 verb, **Move** or **Copy**. Everything else on the dialog is the same.
@@ -125,9 +129,9 @@ verb, **Move** or **Copy**. Everything else on the dialog is the same.
 3. The tester selects a folder that can hold them: **Test Cases**, **Test
    Runs**, or a package of the right family.
 4. The tester presses `Ctrl+V`, or chooses **Actions → Paste**.
-5. The **Paste** dialog asks *Move '\<name\>' into '\<folder\>'?*, with *From*
-   and *To* rows.
-6. The tester presses `Enter`. The nodes move, and Testin shows *Moved*, or *Moved N*.
+5. The **Paste** dialog asks *Move '\<name\>' into '\<folder\>'?*, with one row
+   saying where the nodes are and where they land.
+6. The tester presses `Enter`, or the **Move** button. The nodes move, and Testin shows *Moved*, or *Moved N*.
 
 **Drag and drop**
 

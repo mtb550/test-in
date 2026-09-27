@@ -23,9 +23,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.services.Services;
 
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service(Service.Level.PROJECT)
 @AllArgsConstructor
@@ -48,6 +51,43 @@ public final class TestinRoot {
         return !normalize(before).equals(normalize(after));
     }
 
+    // UC-INTERNAL-007, Rule-INTERNAL-108
+    public static @NotNull List<String> place(final @NotNull Path root, final @NotNull String rawPath) {
+        final @NotNull Optional<Path> read = pathOf(rawPath);
+        if (read.isEmpty()) return asItStands(rawPath);
+
+        final @NotNull Path under = read.orElseThrow();
+        if (!isConfigured(root) || !under.startsWith(root)) return asItStands(rawPath);
+
+        final @NotNull List<String> segments = new ArrayList<>();
+        for (final Path segment : root.relativize(under)) {
+            final @NotNull String name = segment.toString();
+            if (!name.isEmpty()) segments.add(name);
+        }
+
+        return segments.isEmpty() ? List.of(folderName(root)) : List.copyOf(segments);
+    }
+
+    // Rule-INTERNAL-108
+    private static @NotNull List<String> asItStands(final @NotNull String rawPath) {
+        return rawPath.isBlank() ? List.of() : List.of(rawPath.trim());
+    }
+
+    // Rule-INTERNAL-108
+    private static @NotNull String folderName(final @NotNull Path folder) {
+        return Objects.toString(folder.getFileName(), folder.toString());
+    }
+
+    private static @NotNull Optional<Path> pathOf(final @NotNull String rawPath) {
+        if (rawPath.isBlank()) return Optional.empty();
+
+        try {
+            return Optional.of(Path.of(rawPath.trim()));
+        } catch (final InvalidPathException ex) {
+            return Optional.empty();
+        }
+    }
+
     public @NotNull Path getPath() {
         return normalize(Services.getInstance(p, AppSettingsState.class).rootTestinPath);
     }
@@ -63,6 +103,11 @@ public final class TestinRoot {
         if (!isConfigured(root)) return NONE;
 
         return root.isAbsolute() ? root : basePath().resolve(root);
+    }
+
+    // UC-INTERNAL-007, Rule-INTERNAL-108
+    public @NotNull List<String> place(final @NotNull String rawPath) {
+        return place(absolutePath(), rawPath);
     }
 
     private @NotNull Path basePath() {

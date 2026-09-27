@@ -51,17 +51,23 @@ Testin asks first. The test case's file and its generated test method both go.
 │  Confirm Removing                                            │
 ├──────────────────────────────────────────────────────────────┤
 │                                                              │
-│  Remove these 4 test cases?                                  │
-│                                                              │
-│  From    C:\Users\mtb\Downloads\Testin\Demo\Test Cases\Login │
-│                                                              │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │  Remove these 4 test cases?                       (1)  │  │
+│  │                                                        │  │
+│  │  FROM                                             (2)  │  │
+│  │  Demo › Test Cases › Login                             │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                            [ Remove ]   (3)  │
 ├──────────────────────────────────────────────────────────────┤
 │  [k]  Enter Remove       Escape Cancel                       │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **The question** — names the one test case, or counts several.
-2. **From** — the test set they are in, as a path on disk.
+1. **The question** — names the one test case, or counts several. It sits on a
+   card (Rule-INTERNAL-099).
+2. **From** — the test set they are in, said as its place in the test project
+   rather than as a path on disk (Rule-INTERNAL-108).
+3. **The button** — colored, and named for what it does (Rule-INTERNAL-105).
 
 ## Main flow
 

@@ -88,28 +88,36 @@ The node goes to the recycle bin, so nothing is lost for good.
 │  Confirm Removing                                            │
 ├──────────────────────────────────────────────────────────────┤
 │                                                              │
-│  Remove 'Accounts'?                                     (1)  │
-│  Holds 2 test sets, 14 test cases and 0 test runs       (2)  │
-│                                                              │
-│  FROM                                                   (3)  │
-│  C:\Testin\Demo\Test Cases\Accounts                          │
-│                                                              │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │  Remove 'Accounts'?                               (1)  │  │
+│  │  Holds 2 test sets, 14 test cases and 0 test runs (2)  │  │
+│  │                                                        │  │
+│  │  FROM                                             (3)  │  │
+│  │  Demo › Test Cases                                     │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                            [ Remove ]   (4)  │
 ├──────────────────────────────────────────────────────────────┤
-│  Enter Remove    Escape Cancel                          (4)  │
+│  Enter Remove    Escape Cancel                          (5)  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **The question** — names the node.
+1. **The question** — names the node. It sits on a card, like every other
+   section in a Testin dialog (Rule-INTERNAL-099).
 2. **What it holds** — the line the tester reads before pressing `Enter`. It is
    left out when the node holds no test sets, no test cases and no test runs.
    Packages inside the node are never counted. So a node holding only packages
    shows no line.
-3. **Where it is** — in gray. It is the node's full path on disk. It uses the
-   operating system's own separators, not a trail of node names.
-4. The key that confirms is named for what it does. It reads **Remove**, not **OK**.
+3. **Where it is** — in gray. It is the folder the node sits in, said as its
+   place in the test project rather than as a path on disk: the drive, the
+   download folder and the Testin folder are left off, and a chevron stands
+   between the segments (Rule-INTERNAL-108). A folder outside the Testin root is
+   still said in full.
+4. **The button** — colored, and named for what it does. It reads **Remove**,
+   not **OK** (Rule-INTERNAL-105).
+5. The key that confirms is named for the same thing the button is.
 
 For several nodes, the question is *Remove these N items?*. It shows no counts
-and no path.
+and no place.
 
 ## Main flow
 
@@ -117,9 +125,9 @@ and no path.
 2. The tester presses `Delete`, or chooses **Actions → Remove**.
 3. The **Confirm Removing** dialog opens. For one node it asks *Remove
    '\<name\>'?*. It then says how many test sets, test cases and test runs the
-   node holds, and shows where it is under *FROM*. For several nodes it asks *Remove these N items?*, where N is how
+   node holds, and shows the folder it sits in under *FROM*. For several nodes it asks *Remove these N items?*, where N is how
    many.
-4. The tester presses `Enter`.
+4. The tester presses `Enter`, or the **Remove** button.
 5. Testin keeps a copy of each node for undo, under a progress bar reading *Removing*, and then closes every editor open
    on a removed node or under
    it - a removed package takes its test sets' editors with it (Rule-TREE-PANEL-116).

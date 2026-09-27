@@ -18,6 +18,8 @@ package org.testin.ui.framework;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.services.Services;
+import org.testin.setting.TestinRoot;
 import org.testin.util.Shortcuts;
 
 import java.util.ArrayList;
@@ -30,13 +32,17 @@ public final class ConfirmDialog extends AbstractFrameworkDialog {
         this(p, dialogTitle, message, from, to, confirmName, onConfirm, List.of());
     }
 
+    // UC-INTERNAL-007, Rule-INTERNAL-099, Rule-INTERNAL-105, Rule-INTERNAL-108
     public ConfirmDialog(final @NotNull Project p, final @NotNull String dialogTitle, final @NotNull String message, final @NotNull String from, final @NotNull String to, final @NotNull String confirmName, final @NotNull Runnable onConfirm, final @NotNull List<Alternative> alternatives) {
         super(p);
         this.onConfirm = onConfirm;
 
         title = dialogTitle;
 
-        components = List.of(ComponentDialogBase.message(message, from, to));
+        final @NotNull TestinRoot root = Services.getInstance(p, TestinRoot.class);
+        components = List.of(
+                ComponentDialogBase.confirmCard(message, root.place(from), root.place(to)),
+                ComponentDialogBase.button(confirmName));
 
         final @NotNull List<StatusBarShortcut> keys = new ArrayList<>();
         keys.add(StatusBarShortcut.build(Shortcuts.Enter, confirmName, this::submit));
