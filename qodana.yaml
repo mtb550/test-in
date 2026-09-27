@@ -13,22 +13,23 @@ linter: qodana-jvm
 #
 # It was qodana.recommended until then, and that profile turns on inspections
 # this project has switched off on purpose. The first cloud report was 91
-# findings, 86 of them OptionalUsedAsFieldOrParameterType - a field holding an
-# Optional is how a Testin field says "not set yet", which is why the profile
-# below disables that inspection and why CLAUDE.md says turning it back on
-# means reversing the decision rather than tidying up. A gate that reports 86
-# things nobody will ever change is a gate nobody reads.
+# findings, 86 of them OptionalUsedAsFieldOrParameterType. A field holding an
+# Optional is how a Testin field says "not set yet", so the profile below
+# disables that inspection. CLAUDE.md says turning it back on means reversing
+# the decision rather than tidying up. A gate that reports 86 things nobody
+# will ever change is a gate nobody reads.
 #
-# UnusedProperty is off for the same reason, and the evidence is stronger: it
-# reported 176 findings over 60 keys, every one of them an action., group. or
-# toolwindow. key the platform composes at runtime from a plugin.xml id, so no
-# Bundle.message call names them and no inspection can see them being read.
-# BundleKeysTest already owns the question. everyKeyInTheBundleIsAskedForSomewhere
-# fails on an unreferenced key and skips exactly those three prefixes;
-# everyDeclaredActionIsNamedInTheBundle fails when a declared action has no
-# action.<id>.text key at all. The inspection was therefore reporting as dead the
-# keys a test demands exist, and it was not even consistent about it - two
-# toolwindow keys resolved in the English and Hindi bundles and not the French.
+# UnusedProperty is off for the same reason, and the evidence is stronger. It
+# reported 176 findings over 60 keys, and every one of the 60 is an action.,
+# group. or toolwindow. key. The platform composes those at runtime from a
+# plugin.xml id, so no Bundle.message call names them and no inspection can see
+# them read. BundleKeysTest already owns the question.
+# everyKeyInTheBundleIsAskedForSomewhere fails on an unreferenced key and skips
+# exactly those three prefixes; everyDeclaredActionIsNamedInTheBundle fails when
+# a declared action has no action.<id>.text key at all. So the inspection was
+# reporting as dead the keys a test demands exist. It was not even consistent
+# about it: two toolwindow keys resolved in the English and Hindi bundles and
+# not the French.
 profile:
   path: .idea/inspectionProfiles/Testin.xml
 
@@ -36,11 +37,11 @@ include:
   - name: CheckDependencyLicenses
 
 # .idea/scopes/Translations.xml owns this decision and says why: the translated
-# bundles hold the translator's words, and the spelling and grammar checkers know
-# English. The Testin profile switches all three off in that scope, and the IDE
-# and tools/inspect.ps1 honour it. Qodana does not - it reads the profile's own
-# entries, which is how UnusedProperty went quiet, and ignores the named scopes
-# inside them, which is why messages_fr.properties was 2,152 of the 2,408
+# bundles hold the translator's words, and the spelling and grammar checkers
+# know English. The Testin profile switches all three off in that scope, and the
+# IDE and tools/inspect.ps1 honour it. Qodana does not. It reads the profile's
+# own entries, which is how UnusedProperty went quiet, and ignores the named
+# scopes inside them. That is why messages_fr.properties was 2,152 of the 2,408
 # findings in the 27 September report: 2,106 French words spelled wrongly in
 # English, and 46 sentences of French read as English grammar.
 #

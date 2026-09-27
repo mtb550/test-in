@@ -51,10 +51,13 @@ to this folder in **Settings → Testin**.
 ## Changing it
 
 `SampleProjectTest` reads every file here through the same model the plugin
-reads it with, and asserts that all seven markers are present, that each case's
-file name is its id, that each case carries a rank, that a run holds one result
-file per case and no results file of its own, and that every result names a case
-that exists.
+reads it with, and asserts that:
+
+- all seven markers are present;
+- each case's file name is its id;
+- each case carries a rank;
+- a run holds one result file per case and no results file of its own;
+- every result names a case that exists.
 
 So this sample cannot rot quietly. If a format changes, that test fails and names
 the file — which is the entire reason it is worth committing sample data rather

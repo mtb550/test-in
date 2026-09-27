@@ -174,11 +174,10 @@ and which keys it answers, and the shell builds the rest.
   than trailing each name wherever it ends.
 - **Rule-INTERNAL-107** — A closed set of answers is shown as radios with the
   ordinary answer already picked, never a combo box a tester has to open to
-  learn what the answers are. The set is closed when the code names it - a
-  report of four formats, an export of four, a test run of platforms and
-  browsers - and a tester then reads every answer at once and clicks nothing for
-  the ordinary one. Because an answer is always picked, there is no refusal for
-  not picking.
+  learn what the answers are. The set is closed when the code names it: a report
+  of four formats, an export of four, a test run of platforms and browsers. A
+  tester then reads every answer at once and clicks nothing for the ordinary one.
+  Because an answer is always picked, there is no refusal for not picking.
 - **Rule-INTERNAL-108** — A dialog names a node by its place in the test
   project, not by its path on disk: the segments below the Testin root, a
   chevron between them. The root itself is its folder name, and anything

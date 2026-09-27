@@ -107,12 +107,12 @@ The node keeps everything inside it. Only where it sits changes.
    cut. It is *Copy* after a copy. It sits on a card
    (Rule-INTERNAL-099).
 2. **Where it is going** — one row, not two labeled blocks: where the nodes are
-   now, an arrow, then where they land. Both are said as places in the test
-   project rather than as paths on disk, and the segment the destination gains is
-   the one in ordinary text while the rest stays gray, so the tester reads the
-   difference instead of comparing two long lines (Rule-INTERNAL-108,
-   Rule-INTERNAL-109). When nodes were cut from several folders, the left side
-   names only the first folder.
+   now, an arrow, then where they land (Rule-INTERNAL-109). Both are said as
+   places in the test project rather than as paths on disk (Rule-INTERNAL-108).
+   The segment the destination gains is in ordinary text while the rest stays
+   gray, so the tester reads the difference instead of comparing two long lines.
+   When nodes were cut from several folders, the left side names only the first
+   folder.
 3. **The button** — colored, and named for the verb (Rule-INTERNAL-105).
 4. The key that confirms is named for the verb too.
 
