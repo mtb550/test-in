@@ -130,7 +130,8 @@ and which keys it answers, and the shell builds the rest.
   read top to bottom, or nothing at all, which means as tall as its content needs
   and growing as the tester opens more of it. The share is clamped: never
   narrower or shorter than the dialog needs to show its content, never past the
-  frame less a margin. A dialog the tester cannot resize names no size and is as
+  frame less a margin. The frame wins when both cannot hold. A dialog whose
+  content is larger than the frame is the frame's size, not its content's. A dialog the tester cannot resize names no size and is as
   big as its content, so a confirmation holding one sentence stays the size of
   that sentence.
 - **Rule-INTERNAL-101** — A dialog whose size the tester can change can be maximized, from a

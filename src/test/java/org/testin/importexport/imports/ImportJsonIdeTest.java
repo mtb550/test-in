@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.junit.Assert.assertNotEquals;
+
 public class ImportJsonIdeTest extends BasePlatformTestCase {
 
     private static final @NotNull UUID EXPORTED_ID = UUID.fromString("8f7b1a52-0c44-4c1e-9d6b-2a3f5e7c9011");
@@ -51,7 +53,7 @@ public class ImportJsonIdeTest extends BasePlatformTestCase {
 
     // UC-SHARE-005, Rule-SHARE-024
     public void testAnImportedTestCaseIsNewAndNotTheOneTheFileNames() {
-        assertFalse("the id in the file names a test case in the project it was exported from", EXPORTED_ID.equals(imported().getId()));
+        assertNotEquals("the id in the file names a test case in the project it was exported from", EXPORTED_ID, imported().getId());
     }
 
     // UC-SHARE-005, Rule-SHARE-029

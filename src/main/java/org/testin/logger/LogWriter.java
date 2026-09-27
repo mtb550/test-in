@@ -19,6 +19,7 @@ package org.testin.logger;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedWriter;
@@ -43,9 +44,7 @@ public final class LogWriter implements Disposable {
 
     private static final int JOIN_TIMEOUT = 2000;
 
-    //noinspection QualifiedClassName
-    private static final com.intellij.openapi.diagnostic.@NotNull Logger IDE_LOG =
-            com.intellij.openapi.diagnostic.Logger.getInstance(LogWriter.class);
+    private static final @NotNull Logger IDE_LOG = Logger.getInstance(LogWriter.class);
     private static final @NotNull Object SHUTDOWN = new Object();
     private final @NotNull BlockingQueue<Object> logQueue = new ArrayBlockingQueue<>(10000);
     private final @NotNull DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);

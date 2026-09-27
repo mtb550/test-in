@@ -125,7 +125,7 @@ public final class RunStatusService {
 
         fields.storePasted(pasted -> indexer.storeScreenshots(runPath, pasted));
 
-        indexer.changeRun(runPath, current -> current.resultOf(testCaseId).ifPresentOrElse(item -> fields.applyTo(item),
+        indexer.changeRun(runPath, current -> current.resultOf(testCaseId).ifPresentOrElse(fields::applyTo,
                 () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + testCaseId + " - failure details not recorded")));
 
         return true;
