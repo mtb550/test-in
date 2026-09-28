@@ -127,7 +127,7 @@ final class TestCaseSequenceStore {
 
         // Rule-INTERNAL-084
         if (!leftHandNamedFile(testCase.getId(), file)) {
-            files.delete(p, file);
+            files.discard(p, file);
             return false;
         }
 
@@ -141,7 +141,7 @@ final class TestCaseSequenceStore {
     // UC-INTERNAL-004, Rule-INTERNAL-084
     private boolean leftHandNamedFile(final @NotNull UUID id, final @NotNull Path idFile) {
         final @NotNull Optional<Path> original = Optional.ofNullable(handNamed.get(id)).filter(path -> !path.equals(idFile));
-        if (original.isPresent() && !Services.getInstance(p, TestDataFiles.class).delete(p, original.orElseThrow()))
+        if (original.isPresent() && !Services.getInstance(p, TestDataFiles.class).discard(p, original.orElseThrow()))
             return false;
 
         handNamed.remove(id);
@@ -164,13 +164,13 @@ final class TestCaseSequenceStore {
         if (from.equals(to)) return true;
 
         final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
-        if (files.delete(p, from)) {
+        if (files.discard(p, from)) {
             if (!fromSet.equals(toSet))
                 Optional.ofNullable(testCaseIdsByTestSet.get(fromSet.toString())).ifPresent(ids -> ids.remove(id));
             return true;
         }
 
-        files.delete(p, to);
+        files.discard(p, to);
         if (!fromSet.equals(toSet))
             Optional.ofNullable(testCaseIdsByTestSet.get(toSet.toString())).ifPresent(ids -> ids.remove(id));
         was.ifPresent(original -> testCasesById.put(id, original));

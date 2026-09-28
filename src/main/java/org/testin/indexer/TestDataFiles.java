@@ -122,12 +122,30 @@ final class TestDataFiles {
 
             if (!Trash.accepted(p, path)) Files.deleteIfExists(path);
         } catch (final IOException ex) {
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", ex.getMessage()));
-            Logger.error("unable to remove " + path + ": " + ex.getMessage());
+            reportRemoveFailure(p, path, ex);
             return false;
         }
 
         return true;
+    }
+
+    // Rule-INTERNAL-113
+    boolean discard(final @NotNull Project p, final @NotNull Path path) {
+        try {
+            Services.getInstance(OwnWrites.class).record(p, path);
+
+            Files.deleteIfExists(path);
+        } catch (final IOException ex) {
+            reportRemoveFailure(p, path, ex);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void reportRemoveFailure(final @NotNull Project p, final @NotNull Path path, final @NotNull IOException ex) {
+        Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", ex.getMessage()));
+        Logger.error("unable to remove " + path + ": " + ex.getMessage());
     }
 
     private void reportWriteFailure(final @NotNull Project p, final @NotNull Path path, final @NotNull IOException ex) {
