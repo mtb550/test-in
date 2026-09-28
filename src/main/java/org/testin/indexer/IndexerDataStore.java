@@ -257,8 +257,12 @@ final class IndexerDataStore {
     }
 
     void refreshDir(final @NotNull Path dirPath) {
+        refresh(dirPath, true);
+    }
+
+    private void refresh(final @NotNull Path path, final boolean recursive) {
         ApplicationManager.getApplication().executeOnPooledThread(() ->
-                LocalFileSystem.getInstance().refreshNioFiles(List.of(dirPath), true, true, null));
+                LocalFileSystem.getInstance().refreshNioFiles(List.of(path), true, recursive, null));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-021
@@ -394,7 +398,7 @@ final class IndexerDataStore {
     boolean persistMarker(final @NotNull DirectoryDto dto) {
         final boolean written = markers.write(dto.getPath(), dto.getMarkerFileName(), dto.getMarker());
         childrenIndex.invalidate();
-        refreshDir(dto.getPath());
+        refresh(dto.getPath().resolve(dto.getMarkerFileName()), false);
         return written;
     }
 
