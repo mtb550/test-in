@@ -18,6 +18,7 @@ package org.testin.git;
 
 import com.intellij.openapi.project.Project;
 import git4idea.GitUtil;
+import git4idea.commands.GitCommand;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
@@ -36,24 +37,24 @@ public final class GitRepositoryService {
 
     // UC-SHARE-009
     public void initialize(final @NotNull Path repositoryPath) {
-        GitCommandRunner.execute(p, repositoryPath, "git", "init");
+        GitCommandRunner.execute(p, repositoryPath, GitCommand.INIT);
     }
 
     // UC-SHARE-013
     public void configureRemote(final @NotNull Path repositoryPath, final @NotNull String remoteName, final @NotNull String remoteUrl) {
-        GitCommandRunner.execute(p, repositoryPath, "git", "remote", "add", remoteName, remoteUrl);
+        GitCommandRunner.execute(p, repositoryPath, GitCommand.REMOTE, "add", remoteName, remoteUrl);
     }
 
     // UC-TREE-PANEL-003, Rule-SHARE-062
     public void changeRemoteUrl(final @NotNull Path repositoryPath, final @NotNull String remoteName, final @NotNull String remoteUrl) {
-        GitCommandRunner.execute(p, repositoryPath, "git", "remote", "set-url", remoteName, remoteUrl);
+        GitCommandRunner.execute(p, repositoryPath, GitCommand.REMOTE, "set-url", remoteName, remoteUrl);
     }
 
     // UC-SHARE-008, Rule-SHARE-041
     public void configureIdentity(final @NotNull Path repositoryPath, final @NotNull String name, final @NotNull String email, final boolean global) {
         final @NotNull String scope = global ? "--global" : "--local";
-        GitCommandRunner.execute(p, repositoryPath, "git", "config", scope, "user.name", name);
-        GitCommandRunner.execute(p, repositoryPath, "git", "config", scope, "user.email", email);
+        GitCommandRunner.execute(p, repositoryPath, GitCommand.CONFIG, scope, "user.name", name);
+        GitCommandRunner.execute(p, repositoryPath, GitCommand.CONFIG, scope, "user.email", email);
     }
 
     // Rule-TREE-PANEL-104
@@ -62,7 +63,7 @@ public final class GitRepositoryService {
     }
 
     public @NotNull String getCurrentBranch(final @NotNull Path path) {
-        return run(path, "git", "branch", "--show-current").orElse("").trim();
+        return run(path, GitCommand.BRANCH, "--show-current").orElse("").trim();
     }
 
     public @NotNull String getDefaultBranch(final @NotNull Path path) {
@@ -70,7 +71,7 @@ public final class GitRepositoryService {
         final @NotNull String remoteName = getRemoteName(path);
         if (remoteName.isEmpty()) return currentBranch;
 
-        final @NotNull String headBranch = runRemote(path, getRemoteUrl(path, remoteName), "git", "remote", "show", remoteName)
+        final @NotNull String headBranch = runRemote(path, getRemoteUrl(path, remoteName), GitCommand.REMOTE, "show", remoteName)
                 .map(GitRefs::parseHeadBranch)
                 .orElse("");
 
@@ -104,20 +105,20 @@ public final class GitRepositoryService {
         final @NotNull String remoteName = getRemoteName(path);
         if (remoteName.isEmpty()) return;
 
-        GitCommandRunner.executeRemote(p, path, getRemoteUrl(path, remoteName), "git", "fetch", "--all", "--prune");
+        GitCommandRunner.executeRemote(p, path, getRemoteUrl(path, remoteName), GitCommand.FETCH, "--all", "--prune");
     }
 
     // UC-TREE-PANEL-026
     public @NotNull List<String> getAvailableBranches(final @NotNull Path path) {
-        return GitRefs.parseBranches(GitCommandRunner.execute(p, path, "git", "branch", "-a").lines().toList());
+        return GitRefs.parseBranches(GitCommandRunner.execute(p, path, GitCommand.BRANCH, "-a").lines().toList());
     }
 
     public @NotNull String getRemoteUrl(final @NotNull Path path, final @NotNull String remoteName) {
-        return run(path, "git", "remote", "get-url", remoteName).orElse("").trim();
+        return run(path, GitCommand.REMOTE, "get-url", remoteName).orElse("").trim();
     }
 
     public @NotNull String getRemoteName(final @NotNull Path path) {
-        return GitRefs.chooseRemote(run(path, "git", "remote").orElse("").lines().toList());
+        return GitRefs.chooseRemote(run(path, GitCommand.REMOTE).orElse("").lines().toList());
     }
 
     public @NotNull String remoteUrl(final @NotNull Path path) {
@@ -127,48 +128,48 @@ public final class GitRepositoryService {
 
     public @NotNull String checkout(final @NotNull Path path, final @NotNull String branch) {
         final @NotNull List<String> localBranches = getLocalBranches(path);
-        final boolean remoteBranch = GitRefs.isRemoteBranch(branch, localBranches, run(path, "git", "remote").orElse("").lines().toList());
+        final boolean remoteBranch = GitRefs.isRemoteBranch(branch, localBranches, run(path, GitCommand.REMOTE).orElse("").lines().toList());
         final @NotNull String target = remoteBranch ? GitRefs.localNameOf(branch) : branch;
 
         if (remoteBranch && !localBranches.contains(target)) {
-            return run(path, "git", "checkout", "-b", target, "--track", branch).isPresent() ? target : "";
+            return run(path, GitCommand.CHECKOUT, "-b", target, "--track", branch).isPresent() ? target : "";
         }
 
-        return run(path, "git", "checkout", target).isPresent() ? target : "";
+        return run(path, GitCommand.CHECKOUT, target).isPresent() ? target : "";
     }
 
     // UC-SHARE-014, Rule-SHARE-064
     public boolean startBranch(final @NotNull Path path, final @NotNull String branch) {
-        return run(path, "git", "checkout", "-b", branch).isPresent();
+        return run(path, GitCommand.CHECKOUT, "-b", branch).isPresent();
     }
 
     // UC-SHARE-014, Rule-SHARE-063
     public @NotNull List<String> getLocalBranches(final @NotNull Path path) {
-        return GitRefs.parseBranches(run(path, "git", "branch").orElse("").lines().toList());
+        return GitRefs.parseBranches(run(path, GitCommand.BRANCH).orElse("").lines().toList());
     }
 
     // UC-SHARE-010, Rule-SHARE-044
     public @NotNull List<String> status(final @NotNull Path path) {
-        return run(path, "git", "status", "--porcelain", "-uall").orElse("")
+        return run(path, GitCommand.STATUS, "--porcelain", "-uall").orElse("")
                 .lines().filter(line -> !line.isBlank()).toList();
     }
 
     public @NotNull String showAtHead(final @NotNull Path path, final @NotNull String relativePath) {
-        return run(path, "git", "show", "HEAD:" + relativePath).orElse("");
+        return run(path, GitCommand.SHOW, "HEAD:" + relativePath).orElse("");
     }
 
     public boolean hasConflicts(final @NotNull Path path) {
         if (isRebaseInProgress(path)) return true;
 
-        return GitRefs.hasUnmergedPaths(run(path, "git", "status", "--porcelain").orElse("").lines().toList());
+        return GitRefs.hasUnmergedPaths(run(path, GitCommand.STATUS, "--porcelain").orElse("").lines().toList());
     }
 
     public @NotNull String stageContent(final @NotNull Path path, final @NotNull String relativePath, final int stage) {
-        return run(path, "git", "show", ":" + stage + ":" + relativePath).orElse("");
+        return run(path, GitCommand.SHOW, ":" + stage + ":" + relativePath).orElse("");
     }
 
     public boolean stageResolved(final @NotNull Path path, final @NotNull String relativePath) {
-        return run(path, "git", "add", "--", relativePath).isPresent();
+        return run(path, GitCommand.ADD, "--", relativePath).isPresent();
     }
 
     public @NotNull List<String> conflictingPaths(final @NotNull Path path) {
@@ -177,7 +178,7 @@ public final class GitRepositoryService {
 
     // UC-SHARE-015, Rule-SHARE-066
     public @NotNull OptionalInt unpushedCount(final @NotNull Path path) {
-        final @NotNull String counted = run(path, "git", "rev-list", "--count", "@{upstream}..HEAD").orElse("").trim();
+        final @NotNull String counted = run(path, GitCommand.REV_LIST, "--count", "@{upstream}..HEAD").orElse("").trim();
         if (counted.isEmpty()) return OptionalInt.empty();
 
         try {
@@ -194,26 +195,26 @@ public final class GitRepositoryService {
     }
 
     public boolean couldNotAbortRebase(final @NotNull Path path) {
-        return run(path, "git", "rebase", "--abort").isEmpty();
+        return run(path, GitCommand.REBASE, "--abort").isEmpty();
     }
 
     public boolean couldNotContinueRebase(final @NotNull Path path) {
-        return run(path, "git", "rebase", "--continue").isEmpty();
+        return run(path, GitCommand.REBASE, "--continue").isEmpty();
     }
 
-    private @NotNull Optional<String> run(final @NotNull Path path, final @NotNull String... command) {
-        return execute(path, "", command);
+    private @NotNull Optional<String> run(final @NotNull Path path, final @NotNull GitCommand command, final @NotNull String... parameters) {
+        return execute(path, "", command, parameters);
     }
 
-    private @NotNull Optional<String> runRemote(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull String... command) {
-        return execute(path, remoteUrl, command);
+    private @NotNull Optional<String> runRemote(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull GitCommand command, final @NotNull String... parameters) {
+        return execute(path, remoteUrl, command, parameters);
     }
 
-    private @NotNull Optional<String> execute(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull String... command) {
+    private @NotNull Optional<String> execute(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull GitCommand command, final @NotNull String... parameters) {
         try {
-            return Optional.of(GitCommandRunner.executeRemote(p, path, remoteUrl, command));
+            return Optional.of(GitCommandRunner.executeRemote(p, path, remoteUrl, command, parameters));
         } catch (final RuntimeException ex) {
-            Logger.debug("git " + GitSafeText.withoutCredentials(String.join(" ", command))
+            Logger.debug("git " + command.name() + " " + GitSafeText.withoutCredentials(String.join(" ", parameters))
                     + " failed in " + path + ": " + ex.getMessage());
             return Optional.empty();
         }

@@ -17,6 +17,7 @@
 package org.testin.git;
 
 import com.intellij.openapi.project.Project;
+import git4idea.commands.GitCommand;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
@@ -92,15 +93,15 @@ public final class GitCommits {
 
         final @NotNull Set<String> stageable = stageable(repositoryPath, paths);
         if (!stageable.isEmpty()) {
-            GitCommandRunner.executeOverPaths(p, repositoryPath, stageable, "git", "add");
+            GitCommandRunner.executeOverPaths(p, repositoryPath, stageable, GitCommand.ADD);
         }
 
-        GitCommandRunner.executeOverPaths(p, repositoryPath, paths, "git", "commit", "--only", "-m", message);
+        GitCommandRunner.executeOverPaths(p, repositoryPath, paths, GitCommand.COMMIT, "--only", "-m", message);
     }
 
     public @NotNull String headCommitId(final @NotNull Path repositoryPath) {
         try {
-            return GitCommandRunner.execute(p, repositoryPath, "git", "rev-parse", "--short", "HEAD").trim();
+            return GitCommandRunner.execute(p, repositoryPath, GitCommand.REV_PARSE, "--short", "HEAD").trim();
         } catch (final RuntimeException ex) {
             Logger.warn("Could not read the commit id: " + ex.getMessage());
             return "";
@@ -126,13 +127,13 @@ public final class GitCommits {
     // UC-SHARE-016, Rule-SHARE-071
     private void pull(final @NotNull Path repositoryPath, final @NotNull String remoteUrl, final @NotNull String remote, final @NotNull String branch) {
         GitCommandRunner.executeRemote(p, repositoryPath, remoteUrl,
-                "git", "pull", "--rebase", "--autostash", remote, branch);
+                GitCommand.PULL, "--rebase", "--autostash", remote, branch);
     }
 
     private boolean remoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
         try {
             return !GitCommandRunner.executeRemote(p, repositoryPath, repositories.getRemoteUrl(repositoryPath, remote),
-                    "git", "ls-remote", "--heads", remote, branch).isBlank();
+                    GitCommand.LS_REMOTE, "--heads", remote, branch).isBlank();
         } catch (final RuntimeException ex) {
             Logger.debug("Could not list " + remote + " branches: " + ex.getMessage());
             return false;
@@ -144,7 +145,7 @@ public final class GitCommits {
         if (remote.isBlank()) throw new IllegalStateException(Bundle.message("git.error.no.remote"));
 
         GitCommandRunner.executeRemote(p, repositoryPath, repositories.getRemoteUrl(repositoryPath, remote),
-                "git", "push", "-u", remote, branch);
+                GitCommand.PUSH, "-u", remote, branch);
         Logger.info("Git push completed for " + repositoryPath);
     }
 }

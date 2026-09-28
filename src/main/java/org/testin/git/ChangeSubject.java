@@ -16,12 +16,48 @@
 
 package org.testin.git;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+
+@Getter
+@AllArgsConstructor
 public enum ChangeSubject {
-    TEST_CASE,
+    TEST_CASE(
+            ChangeType.CREATE_TEST_CASE,
+            ChangeType.REMOVE_TEST_CASE,
+            ChangeType.CHANGE_FILE
+    ),
 
-    RUN_ITEM,
+    RUN_ITEM(
+            ChangeType.CREATE_RUN_ITEM,
+            ChangeType.REMOVE_RUN_ITEM,
+            ChangeType.CHANGE_RUN_ITEM
+    ),
 
-    MARKER,
+    MARKER(
+            ChangeType.CREATE_MARKER,
+            ChangeType.REMOVE_MARKER,
+            ChangeType.CHANGE_MARKER
+    ),
 
-    OTHER
+    OTHER(
+            ChangeType.CREATE_FILE,
+            ChangeType.REMOVE_FILE,
+            ChangeType.CHANGE_FILE
+    );
+
+    private final @NotNull ChangeType created;
+
+    private final @NotNull ChangeType removed;
+
+    private final @NotNull ChangeType changed;
+
+    public @NotNull ChangeType changeFor(final @NotNull DiffType type) {
+        return switch (type) {
+            case ADDED -> created;
+            case DELETED -> removed;
+            case MODIFIED -> changed;
+        };
+    }
 }

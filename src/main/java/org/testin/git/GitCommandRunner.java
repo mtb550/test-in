@@ -36,25 +36,25 @@ import java.util.Collection;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class GitCommandRunner {
-    static @NotNull String execute(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String... command) {
-        return run(p, workingDirectory, "", command);
+    static @NotNull String execute(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull GitCommand command, final @NotNull String... parameters) {
+        return run(p, workingDirectory, "", command, parameters);
     }
 
-    static @NotNull String executeRemote(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String remoteUrl, final @NotNull String... command) {
-        return run(p, workingDirectory, remoteUrl, command);
+    static @NotNull String executeRemote(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String remoteUrl, final @NotNull GitCommand command, final @NotNull String... parameters) {
+        return run(p, workingDirectory, remoteUrl, command, parameters);
     }
 
     // UC-SHARE-012, Rule-SHARE-058
-    static void executeOverPaths(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull Collection<String> paths, final @NotNull String... command) {
+    static void executeOverPaths(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull Collection<String> paths, final @NotNull GitCommand command, final @NotNull String... parameters) {
         if (paths.isEmpty()) throw new IllegalArgumentException("Expected paths to run over");
 
         final @NotNull Path pathspec = writePathspec(paths);
         try {
-            final String @NotNull [] full = Arrays.copyOf(command, command.length + 2);
-            full[command.length] = "--pathspec-from-file=" + pathspec;
-            full[command.length + 1] = "--pathspec-file-nul";
+            final String @NotNull [] full = Arrays.copyOf(parameters, parameters.length + 2);
+            full[parameters.length] = "--pathspec-from-file=" + pathspec;
+            full[parameters.length + 1] = "--pathspec-file-nul";
 
-            run(p, workingDirectory, "", full);
+            run(p, workingDirectory, "", command, full);
         } finally {
             try {
                 Files.deleteIfExists(pathspec);
@@ -80,18 +80,12 @@ final class GitCommandRunner {
     }
 
     // UC-SHARE-012, Rule-SHARE-056
-    private static @NotNull String run(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String remoteUrl, final @NotNull String... command) {
-        if (command.length < 2 || !"git".equals(command[0])) {
-            throw new IllegalArgumentException("Expected a git command");
-        }
-
-        final @NotNull GitCommand gitCommand = commandFor(command[1]);
-
-        final @NotNull GitLineHandler handler = new GitLineHandler(p, workingDirectory, gitCommand);
+    private static @NotNull String run(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String remoteUrl, final @NotNull GitCommand command, final @NotNull String... parameters) {
+        final @NotNull GitLineHandler handler = new GitLineHandler(p, workingDirectory, command);
 
         handler.addCustomEnvironmentVariable(GitCommand.GIT_EDITOR_ENV, "true");
 
-        handler.addParameters(Arrays.copyOfRange(command, 2, command.length));
+        handler.addParameters(parameters);
         if (!remoteUrl.isBlank()) handler.setUrl(remoteUrl);
 
         final @NotNull GitCommandResult result = Git.getInstance().runCommand(handler);
@@ -105,27 +99,5 @@ final class GitCommandRunner {
             throw new IllegalStateException(Bundle.message("git.command.failed", details));
         }
         return result.getOutputAsJoinedString();
-    }
-
-    private static @NotNull GitCommand commandFor(final @NotNull String command) {
-        return switch (command) {
-            case "add" -> GitCommand.ADD;
-            case "branch" -> GitCommand.BRANCH;
-            case "checkout" -> GitCommand.CHECKOUT;
-            case "commit" -> GitCommand.COMMIT;
-            case "config" -> GitCommand.CONFIG;
-            case "fetch" -> GitCommand.FETCH;
-            case "init" -> GitCommand.INIT;
-            case "ls-remote" -> GitCommand.LS_REMOTE;
-            case "pull" -> GitCommand.PULL;
-            case "rebase" -> GitCommand.REBASE;
-            case "push" -> GitCommand.PUSH;
-            case "remote" -> GitCommand.REMOTE;
-            case "rev-list" -> GitCommand.REV_LIST;
-            case "rev-parse" -> GitCommand.REV_PARSE;
-            case "show" -> GitCommand.SHOW;
-            case "status" -> GitCommand.STATUS;
-            default -> throw new IllegalArgumentException("Unsupported Git command: " + command);
-        };
     }
 }

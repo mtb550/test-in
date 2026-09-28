@@ -78,13 +78,13 @@ final class PendingChangeFactory {
                 final @NotNull TestCaseDto newState = read(mapper, afterJson, TestCaseDto.class);
                 yield new PendingChange(ChangeSubject.TEST_CASE, newState.getDescription(), testSet,
                         newState.getId().toString(), relativePath, DiffType.ADDED, nothingCommitted(),
-                        List.of(new FieldChange(Bundle.message("caption.test.case"), "", newState.getDescription(), ChangeType.CREATE_TEST_CASE)));
+                        List.of(new FieldChange(Bundle.message("caption.test.case"), "", newState.getDescription(), ChangeSubject.TEST_CASE.getCreated())));
             }
             case DELETED -> {
                 final @NotNull TestCaseDto oldState = read(mapper, beforeJson, TestCaseDto.class);
                 yield new PendingChange(ChangeSubject.TEST_CASE, oldState.getDescription(), testSet,
                         oldState.getId().toString(), relativePath, DiffType.DELETED, oldState,
-                        List.of(new FieldChange(Bundle.message("caption.test.case"), oldState.getDescription(), "", ChangeType.REMOVE_TEST_CASE)));
+                        List.of(new FieldChange(Bundle.message("caption.test.case"), oldState.getDescription(), "", ChangeSubject.TEST_CASE.getRemoved())));
             }
             case MODIFIED -> {
                 final @NotNull TestCaseDto oldState = read(mapper, beforeJson, TestCaseDto.class);
@@ -94,7 +94,7 @@ final class PendingChangeFactory {
                 yield new PendingChange(ChangeSubject.TEST_CASE, newState.getDescription(), testSet,
                         newState.getId().toString(), relativePath, DiffType.MODIFIED, oldState,
                         fieldChanges.isEmpty()
-                                ? List.of(new FieldChange(Bundle.message("caption.test.case"), "", Bundle.message("git.change.reordered"), ChangeType.CHANGE_FILE))
+                                ? List.of(new FieldChange(Bundle.message("caption.test.case"), "", Bundle.message("git.change.reordered"), ChangeSubject.TEST_CASE.getChanged()))
                                 : fieldChanges);
             }
         };
@@ -111,9 +111,9 @@ final class PendingChangeFactory {
 
         final @NotNull List<FieldChange> changes = switch (type) {
             case ADDED -> List.of(new FieldChange(parentName(relativePath), "",
-                    RunItemChangeComparator.summary(read(mapper, afterJson, TestRunItems.class)), ChangeType.CREATE_RUN_ITEM));
+                    RunItemChangeComparator.summary(read(mapper, afterJson, TestRunItems.class)), ChangeSubject.RUN_ITEM.getCreated()));
             case DELETED -> List.of(new FieldChange(parentName(relativePath),
-                    RunItemChangeComparator.summary(read(mapper, beforeJson, TestRunItems.class)), "", ChangeType.REMOVE_RUN_ITEM));
+                    RunItemChangeComparator.summary(read(mapper, beforeJson, TestRunItems.class)), "", ChangeSubject.RUN_ITEM.getRemoved()));
             case MODIFIED -> RunItemChangeComparator.compare(
                     read(mapper, beforeJson, TestRunItems.class), read(mapper, afterJson, TestRunItems.class));
         };
@@ -127,14 +127,8 @@ final class PendingChangeFactory {
         final @NotNull String before = statusIn(mapper, beforeJson);
         final @NotNull String after = statusIn(mapper, afterJson);
 
-        final @NotNull ChangeType changeType = switch (type) {
-            case ADDED -> ChangeType.CREATE_MARKER;
-            case DELETED -> ChangeType.REMOVE_MARKER;
-            case MODIFIED -> ChangeType.CHANGE_MARKER;
-        };
-
         final @NotNull List<FieldChange> changes = new ArrayList<>();
-        changes.add(new FieldChange(relativePath.getFileName().toString(), before, after, changeType));
+        changes.add(new FieldChange(relativePath.getFileName().toString(), before, after, ChangeSubject.MARKER.changeFor(type)));
 
         if (type == DiffType.MODIFIED && DirectoryType.byMarker(relativePath.getFileName().toString()).filter(kind -> kind == DirectoryType.TR).isPresent()) {
             changes.addAll(TestRunChangeComparator.compareFacts(
@@ -150,15 +144,9 @@ final class PendingChangeFactory {
     }
 
     private static @NotNull PendingChange other(final @NotNull DiffType type, final @NotNull Path relativePath) {
-        final @NotNull ChangeType changeType = switch (type) {
-            case ADDED -> ChangeType.CREATE_FILE;
-            case DELETED -> ChangeType.REMOVE_FILE;
-            case MODIFIED -> ChangeType.CHANGE_FILE;
-        };
-
         return new PendingChange(ChangeSubject.OTHER, relativePath.getFileName().toString(), "", "",
                 relativePath, type, nothingCommitted(),
-                List.of(new FieldChange(relativePath.toString(), "", "", changeType)));
+                List.of(new FieldChange(relativePath.toString(), "", "", ChangeSubject.OTHER.changeFor(type))));
     }
 
     private static @NotNull String statusIn(final @NotNull Mapper mapper, final @NotNull String json) {
