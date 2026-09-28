@@ -66,7 +66,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
 public final class TestRunPdfGenerator {
     private final @NotNull Set<String> leftOut = new LinkedHashSet<>();
@@ -196,9 +195,7 @@ public final class TestRunPdfGenerator {
                 final long count = section.count(summary);
                 if (count == 0) continue;
 
-                buildTestCaseTable(document, String.valueOf(sectionNumber++), section.getTitle(),
-                        section.description(String.valueOf(count)), tr, boldFont, regularFont,
-                        rgb(section.getHexColor()), rgb(section.textHex()), section.isWithFailureDetail(), section::matches);
+                buildTestCaseTable(document, String.valueOf(sectionNumber++), section, section.description(String.valueOf(count)), tr, boldFont, regularFont);
             }
 
             float pageWidth = pdf.getDefaultPageSize().getWidth();
@@ -246,8 +243,8 @@ public final class TestRunPdfGenerator {
     }
 
     // UC-REPORT-001, Rule-REPORT-024
-    private void buildTestCaseTable(final @NotNull Document document, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont, final @NotNull DeviceRgb headerBg, final @NotNull DeviceRgb headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
-        document.add(para(sectionNumber + ". " + sectionTitle)
+    private void buildTestCaseTable(final @NotNull Document document, final @NotNull String sectionNumber, final @NotNull ReportSection section, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont) {
+        document.add(para(sectionNumber + ". " + section.getTitle())
                 .setFont(boldFont)
                 .setFontSize(Fonts.Report.SECTION.pt())
                 .setFontColor(DARK_NAVY)
@@ -260,22 +257,24 @@ public final class TestRunPdfGenerator {
                 .setFont(regularFont).setFontSize(Fonts.Report.LEAD.pt()).setFontColor(BLACK)
                 .setMarginBottom(12));
 
-        Table table = new Table(withFailureDetail ? 4 : 2)
+        final @NotNull List<RunEditorAttributes> failureDetail = section.getFailureDetailColumns();
+        Table table = new Table(2 + failureDetail.size())
                 .useAllAvailableWidth()
                 .setAutoLayout()
                 .setBorder(Border.NO_BORDER);
 
+        final @NotNull DeviceRgb headerBg = rgb(section.getHexColor());
+        final @NotNull DeviceRgb headerFg = rgb(section.textHex());
         addTestCaseTableHeader(table, "#", headerBg, headerFg, boldFont);
         addTestCaseTableHeader(table, Bundle.message("caption.test.case"), headerBg, headerFg, boldFont);
-        if (withFailureDetail)
-            addTestCaseTableHeader(table, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg, boldFont);
-        if (withFailureDetail)
-            addTestCaseTableHeader(table, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg, boldFont);
+        for (final RunEditorAttributes detail : failureDetail) {
+            addTestCaseTableHeader(table, detail.getName(), headerBg, headerFg, boldFont);
+        }
 
         int idx = 1;
         boolean alt = true;
         for (TestRunItems item : tr.getResults()) {
-            if (!filter.test(item)) continue;
+            if (!section.matches(item)) continue;
 
             DeviceRgb rowBg = alt ? LIGHT_BG : WHITE;
             alt = !alt;
@@ -297,52 +296,42 @@ public final class TestRunPdfGenerator {
             testCaseCell.add(para(tcName)
                     .setFont(regularFont).setFontSize(Fonts.Report.BODY.pt()).setFontColor(BLACK)
                     .setMarginBottom(0));
-            if (withFailureDetail) {
-                String actualResult = item.getActualResult();
-                if (actualResult.isEmpty()) actualResult = "—";
-                final @NotNull Paragraph actual = para(Bundle.message("report.actual.result", actualResult))
-                        .setFont(regularFont).setFontSize(Fonts.Report.SMALL.pt()).setFontColor(DARK_GRAY);
-
-                item.bugIssue().ifPresent(url -> actual.add(text(" ("))
-                        .add(new Link(BugIssueUrl.shortReference(url), PdfAction.createURI(url)).setFontColor(LINK_BLUE))
-                        .add(text(")")));
-                testCaseCell.add(actual);
-            }
             table.addCell(testCaseCell);
 
-            if (withFailureDetail) {
-                BugPriority pri = item.getBugPriority();
-                DeviceRgb priColor = rgb(pri.getEmphasis().getHexColor());
-                String priText = pri.getLabel();
-                table.addCell(new Cell()
-                        .setBackgroundColor(rowBg)
-                        .setBorder(new SolidBorder(BORDER_GRAY, 1))
-                        .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
-                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                        .add(para(priText)
-                                .setFont(boldFont).setFontSize(Fonts.Report.BODY.pt()).setFontColor(priColor)
-                                .setTextAlignment(TextAlignment.CENTER)));
-            }
-
-            if (withFailureDetail) {
-                BugSeverity sev = item.getBugSeverity();
-                DeviceRgb sevColor = rgb(sev.getEmphasis().getHexColor());
-                String sevText = sev.getLabel();
-                if (sevText.isEmpty()) sevText = "—";
-                table.addCell(new Cell()
-                        .setBackgroundColor(rowBg)
-                        .setBorder(new SolidBorder(BORDER_GRAY, 1))
-                        .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
-                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                        .add(para(sevText)
-                                .setFont(boldFont).setFontSize(Fonts.Report.BODY.pt()).setFontColor(sevColor)
-                                .setTextAlignment(TextAlignment.CENTER)));
-            }
+            if (section.isWithFailureDetail()) addFailureDetail(table, testCaseCell, item, rowBg, boldFont, regularFont);
 
             idx++;
         }
 
         document.add(table);
+    }
+
+    private void addFailureDetail(final @NotNull Table table, final @NotNull Cell testCaseCell, final @NotNull TestRunItems item, final @NotNull DeviceRgb rowBg, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont) {
+        final @NotNull String actualResult = item.getActualResult();
+        final @NotNull Paragraph actual = para(Bundle.message("report.actual.result", actualResult.isEmpty() ? "—" : actualResult))
+                .setFont(regularFont).setFontSize(Fonts.Report.SMALL.pt()).setFontColor(DARK_GRAY);
+
+        item.bugIssue().ifPresent(url -> actual.add(text(" ("))
+                .add(new Link(BugIssueUrl.shortReference(url), PdfAction.createURI(url)).setFontColor(LINK_BLUE))
+                .add(text(")")));
+        testCaseCell.add(actual);
+
+        final @NotNull BugPriority pri = item.getBugPriority();
+        table.addCell(verdictCell(pri.getLabel(), rgb(pri.getEmphasis().getHexColor()), rowBg, boldFont));
+
+        final @NotNull BugSeverity sev = item.getBugSeverity();
+        table.addCell(verdictCell(sev.getLabel().isEmpty() ? "—" : sev.getLabel(), rgb(sev.getEmphasis().getHexColor()), rowBg, boldFont));
+    }
+
+    private @NotNull Cell verdictCell(final @NotNull String text, final @NotNull DeviceRgb color, final @NotNull DeviceRgb rowBg, final @NotNull PdfFont boldFont) {
+        return new Cell()
+                .setBackgroundColor(rowBg)
+                .setBorder(new SolidBorder(BORDER_GRAY, 1))
+                .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                .add(para(text)
+                        .setFont(boldFont).setFontSize(Fonts.Report.BODY.pt()).setFontColor(color)
+                        .setTextAlignment(TextAlignment.CENTER));
     }
 
     private void addTestCaseTableHeader(final @NotNull Table table, final @NotNull String text, final @NotNull DeviceRgb bgColor, final @NotNull DeviceRgb textColor, final @NotNull PdfFont boldFont) {

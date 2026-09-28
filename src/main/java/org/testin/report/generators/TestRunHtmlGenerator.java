@@ -41,7 +41,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
 
 public final class TestRunHtmlGenerator {
     final String DARK_BLUE = "#1f3864";
@@ -128,10 +127,7 @@ public final class TestRunHtmlGenerator {
             final long count = section.count(summary);
             if (count == 0) continue;
 
-            appendTestCaseTable(html, sectionNumber++, section.getTitle(),
-                    section.description("<b>" + count + "</b>"),
-                    section.name().toLowerCase(Locale.ROOT), section.isWithFailureDetail(),
-                    results, section::matches);
+            appendTestCaseTable(html, sectionNumber++, section, section.description("<b>" + count + "</b>"), results);
         }
 
         html.append("<div class='footer'>")
@@ -147,24 +143,24 @@ public final class TestRunHtmlGenerator {
     }
 
     // Rule-REPORT-019
-    private void appendTestCaseTable(final @NotNull StringBuilder html, final int sectionNumber, final @NotNull String title, final @NotNull String blurb, final @NotNull String section, final boolean withFailureDetail, final @NotNull List<TestRunItems> results, final @NotNull Predicate<TestRunItems> filter) {
-        html.append("<div class='section-title-bar'><div class='section-title'>").append(sectionNumber).append(". ").append(title).append("</div></div>");
+    private void appendTestCaseTable(final @NotNull StringBuilder html, final int sectionNumber, final @NotNull ReportSection section, final @NotNull String blurb, final @NotNull List<TestRunItems> results) {
+        final @NotNull String name = section.name().toLowerCase(Locale.ROOT);
+        html.append("<div class='section-title-bar'><div class='section-title'>").append(sectionNumber).append(". ").append(section.getTitle()).append("</div></div>");
         html.append("<div class='summary-text'>").append(blurb).append("</div>");
         html.append("<table class='detail-table'>")
-                .append("<tr style='background: var(--section-").append(section).append(")")
-                .append("; color: var(--section-").append(section).append("-ink)'>")
+                .append("<tr style='background: var(--section-").append(name).append(")")
+                .append("; color: var(--section-").append(name).append("-ink)'>")
                 .append("<th class='seq'>#</th><th>").append(Bundle.message("caption.test.case")).append("</th>");
 
-        if (withFailureDetail) {
-            html.append("<th class='verdict'>").append(RunEditorAttributes.BUG_PRIORITY.getName()).append("</th>")
-                    .append("<th class='verdict'>").append(RunEditorAttributes.BUG_SEVERITY.getName()).append("</th>");
+        for (final RunEditorAttributes detail : section.getFailureDetailColumns()) {
+            html.append("<th class='verdict'>").append(detail.getName()).append("</th>");
         }
 
         html.append("</tr>");
 
         final @NotNull AtomicInteger seq = new AtomicInteger(1);
         results.stream()
-                .filter(filter)
+                .filter(section::matches)
                 .forEach(item -> {
                     final @NotNull String desc = item.shownTestCase().getDescription();
 
@@ -172,40 +168,40 @@ public final class TestRunHtmlGenerator {
                             .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
                             .append("<td>").append(StringUtil.escapeXmlEntities(desc.isEmpty() ? "—" : desc));
 
-                    if (withFailureDetail) {
-                        final @NotNull String actual = item.getActualResult();
-                        html.append("<div class='actual'>")
-                                .append(Bundle.message("report.actual.result", StringUtil.escapeXmlEntities(actual.isEmpty() ? "—" : actual)));
-
-                        item.bugIssue().ifPresent(url -> html.append(" (<a href='").append(StringUtil.escapeXmlEntities(url)).append("' target='_blank'>")
-                                .append(StringUtil.escapeXmlEntities(BugIssueUrl.shortReference(url)))
-                                .append("</a>)"));
-                        html.append("</div>");
-
-                        final @NotNull String stacktrace = item.getStacktrace();
-                        if (!stacktrace.isBlank()) {
-                            html.append("<div class='stacktrace'>").append(StringUtil.escapeXmlEntities(stacktrace)).append("</div>");
-                        }
-                    }
-
-                    html.append("</td>");
-
-                    if (withFailureDetail) {
-                        final @NotNull BugPriority priority = item.getBugPriority();
-                        final @NotNull BugSeverity severity = item.getBugSeverity();
-                        final @NotNull String severityText = severity.getLabel();
-
-                        html.append("<td class='verdict' style='color: ")
-                                .append(priority.getEmphasis().getCssToken()).append("'>")
-                                .append(StringUtil.escapeXmlEntities(priority.getLabel())).append("</td>")
-                                .append("<td class='verdict' style='color: ")
-                                .append(severity.getEmphasis().getCssToken()).append("'>")
-                                .append(StringUtil.escapeXmlEntities(severityText.isEmpty() ? "—" : severityText)).append("</td>");
-                    }
+                    if (section.isWithFailureDetail()) appendFailureDetail(html, item);
+                    else html.append("</td>");
 
                     html.append("</tr>");
                 });
         html.append("</table>");
+    }
+
+    private void appendFailureDetail(final @NotNull StringBuilder html, final @NotNull TestRunItems item) {
+        final @NotNull String actual = item.getActualResult();
+        html.append("<div class='actual'>")
+                .append(Bundle.message("report.actual.result", StringUtil.escapeXmlEntities(actual.isEmpty() ? "—" : actual)));
+
+        item.bugIssue().ifPresent(url -> html.append(" (<a href='").append(StringUtil.escapeXmlEntities(url)).append("' target='_blank'>")
+                .append(StringUtil.escapeXmlEntities(BugIssueUrl.shortReference(url)))
+                .append("</a>)"));
+        html.append("</div>");
+
+        final @NotNull String stacktrace = item.getStacktrace();
+        if (!stacktrace.isBlank()) {
+            html.append("<div class='stacktrace'>").append(StringUtil.escapeXmlEntities(stacktrace)).append("</div>");
+        }
+
+        final @NotNull BugPriority priority = item.getBugPriority();
+        final @NotNull BugSeverity severity = item.getBugSeverity();
+        final @NotNull String severityText = severity.getLabel();
+
+        html.append("</td>")
+                .append("<td class='verdict' style='color: ")
+                .append(priority.getEmphasis().getCssToken()).append("'>")
+                .append(StringUtil.escapeXmlEntities(priority.getLabel())).append("</td>")
+                .append("<td class='verdict' style='color: ")
+                .append(severity.getEmphasis().getCssToken()).append("'>")
+                .append(StringUtil.escapeXmlEntities(severityText.isEmpty() ? "—" : severityText)).append("</td>");
     }
 
     // UC-REPORT-001, Rule-REPORT-023, Rule-REPORT-024

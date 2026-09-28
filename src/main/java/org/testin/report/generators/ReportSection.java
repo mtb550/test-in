@@ -21,10 +21,12 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunSummary;
 import org.testin.model.TestStatus;
+import org.testin.testrun.RunEditorAttributes;
 import org.testin.util.Bundle;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.ToLongFunction;
 
@@ -34,7 +36,7 @@ enum ReportSection {
             Bundle.message("report.section.failed.description"),
             "F2685A",
             TestRunSummary::failed,
-            true,
+            List.of(RunEditorAttributes.BUG_PRIORITY, RunEditorAttributes.BUG_SEVERITY),
             TestStatus.FAILED),
 
     PASSED(
@@ -42,7 +44,7 @@ enum ReportSection {
             Bundle.message("report.section.passed.description"),
             "4FBF60",
             TestRunSummary::passed,
-            false,
+            List.of(),
             TestStatus.PASSED),
 
     BLOCKED(
@@ -50,7 +52,7 @@ enum ReportSection {
             Bundle.message("report.section.blocked.description"),
             "F5B940",
             TestRunSummary::blocked,
-            false,
+            List.of(),
             TestStatus.BLOCKED),
 
     UNTESTED(
@@ -58,7 +60,7 @@ enum ReportSection {
             Bundle.message("report.section.untested.description"),
             "96A1B0",
             TestRunSummary::untested,
-            false,
+            List.of(),
             TestStatus.PENDING,
             TestStatus.UNTESTED),
 
@@ -67,7 +69,7 @@ enum ReportSection {
             Bundle.message("report.section.removed.description"),
             "96A1B0",
             TestRunSummary::removed,
-            false,
+            List.of(),
             TestStatus.REMOVED);
 
     @Getter
@@ -77,15 +79,15 @@ enum ReportSection {
     private final @NotNull String hexColor;
     private final @NotNull ToLongFunction<TestRunSummary> count;
     @Getter
-    private final boolean withFailureDetail;
+    private final @NotNull List<RunEditorAttributes> failureDetailColumns;
     private final @NotNull Set<TestStatus> statuses;
 
-    ReportSection(final @NotNull String title, final @NotNull String descriptionFmt, final @NotNull String hexColor, final @NotNull ToLongFunction<TestRunSummary> count, final boolean withFailureDetail, final @NotNull TestStatus... statuses) {
+    ReportSection(final @NotNull String title, final @NotNull String descriptionFmt, final @NotNull String hexColor, final @NotNull ToLongFunction<TestRunSummary> count, final @NotNull List<RunEditorAttributes> failureDetailColumns, final @NotNull TestStatus... statuses) {
         this.title = title;
         this.descriptionFmt = descriptionFmt;
         this.hexColor = hexColor;
         this.count = count;
-        this.withFailureDetail = withFailureDetail;
+        this.failureDetailColumns = failureDetailColumns;
         this.statuses = EnumSet.copyOf(Arrays.asList(statuses));
     }
 
@@ -121,6 +123,10 @@ enum ReportSection {
     // UC-REPORT-001, Rule-REPORT-022
     public @NotNull String textHex() {
         return contrast(hexColor, "FFFFFF") >= contrast(hexColor, "14171A") ? "FFFFFF" : "14171A";
+    }
+
+    public boolean isWithFailureDetail() {
+        return !failureDetailColumns.isEmpty();
     }
 
     public boolean matches(final @NotNull TestRunItems item) {

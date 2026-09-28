@@ -69,7 +69,6 @@ import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Predicate;
 
 public final class TestRunWordGenerator {
     final String NO_BORDER = "";
@@ -153,9 +152,7 @@ public final class TestRunWordGenerator {
                     final long count = section.count(summary);
                     if (count == 0) continue;
 
-                    buildTestCaseTable(doc, String.valueOf(sectionNumber++), section.getTitle(),
-                            section.description(String.valueOf(count)), tr, section.getHexColor(), section.textHex(),
-                            section.isWithFailureDetail(), section::matches);
+                    buildTestCaseTable(doc, String.valueOf(sectionNumber++), section, section.description(String.valueOf(count)), tr);
                 }
 
                 addFooter(doc, Display.formatDate(ZonedDateTime.now()));
@@ -255,27 +252,29 @@ public final class TestRunWordGenerator {
         hrun.setColor(headingColor);
     }
 
-    private void buildTestCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber, final @NotNull String sectionTitle, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull String headerBg, final @NotNull String headerFg, final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
-        addHeading(doc, sectionNumber + ". " + sectionTitle, 20, 12);
+    private void buildTestCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber, final @NotNull ReportSection section, final @NotNull String description, final @NotNull TestRunDto tr) {
+        addHeading(doc, sectionNumber + ". " + section.getTitle(), 20, 12);
         addText(doc, description, Fonts.Report.LEAD.ptRounded(), false, BLACK, NO_BORDER, 12);
 
-        int cols = withFailureDetail ? 4 : 2;
-        XWPFTable table = doc.createTable(1, cols);
+        final @NotNull List<RunEditorAttributes> failureDetail = section.getFailureDetailColumns();
+        XWPFTable table = doc.createTable(1, 2 + failureDetail.size());
         table.setWidth("100%");
         table.setWidthType(TableWidthType.PCT);
 
+        final @NotNull String headerBg = section.getHexColor();
+        final @NotNull String headerFg = section.textHex();
         XWPFTableRow headerRow = table.getRow(0);
         addTestCaseHeader(headerRow, 0, "#", headerBg, headerFg);
         addTestCaseHeader(headerRow, 1, Bundle.message("caption.test.case"), headerBg, headerFg);
-        if (withFailureDetail)
-            addTestCaseHeader(headerRow, 2, RunEditorAttributes.BUG_PRIORITY.getName(), headerBg, headerFg);
-        if (withFailureDetail)
-            addTestCaseHeader(headerRow, 3, RunEditorAttributes.BUG_SEVERITY.getName(), headerBg, headerFg);
+        int column = 2;
+        for (final RunEditorAttributes detail : failureDetail) {
+            addTestCaseHeader(headerRow, column++, detail.getName(), headerBg, headerFg);
+        }
 
         int idx = 1;
         boolean alt = true;
         for (TestRunItems item : tr.getResults()) {
-            if (!filter.test(item)) continue;
+            if (!section.matches(item)) continue;
 
             String rowBg = alt ? LIGHT_BG : WHITE;
             alt = !alt;
@@ -294,46 +293,39 @@ public final class TestRunWordGenerator {
             final @NotNull String tcName = testCaseName.isEmpty() ? "—" : testCaseName;
             setCellText(tcCell, tcName, Fonts.Report.BODY.ptRounded(), false, BLACK);
 
-            if (withFailureDetail) {
-                String actualResult = item.getActualResult();
-                if (actualResult.isEmpty()) actualResult = "—";
-                final @NotNull XWPFParagraph ap = tcCell.addParagraph();
-                styledRun(ap.createRun(), Bundle.message("report.actual.result", actualResult), Fonts.Report.SMALL, DARK_GRAY);
-
-                item.bugIssue().ifPresent(url -> {
-                    styledRun(ap.createRun(), " (", Fonts.Report.SMALL, DARK_GRAY);
-                    final @NotNull XWPFHyperlinkRun issue = ap.createHyperlinkRun(url);
-                    styledRun(issue, BugIssueUrl.shortReference(url), Fonts.Report.SMALL, LINK_BLUE);
-                    issue.setUnderline(UnderlinePatterns.SINGLE);
-                    styledRun(ap.createRun(), ")", Fonts.Report.SMALL, DARK_GRAY);
-                });
-            }
-
-            if (withFailureDetail) {
-                XWPFTableCell priCell = row.getCell(2);
-                shadeCell(priCell, rowBg);
-                setCellPadding(priCell, 4, 6, 4, 6);
-                BugPriority pri = item.getBugPriority();
-                String priColor = pri.getEmphasis().getHexColor();
-                setCellText(priCell, pri.getLabel(), Fonts.Report.BODY.ptRounded(), true, priColor);
-            }
-
-            if (withFailureDetail) {
-                XWPFTableCell sevCell = row.getCell(3);
-                shadeCell(sevCell, rowBg);
-                setCellPadding(sevCell, 4, 6, 4, 6);
-                BugSeverity sev = item.getBugSeverity();
-                String sevColor = sev.getEmphasis().getHexColor();
-                String sevText = sev.getLabel();
-                if (sevText.isEmpty()) sevText = "—";
-                setCellText(sevCell, sevText, Fonts.Report.BODY.ptRounded(), true, sevColor);
-            }
+            if (section.isWithFailureDetail()) addFailureDetail(row, item, rowBg);
 
             idx++;
         }
 
         setTableBorders(table);
         autoFitToContent(table);
+    }
+
+    private void addFailureDetail(final @NotNull XWPFTableRow row, final @NotNull TestRunItems item, final @NotNull String rowBg) {
+        final @NotNull String actualResult = item.getActualResult();
+        final @NotNull XWPFParagraph ap = row.getCell(1).addParagraph();
+        styledRun(ap.createRun(), Bundle.message("report.actual.result", actualResult.isEmpty() ? "—" : actualResult), Fonts.Report.SMALL, DARK_GRAY);
+
+        item.bugIssue().ifPresent(url -> {
+            styledRun(ap.createRun(), " (", Fonts.Report.SMALL, DARK_GRAY);
+            final @NotNull XWPFHyperlinkRun issue = ap.createHyperlinkRun(url);
+            styledRun(issue, BugIssueUrl.shortReference(url), Fonts.Report.SMALL, LINK_BLUE);
+            issue.setUnderline(UnderlinePatterns.SINGLE);
+            styledRun(ap.createRun(), ")", Fonts.Report.SMALL, DARK_GRAY);
+        });
+
+        final @NotNull XWPFTableCell priCell = row.getCell(2);
+        shadeCell(priCell, rowBg);
+        setCellPadding(priCell, 4, 6, 4, 6);
+        final @NotNull BugPriority pri = item.getBugPriority();
+        setCellText(priCell, pri.getLabel(), Fonts.Report.BODY.ptRounded(), true, pri.getEmphasis().getHexColor());
+
+        final @NotNull XWPFTableCell sevCell = row.getCell(3);
+        shadeCell(sevCell, rowBg);
+        setCellPadding(sevCell, 4, 6, 4, 6);
+        final @NotNull BugSeverity sev = item.getBugSeverity();
+        setCellText(sevCell, sev.getLabel().isEmpty() ? "—" : sev.getLabel(), Fonts.Report.BODY.ptRounded(), true, sev.getEmphasis().getHexColor());
     }
 
     private void autoFitToContent(final @NotNull XWPFTable table) {
