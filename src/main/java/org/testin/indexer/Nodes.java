@@ -1,0 +1,218 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.indexer;
+
+import com.intellij.openapi.components.Service;
+import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
+import org.testin.model.DirectoryType;
+import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.model.markers.AbstractMarker;
+import org.testin.services.Services;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
+
+@Service(Service.Level.PROJECT)
+@AllArgsConstructor
+public final class Nodes {
+    private final @NotNull Project p;
+
+    private static boolean sameFile(final @NotNull Path one, final @NotNull Path other) {
+        try {
+            return Files.isSameFile(one, other);
+        } catch (final IOException ex) {
+            Logger.warn("Could not compare " + one + " with " + other + ": " + ex.getMessage());
+            return false;
+        }
+    }
+
+    private @NotNull ProjectIndexer indexer() {
+        return Services.getInstance(p, ProjectIndexer.class);
+    }
+
+    private @NotNull IndexerDataStore store() {
+        return indexer().getStore();
+    }
+
+    public @NotNull TestSetDirectoryDto getTestSetByPath(final @NotNull Path path) {
+        return store().getTestSetDirByPath(path);
+    }
+
+    public @NotNull Map<String, TestProjectDirectoryDto> getTestProjectsByPath() {
+        return store().getTestProjectsByPath();
+    }
+
+    // UC-TREE-PANEL-002, UC-TREE-PANEL-003, UC-TREE-PANEL-011, Rule-TREE-PANEL-004
+    public boolean isTaken(final @NotNull Path wanted, final @NotNull Optional<Path> renaming) {
+        if (!Files.exists(wanted)) return false;
+
+        return renaming.map(self -> !sameFile(self, wanted)).orElse(true);
+    }
+
+    public @NotNull List<DirectoryDto> getChildren(final @NotNull Path parentPath) {
+        return store().getChildren(parentPath);
+    }
+
+    public @NotNull List<DirectoryDto> getAllNodes() {
+        return List.copyOf(store().allDirectories());
+    }
+
+    // UC-INTERNAL-005
+    public void removeTestProject(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
+        removeVf(path, IndexerDataStore::removeTestProject, onRemoved);
+    }
+
+    public void removeTestSet(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
+        removeVf(path, IndexerDataStore::removeTestSet, onRemoved);
+    }
+
+    public void removeTestRun(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
+        removeVf(path, IndexerDataStore::removeTestRun, onRemoved);
+    }
+
+    public void removeTestSetPackage(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
+        removeVf(path, IndexerDataStore::removeTestSetPackage, onRemoved);
+    }
+
+    public void removeTestRunPackage(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
+        removeVf(path, IndexerDataStore::removeTestRunPackage, onRemoved);
+    }
+
+    // UC-TREE-PANEL-012, Rule-TREE-PANEL-042
+    public void refuseRemove(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
+        Logger.info("Not removed: " + path.getFileName() + " is not removable from the tree");
+        onRemoved.accept(false);
+    }
+
+    private void removeVf(final @NotNull Path path, final @NotNull BiConsumer<IndexerDataStore, Path> cacheUpdate, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
+        final @NotNull ProjectIndexer indexer = indexer();
+        indexer.getNodeFiles().remove(path, () -> cacheUpdate.accept(indexer.getStore(), path), removed -> {
+            onRemoved.accept(removed);
+            if (removed) indexer.announce(path);
+        });
+    }
+
+    public void moveNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Consumer<@NotNull Boolean> onFinished) {
+        final @NotNull ProjectIndexer indexer = indexer();
+        indexer.getNodeFiles().move(oldPath, newPath, moved -> {
+            onFinished.accept(moved);
+            if (!moved) return;
+
+            indexer.announce(oldPath);
+            indexer.announce(newPath);
+        });
+    }
+
+    public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final @NotNull IntConsumer onComplete) {
+        final @NotNull ProjectIndexer indexer = indexer();
+        indexer.getNodeFiles().copy(sourcePaths, targetPath, copied -> {
+            onComplete.accept(copied);
+            if (copied > 0) indexer.announceChildrenOf(targetPath);
+        });
+    }
+
+    // UC-INTERNAL-005, Rule-INTERNAL-037, Rule-INTERNAL-041
+    public @NotNull Optional<Path> keepAside(final @NotNull Path node) {
+        return Services.getInstance(DeletedNodes.class).keep(node);
+    }
+
+    // UC-INTERNAL-005, Rule-INTERNAL-042
+    public @NotNull List<Path> restoreNodes(final @NotNull Map<Path, Path> originalByKept) {
+        final @NotNull List<Path> back = new ArrayList<>();
+        final @NotNull List<Path> lost = new ArrayList<>();
+        for (final Map.Entry<Path, Path> one : originalByKept.entrySet()) {
+            if (Services.getInstance(DeletedNodes.class).putBack(p, one.getKey(), one.getValue())) back.add(one.getValue());
+            else lost.add(one.getValue());
+        }
+
+        final @NotNull ProjectIndexer indexer = indexer();
+        back.forEach(this::refreshDirectory);
+        back.stream().flatMap(original -> indexer.testProjectHolding(original).stream()).distinct().forEach(indexer.getScanCoordinator()::rescanExclusively);
+        back.forEach(indexer::announce);
+        return lost;
+    }
+
+    // UC-INTERNAL-005, Rule-INTERNAL-043
+    public void forgetKept(final @NotNull Path kept) {
+        Services.getInstance(DeletedNodes.class).forget(kept);
+    }
+
+    // UC-TREE-PANEL-002
+    public boolean addTestProject(final @NotNull TestProjectDirectoryDto tp) {
+        return indexer().announcedIf(store().addTestProject(tp), tp.getPath());
+    }
+
+    public boolean addTestSet(final @NotNull TestSetDirectoryDto ts) {
+        return indexer().announcedIf(store().addTestSet(ts), ts.getPath());
+    }
+
+    public boolean addTestSetPackage(final @NotNull TestSetPackageDirectoryDto tsp) {
+        return indexer().announcedIf(store().addTestSetPackage(tsp), tsp.getPath());
+    }
+
+    public boolean addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
+        return indexer().announcedIf(store().addTestRunDir(trd), trd.getPath());
+    }
+
+    public boolean addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
+        return indexer().announcedIf(store().addTestRunPackage(trp), trp.getPath());
+    }
+
+    public boolean persistMarker(final @NotNull DirectoryDto dto) {
+        return indexer().announcedIf(store().persistMarker(dto), dto.getPath());
+    }
+
+    public <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name, final @NotNull Class<M> markerClass) {
+        return store().readMarker(dirPath, kind, name, markerClass);
+    }
+
+    public @NotNull Optional<DirectoryDto> find(final @NotNull Path path) {
+        return store().findByPath(path);
+    }
+
+    public boolean nodeExists(final @NotNull Path path) {
+        return store().findByPath(path).isPresent();
+    }
+
+    public void refreshDirectory(final @NotNull Path path) {
+        store().refreshDir(path);
+    }
+
+    public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
+        final @NotNull ProjectIndexer indexer = indexer();
+        indexer.getNodeFiles().rename(oldPath, newPath, () -> {
+            onFinished.run();
+            indexer.announce(newPath);
+        });
+    }
+}

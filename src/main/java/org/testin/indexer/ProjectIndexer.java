@@ -23,6 +23,8 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.LastOpenEditors;
 import org.testin.logger.Logger;
@@ -72,12 +74,16 @@ import java.util.stream.Stream;
 @Service(Service.Level.PROJECT)
 public final class ProjectIndexer {
     private final @NotNull Project p;
+    @Getter(AccessLevel.PACKAGE)
     private final @NotNull IndexerDataStore store;
+    @Getter(AccessLevel.PACKAGE)
     private final @NotNull ProjectScanCoordinator scanCoordinator;
     private final @NotNull AtomicBoolean indexed = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean indexing = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean restoreEditorsOnComplete = new AtomicBoolean(true);
+    @Getter(AccessLevel.PACKAGE)
     private final @NotNull RunWriter runWriter;
+    @Getter(AccessLevel.PACKAGE)
     private final @NotNull NodeFiles nodeFiles;
     private volatile @NotNull CountDownLatch indexingLatch = new CountDownLatch(1);
 
@@ -247,7 +253,7 @@ public final class ProjectIndexer {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-114
-    private void announce(final @NotNull Path changed) {
+    void announce(final @NotNull Path changed) {
         if (p.isDisposed()) return;
 
         final @NotNull IndexChanged listeners = p.getMessageBus().syncPublisher(IndexChanged.TOPIC);
@@ -256,7 +262,7 @@ public final class ProjectIndexer {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-114
-    private void announceChildrenOf(final @NotNull Path folder) {
+    void announceChildrenOf(final @NotNull Path folder) {
         if (!p.isDisposed()) p.getMessageBus().syncPublisher(IndexChanged.TOPIC).nodesChanged(Set.of(folder));
     }
 
@@ -581,7 +587,7 @@ public final class ProjectIndexer {
         testProjectHolding(changedPath).ifPresent(scanCoordinator::rescanExclusively);
     }
 
-    private @NotNull Optional<Path> testProjectHolding(final @NotNull Path path) {
+    @NotNull Optional<Path> testProjectHolding(final @NotNull Path path) {
         return store.getTestProjectsByPath().keySet().stream()
                 .map(Path::of)
                 .filter(path::startsWith)
@@ -654,7 +660,7 @@ public final class ProjectIndexer {
         return announcedIf(store.persistMarker(dto), dto.getPath());
     }
 
-    private boolean announcedIf(final boolean changed, final @NotNull Path path) {
+    boolean announcedIf(final boolean changed, final @NotNull Path path) {
         if (changed) announce(path);
         return changed;
     }
