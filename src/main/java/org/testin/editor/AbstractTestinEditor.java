@@ -100,6 +100,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     @Getter
     protected final @NotNull StatusBar statusBar = new StatusBar();
     protected @NotNull Optional<GridView> grid = Optional.empty();
+    private final @NotNull List<TestCaseDto> rowsOnGrid = new ArrayList<>();
     @Getter
     @Setter
     protected int currentPage = 1;
@@ -291,7 +292,9 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         });
     }
 
-    protected abstract @NotNull JBTable buildTable(final @NotNull List<TestCaseDto> pageItems, final @NotNull Set<A> attributes);
+    protected abstract @NotNull List<String[]> gridRows(final @NotNull List<TestCaseDto> pageItems);
+
+    protected abstract @NotNull JBTable buildTable(final @NotNull List<String[]> rows, final @NotNull Set<A> attributes);
 
     protected abstract void installEditListener(final @NotNull JBTable table, final @NotNull List<TestCaseDto> pageItems);
 
@@ -299,12 +302,12 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     protected void rebuildGrid() {
         final boolean keepKeyboard = grid.map(GridView::handOver).orElse(false);
 
-        final @NotNull List<TestCaseDto> pageItems = getCurrentPageItems();
+        final @NotNull List<TestCaseDto> pageItems = showOnGrid(getCurrentPageItems());
         final @NotNull Set<A> attributes = getSelectedDetails();
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
         final @NotNull Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin." + getClass().getSimpleName() + ".gridFontSync");
         try {
-            final @NotNull JBTable table = buildTable(pageItems, attributes);
+            final @NotNull JBTable table = buildTable(gridRows(pageItems), attributes);
             FontSync.syncWithNativeEditor(p, table, fontSync, _ -> GridPanelBuilder.resizeToFont(table));
 
             table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, list, pageItems));
@@ -333,6 +336,29 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
             center.set(scrollPane);
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("editor.grid.not.drawn", FailureText.of(ex)));
         }
+    }
+
+    // UC-EDITOR-PANEL-020, UC-EDITOR-PANEL-022
+    private void redrawGrid() {
+        grid.ifPresentOrElse(this::refillGrid, this::rebuildGrid);
+    }
+
+    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-249
+    private void refillGrid(final @NotNull GridView view) {
+        final boolean keepKeyboard = view.handOver();
+        final int column = view.table().getSelectedColumn();
+
+        final @NotNull List<TestCaseDto> pageItems = showOnGrid(getCurrentPageItems());
+        GridPanelBuilder.replaceRows(view.table(), gridRows(pageItems));
+        GridPanelBuilder.restoreSelection(view.table(), list, pageItems, column);
+
+        if (keepKeyboard) ApplicationManager.getApplication().invokeLater(view.table()::requestFocusInWindow);
+    }
+
+    private @NotNull List<TestCaseDto> showOnGrid(final @NotNull List<TestCaseDto> pageItems) {
+        rowsOnGrid.clear();
+        rowsOnGrid.addAll(pageItems);
+        return rowsOnGrid;
     }
 
     protected void loadDataAsync() {
@@ -499,8 +525,8 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         afterSelectionShown();
 
         if (getToolBar().getCurrentView() == ViewMode.GRID_VIEW) {
-            Logger.debug("[refreshView] grid active -> rebuilding grid");
-            rebuildGrid();
+            Logger.debug("[refreshView] grid active -> redrawing grid");
+            redrawGrid();
             grid.ifPresent(view -> center.set(view.scrollPane()));
         }
 

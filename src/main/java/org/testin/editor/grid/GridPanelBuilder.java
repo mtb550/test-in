@@ -295,19 +295,25 @@ public class GridPanelBuilder {
         return viewColumn >= 0 && isOrderColumn(table.convertColumnIndexToModel(viewColumn));
     }
 
-    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020
-    public @NotNull JBTable buildRunTable(final @NotNull List<TestCaseDto> testCases, final @NotNull Set<RunEditorAttributes> attributes, final @NotNull Map<UUID, TestRunItems> resultsMap, final @NotNull ToIntFunction<TestCaseDto> position) {
-        Logger.debug("[GridPanelBuilder] buildRunTable: testCases=" + testCases.size() + ", attributes=" + attributes);
-        final @NotNull List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
+    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-027
+    public static void replaceRows(final @NotNull JBTable table, final @NotNull List<String[]> rows) {
+        final @NotNull DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
+        rows.forEach(model::addRow);
+        autoSizeColumns(table);
+        updateRowHeights(table);
+    }
 
-        final String @NotNull [] columns = buildColumns(ordered);
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020
+    public @NotNull List<String[]> runRows(final @NotNull List<TestCaseDto> testCases, final @NotNull Map<UUID, TestRunItems> resultsMap, final @NotNull ToIntFunction<TestCaseDto> position) {
+        final @NotNull List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
         final @NotNull List<String[]> rows = new ArrayList<>();
 
         for (final TestCaseDto tc : testCases) {
             final @NotNull TestRunItems runItem = Optional.ofNullable(resultsMap.get(tc.getId()))
                     .orElseGet(() -> TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc)));
 
-            final String @NotNull [] row = new String[columns.length];
+            final String @NotNull [] row = new String[ordered.size()];
             final int rowNumber = position.applyAsInt(tc);
 
             for (int c = 0; c < ordered.size(); c++) {
@@ -320,22 +326,26 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        final @NotNull JBTable table = buildTable(columns, rows,
-                column -> ordered.get(column).isEdited(), EditorKind.RUN);
+        return rows;
+    }
+
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020
+    public @NotNull JBTable buildRunTable(final @NotNull List<String[]> rows, final @NotNull Set<RunEditorAttributes> attributes) {
+        Logger.debug("[GridPanelBuilder] buildRunTable: rows=" + rows.size() + ", attributes=" + attributes);
+        final @NotNull List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
+
+        final @NotNull JBTable table = buildTable(buildColumns(ordered), rows, column -> ordered.get(column).isEdited(), EditorKind.RUN);
         applyColumnVisibility(table, RunEditorAttributes.class, attributes);
         return table;
     }
 
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-020
-    public @NotNull JBTable buildTestTable(final @NotNull List<TestCaseDto> testCases, final @NotNull Set<TestEditorAttributes> attributes, final @NotNull ToIntFunction<TestCaseDto> position) {
-        Logger.debug("[GridPanelBuilder] buildTestTable: testCases=" + testCases.size() + ", attributes=" + attributes);
+    public @NotNull List<String[]> testRows(final @NotNull List<TestCaseDto> testCases, final @NotNull ToIntFunction<TestCaseDto> position) {
         final @NotNull List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values()).toList();
-
-        final String @NotNull [] columns = buildColumns(ordered);
         final @NotNull List<String[]> rows = new ArrayList<>();
 
         for (final TestCaseDto tc : testCases) {
-            final String @NotNull [] row = new String[columns.length];
+            final String @NotNull [] row = new String[ordered.size()];
             final int rowNumber = position.applyAsInt(tc);
 
             for (int c = 0; c < ordered.size(); c++) {
@@ -348,7 +358,15 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        final @NotNull JBTable table = buildTable(columns, rows, column -> ordered.get(column).can(Can.EDIT), EditorKind.TEST);
+        return rows;
+    }
+
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-020
+    public @NotNull JBTable buildTestTable(final @NotNull List<String[]> rows, final @NotNull Set<TestEditorAttributes> attributes) {
+        Logger.debug("[GridPanelBuilder] buildTestTable: rows=" + rows.size() + ", attributes=" + attributes);
+        final @NotNull List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values()).toList();
+
+        final @NotNull JBTable table = buildTable(buildColumns(ordered), rows, column -> ordered.get(column).can(Can.EDIT), EditorKind.TEST);
         applyColumnVisibility(table, TestEditorAttributes.class, attributes);
         return table;
     }

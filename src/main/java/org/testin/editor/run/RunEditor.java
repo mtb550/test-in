@@ -337,8 +337,14 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
     @Override
-    protected @NotNull JBTable buildTable(final @NotNull List<TestCaseDto> pageItems, final @NotNull Set<RunEditorAttributes> attributes) {
-        return gridPanelBuilder.buildRunTable(pageItems, attributes, resultsMap, this::positionOf);
+    protected @NotNull List<String[]> gridRows(final @NotNull List<TestCaseDto> pageItems) {
+        return gridPanelBuilder.runRows(pageItems, resultsMap, this::positionOf);
+    }
+
+    // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
+    @Override
+    protected @NotNull JBTable buildTable(final @NotNull List<String[]> rows, final @NotNull Set<RunEditorAttributes> attributes) {
+        return gridPanelBuilder.buildRunTable(rows, attributes);
     }
 
     @Override

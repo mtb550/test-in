@@ -347,8 +347,14 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
 
     // UC-EDITOR-PANEL-020
     @Override
-    protected @NotNull JBTable buildTable(final @NotNull List<TestCaseDto> pageItems, final @NotNull Set<TestEditorAttributes> attributes) {
-        return gridPanelBuilder.buildTestTable(pageItems, attributes, this::positionOf);
+    protected @NotNull List<String[]> gridRows(final @NotNull List<TestCaseDto> pageItems) {
+        return gridPanelBuilder.testRows(pageItems, this::positionOf);
+    }
+
+    // UC-EDITOR-PANEL-020
+    @Override
+    protected @NotNull JBTable buildTable(final @NotNull List<String[]> rows, final @NotNull Set<TestEditorAttributes> attributes) {
+        return gridPanelBuilder.buildTestTable(rows, attributes);
     }
 
     @Override
