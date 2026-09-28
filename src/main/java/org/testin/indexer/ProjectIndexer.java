@@ -630,6 +630,7 @@ public final class ProjectIndexer {
     // UC-INTERNAL-003, Rule-INTERNAL-021
     public void scanSingleProject(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         Logger.info("Scanning single project: " + projectPath.getFileName());
+        Services.getInstance(Rescan.class).coveredByAScan(projectPath);
         try {
             scanCoordinator.scan(projectPath, indicator);
         } catch (final Exception ex) {

@@ -60,6 +60,11 @@ public final class Rescan {
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-022
+    void coveredByAScan(final @NotNull Path testProject) {
+        waiting.remove(testProject);
+    }
+
+    // UC-INTERNAL-003, Rule-INTERNAL-022
     private void run() {
         final @NotNull List<Path> testProjects = List.copyOf(waiting);
         testProjects.forEach(waiting::remove);
