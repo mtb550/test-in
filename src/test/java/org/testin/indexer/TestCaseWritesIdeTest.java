@@ -91,15 +91,23 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
+    private TestCases testCases() {
+        return Services.getInstance(getProject(), TestCases.class);
+    }
+
+    private Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
+    }
+
     private TestSetDirectoryDto oneTestSet() {
         return WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 
             final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
-            indexer().addTestProject(tp);
+            nodes().addTestProject(tp);
 
             final TestSetDirectoryDto ts = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
-            indexer().addTestSet(ts);
+            nodes().addTestSet(ts);
             return ts;
         });
     }
@@ -109,12 +117,12 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 
             final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
-            indexer().addTestProject(tp);
+            nodes().addTestProject(tp);
 
             final TestSetDirectoryDto login = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
             final TestSetDirectoryDto signUp = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Sign up"), tp.getTestCasesDirectory());
-            indexer().addTestSet(login);
-            indexer().addTestSet(signUp);
+            nodes().addTestSet(login);
+            nodes().addTestSet(signUp);
             return List.of(login, signUp);
         });
     }
@@ -138,7 +146,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         final TestSetDirectoryDto ts = oneTestSet();
         final TestCaseDto pasted = testCase(ts, "m");
 
-        indexer().updateSequence(ts.getPath(), List.of(pasted), List.of());
+        testCases().updateSequence(ts.getPath(), List.of(pasted), List.of());
 
         assertTrue("a pasted case whose rank did not move never reached disk",
                 Files.isRegularFile(fileOf(ts, pasted)));
@@ -149,10 +157,10 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         final TestCaseDto moved = testCase(ts, "m").setCreatedBy("Sara Al-Otaibi");
         final var createdAt = moved.getCreatedAt();
 
-        indexer().putTestCaseVerbatim(ts.getPath(), moved);
-        indexer().updateSequence(ts.getPath(), List.of(moved), List.of());
+        testCases().putTestCaseVerbatim(ts.getPath(), moved);
+        testCases().updateSequence(ts.getPath(), List.of(moved), List.of());
 
-        final TestCaseDto indexed = indexer().findTestCase(moved.getId()).orElseThrow();
+        final TestCaseDto indexed = testCases().findTestCase(moved.getId()).orElseThrow();
         assertEquals("a moved case took the paster's name as its creator", "Sara Al-Otaibi", indexed.getCreatedBy());
         assertEquals("a moved case took a new creation date", createdAt, indexed.getCreatedAt());
     }
@@ -162,9 +170,9 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         final TestCaseDto created = testCase(ts, "");
         final List<TestCaseDto> arranged = List.of(created);
 
-        indexer().updateSequence(ts.getPath(), arranged, TestCaseOrder.place(arranged));
+        testCases().updateSequence(ts.getPath(), arranged, TestCaseOrder.place(arranged));
 
-        final TestCaseDto indexed = indexer().findTestCase(created.getId()).orElseThrow();
+        final TestCaseDto indexed = testCases().findTestCase(created.getId()).orElseThrow();
         assertFalse("the order write gave the new case no rank", indexed.getOrder().isEmpty());
         assertEquals("the order write did not stamp the new case as created",
                 Services.getInstance(getProject(), AppSettingsState.class).testerName, indexed.getCreatedBy());
@@ -182,18 +190,18 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         final TestSetDirectoryDto login = sets.get(0);
         final TestSetDirectoryDto signUp = sets.get(1);
         final TestCaseDto cut = testCase(login, "m").setCreatedBy("Sara Al-Otaibi");
-        indexer().putTestCaseVerbatim(login.getPath(), cut);
+        testCases().putTestCaseVerbatim(login.getPath(), cut);
 
-        assertTrue("the move said it failed", indexer().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
+        assertTrue("the move said it failed", testCases().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
 
         assertTrue("the moved case was not written into its new set", Files.isRegularFile(fileOf(signUp, cut)));
         assertFalse("the moved case's old file was left behind", Files.exists(fileOf(login, cut)));
 
-        final TestCaseDto indexed = indexer().findTestCase(cut.getId()).orElseThrow();
+        final TestCaseDto indexed = testCases().findTestCase(cut.getId()).orElseThrow();
         assertEquals("the index still files the case under its old set", signUp.getPath(), indexed.getParent().getPath());
         assertEquals("the move took a new creator", "Sara Al-Otaibi", indexed.getCreatedBy());
         assertTrue("the old set still lists the case",
-                indexer().getTestCasesForTestSet(login.getPath()).stream().noneMatch(tc -> tc.getId().equals(cut.getId())));
+                testCases().getTestCasesForTestSet(login.getPath()).stream().noneMatch(tc -> tc.getId().equals(cut.getId())));
     }
 
     public void testAMoveWhoseWriteIsRefusedLeavesTheTestCaseWhereItWas() {
@@ -201,7 +209,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         final TestSetDirectoryDto login = sets.get(0);
         final TestSetDirectoryDto signUp = sets.get(1);
         final TestCaseDto cut = testCase(login, "m");
-        indexer().putTestCaseVerbatim(login.getPath(), cut);
+        testCases().putTestCaseVerbatim(login.getPath(), cut);
 
         try {
             Files.createDirectories(fileOf(signUp, cut));
@@ -209,25 +217,25 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
             throw new AssertionError("could not set up the refused write", ex);
         }
 
-        assertFalse("a refused write was reported as a move", indexer().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
+        assertFalse("a refused write was reported as a move", testCases().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
 
         assertTrue("a refused move took the case's file out of its set", Files.isRegularFile(fileOf(login, cut)));
         assertEquals("a refused move took the case out of its set in the index",
-                login.getPath(), indexer().findTestCase(cut.getId()).orElseThrow().getParent().getPath());
+                login.getPath(), testCases().findTestCase(cut.getId()).orElseThrow().getParent().getPath());
     }
 
     public void testARemovalWhoseDeleteIsRefusedKeepsTheTestCase() {
         final TestSetDirectoryDto ts = oneTestSet();
         final TestCaseDto tc = testCase(ts, "m");
-        indexer().putTestCaseVerbatim(ts.getPath(), tc);
+        testCases().putTestCaseVerbatim(ts.getPath(), tc);
 
         undeletable(fileOf(ts, tc));
 
-        assertFalse("a refused delete was reported as a removal", indexer().removeTestCase(ts.getPath(), tc.getId()));
+        assertFalse("a refused delete was reported as a removal", testCases().removeTestCase(ts.getPath(), tc.getId()));
 
-        assertTrue("a refused delete took the case out of the index", indexer().findTestCase(tc.getId()).isPresent());
+        assertTrue("a refused delete took the case out of the index", testCases().findTestCase(tc.getId()).isPresent());
         assertTrue("a refused delete took the case out of its set",
-                indexer().getTestCasesForTestSet(ts.getPath()).stream().anyMatch(each -> each.getId().equals(tc.getId())));
+                testCases().getTestCasesForTestSet(ts.getPath()).stream().anyMatch(each -> each.getId().equals(tc.getId())));
     }
 
     public void testAMoveWhoseOldFileWillNotGoLeavesTheTestCaseWhereItWas() {
@@ -235,24 +243,24 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         final TestSetDirectoryDto login = sets.get(0);
         final TestSetDirectoryDto signUp = sets.get(1);
         final TestCaseDto cut = testCase(login, "m");
-        indexer().putTestCaseVerbatim(login.getPath(), cut);
+        testCases().putTestCaseVerbatim(login.getPath(), cut);
 
         undeletable(fileOf(login, cut));
 
-        assertFalse("a move whose old file stayed was reported as a move", indexer().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
+        assertFalse("a move whose old file stayed was reported as a move", testCases().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
 
         assertFalse("the new file was left behind beside the old one", Files.exists(fileOf(signUp, cut)));
         assertEquals("the index files the case under the set it could not leave",
-                login.getPath(), indexer().findTestCase(cut.getId()).orElseThrow().getParent().getPath());
+                login.getPath(), testCases().findTestCase(cut.getId()).orElseThrow().getParent().getPath());
         assertTrue("the new set lists a case that did not arrive",
-                indexer().getTestCasesForTestSet(signUp.getPath()).stream().noneMatch(each -> each.getId().equals(cut.getId())));
+                testCases().getTestCasesForTestSet(signUp.getPath()).stream().noneMatch(each -> each.getId().equals(cut.getId())));
     }
 
     public void testSavingAHandNamedTestCaseFilesItUnderItsId() {
         final Path set = setWithAHandNamedTestCase();
-        final TestCaseDto tc = indexer().getTestCasesForTestSet(set).getFirst();
+        final TestCaseDto tc = testCases().getTestCasesForTestSet(set).getFirst();
 
-        assertTrue("the save said it failed", indexer().putTestCaseVerbatim(set, tc));
+        assertTrue("the save said it failed", testCases().putTestCaseVerbatim(set, tc));
 
         assertTrue("the case was not filed under its id", Files.isRegularFile(set.resolve(tc.getId() + ".tc")));
         assertFalse("the hand-named file was left beside it", Files.exists(set.resolve(HAND_NAMED)));
@@ -260,10 +268,10 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
 
     public void testASaveWhoseHandNamedFileWillNotGoIsTakenBack() {
         final Path set = setWithAHandNamedTestCase();
-        final TestCaseDto tc = indexer().getTestCasesForTestSet(set).getFirst();
+        final TestCaseDto tc = testCases().getTestCasesForTestSet(set).getFirst();
         undeletable(set.resolve(HAND_NAMED));
 
-        assertFalse("a save that left the case in two files was reported as saved", indexer().putTestCaseVerbatim(set, tc));
+        assertFalse("a save that left the case in two files was reported as saved", testCases().putTestCaseVerbatim(set, tc));
 
         assertFalse("the file filed under the id was left beside the hand-named one", Files.exists(set.resolve(tc.getId() + ".tc")));
         assertTrue("the hand-named file went although its delete was refused", Files.exists(set.resolve(HAND_NAMED)));

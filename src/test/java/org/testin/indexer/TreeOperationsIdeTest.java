@@ -52,12 +52,16 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
+    private Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
+    }
+
     private TestProjectDirectoryDto create(final Path path) {
         return WriteAction.computeAndWait(() -> {
             final TestProjectDirectoryDto tp =
                     Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(getProject(), path);
 
-            indexer().addTestProject(tp);
+            nodes().addTestProject(tp);
             return tp;
         });
     }
@@ -69,20 +73,20 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
 
         WriteAction.runAndWait(() -> {
             tp.getMarker().setStatus(ProjectStatus.INACTIVE);
-            indexer().persistMarker(tp);
+            nodes().persistMarker(tp);
         });
 
         indexer().scanSingleProject(testProject);
 
         assertTrue("an inactive project is still a node, so the tree can say what it is",
-                indexer().nodeExists(testProject));
+                nodes().nodeExists(testProject));
 
         assertTrue("nothing under an inactive project is read - it is not being worked on",
-                indexer().getChildren(testProject).isEmpty());
+                nodes().getChildren(testProject).isEmpty());
 
         assertEquals("and it says which status it is",
                 ProjectStatus.INACTIVE,
-                indexer().find(testProject).orElseThrow().getMarker().status());
+                nodes().find(testProject).orElseThrow().getMarker().status());
     }
 
     public void testAFoldersIdIsWrittenOnceAndKept() {
@@ -93,16 +97,16 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
 
         assertFalse("a folder Testin wrote carries an id", stamped.isEmpty());
         assertFalse("and so do the two containers under it",
-                indexer().readMarker(testProject.resolve(DirectoryType.TCD.getFolderName()), DirectoryType.TCD, "Test Cases", TestCasesMainDirectoryMarker.class).getId().isEmpty());
+                nodes().readMarker(testProject.resolve(DirectoryType.TCD.getFolderName()), DirectoryType.TCD, "Test Cases", TestCasesMainDirectoryMarker.class).getId().isEmpty());
 
         WriteAction.runAndWait(() -> {
             tp.getMarker().setStatus(ProjectStatus.INACTIVE);
-            indexer().persistMarker(tp);
+            nodes().persistMarker(tp);
         });
 
         assertEquals("the id a folder has is the id it keeps",
                 stamped,
-                indexer().readMarker(testProject, DirectoryType.TP, "NAFATH", TestProjectMarker.class).getId());
+                nodes().readMarker(testProject, DirectoryType.TP, "NAFATH", TestProjectMarker.class).getId());
     }
 
     public void testACreatedNodeIsOnDiskAndInTheCache() {
@@ -113,7 +117,7 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
         assertTrue("the test project is in the cache and not on disk - the phantom rule 2 forbids",
                 Files.isDirectory(testProject));
         assertTrue("the cache has not heard of a node that was just created",
-                indexer().nodeExists(testProject));
+                nodes().nodeExists(testProject));
     }
 
     public void testATestProjectArrivesWithItsTwoContainers() {
@@ -129,6 +133,6 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
 
     public void testAnAbsentNodeIsNotInTheCache() {
         assertFalse("the cache claims a node that was never created",
-                indexer().nodeExists(root.resolve("never-made")));
+                nodes().nodeExists(root.resolve("never-made")));
     }
 }

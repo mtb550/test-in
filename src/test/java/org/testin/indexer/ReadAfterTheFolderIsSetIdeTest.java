@@ -55,6 +55,10 @@ public class ReadAfterTheFolderIsSetIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
+    private Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
+    }
+
     public void testTheFolderSetAfterStartupIsReadWhenTheTreeOpens() {
         StartupActivity.execute(getProject());
 
@@ -67,6 +71,6 @@ public class ReadAfterTheFolderIsSetIdeTest extends BasePlatformTestCase {
 
         assertTrue("the folder was set after the startup pass, and opening the tree read nothing: it asked"
                         + " for the one-time wiring and was turned away with it",
-                indexer().nodeExists(project));
+                nodes().nodeExists(project));
     }
 }

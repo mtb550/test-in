@@ -53,14 +53,18 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private ProjectIndexer indexer() {
-        return Services.getInstance(getProject(), ProjectIndexer.class);
+    private TestCases testCases() {
+        return Services.getInstance(getProject(), TestCases.class);
+    }
+
+    private Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
     }
 
     private TestProjectDirectoryDto testProject(final String name) {
         return WriteAction.computeAndWait(() -> {
             final TestProjectDirectoryDto tp = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(getProject(), root.resolve(name));
-            indexer().addTestProject(tp);
+            nodes().addTestProject(tp);
             return tp;
         });
     }
@@ -69,7 +73,7 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
         return WriteAction.computeAndWait(() -> {
             final TestSetDirectoryDto ts = Services.getInstance(getProject(), DirectoryMapper.class)
                     .getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
-            indexer().addTestSet(ts);
+            nodes().addTestSet(ts);
             return ts;
         });
     }
@@ -79,7 +83,7 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
         testProject("NAFATH2");
         final TestCaseDto tc = testCase(testSet(tp));
 
-        final TestCaseFile file = indexer().testCaseFile(tc).orElseThrow();
+        final TestCaseFile file = testCases().testCaseFile(tc).orElseThrow();
 
         assertEquals("the case was placed in the wrong test project", tp.getPath(), file.testProject());
         assertEquals("the case's file is not where the store writes it",
@@ -89,6 +93,6 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
     public void testATestCaseNoIndexedTestProjectHoldsHasNoFile() {
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).build();
 
-        assertTrue("a case with no test set was given a file", indexer().testCaseFile(tc).isEmpty());
+        assertTrue("a case with no test set was given a file", testCases().testCaseFile(tc).isEmpty());
     }
 }

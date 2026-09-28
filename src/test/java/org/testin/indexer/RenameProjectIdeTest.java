@@ -57,10 +57,18 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
+    private TestCases testCases() {
+        return Services.getInstance(getProject(), TestCases.class);
+    }
+
+    private Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
+    }
+
     private TestProjectDirectoryDto testProject(final String name) {
         return WriteAction.computeAndWait(() -> {
             final TestProjectDirectoryDto tp = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(getProject(), root.resolve(name));
-            indexer().addTestProject(tp);
+            nodes().addTestProject(tp);
             return tp;
         });
     }
@@ -69,14 +77,14 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         return WriteAction.computeAndWait(() -> {
             final TestSetDirectoryDto ts = Services.getInstance(getProject(), DirectoryMapper.class)
                     .getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
-            indexer().addTestSet(ts);
+            nodes().addTestSet(ts);
             return ts;
         });
     }
 
     private void rename(final Path from, final Path to) {
         final AtomicBoolean done = new AtomicBoolean();
-        indexer().renameNode(from, to, () -> done.set(true));
+        nodes().renameNode(from, to, () -> done.set(true));
 
         final long deadline = System.currentTimeMillis() + 15_000;
 
@@ -98,23 +106,23 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         rename(from, to);
 
         assertTrue("the folder did not move", Files.isDirectory(to));
-        assertTrue("the index does not hold the project under its new name", indexer().nodeExists(to));
-        assertFalse("the index still holds the old name", indexer().nodeExists(from));
-        assertTrue("its test cases folder did not follow", indexer().nodeExists(to.resolve("Test Cases")));
+        assertTrue("the index does not hold the project under its new name", nodes().nodeExists(to));
+        assertFalse("the index still holds the old name", nodes().nodeExists(from));
+        assertTrue("its test cases folder did not follow", nodes().nodeExists(to.resolve("Test Cases")));
     }
 
     public void testAnInactiveProjectsContainersFollowIt() {
         final TestProjectDirectoryDto tp = testProject("Checkout");
         WriteAction.runAndWait(() -> {
             tp.getMarker().setStatus(ProjectStatus.INACTIVE);
-            indexer().persistMarker(tp);
+            nodes().persistMarker(tp);
         });
         indexer().scanSingleProject(tp.getPath());
 
         final Path to = root.resolve("Checkout_App");
         rename(tp.getPath(), to);
 
-        final TestProjectDirectoryDto renamed = Optional.ofNullable(indexer().getTestProjectsByPath().get(to.toString()))
+        final TestProjectDirectoryDto renamed = Optional.ofNullable(nodes().getTestProjectsByPath().get(to.toString()))
                 .orElseThrow(() -> new AssertionError("the inactive project is not held under its new name"));
         assertEquals("its test cases folder kept the old path", to.resolve("Test Cases"), renamed.getTestCasesDirectory().getPath());
         assertEquals("its test runs folder kept the old path", to.resolve("Test Runs"), renamed.getTestRunsDirectory().getPath());
@@ -136,8 +144,8 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         final Path to = root.resolve("Nafath_App");
         rename(tp.getPath(), to);
 
-        final TestCaseDto tc = indexer().findTestCase(id).orElseThrow();
-        final TestCaseFile file = indexer().testCaseFile(tc).orElseThrow();
+        final TestCaseDto tc = testCases().findTestCase(id).orElseThrow();
+        final TestCaseFile file = testCases().testCaseFile(tc).orElseThrow();
 
         assertEquals("the case is placed in the renamed project", to, file.testProject());
         assertEquals("the case lost its hand-named file", "login.tc", file.inProject().getFileName().toString());
@@ -153,9 +161,9 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
             throw new AssertionError("Could not make the folders: " + ex.getMessage(), ex);
         }
 
-        assertTrue("a sibling folder the index never read was not seen", indexer().isTaken(other, Optional.empty()));
-        assertTrue("a sibling is in the way of a rename", indexer().isTaken(other, Optional.of(self)));
-        assertFalse("a free name was reported taken", indexer().isTaken(root.resolve("Checkout"), Optional.empty()));
-        assertFalse("changing only the case of a name was refused as taken", indexer().isTaken(root.resolve("Nafath"), Optional.of(self)));
+        assertTrue("a sibling folder the index never read was not seen", nodes().isTaken(other, Optional.empty()));
+        assertTrue("a sibling is in the way of a rename", nodes().isTaken(other, Optional.of(self)));
+        assertFalse("a free name was reported taken", nodes().isTaken(root.resolve("Checkout"), Optional.empty()));
+        assertFalse("changing only the case of a name was refused as taken", nodes().isTaken(root.resolve("Nafath"), Optional.of(self)));
     }
 }

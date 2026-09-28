@@ -56,15 +56,23 @@ public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
+    private TestCases testCases() {
+        return Services.getInstance(getProject(), TestCases.class);
+    }
+
+    private Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
+    }
+
     public void testNothingDisappearsWhileTheProjectIsReadAgain() {
         final Path project = SyntheticTree.write(root, SETS, TEST_CASES_PER_SET);
         indexer().scanSingleProject(project);
 
         final Path set = project.resolve("Test Cases").resolve("set-0");
-        final UUID testCase = indexer().getTestCasesForTestSet(set).getFirst().getId();
+        final UUID testCase = testCases().getTestCasesForTestSet(set).getFirst().getId();
 
         assertTrue("the first pass did not index the project, so there is nothing to watch",
-                indexer().nodeExists(set) && indexer().findTestCase(testCase).isPresent());
+                nodes().nodeExists(set) && testCases().findTestCase(testCase).isPresent());
 
         final AtomicBoolean vanished = new AtomicBoolean(false);
         final CountDownLatch scanned = new CountDownLatch(1);
@@ -78,7 +86,7 @@ public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
         });
 
         while (scanned.getCount() > 0) {
-            if (!indexer().nodeExists(set) || indexer().findTestCase(testCase).isEmpty()) vanished.set(true);
+            if (!nodes().nodeExists(set) || testCases().findTestCase(testCase).isEmpty()) vanished.set(true);
             Thread.onSpinWait();
         }
 
@@ -89,7 +97,7 @@ public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
                 vanished.get());
 
         assertTrue("and it is there when the pass has finished",
-                indexer().nodeExists(set) && indexer().findTestCase(testCase).isPresent());
+                nodes().nodeExists(set) && testCases().findTestCase(testCase).isPresent());
     }
 
     public void testASetDeletedOnDiskIsGoneAfterTheRescan() {
@@ -99,17 +107,17 @@ public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
         final Path deleted = project.resolve("Test Cases").resolve("set-1");
         final Path kept = project.resolve("Test Cases").resolve("set-2");
 
-        final UUID testCaseInDeleted = indexer().getTestCasesForTestSet(deleted).getFirst().getId();
-        final UUID testCaseInKept = indexer().getTestCasesForTestSet(kept).getFirst().getId();
+        final UUID testCaseInDeleted = testCases().getTestCasesForTestSet(deleted).getFirst().getId();
+        final UUID testCaseInKept = testCases().getTestCasesForTestSet(kept).getFirst().getId();
 
         assertTrue("could not delete " + deleted, TempTree.delete(deleted));
         indexer().scanSingleProject(project);
 
         assertFalse("a test set deleted on disk is still in the index after a rescan",
-                indexer().nodeExists(deleted));
-        assertTrue("its test cases went with it", indexer().findTestCase(testCaseInDeleted).isEmpty());
-        assertTrue("the test cases of a set nobody touched went too", indexer().findTestCase(testCaseInKept).isPresent());
-        assertTrue("and the sets that are still there are still there", indexer().nodeExists(kept));
+                nodes().nodeExists(deleted));
+        assertTrue("its test cases went with it", testCases().findTestCase(testCaseInDeleted).isEmpty());
+        assertTrue("the test cases of a set nobody touched went too", testCases().findTestCase(testCaseInKept).isPresent());
+        assertTrue("and the sets that are still there are still there", nodes().nodeExists(kept));
     }
 
     private void await(final CountDownLatch latch) {

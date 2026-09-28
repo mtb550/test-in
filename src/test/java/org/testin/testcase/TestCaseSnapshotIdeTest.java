@@ -21,7 +21,8 @@ import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.testin.TempTree;
 import org.testin.indexer.DirectoryMapper;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
@@ -53,8 +54,12 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private ProjectIndexer indexer() {
-        return Services.getInstance(getProject(), ProjectIndexer.class);
+    private TestCases testCases() {
+        return Services.getInstance(getProject(), TestCases.class);
+    }
+
+    private Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
     }
 
     private TestSetDirectoryDto checkoutSet() {
@@ -62,10 +67,10 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 
             final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
-            indexer().addTestProject(tp);
+            nodes().addTestProject(tp);
 
             final TestSetDirectoryDto ts = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Checkout"), tp.getTestCasesDirectory());
-            indexer().addTestSet(ts);
+            nodes().addTestSet(ts);
             return ts;
         });
     }
@@ -86,7 +91,7 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
         final TestCaseSnapshot sourceBefore = new TestCaseSnapshot(getProject(), source, List.of(moved), List.of());
         final TestCaseSnapshot destinationBefore = TestCaseSnapshot.of(getProject(), destination.getPath(), ids);
 
-        indexer().putTestCaseVerbatim(destination.getPath(), moved);
+        testCases().putTestCaseVerbatim(destination.getPath(), moved);
 
         final UndoScope scope = UndoScope.of(destination.getPath());
         TestCaseSnapshot.record(getProject(), scope, "Paste",
@@ -97,7 +102,7 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
         assertFalse("an undo into a set no longer indexed was not refused",
                 Services.getInstance(getProject(), UndoHistories.class).undo(scope));
         assertTrue("the pasted case was taken out of the destination by a refused undo",
-                indexer().findTestCase(moved.getId()).isPresent());
+                testCases().findTestCase(moved.getId()).isPresent());
     }
 
     public void testUndoingARemovalPutsTheTestCaseBack() {
@@ -108,18 +113,18 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
                 .order("m")
                 .build();
         removed.setParent(ts);
-        indexer().putTestCaseVerbatim(ts.getPath(), removed);
+        testCases().putTestCaseVerbatim(ts.getPath(), removed);
         final List<UUID> ids = List.of(removed.getId());
 
         final TestCaseSnapshot before = TestCaseSnapshot.of(getProject(), ts.getPath(), ids);
-        assertTrue("the removal being undone did not happen", indexer().removeTestCase(ts.getPath(), removed.getId()));
+        assertTrue("the removal being undone did not happen", testCases().removeTestCase(ts.getPath(), removed.getId()));
 
         final UndoScope scope = UndoScope.of(ts.getPath());
         TestCaseSnapshot.record(getProject(), scope, "Remove", List.of(before), List.of(TestCaseSnapshot.of(getProject(), ts.getPath(), ids)));
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
         assertTrue("the undo said it could not put the case back", Services.getInstance(getProject(), UndoHistories.class).undo(scope));
-        assertTrue("the case is not back in the index", indexer().findTestCase(removed.getId()).isPresent());
+        assertTrue("the case is not back in the index", testCases().findTestCase(removed.getId()).isPresent());
         assertTrue("the case's file is not back on disk", Files.isRegularFile(ts.getPath().resolve(removed.getId() + ".tc")));
     }
 }

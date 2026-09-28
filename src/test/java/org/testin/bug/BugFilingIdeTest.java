@@ -22,7 +22,9 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.util.TimeoutUtil;
 import org.testin.TempTree;
 import org.testin.indexer.DirectoryMapper;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestCases;
+import org.testin.indexer.TestRuns;
 import org.testin.model.FileKind;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
@@ -82,8 +84,16 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private ProjectIndexer indexer() {
-        return Services.getInstance(getProject(), ProjectIndexer.class);
+    private TestCases testCases() {
+        return Services.getInstance(getProject(), TestCases.class);
+    }
+
+    private TestRuns testRuns() {
+        return Services.getInstance(getProject(), TestRuns.class);
+    }
+
+    private Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
     }
 
     private Path runPath() {
@@ -96,7 +106,7 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
 
     private BugReports.RunItem runItem(final UUID testCaseId, final TestStatus status) {
         final TestRunItems item = TestRunItems.builder().id(testCaseId).status(status).build();
-        indexer().putTestRun(runPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
+        testRuns().putTestRun(runPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
         return new BugReports.RunItem(runPath(), testCaseId);
     }
 
@@ -104,21 +114,21 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         final TestSetDirectoryDto ts = WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
             final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
-            indexer().addTestProject(tp);
+            nodes().addTestProject(tp);
 
             final TestSetDirectoryDto set = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
-            indexer().addTestSet(set);
+            nodes().addTestSet(set);
             return set;
         });
 
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
         tc.setParent(ts);
-        indexer().putTestCase(ts.getPath(), tc);
+        testCases().putTestCase(ts.getPath(), tc);
         return tc.getId();
     }
 
     private String storedLink(final BugReports.RunItem item) {
-        return indexer().findTestRun(item.run()).flatMap(item::in).orElseThrow().getBugIssueUrl();
+        return testRuns().findTestRun(item.run()).flatMap(item::in).orElseThrow().getBugIssueUrl();
     }
 
     public void testAFailedRunItemKeepsTheIssue() {
@@ -142,7 +152,7 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         final BugReports.RunItem gone = new BugReports.RunItem(runPath(), UUID.randomUUID());
 
         assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), gone, ISSUE));
-        assertTrue("storing on the old path registered the run again", indexer().findTestRun(runPath()).isEmpty());
+        assertTrue("storing on the old path registered the run again", testRuns().findTestRun(runPath()).isEmpty());
     }
 
     public void testARemovedRunItemIsNotWritten() {

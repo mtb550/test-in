@@ -107,8 +107,12 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private ProjectIndexer indexer() {
-        return Services.getInstance(getProject(), ProjectIndexer.class);
+    private TestRuns testRuns() {
+        return Services.getInstance(getProject(), TestRuns.class);
+    }
+
+    private Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
     }
 
     private Path aRun() {
@@ -116,11 +120,11 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 
             final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
-            indexer().addTestProject(tp);
+            nodes().addTestProject(tp);
 
             final Path path = tp.getTestRunsDirectory().getPath().resolve("Cycle-1");
             final TestRunDirectoryDto tr = mapper.setTestRunNode(getProject(), path, tp.getTestRunsDirectory());
-            indexer().addTestRunDir(tr);
+            nodes().addTestRunDir(tr);
             return path;
         });
 
@@ -129,7 +133,7 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
             results.add(new TestRunItems().setId(testCaseId).setStatus(TestStatus.PASSED));
         }
 
-        indexer().putTestRun(runPath, new TestRunDto().setResults(results));
+        testRuns().putTestRun(runPath, new TestRunDto().setResults(results));
         return runPath;
     }
 
@@ -146,7 +150,7 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
 
         writePulledResult(resultOf(run, PULLED_TEST_CASE));
 
-        indexer().changeRun(run, tr -> tr.setResults(new ArrayList<>(tr.getResults().stream()
+        testRuns().changeRun(run, tr -> tr.setResults(new ArrayList<>(tr.getResults().stream()
                 .filter(item -> item.getId().equals(JUDGED_TEST_CASE))
                 .toList())));
 
@@ -168,8 +172,8 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
         awaitFile(resultOf(run, UNTICKED_TEST_CASE), "the run's results never reached disk");
         final String untouched = read(resultOf(run, UNTICKED_TEST_CASE));
 
-        indexer().findTestRun(run).orElseThrow().resultOf(UNTICKED_TEST_CASE).orElseThrow().setActualResult("Not saved yet");
-        indexer().changeResult(run, JUDGED_TEST_CASE, item -> item.setStatus(TestStatus.FAILED));
+        testRuns().findTestRun(run).orElseThrow().resultOf(UNTICKED_TEST_CASE).orElseThrow().setActualResult("Not saved yet");
+        testRuns().changeResult(run, JUDGED_TEST_CASE, item -> item.setStatus(TestStatus.FAILED));
 
         await("the verdict never reached its result file", () -> read(resultOf(run, JUDGED_TEST_CASE)).contains("FAILED"));
         assertEquals("a verdict on one case rewrote the result of another", untouched, read(resultOf(run, UNTICKED_TEST_CASE)));

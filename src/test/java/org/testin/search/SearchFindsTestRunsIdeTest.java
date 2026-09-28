@@ -19,7 +19,9 @@ import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.testin.TempTree;
 import org.testin.indexer.DirectoryMapper;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestCases;
+import org.testin.indexer.TestRuns;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -51,7 +53,7 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
 
         final TestProjectDirectoryDto tp = WriteAction.computeAndWait(() -> {
             final TestProjectDirectoryDto project = mapper().setTestProjectNode(getProject(), root.resolve("NAFATH"));
-            indexer().addTestProject(project);
+            nodes().addTestProject(project);
 
             return project;
         });
@@ -74,14 +76,22 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), DirectoryMapper.class);
     }
 
-    private ProjectIndexer indexer() {
-        return Services.getInstance(getProject(), ProjectIndexer.class);
+    private TestCases testCases() {
+        return Services.getInstance(getProject(), TestCases.class);
+    }
+
+    private TestRuns testRuns() {
+        return Services.getInstance(getProject(), TestRuns.class);
+    }
+
+    private Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
     }
 
     private TestCaseDto aTestCaseIn(final TestProjectDirectoryDto tp) {
         final TestSetDirectoryDto login = WriteAction.computeAndWait(() -> {
             final TestSetDirectoryDto set = mapper().getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
-            indexer().addTestSet(set);
+            nodes().addTestSet(set);
 
             return set;
         });
@@ -93,7 +103,7 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
                 .build();
         tc.setParent(login);
 
-        indexer().putTestCaseVerbatim(login.getPath(), tc);
+        testCases().putTestCaseVerbatim(login.getPath(), tc);
         return tc;
     }
 
@@ -101,12 +111,12 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
         final Path runPath = WriteAction.computeAndWait(() -> {
             final Path path = tp.getTestRunsDirectory().getPath().resolve(named);
             final TestRunDirectoryDto tr = mapper().setTestRunNode(getProject(), path, tp.getTestRunsDirectory());
-            indexer().addTestRunDir(tr);
+            nodes().addTestRunDir(tr);
 
             return path;
         });
 
-        indexer().putTestRun(runPath, new TestRunDto().setResults(List.of(new TestRunItems().setId(testCaseId).setStatus(TestStatus.PASSED))));
+        testRuns().putTestRun(runPath, new TestRunDto().setResults(List.of(new TestRunItems().setId(testCaseId).setStatus(TestStatus.PASSED))));
         return runPath;
     }
 

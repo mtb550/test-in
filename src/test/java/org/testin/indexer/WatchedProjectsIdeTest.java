@@ -50,6 +50,10 @@ public class WatchedProjectsIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
+    private Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
+    }
+
     public void testAChangeInAFolderWithoutAMarkerAddsNothing() {
         final Path notes = root.resolve("notes");
         try {
@@ -61,16 +65,16 @@ public class WatchedProjectsIdeTest extends BasePlatformTestCase {
 
         indexer().rescanChangedProject(notes, new EmptyProgressIndicator());
 
-        assertFalse("a folder with no .tp marker became a test project", indexer().nodeExists(notes));
+        assertFalse("a folder with no .tp marker became a test project", nodes().nodeExists(notes));
     }
 
     public void testATestProjectIsReadAgainAndForgottenOnceItsMarkerIsGone() {
         final Path project = root.resolve("NAFATH");
-        WriteAction.runAndWait(() -> indexer().addTestProject(
+        WriteAction.runAndWait(() -> nodes().addTestProject(
                 Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(getProject(), project)));
 
         indexer().rescanChangedProject(project, new EmptyProgressIndicator());
-        assertTrue("a test project with its marker was not read again", indexer().nodeExists(project));
+        assertTrue("a test project with its marker was not read again", nodes().nodeExists(project));
 
         try {
             Files.delete(project.resolve(DirectoryType.TP.getMarker()));
@@ -79,6 +83,6 @@ public class WatchedProjectsIdeTest extends BasePlatformTestCase {
         }
 
         indexer().rescanChangedProject(project, new EmptyProgressIndicator());
-        assertFalse("a folder that is no longer a test project stayed in the index", indexer().nodeExists(project));
+        assertFalse("a folder that is no longer a test project stayed in the index", nodes().nodeExists(project));
     }
 }
