@@ -24,7 +24,6 @@ import org.testin.util.FromContentModule;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,7 +40,7 @@ public interface CodeNavigation {
     void toCode(final @NotNull Project p, final @NotNull TestCaseDto tc);
 
     @FromContentModule
-    @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc);
+    @NotNull Map<UUID, List<String>> methodFqcnsOf(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases);
 
     @FromContentModule
     @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases);

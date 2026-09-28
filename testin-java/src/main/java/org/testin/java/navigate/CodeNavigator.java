@@ -164,13 +164,20 @@ public final class CodeNavigator implements CodeNavigation {
 
     // UC-CODEGEN-008, Rule-CODEGEN-032
     @Override
-    public @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        return resolve(p, tc).map(method -> {
-            final @NotNull List<String> named = new ArrayList<>(Fqcn.ofMethod(tc));
-            named.set(named.size() - 1, method.getName());
+    public @NotNull Map<UUID, List<String>> methodFqcnsOf(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        final @NotNull Map<UUID, PsiMethod> methods = generatedMethodsOf(p, testCases);
+        final @NotNull Map<UUID, List<String>> named = new LinkedHashMap<>();
 
-            return named;
-        });
+        for (final TestCaseDto tc : testCases) {
+            Optional.ofNullable(methods.get(tc.getId())).ifPresent(pm -> {
+                final @NotNull List<String> fqcn = new ArrayList<>(Fqcn.ofMethod(tc));
+                fqcn.set(fqcn.size() - 1, pm.getName());
+
+                named.put(tc.getId(), fqcn);
+            });
+        }
+
+        return named;
     }
 
     // UC-CODEGEN-006, Rule-CODEGEN-026

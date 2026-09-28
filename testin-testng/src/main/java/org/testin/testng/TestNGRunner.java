@@ -18,7 +18,8 @@ package org.testin.testng;
 
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.DumbService;
@@ -26,6 +27,7 @@ import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.util.concurrency.AppExecutorUtil;
 import com.theoryinpractice.testng.configuration.TestNGConfiguration;
 import com.theoryinpractice.testng.configuration.TestNGConfigurationType;
 import com.theoryinpractice.testng.model.TestType;
@@ -41,7 +43,9 @@ import org.testin.util.Bundle;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public final class TestNGRunner implements TestRunner {
     private static @NotNull Optional<Module> moduleOf(final @NotNull Project p, final @NotNull List<String> fqcn) {
@@ -75,45 +79,53 @@ public final class TestNGRunner implements TestRunner {
 
         testCases.forEach(execution::starting);
 
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            try {
-                ApplicationManager.getApplication().runReadAction(() -> prepare(p, testCases));
-
-            } catch (final IndexNotReadyException ex) {
-                testCases.forEach(execution::notStarting);
-
-                ApplicationManager.getApplication().invokeLater(() -> DumbService.getInstance(p)
-                        .showDumbModeNotification(Bundle.message("testng.indexing.interrupted")));
-            }
-        });
+        ReadAction.nonBlocking(() -> prepare(p, testCases))
+                .expireWith(execution)
+                .finishOnUiThread(ModalityState.nonModal(), prepared -> prepared.ifPresentOrElse(
+                        ready -> start(p, ready),
+                        () -> interrupted(p, testCases)))
+                .submit(AppExecutorUtil.getAppExecutorService());
     }
 
-    private void prepare(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
-        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
+    private @NotNull Optional<Prepared> prepare(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        try {
+            final @NotNull Map<UUID, List<String>> methods = CodeNavigation.available().methodFqcnsOf(p, testCases);
 
-        final @NotNull List<Generated> found = new ArrayList<>();
-        final @NotNull List<TestCaseDto> withoutCode = new ArrayList<>();
-        Optional<Module> module = Optional.empty();
+            final @NotNull List<Generated> found = new ArrayList<>();
+            final @NotNull List<TestCaseDto> withoutCode = new ArrayList<>();
 
-        for (final TestCaseDto tc : testCases) {
-            final @NotNull Optional<List<String>> method = CodeNavigation.available().methodOf(p, tc);
-
-            if (method.isEmpty()) {
-                execution.noGeneratedCode(tc);
-                withoutCode.add(tc);
-                continue;
+            for (final TestCaseDto tc : testCases) {
+                Optional.ofNullable(methods.get(tc.getId())).ifPresentOrElse(
+                        method -> found.add(new Generated(tc, method)),
+                        () -> withoutCode.add(tc));
             }
 
-            found.add(new Generated(tc, method.orElseThrow()));
-            if (module.isEmpty()) module = moduleOf(p, method.orElseThrow());
+            final @NotNull Optional<Module> module = found.stream()
+                    .map(one -> moduleOf(p, one.fqcn()))
+                    .flatMap(Optional::stream)
+                    .findFirst();
+
+            return Optional.of(new Prepared(found, withoutCode, module));
+        } catch (final IndexNotReadyException ex) {
+            return Optional.empty();
         }
+    }
 
-        execution.started(List.of(), withoutCode);
+    private void interrupted(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        testCases.forEach(Services.getInstance(p, TestNGExecution.class)::notStarting);
 
-        if (found.isEmpty()) return;
+        DumbService.getInstance(p).showDumbModeNotification(Bundle.message("testng.indexing.interrupted"));
+    }
 
-        final @NotNull Optional<Module> runModule = module;
-        ApplicationManager.getApplication().invokeLater(() -> launch(p, found, runModule));
+    private void start(final @NotNull Project p, final @NotNull Prepared prepared) {
+        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
+
+        prepared.withoutCode().forEach(execution::noGeneratedCode);
+        execution.started(List.of(), prepared.withoutCode());
+
+        if (prepared.found().isEmpty()) return;
+
+        launch(p, prepared.found(), prepared.module());
     }
 
     private void launch(final @NotNull Project p, final @NotNull List<Generated> found, final @NotNull Optional<Module> module) {
@@ -162,6 +174,9 @@ public final class TestNGRunner implements TestRunner {
         // Rule-CODEGEN-033
         execution.started(testCases, List.of());
         execution.launch(testCases, settings);
+    }
+
+    private record Prepared(@NotNull List<Generated> found, @NotNull List<TestCaseDto> withoutCode, @NotNull Optional<Module> module) {
     }
 
     private record Generated(@NotNull TestCaseDto tc, @NotNull List<String> fqcn) {

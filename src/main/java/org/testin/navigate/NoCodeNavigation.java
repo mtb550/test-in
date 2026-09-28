@@ -23,7 +23,6 @@ import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -58,9 +57,9 @@ public final class NoCodeNavigation implements CodeNavigation {
     }
 
     @Override
-    public @NotNull Optional<List<String>> methodOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        Logger.debug("No code navigation in this IDE; no generated method for '" + tc.getDescription() + "'");
+    public @NotNull Map<UUID, List<String>> methodFqcnsOf(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        Logger.debug("No code navigation in this IDE; no generated methods for " + testCases.size() + " test case(s)");
 
-        return Optional.empty();
+        return Map.of();
     }
 }
