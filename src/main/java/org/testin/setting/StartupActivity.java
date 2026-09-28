@@ -61,7 +61,7 @@ public final class StartupActivity implements ProjectActivity {
         TestCaseExecutionSubscriber.initRecording(p);
     }
 
-    // UC-SETTING-002, Rule-SETTING-014, Rule-INTERNAL-115
+    // UC-SETTING-002, Rule-SETTING-014
     private static void readTheFolder(final @NotNull Project p) {
         final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         final @NotNull Path testinPath = TestinRoot.normalize(settings.rootTestinPath);
@@ -74,15 +74,6 @@ public final class StartupActivity implements ProjectActivity {
         if (!Once.claim(p, READ)) return;
 
         Logger.info("testin Path: " + testinPath);
-
-        final @NotNull BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
-
-        if (!bound.isNamed()) {
-            Logger.info("No test project chosen for " + p.getName() + ", so nothing is read until something needs it");
-            return;
-        }
-
-        Logger.info("Test project for this repository: '" + bound.name() + "'");
         Services.getInstance(p, ProjectIndexer.class).indexWithProgress();
     }
 
@@ -103,9 +94,19 @@ public final class StartupActivity implements ProjectActivity {
         });
     }
 
+    // UC-SETTING-002, Rule-INTERNAL-115
     @Override
     public @NotNull Object execute(final @NotNull Project p, final @NotNull Continuation<? super Unit> continuation) {
-        execute(p);
+        if (Once.claim(p, STARTED)) wire(p);
+
+        final @NotNull BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
+        if (bound.isNamed()) {
+            Logger.info("Test project for this repository: '" + bound.name() + "'");
+            readTheFolder(p);
+        } else {
+            Logger.info("No test project chosen for " + p.getName() + ", so nothing is read until something needs it");
+        }
+
         warnIfUnconfigured(p);
         return Unit.INSTANCE;
     }
