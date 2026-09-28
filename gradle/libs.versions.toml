@@ -9,6 +9,8 @@ archunit = "1.5.0"
 # BasePlatformTestCase is a JUnit TestCase; the platform test framework brings no
 # JUnit of its own. Only the ideTest task uses it.
 junit = "4.13.2"
+errorprone = "2.50.0"
+nullaway = "0.14.2"
 
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
@@ -23,3 +25,8 @@ poi = { module = "org.apache.poi:poi", version.ref = "poi" }
 poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi" }
 archunit = { module = "com.tngtech.archunit:archunit", version.ref = "archunit" }
 junit = { module = "junit:junit", version.ref = "junit" }
+errorprone = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
+nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
+
+[plugins]
+errorprone = { id = "net.ltgt.errorprone", version = "5.1.1" }

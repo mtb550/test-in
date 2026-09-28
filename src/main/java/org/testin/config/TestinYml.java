@@ -222,9 +222,9 @@ public final class TestinYml {
         final @NotNull Set<String> placed = new HashSet<>();
         for (int i = 0; i < lines.size(); i++) {
             final int at = i;
-            keyOf(lines.get(i), owned.keySet()).ifPresent(key -> {
-                lines.set(at, line(key, owned.get(key)));
-                placed.add(key);
+            entryOf(lines.get(i), owned).ifPresent(entry -> {
+                lines.set(at, line(entry.getKey(), entry.getValue()));
+                placed.add(entry.getKey());
             });
         }
 
@@ -252,8 +252,8 @@ public final class TestinYml {
         }
     }
 
-    private static @NotNull Optional<String> keyOf(final @NotNull String line, final @NotNull Set<String> keys) {
-        return keys.stream().filter(key -> line.startsWith(key + ":")).findFirst();
+    private static @NotNull Optional<Map.Entry<String, String>> entryOf(final @NotNull String line, final @NotNull Map<String, String> owned) {
+        return owned.entrySet().stream().filter(entry -> line.startsWith(entry.getKey() + ":")).findFirst();
     }
 
     private static @NotNull String line(final @NotNull String key, final @NotNull String value) {

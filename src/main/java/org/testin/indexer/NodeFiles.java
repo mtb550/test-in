@@ -27,6 +27,7 @@ import org.testin.model.FileKind;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.io.IOException;
@@ -73,7 +74,7 @@ final class NodeFiles {
             try {
                 sourceVf.move(indexer, targetVf);
             } catch (final IOException ex) {
-                Logger.error(ex.getMessage());
+                Logger.error(FailureText.of(ex));
                 throw new RuntimeException(ex);
             }
         }, () -> followOnDisk(oldPath, newPath, () -> {
@@ -129,7 +130,7 @@ final class NodeFiles {
                 try {
                     sourceVf.copy(indexer, targetVf, sourceVf.getName());
                 } catch (final IOException ex) {
-                    Logger.error(ex.getMessage());
+                    Logger.error(FailureText.of(ex));
                     throw new RuntimeException(ex);
                 }
             }, copySucceeded, operationFinished);
@@ -141,7 +142,7 @@ final class NodeFiles {
             try {
                 vf.rename(indexer, newPath.getFileName().toString());
             } catch (final IOException ex) {
-                Logger.error(ex.getMessage());
+                Logger.error(FailureText.of(ex));
                 throw new RuntimeException(ex);
             }
 

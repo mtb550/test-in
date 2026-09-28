@@ -150,7 +150,7 @@ public class EditTestRunAction extends AbstractAnyProjectAction {
                 return;
             }
 
-            NodeRename.apply(p, run, toName, () -> write(from.getParent().resolve(toName), writeTo, onDone));
+            NodeRename.apply(p, run, toName, () -> write(from.resolveSibling(toName), writeTo, onDone));
         }
 
         private void write(final @NotNull Path runPath, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {

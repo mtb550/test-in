@@ -48,6 +48,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class StatusBar extends JBPanel<StatusBar> {
     private static final int EDGE = 2;
@@ -250,7 +251,7 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     public @NotNull PageBtn button(final @NotNull PageStep step) {
-        return pageButtons.get(step);
+        return Objects.requireNonNull(pageButtons.get(step), step.name());
     }
 
     // UC-EDITOR-PANEL-024

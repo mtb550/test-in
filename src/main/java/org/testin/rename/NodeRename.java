@@ -49,7 +49,7 @@ public final class NodeRename {
         final @NotNull String oldName = dir.getName();
 
         final @NotNull Path oldPath = dir.getPath();
-        final @NotNull Path newPath = oldPath.getParent().resolve(newName);
+        final @NotNull Path newPath = oldPath.resolveSibling(newName);
 
         Services.getInstance(p, Nodes.class).renameNode(oldPath, newPath, () -> {
             // Rule-CODEGEN-082

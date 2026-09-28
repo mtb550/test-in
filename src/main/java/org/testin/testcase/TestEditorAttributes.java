@@ -285,7 +285,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     // UC-SHARE-002, Rule-SHARE-001
     public static @NotNull List<TestEditorAttributes> all(final @NotNull Can capability) {
-        return BY_CAPABILITY.get(capability);
+        return BY_CAPABILITY.getOrDefault(capability, List.of());
     }
 
     // UC-SHARE-005, UC-SHARE-006, Rule-SHARE-110

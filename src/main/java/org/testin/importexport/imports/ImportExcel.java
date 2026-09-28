@@ -28,6 +28,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
+import org.testin.util.FailureText;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +63,7 @@ public class ImportExcel {
             parseWorkbook(workbook, p, result);
 
         } catch (final IOException ex) {
-            Logger.error(ex.getMessage());
+            Logger.error(FailureText.of(ex));
             throw new RuntimeException(ex);
         }
         return result;

@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -61,7 +62,7 @@ final class VfsExecutor {
                         try {
                             operation.execute(file);
                         } catch (final Exception ex) {
-                            Services.getInstance(p, Notifier.class).error(p, errorTitle, Bundle.message("vfs.operation.failed", ex.getMessage()));
+                            Services.getInstance(p, Notifier.class).error(p, errorTitle, Bundle.message("vfs.operation.failed", FailureText.of(ex)));
                         }
                     }),
                     () -> Services.getInstance(p, Notifier.class)
@@ -89,7 +90,7 @@ final class VfsExecutor {
                         operation.execute(sourceVf.get(), targetVf.get());
                         onSuccess.run();
                     } catch (final Exception ex) {
-                        Services.getInstance(p, Notifier.class).error(p, errorTitle, Bundle.message("vfs.operation.failed", ex.getMessage()));
+                        Services.getInstance(p, Notifier.class).error(p, errorTitle, Bundle.message("vfs.operation.failed", FailureText.of(ex)));
                         onFailure.run();
                     }
                 });
@@ -116,7 +117,7 @@ final class VfsExecutor {
                         if (vf.isPresent()) vf.get().delete(requester);
                     } catch (final IOException ex) {
                         deleted.set(false);
-                        Services.getInstance(p, Notifier.class).error(p, Bundle.message("vfs.delete.failed.title"), Bundle.message("vfs.delete.failed", ex.getMessage()));
+                        Services.getInstance(p, Notifier.class).error(p, Bundle.message("vfs.delete.failed.title"), Bundle.message("vfs.delete.failed", FailureText.of(ex)));
                     }
                 });
 

@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -104,7 +105,7 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
                 continue;
             }
 
-            if (!taken.get(items.get(i).getParent().getPath()).add(NameSanitizer.methodKey(methodName))) {
+            if (!Objects.requireNonNull(taken.get(items.get(i).getParent().getPath())).add(NameSanitizer.methodKey(methodName))) {
                 clashing.add(i);
                 takenYet.add(methodName);
             }

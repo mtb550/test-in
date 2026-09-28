@@ -151,7 +151,7 @@ public class SyncActionAction extends AbstractAnyProjectAction {
                             if (!conflicting.isEmpty()) {
                                 showConflictActions(repoPath, conflicting);
                             } else {
-                                reportSyncFailure(Bundle.message("git.sync.failed.remote", ex.getMessage()));
+                                reportSyncFailure(Bundle.message("git.sync.failed.remote", FailureText.of(ex)));
                             }
                         });
                     });
@@ -228,7 +228,7 @@ public class SyncActionAction extends AbstractAnyProjectAction {
                             Logger.error("Could not push after resolving: " + ex.getMessage());
                             ApplicationManager.getApplication().invokeLater(() ->
                                     Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.push.failed.title"),
-                                            Bundle.message("git.push.failed.after.resolve", ex.getMessage())));
+                                            Bundle.message("git.push.failed.after.resolve", FailureText.of(ex))));
 
                             indicator.setText(Bundle.message("git.progress.refreshing"));
                             refreshRepository(repoPath);
@@ -241,7 +241,7 @@ public class SyncActionAction extends AbstractAnyProjectAction {
                     ex -> {
                         Logger.error(FailureText.of(ex));
                         ApplicationManager.getApplication().invokeLater(() ->
-                                reportSyncFailure(Bundle.message("git.sync.did.not.finish", ex.getMessage())));
+                                reportSyncFailure(Bundle.message("git.sync.did.not.finish", FailureText.of(ex))));
                     });
         }
 

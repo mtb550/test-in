@@ -1,3 +1,5 @@
+import net.ltgt.gradle.errorprone.CheckSeverity
+import net.ltgt.gradle.errorprone.errorprone
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
@@ -9,6 +11,7 @@ plugins {
     id("java")
     id("idea")
     id("org.jetbrains.intellij.platform")
+    alias(libs.plugins.errorprone)
 }
 
 // What the IDE and the headless inspector must not index. The sandbox alone is
@@ -67,6 +70,27 @@ tasks.withType<JavaCompile>().configureEach {
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
+
+// #377: NullAway fails compileJava on a null reaching what the annotations say
+// cannot take one, in all three modules. Every other Error Prone check is off,
+// so this is a null gate and not an Error Prone sweep; the tests are not checked.
+allprojects {
+    apply(plugin = "net.ltgt.errorprone")
+
+    dependencies {
+        "errorprone"(rootProject.libs.errorprone)
+        "errorprone"(rootProject.libs.nullaway)
+    }
+
+    tasks.withType<JavaCompile>().configureEach {
+        options.errorprone {
+            enabled.set(name == "compileJava")
+            disableAllChecks.set(true)
+            check("NullAway", CheckSeverity.ERROR)
+            option("NullAway:AnnotatedPackages", "org.testin")
+        }
     }
 }
 

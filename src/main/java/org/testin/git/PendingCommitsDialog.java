@@ -35,6 +35,7 @@ import org.testin.ui.framework.SelectionTable;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextInput;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 import org.testin.util.Shortcuts;
 
 import java.nio.file.Path;
@@ -173,7 +174,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
             Services.getInstance(p, Notifier.class).softShow(p, Done.REVERTED);
 
         } catch (final Exception ex) {
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("dialog.pending.revert.failed.title"), Bundle.message("dialog.pending.revert.failed.message", ex.getMessage()));
+            Services.getInstance(p, Notifier.class).error(p, Bundle.message("dialog.pending.revert.failed.title"), Bundle.message("dialog.pending.revert.failed.message", FailureText.of(ex)));
         }
     }
 

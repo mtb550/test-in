@@ -29,6 +29,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.SwingConstants;
@@ -110,7 +111,7 @@ public class TablePanelBuilder {
             final @NotNull TableColumn groupCol = table.getColumn(TestEditorAttributes.GROUP.getName());
             groupCol.setCellEditor(new GroupMultiSelectEditor(p));
         } catch (final IllegalArgumentException ex) {
-            Logger.error(ex.getMessage());
+            Logger.error(FailureText.of(ex));
         }
 
         GridPanelBuilder.autoSizeColumns(table);

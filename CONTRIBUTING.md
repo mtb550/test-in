@@ -130,10 +130,22 @@ open any of the files it names.
 
 This is the single most useful thing to know about this codebase.
 
-`@NotNull` is not a compile-time contract: javac ignores it, and the IDE's
+`@NotNull` is half a compile-time contract. javac ignores it, and the IDE's
 instrumenter rewrites it into a throw that exists only inside a running IDE.
-`return null` from a method declared to return `Optional` compiles. A null passed
-to a `@NotNull` parameter compiles. Both throw in front of a tester.
+NullAway, run by Error Prone inside `compileJava`, is the half that is checked:
+a null passed to a `@NotNull` parameter, returned from a method not marked
+`@Nullable`, or dereferenced where it may be null fails the build, in the
+production code of all three modules (#377). Every other Error Prone check is
+off, and the tests are not checked. What NullAway cannot see still throws in
+front of a tester: a null from platform or library code it has no model for,
+and a field Jackson or reflection left empty.
+
+When it reports a map lookup, a `Path.getParent()` or an `AtomicReference.get()`
+that cannot be null here, say so in the code rather than suppressing it: a
+harmless default (`getOrDefault(key, List.of())`) where there is one, and
+`Objects.requireNonNull(value, whatWasMissing)` where there is not. A
+`@SuppressWarnings("NullAway")` fails the inspection gate like any other
+suppression.
 
 Guarded blocks, caret gestures, tab colors, dialog layout, action registration
 and anything the platform calls back into are reached by **no** unit test. If

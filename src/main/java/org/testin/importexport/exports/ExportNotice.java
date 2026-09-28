@@ -31,6 +31,7 @@ import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.awt.Desktop;
 import java.awt.datatransfer.StringSelection;
@@ -78,7 +79,7 @@ public final class ExportNotice {
                 Desktop.getDesktop().open(toOpen);
             } catch (final IOException ex) {
                 ApplicationManager.getApplication().invokeLater(() ->
-                        notifier.error(p, Bundle.message("export.execution.error.title"), Bundle.message("export.execution.failed", ex.getMessage())));
+                        notifier.error(p, Bundle.message("export.execution.error.title"), Bundle.message("export.execution.failed", FailureText.of(ex))));
             }
         });
     }

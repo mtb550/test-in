@@ -28,6 +28,7 @@ import org.testin.model.FileKind;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.io.IOException;
@@ -144,12 +145,12 @@ final class TestDataFiles {
     }
 
     private void reportRemoveFailure(final @NotNull Project p, final @NotNull Path path, final @NotNull IOException ex) {
-        Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", ex.getMessage()));
+        Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", FailureText.of(ex)));
         Logger.error("unable to remove " + path + ": " + ex.getMessage());
     }
 
     private void reportWriteFailure(final @NotNull Project p, final @NotNull Path path, final @NotNull IOException ex) {
-        Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.write", ex.getMessage()));
+        Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.write", FailureText.of(ex)));
         Logger.error("unable to write content: " + ex.getMessage());
         Logger.error("path" + path);
     }

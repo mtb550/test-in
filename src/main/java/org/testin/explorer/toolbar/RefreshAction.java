@@ -32,6 +32,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -83,7 +84,7 @@ public class RefreshAction extends AbstractProjectAction {
             } catch (final Exception ex) {
                 Logger.error("Refresh: re-indexing failed - " + ex.getMessage());
                 releaseAndRunWhatWaited();
-                Services.getInstance(p, Notifier.class).error(p, Bundle.message("toolbar.refresh.failed.title"), ex.getMessage());
+                Services.getInstance(p, Notifier.class).error(p, Bundle.message("toolbar.refresh.failed.title"), FailureText.of(ex));
             }
         });
     }

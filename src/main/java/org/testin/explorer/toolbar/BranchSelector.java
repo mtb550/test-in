@@ -33,6 +33,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 import org.testin.util.Shortcuts;
 
 import javax.swing.DefaultComboBoxModel;
@@ -249,7 +250,7 @@ public class BranchSelector {
             ApplicationManager.getApplication().invokeLater(() -> {
                 showPlaceholder(Bundle.message("branch.load.failed"));
                 Services.getInstance(p, Notifier.class)
-                        .error(p, Bundle.message("git.error.title"), Bundle.message("branch.load.failed.message", ex.getMessage()));
+                        .error(p, Bundle.message("git.error.title"), Bundle.message("branch.load.failed.message", FailureText.of(ex)));
             });
         }
     }
@@ -262,7 +263,7 @@ public class BranchSelector {
             Logger.error("Could not refresh remote branches: " + fetchError.getMessage());
             ApplicationManager.getApplication().invokeLater(() ->
                     Services.getInstance(p, Notifier.class).warn(p, Bundle.message("branch.fetch.warning.title"),
-                            Bundle.message("branch.fetch.warning.message", fetchError.getMessage())));
+                            Bundle.message("branch.fetch.warning.message", FailureText.of(fetchError))));
         }
     }
 

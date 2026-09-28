@@ -114,7 +114,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                         ApplicationManager.getApplication().invokeLater(() ->
                                 reviewChanges(path, changes, branches, current, unpushed));
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.diffs", ex.getMessage())));
+                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.diffs", FailureText.of(ex))));
         }
 
         // UC-SHARE-010
@@ -174,7 +174,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                         });
                     },
                     ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"),
-                            Bundle.message("git.error.prepare", target, ex.getMessage())));
+                            Bundle.message("git.error.prepare", target, FailureText.of(ex))));
         }
 
         // UC-SHARE-015, Rule-SHARE-067
@@ -241,7 +241,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                             scanForChanges(repoPath);
                         });
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.init.failed.title"), Bundle.message("git.init.failed.message", ex.getMessage())));
+                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.init.failed.title"), Bundle.message("git.init.failed.message", FailureText.of(ex))));
         }
 
         // UC-SHARE-013
@@ -286,7 +286,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                         git.configureRemote(repoPath, remoteName, remoteUrl);
                         ApplicationManager.getApplication().invokeLater(() -> executeGitPush(repoPath, remoteName, remoteUrl, branch, commitId));
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.add.remote", ex.getMessage())));
+                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.add.remote", FailureText.of(ex))));
         }
 
         // UC-SHARE-013, Rule-SHARE-061

@@ -28,6 +28,7 @@ import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.util.FailureText;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -45,7 +46,7 @@ public final class BackgroundWork {
 
     public static <T> void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final boolean cancellable, final @NotNull Function<@NotNull ProgressIndicator, @NotNull T> work, final @NotNull Consumer<@NotNull T> onSuccess, final @NotNull Runnable onFinished) {
         final @NotNull AtomicReference<Optional<T>> answer = new AtomicReference<>(Optional.empty());
-        run(p, title, whatFailed, cancellable, indicator -> answer.set(Optional.of(work.apply(indicator))), () -> answer.get().ifPresent(onSuccess), onFinished);
+        run(p, title, whatFailed, cancellable, indicator -> answer.set(Optional.of(work.apply(indicator))), () -> Objects.requireNonNull(answer.get()).ifPresent(onSuccess), onFinished);
     }
 
     private static void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final boolean cancellable, final @NotNull Consumer<@NotNull ProgressIndicator> work, final @NotNull Runnable onSuccess, final @NotNull Runnable onFinished) {

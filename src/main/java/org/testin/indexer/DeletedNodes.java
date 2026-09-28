@@ -28,6 +28,7 @@ import org.testin.services.Services;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -92,7 +93,8 @@ public final class DeletedNodes {
 
     // UC-INTERNAL-005, Rule-INTERNAL-043
     public void forget(final @NotNull Path kept) {
-        if (!FileUtil.delete(kept.getParent().toFile()))
-            Logger.warn("Left a kept copy of a removed node behind at " + kept.getParent());
+        final @NotNull Path keptIn = Objects.requireNonNull(kept.getParent(), kept.toString());
+        if (!FileUtil.delete(keptIn.toFile()))
+            Logger.warn("Left a kept copy of a removed node behind at " + keptIn);
     }
 }

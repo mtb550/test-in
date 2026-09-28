@@ -24,6 +24,7 @@ import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
+import org.testin.util.FailureText;
 import org.testin.util.Fonts;
 
 import java.io.BufferedWriter;
@@ -42,7 +43,7 @@ public class ExportHtml {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), StandardCharsets.UTF_8))) {
             writeHtmlDocument(writer, sheetsData);
         } catch (final IOException ex) {
-            Logger.error(ex.getMessage());
+            Logger.error(FailureText.of(ex));
             throw new RuntimeException(ex);
         }
     }
@@ -134,7 +135,7 @@ public class ExportHtml {
             writer.write("</html>");
             writer.newLine();
         } catch (final IOException ex) {
-            Logger.error(ex.getMessage());
+            Logger.error(FailureText.of(ex));
             throw new RuntimeException(ex);
         }
     }
