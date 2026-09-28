@@ -13,12 +13,9 @@
             <property name="violationSuppressXPath">
                 <value><![CDATA[
 ./self::*[concat(ancestor::*[@SimpleName][last()]/@SimpleName, '#', @Name) = (
-    'ImportCsv#parseCsvRecords',
-    'GridExcelBehavior#parseTsv',
+    'SeparatedValues#split',
     'GridExcelBehavior#pasteIntoSelection',
     'PasteTestCaseAction#paste',
-    'TestRunWordGenerator#buildTestCaseTable',
-    'TestRunPdfGenerator#buildTestCaseTable',
     'RunStatusService#record',
     'ImportAction#executeImportWriteAction',
     'GridExcelBehavior#copySelection',
@@ -27,12 +24,11 @@
     'CreateTestMethod#injectAsText',
     'ViewPendingCommitsAction#commitOnBranch',
     'TreePanelTree#refresh',
-    'TestRunHtmlGenerator#appendTestCaseTable',
     'ReportOverview#rowsFor',
     'TestEditor#loadDataAsync',
     'RemoveTestCaseAction#performDeletion',
     'ProjectIndexer#indexWithProgress',
-    'GitRefs#parseStatus'
+    'TestRunPdfGenerator#generate'
 )]
                 ]]></value>
             </property>
@@ -45,8 +41,7 @@
             <property name="violationSuppressXPath">
                 <value><![CDATA[
 ./ancestor::MethodDeclaration[concat(ancestor::*[@SimpleName][last()]/@SimpleName, '#', @Name) = (
-    'ImportCsv#parseCsvRecords',
-    'GridExcelBehavior#parseTsv',
+    'SeparatedValues#split',
     'RunStatusService#record',
     'CellEditListener#tableChanged',
     'SetTestCaseStatusAction#record'
