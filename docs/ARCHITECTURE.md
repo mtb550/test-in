@@ -165,8 +165,9 @@ has moved the binding before the panel redraws. The tree panel subscribes when i
 is created, so a project that never opened the tool window has no listener. The
 open editors follow through a project listener in `plugin.xml`. `Rescan` still
 asks `Services.isNotCreated(p, TreePanel.class)` before it scans, because that
-question decides whether the project is scanned at all (#77), and whether startup
-should index at all is still open (#364). Nothing outside `explorer` and `editor`
+question decides whether the project is scanned at all (#77). Startup reads only
+a bound test project; anything else waits for something to need the index
+(#364, Rule-INTERNAL-115). Nothing outside `explorer` and `editor`
 refreshes the tree or reloads the open editors itself, and `ArchitectureTest`
 fails if something does (#361, Rule-INTERNAL-114).
 

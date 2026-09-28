@@ -101,6 +101,10 @@ There is no key for this. It starts on its own.
   once, after it is recorded. Each surface redraws itself from that: the tree
   for a node, the panel for a test project, and the open editors for a project
   read again from disk.
+- **Rule-INTERNAL-115** — A code project bound to a test project reads it when
+  the project opens. One with no test project bound reads nothing until
+  something needs Testin's index, such as opening the Testin panel or following
+  the gutter's link to a test case.
 
 ## The budget
 

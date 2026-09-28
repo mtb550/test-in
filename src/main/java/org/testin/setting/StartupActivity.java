@@ -61,7 +61,7 @@ public final class StartupActivity implements ProjectActivity {
         TestCaseExecutionSubscriber.initRecording(p);
     }
 
-    // UC-SETTING-002, Rule-SETTING-014
+    // UC-SETTING-002, Rule-SETTING-014, Rule-INTERNAL-115
     private static void readTheFolder(final @NotNull Project p) {
         final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         final @NotNull Path testinPath = TestinRoot.normalize(settings.rootTestinPath);
@@ -77,12 +77,12 @@ public final class StartupActivity implements ProjectActivity {
 
         final @NotNull BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
 
-        if (bound.isNamed()) {
-            Logger.info("Test project for this repository: '" + bound.name() + "'");
-        } else {
-            Logger.warn("No test project chosen for " + p.getName());
+        if (!bound.isNamed()) {
+            Logger.info("No test project chosen for " + p.getName() + ", so nothing is read until something needs it");
+            return;
         }
 
+        Logger.info("Test project for this repository: '" + bound.name() + "'");
         Services.getInstance(p, ProjectIndexer.class).indexWithProgress();
     }
 
