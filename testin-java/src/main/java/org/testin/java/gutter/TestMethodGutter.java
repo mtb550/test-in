@@ -80,7 +80,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NO_TEST_CASE_BEHIND_IT, methodName));
     }
 
-    // UC-CODEGEN-007, Rule-CODEGEN-028, Rule-CODEGEN-029
+    // UC-CODEGEN-007, Rule-CODEGEN-028, Rule-CODEGEN-029, Rule-CODEGEN-082
     @Override
     protected void collectNavigationMarkers(final @NotNull PsiElement element, final @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
         final @NotNull Project p = element.getProject();
@@ -89,13 +89,11 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
             return;
         }
 
-        // Rule-CODEGEN-082
-        if (!CodeOn.isOn(p)) return;
-
         Optional.ofNullable(PsiTreeUtil.getParentOfType(token, PsiLiteralExpression.class))
                 .filter(TestMethodGutter::namesATestCase)
                 .map(literal -> StringUtil.unquoteString(literal.getText()).trim())
                 .flatMap(TestMethodGutter::parseUuid)
+                .filter(_ -> CodeOn.isOn(p))
                 .ifPresent(testCaseId -> result.add(new RelatedItemLineMarkerInfo<>(
                         element,
                         element.getTextRange(),
