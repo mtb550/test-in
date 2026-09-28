@@ -25,6 +25,8 @@ import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 
 import java.nio.file.Path;
 
+import static org.testng.Assert.assertNotEquals;
+
 public class TreePanelNodeIdeTest extends BasePlatformTestCase {
 
     private static final Path SET = Path.of("project", "Test Cases", "Login");
@@ -46,7 +48,7 @@ public class TreePanelNodeIdeTest extends BasePlatformTestCase {
         final TreePanelNode login = new TreePanelNode(getProject(), at(new TestSetDirectoryDto(), SET));
         final TreePanelNode checkout = new TreePanelNode(getProject(), at(new TestSetDirectoryDto(), SET.resolveSibling("Checkout")));
 
-        assertFalse(login.equals(checkout));
+        assertNotEquals(login, checkout);
     }
 
     public void testATestSetAndATestRunHaveNothingToOpen() {

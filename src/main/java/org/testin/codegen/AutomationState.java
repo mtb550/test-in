@@ -16,10 +16,15 @@
 
 package org.testin.codegen;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.components.Service;
-import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.util.PsiModificationTracker;
+import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.Automated;
@@ -37,8 +42,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service(Service.Level.PROJECT)
-public final class AutomationState {
+public final class AutomationState implements Disposable {
+    private static final long NEVER_READ = -1;
+
     private final @NotNull Map<UUID, Automated> known = new ConcurrentHashMap<>();
+
+    private volatile long readAtCodeVersion = NEVER_READ;
 
     // UC-CODEGEN-005, Rule-CODEGEN-025
     private final @NotNull Set<UUID> withAMethod = ConcurrentHashMap.newKeySet();
@@ -68,6 +77,7 @@ public final class AutomationState {
 
         // Rule-CODEGEN-082
         if (!CodeOn.isOn(p)) {
+            readAtCodeVersion = NEVER_READ;
             if (known.isEmpty() && withAMethod.isEmpty()) return;
 
             known.clear();
@@ -76,49 +86,64 @@ public final class AutomationState {
             return;
         }
 
-        if (DumbService.isDumb(p)) {
-            DumbService.getInstance(p).runWhenSmart(() -> read(p, testCases, onAnswered));
-            return;
-        }
+        if (alreadyAnswered(p, testCases)) return;
 
-        final @NotNull Map<UUID, Automated> asking = testCases.stream()
+        final @NotNull List<TestCaseDto> reading = List.copyOf(testCases);
+        final @NotNull Map<UUID, Automated> asking = reading.stream()
                 .collect(Collectors.toMap(TestCaseDto::getId, tc -> of(tc.getId()), (first, _) -> first));
 
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final @NotNull Map<UUID, Automated> answers = new LinkedHashMap<>();
-            final @NotNull Set<UUID> found = new LinkedHashSet<>();
+        ReadAction.nonBlocking(() -> answer(p, reading))
+                .inSmartMode(p)
+                .coalesceBy(this, asking.keySet())
+                .expireWith(this)
+                .finishOnUiThread(ModalityState.defaultModalityState(), answer -> keep(answer, reading, asking, onAnswered))
+                .submit(AppExecutorUtil.getAppExecutorService());
+    }
 
-            ApplicationManager.getApplication().runReadAction(() -> {
-                try {
-                    final @NotNull Map<UUID, Boolean> methods = CodeNavigation.available().methodsFor(p, testCases);
+    // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-197
+    private boolean alreadyAnswered(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        return readAtCodeVersion == PsiModificationTracker.getInstance(p).getModificationCount()
+                && testCases.stream().allMatch(tc -> known.containsKey(tc.getId()));
+    }
 
-                    for (final TestCaseDto tc : testCases) {
-                        answers.put(tc.getId(), stateOf(tc, methods));
-                        if (methods.containsKey(tc.getId())) found.add(tc.getId());
-                    }
-                } catch (final Exception ex) {
-                    Logger.warn("Could not read the automation state of " + testCases.size() + " test case(s): " + ex.getMessage());
-                }
-            });
+    private static @NotNull Answer answer(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        final long codeVersion = PsiModificationTracker.getInstance(p).getModificationCount();
+        final @NotNull Map<UUID, Automated> answers = new LinkedHashMap<>();
+        final @NotNull Set<UUID> found = new LinkedHashSet<>();
 
-            if (answers.isEmpty()) return;
+        try {
+            final @NotNull Map<UUID, Boolean> methods = CodeNavigation.available().methodsFor(p, testCases);
 
-            ApplicationManager.getApplication().invokeLater(() -> {
-                known.putAll(answers);
+            for (final TestCaseDto tc : testCases) {
+                answers.put(tc.getId(), stateOf(tc, methods));
+                if (methods.containsKey(tc.getId())) found.add(tc.getId());
+            }
+        } catch (final ProcessCanceledException cancelled) {
+            throw cancelled;
+        } catch (final Exception ex) {
+            Logger.warn("Could not read the automation state of " + testCases.size() + " test case(s): " + ex.getMessage());
+        }
 
-                for (final TestCaseDto tc : testCases) {
-                    if (found.contains(tc.getId())) withAMethod.add(tc.getId());
-                    else withAMethod.remove(tc.getId());
-                }
+        return new Answer(answers, found, codeVersion);
+    }
 
-                if (answers.equals(asking)) return;
+    private void keep(final @NotNull Answer answer, final @NotNull List<TestCaseDto> testCases, final @NotNull Map<UUID, Automated> asking, final @NotNull Runnable onAnswered) {
+        if (answer.states().isEmpty()) return;
 
-                Logger.debug("Automation state read: " + answers.size() + " case(s), "
-                        + answers.values().stream().filter(state -> state == Automated.WRITTEN).count() + " automated");
+        known.putAll(answer.states());
+        readAtCodeVersion = answer.codeVersion();
 
-                onAnswered.run();
-            });
-        });
+        for (final TestCaseDto tc : testCases) {
+            if (answer.withMethods().contains(tc.getId())) withAMethod.add(tc.getId());
+            else withAMethod.remove(tc.getId());
+        }
+
+        if (answer.states().equals(asking)) return;
+
+        Logger.debug("Automation state read: " + answer.states().size() + " case(s), "
+                + answer.states().values().stream().filter(state -> state == Automated.WRITTEN).count() + " automated");
+
+        onAnswered.run();
     }
 
     // UC-EDITOR-PANEL-047, Rule-EDITOR-PANEL-210
@@ -136,5 +161,12 @@ public final class AutomationState {
         if (wanted.isEmpty()) return testCases;
 
         return testCases.stream().filter(tc -> wanted.contains(of(tc.getId()))).toList();
+    }
+
+    @Override
+    public void dispose() {
+    }
+
+    private record Answer(@NotNull Map<UUID, Automated> states, @NotNull Set<UUID> withMethods, long codeVersion) {
     }
 }

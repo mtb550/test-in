@@ -23,8 +23,8 @@ set at once, and the status bar says the same thing as a number.
   answers arrive. A test case nobody has read yet is never reported as not
   automated.
 - **Rule-EDITOR-PANEL-197** — Nothing about this is saved. The state is read
-  from the code every time the list is drawn, so a method written or deleted
-  shows the next time the tester looks.
+  from the code again whenever the code has changed since it was last read, so a
+  method written or deleted shows the next time the tester looks.
 - **Rule-EDITOR-PANEL-198** — The filter offers the three states and behaves
   like the four filters beside it. Choosing none of them shows everything. It is
   offered in both editors, because a test run holds test cases too.
