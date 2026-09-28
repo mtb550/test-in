@@ -558,13 +558,18 @@ public final class ProjectIndexer {
     }
 
     // UC-INTERNAL-005, Rule-INTERNAL-042
-    public boolean restoreNode(final @NotNull Path kept, final @NotNull Path original) {
-        if (!Services.getInstance(DeletedNodes.class).putBack(p, kept, original)) return false;
+    public @NotNull List<Path> restoreNodes(final @NotNull Map<Path, Path> originalByKept) {
+        final @NotNull List<Path> back = new ArrayList<>();
+        final @NotNull List<Path> lost = new ArrayList<>();
+        for (final Map.Entry<Path, Path> one : originalByKept.entrySet()) {
+            if (Services.getInstance(DeletedNodes.class).putBack(p, one.getKey(), one.getValue())) back.add(one.getValue());
+            else lost.add(one.getValue());
+        }
 
-        refreshDirectory(original);
-        refreshIndexedProject(original);
-        announce(original);
-        return true;
+        back.forEach(this::refreshDirectory);
+        back.stream().flatMap(original -> testProjectHolding(original).stream()).distinct().forEach(scanCoordinator::rescanExclusively);
+        back.forEach(this::announce);
+        return lost;
     }
 
     // UC-INTERNAL-005, Rule-INTERNAL-043

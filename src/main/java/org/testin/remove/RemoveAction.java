@@ -42,7 +42,9 @@ import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -184,9 +186,12 @@ public class RemoveAction extends DumbAwareAction {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             // Rule-TREE-PANEL-102
-            final @NotNull List<Kept> lost = new ArrayList<>();
+            final @NotNull Map<Path, Path> originalByKept = new LinkedHashMap<>();
+            kept.forEach(one -> originalByKept.put(one.copy(), one.original()));
+
+            final @NotNull List<Path> lost = new ArrayList<>();
             ProgressManager.getInstance().runProcessWithProgressSynchronously(
-                    () -> lost.addAll(kept.stream().filter(one -> !indexer.restoreNode(one.copy(), one.original())).toList()),
+                    () -> lost.addAll(indexer.restoreNodes(originalByKept)),
                     Bundle.message("remove.undo.progress"), false, p);
 
             if (lost.isEmpty()) return true;
