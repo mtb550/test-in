@@ -51,7 +51,7 @@ public final class NodeCounter {
                 counted(byType, DirectoryType.TSP) + counted(byType, DirectoryType.TRP),
                 indexer.testCaseCountOf(dto.getPath())
                         + beneath.stream().mapToLong(node -> indexer.testCaseCountOf(node.getPath())).sum(),
-                indexer.getTestCasesUnder(dto).size(),
+                activeTestCasesUnder(indexer, dto),
                 counted(byType, DirectoryType.TR));
     }
 
@@ -71,6 +71,16 @@ public final class NodeCounter {
         }
 
         return found;
+    }
+
+    private static long activeTestCasesUnder(final @NotNull ProjectIndexer indexer, final @NotNull DirectoryDto node) {
+        long count = indexer.testCaseCountOf(node.getPath());
+
+        for (final DirectoryDto child : indexer.getChildren(node.getPath())) {
+            if (!child.isRetired()) count += activeTestCasesUnder(indexer, child);
+        }
+
+        return count;
     }
 
     private static long counted(final @NotNull Map<DirectoryType, Long> byType, final @NotNull DirectoryType type) {
