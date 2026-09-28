@@ -16,17 +16,13 @@
 
 package org.testin.lightmode;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionUiKind;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.util.WindowStateService;
 import com.intellij.ui.RoundedLineBorder;
-import com.intellij.ui.WindowMoveListener;
-import com.intellij.ui.WindowResizeListener;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.Animator;
@@ -62,16 +58,13 @@ import org.testin.util.Fonts;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
 
-import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
-import javax.swing.WindowConstants;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -79,29 +72,17 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 final class LightModeWindow {
-    private static final @NotNull String PLACEMENT = "testin.lightMode.v1";
-
     private static final @NotNull String ZOOM = "testin.lightMode.zoom.v1";
 
     private static final int START_WIDTH = 420;
-
-    private static final int MIN_WIDTH = 280;
-
-    private static final int GRAB = 4;
 
     private static final int SET_FRAME_ARC = 20;
 
@@ -113,7 +94,6 @@ final class LightModeWindow {
     private static final float ZOOM_MIN = 0.8f;
     private static final float ZOOM_MAX = 2.0f;
 
-    private final @NotNull JFrame frame = new JFrame();
     private final @NotNull RunEditor editor;
     private final @NotNull Runnable onClosed;
 
@@ -135,6 +115,7 @@ final class LightModeWindow {
     private final @NotNull JBLabel chosen = new JBLabel();
     private final @NotNull SlidingPanel testCaseView = new SlidingPanel(new BorderLayout());
     private final @NotNull Disposable motionScope = Disposer.newDisposable("Testin light mode motion");
+    private final @NotNull LightModeFrame frame = new LightModeFrame(motionScope);
     private final @NotNull TestCaseDetails details;
     private final @NotNull JBPanel<?> underTestCase = new JBPanel<>(new BorderLayout());
     private final @NotNull JBLabel testCaseClock = clock(Bundle.message("light.case.clock"));
@@ -147,7 +128,6 @@ final class LightModeWindow {
     private final @NotNull StatusBarBase statusBar = new StatusBarBase(new StatusBarItem[0]);
     private final @NotNull ViewMenuBtn viewMenu = new ViewMenuBtn(this::applyView);
     private @NotNull Optional<UUID> shownTestCase = Optional.empty();
-    private @NotNull Optional<Animator> heightMotion = Optional.empty();
     private @NotNull Optional<Animator> slideMotion = Optional.empty();
     private @NotNull Optional<FailureForm> capture = Optional.empty();
 
@@ -155,29 +135,23 @@ final class LightModeWindow {
 
     private boolean detailsKeyHeld = false;
 
-    private int lastWidth;
-
     LightModeWindow(final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
         this.editor = editor;
         this.details = new TestCaseDetails();
         this.onClosed = onClosed;
 
-        frame.setUndecorated(true);
-        frame.setAlwaysOnTop(true);
-        frame.setContentPane(content());
+        frame.hold(content());
 
         applyZoom();
 
-        frame.pack();
-
-        placeIt();
+        frame.packAndPlace();
         refresh();
 
         bindKeys();
         bindWheel();
-        bindResize();
+        frame.resizable(this::fitHeight);
 
-        frame.setVisible(true);
+        frame.show();
     }
 
     private static @NotNull String keyOf(final @NotNull TestStatus status) {
@@ -242,36 +216,7 @@ final class LightModeWindow {
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-202, Rule-EDITOR-PANEL-204
     private void fitHeight() {
-        frame.validate();
-
-        final int wanted = frame.getPreferredSize().height;
-        final int usable = usableHeight();
-
-        details.setCutOff(wanted > usable);
-        frame.validate();
-
-        final int target = Math.min(frame.getPreferredSize().height, usable);
-        final int from = frame.getHeight();
-
-        if (from == target || !frame.isShowing() || from <= 0) {
-            frame.setSize(frame.getWidth(), target);
-            return;
-        }
-
-        heightMotion.ifPresent(Animator::dispose);
-
-        heightMotion = Motion.run(motionScope, "Testin light mode height",
-                travelled -> frame.setSize(frame.getWidth(), from + (int) ((target - from) * travelled)),
-                () -> frame.setSize(frame.getWidth(), target));
-    }
-
-    // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-217
-    private int usableHeight() {
-        return Optional.ofNullable(frame.getGraphicsConfiguration())
-                .map(gc -> gc.getBounds().height
-                        - Toolkit.getDefaultToolkit().getScreenInsets(gc).top
-                        - Toolkit.getDefaultToolkit().getScreenInsets(gc).bottom)
-                .orElseGet(() -> Toolkit.getDefaultToolkit().getScreenSize().height);
+        frame.fitHeight(details::setCutOff);
     }
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-201
@@ -308,51 +253,30 @@ final class LightModeWindow {
     }
 
     void closeQuietly() {
-        WindowStateService.getInstance().putLocation(PLACEMENT, frame.getLocation());
-
-        WindowStateService.getInstance().putSize(PLACEMENT, frame.getSize());
-
         Disposer.dispose(motionScope);
-        frame.dispose();
-    }
-
-    private void placeIt() {
-        Optional.ofNullable(WindowStateService.getInstance().getSize(PLACEMENT))
-                .map(size -> Math.max(size.width, JBUI.scale(MIN_WIDTH)))
-                .ifPresent(width -> frame.setSize(width, frame.getHeight()));
-
-        lastWidth = frame.getWidth();
-
-        Optional.ofNullable(WindowStateService.getInstance().getLocation(PLACEMENT))
-                .ifPresentOrElse(frame::setLocation, () -> frame.setLocationRelativeTo(null));
+        frame.closeQuietly();
     }
 
     private void bindKeys() {
-        bind(Shortcuts.Escape.getKey(), "testin.lightMode.escape", this::escape);
-        bind(Shortcuts.Enter.getKey(), "testin.lightMode.commit", this::saveCapture);
-        bind(Shortcuts.ToggleDetails.getKey(), "testin.lightMode.toggleDetails", this::toggleDetailsOnce);
-        bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK, true), "testin.lightMode.releaseDetails", () -> detailsKeyHeld = false);
-        bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, true), "testin.lightMode.releaseDetailsAlone", () -> detailsKeyHeld = false);
+        frame.bind(Shortcuts.Escape.getKey(), "testin.lightMode.escape", this::escape);
+        frame.bind(Shortcuts.Enter.getKey(), "testin.lightMode.commit", this::saveCapture);
+        frame.bind(Shortcuts.ToggleDetails.getKey(), "testin.lightMode.toggleDetails", this::toggleDetailsOnce);
+        frame.bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK, true), "testin.lightMode.releaseDetails", () -> detailsKeyHeld = false);
+        frame.bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, true), "testin.lightMode.releaseDetailsAlone", () -> detailsKeyHeld = false);
 
         for (final TestStatus status : TestStatus.values()) {
             if (!status.isVerdict()) continue;
 
-            bind(status.getMenuEntry().shortcut(), "testin.lightMode." + status.name(), () -> judge(status));
+            frame.bind(status.getMenuEntry().shortcut(), "testin.lightMode." + status.name(), () -> judge(status));
         }
 
-        KEYED.forEach(button -> ShownTestCaseAction.bind(editor.getProject(), button, this::testCaseForButtons, (action, tc) -> action.executeFor(editor, tc), frame.getRootPane()));
+        KEYED.forEach(button -> ShownTestCaseAction.bind(editor.getProject(), button, this::testCaseForButtons, (action, tc) -> action.executeFor(editor, tc), frame.rootPane()));
 
-        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final @NotNull WindowEvent e) {
-                close();
-            }
-        });
+        frame.onClosing(this::close);
     }
 
     private void bindWheel() {
-        frame.getContentPane().addMouseWheelListener(e -> {
+        frame.content().addMouseWheelListener(e -> {
             zoomBy(-e.getWheelRotation() * ZOOM_STEP);
             e.consume();
         });
@@ -383,18 +307,6 @@ final class LightModeWindow {
 
     private @NotNull Font scaled(final @NotNull Font base) {
         return Fonts.zoomed(base, zoom);
-    }
-
-    private void bind(final @NotNull KeyStroke key, final @NotNull String name, final @NotNull Runnable action) {
-        final @NotNull JComponent root = frame.getRootPane();
-
-        root.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(key, name);
-        root.getActionMap().put(name, new AbstractAction() {
-            @Override
-            public void actionPerformed(final @NotNull ActionEvent e) {
-                action.run();
-            }
-        });
     }
 
     // UC-EDITOR-PANEL-046
@@ -475,7 +387,7 @@ final class LightModeWindow {
     private void showCapture() {
         underTestCase.removeAll();
 
-        ActionSystem.perform(frame.getRootPane(), ActionPlaces.UNKNOWN, ActionUiKind.NONE, () -> underTestCase.add(capture.map(form -> (JComponent) form).orElse(details), BorderLayout.CENTER));
+        ActionSystem.perform(frame.rootPane(), ActionPlaces.UNKNOWN, ActionUiKind.NONE, () -> underTestCase.add(capture.map(form -> (JComponent) form).orElse(details), BorderLayout.CENTER));
 
         statusBar.updateItems(capture.isPresent() ? commitKeys() : testCaseKeys());
 
@@ -547,7 +459,7 @@ final class LightModeWindow {
         panel.setBackground(JBUI.CurrentTheme.CustomFrameDecorations.paneBackground());
         panel.setBorder(BorderFactory.createCompoundBorder(
                 JBUI.Borders.customLine(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground()),
-                JBUI.Borders.empty(0, GRAB)));
+                JBUI.Borders.empty(0, LightModeFrame.GRAB)));
 
         panel.add(titleBar(), BorderLayout.NORTH);
         panel.add(body(), BorderLayout.CENTER);
@@ -569,7 +481,7 @@ final class LightModeWindow {
         left.setOpaque(false);
         left.add(start);
         left.add(stop);
-        left.add(pin());
+        left.add(frame.pin());
         left.add(viewMenu);
 
         counter.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
@@ -581,46 +493,9 @@ final class LightModeWindow {
         bar.add(runName, BorderLayout.CENTER);
         bar.add(counter, BorderLayout.EAST);
 
-        dragBy(bar);
+        frame.dragBy(bar);
 
         return bar;
-    }
-
-    private @NotNull TitleBarBtn pin() {
-        final @NotNull TitleBarBtn button = new TitleBarBtn(Bundle.message("light.pin"), AllIcons.General.Pin_tab);
-
-        button.setOn(frame.isAlwaysOnTop());
-        button.addActionListener(_ -> {
-            frame.setAlwaysOnTop(!frame.isAlwaysOnTop());
-            button.setOn(frame.isAlwaysOnTop());
-        });
-
-        return button;
-    }
-
-    private void dragBy(final @NotNull JComponent bar) {
-        new WindowMoveListener(bar).installTo(bar);
-    }
-
-    // UC-EDITOR-PANEL-046
-    private void bindResize() {
-        frame.setMinimumSize(new Dimension(JBUI.scale(MIN_WIDTH), 0));
-
-        final @NotNull JComponent content = (JComponent) frame.getContentPane();
-        final @NotNull WindowResizeListener resize = new WindowResizeListener(content, JBUI.insets(0, GRAB), null);
-
-        content.addMouseListener(resize);
-        content.addMouseMotionListener(resize);
-
-        frame.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(final @NotNull ComponentEvent e) {
-                if (frame.getWidth() == lastWidth) return;
-
-                lastWidth = frame.getWidth();
-                fitHeight();
-            }
-        });
     }
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-232, Rule-EDITOR-PANEL-243
