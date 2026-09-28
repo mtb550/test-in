@@ -71,6 +71,17 @@ public abstract class DirectoryDto {
     @NonNull
     public abstract Marker getMarker();
 
+    // Rule-INTERNAL-116
+    @Override
+    public final boolean equals(final @Nullable Object other) {
+        return other instanceof DirectoryDto dir && dir.getClass() == getClass() && dir.path.equals(path);
+    }
+
+    @Override
+    public final int hashCode() {
+        return path.hashCode();
+    }
+
     public int getOrder() {
         return getMarker().getOrder();
     }

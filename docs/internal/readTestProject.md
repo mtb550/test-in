@@ -105,6 +105,9 @@ There is no key for this. It starts on its own.
   the project opens. One with no test project bound reads nothing until
   something needs Testin's index, such as opening the Testin panel or following
   the gutter's link to a test case.
+- **Rule-INTERNAL-116** — A folder is known by its path. Two readings of the
+  same folder are the same node, however much of it each one read, and two kinds
+  of node at one path are not.
 
 ## The budget
 
