@@ -30,9 +30,7 @@ import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -60,8 +58,7 @@ public class ImportExcel {
 
     public @NotNull Map<String, List<TestCaseDto>> parseFile(final @NotNull Project p, final @NotNull File file) {
         final @NotNull Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
-        try (InputStream fis = new FileInputStream(file);
-             Workbook workbook = WorkbookFactory.create(fis)) {
+        try (Workbook workbook = WorkbookFactory.create(file, null, true)) {
             parseWorkbook(workbook, p, result);
 
         } catch (final IOException ex) {
