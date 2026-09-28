@@ -224,7 +224,8 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
 
         // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-083
         private void rankUnderTheSelection(final @NotNull TestEditor destUI, final @NotNull List<TestCaseDto> pastedHere) {
-            final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(destUI.getAllTestCases().stream().filter(tc -> !pastedHere.contains(tc)).toList());
+            final @NotNull Set<TestCaseDto> pasted = new HashSet<>(pastedHere);
+            final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(destUI.getAllTestCases().stream().filter(tc -> !pasted.contains(tc)).toList());
             final @NotNull Optional<TestCaseDto> anchor = destUI.getSelectedTestCases().stream()
                     .filter(selected -> !selected.getOrder().isEmpty())
                     .reduce((_, last) -> last);
@@ -234,9 +235,9 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
             @NotNull String previous = under > 0 && under <= ordered.size() ? ordered.get(under - 1).getOrder() : "";
             final @NotNull String upperBound = under < ordered.size() ? ordered.get(under).getOrder() : "";
 
-            for (final TestCaseDto pasted : pastedHere) {
+            for (final TestCaseDto tc : pastedHere) {
                 previous = Rank.between(previous, upperBound);
-                pasted.setOrder(previous);
+                tc.setOrder(previous);
             }
         }
 

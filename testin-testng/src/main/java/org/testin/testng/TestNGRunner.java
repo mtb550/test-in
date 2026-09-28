@@ -41,10 +41,12 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public final class TestNGRunner implements TestRunner {
@@ -131,7 +133,7 @@ public final class TestNGRunner implements TestRunner {
     private void launch(final @NotNull Project p, final @NotNull List<Generated> found, final @NotNull Optional<Module> module) {
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
-        final @NotNull List<TestCaseDto> stillWanted = execution.stillWanted(found.stream().map(Generated::tc).toList());
+        final @NotNull Set<TestCaseDto> stillWanted = new HashSet<>(execution.stillWanted(found.stream().map(Generated::tc).toList()));
         if (stillWanted.isEmpty()) {
             Logger.info("Not starting: every case in the run was stopped before it began");
             return;
