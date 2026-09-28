@@ -40,8 +40,9 @@ public final class NodeCounter {
 
     // UC-INTERNAL-006, Rule-INTERNAL-046, Rule-INTERNAL-047, Rule-INTERNAL-050
     public static @NotNull NodeFigures childCounts(final @NotNull Project p, final @NotNull DirectoryDto dto) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        final @NotNull List<DirectoryDto> beneath = beneath(indexer, dto);
+        final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
+        final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
+        final @NotNull List<DirectoryDto> beneath = beneath(nodes, dto);
 
         final @NotNull Map<DirectoryType, Long> byType = beneath.stream()
                 .collect(Collectors.groupingBy(DirectoryDto::getType, Collectors.counting()));
@@ -49,35 +50,35 @@ public final class NodeCounter {
         return NodeFigures.ofChildren(
                 counted(byType, DirectoryType.TS),
                 counted(byType, DirectoryType.TSP) + counted(byType, DirectoryType.TRP),
-                indexer.testCaseCountOf(dto.getPath())
-                        + beneath.stream().mapToLong(node -> indexer.testCaseCountOf(node.getPath())).sum(),
-                activeTestCasesUnder(indexer, dto),
+                testCases.testCaseCountOf(dto.getPath())
+                        + beneath.stream().mapToLong(node -> testCases.testCaseCountOf(node.getPath())).sum(),
+                activeTestCasesUnder(testCases, nodes, dto),
                 counted(byType, DirectoryType.TR));
     }
 
     // UC-INTERNAL-006, Rule-INTERNAL-048, Rule-INTERNAL-049, Rule-INTERNAL-051
     public static @NotNull NodeFigures runVerdicts(final @NotNull Project p, final @NotNull DirectoryDto dto) {
-        return Services.getInstance(p, ProjectIndexer.class).findTestRun(dto.getPath())
+        return Services.getInstance(p, TestRuns.class).findTestRun(dto.getPath())
                 .map(run -> NodeFigures.ofRun(TestRunSummary.of(run.getResults())))
                 .orElse(NodeFigures.NONE);
     }
 
-    private static @NotNull List<DirectoryDto> beneath(final @NotNull ProjectIndexer indexer, final @NotNull DirectoryDto node) {
+    private static @NotNull List<DirectoryDto> beneath(final @NotNull Nodes nodes, final @NotNull DirectoryDto node) {
         final @NotNull List<DirectoryDto> found = new ArrayList<>();
 
-        for (final DirectoryDto child : indexer.getChildren(node.getPath())) {
+        for (final DirectoryDto child : nodes.getChildren(node.getPath())) {
             found.add(child);
-            found.addAll(beneath(indexer, child));
+            found.addAll(beneath(nodes, child));
         }
 
         return found;
     }
 
-    private static long activeTestCasesUnder(final @NotNull ProjectIndexer indexer, final @NotNull DirectoryDto node) {
-        long count = indexer.testCaseCountOf(node.getPath());
+    private static long activeTestCasesUnder(final @NotNull TestCases testCases, final @NotNull Nodes nodes, final @NotNull DirectoryDto node) {
+        long count = testCases.testCaseCountOf(node.getPath());
 
-        for (final DirectoryDto child : indexer.getChildren(node.getPath())) {
-            if (!child.isRetired()) count += activeTestCasesUnder(indexer, child);
+        for (final DirectoryDto child : nodes.getChildren(node.getPath())) {
+            if (!child.isRetired()) count += activeTestCasesUnder(testCases, nodes, child);
         }
 
         return count;
