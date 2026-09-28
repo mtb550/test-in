@@ -1,0 +1,134 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.editor;
+
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.util.Disposer;
+import com.intellij.ui.table.JBTable;
+import org.jetbrains.annotations.NotNull;
+import org.testin.actions.EscapeAction;
+import org.testin.editor.grid.GridEnterAction;
+import org.testin.editor.grid.GridPanelBuilder;
+import org.testin.editor.grid.GridView;
+import org.testin.editor.listeners.GridContextMenuListener;
+import org.testin.editor.listeners.GridSelectionListener;
+import org.testin.editor.statusbar.PageAction;
+import org.testin.logger.Logger;
+import org.testin.model.ToolBarAttribute;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
+import org.testin.open.OpenContextMenuAction;
+import org.testin.services.Services;
+import org.testin.ui.FontSync;
+import org.testin.util.Bundle;
+import org.testin.util.FailureText;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+final class EditorGrid<A extends Enum<A> & ToolBarAttribute> {
+    private final @NotNull AbstractTestinEditor<A, ?> editor;
+    private final @NotNull List<TestCaseDto> rowsOnGrid = new ArrayList<>();
+    private @NotNull Optional<GridView> view = Optional.empty();
+
+    EditorGrid(final @NotNull AbstractTestinEditor<A, ?> editor) {
+        this.editor = editor;
+    }
+
+    @NotNull Optional<GridView> view() {
+        return view;
+    }
+
+    @NotNull Optional<JBTable> table() {
+        return view.map(GridView::table);
+    }
+
+    // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-119
+    boolean isCellOpen() {
+        return view.map(GridView::isCellOpen).orElse(false);
+    }
+
+    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-021
+    void updateColumns() {
+        view.ifPresent(shown -> editor.gridPanelBuilder.applyColumnVisibility(shown.table(), editor.attributeType(), editor.getSelectedDetails()));
+    }
+
+    // UC-EDITOR-PANEL-020, UC-EDITOR-PANEL-022
+    void redraw() {
+        view.ifPresentOrElse(this::refill, this::rebuild);
+    }
+
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-017
+    void rebuild() {
+        final boolean keepKeyboard = view.map(GridView::handOver).orElse(false);
+
+        final @NotNull List<TestCaseDto> pageItems = showOnGrid(editor.getCurrentPageItems());
+        final @NotNull Set<A> attributes = editor.getSelectedDetails();
+        Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
+        final @NotNull Disposable fontSync = Disposer.newDisposable(editor.projectDisposable, "testin." + editor.getClass().getSimpleName() + ".gridFontSync");
+        try {
+            final @NotNull JBTable table = editor.buildTable(editor.gridRows(pageItems), attributes);
+            FontSync.syncWithNativeEditor(editor.p, table, fontSync, _ -> GridPanelBuilder.resizeToFont(table));
+
+            table.getSelectionModel().addListSelectionListener(new GridSelectionListener(editor, table, editor.list, pageItems));
+            editor.installEditListener(table, pageItems);
+            new EscapeAction(editor.p, table);
+            new GridEnterAction(editor.p, table, pageItems, editor.parent.getPath2());
+            table.addMouseListener(new GridContextMenuListener(table, editor.list, editor.contextMenu, pageItems));
+            editor.contextMenu.bindShortcutsTo(table);
+            PageAction.bindToGrid(editor, table);
+            new OpenContextMenuAction(table, editor.contextMenu);
+
+            final @NotNull Optional<GridView> previous = view;
+            view = Optional.of(GridPanelBuilder.finishRebuild(table, editor.list, pageItems, fontSync, keepKeyboard));
+
+            previous.ifPresent(old -> Disposer.dispose(old.fontSync()));
+
+            Logger.debug("[grid] rebuildGrid done, rows=" + table.getRowCount() + ", cols=" + table.getColumnCount());
+        } catch (final Exception ex) {
+            Logger.error("[grid] rebuildGrid FAILED: " + ex);
+            Disposer.dispose(fontSync);
+
+            // Rule-EDITOR-PANEL-229
+            view.ifPresent(old -> Disposer.dispose(old.fontSync()));
+            view = Optional.empty();
+            editor.center.set(editor.scrollPane);
+            Services.getInstance(editor.p, Notifier.class).softRefuse(editor.p, Bundle.message("editor.grid.not.drawn", FailureText.of(ex)));
+        }
+    }
+
+    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-249
+    private void refill(final @NotNull GridView shown) {
+        final boolean keepKeyboard = shown.handOver();
+        final int column = shown.table().getSelectedColumn();
+
+        final @NotNull List<TestCaseDto> pageItems = showOnGrid(editor.getCurrentPageItems());
+        GridPanelBuilder.replaceRows(shown.table(), editor.gridRows(pageItems));
+        GridPanelBuilder.restoreSelection(shown.table(), editor.list, pageItems, column);
+
+        if (keepKeyboard) ApplicationManager.getApplication().invokeLater(shown.table()::requestFocusInWindow);
+    }
+
+    private @NotNull List<TestCaseDto> showOnGrid(final @NotNull List<TestCaseDto> pageItems) {
+        rowsOnGrid.clear();
+        rowsOnGrid.addAll(pageItems);
+        return rowsOnGrid;
+    }
+}

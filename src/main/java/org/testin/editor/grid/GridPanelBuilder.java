@@ -238,8 +238,8 @@ public class GridPanelBuilder {
         table.scrollRectToVisible(table.getCellRect(selectedRow, column, true));
     }
 
-    public static @NotNull GridView finishRebuild(final @NotNull JBTable table, final @NotNull JBList<TestCaseDto> list, final @NotNull List<TestCaseDto> pageItems, final int columnToRestore, final @NotNull Disposable fontSync, final boolean keepKeyboard) {
-        restoreSelection(table, list, pageItems, columnToRestore);
+    public static @NotNull GridView finishRebuild(final @NotNull JBTable table, final @NotNull JBList<TestCaseDto> list, final @NotNull List<TestCaseDto> pageItems, final @NotNull Disposable fontSync, final boolean keepKeyboard) {
+        restoreSelection(table, list, pageItems, 0);
 
         if (keepKeyboard) ApplicationManager.getApplication().invokeLater(table::requestFocusInWindow);
 

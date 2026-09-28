@@ -31,14 +31,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
-import org.testin.actions.EscapeAction;
-import org.testin.editor.grid.GridEnterAction;
 import org.testin.editor.grid.GridPanelBuilder;
-import org.testin.editor.grid.GridView;
 import org.testin.editor.list.ListPanelBuilder;
 import org.testin.editor.list.ListView;
-import org.testin.editor.listeners.GridContextMenuListener;
-import org.testin.editor.listeners.GridSelectionListener;
 import org.testin.editor.statusbar.PageAction;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
@@ -50,15 +45,12 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
-import org.testin.open.OpenContextMenuAction;
 import org.testin.services.ProjectLifetime;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
-import org.testin.ui.FontSync;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
-import org.testin.util.FailureText;
 
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
@@ -99,8 +91,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     protected final @NotNull AbstractEditorContextMenu contextMenu;
     @Getter
     protected final @NotNull StatusBar statusBar = new StatusBar();
-    protected @NotNull Optional<GridView> grid = Optional.empty();
-    private final @NotNull List<TestCaseDto> rowsOnGrid = new ArrayList<>();
+    protected final @NotNull EditorGrid<A> grid = new EditorGrid<>(this);
     @Getter
     @Setter
     protected int currentPage = 1;
@@ -114,7 +105,6 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     @Setter
     protected int hoveredIndex = -1;
     protected @NotNull Optional<UUID> selectionToRestore = Optional.empty();
-    protected int gridColumnToRestore = -1;
     private boolean goingTo = false;
     private boolean disposed;
 
@@ -169,7 +159,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     public @NotNull JComponent getPreferredFocusedComponent() {
         if (getToolBar().getCurrentView() != ViewMode.GRID_VIEW) return list;
 
-        return grid.<JComponent>map(GridView::table).orElse(list);
+        return grid.table().<JComponent>map(JComponent.class::cast).orElse(list);
     }
 
     @Override
@@ -221,7 +211,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-119
     @Override
     public boolean isBusy() {
-        return grid.map(GridView::isCellOpen).orElse(false);
+        return grid.isCellOpen();
     }
 
     protected void refreshCards() {
@@ -262,14 +252,10 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
 
         if (getToolBar().getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[details] grid active -> toggling column visibility");
-            updateGridColumns();
+            grid.updateColumns();
         } else {
             refreshCards();
         }
-    }
-
-    protected void updateGridColumns() {
-        grid.ifPresent(view -> gridPanelBuilder.applyColumnVisibility(view.table(), attributeType(), getSelectedDetails()));
     }
 
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-018
@@ -285,8 +271,8 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     @Override
     public void onToolBarSwitchedToGridView() {
         Logger.debug("[switch] -> GRID view, currentView=" + getToolBar().getCurrentView());
-        rebuildGrid();
-        grid.ifPresent(view -> {
+        grid.rebuild();
+        grid.view().ifPresent(view -> {
             center.set(view.scrollPane());
             ApplicationManager.getApplication().invokeLater(view.table()::requestFocusInWindow);
         });
@@ -297,69 +283,6 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     protected abstract @NotNull JBTable buildTable(final @NotNull List<String[]> rows, final @NotNull Set<A> attributes);
 
     protected abstract void installEditListener(final @NotNull JBTable table, final @NotNull List<TestCaseDto> pageItems);
-
-    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-017
-    protected void rebuildGrid() {
-        final boolean keepKeyboard = grid.map(GridView::handOver).orElse(false);
-
-        final @NotNull List<TestCaseDto> pageItems = showOnGrid(getCurrentPageItems());
-        final @NotNull Set<A> attributes = getSelectedDetails();
-        Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
-        final @NotNull Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin." + getClass().getSimpleName() + ".gridFontSync");
-        try {
-            final @NotNull JBTable table = buildTable(gridRows(pageItems), attributes);
-            FontSync.syncWithNativeEditor(p, table, fontSync, _ -> GridPanelBuilder.resizeToFont(table));
-
-            table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, list, pageItems));
-            installEditListener(table, pageItems);
-            new EscapeAction(p, table);
-            new GridEnterAction(p, table, pageItems, parent.getPath2());
-            table.addMouseListener(new GridContextMenuListener(table, list, contextMenu, pageItems));
-            contextMenu.bindShortcutsTo(table);
-            PageAction.bindToGrid(this, table);
-            new OpenContextMenuAction(table, contextMenu);
-
-            final @NotNull Optional<GridView> previous = grid;
-            grid = Optional.of(GridPanelBuilder.finishRebuild(table, list, pageItems, gridColumnToRestore, fontSync, keepKeyboard));
-
-            previous.ifPresent(old -> Disposer.dispose(old.fontSync()));
-
-            gridColumnToRestore = -1;
-            Logger.debug("[grid] rebuildGrid done, rows=" + table.getRowCount() + ", cols=" + table.getColumnCount());
-        } catch (final Exception ex) {
-            Logger.error("[grid] rebuildGrid FAILED: " + ex);
-            Disposer.dispose(fontSync);
-
-            // Rule-EDITOR-PANEL-229
-            grid.ifPresent(old -> Disposer.dispose(old.fontSync()));
-            grid = Optional.empty();
-            center.set(scrollPane);
-            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("editor.grid.not.drawn", FailureText.of(ex)));
-        }
-    }
-
-    // UC-EDITOR-PANEL-020, UC-EDITOR-PANEL-022
-    private void redrawGrid() {
-        grid.ifPresentOrElse(this::refillGrid, this::rebuildGrid);
-    }
-
-    // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-249
-    private void refillGrid(final @NotNull GridView view) {
-        final boolean keepKeyboard = view.handOver();
-        final int column = view.table().getSelectedColumn();
-
-        final @NotNull List<TestCaseDto> pageItems = showOnGrid(getCurrentPageItems());
-        GridPanelBuilder.replaceRows(view.table(), gridRows(pageItems));
-        GridPanelBuilder.restoreSelection(view.table(), list, pageItems, column);
-
-        if (keepKeyboard) ApplicationManager.getApplication().invokeLater(view.table()::requestFocusInWindow);
-    }
-
-    private @NotNull List<TestCaseDto> showOnGrid(final @NotNull List<TestCaseDto> pageItems) {
-        rowsOnGrid.clear();
-        rowsOnGrid.addAll(pageItems);
-        return rowsOnGrid;
-    }
 
     protected void loadDataAsync() {
         loadDataAsync(() -> {
@@ -482,7 +405,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         Declared.bindTo("Testin.RemoveTestCase", list);
 
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
-                () -> grid.map(GridView::table),
+                grid::table,
                 () -> getToolBar().getCurrentView() == ViewMode.GRID_VIEW);
     }
 
@@ -526,8 +449,8 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
 
         if (getToolBar().getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> redrawing grid");
-            redrawGrid();
-            grid.ifPresent(view -> center.set(view.scrollPane()));
+            grid.redraw();
+            grid.view().ifPresent(view -> center.set(view.scrollPane()));
         }
 
         afterViewRefreshed();
