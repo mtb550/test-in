@@ -37,7 +37,8 @@ There is no key for this. **Commit & Push** is the face of the split button.
 - **Rule-SHARE-123** — **Commit & Push** pulls before it pushes, rebasing and
   stashing the way a sync does, so the tester's commits land on top of what the
   remote already holds. A remote with no branch of that name yet is pushed to
-  without the pull.
+  without the pull; a remote that cannot be asked is not taken for one, and
+  nothing is pushed.
 
 ## What the tester sees
 
@@ -80,6 +81,11 @@ already made.
 
 **If the remote cannot be read** — a message titled **Git Error** reads *Could
 not read the Git remote:* and then the reason.
+
+**If the remote cannot be asked for its branches** — nothing is pulled or
+pushed. A message titled **Push Failed** reads *Could not ask* the remote
+*whether it has the branch*, the branch, *so nothing was pulled or pushed:*,
+and Git's reason on the next line.
 
 **If the push fails** — a message titled **Push Failed** carries the reason.
 

@@ -44,6 +44,10 @@ There is no key for this. The menu entry is **Sync With Remote**.
 - **Rule-SHARE-122** — Where the repository has several remotes, the one named
   `origin` is used, and with no `origin` the first one Git lists. **Commit &
   Push** chooses the same way.
+- **Rule-SHARE-125** — A remote that cannot be asked whether it has the branch
+  stops the sync before anything is pulled or pushed, and the message gives the
+  reason Git gave. Only a remote that answered, and answered that it has no
+  branch of that name, is pushed to without a pull.
 
 ## What the tester sees
 
@@ -81,6 +85,11 @@ remote.*
 
 **If the pull stops on a conflict** — the conflict offer appears instead of
 anything else. That is [UC-SHARE-017](resolveConflicts.md).
+
+**If the remote cannot be asked for its branches** — nothing is pulled or
+pushed. A message titled **Sync Failed** reads *Could not sync with the
+remote:*, then *Could not ask* the remote *whether it has the branch*, the
+branch, *so nothing was pulled or pushed:*, and Git's reason on the next line.
 
 **If anything else fails** — a message titled **Sync Failed** reads *Could not
 sync with the remote:*. The reason is on the next line.

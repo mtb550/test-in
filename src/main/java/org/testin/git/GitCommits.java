@@ -23,6 +23,7 @@ import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -130,12 +131,12 @@ public final class GitCommits {
                 GitCommand.PULL, "--rebase", "--autostash", remote, branch);
     }
 
+    // UC-SHARE-016, Rule-SHARE-125
     private boolean remoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String remoteUrl, final @NotNull String branch) {
         try {
             return !GitCommandRunner.executeRemote(p, repositoryPath, remoteUrl, GitCommand.LS_REMOTE, "--heads", remote, branch).isBlank();
         } catch (final RuntimeException ex) {
-            Logger.debug("Could not list " + remote + " branches: " + ex.getMessage());
-            return false;
+            throw new IllegalStateException(Bundle.message("git.error.remote.unreachable", remote, branch, FailureText.of(ex)), ex);
         }
     }
 
