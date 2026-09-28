@@ -52,11 +52,11 @@ public final class ReportBug {
         reports.begin(item);
         redraw.run();
 
-        final @NotNull BugFacts facts = BugFacts.of(failed.orElseThrow(), tc, runDirectory.getMarker(), runDirectory.getName(), indexer.screenshots(item.run(), failed.orElseThrow()));
+        final @NotNull TestRunItems failedItem = failed.orElseThrow();
         final @NotNull Optional<TestCaseFile> file = indexer.testCaseFile(tc);
 
         BackgroundWork.run(p, Bundle.message("bug.preparing"), Bundle.message("bug.send.failed.title"), true,
-                indicator -> prepare(p, facts, file, indicator),
+                indicator -> prepare(p, BugFacts.of(failedItem, tc, runDirectory.getMarker(), runDirectory.getName(), indexer.screenshots(item.run(), failedItem)), file, indicator),
                 bug -> open(p, item, bug, redraw),
                 () -> {
                     reports.end(item, BugReports.Stage.PREPARING);
