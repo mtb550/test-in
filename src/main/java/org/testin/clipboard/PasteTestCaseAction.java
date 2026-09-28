@@ -185,11 +185,9 @@ public class PasteTestCaseAction extends DumbAwareAction {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             final @NotNull List<TestCaseDto> stayed = new ArrayList<>();
-            ApplicationManager.getApplication().runWriteAction(() -> {
-                for (final TestCaseDto moved : pastedHere) {
-                    if (!indexer.moveTestCase(from, to, moved)) stayed.add(moved);
-                }
-            });
+            for (final TestCaseDto moved : pastedHere) {
+                if (!indexer.moveTestCase(from, to, moved)) stayed.add(moved);
+            }
 
             pastedHere.removeAll(stayed);
             destUI.getAllTestCases().removeAll(stayed);
