@@ -46,6 +46,10 @@ There is no key for this. The menu entry is **Import**.
   exports them and in Excel's own date shape, so a sheet exported and imported
   unchanged keeps its dates. An empty cell leaves the date empty, and any other
   shape is refused and counted in the one message.
+- **Rule-SHARE-124** — A CSV file is read the way a spreadsheet writes it. A
+  quote opens a quoted value only at the start of a value; a quote anywhere else
+  is kept as typed. A byte-order mark at the start is ignored, and a line with
+  no value in it is skipped.
 
 ## The screen
 

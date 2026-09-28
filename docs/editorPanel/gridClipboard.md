@@ -60,6 +60,11 @@ Inside the grid these three keys act on cells, not on whole test cases.
   a short floor, and the page arrows keep their width to the last.
 - **Rule-EDITOR-PANEL-252** — A badge's words are printed white or dark,
   whichever reads on its color, so a pale badge never carries white text.
+- **Rule-EDITOR-PANEL-254** — Pasted text is read the way a spreadsheet writes
+  it. A quote opens a quoted value only at the start of a value; a quote
+  anywhere else is kept as typed. A byte-order mark at the start is ignored. An
+  empty line is a row of empty values, so the rows under it land in the same
+  cells they held in the spreadsheet.
 
 ## What the tester sees
 

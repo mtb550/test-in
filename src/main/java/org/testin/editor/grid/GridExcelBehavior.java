@@ -21,6 +21,7 @@ import com.intellij.ui.table.JBTable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.SeparatedValues;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -32,7 +33,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -100,7 +100,7 @@ public final class GridExcelBehavior {
         }
     }
 
-    // UC-EDITOR-PANEL-018, Rule-EDITOR-PANEL-088
+    // UC-EDITOR-PANEL-018, Rule-EDITOR-PANEL-088, Rule-EDITOR-PANEL-254
     private static void pasteIntoSelection(final @NotNull JBTable table) {
         final @NotNull String text = Objects.requireNonNullElse(
                 CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor), "");
@@ -110,7 +110,7 @@ public final class GridExcelBehavior {
         final int anchorCol = table.getSelectedColumn();
         if (anchorRow < 0 || anchorCol < 0) return;
 
-        final @NotNull List<List<String>> block = parseTsv(text);
+        final @NotNull List<List<String>> block = SeparatedValues.split(text, '\t');
         if (block.isEmpty()) return;
 
         if (block.size() == 1 && block.getFirst().size() == 1) {
@@ -146,49 +146,5 @@ public final class GridExcelBehavior {
             return value;
         }
         return '"' + value.replace("\"", "\"\"") + '"';
-    }
-
-    private static @NotNull List<List<String>> parseTsv(final @NotNull String text) {
-        final @NotNull List<List<String>> records = new ArrayList<>();
-        List<String> fields = new ArrayList<>();
-        final @NotNull StringBuilder current = new StringBuilder();
-        boolean inQuotes = false;
-
-        for (int i = 0; i < text.length(); i++) {
-            final char c = text.charAt(i);
-
-            if (inQuotes) {
-                if (c == '"') {
-                    if (i + 1 < text.length() && text.charAt(i + 1) == '"') {
-                        current.append('"');
-                        i++;
-                    } else {
-                        inQuotes = false;
-                    }
-                } else {
-                    current.append(c);
-                }
-            } else if (c == '"' && current.isEmpty()) {
-                inQuotes = true;
-            } else if (c == '\t') {
-                fields.add(current.toString());
-                current.setLength(0);
-            } else if (c == '\n' || c == '\r') {
-                if (c == '\r' && i + 1 < text.length() && text.charAt(i + 1) == '\n') i++;
-                fields.add(current.toString());
-                current.setLength(0);
-                records.add(fields);
-                fields = new ArrayList<>();
-            } else {
-                current.append(c);
-            }
-        }
-
-        if (!current.isEmpty() || !fields.isEmpty()) {
-            fields.add(current.toString());
-            records.add(fields);
-        }
-
-        return records;
     }
 }

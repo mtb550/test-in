@@ -22,16 +22,13 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
+import org.testin.util.SeparatedValues;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PushbackReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -55,11 +52,11 @@ public class ImportCsv {
         return parseCsvFile(file, p);
     }
 
-    private @NotNull Map<String, Integer> headerIndexes(final String @NotNull [] headers) {
+    private @NotNull Map<String, Integer> headerIndexes(final @NotNull List<String> headers) {
         final @NotNull Map<String, Integer> byName = new HashMap<>();
 
-        for (int i = 0; i < headers.length; i++) {
-            final @NotNull String headerName = headers[i].trim();
+        for (int i = 0; i < headers.size(); i++) {
+            final @NotNull String headerName = headers.get(i).trim();
             for (final TestEditorAttributes reqCol : TestEditorAttributes.all(Can.IMPORT)) {
                 if (reqCol.isColumn(headerName)) byName.put(reqCol.getName().toLowerCase(), i);
             }
@@ -70,7 +67,7 @@ public class ImportCsv {
 
     private @NotNull List<TestCaseDto> parseCsvFile(final @NotNull File file, final @NotNull Project p) {
         final @NotNull List<TestCaseDto> result = new ArrayList<>();
-        final @NotNull List<String[]> records = parseCsvRecords(file);
+        final @NotNull List<List<String>> records = parseCsvRecords(file);
 
         if (records.isEmpty()) return result;
 
@@ -79,15 +76,15 @@ public class ImportCsv {
         int refused = 0;
 
         for (int r = 1; r < records.size(); r++) {
-            final String @NotNull [] values = records.get(r);
+            final @NotNull List<String> values = records.get(r);
 
-            if (Arrays.stream(values).allMatch(String::isBlank)) continue;
+            if (values.stream().allMatch(String::isBlank)) continue;
 
             final @NotNull TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
 
             refused += TestEditorAttributes.importRow(p, currentTestCase, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
-                    .filter(colIndex -> colIndex < values.length)
-                    .map(colIndex -> values[colIndex].trim())
+                    .filter(colIndex -> colIndex < values.size())
+                    .map(colIndex -> values.get(colIndex).trim())
                     .orElse(""));
 
             result.add(currentTestCase);
@@ -98,70 +95,16 @@ public class ImportCsv {
         return result;
     }
 
-    private @NotNull List<String[]> parseCsvRecords(final @NotNull File file) {
-        final @NotNull List<String[]> records = new ArrayList<>();
-        final @NotNull List<String> fields = new ArrayList<>();
-        final @NotNull StringBuilder current = new StringBuilder();
-
-        try (PushbackReader reader = new PushbackReader(
-                new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)))) {
-            boolean inQuotes = false;
-            boolean firstChar = true;
-            int ci;
-            while ((ci = reader.read()) != -1) {
-                final char c = (char) ci;
-
-                if (firstChar) {
-                    firstChar = false;
-                    if (c == '\ufeff') continue;
-                }
-
-                if (inQuotes) {
-                    if (c == '"') {
-                        final int next = reader.read();
-                        if (next == '"') {
-                            current.append('"');
-                        } else {
-                            inQuotes = false;
-                            if (next != -1) reader.unread(next);
-                        }
-                    } else {
-                        current.append(c);
-                    }
-                } else if (c == '"') {
-                    inQuotes = true;
-                } else if (c == ',') {
-                    fields.add(current.toString());
-                    current.setLength(0);
-                } else if (c == '\r' || c == '\n') {
-                    if (c == '\r') {
-                        final int next = reader.read();
-                        if (next != '\n' && next != -1) reader.unread(next);
-                    }
-                    endRecord(records, fields, current);
-                } else {
-                    current.append(c);
-                }
-            }
-
-            endRecord(records, fields, current);
-
+    // UC-SHARE-005, Rule-SHARE-124
+    private @NotNull List<List<String>> parseCsvRecords(final @NotNull File file) {
+        try {
+            final @NotNull String text = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+            return SeparatedValues.split(text, ',').stream()
+                    .filter(fields -> !fields.stream().allMatch(String::isEmpty))
+                    .toList();
         } catch (final IOException ex) {
             Logger.error("CSV parse failed: " + ex.getMessage());
             throw new RuntimeException(ex);
         }
-        return records;
-    }
-
-    private void endRecord(final @NotNull List<String[]> records, final @NotNull List<String> fields, final @NotNull StringBuilder current) {
-        if (fields.isEmpty() && current.isEmpty()) return;
-
-        fields.add(current.toString());
-        current.setLength(0);
-
-        if (!fields.stream().allMatch(String::isEmpty)) {
-            records.add(fields.toArray(new String[0]));
-        }
-        fields.clear();
     }
 }
