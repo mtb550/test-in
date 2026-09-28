@@ -23,7 +23,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.search.GoTo;
 import org.testin.search.Hit;
@@ -96,7 +96,7 @@ public class Breadcrumb extends AbstractDetails {
                     public void mouseClicked(final MouseEvent e) {
                         final @NotNull Path stepPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath.subList(0, index + 1));
 
-                        Services.getInstance(p, ProjectIndexer.class).find(stepPath).map(Hit::of).ifPresent(hit -> GoTo.the(p, hit));
+                        Services.getInstance(p, Nodes.class).find(stepPath).map(Hit::of).ifPresent(hit -> GoTo.the(p, hit));
                     }
                 });
 

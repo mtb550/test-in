@@ -31,7 +31,7 @@ import org.testin.actions.TestinData;
 import org.testin.codegen.JavaCode;
 import org.testin.codegen.Moved;
 import org.testin.codegen.SubtreeCode;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -285,13 +285,13 @@ public class TreeTransferHandler extends TransferHandler {
     public boolean canTransferInto(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
         return target.acceptsTransferred(source)
                 && sameTestProject(source, target)
-                && isValidDestination(source, target, path -> Services.getInstance(p, ProjectIndexer.class).nodeExists(path));
+                && isValidDestination(source, target, path -> Services.getInstance(p, Nodes.class).nodeExists(path));
     }
 
     private boolean isNameCollision(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
         return target.acceptsTransferred(source)
                 && isValidDestination(source, target, _ -> false)
-                && Services.getInstance(p, ProjectIndexer.class).nodeExists(target.getPath().resolve(source.getName()));
+                && Services.getInstance(p, Nodes.class).nodeExists(target.getPath().resolve(source.getName()));
     }
 
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-004
@@ -315,7 +315,7 @@ public class TreeTransferHandler extends TransferHandler {
             moveNodes(sources, target);
         } else {
             final @NotNull List<Path> sourcePaths = sources.stream().map(DirectoryDto::getPath).toList();
-            Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), copied -> {
+            Services.getInstance(p, Nodes.class).copyNodes(sourcePaths, target.getPath(), copied -> {
                 generateForCopies(sources, target);
 
                 if (copied > 0) revealAfterRefresh.accept(target.getPath().resolve(sources.getFirst().getName()));
@@ -389,7 +389,7 @@ public class TreeTransferHandler extends TransferHandler {
         for (int i = 0; i < from.size(); i++) {
             final @NotNull Path source = from.get(i);
 
-            Services.getInstance(p, ProjectIndexer.class).moveNode(source, to.get(i), wasMoved -> {
+            Services.getInstance(p, Nodes.class).moveNode(source, to.get(i), wasMoved -> {
                 if (p.isDisposed()) return;
 
                 if (wasMoved) moved.incrementAndGet();
@@ -404,10 +404,10 @@ public class TreeTransferHandler extends TransferHandler {
 
     // Rule-CODEGEN-082
     private void generateForCopies(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
         for (final DirectoryDto source : sources) {
-            indexer.find(target.getPath().resolve(source.getName())).ifPresent(copy -> SubtreeCode.generate(p, copy));
+            nodes.find(target.getPath().resolve(source.getName())).ifPresent(copy -> SubtreeCode.generate(p, copy));
         }
     }
 
@@ -427,7 +427,7 @@ public class TreeTransferHandler extends TransferHandler {
 
     private void moveCodeOf(final @NotNull Path from, final @NotNull Path to) {
         Optional.ofNullable(to.getParent()).ifPresent(target ->
-                Services.getInstance(p, ProjectIndexer.class).find(from)
+                Services.getInstance(p, Nodes.class).find(from)
                         .ifPresent(dir -> JavaCode.of(dir.getType()).getMoved().execute(p, new Moved(dir, target))));
     }
 

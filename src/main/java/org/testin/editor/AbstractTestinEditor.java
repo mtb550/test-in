@@ -38,7 +38,7 @@ import org.testin.editor.statusbar.PageAction;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.editor.toolbar.Toolbar;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.dto.TestCaseDto;
@@ -326,7 +326,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
 
         reloadData(() -> Services.getInstance(p, Notifier.class).softShow(p, message));
 
-        Services.getInstance(p, TestCaseValues.class).reload(Services.getInstance(p, ProjectIndexer.class)::getAllTestCases);
+        Services.getInstance(p, TestCaseValues.class).reload(Services.getInstance(p, TestCases.class)::getAllTestCases);
     }
 
     protected @NotNull Done refreshed() {

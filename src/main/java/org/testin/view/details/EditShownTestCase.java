@@ -27,7 +27,8 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
 import org.testin.codegen.GenType;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -84,11 +85,11 @@ public final class EditShownTestCase {
 
     // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007
     private static void save(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath, final @NotNull List<TestCaseDto> tcs, final @NotNull GenType gt, final @NotNull List<UUID> ids, final @NotNull Optional<TestCaseSnapshot> before) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
 
         writesTo(p, dto, currentPath).ifPresentOrElse(editPath -> {
             boolean changed = false;
-            for (final TestCaseDto tc : tcs) changed |= indexer.putTestCase(editPath, tc);
+            for (final TestCaseDto tc : tcs) changed |= testCases.putTestCase(editPath, tc);
 
             if (!changed) return;
 
@@ -115,7 +116,7 @@ public final class EditShownTestCase {
 
         final @NotNull Path resolved = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
 
-        return Services.getInstance(p, ProjectIndexer.class).find(resolved)
+        return Services.getInstance(p, Nodes.class).find(resolved)
                 .filter(TestSetDirectoryDto.class::isInstance)
                 .map(DirectoryDto::getPath);
     }

@@ -41,6 +41,7 @@ import org.testin.editor.toolbar.components.RunDetailsPopupBtn;
 import org.testin.editor.toolbar.components.StartExecutionBtn;
 import org.testin.editor.toolbar.components.StopExecutionBtn;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestRuns;
 import org.testin.lightmode.LightMode;
 import org.testin.logger.Logger;
 import org.testin.model.Failure;
@@ -124,8 +125,9 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
                 indexer.awaitIndexing();
-                final @NotNull TestRunDto fromDisk = run.orElseGet(() -> indexer.getTestRunByPath(parent.getPath()));
+                final @NotNull TestRunDto fromDisk = run.orElseGet(() -> testRuns.getTestRunByPath(parent.getPath()));
 
                 final @NotNull Map<UUID, TestRunItems> results = fromDisk.getResults().stream()
                         .collect(Collectors.toMap(TestRunItems::getId, item -> item,
@@ -211,7 +213,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     }
 
     private void saveRun() {
-        Services.getInstance(p, ProjectIndexer.class).saveRun(parent.getPath());
+        Services.getInstance(p, TestRuns.class).saveRun(parent.getPath());
     }
 
     @Override
@@ -265,7 +267,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                 TestRunSummary.of(runData.getResults()),
                 parent.getMarker().getResultAnalysis(),
                 analysis -> {
-                    Services.getInstance(p, ProjectIndexer.class).changeRunMarker(parent.getPath(),
+                    Services.getInstance(p, TestRuns.class).changeRunMarker(parent.getPath(),
                             marker -> marker.setResultAnalysis(ResultAnalysis.written(analysis)));
                     Services.getInstance(p, Notifier.class).softShow(p, Done.SAVED);
                 }).show());
@@ -444,7 +446,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
     // UC-EDITOR-PANEL-031, UC-EDITOR-PANEL-043
     private void markStarted() {
-        Services.getInstance(p, ProjectIndexer.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionStarted);
+        Services.getInstance(p, TestRuns.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionStarted);
         Services.getInstance(p, TestRunStatusChange.class).apply(parent, TestRunStatus.IN_PROGRESS);
     }
 
@@ -627,7 +629,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-151
     public void stopExecution() {
-        Services.getInstance(p, ProjectIndexer.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionEnded);
+        Services.getInstance(p, TestRuns.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionEnded);
 
         haltExecution();
     }

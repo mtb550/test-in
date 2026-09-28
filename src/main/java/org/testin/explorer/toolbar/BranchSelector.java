@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.ViewPendingCommitsAction;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -186,7 +186,7 @@ public class BranchSelector {
 
                 currentBranch = checkedOut;
 
-                Services.getInstance(p, ProjectIndexer.class).refreshDirectory(repositoryPath);
+                Services.getInstance(p, Nodes.class).refreshDirectory(repositoryPath);
 
                 ApplicationManager.getApplication().invokeLater(() -> tp.reindex(Bundle.message("git.switched.to", checkedOut)));
             }

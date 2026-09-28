@@ -23,7 +23,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestRuns;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.FailureDetail;
 import org.testin.model.OpenBug;
@@ -122,7 +122,7 @@ public class OpenBugsTab {
         if (shown.isEmpty()) return note(Bundle.message("view.bugs.no.selection"));
 
         final @NotNull List<OpenBug> bugs = OpenBug.of(
-                Services.getInstance(p, ProjectIndexer.class).getAllTestRuns(), shown.orElseThrow().getId());
+                Services.getInstance(p, TestRuns.class).getAllTestRuns(), shown.orElseThrow().getId());
 
         return bugs.isEmpty() ? note(Bundle.message("view.bugs.none")) : rows(bugs);
     }

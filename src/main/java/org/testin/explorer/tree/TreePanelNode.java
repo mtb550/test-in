@@ -23,6 +23,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.tree.LeafState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
@@ -59,13 +60,14 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
 
         try {
             final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
             // Rule-INTERNAL-091
             final @NotNull Optional<String> refused = indexer.whyNotRead(directory.getPath());
             if (refused.isPresent()) return List.of(child(new TreeLoadError(refused.orElseThrow())));
 
             final @NotNull List<TreePanelNode> children = new ArrayList<>();
-            for (final DirectoryDto child : indexer.getChildren(directory.getPath())) {
+            for (final DirectoryDto child : nodes.getChildren(directory.getPath())) {
                 children.add(child(child));
             }
             return children;

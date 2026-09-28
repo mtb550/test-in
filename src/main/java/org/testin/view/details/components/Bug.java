@@ -26,7 +26,7 @@ import org.testin.bug.BugReports;
 import org.testin.bug.ReportBug;
 import org.testin.editor.TestinEditors;
 import org.testin.editor.run.RunEditor;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
@@ -53,7 +53,7 @@ public final class Bug {
         final @NotNull Optional<String> bugIssue = runItem.bugIssue();
         if (runItem.shownStatus() != TestStatus.FAILED && bugIssue.isEmpty()) return Optional.empty();
 
-        return Services.getInstance(p, ProjectIndexer.class).find(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
+        return Services.getInstance(p, Nodes.class).find(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
                 .filter(TestRunDirectoryDto.class::isInstance)
                 .map(TestRunDirectoryDto.class::cast)
                 .map(runDirectory -> drawn(p, runItem, dto, bugIssue, runDirectory));

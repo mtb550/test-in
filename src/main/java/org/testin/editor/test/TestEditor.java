@@ -38,7 +38,9 @@ import org.testin.editor.listeners.TransferListener;
 import org.testin.editor.toolbar.TestToolbar;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.TestDetailsPopupBtn;
+import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.Modules;
 import org.testin.model.dto.TestCaseDto;
@@ -110,9 +112,10 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
                 indexer.awaitIndexing();
 
-                final @NotNull List<TestCaseDto> items = indexer.getTestCasesForTestSet(parent.getPath());
+                final @NotNull List<TestCaseDto> items = testCases.getTestCasesForTestSet(parent.getPath());
 
                 if (items.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() -> {
@@ -181,7 +184,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
             try {
                 final @NotNull List<TestCaseDto> moved = TestCaseOrder.place(snapshot);
 
-                Services.getInstance(p, ProjectIndexer.class).updateSequence(dirPath, snapshot, moved);
+                Services.getInstance(p, TestCases.class).updateSequence(dirPath, snapshot, moved);
 
                 if (!snapshot.isEmpty()) GenType.UPDATE_TEST_CASE_ORDER.executeAll(p, snapshot);
 
@@ -215,7 +218,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
 
             updateSequenceAndSaveAll(onPersisted);
 
-            Services.getInstance(p, ProjectIndexer.class).refreshDirectory(parent.getPath());
+            Services.getInstance(p, Nodes.class).refreshDirectory(parent.getPath());
 
             refreshView();
             selectTestCase(tc);
@@ -342,7 +345,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
     @Override
     public @NotNull Set<String> getAvailableModules() {
-        return Modules.in(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(parent.getPath()));
+        return Modules.in(Services.getInstance(p, TestCases.class).getTestCasesForTestSet(parent.getPath()));
     }
 
     // UC-EDITOR-PANEL-020

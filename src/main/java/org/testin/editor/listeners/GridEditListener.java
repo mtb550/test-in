@@ -20,7 +20,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -119,12 +119,12 @@ public class GridEditListener extends AbstractGridEditListener {
         changedThisGesture.clear();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
             final @NotNull List<TestCaseDto> written = new ArrayList<>();
             final @NotNull List<TestCaseSnapshot> before = new ArrayList<>();
 
             for (final Changed changed : gesture) {
-                if (!indexer.putTestCase(testSetPath, changed.tc())) continue;
+                if (!testCases.putTestCase(testSetPath, changed.tc())) continue;
 
                 changed.generators().forEach(generator -> generator.getAction().execute(p, changed.tc()));
                 written.add(changed.tc());

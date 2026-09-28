@@ -29,7 +29,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.EscapeAction;
 import org.testin.editor.WheelForwarding;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
+import org.testin.indexer.TestRuns;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
@@ -214,7 +215,7 @@ public class ViewPanel implements Disposable {
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-083
     @NotNull Optional<TestCaseDto> shownTestCase() {
         return getCurrentTestCase().map(shown -> shownRunItem().map(TestRunItems::shownTestCase)
-                .orElseGet(() -> Services.getInstance(p, ProjectIndexer.class).findTestCase(shown.getId()).orElse(shown)));
+                .orElseGet(() -> Services.getInstance(p, TestCases.class).findTestCase(shown.getId()).orElse(shown)));
     }
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-083
@@ -222,7 +223,7 @@ public class ViewPanel implements Disposable {
         final @NotNull List<String> path = page.getCurrentPath();
         if (path.isEmpty()) return Optional.empty();
 
-        return getCurrentTestCase().flatMap(shown -> Services.getInstance(p, ProjectIndexer.class)
+        return getCurrentTestCase().flatMap(shown -> Services.getInstance(p, TestRuns.class)
                 .findTestRun(Services.getInstance(p, TestinRoot.class).resolve(path))
                 .flatMap(run -> run.resultOf(shown.getId())));
     }

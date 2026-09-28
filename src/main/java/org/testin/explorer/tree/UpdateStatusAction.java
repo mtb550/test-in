@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.NodeStatus;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -63,7 +63,7 @@ public class UpdateStatusAction extends AbstractAnyProjectAction {
             marker.applyStatus(status);
             marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
 
-            if (!Services.getInstance(p, ProjectIndexer.class).persistMarker(dir)) {
+            if (!Services.getInstance(p, Nodes.class).persistMarker(dir)) {
                 marker.applyStatus(before);
                 marker.setModifiedBy(modifiedByBefore);
                 marker.setModifiedAt(modifiedAtBefore);

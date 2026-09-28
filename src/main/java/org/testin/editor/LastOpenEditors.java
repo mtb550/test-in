@@ -22,7 +22,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
@@ -87,11 +87,11 @@ public final class LastOpenEditors {
     }
 
     private @NotNull List<DirectoryDto> stillIndexed(final @NotNull Project p, final String @NotNull [] entries) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
         final @NotNull List<DirectoryDto> found = new ArrayList<>();
 
         for (final String entry : entries) {
-            indexer.find(Path.of(entry)).ifPresentOrElse(
+            nodes.find(Path.of(entry)).ifPresentOrElse(
                     dir -> {
                         Logger.debug("restoring editor for '" + entry + "' -> found");
                         found.add(dir);

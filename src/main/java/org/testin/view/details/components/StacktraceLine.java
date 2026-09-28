@@ -25,7 +25,7 @@ import com.intellij.ui.components.panels.HorizontalLayout;
 import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestRuns;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
@@ -88,7 +88,7 @@ public final class StacktraceLine extends AbstractDetails {
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081
     private @NotNull JComponent thumbnail(final @NotNull Project p, final @NotNull Path runPath, final @NotNull String name) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
 
         final @NotNull JBLabel square = new JBLabel(Picture.noThumbnail());
         Tooltip.set(square, name);
@@ -96,12 +96,12 @@ public final class StacktraceLine extends AbstractDetails {
         square.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                new ScreenshotDialog(p, name, indexer.screenshot(runPath, name)).show();
+                new ScreenshotDialog(p, name, testRuns.screenshot(runPath, name)).show();
             }
         });
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final @NotNull Icon thumbnail = Picture.thumbnail(indexer.screenshot(runPath, name));
+            final @NotNull Icon thumbnail = Picture.thumbnail(testRuns.screenshot(runPath, name));
             ApplicationManager.getApplication().invokeLater(() -> square.setIcon(thumbnail));
         });
 

@@ -19,7 +19,7 @@ package org.testin.editor.listeners;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestRuns;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
@@ -80,7 +80,7 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
         if (Objects.equals(before, after)) return GridEdit.UNCHANGED;
 
-        Services.getInstance(p, ProjectIndexer.class).changeResult(editor.getParent().getPath(), onThisRow.getId(), result -> attr.getRunValueSetter().execute(result, typed));
+        Services.getInstance(p, TestRuns.class).changeResult(editor.getParent().getPath(), onThisRow.getId(), result -> attr.getRunValueSetter().execute(result, typed));
         onEdited.run();
 
         return GridEdit.WROTE;

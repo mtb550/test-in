@@ -27,7 +27,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -110,7 +110,7 @@ public final class TestinEditors {
     }
 
     private boolean isIndexed(final @NotNull Project p, final @NotNull UnifiedVirtualFile file) {
-        return Services.getInstance(p, ProjectIndexer.class).nodeExists(file.getDir().getPath());
+        return Services.getInstance(p, Nodes.class).nodeExists(file.getDir().getPath());
     }
 
     public void openThen(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull Consumer<TestinEditor> tell) {
