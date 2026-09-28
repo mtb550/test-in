@@ -55,6 +55,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 public class CreateTestMethod implements GenAction {
@@ -91,7 +92,7 @@ public class CreateTestMethod implements GenAction {
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-014, Rule-CODEGEN-046
-    private static @NotNull String methodText(final @NotNull Project p, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
+    private static @NotNull String methodText(final @NotNull String methodName, final @NotNull TestCaseDto tc, final int position) {
         final @NotNull StringBuilder attributes = new StringBuilder();
 
         if (!tc.getGroup().isEmpty()) {
@@ -100,7 +101,7 @@ public class CreateTestMethod implements GenAction {
             attributes.append(", groups = {").append(String.join(", ", quoted)).append("}");
         }
 
-        attributes.append(", priority = ").append(ExecutionPosition.of(p, tc));
+        attributes.append(", priority = ").append(position);
 
         final @NotNull String annotation = String.format("@Test(description = %s, testName = \"%s\"%s)",
                 JavaLiteral.of(tc.getDescription()),
@@ -175,6 +176,7 @@ public class CreateTestMethod implements GenAction {
         }
 
         final @NotNull Map<String, PsiMethod> generated = GeneratedMethod.byTestCaseId(targetClass);
+        final @NotNull ToIntFunction<TestCaseDto> positions = ExecutionPosition.ofEach(p);
 
         final @NotNull StringBuilder methods = new StringBuilder();
         final @NotNull List<TestCaseDto> lostTheName = new ArrayList<>();
@@ -212,7 +214,7 @@ public class CreateTestMethod implements GenAction {
             }
 
             owners.put(key, id);
-            methods.append('\n').append(methodText(p, methodName, tc)).append('\n');
+            methods.append('\n').append(methodText(methodName, tc, positions.applyAsInt(tc))).append('\n');
         }
 
         if (alreadyThere > 0) {
@@ -352,7 +354,7 @@ public class CreateTestMethod implements GenAction {
                 return Optional.empty();
             }
 
-            final @NotNull PsiMethod newMethod = factory.createMethodFromText(methodText(p, methodName, tc), targetClass);
+            final @NotNull PsiMethod newMethod = factory.createMethodFromText(methodText(methodName, tc, ExecutionPosition.of(p, tc)), targetClass);
             final @NotNull PsiElement addedElement = targetClass.add(newMethod);
 
             Logger.info("Injected method: " + methodName + " with Priority: " + tc.getPriority().getLabel());

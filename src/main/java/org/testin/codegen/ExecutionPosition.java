@@ -25,13 +25,24 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
 
+import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.ToIntFunction;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ExecutionPosition {
     // UC-CODEGEN-002, Rule-CODEGEN-014
     public static int of(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        return TestCaseOrder.positionOf(setOf(p, tc), tc);
+        return ofEach(p).applyAsInt(tc);
+    }
+
+    // UC-CODEGEN-002, Rule-CODEGEN-014
+    public static @NotNull ToIntFunction<TestCaseDto> ofEach(final @NotNull Project p) {
+        final @NotNull Map<Path, List<TestCaseDto>> sets = new HashMap<>();
+
+        return tc -> TestCaseOrder.positionOf(sets.computeIfAbsent(tc.getParent().getPath(), _ -> setOf(p, tc)), tc);
     }
 
     // UC-CODEGEN-011, Rule-CODEGEN-042
