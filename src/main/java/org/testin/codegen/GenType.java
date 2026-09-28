@@ -158,7 +158,13 @@ public enum GenType {
         this.action = new NoOpCodeUpdate(dataOnlyField);
     }
 
+    // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-EDITOR-PANEL-046
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+        ApplicationManager.getApplication().invokeLater(() -> executeAllNow(p, items));
+    }
+
+    // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-018
+    public void executeAllNow(final @NotNull Project p, final @NotNull List<?> items) {
         action.executeAll(p, items);
     }
 
@@ -176,9 +182,8 @@ public enum GenType {
         public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
             if (cannotGenerate(p) || items.isEmpty()) return;
 
-            ApplicationManager.getApplication().invokeLater(() ->
-                    WriteCommandAction.runWriteCommandAction(p, description, null,
-                            () -> CodeGenerators.find(GenType.this).executeAll(p, items)));
+            WriteCommandAction.runWriteCommandAction(p, description, null,
+                    () -> CodeGenerators.find(GenType.this).executeAll(p, items));
         }
 
         // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-006, Rule-CODEGEN-082

@@ -249,7 +249,7 @@ public class ImportAction extends DumbAwareAction {
                 final int written = from + batch.size();
 
                 indicator.setText2(Bundle.message("import.progress.generating", String.valueOf(written), String.valueOf(testCases.size())));
-                onEdt(() -> GenType.CREATE_TEST_CASE.executeAll(p, batch));
+                onEdt(() -> GenType.CREATE_TEST_CASE.executeAllNow(p, batch));
             }
 
             Logger.info("Import: generated " + testCases.size() + " test methods in "
