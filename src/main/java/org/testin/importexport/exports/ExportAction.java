@@ -19,12 +19,11 @@ package org.testin.importexport.exports;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
@@ -45,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class ExportAction extends DumbAwareAction {
+public class ExportAction extends AbstractAnyProjectAction {
     public static final @NotNull String NAME = Bundle.message("export.action.name");
 
     // UC-SHARE-002, Rule-SHARE-001
@@ -77,16 +76,13 @@ public class ExportAction extends DumbAwareAction {
 
     // UC-SHARE-001, UC-SHARE-002
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TestinData.firstSelected(e, DirectoryDto.class).ifPresent(dir -> new Work(p).exportFrom(dir));
     }
 
     // UC-SHARE-001
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         e.getPresentation().setEnabled(TestinData.singleSelectedNode(e)
                 .filter(DirectoryDto::isTestCaseContainer)
                 .isPresent());

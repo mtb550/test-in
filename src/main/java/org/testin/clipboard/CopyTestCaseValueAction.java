@@ -19,10 +19,9 @@ package org.testin.clipboard;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.model.dto.TestCaseDto;
@@ -34,7 +33,7 @@ import org.testin.util.Bundle;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
-public class CopyTestCaseValueAction extends DumbAwareAction {
+public class CopyTestCaseValueAction extends AbstractAnyProjectAction {
     private static void copy(final @NotNull Project p, final @NotNull CopyChoice choice, final @NotNull List<TestCaseDto> selected) {
         CopyPasteManager.getInstance().setContents(new StringSelection(choice.from(selected)));
 
@@ -43,10 +42,7 @@ public class CopyTestCaseValueAction extends DumbAwareAction {
 
     // UC-EDITOR-PANEL-014, Rule-EDITOR-PANEL-207
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
         if (selected.isEmpty()) return;
 
@@ -54,7 +50,7 @@ public class CopyTestCaseValueAction extends DumbAwareAction {
     }
 
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         GrayWithReason.unless(this, e, !TestinData.selectedTestCases(e).isEmpty(), Bundle.message("action.select.case.description"));
     }
 

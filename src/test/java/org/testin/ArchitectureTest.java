@@ -135,6 +135,17 @@ public class ArchitectureTest {
     }
 
     @Test
+    public void onlyOneActionAsksTheEventForItsProject() {
+        final @NotNull ArchRule rule = noClasses()
+                .that().doNotHaveFullyQualifiedName("org.testin.actions.AbstractAnyProjectAction")
+                .should().callMethod("com.intellij.openapi.actionSystem.AnActionEvent", "getProject")
+                .because("the event's project is the one null the platform hands an action; AbstractAnyProjectAction"
+                        + " checks it once and gives perform and update a project that is there (#360)");
+
+        rule.check(CLASSES);
+    }
+
+    @Test
     public void onlyTheSurfacesRefreshThemselves() {
         final @NotNull ArchRule rule = noClasses()
                 .that().resideOutsideOfPackages("org.testin.explorer..", "org.testin.editor..")

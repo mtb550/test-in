@@ -19,10 +19,9 @@ package org.testin.git;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
@@ -44,7 +43,7 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 
-public class ViewPendingCommitsAction extends DumbAwareAction {
+public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
     // UC-SHARE-009, Rule-SHARE-042
     public static void reviewFor(final @NotNull Project p, final @NotNull Path path) {
         new Work(p).openFor(path);
@@ -56,16 +55,13 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
     // UC-SHARE-010
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TestinData.tree(e).flatMap(TreeValues::projectPath).ifPresent(path -> reviewFor(p, path));
     }
 
     // UC-SHARE-010
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         // Rule-SHARE-105
         if (OptionalPlugin.GIT.grayedWithReason(this, e.getPresentation())) return;
 

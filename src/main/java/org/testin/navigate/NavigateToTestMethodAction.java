@@ -18,17 +18,16 @@ package org.testin.navigate;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.codegen.CodeOn;
 import org.testin.editor.CardHoverAction;
 import org.testin.model.dto.TestCaseDto;
 
 // UC-CODEGEN-006
-public class NavigateToTestMethodAction extends DumbAwareAction {
+public class NavigateToTestMethodAction extends AbstractAnyProjectAction {
     public static void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         if (CodeOn.isOffAndWarned(p)) return;
 
@@ -36,22 +35,13 @@ public class NavigateToTestMethodAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TestinData.selectedTestCases(e).stream().findFirst().ifPresent(tc -> execute(p, tc));
     }
 
     @Override
-    public void update(final @NotNull AnActionEvent e) {
-        final @Nullable Project shownIn = e.getProject();
-        if (shownIn == null) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
-
-        if (!CardHoverAction.NAVIGATE_TO_TEST_METHOD.enableOrExplain(shownIn, e.getPresentation())) return;
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
+        if (!CardHoverAction.NAVIGATE_TO_TEST_METHOD.enableOrExplain(p, e.getPresentation())) return;
 
         e.getPresentation().setEnabled(!TestinData.selectedTestCases(e).isEmpty());
     }

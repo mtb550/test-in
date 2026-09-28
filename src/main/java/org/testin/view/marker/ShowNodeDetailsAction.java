@@ -18,26 +18,22 @@ package org.testin.view.marker;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 
 // UC-TREE-PANEL-027
-public class ShowNodeDetailsAction extends DumbAwareAction {
+public class ShowNodeDetailsAction extends AbstractAnyProjectAction {
     // UC-TREE-PANEL-027, Rule-TREE-PANEL-087
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TestinData.singleSelectedNode(e).ifPresent(dir -> new MarkerDetailsViewDialog(p, dir).show());
     }
 
     // UC-TREE-PANEL-027, Rule-TREE-PANEL-087
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         e.getPresentation().setEnabled(TestinData.singleSelectedNode(e).isPresent());
     }
 

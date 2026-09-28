@@ -19,10 +19,9 @@ package org.testin.clipboard;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditor;
 import org.testin.logger.Logger;
@@ -38,13 +37,12 @@ import java.awt.datatransfer.StringSelection;
 import java.util.List;
 import java.util.Optional;
 
-public class CutTestCaseAction extends DumbAwareAction {
+public class CutTestCaseAction extends AbstractAnyProjectAction {
     // UC-EDITOR-PANEL-016
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull Optional<TestinEditor> found = TestinData.editor(e);
-        if (p == null || found.isEmpty()) return;
+        if (found.isEmpty()) return;
 
         final @NotNull TestinEditor editor = found.orElseThrow();
         final @NotNull List<TestCaseDto> selectedTestCases = TestinData.selectedTestCases(e);
@@ -68,7 +66,7 @@ public class CutTestCaseAction extends DumbAwareAction {
     }
 
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         // Rule-EDITOR-PANEL-214
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             e.getPresentation().setEnabled(false);

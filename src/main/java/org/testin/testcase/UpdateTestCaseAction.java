@@ -19,10 +19,9 @@ package org.testin.testcase;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.codegen.GenType;
@@ -44,7 +43,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 // UC-EDITOR-PANEL-006
-public class UpdateTestCaseAction extends DumbAwareAction {
+public class UpdateTestCaseAction extends AbstractAnyProjectAction {
     // UC-EDITOR-PANEL-006
     public static void openField(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull UpdateTestCaseFields field) {
         new Work(p, editor).overSelection(menu -> menu.open(field));
@@ -52,16 +51,13 @@ public class UpdateTestCaseAction extends DumbAwareAction {
 
     // UC-EDITOR-PANEL-006
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TestinData.editor(e).ifPresent(editor -> new Work(p, editor).overSelection(TestCaseUpdateMenuDialog::show));
     }
 
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             GrayWithReason.unless(this, e, false, Bundle.message("update.case.disabled.description"));
             return;

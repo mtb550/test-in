@@ -19,10 +19,9 @@ package org.testin.testrun;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.run.RunEditor;
@@ -40,13 +39,10 @@ import java.util.List;
 import java.util.Optional;
 
 // UC-EDITOR-PANEL-040
-public class UpdateRunItemAction extends DumbAwareAction {
+public class UpdateRunItemAction extends AbstractAnyProjectAction {
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull Optional<TestCaseDto> selected = TestinData.singleSelectedTestCase(e);
         final @NotNull Optional<RunEditor> runEditor = TestinData.runEditor(e);
         if (selected.isEmpty() || runEditor.isEmpty()) return;
@@ -84,7 +80,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-168
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         GrayWithReason.unless(this, e, TestinData.runEditor(e)
                         .flatMap(runEditor -> TestinData.singleSelectedTestCase(e).flatMap(tc -> runEditor.runItem(tc.getId())))
                         .filter(item -> item.shownStatus() == TestStatus.FAILED)

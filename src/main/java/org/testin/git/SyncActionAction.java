@@ -19,11 +19,10 @@ package org.testin.git;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.logger.Logger;
@@ -40,7 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 
-public class SyncActionAction extends DumbAwareAction {
+public class SyncActionAction extends AbstractAnyProjectAction {
     private static @NotNull Optional<Path> activeProjectPath(final @NotNull AnActionEvent e) {
         return TestinData.tree(e).flatMap(SyncActionAction::activeProjectIn);
     }
@@ -63,10 +62,7 @@ public class SyncActionAction extends DumbAwareAction {
 
     // UC-SHARE-016
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         activeProjectPath(e).ifPresentOrElse(path -> new Work(p).syncRepository(path), () ->
                 Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("git.sync.error.title"),
                         Bundle.message("git.sync.no.project")));
@@ -74,7 +70,7 @@ public class SyncActionAction extends DumbAwareAction {
 
     // UC-SHARE-016
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         // Rule-SHARE-105
         if (OptionalPlugin.GIT.grayedWithReason(this, e.getPresentation())) return;
 

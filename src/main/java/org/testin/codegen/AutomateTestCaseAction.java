@@ -19,12 +19,11 @@ package org.testin.codegen;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Computable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditor;
 import org.testin.logger.Logger;
@@ -39,7 +38,7 @@ import java.util.List;
 import java.util.Optional;
 
 // UC-CODEGEN-005
-public class AutomateTestCaseAction extends DumbAwareAction {
+public class AutomateTestCaseAction extends AbstractAnyProjectAction {
     private static int writtenFor(final @NotNull Project p, final @NotNull List<TestCaseDto> asked) {
         if (DumbService.isDumb(p)) return 0;
 
@@ -70,10 +69,7 @@ public class AutomateTestCaseAction extends DumbAwareAction {
 
     // UC-CODEGEN-005, Rule-CODEGEN-025
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull List<TestCaseDto> toWrite = withoutAMethod(p, nameable(e));
         if (toWrite.isEmpty() && !AgentConnection.stored().isConnected()) return;
 
@@ -97,14 +93,8 @@ public class AutomateTestCaseAction extends DumbAwareAction {
 
     // UC-CODEGEN-005, Rule-CODEGEN-071
     @Override
-    public void update(final @NotNull AnActionEvent e) {
-        if (CodeOn.grayedWithReason(this, e)) return;
-
-        final @Nullable Project p = e.getProject();
-        if (p == null) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
+        if (CodeOn.grayedWithReason(this, e, p)) return;
 
         final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
         if (selected.isEmpty()) {

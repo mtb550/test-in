@@ -19,10 +19,9 @@ package org.testin.explorer.tree;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.indexer.ProjectIndexer;
@@ -38,7 +37,7 @@ import org.testin.util.Bundle;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-public class UpdateStatusAction extends DumbAwareAction {
+public class UpdateStatusAction extends AbstractAnyProjectAction {
     private final @NotNull NodeStatus status;
 
     public UpdateStatusAction(final @NotNull NodeStatus status) {
@@ -48,10 +47,7 @@ public class UpdateStatusAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-018, UC-TREE-PANEL-019
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         selected(e).ifPresent(dir -> mark(p, dir));
     }
 
@@ -88,7 +84,7 @@ public class UpdateStatusAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-018, Rule-TREE-PANEL-065
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull Optional<DirectoryDto> dir = selected(e);
 
         e.getPresentation().setVisible(dir.isPresent());

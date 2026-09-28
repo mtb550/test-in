@@ -19,10 +19,9 @@ package org.testin.testcase;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.clipboard.CutState;
@@ -42,19 +41,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class RemoveTestCaseAction extends DumbAwareAction {
+public class RemoveTestCaseAction extends AbstractAnyProjectAction {
     // UC-EDITOR-PANEL-011
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
-        if (p == null || selected.isEmpty()) return;
+        if (selected.isEmpty()) return;
 
         TestinData.editor(e).ifPresent(editor -> new Work(p, editor, editor.getParent(), selected).remove());
     }
 
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         // Rule-EDITOR-PANEL-214
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             e.getPresentation().setEnabled(false);

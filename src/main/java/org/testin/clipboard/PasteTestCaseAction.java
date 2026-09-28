@@ -20,9 +20,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.codegen.CopiedTestCase;
@@ -59,21 +59,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public class PasteTestCaseAction extends DumbAwareAction {
+public class PasteTestCaseAction extends AbstractAnyProjectAction {
     private @NotNull Optional<Answered> answered = Optional.empty();
 
-    private static @NotNull Optional<Work> work(final @NotNull AnActionEvent e) {
-        return Optional.ofNullable(e.getProject()).flatMap(p -> TestinData.editor(e).map(editor -> new Work(p, editor)));
+    private static @NotNull Optional<Work> work(final @NotNull AnActionEvent e, final @NotNull Project p) {
+        return TestinData.editor(e).map(editor -> new Work(p, editor));
     }
 
     // UC-EDITOR-PANEL-017
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        work(e).ifPresent(Work::paste);
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
+        work(e, p).ifPresent(Work::paste);
     }
 
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         // Rule-EDITOR-PANEL-214
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             e.getPresentation().setEnabled(false);
@@ -81,7 +81,7 @@ public class PasteTestCaseAction extends DumbAwareAction {
             return;
         }
 
-        GrayWithReason.unless(this, e, work(e).map(this::clipboardHoldsTestCases).orElse(false), Bundle.message("paste.case.nothing.description"));
+        GrayWithReason.unless(this, e, work(e, p).map(this::clipboardHoldsTestCases).orElse(false), Bundle.message("paste.case.nothing.description"));
     }
 
     private boolean clipboardHoldsTestCases(final @NotNull Work work) {

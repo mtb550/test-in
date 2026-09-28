@@ -18,23 +18,19 @@ package org.testin.runner;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.editor.CardHoverAction;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;
 
-public class RunTestMethodAction extends DumbAwareAction {
+public class RunTestMethodAction extends AbstractAnyProjectAction {
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-150
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
         final @NotNull CardHoverAction gesture = CardHoverAction.runSlot(p, selected);
 
@@ -47,13 +43,7 @@ public class RunTestMethodAction extends DumbAwareAction {
 
     // UC-CODEGEN-009, Rule-CODEGEN-036
     @Override
-    public void update(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
-
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
         final @NotNull CardHoverAction offered = CardHoverAction.runSlot(p, selected);
 

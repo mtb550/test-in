@@ -20,13 +20,13 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractAnyProjectAction;
 
 import java.util.Objects;
-import java.util.Optional;
 
-public final class GlobalSearchAction extends DumbAwareAction {
+public final class GlobalSearchAction extends AbstractAnyProjectAction {
     private static final @NotNull String ID = "Testin.Search";
 
     public static @NotNull AnAction registered() {
@@ -35,13 +35,8 @@ public final class GlobalSearchAction extends DumbAwareAction {
 
     // UC-INTERNAL-001
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        Optional.ofNullable(e.getProject()).ifPresent(p -> new GlobalSearchDialog(p).show());
-    }
-
-    @Override
-    public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(e.getProject() != null);
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
+        new GlobalSearchDialog(p).show();
     }
 
     @Override

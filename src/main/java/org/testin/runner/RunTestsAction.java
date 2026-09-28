@@ -18,10 +18,9 @@ package org.testin.runner;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.codegen.CodeOn;
 import org.testin.editor.TestinEditor;
@@ -39,21 +38,18 @@ import org.testin.services.Services;
 import java.util.List;
 import java.util.Optional;
 
-public class RunTestsAction extends DumbAwareAction {
+public class RunTestsAction extends AbstractAnyProjectAction {
     // Rule-TREE-PANEL-079
     @Override
-    public void update(final @NotNull AnActionEvent e) {
-        if (CodeOn.grayedWithReason(this, e)) return;
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
+        if (CodeOn.grayedWithReason(this, e, p)) return;
         if (OptionalPlugin.TESTNG.grayedWithReason(this, e.getPresentation())) return;
 
         e.getPresentation().setEnabled(runnable(e).isPresent() || selectedRun(e).isPresent());
     }
 
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         selectedRun(e).ifPresentOrElse(run -> openAndRun(p, run), () -> runnable(e).ifPresent(dir -> run(p, dir)));
     }
 

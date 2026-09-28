@@ -19,11 +19,10 @@ package org.testin.testrun;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditors;
@@ -54,7 +53,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class EditTestRunAction extends DumbAwareAction {
+public class EditTestRunAction extends AbstractAnyProjectAction {
     private static @NotNull Optional<TestRunDirectoryDto> selectedRun(final @NotNull Optional<DirectoryDto> dir) {
         return dir.filter(TestRunDirectoryDto.class::isInstance)
                 .map(TestRunDirectoryDto.class::cast)
@@ -63,10 +62,7 @@ public class EditTestRunAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-022
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TestinData.tree(e)
                 .map(SimpleTree::getSelectionPath)
                 .ifPresent(path -> new Work(p).editAt(path));
@@ -74,7 +70,7 @@ public class EditTestRunAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-022, Rule-TREE-PANEL-073
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         GrayWithReason.unless(this, e, selectedRun(TestinData.singleSelectedNode(e)).isPresent(), Bundle.message("run.not.open.description"));
     }
 

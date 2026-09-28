@@ -20,10 +20,9 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.Declared;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
@@ -51,7 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 // UC-TREE-PANEL-012
-public class RemoveAction extends DumbAwareAction {
+public class RemoveAction extends AbstractAnyProjectAction {
     private static @NotNull List<DirectoryDto> removableNodes(final @NotNull AnActionEvent e) {
         return TestinData.selectedNodes(e).stream()
                 .filter(DirectoryDto::isRemovable)
@@ -60,10 +59,7 @@ public class RemoveAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-012, Rule-TREE-PANEL-038
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull List<DirectoryDto> nodesToRemove = removableNodes(e);
         if (nodesToRemove.isEmpty()) return;
 
@@ -72,7 +68,7 @@ public class RemoveAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-012, Rule-TREE-PANEL-042
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         GrayWithReason.unless(this, e, !removableNodes(e).isEmpty(), Bundle.message("remove.node.disabled.description"));
     }
 

@@ -18,10 +18,9 @@ package org.testin.creator;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.codegen.JavaCode;
 import org.testin.creator.dialogs.CreateRunDialog;
@@ -42,7 +41,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 // UC-TREE-PANEL-007, UC-TREE-PANEL-009
-public class CreateTreeNodeAction extends DumbAwareAction {
+public class CreateTreeNodeAction extends AbstractAnyProjectAction {
     private static final @NotNull String CREATES = Bundle.message("action.Testin.CreateNode.description");
 
     // UC-TREE-PANEL-007, Rule-TREE-PANEL-096
@@ -67,16 +66,13 @@ public class CreateTreeNodeAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-007, UC-TREE-PANEL-009
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TestinData.singleSelectedNode(e).ifPresent(dir -> new Work(p).createUnder(dir));
     }
 
     // UC-TREE-PANEL-007, Rule-TREE-PANEL-025
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull Optional<DirectoryDto> selected = TestinData.singleSelectedNode(e);
         final boolean enabled = selected.filter(DirectoryDto::canCreateChildren).isPresent();
 

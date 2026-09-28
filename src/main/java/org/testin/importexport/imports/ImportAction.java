@@ -21,12 +21,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.concurrency.ThreadingAssertions;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.codegen.CodeOn;
 import org.testin.codegen.GenType;
@@ -62,7 +61,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class ImportAction extends DumbAwareAction {
+public class ImportAction extends AbstractAnyProjectAction {
     public static final @NotNull String NAME = Bundle.message("import.action.name");
 
     private static final int METHODS_PER_COMMAND = 200;
@@ -87,10 +86,7 @@ public class ImportAction extends DumbAwareAction {
 
     // UC-SHARE-005
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TestinData.firstSelected(e, DirectoryDto.class)
                 .filter(DirectoryDto::isTestCaseContainer)
                 .ifPresent(dir -> new Work(p).openImportDialog(dir));
@@ -98,7 +94,7 @@ public class ImportAction extends DumbAwareAction {
 
     // UC-SHARE-005
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         e.getPresentation().setEnabled(TestinData.singleSelectedNode(e)
                 .filter(DirectoryDto::isTestCaseContainer)
                 .isPresent());

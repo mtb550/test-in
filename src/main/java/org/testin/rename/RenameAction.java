@@ -18,9 +18,9 @@ package org.testin.rename;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditors;
@@ -38,7 +38,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 // UC-TREE-PANEL-011
-public class RenameAction extends DumbAwareAction {
+public class RenameAction extends AbstractAnyProjectAction {
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-104, Rule-TREE-PANEL-111
     private static @NotNull Optional<String> whyNot(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         if (!dir.isRenamable()) return Optional.of(Bundle.message("rename.disabled.description"));
@@ -50,12 +50,7 @@ public class RenameAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-011
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @NotNull Optional<Project> project = Optional.ofNullable(e.getProject());
-        if (project.isEmpty()) return;
-
-        final @NotNull Project p = project.orElseThrow();
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TestinData.singleSelectedNode(e)
                 .filter(dir -> whyNot(p, dir).isEmpty())
                 .ifPresent(dir -> new RenameDialog(p, dir, newName -> renameNode(p, dir, newName)).show());
@@ -106,9 +101,8 @@ public class RenameAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-104
     @Override
-    public void update(final @NotNull AnActionEvent e) {
-        final @NotNull Optional<String> why = Optional.ofNullable(e.getProject())
-                .flatMap(p -> TestinData.singleSelectedNode(e).map(dir -> whyNot(p, dir)))
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
+        final @NotNull Optional<String> why = TestinData.singleSelectedNode(e).map(dir -> whyNot(p, dir))
                 .orElse(Optional.of(Bundle.message("rename.disabled.description")));
 
         GrayWithReason.unless(this, e, why);

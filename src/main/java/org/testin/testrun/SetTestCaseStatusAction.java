@@ -18,11 +18,10 @@ package org.testin.testrun;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.editor.run.RunEditor;
 import org.testin.model.TestRunItems;
@@ -35,7 +34,7 @@ import org.testin.util.Bundle;
 import java.util.List;
 import java.util.Optional;
 
-public class SetTestCaseStatusAction extends DumbAwareAction {
+public class SetTestCaseStatusAction extends AbstractAnyProjectAction {
     @Getter
     private final @NotNull TestStatus status;
 
@@ -48,10 +47,9 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
 
     // UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033, UC-EDITOR-PANEL-034
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull List<TestCaseDto> selectedItems = TestinData.selectedTestCases(e);
-        if (p == null || selectedItems.isEmpty()) return;
+        if (selectedItems.isEmpty()) return;
 
         TestinData.runEditor(e).ifPresent(editor -> record(p, editor, selectedItems));
     }
@@ -81,7 +79,7 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
 
     // UC-EDITOR-PANEL-032
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         e.getPresentation().setEnabled(TestinData.runEditor(e).isPresent()
                 && !TestinData.selectedTestCases(e).isEmpty());
     }

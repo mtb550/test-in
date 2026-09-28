@@ -83,12 +83,12 @@ public final class CodeOn {
     }
 
     // Rule-CODEGEN-082, Rule-TREE-PANEL-104
-    public static boolean grayedWithReason(final @NotNull AnAction action, final @NotNull AnActionEvent e) {
+    public static boolean grayedWithReason(final @NotNull AnAction action, final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull Presentation presentation = e.getPresentation();
         if (OptionalPlugin.JAVA.grayedWithReason(action, presentation)) return true;
 
         final @NotNull Presentation own = action.getTemplatePresentation();
-        final @NotNull Optional<String> why = Optional.ofNullable(e.getProject()).flatMap(CodeOn::whyOff);
+        final @NotNull Optional<String> why = whyOff(p);
         if (why.isEmpty()) {
             presentation.setText(own.getText());
             presentation.setDescription(own.getDescription());

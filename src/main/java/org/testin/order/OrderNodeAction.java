@@ -18,10 +18,9 @@ package org.testin.order;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.indexer.ProjectIndexer;
@@ -35,13 +34,10 @@ import org.testin.util.Bundle;
 
 import java.util.Optional;
 
-public class OrderNodeAction extends DumbAwareAction {
+public class OrderNodeAction extends AbstractAnyProjectAction {
     // UC-TREE-PANEL-015
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         orderable(e).ifPresent(node -> new OrderDialog(p, node.getOrder(), order -> apply(p, node, order)).show());
     }
 
@@ -82,7 +78,7 @@ public class OrderNodeAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-015, Rule-TREE-PANEL-058
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         GrayWithReason.unless(this, e, orderable(e).isPresent(), Bundle.message("order.disabled.description"));
     }
 

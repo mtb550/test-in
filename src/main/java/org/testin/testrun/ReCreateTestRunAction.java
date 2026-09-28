@@ -18,11 +18,10 @@ package org.testin.testrun;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.creator.CreateTestRun;
@@ -40,13 +39,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class ReCreateTestRunAction extends DumbAwareAction {
+public class ReCreateTestRunAction extends AbstractAnyProjectAction {
     // UC-TREE-PANEL-021
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TestinData.tree(e)
                 .map(SimpleTree::getSelectionPath)
                 .ifPresent(path -> new Work(p).reCreateAt(path));
@@ -54,7 +50,7 @@ public class ReCreateTestRunAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-021, Rule-TREE-PANEL-069
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         GrayWithReason.unless(this, e, TestinData.singleSelected(e, TestRunDirectoryDto.class).isPresent(),
                 Bundle.message("recreate.run.disabled.description"));
     }

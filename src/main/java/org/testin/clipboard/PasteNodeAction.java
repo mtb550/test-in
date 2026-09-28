@@ -18,10 +18,9 @@ package org.testin.clipboard;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.explorer.tree.TreeTransferPayload;
@@ -42,13 +41,10 @@ import java.util.List;
 import java.util.Objects;
 
 // UC-TREE-PANEL-013, UC-TREE-PANEL-014
-public class PasteNodeAction extends DumbAwareAction {
+public class PasteNodeAction extends AbstractAnyProjectAction {
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TreeTransferHandler.of(e).ifPresent(handler ->
                 ClipboardContents.withFlavor(TreeTransferHandler.NODE_FLAVOR).ifPresent(contents ->
                         TestinData.singleSelectedNode(e).ifPresent(target -> new Work(p, handler).paste(contents, target))));
@@ -56,7 +52,7 @@ public class PasteNodeAction extends DumbAwareAction {
 
     // UC-TREE-PANEL-013
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         e.getPresentation().setEnabled(TreeTransferHandler.of(e)
                 .filter(TreeTransferHandler::canPasteFromClipboard)
                 .isPresent());

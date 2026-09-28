@@ -18,10 +18,9 @@ package org.testin.navigate;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.CardHoverAction;
@@ -34,7 +33,7 @@ import org.testin.util.Bundle;
 import java.util.Optional;
 
 // UC-EDITOR-PANEL-048
-public class NavigateToTestCaseAction extends DumbAwareAction {
+public class NavigateToTestCaseAction extends AbstractAnyProjectAction {
     public NavigateToTestCaseAction() {
         getTemplatePresentation().setIcon(CardHoverAction.NAVIGATE_TO_TEST_CASE.getIcon());
     }
@@ -58,16 +57,13 @@ public class NavigateToTestCaseAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @Nullable Project p = e.getProject();
-        if (p == null) return;
-
+    protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         TestinData.selectedTestCases(e).stream().findFirst().ifPresent(tc -> execute(p, tc));
     }
 
     // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-236
     @Override
-    public void update(final @NotNull AnActionEvent e) {
+    protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull Optional<TestCaseDto> first = TestinData.selectedTestCases(e).stream().findFirst();
         final @NotNull Optional<String> whyNot = first.flatMap(NavigateToTestCaseAction::whyNot);
 
