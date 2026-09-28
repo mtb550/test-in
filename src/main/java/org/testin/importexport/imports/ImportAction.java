@@ -33,7 +33,6 @@ import org.testin.codegen.GenType;
 import org.testin.codegen.JavaCode;
 import org.testin.creator.CreateTestSet;
 import org.testin.editor.TestinEditors;
-import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
@@ -190,8 +189,6 @@ public class ImportAction extends DumbAwareAction {
 
         private void refreshTarget(final @NotNull Path targetPath) {
             Services.getInstance(p, ProjectIndexer.class).refreshDirectory(targetPath);
-            ApplicationManager.getApplication().invokeLater(() ->
-                    Services.getInstance(p, TreePanel.class).getProjectTree().refresh());
         }
 
         // UC-SHARE-007, Rule-SHARE-037

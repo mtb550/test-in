@@ -28,7 +28,6 @@ import org.testin.actions.Declared;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditors;
-import org.testin.explorer.TreePanel;
 import org.testin.indexer.NodeCounter;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -153,7 +152,6 @@ public class RemoveAction extends DumbAwareAction {
                     if (wasRemoved) went.add(node);
                     if (pending.decrementAndGet() != 0) return;
 
-                    Services.getInstance(p, TreePanel.class).getProjectTree().updateNodes();
                     whenAllGone.accept(List.copyOf(went));
                 });
             }
@@ -190,7 +188,6 @@ public class RemoveAction extends DumbAwareAction {
             ProgressManager.getInstance().runProcessWithProgressSynchronously(
                     () -> lost.addAll(kept.stream().filter(one -> !indexer.restoreNode(one.copy(), one.original())).toList()),
                     Bundle.message("remove.undo.progress"), false, p);
-            Services.getInstance(p, TreePanel.class).getProjectTree().updateNodes();
 
             if (lost.isEmpty()) return true;
 

@@ -35,6 +35,7 @@ import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.BranchSelector;
 import org.testin.explorer.toolbar.RefreshAction;
 import org.testin.explorer.tree.TreePanelTree;
+import org.testin.indexer.IndexChanged;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
@@ -78,7 +79,7 @@ public final class TreePanel implements Disposable {
 
         refreshAction = new RefreshAction(p, this);
         branchSelector = new BranchSelector(p, this, bound());
-        projectTree = new TreePanelTree(p, this);
+        projectTree = new TreePanelTree(p);
         Disposer.register(this, projectTree);
 
         final @NotNull JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
@@ -89,8 +90,29 @@ public final class TreePanel implements Disposable {
 
         panel.add(treeView, BorderLayout.CENTER);
 
+        followTheIndex();
         refresh();
         refreshWhenIndexed();
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-114
+    private void followTheIndex() {
+        p.getMessageBus().connect(this).subscribe(IndexChanged.TOPIC, new IndexChanged() {
+            @Override
+            public void nodesChanged() {
+                projectTree.refresh();
+            }
+
+            @Override
+            public void testProjectsChanged() {
+                refresh();
+            }
+
+            @Override
+            public void readAgain() {
+                refresh();
+            }
+        });
     }
 
     private void refreshWhenIndexed() {

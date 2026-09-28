@@ -27,7 +27,6 @@ import org.testin.codegen.JavaCode;
 import org.testin.creator.dialogs.CreateRunDialog;
 import org.testin.creator.dialogs.CreateTestDialog;
 import org.testin.editor.TestinEditors;
-import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -107,7 +106,6 @@ public class CreateTreeNodeAction extends DumbAwareAction {
                 }
 
                 final @NotNull Optional<DirectoryDto> created = NodeCreators.of(p, dt).execute(s, pDir, newDirPath);
-                Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
 
                 created.ifPresent(dir -> {
                     Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);

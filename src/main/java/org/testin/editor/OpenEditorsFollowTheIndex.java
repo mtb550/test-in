@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.editor;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import git4idea.GitUtil;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.IndexChanged;
 import org.testin.services.Services;
 
-import java.nio.file.Path;
-import java.util.Optional;
+public final class OpenEditorsFollowTheIndex implements IndexChanged {
+    private final @NotNull Project p;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class RepositoryRefresh {
-    // UC-SHARE-016, Rule-SHARE-073
-    static void after(final @NotNull Project p, final @NotNull Path repoPath) {
-        Optional.ofNullable(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(repoPath.toFile()))
-                .ifPresent(GitUtil::refreshVfsInRoot);
+    public OpenEditorsFollowTheIndex(final @NotNull Project p) {
+        this.p = p;
+    }
 
-        Services.getInstance(p, ProjectIndexer.class).scanSingleProject(repoPath);
+    // UC-INTERNAL-002, Rule-INTERNAL-114
+    @Override
+    public void readAgain() {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (!p.isDisposed()) Services.getInstance(p, TestinEditors.class).refreshOpen(p);
+        });
     }
 }

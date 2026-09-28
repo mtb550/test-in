@@ -97,6 +97,10 @@ There is no key for this. It starts on its own.
 - **Rule-INTERNAL-112** — A node is moved, renamed or removed on disk, and the
   file system refreshed, before Testin's own reading of it changes, so that
   reading never names something the disk does not have yet.
+- **Rule-INTERNAL-114** — Every change Testin records to a node is announced
+  once, after it is recorded. Each surface redraws itself from that: the tree
+  for a node, the panel for a test project, and the open editors for a project
+  read again from disk.
 
 ## The budget
 

@@ -29,7 +29,6 @@ import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
-import org.testin.explorer.TreePanel;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -56,7 +55,6 @@ public class TreePanelTree implements Disposable {
     };
 
     private final @NotNull Project p;
-    private final @NotNull TreePanel tp;
     private final @NotNull JBScrollPane scrollPane;
     private final @NotNull TreePanelStructure treeStructure;
     private final @NotNull StructureTreeModel<TreePanelStructure> structureModel;
@@ -70,9 +68,8 @@ public class TreePanelTree implements Disposable {
 
     private @NotNull Optional<Path> revealAfterRebuild = Optional.empty();
 
-    public TreePanelTree(final @NotNull Project p, final @NotNull TreePanel tp) {
+    public TreePanelTree(final @NotNull Project p) {
         this.p = p;
-        this.tp = tp;
 
         this.treeStructure = new TreePanelStructure(p, bound());
         this.structureModel = new StructureTreeModel<>(treeStructure, this);
@@ -89,7 +86,7 @@ public class TreePanelTree implements Disposable {
         final @NotNull Set<Path> sharedCutNodes = new HashSet<>();
         mainTree.setCellRenderer(new TreeCellRenderer(sharedCutNodes));
 
-        final @NotNull TreeTransferHandler transferHandler = new TreeTransferHandler(p, mainTree, sharedCutNodes, this::refresh, this::refreshAndReveal);
+        final @NotNull TreeTransferHandler transferHandler = new TreeTransferHandler(p, mainTree, sharedCutNodes, this::revealAfterRefresh);
         mainTree.setTransferHandler(transferHandler);
         mainTree.setDragEnabled(true);
 
@@ -148,9 +145,8 @@ public class TreePanelTree implements Disposable {
     }
 
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014
-    public void refreshAndReveal(final @NotNull Path target) {
+    public void revealAfterRefresh(final @NotNull Path target) {
         revealAfterRebuild = Optional.of(target);
-        refresh();
     }
 
     public void refresh() {
@@ -198,10 +194,6 @@ public class TreePanelTree implements Disposable {
         revealAfterRebuild = Optional.empty();
 
         target.ifPresent(this::reveal);
-    }
-
-    public void updateNodes() {
-        tp.refresh();
     }
 
     private @NotNull Optional<TestProjectDirectoryDto> bound() {

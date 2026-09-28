@@ -76,19 +76,17 @@ public class TreeTransferHandler extends TransferHandler {
 
     private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
-    private final @NotNull Runnable refresh;
 
-    private final @NotNull Consumer<Path> refreshAndReveal;
+    private final @NotNull Consumer<Path> revealAfterRefresh;
     @Getter
     private final @NotNull Set<Path> selectedNodes;
     private int clipboardAction = COPY;
 
-    public TreeTransferHandler(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull Set<Path> selectedNodes, final @NotNull Runnable refresh, final @NotNull Consumer<Path> refreshAndReveal) {
+    public TreeTransferHandler(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull Set<Path> selectedNodes, final @NotNull Consumer<Path> revealAfterRefresh) {
         this.p = p;
         this.tree = tree;
         this.selectedNodes = selectedNodes;
-        this.refresh = refresh;
-        this.refreshAndReveal = refreshAndReveal;
+        this.revealAfterRefresh = revealAfterRefresh;
     }
 
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014
@@ -320,7 +318,7 @@ public class TreeTransferHandler extends TransferHandler {
             Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), copied -> {
                 generateForCopies(sources, target);
 
-                refreshAndReveal.accept(target.getPath().resolve(sources.getFirst().getName()));
+                if (copied > 0) revealAfterRefresh.accept(target.getPath().resolve(sources.getFirst().getName()));
 
                 confirmLanded(Done.PASTED, copied);
             });
@@ -399,7 +397,6 @@ public class TreeTransferHandler extends TransferHandler {
 
                 if (remaining.decrementAndGet() != 0) return;
 
-                refresh.run();
                 onDone.accept(moved.get());
             });
         }

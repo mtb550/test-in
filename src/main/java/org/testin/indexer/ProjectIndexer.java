@@ -241,6 +241,20 @@ public final class ProjectIndexer {
         return Services.getInstance(p, TestinRoot.class).absolutePath();
     }
 
+    // UC-INTERNAL-002, Rule-INTERNAL-114
+    private void announce(final @NotNull Path changed) {
+        if (p.isDisposed()) return;
+
+        final @NotNull IndexChanged listeners = p.getMessageBus().syncPublisher(IndexChanged.TOPIC);
+        if (absoluteRoot().equals(changed.getParent())) listeners.testProjectsChanged();
+        else listeners.nodesChanged();
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-114
+    private void announceReadAgain() {
+        if (!p.isDisposed()) p.getMessageBus().syncPublisher(IndexChanged.TOPIC).readAgain();
+    }
+
     // UC-INTERNAL-002, Rule-INTERNAL-006
     private @NotNull List<Path> boundOnly(final @NotNull List<Path> projects) {
         final @NotNull String bound = Services.getInstance(p, BoundTestProject.class).name();
@@ -442,6 +456,7 @@ public final class ProjectIndexer {
             final @NotNull TestRunMarker marker = dir.getMarker();
             change.accept(marker);
             runWriter.persistMarker(runPath);
+            announce(runPath);
         }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + runPath.getFileName()));
     }
 
@@ -495,15 +510,24 @@ public final class ProjectIndexer {
     }
 
     private void removeVf(final @NotNull Path path, final @NotNull Runnable cacheUpdate, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
-        nodeFiles.remove(path, cacheUpdate, onRemoved);
+        nodeFiles.remove(path, cacheUpdate, removed -> {
+            onRemoved.accept(removed);
+            if (removed) announce(path);
+        });
     }
 
     public void moveNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Consumer<@NotNull Boolean> onFinished) {
-        nodeFiles.move(oldPath, newPath, onFinished);
+        nodeFiles.move(oldPath, newPath, moved -> {
+            onFinished.accept(moved);
+            if (moved) announce(newPath);
+        });
     }
 
     public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final @NotNull IntConsumer onComplete) {
-        nodeFiles.copy(sourcePaths, targetPath, onComplete);
+        nodeFiles.copy(sourcePaths, targetPath, copied -> {
+            onComplete.accept(copied);
+            if (copied > 0) announce(targetPath);
+        });
     }
 
     // UC-INTERNAL-005, Rule-INTERNAL-037, Rule-INTERNAL-041
@@ -517,6 +541,7 @@ public final class ProjectIndexer {
 
         refreshDirectory(original);
         refreshIndexedProject(original);
+        announce(original);
         return true;
     }
 
@@ -549,23 +574,23 @@ public final class ProjectIndexer {
 
     // UC-TREE-PANEL-002
     public boolean addTestProject(final @NotNull TestProjectDirectoryDto tp) {
-        return store.addTestProject(tp);
+        return announcedIf(store.addTestProject(tp), tp.getPath());
     }
 
     public boolean addTestSet(final @NotNull TestSetDirectoryDto ts) {
-        return store.addTestSet(ts);
+        return announcedIf(store.addTestSet(ts), ts.getPath());
     }
 
     public boolean addTestSetPackage(final @NotNull TestSetPackageDirectoryDto tsp) {
-        return store.addTestSetPackage(tsp);
+        return announcedIf(store.addTestSetPackage(tsp), tsp.getPath());
     }
 
     public boolean addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
-        return store.addTestRunDir(trd);
+        return announcedIf(store.addTestRunDir(trd), trd.getPath());
     }
 
     public boolean addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
-        return store.addTestRunPackage(trp);
+        return announcedIf(store.addTestRunPackage(trp), trp.getPath());
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-016
@@ -578,6 +603,7 @@ public final class ProjectIndexer {
         Logger.info("Not a test project Testin reads, so not scanned: " + projectPath);
         store.removeTestProject(projectPath);
         store.invalidateChildrenIndex();
+        announceReadAgain();
     }
 
     public void scanSingleProject(final @NotNull Path projectPath) {
@@ -592,10 +618,17 @@ public final class ProjectIndexer {
         } catch (final Exception ex) {
             Logger.error("Failed to scan single project: " + ex.getMessage());
         }
+
+        announceReadAgain();
     }
 
     public boolean persistMarker(final @NotNull DirectoryDto dto) {
-        return store.persistMarker(dto);
+        return announcedIf(store.persistMarker(dto), dto.getPath());
+    }
+
+    private boolean announcedIf(final boolean changed, final @NotNull Path path) {
+        if (changed) announce(path);
+        return changed;
     }
 
     public <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name, final @NotNull Class<M> markerClass) {
@@ -625,6 +658,9 @@ public final class ProjectIndexer {
     }
 
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
-        nodeFiles.rename(oldPath, newPath, onFinished);
+        nodeFiles.rename(oldPath, newPath, () -> {
+            onFinished.run();
+            announce(newPath);
+        });
     }
 }

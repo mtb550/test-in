@@ -58,6 +58,7 @@ public class ArchitectureTest {
     };
     private static final @NotNull Set<String> UTIL_EXCEPTIONS = Set.of();
     private static final @NotNull Set<String> FILE_ACCESS_EXCEPTIONS = Set.of();
+    private static final @NotNull Set<String> REFRESH_EXCEPTIONS = Set.of("org.testin.testproject.SaveTestinYml");
 
     private static @NotNull JavaClasses productionClasses() {
         final @NotNull Path compiled = Path.of("build", "classes", "java", "main").toAbsolutePath();
@@ -129,6 +130,21 @@ public class ArchitectureTest {
                 .should().dependOnClassesThat().resideInAPackage("com.fasterxml.jackson.dataformat.yaml..")
                 .because("testin.yml is read by one class, so a missing value means the same thing everywhere,"
                         + " and nothing else can open, parse or write the file (Rule-INTERNAL-089)");
+
+        rule.check(CLASSES);
+    }
+
+    @Test
+    public void onlyTheSurfacesRefreshThemselves() {
+        final @NotNull ArchRule rule = noClasses()
+                .that().resideOutsideOfPackages("org.testin.explorer..", "org.testin.editor..")
+                .and(notOneOf(REFRESH_EXCEPTIONS))
+                .should().callMethod("org.testin.explorer.tree.TreePanelTree", "refresh")
+                .orShould().callMethod("org.testin.editor.TestinEditors", "refreshOpen", "com.intellij.openapi.project.Project")
+                .because("the indexer announces every change on IndexChanged and the surfaces redraw themselves from it;"
+                        + " a caller that refreshes as well is how a rename redrew the tree twice (Rule-INTERNAL-114, #361)."
+                        + " SaveTestinYml is the one exception: testin.yml turns code on or off, which the editors draw,"
+                        + " and that is not a change to the index");
 
         rule.check(CLASSES);
     }

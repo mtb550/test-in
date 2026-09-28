@@ -25,7 +25,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
-import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.NodeStatus;
@@ -74,8 +73,6 @@ public class UpdateStatusAction extends DumbAwareAction {
                 marker.setModifiedAt(modifiedAtBefore);
                 return;
             }
-
-            Services.getInstance(p, TreePanel.class).getProjectTree().updateNodes();
 
             Services.getInstance(p, Notifier.class).softShow(p, status.getLabel());
 

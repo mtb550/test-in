@@ -25,7 +25,6 @@ import org.testin.codegen.JavaCode;
 import org.testin.codegen.Renamed;
 import org.testin.config.TestinYml;
 import org.testin.editor.TestinEditors;
-import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -43,7 +42,7 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NodeRename {
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-036, Rule-TREE-PANEL-111
-    public static void apply(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull DirectoryDto dir, final @NotNull String newName, final @NotNull Runnable onDone) {
+    public static void apply(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName, final @NotNull Runnable onDone) {
         Services.getInstance(p, TestinEditors.class).close(p, dir);
 
         final @NotNull Renamed renamed = new Renamed(dir, newName);
@@ -57,12 +56,8 @@ public final class NodeRename {
             if (renamed.toTheFilesName(p)) Services.getInstance(p, BoundTestProject.class).follow(oldName, newName);
             JavaCode.of(dir.getType()).getRenamed().execute(p, renamed);
 
-            if (dir instanceof TestProjectDirectoryDto) {
-                projectFollows(p, oldName, newName);
-                tp.refresh();
-            }
+            if (dir instanceof TestProjectDirectoryDto) projectFollows(p, oldName, newName);
 
-            tp.getProjectTree().refresh();
             Logger.info("Success! Renamed to: " + newName);
 
             onDone.run();

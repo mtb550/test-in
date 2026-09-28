@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditors;
-import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -76,9 +75,8 @@ public class RenameAction extends DumbAwareAction {
         final @NotNull String oldName = dir.getName();
         final @NotNull Path oldPath = dir.getPath();
         final @NotNull Path newPath = oldPath.resolveSibling(newName);
-        final @NotNull TreePanel tp = Services.getInstance(p, TreePanel.class);
 
-        NodeRename.apply(p, tp, dir, newName, () -> {
+        NodeRename.apply(p, dir, newName, () -> {
             Services.getInstance(p, Notifier.class).softShow(p, Done.RENAMED);
 
             Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
@@ -101,7 +99,7 @@ public class RenameAction extends DumbAwareAction {
         final @NotNull DirectoryDto dir = node.orElseThrow();
         if (NodeRename.refused(p, dir, newName)) return false;
 
-        NodeRename.apply(p, Services.getInstance(p, TreePanel.class), dir, newName, () -> {
+        NodeRename.apply(p, dir, newName, () -> {
         });
         return true;
     }

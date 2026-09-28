@@ -27,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditors;
-import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -153,7 +152,7 @@ public class EditTestRunAction extends DumbAwareAction {
                 return;
             }
 
-            NodeRename.apply(p, Services.getInstance(p, TreePanel.class), run, toName, () -> write(from.getParent().resolve(toName), writeTo, onDone));
+            NodeRename.apply(p, run, toName, () -> write(from.getParent().resolve(toName), writeTo, onDone));
         }
 
         private void write(final @NotNull Path runPath, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
@@ -163,8 +162,6 @@ public class EditTestRunAction extends DumbAwareAction {
                 Services.getInstance(p, ProjectIndexer.class).refreshDirectory(runPath);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
-
                     Services.getInstance(p, TestinEditors.class).reloadOpen(p, runPath);
 
                     onDone.run();

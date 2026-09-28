@@ -665,4 +665,13 @@
 
     </applicationListeners>
 
+    <projectListeners>
+
+        <listener
+                class="org.testin.editor.OpenEditorsFollowTheIndex"
+                topic="org.testin.indexer.IndexChanged"
+        />
+
+    </projectListeners>
+
 </idea-plugin>

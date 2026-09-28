@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
-import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
@@ -74,7 +73,6 @@ public class OrderNodeAction extends DumbAwareAction {
             return false;
         }
 
-        Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
         return true;
     }
 

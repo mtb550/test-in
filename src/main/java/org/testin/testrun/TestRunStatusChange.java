@@ -23,7 +23,6 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditors;
 import org.testin.editor.run.RunEditor;
-import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
@@ -96,8 +95,5 @@ public final class TestRunStatusChange {
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-091
     private void redraw(final @NotNull Optional<RunEditor> open) {
         ApplicationManager.getApplication().invokeLater(() -> open.ifPresent(RunEditor::refreshAfterRunStatusChanged));
-
-        if (Services.isNotCreated(p, TreePanel.class)) return;
-        Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
     }
 }

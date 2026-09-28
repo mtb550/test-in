@@ -21,7 +21,6 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditors;
-import org.testin.explorer.TreePanel;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -115,7 +114,6 @@ public class CreateTestRun implements NodeCreator {
             indexer.refreshDirectory(savePath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                Services.getInstance(p, TreePanel.class).getProjectTree().refresh();
                 Services.getInstance(p, TestinEditors.class).open(p, trDir);
 
                 Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
