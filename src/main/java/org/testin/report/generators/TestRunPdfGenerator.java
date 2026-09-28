@@ -16,6 +16,8 @@
 
 package org.testin.report.generators;
 
+import com.intellij.openapi.progress.ProcessCanceledException;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.itextpdf.kernel.colors.DeviceRgb;
@@ -229,6 +231,8 @@ public final class TestRunPdfGenerator {
             sayWhatWasLeftOut(p);
             return baos.toByteArray();
 
+        } catch (final ProcessCanceledException stopped) {
+            throw stopped;
         } catch (final Exception ex) {
             Logger.error("PDF generation failed: " + ex.getMessage());
             throw new RuntimeException(ex);
@@ -275,6 +279,7 @@ public final class TestRunPdfGenerator {
         boolean alt = true;
         for (TestRunItems item : tr.getResults()) {
             if (!section.matches(item)) continue;
+            ProgressManager.checkCanceled();
 
             DeviceRgb rowBg = alt ? LIGHT_BG : WHITE;
             alt = !alt;

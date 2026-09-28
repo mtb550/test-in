@@ -16,6 +16,7 @@
 
 package org.testin.report.generators;
 
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import org.dhatim.fastexcel.HyperLink;
 import org.dhatim.fastexcel.Workbook;
@@ -112,6 +113,7 @@ public final class TestRunExcelGenerator {
 
         int row = 1;
         for (final TestRunItems result : tr.getResults()) {
+            ProgressManager.checkCanceled();
             final @NotNull UUID id = result.getId();
             final @NotNull TestCaseDto details = result.shownTestCase();
 

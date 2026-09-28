@@ -16,6 +16,7 @@
 
 package org.testin.report.generators;
 
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
@@ -275,6 +276,7 @@ public final class TestRunWordGenerator {
         boolean alt = true;
         for (TestRunItems item : tr.getResults()) {
             if (!section.matches(item)) continue;
+            ProgressManager.checkCanceled();
 
             String rowBg = alt ? LIGHT_BG : WHITE;
             alt = !alt;

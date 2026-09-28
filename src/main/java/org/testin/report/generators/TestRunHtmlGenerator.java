@@ -16,6 +16,7 @@
 
 package org.testin.report.generators;
 
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -162,6 +163,7 @@ public final class TestRunHtmlGenerator {
         results.stream()
                 .filter(section::matches)
                 .forEach(item -> {
+                    ProgressManager.checkCanceled();
                     final @NotNull String desc = item.shownTestCase().getDescription();
 
                     html.append("<tr>")
