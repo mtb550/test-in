@@ -34,6 +34,7 @@ import org.testin.model.dto.TestCaseDto;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,35 +45,30 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
     // UC-CODEGEN-011, Rule-CODEGEN-067
     private static @NotNull PsiElement place(final @NotNull PsiClass pc, final @NotNull PsiMethod pm, final @Nullable PsiElement after) {
         if (after == null) {
-            final @Nullable PsiMethod first = firstGenerated(pc);
+            final @NotNull Optional<PsiMethod> first = firstGenerated(pc).filter(found -> found != pm);
+            if (first.isEmpty()) return pm;
 
-            if (first == null || first == pm) return pm;
-
-            final @NotNull PsiElement moved = pc.addBefore(pm, first);
+            final @NotNull PsiElement moved = pc.addBefore(pm, first.get());
             pm.delete();
             return moved;
         }
 
-        if (nextAfter(after) == pm) return pm;
+        if (nextAfter(after).filter(next -> next == pm).isPresent()) return pm;
 
         final @NotNull PsiElement moved = pc.addAfter(pm, after);
         pm.delete();
         return moved;
     }
 
-    private static @Nullable PsiMethod firstGenerated(final @NotNull PsiClass pc) {
-        for (final PsiMethod pm : pc.getMethods()) {
-            if (GeneratedMethod.testCaseIdOf(pm).isPresent()) return pm;
-        }
-
-        return null;
+    private static @NotNull Optional<PsiMethod> firstGenerated(final @NotNull PsiClass pc) {
+        return Arrays.stream(pc.getMethods()).filter(method -> GeneratedMethod.testCaseIdOf(method).isPresent()).findFirst();
     }
 
-    private static @Nullable PsiElement nextAfter(final @NotNull PsiElement element) {
-        PsiElement next = element.getNextSibling();
+    private static @NotNull Optional<PsiElement> nextAfter(final @NotNull PsiElement element) {
+        @Nullable PsiElement next = element.getNextSibling();
         while (next instanceof PsiWhiteSpace) next = next.getNextSibling();
 
-        return next;
+        return Optional.ofNullable(next);
     }
 
     @Override

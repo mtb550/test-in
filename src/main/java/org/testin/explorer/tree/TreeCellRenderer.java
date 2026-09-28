@@ -50,17 +50,20 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
     @Override
     public void customizeCellRenderer(final @NotNull JTree tree, final @Nullable Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
         try {
-            final @Nullable Object shown = TreeValues.valueOf(value);
-
-            if (shown instanceof TreeLoadError(String message)) {
+            final @NotNull Optional<TreeLoadError> loadError = TreeValues.valueOf(value, TreeLoadError.class);
+            if (loadError.isPresent()) {
                 setIcon(AllIcons.General.Error);
-                append(message, SimpleTextAttributes.ERROR_ATTRIBUTES);
+                append(loadError.get().message(), SimpleTextAttributes.ERROR_ATTRIBUTES);
                 return;
             }
-            if (!(shown instanceof DirectoryDto dir)) {
+
+            final @NotNull Optional<DirectoryDto> shown = TreeValues.directoryOf(value);
+            if (shown.isEmpty()) {
                 append(Objects.toString(value, ""), SimpleTextAttributes.REGULAR_ATTRIBUTES);
                 return;
             }
+
+            final @NotNull DirectoryDto dir = shown.get();
             final @NotNull DirectoryType type = dir.getType();
 
             final @NotNull Optional<TestRunStatus> runStatus = dir instanceof TestRunDirectoryDto trDir

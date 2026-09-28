@@ -38,9 +38,9 @@ public final class TreeValues {
     private static final TreePath @NotNull [] NO_PATHS = new TreePath[0];
     private static final int @NotNull [] NO_ROWS = new int[0];
 
-    public static @Nullable Object valueOf(final @Nullable Object component) {
+    private static @NotNull Optional<Object> valueOf(final @Nullable Object component) {
         if (component instanceof TreePanelNode node) {
-            return node.getValue();
+            return Optional.ofNullable(node.getValue());
         }
         if (component instanceof DefaultMutableTreeNode node) {
             return valueOf(node.getUserObject());
@@ -48,11 +48,11 @@ public final class TreeValues {
         if (component instanceof NodeDescriptor<?> descriptor) {
             return valueOf(descriptor.getElement());
         }
-        return component;
+        return Optional.ofNullable(component);
     }
 
     public static <T> @NotNull Optional<T> valueOf(final @Nullable Object component, final @NotNull Class<T> type) {
-        return Optional.ofNullable(valueOf(component)).filter(type::isInstance).map(type::cast);
+        return valueOf(component).filter(type::isInstance).map(type::cast);
     }
 
     public static @NotNull Optional<DirectoryDto> directoryOf(final @Nullable Object component) {

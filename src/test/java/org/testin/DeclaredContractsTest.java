@@ -60,10 +60,7 @@ public class DeclaredContractsTest {
             entry("TreeTransferHandler.createTransferable", "TransferHandler's contract: null is nothing to drag"),
             entry("TreeDropHandler.handleDrop", "FileDropHandler is a Kotlin suspend function, whose Java face answers an Object that may be null"),
             entry("TreePanelStructure.getParentElement", "AbstractTreeStructure's contract: null is the root"),
-            entry("TestinFileWatcher.prepareChange", "AsyncFileListener's contract: null is nothing to apply"),
-            entry("TreeValues.valueOf", "Testin's own: what a Swing tree node holds, which is null for an empty one. Its typed overload answers an Optional"),
-            entry("UpdateTestOrder.firstGenerated", "Testin's own: no generated method in the class yet"),
-            entry("UpdateTestOrder.nextAfter", "Testin's own: nothing after this element in the class")
+            entry("TestinFileWatcher.prepareChange", "AsyncFileListener's contract: null is nothing to apply")
     );
 
     private static @NotNull Set<String> declared(final @NotNull Pattern declaration) {
