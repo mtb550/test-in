@@ -19,6 +19,7 @@ package org.testin.explorer.tree;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.tree.LeafState;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
@@ -54,6 +55,17 @@ public class TreePanelNodeIdeTest extends BasePlatformTestCase {
     public void testATestSetAndATestRunHaveNothingToOpen() {
         assertEquals(LeafState.ALWAYS, new TreePanelNode(getProject(), at(new TestSetDirectoryDto(), SET)).getLeafState());
         assertEquals(LeafState.ALWAYS, new TreePanelNode(getProject(), at(new TestRunDirectoryDto(), Path.of("project", "Test Runs", "Cycle 1"))).getLeafState());
+    }
+
+    public void testAFolderCanBeFoundByItsPathAlone() {
+        final Path root = Path.of("project");
+        final TreePanelNode probe = TreePanelNode.standingFor(getProject(), root, SET);
+
+        assertEquals("the model finds a changed folder by comparing a probe with the node it holds",
+                new TreePanelNode(getProject(), at(new TestSetDirectoryDto(), SET)), probe);
+        assertEquals(new TreePanelNode(getProject(), at(new TestSetPackageDirectoryDto(), SET.getParent())), probe.getParent());
+        assertEquals("the probe's parents lead to the root the structure answers with",
+                new TreePanelNode(getProject(), at(new TestProjectDirectoryDto(), root)), probe.getParent().getParent());
     }
 
     public void testAPackageIsAskedForItsChildren() {

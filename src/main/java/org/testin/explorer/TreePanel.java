@@ -51,8 +51,10 @@ import org.testin.util.Bundle;
 
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Service(Service.Level.PROJECT)
 public final class TreePanel implements Disposable {
@@ -99,8 +101,8 @@ public final class TreePanel implements Disposable {
     private void followTheIndex() {
         p.getMessageBus().connect(this).subscribe(IndexChanged.TOPIC, new IndexChanged() {
             @Override
-            public void nodesChanged() {
-                projectTree.refresh();
+            public void nodesChanged(final @NotNull Set<Path> folders) {
+                projectTree.refresh(folders);
             }
 
             @Override

@@ -19,10 +19,13 @@ package org.testin.indexer;
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
+import java.util.Set;
+
 public interface IndexChanged {
     @NotNull Topic<IndexChanged> TOPIC = Topic.create("Testin index changed", IndexChanged.class);
 
-    default void nodesChanged() {
+    default void nodesChanged(final @NotNull Set<Path> folders) {
     }
 
     default void testProjectsChanged() {

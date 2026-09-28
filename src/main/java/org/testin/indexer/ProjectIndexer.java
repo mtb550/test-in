@@ -247,7 +247,12 @@ public final class ProjectIndexer {
 
         final @NotNull IndexChanged listeners = p.getMessageBus().syncPublisher(IndexChanged.TOPIC);
         if (absoluteRoot().equals(changed.getParent())) listeners.testProjectsChanged();
-        else listeners.nodesChanged();
+        else listeners.nodesChanged(Set.of(changed.getParent()));
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-114
+    private void announceChildrenOf(final @NotNull Path folder) {
+        if (!p.isDisposed()) p.getMessageBus().syncPublisher(IndexChanged.TOPIC).nodesChanged(Set.of(folder));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-114
@@ -519,14 +524,17 @@ public final class ProjectIndexer {
     public void moveNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Consumer<@NotNull Boolean> onFinished) {
         nodeFiles.move(oldPath, newPath, moved -> {
             onFinished.accept(moved);
-            if (moved) announce(newPath);
+            if (!moved) return;
+
+            announce(oldPath);
+            announce(newPath);
         });
     }
 
     public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final @NotNull IntConsumer onComplete) {
         nodeFiles.copy(sourcePaths, targetPath, copied -> {
             onComplete.accept(copied);
-            if (copied > 0) announce(targetPath);
+            if (copied > 0) announceChildrenOf(targetPath);
         });
     }
 

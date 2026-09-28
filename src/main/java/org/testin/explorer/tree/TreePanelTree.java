@@ -25,6 +25,7 @@ import com.intellij.ui.tree.AsyncTreeModel;
 import com.intellij.ui.tree.StructureTreeModel;
 import com.intellij.ui.tree.TreeVisitor;
 import com.intellij.ui.treeStructure.SimpleTree;
+import com.intellij.util.concurrency.AppExecutorUtil;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -48,11 +49,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TreePanelTree implements Disposable {
     private static final @NotNull Runnable NOTHING_AFTER = () -> {
     };
+    private static final long QUIET_MILLIS = 100;
 
     private final @NotNull Project p;
     private final @NotNull JBScrollPane scrollPane;
@@ -62,6 +67,8 @@ public class TreePanelTree implements Disposable {
     @Getter
     private final @NotNull SimpleTree mainTree;
     private final @NotNull AtomicBoolean refreshScheduled = new AtomicBoolean();
+    private final @NotNull Set<Path> changedFolders = ConcurrentHashMap.newKeySet();
+    private final @NotNull AtomicBoolean foldersBooked = new AtomicBoolean();
 
     private volatile @NotNull String expandedProjectPath = "";
     private volatile boolean disposed;
@@ -183,6 +190,40 @@ public class TreePanelTree implements Disposable {
                 refreshScheduled.set(false);
             }
         });
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-114
+    public void refresh(final @NotNull Set<Path> folders) {
+        if (disposed) return;
+
+        changedFolders.addAll(folders);
+        if (!foldersBooked.compareAndSet(false, true)) return;
+
+        AppExecutorUtil.getAppScheduledExecutorService().schedule(this::redrawChangedFolders, QUIET_MILLIS, TimeUnit.MILLISECONDS);
+    }
+
+    private void redrawChangedFolders() {
+        foldersBooked.set(false);
+        if (disposed) return;
+
+        final @NotNull List<Path> folders = List.copyOf(changedFolders);
+        folders.forEach(changedFolders::remove);
+
+        final @NotNull Optional<Path> root = bound().map(DirectoryDto::getPath);
+        if (root.isEmpty()) return;
+
+        final long started = System.nanoTime();
+        final @NotNull CompletableFuture<?>[] redrawn = folders.stream()
+                .filter(folder -> folder.startsWith(root.get()))
+                .map(folder -> structureModel.invalidateAsync(TreePanelNode.standingFor(p, root.get(), folder), true))
+                .toArray(CompletableFuture[]::new);
+
+        CompletableFuture.allOf(redrawn).thenRun(() -> ApplicationManager.getApplication().invokeLater(() -> {
+            if (disposed) return;
+
+            consumePendingReveal();
+            Logger.debug("Tree redrew " + redrawn.length + " folder(s) in " + millisSince(started) + " ms");
+        }));
     }
 
     private static long millisSince(final long started) {

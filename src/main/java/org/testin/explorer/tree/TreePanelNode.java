@@ -29,6 +29,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -100,6 +101,21 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
 
     private @NotNull Object identity() {
         return getValue() instanceof DirectoryDto directory ? directory.getPath() : getValue();
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-114
+    static @NotNull TreePanelNode standingFor(final @NotNull Project p, final @NotNull Path root, final @NotNull Path folder) {
+        @NotNull TreePanelNode node = new TreePanelNode(p, root);
+        @NotNull Path at = root;
+
+        for (final Path part : root.relativize(folder)) {
+            at = at.resolve(part);
+            final @NotNull TreePanelNode child = new TreePanelNode(p, at);
+            child.setParent(node);
+            node = child;
+        }
+
+        return node;
     }
 
     // UC-TREE-PANEL-028, Rule-TREE-PANEL-008
