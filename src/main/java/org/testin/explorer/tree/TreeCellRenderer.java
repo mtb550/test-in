@@ -30,13 +30,14 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Bundle;
 
 import javax.swing.JTree;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 @AllArgsConstructor
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
-    private final @NotNull Set<DirectoryDto> selectedNodes;
+    private final @NotNull Set<Path> selectedNodes;
 
     // UC-TREE-PANEL-001, Rule-TREE-PANEL-099
     private static @NotNull String statusLabel(final @NotNull DirectoryDto dir) {
@@ -49,12 +50,14 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
     @Override
     public void customizeCellRenderer(final @NotNull JTree tree, final @Nullable Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
         try {
-            if (TreeValues.valueOf(value) instanceof TreeLoadError(String message)) {
+            final @Nullable Object shown = TreeValues.valueOf(value);
+
+            if (shown instanceof TreeLoadError(String message)) {
                 setIcon(AllIcons.General.Error);
                 append(message, SimpleTextAttributes.ERROR_ATTRIBUTES);
                 return;
             }
-            if (!(TreeValues.valueOf(value) instanceof DirectoryDto dir)) {
+            if (!(shown instanceof DirectoryDto dir)) {
                 append(Objects.toString(value, ""), SimpleTextAttributes.REGULAR_ATTRIBUTES);
                 return;
             }
@@ -65,10 +68,11 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                     : Optional.empty();
 
             setIcon(runStatus.map(TestRunStatus::getIcon).orElseGet(type::getIcon));
-            final boolean grayed = selectedNodes.contains(dir) || dir.isRetired();
+            final boolean grayed = selectedNodes.contains(dir.getPath()) || dir.isRetired();
             append(dir.getName(), grayed ? SimpleTextAttributes.GRAYED_ATTRIBUTES : type.getAttributes());
-            append(" ");
-            append(statusLabel(dir), SimpleTextAttributes.GRAY_ATTRIBUTES);
+
+            final @NotNull String status = statusLabel(dir);
+            if (!status.isEmpty()) append(" " + status, SimpleTextAttributes.GRAY_ATTRIBUTES);
 
         } catch (final Exception ex) {
             Logger.error("Error rendering tree node: " + ex.getMessage());

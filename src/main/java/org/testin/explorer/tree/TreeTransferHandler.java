@@ -80,10 +80,10 @@ public class TreeTransferHandler extends TransferHandler {
 
     private final @NotNull Consumer<Path> refreshAndReveal;
     @Getter
-    private final @NotNull Set<DirectoryDto> selectedNodes;
+    private final @NotNull Set<Path> selectedNodes;
     private int clipboardAction = COPY;
 
-    public TreeTransferHandler(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull Set<DirectoryDto> selectedNodes, final @NotNull Runnable refresh, final @NotNull Consumer<Path> refreshAndReveal) {
+    public TreeTransferHandler(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull Set<Path> selectedNodes, final @NotNull Runnable refresh, final @NotNull Consumer<Path> refreshAndReveal) {
         this.p = p;
         this.tree = tree;
         this.selectedNodes = selectedNodes;
@@ -500,7 +500,7 @@ public class TreeTransferHandler extends TransferHandler {
 
     private void updateClipboardState(final int action, final @NotNull List<DirectoryDto> directories) {
         selectedNodes.clear();
-        if (action == MOVE) selectedNodes.addAll(directories);
+        if (action == MOVE) directories.forEach(directory -> selectedNodes.add(directory.getPath()));
         tree.repaint();
     }
 }

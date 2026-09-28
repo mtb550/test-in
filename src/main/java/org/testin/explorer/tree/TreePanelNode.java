@@ -21,6 +21,7 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.tree.LeafState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
@@ -79,9 +80,26 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
         return child;
     }
 
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-127
     @Override
     public @NotNull LeafState getLeafState() {
-        return getValue() instanceof DirectoryDto ? LeafState.ASYNC : LeafState.ALWAYS;
+        if (!(getValue() instanceof DirectoryDto directory)) return LeafState.ALWAYS;
+
+        return directory instanceof TestProjectDirectoryDto || directory.getType().acceptsAnything() ? LeafState.ASYNC : LeafState.ALWAYS;
+    }
+
+    @Override
+    public boolean equals(final @Nullable Object other) {
+        return other instanceof TreePanelNode node && identity().equals(node.identity());
+    }
+
+    @Override
+    public int hashCode() {
+        return identity().hashCode();
+    }
+
+    private @NotNull Object identity() {
+        return getValue() instanceof DirectoryDto directory ? directory.getPath() : getValue();
     }
 
     // UC-TREE-PANEL-028, Rule-TREE-PANEL-008

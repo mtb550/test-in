@@ -30,6 +30,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
 import org.testin.explorer.TreePanel;
+import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
@@ -85,7 +86,7 @@ public class TreePanelTree implements Disposable {
         mainTree.setDropMode(DropMode.ON);
         mainTree.setAutoscrolls(true);
 
-        final @NotNull Set<DirectoryDto> sharedCutNodes = new HashSet<>();
+        final @NotNull Set<Path> sharedCutNodes = new HashSet<>();
         mainTree.setCellRenderer(new TreeCellRenderer(sharedCutNodes));
 
         final @NotNull TreeTransferHandler transferHandler = new TreeTransferHandler(p, mainTree, sharedCutNodes, this::refresh, this::refreshAndReveal);
@@ -166,9 +167,11 @@ public class TreePanelTree implements Disposable {
                 expandedProjectPath = projectPath;
 
                 final @NotNull TreeState shape = TreeState.createOn(mainTree);
+                final long started = System.nanoTime();
 
                 structureModel.invalidateAsync().thenRun(() -> {
                     if (disposed) return;
+                    Logger.debug("Tree rebuilt in " + millisSince(started) + " ms");
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (disposed) return;
@@ -177,15 +180,17 @@ public class TreePanelTree implements Disposable {
                         else shape.applyTo(mainTree);
 
                         consumePendingReveal();
+                        Logger.debug("Tree refreshed and expanded in " + millisSince(started) + " ms");
                     });
                 });
-
-                mainTree.revalidate();
-                mainTree.repaint();
             } finally {
                 refreshScheduled.set(false);
             }
         });
+    }
+
+    private static long millisSince(final long started) {
+        return (System.nanoTime() - started) / 1_000_000;
     }
 
     private void consumePendingReveal() {
