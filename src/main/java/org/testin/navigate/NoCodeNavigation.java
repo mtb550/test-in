@@ -24,6 +24,7 @@ import org.testin.model.dto.TestCaseDto;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public final class NoCodeNavigation implements CodeNavigation {
@@ -40,8 +41,8 @@ public final class NoCodeNavigation implements CodeNavigation {
     }
 
     @Override
-    public boolean hasTheWrittenBody(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        return false;
+    public @NotNull Set<UUID> withAWrittenBody(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        return Set.of();
     }
 
     @Override

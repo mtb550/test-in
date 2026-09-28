@@ -25,6 +25,7 @@ import org.testin.util.FromContentModule;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public interface CodeNavigation {
@@ -46,7 +47,7 @@ public interface CodeNavigation {
     @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases);
 
     @FromContentModule
-    boolean hasTheWrittenBody(@NotNull Project p, @NotNull TestCaseDto tc);
+    @NotNull Set<UUID> withAWrittenBody(@NotNull Project p, @NotNull List<TestCaseDto> testCases);
 
     @FromContentModule
     boolean fillBody(@NotNull Project p, @NotNull TestCaseDto tc, @NotNull String statements);

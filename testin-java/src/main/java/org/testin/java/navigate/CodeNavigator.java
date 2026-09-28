@@ -17,7 +17,6 @@
 package org.testin.java.navigate;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.IndexNotReadyException;
@@ -41,10 +40,12 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public final class CodeNavigator implements CodeNavigation {
@@ -75,6 +76,14 @@ public final class CodeNavigator implements CodeNavigation {
     // UC-CODEGEN-006, Rule-CODEGEN-026
     @Override
     public @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        final @NotNull Map<UUID, Boolean> found = new LinkedHashMap<>();
+        generatedMethodsOf(p, testCases).forEach((id, pm) -> found.put(id, doesSomething(pm)));
+
+        return found;
+    }
+
+    // UC-CODEGEN-006, Rule-CODEGEN-026
+    private @NotNull Map<UUID, PsiMethod> generatedMethodsOf(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
 
         for (final TestCaseDto tc : testCases) {
@@ -84,7 +93,7 @@ public final class CodeNavigator implements CodeNavigation {
             byClass.computeIfAbsent(classFqcn, _ -> new ArrayList<>()).add(tc);
         }
 
-        final @NotNull Map<UUID, Boolean> found = new LinkedHashMap<>();
+        final @NotNull Map<UUID, PsiMethod> found = new LinkedHashMap<>();
 
         for (final Map.Entry<String, List<TestCaseDto>> group : byClass.entrySet()) {
             final @NotNull Optional<PsiClass> owner = GeneratedClass.byName(p, group.getKey());
@@ -95,7 +104,7 @@ public final class CodeNavigator implements CodeNavigation {
 
             for (final TestCaseDto tc : group.getValue()) {
                 Optional.ofNullable(methods.get(tc.getId().toString()))
-                        .ifPresent(pm -> found.put(tc.getId(), doesSomething(pm)));
+                        .ifPresent(pm -> found.put(tc.getId(), pm));
             }
         }
 
@@ -104,10 +113,15 @@ public final class CodeNavigator implements CodeNavigation {
 
     // UC-CODEGEN-021, Rule-CODEGEN-003
     @Override
-    public boolean hasTheWrittenBody(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        if (DumbService.isDumb(p)) return false;
+    public @NotNull Set<UUID> withAWrittenBody(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+        if (DumbService.isDumb(p)) return Set.of();
 
-        return Boolean.TRUE.equals(ReadAction.computeBlocking(() -> resolve(p, tc).map(GeneratedMethod::holdsAWrittenBody).orElse(false)));
+        final @NotNull Set<UUID> written = new HashSet<>();
+        generatedMethodsOf(p, testCases).forEach((id, pm) -> {
+            if (GeneratedMethod.holdsAWrittenBody(pm)) written.add(id);
+        });
+
+        return written;
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-003, Rule-CODEGEN-089

@@ -16,8 +16,11 @@
 
 package org.testin.codegen;
 
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.concurrency.AppExecutorUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +29,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
+import org.testin.services.ProjectLifetime;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Shortcuts;
@@ -33,6 +37,8 @@ import org.testin.util.Bundle;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -42,8 +48,16 @@ public final class WriteBodies {
         final @NotNull AgentConnection connection = AgentConnection.stored();
         if (!connection.isConnected() || testCases.isEmpty()) return;
 
-        final @NotNull List<TestCaseDto> theirs = testCases.stream().filter(tc -> CodeNavigation.available().hasTheWrittenBody(p, tc)).toList();
-        final @NotNull List<TestCaseDto> empty = testCases.stream().filter(tc -> !theirs.contains(tc)).toList();
+        ReadAction.nonBlocking(() -> CodeNavigation.available().withAWrittenBody(p, testCases))
+                .expireWith(ProjectLifetime.of(p))
+                .finishOnUiThread(ModalityState.defaultModalityState(), written -> askOrConfirm(p, connection, testCases, written, editor))
+                .submit(AppExecutorUtil.getAppExecutorService());
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-084, Rule-CODEGEN-091
+    private static void askOrConfirm(final @NotNull Project p, final @NotNull AgentConnection connection, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<UUID> written, final @NotNull Optional<TestinEditor> editor) {
+        final @NotNull List<TestCaseDto> theirs = testCases.stream().filter(tc -> written.contains(tc.getId())).toList();
+        final @NotNull List<TestCaseDto> empty = testCases.stream().filter(tc -> !written.contains(tc.getId())).toList();
 
         if (theirs.isEmpty()) {
             ask(p, connection, empty, List.of(), editor);
