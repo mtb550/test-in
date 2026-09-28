@@ -18,7 +18,7 @@ package org.testin.testrun.failure;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestRuns;
 import org.testin.model.TestRunItems;
 import org.testin.services.Services;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -39,7 +39,7 @@ public final class ScreenshotsSection implements FailureSection {
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
     public ScreenshotsSection(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem) {
-        final @NotNull List<byte[]> stored = Services.getInstance(p, ProjectIndexer.class).screenshots(runPath, runItem);
+        final @NotNull List<byte[]> stored = Services.getInstance(p, TestRuns.class).screenshots(runPath, runItem);
         IntStream.range(0, stored.size()).forEach(index -> named.put(stored.get(index), runItem.getScreenshots().get(index)));
 
         component = ComponentDialogBase.screenshots(Bundle.message("dialog.failure.caption.screenshots"), stored);

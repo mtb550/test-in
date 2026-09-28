@@ -28,7 +28,7 @@ import org.testin.clipboard.CutState;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.TestinEditors;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
@@ -93,10 +93,10 @@ public class RemoveTestCaseAction extends AbstractAnyProjectAction {
                 final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(selectedItems);
                 final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, dir.getPath(), ids);
 
-                final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
                 final @NotNull List<TestCaseDto> removed = new ArrayList<>();
                 for (final TestCaseDto tc : selectedItems) {
-                    if (indexer.removeTestCase(dir.getPath(), tc.getId())) removed.add(tc);
+                    if (testCases.removeTestCase(dir.getPath(), tc.getId())) removed.add(tc);
                 }
 
                 TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.remove"), removed), before, TestCaseSnapshot.of(p, dir.getPath(), ids));

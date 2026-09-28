@@ -30,7 +30,7 @@ import org.testin.codegen.GenType;
 import org.testin.codegen.MovedTestCase;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -138,7 +138,7 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
 
                     if (!isCut) {
                         copied.add(new CopiedTestCase(clonedTc,
-                                Services.getInstance(p, ProjectIndexer.class).findTestCase(tc.getId()).orElse(tc)));
+                                Services.getInstance(p, TestCases.class).findTestCase(tc.getId()).orElse(tc)));
                     }
                 }
 
@@ -182,11 +182,11 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
         private void moveCut(final @NotNull TestinEditor sourceUI, final @NotNull TestEditor destUI, final @NotNull List<TestCaseDto> cutItems, final @NotNull List<TestCaseDto> pastedHere) {
             final @NotNull Path from = sourceUI.getParent().getPath();
             final @NotNull Path to = destUI.getParent().getPath();
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
 
             final @NotNull List<TestCaseDto> stayed = new ArrayList<>();
             for (final TestCaseDto moved : pastedHere) {
-                if (!indexer.moveTestCase(from, to, moved)) stayed.add(moved);
+                if (!testCases.moveTestCase(from, to, moved)) stayed.add(moved);
             }
 
             pastedHere.removeAll(stayed);

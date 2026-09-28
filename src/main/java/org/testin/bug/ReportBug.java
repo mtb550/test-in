@@ -23,8 +23,9 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.BugRepository;
 import org.testin.config.TestinYml;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCaseFile;
+import org.testin.indexer.TestCases;
+import org.testin.indexer.TestRuns;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
@@ -41,11 +42,12 @@ import java.util.UUID;
 public final class ReportBug {
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-067
     public static void start(final @NotNull Project p, final @NotNull TestRunDirectoryDto runDirectory, final @NotNull UUID runItemId, final @NotNull TestCaseDto tc, final @NotNull Runnable redraw) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
+        final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
         final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
         final @NotNull BugReports.RunItem item = new BugReports.RunItem(runDirectory.getPath(), runItemId);
 
-        final @NotNull Optional<TestRunDto> run = indexer.findTestRun(item.run());
+        final @NotNull Optional<TestRunDto> run = testRuns.findTestRun(item.run());
         final @NotNull Optional<TestRunItems> failed = run.flatMap(item::failedIn);
         if (failed.isEmpty() || reports.whyReportBugIsOff(item, failed.orElseThrow()).isPresent()) return;
 
@@ -53,10 +55,10 @@ public final class ReportBug {
         redraw.run();
 
         final @NotNull TestRunItems failedItem = failed.orElseThrow();
-        final @NotNull Optional<TestCaseFile> file = indexer.testCaseFile(tc);
+        final @NotNull Optional<TestCaseFile> file = testCases.testCaseFile(tc);
 
         BackgroundWork.run(p, Bundle.message("bug.preparing"), Bundle.message("bug.send.failed.title"), true,
-                indicator -> prepare(p, BugFacts.of(failedItem, tc, runDirectory.getMarker(), runDirectory.getName(), indexer.screenshots(item.run(), failedItem)), file, indicator),
+                indicator -> prepare(p, BugFacts.of(failedItem, tc, runDirectory.getMarker(), runDirectory.getName(), testRuns.screenshots(item.run(), failedItem)), file, indicator),
                 bug -> open(p, item, bug, redraw),
                 () -> {
                     reports.end(item, BugReports.Stage.PREPARING);

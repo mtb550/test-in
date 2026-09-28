@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
@@ -35,7 +35,7 @@ public final class TestProjectFolder {
     public static @NotNull Optional<Path> free(final @NotNull Project p, final @NotNull String name) {
         final @NotNull Path folder = Services.getInstance(p, TestinRoot.class).absolutePath().resolve(name);
 
-        if (Services.getInstance(p, ProjectIndexer.class).isTaken(folder, Optional.empty())) {
+        if (Services.getInstance(p, Nodes.class).isTaken(folder, Optional.empty())) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, name);
             return Optional.empty();
         }

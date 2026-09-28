@@ -29,6 +29,7 @@ import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.GitSafeText;
+import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.notifications.Done;
@@ -57,10 +58,10 @@ public final class CloneTestProject {
 
         final @NotNull String base = repositoryName(url);
         final @NotNull Path root = Services.getInstance(p, TestinRoot.class).absolutePath();
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
         @NotNull String name = base;
-        for (int n = 2; indexer.isTaken(root.resolve(name), Optional.empty()); n++) {
+        for (int n = 2; nodes.isTaken(root.resolve(name), Optional.empty()); n++) {
             name = base + n;
         }
         return name;

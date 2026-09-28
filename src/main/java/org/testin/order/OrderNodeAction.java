@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
@@ -64,7 +64,7 @@ public class OrderNodeAction extends AbstractAnyProjectAction {
         final int was = node.getOrder();
         node.getMarker().setOrder(order);
 
-        if (!Services.getInstance(p, ProjectIndexer.class).persistMarker(node)) {
+        if (!Services.getInstance(p, Nodes.class).persistMarker(node)) {
             node.getMarker().setOrder(was);
             return false;
         }

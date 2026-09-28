@@ -26,7 +26,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.ExecutionPosition;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -135,7 +135,7 @@ public class OrderSection implements CreateTestCaseSection {
 
         final @NotNull Path setPath = dto.getParent().getPath();
         ApplicationManager.getApplication().executeOnPooledThread(() ->
-                ranked.forEach(moved -> Services.getInstance(p, ProjectIndexer.class).putTestCase(setPath, moved)));
+                ranked.forEach(moved -> Services.getInstance(p, TestCases.class).putTestCase(setPath, moved)));
     }
 
     @Override

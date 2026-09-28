@@ -28,7 +28,7 @@ import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditors;
 import org.testin.indexer.NodeCounter;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
@@ -97,7 +97,7 @@ public class RemoveAction extends AbstractAnyProjectAction {
         private void removeNodes(final @NotNull List<DirectoryDto> nodesToRemove) {
             if (nodesToRemove.isEmpty()) return;
 
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
             final @NotNull List<Kept> kept = new ArrayList<>(nodesToRemove.size());
 
@@ -105,12 +105,12 @@ public class RemoveAction extends AbstractAnyProjectAction {
             final boolean copied = ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
                 for (final DirectoryDto node : nodesToRemove) {
                     ProgressManager.checkCanceled();
-                    indexer.keepAside(node.getPath()).ifPresent(copy -> kept.add(new Kept(node, node.getPath(), copy)));
+                    nodes.keepAside(node.getPath()).ifPresent(copy -> kept.add(new Kept(node, node.getPath(), copy)));
                 }
             }, Bundle.message("remove.progress"), true, p);
 
             if (!copied) {
-                kept.forEach(one -> indexer.forgetKept(one.copy()));
+                kept.forEach(one -> nodes.forgetKept(one.copy()));
                 return;
             }
 
@@ -123,7 +123,7 @@ public class RemoveAction extends AbstractAnyProjectAction {
                 Logger.info("Removed " + went.size() + " of " + nodesToRemove.size() + " node(s).");
 
                 final @NotNull List<Kept> undoable = kept.stream().filter(one -> went.contains(one.dto())).toList();
-                kept.stream().filter(one -> !went.contains(one.dto())).forEach(one -> indexer.forgetKept(one.copy()));
+                kept.stream().filter(one -> !went.contains(one.dto())).forEach(one -> nodes.forgetKept(one.copy()));
 
                 if (went.isEmpty()) return;
 
@@ -168,7 +168,7 @@ public class RemoveAction extends AbstractAnyProjectAction {
                         removeAll(kept);
                         return true;
                     },
-                    () -> kept.forEach(one -> Services.getInstance(p, ProjectIndexer.class).forgetKept(one.copy()))));
+                    () -> kept.forEach(one -> Services.getInstance(p, Nodes.class).forgetKept(one.copy()))));
         }
 
         // UC-TREE-PANEL-016, Rule-TREE-PANEL-040, Rule-INTERNAL-063
@@ -179,7 +179,7 @@ public class RemoveAction extends AbstractAnyProjectAction {
                 return false;
             }
 
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
             // Rule-TREE-PANEL-102
             final @NotNull Map<Path, Path> originalByKept = new LinkedHashMap<>();
@@ -187,7 +187,7 @@ public class RemoveAction extends AbstractAnyProjectAction {
 
             final @NotNull List<Path> lost = new ArrayList<>();
             ProgressManager.getInstance().runProcessWithProgressSynchronously(
-                    () -> lost.addAll(indexer.restoreNodes(originalByKept)),
+                    () -> lost.addAll(nodes.restoreNodes(originalByKept)),
                     Bundle.message("remove.undo.progress"), false, p);
 
             if (lost.isEmpty()) return true;

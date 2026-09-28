@@ -21,7 +21,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.BugRepository;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.TestRunItems;
@@ -73,13 +73,13 @@ public final class BugFiling {
 
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-074
     static @NotNull Optional<String> store(final @NotNull Project p, final @NotNull BugReports.RunItem item, final @NotNull String url) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        final @NotNull Optional<TestRunItems> found = indexer.findTestRun(item.run()).flatMap(item::in);
+        final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
+        final @NotNull Optional<TestRunItems> found = testRuns.findTestRun(item.run()).flatMap(item::in);
         if (found.isEmpty()) return Optional.of(Bundle.message("bug.not.stored.moved"));
         if (found.orElseThrow().getStatus() != TestStatus.FAILED)
             return Optional.of(Bundle.message("bug.not.stored.no.longer.failed"));
 
-        indexer.changeRun(item.run(), run -> item.failedIn(run).ifPresentOrElse(result -> result.setBugIssueUrl(url),
+        testRuns.changeRun(item.run(), run -> item.failedIn(run).ifPresentOrElse(result -> result.setBugIssueUrl(url),
                 () -> Logger.warn("The run a sync brought in no longer has this failure, so its bug link was not stored: " + url)));
         return Optional.empty();
     }

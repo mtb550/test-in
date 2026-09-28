@@ -27,7 +27,7 @@ import org.testin.actions.TestinData;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.toolbar.Toolbar;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Done;
@@ -84,10 +84,10 @@ public class UpdateTestCaseAction extends AbstractAnyProjectAction {
             final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, path, ids);
 
             open.accept(new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
                 int counted = 0;
                 for (final TestCaseDto tc : updatedItems)
-                    if (indexer.putTestCase(path, tc)) counted++;
+                    if (testCases.putTestCase(path, tc)) counted++;
                 final int written = counted;
 
                 if (written == 0) return;

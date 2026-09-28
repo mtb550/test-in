@@ -22,7 +22,8 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditors;
 import org.testin.indexer.DirectoryMapper;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.dto.TestRunDto;
@@ -69,7 +70,7 @@ public class CreateTestRun implements NodeCreator {
 
     // UC-TREE-PANEL-009, Rule-TREE-PANEL-004
     private boolean create(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull DirectoryDto parentDir) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
         final @NotNull String name = form.getRunName();
@@ -78,13 +79,13 @@ public class CreateTestRun implements NodeCreator {
             return false;
         }
 
-        if (!indexer.nodeExists(parentDir.getPath())) {
+        if (!nodes.nodeExists(parentDir.getPath())) {
             notifier.softRefuse(p, Bundle.message("run.parent.gone", parentDir.getName()));
             return false;
         }
 
         final @NotNull Path savePath = parentDir.getPath().resolve(name);
-        if (indexer.nodeExists(savePath)) {
+        if (nodes.nodeExists(savePath)) {
             notifier.softRefuse(p, Refused.ALREADY_EXISTS, name);
             return false;
         }
@@ -102,16 +103,17 @@ public class CreateTestRun implements NodeCreator {
         final @NotNull TestRunDto tr = new TestRunDto().coverOnly(RunForm.checkedTestCases(selection));
 
         BackgroundWork.run(p, Bundle.message("run.task.creating", savePath.getFileName()), Bundle.message("run.create.failed.title"), _ -> {
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
+            final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
 
             final @NotNull TestRunMarker marker = new TestRunMarker();
             marker.setConfiguration(TestRunConfiguration.answered(configuration));
             trDir.setMarker(marker);
 
-            if (!indexer.addTestRunDir(trDir)) return;
+            if (!nodes.addTestRunDir(trDir)) return;
 
-            indexer.putTestRun(savePath, tr);
-            indexer.refreshDirectory(savePath);
+            testRuns.putTestRun(savePath, tr);
+            nodes.refreshDirectory(savePath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 Services.getInstance(p, TestinEditors.class).open(p, trDir);

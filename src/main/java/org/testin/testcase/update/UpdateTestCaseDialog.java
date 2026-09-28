@@ -19,7 +19,7 @@ package org.testin.testcase.update;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testcase.UpdateTestCaseFields;
@@ -43,7 +43,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         super(p, existingDto, onSave);
 
         // Rule-CODEGEN-001
-        descriptionSection.compareAgainst(() -> Services.getInstance(p, ProjectIndexer.class)
+        descriptionSection.compareAgainst(() -> Services.getInstance(p, TestCases.class)
                 .getTestCasesForTestSet(existingDto.getParent().getPath()).stream()
                 .filter(sibling -> !sibling.getId().equals(existingDto.getId()))
                 .toList());

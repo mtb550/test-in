@@ -27,7 +27,8 @@ import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditors;
 import org.testin.explorer.tree.TreeValues;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.dto.TestRunDto;
@@ -85,7 +86,7 @@ public class EditTestRunAction extends AbstractAnyProjectAction {
         }
 
         private void edit(final @NotNull TestRunDirectoryDto run) {
-            final @NotNull Set<UUID> covered = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(run.getPath()).coveredIds();
+            final @NotNull Set<UUID> covered = Services.getInstance(p, TestRuns.class).getTestRunByPath(run.getPath()).coveredIds();
 
             Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
                     tp -> new RunForm(p).open(tp.getTestCasesDirectory(), run.getName(), covered, run.getMarker().getConfiguration(), saves(run)),
@@ -99,7 +100,8 @@ public class EditTestRunAction extends AbstractAnyProjectAction {
         // UC-TREE-PANEL-022, Rule-TREE-PANEL-074, Rule-TREE-PANEL-076
         private boolean save(final @NotNull TestRunDirectoryDto run, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection) {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
+            final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
 
             final @NotNull String name = form.getRunName();
             if (name.isEmpty()) {
@@ -107,7 +109,7 @@ public class EditTestRunAction extends AbstractAnyProjectAction {
                 return false;
             }
 
-            if (!indexer.nodeExists(run.getPath())) {
+            if (!nodes.nodeExists(run.getPath())) {
                 notifier.softRefuse(p, Bundle.message("run.gone", run.getName()));
                 return false;
             }
@@ -124,8 +126,8 @@ public class EditTestRunAction extends AbstractAnyProjectAction {
             final @NotNull Map<TestRunConfiguration, String> configuration = TestRunConfiguration.answered(form.configuration());
 
             applyEdit(run, name, runPath -> {
-                indexer.changeRun(runPath, held -> held.setResults(held.coverOnly(wanted(held, checked, offered::contains)).getResults()));
-                indexer.changeRunMarker(runPath, marker -> marker.setConfiguration(configuration));
+                testRuns.changeRun(runPath, held -> held.setResults(held.coverOnly(wanted(held, checked, offered::contains)).getResults()));
+                testRuns.changeRunMarker(runPath, marker -> marker.setConfiguration(configuration));
             }, () -> notifier.softShow(p, Done.UPDATED));
 
             return true;
@@ -155,7 +157,7 @@ public class EditTestRunAction extends AbstractAnyProjectAction {
             writeTo.accept(runPath);
 
             BackgroundWork.run(p, Bundle.message("run.task.updating", runPath.getFileName()), Bundle.message("run.update.failed.title"), _ -> {
-                Services.getInstance(p, ProjectIndexer.class).refreshDirectory(runPath);
+                Services.getInstance(p, Nodes.class).refreshDirectory(runPath);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     Services.getInstance(p, TestinEditors.class).reloadOpen(p, runPath);

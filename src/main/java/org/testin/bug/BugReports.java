@@ -20,7 +20,7 @@ import com.intellij.openapi.components.Service;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestRuns;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestRunDto;
@@ -103,8 +103,8 @@ public final class BugReports {
             return in(testRun).filter(result -> result.getStatus() == TestStatus.FAILED);
         }
 
-        public @NotNull Optional<TestRunItems> stillFailed(final @NotNull ProjectIndexer indexer) {
-            return indexer.findTestRun(run).flatMap(this::failedIn);
+        public @NotNull Optional<TestRunItems> stillFailed(final @NotNull TestRuns testRuns) {
+            return testRuns.findTestRun(run).flatMap(this::failedIn);
         }
     }
 

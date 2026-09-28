@@ -21,7 +21,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.CheckedTreeNode;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -102,18 +104,20 @@ public final class RunForm {
     // UC-TREE-PANEL-009, Rule-TREE-PANEL-030
     private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder, final @NotNull DirectoryDto thisNodeDto) {
         final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
+        final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
         indexer.awaitIndexing();
 
         final @NotNull DefaultMutableTreeNode node = new DefaultMutableTreeNode(thisNodeDto);
 
         if (thisNodeDto instanceof TestSetDirectoryDto) {
-            for (final TestCaseDto tc : indexer.getTestCasesForTestSet(folder)) {
+            for (final TestCaseDto tc : testCases.getTestCasesForTestSet(folder)) {
                 node.add(new DefaultMutableTreeNode(tc));
             }
             return node;
         }
 
-        for (final DirectoryDto child : indexer.getChildren(folder)) {
+        for (final DirectoryDto child : nodes.getChildren(folder)) {
             if (child.isRetired()) continue;
 
             final @NotNull DefaultMutableTreeNode childNode = buildDirectoryTree(child.getPath(), child);

@@ -20,7 +20,9 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestCases;
+import org.testin.indexer.TestRuns;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -43,12 +45,11 @@ public final class Hits {
     // UC-INTERNAL-001, Rule-INTERNAL-001
     public static @NotNull Found forQuery(final @NotNull Project p, final @NotNull String query) {
         final @NotNull String wanted = query.trim().toLowerCase(Locale.ROOT);
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-        final @NotNull List<DirectoryDto> nodes = wanted.isEmpty() ? everywhereToGo(indexer) : nodesNamed(indexer, wanted);
-        final @NotNull List<TestCaseDto> testCases = testCasesMatching(indexer, wanted);
+        final @NotNull List<DirectoryDto> nodes = wanted.isEmpty() ? everywhereToGo(p) : nodesNamed(p, wanted);
+        final @NotNull List<TestCaseDto> testCases = testCasesMatching(p, wanted);
 
-        final @NotNull List<Hit> inTestRuns = inTestRuns(indexer, testCases);
+        final @NotNull List<Hit> inTestRuns = inTestRuns(p, testCases);
 
         final @NotNull List<Hit> found = new ArrayList<>(nodes.stream().limit(SHOWN).map(Hit::of).toList());
         found.addAll(topTestCases(testCases, wanted, SHOWN - found.size()));
@@ -57,38 +58,39 @@ public final class Hits {
         return new Found(List.copyOf(found), nodes.size() + testCases.size() + inTestRuns.size());
     }
 
-    private static @NotNull List<DirectoryDto> everywhereToGo(final @NotNull ProjectIndexer indexer) {
-        return indexer.getAllNodes().stream()
+    private static @NotNull List<DirectoryDto> everywhereToGo(final @NotNull Project p) {
+        return Services.getInstance(p, Nodes.class).getAllNodes().stream()
                 .filter(DirectoryDto::isOpenableInEditor)
                 .sorted(Hits::inTreeOrder)
                 .toList();
     }
 
-    private static @NotNull List<DirectoryDto> nodesNamed(final @NotNull ProjectIndexer indexer, final @NotNull String wanted) {
-        return indexer.getAllNodes().stream()
+    private static @NotNull List<DirectoryDto> nodesNamed(final @NotNull Project p, final @NotNull String wanted) {
+        return Services.getInstance(p, Nodes.class).getAllNodes().stream()
                 .filter(node -> contains(node.getName(), wanted))
                 .sorted(Hits::byClosestName)
                 .toList();
     }
 
-    private static @NotNull List<TestCaseDto> testCasesMatching(final @NotNull ProjectIndexer indexer, final @NotNull String wanted) {
+    private static @NotNull List<TestCaseDto> testCasesMatching(final @NotNull Project p, final @NotNull String wanted) {
         if (tooShort(wanted)) return List.of();
 
-        return indexer.getAllTestCases().stream()
+        return Services.getInstance(p, TestCases.class).getAllTestCases().stream()
                 .filter(tc -> TestEditorAttributes.anyContains(tc, wanted))
                 .toList();
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-098
-    private static @NotNull List<Hit> inTestRuns(final @NotNull ProjectIndexer indexer, final @NotNull List<TestCaseDto> testCases) {
+    private static @NotNull List<Hit> inTestRuns(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         if (testCases.isEmpty()) return List.of();
 
+        final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
         final @NotNull List<Hit> rows = new ArrayList<>();
 
-        for (final DirectoryDto node : indexer.getAllNodes()) {
+        for (final DirectoryDto node : Services.getInstance(p, Nodes.class).getAllNodes()) {
             if (!(node instanceof TestRunDirectoryDto)) continue;
 
-            final @NotNull Optional<TestRunDto> recorded = indexer.findTestRun(node.getPath());
+            final @NotNull Optional<TestRunDto> recorded = testRuns.findTestRun(node.getPath());
             if (recorded.isEmpty()) continue;
 
             final @NotNull Set<UUID> covered = recorded.orElseThrow().coveredIds();

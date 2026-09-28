@@ -20,7 +20,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -42,7 +43,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
         super(p, new TestCaseDto(), onSave);
         this.dir = dir;
 
-        descriptionSection.compareAgainst(() -> Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(dir.getPath()));
+        descriptionSection.compareAgainst(() -> Services.getInstance(p, TestCases.class).getTestCasesForTestSet(dir.getPath()));
 
         final @NotNull TestCaseForm form = new TestCaseForm(descriptionSection::getFocusComponent, true);
         final @NotNull JComponent keys = form.getPanel();
@@ -75,7 +76,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
     // UC-EDITOR-PANEL-005
     @Override
     protected void submit() {
-        if (!Services.getInstance(p, ProjectIndexer.class).nodeExists(dir.getPath())) {
+        if (!Services.getInstance(p, Nodes.class).nodeExists(dir.getPath())) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("create.test.case.set.gone", dir.getName()));
             return;
         }

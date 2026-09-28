@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.DirectoryMapper;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
 import org.testin.services.Services;
@@ -37,6 +37,6 @@ public class CreateTestRunPackage implements NodeCreator {
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         TestRunPackageDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).getTestRunPackageNode(p, newDirPath, parentDir);
 
-        return Services.getInstance(p, ProjectIndexer.class).addTestRunPackage(tr) ? Optional.of(tr) : Optional.empty();
+        return Services.getInstance(p, Nodes.class).addTestRunPackage(tr) ? Optional.of(tr) : Optional.empty();
     }
 }

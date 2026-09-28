@@ -26,7 +26,8 @@ import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.creator.CreateTestRun;
 import org.testin.explorer.tree.TreeValues;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -70,11 +71,12 @@ public class ReCreateTestRunAction extends AbstractAnyProjectAction {
         }
 
         private void reCreate(final @NotNull TestRunDirectoryDto source, final @NotNull DirectoryDto parent) {
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
+            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
-            final @NotNull Set<UUID> testCases = indexer.getTestRunByPath(source.getPath()).coveredIds();
+            final @NotNull Set<UUID> testCases = testRuns.getTestRunByPath(source.getPath()).coveredIds();
 
-            final @NotNull Set<String> taken = indexer.getChildren(parent.getPath()).stream()
+            final @NotNull Set<String> taken = nodes.getChildren(parent.getPath()).stream()
                     .map(DirectoryDto::getName)
                     .collect(Collectors.toSet());
 

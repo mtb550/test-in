@@ -23,7 +23,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditors;
 import org.testin.editor.run.RunEditor;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunStatus;
@@ -59,24 +59,24 @@ public final class TestRunStatusChange {
     }
 
     private void persist(final @NotNull TestRunDirectoryDto run, final @NotNull Optional<RunEditor> open) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
         final @NotNull TestRunStatus status = run.getMarker().getStatus();
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
 
         if (status.isTerminal()) finish(run.getPath());
 
-        indexer.changeRunMarker(run.getPath(), marker -> {
+        testRuns.changeRunMarker(run.getPath(), marker -> {
             marker.setStatus(status);
             marker.touch(tester);
         });
 
-        if (open.isPresent()) indexer.saveRun(run.getPath());
+        if (open.isPresent()) testRuns.saveRun(run.getPath());
     }
 
     private void finish(final @NotNull Path runPath) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
 
-        indexer.changeRun(runPath, run -> {
+        testRuns.changeRun(runPath, run -> {
             int closed = 0;
             for (final TestRunItems item : run.getResults()) {
                 if (item.shownStatus() == TestStatus.PENDING) {
@@ -89,7 +89,7 @@ public final class TestRunStatusChange {
                 Logger.info("Run finished with " + closed + " case(s) not executed; marked untested: " + runPath);
         });
 
-        indexer.changeRunMarker(runPath, TestRunMarker::markExecutionEnded);
+        testRuns.changeRunMarker(runPath, TestRunMarker::markExecutionEnded);
     }
 
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-091

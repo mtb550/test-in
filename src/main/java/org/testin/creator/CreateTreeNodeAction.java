@@ -26,7 +26,7 @@ import org.testin.codegen.JavaCode;
 import org.testin.creator.dialogs.CreateRunDialog;
 import org.testin.creator.dialogs.CreateTestDialog;
 import org.testin.editor.TestinEditors;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
@@ -96,7 +96,7 @@ public class CreateTreeNodeAction extends AbstractAnyProjectAction {
                 if (s.isEmpty()) return;
                 final @NotNull Path newDirPath = pDir.getPath().resolve(s);
 
-                if (Services.getInstance(p, ProjectIndexer.class).nodeExists(newDirPath)) {
+                if (Services.getInstance(p, Nodes.class).nodeExists(newDirPath)) {
                     Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, s);
                     return;
                 }

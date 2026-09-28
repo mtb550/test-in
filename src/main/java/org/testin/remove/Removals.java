@@ -20,7 +20,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.model.DirectoryType;
 import org.testin.model.RemoveHandler;
 import org.testin.services.Services;
@@ -30,26 +30,26 @@ public final class Removals {
     // UC-TREE-PANEL-013, Rule-TREE-PANEL-046
     public static @NotNull RemoveHandler of(final @NotNull DirectoryType type) {
         return switch (type) {
-            case TP -> (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestProject(dir.getPath(), removed -> {
+            case TP -> (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).removeTestProject(dir.getPath(), removed -> {
                 if (removed) GenType.REMOVE_TEST_PROJECT.getAction().execute(p, dir);
                 onRemoved.accept(removed);
             });
 
-            case TCD, TRD -> (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved);
+            case TCD, TRD -> (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).refuseRemove(dir.getPath(), onRemoved);
 
-            case TSP -> (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestSetPackage(dir.getPath(), removed -> {
+            case TSP -> (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).removeTestSetPackage(dir.getPath(), removed -> {
                 if (removed) GenType.REMOVE_TEST_SET_PACKAGE.getAction().execute(p, dir);
                 onRemoved.accept(removed);
             });
 
-            case TRP -> (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestRunPackage(dir.getPath(), onRemoved);
+            case TRP -> (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).removeTestRunPackage(dir.getPath(), onRemoved);
 
-            case TS -> (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestSet(dir.getPath(), removed -> {
+            case TS -> (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).removeTestSet(dir.getPath(), removed -> {
                 if (removed) GenType.REMOVE_TEST_SET.getAction().execute(p, dir);
                 onRemoved.accept(removed);
             });
 
-            case TR -> (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestRun(dir.getPath(), onRemoved);
+            case TR -> (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).removeTestRun(dir.getPath(), onRemoved);
         };
     }
 }

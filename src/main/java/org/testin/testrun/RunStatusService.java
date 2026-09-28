@@ -23,7 +23,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.Failure;
 import org.testin.model.TestRunItems;
@@ -106,7 +106,7 @@ public final class RunStatusService {
         final @NotNull Optional<TestRunDto> held = heldRun(p, runPath);
         if (held.isEmpty() || liveItem(p, held.orElseThrow(), runPath, testCaseId).isEmpty()) return false;
 
-        Services.getInstance(p, ProjectIndexer.class).changeResult(runPath, testCaseId, verdict);
+        Services.getInstance(p, TestRuns.class).changeResult(runPath, testCaseId, verdict);
 
         Logger.trace("[RunStatusService]: Status updated -> " + testCaseId + " = " + status);
 
@@ -116,22 +116,22 @@ public final class RunStatusService {
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167
     public boolean recordFailureDetails(final @NotNull Project p, final @NotNull Path runPath, final @NotNull UUID testCaseId, final @NotNull FailureFields fields) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
         final @NotNull Optional<TestRunDto> run = heldRun(p, runPath);
         if (run.isEmpty()) return false;
 
         if (liveItem(p, run.orElseThrow(), runPath, testCaseId).isEmpty()) return false;
 
-        fields.storePasted(pasted -> indexer.storeScreenshots(runPath, pasted));
+        fields.storePasted(pasted -> testRuns.storeScreenshots(runPath, pasted));
 
-        indexer.changeResult(runPath, testCaseId, fields::applyTo);
+        testRuns.changeResult(runPath, testCaseId, fields::applyTo);
 
         return true;
     }
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-225
     public @NotNull Optional<TestRunDto> heldRun(final @NotNull Project p, final @NotNull Path runPath) {
-        final @NotNull Optional<TestRunDto> run = Services.getInstance(p, ProjectIndexer.class).findTestRun(runPath);
+        final @NotNull Optional<TestRunDto> run = Services.getInstance(p, TestRuns.class).findTestRun(runPath);
 
         if (run.isEmpty()) {
             Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' is no longer indexed - nothing recorded");
@@ -227,8 +227,8 @@ public final class RunStatusService {
             }
 
             final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-            judged.forEach(id -> indexer.changeResult(editor.getParent().getPath(), id, item -> item.correctVerdict(status, tester, asItIsNow(p, item))));
+            final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
+            judged.forEach(id -> testRuns.changeResult(editor.getParent().getPath(), id, item -> item.correctVerdict(status, tester, asItIsNow(p, item))));
             triggerFilterRefresh(editor);
 
             confirmVerdict(p, status, judged.size());

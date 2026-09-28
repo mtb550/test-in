@@ -24,7 +24,7 @@ import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.TestinEditors;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
@@ -85,7 +85,7 @@ public class RenameAction extends AbstractAnyProjectAction {
 
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-037
     private boolean applyRename(final @NotNull Project p, final @NotNull Path path, final @NotNull String newName) {
-        final @NotNull Optional<DirectoryDto> node = Services.getInstance(p, ProjectIndexer.class).find(path);
+        final @NotNull Optional<DirectoryDto> node = Services.getInstance(p, Nodes.class).find(path);
         if (node.isEmpty()) {
             Logger.warn("Nothing to rename at " + path + ", so the step is refused");
             return false;

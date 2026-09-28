@@ -18,7 +18,7 @@ package org.testin.testcase.update.bulk;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -124,7 +124,7 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
     private @NotNull Set<String> keysOutside(final @NotNull Path testSet, final @NotNull Set<UUID> inThisDialog) {
         final @NotNull Set<String> keys = new HashSet<>();
 
-        Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(testSet).stream()
+        Services.getInstance(p, TestCases.class).getTestCasesForTestSet(testSet).stream()
                 .filter(sibling -> !inThisDialog.contains(sibling.getId()))
                 .forEach(sibling -> keyOf(sibling.getDescription()).ifPresent(keys::add));
 

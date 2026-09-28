@@ -25,7 +25,7 @@ import org.testin.codegen.JavaCode;
 import org.testin.codegen.Renamed;
 import org.testin.config.TestinYml;
 import org.testin.editor.TestinEditors;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -51,7 +51,7 @@ public final class NodeRename {
         final @NotNull Path oldPath = dir.getPath();
         final @NotNull Path newPath = oldPath.getParent().resolve(newName);
 
-        Services.getInstance(p, ProjectIndexer.class).renameNode(oldPath, newPath, () -> {
+        Services.getInstance(p, Nodes.class).renameNode(oldPath, newPath, () -> {
             // Rule-CODEGEN-082
             if (renamed.toTheFilesName(p)) Services.getInstance(p, BoundTestProject.class).follow(oldName, newName);
             JavaCode.of(dir.getType()).getRenamed().execute(p, renamed);
@@ -68,7 +68,7 @@ public final class NodeRename {
     public static boolean refused(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
-        if (Services.getInstance(p, ProjectIndexer.class).isTaken(dir.getPath().resolveSibling(newName), Optional.of(dir.getPath()))) {
+        if (Services.getInstance(p, Nodes.class).isTaken(dir.getPath().resolveSibling(newName), Optional.of(dir.getPath()))) {
             notifier.softRefuse(p, Refused.ALREADY_EXISTS, newName);
             return true;
         }

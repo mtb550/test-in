@@ -21,7 +21,7 @@ import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.BugRepository;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestRuns;
 import org.testin.services.Services;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -111,7 +111,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
     }
 
     private @NotNull Optional<String> noLongerFailed() {
-        return item.stillFailed(Services.getInstance(p, ProjectIndexer.class)).isPresent()
+        return item.stillFailed(Services.getInstance(p, TestRuns.class)).isPresent()
                 ? Optional.empty()
                 : Optional.of(Bundle.message("bug.no.longer.failed"));
     }

@@ -25,7 +25,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
 import org.testin.git.GitRefs;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -65,7 +65,7 @@ public final class BoundTestProject {
         final @NotNull String name = name();
         if (name.isEmpty()) return Optional.empty();
 
-        return Services.getInstance(p, ProjectIndexer.class).getTestProjectsByPath().values().stream()
+        return Services.getInstance(p, Nodes.class).getTestProjectsByPath().values().stream()
                 .filter(tp -> name.equals(tp.getName()))
                 .findFirst();
     }

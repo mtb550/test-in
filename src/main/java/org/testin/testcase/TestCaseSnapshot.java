@@ -22,7 +22,8 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditors;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -41,12 +42,12 @@ import java.util.UUID;
 public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @NotNull List<TestCaseDto> present, @NotNull List<UUID> absent) {
     // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-228
     public static @NotNull TestCaseSnapshot of(final @NotNull Project p, final @NotNull Path testSetPath, final @NotNull List<UUID> ids) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
         final @NotNull List<TestCaseDto> present = new ArrayList<>(ids.size());
         final @NotNull List<UUID> absent = new ArrayList<>();
 
         for (final UUID id : ids)
-            indexer.findTestCase(id)
+            testCases.findTestCase(id)
                     .filter(tc -> tc.getParent().getPath().equals(testSetPath))
                     .ifPresentOrElse(tc -> present.add(copy(p, tc)), () -> absent.add(id));
 
@@ -127,7 +128,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
     }
 
     private boolean stillStands() {
-        return Services.getInstance(p, ProjectIndexer.class).nodeExists(testSetPath) && sameAs(of(p, testSetPath, ids()));
+        return Services.getInstance(p, Nodes.class).nodeExists(testSetPath) && sameAs(of(p, testSetPath, ids()));
     }
 
     public @NotNull List<UUID> ids() {
@@ -147,13 +148,13 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
 
     // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-215
     private boolean removeAbsent(final @NotNull Written written) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
 
-        final @NotNull List<TestCaseDto> stillThere = absent.stream().flatMap(id -> indexer.findTestCase(id).stream()).toList();
+        final @NotNull List<TestCaseDto> stillThere = absent.stream().flatMap(id -> testCases.findTestCase(id).stream()).toList();
 
         boolean allWent = true;
         for (final TestCaseDto tc : stillThere) {
-            if (indexer.removeTestCase(testSetPath, tc.getId())) written.removed().add(tc);
+            if (testCases.removeTestCase(testSetPath, tc.getId())) written.removed().add(tc);
             else allWent = false;
         }
 
@@ -162,18 +163,19 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
 
     // UC-EDITOR-PANEL-017
     private boolean restorePresent(final @NotNull Written written) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
+        final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
-        final @NotNull TestSetDirectoryDto parent = indexer.getTestSetByPath(testSetPath);
+        final @NotNull TestSetDirectoryDto parent = nodes.getTestSetByPath(testSetPath);
         present.forEach(tc -> tc.setParent(parent));
 
         boolean allBack = true;
         for (final TestCaseDto tc : present) {
-            final boolean isComingBack = indexer.findTestCase(tc.getId()).isEmpty();
+            final boolean isComingBack = testCases.findTestCase(tc.getId()).isEmpty();
 
             final @NotNull TestCaseDto stored = copy(p, tc);
             stored.setParent(parent);
-            if (!indexer.putTestCaseVerbatim(testSetPath, stored)) {
+            if (!testCases.putTestCaseVerbatim(testSetPath, stored)) {
                 allBack = false;
                 continue;
             }

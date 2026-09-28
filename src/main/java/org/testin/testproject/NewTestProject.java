@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.DirectoryMapper;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
@@ -45,7 +45,7 @@ public final class NewTestProject {
     private void create(final @NotNull Path tpPath) {
         final @NotNull TestProjectDirectoryDto created = Services.getInstance(p, DirectoryMapper.class).setTestProjectNode(p, tpPath);
 
-        if (!Services.getInstance(p, ProjectIndexer.class).addTestProject(created)) return;
+        if (!Services.getInstance(p, Nodes.class).addTestProject(created)) return;
 
         // Rule-TREE-PANEL-106
         Services.getInstance(p, BoundTestProject.class).choose(created.getName());

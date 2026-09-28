@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.DirectoryMapper;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.services.Services;
@@ -37,6 +37,6 @@ public class CreateTestSetPackage implements NodeCreator {
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         TestSetPackageDirectoryDto tsp = Services.getInstance(p, DirectoryMapper.class).getTestSetPackageNode(p, newDirPath, parentDir);
 
-        return Services.getInstance(p, ProjectIndexer.class).addTestSetPackage(tsp) ? Optional.of(tsp) : Optional.empty();
+        return Services.getInstance(p, Nodes.class).addTestSetPackage(tsp) ? Optional.of(tsp) : Optional.empty();
     }
 }
