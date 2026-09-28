@@ -60,6 +60,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -141,11 +142,13 @@ public final class ProjectIndexer {
                                 indicator.setFraction(0.0);
                                 indicator.setText(Bundle.message("indexer.progress.indexing", projectName));
 
+                                final long started = System.nanoTime();
                                 try {
                                     scanCoordinator.scan(projectPath, indicator);
                                 } catch (final Exception ex) {
                                     Logger.error("Failed to index project: " + projectName + " - " + ex.getMessage());
                                 }
+                                Logger.info("First read of '" + projectName + "' took " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started) + " ms");
 
                                 indicator.setFraction(1.0);
                                 indicator.setText(Bundle.message("indexer.progress.done", projectName));
