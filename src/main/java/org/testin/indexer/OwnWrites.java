@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Service(Service.Level.APP)
@@ -40,6 +41,7 @@ public final class OwnWrites {
 
     private static final long SETTLES_IN_MILLIS = 5_000;
     private final @NotNull Map<String, Claim> written = new ConcurrentHashMap<>();
+    private final @NotNull AtomicLong lastPurge = new AtomicLong();
 
     private static boolean stillSays(final @NotNull Path path, final byte @NotNull [] ourContent) {
         try {
@@ -97,6 +99,9 @@ public final class OwnWrites {
 
     private void forgetOldEntries() {
         final long now = System.currentTimeMillis();
+        final long last = lastPurge.get();
+        if (now - last < SETTLES_IN_MILLIS || !lastPurge.compareAndSet(last, now)) return;
+
         written.values().removeIf(one -> now - one.at() >= SETTLES_IN_MILLIS);
     }
 
