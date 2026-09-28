@@ -17,10 +17,13 @@
 package org.testin.git;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.VcsException;
 import git4idea.commands.Git;
+import git4idea.commands.GitBinaryHandler;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitCommandResult;
 import git4idea.commands.GitLineHandler;
+import git4idea.config.GitExecutableManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +36,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class GitCommandRunner {
@@ -77,6 +85,54 @@ final class GitCommandRunner {
 
     static byte @NotNull [] pathspecBytes(final @NotNull Collection<String> paths) {
         return String.join("\0", paths).getBytes(StandardCharsets.UTF_8);
+    }
+
+    // UC-SHARE-010, UC-SHARE-017
+    static @NotNull Map<String, String> readObjects(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String revision, final @NotNull List<String> relativePaths) {
+        final @NotNull GitBinaryHandler handler = new GitBinaryHandler(workingDirectory, GitExecutableManager.getInstance().getExecutable(p, workingDirectory), GitCommand.CAT_FILE);
+        handler.addParameters("--batch");
+        handler.setInputProcessor(stdin -> stdin.write(batchRequest(revision, relativePaths)));
+
+        try {
+            return objectsIn(relativePaths, handler.run());
+        } catch (final VcsException ex) {
+            final @NotNull String details = GitSafeText.withoutCredentials(Objects.toString(ex.getMessage(), ""));
+            Logger.error("Git command failed: " + details);
+            throw new IllegalStateException(Bundle.message("git.command.failed", details));
+        }
+    }
+
+    static byte @NotNull [] batchRequest(final @NotNull String revision, final @NotNull List<String> relativePaths) {
+        return relativePaths.stream()
+                .map(relativePath -> revision + ":" + relativePath + "\n")
+                .collect(Collectors.joining())
+                .getBytes(StandardCharsets.UTF_8);
+    }
+
+    static @NotNull Map<String, String> objectsIn(final @NotNull List<String> relativePaths, final byte @NotNull [] batch) {
+        final @NotNull Map<String, String> contents = new HashMap<>();
+        int at = 0;
+
+        for (final String relativePath : relativePaths) {
+            final int headerEnd = lineEnd(batch, at);
+            if (headerEnd < 0) break;
+
+            final @NotNull String header = new String(batch, at, headerEnd - at, StandardCharsets.UTF_8);
+            at = headerEnd + 1;
+            if (header.endsWith(" missing") || header.endsWith(" ambiguous")) continue;
+
+            final int size = Integer.parseInt(header.substring(header.lastIndexOf(' ') + 1));
+            contents.put(relativePath, new String(batch, at, size, StandardCharsets.UTF_8));
+            at += size + 1;
+        }
+        return contents;
+    }
+
+    private static int lineEnd(final byte @NotNull [] batch, final int from) {
+        for (int i = from; i < batch.length; i++) {
+            if (batch[i] == '\n') return i;
+        }
+        return -1;
     }
 
     // UC-SHARE-012, Rule-SHARE-056

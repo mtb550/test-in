@@ -102,8 +102,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         private void scanForChanges(final @NotNull Path path) {
             GitBackgroundTask.run(p, Bundle.message("git.task.scanning"), true,
                     _ -> {
-                        if (git.hasConflicts(path)) {
-                            showConflictActions(path, git.getRemoteName(path), git.syncBranch(path), git.conflictingPaths(path));
+                        final @NotNull Optional<List<String>> unfinished = git.unfinished(path);
+                        if (unfinished.isPresent()) {
+                            showConflictActions(path, git.getRemoteName(path), git.syncBranch(path), unfinished.orElseThrow());
                             return;
                         }
 
@@ -262,7 +263,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                             if (remoteUrl.isEmpty()) {
                                 configureRemoteAndPush(repoPath, remoteName.isEmpty() ? "origin" : remoteName, branch, commitId);
                             } else {
-                                executeGitPush(repoPath, remoteName, branch, commitId);
+                                executeGitPush(repoPath, remoteName, remoteUrl, branch, commitId);
                             }
                         });
                     },
@@ -287,17 +288,17 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             GitBackgroundTask.run(p, Bundle.message("git.task.configuring.remote"), false,
                     _ -> {
                         git.configureRemote(repoPath, remoteName, remoteUrl);
-                        ApplicationManager.getApplication().invokeLater(() -> executeGitPush(repoPath, remoteName, branch, commitId));
+                        ApplicationManager.getApplication().invokeLater(() -> executeGitPush(repoPath, remoteName, remoteUrl, branch, commitId));
                     },
                     ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.add.remote", ex.getMessage())));
         }
 
         // UC-SHARE-013, Rule-SHARE-061
-        private void executeGitPush(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final @NotNull String commitId) {
+        private void executeGitPush(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String remoteUrl, final @NotNull String branch, final @NotNull String commitId) {
             GitBackgroundTask.run(p, Bundle.message("git.task.pushing.remote"), false,
                     indicator -> {
                         indicator.setText(Bundle.message("git.progress.pull.rebase"));
-                        commits.pullAndPush(repoPath, remote, branch);
+                        commits.pullAndPush(repoPath, remote, remoteUrl, branch);
 
                         RepositoryRefresh.after(p, repoPath);
                         ApplicationManager.getApplication().invokeLater(() ->

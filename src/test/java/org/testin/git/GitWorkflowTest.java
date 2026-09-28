@@ -27,12 +27,14 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -188,9 +190,22 @@ public class GitWorkflowTest {
     private List<PendingChange> review() {
         final List<String> status = GitRefs.records(mustGit(work, "status", "--porcelain", "-z", "-uall"));
 
-        return GitDiffProcessor.toDiffs(status, work, RealMapper.build(),
-                path -> git(work, "show", "HEAD:" + path).orElse(""),
-                _ -> Optional.empty());
+        return GitDiffProcessor.toDiffs(status, work, RealMapper.build(), paths -> contents(work, "HEAD", paths), _ -> Optional.empty());
+    }
+
+    private static Map<String, String> contents(final Path directory, final String revision, final List<String> relativePaths) {
+        try {
+            final Process process = new ProcessBuilder("git", "cat-file", "--batch").directory(directory.toFile()).start();
+            try (OutputStream stdin = process.getOutputStream()) {
+                stdin.write(GitCommandRunner.batchRequest(revision, relativePaths));
+            }
+
+            final byte[] batch = process.getInputStream().readAllBytes();
+            assertEquals(process.waitFor(), 0, "git cat-file --batch failed in " + directory);
+            return GitCommandRunner.objectsIn(relativePaths, batch);
+        } catch (final IOException | InterruptedException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     private Set<String> stagedFor(final List<PendingChange> review) {
@@ -385,9 +400,9 @@ public class GitWorkflowTest {
             assertTrue(Files.isDirectory(gitDir.resolve("rebase-merge")) || Files.isDirectory(gitDir.resolve("rebase-apply")),
                     "the stopped rebase is found under the directory Git names");
 
-            final String base = mustGit(work, "show", ":1:" + relativePath);
-            final String remote = mustGit(work, "show", ":2:" + relativePath);
-            final String replayed = mustGit(work, "show", ":3:" + relativePath);
+            final String base = contents(work, ":1", conflicting).get(relativePath);
+            final String remote = contents(work, ":2", conflicting).get(relativePath);
+            final String replayed = contents(work, ":3", conflicting).get(relativePath);
 
             final Merge merge = TestCaseMerge.of(RealMapper.build(), base, replayed, remote);
             assertTrue(merge.isSettled(), "different fields are not a disagreement");

@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 
@@ -156,16 +157,21 @@ public final class GitRepositoryService {
         return GitRefs.records(run(path, GitCommand.STATUS, "--porcelain", "-z", "-uall").orElse(""));
     }
 
-    public @NotNull String showAtHead(final @NotNull Path path, final @NotNull String relativePath) {
-        return run(path, GitCommand.SHOW, "HEAD:" + relativePath).orElse("");
+    public @NotNull Map<String, String> contents(final @NotNull Path path, final @NotNull String revision, final @NotNull List<String> relativePaths) {
+        if (relativePaths.isEmpty()) return Map.of();
+
+        try {
+            return GitCommandRunner.readObjects(p, path, revision, relativePaths);
+        } catch (final RuntimeException ex) {
+            Logger.warn("Could not read " + relativePaths.size() + " files at " + revision + " in " + path + ": " + ex.getMessage());
+            return Map.of();
+        }
     }
 
-    public boolean hasConflicts(final @NotNull Path path) {
-        return isRebaseInProgress(path) || !conflictingPaths(path).isEmpty();
-    }
+    public @NotNull Optional<List<String>> unfinished(final @NotNull Path path) {
+        final @NotNull List<String> conflicting = conflictingPaths(path);
 
-    public @NotNull String stageContent(final @NotNull Path path, final @NotNull String relativePath, final int stage) {
-        return run(path, GitCommand.SHOW, ":" + stage + ":" + relativePath).orElse("");
+        return conflicting.isEmpty() && !isRebaseInProgress(path) ? Optional.empty() : Optional.of(conflicting);
     }
 
     public boolean stageResolved(final @NotNull Path path, final @NotNull String relativePath) {

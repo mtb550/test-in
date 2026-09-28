@@ -130,17 +130,17 @@ public class SyncActionAction extends DumbAwareAction {
                             throw new IllegalStateException(Bundle.message("git.error.no.sync.branch"));
                         }
 
-                        if (git.hasConflicts(repoPath)) {
-                            final @NotNull List<String> unfinished = git.conflictingPaths(repoPath);
-                            ApplicationManager.getApplication().invokeLater(() -> showConflictActions(repoPath, unfinished));
+                        final @NotNull Optional<List<String>> unfinished = git.unfinished(repoPath);
+                        if (unfinished.isPresent()) {
+                            ApplicationManager.getApplication().invokeLater(() -> showConflictActions(repoPath, unfinished.orElseThrow()));
                             return;
                         }
 
                         indicator.setText(Bundle.message("git.progress.pulling", branch));
-                        commits.pullWhereTheRemoteHasBranch(repoPath, remoteName, branch);
+                        commits.pullWhereTheRemoteHasBranch(repoPath, remoteName, remoteUrl, branch);
 
                         indicator.setText(Bundle.message("git.progress.pushing.committed"));
-                        final @NotNull OptionalInt pushed = pushUnpushed(repoPath, remoteName, branch);
+                        final @NotNull OptionalInt pushed = pushUnpushed(repoPath, remoteName, remoteUrl, branch);
 
                         indicator.setText(Bundle.message("git.progress.refreshing"));
                         refreshAfterSync(repoPath, pushed);
@@ -226,7 +226,8 @@ public class SyncActionAction extends DumbAwareAction {
                         final @NotNull OptionalInt pushed;
                         try {
                             indicator.setText(Bundle.message("git.progress.pushing.committed"));
-                            pushed = pushUnpushed(repoPath, git.getRemoteName(repoPath), git.syncBranch(repoPath));
+                            final @NotNull String remoteName = git.getRemoteName(repoPath);
+                            pushed = pushUnpushed(repoPath, remoteName, git.getRemoteUrl(repoPath, remoteName), git.syncBranch(repoPath));
                         } catch (final Exception ex) {
                             Logger.error("Could not push after resolving: " + ex.getMessage());
                             ApplicationManager.getApplication().invokeLater(() ->
@@ -249,11 +250,11 @@ public class SyncActionAction extends DumbAwareAction {
         }
 
         // UC-SHARE-016, Rule-SHARE-070
-        private @NotNull OptionalInt pushUnpushed(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
+        private @NotNull OptionalInt pushUnpushed(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String remoteUrl, final @NotNull String branch) {
             final @NotNull OptionalInt unpushed = git.unpushedCount(repoPath);
             if (unpushed.orElse(-1) == 0) return OptionalInt.of(0);
 
-            commits.push(repoPath, remote, branch);
+            commits.push(repoPath, remote, remoteUrl, branch);
             return unpushed;
         }
 

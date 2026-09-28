@@ -109,19 +109,19 @@ public final class GitCommits {
     }
 
     // UC-SHARE-013, Rule-SHARE-123
-    public void pullAndPush(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
-        pullWhereTheRemoteHasBranch(repositoryPath, remote, branch);
-        push(repositoryPath, remote, branch);
+    public void pullAndPush(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String remoteUrl, final @NotNull String branch) {
+        pullWhereTheRemoteHasBranch(repositoryPath, remote, remoteUrl, branch);
+        push(repositoryPath, remote, remoteUrl, branch);
     }
 
     // UC-SHARE-016, Rule-SHARE-069, Rule-SHARE-120
-    public void pullWhereTheRemoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
-        if (!remoteHasBranch(repositoryPath, remote, branch)) {
+    public void pullWhereTheRemoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String remoteUrl, final @NotNull String branch) {
+        if (!remoteHasBranch(repositoryPath, remote, remoteUrl, branch)) {
             Logger.info("Remote " + remote + " has no branch " + branch + " yet; pushing without pulling first");
             return;
         }
 
-        pull(repositoryPath, repositories.getRemoteUrl(repositoryPath, remote), remote, branch);
+        pull(repositoryPath, remoteUrl, remote, branch);
     }
 
     // UC-SHARE-016, Rule-SHARE-071
@@ -130,10 +130,9 @@ public final class GitCommits {
                 GitCommand.PULL, "--rebase", "--autostash", remote, branch);
     }
 
-    private boolean remoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
+    private boolean remoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String remoteUrl, final @NotNull String branch) {
         try {
-            return !GitCommandRunner.executeRemote(p, repositoryPath, repositories.getRemoteUrl(repositoryPath, remote),
-                    GitCommand.LS_REMOTE, "--heads", remote, branch).isBlank();
+            return !GitCommandRunner.executeRemote(p, repositoryPath, remoteUrl, GitCommand.LS_REMOTE, "--heads", remote, branch).isBlank();
         } catch (final RuntimeException ex) {
             Logger.debug("Could not list " + remote + " branches: " + ex.getMessage());
             return false;
@@ -142,10 +141,14 @@ public final class GitCommits {
 
     // UC-SHARE-013, Rule-SHARE-077
     public void push(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
+        push(repositoryPath, remote, repositories.getRemoteUrl(repositoryPath, remote), branch);
+    }
+
+    // UC-SHARE-013, Rule-SHARE-077
+    public void push(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String remoteUrl, final @NotNull String branch) {
         if (remote.isBlank()) throw new IllegalStateException(Bundle.message("git.error.no.remote"));
 
-        GitCommandRunner.executeRemote(p, repositoryPath, repositories.getRemoteUrl(repositoryPath, remote),
-                GitCommand.PUSH, "-u", remote, branch);
+        GitCommandRunner.executeRemote(p, repositoryPath, remoteUrl, GitCommand.PUSH, "-u", remote, branch);
         Logger.info("Git push completed for " + repositoryPath);
     }
 }

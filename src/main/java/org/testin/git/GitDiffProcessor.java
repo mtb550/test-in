@@ -34,6 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -49,29 +50,30 @@ public final class GitDiffProcessor {
 
         return toDiffs(repositories.status(root), root,
                 Services.getInstance(p, Mapper.class),
-                path -> repositories.showAtHead(root, path),
+                paths -> repositories.contents(root, "HEAD", paths),
                 indexer::findTestCase);
     }
 
     // UC-SHARE-010
-    static @NotNull List<PendingChange> toDiffs(final @NotNull List<String> statusLines, final @NotNull Path repositoryRoot, final @NotNull Mapper mapper, final @NotNull Function<String, String> committedContent, final @NotNull Function<UUID, Optional<TestCaseDto>> testCases) {
+    static @NotNull List<PendingChange> toDiffs(final @NotNull List<String> statusLines, final @NotNull Path repositoryRoot, final @NotNull Mapper mapper, final @NotNull Function<List<String>, Map<String, String>> committedContents, final @NotNull Function<UUID, Optional<TestCaseDto>> testCases) {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
         final @NotNull List<PendingChange> result = new ArrayList<>();
 
-        for (final GitRefs.StatusEntry entry : GitRefs.parseStatus(statusLines)) {
+        final @NotNull List<GitRefs.StatusEntry> listed = GitRefs.parseStatus(statusLines).stream()
+                .filter(entry -> isListed(root, entry))
+                .toList();
+        final @NotNull Map<String, String> committed = committedContents.apply(listed.stream()
+                .filter(entry -> entry.type() != DiffType.ADDED)
+                .map(GitRefs.StatusEntry::path)
+                .toList());
+
+        for (final GitRefs.StatusEntry entry : listed) {
             final @NotNull Path relativePath = Path.of(entry.path());
-
-            if (FileKind.of(relativePath, folderKindOf(root, relativePath)) == FileKind.SCREENSHOT) continue;
-
-            if (entry.type() == DiffType.ADDED && !Files.exists(root.resolve(relativePath))) {
-                Logger.warn("Skipping " + relativePath + ": Git listed it as new, and it is gone");
-                continue;
-            }
 
             try {
                 result.add(PendingChangeFactory.fromFile(
                         entry.type(),
-                        entry.type() == DiffType.ADDED ? "" : committedContent.apply(entry.path()),
+                        committed.getOrDefault(entry.path(), ""),
                         workingContent(root, relativePath, entry),
                         relativePath,
                         mapper,
@@ -83,6 +85,17 @@ public final class GitDiffProcessor {
             }
         }
         return result;
+    }
+
+    private static boolean isListed(final @NotNull Path root, final @NotNull GitRefs.StatusEntry entry) {
+        final @NotNull Path relativePath = Path.of(entry.path());
+        if (FileKind.of(relativePath, folderKindOf(root, relativePath)) == FileKind.SCREENSHOT) return false;
+
+        if (entry.type() == DiffType.ADDED && !Files.exists(root.resolve(relativePath))) {
+            Logger.warn("Skipping " + relativePath + ": Git listed it as new, and it is gone");
+            return false;
+        }
+        return true;
     }
 
     // Rule-INTERNAL-011

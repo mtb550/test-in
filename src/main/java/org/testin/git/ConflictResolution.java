@@ -36,14 +36,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ConflictResolution {
-    private static final int BASE = 1;
-    private static final int REMOTE = 2;
-    private static final int MINE = 3;
+    private static final @NotNull String BASE = ":1";
+    private static final @NotNull String REMOTE = ":2";
+    private static final @NotNull String MINE = ":3";
 
     // UC-SHARE-017
     public static void resolveRebase(final @NotNull Project p, final @NotNull Path repositoryPath, final @NotNull Runnable onFinished, final @NotNull Consumer<List<String>> onStuck) {
@@ -108,6 +109,11 @@ public final class ConflictResolution {
         final @NotNull List<Pending> pending = new ArrayList<>();
         final @NotNull List<String> settledQuietly = new ArrayList<>();
 
+        final @NotNull List<String> mergeable = conflicting.stream().filter(relativePath -> mergerFor(relativePath).isPresent()).toList();
+        final @NotNull Map<String, String> bases = git.contents(repositoryPath, BASE, mergeable);
+        final @NotNull Map<String, String> mines = git.contents(repositoryPath, MINE, mergeable);
+        final @NotNull Map<String, String> theirsByPath = git.contents(repositoryPath, REMOTE, mergeable);
+
         for (final String relativePath : conflicting) {
             final @NotNull Optional<Merger> merger = mergerFor(relativePath);
             if (merger.isEmpty()) {
@@ -115,9 +121,9 @@ public final class ConflictResolution {
                 continue;
             }
 
-            final @NotNull String base = git.stageContent(repositoryPath, relativePath, BASE);
-            final @NotNull String mine = git.stageContent(repositoryPath, relativePath, MINE);
-            final @NotNull String theirs = git.stageContent(repositoryPath, relativePath, REMOTE);
+            final @NotNull String base = bases.getOrDefault(relativePath, "");
+            final @NotNull String mine = mines.getOrDefault(relativePath, "");
+            final @NotNull String theirs = theirsByPath.getOrDefault(relativePath, "");
 
             if (mine.isBlank() || theirs.isBlank()) {
                 leftOver.add(relativePath);

@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -48,6 +49,25 @@ public class GitCommandRunnerTest {
     @Test
     public void onePathIsJustThatPath() {
         assertEquals(new String(GitCommandRunner.pathspecBytes(List.of("a.json")), StandardCharsets.UTF_8), "a.json");
+    }
+
+    @Test
+    public void oneBatchAnswersEveryFileByItsByteSize() {
+        final String arabic = "{\"description\":\"تسجيل\"}\n";
+        final byte[] batch = ("1111 blob 3\nabc\n"
+                + "HEAD:gone.tc missing\n"
+                + "2222 blob " + arabic.getBytes(StandardCharsets.UTF_8).length + "\n" + arabic + "\n")
+                .getBytes(StandardCharsets.UTF_8);
+
+        assertEquals(GitCommandRunner.objectsIn(List.of("a.tc", "gone.tc", "b.tc"), batch),
+                Map.of("a.tc", "abc", "b.tc", arabic),
+                "a missing file is absent, and a size counted in bytes still ends on the right letter");
+    }
+
+    @Test
+    public void theBatchAsksForEachFileAtTheRevisionOnItsOwnLine() {
+        assertEquals(new String(GitCommandRunner.batchRequest(":2", List.of("Test Cases/a b.tc", "c.tc")), StandardCharsets.UTF_8),
+                ":2:Test Cases/a b.tc\n:2:c.tc\n");
     }
 
     @Test
