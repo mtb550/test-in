@@ -36,9 +36,10 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.APP)
@@ -47,23 +48,19 @@ public final class Rescan {
 
     private final @NotNull Set<Path> waiting = ConcurrentHashMap.newKeySet();
 
-    private final @NotNull AtomicBoolean booked = new AtomicBoolean();
+    private @NotNull Future<?> booked = CompletableFuture.completedFuture(null);
 
     // UC-INTERNAL-003, Rule-INTERNAL-020
-    public void of(final @NotNull Collection<Path> testProjects) {
+    public synchronized void of(final @NotNull Collection<Path> testProjects) {
         if (testProjects.isEmpty()) return;
 
         waiting.addAll(testProjects);
-        if (!booked.compareAndSet(false, true)) return;
-
-        AppExecutorUtil.getAppScheduledExecutorService()
-                .schedule(this::run, QUIET_MILLIS, TimeUnit.MILLISECONDS);
+        booked.cancel(false);
+        booked = AppExecutorUtil.getAppScheduledExecutorService().schedule(this::run, QUIET_MILLIS, TimeUnit.MILLISECONDS);
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-022
     private void run() {
-        booked.set(false);
-
         final @NotNull List<Path> testProjects = List.copyOf(waiting);
         testProjects.forEach(waiting::remove);
         if (testProjects.isEmpty()) return;
