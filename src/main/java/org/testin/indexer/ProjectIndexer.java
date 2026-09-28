@@ -31,24 +31,11 @@ import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
 import org.testin.model.ProjectStatus;
-import org.testin.model.TestRunItems;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.TestRunDto;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
-import org.testin.model.markers.AbstractMarker;
-import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
-import org.testin.services.TestCaseValues;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.BoundTestProject;
 import org.testin.util.Bundle;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -60,15 +47,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.function.IntConsumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service(Service.Level.PROJECT)
@@ -93,15 +76,6 @@ public final class ProjectIndexer {
         this.scanCoordinator = new ProjectScanCoordinator(new IndexingScanner(p, store));
         this.runWriter = new RunWriter(p, store);
         this.nodeFiles = new NodeFiles(p, this, store);
-    }
-
-    private static boolean sameFile(final @NotNull Path one, final @NotNull Path other) {
-        try {
-            return Files.isSameFile(one, other);
-        } catch (final IOException ex) {
-            Logger.warn("Could not compare " + one + " with " + other + ": " + ex.getMessage());
-            return false;
-        }
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-011
@@ -262,6 +236,12 @@ public final class ProjectIndexer {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-114
+    boolean announcedIf(final boolean changed, final @NotNull Path path) {
+        if (changed) announce(path);
+        return changed;
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-114
     void announceChildrenOf(final @NotNull Path folder) {
         if (!p.isDisposed()) p.getMessageBus().syncPublisher(IndexChanged.TOPIC).nodesChanged(Set.of(folder));
     }
@@ -354,235 +334,6 @@ public final class ProjectIndexer {
                 store.getTestRunPackagesByPath().size() + " test run packages");
     }
 
-    public @NotNull List<TestCaseDto> getTestCasesForTestSet(final @NotNull Path testSetPath) {
-        return store.getTestCasesForTestSet(testSetPath);
-    }
-
-    // UC-INTERNAL-006, Rule-INTERNAL-046
-    public long testCaseCountOf(final @NotNull Path testSetPath) {
-        return store.getTestCaseIdsByTestSet().getOrDefault(testSetPath.toString(), List.of()).size();
-    }
-
-    // Rule-TREE-PANEL-008
-    public @NotNull List<TestCaseDto> getTestCasesUnder(final @NotNull DirectoryDto dir) {
-        final @NotNull List<TestCaseDto> testCases = new ArrayList<>(getTestCasesForTestSet(dir.getPath()));
-
-        for (final DirectoryDto child : getChildren(dir.getPath())) {
-            if (child.isRetired()) continue;
-
-            testCases.addAll(getTestCasesUnder(child));
-        }
-
-        return testCases;
-    }
-
-    public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
-        return withTestCasesShown(store.getTestRunByPath(testRunPath));
-    }
-
-    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-REPORT-021, Rule-VIEW-PANEL-083
-    private @NotNull TestRunDto withTestCasesShown(final @NotNull TestRunDto run) {
-        run.getResults().forEach(item -> item.showing(store.findTestCase(item.getId())));
-        return run;
-    }
-
-    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-065
-    public @NotNull Map<Path, TestRunDto> getAllTestRuns() {
-        return store.getTestRunsByPath().entrySet().stream()
-                .collect(Collectors.toMap(entry -> Path.of(entry.getKey()), entry -> withTestCasesShown(entry.getValue())));
-    }
-
-    // UC-INTERNAL-006, Rule-INTERNAL-051
-    public @NotNull Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
-        return store.findTestRun(testRunPath).map(this::withTestCasesShown);
-    }
-
-    public @NotNull Optional<TestCaseDto> findTestCase(final @NotNull UUID id) {
-        return store.findTestCase(id);
-    }
-
-    public @NotNull TestSetDirectoryDto getTestSetByPath(final @NotNull Path path) {
-        return store.getTestSetDirByPath(path);
-    }
-
-    public @NotNull Map<String, TestProjectDirectoryDto> getTestProjectsByPath() {
-        return store.getTestProjectsByPath();
-    }
-
-    // UC-TREE-PANEL-002, UC-TREE-PANEL-003, UC-TREE-PANEL-011, Rule-TREE-PANEL-004
-    public boolean isTaken(final @NotNull Path wanted, final @NotNull Optional<Path> renaming) {
-        if (!Files.exists(wanted)) return false;
-
-        return renaming.map(self -> !sameFile(self, wanted)).orElse(true);
-    }
-
-    public @NotNull List<DirectoryDto> getChildren(final @NotNull Path parentPath) {
-        return store.getChildren(parentPath);
-    }
-
-    // UC-INTERNAL-004, Rule-INTERNAL-033
-    public boolean putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
-        return store.putTestCase(testSetPath, tc);
-    }
-
-    // UC-INTERNAL-004, Rule-INTERNAL-035
-    public boolean putTestCaseVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
-        return store.putTestCaseVerbatim(testSetPath, tc);
-    }
-
-    // UC-EDITOR-PANEL-017, Rule-INTERNAL-035
-    public boolean moveTestCase(final @NotNull Path fromSet, final @NotNull Path toSet, final @NotNull TestCaseDto tc) {
-        return store.moveTestCase(fromSet, toSet, tc);
-    }
-
-    // UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-064
-    public boolean removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
-        if (!store.removeTestCase(testSetPath, tcId)) return false;
-
-        Services.getInstance(p, TestCaseValues.class).reload(this::getAllTestCases);
-        return true;
-    }
-
-    public @NotNull List<TestCaseDto> getAllTestCases() {
-        return List.copyOf(store.getTestCasesById().values());
-    }
-
-    public @NotNull List<DirectoryDto> getAllNodes() {
-        return List.copyOf(store.allDirectories());
-    }
-
-    // UC-INTERNAL-004, Rule-INTERNAL-031
-    public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
-        store.updateSequence(testSetPath, orderedList, moved);
-    }
-
-    public void changeRun(final @NotNull Path runPath, final @NotNull Consumer<TestRunDto> change) {
-        findTestRun(runPath).ifPresentOrElse(run -> {
-            // Rule-INTERNAL-011
-            final @NotNull Set<UUID> gone = run.coveredIds();
-            change.accept(run);
-            gone.removeAll(run.coveredIds());
-
-            runWriter.persist(runPath, run, gone);
-        }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
-    }
-
-    // Rule-INTERNAL-011
-    public void changeResult(final @NotNull Path runPath, final @NotNull UUID testCaseId, final @NotNull Consumer<TestRunItems> change) {
-        findTestRun(runPath).ifPresentOrElse(run -> run.resultOf(testCaseId).ifPresentOrElse(result -> {
-            change.accept(result);
-            runWriter.persistResult(runPath, run, result);
-        }, () -> Logger.warn("'" + runPath.getFileName() + "' no longer covers " + testCaseId + ", so a change to its result was dropped")),
-                () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
-    }
-
-    public void changeRunMarker(final @NotNull Path runPath, final @NotNull Consumer<TestRunMarker> change) {
-        store.findTestRunDir(runPath).ifPresentOrElse(dir -> {
-            final @NotNull TestRunMarker marker = dir.getMarker();
-            change.accept(marker);
-            runWriter.persistMarker(runPath);
-            announce(runPath);
-        }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + runPath.getFileName()));
-    }
-
-    public void saveRun(final @NotNull Path runPath) {
-        changeRun(runPath, _ -> {
-        });
-    }
-
-    public void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
-        runWriter.create(testRunPath, tr);
-    }
-
-    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
-    public @NotNull List<String> storeScreenshots(final @NotNull Path runPath, final @NotNull List<byte[]> pngs) {
-        return runWriter.storeScreenshots(runPath, pngs);
-    }
-
-    public byte @NotNull [] screenshot(final @NotNull Path runPath, final @NotNull String name) {
-        return runWriter.readScreenshot(runPath, name);
-    }
-
-    public @NotNull List<byte[]> screenshots(final @NotNull Path runPath, final @NotNull TestRunItems item) {
-        return item.getScreenshots().stream().map(name -> screenshot(runPath, name)).toList();
-    }
-
-    // UC-INTERNAL-005
-    public void removeTestProject(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
-        removeVf(path, () -> store.removeTestProject(path), onRemoved);
-    }
-
-    public void removeTestSet(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
-        removeVf(path, () -> store.removeTestSet(path), onRemoved);
-    }
-
-    public void removeTestRun(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
-        removeVf(path, () -> store.removeTestRun(path), onRemoved);
-    }
-
-    public void removeTestSetPackage(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
-        removeVf(path, () -> store.removeTestSetPackage(path), onRemoved);
-    }
-
-    public void removeTestRunPackage(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
-        removeVf(path, () -> store.removeTestRunPackage(path), onRemoved);
-    }
-
-    // UC-TREE-PANEL-012, Rule-TREE-PANEL-042
-    public void refuseRemove(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
-        Logger.info("Not removed: " + path.getFileName() + " is not removable from the tree");
-        onRemoved.accept(false);
-    }
-
-    private void removeVf(final @NotNull Path path, final @NotNull Runnable cacheUpdate, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
-        nodeFiles.remove(path, cacheUpdate, removed -> {
-            onRemoved.accept(removed);
-            if (removed) announce(path);
-        });
-    }
-
-    public void moveNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Consumer<@NotNull Boolean> onFinished) {
-        nodeFiles.move(oldPath, newPath, moved -> {
-            onFinished.accept(moved);
-            if (!moved) return;
-
-            announce(oldPath);
-            announce(newPath);
-        });
-    }
-
-    public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final @NotNull IntConsumer onComplete) {
-        nodeFiles.copy(sourcePaths, targetPath, copied -> {
-            onComplete.accept(copied);
-            if (copied > 0) announceChildrenOf(targetPath);
-        });
-    }
-
-    // UC-INTERNAL-005, Rule-INTERNAL-037, Rule-INTERNAL-041
-    public @NotNull Optional<Path> keepAside(final @NotNull Path node) {
-        return Services.getInstance(DeletedNodes.class).keep(node);
-    }
-
-    // UC-INTERNAL-005, Rule-INTERNAL-042
-    public @NotNull List<Path> restoreNodes(final @NotNull Map<Path, Path> originalByKept) {
-        final @NotNull List<Path> back = new ArrayList<>();
-        final @NotNull List<Path> lost = new ArrayList<>();
-        for (final Map.Entry<Path, Path> one : originalByKept.entrySet()) {
-            if (Services.getInstance(DeletedNodes.class).putBack(p, one.getKey(), one.getValue())) back.add(one.getValue());
-            else lost.add(one.getValue());
-        }
-
-        back.forEach(this::refreshDirectory);
-        back.stream().flatMap(original -> testProjectHolding(original).stream()).distinct().forEach(scanCoordinator::rescanExclusively);
-        back.forEach(this::announce);
-        return lost;
-    }
-
-    // UC-INTERNAL-005, Rule-INTERNAL-043
-    public void forgetKept(final @NotNull Path kept) {
-        Services.getInstance(DeletedNodes.class).forget(kept);
-    }
-
     void refreshIndexedProject(final @NotNull Path changedPath) {
         testProjectHolding(changedPath).ifPresent(scanCoordinator::rescanExclusively);
     }
@@ -592,38 +343,6 @@ public final class ProjectIndexer {
                 .map(Path::of)
                 .filter(path::startsWith)
                 .max(Comparator.comparingInt(Path::getNameCount));
-    }
-
-    // UC-SHARE-002, Rule-SHARE-001
-    public @NotNull Set<String> unreadableTestCasesIn(final @NotNull Path testSetPath) {
-        return store.unreadableTestCasesIn(testSetPath);
-    }
-
-    // UC-INTERNAL-004, Rule-INTERNAL-034
-    public @NotNull Optional<TestCaseFile> testCaseFile(final @NotNull TestCaseDto tc) {
-        final @NotNull Path file = store.testCaseFileOf(tc);
-        return testProjectHolding(file).map(testProject -> new TestCaseFile(testProject, testProject.relativize(file)));
-    }
-
-    // UC-TREE-PANEL-002
-    public boolean addTestProject(final @NotNull TestProjectDirectoryDto tp) {
-        return announcedIf(store.addTestProject(tp), tp.getPath());
-    }
-
-    public boolean addTestSet(final @NotNull TestSetDirectoryDto ts) {
-        return announcedIf(store.addTestSet(ts), ts.getPath());
-    }
-
-    public boolean addTestSetPackage(final @NotNull TestSetPackageDirectoryDto tsp) {
-        return announcedIf(store.addTestSetPackage(tsp), tsp.getPath());
-    }
-
-    public boolean addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
-        return announcedIf(store.addTestRunDir(trd), trd.getPath());
-    }
-
-    public boolean addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
-        return announcedIf(store.addTestRunPackage(trp), trp.getPath());
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-016
@@ -656,19 +375,6 @@ public final class ProjectIndexer {
         announceReadAgain();
     }
 
-    public boolean persistMarker(final @NotNull DirectoryDto dto) {
-        return announcedIf(store.persistMarker(dto), dto.getPath());
-    }
-
-    boolean announcedIf(final boolean changed, final @NotNull Path path) {
-        if (changed) announce(path);
-        return changed;
-    }
-
-    public <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name, final @NotNull Class<M> markerClass) {
-        return store.readMarker(dirPath, kind, name, markerClass);
-    }
-
     // Rule-INTERNAL-091
     public @NotNull Optional<String> whyNotRead(final @NotNull Path projectPath) {
         return store.whyNotRead(projectPath);
@@ -677,24 +383,5 @@ public final class ProjectIndexer {
     // UC-INTERNAL-002, Rule-INTERNAL-014
     public @NotNull List<Path> takeDamagedMarkers() {
         return store.takeDamagedMarkers();
-    }
-
-    public @NotNull Optional<DirectoryDto> find(final @NotNull Path path) {
-        return store.findByPath(path);
-    }
-
-    public boolean nodeExists(final @NotNull Path path) {
-        return store.findByPath(path).isPresent();
-    }
-
-    public void refreshDirectory(final @NotNull Path path) {
-        store.refreshDir(path);
-    }
-
-    public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
-        nodeFiles.rename(oldPath, newPath, () -> {
-            onFinished.run();
-            announce(newPath);
-        });
     }
 }

@@ -36,8 +36,9 @@ explorer          editor           view          lightmode      the surfaces
              (Services, Notifier, settings, testin.yml)
                             |
                         indexer                                 the only door
-             ProjectIndexer -> IndexerDataStore                 to test data
-             -> TestCaseSequenceStore -> TestDataFiles
+        ProjectIndexer   TestCases   TestRuns   Nodes           to test data
+             -> IndexerDataStore -> TestCaseSequenceStore
+             -> TestDataFiles
                             |
                        VFS / disk
 
@@ -197,6 +198,20 @@ agree.
 cache is therefore authoritative, and every read a surface makes is an in-memory
 lookup rather than a disk hit.
 
+The package is one owner with four doors, one per area, and a caller asks the
+one for what it holds:
+
+| Service          | Answers for                                                                              |
+|------------------|------------------------------------------------------------------------------------------|
+| `ProjectIndexer` | Scanning and the index's lifecycle: the first read, a rescan, whether it is indexed yet  |
+| `TestCases`      | Test cases: find, save, move, remove, order, and the file each one lives in              |
+| `TestRuns`       | Test runs: find, change a run, a result or its marker, and a run's screenshots           |
+| `Nodes`          | The tree's folders: find, add, rename, move, copy, remove and restore, and their markers |
+
+All four share one store, one run writer and one announcer, which
+`ProjectIndexer` builds and hands out inside the package only, so there is still
+one cache and one `IndexChanged` announcement per change.
+
 - Need to know whether a node exists? Ask the indexer's cache — never
   `Files.exists`.
 - Need to create, move, rename, copy or delete? Call the indexer. It performs the
@@ -205,13 +220,13 @@ lookup rather than a disk hit.
   never touches disk.
 
 Test runs in particular are saved and read only through the indexer —
-`putTestRun` to create one, `changeRun` and `saveRun` to change one,
-`changeRunMarker`, `addTestRunDir`. The sequential run writer lives inside it,
-and writes one file per result - `<test case id>.ri` - so recording a verdict
-writes that one file and two testers judging different test cases of a run
-never touch the same one. A run's screenshots are its files too:
-`storeScreenshots` writes them, `screenshot` reads one, and the run writer
-removes those no result names.
+`TestRuns.putTestRun` to create one, `changeRun` and `saveRun` to change one,
+`changeRunMarker`, and `Nodes.addTestRunDir` for its folder. The sequential run
+writer lives inside the package, and writes one file per result -
+`<test case id>.ri` - so recording a verdict writes that one file and two
+testers judging different test cases of a run never touch the same one. A run's
+screenshots are its files too: `TestRuns.storeScreenshots` writes them,
+`screenshot` reads one, and the run writer removes those no result names.
 
 The rule is enforced by the compiler rather than by review: `TestDataFiles` and
 `VfsExecutor` are package-private and live in `indexer`, so nothing outside the
@@ -231,7 +246,7 @@ index.
 
 `bug` joined the list with #28. It writes a bug report's body and screenshots
 into a fresh temporary folder, runs `gh` from there, and deletes the folder
-afterward. The test case's own file is asked of the indexer (`ProjectIndexer.testCaseFile`), never built. Its other
+afterward. The test case's own file is asked of the indexer (`TestCases.testCaseFile`), never built. Its other
 edges point down: `git`
 for the test project's remote and branch, `report` for `ReportText.joined`, and
 `config` for `bugRepoUrl`.
@@ -242,7 +257,7 @@ Never the other way round. The cache update may persist markers, and a marker
 write creates directories — so a cache update that runs first produces phantom
 directories and "already exists in VFS" errors.
 
-`ProjectIndexer.moveNode` is the shape to copy: `VfsExecutor.executeVfsAction`
+`Nodes.moveNode` is the shape to copy: `VfsExecutor.executeVfsAction`
 performs the move and takes two callbacks, and `store.renameNode` is called from
 the success one.
 
@@ -287,7 +302,7 @@ anything else happens at all.
 |----|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
 | 1  | `editor/listeners/GridEditListener`                    | Reads what was typed, parses it for the column's type, and compares it to what the test case already held. **Unchanged, and it stops here.** |
 | 2  | `editor/listeners/GridEditListener.persistAndGenerate` | Moves off the EDT with `executeOnPooledThread`, because the codegen in step 10 schedules its own write commands.                             |
-| 3  | `indexer/ProjectIndexer.putTestCase`                   | The public door. Returns a boolean: did this have anything to save.                                                                          |
+| 3  | `indexer/TestCases.putTestCase`                        | The public door. Returns a boolean: did this have anything to save.                                                                          |
 | 4  | `indexer/IndexerDataStore.putTestCase`                 | Delegates the write, then stamps the **set's** marker as modified — but only if the write happened.                                          |
 | 5  | `indexer/TestCaseSequenceStore.put`                    | The funnel every save arrives at: the update dialog, a grid cell, the details panel, a paste.                                                |
 | 6  | `indexer/TestDataFiles.alreadyHolds`                   | Serializes the test case and compares the bytes to the file. **Identical, and nothing below runs.**                                          |
