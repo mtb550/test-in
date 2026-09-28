@@ -34,9 +34,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Pattern;
 
 @Service(Service.Level.PROJECT)
 public final class TestCaseExecutionSubscriber implements Disposable {
+    private static final @NotNull Pattern TEST_CASE_ID = Pattern.compile("\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}");
+
     private final @NotNull Project p;
 
     private final @NotNull List<Reported> surfaces = new CopyOnWriteArrayList<>();
@@ -93,11 +96,7 @@ public final class TestCaseExecutionSubscriber implements Disposable {
     }
 
     private @NotNull Optional<UUID> parseUuid(final @NotNull String s) {
-        try {
-            return Optional.of(UUID.fromString(s));
-        } catch (final IllegalArgumentException notAnId) {
-            return Optional.empty();
-        }
+        return TEST_CASE_ID.matcher(s).matches() ? Optional.of(UUID.fromString(s)) : Optional.empty();
     }
 
     @FunctionalInterface
