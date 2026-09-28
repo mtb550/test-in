@@ -45,10 +45,10 @@ public final class TestinFileWatcher implements AsyncFileListener {
         for (final VFileEvent event : events) {
             changedFile(event).ifPresent(file -> {
                 for (final Project p : watching) {
-                    if (ours.areOurs(file, p)) continue;
+                    final @NotNull Optional<Path> testProject = WatchedPath.testProjectOf(file, Services.getInstance(p, TestinRoot.class).absolutePath());
+                    if (testProject.isEmpty() || ours.areOurs(file, p)) continue;
 
-                    WatchedPath.testProjectOf(file, Services.getInstance(p, TestinRoot.class).absolutePath())
-                            .ifPresent(testProjects::add);
+                    testProjects.add(testProject.orElseThrow());
                 }
             });
         }
