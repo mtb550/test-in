@@ -91,7 +91,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     protected final @NotNull AbstractEditorContextMenu contextMenu;
     @Getter
     protected final @NotNull StatusBar statusBar = new StatusBar();
-    protected final @NotNull EditorGrid<A> grid = new EditorGrid<>(this);
+    private final @NotNull EditorGrid<A> grid = new EditorGrid<>(this);
     @Getter
     @Setter
     protected int currentPage = 1;
