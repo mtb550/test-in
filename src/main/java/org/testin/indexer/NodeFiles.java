@@ -90,6 +90,7 @@ final class NodeFiles {
         });
     }
 
+    // Rule-INTERNAL-113
     void copy(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final @NotNull IntConsumer onComplete) {
         if (sourcePaths.isEmpty()) {
             onComplete.accept(0);
@@ -123,6 +124,7 @@ final class NodeFiles {
                 operationSucceeded.run();
             };
 
+            Services.getInstance(OwnWrites.class).record(p, copiedRoot);
             Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, sourcePath, targetPath, Bundle.message("vfs.copy.failed.title"), (sourceVf, targetVf) -> {
                 try {
                     sourceVf.copy(indexer, targetVf, sourceVf.getName());
