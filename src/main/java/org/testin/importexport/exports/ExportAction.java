@@ -25,7 +25,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
@@ -158,14 +159,15 @@ public class ExportAction extends AbstractAnyProjectAction {
         }
 
         private void walk(final @NotNull DirectoryDto node, final @NotNull List<String> path, final @NotNull List<Sheet> found, final @NotNull List<String> unreadable) {
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
+            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
-            final @NotNull List<TestCaseDto> here = indexer.getTestCasesForTestSet(node.getPath());
+            final @NotNull List<TestCaseDto> here = testCases.getTestCasesForTestSet(node.getPath());
             if (!here.isEmpty()) found.add(new Sheet(path, detached(here)));
 
-            unreadable.addAll(indexer.unreadableTestCasesIn(node.getPath()).stream().sorted().toList());
+            unreadable.addAll(testCases.unreadableTestCasesIn(node.getPath()).stream().sorted().toList());
 
-            for (final DirectoryDto child : indexer.getChildren(node.getPath())) {
+            for (final DirectoryDto child : nodes.getChildren(node.getPath())) {
                 final @NotNull List<String> under = new ArrayList<>(path);
                 under.add(child.getName());
                 walk(child, under, found, unreadable);

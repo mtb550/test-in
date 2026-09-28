@@ -19,7 +19,7 @@ package org.testin.git;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Done;
@@ -152,15 +152,15 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
             if (found.isEmpty()) return;
 
             final @NotNull Path testSetPath = found.orElseThrow();
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
             final @NotNull UUID testCaseId = UUID.fromString(diff.testCaseId());
             final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, testSetPath, List.of(testCaseId));
 
             final boolean reverted = switch (diff.type()) {
-                case ADDED -> removeNewTestCase(indexer, testSetPath, testCaseId, before);
+                case ADDED -> removeNewTestCase(testCases, testSetPath, testCaseId, before);
                 // Rule-INTERNAL-035
-                case DELETED -> indexer.putTestCaseVerbatim(testSetPath, diff.committed());
-                case MODIFIED -> revertField(indexer, testSetPath, changeType, diff);
+                case DELETED -> testCases.putTestCaseVerbatim(testSetPath, diff.committed());
+                case MODIFIED -> revertField(testCases, testSetPath, changeType, diff);
             };
 
             if (!reverted) return;
@@ -178,21 +178,21 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
     }
 
     // UC-SHARE-011, Rule-CODEGEN-049
-    private boolean removeNewTestCase(final @NotNull ProjectIndexer indexer, final @NotNull Path testSetPath, final @NotNull UUID testCaseId, final @NotNull TestCaseSnapshot before) {
-        if (!indexer.removeTestCase(testSetPath, testCaseId)) return false;
+    private boolean removeNewTestCase(final @NotNull TestCases testCases, final @NotNull Path testSetPath, final @NotNull UUID testCaseId, final @NotNull TestCaseSnapshot before) {
+        if (!testCases.removeTestCase(testSetPath, testCaseId)) return false;
 
         GenType.REMOVE_TEST_CASE.executeAll(p, before.present());
         return true;
     }
 
     // UC-SHARE-011, Rule-SHARE-052
-    private boolean revertField(final @NotNull ProjectIndexer indexer, final @NotNull Path testSetPath, final @NotNull ChangeType changeType, final @NotNull PendingChange diff) {
+    private boolean revertField(final @NotNull TestCases testCases, final @NotNull Path testSetPath, final @NotNull ChangeType changeType, final @NotNull PendingChange diff) {
         if (!changeType.isRevertible()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("dialog.pending.revert.not.supported", changeType.getLabel()));
             return false;
         }
 
-        final @NotNull Optional<TestCaseDto> current = indexer.findTestCase(UUID.fromString(diff.testCaseId()));
+        final @NotNull Optional<TestCaseDto> current = testCases.findTestCase(UUID.fromString(diff.testCaseId()));
         if (current.isEmpty()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("dialog.pending.revert.gone"));
             return false;
@@ -204,10 +204,10 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
 
         if (TestCaseChangeComparator.compare(committed, working).isEmpty()) {
             working.takeAuditOf(committed);
-            return indexer.putTestCaseVerbatim(testSetPath, working);
+            return testCases.putTestCaseVerbatim(testSetPath, working);
         }
 
-        return indexer.putTestCase(testSetPath, working);
+        return testCases.putTestCase(testSetPath, working);
     }
 
     private void removeRow(final int row) {

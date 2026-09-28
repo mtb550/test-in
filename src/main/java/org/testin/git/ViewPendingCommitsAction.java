@@ -26,7 +26,7 @@ import org.testin.actions.TestinData;
 import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreeValues;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
@@ -161,7 +161,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                         }
 
                         if (!request.newBranch()) {
-                            Services.getInstance(p, ProjectIndexer.class).refreshDirectory(repoPath);
+                            Services.getInstance(p, Nodes.class).refreshDirectory(repoPath);
                         }
 
                         ApplicationManager.getApplication().invokeLater(() -> {

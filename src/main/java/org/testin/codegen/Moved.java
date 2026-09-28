@@ -18,7 +18,7 @@ package org.testin.codegen;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
@@ -34,7 +34,7 @@ public record Moved(@NotNull DirectoryDto dir, @NotNull Path newParent) {
     // UC-CODEGEN-016, Rule-CODEGEN-055
     @FromContentModule
     public @NotNull Optional<List<String>> destinationPackage(final @NotNull Project p) {
-        return Services.getInstance(p, ProjectIndexer.class).find(newParent).map(Fqcn::ofPackage);
+        return Services.getInstance(p, Nodes.class).find(newParent).map(Fqcn::ofPackage);
     }
 
     // UC-CODEGEN-016, Rule-CODEGEN-055

@@ -30,7 +30,7 @@ import org.testin.editor.run.RunEditor;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.exports.ExportNotice;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestRuns;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -112,8 +112,8 @@ public class GenerateReportAction extends AbstractProjectAction {
         BackgroundWork.run(p, Bundle.message("report.task.generating", format.getLabel(), tr.getName()), Bundle.message("report.failed.title", format.getLabel()), indicator -> {
             final @NotNull Path dirPath = tr.getPath();
 
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-            final @NotNull TestRunDto runData = indexer.getTestRunByPath(dirPath);
+            final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
+            final @NotNull TestRunDto runData = testRuns.getTestRunByPath(dirPath);
 
             final byte[] fileBytes = format.generateReport(p, tr, runData);
 

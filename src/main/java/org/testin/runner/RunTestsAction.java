@@ -25,7 +25,7 @@ import org.testin.actions.TestinData;
 import org.testin.codegen.CodeOn;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.TestinEditors;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -68,7 +68,7 @@ public class RunTestsAction extends AbstractAnyProjectAction {
 
     // UC-CODEGEN-008, Rule-CODEGEN-031
     private void run(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        final @NotNull List<TestCaseDto> testCases = Services.getInstance(p, ProjectIndexer.class).getTestCasesUnder(dir);
+        final @NotNull List<TestCaseDto> testCases = Services.getInstance(p, TestCases.class).getTestCasesUnder(dir);
 
         if (testCases.isEmpty()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NOTHING_TO_RUN, dir.getName());

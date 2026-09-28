@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
@@ -46,12 +46,12 @@ public final class GitDiffProcessor {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
         final @NotNull GitRepositoryService repositories = new GitRepositoryService(p);
 
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
 
         return toDiffs(repositories.status(root), root,
                 Services.getInstance(p, Mapper.class),
                 paths -> repositories.contents(root, "HEAD", paths),
-                indexer::findTestCase);
+                testCases::findTestCase);
     }
 
     // UC-SHARE-010

@@ -32,7 +32,8 @@ import org.testin.codegen.GenType;
 import org.testin.codegen.JavaCode;
 import org.testin.creator.CreateTestSet;
 import org.testin.editor.TestinEditors;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.TestCaseDto;
@@ -184,7 +185,7 @@ public class ImportAction extends AbstractAnyProjectAction {
         }
 
         private void refreshTarget(final @NotNull Path targetPath) {
-            Services.getInstance(p, ProjectIndexer.class).refreshDirectory(targetPath);
+            Services.getInstance(p, Nodes.class).refreshDirectory(targetPath);
         }
 
         // UC-SHARE-007, Rule-SHARE-037
@@ -254,7 +255,7 @@ public class ImportAction extends AbstractAnyProjectAction {
 
         // UC-SHARE-005, Rule-SHARE-025, Rule-SHARE-037
         private @NotNull List<TestCaseDto> linkAndSaveTestCases(final @NotNull Path dirPath, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final @NotNull TestCases indexedTestCases = Services.getInstance(p, TestCases.class);
 
             String rank = tailRank;
 
@@ -268,7 +269,7 @@ public class ImportAction extends AbstractAnyProjectAction {
             for (final TestCaseDto tc : testCases) {
                 if (indicator.isCanceled()) break;
 
-                if (indexer.putTestCaseVerbatim(dirPath, tc)) written.add(tc);
+                if (indexedTestCases.putTestCaseVerbatim(dirPath, tc)) written.add(tc);
 
                 tried++;
                 indicator.setFraction((done + tried) / (double) total);
@@ -284,7 +285,7 @@ public class ImportAction extends AbstractAnyProjectAction {
 
         private @NotNull Optional<TestCaseDto> findExistingTail(final @NotNull Path directory) {
             final @NotNull List<TestCaseDto> existing =
-                    TestCaseOrder.ordered(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(directory));
+                    TestCaseOrder.ordered(Services.getInstance(p, TestCases.class).getTestCasesForTestSet(directory));
 
             return existing.isEmpty() ? Optional.empty() : Optional.of(existing.getLast());
         }

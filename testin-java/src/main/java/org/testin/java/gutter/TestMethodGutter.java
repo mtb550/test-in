@@ -35,6 +35,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.CodeOn;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
@@ -112,9 +113,10 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
                 indexer.awaitIndexing();
 
-                indexer.findTestCase(uuid).ifPresentOrElse(
+                testCases.findTestCase(uuid).ifPresentOrElse(
                         dto -> {
                             Logger.info("Found in indexer: " + dto.getDescription());
 

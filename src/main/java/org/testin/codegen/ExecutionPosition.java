@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
@@ -47,6 +47,6 @@ public final class ExecutionPosition {
 
     // UC-CODEGEN-011, Rule-CODEGEN-042
     public static @NotNull List<TestCaseDto> setOf(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        return TestCaseOrder.ordered(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(tc.getParent().getPath()));
+        return TestCaseOrder.ordered(Services.getInstance(p, TestCases.class).getTestCasesForTestSet(tc.getParent().getPath()));
     }
 }

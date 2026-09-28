@@ -21,7 +21,8 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.ProjectIndexer;
+import org.testin.indexer.Nodes;
+import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
@@ -36,14 +37,15 @@ public final class SubtreeCode {
 
     // UC-CODEGEN-004, Rule-CODEGEN-023
     private static void walk(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
+        final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
         Logger.info("Generating code for " + dir.getName());
         JavaCode.of(dir.getType()).getCreated().execute(p, dir);
 
-        GenType.CREATE_TEST_CASE.executeAllNow(p, indexer.getTestCasesForTestSet(dir.getPath()));
+        GenType.CREATE_TEST_CASE.executeAllNow(p, testCases.getTestCasesForTestSet(dir.getPath()));
 
-        for (final DirectoryDto child : indexer.getChildren(dir.getPath())) {
+        for (final DirectoryDto child : nodes.getChildren(dir.getPath())) {
             walk(p, child);
         }
     }
