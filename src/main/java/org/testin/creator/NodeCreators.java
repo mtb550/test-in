@@ -17,46 +17,21 @@
 package org.testin.creator;
 
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 
-import java.util.function.Function;
-
-@AllArgsConstructor
-public enum NodeCreators {
-    TP(
-            _ -> new NotCreatableFromTree(DirectoryType.TP.getDescription())
-    ),
-
-    TCD(
-            _ -> new NotCreatableFromTree(DirectoryType.TCD.getDescription())
-    ),
-
-    TRD(
-            _ -> new NotCreatableFromTree(DirectoryType.TRD.getDescription())
-    ),
-
-    TSP(
-            CreateTestSetPackage::new
-    ),
-
-    TRP(
-            CreateTestRunPackage::new
-    ),
-
-    TS(
-            CreateTestSet::new
-    ),
-
-    TR(
-            CreateTestRun::new
-    );
-
-    private final @NotNull Function<Project, NodeCreator> creator;
-
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class NodeCreators {
     // UC-TREE-PANEL-002, Rule-TREE-PANEL-011
     public static @NotNull NodeCreator of(final @NotNull Project p, final @NotNull DirectoryType type) {
-        return valueOf(type.name()).creator.apply(p);
+        return switch (type) {
+            case TP, TCD, TRD -> new NotCreatableFromTree(type.getDescription());
+            case TSP -> new CreateTestSetPackage(p);
+            case TRP -> new CreateTestRunPackage(p);
+            case TS -> new CreateTestSet(p);
+            case TR -> new CreateTestRun(p);
+        };
     }
 }

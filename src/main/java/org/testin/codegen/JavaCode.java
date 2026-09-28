@@ -16,56 +16,15 @@
 
 package org.testin.codegen;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 
 @Getter
-@AllArgsConstructor
-public enum JavaCode {
-    TP(
-            new NoJavaCode(DirectoryType.TP.getDescription()),
-            (p, renamed) -> GenType.RENAME_TEST_PROJECT.getAction().execute(p, renamed),
-            new NoJavaCode(DirectoryType.TP.getDescription())
-    ),
-
-    TCD(
-            new NoJavaCode(DirectoryType.TCD.getDescription()),
-            new NoJavaCode(DirectoryType.TCD.getDescription()),
-            new NoJavaCode(DirectoryType.TCD.getDescription())
-    ),
-
-    TRD(
-            new NoJavaCode(DirectoryType.TRD.getDescription()),
-            new NoJavaCode(DirectoryType.TRD.getDescription()),
-            new NoJavaCode(DirectoryType.TRD.getDescription())
-    ),
-
-    TSP(
-            new NoJavaCode(DirectoryType.TSP.getDescription()),
-            (p, renamed) -> GenType.RENAME_TEST_SET_PACKAGE.getAction().execute(p, renamed),
-            (p, moved) -> GenType.MOVE_TEST_SET_PACKAGE.getAction().execute(p, moved)
-    ),
-
-    TRP(
-            new NoJavaCode(DirectoryType.TRP.getDescription()),
-            new NoJavaCode(DirectoryType.TRP.getDescription()),
-            new NoJavaCode(DirectoryType.TRP.getDescription())
-    ),
-
-    TS(
-            (p, dir) -> GenType.CREATE_TEST_SET.getAction().execute(p, dir),
-            (p, renamed) -> GenType.RENAME_TEST_SET.getAction().execute(p, renamed),
-            (p, moved) -> GenType.MOVE_TEST_SET.getAction().execute(p, moved)
-    ),
-
-    TR(
-            new NoJavaCode(DirectoryType.TR.getDescription()),
-            new NoJavaCode(DirectoryType.TR.getDescription()),
-            new NoJavaCode(DirectoryType.TR.getDescription())
-    );
-
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public final class JavaCode {
     // UC-CODEGEN-004, Rule-CODEGEN-023
     private final @NotNull GenAction created;
 
@@ -76,6 +35,31 @@ public enum JavaCode {
     private final @NotNull GenAction moved;
 
     public static @NotNull JavaCode of(final @NotNull DirectoryType type) {
-        return valueOf(type.name());
+        final @NotNull GenAction none = new NoJavaCode(type.getDescription());
+        return switch (type) {
+            case TP -> new JavaCode(
+                    none,
+                    (p, renamed) -> GenType.RENAME_TEST_PROJECT.getAction().execute(p, renamed),
+                    none
+            );
+
+            case TCD, TRD, TRP, TR -> new JavaCode(
+                    none,
+                    none,
+                    none
+            );
+
+            case TSP -> new JavaCode(
+                    none,
+                    (p, renamed) -> GenType.RENAME_TEST_SET_PACKAGE.getAction().execute(p, renamed),
+                    (p, moved) -> GenType.MOVE_TEST_SET_PACKAGE.getAction().execute(p, moved)
+            );
+
+            case TS -> new JavaCode(
+                    (p, dir) -> GenType.CREATE_TEST_SET.getAction().execute(p, dir),
+                    (p, renamed) -> GenType.RENAME_TEST_SET.getAction().execute(p, renamed),
+                    (p, moved) -> GenType.MOVE_TEST_SET.getAction().execute(p, moved)
+            );
+        };
     }
 }

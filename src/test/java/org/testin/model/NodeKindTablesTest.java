@@ -17,9 +17,6 @@
 package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.JavaCode;
-import org.testin.creator.NodeCreators;
-import org.testin.remove.Removals;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Field;
@@ -37,19 +34,7 @@ import static org.testng.Assert.fail;
 
 public class NodeKindTablesTest {
 
-    private static final @NotNull List<String> KINDS =
-            Arrays.stream(DirectoryType.values()).map(Enum::name).collect(Collectors.toList());
-
     private static final @NotNull UUID A_TEST_CASE = UUID.fromString("11111111-1111-4111-8111-111111111101");
-
-    private static void assertSameNames(final @NotNull Class<?> table, final @NotNull String named) {
-        final @NotNull List<String> names =
-                Arrays.stream(table.getEnumConstants()).map(c -> ((Enum<?>) c).name()).collect(Collectors.toList());
-
-        assertEquals(names, KINDS,
-                named + " no longer has one constant per DirectoryType, named after it and in the same order."
-                        + " A kind of node with no entry throws on valueOf the first time a tester reaches it (#111)");
-    }
 
     private static @NotNull Set<String> kindsWithAnAcceptsRow() {
         try {
@@ -91,21 +76,6 @@ public class NodeKindTablesTest {
         assertEquals(DirectoryType.values().length,
                 Arrays.stream(DirectoryType.values()).map(DirectoryType::getMarkerClass).distinct().count(),
                 "no two kinds share a marker class");
-    }
-
-    @Test
-    public void everyKindOfNodeSaysWhatMakesIt() {
-        assertSameNames(NodeCreators.class, "org.testin.creator.NodeCreators");
-    }
-
-    @Test
-    public void everyKindOfNodeSaysWhatItsJavaDoes() {
-        assertSameNames(JavaCode.class, "org.testin.codegen.JavaCode");
-    }
-
-    @Test
-    public void everyKindOfNodeSaysHowItIsRemoved() {
-        assertSameNames(Removals.class, "org.testin.remove.Removals");
     }
 
     @Test

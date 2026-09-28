@@ -176,14 +176,15 @@ What is **not** there: **`model` imports nothing above it at all** - not
 `statusbar` either. The leaf rule is at zero and `ArchitectureTest` no longer
 carries a single exception to it (#111).
 
-Four of the six that had to move were tables: an enum naming, per node kind,
-what some feature does for it. Each is an enum of its own now, in the package
-that knows the answer, with one constant per kind **named after it** -
-`creator/NodeCreators`, `codegen/JavaCode`, `remove/Removals`,
-`NodeCounter.Gathered`. The bridge is `valueOf(type.name())`, so nothing
-branches on a node kind and no call site asks what it is holding; what the
-enum constructor used to guarantee - that a new kind supplies every column -
-`NodeKindTablesTest` guarantees instead, by name.
+Four of the six that had to move were tables: per node kind, what some feature
+does for it. Each lives in the package that knows the answer. Three of them -
+`creator/NodeCreators`, `codegen/JavaCode`, `remove/Removals` - answer through
+one `of(DirectoryType)` whose body is a `switch` over every kind with no
+`default`, so a kind added without an entry fails `compileJava`, and no call
+site asks what it is holding (#350). The fourth, `NodeCounter.Gathered`, is
+still an enum with one constant per way of counting, bridged by
+`valueOf(...name())`, and `NodeKindTablesTest` guarantees by name that the two
+agree.
 
 ---
 
