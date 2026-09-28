@@ -57,10 +57,10 @@ public final class RunStatusService {
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130
     public void executeNext(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestStatus status) {
-        final int executingIndex = editor.getCurrentlyExecutingIndex();
+        final int executingIndex = editor.getWalk().getCurrentlyExecutingIndex();
         if (executingIndex == -1) {
             // Rule-EDITOR-PANEL-227
-            if (editor.executingTestCaseIsHidden())
+            if (editor.getWalk().executingTestCaseIsHidden())
                 Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.executing.hidden"));
             return;
         }
@@ -74,16 +74,16 @@ public final class RunStatusService {
         confirmVerdict(p, status, 1);
 
         // Rule-EDITOR-PANEL-130
-        ApplicationManager.getApplication().invokeLater(() -> editor.startTimerForIndex(executingIndex));
+        ApplicationManager.getApplication().invokeLater(() -> editor.getWalk().startTimerForIndex(executingIndex));
     }
 
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-241, Rule-EDITOR-PANEL-242
     public void recordReported(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
-        final boolean clockCounted = editor.clockIsOn(tc.getId());
+        final boolean clockCounted = editor.getWalk().clockIsOn(tc.getId());
 
         final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
-        if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
-            editor.startTimerForIndex(tcIndex + 1);
+        if (tcIndex != -1 && tcIndex == editor.getWalk().getCurrentlyExecutingIndex()) {
+            editor.getWalk().startTimerForIndex(tcIndex + 1);
         }
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
@@ -204,7 +204,7 @@ public final class RunStatusService {
             }
 
             final int globalIndex = editor.getCurrentTestCases().indexOf(tc);
-            if (globalIndex == editor.getCurrentlyExecutingIndex()) {
+            if (globalIndex == editor.getWalk().getCurrentlyExecutingIndex()) {
                 executeNext(p, editor, status);
             } else {
                 if (correct(p, editor, tc, status)) confirmVerdict(p, status, 1);
@@ -221,8 +221,8 @@ public final class RunStatusService {
                 judged.add(tc.getId());
 
                 final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
-                if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
-                    editor.stopExecutionUntimed();
+                if (tcIndex != -1 && tcIndex == editor.getWalk().getCurrentlyExecutingIndex()) {
+                    editor.getWalk().stopExecutionUntimed();
                 }
             }
 
@@ -234,7 +234,7 @@ public final class RunStatusService {
             confirmVerdict(p, status, judged.size());
         }
 
-        editor.finishIfEverythingIsJudged();
+        editor.getWalk().finishIfEverythingIsJudged();
     }
 
     private void confirmVerdict(final @NotNull Project p, final @NotNull TestStatus status, final int count) {

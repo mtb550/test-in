@@ -177,7 +177,7 @@ final class LightModeWindow {
 
     void refresh() {
         final @NotNull List<TestCaseDto> testCases = editor.getCurrentTestCases();
-        final int index = editor.getCurrentlyExecutingIndex();
+        final int index = editor.getWalk().getCurrentlyExecutingIndex();
         final boolean executing = index >= 0 && index < testCases.size();
 
         counter.setText(executing
@@ -188,11 +188,11 @@ final class LightModeWindow {
         testCaseView.setVisible(executing);
         footer.setVisible(executing);
 
-        start.setVisible(!editor.isExecuting());
-        stop.setVisible(editor.isExecuting());
+        start.setVisible(!editor.getWalk().isExecuting());
+        stop.setVisible(editor.getWalk().isExecuting());
 
         // Rule-EDITOR-PANEL-135
-        start.setEnabled(editor.canStartManualExecution());
+        start.setEnabled(editor.getWalk().canStartManualExecution());
         Tooltip.set(start, StartExecutionBtn.tooltipFor(editor));
 
         final @NotNull Optional<UUID> wasShowing = shownTestCase;
@@ -210,7 +210,7 @@ final class LightModeWindow {
     }
 
     void tick() {
-        testCaseClock.setText(Display.formatTestCaseClock(editor.getCurrentTestCaseElapsed()));
+        testCaseClock.setText(Display.formatTestCaseClock(editor.getWalk().getCurrentTestCaseElapsed()));
         runClock.setText(Display.formatRunClock(editor.getElapsed()));
     }
 
@@ -442,7 +442,7 @@ final class LightModeWindow {
 
     private @NotNull Optional<TestCaseDto> executingTestCase() {
         final @NotNull List<TestCaseDto> testCases = editor.getCurrentTestCases();
-        final int index = editor.getCurrentlyExecutingIndex();
+        final int index = editor.getWalk().getCurrentlyExecutingIndex();
 
         return index >= 0 && index < testCases.size() ? Optional.of(testCases.get(index)) : Optional.empty();
     }

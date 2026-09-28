@@ -44,10 +44,8 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestRuns;
 import org.testin.lightmode.LightMode;
 import org.testin.logger.Logger;
-import org.testin.model.Failure;
 import org.testin.model.Modules;
 import org.testin.model.ResultAnalysis;
-import org.testin.model.RunStatus;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunStatus;
 import org.testin.model.TestRunSummary;
@@ -55,28 +53,21 @@ import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
-import org.testin.notifications.Refused;
-import org.testin.runner.RunTestCases;
 import org.testin.runner.TestCaseExecutionSubscriber;
-import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testrun.ResultAnalysisDialog;
 import org.testin.testrun.RunEditorAttributes;
-import org.testin.testrun.RunStatusService;
-import org.testin.testrun.TestRunStatusChange;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 
 import java.awt.BorderLayout;
 import java.time.Duration;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -91,14 +82,12 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     @Getter
     private final @NotNull RunToolbar toolBar;
 
-    private final @NotNull RunExecutionTimer executionTimer = new RunExecutionTimer();
+    @Getter
+    private final @NotNull RunWalk walk = new RunWalk(this, p, parent);
 
-    private final @NotNull Set<UUID> launchedHere = ConcurrentHashMap.newKeySet();
     private final @NotNull AtomicInteger loadGeneration = new AtomicInteger();
 
     private volatile @NotNull Optional<TestRunDto> run = Optional.empty();
-
-    private @NotNull Optional<UUID> executingTestCase = Optional.empty();
 
     private boolean loaded;
 
@@ -107,7 +96,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     public RunEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
         super(p, vf.getTestRun());
 
-        TestCaseExecutionSubscriber.onReported(p, projectDisposable, this::executionReported);
+        TestCaseExecutionSubscriber.onReported(p, projectDisposable, walk::executionReported);
 
         this.toolBar = new RunToolbar(p, this);
         buildOpeningPanel();
@@ -175,16 +164,13 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
     @Override
     protected @NotNull Done refreshed() {
-        return isExecuting() ? Done.REFRESHED_EXECUTION_STOPPED : Done.REFRESHED;
+        return walk.isExecuting() ? Done.REFRESHED_EXECUTION_STOPPED : Done.REFRESHED;
     }
 
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-150
     @Override
     protected void beforeReload() {
-        final boolean timing = executingTestCase.isPresent();
-
-        haltExecution();
-        if (timing) saveRun();
+        walk.haltBeforeReload();
     }
 
     @Override
@@ -200,20 +186,9 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                 () -> Services.getInstance(p, LightMode.class).editorClosing(parent),
 
                 () -> {
-                    if (isExecuting()) stopAndWriteTheRunDown();
+                    if (walk.isExecuting()) walk.stopAndWriteTheRunDown();
                 },
-                executionTimer::dispose);
-    }
-
-    // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-149
-    private void stopAndWriteTheRunDown() {
-        stopAutomation();
-        stopExecution();
-        saveRun();
-    }
-
-    private void saveRun() {
-        Services.getInstance(p, TestRuns.class).saveRun(parent.getPath());
+                walk::dispose);
     }
 
     @Override
@@ -227,21 +202,6 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
     public @NotNull Optional<TestRunDto> run() {
         return run;
-    }
-
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-227
-    public int getCurrentlyExecutingIndex() {
-        return executingTestCase.map(id -> {
-            for (int i = 0; i < currentTestCases.size(); i++) {
-                if (currentTestCases.get(i).getId().equals(id)) return i;
-            }
-            return -1;
-        }).orElse(-1);
-    }
-
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-227
-    public boolean executingTestCaseIsHidden() {
-        return executingTestCase.isPresent() && getCurrentlyExecutingIndex() == -1;
     }
 
     private void buildOpeningPanel() {
@@ -379,75 +339,9 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         onPersisted.run();
     }
 
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130, Rule-EDITOR-PANEL-134
-    public void startTimerForIndex(final int from) {
-        final int globalIndex = nextPendingIndex(from);
-
-        if (globalIndex >= currentTestCases.size()) {
-            stopExecution();
-            finishIfEverythingIsJudged();
-            saveRun();
-            return;
-        }
-
-        executingTestCase = Optional.of(currentTestCases.get(globalIndex).getId());
-
-        final int expectedPage = (globalIndex / pageSize) + 1;
-        if (currentPage != expectedPage) {
-            currentPage = expectedPage;
-            refreshView();
-        }
-
-        final int localIndex = globalIndex - ((currentPage - 1) * pageSize);
-
-        list.setSelectedIndex(localIndex);
-        list.ensureIndexIsVisible(localIndex);
-
-        final @NotNull TestCaseDto currentTc = currentTestCases.get(globalIndex);
-
-        runItem(currentTc.getId()).ifPresent(item -> executionTimer.start(item, () -> {
-            if (model.contains(currentTc)) model.contentsChanged(currentTc);
-            showElapsed();
-        }));
-
-        onExecutionStateChanged();
-    }
-
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130
-    public int nextPendingIndex(final int from) {
-        for (int i = Math.max(from, 0); i < currentTestCases.size(); i++) {
-            if (runItem(currentTestCases.get(i).getId())
-                    .filter(item -> item.shownStatus() == TestStatus.PENDING)
-                    .isPresent()) return i;
-        }
-
-        return currentTestCases.size();
-    }
-
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-132
-    public boolean clockIsOn(final @NotNull UUID testCaseId) {
-        return executionTimer.isOn(testCaseId);
-    }
-
     @Override
     public void launching(final @NotNull UUID testCaseId) {
-        launchedHere.add(testCaseId);
-
-        markStartedByAutomation();
-    }
-
-    // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-181
-    private void markStartedByAutomation() {
-        final @NotNull TestRunStatus status = parent.getMarker().getStatus();
-        if (status == TestRunStatus.IN_PROGRESS || status.isTerminal()) return;
-
-        markStarted();
-    }
-
-    // UC-EDITOR-PANEL-031, UC-EDITOR-PANEL-043
-    private void markStarted() {
-        Services.getInstance(p, TestRuns.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionStarted);
-        Services.getInstance(p, TestRunStatusChange.class).apply(parent, TestRunStatus.IN_PROGRESS);
+        walk.launching(testCaseId);
     }
 
     // UC-EDITOR-PANEL-044
@@ -461,102 +355,43 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         if (!startWhenLoaded || !loaded) return;
 
         startWhenLoaded = false;
-        runPending();
+        walk.runPending();
     }
 
-    // UC-EDITOR-PANEL-044, Rule-EDITOR-PANEL-184
-    private void runPending() {
-        if (!canStartExecution()) {
-            if (isExecuting())
-                Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_RUNNING, parent.getName());
-            return;
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130
+    void showExecuting(final int globalIndex) {
+        final int expectedPage = (globalIndex / pageSize) + 1;
+        if (currentPage != expectedPage) {
+            currentPage = expectedPage;
+            refreshView();
         }
 
-        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
+        final int localIndex = globalIndex - ((currentPage - 1) * pageSize);
 
-        final @NotNull List<TestCaseDto> pending = snapshotOfAll().stream()
-                .filter(tc -> runItem(tc.getId()).filter(item -> item.shownStatus() == TestStatus.PENDING).isPresent())
-                .filter(tc -> !execution.isRunning(tc.getId()))
-                .toList();
-
-        if (pending.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NOTHING_TO_RUN, parent.getName());
-            return;
-        }
-
-        Logger.info("Running " + parent.getName() + " with " + pending.size() + " pending test case(s)");
-
-        pending.forEach(tc -> launching(tc.getId()));
-
-        RunTestCases.run(p, pending);
+        list.setSelectedIndex(localIndex);
+        list.ensureIndexIsVisible(localIndex);
     }
 
-    // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-182
-    private void executionReported(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
-        if (!launchedHere.contains(tc.getId())) return;
-
-        if (!status.stillGoing()) launchedHere.remove(tc.getId());
-
-        if (runItem(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) return;
-
-        if (parent.getMarker().getStatus().isTerminal()) return;
-
-        status.getVerdict().ifPresent(verdict -> {
-            sayWhatTheVerdictCleared(tc, verdict, failure);
-
-            Services.getInstance(p, RunStatusService.class).recordReported(p, this, tc, verdict, duration, failure);
-
-            if (launchedHere.isEmpty()) sayWhatTheRunRecorded();
-        });
-
+    void repaint(final @NotNull TestCaseDto tc) {
         if (model.contains(tc)) model.contentsChanged(tc);
-        showRunTotals();
-
-        onExecutionStateChanged();
-
-        finishIfEverythingIsJudged();
     }
 
-    // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-182, Rule-EDITOR-PANEL-220
-    private void sayWhatTheVerdictCleared(final @NotNull TestCaseDto tc, final @NotNull TestStatus verdict, final @NotNull Failure failure) {
-        final @NotNull List<String> cleared = runItem(tc.getId()).map(item -> item.wouldClear(verdict, failure)).orElseGet(List::of);
-        if (cleared.isEmpty()) return;
-
-        Services.getInstance(p, Notifier.class).info(p, Bundle.message("editor.cleared.title"),
-                Bundle.message("editor.cleared.message", tc.getDescription(),
-                        verdict.getLabel().toLowerCase(Locale.ROOT), Display.andJoin(cleared)));
-    }
-
-    // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-008
-    private void sayWhatTheRunRecorded() {
-        final @NotNull String recorded = ResultAnalysis
-                .segments(TestRunSummary.of(List.copyOf(resultsMap.values())), parent.getMarker().getStatus())
-                .stream().map(ResultAnalysis.Segment::text).collect(Collectors.joining(", "));
-
-        if (!recorded.isEmpty()) Services.getInstance(p, Notifier.class).softShow(p, recorded);
-    }
-
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-134
-    public void finishIfEverythingIsJudged() {
-        if (parent.getMarker().getStatus().isTerminal()) return;
-
-        if (run().filter(TestRunDto::isFullyJudged).isEmpty()) return;
-
-        Services.getInstance(p, TestRunStatusChange.class).apply(parent, TestRunStatus.COMPLETED);
+    @NotNull List<TestRunItems> results() {
+        return List.copyOf(resultsMap.values());
     }
 
     // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-177
-    private void showRunTotals() {
+    void showRunTotals() {
         final @NotNull TestRunStatus status = parent.getMarker().getStatus();
 
         statusBar.showRunStatus(status);
-        statusBar.showVerdicts(ResultAnalysis.segments(TestRunSummary.of(List.copyOf(resultsMap.values())), status));
+        statusBar.showVerdicts(ResultAnalysis.segments(TestRunSummary.of(results()), status));
 
         showElapsed();
     }
 
     // UC-EDITOR-PANEL-042
-    private void showElapsed() {
+    void showElapsed() {
         statusBar.showExecutionTime(Display.formatRunClock(getElapsed()));
 
         Services.getInstance(p, LightMode.class).tick(parent);
@@ -568,48 +403,17 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                 .reduce(Duration.ZERO, Duration::plus);
     }
 
-    // UC-EDITOR-PANEL-046
-    public @NotNull Duration getCurrentTestCaseElapsed() {
-        return executingTestCase.flatMap(this::runItem)
-                .map(TestRunItems::getDuration)
-                .orElse(Duration.ZERO);
-    }
-
-    public boolean isExecuting() {
-        return executingTestCase.isPresent() || isAutomationRunning();
-    }
-
-    private boolean isAutomationRunning() {
-        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
-
-        return launchedHere.stream().anyMatch(execution::isRunning);
-    }
-
     // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-119
     @Override
     public boolean isBusy() {
-        return isExecuting() || super.isBusy();
-    }
-
-    public boolean canStartExecution() {
-        return !isExecuting() && !parent.getMarker().getStatus().isTerminal();
-    }
-
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
-    public boolean hasSomethingToWalk() {
-        return nextPendingIndex(0) < currentTestCases.size();
-    }
-
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
-    public boolean canStartManualExecution() {
-        return canStartExecution() && hasSomethingToWalk();
+        return walk.isExecuting() || super.isBusy();
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-133
     public void onExecutionStateChanged() {
         if (isDisposed()) return;
 
-        final boolean executing = isExecuting();
+        final boolean executing = walk.isExecuting();
 
         final @NotNull StartExecutionBtn startBtn = toolBar.getToolbarItem(StartExecutionBtn.class);
         final @NotNull StopExecutionBtn stopBtn = toolBar.getToolbarItem(StopExecutionBtn.class);
@@ -627,55 +431,15 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         Services.getInstance(p, LightMode.class).refresh(parent);
     }
 
-    // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-151
-    public void stopExecution() {
-        Services.getInstance(p, TestRuns.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionEnded);
-
-        haltExecution();
-    }
-
-    // UC-EDITOR-PANEL-039, Rule-EDITOR-PANEL-164
-    public void stopExecutionUntimed() {
-        executionTimer.discard();
-        stopExecution();
-    }
-
-    // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-152
-    private void stopAutomation() {
-        if (launchedHere.isEmpty()) return;
-
-        final int stopped = Services.getInstance(p, TestNGExecution.class).stopTestCases(launchedHere);
-        if (stopped == 0) return;
-
-        Logger.info("Stopped " + stopped + " test case(s) running from '" + parent.getName() + "'");
-    }
-
-    // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-150
-    private void haltExecution() {
-        executionTimer.stop();
-        executingTestCase = Optional.empty();
-        onExecutionStateChanged();
-    }
-
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
     @Override
     public void onStartExecutionClicked() {
-        if (run.isEmpty()) return;
-
-        if (!hasSomethingToWalk()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NOTHING_SHOWING, parent.getName());
-            return;
-        }
-
-        markStarted();
-        startTimerForIndex(0);
+        walk.start();
     }
 
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-149
     @Override
     public void onStopExecutionClicked() {
-        stopAndWriteTheRunDown();
-
-        Services.getInstance(p, Notifier.class).softShow(p, Done.STOPPED);
+        walk.stop();
     }
 }

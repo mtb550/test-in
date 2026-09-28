@@ -35,19 +35,19 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
     public static @NotNull String tooltipFor(final @NotNull RunEditor editor) {
-        if (editor.isExecuting()) return Bundle.message("toolbar.executing");
+        if (editor.getWalk().isExecuting()) return Bundle.message("toolbar.executing");
 
         final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();
         if (status.isTerminal()) return Bundle.message("toolbar.execution.disabled", status.getLabel());
 
-        return editor.hasSomethingToWalk()
+        return editor.getWalk().hasSomethingToWalk()
                 ? ExecutionControl.START.getLabel()
                 : Bundle.message("toolbar.nothing.to.execute");
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
     public void updateEnabledState() {
-        setEnabled(editor.canStartManualExecution());
+        setEnabled(editor.getWalk().canStartManualExecution());
         describe(tooltipFor(editor));
     }
 }
