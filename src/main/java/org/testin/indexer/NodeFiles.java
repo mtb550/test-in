@@ -18,7 +18,7 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
@@ -49,11 +49,14 @@ final class NodeFiles {
 
     // UC-INTERNAL-002, Rule-INTERNAL-112
     void remove(final @NotNull Path path, final @NotNull Runnable cacheUpdate, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
+        final @NotNull Path folder = Optional.ofNullable(path.getParent()).orElse(path);
+
         Services.getInstance(p, VfsExecutor.class).removeVf(p, indexer, path,
-                deleted -> VirtualFileManager.getInstance().asyncRefresh(() -> {
-                    if (deleted) cacheUpdate.run();
-                    onRemoved.accept(deleted);
-                }));
+                deleted -> ApplicationManager.getApplication().executeOnPooledThread(() ->
+                        LocalFileSystem.getInstance().refreshNioFiles(List.of(folder), true, false, () -> {
+                            if (deleted) cacheUpdate.run();
+                            onRemoved.accept(deleted);
+                        })));
     }
 
     void move(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Consumer<@NotNull Boolean> onFinished) {
