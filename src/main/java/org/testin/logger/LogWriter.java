@@ -129,8 +129,12 @@ public final class LogWriter implements Disposable {
         }
     }
 
+    public boolean writes(final @NotNull Level level) {
+        return isRunning && currentLogLevel != Level.DISABLED && level.priority >= currentLogLevel.priority;
+    }
+
     public void log(final @NotNull Level level, final @NotNull String callerClass, final @NotNull String message) {
-        if (!isRunning || currentLogLevel == Level.DISABLED || level.priority < currentLogLevel.priority) return;
+        if (!writes(level)) return;
 
         final @NotNull String formattedMessage = "[" + LocalDateTime.now().format(formatter) + "] " + "[" + level.paddedName + "] " + "[" + callerClass + "] " + message;
 

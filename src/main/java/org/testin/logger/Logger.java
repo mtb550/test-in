@@ -32,28 +32,32 @@ public final class Logger {
     }
 
     public static void trace(final @NotNull String message) {
-        log(Level.TRACE, WALKER.getCallerClass().getSimpleName(), message);
+        log(Level.TRACE, message);
     }
 
     public static void debug(final @NotNull String message) {
-        log(Level.DEBUG, WALKER.getCallerClass().getSimpleName(), message);
+        log(Level.DEBUG, message);
     }
 
     public static void info(final @NotNull String message) {
-        log(Level.INFO, WALKER.getCallerClass().getSimpleName(), message);
+        log(Level.INFO, message);
     }
 
     public static void warn(final @NotNull String message) {
-        log(Level.WARN, WALKER.getCallerClass().getSimpleName(), message);
+        log(Level.WARN, message);
     }
 
     public static void error(final @NotNull String message) {
-        log(Level.ERROR, WALKER.getCallerClass().getSimpleName(), message);
+        log(Level.ERROR, message);
     }
 
-    private static void log(final @NotNull Level level, final @NotNull String callerClass, final @NotNull String message) {
-        getService().ifPresentOrElse(
-                service -> service.log(level, callerClass, message),
+    private static void log(final @NotNull Level level, final @NotNull String message) {
+        final @NotNull Optional<LogWriter> service = getService();
+        if (!service.map(writer -> writer.writes(level)).orElse(true)) return;
+
+        final @NotNull String callerClass = WALKER.walk(frames -> frames.skip(2).findFirst()).orElseThrow().getDeclaringClass().getSimpleName();
+        service.ifPresentOrElse(
+                writer -> writer.log(level, callerClass, message),
                 () -> System.out.println("[" + level.paddedName + "] [" + callerClass + "] " + message));
     }
 
