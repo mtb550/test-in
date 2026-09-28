@@ -105,6 +105,7 @@ final class MarkerFiles {
 
     void touched(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Marker marker) {
         marker.touch(tester());
+        if (Services.getInstance(p, TestDataFiles.class).alreadyHolds(p, dirPath.resolve(markerFileName), marker)) return;
 
         write(dirPath, markerFileName, marker);
     }
