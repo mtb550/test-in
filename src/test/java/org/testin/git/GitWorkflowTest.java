@@ -186,8 +186,7 @@ public class GitWorkflowTest {
     }
 
     private List<PendingChange> review() {
-        final List<String> status = mustGit(work, "status", "--porcelain", "-uall")
-                .lines().filter(line -> !line.isBlank()).toList();
+        final List<String> status = GitRefs.records(mustGit(work, "status", "--porcelain", "-z", "-uall"));
 
         return GitDiffProcessor.toDiffs(status, work, RealMapper.build(),
                 path -> git(work, "show", "HEAD:" + path).orElse(""),
@@ -379,9 +378,12 @@ public class GitWorkflowTest {
             assertTrue(git(work, "pull", "--rebase", "--autostash", "origin", "main").isEmpty(),
                     "the pull is expected to stop on the conflict");
 
-            final List<String> conflicting = GitRefs.unmergedPaths(
-                    mustGit(work, "status", "--porcelain", "-uall").lines().filter(line -> !line.isBlank()).toList());
+            final List<String> conflicting = GitRefs.records(mustGit(work, "diff", "--name-only", "--diff-filter=U", "-z"));
             assertEquals(conflicting, List.of(relativePath));
+
+            final Path gitDir = Path.of(mustGit(work, "rev-parse", "--absolute-git-dir").trim());
+            assertTrue(Files.isDirectory(gitDir.resolve("rebase-merge")) || Files.isDirectory(gitDir.resolve("rebase-apply")),
+                    "the stopped rebase is found under the directory Git names");
 
             final String base = mustGit(work, "show", ":1:" + relativePath);
             final String remote = mustGit(work, "show", ":2:" + relativePath);
@@ -483,21 +485,45 @@ public class GitWorkflowTest {
 
     @Test
     public void anEmptyRemoteNamesNoHeadBranch() {
-        final String remoteInfo = mustGit(work, "remote", "show", "origin");
-
-        assertTrue(remoteInfo.contains("HEAD branch:"), "git reports a HEAD branch line: " + remoteInfo);
-        assertEquals(GitRefs.parseHeadBranch(remoteInfo), "", "an empty remote names no branch, so the push falls back to the local one");
+        assertEquals(mustGit(work, "for-each-ref", GitRepositoryService.REMOTE_HEAD_BRANCH, "refs/remotes/origin/HEAD").trim(), "",
+                "an empty remote names no branch, so the push falls back to the local one");
     }
 
     @Test
-    public void gitReportsNewTestCasesAsUntrackedWithQuotedPaths() {
+    public void aCloneNamesItsRemotesDefaultBranchWithoutAskingTheServer() {
+        mustGit(work, "commit", "--allow-empty", "-m", "root");
+        mustGit(work, "push", "-u", "origin", "main");
+
+        final Path colleague = cloneAsColleague();
+        mustGit(colleague, "branch", "feature/login");
+
+        assertEquals(mustGit(colleague, "for-each-ref", GitRepositoryService.REMOTE_HEAD_BRANCH, "refs/remotes/origin/HEAD").trim(), "main");
+        assertEquals(mustGit(colleague, "for-each-ref", GitRepositoryService.BRANCH_NAMES, "refs/heads", "refs/remotes").lines()
+                        .filter(name -> !name.isBlank()).sorted().toList(),
+                List.of("feature/login", "main", "origin/main"),
+                "the remote's HEAD is a pointer, not a branch to offer");
+    }
+
+    @Test
+    public void aLinkedWorktreeHasItsOwnGitDirectory() {
+        mustGit(work, "commit", "--allow-empty", "-m", "root");
+        final Path linked = remote.getParent().resolve("linked");
+        mustGit(work, "worktree", "add", "-b", "side", linked.toString());
+
+        assertTrue(Files.isRegularFile(linked.resolve(".git")), "a linked worktree's .git is a file, not a folder");
+        assertTrue(Files.isDirectory(Path.of(mustGit(linked, "rev-parse", "--absolute-git-dir").trim())),
+                "Git still names the directory its rebase state is kept in");
+    }
+
+    @Test
+    public void gitReportsNewTestCasesAsUntrackedWithTheirPathsAsWritten() {
         writeTestProject();
 
-        final String status = mustGit(work, "status", "--porcelain", "-uall");
+        final List<String> status = GitRefs.records(mustGit(work, "status", "--porcelain", "-z", "-uall"));
 
-        assertTrue(status.contains("?? \"Test Cases/login flow/"),
-                "a path with a space comes back quoted: " + status);
-        assertEquals(GitRefs.parseStatus(status.lines().toList()).stream()
+        assertTrue(status.stream().anyMatch(record -> record.startsWith("?? Test Cases/login flow/")),
+                "a path with a space comes back unquoted: " + status);
+        assertEquals(GitRefs.parseStatus(status).stream()
                 .filter(entry -> entry.path().endsWith(".tc")).count(), 2);
     }
 }

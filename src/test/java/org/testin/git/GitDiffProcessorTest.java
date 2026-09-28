@@ -85,7 +85,7 @@ public class GitDiffProcessorTest {
     public void aNewlyWrittenTestCaseIsInTheReview() {
         onDisk("Test Cases/login/case.tc", testCase("a brand new case"));
 
-        final List<PendingChange> review = review("?? \"Test Cases/login/case.tc\"");
+        final List<PendingChange> review = review("?? Test Cases/login/case.tc");
 
         assertEquals(review.size(), 1);
         assertEquals(review.getFirst().type(), DiffType.ADDED);
@@ -101,7 +101,7 @@ public class GitDiffProcessorTest {
         committed.put("Test Cases/login/case.tc", RealMapper.build().writeValueAsString(before));
         onDisk("Test Cases/login/case.tc", after);
 
-        final List<PendingChange> review = review(" M \"Test Cases/login/case.tc\"");
+        final List<PendingChange> review = review(" M Test Cases/login/case.tc");
 
         assertEquals(review.size(), 1);
         assertEquals(review.getFirst().type(), DiffType.MODIFIED);
@@ -114,7 +114,7 @@ public class GitDiffProcessorTest {
         final TestCaseDto removed = testCase("a case that is going away");
         committed.put("Test Cases/login/case.tc", RealMapper.build().writeValueAsString(removed));
 
-        final List<PendingChange> review = review(" D \"Test Cases/login/case.tc\"");
+        final List<PendingChange> review = review(" D Test Cases/login/case.tc");
 
         assertEquals(review.size(), 1);
         assertEquals(review.getFirst().type(), DiffType.DELETED);
@@ -130,8 +130,8 @@ public class GitDiffProcessorTest {
 
             final List<PendingChange> review = review(
                     "?? .tp",
-                    "?? \"Test Cases/login/.ts\"",
-                    "?? \"Test Cases/login/case.tc\"");
+                    "?? Test Cases/login/.ts",
+                    "?? Test Cases/login/case.tc");
 
             assertEquals(review.size(), 3, "every changed file is a row - what is not listed cannot be committed");
             assertEquals(review.stream().filter(change -> change.subject() == ChangeSubject.MARKER).count(), 2);
@@ -148,7 +148,7 @@ public class GitDiffProcessorTest {
         committed.put("Test Cases/login/case.tc", RealMapper.build().writeValueAsString(unchanged));
         onDisk("Test Cases/login/case.tc", unchanged);
 
-        final List<PendingChange> review = review(" M \"Test Cases/login/case.tc\"");
+        final List<PendingChange> review = review(" M Test Cases/login/case.tc");
 
         assertEquals(review.size(), 1);
         assertEquals(review.getFirst().fieldChanges().getFirst().changeType(), ChangeType.CHANGE_FILE);
@@ -163,10 +163,10 @@ public class GitDiffProcessorTest {
             Files.writeString(root.resolve("Test Cases/login flow/.ts"), "{}", StandardCharsets.UTF_8);
 
             final List<PendingChange> review = review(
-                    "?? \"Test Cases/login flow/.ts\"",
-                    "?? \"Test Cases/login flow/case-1.tc\"",
-                    "?? \"Test Cases/login flow/case-2.tc\"",
-                    "?? \"Test Cases/login flow/case-3.tc\"");
+                    "?? Test Cases/login flow/.ts",
+                    "?? Test Cases/login flow/case-1.tc",
+                    "?? Test Cases/login flow/case-2.tc",
+                    "?? Test Cases/login flow/case-3.tc");
 
             assertEquals(review.size(), 4, "three cases and the marker that makes the directory a test set");
             assertTrue(review.stream().allMatch(diff -> diff.type() == DiffType.ADDED));
@@ -180,7 +180,7 @@ public class GitDiffProcessorTest {
     public void aQuotedPathStillFindsItsFile() {
         onDisk("Test Cases/login flow/a case.tc", testCase("quoted all the way down"));
 
-        final List<PendingChange> review = review("?? \"Test Cases/login flow/a case.tc\"");
+        final List<PendingChange> review = review("?? Test Cases/login flow/a case.tc");
 
         assertEquals(review.size(), 1);
         assertEquals(review.getFirst().relativeFilePath(), Path.of("Test Cases/login flow/a case.tc"));
@@ -192,8 +192,8 @@ public class GitDiffProcessorTest {
         onDisk("Test Cases/login/case.tc", testCase("still here"));
 
         final List<PendingChange> review = review(
-                "?? \"Test Cases/login/gone.tc\"",
-                "?? \"Test Cases/login/case.tc\"");
+                "?? Test Cases/login/gone.tc",
+                "?? Test Cases/login/case.tc");
 
         assertEquals(review.size(), 1, "the file that vanished is not a change; the one that is there still is");
         assertEquals(review.getFirst().name(), "still here");

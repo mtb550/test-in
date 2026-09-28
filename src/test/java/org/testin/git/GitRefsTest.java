@@ -64,31 +64,6 @@ public class GitRefsTest {
     }
 
     @Test
-    public void readsTheHeadBranchOutOfRemoteShowOutput() {
-        final String remoteShow = """
-                * remote origin
-                  Fetch URL: https://github.com/mtb550/test-in.git
-                  Push  URL: https://github.com/mtb550/test-in.git
-                  HEAD branch: main
-                  Remote branches:
-                    main    tracked
-                    develop tracked
-                """;
-
-        assertEquals(GitRefs.parseHeadBranch(remoteShow), "main");
-    }
-
-    @Test
-    public void headBranchIsEmptyWhenTheRemoteDoesNotReportOne() {
-        final String remoteShow = """
-                * remote origin
-                  Fetch URL: https://github.com/mtb550/test-in.git
-                """;
-
-        assertEquals(GitRefs.parseHeadBranch(remoteShow), "");
-    }
-
-    @Test
     public void originWinsWhateverOrderTheRemotesArrive() {
         assertEquals(GitRefs.chooseRemote(List.of("upstream", "origin", "fork")), "origin");
     }
@@ -171,10 +146,10 @@ public class GitRefsTest {
     public void everyNewTestCaseInANewTestSetIsReported() {
         final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of(
                 "?? .tp",
-                "?? \"Test Cases/.tcd\"",
-                "?? \"Test Cases/rp/.ts\"",
-                "?? \"Test Cases/rp/73ebd4d7-4a2c-4813-92d5-30aebe3a3670.json\"",
-                "?? \"Test Cases/rp/84e8bf04-815d-4a48-81e2-3985b1e25c75.json\""));
+                "?? Test Cases/.tcd",
+                "?? Test Cases/rp/.ts",
+                "?? Test Cases/rp/73ebd4d7-4a2c-4813-92d5-30aebe3a3670.json",
+                "?? Test Cases/rp/84e8bf04-815d-4a48-81e2-3985b1e25c75.json"));
 
         assertEquals(entries.size(), 5);
         assertEquals(entries.stream().filter(e -> e.path().endsWith(".json")).count(), 2);
@@ -202,7 +177,7 @@ public class GitRefsTest {
     @Test
     public void aRenameIsBothTheDeletionAndTheAddition() {
         final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(
-                List.of("R  \"Test Cases/old/a.json\" -> \"Test Cases/new/a.json\""));
+                List.of("R  Test Cases/new/a.json", "Test Cases/old/a.json"));
 
         assertEquals(entries.size(), 2);
 
@@ -215,15 +190,16 @@ public class GitRefsTest {
 
     @Test
     public void aCopyIsOnlyTheNewFile() {
-        final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of("C  a.json -> b.json"));
+        final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of("C  b.json", "a.json", " M c.json"));
 
-        assertEquals(entries.size(), 1);
+        assertEquals(entries.size(), 2);
         assertEquals(entries.getFirst().path(), "b.json");
+        assertEquals(entries.get(1).path(), "c.json", "the copy's source is not read as the next change");
     }
 
     @Test
     public void aRenameThenDeletedIsTwoDeletions() {
-        final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of("RD a.json -> b.json"));
+        final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of("RD b.json", "a.json"));
 
         assertEquals(entries.size(), 2);
         assertEquals(entries.getFirst().type(), DiffType.DELETED);
@@ -231,17 +207,15 @@ public class GitRefsTest {
     }
 
     @Test
-    public void aQuotedPathLosesItsQuotes() {
-        assertEquals(GitRefs.parseStatus(List.of("?? \"Test Cases/login flow/a.json\"")).getFirst().path(),
-                "Test Cases/login flow/a.json");
+    public void aPathIsTakenAsGitWroteItWithNoQuotingToUndo() {
+        assertEquals(GitRefs.parseStatus(List.of("?? Test Cases/\"quoted\" تسجيل/a.json")).getFirst().path(),
+                "Test Cases/\"quoted\" تسجيل/a.json");
     }
 
     @Test
-    public void aNonAsciiPathIsDecodedBackToItsName() {
-        final String escaped = "?? \"Test Cases/\\330\\252\\330\\263\\330\\254\\331\\212\\331\\204/a.json\"";
-
-        assertEquals(GitRefs.parseStatus(List.of(escaped)).getFirst().path(),
-                "Test Cases/تسجيل/a.json");
+    public void nulSeparatedOutputSplitsIntoRecords() {
+        assertEquals(GitRefs.records("?? a b.json\0R  new.json\0old.json\0"), List.of("?? a b.json", "R  new.json", "old.json"));
+        assertEquals(GitRefs.records(""), List.of());
     }
 
     @Test
@@ -256,51 +230,6 @@ public class GitRefsTest {
     @Test
     public void aFileAtTheRepositoryRootHasOnlyTheRoot() {
         assertEquals(GitRefs.ancestorDirectories(List.of("a.json")), Set.of(""));
-    }
-
-    @Test
-    public void aRemoteWithNoBranchesNamesNoHeadBranch() {
-        final String output = """
-                * remote origin
-                  Fetch URL: https://github.com/mtb550/testin-sync-check.git
-                  Push  URL: https://github.com/mtb550/testin-sync-check.git
-                  HEAD branch: (unknown)
-                """;
-
-        assertEquals(GitRefs.parseHeadBranch(output), "", "an empty remote has no branch to name");
-    }
-
-    @Test
-    public void theBranchListDropsTheMarkerAndTheSymbolicRef() {
-        assertEquals(GitRefs.parseBranches(List.of(
-                        "* main",
-                        "  remotes/origin/HEAD -> origin/main",
-                        "  remotes/origin/main")),
-                List.of("main", "origin/main"));
-    }
-
-    @Test
-    public void aRepositoryWithOneBranchListsOne() {
-        assertEquals(GitRefs.parseBranches(List.of("* master")), List.of("master"));
-    }
-
-    @Test
-    public void anEmptyBranchListIsNotAnError() {
-        assertEquals(GitRefs.parseBranches(List.of()), List.of());
-        assertEquals(GitRefs.parseBranches(List.of("", "   ")), List.of());
-    }
-
-    @Test
-    public void everyUnmergedCodeCountsAsAConflict() {
-        for (final String code : List.of("DD", "AU", "UD", "UA", "DU", "AA", "UU")) {
-            assertTrue(GitRefs.hasUnmergedPaths(List.of(code + " Test Cases/a.json")), code + " is a conflict");
-        }
-    }
-
-    @Test
-    public void ordinaryChangesAreNotConflicts() {
-        assertFalse(GitRefs.hasUnmergedPaths(List.of(" M a.json", "?? b.json", "A  c.json", "D  d.json")));
-        assertFalse(GitRefs.hasUnmergedPaths(List.of()));
     }
 
     @Test

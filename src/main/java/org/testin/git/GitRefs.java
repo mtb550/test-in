@@ -22,87 +22,49 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
 import org.testin.util.Bundle;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GitRefs {
-    private static final @NotNull Pattern HEAD_BRANCH = Pattern.compile("(?m)^\\s*HEAD branch:\\s*(\\S+)\\s*$");
-
-    private static final @NotNull String REMOTES_PREFIX = "remotes/";
-
-    private static final @NotNull String NO_HEAD_BRANCH = "(unknown)";
-
-    private static final @NotNull Set<String> UNMERGED =
-            Set.of("DD", "AU", "UD", "UA", "DU", "AA", "UU");
     // UC-TREE-PANEL-001, Rule-TREE-PANEL-117
     private static final @NotNull Pattern CLONE_CHARACTERS = Pattern.compile("^[A-Za-z0-9._~:/?#@%+=-]+$");
     private static final @NotNull Pattern REMOTE_SCHEME = Pattern.compile("^(https?|ssh|git)://");
 
     // UC-SHARE-010, Rule-SHARE-048
-    public static @NotNull List<StatusEntry> parseStatus(final @NotNull List<String> porcelainLines) {
+    public static @NotNull List<StatusEntry> parseStatus(final @NotNull List<String> statusRecords) {
         final @NotNull List<StatusEntry> entries = new ArrayList<>();
+        final @NotNull Iterator<String> records = statusRecords.iterator();
 
-        for (final String line : porcelainLines) {
-            if (line.length() < 4) continue;
+        while (records.hasNext()) {
+            final @NotNull String record = records.next();
+            if (record.length() < 4) continue;
 
-            final @NotNull String code = line.substring(0, 2);
-            final @NotNull String rawPath = line.substring(3);
+            final @NotNull String code = record.substring(0, 2);
+            final boolean moved = code.indexOf('R') >= 0 || code.indexOf('C') >= 0;
+            final @NotNull String from = moved && records.hasNext() ? records.next() : "";
             if (code.charAt(0) == '!') continue;
 
-            final int renameArrow = rawPath.indexOf(" -> ");
-            final @NotNull String path = unquote(renameArrow < 0 ? rawPath : rawPath.substring(renameArrow + 4));
-            if (path.isEmpty()) continue;
+            if (code.indexOf('R') >= 0 && !from.isEmpty()) entries.add(new StatusEntry(DiffType.DELETED, slashed(from)));
 
-            if (renameArrow >= 0 && code.indexOf('R') >= 0) {
-                final @NotNull String from = unquote(rawPath.substring(0, renameArrow));
-                if (!from.isEmpty()) entries.add(new StatusEntry(DiffType.DELETED, slashed(from)));
-            }
-
-            entries.add(new StatusEntry(typeOf(code), slashed(path)));
+            entries.add(new StatusEntry(typeOf(code), slashed(record.substring(3))));
         }
         return entries;
     }
 
-    public static @NotNull List<String> parseBranches(final @NotNull List<String> branchOutput) {
-        return branchOutput.stream()
-                .map(line -> line.startsWith("*") ? line.substring(1) : line)
-                .map(String::trim)
-                .filter(line -> !line.isEmpty())
-                .filter(line -> !line.contains(" -> "))
-                .map(line -> line.startsWith(REMOTES_PREFIX) ? line.substring(REMOTES_PREFIX.length()) : line)
-                .distinct()
-                .sorted()
-                .toList();
-    }
-
-    public static boolean hasUnmergedPaths(final @NotNull List<String> porcelainLines) {
-        return porcelainLines.stream()
-                .filter(line -> line.length() >= 2)
-                .map(line -> line.substring(0, 2))
-                .anyMatch(UNMERGED::contains);
+    static @NotNull List<String> records(final @NotNull String nulSeparated) {
+        return Arrays.stream(nulSeparated.split("\0")).filter(record -> !record.isEmpty()).toList();
     }
 
     private static @NotNull String slashed(final @NotNull String path) {
         return path.replace('\\', '/');
-    }
-
-    public static @NotNull List<String> unmergedPaths(final @NotNull List<String> porcelainLines) {
-        return porcelainLines.stream()
-                .filter(line -> line.length() >= 4)
-                .filter(line -> UNMERGED.contains(line.substring(0, 2)))
-                .map(line -> unquote(line.substring(3)))
-                .filter(path -> !path.isEmpty())
-                .map(GitRefs::slashed)
-                .toList();
     }
 
     // UC-SHARE-017
@@ -127,46 +89,6 @@ public final class GitRefs {
         if (code.indexOf('R') >= 0) return DiffType.ADDED;
 
         return DiffType.MODIFIED;
-    }
-
-    private static @NotNull String unquote(final @NotNull String rawPath) {
-        if (rawPath.length() < 2 || rawPath.charAt(0) != '"' || !rawPath.endsWith("\"")) return rawPath;
-
-        final @NotNull String body = rawPath.substring(1, rawPath.length() - 1);
-        final @NotNull ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-
-        for (int i = 0; i < body.length(); i++) {
-            final char c = body.charAt(i);
-            if (c != '\\' || i + 1 >= body.length()) {
-                bytes.writeBytes(String.valueOf(c).getBytes(StandardCharsets.UTF_8));
-                continue;
-            }
-
-            final char escaped = body.charAt(++i);
-            switch (escaped) {
-                case 'n' -> bytes.write('\n');
-                case 't' -> bytes.write('\t');
-                case 'r' -> bytes.write('\r');
-                case '"', '\\' -> bytes.write(escaped);
-                default -> {
-                    if (escaped >= '0' && escaped <= '7' && i + 2 < body.length()) {
-                        bytes.write(Integer.parseInt(body.substring(i, i + 3), 8));
-                        i += 2;
-                    } else {
-                        bytes.write(escaped);
-                    }
-                }
-            }
-        }
-        return bytes.toString(StandardCharsets.UTF_8);
-    }
-
-    public static @NotNull String parseHeadBranch(final @NotNull String remoteShowOutput) {
-        final @NotNull Matcher matcher = HEAD_BRANCH.matcher(remoteShowOutput);
-        if (!matcher.find()) return "";
-
-        final @NotNull String branch = matcher.group(1);
-        return NO_HEAD_BRANCH.equals(branch) ? "" : branch;
     }
 
     // UC-SHARE-016, Rule-SHARE-122

@@ -33,6 +33,10 @@ import java.util.OptionalInt;
 
 @AllArgsConstructor
 public final class GitRepositoryService {
+    static final @NotNull String BRANCH_NAMES = "--format=%(if)%(symref)%(then)%(else)%(refname:short)%(end)";
+
+    static final @NotNull String REMOTE_HEAD_BRANCH = "--format=%(symref:lstrip=3)";
+
     private final @NotNull Project p;
 
     // UC-SHARE-009
@@ -67,15 +71,11 @@ public final class GitRepositoryService {
     }
 
     public @NotNull String getDefaultBranch(final @NotNull Path path) {
-        final @NotNull String currentBranch = getCurrentBranch(path);
         final @NotNull String remoteName = getRemoteName(path);
-        if (remoteName.isEmpty()) return currentBranch;
+        final @NotNull String headBranch = remoteName.isEmpty() ? ""
+                : run(path, GitCommand.FOR_EACH_REF, REMOTE_HEAD_BRANCH, "refs/remotes/" + remoteName + "/HEAD").orElse("").trim();
 
-        final @NotNull String headBranch = runRemote(path, getRemoteUrl(path, remoteName), GitCommand.REMOTE, "show", remoteName)
-                .map(GitRefs::parseHeadBranch)
-                .orElse("");
-
-        return headBranch.isEmpty() ? currentBranch : headBranch;
+        return headBranch.isEmpty() ? getCurrentBranch(path) : headBranch;
     }
 
     // UC-SHARE-016, Rule-SHARE-068
@@ -86,10 +86,9 @@ public final class GitRepositoryService {
     }
 
     public int rebaseStep(final @NotNull Path path) {
-        final @NotNull Path gitDir = path.resolve(".git");
-
-        return readStep(gitDir.resolve("rebase-merge").resolve("msgnum"))
-                + readStep(gitDir.resolve("rebase-apply").resolve("next"));
+        return gitDirectory(path)
+                .map(gitDir -> readStep(gitDir.resolve("rebase-merge").resolve("msgnum")) + readStep(gitDir.resolve("rebase-apply").resolve("next")))
+                .orElse(0);
     }
 
     private int readStep(final @NotNull Path counter) {
@@ -110,7 +109,7 @@ public final class GitRepositoryService {
 
     // UC-TREE-PANEL-026
     public @NotNull List<String> getAvailableBranches(final @NotNull Path path) {
-        return GitRefs.parseBranches(GitCommandRunner.execute(p, path, GitCommand.BRANCH, "-a").lines().toList());
+        return branchNames(GitCommandRunner.execute(p, path, GitCommand.FOR_EACH_REF, BRANCH_NAMES, "refs/heads", "refs/remotes"));
     }
 
     public @NotNull String getRemoteUrl(final @NotNull Path path, final @NotNull String remoteName) {
@@ -145,13 +144,16 @@ public final class GitRepositoryService {
 
     // UC-SHARE-014, Rule-SHARE-063
     public @NotNull List<String> getLocalBranches(final @NotNull Path path) {
-        return GitRefs.parseBranches(run(path, GitCommand.BRANCH).orElse("").lines().toList());
+        return branchNames(run(path, GitCommand.FOR_EACH_REF, BRANCH_NAMES, "refs/heads").orElse(""));
+    }
+
+    private static @NotNull List<String> branchNames(final @NotNull String refNames) {
+        return refNames.lines().filter(name -> !name.isBlank()).distinct().sorted().toList();
     }
 
     // UC-SHARE-010, Rule-SHARE-044
     public @NotNull List<String> status(final @NotNull Path path) {
-        return run(path, GitCommand.STATUS, "--porcelain", "-uall").orElse("")
-                .lines().filter(line -> !line.isBlank()).toList();
+        return GitRefs.records(run(path, GitCommand.STATUS, "--porcelain", "-z", "-uall").orElse(""));
     }
 
     public @NotNull String showAtHead(final @NotNull Path path, final @NotNull String relativePath) {
@@ -159,9 +161,7 @@ public final class GitRepositoryService {
     }
 
     public boolean hasConflicts(final @NotNull Path path) {
-        if (isRebaseInProgress(path)) return true;
-
-        return GitRefs.hasUnmergedPaths(run(path, GitCommand.STATUS, "--porcelain").orElse("").lines().toList());
+        return isRebaseInProgress(path) || !conflictingPaths(path).isEmpty();
     }
 
     public @NotNull String stageContent(final @NotNull Path path, final @NotNull String relativePath, final int stage) {
@@ -173,7 +173,7 @@ public final class GitRepositoryService {
     }
 
     public @NotNull List<String> conflictingPaths(final @NotNull Path path) {
-        return GitRefs.unmergedPaths(status(path));
+        return GitRefs.records(run(path, GitCommand.DIFF, "--name-only", "--diff-filter=U", "-z").orElse(""));
     }
 
     // UC-SHARE-015, Rule-SHARE-066
@@ -190,8 +190,13 @@ public final class GitRepositoryService {
     }
 
     private boolean isRebaseInProgress(final @NotNull Path path) {
-        final @NotNull Path gitDir = path.resolve(".git");
-        return Files.isDirectory(gitDir.resolve("rebase-merge")) || Files.isDirectory(gitDir.resolve("rebase-apply"));
+        return gitDirectory(path)
+                .filter(gitDir -> Files.isDirectory(gitDir.resolve("rebase-merge")) || Files.isDirectory(gitDir.resolve("rebase-apply")))
+                .isPresent();
+    }
+
+    private @NotNull Optional<Path> gitDirectory(final @NotNull Path path) {
+        return run(path, GitCommand.REV_PARSE, "--absolute-git-dir").map(String::trim).filter(gitDir -> !gitDir.isEmpty()).map(Path::of);
     }
 
     public boolean couldNotAbortRebase(final @NotNull Path path) {
@@ -203,16 +208,8 @@ public final class GitRepositoryService {
     }
 
     private @NotNull Optional<String> run(final @NotNull Path path, final @NotNull GitCommand command, final @NotNull String... parameters) {
-        return execute(path, "", command, parameters);
-    }
-
-    private @NotNull Optional<String> runRemote(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull GitCommand command, final @NotNull String... parameters) {
-        return execute(path, remoteUrl, command, parameters);
-    }
-
-    private @NotNull Optional<String> execute(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull GitCommand command, final @NotNull String... parameters) {
         try {
-            return Optional.of(GitCommandRunner.executeRemote(p, path, remoteUrl, command, parameters));
+            return Optional.of(GitCommandRunner.execute(p, path, command, parameters));
         } catch (final RuntimeException ex) {
             Logger.debug("git " + command.name() + " " + GitSafeText.withoutCredentials(String.join(" ", parameters))
                     + " failed in " + path + ": " + ex.getMessage());
