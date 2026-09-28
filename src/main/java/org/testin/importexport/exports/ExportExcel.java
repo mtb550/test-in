@@ -20,10 +20,10 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.WorkbookUtil;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -60,7 +60,7 @@ public class ExportExcel {
 
     // UC-SHARE-002, Rule-SHARE-012
     public void exportToFile(final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
-        try (Workbook workbook = new XSSFWorkbook()) {
+        try (SXSSFWorkbook workbook = new SXSSFWorkbook()) {
             final @NotNull CellStyle headerStyle = workbook.createCellStyle();
             final @NotNull Font headerFont = workbook.createFont();
             headerFont.setFontName(Fonts.Report.FAMILY);
@@ -68,7 +68,8 @@ public class ExportExcel {
             headerStyle.setFont(headerFont);
 
             for (final Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
-                final @NotNull Sheet sheet = workbook.createSheet(uniqueSheetName(workbook, entry.getKey()));
+                final @NotNull SXSSFSheet sheet = workbook.createSheet(uniqueSheetName(workbook, entry.getKey()));
+                sheet.trackAllColumnsForAutoSizing();
 
                 final @NotNull Row headerRow = sheet.createRow(0);
                 for (int i = 0; i < TestEditorAttributes.all(Can.EXPORT).size(); i++) {
