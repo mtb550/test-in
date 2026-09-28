@@ -18,6 +18,7 @@ package org.testin.explorer.tree;
 
 import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
+import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.tree.LeafState;
 import org.jetbrains.annotations.NotNull;
@@ -68,6 +69,8 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
                 children.add(child(child));
             }
             return children;
+        } catch (final ProcessCanceledException cancelled) {
+            throw cancelled;
         } catch (final Exception ex) {
             final @NotNull String message = "Could not load '" + directory.getName() + "'";
             Logger.error(message + ": " + ex.getMessage());

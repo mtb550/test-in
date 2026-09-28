@@ -16,7 +16,6 @@
 
 package org.testin.explorer.tree;
 
-import com.intellij.ide.util.treeView.TreeState;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -169,7 +168,6 @@ public class TreePanelTree implements Disposable {
                 final boolean projectChanged = !projectPath.isEmpty() && !projectPath.equals(expandedProjectPath);
                 expandedProjectPath = projectPath;
 
-                final @NotNull TreeState shape = TreeState.createOn(mainTree);
                 final long started = System.nanoTime();
 
                 structureModel.invalidateAsync().thenRun(() -> {
@@ -180,7 +178,6 @@ public class TreePanelTree implements Disposable {
                         if (disposed) return;
 
                         if (projectChanged) TreeUtil.promiseExpandAll(mainTree);
-                        else shape.applyTo(mainTree);
 
                         consumePendingReveal();
                         Logger.debug("Tree refreshed and expanded in " + millisSince(started) + " ms");
