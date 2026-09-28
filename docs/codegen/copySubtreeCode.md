@@ -57,7 +57,9 @@ matches the one in the Testin tree.
 ## What Testin refuses
 
 Every refusal of [UC-CODEGEN-001](getClassForTestSet.md) and
-[UC-CODEGEN-002](getMethodForTestCase.md), once for each node it applies to.
+[UC-CODEGEN-002](getMethodForTestCase.md), once for each test set it applies
+to. A test set's methods are written together, so the test cases in it that get
+no method are named in one message, not one message each.
 
 **A node with no code to generate stays silent.** The two fixed folders, test run
 packages and test runs write no code, and that is not reported.

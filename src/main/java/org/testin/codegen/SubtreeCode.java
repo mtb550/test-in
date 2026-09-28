@@ -23,7 +23,6 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -42,9 +41,7 @@ public final class SubtreeCode {
         Logger.info("Generating code for " + dir.getName());
         JavaCode.of(dir.getType()).getCreated().execute(p, dir);
 
-        for (final TestCaseDto tc : indexer.getTestCasesForTestSet(dir.getPath())) {
-            GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
-        }
+        GenType.CREATE_TEST_CASE.executeAllNow(p, indexer.getTestCasesForTestSet(dir.getPath()));
 
         for (final DirectoryDto child : indexer.getChildren(dir.getPath())) {
             walk(p, child);
