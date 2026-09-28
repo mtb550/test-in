@@ -38,6 +38,7 @@ import org.testin.util.Bundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
@@ -47,6 +48,8 @@ import java.util.function.Supplier;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ListPanelBuilder {
+    private static final int RESIZE_SETTLES_MILLIS = 100;
+
     public static @NotNull ListView build(final @NotNull Project p, final @NotNull Disposable fontSyncDisposable, final @NotNull TestinEditor editor) {
         final @NotNull CollectionListModel<TestCaseDto> model = new CollectionListModel<>(new ArrayList<>());
 
@@ -61,6 +64,9 @@ public final class ListPanelBuilder {
 
         FontSync.syncWithNativeEditor(p, list, fontSyncDisposable, _ -> list.updateUI());
 
+        final @NotNull Timer remeasure = new Timer(RESIZE_SETTLES_MILLIS, _ -> model.allContentsChanged());
+        remeasure.setRepeats(false);
+
         list.addComponentListener(new ComponentAdapter() {
             private int lastWidth = -1;
 
@@ -69,7 +75,7 @@ public final class ListPanelBuilder {
                 if (list.getWidth() == lastWidth) return;
 
                 lastWidth = list.getWidth();
-                model.allContentsChanged();
+                remeasure.restart();
             }
         });
 

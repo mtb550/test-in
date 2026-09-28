@@ -56,6 +56,7 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -65,6 +66,8 @@ import java.util.Optional;
 import java.util.function.IntFunction;
 
 final class BulkJsonEditors implements DialogComponent {
+    private static final int TYPING_SETTLES_MILLIS = 150;
+
     private final @NotNull Project p;
 
     private final @NotNull Document leftDoc;
@@ -246,10 +249,13 @@ final class BulkJsonEditors implements DialogComponent {
 
     // UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-043
     private void installDiffHighlighting() {
+        final @NotNull Timer redraw = new Timer(TYPING_SETTLES_MILLIS, _ -> refreshDiffHighlights());
+        redraw.setRepeats(false);
+
         rightDoc.addDocumentListener(new DocumentListener() {
             @Override
             public void documentChanged(final @NotNull DocumentEvent event) {
-                ApplicationManager.getApplication().invokeLater(BulkJsonEditors.this::refreshDiffHighlights);
+                redraw.restart();
             }
         }, docListenerDisposable);
     }

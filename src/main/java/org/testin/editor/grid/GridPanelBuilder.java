@@ -121,6 +121,7 @@ public class GridPanelBuilder {
                 c.weighty = 1.0;
                 c.fill = GridBagConstraints.HORIZONTAL;
                 c.anchor = GridBagConstraints.WEST;
+                wrapper.add(textArea, c);
             }
 
             // Rule-EDITOR-PANEL-250
@@ -141,7 +142,6 @@ public class GridPanelBuilder {
 
                 final int width = table.getColumnModel().getColumn(column).getWidth();
                 textArea.setSize(new Dimension(width, Short.MAX_VALUE));
-                wrapper.add(textArea, c);
                 return wrapper;
             }
         };

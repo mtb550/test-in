@@ -121,6 +121,7 @@ public class CardMouseListener extends MouseAdapter {
     @Override
     public void mouseMoved(final MouseEvent e) {
         final int index = list.locationToIndex(e.getPoint());
+        final int before = editor.getHoveredIndex();
         final @NotNull Optional<CardHoverAction.Offered> currentAction = actionUnder(e, index);
 
         list.setCursor(Cursor.getPredefinedCursor(currentAction.isPresent() ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
@@ -141,17 +142,24 @@ public class CardMouseListener extends MouseAdapter {
             Tooltip.set(list, currentAction.map(CardHoverAction.Offered::hintText).orElse(""));
         }
 
-        if (needsRepaint)
-            list.repaint();
+        if (!needsRepaint) return;
+
+        repaintRow(before);
+        repaintRow(index);
+    }
+
+    private void repaintRow(final int row) {
+        if (row >= 0) Optional.ofNullable(list.getCellBounds(row, row)).ifPresent(list::repaint);
     }
 
     @Override
     public void mouseExited(final MouseEvent e) {
         if (editor.getHoveredIndex() != -1 || !editor.getHoveredIconAction().isEmpty()) {
+            final int before = editor.getHoveredIndex();
             editor.setHoveredIndex(-1);
             editor.setHoveredIconAction("");
             Tooltip.set(list, "");
-            list.repaint();
+            repaintRow(before);
         }
     }
 
