@@ -42,8 +42,10 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 // UC-CODEGEN-002, Rule-CODEGEN-077
 public class MoveTestMethod extends UpdateTestBase implements GenAction {
@@ -66,7 +68,10 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
 
         final @NotNull Runnable inCommand = () ->
                 WriteCommandAction.runWriteCommandAction(p, GenType.MOVE_TEST_CASE.getDescription(), null, () -> {
-                    moves.forEach(moved -> move(p, moved));
+                    final @NotNull Set<PsiClass> touched = new LinkedHashSet<>();
+                    moves.forEach(moved -> touched.addAll(move(p, moved)));
+                    touched.forEach(pc -> reformat(p, pc));
+
                     new UpdateTestOrder().executeAll(p, moves.stream().map(MovedTestCase::tc).toList());
                 });
 
@@ -74,19 +79,19 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
         else ApplicationManager.getApplication().invokeLater(inCommand);
     }
 
-    private void move(final @NotNull Project p, final @NotNull MovedTestCase moved) {
+    private @NotNull List<PsiClass> move(final @NotNull Project p, final @NotNull MovedTestCase moved) {
         final @NotNull TestCaseDto tc = moved.tc();
 
         final @NotNull Optional<PsiClass> from = GeneratedClass.find(p, Fqcn.ofClass(moved.from()));
         if (from.isEmpty()) {
             Logger.debug("Nothing to move for '" + tc.getDescription() + "': the test set it came from has no class");
-            return;
+            return List.of();
         }
 
         final @NotNull Optional<PsiMethod> method = GeneratedMethod.forTestCase(from.orElseThrow(), tc);
         if (method.isEmpty()) {
             Logger.debug("Nothing to move for '" + tc.getDescription() + "': no method with testName=" + tc.getId());
-            return;
+            return List.of();
         }
 
         final @NotNull List<String> destination = Fqcn.ofClass(tc.getParent());
@@ -98,20 +103,20 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
         if (into.isEmpty()) {
             Logger.warn("Left the method for '" + tc.getDescription() + "' where it was: "
                     + "the test set it moved into has no class to put it in");
-            return;
+            return List.of();
         }
 
         final @NotNull PsiClass target = into.orElseThrow();
 
         if (target.equals(from.orElseThrow())) {
             Logger.debug("The method for '" + tc.getDescription() + "' is already in the right class");
-            return;
+            return List.of();
         }
 
         if (GeneratedMethod.forTestCase(target, tc).isPresent()) {
             Logger.warn("Left the method for '" + tc.getDescription() + "' in " + from.orElseThrow().getQualifiedName()
                     + ": " + target.getQualifiedName() + " already has a method for this test case");
-            return;
+            return List.of();
         }
 
         addTestImport(p, target);
@@ -122,10 +127,8 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction {
         target.add(carried);
         method.orElseThrow().delete();
 
-        reformat(p, target);
-        reformat(p, from.orElseThrow());
-
         Logger.info("Moved test method " + carried.getName() + " into " + target.getName());
+        return List.of(target, from.orElseThrow());
     }
 
     private void addTestImport(final @NotNull Project p, final @NotNull PsiClass target) {
