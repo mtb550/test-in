@@ -85,6 +85,7 @@ work had it not been noticed immediately.
 | `./gradlew runIde`                           | It actually works                                                                                                          | Anything a tester can see — see below                                                                                                                                                |
 | `./gradlew inspect`                          | Every finding in the Inspected scope, and the display-string ratchet                                                       | Never by hand. CI runs it on every push, on every branch, and the run is where it is read                                                                                            |
 | `pwsh tools/inspect.ps1 -Quick`              | The rules that read the source as text, not what an IDE indexes                                                            | Every change, before you hand it over. Five seconds, no IDE                                                                                                                          |
+| `./gradlew pmdMain`                          | No production method is over the cognitive complexity or nesting limit                                                     | Every change. Part of `check` and of `build.yml`; fifteen seconds, and it does not wait for a compile                                                                                |
 | `git worktree add ../testin-<what> <branch>` | A second branch, checked out at once                                                                                       | Whenever two pieces of work run at the same time — see below                                                                                                                         |
 | `./gradlew verifyDistribution`               | No test classes and no compile-only dependencies reached the jar                                                           | Runs in CI; run it if you touched packaging                                                                                                                                          |
 | `pwsh tools/warnings.ps1`                    | Every warning from every source in one table, the gated ones first: inspections, Plugin Verifier, Qodana, compiler, Gradle | Whenever you want the whole picture. It prints to the console and names where each source's full list lives. It reads last results; `-Full` runs the slow ones, about twenty minutes |
@@ -150,6 +151,29 @@ suppression.
 Guarded blocks, caret gestures, tab colors, dialog layout, action registration
 and anything the platform calls back into are reached by **no** unit test. If
 your change touches one of those, it has not been tested until it has been run.
+
+### The complexity gate
+
+How hard a method is to read is measured, not argued over (#378). PMD scores
+every method in the three modules' production code with two rules, and
+`pmdMain` fails on either:
+
+| Rule                       | Limit                                                                                                         |
+|----------------------------|---------------------------------------------------------------------------------------------------------------|
+| `CognitiveComplexity`      | Fails at 15. Each `if`, loop, `catch`, ternary and run of boolean operators costs one, plus its nesting depth |
+| `AvoidDeeplyNestedIfStmts` | Fails on a third `if` nested inside two others                                                                |
+
+A count of `if`s would punish the guard clauses that keep a method flat;
+cognitive complexity charges for nesting, which is what makes a method hard to
+follow.
+
+`.github/complexity-rules.xml` holds both limits and, under each rule, the
+methods that were already over it when the gate was written: twenty for
+complexity, five for nesting, each written `TopLevelClass#method`. That list is
+a baseline, not an allowance. A method comes off it when it is brought under the
+limit, and none is added: a new method over the limit is split, not listed. The
+report is in `build/reports/pmd/main.html` of each module, and the console names
+the method and its score.
 
 ### The inspection gate
 
@@ -257,7 +281,7 @@ string a tester reads should have one owner; the number may go down and never up
 
 | Workflow      | When                                                                                                                                                                                                                                                                                                               |
 |---------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `build.yml`   | Every push to `main` and every pull request. Compiles, runs the unit tests and the IDE tests, and verifies against **IntelliJ IDEA** - the one verdict that turns a pull request red                                                                                                                               |
+| `build.yml`   | Every push to `main` and every pull request. Compiles, runs the unit tests, the complexity gate and the IDE tests, and verifies against **IntelliJ IDEA** - the one verdict that turns a pull request red                                                                                                          |
 | `verify.yml`  | Every push to `main`, plus every second day and on demand. The same verifier against **all six targets** - IntelliJ IDEA, PyCharm and Rider at both ends of the 262 branch - compared against `.github/verification-baseline.txt`. This is the number the JetBrains Marketplace shows a tester before they install |
 | `inspect.yml` | Every push, on every branch, and on demand                                                                                                                                                                                                                                                                         |
 

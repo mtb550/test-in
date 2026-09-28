@@ -11,6 +11,7 @@ archunit = "1.5.0"
 junit = "4.13.2"
 errorprone = "2.50.0"
 nullaway = "0.14.2"
+pmd = "7.28.0"
 
 [libraries]
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }

@@ -10,6 +10,7 @@ import java.util.zip.ZipInputStream
 plugins {
     id("java")
     id("idea")
+    id("pmd")
     id("org.jetbrains.intellij.platform")
     alias(libs.plugins.errorprone)
 }
@@ -91,6 +92,26 @@ allprojects {
             check("NullAway", CheckSeverity.ERROR)
             option("NullAway:AnnotatedPackages", "org.testin")
         }
+    }
+}
+
+// #378: pmdMain, part of check, fails on a production method over the cognitive
+// complexity or if-nesting limit in .github/complexity-rules.xml, which also
+// lists the methods that were over it already. Both rules read the syntax tree
+// only, so PMD is given no classpath and does not wait for compileJava.
+allprojects {
+    apply(plugin = "pmd")
+
+    pmd {
+        toolVersion = rootProject.libs.versions.pmd.get()
+        ruleSets = listOf()
+        ruleSetFiles = rootProject.files(".github/complexity-rules.xml")
+        isConsoleOutput = true
+    }
+
+    tasks.withType<Pmd>().configureEach {
+        enabled = name == "pmdMain"
+        classpath = files()
     }
 }
 

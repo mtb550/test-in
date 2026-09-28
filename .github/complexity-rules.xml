@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Complexity" xmlns="http://pmd.sourceforge.net/ruleset/2.0.0">
+    <description>
+        How hard a method is to read (#378). ./gradlew check runs it through pmdMain and fails on a
+        method over either limit. Each rule lists the methods that were over it when the gate was
+        written, as TopLevelClass#method: they are the baseline, not an allowance. Take a method off
+        its list when it drops under the limit, and never add one.
+    </description>
+
+    <rule ref="category/java/design.xml/CognitiveComplexity">
+        <properties>
+            <property name="reportLevel" value="15"/>
+            <property name="violationSuppressXPath">
+                <value><![CDATA[
+./self::*[concat(ancestor::*[@SimpleName][last()]/@SimpleName, '#', @Name) = (
+    'ImportCsv#parseCsvRecords',
+    'GridExcelBehavior#parseTsv',
+    'GridExcelBehavior#pasteIntoSelection',
+    'PasteTestCaseAction#paste',
+    'TestRunWordGenerator#buildTestCaseTable',
+    'TestRunPdfGenerator#buildTestCaseTable',
+    'RunStatusService#record',
+    'ImportAction#executeImportWriteAction',
+    'GridExcelBehavior#copySelection',
+    'ViewPendingCommitsAction#finishRebase',
+    'UpdateTestCaseAction#overSelection',
+    'CreateTestMethod#injectAsText',
+    'ViewPendingCommitsAction#commitOnBranch',
+    'TreePanelTree#refresh',
+    'TestRunHtmlGenerator#appendTestCaseTable',
+    'ReportOverview#rowsFor',
+    'TestEditor#loadDataAsync',
+    'RemoveTestCaseAction#performDeletion',
+    'ProjectIndexer#indexWithProgress',
+    'GitRefs#parseStatus'
+)]
+                ]]></value>
+            </property>
+        </properties>
+    </rule>
+
+    <rule ref="category/java/design.xml/AvoidDeeplyNestedIfStmts">
+        <properties>
+            <property name="problemDepth" value="3"/>
+            <property name="violationSuppressXPath">
+                <value><![CDATA[
+./ancestor::MethodDeclaration[concat(ancestor::*[@SimpleName][last()]/@SimpleName, '#', @Name) = (
+    'ImportCsv#parseCsvRecords',
+    'GridExcelBehavior#parseTsv',
+    'RunStatusService#record',
+    'CellEditListener#tableChanged',
+    'SetTestCaseStatusAction#record'
+)]
+                ]]></value>
+            </property>
+        </properties>
+    </rule>
+</ruleset>

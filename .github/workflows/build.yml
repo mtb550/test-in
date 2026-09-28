@@ -100,7 +100,7 @@ jobs:
         # The budget second and alone, so the clock it reads is not shared with
         # compiling and verifying (#66, finding 108).
         run: |
-          ./gradlew compileJava test ideTest verifyPlugin verifyDistribution
+          ./gradlew compileJava test pmdMain ideTest verifyPlugin verifyDistribution
           ./gradlew test -Pbudget
 
       - name: Keep the reports
