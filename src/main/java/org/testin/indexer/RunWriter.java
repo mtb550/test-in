@@ -59,7 +59,7 @@ final class RunWriter {
 
     void create(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
         store.registerTestRun(runPath, tr);
-        write(runPath, tr, Set.of());
+        write(runPath, tr, tr.getResults(), Set.of());
     }
 
     void persist(final @NotNull Path runPath, final @NotNull TestRunDto tr, final @NotNull Set<UUID> gone) {
@@ -69,15 +69,20 @@ final class RunWriter {
         }
 
         store.registerTestRun(runPath, tr);
-        write(runPath, tr, gone);
+        write(runPath, tr, tr.getResults(), gone);
     }
 
     // Rule-INTERNAL-011
-    private void write(final @NotNull Path runPath, final @NotNull TestRunDto tr, final @NotNull Set<UUID> gone) {
+    void persistResult(final @NotNull Path runPath, final @NotNull TestRunDto tr, final @NotNull TestRunItems result) {
+        write(runPath, tr, List.of(result), Set.of());
+    }
+
+    // Rule-INTERNAL-011
+    private void write(final @NotNull Path runPath, final @NotNull TestRunDto tr, final @NotNull List<TestRunItems> changed, final @NotNull Set<UUID> gone) {
         final @NotNull Set<String> named = namedScreenshots(tr);
 
         final @NotNull Map<Path, byte[]> results = new LinkedHashMap<>();
-        for (final TestRunItems item : tr.getResults()) {
+        for (final TestRunItems item : changed) {
             snapshot(item).ifPresent(bytes -> results.put(runPath.resolve(FileKind.RUN_ITEM.fileName(item.getId())), bytes));
         }
 

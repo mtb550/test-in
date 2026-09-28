@@ -508,7 +508,8 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     }
 
     protected void replaceModel(final @NotNull List<TestCaseDto> pageItems) {
-        model.replaceAll(pageItems);
+        if (model.getItems().equals(pageItems)) refreshCards();
+        else model.replaceAll(pageItems);
     }
 
     protected abstract void drawStatus(final @NotNull PageWindow page, final int totalItems);

@@ -80,8 +80,7 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
         if (Objects.equals(before, after)) return GridEdit.UNCHANGED;
 
-        Services.getInstance(p, ProjectIndexer.class).changeRun(editor.getParent().getPath(),
-                run -> run.resultOf(onThisRow.getId()).ifPresent(result -> attr.getRunValueSetter().execute(result, typed)));
+        Services.getInstance(p, ProjectIndexer.class).changeResult(editor.getParent().getPath(), onThisRow.getId(), result -> attr.getRunValueSetter().execute(result, typed));
         onEdited.run();
 
         return GridEdit.WROTE;

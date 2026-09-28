@@ -106,8 +106,7 @@ public final class RunStatusService {
         final @NotNull Optional<TestRunDto> held = heldRun(p, runPath);
         if (held.isEmpty() || liveItem(p, held.orElseThrow(), runPath, testCaseId).isEmpty()) return false;
 
-        Services.getInstance(p, ProjectIndexer.class).changeRun(runPath, current -> current.resultOf(testCaseId).ifPresentOrElse(verdict,
-                () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + testCaseId + " - verdict not recorded")));
+        Services.getInstance(p, ProjectIndexer.class).changeResult(runPath, testCaseId, verdict);
 
         Logger.trace("[RunStatusService]: Status updated -> " + testCaseId + " = " + status);
 
@@ -125,8 +124,7 @@ public final class RunStatusService {
 
         fields.storePasted(pasted -> indexer.storeScreenshots(runPath, pasted));
 
-        indexer.changeRun(runPath, current -> current.resultOf(testCaseId).ifPresentOrElse(fields::applyTo,
-                () -> Logger.warn("[RunStatusService]: '" + runPath.getFileName() + "' no longer covers " + testCaseId + " - failure details not recorded")));
+        indexer.changeResult(runPath, testCaseId, fields::applyTo);
 
         return true;
     }
@@ -229,8 +227,8 @@ public final class RunStatusService {
             }
 
             final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-            Services.getInstance(p, ProjectIndexer.class).changeRun(editor.getParent().getPath(), run -> judged.forEach(id ->
-                    run.resultOf(id).filter(item -> !item.isRemoved()).ifPresent(item -> item.correctVerdict(status, tester, asItIsNow(p, item)))));
+            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            judged.forEach(id -> indexer.changeResult(editor.getParent().getPath(), id, item -> item.correctVerdict(status, tester, asItIsNow(p, item))));
             triggerFilterRefresh(editor);
 
             confirmVerdict(p, status, judged.size());

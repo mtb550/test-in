@@ -162,4 +162,16 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
         assertEquals("and the verdict it carries was rewritten rather than left alone",
                 A_PULLED_RESULT, read(resultOf(run, PULLED_TEST_CASE)));
     }
+
+    public void testAVerdictWritesTheResultItChangedAndNoOther() {
+        final Path run = aRun();
+        awaitFile(resultOf(run, UNTICKED_TEST_CASE), "the run's results never reached disk");
+        final String untouched = read(resultOf(run, UNTICKED_TEST_CASE));
+
+        indexer().findTestRun(run).orElseThrow().resultOf(UNTICKED_TEST_CASE).orElseThrow().setActualResult("Not saved yet");
+        indexer().changeResult(run, JUDGED_TEST_CASE, item -> item.setStatus(TestStatus.FAILED));
+
+        await("the verdict never reached its result file", () -> read(resultOf(run, JUDGED_TEST_CASE)).contains("FAILED"));
+        assertEquals("a verdict on one case rewrote the result of another", untouched, read(resultOf(run, UNTICKED_TEST_CASE)));
+    }
 }

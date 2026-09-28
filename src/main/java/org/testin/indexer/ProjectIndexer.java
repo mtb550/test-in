@@ -456,6 +456,15 @@ public final class ProjectIndexer {
         }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
     }
 
+    // Rule-INTERNAL-011
+    public void changeResult(final @NotNull Path runPath, final @NotNull UUID testCaseId, final @NotNull Consumer<TestRunItems> change) {
+        findTestRun(runPath).ifPresentOrElse(run -> run.resultOf(testCaseId).ifPresentOrElse(result -> {
+            change.accept(result);
+            runWriter.persistResult(runPath, run, result);
+        }, () -> Logger.warn("'" + runPath.getFileName() + "' no longer covers " + testCaseId + ", so a change to its result was dropped")),
+                () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
+    }
+
     public void changeRunMarker(final @NotNull Path runPath, final @NotNull Consumer<TestRunMarker> change) {
         store.findTestRunDir(runPath).ifPresentOrElse(dir -> {
             final @NotNull TestRunMarker marker = dir.getMarker();
