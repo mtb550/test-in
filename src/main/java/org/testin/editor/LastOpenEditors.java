@@ -55,7 +55,7 @@ public final class LastOpenEditors {
     private @NotNull List<String> pathsOfOpen() {
         final @NotNull List<String> entries = new ArrayList<>();
 
-        for (final Path path : Services.getInstance(p, TestinEditors.class).openNodePaths(p)) {
+        for (final Path path : Services.getInstance(p, TestinEditors.class).openNodePaths()) {
             entries.add(path.toString());
         }
 
@@ -107,6 +107,6 @@ public final class LastOpenEditors {
     private void openAll(final @NotNull List<DirectoryDto> found) {
         final @NotNull TestinEditors editors = Services.getInstance(p, TestinEditors.class);
 
-        for (int i = 0; i < found.size(); i++) editors.open(p, found.get(i), i == found.size() - 1);
+        for (int i = 0; i < found.size(); i++) editors.open(found.get(i), i == found.size() - 1);
     }
 }

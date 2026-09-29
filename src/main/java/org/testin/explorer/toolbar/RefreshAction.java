@@ -105,7 +105,7 @@ public class RefreshAction extends AbstractProjectAction {
         try {
             if (p.isDisposed()) return;
 
-            testinEditors.refreshOpen(p);
+            testinEditors.refreshOpen();
 
             tp.refresh();
             Logger.info("Refresh: tree rebuilt");

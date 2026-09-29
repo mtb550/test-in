@@ -57,7 +57,7 @@ record CreateTreeNodeWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull Not
                 notifier.softShow(p, Done.CREATED);
 
                 if (dir.isOpenableInEditor())
-                    editors.open(p, dir);
+                    editors.open(dir);
 
                 JavaCode.of(dt).getCreated().execute(p, dir);
             });

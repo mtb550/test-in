@@ -37,7 +37,7 @@ public class OpenAction extends AbstractAnyProjectAction {
                 .filter(DirectoryDto::isOpenableInEditor)
                 .forEach(dir -> {
                     Logger.info("open: " + dir.getPath());
-                    Services.getInstance(p, TestinEditors.class).open(p, dir);
+                    Services.getInstance(p, TestinEditors.class).open(dir);
                 });
     }
 

@@ -103,7 +103,7 @@ public final class SaveTestinYml {
         }
 
         Services.getInstance(p, BoundTestProject.class).refreshGutter();
-        Services.getInstance(p, TestinEditors.class).refreshOpen(p);
+        Services.getInstance(p, TestinEditors.class).refreshOpen();
         notifier.softShow(p, Done.SAVED);
     }
 }

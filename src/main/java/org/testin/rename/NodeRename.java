@@ -43,7 +43,7 @@ import java.util.Optional;
 public final class NodeRename {
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-036, Rule-TREE-PANEL-111
     public static void apply(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName, final @NotNull Runnable onDone) {
-        Services.getInstance(p, TestinEditors.class).close(p, dir);
+        Services.getInstance(p, TestinEditors.class).close(dir);
 
         final @NotNull Renamed renamed = new Renamed(dir, newName);
         final @NotNull String oldName = dir.getName();

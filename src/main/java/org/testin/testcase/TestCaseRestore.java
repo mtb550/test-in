@@ -60,7 +60,7 @@ final class TestCaseRestore {
     private static void tellTheSurfaces(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> written) {
         final @NotNull TestinEditors editors = Services.getInstance(p, TestinEditors.class);
 
-        written.forEach(snapshot -> editors.reloadOpen(p, snapshot.testSetPath()));
+        written.forEach(snapshot -> editors.reloadOpen(snapshot.testSetPath()));
 
         written.forEach(snapshot -> ViewToolWindowFactory.refreshIfShowing(p, snapshot.present()));
     }

@@ -86,7 +86,7 @@ record RemoveWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEdito
 
         // Rule-TREE-PANEL-116
         for (final DirectoryDto node : nodesToRemove) {
-            editors.close(p, node);
+            editors.close(node);
         }
 
         removeEach(nodesToRemove, went -> {

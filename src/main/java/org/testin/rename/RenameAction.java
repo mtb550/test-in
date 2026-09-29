@@ -43,7 +43,7 @@ public class RenameAction extends AbstractAnyProjectAction {
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-104, Rule-TREE-PANEL-111
     private static @NotNull Optional<String> whyNot(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         if (!dir.isRenamable()) return Optional.of(Bundle.message("rename.disabled.description"));
-        if (Services.getInstance(p, TestinEditors.class).busyUnder(p, dir))
+        if (Services.getInstance(p, TestinEditors.class).busyUnder(dir))
             return Optional.of(Bundle.message("rename.disabled.busy"));
 
         return Optional.empty();

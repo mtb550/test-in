@@ -121,7 +121,7 @@ public class CreateTestRun implements NodeCreator {
             nodes.refreshDirectory(savePath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                editors.open(p, trDir);
+                editors.open(trDir);
 
                 notifier.softShow(p, Done.CREATED);
             });

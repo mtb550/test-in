@@ -53,7 +53,7 @@ public final class TestRunStatusChange {
 
     // UC-TREE-PANEL-020, Rule-EDITOR-PANEL-008, Rule-TREE-PANEL-091
     public void apply(final @NotNull TestRunDirectoryDto run, final @NotNull TestRunStatus newStatus) {
-        final @NotNull Optional<RunEditor> open = editors.runEditorFor(p, run);
+        final @NotNull Optional<RunEditor> open = editors.runEditorFor(run);
 
         Logger.trace("Test run status changed: " + run.getName() + " = " + newStatus.getLabel());
 

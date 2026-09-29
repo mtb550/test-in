@@ -48,13 +48,13 @@ public final class GoTo {
     private static void toTestCase(final @NotNull Project p, final @NotNull Hit hit, final @NotNull TestCaseDto tc) {
         showTree(p, WITHOUT_FOCUS, tree -> tree.reveal(hit.node().getPath()));
 
-        Services.getInstance(p, TestinEditors.class).openAndSelect(p, hit.node(), tc);
+        Services.getInstance(p, TestinEditors.class).openAndSelect(hit.node(), tc);
     }
 
     private static void toNode(final @NotNull Project p, final @NotNull Hit hit) {
         showTree(p, WITH_FOCUS, tree -> tree.reveal(hit.node().getPath(), tree::focus));
 
-        Services.getInstance(p, TestinEditors.class).open(p, hit.node());
+        Services.getInstance(p, TestinEditors.class).open(hit.node());
     }
 
     private static void showTree(final @NotNull Project p, final boolean withFocus, final @NotNull Consumer<TreePanelTree> onShown) {

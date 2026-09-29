@@ -112,6 +112,6 @@ public final class Bug {
 
     private static void redraw(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto runDirectory) {
         ViewToolWindowFactory.refreshIfShowing(p, List.of(dto));
-        Services.getInstance(p, TestinEditors.class).runEditorFor(p, runDirectory).ifPresent(RunEditor::refreshView);
+        Services.getInstance(p, TestinEditors.class).runEditorFor(runDirectory).ifPresent(RunEditor::refreshView);
     }
 }

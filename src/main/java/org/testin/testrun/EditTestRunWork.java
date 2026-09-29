@@ -126,7 +126,7 @@ record EditTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull 
             nodes.refreshDirectory(runPath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                editors.reloadOpen(p, runPath);
+                editors.reloadOpen(runPath);
 
                 onDone.run();
             });

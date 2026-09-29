@@ -149,7 +149,7 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
         }
 
         if (selectedDirDto.holdsTestCases()) {
-            onEdt(() -> editors.closeThenOpen(p, selectedDirDto));
+            onEdt(() -> editors.closeThenOpen(selectedDirDto));
         }
 
         notifier.softShowCounted(p, Done.IMPORTED, imported);

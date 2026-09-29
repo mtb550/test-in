@@ -155,7 +155,7 @@ public class ArchitectureTest {
                 .that().resideOutsideOfPackages("org.testin.explorer..", "org.testin.editor..")
                 .and(notOneOf(REFRESH_EXCEPTIONS))
                 .should().callMethod("org.testin.explorer.tree.TreePanelTree", "refresh")
-                .orShould().callMethod("org.testin.editor.TestinEditors", "refreshOpen", "com.intellij.openapi.project.Project")
+                .orShould().callMethod("org.testin.editor.TestinEditors", "refreshOpen")
                 .because("the indexer announces every change on IndexChanged and the surfaces redraw themselves from it;"
                         + " a caller that refreshes as well is how a rename redrew the tree twice (Rule-INTERNAL-114, #361)."
                         + " SaveTestinYml is the one exception: testin.yml turns code on or off, which the editors draw,"

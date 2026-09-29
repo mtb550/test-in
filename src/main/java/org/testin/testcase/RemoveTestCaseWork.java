@@ -80,7 +80,7 @@ record RemoveTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @Not
             if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
 
             if (removed.size() == selectedItems.size()) editor.refreshView();
-            else editors.reloadOpen(p, dir.getPath());
+            else editors.reloadOpen(dir.getPath());
 
             if (!removed.isEmpty())
                 notifier.softShowCounted(p, Done.REMOVED, removed.size());

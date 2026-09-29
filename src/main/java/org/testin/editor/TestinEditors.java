@@ -24,7 +24,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.concurrency.ThreadingAssertions;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.indexer.Nodes;
@@ -42,39 +42,41 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class TestinEditors {
-    private @NotNull Optional<VirtualFile> openFileAt(final @NotNull Project p, final @NotNull Path path) {
+    private final @NotNull Project p;
+
+    private @NotNull Optional<VirtualFile> openFileAt(final @NotNull Path path) {
         return Arrays.stream(FileEditorManager.getInstance(p).getOpenFiles())
                 .filter(open -> open instanceof UnifiedVirtualFile testinFile && testinFile.getDir().getPath().equals(path))
                 .findFirst();
     }
 
-    public void reloadOpen(final @NotNull Project p, final @NotNull Path path) {
-        editorAt(p, path).ifPresent(TestinEditor::reloadData);
+    public void reloadOpen(final @NotNull Path path) {
+        editorAt(path).ifPresent(TestinEditor::reloadData);
     }
 
     // UC-TREE-PANEL-011, UC-TREE-PANEL-012, Rule-TREE-PANEL-111, Rule-TREE-PANEL-116
-    public void close(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        openFilesUnder(p, dir.getPath()).forEach(FileEditorManager.getInstance(p)::closeFile);
+    public void close(final @NotNull DirectoryDto dir) {
+        openFilesUnder(dir.getPath()).forEach(FileEditorManager.getInstance(p)::closeFile);
     }
 
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-111
-    public boolean busyUnder(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        return openFilesUnder(p, dir.getPath()).stream()
+    public boolean busyUnder(final @NotNull DirectoryDto dir) {
+        return openFilesUnder(dir.getPath()).stream()
                 .flatMap(open -> Arrays.stream(FileEditorManager.getInstance(p).getAllEditors(open)))
                 .anyMatch(tab -> tab instanceof UnifiedFileEditor unified && unified.getEditor().isBusy());
     }
 
-    private @NotNull List<VirtualFile> openFilesUnder(final @NotNull Project p, final @NotNull Path path) {
+    private @NotNull List<VirtualFile> openFilesUnder(final @NotNull Path path) {
         return Arrays.stream(FileEditorManager.getInstance(p).getOpenFiles())
                 .filter(open -> open instanceof UnifiedVirtualFile testinFile && testinFile.getDir().getPath().startsWith(path))
                 .toList();
     }
 
     // Rule-EDITOR-PANEL-015
-    public void closeAll(final @NotNull Project p) {
+    public void closeAll() {
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
         for (final VirtualFile open : fed.getOpenFiles()) {
@@ -83,13 +85,13 @@ public final class TestinEditors {
     }
 
     // UC-TREE-PANEL-025, Rule-TREE-PANEL-082
-    public void refreshOpen(final @NotNull Project p) {
+    public void refreshOpen() {
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
         for (final VirtualFile open : fed.getOpenFiles()) {
             if (!(open instanceof UnifiedVirtualFile testinFile)) continue;
 
-            if (!isIndexed(p, testinFile)) {
+            if (!isIndexed(testinFile)) {
                 Logger.info("Closing the editor for a node that is no longer indexed: " + testinFile.getName());
                 fed.closeFile(testinFile);
                 continue;
@@ -109,63 +111,63 @@ public final class TestinEditors {
         }
     }
 
-    private boolean isIndexed(final @NotNull Project p, final @NotNull UnifiedVirtualFile file) {
+    private boolean isIndexed(final @NotNull UnifiedVirtualFile file) {
         return Services.getInstance(p, Nodes.class).nodeExists(file.getDir().getPath());
     }
 
-    public void openThen(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull Consumer<TestinEditor> tell) {
+    public void openThen(final @NotNull DirectoryDto dir, final @NotNull Consumer<TestinEditor> tell) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (!openNow(p, dir, true)) return;
+            if (!openNow(dir, true)) return;
 
-            editorFor(p, dir).ifPresent(tell);
+            editorFor(dir).ifPresent(tell);
         });
     }
 
-    public void openAndSelect(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull TestCaseDto tc) {
-        openThen(p, dir, editor -> {
+    public void openAndSelect(final @NotNull DirectoryDto dir, final @NotNull TestCaseDto tc) {
+        openThen(dir, editor -> {
             editor.selectWhenLoaded(tc.getId());
 
             ViewToolWindowFactory.showPanel(p, List.of(tc), dir.getPath2());
         });
     }
 
-    public @NotNull Optional<RunEditor> runEditorFor(final @NotNull Project p, final @NotNull TestRunDirectoryDto run) {
-        return editorFor(p, run).filter(RunEditor.class::isInstance).map(RunEditor.class::cast);
+    public @NotNull Optional<RunEditor> runEditorFor(final @NotNull TestRunDirectoryDto run) {
+        return editorFor(run).filter(RunEditor.class::isInstance).map(RunEditor.class::cast);
     }
 
-    public @NotNull Optional<TestinEditor> editorFor(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        return editorAt(p, dir.getPath());
+    public @NotNull Optional<TestinEditor> editorFor(final @NotNull DirectoryDto dir) {
+        return editorAt(dir.getPath());
     }
 
-    private @NotNull Optional<TestinEditor> editorAt(final @NotNull Project p, final @NotNull Path path) {
-        return openFileAt(p, path).flatMap(open -> Arrays.stream(FileEditorManager.getInstance(p).getAllEditors(open))
+    private @NotNull Optional<TestinEditor> editorAt(final @NotNull Path path) {
+        return openFileAt(path).flatMap(open -> Arrays.stream(FileEditorManager.getInstance(p).getAllEditors(open))
                 .filter(UnifiedFileEditor.class::isInstance)
                 .map(tab -> ((UnifiedFileEditor) tab).getEditor())
                 .findFirst());
     }
 
-    public void closeThenOpen(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+    public void closeThenOpen(final @NotNull DirectoryDto dir) {
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
-        ApplicationManager.getApplication().invokeLater(() -> openFileAt(p, dir.getPath()).ifPresentOrElse(open -> {
+        ApplicationManager.getApplication().invokeLater(() -> openFileAt(dir.getPath()).ifPresentOrElse(open -> {
             fed.closeFile(open);
             fed.openFile(open, true);
-        }, () -> open(p, dir)));
+        }, () -> open(dir)));
     }
 
-    public void open(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        open(p, dir, true);
+    public void open(final @NotNull DirectoryDto dir) {
+        open(dir, true);
     }
 
-    public void open(final @NotNull Project p, final @NotNull DirectoryDto dir, final boolean focus) {
-        ApplicationManager.getApplication().invokeLater(() -> openNow(p, dir, focus));
+    public void open(final @NotNull DirectoryDto dir, final boolean focus) {
+        ApplicationManager.getApplication().invokeLater(() -> openNow(dir, focus));
     }
 
-    private boolean openNow(final @NotNull Project p, final @NotNull DirectoryDto dir, final boolean focus) {
+    private boolean openNow(final @NotNull DirectoryDto dir, final boolean focus) {
         ThreadingAssertions.assertEventDispatchThread();
         final @NotNull FileEditorManager fed = FileEditorManager.getInstance(p);
 
-        final @NotNull Optional<VirtualFile> already = openFileAt(p, dir.getPath());
+        final @NotNull Optional<VirtualFile> already = openFileAt(dir.getPath());
         if (already.isPresent()) {
             Logger.info("Editor already open, focusing: " + dir.getName());
             fed.openFile(already.orElseThrow(), focus);
@@ -183,7 +185,7 @@ public final class TestinEditors {
         return true;
     }
 
-    public @NotNull List<Path> openNodePaths(final @NotNull Project p) {
+    public @NotNull List<Path> openNodePaths() {
         final @NotNull List<Path> paths = new ArrayList<>();
 
         for (final VirtualFile vf : FileEditorManager.getInstance(p).getOpenFiles()) {

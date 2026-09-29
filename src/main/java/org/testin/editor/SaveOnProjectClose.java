@@ -26,6 +26,6 @@ public final class SaveOnProjectClose implements ProjectCloseListener {
     @Override
     public void projectClosingBeforeSave(final @NotNull Project p) {
         Services.getInstance(p, LastOpenEditors.class).remember();
-        Services.getInstance(p, TestinEditors.class).closeAll(p);
+        Services.getInstance(p, TestinEditors.class).closeAll();
     }
 }

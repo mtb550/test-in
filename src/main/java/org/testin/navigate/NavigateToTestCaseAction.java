@@ -53,7 +53,7 @@ public class NavigateToTestCaseAction extends AbstractAnyProjectAction {
             return;
         }
 
-        Services.getInstance(p, TestinEditors.class).openAndSelect(p, tc.getParent(), tc);
+        Services.getInstance(p, TestinEditors.class).openAndSelect(tc.getParent(), tc);
     }
 
     @Override

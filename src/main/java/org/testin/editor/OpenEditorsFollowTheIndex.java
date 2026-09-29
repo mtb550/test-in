@@ -35,7 +35,7 @@ public final class OpenEditorsFollowTheIndex implements IndexChanged {
     @Override
     public void readAgain() {
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (!p.isDisposed()) testinEditors.refreshOpen(p);
+            if (!p.isDisposed()) testinEditors.refreshOpen();
         });
     }
 }

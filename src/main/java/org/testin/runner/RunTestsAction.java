@@ -63,7 +63,7 @@ public class RunTestsAction extends AbstractAnyProjectAction {
     }
 
     private void openAndRun(final @NotNull Project p, final @NotNull TestRunDirectoryDto run) {
-        Services.getInstance(p, TestinEditors.class).openThen(p, run, TestinEditor::runWhenLoaded);
+        Services.getInstance(p, TestinEditors.class).openThen(run, TestinEditor::runWhenLoaded);
     }
 
     // UC-CODEGEN-008, Rule-CODEGEN-031
