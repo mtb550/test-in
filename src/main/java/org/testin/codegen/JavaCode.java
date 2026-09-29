@@ -21,36 +21,37 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
+import org.testin.model.dto.dirs.DirectoryDto;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class JavaCode {
     // UC-CODEGEN-004, Rule-CODEGEN-023
-    private final @NotNull GenAction created;
+    private final @NotNull GenAction<DirectoryDto> created;
 
     // UC-CODEGEN-015, UC-CODEGEN-017, Rule-CODEGEN-051
-    private final @NotNull GenAction renamed;
+    private final @NotNull GenAction<Renamed> renamed;
 
     // UC-CODEGEN-016, UC-CODEGEN-017, Rule-CODEGEN-053
-    private final @NotNull GenAction moved;
+    private final @NotNull GenAction<Moved> moved;
 
     public static @NotNull JavaCode of(final @NotNull DirectoryType type) {
-        final @NotNull GenAction none = new NoJavaCode(type.getDescription());
+        final @NotNull String nodeType = type.getDescription();
         return switch (type) {
             case TP -> new JavaCode(
-                    none,
+                    new NoJavaCode<>(nodeType),
                     (p, renamed) -> GenType.RENAME_TEST_PROJECT.getAction().execute(p, renamed),
-                    none
+                    new NoJavaCode<>(nodeType)
             );
 
             case TCD, TRD, TRP, TR -> new JavaCode(
-                    none,
-                    none,
-                    none
+                    new NoJavaCode<>(nodeType),
+                    new NoJavaCode<>(nodeType),
+                    new NoJavaCode<>(nodeType)
             );
 
             case TSP -> new JavaCode(
-                    none,
+                    new NoJavaCode<>(nodeType),
                     (p, renamed) -> GenType.RENAME_TEST_SET_PACKAGE.getAction().execute(p, renamed),
                     (p, moved) -> GenType.MOVE_TEST_SET_PACKAGE.getAction().execute(p, moved)
             );

@@ -25,17 +25,17 @@ import org.testin.logger.Logger;
 import java.util.List;
 
 @AllArgsConstructor
-public final class NoOpCodeUpdate implements GenAction {
+public final class NoOpCodeUpdate<T> implements GenAction<T> {
     private final @NotNull String fieldName;
 
     // Rule-CODEGEN-003
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
+    public void execute(final @NotNull Project p, final @NotNull T payload) {
         Logger.info("Update " + fieldName + ": data-only field, no Java code change");
     }
 
     @Override
-    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+    public void executeAll(final @NotNull Project p, final @NotNull List<? extends T> items) {
         Logger.info("Update " + fieldName + " on " + items.size() + ": data-only field, no Java code change");
     }
 }

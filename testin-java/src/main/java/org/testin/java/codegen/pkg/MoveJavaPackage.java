@@ -31,12 +31,10 @@ import org.testin.logger.Logger;
 import java.util.List;
 import java.util.Optional;
 
-public class MoveJavaPackage implements GenAction {
+public class MoveJavaPackage implements GenAction<Moved> {
     // UC-CODEGEN-017, Rule-CODEGEN-057, Rule-CODEGEN-058
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (!(obj instanceof Moved moved)) return;
-
+    public void execute(final @NotNull Project p, final @NotNull Moved moved) {
         final @NotNull List<String> fqcn = Fqcn.ofPackage(moved.dir());
 
         final @NotNull Optional<List<String>> destinationFound = moved.destinationPackage(p);

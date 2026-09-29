@@ -28,24 +28,19 @@ import org.testin.java.codegen.method.update.UpdateTestBase;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 // UC-CODEGEN-002, Rule-CODEGEN-078
-public class CopyTestMethod extends UpdateTestBase implements GenAction {
+public class CopyTestMethod extends UpdateTestBase implements GenAction<CopiedTestCase> {
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (obj instanceof CopiedTestCase copied) executeAll(p, List.of(copied));
+    public void execute(final @NotNull Project p, final @NotNull CopiedTestCase copied) {
+        executeAll(p, List.of(copied));
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-078
     @Override
-    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        final @NotNull List<CopiedTestCase> copies = new ArrayList<>();
-        for (final Object item : items) {
-            if (item instanceof CopiedTestCase copied) copies.add(copied);
-        }
+    public void executeAll(final @NotNull Project p, final @NotNull List<? extends CopiedTestCase> copies) {
         if (copies.isEmpty()) return;
 
         new CreateTestMethod().executeAll(p, copies.stream().map(CopiedTestCase::copy).toList());

@@ -161,12 +161,10 @@ public class UpdateTestBase {
     }
 
     // UC-CODEGEN-012, Rule-CODEGEN-045
-    protected void applyToEach(final @NotNull Project p, final @NotNull List<?> items, final @NotNull String title, final @NotNull BiConsumer<PsiMethod, TestCaseDto> updater) {
+    protected void applyToEach(final @NotNull Project p, final @NotNull List<? extends TestCaseDto> items, final @NotNull String title, final @NotNull BiConsumer<PsiMethod, TestCaseDto> updater) {
         final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
 
-        for (final Object item : items) {
-            if (!(item instanceof TestCaseDto tc)) continue;
-
+        for (final TestCaseDto tc : items) {
             final @NotNull String classFqcn = Fqcn.classOfMethod(tc);
             if (classFqcn.isEmpty()) continue;
 

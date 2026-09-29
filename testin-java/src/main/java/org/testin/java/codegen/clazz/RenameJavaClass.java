@@ -31,12 +31,10 @@ import org.testin.util.NameSanitizer;
 import java.util.List;
 import java.util.Optional;
 
-public class RenameJavaClass implements GenAction {
+public class RenameJavaClass implements GenAction<Renamed> {
     // UC-CODEGEN-015, Rule-CODEGEN-052
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (!(obj instanceof Renamed renamed)) return;
-
+    public void execute(final @NotNull Project p, final @NotNull Renamed renamed) {
         final @NotNull String newName = renamed.newName();
         final @NotNull List<String> fqcn = Fqcn.ofClass(renamed.dir());
         if (fqcn.isEmpty()) return;

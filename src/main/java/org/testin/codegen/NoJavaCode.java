@@ -22,12 +22,12 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
 @AllArgsConstructor
-public final class NoJavaCode implements GenAction {
+public final class NoJavaCode<T> implements GenAction<T> {
     private final @NotNull String nodeType;
 
     // UC-CODEGEN-004
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
+    public void execute(final @NotNull Project p, final @NotNull T payload) {
         Logger.debug(nodeType + " generates no Java code");
     }
 

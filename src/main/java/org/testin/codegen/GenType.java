@@ -25,6 +25,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.method.update.NoOpCodeUpdate;
 import org.testin.logger.Logger;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
@@ -34,152 +36,158 @@ import org.testin.util.Once;
 import java.util.List;
 
 @Getter
-public enum GenType {
-    REMOVE_TEST_PROJECT(
+public final class GenType<T> {
+    private static final @NotNull Key<Boolean> INDEXING_SAID = Key.create("testin.codegen.indexingSaid");
+
+    public static final @NotNull GenType<DirectoryDto> REMOVE_TEST_PROJECT = new GenType<>(
             Bundle.message("codegen.remove.test.project")
-    ),
+    );
 
-    RENAME_TEST_PROJECT(
+    public static final @NotNull GenType<Renamed> RENAME_TEST_PROJECT = new GenType<>(
             Bundle.message("codegen.rename.test.project")
-    ),
+    );
 
-    REMOVE_TEST_SET_PACKAGE(
+    public static final @NotNull GenType<DirectoryDto> REMOVE_TEST_SET_PACKAGE = new GenType<>(
             Bundle.message("codegen.remove.test.set.package")
-    ),
+    );
 
-    RENAME_TEST_SET_PACKAGE(
+    public static final @NotNull GenType<Renamed> RENAME_TEST_SET_PACKAGE = new GenType<>(
             Bundle.message("codegen.rename.test.set.package")
-    ),
+    );
 
-    MOVE_TEST_SET_PACKAGE(
+    public static final @NotNull GenType<Moved> MOVE_TEST_SET_PACKAGE = new GenType<>(
             Bundle.message("codegen.move.test.set.package")
-    ),
+    );
 
-    CREATE_TEST_SET(
+    public static final @NotNull GenType<DirectoryDto> CREATE_TEST_SET = new GenType<>(
             Bundle.message("codegen.create.test.set")
-    ),
+    );
 
-    REMOVE_TEST_SET(
+    public static final @NotNull GenType<DirectoryDto> REMOVE_TEST_SET = new GenType<>(
             Bundle.message("codegen.remove.test.set")
-    ),
+    );
 
-    RENAME_TEST_SET(
+    public static final @NotNull GenType<Renamed> RENAME_TEST_SET = new GenType<>(
             Bundle.message("codegen.rename.test.set")
-    ),
+    );
 
-    MOVE_TEST_SET(
+    public static final @NotNull GenType<Moved> MOVE_TEST_SET = new GenType<>(
             Bundle.message("codegen.move.test.set")
-    ),
+    );
 
-    CREATE_TEST_CASE(
+    public static final @NotNull GenType<TestCaseDto> CREATE_TEST_CASE = new GenType<>(
             Bundle.message("codegen.create.test.case")
-    ),
+    );
 
-    REMOVE_TEST_CASE(
+    public static final @NotNull GenType<TestCaseDto> REMOVE_TEST_CASE = new GenType<>(
             Bundle.message("codegen.remove.test.case")
-    ),
+    );
 
     // UC-CODEGEN-002, Rule-CODEGEN-077
-    MOVE_TEST_CASE(
+    public static final @NotNull GenType<MovedTestCase> MOVE_TEST_CASE = new GenType<>(
             Bundle.message("codegen.move.test.case")
-    ),
+    );
 
     // UC-CODEGEN-002, Rule-CODEGEN-078
-    COPY_TEST_CASE(
+    public static final @NotNull GenType<CopiedTestCase> COPY_TEST_CASE = new GenType<>(
             Bundle.message("codegen.copy.test.case")
-    ),
+    );
 
-    UPDATE_TEST_CASE_DESCRIPTION(
+    public static final @NotNull GenType<TestCaseDto> UPDATE_TEST_CASE_DESCRIPTION = new GenType<>(
             Bundle.message("codegen.update.test.case")
-    ),
+    );
 
-    UPDATE_TEST_CASE_EXPECTED_RESULT(
+    public static final @NotNull GenType<TestCaseDto> UPDATE_TEST_CASE_EXPECTED_RESULT = new GenType<>(
             Bundle.message("codegen.update.test.case"),
             "expected result"
-    ),
+    );
 
-    UPDATE_TEST_CASE_MODULE(
+    public static final @NotNull GenType<TestCaseDto> UPDATE_TEST_CASE_MODULE = new GenType<>(
             Bundle.message("codegen.update.test.case"),
             "module"
-    ),
+    );
 
-    UPDATE_TEST_CASE_TEST_DATA(
+    public static final @NotNull GenType<TestCaseDto> UPDATE_TEST_CASE_TEST_DATA = new GenType<>(
             Bundle.message("codegen.update.test.case"),
             "test data"
-    ),
+    );
 
-    UPDATE_TEST_CASE_PRE_CONDITIONS(
+    public static final @NotNull GenType<TestCaseDto> UPDATE_TEST_CASE_PRE_CONDITIONS = new GenType<>(
             Bundle.message("codegen.update.test.case"),
             "pre-conditions"
-    ),
+    );
 
-    UPDATE_TEST_CASE_STEPS(
+    public static final @NotNull GenType<TestCaseDto> UPDATE_TEST_CASE_STEPS = new GenType<>(
             Bundle.message("codegen.update.test.case"),
             "steps"
-    ),
+    );
 
-    UPDATE_TEST_CASE_GROUP(
+    public static final @NotNull GenType<TestCaseDto> UPDATE_TEST_CASE_GROUP = new GenType<>(
             Bundle.message("codegen.update.test.case")
-    ),
+    );
 
-    UPDATE_TEST_CASE_PRIORITY(
+    public static final @NotNull GenType<TestCaseDto> UPDATE_TEST_CASE_PRIORITY = new GenType<>(
             Bundle.message("codegen.update.test.case"),
             "priority"
-    ),
+    );
 
-    UPDATE_TEST_CASE_ORDER(
+    public static final @NotNull GenType<TestCaseDto> UPDATE_TEST_CASE_ORDER = new GenType<>(
             Bundle.message("codegen.update.test.case")
-    ),
+    );
 
-    RECONCILE_TEST_CASE(
+    public static final @NotNull GenType<TestCaseDto> RECONCILE_TEST_CASE = new GenType<>(
             Bundle.message("codegen.restore.test.case")
-    ),
+    );
 
-    UPDATE_TEST_CASE_STATUS(
+    public static final @NotNull GenType<TestCaseDto> UPDATE_TEST_CASE_STATUS = new GenType<>(
             Bundle.message("codegen.update.test.case")
-    ),
+    );
 
-    NO_CODE_CHANGE(
+    public static final @NotNull GenType<TestCaseDto> NO_CODE_CHANGE = new GenType<>(
             Bundle.message("codegen.no.code.change"),
             "read-only attribute"
     );
 
-    private static final @NotNull Key<Boolean> INDEXING_SAID = Key.create("testin.codegen.indexingSaid");
     private final @NotNull String description;
-    private final @NotNull GenAction action;
+    private final @NotNull GenAction<T> action;
 
-    GenType(final @NotNull String description) {
+    private GenType(final @NotNull String description) {
         this.description = description;
         this.action = new JavaCodeUpdate();
     }
 
-    GenType(final @NotNull String description, final @NotNull String dataOnlyField) {
+    private GenType(final @NotNull String description, final @NotNull String dataOnlyField) {
         this.description = description;
-        this.action = new NoOpCodeUpdate(dataOnlyField);
+        this.action = new NoOpCodeUpdate<>(dataOnlyField);
     }
 
     // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-EDITOR-PANEL-046
-    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+    public void executeAll(final @NotNull Project p, final @NotNull List<? extends T> items) {
         ApplicationManager.getApplication().invokeLater(() -> executeAllNow(p, items), p.getDisposed());
     }
 
     // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-018
-    public void executeAllNow(final @NotNull Project p, final @NotNull List<?> items) {
+    public void executeAllNow(final @NotNull Project p, final @NotNull List<? extends T> items) {
         action.executeAll(p, items);
     }
 
-    private final class JavaCodeUpdate implements GenAction {
+    @Override
+    public @NotNull String toString() {
+        return description;
+    }
+
+    private final class JavaCodeUpdate implements GenAction<T> {
         // UC-CODEGEN-019, Rule-CODEGEN-005
         @Override
-        public void execute(final @NotNull Project p, final @NotNull Object obj) {
+        public void execute(final @NotNull Project p, final @NotNull T payload) {
             if (cannotGenerate(p)) return;
 
-            CodeGenerators.find(GenType.this).execute(p, obj);
+            CodeGenerators.find(GenType.this).execute(p, payload);
         }
 
         // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-EDITOR-PANEL-046
         @Override
-        public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+        public void executeAll(final @NotNull Project p, final @NotNull List<? extends T> items) {
             if (cannotGenerate(p) || items.isEmpty()) return;
 
             WriteCommandAction.runWriteCommandAction(p, description, null,
@@ -197,7 +205,7 @@ public enum GenType {
                 DumbService.getInstance(p).runWhenSmart(() -> p.putUserData(INDEXING_SAID, null));
             }
 
-            Logger.info("Skipped " + name() + ": the IDE is indexing");
+            Logger.info("Skipped " + description + ": the IDE is indexing");
             return true;
         }
     }

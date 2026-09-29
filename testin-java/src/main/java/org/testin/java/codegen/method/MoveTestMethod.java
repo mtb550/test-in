@@ -41,29 +41,24 @@ import org.testin.java.codegen.method.update.UpdateTestOrder;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 // UC-CODEGEN-002, Rule-CODEGEN-077
-public class MoveTestMethod extends UpdateTestBase implements GenAction {
+public class MoveTestMethod extends UpdateTestBase implements GenAction<MovedTestCase> {
     private static final @NotNull String TESTNG_TEST = "org.testng.annotations.Test";
 
     // UC-CODEGEN-002, Rule-CODEGEN-077
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        executeAll(p, List.of(obj));
+    public void execute(final @NotNull Project p, final @NotNull MovedTestCase moved) {
+        executeAll(p, List.of(moved));
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-077, Rule-CODEGEN-014
     @Override
-    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        final @NotNull List<MovedTestCase> moves = new ArrayList<>();
-        for (final Object item : items) {
-            if (item instanceof MovedTestCase moved) moves.add(moved);
-        }
+    public void executeAll(final @NotNull Project p, final @NotNull List<? extends MovedTestCase> moves) {
         if (moves.isEmpty()) return;
 
         final @NotNull Runnable inCommand = () ->

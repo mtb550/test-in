@@ -35,15 +35,15 @@ import java.util.function.BiConsumer;
 public class TestCaseUpdateMenuDialog {
     private final @NotNull Project p;
     private final @NotNull List<TestCaseDto> items;
-    private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GenType> updatedItems;
+    private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GenType<TestCaseDto>> updatedItems;
 
-    public TestCaseUpdateMenuDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GenType> updatedItems) {
+    public TestCaseUpdateMenuDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GenType<TestCaseDto>> updatedItems) {
         this.p = p;
         this.items = items;
         this.updatedItems = updatedItems;
     }
 
-    public static void applyAftermath(final @NotNull Project p, final @NotNull List<TestCaseDto> updated, final @NotNull GenType gt) {
+    public static void applyAftermath(final @NotNull Project p, final @NotNull List<TestCaseDto> updated, final @NotNull GenType<TestCaseDto> gt) {
         ViewToolWindowFactory.refreshIfShowing(p, updated);
 
         Logger.trace("Generating automation code for " + updated.size() + ": " + gt);
@@ -70,7 +70,7 @@ public class TestCaseUpdateMenuDialog {
 
     // UC-EDITOR-PANEL-006, UC-EDITOR-PANEL-007
     public void open(final @NotNull UpdateTestCaseFields field) {
-        final @NotNull GenType gt = field.getGt();
+        final @NotNull GenType<TestCaseDto> gt = field.getGt();
         Logger.trace("Update field -> " + field.getName() + " | changeType = " + gt);
 
         if (items.size() == 1) {

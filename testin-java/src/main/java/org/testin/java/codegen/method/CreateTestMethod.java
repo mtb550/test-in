@@ -58,7 +58,7 @@ import java.util.Optional;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
-public class CreateTestMethod implements GenAction {
+public class CreateTestMethod implements GenAction<TestCaseDto> {
     private static final @NotNull String TESTNG_TEST = "org.testng.annotations.Test";
 
     static @NotNull Optional<Target> parse(final @NotNull List<String> fqcn) {
@@ -113,20 +113,16 @@ public class CreateTestMethod implements GenAction {
 
     // UC-CODEGEN-002
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (!(obj instanceof TestCaseDto tc)) return;
-
+    public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         executeAll(p, List.of(tc));
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-018
     @Override
-    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+    public void executeAll(final @NotNull Project p, final @NotNull List<? extends TestCaseDto> items) {
         final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
 
-        for (final Object item : items) {
-            if (!(item instanceof TestCaseDto tc)) continue;
-
+        for (final TestCaseDto tc : items) {
             final @NotNull List<String> fqcn = Fqcn.ofMethod(tc);
             parse(fqcn).ifPresentOrElse(
                     target -> byClass.computeIfAbsent(target.path(), _ -> new ArrayList<>()).add(tc),

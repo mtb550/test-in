@@ -23,12 +23,12 @@ public interface CodeGenerators {
     @NotNull ExtensionPointName<CodeGenerators> EP = ExtensionPointName.create("org.testin.codeGenerators");
 
     // UC-CODEGEN-019, Rule-CODEGEN-005
-    static @NotNull GenAction find(final @NotNull GenType type) {
+    static <T> @NotNull GenAction<T> find(final @NotNull GenType<T> type) {
         return EP.getExtensionList().stream()
                 .findFirst()
                 .map(generators -> generators.actionFor(type))
-                .orElseGet(() -> new NoJavaCode(type.getDescription()));
+                .orElseGet(() -> new NoJavaCode<>(type.getDescription()));
     }
 
-    @NotNull GenAction actionFor(final @NotNull GenType type);
+    <T> @NotNull GenAction<T> actionFor(final @NotNull GenType<T> type);
 }

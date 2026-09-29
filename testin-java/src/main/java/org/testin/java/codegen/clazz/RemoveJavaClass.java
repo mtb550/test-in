@@ -25,12 +25,10 @@ import org.testin.model.dto.dirs.DirectoryDto;
 
 import java.util.List;
 
-public class RemoveJavaClass implements GenAction {
+public class RemoveJavaClass implements GenAction<DirectoryDto> {
     // UC-CODEGEN-018, Rule-CODEGEN-059
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (!(obj instanceof DirectoryDto dir)) return;
-
+    public void execute(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final @NotNull List<String> fqcn = Fqcn.ofClass(dir);
         if (fqcn.isEmpty()) return;
 

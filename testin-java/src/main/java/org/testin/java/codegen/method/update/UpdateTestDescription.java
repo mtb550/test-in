@@ -24,11 +24,10 @@ import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;
 
-public class UpdateTestDescription extends UpdateTestBase implements GenAction {
+public class UpdateTestDescription extends UpdateTestBase implements GenAction<TestCaseDto> {
     // UC-CODEGEN-010, Rule-CODEGEN-039, Rule-CODEGEN-040
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (!(obj instanceof TestCaseDto tc)) return;
+    public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         applyOrCreate(p, tc, GenType.UPDATE_TEST_CASE_DESCRIPTION.getDescription(), pm -> {
             writeDescription(p, pm, tc);
             reformat(p, pm);
@@ -36,7 +35,7 @@ public class UpdateTestDescription extends UpdateTestBase implements GenAction {
     }
 
     @Override
-    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+    public void executeAll(final @NotNull Project p, final @NotNull List<? extends TestCaseDto> items) {
         applyToEach(p, items, GenType.UPDATE_TEST_CASE_DESCRIPTION.getDescription(), (pm, tc) -> writeDescription(p, pm, tc));
     }
 }

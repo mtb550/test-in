@@ -23,12 +23,10 @@ import org.testin.java.codegen.method.update.UpdateTestBase;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 
-public class RemoveTestMethod extends UpdateTestBase implements GenAction {
+public class RemoveTestMethod extends UpdateTestBase implements GenAction<TestCaseDto> {
     // UC-CODEGEN-014, Rule-CODEGEN-049, Rule-CODEGEN-050
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (!(obj instanceof TestCaseDto tc)) return;
-
+    public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         applyToMethod(p, tc, "Remove Test Method", pm -> {
             final @NotNull String name = pm.getName();
             pm.delete();

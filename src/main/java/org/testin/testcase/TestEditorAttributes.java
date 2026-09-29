@@ -240,11 +240,11 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     private final @NotNull ToolBarDefault toolBarDefault;
     private final @NotNull Function<TestCaseDto, String> testValueExtractor;
     private final @NotNull ImportSetter importSetter;
-    private final @NotNull GenType genType;
+    private final @NotNull GenType<TestCaseDto> genType;
     @Getter(AccessLevel.NONE)
     private final @NotNull Set<Can> can;
 
-    TestEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull Function<TestCaseDto, String> testValueExtractor, final @NotNull ImportSetter importSetter, final @NotNull GenType genType, final @NotNull Can... can) {
+    TestEditorAttributes(final @NotNull String name, final @NotNull ToolBarDefault toolBarDefault, final @NotNull Function<TestCaseDto, String> testValueExtractor, final @NotNull ImportSetter importSetter, final @NotNull GenType<TestCaseDto> genType, final @NotNull Can... can) {
         this.name = name;
         this.toolBarDefault = toolBarDefault;
         this.testValueExtractor = testValueExtractor;

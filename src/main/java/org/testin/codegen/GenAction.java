@@ -22,11 +22,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @FunctionalInterface
-public interface GenAction {
-    void execute(final @NotNull Project p, final @NotNull Object obj);
+public interface GenAction<T> {
+    void execute(final @NotNull Project p, final @NotNull T payload);
 
-    default void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        for (final Object item : items) execute(p, item);
+    default void executeAll(final @NotNull Project p, final @NotNull List<? extends T> items) {
+        for (final T item : items) execute(p, item);
     }
 
     // Rule-CODEGEN-081

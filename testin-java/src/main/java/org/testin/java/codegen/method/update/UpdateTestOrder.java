@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Optional;
 
 // Rule-CODEGEN-014
-public class UpdateTestOrder extends UpdateTestBase implements GenAction {
+public class UpdateTestOrder extends UpdateTestBase implements GenAction<TestCaseDto> {
     // UC-CODEGEN-011, Rule-CODEGEN-067
     private static @NotNull PsiElement place(final @NotNull PsiClass pc, final @NotNull PsiMethod pm, final @NotNull Optional<PsiElement> after) {
         return after.map(previous -> placeAfter(pc, pm, previous)).orElseGet(() -> placeFirst(pc, pm));
@@ -78,18 +78,17 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
     }
 
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (obj instanceof TestCaseDto tc) executeAll(p, List.of(tc));
+    public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        executeAll(p, List.of(tc));
     }
 
     // UC-CODEGEN-011, Rule-CODEGEN-042, Rule-CODEGEN-067
     @Override
-    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
+    public void executeAll(final @NotNull Project p, final @NotNull List<? extends TestCaseDto> items) {
         final @NotNull Map<Path, List<TestCaseDto>> sets = new LinkedHashMap<>();
 
-        for (final Object item : items) {
-            if (item instanceof TestCaseDto tc)
-                sets.computeIfAbsent(tc.getParent().getPath(), _ -> ExecutionPosition.setOf(p, tc));
+        for (final TestCaseDto tc : items) {
+            sets.computeIfAbsent(tc.getParent().getPath(), _ -> ExecutionPosition.setOf(p, tc));
         }
         if (sets.isEmpty()) return;
 

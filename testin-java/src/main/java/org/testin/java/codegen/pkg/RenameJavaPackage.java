@@ -32,12 +32,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-public class RenameJavaPackage implements GenAction {
+public class RenameJavaPackage implements GenAction<Renamed> {
     // UC-CODEGEN-017, Rule-CODEGEN-056
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (!(obj instanceof Renamed renamed)) return;
-
+    public void execute(final @NotNull Project p, final @NotNull Renamed renamed) {
         final @NotNull List<String> fqcn = Fqcn.ofPackage(renamed.dir());
 
         JavaSourceRoot.find(p).ifPresentOrElse(

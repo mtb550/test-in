@@ -37,19 +37,15 @@ import java.util.Map;
 import java.util.Optional;
 
 // Rule-CODEGEN-044
-public class ReconcileTestMethod extends UpdateTestBase implements GenAction {
+public class ReconcileTestMethod extends UpdateTestBase implements GenAction<TestCaseDto> {
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (obj instanceof TestCaseDto tc) executeAll(p, List.of(tc));
+    public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        executeAll(p, List.of(tc));
     }
 
     // UC-CODEGEN-002, Rule-CODEGEN-068
     @Override
-    public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        final @NotNull List<TestCaseDto> testCases = new ArrayList<>();
-        for (final Object item : items) {
-            if (item instanceof TestCaseDto tc) testCases.add(tc);
-        }
+    public void executeAll(final @NotNull Project p, final @NotNull List<? extends TestCaseDto> testCases) {
         if (testCases.isEmpty()) return;
 
         final @NotNull Map<Path, List<TestCaseDto>> byClass = new LinkedHashMap<>();

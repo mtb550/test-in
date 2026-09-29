@@ -56,7 +56,7 @@ record UpdateTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @Not
                 save(path, ids, before, updatedItems, gt))));
     }
 
-    private void save(final @NotNull Path path, final @NotNull List<UUID> ids, final @NotNull TestCaseSnapshot before, final @NotNull List<TestCaseDto> updatedItems, final @NotNull GenType gt) {
+    private void save(final @NotNull Path path, final @NotNull List<UUID> ids, final @NotNull TestCaseSnapshot before, final @NotNull List<TestCaseDto> updatedItems, final @NotNull GenType<TestCaseDto> gt) {
         int counted = 0;
         for (final TestCaseDto tc : updatedItems)
             if (testCases.putTestCase(path, tc)) counted++;

@@ -19,10 +19,8 @@ package org.testin.codegen;
 import org.testin.codegen.method.update.NoOpCodeUpdate;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -30,7 +28,7 @@ public class GenTypeActionTest {
 
     @Test
     public void aDataOnlyAttributeCarriesTheNoOp() {
-        for (final GenType type : List.of(
+        for (final GenType<?> type : List.of(
                 GenType.UPDATE_TEST_CASE_EXPECTED_RESULT,
                 GenType.UPDATE_TEST_CASE_MODULE,
                 GenType.UPDATE_TEST_CASE_TEST_DATA,
@@ -46,7 +44,7 @@ public class GenTypeActionTest {
 
     @Test
     public void anOperationThatWritesCodeDoesNot() {
-        for (final GenType type : List.of(
+        for (final GenType<?> type : List.of(
                 GenType.CREATE_TEST_CASE,
                 GenType.REMOVE_TEST_CASE,
                 GenType.UPDATE_TEST_CASE_DESCRIPTION,
@@ -59,10 +57,5 @@ public class GenTypeActionTest {
             assertFalse(type.getAction() instanceof NoOpCodeUpdate,
                     type + " writes code, so it must reach a generator");
         }
-    }
-
-    @Test
-    public void everyOperationCarriesAnAction() {
-        assertEquals(Arrays.stream(GenType.values()).filter(_ -> false).count(), 0L);
     }
 }

@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.model.MenuItem;
 import org.testin.model.StatusBarItem;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.create.CreateTestCaseSection;
@@ -160,7 +161,7 @@ public enum UpdateTestCaseFields implements MenuItem {
     private final @NotNull String name;
     private final @NotNull Shortcuts shortcut;
     private final @NotNull Icon icon;
-    private final @NotNull GenType gt;
+    private final @NotNull GenType<TestCaseDto> gt;
     private final @NotNull BulkEditorAction bulkAction;
     private final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor;
 

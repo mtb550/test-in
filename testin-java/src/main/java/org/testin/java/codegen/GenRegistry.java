@@ -39,42 +39,47 @@ import org.testin.java.codegen.pkg.MoveJavaPackage;
 import org.testin.java.codegen.pkg.RemoveJavaPackage;
 import org.testin.java.codegen.pkg.RenameJavaPackage;
 
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @NoArgsConstructor
 public final class GenRegistry implements CodeGenerators {
-    private final @NotNull Map<GenType, GenAction> actions = byType();
+    private final @NotNull Map<GenType<?>, GenAction<?>> actions = byType();
 
-    private static @NotNull Map<GenType, GenAction> byType() {
-        final @NotNull Map<GenType, GenAction> byType = new EnumMap<>(GenType.class);
+    private static @NotNull Map<GenType<?>, GenAction<?>> byType() {
+        final @NotNull Map<GenType<?>, GenAction<?>> byType = new HashMap<>();
 
-        byType.put(GenType.RENAME_TEST_PROJECT, new RenameJavaPackage());
-        byType.put(GenType.REMOVE_TEST_PROJECT, new RemoveJavaPackage());
-        byType.put(GenType.REMOVE_TEST_SET_PACKAGE, new RemoveJavaPackage());
-        byType.put(GenType.RENAME_TEST_SET_PACKAGE, new RenameJavaPackage());
-        byType.put(GenType.MOVE_TEST_SET_PACKAGE, new MoveJavaPackage());
-        byType.put(GenType.CREATE_TEST_SET, new CreateJavaClass());
-        byType.put(GenType.REMOVE_TEST_SET, new RemoveJavaClass());
-        byType.put(GenType.RENAME_TEST_SET, new RenameJavaClass());
-        byType.put(GenType.MOVE_TEST_SET, new MoveJavaClass());
-        byType.put(GenType.CREATE_TEST_CASE, new CreateTestMethod());
-        byType.put(GenType.REMOVE_TEST_CASE, new RemoveTestMethod());
-        byType.put(GenType.MOVE_TEST_CASE, new MoveTestMethod());
-        byType.put(GenType.COPY_TEST_CASE, new CopyTestMethod());
-        byType.put(GenType.UPDATE_TEST_CASE_DESCRIPTION, new UpdateTestDescription());
-        byType.put(GenType.UPDATE_TEST_CASE_GROUP, new UpdateTestGroup());
-        byType.put(GenType.UPDATE_TEST_CASE_ORDER, new UpdateTestOrder());
-        byType.put(GenType.UPDATE_TEST_CASE_STATUS, new UpdateTestEnabled());
-        byType.put(GenType.RECONCILE_TEST_CASE, new ReconcileTestMethod());
+        put(byType, GenType.RENAME_TEST_PROJECT, new RenameJavaPackage());
+        put(byType, GenType.REMOVE_TEST_PROJECT, new RemoveJavaPackage());
+        put(byType, GenType.REMOVE_TEST_SET_PACKAGE, new RemoveJavaPackage());
+        put(byType, GenType.RENAME_TEST_SET_PACKAGE, new RenameJavaPackage());
+        put(byType, GenType.MOVE_TEST_SET_PACKAGE, new MoveJavaPackage());
+        put(byType, GenType.CREATE_TEST_SET, new CreateJavaClass());
+        put(byType, GenType.REMOVE_TEST_SET, new RemoveJavaClass());
+        put(byType, GenType.RENAME_TEST_SET, new RenameJavaClass());
+        put(byType, GenType.MOVE_TEST_SET, new MoveJavaClass());
+        put(byType, GenType.CREATE_TEST_CASE, new CreateTestMethod());
+        put(byType, GenType.REMOVE_TEST_CASE, new RemoveTestMethod());
+        put(byType, GenType.MOVE_TEST_CASE, new MoveTestMethod());
+        put(byType, GenType.COPY_TEST_CASE, new CopyTestMethod());
+        put(byType, GenType.UPDATE_TEST_CASE_DESCRIPTION, new UpdateTestDescription());
+        put(byType, GenType.UPDATE_TEST_CASE_GROUP, new UpdateTestGroup());
+        put(byType, GenType.UPDATE_TEST_CASE_ORDER, new UpdateTestOrder());
+        put(byType, GenType.UPDATE_TEST_CASE_STATUS, new UpdateTestEnabled());
+        put(byType, GenType.RECONCILE_TEST_CASE, new ReconcileTestMethod());
 
         return byType;
     }
 
+    private static <T> void put(final @NotNull Map<GenType<?>, GenAction<?>> byType, final @NotNull GenType<T> type, final @NotNull GenAction<T> action) {
+        byType.put(type, action);
+    }
+
     @Override
-    public @NotNull GenAction actionFor(final @NotNull GenType type) {
-        return Optional.ofNullable(actions.get(type))
-                .orElseGet(() -> new NoJavaCode(type.getDescription()));
+    @SuppressWarnings("unchecked")
+    public <T> @NotNull GenAction<T> actionFor(final @NotNull GenType<T> type) {
+        return Optional.ofNullable((GenAction<T>) actions.get(type))
+                .orElseGet(() -> new NoJavaCode<>(type.getDescription()));
     }
 }

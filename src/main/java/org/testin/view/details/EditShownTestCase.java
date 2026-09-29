@@ -84,7 +84,7 @@ public final class EditShownTestCase {
     }
 
     // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007
-    private static void save(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath, final @NotNull List<TestCaseDto> tcs, final @NotNull GenType gt, final @NotNull List<UUID> ids, final @NotNull Optional<TestCaseSnapshot> before) {
+    private static void save(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath, final @NotNull List<TestCaseDto> tcs, final @NotNull GenType<TestCaseDto> gt, final @NotNull List<UUID> ids, final @NotNull Optional<TestCaseSnapshot> before) {
         final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
 
         writesTo(p, dto, currentPath).ifPresentOrElse(editPath -> {

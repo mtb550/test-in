@@ -30,12 +30,10 @@ import org.testin.logger.Logger;
 import java.util.List;
 import java.util.Optional;
 
-public class MoveJavaClass implements GenAction {
+public class MoveJavaClass implements GenAction<Moved> {
     // UC-CODEGEN-016, Rule-CODEGEN-053, Rule-CODEGEN-054
     @Override
-    public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (!(obj instanceof Moved moved)) return;
-
+    public void execute(final @NotNull Project p, final @NotNull Moved moved) {
         final @NotNull List<String> fqcn = Fqcn.ofClass(moved.dir());
         if (fqcn.isEmpty()) return;
 

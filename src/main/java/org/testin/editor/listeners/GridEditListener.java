@@ -109,7 +109,7 @@ public class GridEditListener extends AbstractGridEditListener {
         }
 
         final boolean first = changedThisGesture.isEmpty();
-        final @NotNull Set<GenType> generators = Optional.ofNullable(changedThisGesture.get(edited.getId()))
+        final @NotNull Set<GenType<TestCaseDto>> generators = Optional.ofNullable(changedThisGesture.get(edited.getId()))
                 .map(Changed::generators)
                 .orElseGet(LinkedHashSet::new);
         generators.add(attr.getGenType());
