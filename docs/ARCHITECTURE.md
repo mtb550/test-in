@@ -176,8 +176,8 @@ fails if something does (#361, Rule-INTERNAL-114).
 test case, test run and marker, and the EDT and pooled threads read the same
 one. Only `model` and `indexer` call a setter on them, and `ArchitectureTest`
 fails if anything else does (#376, Rule-INTERNAL-117). A test case is edited as
-a copy - `TestCaseDto.edit()` - and handed to `TestCases`, which writes the file
-and then writes the copy into the instance it holds, so every surface showing
+a copy - `TestCaseDto.edit()` - and handed to `TestCases`. It writes the file
+first, then writes the copy into the instance it holds. So every surface showing
 that test case sees the change without being handed a new object. A run item, a
 run or a marker is changed inside the lambda `TestRuns` runs before it saves,
 through a method named for the change - `linkBug`, `recordFailure`,
