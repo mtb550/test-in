@@ -18,7 +18,6 @@ package org.testin.indexer;
 
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
@@ -46,9 +45,14 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 @Service(Service.Level.PROJECT)
-@AllArgsConstructor
 public final class Nodes {
     private final @NotNull Project p;
+    private final @NotNull DeletedNodes deletedNodes;
+
+    public Nodes(final @NotNull Project p) {
+        this.p = p;
+        this.deletedNodes = Services.getInstance(DeletedNodes.class);
+    }
 
     private static boolean sameFile(final @NotNull Path one, final @NotNull Path other) {
         try {
@@ -146,7 +150,7 @@ public final class Nodes {
 
     // UC-INTERNAL-005, Rule-INTERNAL-037, Rule-INTERNAL-041
     public @NotNull Optional<Path> keepAside(final @NotNull Path node) {
-        return Services.getInstance(DeletedNodes.class).keep(node);
+        return deletedNodes.keep(node);
     }
 
     // UC-INTERNAL-005, Rule-INTERNAL-042
@@ -154,7 +158,7 @@ public final class Nodes {
         final @NotNull List<Path> back = new ArrayList<>();
         final @NotNull List<Path> lost = new ArrayList<>();
         for (final Map.Entry<Path, Path> one : originalByKept.entrySet()) {
-            if (Services.getInstance(DeletedNodes.class).putBack(p, one.getKey(), one.getValue())) back.add(one.getValue());
+            if (deletedNodes.putBack(p, one.getKey(), one.getValue())) back.add(one.getValue());
             else lost.add(one.getValue());
         }
 
@@ -167,7 +171,7 @@ public final class Nodes {
 
     // UC-INTERNAL-005, Rule-INTERNAL-043
     public void forgetKept(final @NotNull Path kept) {
-        Services.getInstance(DeletedNodes.class).forget(kept);
+        deletedNodes.forget(kept);
     }
 
     // UC-TREE-PANEL-002

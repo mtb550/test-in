@@ -40,6 +40,8 @@ public final class DeletedNodes {
 
     private final @NotNull AtomicBoolean swept = new AtomicBoolean();
 
+    private final @NotNull OwnWrites ownWrites = Services.getInstance(OwnWrites.class);
+
     // UC-INTERNAL-005, Rule-INTERNAL-044
     public void sweep() {
         if (!swept.compareAndSet(false, true)) return;
@@ -77,7 +79,7 @@ public final class DeletedNodes {
         }
 
         try {
-            Services.getInstance(OwnWrites.class).record(p, original);
+            ownWrites.record(p, original);
             Files.createDirectories(original.getParent());
 
             if (Files.isDirectory(kept)) FileUtil.copyDir(kept.toFile(), original.toFile());

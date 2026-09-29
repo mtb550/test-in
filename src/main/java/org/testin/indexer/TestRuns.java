@@ -18,7 +18,6 @@ package org.testin.indexer;
 
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
@@ -36,20 +35,19 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service(Service.Level.PROJECT)
-@AllArgsConstructor
 public final class TestRuns {
-    private final @NotNull Project p;
+    private final @NotNull ProjectIndexer indexer;
 
-    private @NotNull ProjectIndexer indexer() {
-        return Services.getInstance(p, ProjectIndexer.class);
+    public TestRuns(final @NotNull Project p) {
+        this.indexer = Services.getInstance(p, ProjectIndexer.class);
     }
 
     private @NotNull IndexerDataStore store() {
-        return indexer().getStore();
+        return indexer.getStore();
     }
 
     private @NotNull RunWriter runWriter() {
-        return indexer().getRunWriter();
+        return indexer.getRunWriter();
     }
 
     public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
@@ -99,7 +97,7 @@ public final class TestRuns {
             final @NotNull TestRunMarker marker = dir.getMarker();
             change.accept(marker);
             runWriter().persistMarker(runPath);
-            indexer().announce(runPath);
+            indexer.announce(runPath);
         }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + runPath.getFileName()));
     }
 

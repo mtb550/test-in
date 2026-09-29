@@ -19,7 +19,6 @@ package org.testin.indexer;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
@@ -57,11 +56,23 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@AllArgsConstructor
 final class IndexingScanner {
     private static final int SHOWN = 5;
     private final @NotNull Project p;
     private final @NotNull IndexerDataStore store;
+    private final @NotNull DirectoryMapper directoryMapper;
+    private final @NotNull Mapper mapper;
+    private final @NotNull Notifier notifier;
+    private final @NotNull TestDataFiles testDataFiles;
+
+    IndexingScanner(final @NotNull Project p, final @NotNull IndexerDataStore store) {
+        this.p = p;
+        this.store = store;
+        this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
+        this.mapper = Services.getInstance(p, Mapper.class);
+        this.notifier = Services.getInstance(p, Notifier.class);
+        this.testDataFiles = Services.getInstance(p, TestDataFiles.class);
+    }
 
     private static boolean looksLikeATestCaseFile(final @NotNull Path file) {
         return FileKind.TEST_CASE.idIn(file).isPresent();
@@ -130,7 +141,7 @@ final class IndexingScanner {
     // UC-INTERNAL-002, Rule-INTERNAL-005, Rule-INTERNAL-007, Rule-INTERNAL-091
     private void scanProjectContents(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
-            final @NotNull TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).getTestProjectNode(p, projectPath);
+            final @NotNull TestProjectDirectoryDto tp = directoryMapper.getTestProjectNode(p, projectPath);
 
             // Rule-INTERNAL-091
             final @NotNull Optional<String> refused = tp.getMarker().whyNotReadable();
@@ -184,7 +195,7 @@ final class IndexingScanner {
             indicator.setText(Bundle.message("indexer.progress.project.done", tp.getName()));
 
             reportUnread(tp.getName(), unread);
-            reportDamaged(tp.getName(), Services.getInstance(p, ProjectIndexer.class).takeDamagedMarkers());
+            reportDamaged(tp.getName(), store.takeDamagedMarkers());
             reportUnreadableResults(tp.getName(), scanned.getUnreadableResults());
             reportHandNamedResults(tp.getName(), scanned.getHandNamedResults());
             reportClashing(tp.getName(), List.copyOf(scanned.getClashingTestCases()));
@@ -217,8 +228,7 @@ final class IndexingScanner {
     // UC-INTERNAL-002, Rule-INTERNAL-008, Rule-INTERNAL-015
     private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
         try {
-            final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
-            final @NotNull TestSetPackageDirectoryDto tsp = dirMapper.getTestSetPackageNode(p, path, parent);
+            final @NotNull TestSetPackageDirectoryDto tsp = directoryMapper.getTestSetPackageNode(p, path, parent);
 
             scanned.getTestSetPackages().put(path.toString(), tsp);
 
@@ -238,13 +248,11 @@ final class IndexingScanner {
     // UC-INTERNAL-002, Rule-INTERNAL-011
     private void scanTestSet(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull ScannedProject scanned) {
         try {
-            final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
-            final @NotNull TestSetDirectoryDto ts = dirMapper.getTestSetNode(p, path, parent);
+            final @NotNull TestSetDirectoryDto ts = directoryMapper.getTestSetNode(p, path, parent);
 
             scanned.getTestSets().put(path.toString(), ts);
 
             final @NotNull List<UUID> testCaseIds = TestCaseSequenceStore.testCaseIds(List.of());
-            final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
 
             try (Stream<Path> files = Files.list(path)) {
                 files.filter(Files::isRegularFile)
@@ -310,8 +318,7 @@ final class IndexingScanner {
     // UC-INTERNAL-002, Rule-INTERNAL-010, Rule-INTERNAL-015
     private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
         try {
-            final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
-            final @NotNull TestRunPackageDirectoryDto trp = dirMapper.getTestRunPackageNode(p, path, parent);
+            final @NotNull TestRunPackageDirectoryDto trp = directoryMapper.getTestRunPackageNode(p, path, parent);
 
             scanned.getTestRunPackages().put(path.toString(), trp);
 
@@ -396,7 +403,7 @@ final class IndexingScanner {
         if (names.isEmpty()) return;
 
         if (names.size() == 1) {
-            Services.getInstance(p, Notifier.class).warn(p, title, one.apply(names.getFirst()));
+            notifier.warn(p, title, one.apply(names.getFirst()));
             return;
         }
 
@@ -405,7 +412,7 @@ final class IndexingScanner {
                 ? Bundle.message("indexer.more", String.valueOf(names.size() - SHOWN))
                 : "";
 
-        Services.getInstance(p, Notifier.class).warn(p, title, many.apply(named, rest));
+        notifier.warn(p, title, many.apply(named, rest));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-082
@@ -420,15 +427,14 @@ final class IndexingScanner {
                 ? Bundle.message("indexer.clash.one")
                 : Bundle.message("indexer.clash.many", String.valueOf(clashing.size()));
 
-        Services.getInstance(p, Notifier.class).warn(p, Bundle.message("indexer.clash.title", projectName),
+        notifier.warn(p, Bundle.message("indexer.clash.title", projectName),
                 Bundle.message("indexer.clash.message", count, named, rest));
     }
 
     // UC-INTERNAL-002
     private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull ScannedProject scanned) {
         try {
-            final @NotNull DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
-            final @NotNull TestRunDirectoryDto tr = dirMapper.getTestRunNode(p, path, parent);
+            final @NotNull TestRunDirectoryDto tr = directoryMapper.getTestRunNode(p, path, parent);
 
             scanned.getTestRunDirs().put(path.toString(), tr);
 
@@ -445,10 +451,9 @@ final class IndexingScanner {
 
     // UC-INTERNAL-002, Rule-INTERNAL-011, Rule-INTERNAL-012
     private @NotNull List<TestRunItems> resultsIn(final @NotNull Path runPath, final @NotNull ScannedProject scanned) {
-        final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
         final @NotNull List<TestRunItems> read = new ArrayList<>();
 
-        for (final Path file : Services.getInstance(p, TestDataFiles.class).resultsIn(runPath)) {
+        for (final Path file : testDataFiles.resultsIn(runPath)) {
             // Rule-INTERNAL-094
             final @NotNull Optional<UUID> id = FileKind.RUN_ITEM.idIn(file);
             if (id.isEmpty()) {

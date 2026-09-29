@@ -17,7 +17,6 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
@@ -35,11 +34,23 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@AllArgsConstructor
 final class MarkerFiles {
     private final @NotNull Project p;
 
+    private final @NotNull Mapper mapper;
+
+    private final @NotNull TestDataFiles testDataFiles;
+
+    private final @NotNull AppSettingsState settings;
+
     private final @NotNull Set<Path> damaged = ConcurrentHashMap.newKeySet();
+
+    MarkerFiles(final @NotNull Project p) {
+        this.p = p;
+        this.mapper = Services.getInstance(p, Mapper.class);
+        this.testDataFiles = Services.getInstance(p, TestDataFiles.class);
+        this.settings = Services.getInstance(p, AppSettingsState.class);
+    }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
     <M extends AbstractMarker> @NotNull M read(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name, final @NotNull Class<M> markerClass) {
@@ -48,7 +59,7 @@ final class MarkerFiles {
         if (!Files.exists(markerFile)) return defaultFor(markerClass, kind);
 
         try {
-            return Services.getInstance(p, Mapper.class).readValue(markerFile.toFile(), markerClass);
+            return mapper.readValue(markerFile.toFile(), markerClass);
 
         } catch (final Exception ex) {
             Logger.warn("Unreadable " + kind.getMarkerKind() + " marker '" + name + "', using defaults: " + ex.getMessage());
@@ -74,7 +85,7 @@ final class MarkerFiles {
         // Rule-INTERNAL-090
         if (marker instanceof Marker m && m.getId().isEmpty()) m.setId(UUID.randomUUID().toString());
 
-        return Services.getInstance(p, TestDataFiles.class).write(p, file, marker);
+        return testDataFiles.write(p, file, marker);
     }
 
     // Rule-INTERNAL-090, Rule-TREE-PANEL-051
@@ -83,10 +94,10 @@ final class MarkerFiles {
         if (kind.isEmpty()) return false;
 
         try {
-            final @NotNull AbstractMarker marker = Services.getInstance(p, Mapper.class).readValue(markerFile.toFile(), kind.orElseThrow().getMarkerClass());
+            final @NotNull AbstractMarker marker = mapper.readValue(markerFile.toFile(), kind.orElseThrow().getMarkerClass());
             marker.setId(UUID.randomUUID().toString());
 
-            return Services.getInstance(p, TestDataFiles.class).write(p, markerFile, marker);
+            return testDataFiles.write(p, markerFile, marker);
 
         } catch (final Exception ex) {
             Logger.warn("Left the copied marker " + markerFile + " without an id of its own: " + ex.getMessage());
@@ -96,7 +107,7 @@ final class MarkerFiles {
 
     private boolean parses(final @NotNull Path file, final @NotNull Class<?> markerClass) {
         try {
-            Services.getInstance(p, Mapper.class).readValue(file.toFile(), markerClass);
+            mapper.readValue(file.toFile(), markerClass);
             return true;
         } catch (final Exception unreadable) {
             return false;
@@ -105,7 +116,7 @@ final class MarkerFiles {
 
     void touched(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Marker marker) {
         marker.touch(tester());
-        if (Services.getInstance(p, TestDataFiles.class).alreadyHolds(p, dirPath.resolve(markerFileName), marker)) return;
+        if (testDataFiles.alreadyHolds(p, dirPath.resolve(markerFileName), marker)) return;
 
         write(dirPath, markerFileName, marker);
     }
@@ -128,7 +139,7 @@ final class MarkerFiles {
     }
 
     private @NotNull String tester() {
-        return Services.getInstance(p, AppSettingsState.class).testerName;
+        return settings.testerName;
     }
 
     private <M> @NotNull M defaultFor(final @NotNull Class<M> markerClass, final @NotNull DirectoryType kind) {

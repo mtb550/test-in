@@ -41,6 +41,8 @@ import java.util.stream.Stream;
 @Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class TestDataFiles {
+    private final @NotNull OwnWrites ownWrites = Services.getInstance(OwnWrites.class);
+
     // UC-INTERNAL-004, Rule-INTERNAL-033
     <T> boolean alreadyHolds(final @NotNull Project p, final @NotNull Path path, final @NotNull T content) {
         try {
@@ -103,12 +105,12 @@ final class TestDataFiles {
         }
 
         try {
-            Services.getInstance(OwnWrites.class).record(p, path);
+            ownWrites.record(p, path);
 
             FileUtil.createParentDirs(path.toFile());
             Files.write(path, jsonBytes);
 
-            Services.getInstance(OwnWrites.class).wrote(p, path, jsonBytes);
+            ownWrites.wrote(p, path, jsonBytes);
             return true;
         } catch (final IOException ex) {
             reportWriteFailure(p, path, ex);
@@ -119,7 +121,7 @@ final class TestDataFiles {
     // UC-INTERNAL-005, Rule-INTERNAL-036, Rule-INTERNAL-113
     boolean delete(final @NotNull Project p, final @NotNull Path path) {
         try {
-            Services.getInstance(OwnWrites.class).record(p, path);
+            ownWrites.record(p, path);
 
             if (!Trash.accepted(p, path)) Files.deleteIfExists(path);
         } catch (final IOException ex) {
@@ -133,7 +135,7 @@ final class TestDataFiles {
     // Rule-INTERNAL-113
     boolean discard(final @NotNull Project p, final @NotNull Path path) {
         try {
-            Services.getInstance(OwnWrites.class).record(p, path);
+            ownWrites.record(p, path);
 
             Files.deleteIfExists(path);
         } catch (final IOException ex) {

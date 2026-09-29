@@ -68,10 +68,20 @@ public final class ProjectIndexer {
     private final @NotNull RunWriter runWriter;
     @Getter(AccessLevel.PACKAGE)
     private final @NotNull NodeFiles nodeFiles;
+    private final @NotNull TestinRoot testinRoot;
+    private final @NotNull Rescan rescan;
+    private final @NotNull BoundTestProject boundTestProject;
+    private final @NotNull DirectoryMapper directoryMapper;
+    private final @NotNull LastOpenEditors lastOpenEditors;
     private volatile @NotNull CountDownLatch indexingLatch = new CountDownLatch(1);
 
     public ProjectIndexer(final @NotNull Project p) {
         this.p = p;
+        this.testinRoot = Services.getInstance(p, TestinRoot.class);
+        this.rescan = Services.getInstance(Rescan.class);
+        this.boundTestProject = Services.getInstance(p, BoundTestProject.class);
+        this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
+        this.lastOpenEditors = Services.getInstance(p, LastOpenEditors.class);
         this.store = new IndexerDataStore(p);
         this.scanCoordinator = new ProjectScanCoordinator(new IndexingScanner(p, store));
         this.runWriter = new RunWriter(p, store);
@@ -180,7 +190,7 @@ public final class ProjectIndexer {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (restoreEditorsOnComplete.getAndSet(false)) {
                 Logger.info("Indexing finished, restoring open editors.");
-                Services.getInstance(p, LastOpenEditors.class).reopen(p);
+                lastOpenEditors.reopen(p);
             } else {
                 Logger.info("Indexing finished, skipping editor restore.");
             }
@@ -223,7 +233,7 @@ public final class ProjectIndexer {
     }
 
     private @NotNull Path absoluteRoot() {
-        return Services.getInstance(p, TestinRoot.class).absolutePath();
+        return testinRoot.absolutePath();
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-114
@@ -253,7 +263,7 @@ public final class ProjectIndexer {
 
     // UC-INTERNAL-002, Rule-INTERNAL-006
     private @NotNull List<Path> boundOnly(final @NotNull List<Path> projects) {
-        final @NotNull String bound = Services.getInstance(p, BoundTestProject.class).name();
+        final @NotNull String bound = boundTestProject.name();
         if (bound.isEmpty()) return projects;
 
         final @NotNull List<Path> scoped = projects.stream()
@@ -270,7 +280,7 @@ public final class ProjectIndexer {
     }
 
     private boolean isBound(final @NotNull Path projectPath) {
-        final @NotNull String bound = Services.getInstance(p, BoundTestProject.class).name();
+        final @NotNull String bound = boundTestProject.name();
         return bound.isEmpty() || bound.equals(projectPath.getFileName().toString());
     }
 
@@ -282,8 +292,7 @@ public final class ProjectIndexer {
         for (final Path path : collectValidProjects(root)) {
             final @NotNull String name = path.getFileName().toString();
             try {
-                byName.put(name, Services.getInstance(p, DirectoryMapper.class)
-                        .getTestProjectNode(p, path).getMarker().getStatus());
+                byName.put(name, directoryMapper.getTestProjectNode(p, path).getMarker().getStatus());
 
             } catch (final Exception ex) {
                 Logger.warn("Could not read test project '" + name + "': " + ex.getMessage());
@@ -365,7 +374,7 @@ public final class ProjectIndexer {
     // UC-INTERNAL-003, Rule-INTERNAL-021
     public void scanSingleProject(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         Logger.info("Scanning single project: " + projectPath.getFileName());
-        Services.getInstance(Rescan.class).coveredByAScan(projectPath);
+        rescan.coveredByAScan(projectPath);
         try {
             scanCoordinator.scan(projectPath, indicator);
         } catch (final Exception ex) {
@@ -378,10 +387,5 @@ public final class ProjectIndexer {
     // Rule-INTERNAL-091
     public @NotNull Optional<String> whyNotRead(final @NotNull Path projectPath) {
         return store.whyNotRead(projectPath);
-    }
-
-    // UC-INTERNAL-002, Rule-INTERNAL-014
-    public @NotNull List<Path> takeDamagedMarkers() {
-        return store.takeDamagedMarkers();
     }
 }

@@ -19,7 +19,6 @@ package org.testin.indexer;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
@@ -42,17 +41,30 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.stream.Stream;
 
-@AllArgsConstructor
 final class NodeFiles {
     private final @NotNull Project p;
     private final @NotNull ProjectIndexer indexer;
     private final @NotNull IndexerDataStore store;
+    private final @NotNull VfsExecutor vfs;
+    private final @NotNull Mapper mapper;
+    private final @NotNull TestDataFiles testDataFiles;
+    private final @NotNull OwnWrites ownWrites;
+
+    NodeFiles(final @NotNull Project p, final @NotNull ProjectIndexer indexer, final @NotNull IndexerDataStore store) {
+        this.p = p;
+        this.indexer = indexer;
+        this.store = store;
+        this.vfs = Services.getInstance(p, VfsExecutor.class);
+        this.mapper = Services.getInstance(p, Mapper.class);
+        this.testDataFiles = Services.getInstance(p, TestDataFiles.class);
+        this.ownWrites = Services.getInstance(OwnWrites.class);
+    }
 
     // UC-INTERNAL-002, Rule-INTERNAL-112
     void remove(final @NotNull Path path, final @NotNull Runnable cacheUpdate, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         final @NotNull Path folder = Optional.ofNullable(path.getParent()).orElse(path);
 
-        Services.getInstance(p, VfsExecutor.class).removeVf(p, indexer, path,
+        vfs.removeVf(p, indexer, path,
                 deleted -> ApplicationManager.getApplication().executeOnPooledThread(() ->
                         LocalFileSystem.getInstance().refreshNioFiles(List.of(folder), true, false, () -> {
                             if (deleted) cacheUpdate.run();
@@ -70,7 +82,7 @@ final class NodeFiles {
 
         final @NotNull Path targetParent = found.orElseThrow();
 
-        Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, targetParent, Bundle.message("vfs.move.failed.title"), (sourceVf, targetVf) -> {
+        vfs.executeVfsAction(p, oldPath, targetParent, Bundle.message("vfs.move.failed.title"), (sourceVf, targetVf) -> {
             try {
                 sourceVf.move(indexer, targetVf);
             } catch (final IOException ex) {
@@ -125,8 +137,8 @@ final class NodeFiles {
                 operationSucceeded.run();
             };
 
-            Services.getInstance(OwnWrites.class).record(p, copiedRoot);
-            Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, sourcePath, targetPath, Bundle.message("vfs.copy.failed.title"), (sourceVf, targetVf) -> {
+            ownWrites.record(p, copiedRoot);
+            vfs.executeVfsAction(p, sourcePath, targetPath, Bundle.message("vfs.copy.failed.title"), (sourceVf, targetVf) -> {
                 try {
                     sourceVf.copy(indexer, targetVf, sourceVf.getName());
                 } catch (final IOException ex) {
@@ -138,7 +150,7 @@ final class NodeFiles {
     }
 
     void rename(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
-        Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, vf -> {
+        vfs.executeVfsAction(p, oldPath, vf -> {
             try {
                 vf.rename(indexer, newPath.getFileName().toString());
             } catch (final IOException ex) {
@@ -182,14 +194,14 @@ final class NodeFiles {
     // UC-TREE-PANEL-014, Rule-TREE-PANEL-051, Rule-INTERNAL-113
     private boolean reidentify(final @NotNull Path testCaseFile) {
         try {
-            final @NotNull TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(testCaseFile.toFile(), TestCaseDto.class);
+            final @NotNull TestCaseDto tc = mapper.readValue(testCaseFile.toFile(), TestCaseDto.class);
             final @NotNull UUID fresh = UUID.randomUUID();
 
             tc.setId(fresh);
-            if (!Services.getInstance(p, TestDataFiles.class).write(p, testCaseFile.resolveSibling(FileKind.TEST_CASE.fileName(fresh)), tc))
+            if (!testDataFiles.write(p, testCaseFile.resolveSibling(FileKind.TEST_CASE.fileName(fresh)), tc))
                 return false;
 
-            Services.getInstance(OwnWrites.class).record(p, testCaseFile);
+            ownWrites.record(p, testCaseFile);
             Files.delete(testCaseFile);
             return true;
 

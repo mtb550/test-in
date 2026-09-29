@@ -18,7 +18,6 @@ package org.testin.indexer;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.util.concurrency.AppExecutorUtil;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.FileKind;
@@ -41,15 +40,23 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
 final class RunWriter {
     private final @NotNull Project p;
     private final @NotNull IndexerDataStore store;
+    private final @NotNull TestDataFiles files;
+    private final @NotNull Mapper mapper;
 
     private final @NotNull ExecutorService queue =
             AppExecutorUtil.createBoundedApplicationPoolExecutor("Testin Run Status Writer", 1);
 
     private final @NotNull Map<Path, byte[]> unwritten = new ConcurrentHashMap<>();
+
+    RunWriter(final @NotNull Project p, final @NotNull IndexerDataStore store) {
+        this.p = p;
+        this.store = store;
+        this.files = Services.getInstance(p, TestDataFiles.class);
+        this.mapper = Services.getInstance(p, Mapper.class);
+    }
 
     private static @NotNull Set<String> namedScreenshots(final @NotNull TestRunDto tr) {
         return tr.getResults().stream()
@@ -93,7 +100,6 @@ final class RunWriter {
                     return;
                 }
 
-                final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
                 results.forEach((file, bytes) -> {
                     if (files.alreadyHolds(file, bytes)) return;
 
@@ -101,8 +107,8 @@ final class RunWriter {
                     Logger.trace("Result written for " + runPath.getFileName() + ": " + file.getFileName());
                 });
 
-                removeResultsOf(files, runPath, gone);
-                sweepScreenshots(files, runPath, named);
+                removeResultsOf(runPath, gone);
+                sweepScreenshots(runPath, named);
             } catch (final Exception ex) {
                 Logger.error("Failed to persist test run data: " + ex.getMessage());
             }
@@ -110,7 +116,7 @@ final class RunWriter {
     }
 
     // UC-TREE-PANEL-022, Rule-INTERNAL-011
-    private void removeResultsOf(final @NotNull TestDataFiles files, final @NotNull Path runPath, final @NotNull Set<UUID> gone) {
+    private void removeResultsOf(final @NotNull Path runPath, final @NotNull Set<UUID> gone) {
         for (final UUID id : gone) {
             final @NotNull Path file = runPath.resolve(FileKind.RUN_ITEM.fileName(id));
             if (!Files.exists(file)) continue;
@@ -121,7 +127,7 @@ final class RunWriter {
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
-    private void sweepScreenshots(final @NotNull TestDataFiles files, final @NotNull Path runPath, final @NotNull Set<String> named) {
+    private void sweepScreenshots(final @NotNull Path runPath, final @NotNull Set<String> named) {
         files.screenshotsIn(runPath).stream()
                 .filter(file -> !named.contains(file.getFileName().toString()))
                 .forEach(file -> files.delete(p, file));
@@ -146,7 +152,6 @@ final class RunWriter {
                     return;
                 }
 
-                final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
                 byName.forEach((name, png) -> files.write(p, TestRunDirectoryDto.screenshotFile(runPath, name), png));
             } catch (final Exception ex) {
                 Logger.error("Failed to write the screenshots of " + runPath.getFileName() + ": " + ex.getMessage());
@@ -162,7 +167,7 @@ final class RunWriter {
         if (!TestRunDirectoryDto.isScreenshotName(name)) return new byte[0];
 
         final @NotNull Path file = TestRunDirectoryDto.screenshotFile(runPath, name);
-        return Optional.ofNullable(unwritten.get(file)).orElseGet(() -> Services.getInstance(p, TestDataFiles.class).readBytes(file));
+        return Optional.ofNullable(unwritten.get(file)).orElseGet(() -> files.readBytes(file));
     }
 
     // Rule-INTERNAL-090
@@ -183,7 +188,7 @@ final class RunWriter {
 
     private @NotNull Optional<byte[]> snapshot(final @NotNull TestRunItems item) {
         try {
-            return Optional.of(Services.getInstance(p, Mapper.class).writeValueAsBytes(item));
+            return Optional.of(mapper.writeValueAsBytes(item));
         } catch (final Exception ex) {
             Logger.error("Failed to snapshot run item: " + ex.getMessage());
             return Optional.empty();

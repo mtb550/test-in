@@ -18,7 +18,6 @@ package org.testin.indexer;
 
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -33,16 +32,17 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service(Service.Level.PROJECT)
-@AllArgsConstructor
 public final class TestCases {
-    private final @NotNull Project p;
+    private final @NotNull ProjectIndexer indexer;
+    private final @NotNull TestCaseValues testCaseValues;
 
-    private @NotNull ProjectIndexer indexer() {
-        return Services.getInstance(p, ProjectIndexer.class);
+    public TestCases(final @NotNull Project p) {
+        this.indexer = Services.getInstance(p, ProjectIndexer.class);
+        this.testCaseValues = Services.getInstance(p, TestCaseValues.class);
     }
 
     private @NotNull IndexerDataStore store() {
-        return indexer().getStore();
+        return indexer.getStore();
     }
 
     public @NotNull List<TestCaseDto> getTestCasesForTestSet(final @NotNull Path testSetPath) {
@@ -90,7 +90,7 @@ public final class TestCases {
     public boolean removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
         if (!store().removeTestCase(testSetPath, tcId)) return false;
 
-        Services.getInstance(p, TestCaseValues.class).reload(this::getAllTestCases);
+        testCaseValues.reload(this::getAllTestCases);
         return true;
     }
 
@@ -111,6 +111,6 @@ public final class TestCases {
     // UC-INTERNAL-004, Rule-INTERNAL-034
     public @NotNull Optional<TestCaseFile> testCaseFile(final @NotNull TestCaseDto tc) {
         final @NotNull Path file = store().testCaseFileOf(tc);
-        return indexer().testProjectHolding(file).map(testProject -> new TestCaseFile(testProject, testProject.relativize(file)));
+        return indexer.testProjectHolding(file).map(testProject -> new TestCaseFile(testProject, testProject.relativize(file)));
     }
 }
