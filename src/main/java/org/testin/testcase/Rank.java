@@ -20,8 +20,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Rank {
@@ -30,8 +28,6 @@ public final class Rank {
     private static final char LAST = 'z';
     private static final char BELOW_FIRST = FIRST - 1;
     private static final char ABOVE_LAST = LAST + 1;
-    private static final char SPREAD_FIRST = 'b';
-    private static final int SPREAD_DIGITS = LAST - SPREAD_FIRST + 1;
 
     public static @NotNull String between(final @NotNull String before, final @NotNull String after) {
         if (after.isEmpty()) return after(before);
@@ -49,38 +45,6 @@ public final class Rank {
         }
 
         return last + MIDDLE;
-    }
-
-    public static @NotNull List<String> spread(final int count) {
-        if (count <= 0) return List.of();
-
-        int width = 1;
-        long slots = SPREAD_DIGITS;
-        while (slots < count + 1L) {
-            width++;
-            slots *= SPREAD_DIGITS;
-        }
-
-        final long step = slots / (count + 1L);
-        final @NotNull List<String> ranks = new ArrayList<>(count);
-
-        for (int i = 0; i < count; i++) {
-            ranks.add(digits((i + 1) * step, width));
-        }
-
-        return List.copyOf(ranks);
-    }
-
-    private static @NotNull String digits(final long value, final int width) {
-        final char[] rank = new char[width];
-        long left = value;
-
-        for (int i = width - 1; i >= 0; i--) {
-            rank[i] = (char) (SPREAD_FIRST + (left % SPREAD_DIGITS));
-            left /= SPREAD_DIGITS;
-        }
-
-        return new String(rank);
     }
 
     private static @NotNull String midpoint(final @NotNull String before, final @NotNull String after) {

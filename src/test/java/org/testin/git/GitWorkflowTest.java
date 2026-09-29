@@ -180,8 +180,11 @@ public class GitWorkflowTest {
                 testCase("a registered user signs in"),
                 testCase("a wrong password is refused"));
 
-        final List<String> ranks = Rank.spread(testCases.size());
-        for (int i = 0; i < testCases.size(); i++) testCases.get(i).setOrder(ranks.get(i));
+        String rank = "";
+        for (final TestCaseDto testCase : testCases) {
+            rank = Rank.after(rank);
+            testCase.setOrder(rank);
+        }
 
         for (final TestCaseDto testCase : testCases) {
             write(work, "Test Cases/login flow/" + testCase.getId() + ".tc", testCase);

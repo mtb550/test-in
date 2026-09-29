@@ -18,8 +18,6 @@ package org.testin.testcase;
 
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -73,49 +71,11 @@ public class RankTest {
     }
 
     @Test
-    public void aSpreadIsInOrderAndLeavesGaps() {
-        final List<String> ranks = Rank.spread(10);
-
-        assertEquals(ranks.size(), 10);
-
-        for (int i = 1; i < ranks.size(); i++) {
-            assertTrue(ranks.get(i - 1).compareTo(ranks.get(i)) < 0,
-                    "spread is ordered: " + ranks.get(i - 1) + " < " + ranks.get(i));
-
-            final String between = Rank.between(ranks.get(i - 1), ranks.get(i));
-            assertTrue(ranks.get(i - 1).compareTo(between) < 0 && between.compareTo(ranks.get(i)) < 0,
-                    "and something fits in every gap");
-        }
-    }
-
-    @Test
-    public void aLargeSpreadStaysDistinctAndOrdered() {
-        final List<String> ranks = Rank.spread(300);
-        final List<String> ordered = new ArrayList<>(ranks);
-        ordered.sort(String::compareTo);
-
-        assertEquals(ranks, ordered, "a spread is already in sort order");
-        assertEquals(ranks.stream().distinct().count(), 300L, "and holds no duplicates");
-    }
-
-    @Test
     public void appendingPastTheAlphabetGrowsTheRank() {
         assertEquals(Rank.after("y"), "z");
         assertEquals(Rank.after("z"), "zm");
         assertEquals(Rank.after("zz"), "zzm");
 
         assertTrue("z".compareTo(Rank.after("z")) < 0, "and the longer rank still sorts after");
-    }
-
-    @Test
-    public void aSpreadStaysShortHoweverManyTestCasesThereAre() {
-        assertEquals(Rank.spread(20).stream().mapToInt(String::length).max().orElse(0), 1);
-        assertEquals(Rank.spread(500).stream().mapToInt(String::length).max().orElse(0), 2);
-        assertEquals(Rank.spread(1000).stream().mapToInt(String::length).max().orElse(0), 3);
-    }
-
-    @Test
-    public void anEmptySpreadIsEmptyRatherThanAFailure() {
-        assertEquals(Rank.spread(0), List.of());
     }
 }
