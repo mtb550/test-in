@@ -22,7 +22,6 @@ import com.intellij.ui.table.JBTable;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
-import org.testin.codegen.AutomationState;
 import org.testin.codegen.GenType;
 import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.BaseCard;
@@ -39,16 +38,12 @@ import org.testin.editor.toolbar.TestToolbar;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.TestDetailsPopupBtn;
 import org.testin.indexer.Nodes;
-import org.testin.indexer.ProjectIndexer;
-import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.Modules;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.notifications.Notifier;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.services.Services;
-import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestEditorAttributes;
@@ -63,6 +58,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestSetDirectoryDto> implements Toolbar {
+    private final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
+
     private final @NotNull ModelChangeNotifier modelChangeNotifier;
 
     @Getter
@@ -111,8 +108,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         loading = true;
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
                 indexer.awaitIndexing();
 
                 final @NotNull List<TestCaseDto> items = testCases.getTestCasesForTestSet(parent.getPath());
@@ -130,7 +125,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
                     return;
                 }
 
-                Services.getInstance(p, TestCaseValues.class).load(items);
+                testCaseValues.load(items);
 
                 final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(items);
 
@@ -182,7 +177,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
             try {
                 final @NotNull List<TestCaseDto> moved = TestCaseOrder.place(snapshot);
 
-                Services.getInstance(p, TestCases.class).updateSequence(dirPath, snapshot, moved);
+                testCases.updateSequence(dirPath, snapshot, moved);
 
                 if (!snapshot.isEmpty()) GenType.UPDATE_TEST_CASE_ORDER.executeAll(p, snapshot);
 
@@ -193,7 +188,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
             } catch (final Exception ex) {
                 Logger.error("Failed to save the test case sequence: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("save.failed"));
+                    notifier.softRefuse(p, Bundle.message("save.failed"));
                     loadDataAsync();
                 });
             }
@@ -203,7 +198,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     // UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-009
     @Override
     protected void notOnAnyPage(final @NotNull TestCaseDto tc) {
-        Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("editor.hidden.title"),
+        notifier.softShow(p, Bundle.message("editor.hidden.title"),
                 Bundle.message("editor.hidden.message", tc.getDescription()));
     }
 
@@ -216,7 +211,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
 
             updateSequenceAndSaveAll(onPersisted);
 
-            Services.getInstance(p, Nodes.class).refreshDirectory(parent.getPath());
+            nodes.refreshDirectory(parent.getPath());
 
             refreshView();
             selectTestCase(tc);
@@ -233,7 +228,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     @Override
     public void onToolBarCreateTestCaseClicked() {
         if (loading) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("create.case.still.loading"));
+            notifier.softRefuse(p, Bundle.message("create.case.still.loading"));
             return;
         }
 
@@ -278,11 +273,9 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         showEmptyStateIfNothingToDraw(totalItems);
 
         final @NotNull List<TestCaseDto> all = snapshotOfAll();
-        final @NotNull AutomationState automation = Services.getInstance(p, AutomationState.class);
+        automationState.read(p, all, this::refreshView);
 
-        automation.read(p, all, this::refreshView);
-
-        statusBar.showAutomated(automation.writtenIn(all), automation.knownIn(all));
+        statusBar.showAutomated(automationState.writtenIn(all), automationState.knownIn(all));
 
         statusBar.updatePaginationState(page.page(), page.totalPages());
     }
@@ -343,7 +336,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
     @Override
     public @NotNull Set<String> getAvailableModules() {
-        return Modules.in(Services.getInstance(p, TestCases.class).getTestCasesForTestSet(parent.getPath()));
+        return Modules.in(testCases.getTestCasesForTestSet(parent.getPath()));
     }
 
     // UC-EDITOR-PANEL-020
@@ -377,7 +370,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
                     filters.modules());
         }
 
-        return Services.getInstance(p, AutomationState.class).matching(matched, filters.automation());
+        return automationState.matching(matched, filters.automation());
     }
 
     @Override

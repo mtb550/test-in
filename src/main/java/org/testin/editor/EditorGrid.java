@@ -31,9 +31,7 @@ import org.testin.editor.statusbar.PageAction;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
 import org.testin.open.OpenContextMenuAction;
-import org.testin.services.Services;
 import org.testin.ui.FontSync;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
@@ -110,7 +108,7 @@ final class EditorGrid<A extends Enum<A> & ToolBarAttribute> {
             view.ifPresent(old -> Disposer.dispose(old.fontSync()));
             view = Optional.empty();
             editor.center.set(editor.scrollPane);
-            Services.getInstance(editor.p, Notifier.class).softRefuse(editor.p, Bundle.message("editor.grid.not.drawn", FailureText.of(ex)));
+            editor.notifier.softRefuse(editor.p, Bundle.message("editor.grid.not.drawn", FailureText.of(ex)));
         }
     }
 

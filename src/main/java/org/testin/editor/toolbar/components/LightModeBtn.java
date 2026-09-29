@@ -17,7 +17,6 @@
 package org.testin.editor.toolbar.components;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.AbstractIconButton;
 import org.testin.editor.run.RunEditor;
@@ -26,16 +25,16 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 
 public class LightModeBtn extends AbstractIconButton implements ToolbarItem {
-    private final @NotNull Project p;
     private final @NotNull RunEditor editor;
+    private final @NotNull LightMode lightMode;
 
     // UC-EDITOR-PANEL-046
     public LightModeBtn(final @NotNull RunEditor editor) {
         super(Bundle.message("toolbar.light.mode"), AllIcons.MeetNewUi.LightTheme);
-        this.p = editor.getProject();
         this.editor = editor;
+        this.lightMode = Services.getInstance(editor.getProject(), LightMode.class);
 
-        addActionListener(_ -> Services.getInstance(p, LightMode.class).toggle(editor, this::updateState));
+        addActionListener(_ -> lightMode.toggle(editor, this::updateState));
     }
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-008
@@ -46,6 +45,6 @@ public class LightModeBtn extends AbstractIconButton implements ToolbarItem {
         describe(stillOpen
                 ? Bundle.message("toolbar.light.mode")
                 : Bundle.message("toolbar.light.mode.disabled", editor.getParent().getMarker().getStatus().getLabel()));
-        setOn(Services.getInstance(p, LightMode.class).isOpenOn(editor.getParent()));
+        setOn(lightMode.isOpenOn(editor.getParent()));
     }
 }

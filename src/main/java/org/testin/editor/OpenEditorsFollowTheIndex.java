@@ -24,16 +24,18 @@ import org.testin.services.Services;
 
 public final class OpenEditorsFollowTheIndex implements IndexChanged {
     private final @NotNull Project p;
+    private final @NotNull TestinEditors testinEditors;
 
     public OpenEditorsFollowTheIndex(final @NotNull Project p) {
         this.p = p;
+        this.testinEditors = Services.getInstance(p, TestinEditors.class);
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-114
     @Override
     public void readAgain() {
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (!p.isDisposed()) Services.getInstance(p, TestinEditors.class).refreshOpen(p);
+            if (!p.isDisposed()) testinEditors.refreshOpen(p);
         });
     }
 }

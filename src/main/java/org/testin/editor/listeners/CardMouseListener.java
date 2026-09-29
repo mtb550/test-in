@@ -53,6 +53,7 @@ public class CardMouseListener extends MouseAdapter {
     private final @NotNull AbstractEditorContextMenu cm;
     private final @NotNull ArrayList<String> path;
     private final @NotNull TestinEditor editor;
+    private final @NotNull Notifier notifier;
 
     public CardMouseListener(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model, final @NotNull DirectoryDto dir, final @NotNull AbstractEditorContextMenu cm) {
         this.p = p;
@@ -61,6 +62,7 @@ public class CardMouseListener extends MouseAdapter {
         this.path = dir.getPath2();
         this.model = model;
         this.cm = cm;
+        this.notifier = Services.getInstance(p, Notifier.class);
     }
 
     // UC-EDITOR-PANEL-024, UC-EDITOR-PANEL-025
@@ -107,7 +109,7 @@ public class CardMouseListener extends MouseAdapter {
             Logger.trace(button.action().getTooltip() + ", tc: " + tc.getDescription());
 
             if (!button.works()) {
-                Services.getInstance(p, Notifier.class).softRefuse(p, button.hintText());
+                notifier.softRefuse(p, button.hintText());
                 e.consume();
                 return;
             }

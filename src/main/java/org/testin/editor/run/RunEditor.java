@@ -21,7 +21,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.JBTable;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.AutomationState;
 import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.BaseCard;
 import org.testin.editor.EditorFilters;
@@ -40,7 +39,6 @@ import org.testin.editor.toolbar.components.ResultAnalysisBtn;
 import org.testin.editor.toolbar.components.RunDetailsPopupBtn;
 import org.testin.editor.toolbar.components.StartExecutionBtn;
 import org.testin.editor.toolbar.components.StopExecutionBtn;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestRuns;
 import org.testin.lightmode.LightMode;
 import org.testin.logger.Logger;
@@ -54,10 +52,8 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Done;
-import org.testin.notifications.Notifier;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.services.Services;
-import org.testin.services.TestCaseValues;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testrun.ResultAnalysisDialog;
@@ -77,6 +73,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRunDirectoryDto> implements Toolbar {
+    private final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
+
+    private final @NotNull LightMode lightMode = Services.getInstance(p, LightMode.class);
+
     private final @NotNull Map<UUID, TestRunItems> resultsMap = new ConcurrentHashMap<>();
 
     @Getter
@@ -113,8 +113,6 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
                 indexer.awaitIndexing();
                 final @NotNull TestRunDto fromDisk = run.orElseGet(() -> testRuns.getTestRunByPath(parent.getPath()));
 
@@ -123,7 +121,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                                 (existingItem, _) -> existingItem));
 
                 final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(fromDisk.getResults().stream().map(TestRunItems::liveTestCase).toList());
-                Services.getInstance(p, TestCaseValues.class).load(ordered);
+                testCaseValues.load(ordered);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (generation != loadGeneration.get()) return;
@@ -183,7 +181,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     @Override
     protected void beforeDispose() {
         teardown(
-                () -> Services.getInstance(p, LightMode.class).editorClosing(parent),
+                () -> lightMode.editorClosing(parent),
 
                 () -> {
                     if (walk.isExecuting()) walk.stopAndWriteTheRunDown();
@@ -227,9 +225,9 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                 TestRunSummary.of(runData.getResults()),
                 parent.getMarker().getResultAnalysis(),
                 analysis -> {
-                    Services.getInstance(p, TestRuns.class).changeRunMarker(parent.getPath(),
+                    testRuns.changeRunMarker(parent.getPath(),
                             marker -> marker.recordAnalysis(ResultAnalysis.written(analysis)));
-                    Services.getInstance(p, Notifier.class).softShow(p, Done.SAVED);
+                    notifier.softShow(p, Done.SAVED);
                 }).show());
     }
 
@@ -264,7 +262,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     protected void drawStatus(final @NotNull PageWindow page, final int totalItems) {
         statusBar.updatePaginationState(page.page(), page.totalPages());
 
-        Services.getInstance(p, AutomationState.class).read(p, snapshotOfAll(), this::refreshView);
+        automationState.read(p, snapshotOfAll(), this::refreshView);
     }
 
     @Override
@@ -331,7 +329,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                     this::runItem);
         }
 
-        return Services.getInstance(p, AutomationState.class).matching(matched, filters.automation());
+        return automationState.matching(matched, filters.automation());
     }
 
     @Override
@@ -394,7 +392,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     void showElapsed() {
         statusBar.showExecutionTime(Display.formatRunClock(getElapsed()));
 
-        Services.getInstance(p, LightMode.class).tick(parent);
+        lightMode.tick(parent);
     }
 
     public @NotNull Duration getElapsed() {
@@ -428,7 +426,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         toolBar.revalidate();
         toolBar.repaint();
 
-        Services.getInstance(p, LightMode.class).refresh(parent);
+        lightMode.refresh(parent);
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135

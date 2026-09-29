@@ -23,7 +23,6 @@ import org.testin.codegen.GenType;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseSnapshot;
@@ -49,12 +48,15 @@ public class GridEditListener extends AbstractGridEditListener {
 
     private final @NotNull Path testSetPath;
 
+    private final @NotNull TestCases testCases;
+
     private final @NotNull Map<UUID, Changed> changedThisGesture = new LinkedHashMap<>();
 
     public GridEditListener(final @NotNull Project p, final @NotNull List<TestCaseDto> pageItems, final @NotNull Runnable onEdited, final @NotNull Path testSetPath) {
         super(p, pageItems);
         this.onEdited = onEdited;
         this.testSetPath = testSetPath;
+        this.testCases = Services.getInstance(p, TestCases.class);
     }
 
     private static @NotNull String quoted(final @NotNull String typed, final @NotNull TestEditorAttributes attr) {
@@ -88,7 +90,7 @@ public class GridEditListener extends AbstractGridEditListener {
 
         // Rule-EDITOR-PANEL-206
         if (took.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.UNREADABLE, quoted(typed, attr));
+            notifier.softRefuse(p, Refused.UNREADABLE, quoted(typed, attr));
             return GridEdit.REFUSED;
         }
 
@@ -122,7 +124,6 @@ public class GridEditListener extends AbstractGridEditListener {
         changedThisGesture.clear();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
             final @NotNull List<TestCaseDto> written = new ArrayList<>();
             final @NotNull List<TestCaseSnapshot> before = new ArrayList<>();
 

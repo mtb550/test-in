@@ -36,10 +36,16 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
     private final @NotNull Runnable onEdited;
 
+    private final @NotNull RunStatusService runStatusService;
+
+    private final @NotNull TestRuns testRuns;
+
     public RunGridEditListener(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> pageItems, final @NotNull Runnable onEdited) {
         super(p, pageItems);
         this.editor = editor;
         this.onEdited = onEdited;
+        this.runStatusService = Services.getInstance(p, RunStatusService.class);
+        this.testRuns = Services.getInstance(p, TestRuns.class);
     }
 
     @Override
@@ -62,12 +68,12 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
         if (item.isRemoved()) {
             model.setValueAt(before, row, col);
-            Services.getInstance(p, RunStatusService.class).refuseRemoved(p);
+            runStatusService.refuseRemoved(p);
             return GridEdit.REFUSED;
         }
 
         // Rule-EDITOR-PANEL-174
-        if (Services.getInstance(p, RunStatusService.class).heldRun(p, editor.getParent().getPath()).isEmpty()) {
+        if (runStatusService.heldRun(p, editor.getParent().getPath()).isEmpty()) {
             model.setValueAt(before, row, col);
             return GridEdit.REFUSED;
         }
@@ -80,7 +86,7 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
         if (Objects.equals(before, after)) return GridEdit.UNCHANGED;
 
-        Services.getInstance(p, TestRuns.class).changeResult(editor.getParent().getPath(), onThisRow.getId(), result -> attr.getRunValueSetter().execute(result, typed));
+        testRuns.changeResult(editor.getParent().getPath(), onThisRow.getId(), result -> attr.getRunValueSetter().execute(result, typed));
         onEdited.run();
 
         return GridEdit.WROTE;

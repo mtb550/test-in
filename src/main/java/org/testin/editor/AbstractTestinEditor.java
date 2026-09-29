@@ -31,6 +31,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
+import org.testin.codegen.AutomationState;
 import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.editor.list.ListPanelBuilder;
 import org.testin.editor.list.ListView;
@@ -38,6 +39,7 @@ import org.testin.editor.statusbar.PageAction;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.editor.toolbar.Toolbar;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
@@ -75,6 +77,13 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     @Getter
     protected final @NotNull List<TestCaseDto> currentTestCases;
 
+    protected final @NotNull ProjectIndexer indexer;
+    protected final @NotNull TestCases testCases;
+    protected final @NotNull TestCaseValues testCaseValues;
+    protected final @NotNull AutomationState automationState;
+    protected final @NotNull Notifier notifier;
+    private final @NotNull UndoHistories undoHistories;
+
     protected final @NotNull GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
     protected final @NotNull Disposable projectDisposable;
     protected final @NotNull JBPanel<?> mainPanel;
@@ -111,6 +120,12 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     protected AbstractTestinEditor(final @NotNull Project p, final @NotNull N parent) {
         this.p = p;
         this.parent = parent;
+        this.indexer = Services.getInstance(p, ProjectIndexer.class);
+        this.testCases = Services.getInstance(p, TestCases.class);
+        this.testCaseValues = Services.getInstance(p, TestCaseValues.class);
+        this.automationState = Services.getInstance(p, AutomationState.class);
+        this.notifier = Services.getInstance(p, Notifier.class);
+        this.undoHistories = Services.getInstance(p, UndoHistories.class);
 
         final @NotNull Disposable projectDisposable = Disposer.newDisposable();
         Disposer.register(ProjectLifetime.of(p), projectDisposable);
@@ -205,7 +220,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
     @Override
     public @NotNull Set<String> getAvailableGroups() {
-        return Services.getInstance(p, TestCaseValues.class).getGroups();
+        return testCaseValues.getGroups();
     }
 
     // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-119
@@ -324,9 +339,9 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
 
         final @NotNull Done message = refreshed();
 
-        reloadData(() -> Services.getInstance(p, Notifier.class).softShow(p, message));
+        reloadData(() -> notifier.softShow(p, message));
 
-        Services.getInstance(p, TestCaseValues.class).reload(Services.getInstance(p, TestCases.class)::getAllTestCases);
+        testCaseValues.reload(testCases::getAllTestCases);
     }
 
     protected @NotNull Done refreshed() {
@@ -482,7 +497,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
                 this::stopListening,
                 () -> getToolBar().dispose(),
 
-                () -> Services.getInstance(p, UndoHistories.class).forget(UndoScope.of(parent.getPath())),
+                () -> undoHistories.forget(UndoScope.of(parent.getPath())),
 
                 allTestCases::clear,
                 currentTestCases::clear,

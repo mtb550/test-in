@@ -26,7 +26,9 @@ import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.AutomationState;
 import org.testin.model.Automated;
+import org.testin.services.Services;
 import org.testin.ui.Badges;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.RowStripe;
@@ -52,6 +54,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected final @NotNull BorderLayoutPanel wrapper = new BorderLayoutPanel();
     // Rule-CODEGEN-082
     protected final @NotNull Project p;
+    protected final @NotNull AutomationState automationState;
     protected boolean isRowHovered;
     protected @NotNull String hoveredAction = "";
     protected @NotNull Automated automation = Automated.UNKNOWN;
@@ -63,6 +66,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
 
     public BaseCard(final @NotNull Project p) {
         this.p = p;
+        this.automationState = Services.getInstance(p, AutomationState.class);
         setLayout(new BorderLayout());
         setOpaque(true);
 

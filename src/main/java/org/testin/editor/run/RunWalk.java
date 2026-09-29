@@ -54,6 +54,11 @@ public final class RunWalk {
     private final @NotNull RunEditor editor;
     private final @NotNull Project p;
     private final @NotNull TestRunDirectoryDto parent;
+    private final @NotNull TestRuns testRuns;
+    private final @NotNull TestRunStatusChange testRunStatusChange;
+    private final @NotNull RunStatusService runStatusService;
+    private final @NotNull TestNGExecution testNGExecution;
+    private final @NotNull Notifier notifier;
 
     private final @NotNull RunExecutionTimer executionTimer = new RunExecutionTimer();
     private final @NotNull Set<UUID> launchedHere = ConcurrentHashMap.newKeySet();
@@ -64,6 +69,11 @@ public final class RunWalk {
         this.editor = editor;
         this.p = p;
         this.parent = parent;
+        this.testRuns = Services.getInstance(p, TestRuns.class);
+        this.testRunStatusChange = Services.getInstance(p, TestRunStatusChange.class);
+        this.runStatusService = Services.getInstance(p, RunStatusService.class);
+        this.testNGExecution = Services.getInstance(p, TestNGExecution.class);
+        this.notifier = Services.getInstance(p, Notifier.class);
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-227
@@ -142,27 +152,25 @@ public final class RunWalk {
 
     // UC-EDITOR-PANEL-031, UC-EDITOR-PANEL-043
     private void markStarted() {
-        Services.getInstance(p, TestRuns.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionStarted);
-        Services.getInstance(p, TestRunStatusChange.class).apply(parent, TestRunStatus.IN_PROGRESS);
+        testRuns.changeRunMarker(parent.getPath(), TestRunMarker::markExecutionStarted);
+        testRunStatusChange.apply(parent, TestRunStatus.IN_PROGRESS);
     }
 
     // UC-EDITOR-PANEL-044, Rule-EDITOR-PANEL-184
     void runPending() {
         if (!canStartExecution()) {
             if (isExecuting())
-                Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_RUNNING, parent.getName());
+                notifier.softRefuse(p, Refused.ALREADY_RUNNING, parent.getName());
             return;
         }
 
-        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
-
         final @NotNull List<TestCaseDto> pending = editor.snapshotOfAll().stream()
                 .filter(tc -> editor.runItem(tc.getId()).filter(item -> item.shownStatus() == TestStatus.PENDING).isPresent())
-                .filter(tc -> !execution.isRunning(tc.getId()))
+                .filter(tc -> !testNGExecution.isRunning(tc.getId()))
                 .toList();
 
         if (pending.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NOTHING_TO_RUN, parent.getName());
+            notifier.softRefuse(p, Refused.NOTHING_TO_RUN, parent.getName());
             return;
         }
 
@@ -186,7 +194,7 @@ public final class RunWalk {
         status.getVerdict().ifPresent(verdict -> {
             sayWhatTheVerdictCleared(tc, verdict, failure);
 
-            Services.getInstance(p, RunStatusService.class).recordReported(p, editor, tc, verdict, duration, failure);
+            runStatusService.recordReported(p, editor, tc, verdict, duration, failure);
 
             if (launchedHere.isEmpty()) sayWhatTheRunRecorded();
         });
@@ -204,7 +212,7 @@ public final class RunWalk {
         final @NotNull List<String> cleared = editor.runItem(tc.getId()).map(item -> item.wouldClear(verdict, failure)).orElseGet(List::of);
         if (cleared.isEmpty()) return;
 
-        Services.getInstance(p, Notifier.class).info(p, Bundle.message("editor.cleared.title"),
+        notifier.info(p, Bundle.message("editor.cleared.title"),
                 Bundle.message("editor.cleared.message", tc.getDescription(),
                         verdict.getLabel().toLowerCase(Locale.ROOT), Display.andJoin(cleared)));
     }
@@ -215,7 +223,7 @@ public final class RunWalk {
                 .segments(TestRunSummary.of(editor.results()), parent.getMarker().getStatus())
                 .stream().map(ResultAnalysis.Segment::text).collect(Collectors.joining(", "));
 
-        if (!recorded.isEmpty()) Services.getInstance(p, Notifier.class).softShow(p, recorded);
+        if (!recorded.isEmpty()) notifier.softShow(p, recorded);
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-134
@@ -224,7 +232,7 @@ public final class RunWalk {
 
         if (editor.run().filter(TestRunDto::isFullyJudged).isEmpty()) return;
 
-        Services.getInstance(p, TestRunStatusChange.class).apply(parent, TestRunStatus.COMPLETED);
+        testRunStatusChange.apply(parent, TestRunStatus.COMPLETED);
     }
 
     // UC-EDITOR-PANEL-046
@@ -239,9 +247,7 @@ public final class RunWalk {
     }
 
     private boolean isAutomationRunning() {
-        final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
-
-        return launchedHere.stream().anyMatch(execution::isRunning);
+        return launchedHere.stream().anyMatch(testNGExecution::isRunning);
     }
 
     private boolean canStartExecution() {
@@ -260,7 +266,7 @@ public final class RunWalk {
 
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-151
     public void stopExecution() {
-        Services.getInstance(p, TestRuns.class).changeRunMarker(parent.getPath(), TestRunMarker::markExecutionEnded);
+        testRuns.changeRunMarker(parent.getPath(), TestRunMarker::markExecutionEnded);
 
         halt();
     }
@@ -275,7 +281,7 @@ public final class RunWalk {
     private void stopAutomation() {
         if (launchedHere.isEmpty()) return;
 
-        final int stopped = Services.getInstance(p, TestNGExecution.class).stopTestCases(launchedHere);
+        final int stopped = testNGExecution.stopTestCases(launchedHere);
         if (stopped == 0) return;
 
         Logger.info("Stopped " + stopped + " test case(s) running from '" + parent.getName() + "'");
@@ -304,7 +310,7 @@ public final class RunWalk {
     }
 
     private void saveRun() {
-        Services.getInstance(p, TestRuns.class).saveRun(parent.getPath());
+        testRuns.saveRun(parent.getPath());
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
@@ -312,7 +318,7 @@ public final class RunWalk {
         if (editor.run().isEmpty()) return;
 
         if (!hasSomethingToWalk()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Refused.NOTHING_SHOWING, parent.getName());
+            notifier.softRefuse(p, Refused.NOTHING_SHOWING, parent.getName());
             return;
         }
 
@@ -324,7 +330,7 @@ public final class RunWalk {
     void stop() {
         stopAndWriteTheRunDown();
 
-        Services.getInstance(p, Notifier.class).softShow(p, Done.STOPPED);
+        notifier.softShow(p, Done.STOPPED);
     }
 
     void dispose() {

@@ -19,7 +19,6 @@ package org.testin.editor.test;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.clipboard.CutState;
-import org.testin.codegen.AutomationState;
 import org.testin.editor.BaseCard;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -41,6 +40,8 @@ import java.util.Set;
 public class TestCard extends BaseCard {
     private final @NotNull List<Badges.Badge> badges = new ArrayList<>();
     private final @NotNull Map<String, String> details = new LinkedHashMap<>();
+    private final @NotNull CutState cutState = Services.getInstance(p, CutState.class);
+    private final @NotNull TestNGExecution testNGExecution = Services.getInstance(p, TestNGExecution.class);
     private boolean isPendingCut = false;
 
     public TestCard(final @NotNull Project p) {
@@ -52,15 +53,15 @@ public class TestCard extends BaseCard {
         badges.clear();
         details.clear();
 
-        this.isPendingCut = Services.getInstance(p, CutState.class).isPending(tc.getId());
+        this.isPendingCut = cutState.isPending(tc.getId());
 
-        this.automation = Services.getInstance(p, AutomationState.class).of(tc.getId());
+        this.automation = automationState.of(tc.getId());
 
         Arrays.stream(TestEditorAttributes.values())
                 .filter(activeDetails::contains)
                 .forEach(attr -> attr.applyToUI(tc, badges, details));
 
-        final @NotNull RunStatus runStatus = Services.getInstance(p, TestNGExecution.class).statusOf(tc);
+        final @NotNull RunStatus runStatus = testNGExecution.statusOf(tc);
 
         if (runStatus.hasBadge()) badges.add(Badges.createRunStatusBadge(runStatus.getBadge()));
 

@@ -18,8 +18,6 @@ package org.testin.editor.listeners;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Done;
@@ -36,15 +34,22 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractGridEditListener implements TableModelListener {
     protected final @NotNull Project p;
+
+    protected final @NotNull Notifier notifier;
 
     private final @NotNull List<TestCaseDto> pageItems;
 
     private final @NotNull Set<UUID> writtenThisGesture = new HashSet<>();
 
     private boolean updating = false;
+
+    protected AbstractGridEditListener(final @NotNull Project p, final @NotNull List<TestCaseDto> pageItems) {
+        this.p = p;
+        this.notifier = Services.getInstance(p, Notifier.class);
+        this.pageItems = pageItems;
+    }
 
     private static @NotNull String shortened(final @NotNull String value) {
         final @NotNull String oneLine = value.replace('\n', ' ').trim();
@@ -101,7 +106,7 @@ public abstract class AbstractGridEditListener implements TableModelListener {
             final int written = writtenThisGesture.size();
             writtenThisGesture.clear();
 
-            Services.getInstance(p, Notifier.class).softShowCounted(p, Done.UPDATED, written);
+            notifier.softShowCounted(p, Done.UPDATED, written);
         });
     }
 
@@ -109,7 +114,7 @@ public abstract class AbstractGridEditListener implements TableModelListener {
     private void sayIfRewritten(final @NotNull String typed, final @NotNull String stored) {
         if (typed.equals(stored)) return;
 
-        Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("grid.adjusted.title"),
+        notifier.softShow(p, Bundle.message("grid.adjusted.title"),
                 Bundle.message("grid.adjusted.message", shortened(stored), shortened(typed)));
     }
 }

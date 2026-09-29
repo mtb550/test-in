@@ -18,7 +18,6 @@ package org.testin.editor.listeners;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.TestinEditor;
@@ -43,11 +42,17 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
 public class TransferListener extends TransferHandler {
     private static final @NotNull DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
     private final @NotNull Project p;
     private final @NotNull TestinEditor editor;
+    private final @NotNull Notifier notifier;
+
+    public TransferListener(final @NotNull Project p, final @NotNull TestinEditor editor) {
+        this.p = p;
+        this.editor = editor;
+        this.notifier = Services.getInstance(p, Notifier.class);
+    }
 
     private static int landingIndex(final @NotNull List<TestCaseDto> allItems, final @NotNull Optional<TestCaseDto> above, final @NotNull Optional<TestCaseDto> below) {
         return above.map(tc -> Math.min(indexOfId(allItems, tc.getId()) + 1, allItems.size()))
@@ -144,7 +149,7 @@ public class TransferListener extends TransferHandler {
 
             editor.updateSequenceAndSaveAll(() -> {
                 TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.reorder"), itemsToMove), before, TestCaseSnapshot.of(p, setPath, ids));
-                Services.getInstance(p, Notifier.class).softShowCounted(p, Done.RE_SORTED, itemsToMove.size());
+                notifier.softShowCounted(p, Done.RE_SORTED, itemsToMove.size());
             });
 
             itemsToMove.stream().findFirst().ifPresentOrElse(
@@ -157,7 +162,7 @@ public class TransferListener extends TransferHandler {
             putBack(orderBefore);
 
             Logger.error("Reordering the test cases failed: " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("save.failed"));
+            notifier.softRefuse(p, Bundle.message("save.failed"));
             return false;
         }
     }
