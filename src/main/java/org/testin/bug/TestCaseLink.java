@@ -26,6 +26,7 @@ import org.testin.git.GitRepositoryService;
 import org.testin.indexer.TestCaseFile;
 import org.testin.logger.Logger;
 import org.testin.services.OptionalPlugin;
+import org.testin.util.FailureText;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -67,7 +68,7 @@ public final class TestCaseLink {
                     .replace("(", "%28")
                     .replace(")", "%29"));
         } catch (final URISyntaxException ex) {
-            Logger.warn("No link to the test case's file could be built from " + path + ": " + ex.getMessage());
+            Logger.warn("No link to the test case's file could be built from " + path + ": " + FailureText.of(ex));
             return Optional.empty();
         }
     }

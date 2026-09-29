@@ -44,6 +44,7 @@ import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 import org.testin.util.ClipboardContents;
+import org.testin.util.FailureText;
 
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -201,7 +202,7 @@ public class TreeTransferHandler extends TransferHandler {
         try {
             return List.of(((TreeTransferPayload) contents.getTransferData(NODE_FLAVOR)).nodes());
         } catch (final Exception ex) {
-            Logger.debug("Clipboard no longer holds tree nodes: " + ex.getMessage());
+            Logger.debug("Clipboard no longer holds tree nodes: " + FailureText.of(ex));
             return List.of();
         }
     }
@@ -275,7 +276,7 @@ public class TreeTransferHandler extends TransferHandler {
             transfer(action, sources, target);
             return true;
         } catch (final Exception ex) {
-            Logger.error("Tree transfer failed: " + ex.getMessage());
+            Logger.error("Tree transfer failed: " + FailureText.of(ex));
             return false;
         }
     }
@@ -485,7 +486,7 @@ public class TreeTransferHandler extends TransferHandler {
         try {
             return ((TreeTransferPayload) contents.getTransferData(NODE_FLAVOR)).clipboardAction() == MOVE;
         } catch (final Exception ex) {
-            Logger.debug("Clipboard no longer holds tree nodes: " + ex.getMessage());
+            Logger.debug("Clipboard no longer holds tree nodes: " + FailureText.of(ex));
             return false;
         }
     }

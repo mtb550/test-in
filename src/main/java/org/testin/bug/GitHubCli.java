@@ -101,7 +101,7 @@ public final class GitHubCli {
         try {
             return Optional.of(new CapturingProcessHandler(command).runProcessWithProgressIndicator(indicator, (int) TIMEOUT.toMillis()));
         } catch (final ExecutionException ex) {
-            Logger.warn("gh could not be started: " + ex.getMessage());
+            Logger.warn("gh could not be started: " + FailureText.of(ex));
             return Optional.empty();
         }
     }

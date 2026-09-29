@@ -30,6 +30,7 @@ import org.testin.logger.Logger;
 import org.testin.model.Automated;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
+import org.testin.util.FailureText;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -121,7 +122,7 @@ public final class AutomationState implements Disposable {
         } catch (final ProcessCanceledException cancelled) {
             throw cancelled;
         } catch (final Exception ex) {
-            Logger.warn("Could not read the automation state of " + testCases.size() + " test case(s): " + ex.getMessage());
+            Logger.warn("Could not read the automation state of " + testCases.size() + " test case(s): " + FailureText.of(ex));
         }
 
         return new Answer(answers, found, codeVersion);

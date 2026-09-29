@@ -23,6 +23,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.Can;
 import org.testin.testcase.ImportedRow;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.util.FailureText;
 import org.testin.util.SeparatedValues;
 
 import java.io.File;
@@ -102,7 +103,7 @@ public class ImportCsv {
                     .filter(fields -> !fields.stream().allMatch(String::isEmpty))
                     .toList();
         } catch (final IOException ex) {
-            Logger.error("CSV parse failed: " + ex.getMessage());
+            Logger.error("CSV parse failed: " + FailureText.of(ex));
             throw new RuntimeException(ex);
         }
     }

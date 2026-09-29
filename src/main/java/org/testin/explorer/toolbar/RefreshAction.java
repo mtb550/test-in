@@ -93,7 +93,7 @@ public class RefreshAction extends AbstractProjectAction {
                 ApplicationManager.getApplication().invokeLater(() -> rebuildTree(outcome));
 
             } catch (final Exception ex) {
-                Logger.error("Refresh: re-indexing failed - " + ex.getMessage());
+                Logger.error("Refresh: re-indexing failed - " + FailureText.of(ex));
                 releaseAndRunWhatWaited();
                 notifier.error(p, Bundle.message("toolbar.refresh.failed.title"), FailureText.of(ex));
             }

@@ -27,6 +27,7 @@ import org.testin.codegen.Renamed;
 import org.testin.java.codegen.PackageDeclarations;
 import org.testin.logger.Logger;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.io.IOException;
 import java.util.List;
@@ -60,7 +61,7 @@ public class RenameJavaPackage implements GenAction<Renamed> {
                 PackageDeclarations.retarget(p, testSourceRoot, pkgDir);
                 Logger.info("Package renamed to: " + newTop);
             } catch (final IOException ex) {
-                Logger.info("Error renaming package: " + ex.getMessage());
+                Logger.info("Error renaming package: " + FailureText.of(ex));
             }
         });
     }

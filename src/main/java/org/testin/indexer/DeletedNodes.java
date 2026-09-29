@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
+import org.testin.util.FailureText;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,7 +67,7 @@ public final class DeletedNodes {
             return Optional.of(kept);
 
         } catch (final Exception ex) {
-            Logger.warn("Could not keep " + node + " aside, so removing it will not be undoable: " + ex.getMessage());
+            Logger.warn("Could not keep " + node + " aside, so removing it will not be undoable: " + FailureText.of(ex));
             return Optional.empty();
         }
     }
@@ -88,7 +89,7 @@ public final class DeletedNodes {
             return true;
 
         } catch (final Exception ex) {
-            Logger.error("Could not restore " + original + " from " + kept + ": " + ex.getMessage());
+            Logger.error("Could not restore " + original + " from " + kept + ": " + FailureText.of(ex));
             return false;
         }
     }

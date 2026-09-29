@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.services.OptionalPlugin;
+import org.testin.util.FailureText;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -172,7 +173,7 @@ public final class GitRepositoryService {
         try {
             return GitCommandRunner.readObjects(p, path, revision, relativePaths);
         } catch (final RuntimeException ex) {
-            Logger.warn("Could not read " + relativePaths.size() + " files at " + revision + " in " + path + ": " + ex.getMessage());
+            Logger.warn("Could not read " + relativePaths.size() + " files at " + revision + " in " + path + ": " + FailureText.of(ex));
             return Map.of();
         }
     }
@@ -227,7 +228,7 @@ public final class GitRepositoryService {
             return Optional.of(GitCommandRunner.execute(p, path, command, parameters));
         } catch (final RuntimeException ex) {
             Logger.debug("git " + command.name() + " " + GitSafeText.withoutCredentials(String.join(" ", parameters))
-                    + " failed in " + path + ": " + ex.getMessage());
+                    + " failed in " + path + ": " + FailureText.of(ex));
             return Optional.empty();
         }
     }

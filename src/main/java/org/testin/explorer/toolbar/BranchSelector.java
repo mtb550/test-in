@@ -251,7 +251,7 @@ public class BranchSelector {
 
             ApplicationManager.getApplication().invokeLater(() -> showBranches(branches));
         } catch (final Exception ex) {
-            Logger.error("Could not read branches: " + ex.getMessage());
+            Logger.error("Could not read branches: " + FailureText.of(ex));
             ApplicationManager.getApplication().invokeLater(() -> {
                 showPlaceholder(Bundle.message("branch.load.failed"));
                 notifier.error(p, Bundle.message("git.error.title"), Bundle.message("branch.load.failed.message", FailureText.of(ex)));
@@ -264,7 +264,7 @@ public class BranchSelector {
         try {
             git.fetchRemoteBranches(repositoryPath);
         } catch (final Exception fetchError) {
-            Logger.error("Could not refresh remote branches: " + fetchError.getMessage());
+            Logger.error("Could not refresh remote branches: " + FailureText.of(fetchError));
             ApplicationManager.getApplication().invokeLater(() ->
                     notifier.warn(p, Bundle.message("branch.fetch.warning.title"),
                             Bundle.message("branch.fetch.warning.message", FailureText.of(fetchError))));

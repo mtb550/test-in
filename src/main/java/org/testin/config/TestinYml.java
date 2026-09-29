@@ -43,6 +43,7 @@ import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -76,7 +77,7 @@ public final class TestinYml {
                     try {
                         parser.skipChildren();
                     } catch (final IOException ex) {
-                        Logger.warn("Could not skip past " + key + " in testin.yml: " + ex.getMessage());
+                        Logger.warn("Could not skip past " + key + " in testin.yml: " + FailureText.of(ex));
                     }
 
                     return true;
@@ -206,7 +207,7 @@ public final class TestinYml {
             Logger.info("Saved " + file.getPath() + ": " + owned);
             return true;
         } catch (final IOException ex) {
-            Logger.warn("Could not save testin.yml in " + folder.getPath() + ": " + ex.getMessage());
+            Logger.warn("Could not save testin.yml in " + folder.getPath() + ": " + FailureText.of(ex));
             return false;
         }
     }
@@ -247,7 +248,7 @@ public final class TestinYml {
             keys.stream().filter(read::containsKey).forEach(key -> values.put(key, Objects.toString(read.get(key), "")));
             return values;
         } catch (final IOException ex) {
-            Logger.warn("Could not read the values in testin.yml: " + ex.getMessage());
+            Logger.warn("Could not read the values in testin.yml: " + FailureText.of(ex));
             return Map.of();
         }
     }
@@ -274,7 +275,7 @@ public final class TestinYml {
         try {
             return Files.readString(file);
         } catch (final IOException ex) {
-            Logger.warn("Could not read " + file + ": " + ex.getMessage());
+            Logger.warn("Could not read " + file + ": " + FailureText.of(ex));
             return "";
         }
     }
@@ -326,7 +327,7 @@ public final class TestinYml {
         try {
             return parsed(Files.readString(file), file.toString());
         } catch (final IOException ex) {
-            Logger.warn("Could not read " + file + ": " + ex.getMessage());
+            Logger.warn("Could not read " + file + ": " + FailureText.of(ex));
             return NOTHING_SAID;
         }
     }
@@ -348,7 +349,7 @@ public final class TestinYml {
             return new Parsed(config, true);
 
         } catch (final Exception ex) {
-            Logger.warn("Malformed " + source + ", ignored: " + ex.getMessage());
+            Logger.warn("Malformed " + source + ", ignored: " + FailureText.of(ex));
             return new Parsed(TestinProjectConfig.EMPTY, false);
         }
     }

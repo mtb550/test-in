@@ -24,6 +24,7 @@ import org.testin.model.markers.AbstractMarker;
 import org.testin.model.markers.Marker;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.nio.file.Files;
@@ -60,7 +61,7 @@ final class MarkerFiles {
             return mapper.readValue(markerFile.toFile(), markerClass);
 
         } catch (final Exception ex) {
-            Logger.warn("Unreadable " + kind.getMarkerKind() + " marker '" + name + "', using defaults: " + ex.getMessage());
+            Logger.warn("Unreadable " + kind.getMarkerKind() + " marker '" + name + "', using defaults: " + FailureText.of(ex));
 
             damaged.add(dirPath);
             return defaultFor(markerClass, kind);
@@ -98,7 +99,7 @@ final class MarkerFiles {
             return testDataFiles.write(markerFile, marker);
 
         } catch (final Exception ex) {
-            Logger.warn("Left the copied marker " + markerFile + " without an id of its own: " + ex.getMessage());
+            Logger.warn("Left the copied marker " + markerFile + " without an id of its own: " + FailureText.of(ex));
             return false;
         }
     }

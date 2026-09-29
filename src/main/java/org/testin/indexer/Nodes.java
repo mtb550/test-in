@@ -31,6 +31,7 @@ import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.model.markers.AbstractMarker;
 import org.testin.model.markers.Marker;
 import org.testin.services.Services;
+import org.testin.util.FailureText;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -58,7 +59,7 @@ public final class Nodes {
         try {
             return Files.isSameFile(one, other);
         } catch (final IOException ex) {
-            Logger.warn("Could not compare " + one + " with " + other + ": " + ex.getMessage());
+            Logger.warn("Could not compare " + one + " with " + other + ": " + FailureText.of(ex));
             return false;
         }
     }

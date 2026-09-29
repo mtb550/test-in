@@ -47,6 +47,7 @@ import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import javax.swing.DropMode;
 import java.awt.BorderLayout;
@@ -147,7 +148,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
             });
 
         } catch (final Exception ex) {
-            Logger.error("Failed to load test set data from disk: " + ex.getMessage());
+            Logger.error("Failed to load test set data from disk: " + FailureText.of(ex));
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (generation != modelGeneration.get()) return;
 
@@ -185,7 +186,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
                 ApplicationManager.getApplication().invokeLater(this::refreshView);
 
             } catch (final Exception ex) {
-                Logger.error("Failed to save the test case sequence: " + ex.getMessage());
+                Logger.error("Failed to save the test case sequence: " + FailureText.of(ex));
                 ApplicationManager.getApplication().invokeLater(() -> {
                     notifier.softRefuse(p, Bundle.message("save.failed"));
                     loadDataAsync();

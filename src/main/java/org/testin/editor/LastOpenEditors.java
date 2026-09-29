@@ -26,6 +26,7 @@ import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
+import org.testin.util.FailureText;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public final class LastOpenEditors {
                     entries.isEmpty() ? null : String.join(";", entries));
 
         } catch (final Exception ex) {
-            Logger.error("Failed to save open editors: " + ex.getMessage());
+            Logger.error("Failed to save open editors: " + FailureText.of(ex));
         }
     }
 
@@ -84,7 +85,7 @@ public final class LastOpenEditors {
             Logger.info("cleared saved editor state");
 
         } catch (final Exception ex) {
-            Logger.error("Failed to restore open editors: " + ex.getMessage());
+            Logger.error("Failed to restore open editors: " + FailureText.of(ex));
         }
     }
 

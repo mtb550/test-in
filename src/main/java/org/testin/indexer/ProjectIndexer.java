@@ -35,6 +35,7 @@ import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.BoundTestProject;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -119,7 +120,7 @@ public final class ProjectIndexer {
 
             for (final Path projectPath : validProjects) indexInBackground(projectPath, projectsLeft, passLatch);
         } catch (final Exception ex) {
-            Logger.error("indexWithProgress: " + ex.getMessage());
+            Logger.error("indexWithProgress: " + FailureText.of(ex));
             indexing.set(false);
 
             indexingLatch.countDown();
@@ -148,7 +149,7 @@ public final class ProjectIndexer {
                         try {
                             scanCoordinator.scan(projectPath, indicator);
                         } catch (final Exception ex) {
-                            Logger.error("Failed to index project: " + projectName + " - " + ex.getMessage());
+                            Logger.error("Failed to index project: " + projectName + " - " + FailureText.of(ex));
                         }
                         Logger.info("First read of '" + projectName + "' took " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started) + " ms");
 
@@ -164,7 +165,7 @@ public final class ProjectIndexer {
 
                     @Override
                     public void onThrowable(final @NotNull Throwable error) {
-                        Logger.error("Error indexing '" + projectName + "': " + error.getMessage());
+                        Logger.error("Error indexing '" + projectName + "': " + FailureText.of(error));
                         if (oneProjectFinished(projectsLeft, passLatch)) finishWithFailure();
                     }
                 });
@@ -300,7 +301,7 @@ public final class ProjectIndexer {
                 byName.put(name, directoryMapper.getTestProjectNode(path).getMarker().getStatus());
 
             } catch (final Exception ex) {
-                Logger.warn("Could not read test project '" + name + "': " + ex.getMessage());
+                Logger.warn("Could not read test project '" + name + "': " + FailureText.of(ex));
             }
         }
 
@@ -315,7 +316,7 @@ public final class ProjectIndexer {
         try (Stream<Path> dirs = Files.list(rootPath)) {
             projectPaths = dirs.filter(Files::isDirectory).toArray(Path[]::new);
         } catch (final Exception ex) {
-            Logger.error("Failed to list root directory: " + ex.getMessage());
+            Logger.error("Failed to list root directory: " + FailureText.of(ex));
             return Collections.emptyList();
         }
 
@@ -383,7 +384,7 @@ public final class ProjectIndexer {
         try {
             scanCoordinator.scan(projectPath, indicator);
         } catch (final Exception ex) {
-            Logger.error("Failed to scan single project: " + ex.getMessage());
+            Logger.error("Failed to scan single project: " + FailureText.of(ex));
         }
 
         announceReadAgain();

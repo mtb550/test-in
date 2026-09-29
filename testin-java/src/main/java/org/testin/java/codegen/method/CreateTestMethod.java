@@ -44,6 +44,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 import org.testin.util.NameSanitizer;
 
 import java.util.ArrayList;
@@ -302,7 +303,7 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
                     .ifPresent(added -> CodeStyleManager.getInstance(p).reformat(added));
 
         } catch (final Exception ex) {
-            Logger.error("retryInjectPhysically failed for method '" + methodName + "': " + ex.getMessage());
+            Logger.error("retryInjectPhysically failed for method '" + methodName + "': " + FailureText.of(ex));
         }
     }
 
@@ -340,7 +341,7 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
             return Optional.of(addedElement);
 
         } catch (final Exception ex) {
-            Logger.error("injectMethod failed for '" + methodName + "': " + ex.getMessage());
+            Logger.error("injectMethod failed for '" + methodName + "': " + FailureText.of(ex));
             return Optional.empty();
         }
     }

@@ -38,6 +38,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.nio.file.Files;
@@ -201,7 +202,7 @@ final class IndexingScanner {
             reportClashing(tp.getName(), List.copyOf(scanned.getClashingTestCases()));
 
         } catch (final Exception ex) {
-            Logger.error("Failed to scan project: " + projectPath.getFileName() + " - " + ex.getMessage());
+            Logger.error("Failed to scan project: " + projectPath.getFileName() + " - " + FailureText.of(ex));
         }
     }
 
@@ -216,7 +217,7 @@ final class IndexingScanner {
                 scanTestSetOrPackage(dirPath, parent, indicator, unread, scanned);
             }
         } catch (final Exception ex) {
-            Logger.error("Failed to list test sets: " + ex.getMessage());
+            Logger.error("Failed to list test sets: " + FailureText.of(ex));
         }
     }
 
@@ -279,7 +280,7 @@ final class IndexingScanner {
                                 testCaseIds.add(tc.getId());
                             } catch (final Exception ex) {
                                 Logger.error("Failed to read test case '" + filePath.toAbsolutePath() +
-                                        "': " + ex.getMessage());
+                                        "': " + FailureText.of(ex));
 
                                 scanned.getUnreadableTestCases().computeIfAbsent(path.toString(), _ -> ConcurrentHashMap.newKeySet())
                                         .add(filePath.getFileName().toString());
@@ -293,7 +294,7 @@ final class IndexingScanner {
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test set '" +
-                    path.getFileName().toString() + "': " + ex.getMessage());
+                    path.getFileName().toString() + "': " + FailureText.of(ex));
         }
     }
 
@@ -308,7 +309,7 @@ final class IndexingScanner {
                 scanTestRunOrPackage(dirPath, parent, indicator, unread, scanned);
             }
         } catch (final Exception ex) {
-            Logger.error("Failed to list test runs: " + ex.getMessage());
+            Logger.error("Failed to list test runs: " + FailureText.of(ex));
         }
     }
 
@@ -449,7 +450,7 @@ final class IndexingScanner {
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test run '" +
-                    path.getFileName().toString() + "': " + ex.getMessage());
+                    path.getFileName().toString() + "': " + FailureText.of(ex));
         }
     }
 
@@ -471,7 +472,7 @@ final class IndexingScanner {
                 read.add(item);
 
             } catch (final Exception ex) {
-                Logger.error("Failed to read the result '" + file.toAbsolutePath() + "': " + ex.getMessage());
+                Logger.error("Failed to read the result '" + file.toAbsolutePath() + "': " + FailureText.of(ex));
                 scanned.getUnreadableResults().add(runPath.getFileName() + "/" + file.getFileName());
             }
         }

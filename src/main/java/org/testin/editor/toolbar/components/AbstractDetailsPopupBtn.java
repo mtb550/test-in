@@ -28,6 +28,7 @@ import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.util.HashSet;
 import java.util.List;
@@ -64,7 +65,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
             try {
                 selectedDetails.add(Enum.valueOf(attributes, s));
             } catch (final IllegalArgumentException ex) {
-                Logger.error("Invalid editor attribute '" + s + "' for " + propertyKey + ": " + ex.getMessage());
+                Logger.error("Invalid editor attribute '" + s + "' for " + propertyKey + ": " + FailureText.of(ex));
             }
         }
 

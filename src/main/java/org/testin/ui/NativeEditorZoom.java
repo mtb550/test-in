@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.Editor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
+import org.testin.util.FailureText;
 
 import javax.swing.Timer;
 import java.awt.event.MouseWheelEvent;
@@ -67,7 +68,7 @@ public final class NativeEditorZoom implements Disposable {
             wheeled.filter(editor -> !editor.isDisposed())
                     .ifPresent(editor -> FontSync.applyGlobally(editor.getColorsScheme().getEditorFontSize()));
         } catch (final Exception ex) {
-            Logger.error("Following the editor zoom failed: " + ex.getMessage());
+            Logger.error("Following the editor zoom failed: " + FailureText.of(ex));
         }
     }
 

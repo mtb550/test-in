@@ -32,6 +32,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.util.Optional;
 
@@ -57,7 +58,7 @@ public class UpdateStatusAction extends AbstractAnyProjectAction {
             Services.getInstance(p, Notifier.class).softShow(p, status.getLabel());
 
         } catch (final Exception ex) {
-            Logger.error("Unable to mark '" + dir.getName() + "' " + status.getLabel() + ": " + ex.getMessage());
+            Logger.error("Unable to mark '" + dir.getName() + "' " + status.getLabel() + ": " + FailureText.of(ex));
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("status.failed", status.getLabel()));
         }
     }

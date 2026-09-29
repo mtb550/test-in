@@ -27,6 +27,7 @@ import org.testin.editor.TestinEditors;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
+import org.testin.util.FailureText;
 
 import java.awt.datatransfer.Transferable;
 
@@ -54,7 +55,7 @@ public class TreeDropHandler implements FileDropHandler {
             return true;
 
         } catch (final Exception ex) {
-            Logger.error("Exception: " + ex.getMessage());
+            Logger.error("Exception: " + FailureText.of(ex));
             return false;
         }
     }

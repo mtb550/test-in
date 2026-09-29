@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.io.File;
@@ -38,7 +39,7 @@ public class ExportJson {
 
             Files.write(destFile.toPath(), Services.getInstance(p, Mapper.class).writeValueAsBytes(sheetsData));
         } catch (final IOException ex) {
-            Logger.error("export failed: " + destFile + " - " + ex.getMessage());
+            Logger.error("export failed: " + destFile + " - " + FailureText.of(ex));
             throw new RuntimeException(ex);
         }
     }

@@ -37,6 +37,7 @@ import org.testin.logger.Logger;
 import org.testin.services.Services;
 import org.testin.setting.dialogs.TestinPathPanel;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
@@ -131,7 +132,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         try {
             root = Path.of(typed);
         } catch (final InvalidPathException notAPath) {
-            Logger.info("The Testin folder typed is not a path: " + notAPath.getMessage());
+            Logger.info("The Testin folder typed is not a path: " + FailureText.of(notAPath));
             throw new ConfigurationException(Bundle.message("settings.no.folder", typed), Bundle.message("settings.no.folder.title"));
         }
 

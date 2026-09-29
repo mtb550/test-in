@@ -60,6 +60,7 @@ import org.testin.testrun.ResultAnalysisDialog;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
+import org.testin.util.FailureText;
 
 import java.awt.BorderLayout;
 import java.time.Duration;
@@ -147,7 +148,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                     onLoaded.run();
                 });
             } catch (final Exception ex) {
-                Logger.error("Failed to load Test Run data from disk: " + ex.getMessage());
+                Logger.error("Failed to load Test Run data from disk: " + FailureText.of(ex));
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (generation != loadGeneration.get()) return;
 

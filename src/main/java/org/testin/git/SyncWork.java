@@ -150,7 +150,7 @@ record SyncWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull 
                         final @NotNull String remoteName = git.getRemoteName(repoPath);
                         pushed = pushUnpushed(repoPath, remoteName, git.getRemoteUrl(repoPath, remoteName), git.syncBranch(repoPath));
                     } catch (final Exception ex) {
-                        Logger.error("Could not push after resolving: " + ex.getMessage());
+                        Logger.error("Could not push after resolving: " + FailureText.of(ex));
                         ApplicationManager.getApplication().invokeLater(() ->
                                 notifier.error(p, Bundle.message("git.push.failed.title"),
                                         Bundle.message("git.push.failed.after.resolve", FailureText.of(ex))));

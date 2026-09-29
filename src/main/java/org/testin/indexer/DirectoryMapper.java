@@ -41,6 +41,7 @@ import org.testin.model.markers.TestSetPackageMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -92,7 +93,7 @@ public final class DirectoryMapper {
 
         } catch (final Exception ex) {
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("mapper.read.project.failed"), Bundle.message("mapper.skipping.invalid", fileName));
-            Logger.error("readTestProjectNode: Failed to parse project '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
+            Logger.error("readTestProjectNode: Failed to parse project '" + fileName + "' at " + path.toAbsolutePath() + ": " + FailureText.of(ex));
             throw new RuntimeException(ex);
         }
     }
@@ -137,7 +138,7 @@ public final class DirectoryMapper {
 
         } catch (final Exception ex) {
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("mapper.read.test.set.package.failed"), Bundle.message("mapper.parse.directory.failed", fileName));
-            Logger.error("readTestSetPackageNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
+            Logger.error("readTestSetPackageNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + FailureText.of(ex));
             throw new RuntimeException(ex);
         }
     }
@@ -160,7 +161,7 @@ public final class DirectoryMapper {
 
         } catch (final Exception ex) {
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("mapper.read.test.run.package.failed"), Bundle.message("mapper.parse.directory.failed", fileName));
-            Logger.error("readTestRunPackageNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
+            Logger.error("readTestRunPackageNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + FailureText.of(ex));
             throw new RuntimeException(ex);
         }
     }
@@ -183,7 +184,7 @@ public final class DirectoryMapper {
 
         } catch (final Exception ex) {
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("mapper.read.test.set.failed"), Bundle.message("mapper.parse.directory.failed", fileName));
-            Logger.error("readTestSetNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
+            Logger.error("readTestSetNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + FailureText.of(ex));
             throw new RuntimeException(ex);
         }
     }
@@ -217,7 +218,7 @@ public final class DirectoryMapper {
 
         } catch (final Exception ex) {
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("mapper.read.test.run.failed"), Bundle.message("mapper.parse.directory.failed", fileName));
-            Logger.error("readTestRunNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
+            Logger.error("readTestRunNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + FailureText.of(ex));
             throw new RuntimeException(ex);
         }
     }

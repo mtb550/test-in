@@ -38,6 +38,7 @@ import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -157,7 +158,7 @@ public final class CodeNavigator implements CodeNavigation {
             Optional.ofNullable(method.orElseThrow().getBody()).ifPresent(body -> body.replace(written));
             return true;
         } catch (final IncorrectOperationException notJava) {
-            Logger.warn("The agent's answer for '" + tc.getDescription() + "' is not Java and was dropped: " + notJava.getMessage());
+            Logger.warn("The agent's answer for '" + tc.getDescription() + "' is not Java and was dropped: " + FailureText.of(notJava));
             return false;
         }
     }

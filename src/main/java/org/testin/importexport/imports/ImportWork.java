@@ -203,7 +203,7 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
                 try {
                     JavaCode.of(DirectoryType.TS).getCreated().execute(p, made);
                 } catch (final Exception ex) {
-                    Logger.error("Failed to create Java class: " + ex.getMessage());
+                    Logger.error("Failed to create Java class: " + FailureText.of(ex));
                 }
 
                 return made;

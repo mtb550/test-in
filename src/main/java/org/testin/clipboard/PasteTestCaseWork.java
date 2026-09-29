@@ -41,6 +41,7 @@ import org.testin.testcase.TestCaseSnapshot;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 import org.testin.util.ClipboardContents;
+import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.awt.datatransfer.DataFlavor;
@@ -185,7 +186,7 @@ record PasteTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @NotN
 
             return parsed.stream().filter(Objects::nonNull).toList();
         } catch (final Exception ex) {
-            Logger.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
+            Logger.warn("[WARNING] Failed to parse clipboard JSON: " + FailureText.of(ex));
             return List.of();
         }
     }

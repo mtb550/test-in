@@ -46,7 +46,7 @@ public final class Mapper {
             return mapper.readValue(src, valueType);
 
         } catch (final Exception ex) {
-            Logger.error("Mapper.readValue() failed for file '" + src.getAbsolutePath() + "' to class " + valueType.getSimpleName() + ": " + ex.getMessage());
+            Logger.error("Mapper.readValue() failed for file '" + src.getAbsolutePath() + "' to class " + valueType.getSimpleName() + ": " + FailureText.of(ex));
             throw new IllegalStateException(FailureText.of(ex), ex);
         }
     }
@@ -57,7 +57,7 @@ public final class Mapper {
 
         } catch (final Exception ex) {
             Logger.error("Failed to read file path " + src + " to TypeReference");
-            Logger.error("Exception: " + ex.getMessage());
+            Logger.error("Exception: " + FailureText.of(ex));
             throw new IllegalStateException(FailureText.of(ex), ex);
         }
     }
@@ -88,7 +88,7 @@ public final class Mapper {
 
         } catch (final Exception ex) {
             Logger.error("Failed to serialize object to bytes: " + value.getClass().getSimpleName());
-            Logger.error("Exception: " + ex.getMessage());
+            Logger.error("Exception: " + FailureText.of(ex));
             throw new IllegalStateException("Could not serialize " + value.getClass().getSimpleName(), ex);
         }
     }
@@ -109,7 +109,7 @@ public final class Mapper {
             return node instanceof ObjectNode object ? object : mapper.createObjectNode();
 
         } catch (final Exception ex) {
-            Logger.debug("Mapper.readTree() could not parse the content: " + ex.getMessage());
+            Logger.debug("Mapper.readTree() could not parse the content: " + FailureText.of(ex));
             return mapper.createObjectNode();
         }
     }

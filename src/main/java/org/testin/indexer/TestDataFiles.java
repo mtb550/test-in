@@ -74,7 +74,7 @@ final class TestDataFiles {
         try {
             return Files.readAllBytes(path);
         } catch (final IOException missingOrUnreadable) {
-            Logger.warn("Could not read " + path + ": " + missingOrUnreadable.getMessage());
+            Logger.warn("Could not read " + path + ": " + FailureText.of(missingOrUnreadable));
             return new byte[0];
         }
     }
@@ -84,7 +84,7 @@ final class TestDataFiles {
         try (Stream<Path> inside = Files.list(runPath)) {
             return inside.filter(file -> FileKind.of(file) == FileKind.RUN_ITEM).toList();
         } catch (final IOException ex) {
-            Logger.warn("Could not list the results in " + runPath + ": " + ex.getMessage());
+            Logger.warn("Could not list the results in " + runPath + ": " + FailureText.of(ex));
             return List.of();
         }
     }
@@ -93,7 +93,7 @@ final class TestDataFiles {
         try (Stream<Path> inside = Files.list(runPath)) {
             return inside.filter(file -> FileKind.of(file, DirectoryType.TR) == FileKind.SCREENSHOT).toList();
         } catch (final IOException ex) {
-            Logger.warn("Could not list the screenshots in " + runPath + ": " + ex.getMessage());
+            Logger.warn("Could not list the screenshots in " + runPath + ": " + FailureText.of(ex));
             return List.of();
         }
     }
@@ -150,12 +150,12 @@ final class TestDataFiles {
 
     private void reportRemoveFailure(final @NotNull Path path, final @NotNull IOException ex) {
         Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", FailureText.of(ex)));
-        Logger.error("unable to remove " + path + ": " + ex.getMessage());
+        Logger.error("unable to remove " + path + ": " + FailureText.of(ex));
     }
 
     private void reportWriteFailure(final @NotNull Path path, final @NotNull IOException ex) {
         Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.write", FailureText.of(ex)));
-        Logger.error("unable to write content: " + ex.getMessage());
+        Logger.error("unable to write content: " + FailureText.of(ex));
         Logger.error("path" + path);
     }
 }

@@ -33,6 +33,7 @@ import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +46,7 @@ public class AutomateTestCaseAction extends AbstractAnyProjectAction {
         try {
             return ApplicationManager.getApplication().runReadAction((Computable<Integer>) () -> CodeNavigation.available().methodsFor(p, asked).size());
         } catch (final Exception ex) {
-            Logger.warn("Could not count the methods Automate Test Case wrote: " + ex.getMessage());
+            Logger.warn("Could not count the methods Automate Test Case wrote: " + FailureText.of(ex));
             return 0;
         }
     }

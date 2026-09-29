@@ -30,6 +30,7 @@ import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
+import org.testin.util.FailureText;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -76,7 +77,7 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
             throw cancelled;
         } catch (final Exception ex) {
             final @NotNull String message = "Could not load '" + directory.getName() + "'";
-            Logger.error(message + ": " + ex.getMessage());
+            Logger.error(message + ": " + FailureText.of(ex));
             return List.of(child(new TreeLoadError(message)));
         }
     }

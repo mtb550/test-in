@@ -28,6 +28,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseSnapshot;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import javax.swing.JComponent;
 import javax.swing.ListModel;
@@ -161,7 +162,7 @@ public class TransferListener extends TransferHandler {
         } catch (final Exception ex) {
             putBack(orderBefore);
 
-            Logger.error("Reordering the test cases failed: " + ex.getMessage());
+            Logger.error("Reordering the test cases failed: " + FailureText.of(ex));
             notifier.softRefuse(p, Bundle.message("save.failed"));
             return false;
         }

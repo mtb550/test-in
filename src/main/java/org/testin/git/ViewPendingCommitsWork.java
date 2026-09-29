@@ -206,7 +206,7 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
                         notifier.softShow(p, Bundle.message("git.committed"), commitLabel(commitId));
                     });
                 },
-                ex -> notifier.error(p, Bundle.message("git.commit.failed.title"), Bundle.message("git.commit.failed.message") + System.lineSeparator() + ex.getMessage()));
+                ex -> notifier.error(p, Bundle.message("git.commit.failed.title"), Bundle.message("git.commit.failed.message") + System.lineSeparator() + FailureText.of(ex)));
     }
 
     // UC-SHARE-009, Rule-SHARE-043
@@ -353,7 +353,7 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
                             });
                         },
                         ex -> notifier.error(p, Bundle.message("git.config.failed.title"),
-                                Bundle.message("git.config.failed.message") + System.lineSeparator() + ex.getMessage()))
+                                Bundle.message("git.config.failed.message") + System.lineSeparator() + FailureText.of(ex)))
         ).show());
     }
 }

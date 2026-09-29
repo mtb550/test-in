@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -39,7 +40,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -67,7 +67,7 @@ final class GitCommandRunner {
             try {
                 Files.deleteIfExists(pathspec);
             } catch (final IOException ex) {
-                Logger.warn("Could not delete the pathspec file " + pathspec + ": " + ex.getMessage());
+                Logger.warn("Could not delete the pathspec file " + pathspec + ": " + FailureText.of(ex));
             }
         }
     }
@@ -78,8 +78,8 @@ final class GitCommandRunner {
             Files.write(file, pathspecBytes(paths));
             return file;
         } catch (final IOException ex) {
-            Logger.error("Could not write the Git pathspec file: " + ex.getMessage());
-            throw new IllegalStateException("Could not write the Git pathspec file: " + ex.getMessage());
+            Logger.error("Could not write the Git pathspec file: " + FailureText.of(ex));
+            throw new IllegalStateException("Could not write the Git pathspec file: " + FailureText.of(ex));
         }
     }
 
@@ -96,7 +96,7 @@ final class GitCommandRunner {
         try {
             return objectsIn(relativePaths, handler.run());
         } catch (final VcsException ex) {
-            final @NotNull String details = GitSafeText.withoutCredentials(Objects.toString(ex.getMessage(), ""));
+            final @NotNull String details = GitSafeText.withoutCredentials(FailureText.of(ex));
             Logger.error("Git command failed: " + details);
             throw new IllegalStateException(Bundle.message("git.command.failed", details));
         }

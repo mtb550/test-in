@@ -26,6 +26,7 @@ import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.io.IOException;
@@ -80,7 +81,7 @@ public final class GitDiffProcessor {
                         testCases));
 
             } catch (final RuntimeException ex) {
-                Logger.warn("Listing " + relativePath + " without detail: " + ex.getMessage());
+                Logger.warn("Listing " + relativePath + " without detail: " + FailureText.of(ex));
                 result.add(PendingChangeFactory.unreadable(entry.type(), relativePath));
             }
         }
@@ -113,7 +114,7 @@ public final class GitDiffProcessor {
         try {
             return Files.readString(file, StandardCharsets.UTF_8);
         } catch (final IOException ex) {
-            Logger.warn("Could not read changed file " + file + ": " + ex.getMessage());
+            Logger.warn("Could not read changed file " + file + ": " + FailureText.of(ex));
             throw new IllegalStateException("Could not read " + relativePath, ex);
         }
     }

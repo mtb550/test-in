@@ -62,6 +62,7 @@ import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
+import org.testin.util.FailureText;
 import org.testin.util.ReportFont;
 
 import java.io.ByteArrayOutputStream;
@@ -165,7 +166,7 @@ public final class TestRunWordGenerator {
             return baos.toByteArray();
 
         } catch (final IOException ex) {
-            Logger.error("Word generation failed: " + ex.getMessage());
+            Logger.error("Word generation failed: " + FailureText.of(ex));
             throw new RuntimeException(ex);
         }
     }

@@ -104,7 +104,7 @@ public final class GitCommits {
         try {
             return GitCommandRunner.execute(p, repositoryPath, GitCommand.REV_PARSE, "--short", "HEAD").trim();
         } catch (final RuntimeException ex) {
-            Logger.warn("Could not read the commit id: " + ex.getMessage());
+            Logger.warn("Could not read the commit id: " + FailureText.of(ex));
             return "";
         }
     }

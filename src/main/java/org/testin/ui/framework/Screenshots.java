@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.ui.Caption;
 import org.testin.util.ClipboardContents;
+import org.testin.util.FailureText;
 
 import javax.swing.JComponent;
 import java.awt.Image;
@@ -94,7 +95,7 @@ public final class Screenshots implements DialogComponent {
             final byte @NotNull [] png = Picture.toPng((Image) contents.getTransferData(DataFlavor.imageFlavor));
             if (png.length > 0) strip.add(png);
         } catch (final UnsupportedFlavorException | IOException ex) {
-            Logger.warn("Could not read the pasted image: " + ex.getMessage());
+            Logger.warn("Could not read the pasted image: " + FailureText.of(ex));
         }
     }
 

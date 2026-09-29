@@ -33,6 +33,7 @@ import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 import org.testin.util.FromContentModule;
 import org.testin.util.Once;
 
@@ -94,7 +95,7 @@ public final class JavaSourceRoot {
             target.delete(requestor);
             Logger.info("Removed generated code at: " + target.getPath());
         } catch (final IOException ex) {
-            Logger.error("Could not remove generated code at " + target.getPath() + ": " + ex.getMessage());
+            Logger.error("Could not remove generated code at " + target.getPath() + ": " + FailureText.of(ex));
         }
     }
 
@@ -106,7 +107,7 @@ public final class JavaSourceRoot {
         try {
             folder = Optional.ofNullable(VfsUtil.createDirectoryIfMissing(root, relative));
         } catch (final IOException ex) {
-            Logger.error("Could not create the package folder " + relative + ": " + ex.getMessage());
+            Logger.error("Could not create the package folder " + relative + ": " + FailureText.of(ex));
             return Optional.empty();
         }
 
@@ -138,7 +139,7 @@ public final class JavaSourceRoot {
             Logger.info("Test class created at: " + file.getPath());
             return Optional.of(file);
         } catch (final IOException ex) {
-            Logger.error("Could not create the test class " + fileName + ": " + ex.getMessage());
+            Logger.error("Could not create the test class " + fileName + ": " + FailureText.of(ex));
             return Optional.empty();
         }
     }
@@ -163,7 +164,7 @@ public final class JavaSourceRoot {
         try {
             work.run(root.get());
         } catch (final IOException ex) {
-            Logger.info("Error " + whatFailed + ": " + ex.getMessage());
+            Logger.info("Error " + whatFailed + ": " + FailureText.of(ex));
         }
     }
 

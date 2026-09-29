@@ -26,6 +26,7 @@ import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 import org.testin.util.Once;
 
 import java.awt.Desktop;
@@ -54,7 +55,7 @@ final class Trash {
             return false;
 
         } catch (final Exception ex) {
-            Logger.warn("Could not move " + path + " to the recycle bin, deleting it instead: " + ex.getMessage());
+            Logger.warn("Could not move " + path + " to the recycle bin, deleting it instead: " + FailureText.of(ex));
             sayThereIsNoBin(p);
             return false;
         }

@@ -120,7 +120,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                         () -> refuseMissingTestCase(p, uuid, methodName));
 
             } catch (final Exception ex) {
-                Logger.error("Could not open the test case behind this mark: " + ex.getMessage());
+                Logger.error("Could not open the test case behind this mark: " + FailureText.of(ex));
                 ApplicationManager.getApplication().invokeLater(() ->
                         Services.getInstance(p, Notifier.class).error(p, Bundle.message("gutter.not.opened.title"), Bundle.message("gutter.not.opened.message", FailureText.of(ex)))
                 );

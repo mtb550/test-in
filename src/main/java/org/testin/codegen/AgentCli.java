@@ -26,6 +26,7 @@ import com.intellij.openapi.util.SystemInfo;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.util.FailureText;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,7 +94,7 @@ public final class AgentCli {
         try {
             return Optional.of(new CapturingProcessHandler(line).runProcessWithProgressIndicator(indicator, (int) timeout.toMillis()));
         } catch (final ExecutionException ex) {
-            Logger.warn("The agent '" + command + "' could not be started: " + ex.getMessage());
+            Logger.warn("The agent '" + command + "' could not be started: " + FailureText.of(ex));
             return Optional.empty();
         }
     }
@@ -121,7 +122,7 @@ public final class AgentCli {
 
             return Optional.of(written);
         } catch (final IOException ex) {
-            Logger.warn("The prompt could not be written for the agent: " + ex.getMessage());
+            Logger.warn("The prompt could not be written for the agent: " + FailureText.of(ex));
             return Optional.empty();
         }
     }
@@ -130,7 +131,7 @@ public final class AgentCli {
         try {
             Files.deleteIfExists(written);
         } catch (final IOException ex) {
-            Logger.warn("The prompt file stayed behind at " + written + ": " + ex.getMessage());
+            Logger.warn("The prompt file stayed behind at " + written + ": " + FailureText.of(ex));
         }
     }
 

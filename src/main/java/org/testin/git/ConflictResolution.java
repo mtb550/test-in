@@ -195,7 +195,7 @@ public final class ConflictResolution {
             Files.writeString(repositoryPath.resolve(relativePath), merged.toPrettyString(), StandardCharsets.UTF_8);
 
         } catch (final IOException ex) {
-            Logger.error("Could not write the merged test case " + relativePath + ": " + ex.getMessage());
+            Logger.error("Could not write the merged test case " + relativePath + ": " + FailureText.of(ex));
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.merge.failed.title"),
                     Bundle.message("git.merge.failed.message", relativePath, FailureText.of(ex)));
             return false;

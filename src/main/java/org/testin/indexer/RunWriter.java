@@ -25,6 +25,7 @@ import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
+import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.nio.file.Files;
@@ -108,7 +109,7 @@ final class RunWriter {
                 removeResultsOf(runPath, gone);
                 sweepScreenshots(runPath, named);
             } catch (final Exception ex) {
-                Logger.error("Failed to persist test run data: " + ex.getMessage());
+                Logger.error("Failed to persist test run data: " + FailureText.of(ex));
             }
         });
     }
@@ -152,7 +153,7 @@ final class RunWriter {
 
                 byName.forEach((name, png) -> files.write(TestRunDirectoryDto.screenshotFile(runPath, name), png));
             } catch (final Exception ex) {
-                Logger.error("Failed to write the screenshots of " + runPath.getFileName() + ": " + ex.getMessage());
+                Logger.error("Failed to write the screenshots of " + runPath.getFileName() + ": " + FailureText.of(ex));
             } finally {
                 byName.forEach((name, png) -> unwritten.remove(TestRunDirectoryDto.screenshotFile(runPath, name), png));
             }
@@ -179,7 +180,7 @@ final class RunWriter {
 
                 if (store.persistRunMarker(runPath)) Logger.trace("Marker persisted for " + runPath.getFileName());
             } catch (final Exception ex) {
-                Logger.error("Failed to persist marker: " + ex.getMessage());
+                Logger.error("Failed to persist marker: " + FailureText.of(ex));
             }
         });
     }
@@ -188,7 +189,7 @@ final class RunWriter {
         try {
             return Optional.of(mapper.writeValueAsBytes(item));
         } catch (final Exception ex) {
-            Logger.error("Failed to snapshot run item: " + ex.getMessage());
+            Logger.error("Failed to snapshot run item: " + FailureText.of(ex));
             return Optional.empty();
         }
     }

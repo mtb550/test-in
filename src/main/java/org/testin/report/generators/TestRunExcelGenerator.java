@@ -37,6 +37,7 @@ import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
+import org.testin.util.FailureText;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -162,7 +163,7 @@ public final class TestRunExcelGenerator {
 
             return os.toByteArray();
         } catch (final IOException ex) {
-            Logger.error("Excel report generation failed: " + ex.getMessage());
+            Logger.error("Excel report generation failed: " + FailureText.of(ex));
             throw new RuntimeException(ex);
         }
     }
