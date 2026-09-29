@@ -53,7 +53,7 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
         root = Files.createTempDirectory("testin-search");
 
         final TestProjectDirectoryDto tp = WriteAction.computeAndWait(() -> {
-            final TestProjectDirectoryDto project = mapper().setTestProjectNode(getProject(), root.resolve("NAFATH"));
+            final TestProjectDirectoryDto project = mapper().setTestProjectNode(root.resolve("NAFATH"));
             nodes().addTestProject(project);
 
             return project;
@@ -91,7 +91,7 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
 
     private @NotNull TestCaseDto aTestCaseIn(final TestProjectDirectoryDto tp) {
         final TestSetDirectoryDto login = WriteAction.computeAndWait(() -> {
-            final TestSetDirectoryDto set = mapper().getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            final TestSetDirectoryDto set = mapper().getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
             nodes().addTestSet(set);
 
             return set;
@@ -111,7 +111,7 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
     private @NotNull Path aRunOver(final TestProjectDirectoryDto tp, final String named, final UUID testCaseId) {
         final Path runPath = WriteAction.computeAndWait(() -> {
             final Path path = tp.getTestRunsDirectory().getPath().resolve(named);
-            final TestRunDirectoryDto tr = mapper().setTestRunNode(getProject(), path, tp.getTestRunsDirectory());
+            final TestRunDirectoryDto tr = mapper().setTestRunNode(path, tp.getTestRunsDirectory());
             nodes().addTestRunDir(tr);
 
             return path;

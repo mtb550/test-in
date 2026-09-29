@@ -100,7 +100,7 @@ public class CreateTestRun implements NodeCreator {
             return false;
         }
 
-        final @NotNull TestRunDirectoryDto runDir = directoryMapper.setTestRunNode(p, savePath, parentDir);
+        final @NotNull TestRunDirectoryDto runDir = directoryMapper.setTestRunNode(savePath, parentDir);
         write(form, selection, savePath, runDir);
 
         return true;

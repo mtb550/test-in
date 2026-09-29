@@ -297,7 +297,7 @@ public final class ProjectIndexer {
         for (final Path path : collectValidProjects(root)) {
             final @NotNull String name = path.getFileName().toString();
             try {
-                byName.put(name, directoryMapper.getTestProjectNode(p, path).getMarker().getStatus());
+                byName.put(name, directoryMapper.getTestProjectNode(path).getMarker().getStatus());
 
             } catch (final Exception ex) {
                 Logger.warn("Could not read test project '" + name + "': " + ex.getMessage());

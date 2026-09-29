@@ -120,11 +120,11 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
         final Path runPath = WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 
-            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
+            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
             nodes().addTestProject(tp);
 
             final Path path = tp.getTestRunsDirectory().getPath().resolve("Cycle-1");
-            final TestRunDirectoryDto tr = mapper.setTestRunNode(getProject(), path, tp.getTestRunsDirectory());
+            final TestRunDirectoryDto tr = mapper.setTestRunNode(path, tp.getTestRunsDirectory());
             nodes().addTestRunDir(tr);
             return path;
         });

@@ -104,10 +104,10 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         return WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 
-            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
+            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
             nodes().addTestProject(tp);
 
-            final TestSetDirectoryDto ts = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            final TestSetDirectoryDto ts = mapper.getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
             nodes().addTestSet(ts);
             return ts;
         });
@@ -117,11 +117,11 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         return WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 
-            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
+            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
             nodes().addTestProject(tp);
 
-            final TestSetDirectoryDto login = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
-            final TestSetDirectoryDto signUp = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Sign up"), tp.getTestCasesDirectory());
+            final TestSetDirectoryDto login = mapper.getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            final TestSetDirectoryDto signUp = mapper.getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Sign up"), tp.getTestCasesDirectory());
             nodes().addTestSet(login);
             nodes().addTestSet(signUp);
             return List.of(login, signUp);

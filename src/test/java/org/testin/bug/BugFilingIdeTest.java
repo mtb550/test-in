@@ -114,10 +114,10 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
     private @NotNull UUID indexedTestCase() {
         final TestSetDirectoryDto ts = WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
-            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
+            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
             nodes().addTestProject(tp);
 
-            final TestSetDirectoryDto set = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+            final TestSetDirectoryDto set = mapper.getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
             nodes().addTestSet(set);
             return set;
         });

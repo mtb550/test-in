@@ -141,7 +141,7 @@ final class IndexingScanner {
     // UC-INTERNAL-002, Rule-INTERNAL-005, Rule-INTERNAL-007, Rule-INTERNAL-091
     private void scanProjectContents(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
-            final @NotNull TestProjectDirectoryDto tp = directoryMapper.getTestProjectNode(p, projectPath);
+            final @NotNull TestProjectDirectoryDto tp = directoryMapper.getTestProjectNode(projectPath);
 
             // Rule-INTERNAL-091
             final @NotNull Optional<String> refused = tp.getMarker().whyNotReadable();
@@ -233,7 +233,7 @@ final class IndexingScanner {
     // UC-INTERNAL-002, Rule-INTERNAL-008, Rule-INTERNAL-015
     private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
         try {
-            final @NotNull TestSetPackageDirectoryDto tsp = directoryMapper.getTestSetPackageNode(p, path, parent);
+            final @NotNull TestSetPackageDirectoryDto tsp = directoryMapper.getTestSetPackageNode(path, parent);
 
             scanned.getTestSetPackages().put(path.toString(), tsp);
 
@@ -250,7 +250,7 @@ final class IndexingScanner {
     // UC-INTERNAL-002, Rule-INTERNAL-011
     private void scanTestSet(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull ScannedProject scanned) {
         try {
-            final @NotNull TestSetDirectoryDto ts = directoryMapper.getTestSetNode(p, path, parent);
+            final @NotNull TestSetDirectoryDto ts = directoryMapper.getTestSetNode(path, parent);
 
             scanned.getTestSets().put(path.toString(), ts);
 
@@ -325,7 +325,7 @@ final class IndexingScanner {
     // UC-INTERNAL-002, Rule-INTERNAL-010, Rule-INTERNAL-015
     private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
         try {
-            final @NotNull TestRunPackageDirectoryDto trp = directoryMapper.getTestRunPackageNode(p, path, parent);
+            final @NotNull TestRunPackageDirectoryDto trp = directoryMapper.getTestRunPackageNode(path, parent);
 
             scanned.getTestRunPackages().put(path.toString(), trp);
 
@@ -438,7 +438,7 @@ final class IndexingScanner {
     // UC-INTERNAL-002
     private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull ScannedProject scanned) {
         try {
-            final @NotNull TestRunDirectoryDto tr = directoryMapper.getTestRunNode(p, path, parent);
+            final @NotNull TestRunDirectoryDto tr = directoryMapper.getTestRunNode(path, parent);
 
             scanned.getTestRunDirs().put(path.toString(), tr);
 

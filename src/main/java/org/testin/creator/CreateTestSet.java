@@ -28,12 +28,10 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 public class CreateTestSet implements NodeCreator {
-    private final @NotNull Project p;
     private final @NotNull DirectoryMapper directoryMapper;
     private final @NotNull Nodes nodes;
 
     public CreateTestSet(final @NotNull Project p) {
-        this.p = p;
         this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
         this.nodes = Services.getInstance(p, Nodes.class);
     }
@@ -41,7 +39,7 @@ public class CreateTestSet implements NodeCreator {
     // UC-TREE-PANEL-007
     @Override
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
-        final @NotNull TestSetDirectoryDto ts = directoryMapper.getTestSetNode(p, newDirPath, parentDir);
+        final @NotNull TestSetDirectoryDto ts = directoryMapper.getTestSetNode(newDirPath, parentDir);
 
         return nodes.addTestSet(ts) ? Optional.of(ts) : Optional.empty();
     }

@@ -67,10 +67,10 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
         return WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 
-            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
+            final TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
             nodes().addTestProject(tp);
 
-            final TestSetDirectoryDto ts = mapper.getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Checkout"), tp.getTestCasesDirectory());
+            final TestSetDirectoryDto ts = mapper.getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Checkout"), tp.getTestCasesDirectory());
             nodes().addTestSet(ts);
             return ts;
         });

@@ -60,7 +60,7 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
     private @NotNull TestProjectDirectoryDto create(final Path path) {
         return WriteAction.computeAndWait(() -> {
             final TestProjectDirectoryDto tp =
-                    Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(getProject(), path);
+                    Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(path);
 
             nodes().addTestProject(tp);
             return tp;

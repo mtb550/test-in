@@ -19,7 +19,7 @@ package org.testin.indexer;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
@@ -45,10 +45,12 @@ import org.testin.util.Bundle;
 import java.nio.file.Path;
 import java.util.List;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class DirectoryMapper {
-    public @NotNull TestProjectDirectoryDto setTestProjectNode(final @NotNull Project p, final @NotNull Path path) {
+    private final @NotNull Project p;
+
+    public @NotNull TestProjectDirectoryDto setTestProjectNode(final @NotNull Path path) {
         final @NotNull String fileName = path.getFileName().toString();
 
         final @NotNull TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
@@ -60,14 +62,14 @@ public final class DirectoryMapper {
         // Rule-INTERNAL-091
         tp.getMarker().setFormat(TestProjectMarker.FORMAT);
 
-        tp.setTestCasesDirectory(getTestCasesRootNode(p, path, tp));
-        tp.setTestRunsDirectory(getTestRunsRootNode(p, path, tp));
+        tp.setTestCasesDirectory(getTestCasesRootNode(path, tp));
+        tp.setTestRunsDirectory(getTestRunsRootNode(path, tp));
 
         return tp;
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    public @NotNull TestProjectDirectoryDto getTestProjectNode(final @NotNull Project p, final @NotNull Path path) {
+    public @NotNull TestProjectDirectoryDto getTestProjectNode(final @NotNull Path path) {
         final @NotNull String fileName = path.getFileName().toString();
         try {
             final @NotNull TestProjectMarker marker = Services.getInstance(p, Nodes.class).readMarker(path, DirectoryType.TP, fileName, TestProjectMarker.class);
@@ -79,8 +81,8 @@ public final class DirectoryMapper {
                     .marker(marker)
                     .build();
 
-            final @NotNull TestCasesMainDirectoryDto tcd = getTestCasesRootNode(p, tp.getPath(), tp);
-            final @NotNull TestRunsMainDirectoryDto trd = getTestRunsRootNode(p, path, tp);
+            final @NotNull TestCasesMainDirectoryDto tcd = getTestCasesRootNode(tp.getPath(), tp);
+            final @NotNull TestRunsMainDirectoryDto trd = getTestRunsRootNode(path, tp);
 
             tp.setTestCasesDirectory(tcd);
             tp.setTestRunsDirectory(trd);
@@ -95,7 +97,7 @@ public final class DirectoryMapper {
         }
     }
 
-    public @NotNull TestCasesMainDirectoryDto getTestCasesRootNode(final @NotNull Project p, final @NotNull Path path, final @NotNull TestProjectDirectoryDto tp) {
+    public @NotNull TestCasesMainDirectoryDto getTestCasesRootNode(final @NotNull Path path, final @NotNull TestProjectDirectoryDto tp) {
         final @NotNull Path dir = path.resolve(DirectoryType.TCD.getFolderName());
         return TestCasesMainDirectoryDto.builder()
                 .path(dir)
@@ -106,7 +108,7 @@ public final class DirectoryMapper {
                 .build();
     }
 
-    public @NotNull TestRunsMainDirectoryDto getTestRunsRootNode(final @NotNull Project p, final @NotNull Path path, final @NotNull TestProjectDirectoryDto tp) {
+    public @NotNull TestRunsMainDirectoryDto getTestRunsRootNode(final @NotNull Path path, final @NotNull TestProjectDirectoryDto tp) {
         final @NotNull Path dir = path.resolve(DirectoryType.TRD.getFolderName());
         return TestRunsMainDirectoryDto.builder()
                 .path(dir)
@@ -118,7 +120,7 @@ public final class DirectoryMapper {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    public @NotNull TestSetPackageDirectoryDto getTestSetPackageNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
+    public @NotNull TestSetPackageDirectoryDto getTestSetPackageNode(final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final @NotNull String fileName = path.getFileName().toString();
         try {
             TestSetPackageDirectoryDto testSetPackageDirectoryDto = TestSetPackageDirectoryDto
@@ -141,7 +143,7 @@ public final class DirectoryMapper {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    public @NotNull TestRunPackageDirectoryDto getTestRunPackageNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
+    public @NotNull TestRunPackageDirectoryDto getTestRunPackageNode(final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final @NotNull String fileName = path.getFileName().toString();
         try {
             TestRunPackageDirectoryDto testRunPackageDirectoryDto = TestRunPackageDirectoryDto
@@ -164,7 +166,7 @@ public final class DirectoryMapper {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    public @NotNull TestSetDirectoryDto getTestSetNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
+    public @NotNull TestSetDirectoryDto getTestSetNode(final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final @NotNull String fileName = path.getFileName().toString();
         try {
             TestSetDirectoryDto testSetDirectoryDto = TestSetDirectoryDto
@@ -186,18 +188,18 @@ public final class DirectoryMapper {
         }
     }
 
-    public @NotNull TestRunDirectoryDto setTestRunNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
-        return buildTestRunNode(p, path, parent, new TestRunMarker());
+    public @NotNull TestRunDirectoryDto setTestRunNode(final @NotNull Path path, final @NotNull DirectoryDto parent) {
+        return buildTestRunNode(path, parent, new TestRunMarker());
     }
 
-    public @NotNull TestRunDirectoryDto getTestRunNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
+    public @NotNull TestRunDirectoryDto getTestRunNode(final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final @NotNull String fileName = path.getFileName().toString();
         final @NotNull TestRunMarker marker = Services.getInstance(p, Nodes.class).readMarker(path, DirectoryType.TR, fileName, TestRunMarker.class);
-        return buildTestRunNode(p, path, parent, marker);
+        return buildTestRunNode(path, parent, marker);
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    private @NotNull TestRunDirectoryDto buildTestRunNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull TestRunMarker marker) {
+    private @NotNull TestRunDirectoryDto buildTestRunNode(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull TestRunMarker marker) {
         final @NotNull String fileName = path.getFileName().toString();
         try {
             final var builder = TestRunDirectoryDto

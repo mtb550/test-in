@@ -68,7 +68,7 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
 
     private @NotNull TestProjectDirectoryDto testProject(final String name) {
         return WriteAction.computeAndWait(() -> {
-            final TestProjectDirectoryDto tp = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(getProject(), root.resolve(name));
+            final TestProjectDirectoryDto tp = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(root.resolve(name));
             nodes().addTestProject(tp);
             return tp;
         });
@@ -77,7 +77,7 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
     private @NotNull TestSetDirectoryDto testSet(final TestProjectDirectoryDto tp) {
         return WriteAction.computeAndWait(() -> {
             final TestSetDirectoryDto ts = Services.getInstance(getProject(), DirectoryMapper.class)
-                    .getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
+                    .getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
             nodes().addTestSet(ts);
             return ts;
         });

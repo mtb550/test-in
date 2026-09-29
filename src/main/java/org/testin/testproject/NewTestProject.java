@@ -55,7 +55,7 @@ public final class NewTestProject {
 
     // UC-TREE-PANEL-002, Rule-TREE-PANEL-017
     private void create(final @NotNull Path tpPath) {
-        final @NotNull TestProjectDirectoryDto created = directoryMapper.setTestProjectNode(p, tpPath);
+        final @NotNull TestProjectDirectoryDto created = directoryMapper.setTestProjectNode(tpPath);
 
         if (!nodes.addTestProject(created)) return;
 

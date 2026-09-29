@@ -72,7 +72,7 @@ public class WatchedProjectsIdeTest extends BasePlatformTestCase {
     public void testATestProjectIsReadAgainAndForgottenOnceItsMarkerIsGone() {
         final Path project = root.resolve("NAFATH");
         WriteAction.runAndWait(() -> nodes().addTestProject(
-                Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(getProject(), project)));
+                Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(project)));
 
         indexer().rescanChangedProject(project, new EmptyProgressIndicator());
         assertTrue("a test project with its marker was not read again", nodes().nodeExists(project));
