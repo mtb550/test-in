@@ -17,59 +17,85 @@
 package org.testin.util;
 
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SeparatedValues {
     private static final String BYTE_ORDER_MARK = "﻿";
 
+    private final @NotNull String text;
+    private final char separator;
+    private final @NotNull List<List<String>> records = new ArrayList<>();
+    private final @NotNull StringBuilder current = new StringBuilder();
+    private @NotNull List<String> fields = new ArrayList<>();
+
     // Rule-EDITOR-PANEL-254, Rule-SHARE-124
     public static @NotNull List<List<String>> split(final @NotNull String text, final char separator) {
-        final @NotNull List<List<String>> records = new ArrayList<>();
-        @NotNull List<String> fields = new ArrayList<>();
-        final @NotNull StringBuilder current = new StringBuilder();
-        boolean inQuotes = false;
+        return new SeparatedValues(text, separator).records();
+    }
 
-        final int start = text.startsWith(BYTE_ORDER_MARK) ? 1 : 0;
-        for (int i = start; i < text.length(); i++) {
-            final char c = text.charAt(i);
+    private @NotNull List<List<String>> records() {
+        int next = text.startsWith(BYTE_ORDER_MARK) ? 1 : 0;
+        while (next < text.length()) {
+            next = text.charAt(next) == '"' && current.isEmpty() ? readQuoted(next + 1) : readPlain(next);
+        }
 
-            if (inQuotes) {
-                if (c == '"') {
-                    if (i + 1 < text.length() && text.charAt(i + 1) == '"') {
-                        current.append('"');
-                        i++;
-                    } else {
-                        inQuotes = false;
-                    }
-                } else {
-                    current.append(c);
-                }
-            } else if (c == '"' && current.isEmpty()) {
-                inQuotes = true;
-            } else if (c == separator) {
-                fields.add(current.toString());
-                current.setLength(0);
-            } else if (c == '\n' || c == '\r') {
-                if (c == '\r' && i + 1 < text.length() && text.charAt(i + 1) == '\n') i++;
-                fields.add(current.toString());
-                current.setLength(0);
-                records.add(fields);
-                fields = new ArrayList<>();
-            } else {
+        if (!current.isEmpty() || !fields.isEmpty()) endRecord();
+
+        return records;
+    }
+
+    // Rule-SHARE-124
+    private int readQuoted(final int from) {
+        int at = from;
+        while (at < text.length()) {
+            final char c = text.charAt(at);
+            if (c != '"') {
                 current.append(c);
+                at++;
+            } else if (charAt(at + 1) == '"') {
+                current.append('"');
+                at += 2;
+            } else {
+                return at + 1;
             }
         }
 
-        if (!current.isEmpty() || !fields.isEmpty()) {
-            fields.add(current.toString());
-            records.add(fields);
+        return at;
+    }
+
+    private int readPlain(final int at) {
+        final char c = text.charAt(at);
+        if (c == separator) {
+            endField();
+        } else if (c == '\r' && charAt(at + 1) == '\n') {
+            endRecord();
+            return at + 2;
+        } else if (c == '\n' || c == '\r') {
+            endRecord();
+        } else {
+            current.append(c);
         }
 
-        return records;
+        return at + 1;
+    }
+
+    private char charAt(final int at) {
+        return at < text.length() ? text.charAt(at) : 0;
+    }
+
+    private void endField() {
+        fields.add(current.toString());
+        current.setLength(0);
+    }
+
+    private void endRecord() {
+        endField();
+        records.add(fields);
+        fields = new ArrayList<>();
     }
 }

@@ -167,13 +167,12 @@ A count of `if`s would punish the guard clauses that keep a method flat;
 cognitive complexity charges for nesting, which is what makes a method hard to
 follow.
 
-`.github/complexity-rules.xml` holds both limits and, under each rule, the
-methods that were already over it when the gate was written: twenty for
-complexity, five for nesting, each written `TopLevelClass#method`. That list is
-a baseline, not an allowance. A method comes off it when it is brought under the
-limit, and none is added: a new method over the limit is split, not listed. The
-report is in `build/reports/pmd/main.html` of each module, and the console names
-the method and its score.
+`.github/complexity-rules.xml` holds both limits, and no method is exempt from
+either. The methods that were already over a limit when the gate was written
+were brought under it in #382, so the file lists none, and none is added: a new
+method over the limit is split, not listed. The report is in
+`build/reports/pmd/main.html` of each module, and the console names the method
+and its score.
 
 ### The inspection gate
 

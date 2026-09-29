@@ -195,43 +195,46 @@ public final class RunStatusService {
     }
 
     private void record(final @NotNull Project p, final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
-        if (selectedItems.size() == 1) {
-            final @NotNull TestCaseDto tc = selectedItems.getFirst();
-            if (editor.runItem(tc.getId()).filter(TestRunItems::isRemoved).isPresent()) {
-                refuseRemoved(p);
-                return;
-            }
+        if (selectedItems.size() == 1) recordOne(p, status, editor, selectedItems.getFirst());
+        else recordMany(p, status, editor, selectedItems);
+    }
 
-            final int globalIndex = editor.getCurrentTestCases().indexOf(tc);
-            if (globalIndex == editor.getWalk().getCurrentlyExecutingIndex()) {
-                executeNext(p, editor, status);
-            } else {
-                if (correct(p, editor, tc, status)) confirmVerdict(p, status, 1);
-            }
-        } else {
-            final @NotNull Optional<TestRunDto> held = heldRun(p, editor.getParent().getPath());
-            if (held.isEmpty()) return;
-
-            final @NotNull List<UUID> judged = new ArrayList<>();
-
-            for (final TestCaseDto tc : selectedItems) {
-                if (held.orElseThrow().resultOf(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) continue;
-
-                judged.add(tc.getId());
-
-                final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
-                if (tcIndex != -1 && tcIndex == editor.getWalk().getCurrentlyExecutingIndex()) {
-                    editor.getWalk().stopExecutionUntimed();
-                }
-            }
-
-            final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-            final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
-            judged.forEach(id -> testRuns.changeResult(editor.getParent().getPath(), id, item -> item.correctVerdict(status, tester, asItIsNow(item))));
-            triggerFilterRefresh(editor);
-
-            confirmVerdict(p, status, judged.size());
+    private void recordOne(final @NotNull Project p, final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc) {
+        if (editor.runItem(tc.getId()).filter(TestRunItems::isRemoved).isPresent()) {
+            refuseRemoved(p);
+            return;
         }
+
+        final int globalIndex = editor.getCurrentTestCases().indexOf(tc);
+        if (globalIndex == editor.getWalk().getCurrentlyExecutingIndex()) executeNext(p, editor, status);
+        else if (correct(p, editor, tc, status)) confirmVerdict(p, status, 1);
+
+        editor.getWalk().finishIfEverythingIsJudged();
+    }
+
+    private void recordMany(final @NotNull Project p, final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+        final @NotNull Optional<TestRunDto> held = heldRun(p, editor.getParent().getPath());
+        if (held.isEmpty()) return;
+
+        final @NotNull List<UUID> judged = new ArrayList<>();
+
+        for (final TestCaseDto tc : selectedItems) {
+            if (held.orElseThrow().resultOf(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) continue;
+
+            judged.add(tc.getId());
+
+            final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
+            if (tcIndex != -1 && tcIndex == editor.getWalk().getCurrentlyExecutingIndex()) {
+                editor.getWalk().stopExecutionUntimed();
+            }
+        }
+
+        final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
+        final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
+        judged.forEach(id -> testRuns.changeResult(editor.getParent().getPath(), id, item -> item.correctVerdict(status, tester, asItIsNow(item))));
+        triggerFilterRefresh(editor);
+
+        confirmVerdict(p, status, judged.size());
 
         editor.getWalk().finishIfEverythingIsJudged();
     }

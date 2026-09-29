@@ -106,57 +106,59 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     protected void loadDataAsync(final @NotNull Runnable onLoaded) {
         final int generation = modelGeneration.incrementAndGet();
         loading = true;
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            try {
-                indexer.awaitIndexing();
+        ApplicationManager.getApplication().executeOnPooledThread(() -> readTestCases(generation, onLoaded));
+    }
 
-                final @NotNull List<TestCaseDto> items = testCases.getTestCasesForTestSet(parent.getPath());
+    private void readTestCases(final int generation, final @NotNull Runnable onLoaded) {
+        try {
+            indexer.awaitIndexing();
 
-                if (items.isEmpty()) {
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        if (generation != modelGeneration.get()) return;
-                        allTestCases.clear();
-                        currentTestCases.clear();
-                        list.setPaintBusy(false);
-                        loading = false;
-                        refreshView();
-                        onLoaded.run();
-                    });
-                    return;
-                }
+            final @NotNull List<TestCaseDto> items = testCases.getTestCasesForTestSet(parent.getPath());
 
-                testCaseValues.load(items);
-
-                final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(items);
-
+            if (items.isEmpty()) {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (generation != modelGeneration.get()) return;
                     allTestCases.clear();
-                    allTestCases.addAll(ordered);
                     currentTestCases.clear();
-                    currentTestCases.addAll(ordered);
-
-                    jumpToPageOfPendingSelection();
-
                     list.setPaintBusy(false);
                     loading = false;
-
                     refreshView();
-                    focusIfGoingTo();
                     onLoaded.run();
                 });
-
-            } catch (final Exception ex) {
-                Logger.error("Failed to load test set data from disk: " + ex.getMessage());
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    if (generation != modelGeneration.get()) return;
-
-                    list.setPaintBusy(false);
-                    loading = false;
-                    list.getEmptyText().setText(Bundle.message("editor.test.unreadable"));
-                });
+                return;
             }
-        });
+
+            testCaseValues.load(items);
+
+            final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(items);
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (generation != modelGeneration.get()) return;
+                allTestCases.clear();
+                allTestCases.addAll(ordered);
+                currentTestCases.clear();
+                currentTestCases.addAll(ordered);
+
+                jumpToPageOfPendingSelection();
+
+                list.setPaintBusy(false);
+                loading = false;
+
+                refreshView();
+                focusIfGoingTo();
+                onLoaded.run();
+            });
+
+        } catch (final Exception ex) {
+            Logger.error("Failed to load test set data from disk: " + ex.getMessage());
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (generation != modelGeneration.get()) return;
+
+                list.setPaintBusy(false);
+                loading = false;
+                list.getEmptyText().setText(Bundle.message("editor.test.unreadable"));
+            });
+        }
     }
 
     private void onDataSynced() {

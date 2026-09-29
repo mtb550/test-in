@@ -43,34 +43,36 @@ public final class ReportOverview {
         rows.add(new DetailRow(Bundle.message("report.overview.project"), projectName));
         rows.add(new DetailRow(Bundle.message("node.tr"), trDir.getName()));
 
-        for (final TestRunConfiguration field : TestRunConfiguration.values()) {
-            if (field == TestRunConfiguration.COMMIT_ID) {
-                rows.add(new DetailRow(field.getDisplayName(),
-                        field.valueIn(marker).isEmpty() ? NOT_RECORDED : field.valueIn(marker)));
-                continue;
-            }
-
-            if (field == TestRunConfiguration.COMPONENT) continue;
-
-            if (field == TestRunConfiguration.PLATFORM) {
-                final @NotNull String platform = TestRunConfiguration.PLATFORM.valueIn(marker);
-                final @NotNull String component = TestRunConfiguration.COMPONENT.valueIn(marker);
-
-                add(rows, ReportText.joined(", ",
-                                platform.isEmpty() ? "" : TestRunConfiguration.PLATFORM.getDisplayName(),
-                                component.isEmpty() ? "" : TestRunConfiguration.COMPONENT.getDisplayName()),
-                        ReportText.joined(", ", platform, component));
-                continue;
-            }
-
-            add(rows, field.getDisplayName(), field.valueIn(marker));
-        }
+        for (final TestRunConfiguration field : TestRunConfiguration.values()) addConfiguration(rows, field, marker);
 
         add(rows, RunEditorAttributes.EXECUTED_BY.getName(), summary.executedBy());
         TestRunExecution.rowsOf(marker).forEach(row -> add(rows, row.caption(), row.value()));
         add(rows, RunEditorAttributes.RUN_STATUS.getName(), marker.getStatus().getLabel());
 
         return List.copyOf(rows);
+    }
+
+    // Rule-REPORT-002
+    private static void addConfiguration(final @NotNull List<DetailRow> rows, final @NotNull TestRunConfiguration field, final @NotNull TestRunMarker marker) {
+        if (field == TestRunConfiguration.COMMIT_ID) {
+            rows.add(new DetailRow(field.getDisplayName(),
+                    field.valueIn(marker).isEmpty() ? NOT_RECORDED : field.valueIn(marker)));
+        } else if (field == TestRunConfiguration.PLATFORM) {
+            addPlatformAndComponent(rows, marker);
+        } else if (field != TestRunConfiguration.COMPONENT) {
+            add(rows, field.getDisplayName(), field.valueIn(marker));
+        }
+    }
+
+    // Rule-REPORT-002
+    private static void addPlatformAndComponent(final @NotNull List<DetailRow> rows, final @NotNull TestRunMarker marker) {
+        final @NotNull String platform = TestRunConfiguration.PLATFORM.valueIn(marker);
+        final @NotNull String component = TestRunConfiguration.COMPONENT.valueIn(marker);
+
+        add(rows, ReportText.joined(", ",
+                        platform.isEmpty() ? "" : TestRunConfiguration.PLATFORM.getDisplayName(),
+                        component.isEmpty() ? "" : TestRunConfiguration.COMPONENT.getDisplayName()),
+                ReportText.joined(", ", platform, component));
     }
 
     private static void add(final @NotNull List<DetailRow> rows, final @NotNull String caption, final @NotNull String value) {

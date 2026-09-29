@@ -102,17 +102,13 @@ public final class ProjectIndexer {
 
             final @NotNull Path absoluteRoot = absoluteRoot();
             if (absoluteRoot.toString().isEmpty()) {
-                indexing.set(false);
-                indexed.set(true);
-                indexingLatch.countDown();
+                finishWithNothingToIndex();
                 return;
             }
 
             final @NotNull List<Path> validProjects = boundOnly(collectValidProjects(absoluteRoot));
             if (validProjects.isEmpty()) {
-                indexing.set(false);
-                indexed.set(true);
-                indexingLatch.countDown();
+                finishWithNothingToIndex();
                 Logger.warn("No valid projects found at '" + absoluteRoot.toAbsolutePath() + "'");
                 return;
             }
@@ -121,48 +117,57 @@ public final class ProjectIndexer {
             final @NotNull CountDownLatch passLatch = indexingLatch;
             Logger.info("Indexing " + validProjects.size() + " projects..");
 
-            for (final Path projectPath : validProjects) {
-                final @NotNull String projectName = projectPath.getFileName().toString();
-
-                ProgressManager.getInstance()
-                        .run(new Task.Backgroundable(p, Bundle.message("indexer.task.title", projectName), true) {
-                            @Override
-                            public void run(final @NotNull ProgressIndicator indicator) {
-                                indicator.setIndeterminate(false);
-                                indicator.setFraction(0.0);
-                                indicator.setText(Bundle.message("indexer.progress.indexing", projectName));
-
-                                final long started = System.nanoTime();
-                                try {
-                                    scanCoordinator.scan(projectPath, indicator);
-                                } catch (final Exception ex) {
-                                    Logger.error("Failed to index project: " + projectName + " - " + ex.getMessage());
-                                }
-                                Logger.info("First read of '" + projectName + "' took " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started) + " ms");
-
-                                indicator.setFraction(1.0);
-                                indicator.setText(Bundle.message("indexer.progress.done", projectName));
-                            }
-
-                            @Override
-                            public void onSuccess() {
-                                Logger.info("Project '" + projectName + "' indexed.");
-                                if (oneProjectFinished(projectsLeft, passLatch)) finishSuccessfully();
-                            }
-
-                            @Override
-                            public void onThrowable(final @NotNull Throwable error) {
-                                Logger.error("Error indexing '" + projectName + "': " + error.getMessage());
-                                if (oneProjectFinished(projectsLeft, passLatch)) finishWithFailure();
-                            }
-                        });
-            }
+            for (final Path projectPath : validProjects) indexInBackground(projectPath, projectsLeft, passLatch);
         } catch (final Exception ex) {
             Logger.error("indexWithProgress: " + ex.getMessage());
             indexing.set(false);
 
             indexingLatch.countDown();
         }
+    }
+
+    private void finishWithNothingToIndex() {
+        indexing.set(false);
+        indexed.set(true);
+        indexingLatch.countDown();
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-013
+    private void indexInBackground(final @NotNull Path projectPath, final @NotNull AtomicInteger projectsLeft, final @NotNull CountDownLatch passLatch) {
+        final @NotNull String projectName = projectPath.getFileName().toString();
+
+        ProgressManager.getInstance()
+                .run(new Task.Backgroundable(p, Bundle.message("indexer.task.title", projectName), true) {
+                    @Override
+                    public void run(final @NotNull ProgressIndicator indicator) {
+                        indicator.setIndeterminate(false);
+                        indicator.setFraction(0.0);
+                        indicator.setText(Bundle.message("indexer.progress.indexing", projectName));
+
+                        final long started = System.nanoTime();
+                        try {
+                            scanCoordinator.scan(projectPath, indicator);
+                        } catch (final Exception ex) {
+                            Logger.error("Failed to index project: " + projectName + " - " + ex.getMessage());
+                        }
+                        Logger.info("First read of '" + projectName + "' took " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started) + " ms");
+
+                        indicator.setFraction(1.0);
+                        indicator.setText(Bundle.message("indexer.progress.done", projectName));
+                    }
+
+                    @Override
+                    public void onSuccess() {
+                        Logger.info("Project '" + projectName + "' indexed.");
+                        if (oneProjectFinished(projectsLeft, passLatch)) finishSuccessfully();
+                    }
+
+                    @Override
+                    public void onThrowable(final @NotNull Throwable error) {
+                        Logger.error("Error indexing '" + projectName + "': " + error.getMessage());
+                        if (oneProjectFinished(projectsLeft, passLatch)) finishWithFailure();
+                    }
+                });
     }
 
     private boolean oneProjectFinished(final @NotNull AtomicInteger projectsLeft, final @NotNull CountDownLatch passLatch) {

@@ -56,21 +56,24 @@ public class SetTestCaseStatusAction extends AbstractAnyProjectAction {
 
     // UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033
     private void record(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
-        if (status.isCollectsFailureDetails() && selectedItems.size() == 1) {
-            final @NotNull Optional<TestRunItems> runItem = editor.runItem(selectedItems.getFirst().getId())
-                    .filter(item -> !item.isRemoved());
-
-            if (runItem.isPresent()) {
-                new FailedResultDialog(p, editor.getParent().getPath(), runItem.orElseThrow(), fields -> {
-                    if (Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, editor.getParent().getPath(), selectedItems.getFirst().getId(), fields)) {
-                        applyStatus(p, editor, selectedItems);
-                    }
-                }).show();
-                return;
-            }
+        final @NotNull Optional<TestRunItems> runItem = askingForFailureDetails(editor, selectedItems);
+        if (runItem.isEmpty()) {
+            applyStatus(p, editor, selectedItems);
+            return;
         }
 
-        applyStatus(p, editor, selectedItems);
+        new FailedResultDialog(p, editor.getParent().getPath(), runItem.orElseThrow(), fields -> {
+            if (Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, editor.getParent().getPath(), selectedItems.getFirst().getId(), fields)) {
+                applyStatus(p, editor, selectedItems);
+            }
+        }).show();
+    }
+
+    // UC-EDITOR-PANEL-034
+    private @NotNull Optional<TestRunItems> askingForFailureDetails(final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+        if (!status.isCollectsFailureDetails() || selectedItems.size() != 1) return Optional.empty();
+
+        return editor.runItem(selectedItems.getFirst().getId()).filter(item -> !item.isRemoved());
     }
 
     private void applyStatus(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {

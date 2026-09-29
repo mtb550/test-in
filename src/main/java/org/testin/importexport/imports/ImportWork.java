@@ -92,70 +92,73 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
 
     // UC-SHARE-005, UC-SHARE-006
     private void executeImportWriteAction(final @NotNull DirectoryDto selectedDirDto, final @NotNull Map<String, List<TestCaseDto>> selectedTestCasesBySheet) {
-        final @NotNull Path targetPath = selectedDirDto.getPath();
-
         final boolean generateCode = CodeOn.isOnOrWarnOnce(p);
 
         final int total = selectedTestCasesBySheet.values().stream().mapToInt(List::size).sum();
 
         BackgroundWork.run(p, Bundle.message("import.task.importing", String.valueOf(total), selectedDirDto.getName()),
-                Bundle.message("import.failed.title"), indicator -> {
-                    indicator.setIndeterminate(false);
-                    final long startedAt = System.currentTimeMillis();
+                Bundle.message("import.failed.title"), indicator -> importInBackground(selectedDirDto, selectedTestCasesBySheet, generateCode, total, indicator));
+    }
 
-                    if (generateCode) {
-                        indicator.setText2(Bundle.message("import.progress.indexing"));
-                        DumbService.getInstance(p).waitForSmartMode();
-                    }
-                    final long readyAt = System.currentTimeMillis();
+    // UC-SHARE-005, UC-SHARE-006
+    private void importInBackground(final @NotNull DirectoryDto selectedDirDto, final @NotNull Map<String, List<TestCaseDto>> selectedTestCasesBySheet, final boolean generateCode, final int total, final @NotNull ProgressIndicator indicator) {
+        final @NotNull Path targetPath = selectedDirDto.getPath();
 
-                    int imported = 0;
+        indicator.setIndeterminate(false);
+        final long startedAt = System.currentTimeMillis();
 
-                    final @NotNull Set<String> stillEmpty = new LinkedHashSet<>();
+        if (generateCode) {
+            indicator.setText2(Bundle.message("import.progress.indexing"));
+            DumbService.getInstance(p).waitForSmartMode();
+        }
+        final long readyAt = System.currentTimeMillis();
 
-                    try {
-                        final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targets =
-                                targetSets(selectedDirDto, targetPath, selectedTestCasesBySheet);
-                        targets.keySet().forEach(made -> stillEmpty.add(made.getName()));
+        int imported = 0;
 
-                        for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set : targets.entrySet()) {
-                            final @NotNull TestSetDirectoryDto into = set.getKey();
-                            final @NotNull List<TestCaseDto> testCases = set.getValue();
-                            final @NotNull Path setPath = into.getPath();
+        final @NotNull Set<String> stillEmpty = new LinkedHashSet<>();
 
-                            final @NotNull List<TestCaseDto> written = linkAndSaveTestCases(into, testCases, rankOfTail(setPath), indicator, imported, total);
-                            if (!written.isEmpty()) stillEmpty.remove(into.getName());
+        try {
+            final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> targets =
+                    targetSets(selectedDirDto, targetPath, selectedTestCasesBySheet);
+            targets.keySet().forEach(made -> stillEmpty.add(made.getName()));
 
-                            if (generateCode) generateTestMethods(written, into.getName(), indicator);
+            for (final Map.Entry<TestSetDirectoryDto, List<TestCaseDto>> set : targets.entrySet()) {
+                final @NotNull TestSetDirectoryDto into = set.getKey();
+                final @NotNull List<TestCaseDto> testCases = set.getValue();
+                final @NotNull Path setPath = into.getPath();
 
-                            imported += written.size();
+                final @NotNull List<TestCaseDto> written = linkAndSaveTestCases(into, testCases, rankOfTail(setPath), indicator, imported, total);
+                if (!written.isEmpty()) stillEmpty.remove(into.getName());
 
-                            // UC-SHARE-007, Rule-SHARE-037
-                            if (indicator.isCanceled()) break;
-                        }
-                    } catch (final Exception ex) {
-                        // UC-SHARE-007, Rule-SHARE-037
-                        Logger.error("Import failed after at least " + imported + " of " + total + ": " + FailureText.of(ex));
+                if (generateCode) generateTestMethods(written, into.getName(), indicator);
 
-                        notifier.error(p, Bundle.message("import.failed.title"),
-                                Bundle.message("import.failed.partial", String.valueOf(imported), String.valueOf(total), FailureText.of(ex)));
+                imported += written.size();
 
-                        refreshTarget(targetPath);
-                        return;
-                    }
+                // UC-SHARE-007, Rule-SHARE-037
+                if (indicator.isCanceled()) break;
+            }
+        } catch (final Exception ex) {
+            // UC-SHARE-007, Rule-SHARE-037
+            Logger.error("Import failed after at least " + imported + " of " + total + ": " + FailureText.of(ex));
 
-                    if (selectedDirDto.holdsTestCases()) {
-                        onEdt(() -> editors.closeThenOpen(p, selectedDirDto));
-                    }
+            notifier.error(p, Bundle.message("import.failed.title"),
+                    Bundle.message("import.failed.partial", String.valueOf(imported), String.valueOf(total), FailureText.of(ex)));
 
-                    notifier.softShowCounted(p, Done.IMPORTED, imported);
+            refreshTarget(targetPath);
+            return;
+        }
 
-                    reportEmptySets(List.copyOf(stillEmpty));
+        if (selectedDirDto.holdsTestCases()) {
+            onEdt(() -> editors.closeThenOpen(p, selectedDirDto));
+        }
 
-                    report(total, startedAt, readyAt);
+        notifier.softShowCounted(p, Done.IMPORTED, imported);
 
-                    refreshTarget(targetPath);
-                });
+        reportEmptySets(List.copyOf(stillEmpty));
+
+        report(total, startedAt, readyAt);
+
+        refreshTarget(targetPath);
     }
 
     private void refreshTarget(final @NotNull Path targetPath) {

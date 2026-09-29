@@ -52,26 +52,29 @@ record UpdateTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @Not
         final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(selectedItems);
         final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, path, ids);
 
-        open.accept(new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            int counted = 0;
-            for (final TestCaseDto tc : updatedItems)
-                if (testCases.putTestCase(path, tc)) counted++;
-            final int written = counted;
+        open.accept(new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> ApplicationManager.getApplication().executeOnPooledThread(() ->
+                save(path, ids, before, updatedItems, gt))));
+    }
 
-            if (written == 0) return;
+    private void save(final @NotNull Path path, final @NotNull List<UUID> ids, final @NotNull TestCaseSnapshot before, final @NotNull List<TestCaseDto> updatedItems, final @NotNull GenType gt) {
+        int counted = 0;
+        for (final TestCaseDto tc : updatedItems)
+            if (testCases.putTestCase(path, tc)) counted++;
+        final int written = counted;
 
-            TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.update"), updatedItems), before, TestCaseSnapshot.of(p, path, ids));
+        if (written == 0) return;
 
-            ApplicationManager.getApplication().invokeLater(() -> {
-                // Rule-EDITOR-PANEL-008
-                notifier.softShowCounted(p,
-                        gt == GenType.UPDATE_TEST_CASE_ORDER ? Done.RE_SORTED : Done.UPDATED, written);
+        TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.update"), updatedItems), before, TestCaseSnapshot.of(p, path, ids));
 
-                editor.onToolBarFilterSelectionChanged();
+        ApplicationManager.getApplication().invokeLater(() -> {
+            // Rule-EDITOR-PANEL-008
+            notifier.softShowCounted(p,
+                    gt == GenType.UPDATE_TEST_CASE_ORDER ? Done.RE_SORTED : Done.UPDATED, written);
 
-                editor.refreshOrdered();
-                TestCaseUpdateMenuDialog.applyAftermath(p, updatedItems, gt);
-            });
-        })));
+            editor.onToolBarFilterSelectionChanged();
+
+            editor.refreshOrdered();
+            TestCaseUpdateMenuDialog.applyAftermath(p, updatedItems, gt);
+        });
     }
 }

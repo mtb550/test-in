@@ -17,6 +17,7 @@
 package org.testin.git;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
@@ -108,39 +109,53 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
                         return;
                     }
 
-                    indicator.setText(request.newBranch()
-                            ? Bundle.message("git.progress.starting.branch", target)
-                            : Bundle.message("git.progress.checking.out", target));
-
-                    final boolean moved = request.newBranch()
-                            ? git.startBranch(repoPath, target)
-                            : !git.checkout(repoPath, target).isEmpty();
-
-                    // Rule-SHARE-065
-                    if (!moved) {
-                        ApplicationManager.getApplication().invokeLater(() -> {
-                            notifier.errorWithActions(p, Bundle.message("git.branch.not.switched.title"),
-                                    Bundle.message("git.branch.not.switched.message", target),
-                                    notifier.action(Bundle.message("branch.review.changes"), () -> openFor(repoPath)));
-                        });
-                        return;
-                    }
-
-                    if (!request.newBranch()) {
-                        nodes.refreshDirectory(repoPath);
-                    }
-
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        final @NotNull TreePanel panel = Services.getInstance(p, TreePanel.class);
-
-                        if (request.newBranch()) panel.refresh();
-                        else panel.reindex(Bundle.message("git.switched.to", target));
-
-                        performCommitWorkflow(repoPath, request, target);
-                    });
+                    if (request.newBranch()) startBranchThenCommit(repoPath, request, indicator);
+                    else checkoutThenCommit(repoPath, request, indicator);
                 },
                 ex -> notifier.error(p, Bundle.message("git.error.title"),
                         Bundle.message("git.error.prepare", target, FailureText.of(ex))));
+    }
+
+    // UC-SHARE-014, Rule-SHARE-065
+    private void startBranchThenCommit(final @NotNull Path repoPath, final @NotNull Request request, final @NotNull ProgressIndicator indicator) {
+        final @NotNull String target = request.branch();
+        indicator.setText(Bundle.message("git.progress.starting.branch", target));
+
+        if (!git.startBranch(repoPath, target)) {
+            refuseBranchSwitch(repoPath, target);
+            return;
+        }
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            Services.getInstance(p, TreePanel.class).refresh();
+            performCommitWorkflow(repoPath, request, target);
+        });
+    }
+
+    // UC-SHARE-014, Rule-SHARE-065
+    private void checkoutThenCommit(final @NotNull Path repoPath, final @NotNull Request request, final @NotNull ProgressIndicator indicator) {
+        final @NotNull String target = request.branch();
+        indicator.setText(Bundle.message("git.progress.checking.out", target));
+
+        if (git.checkout(repoPath, target).isEmpty()) {
+            refuseBranchSwitch(repoPath, target);
+            return;
+        }
+
+        nodes.refreshDirectory(repoPath);
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            Services.getInstance(p, TreePanel.class).reindex(Bundle.message("git.switched.to", target));
+            performCommitWorkflow(repoPath, request, target);
+        });
+    }
+
+    // Rule-SHARE-065
+    private void refuseBranchSwitch(final @NotNull Path repoPath, final @NotNull String target) {
+        ApplicationManager.getApplication().invokeLater(() ->
+                notifier.errorWithActions(p, Bundle.message("git.branch.not.switched.title"),
+                        Bundle.message("git.branch.not.switched.message", target),
+                        notifier.action(Bundle.message("branch.review.changes"), () -> openFor(repoPath))));
     }
 
     // UC-SHARE-015, Rule-SHARE-067
@@ -296,36 +311,45 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
     // UC-SHARE-017
     private void pushAfterRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
         GitBackgroundTask.run(p, Bundle.message("git.task.pushing.branch", branch), false,
-                _ -> {
-                    commits.push(repoPath, remote, branch);
-                    RepositoryRefresh.after(p, repoPath);
-
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            notifier.info(p, Bundle.message("git.rebase.continued.title"),
-                                    Bundle.message("git.rebase.continued.message")));
-                },
+                _ -> pushRebased(repoPath, remote, branch),
                 ex -> notifier.error(p, Bundle.message("git.push.failed.title"), FailureText.of(ex)));
+    }
+
+    // UC-SHARE-017
+    private void pushRebased(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
+        commits.push(repoPath, remote, branch);
+        RepositoryRefresh.after(p, repoPath);
+
+        ApplicationManager.getApplication().invokeLater(() ->
+                notifier.info(p, Bundle.message("git.rebase.continued.title"),
+                        Bundle.message("git.rebase.continued.message")));
+    }
+
+    // UC-SHARE-017, Rule-SHARE-077
+    private void continueRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
+        if (git.couldNotContinueRebase(repoPath))
+            throw new IllegalStateException(Bundle.message("git.error.continue.rebase"));
+
+        pushRebased(repoPath, remote, branch);
+    }
+
+    // UC-SHARE-017, Rule-SHARE-077
+    private void abortRebase(final @NotNull Path repoPath) {
+        if (git.couldNotAbortRebase(repoPath))
+            throw new IllegalStateException(Bundle.message("git.error.abort.rebase"));
+
+        RepositoryRefresh.after(p, repoPath);
+
+        ApplicationManager.getApplication().invokeLater(() ->
+                notifier.info(p, Bundle.message("git.rebase.aborted.title"), Bundle.message("git.rebase.aborted.message")));
     }
 
     // UC-SHARE-017, Rule-SHARE-077
     private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final boolean abort) {
         GitBackgroundTask.run(p, abort ? Bundle.message("git.task.aborting.rebase") : Bundle.message("git.task.continuing.rebase"), false,
                 _ -> {
-                    if (abort) {
-                        if (git.couldNotAbortRebase(repoPath))
-                            throw new IllegalStateException(Bundle.message("git.error.abort.rebase"));
-                    } else {
-                        if (git.couldNotContinueRebase(repoPath))
-                            throw new IllegalStateException(Bundle.message("git.error.continue.rebase"));
-                        commits.push(repoPath, remote, branch);
-                    }
-
-                    RepositoryRefresh.after(p, repoPath);
-
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            notifier.info(p,
-                                    abort ? Bundle.message("git.rebase.aborted.title") : Bundle.message("git.rebase.continued.title"),
-                                    abort ? Bundle.message("git.rebase.aborted.message") : Bundle.message("git.rebase.continued.message")));
+                    if (abort) abortRebase(repoPath);
+                    else continueRebase(repoPath, remote, branch);
                 },
                 ex -> {
                     final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);

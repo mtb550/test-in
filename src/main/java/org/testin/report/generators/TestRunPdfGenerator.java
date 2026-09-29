@@ -167,30 +167,7 @@ public final class TestRunPdfGenerator {
 
             final boolean analyzed = ResultAnalysis.anyWrittenIn(trDir.getMarker().getResultAnalysis());
 
-            if (analyzed) {
-                document.add(para(Bundle.message("report.heading.analysis"))
-                        .setFont(boldFont)
-                        .setFontSize(ReportFont.SECTION.pt())
-                        .setFontColor(DARK_NAVY)
-                        .setPaddingBottom(3)
-                        .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
-                        .setMarginBottom(9)
-                        .setMarginTop(20));
-
-                for (final ResultAnalysis section : ResultAnalysis.values()) {
-                    final @NotNull String written = section.writtenIn(trDir.getMarker().getResultAnalysis());
-                    if (written.isEmpty()) continue;
-
-                    document.add(para(section.heading(summary))
-                            .setFont(boldFont).setFontSize(ReportFont.LEAD.pt())
-                            .setFontColor(rgb(section.getHexColor()))
-                            .setMarginBottom(2));
-
-                    document.add(para(written)
-                            .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(BLACK)
-                            .setMarginBottom(8));
-                }
-            }
+            if (analyzed) addAnalysis(document, trDir, summary, boldFont, regularFont);
 
             int sectionNumber = analyzed ? 4 : 3;
             for (final ReportSection section : ReportSection.values()) {
@@ -236,6 +213,32 @@ public final class TestRunPdfGenerator {
         } catch (final Exception ex) {
             Logger.error("PDF generation failed: " + ex.getMessage());
             throw new RuntimeException(ex);
+        }
+    }
+
+    // UC-REPORT-001
+    private void addAnalysis(final @NotNull Document document, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunSummary summary, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont) {
+        document.add(para(Bundle.message("report.heading.analysis"))
+                .setFont(boldFont)
+                .setFontSize(ReportFont.SECTION.pt())
+                .setFontColor(DARK_NAVY)
+                .setPaddingBottom(3)
+                .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
+                .setMarginBottom(9)
+                .setMarginTop(20));
+
+        for (final ResultAnalysis section : ResultAnalysis.values()) {
+            final @NotNull String written = section.writtenIn(trDir.getMarker().getResultAnalysis());
+            if (written.isEmpty()) continue;
+
+            document.add(para(section.heading(summary))
+                    .setFont(boldFont).setFontSize(ReportFont.LEAD.pt())
+                    .setFontColor(rgb(section.getHexColor()))
+                    .setMarginBottom(2));
+
+            document.add(para(written)
+                    .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(BLACK)
+                    .setMarginBottom(8));
         }
     }
 

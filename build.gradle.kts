@@ -96,9 +96,9 @@ allprojects {
 }
 
 // #378: pmdMain, part of check, fails on a production method over the cognitive
-// complexity or if-nesting limit in .github/complexity-rules.xml, which also
-// lists the methods that were over it already. Both rules read the syntax tree
-// only, so PMD is given no classpath and does not wait for compileJava.
+// complexity or if-nesting limit in .github/complexity-rules.xml, which exempts
+// no method (#382). Both rules read the syntax tree only, so PMD is given no
+// classpath and does not wait for compileJava.
 allprojects {
     apply(plugin = "pmd")
 

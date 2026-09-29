@@ -61,26 +61,29 @@ record RemoveTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @Not
 
         cutState.clear();
 
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(selectedItems);
-            final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, dir.getPath(), ids);
+        ApplicationManager.getApplication().executeOnPooledThread(() -> removeFromDisk(selectedItems));
+    }
 
-            final @NotNull List<TestCaseDto> removed = new ArrayList<>();
-            for (final TestCaseDto tc : selectedItems) {
-                if (testCases.removeTestCase(dir.getPath(), tc.getId())) removed.add(tc);
-            }
+    // UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-064
+    private void removeFromDisk(final @NotNull List<TestCaseDto> selectedItems) {
+        final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(selectedItems);
+        final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, dir.getPath(), ids);
 
-            TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.remove"), removed), before, TestCaseSnapshot.of(p, dir.getPath(), ids));
+        final @NotNull List<TestCaseDto> removed = new ArrayList<>();
+        for (final TestCaseDto tc : selectedItems) {
+            if (testCases.removeTestCase(dir.getPath(), tc.getId())) removed.add(tc);
+        }
 
-            ApplicationManager.getApplication().invokeLater(() -> {
-                if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
+        TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.remove"), removed), before, TestCaseSnapshot.of(p, dir.getPath(), ids));
 
-                if (removed.size() == selectedItems.size()) editor.refreshView();
-                else editors.reloadOpen(p, dir.getPath());
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
 
-                if (!removed.isEmpty())
-                    notifier.softShowCounted(p, Done.REMOVED, removed.size());
-            });
+            if (removed.size() == selectedItems.size()) editor.refreshView();
+            else editors.reloadOpen(p, dir.getPath());
+
+            if (!removed.isEmpty())
+                notifier.softShowCounted(p, Done.REMOVED, removed.size());
         });
     }
 }

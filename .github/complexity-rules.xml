@@ -2,52 +2,19 @@
 <ruleset name="Complexity" xmlns="http://pmd.sourceforge.net/ruleset/2.0.0">
     <description>
         How hard a method is to read (#378). ./gradlew check runs it through pmdMain and fails on a
-        method over either limit. Each rule lists the methods that were over it when the gate was
-        written, as TopLevelClass#method: they are the baseline, not an allowance. Take a method off
-        its list when it drops under the limit, and never add one.
+        method over either limit. No method is exempt: the ones that were over a limit when the gate
+        was written were brought under it in #382, and a new method over it is split, not listed.
     </description>
 
     <rule ref="category/java/design.xml/CognitiveComplexity">
         <properties>
             <property name="reportLevel" value="15"/>
-            <property name="violationSuppressXPath">
-                <value><![CDATA[
-./self::*[concat(ancestor::*[@SimpleName][last()]/@SimpleName, '#', @Name) = (
-    'SeparatedValues#split',
-    'GridExcelBehavior#pasteIntoSelection',
-    'PasteTestCaseWork#paste',
-    'RunStatusService#record',
-    'ImportWork#executeImportWriteAction',
-    'GridExcelBehavior#copySelection',
-    'ViewPendingCommitsWork#finishRebase',
-    'UpdateTestCaseWork#overSelection',
-    'CreateTestMethod#injectAsText',
-    'ViewPendingCommitsWork#commitOnBranch',
-    'TreePanelTree#refresh',
-    'ReportOverview#rowsFor',
-    'TestEditor#loadDataAsync',
-    'RemoveTestCaseWork#performDeletion',
-    'ProjectIndexer#indexWithProgress',
-    'TestRunPdfGenerator#generate'
-)]
-                ]]></value>
-            </property>
         </properties>
     </rule>
 
     <rule ref="category/java/design.xml/AvoidDeeplyNestedIfStmts">
         <properties>
             <property name="problemDepth" value="3"/>
-            <property name="violationSuppressXPath">
-                <value><![CDATA[
-./ancestor::MethodDeclaration[concat(ancestor::*[@SimpleName][last()]/@SimpleName, '#', @Name) = (
-    'SeparatedValues#split',
-    'RunStatusService#record',
-    'CellEditListener#tableChanged',
-    'SetTestCaseStatusAction#record'
-)]
-                ]]></value>
-            </property>
         </properties>
     </rule>
 </ruleset>

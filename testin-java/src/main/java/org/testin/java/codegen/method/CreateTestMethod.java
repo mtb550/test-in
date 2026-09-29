@@ -178,25 +178,17 @@ public class CreateTestMethod implements GenAction {
         final @NotNull Map<String, PsiMethod> generated = GeneratedMethod.byTestCaseId(targetClass);
         final @NotNull ToIntFunction<TestCaseDto> positions = ExecutionPosition.ofEach(p);
 
+        final @NotNull List<TestCaseDto> missing = testCases.stream().filter(tc -> !generated.containsKey(tc.getId().toString())).toList();
+        final @NotNull List<TestCaseDto> cannotBeNamed = missing.stream().filter(tc -> NameSanitizer.cannotMakeMethodName(tc.getDescription())).toList();
+        final @NotNull List<TestCaseDto> nameable = missing.stream().filter(tc -> !NameSanitizer.cannotMakeMethodName(tc.getDescription())).toList();
+        final int alreadyThere = testCases.size() - missing.size();
+
         final @NotNull StringBuilder methods = new StringBuilder();
         final @NotNull List<TestCaseDto> lostTheName = new ArrayList<>();
-        final @NotNull List<TestCaseDto> cannotBeNamed = new ArrayList<>();
-        int alreadyThere = 0;
         int adopted = 0;
 
-        for (final TestCaseDto tc : testCases) {
+        for (final TestCaseDto tc : nameable) {
             final @NotNull String id = tc.getId().toString();
-
-            if (generated.containsKey(id)) {
-                alreadyThere++;
-                continue;
-            }
-
-            if (NameSanitizer.cannotMakeMethodName(tc.getDescription())) {
-                cannotBeNamed.add(tc);
-                continue;
-            }
-
             final @NotNull String methodName = Fqcn.methodNameOf(tc);
             final @NotNull String key = NameSanitizer.methodKey(methodName);
             final @NotNull Optional<String> owner = Optional.ofNullable(owners.get(key));
@@ -230,11 +222,17 @@ public class CreateTestMethod implements GenAction {
         reportLostTheName(p, targetClass, lostTheName);
         reportCannotBeNamed(p, targetClass, cannotBeNamed);
 
-        if (methods.isEmpty()) return;
+        if (!methods.isEmpty()) insertBeforeClosingBrace(p, targetClass, testCases, document.orElseThrow(), methods);
+    }
+
+    // UC-CODEGEN-002, Rule-CODEGEN-016
+    private void insertBeforeClosingBrace(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> testCases, final @NotNull Document document, final @NotNull CharSequence methods) {
+        final @NotNull PsiFile file = targetClass.getContainingFile();
+        final @NotNull PsiDocumentManager documents = PsiDocumentManager.getInstance(p);
 
         if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, JavaPsiFacade.getElementFactory(p));
 
-        documents.doPostponedOperationsAndUnblockDocument(document.orElseThrow());
+        documents.doPostponedOperationsAndUnblockDocument(document);
 
         final @NotNull Optional<PsiElement> closingBrace = Optional.ofNullable(targetClass.getRBrace());
         if (closingBrace.isEmpty()) {
@@ -243,8 +241,8 @@ public class CreateTestMethod implements GenAction {
         }
 
         final int insertAt = closingBrace.orElseThrow().getTextRange().getStartOffset();
-        document.orElseThrow().insertString(insertAt, methods);
-        documents.commitDocument(document.orElseThrow());
+        document.insertString(insertAt, methods);
+        documents.commitDocument(document);
 
         CodeStyleManager.getInstance(p).reformatText(file, insertAt, insertAt + methods.length());
     }

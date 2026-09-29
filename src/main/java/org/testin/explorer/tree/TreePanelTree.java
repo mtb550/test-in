@@ -162,33 +162,38 @@ public class TreePanelTree implements Disposable {
 
         ApplicationManager.getApplication().invokeLater(() -> {
             try {
-                if (disposed) return;
-                final @NotNull Optional<TestProjectDirectoryDto> boundProject = bound();
-                treeStructure.setSelectedProject(boundProject);
-
-                final @NotNull String projectPath = boundProject.map(dir -> dir.getPath().toString()).orElse("");
-                final boolean projectChanged = !projectPath.isEmpty() && !projectPath.equals(expandedProjectPath);
-                expandedProjectPath = projectPath;
-
-                final long started = System.nanoTime();
-
-                structureModel.invalidateAsync().thenRun(() -> {
-                    if (disposed) return;
-                    Logger.debug("Tree rebuilt in " + millisSince(started) + " ms");
-
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        if (disposed) return;
-
-                        if (projectChanged) TreeUtil.promiseExpandAll(mainTree);
-
-                        consumePendingReveal();
-                        Logger.debug("Tree refreshed and expanded in " + millisSince(started) + " ms");
-                    });
-                });
+                if (!disposed) rebuild();
             } finally {
                 refreshScheduled.set(false);
             }
         });
+    }
+
+    private void rebuild() {
+        final @NotNull Optional<TestProjectDirectoryDto> boundProject = bound();
+        treeStructure.setSelectedProject(boundProject);
+
+        final @NotNull String projectPath = boundProject.map(dir -> dir.getPath().toString()).orElse("");
+        final boolean projectChanged = !projectPath.isEmpty() && !projectPath.equals(expandedProjectPath);
+        expandedProjectPath = projectPath;
+
+        final long started = System.nanoTime();
+
+        structureModel.invalidateAsync().thenRun(() -> {
+            if (disposed) return;
+            Logger.debug("Tree rebuilt in " + millisSince(started) + " ms");
+
+            ApplicationManager.getApplication().invokeLater(() -> expandAfterRebuild(projectChanged, started));
+        });
+    }
+
+    private void expandAfterRebuild(final boolean projectChanged, final long started) {
+        if (disposed) return;
+
+        if (projectChanged) TreeUtil.promiseExpandAll(mainTree);
+
+        consumePendingReveal();
+        Logger.debug("Tree refreshed and expanded in " + millisSince(started) + " ms");
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-114
