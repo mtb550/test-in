@@ -20,7 +20,6 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.util.Bundle;
@@ -41,7 +40,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
-    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
     private final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
 
     public DescriptionBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {

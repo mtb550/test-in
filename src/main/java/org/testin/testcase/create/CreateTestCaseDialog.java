@@ -24,7 +24,6 @@ import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -39,7 +38,6 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
     private final @NotNull TestSetDirectoryDto dir;
     private final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
     private final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
-    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     // UC-EDITOR-PANEL-005, Rule-CODEGEN-001
     public CreateTestCaseDialog(final @NotNull Project p, final @NotNull TestSetDirectoryDto dir, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {

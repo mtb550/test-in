@@ -22,8 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.SheetPreview;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
-import org.testin.services.Services;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.dialogs.Destination;
 import org.testin.ui.dialogs.DestinationForm;
@@ -45,7 +43,6 @@ public final class ExportDialog extends AbstractFrameworkDialog {
     private final @NotNull SheetPreview preview;
     private final @NotNull BiConsumer<@NotNull Destination,
             @NotNull Map<String, List<TestCaseDto>>> onExport;
-    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     public ExportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> exportAttributes, final @NotNull Map<String, List<TestCaseDto>> sheetsData, final @NotNull VirtualFile exportTarget, final @NotNull BiConsumer<@NotNull Destination, @NotNull Map<String, List<TestCaseDto>>> onExport) {
         super(p);

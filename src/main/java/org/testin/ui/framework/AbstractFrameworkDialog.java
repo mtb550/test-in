@@ -63,7 +63,7 @@ import java.util.function.Predicate;
 public abstract class AbstractFrameworkDialog implements DialogHost {
     protected final @NotNull Project p;
 
-    private final @NotNull Notifier notifier;
+    protected final @NotNull Notifier notifier;
 
     private final @NotNull OpenDialogs openDialogs;
 

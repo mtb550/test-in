@@ -24,7 +24,6 @@ import org.testin.model.DirectoryType;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestCaseDto.TestCaseDtoBuilder;
 import org.testin.notifications.Done;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseSnapshot;
 import org.testin.ui.framework.AbstractFrameworkDialog;
@@ -59,7 +58,6 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
     private final @NotNull TextInput message;
     private final @NotNull DialogSplitButton commit;
     private final @NotNull Consumer<Request> onCommit;
-    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
     private final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
 
     public PendingCommitsDialog(final @NotNull Project p, final @NotNull List<PendingChange> differences, final @NotNull Path repoRoot, final @NotNull List<String> branches, final @NotNull String currentBranch, final @NotNull Consumer<Request> onCommit) {

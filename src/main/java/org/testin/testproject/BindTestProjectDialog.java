@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.ProjectStatus;
 import org.testin.notifications.Done;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -38,7 +37,6 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog {
     private final @NotNull SelectionTable projects;
     private final @NotNull Runnable onBound;
     private final @NotNull BoundTestProject boundTestProject = Services.getInstance(p, BoundTestProject.class);
-    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     public BindTestProjectDialog(final @NotNull Project p, final @NotNull Map<String, ProjectStatus> underRoot, final @NotNull Runnable onBound) {
         super(p);

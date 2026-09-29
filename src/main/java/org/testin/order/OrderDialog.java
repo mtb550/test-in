@@ -20,8 +20,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.markers.Marker;
-import org.testin.notifications.Notifier;
-import org.testin.services.Services;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -36,7 +34,6 @@ final class OrderDialog extends AbstractFrameworkDialog {
     private final @NotNull TextInput orderInput;
 
     private final @NotNull IntConsumer onSubmit;
-    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     // UC-TREE-PANEL-015, Rule-TREE-PANEL-055
     OrderDialog(final @NotNull Project p, final int current, final @NotNull IntConsumer onSubmit) {
