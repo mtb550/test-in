@@ -16,13 +16,14 @@
 
 package org.testin.explorer;
 
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 
 public class PanelStateTest {
 
-    private static PanelState of(final boolean rootConfigured, final boolean indexed, final boolean projectResolved, final boolean boundProjectMissing, final boolean cloneUrlKnown, final boolean anyProjectsUnderRoot) {
+    private static @NotNull PanelState of(final boolean rootConfigured, final boolean indexed, final boolean projectResolved, final boolean boundProjectMissing, final boolean cloneUrlKnown, final boolean anyProjectsUnderRoot) {
         return PanelState.of(rootConfigured, indexed, projectResolved, boundProjectMissing, cloneUrlKnown, anyProjectsUnderRoot);
     }
 

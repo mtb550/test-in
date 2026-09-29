@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 
 import java.util.Optional;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -33,11 +34,11 @@ import static org.testng.Assert.assertTrue;
 public class TestCaseAsJudgedTest {
     private static final Mapper MAPPER = RealMapper.build();
 
-    private static TestCaseDto testCaseReading(final UUID id, final String description) {
+    private static @NotNull TestCaseDto testCaseReading(final UUID id, final String description) {
         return TestCaseDto.builder().id(id).description(description).build();
     }
 
-    private static TestCaseDto copyOf(final TestCaseDto tc) {
+    private static @NotNull TestCaseDto copyOf(final TestCaseDto tc) {
         return MAPPER.readValue(MAPPER.writeValueAsString(tc), TestCaseDto.class);
     }
 

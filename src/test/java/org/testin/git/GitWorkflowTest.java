@@ -40,6 +40,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -52,7 +53,7 @@ public class GitWorkflowTest {
 
     private Path work;
 
-    private static Optional<String> git(final Path directory, final String... arguments) {
+    private static @NotNull Optional<String> git(final Path directory, final String... arguments) {
         final List<String> command = new ArrayList<>();
         command.add("git");
         command.addAll(List.of(arguments));
@@ -71,7 +72,7 @@ public class GitWorkflowTest {
         }
     }
 
-    private static String mustGit(final Path directory, final String... arguments) {
+    private static @NotNull String mustGit(final Path directory, final String... arguments) {
         return git(directory, arguments).orElseThrow(() -> new AssertionError(
                 "git " + String.join(" ", arguments) + " failed in " + directory));
     }
@@ -144,7 +145,7 @@ public class GitWorkflowTest {
         }
     }
 
-    private TestCaseDto testCase(final String description) {
+    private @NotNull TestCaseDto testCase(final String description) {
         return TestCaseDto.builder()
                 .description(description)
                 .expectedResult("the account dashboard opens")
@@ -170,7 +171,7 @@ public class GitWorkflowTest {
 
     }
 
-    private List<TestCaseDto> writeTestProject() {
+    private @NotNull List<TestCaseDto> writeTestProject() {
         write(work, ".tp", "{\"status\":\"ACTIVE\"}");
         write(work, "Test Cases/.tcd", "{}");
         write(work, "Test Runs/.trd", "{}");
@@ -192,13 +193,13 @@ public class GitWorkflowTest {
         return testCases;
     }
 
-    private List<PendingChange> review() {
+    private @NotNull List<PendingChange> review() {
         final List<String> status = GitRefs.records(mustGit(work, "status", "--porcelain", "-z", "-uall"));
 
         return GitDiffProcessor.toDiffs(status, work, RealMapper.build(), paths -> contents(work, "HEAD", paths), _ -> Optional.empty());
     }
 
-    private static Map<String, String> contents(final Path directory, final String revision, final List<String> relativePaths) {
+    private static @NotNull Map<String, String> contents(final Path directory, final String revision, final List<String> relativePaths) {
         try {
             final Process process = new ProcessBuilder("git", "cat-file", "--batch").directory(directory.toFile()).start();
             try (OutputStream stdin = process.getOutputStream()) {
@@ -213,7 +214,7 @@ public class GitWorkflowTest {
         }
     }
 
-    private Set<String> stagedFor(final List<PendingChange> review) {
+    private @NotNull Set<String> stagedFor(final List<PendingChange> review) {
         final Set<String> paths = new LinkedHashSet<>(GitRefs.repoRelativePaths(review));
         paths.addAll(GitCommits.markersAlongside(work, paths));
         return paths;
@@ -233,7 +234,7 @@ public class GitWorkflowTest {
         mustGit(work, commit.toArray(String[]::new));
     }
 
-    private Path cloneAsColleague() {
+    private @NotNull Path cloneAsColleague() {
 
         final Path colleague = remote.getParent().resolve("colleague");
         mustGit(remote.getParent(), "clone", remote.toUri().toString(), colleague.toString());

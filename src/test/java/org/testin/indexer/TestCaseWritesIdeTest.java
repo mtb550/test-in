@@ -31,13 +31,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 public class TestCaseWritesIdeTest extends BasePlatformTestCase {
 
     private static final String HAND_NAMED = "Log in by hand.tc";
     private Path root;
 
-    private static TestCaseDto pastedInto(final TestSetDirectoryDto ts, final TestCaseDto cut) {
+    private static @NotNull TestCaseDto pastedInto(final TestSetDirectoryDto ts, final TestCaseDto cut) {
         final TestCaseDto pasted = TestCaseDto.builder()
                 .id(cut.getId())
                 .description(cut.getDescription())
@@ -58,7 +59,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private static TestCaseDto testCase(final TestSetDirectoryDto ts, final String rank) {
+    private static @NotNull TestCaseDto testCase(final TestSetDirectoryDto ts, final String rank) {
         final TestCaseDto tc = TestCaseDto.builder()
                 .id(UUID.randomUUID())
                 .description("Log in with a valid user")
@@ -68,7 +69,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         return tc;
     }
 
-    private static Path fileOf(final TestSetDirectoryDto ts, final TestCaseDto tc) {
+    private static @NotNull Path fileOf(final TestSetDirectoryDto ts, final TestCaseDto tc) {
         return ts.getPath().resolve(tc.getId() + ".tc");
     }
 
@@ -87,19 +88,19 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private ProjectIndexer indexer() {
+    private @NotNull ProjectIndexer indexer() {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
-    private TestCases testCases() {
+    private @NotNull TestCases testCases() {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
-    private Nodes nodes() {
+    private @NotNull Nodes nodes() {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private TestSetDirectoryDto oneTestSet() {
+    private @NotNull TestSetDirectoryDto oneTestSet() {
         return WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 
@@ -112,7 +113,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         });
     }
 
-    private List<TestSetDirectoryDto> twoTestSets() {
+    private @NotNull List<TestSetDirectoryDto> twoTestSets() {
         return WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 
@@ -127,7 +128,7 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         });
     }
 
-    private Path setWithAHandNamedTestCase() {
+    private @NotNull Path setWithAHandNamedTestCase() {
         final Path project = SyntheticTree.write(root, 1, 1);
         final Path set = project.resolve("Test Cases").resolve("set-0");
 

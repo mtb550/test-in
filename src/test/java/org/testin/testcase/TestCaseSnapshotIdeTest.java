@@ -34,6 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
 
@@ -54,15 +55,15 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private TestCases testCases() {
+    private @NotNull TestCases testCases() {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
-    private Nodes nodes() {
+    private @NotNull Nodes nodes() {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private TestSetDirectoryDto checkoutSet() {
+    private @NotNull TestSetDirectoryDto checkoutSet() {
         return WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 

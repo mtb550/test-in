@@ -16,6 +16,7 @@
 
 package org.testin.git;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
@@ -25,7 +26,7 @@ import static org.testng.Assert.assertTrue;
 
 public class TestCaseMergeTest {
 
-    private static String testCase(final String description, final String expected, final String priority, final String updatedBy, final String updatedAt, final String rank) {
+    private static @NotNull String testCase(final String description, final String expected, final String priority, final String updatedBy, final String updatedAt, final String rank) {
         return """
                 {
                   "order" : "%s",
@@ -43,7 +44,7 @@ public class TestCaseMergeTest {
                 """.formatted(rank, description, expected, priority, updatedBy, updatedAt);
     }
 
-    private static String at(final String time) {
+    private static @NotNull String at(final String time) {
         return "Thursday 20-08-2026 At " + time + " [Asia/Riyadh]";
     }
 

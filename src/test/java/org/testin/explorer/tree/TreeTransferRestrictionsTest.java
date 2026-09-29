@@ -27,26 +27,27 @@ import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class TreeTransferRestrictionsTest {
 
-    private static DirectoryDto project(final String name) {
+    private static @NotNull DirectoryDto project(final String name) {
         final TestProjectDirectoryDto dto = new TestProjectDirectoryDto();
         dto.setPath(Path.of("Testin", name));
         return dto;
     }
 
-    private static DirectoryDto childPackage(final DirectoryDto parent, final String name) {
+    private static @NotNull DirectoryDto childPackage(final DirectoryDto parent, final String name) {
         final TestSetPackageDirectoryDto dto = new TestSetPackageDirectoryDto();
         dto.setPath(parent.getPath().resolve(name));
         dto.setParent(parent);
         return dto;
     }
 
-    private static DirectoryDto node(final String... underRoot) {
+    private static @NotNull DirectoryDto node(final String... underRoot) {
         final TestSetPackageDirectoryDto dto = new TestSetPackageDirectoryDto();
         dto.setPath(Path.of("root", underRoot));
         return dto;

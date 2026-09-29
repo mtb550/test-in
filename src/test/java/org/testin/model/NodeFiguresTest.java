@@ -20,13 +20,14 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;
 
 public class NodeFiguresTest {
 
-    private static TestRunItems item(final TestStatus status) {
+    private static @NotNull TestRunItems item(final TestStatus status) {
         return TestRunItems.builder().id(UUID.randomUUID()).status(status).build();
     }
 

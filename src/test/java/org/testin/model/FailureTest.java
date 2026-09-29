@@ -21,13 +21,14 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 public class FailureTest {
 
-    private static TestRunItems row() {
+    private static @NotNull TestRunItems row() {
         return TestRunItems.builder().id(UUID.randomUUID()).build();
     }
 

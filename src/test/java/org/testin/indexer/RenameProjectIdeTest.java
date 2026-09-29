@@ -33,6 +33,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.jetbrains.annotations.NotNull;
 
 public class RenameProjectIdeTest extends BasePlatformTestCase {
 
@@ -53,19 +54,19 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private ProjectIndexer indexer() {
+    private @NotNull ProjectIndexer indexer() {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
-    private TestCases testCases() {
+    private @NotNull TestCases testCases() {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
-    private Nodes nodes() {
+    private @NotNull Nodes nodes() {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private TestProjectDirectoryDto testProject(final String name) {
+    private @NotNull TestProjectDirectoryDto testProject(final String name) {
         return WriteAction.computeAndWait(() -> {
             final TestProjectDirectoryDto tp = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(getProject(), root.resolve(name));
             nodes().addTestProject(tp);
@@ -73,7 +74,7 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         });
     }
 
-    private TestSetDirectoryDto testSet(final TestProjectDirectoryDto tp) {
+    private @NotNull TestSetDirectoryDto testSet(final TestProjectDirectoryDto tp) {
         return WriteAction.computeAndWait(() -> {
             final TestSetDirectoryDto ts = Services.getInstance(getProject(), DirectoryMapper.class)
                     .getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());

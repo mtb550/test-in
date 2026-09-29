@@ -32,6 +32,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -54,7 +55,7 @@ public class RuleNumbersTest {
 
     private static final Pattern RANGE = Pattern.compile("Rules are `Rule-([A-Z][A-Z-]*)-\\d+` to `Rule-[A-Z][A-Z-]*-(\\d+)`");
 
-    private static Map<String, Map<Integer, Map<String, List<String>>>> definitions() {
+    private static @NotNull Map<String, Map<Integer, Map<String, List<String>>>> definitions() {
         final Map<String, Map<Integer, Map<String, List<String>>>> byPart = new TreeMap<>();
 
         for (final Path page : partPages()) {
@@ -75,11 +76,11 @@ public class RuleNumbersTest {
         return byPart;
     }
 
-    private static String oneLine(final String text) {
+    private static @NotNull String oneLine(final String text) {
         return text.replaceAll("\\s+", " ").trim();
     }
 
-    private static List<Path> partPages() {
+    private static @NotNull List<Path> partPages() {
         final List<Path> pages = new ArrayList<>();
 
         try (Stream<Path> tree = Files.walk(DOCS)) {
@@ -96,7 +97,7 @@ public class RuleNumbersTest {
         return pages;
     }
 
-    private static List<Path> javaFiles() {
+    private static @NotNull List<Path> javaFiles() {
         final List<Path> files = new ArrayList<>();
 
         try (Stream<Path> tree = Files.walk(SOURCES)) {
@@ -108,13 +109,13 @@ public class RuleNumbersTest {
         return files;
     }
 
-    private static Path numberingPage(final String part) {
+    private static @NotNull Path numberingPage(final String part) {
         if ("PRODUCT".equals(part)) return DOCS.resolve(PRODUCT);
 
         return partFolder(part).resolve("main.md");
     }
 
-    private static Path partFolder(final String part) {
+    private static @NotNull Path partFolder(final String part) {
         final Map<String, String> folders = new LinkedHashMap<>();
         folders.put("TREE-PANEL", "treePanel");
         folders.put("EDITOR-PANEL", "editorPanel");
@@ -131,7 +132,7 @@ public class RuleNumbersTest {
         return DOCS.resolve(folder);
     }
 
-    private static String read(final Path file) {
+    private static @NotNull String read(final Path file) {
         try {
             return Files.readString(file);
         } catch (final IOException ex) {

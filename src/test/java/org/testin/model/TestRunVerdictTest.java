@@ -21,6 +21,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -30,7 +31,7 @@ public class TestRunVerdictTest {
 
     private static final String ISSUE = "https://github.com/mtb550/product/issues/123";
 
-    private static TestRunItems failedWithBug() {
+    private static @NotNull TestRunItems failedWithBug() {
         return TestRunItems.builder()
                 .id(UUID.randomUUID())
                 .status(TestStatus.FAILED)

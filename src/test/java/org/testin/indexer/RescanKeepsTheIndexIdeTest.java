@@ -27,6 +27,7 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.jetbrains.annotations.NotNull;
 
 public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
 
@@ -52,15 +53,15 @@ public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private ProjectIndexer indexer() {
+    private @NotNull ProjectIndexer indexer() {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
-    private TestCases testCases() {
+    private @NotNull TestCases testCases() {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
-    private Nodes nodes() {
+    private @NotNull Nodes nodes() {
         return Services.getInstance(getProject(), Nodes.class);
     }
 

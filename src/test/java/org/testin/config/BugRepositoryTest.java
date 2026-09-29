@@ -16,6 +16,7 @@
 
 package org.testin.config;
 
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -23,7 +24,7 @@ import static org.testng.Assert.assertTrue;
 
 public class BugRepositoryTest {
 
-    private static String gh(final String address) {
+    private static @NotNull String gh(final String address) {
         return BugRepository.of(address).map(BugRepository::ghRepo).orElse("refused");
     }
 

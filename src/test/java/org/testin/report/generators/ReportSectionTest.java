@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -92,7 +93,7 @@ public class ReportSectionTest {
         assertTrue(description.contains("<b>7</b>"), description);
     }
 
-    private TestRunItems item(final TestStatus status) {
+    private @NotNull TestRunItems item(final TestStatus status) {
         final TestRunItems item = new TestRunItems();
         item.setId(UUID.randomUUID());
         item.setStatus(status);

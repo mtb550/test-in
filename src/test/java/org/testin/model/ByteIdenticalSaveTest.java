@@ -29,6 +29,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -37,7 +38,7 @@ public class ByteIdenticalSaveTest {
 
     private static final Path GOLDEN = Path.of("src", "test", "resources", "golden", "test-case.json");
 
-    private static TestCaseDto typedByATester() {
+    private static @NotNull TestCaseDto typedByATester() {
         final TestCaseDto tc = new TestCaseDto();
 
         tc.setId(UUID.fromString("11111111-2222-3333-4444-555555555555"));
@@ -60,12 +61,12 @@ public class ByteIdenticalSaveTest {
         return tc;
     }
 
-    private static String saved() {
+    private static @NotNull String saved() {
         return new String(RealMapper.build().writeValueAsBytes(typedByATester()), StandardCharsets.UTF_8)
                 .replace("\r\n", "\n");
     }
 
-    private static String golden() {
+    private static @NotNull String golden() {
         try {
             if (!Files.exists(GOLDEN)) {
                 Files.createDirectories(GOLDEN.getParent());

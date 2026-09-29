@@ -22,6 +22,7 @@ import org.testng.annotations.Test;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -29,7 +30,7 @@ import static org.testng.Assert.assertTrue;
 
 public class AgentCommandTest {
 
-    private static TestCaseDto aTestCase() {
+    private static @NotNull TestCaseDto aTestCase() {
         return TestCaseDto.builder()
                 .id(UUID.randomUUID())
                 .description("Sign in with a valid account")
@@ -40,7 +41,7 @@ public class AgentCommandTest {
                 .build();
     }
 
-    private static AgentConnection connection(final String command) {
+    private static @NotNull AgentConnection connection(final String command) {
         return new AgentConnection(command, "-p", "", Duration.ofSeconds(1));
     }
 

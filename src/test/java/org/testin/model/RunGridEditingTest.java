@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -30,7 +31,7 @@ import static org.testng.Assert.assertTrue;
 
 public class RunGridEditingTest {
 
-    private static TestRunItems item() {
+    private static @NotNull TestRunItems item() {
         return TestRunItems.builder().id(UUID.randomUUID()).build();
     }
 

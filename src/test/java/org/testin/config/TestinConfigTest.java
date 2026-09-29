@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
 
 import java.util.Map;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -35,7 +36,7 @@ public class TestinConfigTest {
             RepoUrl: https://github.com/acme/checkout-testcases
             """;
 
-    private static Map<String, String> savedLines() {
+    private static @NotNull Map<String, String> savedLines() {
         return TestinYml.lines("NAFATH", "https://github.com/acme/nafath-test-cases.git");
     }
 

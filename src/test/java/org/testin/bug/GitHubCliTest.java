@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -40,11 +41,11 @@ public class GitHubCliTest {
     private static final String READY_VERSION = "gh version 2.100.0 (2026-09-03)\nhttps://github.com/cli/cli/releases/tag/v2.100.0\n";
     private static final String ISSUE = "https://github.com/mtb550/test-in/issues/412";
 
-    private static ProcessOutput answer(final String stdout, final String stderr, final int exitCode) {
+    private static @NotNull ProcessOutput answer(final String stdout, final String stderr, final int exitCode) {
         return new ProcessOutput(stdout, stderr, exitCode, false, false);
     }
 
-    private static Optional<String> whyNot(final FakeGh gh, final String bugRepoUrl) {
+    private static @NotNull Optional<String> whyNot(final FakeGh gh, final String bugRepoUrl) {
         return gh.cli().whyItCannotSend(bugRepoUrl);
     }
 

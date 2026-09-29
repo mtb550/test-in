@@ -30,6 +30,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.KeyStroke;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
+import org.jetbrains.annotations.NotNull;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
@@ -45,7 +46,7 @@ import static org.testng.Assert.assertTrue;
 
 public class FrameworkComponentsTest {
 
-    private static TextFieldWithSelections<Integer> twoSelections() {
+    private static @NotNull TextFieldWithSelections<Integer> twoSelections() {
         return ComponentDialogBase.<Integer>textFieldWithSelections()
                 .placeholder("set name..")
                 .selection(DialogStyle.NO_ICON, "One", "first row", 1)
@@ -59,7 +60,7 @@ public class FrameworkComponentsTest {
         field.getActionMap().get(actionKey).actionPerformed(new ActionEvent(field, 0, ""));
     }
 
-    private static Optional<JList<?>> findList(final Container container) {
+    private static @NotNull Optional<JList<?>> findList(final Container container) {
         for (final Component child : container.getComponents()) {
             if (child instanceof JList<?> list) return Optional.of(list);
 

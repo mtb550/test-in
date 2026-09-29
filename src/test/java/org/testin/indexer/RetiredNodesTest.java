@@ -33,6 +33,7 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -42,7 +43,7 @@ public class RetiredNodesTest {
 
     private static final Path PARENT = Path.of("root", "Test Cases");
 
-    private static TestSetDirectoryDto testSet(final String name, final TestSetStatus status) {
+    private static @NotNull TestSetDirectoryDto testSet(final String name, final TestSetStatus status) {
         final TestSetDirectoryDto dto = new TestSetDirectoryDto();
         dto.setName(name);
         dto.setPath(PARENT.resolve(name));
@@ -50,7 +51,7 @@ public class RetiredNodesTest {
         return dto;
     }
 
-    private static TestSetPackageDirectoryDto testSetPackage(final String name, final PackageStatus status) {
+    private static @NotNull TestSetPackageDirectoryDto testSetPackage(final String name, final PackageStatus status) {
         final TestSetPackageDirectoryDto dto = new TestSetPackageDirectoryDto();
         dto.setName(name);
         dto.setPath(PARENT.resolve(name));

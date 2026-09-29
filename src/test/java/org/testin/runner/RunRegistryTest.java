@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -34,11 +35,11 @@ public class RunRegistryTest {
 
     private static final String RUN = "Testin: three cases";
 
-    private static TestCaseDto reloaded(final TestCaseDto original) {
+    private static @NotNull TestCaseDto reloaded(final TestCaseDto original) {
         return TestCaseDto.builder().id(original.getId()).description(original.getDescription()).build();
     }
 
-    private static TestCaseDto aTestCase(final String description) {
+    private static @NotNull TestCaseDto aTestCase(final String description) {
         return TestCaseDto.builder().description(description).build();
     }
 

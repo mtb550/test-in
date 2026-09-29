@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Supplier;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -33,7 +34,7 @@ import static org.testng.Assert.assertTrue;
 
 public class SettingsTest {
 
-    private static AppSettingsState state(final String testerName, final String testerRole) {
+    private static @NotNull AppSettingsState state(final String testerName, final String testerRole) {
         final AppSettingsState settings = new AppSettingsState();
         settings.rootTestinPath = "C:/testin";
         settings.testerName = testerName;

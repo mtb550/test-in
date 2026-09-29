@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -34,7 +35,7 @@ public class BugReportsTest {
     private static final RunItem ITEM = new RunItem(Path.of("NAFATH", "Test Runs", "Sprint 7"), UUID.randomUUID());
     private static final RunItem SAME_TEST_CASE_OTHER_RUN = new RunItem(Path.of("NAFATH", "Test Runs", "Sprint 8"), ITEM.id());
 
-    private static TestRunItems failed() {
+    private static @NotNull TestRunItems failed() {
         return TestRunItems.builder().id(ITEM.id()).status(TestStatus.FAILED).build();
     }
 

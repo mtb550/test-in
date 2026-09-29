@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
 
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -30,7 +31,7 @@ public class UndoHistoriesTest {
     private static final UndoScope TREE = UndoScope.TREE;
     private static final UndoScope EDITOR = UndoScope.of(Path.of("root", "project", "Test Cases", "login"));
 
-    private static Operation counting(final String description, final AtomicInteger undone, final AtomicInteger redone) {
+    private static @NotNull Operation counting(final String description, final AtomicInteger undone, final AtomicInteger redone) {
         return new Operation(description, undone::incrementAndGet, redone::incrementAndGet);
     }
 

@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -30,7 +31,7 @@ import static org.testng.Assert.assertTrue;
 
 public class GitRefsTest {
 
-    private static PendingChange diff(final Path relativePath) {
+    private static @NotNull PendingChange diff(final Path relativePath) {
         return new PendingChange(ChangeSubject.TEST_CASE, "a case", "a test set", UUID.randomUUID().toString(),
                 relativePath, DiffType.MODIFIED,
                 TestCaseDto.builder().build(), List.of());

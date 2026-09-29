@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -57,7 +58,7 @@ public class GitDiffProcessorTest {
         if (root != null) TempTree.delete(root);
     }
 
-    private TestCaseDto testCase(final String description) {
+    private @NotNull TestCaseDto testCase(final String description) {
         return TestCaseDto.builder()
                 .description(description)
                 .expectedResult("the balance is shown")
@@ -77,7 +78,7 @@ public class GitDiffProcessorTest {
         }
     }
 
-    private List<PendingChange> review(final String... statusLines) {
+    private @NotNull List<PendingChange> review(final String... statusLines) {
         return GitDiffProcessor.toDiffs(List.of(statusLines), root, RealMapper.build(), _ -> committed, _ -> Optional.empty());
     }
 

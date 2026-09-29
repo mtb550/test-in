@@ -25,6 +25,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 
 import java.nio.file.Path;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertNotEquals;
 
@@ -32,7 +33,7 @@ public class TreePanelNodeIdeTest extends BasePlatformTestCase {
 
     private static final Path SET = Path.of("project", "Test Cases", "Login");
 
-    private static DirectoryDto at(final DirectoryDto directory, final Path path) {
+    private static @NotNull DirectoryDto at(final DirectoryDto directory, final Path path) {
         directory.setPath(path);
         return directory;
     }

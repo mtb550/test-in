@@ -18,13 +18,14 @@ package org.testin.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RealMapper {
 
-    public static Mapper build() {
+    public static @NotNull Mapper build() {
         try {
             final Constructor<Mapper> constructor = Mapper.class.getDeclaredConstructor();
             constructor.setAccessible(true);

@@ -23,10 +23,11 @@ import org.testin.testcase.TestEditorAttributes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 
 public class GridRowsIdeTest extends BasePlatformTestCase {
 
-    private static String[] aRow(final String description) {
+    private static String @NotNull [] aRow(final String description) {
         final String[] row = new String[TestEditorAttributes.values().length];
         Arrays.fill(row, "");
         row[TestEditorAttributes.DESCRIPTION.ordinal()] = description;

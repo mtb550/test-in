@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -33,7 +34,7 @@ import static org.testng.Assert.assertTrue;
 
 public class ChangeTypeRevertTest {
 
-    private static TestCaseDto committed() {
+    private static @NotNull TestCaseDto committed() {
         return TestCaseDto.builder()
                 .description("committed description")
                 .expectedResult("committed result")
@@ -48,7 +49,7 @@ public class ChangeTypeRevertTest {
                 .build();
     }
 
-    private static TestCaseDto edited() {
+    private static @NotNull TestCaseDto edited() {
         return TestCaseDto.builder()
                 .description("edited description")
                 .expectedResult("edited result")
@@ -63,7 +64,7 @@ public class ChangeTypeRevertTest {
                 .build();
     }
 
-    private static TestCaseDto reverted(final ChangeType type, final TestCaseDto current, final TestCaseDto committed) {
+    private static @NotNull TestCaseDto reverted(final ChangeType type, final TestCaseDto current, final TestCaseDto committed) {
         final TestCaseDto.TestCaseDtoBuilder draft = current.edit();
         type.getRevertAction().apply(draft, committed);
         return draft.build();

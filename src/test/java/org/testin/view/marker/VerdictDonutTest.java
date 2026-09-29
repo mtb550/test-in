@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -32,7 +33,7 @@ public class VerdictDonutTest {
 
     private static final List<NodeCount> SLICES = NodeStatistics.VERDICTS.getSlices();
 
-    private static NodeFigures run(final long passed, final long failed, final long blocked, final long untested) {
+    private static @NotNull NodeFigures run(final long passed, final long failed, final long blocked, final long untested) {
         final long total = passed + failed + blocked + untested;
 
         return NodeFigures.ofRun(new TestRunSummary(total, passed, failed, blocked, untested, 0, ""));

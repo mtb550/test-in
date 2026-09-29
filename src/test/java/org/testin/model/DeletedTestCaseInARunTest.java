@@ -24,6 +24,7 @@ import org.testng.annotations.Test;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -31,7 +32,7 @@ import static org.testng.Assert.assertTrue;
 
 public class DeletedTestCaseInARunTest {
 
-    private static TestRunItems removedItem(final UUID id) {
+    private static @NotNull TestRunItems removedItem(final UUID id) {
         return TestRunItems.builder()
                 .id(id)
                 .status(TestStatus.REMOVED)

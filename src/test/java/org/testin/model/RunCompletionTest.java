@@ -21,17 +21,18 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class RunCompletionTest {
 
-    private static TestRunItems item(final TestStatus status) {
+    private static @NotNull TestRunItems item(final TestStatus status) {
         return TestRunItems.builder().id(UUID.randomUUID()).status(status).build();
     }
 
-    private static TestRunDto runOf(final TestRunItems... items) {
+    private static @NotNull TestRunDto runOf(final TestRunItems... items) {
         return TestRunDto.builder().results(List.of(items)).build();
     }
 

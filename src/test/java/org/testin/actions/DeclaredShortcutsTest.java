@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -38,7 +39,7 @@ public class DeclaredShortcutsTest {
     private static final Map<String, List<String>> SHARED_ON_PURPOSE = Map.of(
             "F2", List.of("Testin.UpdateTestCase", "Testin.UpdateRunItem", "Testin.EditTestRun"));
 
-    private static Map<String, List<String>> declaredKeys(final String keymap) {
+    private static @NotNull Map<String, List<String>> declaredKeys(final String keymap) {
         final String actions = actionsSection();
 
         final Map<String, List<String>> byKey = new LinkedHashMap<>();
@@ -59,7 +60,7 @@ public class DeclaredShortcutsTest {
         return byKey;
     }
 
-    private static String actionsSection() {
+    private static @NotNull String actionsSection() {
         final String xml = read();
         final int from = xml.indexOf("<actions>");
         final int to = xml.indexOf("</actions>");
@@ -68,7 +69,7 @@ public class DeclaredShortcutsTest {
         return xml.substring(from, to);
     }
 
-    private static String normalize(final String keystroke) {
+    private static @NotNull String normalize(final String keystroke) {
         final List<String> parts = new ArrayList<>(List.of(keystroke.replace("control", "ctrl").trim().split("\\s+")));
         final String key = parts.removeLast().toUpperCase(Locale.ROOT);
 
@@ -77,7 +78,7 @@ public class DeclaredShortcutsTest {
         return String.join(" ", parts);
     }
 
-    private static String read() {
+    private static @NotNull String read() {
         final Path path = Path.of("src", "main", "resources", "META-INF", "plugin.xml");
         try {
             return Files.readString(path, StandardCharsets.UTF_8);

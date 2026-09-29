@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -36,7 +37,7 @@ public class GridEditConfirmationTest {
 
     private static final String PARENT = "AbstractGridEditListener";
 
-    private static List<Path> gridEditListeners() {
+    private static @NotNull List<Path> gridEditListeners() {
         try (Stream<Path> files = Files.list(LISTENERS)) {
             final List<Path> found = new ArrayList<>();
 
@@ -53,7 +54,7 @@ public class GridEditConfirmationTest {
         }
     }
 
-    private static String sourceOf(final Path file) {
+    private static @NotNull String sourceOf(final Path file) {
         try {
             return Files.readString(file);
         } catch (final IOException ex) {

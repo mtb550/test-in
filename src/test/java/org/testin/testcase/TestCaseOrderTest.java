@@ -24,12 +24,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 
 public class TestCaseOrderTest {
 
-    private static TestCaseDto testCase(final String description, final String rank) {
+    private static @NotNull TestCaseDto testCase(final String description, final String rank) {
         return TestCaseDto.builder()
                 .id(UUID.randomUUID())
                 .description(description)

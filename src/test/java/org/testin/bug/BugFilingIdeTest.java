@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 public class BugFilingIdeTest extends BasePlatformTestCase {
 
@@ -49,7 +50,7 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
 
     private Path root;
 
-    private static String awaitFileHoldingTheIssue(final Path file) {
+    private static @NotNull String awaitFileHoldingTheIssue(final Path file) {
         final long deadline = System.currentTimeMillis() + 10_000;
         while (System.currentTimeMillis() < deadline) {
             final String held = read(file);
@@ -61,7 +62,7 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         return read(file);
     }
 
-    private static String read(final Path file) {
+    private static @NotNull String read(final Path file) {
         try {
             return Files.exists(file) ? Files.readString(file) : "";
         } catch (final IOException beingWritten) {
@@ -84,33 +85,33 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private TestCases testCases() {
+    private @NotNull TestCases testCases() {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
-    private TestRuns testRuns() {
+    private @NotNull TestRuns testRuns() {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
-    private Nodes nodes() {
+    private @NotNull Nodes nodes() {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private Path runPath() {
+    private @NotNull Path runPath() {
         return root.resolve("NAFATH").resolve("Test Runs").resolve("Sprint 7");
     }
 
-    private RunItem indexedRunItem(final TestStatus status) {
+    private @NotNull RunItem indexedRunItem(final TestStatus status) {
         return runItem(indexedTestCase(), status);
     }
 
-    private RunItem runItem(final UUID testCaseId, final TestStatus status) {
+    private @NotNull RunItem runItem(final UUID testCaseId, final TestStatus status) {
         final TestRunItems item = TestRunItems.builder().id(testCaseId).status(status).build();
         testRuns().putTestRun(runPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
         return new RunItem(runPath(), testCaseId);
     }
 
-    private UUID indexedTestCase() {
+    private @NotNull UUID indexedTestCase() {
         final TestSetDirectoryDto ts = WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
             final TestProjectDirectoryDto tp = mapper.setTestProjectNode(getProject(), root.resolve("NAFATH"));
@@ -127,7 +128,7 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         return tc.getId();
     }
 
-    private String storedLink(final RunItem item) {
+    private @NotNull String storedLink(final RunItem item) {
         return testRuns().findTestRun(item.run()).flatMap(item::in).orElseThrow().getBugIssueUrl();
     }
 

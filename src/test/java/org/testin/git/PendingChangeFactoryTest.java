@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -39,7 +40,7 @@ public class PendingChangeFactoryTest {
 
     private static final Path PATH = Path.of("Test Cases", "login", "case.tc");
 
-    private static TestCaseDto testCase(final String description) {
+    private static @NotNull TestCaseDto testCase(final String description) {
         return TestCaseDto.builder()
                 .description(description)
                 .expectedResult("the balance is shown")
@@ -49,7 +50,7 @@ public class PendingChangeFactoryTest {
                 .build();
     }
 
-    private static String json(final TestCaseDto dto) {
+    private static @NotNull String json(final TestCaseDto dto) {
         return RealMapper.build().writeValueAsString(dto);
     }
 

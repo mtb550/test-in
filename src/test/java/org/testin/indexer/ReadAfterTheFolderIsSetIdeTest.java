@@ -23,13 +23,14 @@ import org.testin.setting.AppSettingsState;
 import org.testin.setting.StartupActivity;
 
 import java.nio.file.Path;
+import org.jetbrains.annotations.NotNull;
 
 public class ReadAfterTheFolderIsSetIdeTest extends BasePlatformTestCase {
 
     private Path root;
     private String wasSet;
 
-    private static AppSettingsState settings() {
+    private static @NotNull AppSettingsState settings() {
         return Services.getInstance(AppSettingsState.class);
     }
 
@@ -51,11 +52,11 @@ public class ReadAfterTheFolderIsSetIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private ProjectIndexer indexer() {
+    private @NotNull ProjectIndexer indexer() {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
-    private Nodes nodes() {
+    private @NotNull Nodes nodes() {
         return Services.getInstance(getProject(), Nodes.class);
     }
 

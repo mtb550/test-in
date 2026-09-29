@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
 
@@ -72,23 +73,23 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private DirectoryMapper mapper() {
+    private @NotNull DirectoryMapper mapper() {
         return Services.getInstance(getProject(), DirectoryMapper.class);
     }
 
-    private TestCases testCases() {
+    private @NotNull TestCases testCases() {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
-    private TestRuns testRuns() {
+    private @NotNull TestRuns testRuns() {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
-    private Nodes nodes() {
+    private @NotNull Nodes nodes() {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private TestCaseDto aTestCaseIn(final TestProjectDirectoryDto tp) {
+    private @NotNull TestCaseDto aTestCaseIn(final TestProjectDirectoryDto tp) {
         final TestSetDirectoryDto login = WriteAction.computeAndWait(() -> {
             final TestSetDirectoryDto set = mapper().getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
             nodes().addTestSet(set);
@@ -107,7 +108,7 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
         return tc;
     }
 
-    private Path aRunOver(final TestProjectDirectoryDto tp, final String named, final UUID testCaseId) {
+    private @NotNull Path aRunOver(final TestProjectDirectoryDto tp, final String named, final UUID testCaseId) {
         final Path runPath = WriteAction.computeAndWait(() -> {
             final Path path = tp.getTestRunsDirectory().getPath().resolve(named);
             final TestRunDirectoryDto tr = mapper().setTestRunNode(getProject(), path, tp.getTestRunsDirectory());
@@ -120,7 +121,7 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
         return runPath;
     }
 
-    private List<Hit> forTheId() {
+    private @NotNull List<Hit> forTheId() {
         return Hits.forQuery(getProject(), testCase.getId().toString()).hits();
     }
 

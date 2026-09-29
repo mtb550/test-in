@@ -28,6 +28,7 @@ import org.testin.services.Services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.jetbrains.annotations.NotNull;
 
 public class TreeOperationsIdeTest extends BasePlatformTestCase {
 
@@ -48,15 +49,15 @@ public class TreeOperationsIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private ProjectIndexer indexer() {
+    private @NotNull ProjectIndexer indexer() {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
-    private Nodes nodes() {
+    private @NotNull Nodes nodes() {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private TestProjectDirectoryDto create(final Path path) {
+    private @NotNull TestProjectDirectoryDto create(final Path path) {
         return WriteAction.computeAndWait(() -> {
             final TestProjectDirectoryDto tp =
                     Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(getProject(), path);

@@ -23,13 +23,14 @@ import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 public class TestCaseChangeComparatorTest {
 
-    private static TestCaseDto base() {
+    private static @NotNull TestCaseDto base() {
         return TestCaseDto.builder()
                 .description("a login case")
                 .expectedResult("the balance is shown")
@@ -44,7 +45,7 @@ public class TestCaseChangeComparatorTest {
                 .build();
     }
 
-    private static FieldChange onlyChange(final TestCaseDto after) {
+    private static @NotNull FieldChange onlyChange(final TestCaseDto after) {
         final List<FieldChange> changes = TestCaseChangeComparator.compare(base(), after);
         assertEquals(changes.size(), 1, "expected exactly one changed field, got " + changes);
         return changes.getFirst();

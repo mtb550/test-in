@@ -21,6 +21,7 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -28,11 +29,11 @@ import static org.testng.Assert.assertTrue;
 
 public class TestRunSummaryTest {
 
-    private static TestRunItems item(final TestStatus status) {
+    private static @NotNull TestRunItems item(final TestStatus status) {
         return TestRunItems.builder().id(UUID.randomUUID()).status(status).build();
     }
 
-    private static TestRunItems executedBy(final String tester) {
+    private static @NotNull TestRunItems executedBy(final String tester) {
         return TestRunItems.builder().id(UUID.randomUUID()).status(TestStatus.PASSED).executedBy(tester).build();
     }
 

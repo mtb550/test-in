@@ -27,12 +27,13 @@ import org.testin.services.Services;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 public class TestCaseFileIdeTest extends BasePlatformTestCase {
 
     private Path root;
 
-    private static TestCaseDto testCase(final TestSetDirectoryDto ts) {
+    private static @NotNull TestCaseDto testCase(final TestSetDirectoryDto ts) {
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
         tc.setParent(ts);
         return tc;
@@ -53,15 +54,15 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private TestCases testCases() {
+    private @NotNull TestCases testCases() {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
-    private Nodes nodes() {
+    private @NotNull Nodes nodes() {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private TestProjectDirectoryDto testProject(final String name) {
+    private @NotNull TestProjectDirectoryDto testProject(final String name) {
         return WriteAction.computeAndWait(() -> {
             final TestProjectDirectoryDto tp = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(getProject(), root.resolve(name));
             nodes().addTestProject(tp);
@@ -69,7 +70,7 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
         });
     }
 
-    private TestSetDirectoryDto testSet(final TestProjectDirectoryDto tp) {
+    private @NotNull TestSetDirectoryDto testSet(final TestProjectDirectoryDto tp) {
         return WriteAction.computeAndWait(() -> {
             final TestSetDirectoryDto ts = Services.getInstance(getProject(), DirectoryMapper.class)
                     .getTestSetNode(getProject(), tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());

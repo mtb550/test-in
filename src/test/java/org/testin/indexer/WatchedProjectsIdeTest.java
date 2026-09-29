@@ -26,6 +26,7 @@ import org.testin.services.Services;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.jetbrains.annotations.NotNull;
 
 public class WatchedProjectsIdeTest extends BasePlatformTestCase {
 
@@ -46,11 +47,11 @@ public class WatchedProjectsIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private ProjectIndexer indexer() {
+    private @NotNull ProjectIndexer indexer() {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
-    private Nodes nodes() {
+    private @NotNull Nodes nodes() {
         return Services.getInstance(getProject(), Nodes.class);
     }
 

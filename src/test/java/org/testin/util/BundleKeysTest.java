@@ -31,13 +31,14 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class BundleKeysTest {
 
-    private static List<String> keysAskedForInCode() {
+    private static @NotNull List<String> keysAskedForInCode() {
         final List<String> keys = new ArrayList<>();
         final Pattern call = Pattern.compile("Bundle\\.message\\(\\s*\"([^\"]+)\"");
 
@@ -50,7 +51,7 @@ public class BundleKeysTest {
         return keys;
     }
 
-    private static List<Path> sources() {
+    private static @NotNull List<Path> sources() {
         return Stream.of(Path.of("src", "main", "java"),
                         Path.of("testin-java", "src", "main", "java"),
                         Path.of("testin-testng", "src", "main", "java"))
@@ -59,7 +60,7 @@ public class BundleKeysTest {
                 .toList();
     }
 
-    private static Stream<Path> javaFilesUnder(final Path root) {
+    private static @NotNull Stream<Path> javaFilesUnder(final Path root) {
         try (var walk = Files.walk(root)) {
             return walk.filter(path -> path.toString().endsWith(".java")).toList().stream();
         } catch (final IOException e) {
@@ -67,7 +68,7 @@ public class BundleKeysTest {
         }
     }
 
-    private static String read(final Path path) {
+    private static @NotNull String read(final Path path) {
         try {
             return Files.readString(path, StandardCharsets.UTF_8);
         } catch (final IOException e) {
@@ -75,7 +76,7 @@ public class BundleKeysTest {
         }
     }
 
-    private static Properties english() {
+    private static @NotNull Properties english() {
         final Properties properties = new Properties();
         final Path path = Path.of("src", "main", "resources", "messages.properties");
 

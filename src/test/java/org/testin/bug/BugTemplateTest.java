@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -34,7 +35,7 @@ public class BugTemplateTest {
     private static final String LINK = "https://github.com/mtb550/test-03/blob/master/Test%20Cases/ts2/07f7e754-b849-4b38-9e6e-a2cacd84e927.tc";
     private static final byte[] SCREENSHOT = {(byte) 0x89, 'P', 'N', 'G', '\r', '\n', 0x1A, '\n', 0};
 
-    private static BugFacts facts() {
+    private static @NotNull BugFacts facts() {
         return BugFacts.builder()
                 .title("Activate app stores the app version")
                 .severity(BugSeverity.MINOR)
@@ -60,7 +61,7 @@ public class BugTemplateTest {
                 .build();
     }
 
-    private static BugFacts nothingKnown() {
+    private static @NotNull BugFacts nothingKnown() {
         return facts().toBuilder()
                 .severity(BugSeverity.EMPTY)
                 .priority(BugPriority.EMPTY)

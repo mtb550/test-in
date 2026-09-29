@@ -31,6 +31,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.fail;
 
@@ -62,11 +63,11 @@ public class DifferenceNumbersTest {
         }
     }
 
-    private static String withoutDifferenceRows(final String text) {
+    private static @NotNull String withoutDifferenceRows(final String text) {
         return ROW.matcher(text).replaceAll("");
     }
 
-    private static Map<String, Set<Integer>> differences(final boolean gone) {
+    private static @NotNull Map<String, Set<Integer>> differences(final boolean gone) {
         final Map<String, Set<Integer>> byPart = new TreeMap<>();
 
         for (final Path main : mainPages()) {
@@ -84,15 +85,15 @@ public class DifferenceNumbersTest {
         return byPart;
     }
 
-    private static String oneLine(final String text) {
+    private static @NotNull String oneLine(final String text) {
         return text.replaceAll("\\s+", " ");
     }
 
-    private static List<Path> mainPages() {
+    private static @NotNull List<Path> mainPages() {
         return pages().stream().filter(page -> "main.md".equals(page.getFileName().toString())).toList();
     }
 
-    private static List<Path> pages() {
+    private static @NotNull List<Path> pages() {
         final List<Path> pages = new ArrayList<>();
 
         try (Stream<Path> tree = Files.walk(DOCS)) {
@@ -109,7 +110,7 @@ public class DifferenceNumbersTest {
         return pages;
     }
 
-    private static String read(final Path file) {
+    private static @NotNull String read(final Path file) {
         try {
             return Files.readString(file);
         } catch (final IOException ex) {

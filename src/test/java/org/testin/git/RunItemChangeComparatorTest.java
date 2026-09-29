@@ -28,6 +28,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -40,7 +41,7 @@ public class RunItemChangeComparatorTest {
     private static final ZonedDateTime EXECUTED_AT =
             ZonedDateTime.of(2026, 9, 20, 11, 30, 0, 0, ZoneId.of("Asia/Riyadh"));
 
-    private static TestRunItems base() {
+    private static @NotNull TestRunItems base() {
         return TestRunItems.builder()
                 .id(JUDGED_TEST_CASE)
                 .status(TestStatus.FAILED)
@@ -55,7 +56,7 @@ public class RunItemChangeComparatorTest {
                 .build();
     }
 
-    private static FieldChange onlyChange(final TestRunItems after) {
+    private static @NotNull FieldChange onlyChange(final TestRunItems after) {
         final List<FieldChange> changes = RunItemChangeComparator.compare(base(), after);
         assertEquals(changes.size(), 1, "expected exactly one changed field, got " + changes);
         return changes.getFirst();

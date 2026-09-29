@@ -20,6 +20,7 @@ import org.testng.annotations.Test;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -30,7 +31,7 @@ public class WatchedPathTest {
 
     private static final Path PROJECT = ROOT.resolve("test-01");
 
-    private static Optional<Path> of(final Path changed) {
+    private static @NotNull Optional<Path> of(final Path changed) {
         return WatchedPath.testProjectOf(changed, ROOT);
     }
 

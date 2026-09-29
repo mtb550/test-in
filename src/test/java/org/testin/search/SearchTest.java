@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -39,7 +40,7 @@ import static org.testng.Assert.assertTrue;
 
 public class SearchTest {
 
-    private static TestSetDirectoryDto testSet(final String name, final String... chain) {
+    private static @NotNull TestSetDirectoryDto testSet(final String name, final String... chain) {
         final TestSetDirectoryDto set = TestSetDirectoryDto.builder().build();
         set.setName(name);
         set.setPath(Path.of("C:", "Testin", "test-01", "Test Cases", name));
@@ -48,7 +49,7 @@ public class SearchTest {
         return set;
     }
 
-    private static TestCaseDto testCase(final String description, final TestSetDirectoryDto in) {
+    private static @NotNull TestCaseDto testCase(final String description, final TestSetDirectoryDto in) {
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description(description).build();
         tc.setParent(in);
 

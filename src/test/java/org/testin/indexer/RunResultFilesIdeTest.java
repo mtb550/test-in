@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
+import org.jetbrains.annotations.NotNull;
 
 public class RunResultFilesIdeTest extends BasePlatformTestCase {
 
@@ -54,7 +55,7 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
 
     private Path root;
 
-    private static Path resultOf(final Path runPath, final UUID testCaseId) {
+    private static @NotNull Path resultOf(final Path runPath, final UUID testCaseId) {
         return runPath.resolve(FileKind.RUN_ITEM.fileName(testCaseId));
     }
 
@@ -75,7 +76,7 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
         fail(what);
     }
 
-    private static String read(final Path file) {
+    private static @NotNull String read(final Path file) {
         try {
             return Files.exists(file) ? Files.readString(file) : "";
         } catch (final IOException beingWritten) {
@@ -107,15 +108,15 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private TestRuns testRuns() {
+    private @NotNull TestRuns testRuns() {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
-    private Nodes nodes() {
+    private @NotNull Nodes nodes() {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private Path aRun() {
+    private @NotNull Path aRun() {
         final Path runPath = WriteAction.computeAndWait(() -> {
             final DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
 

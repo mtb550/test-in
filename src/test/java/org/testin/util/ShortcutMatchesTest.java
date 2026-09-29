@@ -17,6 +17,7 @@
 package org.testin.util;
 
 import org.intellij.lang.annotations.MagicConstant;
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import javax.swing.JPanel;
@@ -29,7 +30,7 @@ import static org.testng.Assert.assertTrue;
 
 public class ShortcutMatchesTest {
 
-    private static KeyEvent event(final int keyCode, @MagicConstant(flags = {InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK, InputEvent.META_DOWN_MASK, InputEvent.ALT_DOWN_MASK}) final int modifiersEx) {
+    private static @NotNull KeyEvent event(final int keyCode, @MagicConstant(flags = {InputEvent.SHIFT_DOWN_MASK, InputEvent.CTRL_DOWN_MASK, InputEvent.META_DOWN_MASK, InputEvent.ALT_DOWN_MASK}) final int modifiersEx) {
         return new KeyEvent(new JPanel(), KeyEvent.KEY_PRESSED, 0L, modifiersEx, keyCode, KeyEvent.CHAR_UNDEFINED);
     }
 
