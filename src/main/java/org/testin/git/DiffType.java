@@ -40,4 +40,12 @@ public enum DiffType {
     public @NotNull ChangeType changeOf(final @NotNull ChangeSubject subject) {
         return change.apply(subject);
     }
+
+    public boolean hasBefore() {
+        return this != ADDED;
+    }
+
+    public boolean hasAfter() {
+        return this != DELETED;
+    }
 }

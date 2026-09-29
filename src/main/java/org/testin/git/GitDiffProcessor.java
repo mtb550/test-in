@@ -63,7 +63,7 @@ public final class GitDiffProcessor {
                 .filter(entry -> isListed(root, entry))
                 .toList();
         final @NotNull Map<String, String> committed = committedContents.apply(listed.stream()
-                .filter(entry -> entry.type() != DiffType.ADDED)
+                .filter(entry -> entry.type().hasBefore())
                 .map(StatusEntry::path)
                 .toList());
 
@@ -91,7 +91,7 @@ public final class GitDiffProcessor {
         final @NotNull Path relativePath = Path.of(entry.path());
         if (FileKind.of(relativePath, folderKindOf(root, relativePath)) == FileKind.SCREENSHOT) return false;
 
-        if (entry.type() == DiffType.ADDED && !Files.exists(root.resolve(relativePath))) {
+        if (!entry.type().hasBefore() && !Files.exists(root.resolve(relativePath))) {
             Logger.warn("Skipping " + relativePath + ": Git listed it as new, and it is gone");
             return false;
         }
@@ -107,7 +107,7 @@ public final class GitDiffProcessor {
     }
 
     private static @NotNull String workingContent(final @NotNull Path root, final @NotNull Path relativePath, final @NotNull StatusEntry entry) {
-        if (entry.type() == DiffType.DELETED) return "";
+        if (!entry.type().hasAfter()) return "";
 
         final @NotNull Path file = root.resolve(relativePath);
         try {
