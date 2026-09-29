@@ -333,7 +333,9 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-114
-    private void followTheIndex() {
+    // UC-INTERNAL-002, Rule-INTERNAL-114
+    @Override
+    public void followTheIndex() {
         parent = nodes.find(parent.getPath()).filter(nodeType()::isInstance).map(nodeType()::cast).orElse(parent);
     }
 

@@ -104,6 +104,7 @@ public final class TestinEditors {
                 if (editor.isBusy()) {
                     Logger.info("Leaving a busy editor as it is rather than reloading under the tester: "
                             + testinFile.getName());
+                    editor.followTheIndex();
                     continue;
                 }
                 editor.reloadData();

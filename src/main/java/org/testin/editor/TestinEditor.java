@@ -124,6 +124,9 @@ public interface TestinEditor extends Disposable {
     // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-117
     void reloadData();
 
+    // UC-INTERNAL-002, Rule-INTERNAL-114
+    void followTheIndex();
+
     // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-119
     default boolean isBusy() {
         return false;
