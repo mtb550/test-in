@@ -80,9 +80,8 @@ public final class RunStatusService {
     public void recordReported(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         final boolean clockCounted = editor.getWalk().clockIsOn(tc.getId());
 
-        final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
-        if (tcIndex != -1 && tcIndex == editor.getWalk().getCurrentlyExecutingIndex()) {
-            editor.getWalk().startTimerForIndex(tcIndex + 1);
+        if (editor.getWalk().isExecuting(tc.getId())) {
+            editor.getWalk().startTimerForIndex(editor.getWalk().getCurrentlyExecutingIndex() + 1);
         }
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
@@ -205,8 +204,7 @@ public final class RunStatusService {
             return;
         }
 
-        final int globalIndex = editor.getCurrentTestCases().indexOf(tc);
-        if (globalIndex == editor.getWalk().getCurrentlyExecutingIndex()) executeNext(p, editor, status);
+        if (editor.getWalk().isExecuting(tc.getId())) executeNext(p, editor, status);
         else if (correct(p, editor, tc, status)) confirmVerdict(p, status, 1);
 
         editor.getWalk().finishIfEverythingIsJudged();
@@ -223,10 +221,7 @@ public final class RunStatusService {
 
             judged.add(tc.getId());
 
-            final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
-            if (tcIndex != -1 && tcIndex == editor.getWalk().getCurrentlyExecutingIndex()) {
-                editor.getWalk().stopExecutionUntimed();
-            }
+            if (editor.getWalk().isExecuting(tc.getId())) editor.getWalk().stopExecutionUntimed();
         }
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;

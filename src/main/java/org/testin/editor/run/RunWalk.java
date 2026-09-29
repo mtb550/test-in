@@ -87,6 +87,11 @@ public final class RunWalk {
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-227
+    public boolean isExecuting(final @NotNull UUID testCaseId) {
+        return executingTestCase.filter(testCaseId::equals).isPresent() && getCurrentlyExecutingIndex() != -1;
+    }
+
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-227
     public boolean executingTestCaseIsHidden() {
         return executingTestCase.isPresent() && getCurrentlyExecutingIndex() == -1;
     }
