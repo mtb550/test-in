@@ -55,6 +55,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
     private final @NotNull ComboBox<String> logLevelComboBox;
 
     private final @NotNull JBCheckBox showShortcutHintsBox = new JBCheckBox(Bundle.message("settings.show.shortcuts"));
+    private final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
 
     public SettingsConfigurable() {
         testinPathPanel = new TestinPathPanel();
@@ -112,7 +113,6 @@ public final class SettingsConfigurable implements SearchableConfigurable {
     // UC-SETTING-001, Rule-SETTING-008
     @Override
     public boolean isModified() {
-        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
         boolean modified = !testinPathPanel.getPathText().trim().equals(settings.rootTestinPath);
         modified |= !Objects.equals(logLevelComboBox.getSelectedItem(), settings.logLevel);
         modified |= !testerNameField.getText().trim().equals(settings.testerName);
@@ -151,8 +151,6 @@ public final class SettingsConfigurable implements SearchableConfigurable {
     public void apply() throws ConfigurationException {
         refuseAnImpossibleRoot();
 
-        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
-
         final boolean rootChanged = TestinRoot.isRootChanged(settings.rootTestinPath, testinPathPanel.getPathText());
 
         settings.rootTestinPath = testinPathPanel.getPathText().trim();
@@ -179,8 +177,6 @@ public final class SettingsConfigurable implements SearchableConfigurable {
     // UC-SETTING-001
     @Override
     public void reset() {
-        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
-
         testinPathPanel.setPathText(settings.rootTestinPath);
         logLevelComboBox.setSelectedItem(settings.logLevel);
         testerNameField.setText(settings.testerName);

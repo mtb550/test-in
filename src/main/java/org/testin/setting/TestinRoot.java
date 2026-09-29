@@ -18,7 +18,6 @@ package org.testin.setting;
 
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.services.Services;
@@ -31,10 +30,15 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service(Service.Level.PROJECT)
-@AllArgsConstructor
 public final class TestinRoot {
     public static final @NotNull Path NONE = Path.of("");
     private final @NotNull Project p;
+    private final @NotNull AppSettingsState settings;
+
+    public TestinRoot(final @NotNull Project p) {
+        this.p = p;
+        this.settings = Services.getInstance(p, AppSettingsState.class);
+    }
 
     // UC-SETTING-002, Rule-SETTING-011
     public static @NotNull Path normalize(final @Nullable String rawPath) {
@@ -89,7 +93,7 @@ public final class TestinRoot {
     }
 
     public @NotNull Path getPath() {
-        return normalize(Services.getInstance(p, AppSettingsState.class).rootTestinPath);
+        return normalize(settings.rootTestinPath);
     }
 
     // UC-SETTING-002, Rule-SETTING-011

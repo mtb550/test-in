@@ -41,6 +41,7 @@ public final class AgentPromptConfigurable implements SearchableConfigurable {
 
     private final @NotNull JBTextArea promptArea = new JBTextArea(PROMPT_ROWS, PROMPT_COLUMNS);
     private final @NotNull JBTextField timeoutField = new JBTextField();
+    private final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
 
     private static @NotNull JBLabel hint(final @NotNull String text) {
         final @NotNull JBLabel note = new JBLabel(text);
@@ -97,8 +98,6 @@ public final class AgentPromptConfigurable implements SearchableConfigurable {
 
     @Override
     public boolean isModified() {
-        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
-
         return !settings.agentPrompt.equals(typedPrompt()) || settings.agentTimeoutSeconds != typedTimeout();
     }
 
@@ -112,8 +111,6 @@ public final class AgentPromptConfigurable implements SearchableConfigurable {
     // UC-CODEGEN-021, Rule-CODEGEN-086
     @Override
     public void apply() {
-        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
-
         settings.agentPrompt = typedPrompt();
         settings.agentTimeoutSeconds = typedTimeout() > 0 ? typedTimeout() : AppSettingsState.DEFAULT_TIMEOUT_SECONDS;
     }
@@ -121,8 +118,6 @@ public final class AgentPromptConfigurable implements SearchableConfigurable {
     // UC-CODEGEN-021, Rule-CODEGEN-086
     @Override
     public void reset() {
-        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
-
         promptArea.setText(AgentConnection.stored().promptTemplate());
         timeoutField.setText(String.valueOf(settings.agentTimeoutSeconds));
     }

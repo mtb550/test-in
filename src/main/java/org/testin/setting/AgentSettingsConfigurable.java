@@ -44,6 +44,7 @@ public final class AgentSettingsConfigurable implements SearchableConfigurable {
     private final @NotNull JBTextField commandField = new JBTextField();
     private final @NotNull JBTextField argumentsField = new JBTextField();
     private final @NotNull JBLabel said = new JBLabel("");
+    private final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
 
     private static @NotNull JBLabel hint(final @NotNull String text) {
         final @NotNull JBLabel note = new JBLabel(text);
@@ -113,8 +114,6 @@ public final class AgentSettingsConfigurable implements SearchableConfigurable {
 
     @Override
     public boolean isModified() {
-        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
-
         return !settings.agentCommand.equals(commandField.getText().trim())
                 || !settings.agentArguments.equals(argumentsField.getText().trim());
     }
@@ -122,8 +121,6 @@ public final class AgentSettingsConfigurable implements SearchableConfigurable {
     // UC-CODEGEN-021, Rule-CODEGEN-083
     @Override
     public void apply() {
-        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
-
         settings.agentCommand = commandField.getText().trim();
         settings.agentArguments = argumentsField.getText().trim();
     }
@@ -131,8 +128,6 @@ public final class AgentSettingsConfigurable implements SearchableConfigurable {
     // UC-CODEGEN-021, Rule-CODEGEN-083
     @Override
     public void reset() {
-        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
-
         commandField.setText(settings.agentCommand);
         argumentsField.setText(settings.agentArguments);
         said.setText("");
