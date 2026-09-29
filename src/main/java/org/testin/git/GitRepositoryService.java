@@ -62,6 +62,15 @@ public final class GitRepositoryService {
         GitCommandRunner.execute(p, repositoryPath, GitCommand.CONFIG, scope, "user.email", email);
     }
 
+    // UC-SHARE-008, Rule-SHARE-039
+    public boolean hasNoIdentity(final @NotNull Path repositoryPath) {
+        return isUnset(repositoryPath, "user.name") || isUnset(repositoryPath, "user.email");
+    }
+
+    private boolean isUnset(final @NotNull Path repositoryPath, final @NotNull String key) {
+        return run(repositoryPath, GitCommand.CONFIG, "--get", key).filter(value -> !value.isBlank()).isEmpty();
+    }
+
     // Rule-TREE-PANEL-104
     public boolean isNotRepository(final @NotNull Path path) {
         return !OptionalPlugin.GIT.isAvailable() || !GitUtil.isGitRoot(path);

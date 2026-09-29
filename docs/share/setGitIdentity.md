@@ -9,8 +9,8 @@ up.
 Git will not record a commit until it knows a name and an email address. This
 dialog asks for them, then makes the commit.
 
-Nothing starts this. It opens when a commit is refused because Git has no
-name.
+Nothing starts this. It opens when the tester commits and Git has no name or
+no email address set.
 
 ## Rules
 
@@ -28,8 +28,9 @@ name.
   be canceled: none of them leaves anything the tester cannot see.
 - **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
   keys can be changed there.
-- **Rule-SHARE-039** — The dialog opens only when Git says it does not know who
-  the tester is.
+- **Rule-SHARE-039** — The dialog opens only when Git has no name or no email
+  address set for this repository. Git is asked before the commit is made, so
+  the answer does not depend on the language Git prints its errors in.
 - **Rule-SHARE-040** — The commit is made straight after the identity is set.
   The tester does not have to press commit again.
 - **Rule-SHARE-041** — The tester chooses whether this is for this one

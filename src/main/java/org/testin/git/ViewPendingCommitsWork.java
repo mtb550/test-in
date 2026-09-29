@@ -31,8 +31,6 @@ import org.testin.util.FailureText;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
@@ -186,6 +184,11 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
 
         GitBackgroundTask.run(p, push ? Bundle.message("git.task.committing.and.pushing") : Bundle.message("git.task.committing"), false,
                 indicator -> {
+                    if (git.hasNoIdentity(repoPath)) {
+                        promptAndSetGitIdentity(repoPath, request, branch);
+                        return;
+                    }
+
                     indicator.setText(Bundle.message("git.progress.staging"));
                     commits.stageAndCommit(repoPath, commitMessage, selectedChanges);
 
@@ -200,13 +203,7 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
                         notifier.softShow(p, Bundle.message("git.committed"), commitLabel(commitId));
                     });
                 },
-                ex -> {
-                    if (isIdentityError(Objects.toString(ex.getMessage(), ""))) {
-                        promptAndSetGitIdentity(repoPath, request, branch);
-                    } else {
-                        notifier.error(p, Bundle.message("git.commit.failed.title"), Bundle.message("git.commit.failed.message") + System.lineSeparator() + ex.getMessage());
-                    }
-                });
+                ex -> notifier.error(p, Bundle.message("git.commit.failed.title"), Bundle.message("git.commit.failed.message") + System.lineSeparator() + ex.getMessage()));
     }
 
     // UC-SHARE-009, Rule-SHARE-043
@@ -373,12 +370,5 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
                         ex -> notifier.error(p, Bundle.message("git.config.failed.title"),
                                 Bundle.message("git.config.failed.message") + System.lineSeparator() + ex.getMessage()))
         ).show());
-    }
-
-    // UC-SHARE-008, Rule-SHARE-039
-    private boolean isIdentityError(final @NotNull String message) {
-        final @NotNull String normalized = message.toLowerCase(Locale.ROOT);
-        return normalized.contains("author identity unknown")
-                || normalized.contains("please tell me who you are");
     }
 }
