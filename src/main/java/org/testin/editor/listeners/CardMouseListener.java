@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.CardHoverAction;
 import org.testin.editor.CardTitle;
+import org.testin.editor.Offered;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.WheelForwarding;
 import org.testin.logger.Logger;
@@ -124,7 +125,7 @@ public class CardMouseListener extends MouseAdapter {
     public void mouseMoved(final MouseEvent e) {
         final int index = list.locationToIndex(e.getPoint());
         final int before = editor.getHoveredIndex();
-        final @NotNull Optional<CardHoverAction.Offered> currentAction = actionUnder(e, index);
+        final @NotNull Optional<Offered> currentAction = actionUnder(e, index);
 
         list.setCursor(Cursor.getPredefinedCursor(currentAction.isPresent() ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
 
@@ -141,7 +142,7 @@ public class CardMouseListener extends MouseAdapter {
             editor.setHoveredIconAction(actionName);
             needsRepaint = true;
 
-            Tooltip.set(list, currentAction.map(CardHoverAction.Offered::hintText).orElse(""));
+            Tooltip.set(list, currentAction.map(Offered::hintText).orElse(""));
         }
 
         if (!needsRepaint) return;
@@ -170,7 +171,7 @@ public class CardMouseListener extends MouseAdapter {
         WheelForwarding.forwardWheelToScrollPane(e);
     }
 
-    private @NotNull Optional<CardHoverAction.Offered> actionUnder(final @NotNull MouseEvent e, final int index) {
+    private @NotNull Optional<Offered> actionUnder(final @NotNull MouseEvent e, final int index) {
         if (index == -1) return Optional.empty();
 
         final @NotNull Rectangle bounds = list.getCellBounds(index, index);
@@ -179,11 +180,11 @@ public class CardMouseListener extends MouseAdapter {
         return getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y);
     }
 
-    private @NotNull Optional<CardHoverAction.Offered> getActionAtPoint(final int index, final int xInCell, final int yInCell) {
+    private @NotNull Optional<Offered> getActionAtPoint(final int index, final int xInCell, final int yInCell) {
         if (index == -1) return Optional.empty();
 
         final @NotNull TestCaseDto tc = list.getModel().getElementAt(index);
-        final @NotNull List<CardHoverAction.Offered> buttons = CardHoverAction.onCard(p, editor.getParent(), tc);
+        final @NotNull List<Offered> buttons = CardHoverAction.onCard(p, editor.getParent(), tc);
         final int titleWidth = CardTitle.titleWidth(list, editor.cardTitle(tc), buttons.size());
 
         return CardTitle.descriptionActionIcons(titleWidth, buttons).at(xInCell, yInCell);

@@ -97,7 +97,4 @@ public final class DestinationForm implements DialogComponent {
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
     }
-
-    public record Destination(@NotNull File file, @NotNull FileTypes format) {
-    }
 }

@@ -30,6 +30,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.undo.Operation;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
@@ -74,7 +75,7 @@ public class RenameAction extends AbstractAnyProjectAction {
         NodeRename.apply(p, dir, newName, () -> {
             Services.getInstance(p, Notifier.class).softShow(p, Done.RENAMED);
 
-            Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
+            Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new Operation(
                     Bundle.message("rename.undo", oldName),
                     () -> applyRename(p, newPath, oldName),
                     () -> applyRename(p, oldPath, newName),

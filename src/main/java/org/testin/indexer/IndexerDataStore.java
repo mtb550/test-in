@@ -35,6 +35,7 @@ import org.testin.model.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.model.markers.AbstractMarker;
+import org.testin.model.markers.Marker;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -213,7 +214,7 @@ final class IndexerDataStore {
         return addDir(testRunPackagesByPath, trp, DirectoryType.TRP.getMarker(), trp.getMarker());
     }
 
-    private <V extends DirectoryDto> boolean addDir(final @NotNull Map<String, V> map, final @NotNull V dto, final @NotNull String markerFileName, final @NotNull Object marker) {
+    private <V extends DirectoryDto> boolean addDir(final @NotNull Map<String, V> map, final @NotNull V dto, final @NotNull String markerFileName, final @NotNull Marker marker) {
         if (!markers.write(dto.getPath(), markerFileName, marker)) return false;
 
         map.put(dto.getPath().toString(), dto);

@@ -37,7 +37,7 @@ public class CreateTestMethodTargetTest {
 
     @Test
     public void aClassAndMethodAreTheSmallestUsableList() {
-        final CreateTestMethod.Target target =
+        final Target target =
                 CreateTestMethod.parse(List.of("LoginTest", "shouldLogIn")).orElseThrow();
 
         assertEquals(target.className(), "LoginTest");
@@ -48,7 +48,7 @@ public class CreateTestMethodTargetTest {
 
     @Test
     public void packageSegmentsAreEverythingBeforeTheClass() {
-        final CreateTestMethod.Target target =
+        final Target target =
                 CreateTestMethod.parse(List.of("org", "example", "tests", "LoginTest", "shouldLogIn")).orElseThrow();
 
         assertEquals(target.className(), "LoginTest");

@@ -20,9 +20,9 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.Can;
+import org.testin.testcase.ImportedRow;
 import org.testin.testcase.TestEditorAttributes;
-import org.testin.testcase.TestEditorAttributes.ImportedRow;
-import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.util.SeparatedValues;
 
 import java.io.File;

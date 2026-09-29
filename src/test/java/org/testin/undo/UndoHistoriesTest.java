@@ -30,8 +30,8 @@ public class UndoHistoriesTest {
     private static final UndoScope TREE = UndoScope.TREE;
     private static final UndoScope EDITOR = UndoScope.of(Path.of("root", "project", "Test Cases", "login"));
 
-    private static UndoHistories.Operation counting(final String description, final AtomicInteger undone, final AtomicInteger redone) {
-        return new UndoHistories.Operation(description, undone::incrementAndGet, redone::incrementAndGet);
+    private static Operation counting(final String description, final AtomicInteger undone, final AtomicInteger redone) {
+        return new Operation(description, undone::incrementAndGet, redone::incrementAndGet);
     }
 
     @Test
@@ -126,7 +126,7 @@ public class UndoHistoriesTest {
         final AtomicInteger ignored = new AtomicInteger();
 
         for (int i = 0; i < 21; i++) {
-            service.push(TREE, new UndoHistories.Operation("op " + i,
+            service.push(TREE, new Operation("op " + i,
                     () -> ignored.incrementAndGet() > 0,
                     () -> ignored.incrementAndGet() > 0,
                     forgotten::incrementAndGet));

@@ -365,8 +365,4 @@ public final class TestinYml {
 
         return Optional.empty();
     }
-
-    // UC-TREE-PANEL-001, Rule-TREE-PANEL-119
-    record Parsed(@NotNull TestinProjectConfig config, boolean readable) {
-    }
 }

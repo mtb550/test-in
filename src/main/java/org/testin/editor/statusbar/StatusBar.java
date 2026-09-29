@@ -30,7 +30,7 @@ import org.testin.editor.EditorColors;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.logger.Logger;
 import org.testin.model.Automated;
-import org.testin.model.ResultAnalysis;
+import org.testin.model.Segment;
 import org.testin.model.TestRunStatus;
 import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
@@ -221,10 +221,10 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-175
-    public void showVerdicts(final @NotNull List<ResultAnalysis.Segment> verdicts) {
+    public void showVerdicts(final @NotNull List<Segment> verdicts) {
         verdictsRow.removeAll();
 
-        for (final ResultAnalysis.Segment verdict : verdicts) {
+        for (final Segment verdict : verdicts) {
             if (verdictsRow.getComponentCount() > 0) verdictsRow.add(painted(" · ", UIUtil.getInactiveTextColor()));
 
             verdictsRow.add(painted(verdict.text(), verdict.color()));
@@ -271,8 +271,5 @@ public class StatusBar extends JBPanel<StatusBar> {
         } else {
             statusLabel.setText(String.format(Locale.ENGLISH, "<html>%s</html>", of));
         }
-    }
-
-    record Widths(int arrows, int arrowsAt, int figures) {
     }
 }

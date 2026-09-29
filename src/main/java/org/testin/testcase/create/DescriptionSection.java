@@ -127,4 +127,10 @@ public class DescriptionSection extends AbstractOneLineSection {
     public void fillData(final @NotNull TestCaseDto dto) {
         field.setText(dto.getDescription());
     }
+
+    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-036
+    @Override
+    public boolean isShownWith(final @NotNull TestCaseDto dto) {
+        return true;
+    }
 }

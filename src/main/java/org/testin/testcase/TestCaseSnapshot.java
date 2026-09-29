@@ -20,7 +20,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditors;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
@@ -28,6 +27,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.undo.Operation;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
@@ -74,7 +74,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
     public static void record(final @NotNull Project p, final @NotNull UndoScope scope, final @NotNull String description, final @NotNull List<TestCaseSnapshot> before, final @NotNull List<TestCaseSnapshot> after) {
         if (same(before, after)) return;
 
-        ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, UndoHistories.class).push(scope, new UndoHistories.Operation(
+        ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, UndoHistories.class).push(scope, new Operation(
                 description,
                 () -> restore(p, before, after),
                 () -> restore(p, after, before),
@@ -178,19 +178,5 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         }
 
         return allBack;
-    }
-
-    private record Written(@NotNull List<TestCaseDto> removed, @NotNull List<TestCaseDto> comingBack, @NotNull List<TestCaseDto> landed) {
-        Written() {
-            this(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
-        }
-
-        void generate(final @NotNull Project p) {
-            if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
-            if (!comingBack.isEmpty()) GenType.CREATE_TEST_CASE.executeAll(p, comingBack);
-
-            // UC-CODEGEN-002, Rule-CODEGEN-068
-            if (!landed.isEmpty()) GenType.RECONCILE_TEST_CASE.executeAll(p, landed);
-        }
     }
 }

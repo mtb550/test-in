@@ -39,13 +39,6 @@ import java.util.Set;
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
     private final @NotNull Set<Path> selectedNodes;
 
-    // UC-TREE-PANEL-001, Rule-TREE-PANEL-099
-    private static @NotNull String statusLabel(final @NotNull DirectoryDto dir) {
-        if (dir instanceof TestRunDirectoryDto) return dir.getMarker().getStatusLabel();
-
-        return dir.getMarker().status().isActive() ? "" : dir.getMarker().getStatusLabel();
-    }
-
     // Rule-TREE-PANEL-008
     @Override
     public void customizeCellRenderer(final @NotNull JTree tree, final @Nullable Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
@@ -74,7 +67,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
             final boolean grayed = selectedNodes.contains(dir.getPath()) || dir.isRetired();
             append(dir.getName(), grayed ? SimpleTextAttributes.GRAYED_ATTRIBUTES : type.getAttributes());
 
-            final @NotNull String status = statusLabel(dir);
+            final @NotNull String status = dir.statusShownInTree();
             if (!status.isEmpty()) append(" " + status, SimpleTextAttributes.GRAY_ATTRIBUTES);
 
         } catch (final Exception ex) {

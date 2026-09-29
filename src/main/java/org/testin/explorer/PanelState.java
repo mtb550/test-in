@@ -16,21 +16,41 @@
 
 package org.testin.explorer;
 
+import com.intellij.util.ui.StatusText;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
 
+import java.util.function.BiConsumer;
+
+@AllArgsConstructor
 public enum PanelState {
-    NO_ROOT,
+    NO_ROOT(
+            TreePanel::offerSettings
+    ),
 
     // Rule-TREE-PANEL-118
-    READING,
+    READING(
+            TreePanel::sayItIsReading
+    ),
 
-    CLONE_BOUND,
+    CLONE_BOUND(
+            TreePanel::offerClone
+    ),
 
-    NO_PROJECTS,
+    NO_PROJECTS(
+            TreePanel::offerFirstProject
+    ),
 
-    CHOOSE,
+    CHOOSE(
+            TreePanel::offerChoice
+    ),
 
-    TREE;
+    TREE(
+            (_, _) -> Logger.warn("Welcome screen asked to draw a resolved project")
+    );
+
+    private final @NotNull BiConsumer<TreePanel, StatusText> welcome;
 
     // UC-TREE-PANEL-001
     public static @NotNull PanelState of(final boolean rootConfigured, final boolean indexed, final boolean projectResolved, final boolean boundProjectMissing, final boolean cloneUrlKnown, final boolean anyProjectsUnderRoot) {
@@ -45,5 +65,10 @@ public enum PanelState {
         if (!anyProjectsUnderRoot) return NO_PROJECTS;
 
         return CHOOSE;
+    }
+
+    // UC-TREE-PANEL-001
+    void offerOn(final @NotNull TreePanel panel, final @NotNull StatusText emptyText) {
+        welcome.accept(panel, emptyText);
     }
 }

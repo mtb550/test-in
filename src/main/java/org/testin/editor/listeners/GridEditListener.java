@@ -25,9 +25,9 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
+import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseSnapshot;
 import org.testin.testcase.TestEditorAttributes;
-import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 
@@ -142,8 +142,5 @@ public class GridEditListener extends AbstractGridEditListener {
             TestCaseSnapshot.record(p, UndoScope.of(testSetPath), TestCaseSnapshot.describe(Bundle.message("snapshot.verb.edit"), written),
                     before, List.of(TestCaseSnapshot.of(p, testSetPath, TestCaseSnapshot.idsOf(written))));
         });
-    }
-
-    private record Changed(@NotNull TestCaseDto tc, @NotNull TestCaseSnapshot before, @NotNull Set<GenType> generators) {
     }
 }

@@ -25,6 +25,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 
 import java.awt.AlphaComposite;
@@ -38,7 +39,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class TestCard extends BaseCard {
-    private final @NotNull List<Badges.Badge> badges = new ArrayList<>();
+    private final @NotNull List<Badge> badges = new ArrayList<>();
     private final @NotNull Map<String, String> details = new LinkedHashMap<>();
     private final @NotNull CutState cutState = Services.getInstance(p, CutState.class);
     private final @NotNull TestNGExecution testNGExecution = Services.getInstance(p, TestNGExecution.class);

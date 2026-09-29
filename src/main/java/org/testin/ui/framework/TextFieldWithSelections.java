@@ -149,7 +149,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
         final @NotNull ModalityState modality = ModalityState.stateForComponent(panel);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final @NotNull Rows.Answer<T> answer = rows.forQuery(query);
+            final @NotNull Answer<T> answer = rows.forQuery(query);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (generation != queryGeneration.get() || !panel.isShowing()) return;

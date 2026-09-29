@@ -77,6 +77,12 @@ public class TestRunDirectoryDto extends DirectoryDto {
         return !marker.getStatus().isTerminal();
     }
 
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-099
+    @Override
+    public @NotNull String statusShownInTree() {
+        return marker.getStatusLabel();
+    }
+
     @Override
     public @NotNull DirectoryType getType() {
         return DirectoryType.TR;

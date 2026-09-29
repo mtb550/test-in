@@ -139,8 +139,4 @@ public final class Hits {
         return Comparator.comparingInt((TestCaseDto tc) -> contains(tc.getDescription(), wanted) ? 0 : 1)
                 .thenComparing(TestCaseDto::getDescription, String.CASE_INSENSITIVE_ORDER);
     }
-
-    // UC-INTERNAL-001, Rule-INTERNAL-073
-    public record Found(@NotNull List<Hit> hits, int matched) {
-    }
 }

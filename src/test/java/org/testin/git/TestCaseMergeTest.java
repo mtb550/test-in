@@ -84,7 +84,7 @@ public class TestCaseMergeTest {
         assertFalse(merge.isSettled());
         assertEquals(merge.questions().size(), 1, "one field, one question - not one per differing line");
 
-        final Merge.Question question = merge.questions().getFirst();
+        final Question question = merge.questions().getFirst();
         assertEquals(question.field(), "description");
         assertEquals(question.mine(), "a registered user signs in");
         assertEquals(question.theirs(), "a known user signs in");

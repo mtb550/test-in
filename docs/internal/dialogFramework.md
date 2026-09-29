@@ -90,7 +90,7 @@ and which keys it answers, and the shell builds the rest.
   which the dialogs follow. A surface asks for the role it is showing and never
   derives a font of its own, so a title is the same size in every panel and a
   placeholder the same in every dialog. The documents Testin writes are in it
-  too: `Fonts.Report` holds the point sizes a PDF and a Word file are set in,
+  too: `ReportFont` holds the point sizes a PDF and a Word file are set in,
   the pixel sizes an HTML report uses, and the families all three are written
   in, so a size changes in one place, or it disagrees with itself in three.
 - **Rule-INTERNAL-096** — Every typing surface in a dialog is drawn in the same

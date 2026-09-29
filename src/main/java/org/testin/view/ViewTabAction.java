@@ -16,31 +16,24 @@
 
 package org.testin.view;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.ActionCallback;
 import com.intellij.ui.content.ContentManager;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.util.Bundle;
-import org.testin.util.Shortcuts;
 
-import javax.swing.Icon;
 import javax.swing.JComponent;
 import java.util.Optional;
-import java.util.function.Function;
 
 // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080
 public final class ViewTabAction extends AbstractProjectAction {
     private final @NotNull Direction direction;
 
     ViewTabAction(final @NotNull Project p, final @NotNull JComponent tab, final @NotNull Direction direction) {
-        super(p, direction.text, direction.description, direction.icon);
+        super(p, direction.getText(), direction.getDescription(), direction.getIcon());
         this.direction = direction;
-        registerCustomShortcutSet(direction.key.getCustomShortcut(), tab);
+        registerCustomShortcutSet(direction.getKey().getCustomShortcut(), tab);
     }
 
     // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080
@@ -48,7 +41,7 @@ public final class ViewTabAction extends AbstractProjectAction {
     public void actionPerformed(final @NotNull AnActionEvent e) {
         ViewToolWindowFactory.toolWindow(p).ifPresent(tw -> {
             final @NotNull ContentManager contents = tw.getContentManager();
-            direction.select.apply(contents).doWhenDone(() -> Optional.ofNullable(contents.getSelectedContent())
+            direction.getSelect().apply(contents).doWhenDone(() -> Optional.ofNullable(contents.getSelectedContent())
                     .ifPresent(front -> contents.setSelectedContent(front, true)));
         });
     }
@@ -56,30 +49,5 @@ public final class ViewTabAction extends AbstractProjectAction {
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;
-    }
-
-    @AllArgsConstructor
-    enum Direction {
-        NEXT(
-                Shortcuts.TabNext,
-                Bundle.message("view.tab.next"),
-                Bundle.message("view.tab.next.description"),
-                AllIcons.Actions.Forward,
-                ContentManager::selectNextContent
-        ),
-
-        PREVIOUS(
-                Shortcuts.TabPrevious,
-                Bundle.message("view.tab.previous"),
-                Bundle.message("view.tab.previous.description"),
-                AllIcons.Actions.Back,
-                ContentManager::selectPreviousContent
-        );
-
-        private final @NotNull Shortcuts key;
-        private final @NotNull String text;
-        private final @NotNull String description;
-        private final @NotNull Icon icon;
-        private final @NotNull Function<ContentManager, ActionCallback> select;
     }
 }

@@ -32,13 +32,8 @@ public class RunTestMethodAction extends AbstractAnyProjectAction {
     @Override
     protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull List<TestCaseDto> selected = TestinData.selectedTestCases(e);
-        final @NotNull CardHoverAction gesture = CardHoverAction.runSlot(p, selected);
 
-        if (gesture == CardHoverAction.RUN_TEST_METHOD) {
-            TestinData.editor(e).ifPresent(ui -> selected.forEach(tc -> ui.launching(tc.getId())));
-        }
-
-        gesture.execute(p, selected);
+        CardHoverAction.runSlot(p, selected).executeFor(p, TestinData.editor(e), selected);
     }
 
     // UC-CODEGEN-009, Rule-CODEGEN-036

@@ -31,8 +31,8 @@ import static org.testng.Assert.assertTrue;
 
 public class BugReportsTest {
 
-    private static final BugReports.RunItem ITEM = new BugReports.RunItem(Path.of("NAFATH", "Test Runs", "Sprint 7"), UUID.randomUUID());
-    private static final BugReports.RunItem SAME_TEST_CASE_OTHER_RUN = new BugReports.RunItem(Path.of("NAFATH", "Test Runs", "Sprint 8"), ITEM.id());
+    private static final RunItem ITEM = new RunItem(Path.of("NAFATH", "Test Runs", "Sprint 7"), UUID.randomUUID());
+    private static final RunItem SAME_TEST_CASE_OTHER_RUN = new RunItem(Path.of("NAFATH", "Test Runs", "Sprint 8"), ITEM.id());
 
     private static TestRunItems failed() {
         return TestRunItems.builder().id(ITEM.id()).status(TestStatus.FAILED).build();
@@ -45,17 +45,17 @@ public class BugReportsTest {
         reports.begin(ITEM);
         assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.preparing")));
 
-        reports.moveTo(ITEM, BugReports.Stage.OPEN);
+        reports.moveTo(ITEM, Stage.OPEN);
         assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.open")));
 
-        reports.moveTo(ITEM, BugReports.Stage.SENDING);
+        reports.moveTo(ITEM, Stage.SENDING);
         assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.sending")),
                 "while sending the run item has no link yet, so the stage is what keeps it off");
 
-        assertFalse(reports.end(ITEM, BugReports.Stage.OPEN), "a dialog closing on Send does not end the send");
+        assertFalse(reports.end(ITEM, Stage.OPEN), "a dialog closing on Send does not end the send");
         assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.sending")));
 
-        assertTrue(reports.end(ITEM, BugReports.Stage.SENDING));
+        assertTrue(reports.end(ITEM, Stage.SENDING));
         assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.empty());
     }
 
@@ -74,7 +74,7 @@ public class BugReportsTest {
 
         assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.empty(), "one being prepared, even for the same test case in another run, does not hold the others");
 
-        reports.moveTo(SAME_TEST_CASE_OTHER_RUN, BugReports.Stage.OPEN);
+        reports.moveTo(SAME_TEST_CASE_OTHER_RUN, Stage.OPEN);
         assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.finish.open.report")));
         assertTrue(reports.anotherIsOpen(ITEM));
         assertFalse(reports.anotherIsOpen(SAME_TEST_CASE_OTHER_RUN), "its own dialog is not another one");
@@ -83,7 +83,7 @@ public class BugReportsTest {
     @Test
     public void unsentEditsAreKeptUntilDiscarded() {
         final BugReports reports = new BugReports();
-        final BugReports.Edits edits = new BugReports.Edits("Log in fails", "body");
+        final Edits edits = new Edits("Log in fails", "body");
 
         reports.keep(ITEM, edits);
         assertEquals(reports.unsent(ITEM), Optional.of(edits), "a failed send reopens with them");

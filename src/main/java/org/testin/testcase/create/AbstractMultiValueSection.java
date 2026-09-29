@@ -155,4 +155,10 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
     public void fillData(final @NotNull TestCaseDto dto) {
         setData(valuesOf(dto));
     }
+
+    // UC-EDITOR-PANEL-006
+    @Override
+    public void readyForEditing() {
+        if (fields.isEmpty()) addField("");
+    }
 }

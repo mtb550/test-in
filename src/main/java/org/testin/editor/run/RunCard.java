@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.BaseCard;
 import org.testin.model.TestRunItems;
 import org.testin.testrun.RunEditorAttributes;
-import org.testin.ui.Badges;
+import org.testin.ui.Badge;
 import org.testin.util.Fonts;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class RunCard extends BaseCard {
-    private final @NotNull List<Badges.Badge> badges = new ArrayList<>();
+    private final @NotNull List<Badge> badges = new ArrayList<>();
     private final @NotNull Map<String, String> details = new LinkedHashMap<>();
 
     public RunCard(final @NotNull Project p) {

@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Optional;
 
 final class ReportBugDialog extends AbstractFrameworkDialog {
-    private final @NotNull BugReports.RunItem item;
+    private final @NotNull RunItem item;
     private final @NotNull PreparedBug bug;
     private final @NotNull Runnable redraw;
     private final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
@@ -47,14 +47,14 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
 
     private boolean sent;
 
-    ReportBugDialog(final @NotNull Project p, final @NotNull BugReports.RunItem item, final @NotNull PreparedBug bug, final @NotNull Runnable redraw) {
+    ReportBugDialog(final @NotNull Project p, final @NotNull RunItem item, final @NotNull PreparedBug bug, final @NotNull Runnable redraw) {
         super(p);
         this.item = item;
         this.bug = bug;
         this.redraw = redraw;
 
-        final @NotNull BugReports.Edits opening = reports.unsent(item)
-                .orElse(new BugReports.Edits(bug.facts().title(), bug.body()));
+        final @NotNull Edits opening = reports.unsent(item)
+                .orElse(new Edits(bug.facts().title(), bug.body()));
 
         titleField = ComponentDialogBase.textField()
                 .placeholder(Bundle.message("bug.dialog.title.placeholder"))
@@ -86,7 +86,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
     void open() {
         if (!show()) {
             reports.discard(item);
-            if (reports.end(item, BugReports.Stage.OPEN)) redraw.run();
+            if (reports.end(item, Stage.OPEN)) redraw.run();
             return;
         }
 
@@ -95,7 +95,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
             public void onClosed(final @NotNull LightweightWindowEvent event) {
                 if (!event.isOk()) reports.discard(item);
 
-                if (reports.end(item, BugReports.Stage.OPEN)) redraw.run();
+                if (reports.end(item, Stage.OPEN)) redraw.run();
             }
         });
     }
@@ -126,7 +126,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
         if (whyNot.isPresent()) return;
 
         sent = true;
-        final @NotNull BugReports.Edits edits = new BugReports.Edits(titleField.getComponent().getText().strip(), bodyArea.getComponent().getText());
+        final @NotNull Edits edits = new Edits(titleField.getComponent().getText().strip(), bodyArea.getComponent().getText());
         BugFiling.send(p, item, bug.repository().orElseThrow(), edits, bug.facts().screenshots(), redraw);
         closeOk();
     }

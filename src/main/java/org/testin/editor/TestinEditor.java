@@ -23,12 +23,14 @@ import org.testin.editor.statusbar.StatusBar;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.JComponent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -150,6 +152,16 @@ public interface TestinEditor extends Disposable {
     // UC-EDITOR-PANEL-009, Rule-EDITOR-PANEL-013
     default void refreshOrdered() {
         refreshView();
+    }
+
+    default void reorderAndPersist() {
+    }
+
+    void onToolBarFilterSelectionChanged();
+
+    // UC-REPORT-001
+    default @NotNull Optional<TestRunDirectoryDto> shownRun() {
+        return Optional.empty();
     }
 
     @NotNull List<TestCaseDto> getAllTestCases();

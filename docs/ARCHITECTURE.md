@@ -194,7 +194,7 @@ does for it. Each lives in the package that knows the answer. Three of them -
 `creator/NodeCreators`, `codegen/JavaCode`, `remove/Removals` - answer through
 one `of(DirectoryType)` whose body is a `switch` over every kind with no
 `default`, so a kind added without an entry fails `compileJava`, and no call
-site asks what it is holding (#350). The fourth, `NodeCounter.Gathered`, is
+site asks what it is holding (#350). The fourth, `indexer/Gathered`, is
 still an enum with one constant per way of counting, bridged by
 `valueOf(...name())`, and `NodeKindTablesTest` guarantees by name that the two
 agree.

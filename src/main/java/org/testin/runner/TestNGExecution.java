@@ -165,7 +165,7 @@ public final class TestNGExecution implements Disposable {
 
     // UC-CODEGEN-009, Rule-CODEGEN-037
     public int stopTestCases(final @NotNull Collection<UUID> ids) {
-        final @NotNull RunRegistry.Stop stop = registry.stopping(List.copyOf(ids));
+        final @NotNull Stop stop = registry.stopping(List.copyOf(ids));
         if (stop.testCases().isEmpty()) return 0;
 
         final @NotNull Map<ProcessHandler, String> theirs = running(stop.runs());

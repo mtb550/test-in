@@ -30,7 +30,7 @@ public class RunStatusBadgeTest {
     @Test
     public void idleDrawsNoBadge() {
         assertFalse(RunStatus.IDLE.hasBadge(), "a case nobody has run carries no badge");
-        assertSame(RunStatus.IDLE.getBadge(), RunStatus.Badge.NONE, "and it says so with the empty badge");
+        assertSame(RunStatus.IDLE.getBadge(), RunStatusBadge.NONE, "and it says so with the empty badge");
     }
 
     @Test
@@ -40,8 +40,8 @@ public class RunStatusBadgeTest {
 
             assertTrue(status.hasBadge(), status + " should draw a badge");
 
-            final RunStatus.Badge badge = status.getBadge();
-            assertNotSame(badge, RunStatus.Badge.NONE, status + " needs a badge of its own");
+            final RunStatusBadge badge = status.getBadge();
+            assertNotSame(badge, RunStatusBadge.NONE, status + " needs a badge of its own");
             assertFalse(badge.label().isBlank(), status + " has a visible label");
         }
     }

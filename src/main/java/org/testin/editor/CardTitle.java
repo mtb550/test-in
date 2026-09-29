@@ -32,19 +32,18 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CardTitle {
     // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-235
-    public static @NotNull ActionIcons descriptionActionIcons(final int titleWidth, final @NotNull List<CardHoverAction.Offered> buttons) {
+    public static @NotNull TitleActionIcons descriptionActionIcons(final int titleWidth, final @NotNull List<Offered> buttons) {
         final @NotNull Icon slot = Icons.TEST_CASE;
         final int first = JBUI.scale(16) + titleWidth + JBUI.scale(10);
         final int step = slot.getIconWidth() + JBUI.scale(8);
         final int y = JBUI.scale(12);
 
-        return new ActionIcons(IntStream.range(0, buttons.size())
+        return new TitleActionIcons(IntStream.range(0, buttons.size())
                 .mapToObj(i -> new Slot(buttons.get(i), new Rectangle(first + i * step, y, slot.getIconWidth(), slot.getIconHeight())))
                 .toList());
     }
@@ -62,13 +61,13 @@ public final class CardTitle {
         return column > forIcons ? column : Integer.MAX_VALUE;
     }
 
-    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth, final @NotNull String hoveredAction, final @NotNull List<CardHoverAction.Offered> buttons, final @NotNull Automated automation) {
+    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth, final @NotNull String hoveredAction, final @NotNull List<Offered> buttons, final @NotNull Automated automation) {
         descriptionActionIcons(titleWidth, buttons).slots()
                 .forEach(slot -> draw(c, g, slot.button(), slot.button().action().iconOn(automation), slot.at(), hoveredAction));
     }
 
     // UC-EDITOR-PANEL-047, Rule-CODEGEN-062, Rule-EDITOR-PANEL-235
-    private static void draw(final @NotNull Component c, final @NotNull Graphics g, final @NotNull CardHoverAction.Offered button, final @NotNull Icon icon, final @NotNull Rectangle at, final @NotNull String hoveredAction) {
+    private static void draw(final @NotNull Component c, final @NotNull Graphics g, final @NotNull Offered button, final @NotNull Icon icon, final @NotNull Rectangle at, final @NotNull String hoveredAction) {
         final @NotNull Icon shown = button.works() ? icon : IconLoader.getDisabledIcon(icon);
 
         drawHoverableIcon(c, g, shown, at.x + (at.width - shown.getIconWidth()) / 2, at.y + (at.height - shown.getIconHeight()) / 2,
@@ -83,22 +82,6 @@ public final class CardTitle {
             scaledIcon.paintIcon(c, g, x - offsetX, y - offsetY);
         } else {
             baseIcon.paintIcon(c, g, x, y);
-        }
-    }
-
-    public record Slot(@NotNull CardHoverAction.Offered button, @NotNull Rectangle at) {
-    }
-
-    public record ActionIcons(@NotNull List<Slot> slots) {
-        private static @NotNull Rectangle grown(final @NotNull Rectangle icon) {
-            final int padding = JBUI.scale(4);
-
-            return new Rectangle(icon.x - padding, icon.y - padding,
-                    icon.width + padding * 2, icon.height + padding * 2);
-        }
-
-        public @NotNull Optional<CardHoverAction.Offered> at(final int x, final int y) {
-            return slots.stream().filter(slot -> grown(slot.at()).contains(x, y)).map(Slot::button).findFirst();
         }
     }
 }

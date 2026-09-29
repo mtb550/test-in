@@ -67,7 +67,7 @@ public final class GitCommits {
                 .collect(Collectors.toSet());
 
         return GitRefs.parseStatus(statusLines).stream()
-                .map(GitRefs.StatusEntry::path)
+                .map(StatusEntry::path)
                 .filter(path -> FileKind.of(Path.of(path), DirectoryType.TR) == FileKind.SCREENSHOT)
                 .filter(path -> runFolders.contains(folderOf(path)))
                 .collect(Collectors.toCollection(LinkedHashSet::new));

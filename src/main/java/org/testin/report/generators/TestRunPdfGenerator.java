@@ -59,7 +59,7 @@ import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.RunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
-import org.testin.util.Fonts;
+import org.testin.util.ReportFont;
 
 import java.io.ByteArrayOutputStream;
 import java.time.ZonedDateTime;
@@ -86,36 +86,36 @@ public final class TestRunPdfGenerator {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
              PdfDocument pdf = new PdfDocument(new PdfWriter(baos));
              Document document = new Document(pdf, pdf.getDefaultPageSize(), false)) {
-            PdfFont boldFont = PdfFontFactory.createFont(Fonts.Report.PDF_BOLD);
-            PdfFont regularFont = PdfFontFactory.createFont(Fonts.Report.PDF_REGULAR);
+            PdfFont boldFont = PdfFontFactory.createFont(ReportFont.PDF_BOLD);
+            PdfFont regularFont = PdfFontFactory.createFont(ReportFont.PDF_REGULAR);
 
             // Rule-REPORT-018
             printsWith = Optional.of(regularFont);
-            PdfFont italicFont = PdfFontFactory.createFont(Fonts.Report.PDF_ITALIC);
+            PdfFont italicFont = PdfFontFactory.createFont(ReportFont.PDF_ITALIC);
 
             final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
 
             document.add(para(Bundle.message("report.title"))
-                    .setFont(boldFont).setFontSize(Fonts.Report.TITLE.pt()).setFontColor(DARK_NAVY)
+                    .setFont(boldFont).setFontSize(ReportFont.TITLE.pt()).setFontColor(DARK_NAVY)
                     .setMarginBottom(2));
 
             document.add(para(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(trDir.getMarker()), TestRunConfiguration.COMPONENT.valueIn(trDir.getMarker()))))
-                    .setFont(regularFont).setFontSize(Fonts.Report.SUBTITLE.pt()).setFontColor(MEDIUM_BLUE)
+                    .setFont(regularFont).setFontSize(ReportFont.SUBTITLE.pt()).setFontColor(MEDIUM_BLUE)
                     .setMarginBottom(0));
 
             document.add(para(trDir.getName())
-                    .setFont(regularFont).setFontSize(Fonts.Report.LEAD.pt()).setFontColor(MEDIUM_BLUE)
+                    .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(MEDIUM_BLUE)
                     .setPaddingBottom(4)
                     .setBorderBottom(new SolidBorder(DARK_NAVY, 2f))
                     .setMarginBottom(1));
 
             document.add(para(Bundle.message("report.confidential"))
-                    .setFont(italicFont).setFontSize(Fonts.Report.CAPTION.pt()).setFontColor(DARK_GRAY)
+                    .setFont(italicFont).setFontSize(ReportFont.CAPTION.pt()).setFontColor(DARK_GRAY)
                     .setMarginBottom(20));
 
             Paragraph sec1 = para(Bundle.message("report.heading.overview"))
                     .setFont(boldFont)
-                    .setFontSize(Fonts.Report.SECTION.pt())
+                    .setFontSize(ReportFont.SECTION.pt())
                     .setFontColor(DARK_NAVY)
                     .setPaddingBottom(3)
                     .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
@@ -136,7 +136,7 @@ public final class TestRunPdfGenerator {
 
             Paragraph sec2 = para(Bundle.message("report.heading.execution"))
                     .setFont(boldFont)
-                    .setFontSize(Fonts.Report.SECTION.pt())
+                    .setFontSize(ReportFont.SECTION.pt())
                     .setFontColor(DARK_NAVY)
                     .setPaddingBottom(3)
                     .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
@@ -147,7 +147,7 @@ public final class TestRunPdfGenerator {
             document.add(para(
                     Bundle.message("report.summary.named", trDir.getName(),
                             String.valueOf(summary.total()), String.valueOf(summary.executed()), summary.passRate() + "%"))
-                    .setFont(regularFont).setFontSize(Fonts.Report.LEAD.pt()).setFontColor(BLACK)
+                    .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(BLACK)
                     .setMarginBottom(12));
 
             final @NotNull List<ReportTile> tiles = ReportTile.shownFor(summary);
@@ -170,7 +170,7 @@ public final class TestRunPdfGenerator {
             if (analyzed) {
                 document.add(para(Bundle.message("report.heading.analysis"))
                         .setFont(boldFont)
-                        .setFontSize(Fonts.Report.SECTION.pt())
+                        .setFontSize(ReportFont.SECTION.pt())
                         .setFontColor(DARK_NAVY)
                         .setPaddingBottom(3)
                         .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
@@ -182,12 +182,12 @@ public final class TestRunPdfGenerator {
                     if (written.isEmpty()) continue;
 
                     document.add(para(section.heading(summary))
-                            .setFont(boldFont).setFontSize(Fonts.Report.LEAD.pt())
+                            .setFont(boldFont).setFontSize(ReportFont.LEAD.pt())
                             .setFontColor(rgb(section.getHexColor()))
                             .setMarginBottom(2));
 
                     document.add(para(written)
-                            .setFont(regularFont).setFontSize(Fonts.Report.BODY.pt()).setFontColor(BLACK)
+                            .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(BLACK)
                             .setMarginBottom(8));
                 }
             }
@@ -216,7 +216,7 @@ public final class TestRunPdfGenerator {
                 pdfCanvas.stroke();
 
                 footerCanvas.add(para()
-                        .setFont(regularFont).setFontSize(Fonts.Report.CAPTION.pt()).setFontColor(DARK_GRAY)
+                        .setFont(regularFont).setFontSize(ReportFont.CAPTION.pt()).setFontColor(DARK_GRAY)
                         .setTextAlignment(TextAlignment.CENTER)
                         .add(text(Display.formatDate(ZonedDateTime.now())))
                         .add(text(Bundle.message("report.footer.prefix")))
@@ -250,7 +250,7 @@ public final class TestRunPdfGenerator {
     private void buildTestCaseTable(final @NotNull Document document, final @NotNull String sectionNumber, final @NotNull ReportSection section, final @NotNull String description, final @NotNull TestRunDto tr, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont) {
         document.add(para(sectionNumber + ". " + section.getTitle())
                 .setFont(boldFont)
-                .setFontSize(Fonts.Report.SECTION.pt())
+                .setFontSize(ReportFont.SECTION.pt())
                 .setFontColor(DARK_NAVY)
                 .setPaddingBottom(3)
                 .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
@@ -258,7 +258,7 @@ public final class TestRunPdfGenerator {
                 .setMarginTop(20));
 
         document.add(para(description)
-                .setFont(regularFont).setFontSize(Fonts.Report.LEAD.pt()).setFontColor(BLACK)
+                .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(BLACK)
                 .setMarginBottom(12));
 
         final @NotNull List<RunEditorAttributes> failureDetail = section.getFailureDetailColumns();
@@ -289,7 +289,7 @@ public final class TestRunPdfGenerator {
                     .setBorder(new SolidBorder(BORDER_GRAY, 1))
                     .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
                     .add(para(String.valueOf(idx))
-                            .setFont(regularFont).setFontSize(Fonts.Report.BODY.pt()).setFontColor(DARK_GRAY)
+                            .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(DARK_GRAY)
                             .setTextAlignment(TextAlignment.CENTER)));
 
             final @NotNull String testCaseName = item.shownTestCase().getDescription();
@@ -299,7 +299,7 @@ public final class TestRunPdfGenerator {
                     .setBorder(new SolidBorder(BORDER_GRAY, 1))
                     .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6);
             testCaseCell.add(para(tcName)
-                    .setFont(regularFont).setFontSize(Fonts.Report.BODY.pt()).setFontColor(BLACK)
+                    .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(BLACK)
                     .setMarginBottom(0));
             table.addCell(testCaseCell);
 
@@ -314,7 +314,7 @@ public final class TestRunPdfGenerator {
     private void addFailureDetail(final @NotNull Table table, final @NotNull Cell testCaseCell, final @NotNull TestRunItems item, final @NotNull DeviceRgb rowBg, final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont) {
         final @NotNull String actualResult = item.getActualResult();
         final @NotNull Paragraph actual = para(Bundle.message("report.actual.result", actualResult.isEmpty() ? "—" : actualResult))
-                .setFont(regularFont).setFontSize(Fonts.Report.SMALL.pt()).setFontColor(DARK_GRAY);
+                .setFont(regularFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY);
 
         item.bugIssue().ifPresent(url -> actual.add(text(" ("))
                 .add(new Link(BugIssueUrl.shortReference(url), PdfAction.createURI(url)).setFontColor(LINK_BLUE))
@@ -335,7 +335,7 @@ public final class TestRunPdfGenerator {
                 .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
                 .add(para(text)
-                        .setFont(boldFont).setFontSize(Fonts.Report.BODY.pt()).setFontColor(color)
+                        .setFont(boldFont).setFontSize(ReportFont.BODY.pt()).setFontColor(color)
                         .setTextAlignment(TextAlignment.CENTER));
     }
 
@@ -345,7 +345,7 @@ public final class TestRunPdfGenerator {
                 .setBorder(new SolidBorder(BORDER_GRAY, 1))
                 .setPaddingTop(5).setPaddingBottom(5).setPaddingLeft(6).setPaddingRight(6)
                 .add(para(text)
-                        .setFont(boldFont).setFontSize(Fonts.Report.HEADING.pt()).setFontColor(textColor)
+                        .setFont(boldFont).setFontSize(ReportFont.HEADING.pt()).setFontColor(textColor)
                         .setTextAlignment(TextAlignment.CENTER)));
     }
 
@@ -355,13 +355,13 @@ public final class TestRunPdfGenerator {
                 .setBorder(new SolidBorder(BORDER_GRAY, 1))
                 .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(8).setPaddingRight(8)
                 .add(para(label)
-                        .setFont(boldFont).setFontSize(Fonts.Report.HEADING.pt()).setFontColor(DARK_NAVY)));
+                        .setFont(boldFont).setFontSize(ReportFont.HEADING.pt()).setFontColor(DARK_NAVY)));
 
         table.addCell(new Cell()
                 .setBorder(new SolidBorder(BORDER_GRAY, 1))
                 .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(8).setPaddingRight(8)
                 .add(para(value)
-                        .setFont(regularFont).setFontSize(Fonts.Report.BODY.pt()).setFontColor(BLACK)));
+                        .setFont(regularFont).setFontSize(ReportFont.BODY.pt()).setFontColor(BLACK)));
     }
 
     private void addStatCell(final @NotNull Table table, final @NotNull String number, final @NotNull String label, final @NotNull DeviceRgb numberColor, final @NotNull PdfFont boldFont) {
@@ -371,12 +371,12 @@ public final class TestRunPdfGenerator {
                 .setPaddingTop(8).setPaddingBottom(8).setPaddingLeft(6).setPaddingRight(6);
 
         cell.add(para(number)
-                .setFont(boldFont).setFontSize(Fonts.Report.FIGURE.pt()).setFontColor(numberColor)
+                .setFont(boldFont).setFontSize(ReportFont.FIGURE.pt()).setFontColor(numberColor)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setMarginBottom(4));
 
         cell.add(para(label)
-                .setFont(boldFont).setFontSize(Fonts.Report.SMALL.pt()).setFontColor(DARK_GRAY)
+                .setFont(boldFont).setFontSize(ReportFont.SMALL.pt()).setFontColor(DARK_GRAY)
                 .setTextAlignment(TextAlignment.CENTER));
 
         table.addCell(cell);

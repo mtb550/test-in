@@ -120,18 +120,18 @@ public final class ComponentDialogBase<C extends DialogComponent> {
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class DetailsBuilder {
-        private final @NotNull List<DialogDetails.Row> rows = new ArrayList<>();
+        private final @NotNull List<Row> rows = new ArrayList<>();
 
         public @NotNull DetailsBuilder row(final @NotNull String caption, final @NotNull String value) {
             if (!value.isBlank()) {
-                rows.add(new DialogDetails.Row(caption, Optional.empty(), value));
+                rows.add(new Row(caption, Optional.empty(), value));
             }
             return this;
         }
 
         public @NotNull DetailsBuilder row(final @NotNull Icon icon, final @NotNull String value) {
             if (!value.isBlank()) {
-                rows.add(new DialogDetails.Row("", Optional.of(icon), value));
+                rows.add(new Row("", Optional.of(icon), value));
             }
             return this;
         }
@@ -144,11 +144,11 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class RadioBuilder<T> {
         private final @NotNull String caption;
-        private final @NotNull List<RadioSelection.Option<T>> options = new ArrayList<>();
+        private final @NotNull List<Option<T>> options = new ArrayList<>();
         private @NotNull Optional<T> selected = Optional.empty();
 
         public @NotNull RadioBuilder<T> option(final @NotNull String name, final @NotNull T value) {
-            options.add(new RadioSelection.Option<>(name, value));
+            options.add(new Option<>(name, value));
             return this;
         }
 
@@ -285,7 +285,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             }
 
             final @NotNull List<SelectionList<T>> fixed = List.copyOf(selections);
-            final @NotNull Rows.Answer<T> always = Rows.Answer.of(fixed);
+            final @NotNull Answer<T> always = Answer.of(fixed);
 
             return new ComponentDialogBase<>(
                     new TextFieldWithSelections<>(icon, placeholder, fixed, _ -> always, fixed.size()));

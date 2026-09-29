@@ -31,6 +31,7 @@ import org.testin.model.dto.TestCaseDto.TestCaseDtoBuilder;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
+import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
@@ -59,7 +60,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             GenType.NO_CODE_CHANGE
     ) {
         @Override
-        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         }
     },
 
@@ -72,7 +73,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
         @Override
-        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         }
     },
 
@@ -112,7 +113,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
         @Override
-        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
             Badges.addPriorityBadge(badges, tc);
         }
     },
@@ -162,7 +163,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
         @Override
-        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
             tc.getGroup().stream().map(Badges::createGroupBadge).forEach(badges::add);
         }
     },
@@ -315,20 +316,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
         return PROSE.contains(this) ? Display.format(raw) : raw;
     }
 
-    public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+    public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         details.put(name, displayValue(tc));
-    }
-
-    public record ImportedRow(@NotNull TestCaseDto testCase, int refused) {
-    }
-
-    public enum Can {
-        EDIT,
-
-        IMPORT,
-
-        COPY,
-
-        EXPORT
     }
 }

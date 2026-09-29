@@ -128,7 +128,4 @@ public enum ResultAnalysis {
     public @NotNull String writtenIn(final @NotNull Map<ResultAnalysis, String> analysis) {
         return analysis.getOrDefault(this, "").trim();
     }
-
-    public record Segment(@NotNull String text, @NotNull Color color) {
-    }
 }

@@ -57,7 +57,7 @@ public final class TestRunStatusChange {
 
         Logger.trace("Test run status changed: " + run.getName() + " = " + newStatus.getLabel());
 
-        if (newStatus == TestRunStatus.COMPLETED) open.ifPresent(editor -> editor.getWalk().stopExecution());
+        if (newStatus.stopsExecution()) open.ifPresent(editor -> editor.getWalk().stopExecution());
 
         run.getMarker().changeStatus(newStatus);
 

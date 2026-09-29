@@ -178,7 +178,7 @@ public final class TestinEditors {
         }
 
         Logger.info("Opening Editor: " + dir.getPath());
-        fed.openFile(new UnifiedVirtualFile(dir, EditorType.of(dir)), focus);
+        fed.openFile(new UnifiedVirtualFile(dir), focus);
 
         return true;
     }

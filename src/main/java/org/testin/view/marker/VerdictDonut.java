@@ -30,12 +30,10 @@ import org.testin.util.Fonts;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
@@ -154,24 +152,6 @@ public final class VerdictDonut implements DialogComponent {
     @Override
     public boolean wantsFocus() {
         return false;
-    }
-
-    private record Swatch(@NotNull Color color) implements Icon {
-        @Override
-        public void paintIcon(final @NotNull Component owner, final @NotNull Graphics g, final int x, final int y) {
-            g.setColor(color);
-            g.fillRect(x, y, getIconWidth(), getIconHeight());
-        }
-
-        @Override
-        public int getIconWidth() {
-            return JBUI.scale(9);
-        }
-
-        @Override
-        public int getIconHeight() {
-            return JBUI.scale(9);
-        }
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

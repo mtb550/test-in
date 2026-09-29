@@ -49,6 +49,11 @@ public class TestSetDirectoryDto extends DirectoryDto {
     }
 
     @Override
+    public boolean holdsTestCases() {
+        return true;
+    }
+
+    @Override
     public @NotNull DirectoryType getType() {
         return DirectoryType.TS;
     }

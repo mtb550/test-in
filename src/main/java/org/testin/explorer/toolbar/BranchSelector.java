@@ -31,6 +31,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.ui.framework.Alternative;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
@@ -171,7 +172,7 @@ public class BranchSelector {
                 Bundle.message("branch.uncommitted.message", changes, targetBranch),
                 currentBranch, targetBranch,
                 Bundle.message("branch.switch.anyway"), () -> checkout(repositoryPath, targetBranch),
-                List.of(new ConfirmDialog.Alternative(Shortcuts.ConfirmAlternative, Bundle.message("branch.review.changes"),
+                List.of(new Alternative(Shortcuts.ConfirmAlternative, Bundle.message("branch.review.changes"),
                         () -> ViewPendingCommitsAction.reviewFor(p, repositoryPath))))
                 .show();
     }

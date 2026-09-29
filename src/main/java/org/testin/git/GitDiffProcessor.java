@@ -59,15 +59,15 @@ public final class GitDiffProcessor {
         final @NotNull Path root = repositoryRoot.toAbsolutePath().normalize();
         final @NotNull List<PendingChange> result = new ArrayList<>();
 
-        final @NotNull List<GitRefs.StatusEntry> listed = GitRefs.parseStatus(statusLines).stream()
+        final @NotNull List<StatusEntry> listed = GitRefs.parseStatus(statusLines).stream()
                 .filter(entry -> isListed(root, entry))
                 .toList();
         final @NotNull Map<String, String> committed = committedContents.apply(listed.stream()
                 .filter(entry -> entry.type() != DiffType.ADDED)
-                .map(GitRefs.StatusEntry::path)
+                .map(StatusEntry::path)
                 .toList());
 
-        for (final GitRefs.StatusEntry entry : listed) {
+        for (final StatusEntry entry : listed) {
             final @NotNull Path relativePath = Path.of(entry.path());
 
             try {
@@ -87,7 +87,7 @@ public final class GitDiffProcessor {
         return result;
     }
 
-    private static boolean isListed(final @NotNull Path root, final @NotNull GitRefs.StatusEntry entry) {
+    private static boolean isListed(final @NotNull Path root, final @NotNull StatusEntry entry) {
         final @NotNull Path relativePath = Path.of(entry.path());
         if (FileKind.of(relativePath, folderKindOf(root, relativePath)) == FileKind.SCREENSHOT) return false;
 
@@ -106,7 +106,7 @@ public final class GitDiffProcessor {
         return isRun ? DirectoryType.TR : DirectoryType.TRD;
     }
 
-    private static @NotNull String workingContent(final @NotNull Path root, final @NotNull Path relativePath, final @NotNull GitRefs.StatusEntry entry) {
+    private static @NotNull String workingContent(final @NotNull Path root, final @NotNull Path relativePath, final @NotNull StatusEntry entry) {
         if (entry.type() == DiffType.DELETED) return "";
 
         final @NotNull Path file = root.resolve(relativePath);

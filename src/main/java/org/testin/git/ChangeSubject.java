@@ -54,10 +54,6 @@ public enum ChangeSubject {
     private final @NotNull ChangeType changed;
 
     public @NotNull ChangeType changeFor(final @NotNull DiffType type) {
-        return switch (type) {
-            case ADDED -> created;
-            case DELETED -> removed;
-            case MODIFIED -> changed;
-        };
+        return type.changeOf(this);
     }
 }

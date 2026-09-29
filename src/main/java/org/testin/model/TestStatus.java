@@ -89,9 +89,4 @@ public enum TestStatus {
     public boolean isVerdict() {
         return menuEntry != MenuEntry.NONE;
     }
-
-    public record MenuEntry(@NotNull KeyStroke shortcut) {
-        public static final @NotNull MenuEntry NONE =
-                new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_UNDEFINED, 0));
-    }
 }

@@ -18,7 +18,6 @@ package org.testin.indexer;
 
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
@@ -35,7 +34,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NodeCounter {
     public static @NotNull NodeFigures figures(final @NotNull Project p, final @NotNull DirectoryDto dto) {
-        return Gathered.valueOf(dto.getType().getStatistics().name()).gather.of(p, dto);
+        return Gathered.valueOf(dto.getType().getStatistics().name()).getGather().of(p, dto);
     }
 
     // UC-INTERNAL-006, Rule-INTERNAL-046, Rule-INTERNAL-047, Rule-INTERNAL-050
@@ -86,18 +85,5 @@ public final class NodeCounter {
 
     private static long counted(final @NotNull Map<DirectoryType, Long> byType, final @NotNull DirectoryType type) {
         return byType.getOrDefault(type, 0L);
-    }
-
-    @AllArgsConstructor
-    private enum Gathered {
-        CHILDREN(
-                NodeCounter::childCounts
-        ),
-
-        VERDICTS(
-                NodeCounter::runVerdicts
-        );
-
-        private final @NotNull FiguresGatherer gather;
     }
 }

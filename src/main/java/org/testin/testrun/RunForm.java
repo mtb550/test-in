@@ -26,7 +26,6 @@ import org.testin.indexer.TestCases;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.util.Bundle;
@@ -115,7 +114,7 @@ public final class RunForm {
 
         final @NotNull DefaultMutableTreeNode node = new DefaultMutableTreeNode(thisNodeDto);
 
-        if (thisNodeDto instanceof TestSetDirectoryDto) {
+        if (thisNodeDto.holdsTestCases()) {
             for (final TestCaseDto tc : testCases.getTestCasesForTestSet(folder)) {
                 node.add(new DefaultMutableTreeNode(tc));
             }

@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.CardHoverAction;
 import org.testin.editor.HoverButton;
+import org.testin.editor.Offered;
 import org.testin.model.Automated;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
@@ -41,9 +42,9 @@ public final class ActionIcons {
 
     // UC-VIEW-PANEL-009, UC-VIEW-PANEL-012, UC-VIEW-PANEL-014, Rule-VIEW-PANEL-050, Rule-VIEW-PANEL-056, Rule-VIEW-PANEL-057, Rule-VIEW-PANEL-063
     public static @NotNull JComponent of(final @NotNull Project p, final @NotNull TestCaseDto dto) {
-        final @NotNull CardHoverAction.Offered navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD.offer(p, dto);
-        final @NotNull CardHoverAction.Offered run = CardHoverAction.RUN_TEST_METHOD.offer(p, dto);
-        final @NotNull CardHoverAction.Offered testCase = CardHoverAction.NAVIGATE_TO_TEST_CASE.offer(p, dto);
+        final @NotNull Offered navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD.offer(p, dto);
+        final @NotNull Offered run = CardHoverAction.RUN_TEST_METHOD.offer(p, dto);
+        final @NotNull Offered testCase = CardHoverAction.NAVIGATE_TO_TEST_CASE.offer(p, dto);
 
         final @NotNull JBPanel<?> actionsPanel = AbstractDetails.row(0);
 

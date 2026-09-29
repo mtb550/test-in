@@ -23,42 +23,17 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.run.RunEditor;
-import org.testin.editor.test.TestEditor;
-import org.testin.model.DirectoryType;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.util.Bundle;
 
 import javax.swing.Icon;
 import java.util.function.BiFunction;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class EditorType extends FakeFileType {
-    // UC-EDITOR-PANEL-001
-    public static final @NotNull EditorType TEST_RUN = new EditorType(
-            "Test Run",
-            Bundle.message("editor.type.run.description"),
-            DirectoryType.TR.getIcon(),
-            RunEditor::new
-    );
-
-    public static final @NotNull EditorType TEST_CASE = new EditorType(
-            "Test Case",
-            Bundle.message("editor.type.case.description"),
-            DirectoryType.TS.getIcon(),
-            TestEditor::new
-    );
-
     private final @NotNull String name;
     private final @NotNull String description;
     private final @NotNull Icon icon;
     private final @NotNull BiFunction<Project, UnifiedVirtualFile, TestinEditor> factory;
-
-    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-001
-    public static @NotNull EditorType of(final @NotNull DirectoryDto dir) {
-        return dir.getType() == DirectoryType.TR ? TEST_RUN : TEST_CASE;
-    }
 
     @Override
     public boolean isMyFileType(final @NotNull VirtualFile file) {

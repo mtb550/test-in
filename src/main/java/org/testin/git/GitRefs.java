@@ -152,7 +152,4 @@ public final class GitRefs {
                 .map(path -> path.toString().replace('\\', '/'))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
-
-    public record StatusEntry(@NotNull DiffType type, @NotNull String path) {
-    }
 }

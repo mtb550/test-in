@@ -31,8 +31,8 @@ public class ForgetOnCloseTest {
     private static final @NotNull UndoScope ONE = UndoScope.of(Path.of("root", "Test Cases", "Login"));
     private static final @NotNull UndoScope ANOTHER = UndoScope.of(Path.of("root", "Test Cases", "Payment"));
 
-    private static @NotNull UndoHistories.Operation held(final @NotNull AtomicInteger released) {
-        return new UndoHistories.Operation("held", () -> true, () -> true, released::incrementAndGet);
+    private static @NotNull Operation held(final @NotNull AtomicInteger released) {
+        return new Operation("held", () -> true, () -> true, released::incrementAndGet);
     }
 
     @Test

@@ -56,7 +56,7 @@ public class RunRegistryTest {
 
         assertTrue(registry.isRunning(afterReload.getId()), "the fresh instance is the same running case");
 
-        final RunRegistry.Stop stop = registry.stopping(List.of(afterReload.getId()));
+        final Stop stop = registry.stopping(List.of(afterReload.getId()));
         assertEquals(stop.testCases(), List.of(original.getId()), "and the stop reaches it");
         assertEquals(stop.runs(), Set.of(RUN), "naming the run whose process has to be killed");
     }
@@ -65,9 +65,9 @@ public class RunRegistryTest {
     public void aTestCaseThatWasNeverRunningIsNotStopped() {
         final RunRegistry registry = new RunRegistry();
 
-        final RunRegistry.Stop stop = registry.stopping(List.of(UUID.randomUUID()));
+        final Stop stop = registry.stopping(List.of(UUID.randomUUID()));
 
-        assertSame(stop, RunRegistry.Stop.NOTHING, "nothing to kill and nothing to repaint");
+        assertSame(stop, Stop.NOTHING, "nothing to kill and nothing to repaint");
         assertTrue(stop.testCases().isEmpty(), "so no case is put back");
     }
 
@@ -81,7 +81,7 @@ public class RunRegistryTest {
         registry.launched(List.of(first.getId(), second.getId()), RUN);
         registry.launched(List.of(alone.getId()), "Testin: one case");
 
-        final RunRegistry.Stop stop = registry.stopping(List.of(first.getId()));
+        final Stop stop = registry.stopping(List.of(first.getId()));
 
         assertTrue(stop.testCases().contains(second.getId()), "one configuration is one process, so its casemate goes too");
         assertFalse(stop.testCases().contains(alone.getId()), "but a case in another run is left alone");
@@ -97,7 +97,7 @@ public class RunRegistryTest {
         registry.launched(List.of(finished.getId(), stillGoing.getId()), RUN);
         registry.reported(finished.getId(), RunStatus.PASSED);
 
-        final RunRegistry.Stop stop = registry.stopping(List.of(stillGoing.getId()));
+        final Stop stop = registry.stopping(List.of(stillGoing.getId()));
 
         assertFalse(stop.testCases().contains(finished.getId()), "its verdict is in, so the stop is not about it");
         assertEquals(registry.statusOf(finished.getId()), RunStatus.PASSED, "and the verdict it gave still stands");

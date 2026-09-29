@@ -16,4 +16,28 @@
 
 package org.testin.git;
 
-public enum DiffType {ADDED, MODIFIED, DELETED}
+import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
+
+@AllArgsConstructor
+public enum DiffType {
+    ADDED(
+            ChangeSubject::getCreated
+    ),
+
+    MODIFIED(
+            ChangeSubject::getChanged
+    ),
+
+    DELETED(
+            ChangeSubject::getRemoved
+    );
+
+    private final @NotNull Function<ChangeSubject, ChangeType> change;
+
+    public @NotNull ChangeType changeOf(final @NotNull ChangeSubject subject) {
+        return change.apply(subject);
+    }
+}

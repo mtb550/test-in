@@ -29,12 +29,12 @@ public class CardTitleWrapIdeTest extends BasePlatformTestCase {
 
     private static final @NotNull String LONG = "Log in with a valid user and check that the dashboard opens with every widget it is supposed to show and nothing else at all";
 
-    private static @NotNull List<CardHoverAction.Offered> everyButton() {
+    private static @NotNull List<Offered> everyButton() {
         return offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD, CardHoverAction.NAVIGATE_TO_TEST_CASE);
     }
 
-    private static @NotNull List<CardHoverAction.Offered> offered(final @NotNull CardHoverAction... actions) {
-        return Arrays.stream(actions).map(action -> new CardHoverAction.Offered(action, Optional.empty())).toList();
+    private static @NotNull List<Offered> offered(final @NotNull CardHoverAction... actions) {
+        return Arrays.stream(actions).map(action -> new Offered(action, Optional.empty())).toList();
     }
 
     private @NotNull Card laidOut(final @NotNull String title) {
@@ -60,9 +60,9 @@ public class CardTitleWrapIdeTest extends BasePlatformTestCase {
     }
 
     public void testTheIconsStillFitAfterATitleThatFillsTheColumn() {
-        final @NotNull List<CardHoverAction.Offered> buttons = everyButton();
+        final @NotNull List<Offered> buttons = everyButton();
         final int column = CardTitle.titleColumnWidth(900, buttons.size());
-        final @NotNull List<CardTitle.Slot> slots = CardTitle.descriptionActionIcons(column, buttons).slots();
+        final @NotNull List<Slot> slots = CardTitle.descriptionActionIcons(column, buttons).slots();
 
         assertTrue("a 900px list must give a bounded column, got " + column, column > 0 && column < 900);
         assertEquals("every button gets a slot", buttons.size(), slots.size());
@@ -70,8 +70,8 @@ public class CardTitleWrapIdeTest extends BasePlatformTestCase {
     }
 
     public void testTheNewButtonGoesLastAndMovesNeitherOfTheOthers() {
-        final @NotNull List<CardTitle.Slot> before = CardTitle.descriptionActionIcons(200, offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD)).slots();
-        final @NotNull List<CardTitle.Slot> now = CardTitle.descriptionActionIcons(200, everyButton()).slots();
+        final @NotNull List<Slot> before = CardTitle.descriptionActionIcons(200, offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD)).slots();
+        final @NotNull List<Slot> now = CardTitle.descriptionActionIcons(200, everyButton()).slots();
 
         assertEquals("the method button moved", before.get(0).at(), now.get(0).at());
         assertEquals("the run button moved", before.get(1).at(), now.get(1).at());
@@ -81,9 +81,9 @@ public class CardTitleWrapIdeTest extends BasePlatformTestCase {
     }
 
     public void testAClickLandsOnTheButtonDrawnThere() {
-        final @NotNull CardTitle.ActionIcons icons = CardTitle.descriptionActionIcons(200, everyButton());
+        final @NotNull TitleActionIcons icons = CardTitle.descriptionActionIcons(200, everyButton());
 
-        for (final CardTitle.Slot slot : icons.slots()) {
+        for (final Slot slot : icons.slots()) {
             assertEquals(slot.button(), icons.at((int) slot.at().getCenterX(), (int) slot.at().getCenterY()).orElseThrow());
         }
         assertTrue("a click on the title reached a button", icons.at(0, 0).isEmpty());

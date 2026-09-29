@@ -69,7 +69,4 @@ public final class ConfirmDialog extends AbstractFrameworkDialog {
     protected boolean replacesItsKind() {
         return true;
     }
-
-    public record Alternative(@NotNull Shortcuts key, @NotNull String name, @NotNull Runnable action) {
-    }
 }

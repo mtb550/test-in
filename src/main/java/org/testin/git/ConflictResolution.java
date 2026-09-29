@@ -94,7 +94,7 @@ public final class ConflictResolution {
         if (TestCaseMerge.isTestCase(relativePath)) return Optional.of(TestCaseMerge::of);
         if (FileKind.of(file) == FileKind.RUN_ITEM)
             return Optional.of((mapper, _, mine, theirs) -> RunItemMerge.of(mapper, mine, theirs));
-        if (DirectoryType.byMarker(String.valueOf(file.getFileName())).filter(kind -> kind == DirectoryType.TR).isPresent()) {
+        if (DirectoryType.TR.isMarkerOf(String.valueOf(file.getFileName()))) {
             return Optional.of(RunMarkerMerge::of);
         }
 
@@ -174,7 +174,7 @@ public final class ConflictResolution {
 
         new ResolveConflictDialog(p, next.name(), next.questions(), next.settled(), takeTheirs -> {
             final @NotNull Merge answered = new Merge(next.merged(), next.questions(), next.settled());
-            for (final Merge.Question question : next.questions()) {
+            for (final Question question : next.questions()) {
                 answered.answer(mapper, question, takeTheirs.contains(question.field()), next.theirs());
             }
 
@@ -224,8 +224,5 @@ public final class ConflictResolution {
     @FunctionalInterface
     private interface Merger {
         @NotNull Merge merge(@NotNull Mapper mapper, @NotNull String base, @NotNull String mine, @NotNull String theirs);
-    }
-
-    private record Pending(@NotNull String relativePath, @NotNull String name, @NotNull ObjectNode merged, @NotNull List<Merge.Question> questions, @NotNull List<String> settled, @NotNull String theirs) {
     }
 }

@@ -135,7 +135,7 @@ public class GitRefsTest {
 
     @Test
     public void anUntrackedFileIsAnAddition() {
-        final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of("?? .tp"));
+        final List<StatusEntry> entries = GitRefs.parseStatus(List.of("?? .tp"));
 
         assertEquals(entries.size(), 1);
         assertEquals(entries.getFirst().type(), DiffType.ADDED);
@@ -144,7 +144,7 @@ public class GitRefsTest {
 
     @Test
     public void everyNewTestCaseInANewTestSetIsReported() {
-        final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of(
+        final List<StatusEntry> entries = GitRefs.parseStatus(List.of(
                 "?? .tp",
                 "?? Test Cases/.tcd",
                 "?? Test Cases/rp/.ts",
@@ -176,7 +176,7 @@ public class GitRefsTest {
 
     @Test
     public void aRenameIsBothTheDeletionAndTheAddition() {
-        final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(
+        final List<StatusEntry> entries = GitRefs.parseStatus(
                 List.of("R  Test Cases/new/a.json", "Test Cases/old/a.json"));
 
         assertEquals(entries.size(), 2);
@@ -190,7 +190,7 @@ public class GitRefsTest {
 
     @Test
     public void aCopyIsOnlyTheNewFile() {
-        final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of("C  b.json", "a.json", " M c.json"));
+        final List<StatusEntry> entries = GitRefs.parseStatus(List.of("C  b.json", "a.json", " M c.json"));
 
         assertEquals(entries.size(), 2);
         assertEquals(entries.getFirst().path(), "b.json");
@@ -199,7 +199,7 @@ public class GitRefsTest {
 
     @Test
     public void aRenameThenDeletedIsTwoDeletions() {
-        final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of("RD b.json", "a.json"));
+        final List<StatusEntry> entries = GitRefs.parseStatus(List.of("RD b.json", "a.json"));
 
         assertEquals(entries.size(), 2);
         assertEquals(entries.getFirst().type(), DiffType.DELETED);

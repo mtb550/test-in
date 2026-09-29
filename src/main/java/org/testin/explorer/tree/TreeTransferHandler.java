@@ -39,6 +39,7 @@ import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
+import org.testin.undo.Operation;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
@@ -374,7 +375,7 @@ public class TreeTransferHandler extends TransferHandler {
             confirmLanded(Done.MOVED, moved);
             if (moved == 0) return;
 
-            undoHistories.push(UndoScope.TREE, new UndoHistories.Operation(
+            undoHistories.push(UndoScope.TREE, new Operation(
                     Bundle.message("transfer.undo.move", describe(sources)),
                     () -> moveBatch(newPaths, oldPaths),
                     () -> moveBatch(oldPaths, newPaths)));

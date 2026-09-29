@@ -20,9 +20,7 @@ import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
-import com.itextpdf.io.font.constants.StandardFonts;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
@@ -150,76 +148,5 @@ public final class Fonts {
 
     private static float sizeOn(final float base, final float delta) {
         return Math.max(FLOOR, base + delta);
-    }
-
-    // Rule-INTERNAL-095
-    @AllArgsConstructor
-    public enum Report {
-        TITLE(
-                18f,
-                40
-        ),
-
-        FIGURE(
-                20f,
-                42
-        ),
-
-        SECTION(
-                13f,
-                28
-        ),
-
-        SUBTITLE(
-                12f,
-                24
-        ),
-
-        LEAD(
-                11f,
-                21
-        ),
-
-        HEADING(
-                10f,
-                19
-        ),
-
-        BODY(
-                10f,
-                19
-        ),
-
-        SMALL(
-                9f,
-                16
-        ),
-
-        CAPTION(
-                8f,
-                15
-        );
-
-        public static final @NotNull String FAMILY = "Calibri";
-        public static final @NotNull String CSS_FAMILY = FAMILY + ", Arial, sans-serif";
-        public static final @NotNull String CSS_MONO = "ui-monospace, Consolas, monospace";
-        public static final @NotNull String PDF_REGULAR = StandardFonts.HELVETICA;
-        public static final @NotNull String PDF_BOLD = StandardFonts.HELVETICA_BOLD;
-        public static final @NotNull String PDF_ITALIC = StandardFonts.HELVETICA_OBLIQUE;
-
-        private final float pt;
-        private final int px;
-
-        public float pt() {
-            return pt;
-        }
-
-        public int ptRounded() {
-            return Math.round(pt);
-        }
-
-        public @NotNull String css() {
-            return px + "px";
-        }
     }
 }

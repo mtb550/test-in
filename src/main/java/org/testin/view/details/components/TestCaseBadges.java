@@ -23,6 +23,7 @@ import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
+import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 
 import javax.swing.JComponent;
@@ -35,7 +36,7 @@ public final class TestCaseBadges {
     public static @NotNull JComponent of(final @NotNull Project p, final @NotNull TestCaseDto dto) {
         final @NotNull JBPanel<?> badgesPanel = AbstractDetails.row(FLOW_GAP);
 
-        final @NotNull List<Badges.Badge> badges = Badges.testCaseBadges(dto);
+        final @NotNull List<Badge> badges = Badges.testCaseBadges(dto);
 
         final @NotNull RunStatus tempStatus = Services.getInstance(p, TestNGExecution.class).statusOf(dto);
         if (tempStatus.hasBadge()) badges.add(Badges.createRunStatusBadge(tempStatus.getBadge()));

@@ -24,7 +24,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testrun.RunEditorAttributes;
+import org.testin.ui.Badge;
 import org.testin.ui.Badges;
+import org.testin.ui.Pill;
 
 import java.awt.GridBagConstraints;
 import java.util.ArrayList;
@@ -60,9 +62,9 @@ public final class RunItemSummary extends AbstractDetails {
     }
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086
-    private @NotNull List<Badges.Badge> facts() {
-        final @NotNull List<Badges.Badge> badges = new ArrayList<>();
-        badges.add(new Badges.Pill(runItem.shownStatus().getLabel(), runItem.shownStatus().getRowColor()));
+    private @NotNull List<Badge> facts() {
+        final @NotNull List<Badge> badges = new ArrayList<>();
+        badges.add(new Pill(runItem.shownStatus().getLabel(), runItem.shownStatus().getRowColor()));
 
         final @NotNull String duration = RunEditorAttributes.DURATION.getRunValueExtractor().apply(runItem);
         if (!duration.isBlank()) badges.add(Badges.createDurationBadge(duration));

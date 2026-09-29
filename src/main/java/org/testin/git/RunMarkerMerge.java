@@ -109,7 +109,7 @@ final class RunMarkerMerge {
             }
             if (yours.equals(was)) continue;
 
-            merging.questions().add(new Merge.Question(object + "." + key, ours.asText(""), yours.asText("")));
+            merging.questions().add(new Question(object + "." + key, ours.asText(""), yours.asText("")));
         }
     }
 

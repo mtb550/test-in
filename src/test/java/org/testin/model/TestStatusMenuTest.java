@@ -48,8 +48,8 @@ public class TestStatusMenuTest {
 
     @Test
     public void theStatusesOffMenuCarryTheEmptyEntry() {
-        assertSame(TestStatus.PENDING.getMenuEntry(), TestStatus.MenuEntry.NONE);
-        assertSame(TestStatus.UNTESTED.getMenuEntry(), TestStatus.MenuEntry.NONE);
+        assertSame(TestStatus.PENDING.getMenuEntry(), MenuEntry.NONE);
+        assertSame(TestStatus.UNTESTED.getMenuEntry(), MenuEntry.NONE);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class TestStatusMenuTest {
         Arrays.stream(TestStatus.values())
                 .filter(TestStatus::isVerdict)
                 .forEach(status -> {
-                    assertNotSame(status.getMenuEntry(), TestStatus.MenuEntry.NONE,
+                    assertNotSame(status.getMenuEntry(), MenuEntry.NONE,
                             status + " is offered, so it needs an entry of its own");
                     assertNotEquals(status.getMenuEntry().shortcut().getKeyCode(), KeyEvent.VK_UNDEFINED,
                             status + " is offered, so it needs a key that reaches it");
@@ -69,7 +69,7 @@ public class TestStatusMenuTest {
         final List<KeyStroke> keys = Arrays.stream(TestStatus.values())
                 .filter(TestStatus::isVerdict)
                 .map(TestStatus::getMenuEntry)
-                .map(TestStatus.MenuEntry::shortcut)
+                .map(MenuEntry::shortcut)
                 .toList();
 
         assertEquals(keys.size(), keys.stream().distinct().count(), "duplicate verdict key");

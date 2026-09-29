@@ -122,8 +122,8 @@ public class ViewPanel implements Disposable {
         tab.setFocusable(true);
         tab.setFocusTraversalKeysEnabled(false);
 
-        new ViewTabAction(p, tab, ViewTabAction.Direction.NEXT);
-        new ViewTabAction(p, tab, ViewTabAction.Direction.PREVIOUS);
+        new ViewTabAction(p, tab, Direction.NEXT);
+        new ViewTabAction(p, tab, Direction.PREVIOUS);
     }
 
     // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-080

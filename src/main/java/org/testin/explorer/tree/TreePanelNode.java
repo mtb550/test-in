@@ -92,7 +92,7 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
     public @NotNull LeafState getLeafState() {
         if (!(getValue() instanceof DirectoryDto directory)) return LeafState.ALWAYS;
 
-        return directory instanceof TestProjectDirectoryDto || directory.getType().acceptsAnything() ? LeafState.ASYNC : LeafState.ALWAYS;
+        return directory.mayHaveChildren() ? LeafState.ASYNC : LeafState.ALWAYS;
     }
 
     @Override

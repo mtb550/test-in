@@ -56,7 +56,7 @@ public enum FileKind {
         final @NotNull FileKind byName = of(file);
         if (byName != OTHER) return byName;
 
-        return folder == DirectoryType.TR && TestRunDirectoryDto.isScreenshotName(String.valueOf(file.getFileName())) ? SCREENSHOT : OTHER;
+        return folder.holdsScreenshots() && TestRunDirectoryDto.isScreenshotName(String.valueOf(file.getFileName())) ? SCREENSHOT : OTHER;
     }
 
     // Rule-INTERNAL-012

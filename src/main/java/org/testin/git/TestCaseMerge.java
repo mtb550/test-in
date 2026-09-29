@@ -82,7 +82,7 @@ public final class TestCaseMerge {
             }
             if (SETTLED.contains(field)) continue;
 
-            merging.questions().add(new Merge.Question(field, text(ours), text(yours)));
+            merging.questions().add(new Question(field, text(ours), text(yours)));
         }
 
         stampTheLaterEdit(merged, merging.mine(), merging.theirs());

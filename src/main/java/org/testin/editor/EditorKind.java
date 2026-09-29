@@ -17,19 +17,42 @@
 package org.testin.editor;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.run.RunEditor;
+import org.testin.editor.test.TestEditor;
+import org.testin.model.DirectoryType;
+import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.util.Bundle;
+
+import java.util.Map;
 
 @AllArgsConstructor
 public enum EditorKind {
+    // UC-EDITOR-PANEL-001
     TEST(
-            "test"
+            "test",
+            new EditorType("Test Case", Bundle.message("editor.type.case.description"), DirectoryType.TS.getIcon(), TestEditor::new)
     ),
 
     RUN(
-            "run"
+            "run",
+            new EditorType("Test Run", Bundle.message("editor.type.run.description"), DirectoryType.TR.getIcon(), RunEditor::new)
     );
 
+    // Rule-EDITOR-PANEL-001
+    private static final @NotNull Map<DirectoryType, EditorKind> OPENS = Map.of(
+            DirectoryType.TS, TEST,
+            DirectoryType.TR, RUN);
+
     private final @NotNull String word;
+    @Getter
+    private final @NotNull EditorType fileType;
+
+    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-001
+    public static @NotNull EditorKind of(final @NotNull DirectoryDto dir) {
+        return OPENS.getOrDefault(dir.getType(), TEST);
+    }
 
     // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-022
     public @NotNull String detailsKey(final int version) {

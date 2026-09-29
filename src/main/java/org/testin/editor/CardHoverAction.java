@@ -142,9 +142,14 @@ public enum CardHoverAction {
 
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-180
     public void executeFor(final @NotNull TestinEditor editor, final @NotNull TestCaseDto tc) {
-        if (this == RUN_TEST_METHOD) editor.launching(tc.getId());
+        executeFor(editor.getProject(), Optional.of(editor), List.of(tc));
+    }
 
-        execute(editor.getProject(), tc);
+    // UC-EDITOR-PANEL-035, UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-180
+    public void executeFor(final @NotNull Project p, final @NotNull Optional<TestinEditor> editor, final @NotNull List<TestCaseDto> testCases) {
+        if (this == RUN_TEST_METHOD) editor.ifPresent(ui -> testCases.forEach(tc -> ui.launching(tc.getId())));
+
+        execute(p, testCases);
     }
 
     // UC-CODEGEN-009, Rule-CODEGEN-005, Rule-CODEGEN-082
@@ -174,7 +179,7 @@ public enum CardHoverAction {
         onClick.accept(p, testCases);
     }
 
-    private @NotNull String hint() {
+    @NotNull String hint() {
         return (tooltip + " " + Declared.shortcutText(actionId)).trim();
     }
 
@@ -188,15 +193,5 @@ public enum CardHoverAction {
         // Rule-CODEGEN-082
         if (missing.isPresent() || !requires.contains(OptionalPlugin.JAVA)) return missing;
         return CodeOn.whyOff(p);
-    }
-
-    public record Offered(@NotNull CardHoverAction action, @NotNull Optional<String> whyNot) {
-        public boolean works() {
-            return whyNot.isEmpty();
-        }
-
-        public @NotNull String hintText() {
-            return whyNot.orElseGet(action::hint);
-        }
     }
 }

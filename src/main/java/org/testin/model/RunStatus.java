@@ -32,31 +32,31 @@ import java.util.Optional;
 public enum RunStatus {
     IDLE(
             AllIcons.RunConfigurations.TestState.Run,
-            Badge.NONE,
+            RunStatusBadge.NONE,
             Optional.empty()
     ),
 
     PASSED(
             AllIcons.RunConfigurations.TestPassed,
-            new Badge(TestStatus.PASSED.getLabel(), new JBColor(new Color(100, 200, 100), new Color(50, 150, 50))),
+            new RunStatusBadge(TestStatus.PASSED.getLabel(), new JBColor(new Color(100, 200, 100), new Color(50, 150, 50))),
             Optional.of(TestStatus.PASSED)
     ),
 
     FAILED(
             AllIcons.RunConfigurations.TestFailed,
-            new Badge(TestStatus.FAILED.getLabel(), new JBColor(new Color(255, 100, 100), new Color(180, 50, 50))),
+            new RunStatusBadge(TestStatus.FAILED.getLabel(), new JBColor(new Color(255, 100, 100), new Color(180, 50, 50))),
             Optional.of(TestStatus.FAILED)
     ),
 
     RUNNING(
             AllIcons.Actions.Suspend,
-            new Badge(Bundle.message("run.status.running"), new JBColor(new Color(255, 200, 100), new Color(200, 150, 50))),
+            new RunStatusBadge(Bundle.message("run.status.running"), new JBColor(new Color(255, 200, 100), new Color(200, 150, 50))),
             Optional.empty()
     );
 
     private final @NotNull Icon icon;
 
-    private final @NotNull Badge badge;
+    private final @NotNull RunStatusBadge badge;
 
     private final @NotNull Optional<TestStatus> verdict;
 
@@ -65,10 +65,6 @@ public enum RunStatus {
     }
 
     public boolean hasBadge() {
-        return badge != Badge.NONE;
-    }
-
-    public record Badge(@NotNull String label, @NotNull JBColor color) {
-        public static final @NotNull Badge NONE = new Badge("", JBColor.GRAY);
+        return badge != RunStatusBadge.NONE;
     }
 }

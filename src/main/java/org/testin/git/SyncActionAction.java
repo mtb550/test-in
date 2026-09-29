@@ -18,26 +18,21 @@ package org.testin.git;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.explorer.tree.TreeValues;
-import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
-import org.testin.util.FailureText;
 
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
 
 public class SyncActionAction extends AbstractAnyProjectAction {
     private static @NotNull Optional<Path> activeProjectPath(final @NotNull AnActionEvent e) {
@@ -63,7 +58,7 @@ public class SyncActionAction extends AbstractAnyProjectAction {
     // UC-SHARE-016
     @Override
     protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        activeProjectPath(e).ifPresentOrElse(path -> new Work(p).syncRepository(path), () ->
+        activeProjectPath(e).ifPresentOrElse(path -> new SyncWork(p).syncRepository(path), () ->
                 Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("git.sync.error.title"),
                         Bundle.message("git.sync.no.project")));
     }
@@ -80,189 +75,5 @@ public class SyncActionAction extends AbstractAnyProjectAction {
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.EDT;
-    }
-
-    private record Work(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits, @NotNull Notifier notifier) {
-        private Work(final @NotNull Project p) {
-            this(p, new GitRepositoryService(p), new GitCommits(p), Services.getInstance(p, Notifier.class));
-        }
-
-        // UC-SHARE-016, Rule-SHARE-070
-        private static @NotNull String pushedMessage(final @NotNull OptionalInt pushed) {
-            if (pushed.isEmpty()) return Bundle.message("git.synced.pushed.upstream");
-
-            if (pushed.getAsInt() == 0) return Bundle.message("git.synced.up.to.date");
-
-            return pushed.getAsInt() == 1
-                    ? Bundle.message("git.synced.pushed.one")
-                    : Bundle.message("git.synced.pushed.many", String.valueOf(pushed.getAsInt()));
-        }
-
-        // UC-SHARE-016, Rule-SHARE-069
-        private void syncRepository(final @NotNull Path repoPath) {
-            if (git.isNotRepository(repoPath)) {
-                notifier.softRefuse(p, Bundle.message("git.sync.nothing.title"),
-                        Bundle.message("git.sync.nothing.message", repoPath.getFileName()));
-                return;
-            }
-
-            // Rule-SHARE-005
-            // Rule-SHARE-072
-            GitBackgroundTask.run(p, Bundle.message("git.task.syncing"), false,
-                    indicator -> {
-                        indicator.setText(Bundle.message("git.progress.checking.remote"));
-                        final @NotNull String remoteName = git.getRemoteName(repoPath);
-                        final @NotNull String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
-
-                        if (remoteUrl.isEmpty()) {
-                            ApplicationManager.getApplication().invokeLater(() ->
-                                    notifier.warn(p, Bundle.message("git.sync.aborted.title"), Bundle.message("git.sync.aborted.message"))
-                            );
-                            return;
-                        }
-
-                        final @NotNull String branch = git.syncBranch(repoPath);
-                        if (branch.isBlank()) {
-                            throw new IllegalStateException(Bundle.message("git.error.no.sync.branch"));
-                        }
-
-                        final @NotNull Optional<List<String>> unfinished = git.unfinished(repoPath);
-                        if (unfinished.isPresent()) {
-                            ApplicationManager.getApplication().invokeLater(() -> showConflictActions(repoPath, unfinished.orElseThrow()));
-                            return;
-                        }
-
-                        indicator.setText(Bundle.message("git.progress.pulling", branch));
-                        commits.pullWhereTheRemoteHasBranch(repoPath, remoteName, remoteUrl, branch);
-
-                        indicator.setText(Bundle.message("git.progress.pushing.committed"));
-                        final @NotNull OptionalInt pushed = pushUnpushed(repoPath, remoteName, remoteUrl, branch);
-
-                        indicator.setText(Bundle.message("git.progress.refreshing"));
-                        refreshAfterSync(repoPath, pushed);
-
-                    },
-                    ex -> {
-                        Logger.error(FailureText.of(ex));
-
-                        final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
-
-                        ApplicationManager.getApplication().invokeLater(() -> {
-                            if (!conflicting.isEmpty()) {
-                                showConflictActions(repoPath, conflicting);
-                            } else {
-                                reportSyncFailure(Bundle.message("git.sync.failed.remote", FailureText.of(ex)));
-                            }
-                        });
-                    });
-        }
-
-        private void showConflictActions(final @NotNull Path repoPath, final @NotNull List<String> conflicting) {
-            GitConflictOffer.show(p, conflicting,
-                    () -> resolveConflicts(repoPath),
-                    () -> finishRebase(repoPath, false),
-                    () -> finishRebase(repoPath, true));
-        }
-
-        // UC-SHARE-017
-        private void resolveConflicts(final @NotNull Path repoPath) {
-            ApplicationManager.getApplication().executeOnPooledThread(() ->
-                    ConflictResolution.resolveRebase(p, repoPath,
-                            () -> finishSyncInBackground(repoPath),
-                            leftOver -> showConflictActions(repoPath, leftOver)));
-        }
-
-        private void reportRebaseFailure(final @NotNull Path repoPath, final @NotNull String message) {
-            final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-                if (!conflicting.isEmpty()) showConflictActions(repoPath, conflicting);
-                else
-                    notifier.error(p, Bundle.message("git.conflict.operation.failed.title"), message);
-            });
-        }
-
-        private void reportSyncFailure(final @NotNull String detail) {
-            notifier.error(p, Bundle.message("git.sync.failed.title"), detail);
-        }
-
-        // UC-SHARE-017, Rule-SHARE-077
-        private void finishRebase(final @NotNull Path repoPath, final boolean abort) {
-            final @NotNull String failure = abort ? Bundle.message("git.error.abort.rebase") : Bundle.message("git.error.continue.rebase");
-
-            GitBackgroundTask.run(p, abort ? Bundle.message("git.task.aborting.rebase") : Bundle.message("git.task.continuing.rebase"), false,
-                    _ -> {
-                        if (abort) {
-                            if (git.couldNotAbortRebase(repoPath)) {
-                                reportRebaseFailure(repoPath, failure);
-                                return;
-                            }
-                            refreshRepository(repoPath);
-                            ApplicationManager.getApplication().invokeLater(() ->
-                                    notifier.info(p, Bundle.message("git.rebase.aborted.title"), Bundle.message("git.rebase.aborted.pull.message")));
-                            return;
-                        }
-
-                        if (git.couldNotContinueRebase(repoPath)) {
-                            reportRebaseFailure(repoPath, failure);
-                            return;
-                        }
-
-                        finishSyncInBackground(repoPath);
-                    },
-                    ex -> {
-                        Logger.error(FailureText.of(ex));
-                        reportRebaseFailure(repoPath, failure);
-                    });
-        }
-
-        private void finishSyncInBackground(final @NotNull Path repoPath) {
-            GitBackgroundTask.run(p, Bundle.message("git.task.finishing.sync"), false,
-                    indicator -> {
-                        final @NotNull OptionalInt pushed;
-                        try {
-                            indicator.setText(Bundle.message("git.progress.pushing.committed"));
-                            final @NotNull String remoteName = git.getRemoteName(repoPath);
-                            pushed = pushUnpushed(repoPath, remoteName, git.getRemoteUrl(repoPath, remoteName), git.syncBranch(repoPath));
-                        } catch (final Exception ex) {
-                            Logger.error("Could not push after resolving: " + ex.getMessage());
-                            ApplicationManager.getApplication().invokeLater(() ->
-                                    notifier.error(p, Bundle.message("git.push.failed.title"),
-                                            Bundle.message("git.push.failed.after.resolve", FailureText.of(ex))));
-
-                            indicator.setText(Bundle.message("git.progress.refreshing"));
-                            refreshRepository(repoPath);
-                            return;
-                        }
-
-                        indicator.setText(Bundle.message("git.progress.refreshing"));
-                        refreshAfterSync(repoPath, pushed);
-                    },
-                    ex -> {
-                        Logger.error(FailureText.of(ex));
-                        ApplicationManager.getApplication().invokeLater(() ->
-                                reportSyncFailure(Bundle.message("git.sync.did.not.finish", FailureText.of(ex))));
-                    });
-        }
-
-        // UC-SHARE-016, Rule-SHARE-070
-        private @NotNull OptionalInt pushUnpushed(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String remoteUrl, final @NotNull String branch) {
-            final @NotNull OptionalInt unpushed = git.unpushedCount(repoPath);
-            if (unpushed.orElse(-1) == 0) return OptionalInt.of(0);
-
-            commits.push(repoPath, remote, remoteUrl, branch);
-            return unpushed;
-        }
-
-        // UC-SHARE-016
-        private void refreshAfterSync(final @NotNull Path repoPath, final @NotNull OptionalInt pushed) {
-            RepositoryRefresh.after(p, repoPath);
-            ApplicationManager.getApplication().invokeLater(() ->
-                    notifier.info(p, Bundle.message("git.synced.title"), pushedMessage(pushed)));
-        }
-
-        private void refreshRepository(final @NotNull Path repoPath) {
-            RepositoryRefresh.after(p, repoPath);
-        }
     }
 }

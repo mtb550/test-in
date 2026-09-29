@@ -103,7 +103,4 @@ public final class RadioSelection<T> implements DialogComponent {
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
     }
-
-    record Option<T>(@NotNull String name, @NotNull T value) {
-    }
 }

@@ -36,7 +36,6 @@ import org.testin.java.codegen.GeneratedClass;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.java.codegen.JavaLiteral;
 import org.testin.logger.Logger;
-import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
@@ -124,8 +123,8 @@ public class UpdateTestBase {
 
     // UC-CODEGEN-002, Rule-CODEGEN-047, Rule-CODEGEN-048
     protected void writeEnabled(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull TestCaseDto tc) {
-        if (tc.getStatus() == TestCaseStatus.DISABLED) updateTestAnnotationAttribute(p, pm, "enabled", "false");
-        else removeTestAnnotationAttribute(pm, "enabled");
+        if (tc.getStatus().isEnabled()) removeTestAnnotationAttribute(pm, "enabled");
+        else updateTestAnnotationAttribute(p, pm, "enabled", "false");
     }
 
     protected void updateTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm, final @NotNull String attrName, final @NotNull String newValue) {

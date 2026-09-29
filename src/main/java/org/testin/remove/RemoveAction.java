@@ -18,36 +18,15 @@ package org.testin.remove;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.IdeActions;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
-import org.testin.actions.Declared;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
-import org.testin.editor.TestinEditors;
-import org.testin.indexer.NodeCounter;
-import org.testin.indexer.Nodes;
-import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.notifications.Done;
-import org.testin.notifications.Notifier;
-import org.testin.services.Services;
-import org.testin.ui.framework.ConfirmDialog;
-import org.testin.undo.UndoHistories;
-import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 // UC-TREE-PANEL-012
 public class RemoveAction extends AbstractAnyProjectAction {
@@ -63,7 +42,7 @@ public class RemoveAction extends AbstractAnyProjectAction {
         final @NotNull List<DirectoryDto> nodesToRemove = removableNodes(e);
         if (nodesToRemove.isEmpty()) return;
 
-        new Work(p).confirm(nodesToRemove);
+        new RemoveWork(p).confirm(nodesToRemove);
     }
 
     // UC-TREE-PANEL-012, Rule-TREE-PANEL-042
@@ -75,133 +54,5 @@ public class RemoveAction extends AbstractAnyProjectAction {
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.EDT;
-    }
-
-    private record Work(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEditors editors, @NotNull Notifier notifier, @NotNull UndoHistories undoHistories) {
-        private Work(final @NotNull Project p) {
-            this(p, Services.getInstance(p, Nodes.class), Services.getInstance(p, TestinEditors.class), Services.getInstance(p, Notifier.class), Services.getInstance(p, UndoHistories.class));
-        }
-
-        // UC-TREE-PANEL-012, Rule-TREE-PANEL-038
-        private void confirm(final @NotNull List<DirectoryDto> nodesToRemove) {
-            final @NotNull String holds = nodesToRemove.size() == 1
-                    ? NodeCounter.childCounts(p, nodesToRemove.getFirst()).describe()
-                    : "";
-
-            final @NotNull String msg = (nodesToRemove.size() == 1
-                    ? Bundle.message("remove.confirm.one", nodesToRemove.getFirst().getName())
-                    : Bundle.message("remove.confirm.many", String.valueOf(nodesToRemove.size())))
-                    + (holds.isEmpty() ? "" : System.lineSeparator() + holds);
-
-            final @NotNull String from = nodesToRemove.size() == 1 ? Objects.toString(nodesToRemove.getFirst().getPath().getParent(), "") : "";
-            new ConfirmDialog(p, Bundle.message("remove.confirm.title"), msg, from, "", Bundle.message("remove.confirm.button"), () -> removeNodes(nodesToRemove)).show();
-        }
-
-        // UC-TREE-PANEL-012, Rule-TREE-PANEL-041
-        private void removeNodes(final @NotNull List<DirectoryDto> nodesToRemove) {
-            if (nodesToRemove.isEmpty()) return;
-
-            final @NotNull List<Kept> kept = new ArrayList<>(nodesToRemove.size());
-
-            // Rule-TREE-PANEL-102
-            final boolean copied = ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
-                for (final DirectoryDto node : nodesToRemove) {
-                    ProgressManager.checkCanceled();
-                    nodes.keepAside(node.getPath()).ifPresent(copy -> kept.add(new Kept(node, node.getPath(), copy)));
-                }
-            }, Bundle.message("remove.progress"), true, p);
-
-            if (!copied) {
-                kept.forEach(one -> nodes.forgetKept(one.copy()));
-                return;
-            }
-
-            // Rule-TREE-PANEL-116
-            for (final DirectoryDto node : nodesToRemove) {
-                editors.close(p, node);
-            }
-
-            removeEach(nodesToRemove, went -> {
-                Logger.info("Removed " + went.size() + " of " + nodesToRemove.size() + " node(s).");
-
-                final @NotNull List<Kept> undoable = kept.stream().filter(one -> went.contains(one.dto())).toList();
-                kept.stream().filter(one -> !went.contains(one.dto())).forEach(one -> nodes.forgetKept(one.copy()));
-
-                if (went.isEmpty()) return;
-
-                recordRemoval(went, undoable);
-                notifier.softShowCounted(p, Done.REMOVED, went.size());
-
-                final int lost = went.size() - undoable.size();
-                if (lost > 0) {
-                    notifier.softRefuse(p, Bundle.message("remove.not.undoable.title"),
-                            lost == 1
-                                    ? Bundle.message("remove.not.undoable.one", Declared.shortcutText(IdeActions.ACTION_UNDO))
-                                    : Bundle.message("remove.not.undoable.many", String.valueOf(lost), Declared.shortcutText(IdeActions.ACTION_UNDO)));
-                }
-            });
-        }
-
-        // UC-TREE-PANEL-012, Rule-TREE-PANEL-042
-        private void removeEach(final @NotNull List<DirectoryDto> nodes, final @NotNull Consumer<@NotNull List<DirectoryDto>> whenAllGone) {
-            final @NotNull AtomicInteger pending = new AtomicInteger(nodes.size());
-            final @NotNull List<DirectoryDto> went = new CopyOnWriteArrayList<>();
-
-            for (final DirectoryDto node : nodes) {
-                Removals.of(node.getType()).remove(p, node, wasRemoved -> {
-                    if (wasRemoved) went.add(node);
-                    if (pending.decrementAndGet() != 0) return;
-
-                    whenAllGone.accept(List.copyOf(went));
-                });
-            }
-        }
-
-        // UC-TREE-PANEL-012, Rule-TREE-PANEL-040
-        private void recordRemoval(final @NotNull List<DirectoryDto> asked, final @NotNull List<Kept> kept) {
-            final @NotNull String what = asked.size() == 1
-                    ? Bundle.message("remove.undo.one", asked.getFirst().getName())
-                    : Bundle.message("remove.undo.many", String.valueOf(asked.size()));
-
-            undoHistories.push(UndoScope.TREE, new UndoHistories.Operation(
-                    what,
-                    () -> restoreAll(kept),
-                    () -> {
-                        removeAll(kept);
-                        return true;
-                    },
-                    () -> kept.forEach(one -> nodes.forgetKept(one.copy()))));
-        }
-
-        // UC-TREE-PANEL-016, Rule-TREE-PANEL-040, Rule-INTERNAL-063
-        private boolean restoreAll(final @NotNull List<Kept> kept) {
-            if (kept.isEmpty()) {
-                notifier.softRefuse(p, Bundle.message("remove.not.undoable.title"),
-                        Bundle.message("remove.nothing.kept"));
-                return false;
-            }
-
-            // Rule-TREE-PANEL-102
-            final @NotNull Map<Path, Path> originalByKept = new LinkedHashMap<>();
-            kept.forEach(one -> originalByKept.put(one.copy(), one.original()));
-
-            final @NotNull List<Path> lost = new ArrayList<>();
-            ProgressManager.getInstance().runProcessWithProgressSynchronously(
-                    () -> lost.addAll(nodes.restoreNodes(originalByKept)),
-                    Bundle.message("remove.undo.progress"), false, p);
-
-            if (lost.isEmpty()) return true;
-
-            notifier.softRefuse(p, Bundle.message("remove.undo.incomplete.title"), Bundle.message("remove.undo.incomplete.message", String.valueOf(lost.size()), String.valueOf(kept.size())));
-            return false;
-        }
-
-        // UC-TREE-PANEL-017
-        private void removeAll(final @NotNull List<Kept> kept) {
-            removeEach(kept.stream().map(Kept::dto).toList(), went -> Logger.info("Removed " + went.size() + " node(s) again."));
-        }
-    }
-
-    private record Kept(@NotNull DirectoryDto dto, @NotNull Path original, @NotNull Path copy) {
     }
 }

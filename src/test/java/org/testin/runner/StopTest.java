@@ -52,7 +52,7 @@ public class StopTest {
         registry.launched(List.of(ONE, TWO), "cycle 1");
         registry.launched(List.of(THREE), "cycle 2");
 
-        final RunRegistry.Stop stop = registry.stopping(List.of(ONE));
+        final Stop stop = registry.stopping(List.of(ONE));
 
         assertEquals(stop.runs(), Set.of("cycle 1"), "the stop killed the wrong runs");
         assertEquals(Set.copyOf(stop.testCases()), Set.of(ONE, TWO), "a case sharing the process was left running");
@@ -66,7 +66,7 @@ public class StopTest {
         registry.launched(List.of(ONE, TWO), "cycle 1");
         registry.reported(ONE, RunStatus.PASSED);
 
-        final RunRegistry.Stop stop = registry.stopping(List.of(TWO));
+        final Stop stop = registry.stopping(List.of(TWO));
 
         assertEquals(registry.statusOf(ONE), RunStatus.PASSED, "a stop took back a verdict that had already landed");
         assertFalse(stop.testCases().contains(ONE), "a finished case was swept up as a casemate");
@@ -77,7 +77,7 @@ public class StopTest {
     public void stoppingNothingIsItsOwnAnswer() {
         final RunRegistry registry = new RunRegistry();
 
-        assertEquals(registry.stopping(List.of(ONE)), RunRegistry.Stop.NOTHING);
+        assertEquals(registry.stopping(List.of(ONE)), Stop.NOTHING);
     }
 
     @Test

@@ -38,12 +38,12 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog {
 
     private static final @NotNull String LINE = "\n";
 
-    private final @NotNull List<Merge.Question> questions;
+    private final @NotNull List<Question> questions;
     private final @NotNull List<RadioSelection<Boolean>> answers = new ArrayList<>();
     private final @NotNull Consumer<Set<String>> onResolved;
     private final @NotNull Runnable onSkipped;
 
-    public ResolveConflictDialog(final @NotNull Project p, final @NotNull String testCase, final @NotNull List<Merge.Question> questions, final @NotNull List<String> settled, final @NotNull Consumer<Set<String>> onResolved, final @NotNull Runnable onSkipped) {
+    public ResolveConflictDialog(final @NotNull Project p, final @NotNull String testCase, final @NotNull List<Question> questions, final @NotNull List<String> settled, final @NotNull Consumer<Set<String>> onResolved, final @NotNull Runnable onSkipped) {
         super(p);
         this.questions = questions;
         this.onResolved = onResolved;
@@ -55,7 +55,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog {
 
         if (!settled.isEmpty()) rows.add(ComponentDialogBase.message(Merge.settledSentence(settled, LINE)));
 
-        for (final Merge.Question question : questions) {
+        for (final Question question : questions) {
             final @NotNull ComponentDialogBase<RadioSelection<Boolean>> row = ComponentDialogBase.<Boolean>radios(FieldName.of(question.field()))
                     .option(Bundle.message("dialog.conflict.option.mine", shortened(question.mine())), Boolean.FALSE)
                     .option(Bundle.message("dialog.conflict.option.remote", shortened(question.theirs())), Boolean.TRUE)

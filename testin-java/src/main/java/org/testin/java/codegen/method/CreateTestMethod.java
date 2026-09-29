@@ -365,7 +365,4 @@ public class CreateTestMethod implements GenAction {
             return Optional.empty();
         }
     }
-
-    record Target(@NotNull String path, @NotNull List<String> packageList, @NotNull String className, @NotNull String methodName) {
-    }
 }

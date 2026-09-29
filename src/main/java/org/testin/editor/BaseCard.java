@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.AutomationState;
 import org.testin.model.Automated;
 import org.testin.services.Services;
+import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.RowStripe;
@@ -59,7 +60,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected @NotNull String hoveredAction = "";
     protected @NotNull Automated automation = Automated.UNKNOWN;
     @Setter
-    private @NotNull List<CardHoverAction.Offered> hoverButtons = List.of();
+    private @NotNull List<Offered> hoverButtons = List.of();
     private @NotNull String plainTitle = "";
     private int titleColumnWidth = Integer.MAX_VALUE;
     private int titleWidth;
@@ -123,7 +124,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         titleArea.setSize(Math.min(titleColumnWidth, Short.MAX_VALUE), Short.MAX_VALUE);
     }
 
-    protected void updateUI(final int index, final @NotNull String title, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+    protected void updateUI(final int index, final @NotNull String title, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         plainTitle = title;
 
         setBackground(RowStripe.of(index));

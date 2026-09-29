@@ -130,7 +130,7 @@ final class PendingChangeFactory {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
         changes.add(new FieldChange(relativePath.getFileName().toString(), before, after, ChangeSubject.MARKER.changeFor(type)));
 
-        if (type == DiffType.MODIFIED && DirectoryType.byMarker(relativePath.getFileName().toString()).filter(kind -> kind == DirectoryType.TR).isPresent()) {
+        if (type == DiffType.MODIFIED && DirectoryType.TR.isMarkerOf(relativePath.getFileName().toString())) {
             changes.addAll(TestRunChangeComparator.compareFacts(
                     read(mapper, beforeJson, TestRunMarker.class), read(mapper, afterJson, TestRunMarker.class)));
         }

@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.bug.BugReports;
 import org.testin.bug.ReportBug;
+import org.testin.bug.RunItem;
 import org.testin.editor.TestinEditors;
 import org.testin.editor.run.RunEditor;
 import org.testin.indexer.Nodes;
@@ -34,6 +35,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
+import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
@@ -83,7 +85,7 @@ public final class Bug {
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075
     private static @NotNull ActionLink report(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto runDirectory) {
         final @NotNull Optional<String> off = Services.getInstance(p, BugReports.class)
-                .whyReportBugIsOff(new BugReports.RunItem(runDirectory.getPath(), runItem.getId()), runItem);
+                .whyReportBugIsOff(new RunItem(runDirectory.getPath(), runItem.getId()), runItem);
 
         final @NotNull ActionLink report = AbstractDetails.link(Bundle.message("bug.dialog.title"),
                 _ -> ReportBug.start(p, runDirectory, runItem.getId(), dto, () -> redraw(p, dto, runDirectory)));
@@ -96,7 +98,7 @@ public final class Bug {
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086
     private static @NotNull Optional<JComponent> chip(final @NotNull TestRunItems runItem) {
-        final @NotNull List<Badges.Badge> bug = new ArrayList<>();
+        final @NotNull List<Badge> bug = new ArrayList<>();
         Badges.addBugBadge(bug, runItem.getBugSeverity().getLabel(), runItem.getBugSeverity().getColor());
         Badges.addBugBadge(bug, runItem.getBugPriority().getLabel(), runItem.getBugSeverity().getColor());
 

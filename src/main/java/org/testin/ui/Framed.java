@@ -1,0 +1,50 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.ui;
+
+import com.intellij.ui.JBColor;
+import com.intellij.util.ui.UIUtil;
+import org.jetbrains.annotations.NotNull;
+
+import javax.swing.Icon;
+import java.awt.Color;
+import java.awt.Graphics2D;
+
+// Rule-VIEW-PANEL-086
+public record Framed(@NotNull String text, @NotNull Icon icon) implements Badge {
+    @Override
+    public @NotNull Color ink() {
+        return UIUtil.getLabelForeground();
+    }
+
+    @Override
+    public @NotNull Icon mark() {
+        return icon;
+    }
+
+    @Override
+    public int notch() {
+        return 0;
+    }
+
+    // Rule-VIEW-PANEL-086
+    @Override
+    public void paint(final @NotNull Graphics2D g2, final int width, final int height) {
+        g2.setColor(JBColor.border());
+        g2.drawRoundRect(0, 0, width - 1, height - 1, Badges.BADGE_RADIUS, Badges.BADGE_RADIUS);
+    }
+}

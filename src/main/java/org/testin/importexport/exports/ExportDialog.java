@@ -25,6 +25,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.ui.dialogs.Destination;
 import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -42,11 +43,11 @@ public final class ExportDialog extends AbstractFrameworkDialog {
     private final @NotNull DestinationForm form;
 
     private final @NotNull SheetPreview preview;
-    private final @NotNull BiConsumer<DestinationForm.@NotNull Destination,
+    private final @NotNull BiConsumer<@NotNull Destination,
             @NotNull Map<String, List<TestCaseDto>>> onExport;
     private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
-    public ExportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> exportAttributes, final @NotNull Map<String, List<TestCaseDto>> sheetsData, final @NotNull VirtualFile exportTarget, final @NotNull BiConsumer<DestinationForm.@NotNull Destination, @NotNull Map<String, List<TestCaseDto>>> onExport) {
+    public ExportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> exportAttributes, final @NotNull Map<String, List<TestCaseDto>> sheetsData, final @NotNull VirtualFile exportTarget, final @NotNull BiConsumer<@NotNull Destination, @NotNull Map<String, List<TestCaseDto>>> onExport) {
         super(p);
         this.onExport = onExport;
 

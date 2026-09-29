@@ -25,20 +25,26 @@ import org.testin.util.Bundle;
 @AllArgsConstructor
 public enum TestCaseStatus {
     REVIEWED(
-            Bundle.message("status.case.reviewed")
+            Bundle.message("status.case.reviewed"),
+            true
     ),
 
     PENDING(
-            Bundle.message("status.case.pending")
+            Bundle.message("status.case.pending"),
+            true
     ),
 
     DISABLED(
-            Bundle.message("status.case.disabled")
+            Bundle.message("status.case.disabled"),
+            false
     ),
 
     TO_BE_UPDATED(
-            Bundle.message("status.case.to.be.updated")
+            Bundle.message("status.case.to.be.updated"),
+            true
     );
 
     private final @NotNull String label;
+    // Rule-CODEGEN-047, Rule-CODEGEN-048
+    private final boolean enabled;
 }

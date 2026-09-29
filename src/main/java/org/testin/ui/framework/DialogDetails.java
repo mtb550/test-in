@@ -25,11 +25,9 @@ import org.testin.ui.Caption;
 import org.testin.util.Fonts;
 
 import javax.swing.BoxLayout;
-import javax.swing.Icon;
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
 import java.util.List;
-import java.util.Optional;
 
 public final class DialogDetails implements DialogComponent {
     private final @NotNull JBPanel<?> panel;
@@ -81,8 +79,5 @@ public final class DialogDetails implements DialogComponent {
     @Override
     public boolean wantsFocus() {
         return false;
-    }
-
-    record Row(@NotNull String caption, @NotNull Optional<Icon> icon, @NotNull String value) {
     }
 }

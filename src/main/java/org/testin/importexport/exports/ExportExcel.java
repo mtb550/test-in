@@ -27,10 +27,10 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.Can;
 import org.testin.testcase.TestEditorAttributes;
-import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.util.FailureText;
-import org.testin.util.Fonts;
+import org.testin.util.ReportFont;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,7 +64,7 @@ public class ExportExcel {
         try (SXSSFWorkbook workbook = new SXSSFWorkbook()) {
             final @NotNull CellStyle headerStyle = workbook.createCellStyle();
             final @NotNull Font headerFont = workbook.createFont();
-            headerFont.setFontName(Fonts.Report.FAMILY);
+            headerFont.setFontName(ReportFont.FAMILY);
             headerFont.setBold(true);
             headerStyle.setFont(headerFont);
 

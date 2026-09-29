@@ -25,16 +25,16 @@ already ship this?** Only the first group is a candidate for removal.
 
 ## The platform does not ship this
 
-| What                                            | Where                                           | Why nothing fits                                                                                                                 |
-|-------------------------------------------------|-------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| The dialog card: a rounded fill plus a hairline | `ui/dialogs/SectionFill.java:40`                | `RoundedLineBorderWithBackground` is exactly this and is `@ApiStatus.Internal`. Verified in the SDK, 2026-09-27                  |
-| The unfocused field frame                       | `ui/dialogs/FieldFrame.java:31-33`              | It **extends** `DarculaTextBorder` and only adds the unfocused stroke, which is the intended way to specialise a platform border |
-| A chosen row as a rounded band                  | `ui/framework/TextFieldWithSelections.java:270` | A list selection is a rectangle everywhere in Swing. Rule-INTERNAL-106                                                           |
-| Badge pills                                     | `ui/Badges.java:180`                            | No platform pill. The shape carries severity and priority together                                                               |
-| The verdict donut                               | `view/marker/VerdictDonut.java:160,182`         | No platform chart of any kind                                                                                                    |
-| The grid's selected-cell edge                   | `editor/grid/SelectionCellBorder.java:45`       | A table cell border is the caller's in Swing                                                                                     |
-| Light mode's key button                         | `lightmode/KeyBtn.java:84`                      | Related: `ui/framework/Keycap` draws the same idea for dialogs, so **these two are each other's duplicate**, not the platform's  |
-| Analysis category colors parsed from `#rrggbb`  | `model/ResultAnalysis.java:125`                 | The colors are the tester's own data, not the IDE's                                                                              |
+| What                                            | Where                                                             | Why nothing fits                                                                                                                 |
+|-------------------------------------------------|-------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| The dialog card: a rounded fill plus a hairline | `ui/dialogs/SectionFill.java:40`                                  | `RoundedLineBorderWithBackground` is exactly this and is `@ApiStatus.Internal`. Verified in the SDK, 2026-09-27                  |
+| The unfocused field frame                       | `ui/dialogs/FieldFrame.java:31-33`                                | It **extends** `DarculaTextBorder` and only adds the unfocused stroke, which is the intended way to specialise a platform border |
+| A chosen row as a rounded band                  | `ui/framework/TextFieldWithSelections.java:270`                   | A list selection is a rectangle everywhere in Swing. Rule-INTERNAL-106                                                           |
+| Badge pills                                     | `ui/Badges.java:135`, `ui/Tag.java:51`                            | No platform pill. The shape carries severity and priority together                                                               |
+| The verdict donut                               | `view/marker/VerdictDonut.java:163`, `view/marker/Swatch.java:29` | No platform chart of any kind                                                                                                    |
+| The grid's selected-cell edge                   | `editor/grid/SelectionCellBorder.java:45`                         | A table cell border is the caller's in Swing                                                                                     |
+| Light mode's key button                         | `lightmode/KeyBtn.java:84`                                        | Related: `ui/framework/Keycap` draws the same idea for dialogs, so **these two are each other's duplicate**, not the platform's  |
+| Analysis category colors parsed from `#rrggbb`  | `model/ResultAnalysis.java:125`                                   | The colors are the tester's own data, not the IDE's                                                                              |
 
 ## Decided, not drift
 

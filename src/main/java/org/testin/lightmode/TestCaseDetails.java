@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.ui.framework.Prose;
 import org.testin.util.Bundle;
@@ -128,7 +129,7 @@ class TestCaseDetails extends JBPanel<TestCaseDetails> {
     }
 
     private void addTags(final @NotNull TestCaseDto tc) {
-        final @NotNull List<Badges.Badge> badges = Badges.testCaseBadges(tc);
+        final @NotNull List<Badge> badges = Badges.testCaseBadges(tc);
 
         if (badges.isEmpty()) return;
 

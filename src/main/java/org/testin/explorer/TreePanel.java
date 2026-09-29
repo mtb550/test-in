@@ -239,24 +239,16 @@ public final class TreePanel implements Disposable {
         emptyText.appendLine("");
         emptyText.appendLine("");
 
-        switch (state) {
-            case NO_ROOT -> offerSettings(emptyText);
-            case READING -> sayItIsReading(emptyText);
-            case CLONE_BOUND -> offerClone(emptyText);
-            case NO_PROJECTS -> offerFirstProject(emptyText);
-            case CHOOSE -> offerChoice(emptyText);
-
-            case TREE -> Logger.warn("Welcome screen asked to draw a resolved project");
-        }
+        state.offerOn(this, emptyText);
     }
 
     // UC-TREE-PANEL-001, Rule-TREE-PANEL-118, Rule-TREE-PANEL-119
-    private void sayItIsReading(final @NotNull StatusText emptyText) {
+    void sayItIsReading(final @NotNull StatusText emptyText) {
         emptyText.appendLine(Bundle.message("welcome.reading"), SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
     }
 
     // UC-TREE-PANEL-001
-    private void offerSettings(final @NotNull StatusText emptyText) {
+    void offerSettings(final @NotNull StatusText emptyText) {
         emptyText.appendLine(
                 AllIcons.General.Settings,
                 Bundle.message("settings.action.description"),
@@ -265,7 +257,7 @@ public final class TreePanel implements Disposable {
     }
 
     // UC-TREE-PANEL-001, UC-TREE-PANEL-003
-    private void offerClone(final @NotNull StatusText emptyText) {
+    void offerClone(final @NotNull StatusText emptyText) {
         final @NotNull String url = boundTestProject.cloneAddress().orElse("");
         final @NotNull String clone = Bundle.message("welcome.clone", boundTestProject.name());
 
@@ -296,7 +288,7 @@ public final class TreePanel implements Disposable {
     }
 
     // UC-TREE-PANEL-001, UC-TREE-PANEL-002
-    private void offerFirstProject(final @NotNull StatusText emptyText) {
+    void offerFirstProject(final @NotNull StatusText emptyText) {
         emptyText.appendLine(
                 AllIcons.General.Add,
                 Bundle.message("welcome.first.project"),
@@ -305,7 +297,7 @@ public final class TreePanel implements Disposable {
     }
 
     // UC-TREE-PANEL-001, UC-TREE-PANEL-004
-    private void offerChoice(final @NotNull StatusText emptyText) {
+    void offerChoice(final @NotNull StatusText emptyText) {
         final @NotNull String problem = boundTestProject.problem(underRoot);
         if (!problem.isEmpty()) {
             emptyText.appendLine(problem, SimpleTextAttributes.ERROR_ATTRIBUTES, null);

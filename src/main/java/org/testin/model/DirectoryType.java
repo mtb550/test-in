@@ -161,7 +161,12 @@ public enum DirectoryType {
 
     // Rule-INTERNAL-014, Rule-INTERNAL-090
     public static @NotNull Optional<DirectoryType> byMarker(final @NotNull String fileName) {
-        return Arrays.stream(values()).filter(type -> type.marker.equals(fileName)).findFirst();
+        return Arrays.stream(values()).filter(type -> type.isMarkerOf(fileName)).findFirst();
+    }
+
+    // Rule-INTERNAL-014, Rule-INTERNAL-090
+    public boolean isMarkerOf(final @NotNull String fileName) {
+        return marker.equals(fileName);
     }
 
     public boolean accepts(final @NotNull DirectoryType source) {
@@ -175,6 +180,11 @@ public enum DirectoryType {
     // UC-TREE-PANEL-008, Rule-TREE-PANEL-095
     public boolean canTakeName(final @NotNull String name) {
         return isOneFolderName(name) && (!BECOME_JAVA_PACKAGES.contains(this) || NameSanitizer.canMakePackageName(name));
+    }
+
+    // Rule-INTERNAL-011
+    public boolean holdsScreenshots() {
+        return this == TR;
     }
 
     public @NotNull String getMarkerKind() {

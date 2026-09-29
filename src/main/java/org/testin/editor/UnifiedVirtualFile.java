@@ -28,11 +28,13 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 @Getter
 public class UnifiedVirtualFile extends LightVirtualFile {
     private final @NotNull DirectoryDto dir;
+    private final @NotNull EditorKind kind;
 
-    public UnifiedVirtualFile(final @NotNull DirectoryDto dir, final @NotNull EditorType ft) {
+    public UnifiedVirtualFile(final @NotNull DirectoryDto dir) {
         super(dir.getName());
         this.dir = dir;
-        this.setFileType(ft);
+        this.kind = EditorKind.of(dir);
+        this.setFileType(kind.getFileType());
     }
 
     @Override

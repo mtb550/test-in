@@ -34,13 +34,13 @@ public class ResultAnalysisSegmentsTest {
         return new TestRunSummary(passed + failed + blocked + untested + removed, passed, failed, blocked, untested, removed, "");
     }
 
-    private static @NotNull List<ResultAnalysis.Segment> of(final @NotNull TestRunSummary summary, final @NotNull TestRunStatus run) {
+    private static @NotNull List<Segment> of(final @NotNull TestRunSummary summary, final @NotNull TestRunStatus run) {
         return ResultAnalysis.segments(summary, run);
     }
 
     private static @NotNull String words(final @NotNull TestRunSummary summary) {
         return of(summary, TestRunStatus.IN_PROGRESS).stream()
-                .map(ResultAnalysis.Segment::text)
+                .map(Segment::text)
                 .collect(Collectors.joining(" · "));
     }
 
@@ -81,7 +81,7 @@ public class ResultAnalysisSegmentsTest {
 
     @Test
     public void everyVerdictsColorFollowsTheThemeRatherThanBeingPickedOnce() {
-        for (final ResultAnalysis.Segment segment : of(run(1, 1, 1, 1, 0), TestRunStatus.IN_PROGRESS)) {
+        for (final Segment segment : of(run(1, 1, 1, 1, 0), TestRunStatus.IN_PROGRESS)) {
             assertTrue(segment.color() instanceof JBColor,
                     segment.text() + " is drawn in a color that was resolved once and cannot follow a theme change");
         }
@@ -89,7 +89,7 @@ public class ResultAnalysisSegmentsTest {
 
     @Test
     public void aRemovedTestCaseIsCountedWithoutBeingPaintedAsAVerdict() {
-        final @NotNull List<ResultAnalysis.Segment> segments = of(run(0, 0, 0, 0, 2), TestRunStatus.CLOSED);
+        final @NotNull List<Segment> segments = of(run(0, 0, 0, 0, 2), TestRunStatus.CLOSED);
 
         assertEquals(segments.size(), 1);
         assertEquals(segments.getFirst().text(), TestStatus.REMOVED.getLabel() + " 2");
@@ -110,7 +110,7 @@ public class ResultAnalysisSegmentsTest {
     @Test
     public void theThreeVerdictsKeepTheirNameWhicheverStateTheRunIsIn() {
         final @NotNull String closed = of(run(1, 1, 1, 0, 0), TestRunStatus.CLOSED).stream()
-                .map(ResultAnalysis.Segment::text)
+                .map(Segment::text)
                 .collect(Collectors.joining(" · "));
 
         assertEquals(words(run(1, 1, 1, 0, 0)), closed);

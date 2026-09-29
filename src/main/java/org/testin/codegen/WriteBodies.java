@@ -31,9 +31,10 @@ import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.ProjectLifetime;
 import org.testin.services.Services;
+import org.testin.ui.framework.Alternative;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.util.Shortcuts;
 import org.testin.util.Bundle;
+import org.testin.util.Shortcuts;
 
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +70,7 @@ public final class WriteBodies {
                 Bundle.message("agent.over.message", String.valueOf(theirs.size())), "", "",
                 Bundle.message("agent.over.confirm"),
                 () -> ask(p, connection, empty, theirs, editor),
-                List.of(new ConfirmDialog.Alternative(Shortcuts.ConfirmAlternative, Bundle.message("agent.over.skip"),
+                List.of(new Alternative(Shortcuts.ConfirmAlternative, Bundle.message("agent.over.skip"),
                         () -> ask(p, connection, empty, List.of(), editor)))).show();
     }
 

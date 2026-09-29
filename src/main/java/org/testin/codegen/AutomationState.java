@@ -166,7 +166,4 @@ public final class AutomationState implements Disposable {
     @Override
     public void dispose() {
     }
-
-    private record Answer(@NotNull Map<UUID, Automated> states, @NotNull Set<UUID> withMethods, long codeVersion) {
-    }
 }

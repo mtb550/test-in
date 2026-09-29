@@ -25,7 +25,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BooleanSupplier;
 
 @Service(Service.Level.PROJECT)
 public final class UndoHistories {
@@ -115,20 +114,5 @@ public final class UndoHistories {
     private static final class History {
         private final @NotNull Deque<Operation> undoStack = new ArrayDeque<>();
         private final @NotNull Deque<Operation> redoStack = new ArrayDeque<>();
-    }
-
-    public record Operation(@NotNull String description, @NotNull BooleanSupplier undo, @NotNull BooleanSupplier redo, @NotNull Runnable forget) {
-        // UC-INTERNAL-005, Rule-INTERNAL-063
-        public Operation(final @NotNull String description, final @NotNull Runnable undo, final @NotNull Runnable redo) {
-            this(description, always(undo), always(redo), () -> {
-            });
-        }
-
-        private static @NotNull BooleanSupplier always(final @NotNull Runnable work) {
-            return () -> {
-                work.run();
-                return true;
-            };
-        }
     }
 }

@@ -22,6 +22,7 @@ import org.testin.logger.Logger;
 import org.testin.model.Failure;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.RunStatus;
+import org.testin.model.Segment;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunStatus;
 import org.testin.model.TestRunSummary;
@@ -221,7 +222,7 @@ public final class RunWalk {
     private void sayWhatTheRunRecorded() {
         final @NotNull String recorded = ResultAnalysis
                 .segments(TestRunSummary.of(editor.results()), parent.getMarker().getStatus())
-                .stream().map(ResultAnalysis.Segment::text).collect(Collectors.joining(", "));
+                .stream().map(Segment::text).collect(Collectors.joining(", "));
 
         if (!recorded.isEmpty()) notifier.softShow(p, recorded);
     }

@@ -113,8 +113,4 @@ public enum OptionalPlugin {
     public @NotNull String needs(final @NotNull String entryName) {
         return Bundle.message("plugin.needs", entryName, label);
     }
-
-    private enum Availability {
-        UNKNOWN, PRESENT, ABSENT
-    }
 }

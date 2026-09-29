@@ -28,6 +28,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.undo.Operation;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
@@ -51,7 +52,7 @@ public class OrderNodeAction extends AbstractAnyProjectAction {
         Services.getInstance(p, Notifier.class).softShow(p, Done.ORDERED);
 
         // Rule-TREE-PANEL-103
-        Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
+        Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new Operation(
                 Bundle.message("order.undo", node.getName()),
                 () -> place(p, node, before),
                 () -> place(p, node, order),

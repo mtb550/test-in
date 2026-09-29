@@ -19,7 +19,6 @@ package org.testin.editor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
 import com.intellij.openapi.fileEditor.FileEditorProvider;
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -34,11 +33,7 @@ public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
     @Override
     public @NotNull FileEditor createEditor(final @NotNull Project p, final @NotNull VirtualFile file) {
         if (file instanceof UnifiedVirtualFile unifiedFile) {
-            final @NotNull FileType ft = unifiedFile.getFileType();
-            if (!(ft instanceof EditorType editorType))
-                throw new IllegalArgumentException("Unknown FileType: " + ft);
-
-            final @NotNull TestinEditor editor = editorType.getFactory().apply(p, unifiedFile);
+            final @NotNull TestinEditor editor = unifiedFile.getKind().getFileType().getFactory().apply(p, unifiedFile);
             return new UnifiedFileEditor(p, unifiedFile, editor);
         }
 

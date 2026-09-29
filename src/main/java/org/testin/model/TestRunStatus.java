@@ -101,6 +101,11 @@ public enum TestRunStatus implements MenuItem {
         return this == COMPLETED || this == CLOSED;
     }
 
+    // UC-TREE-PANEL-020
+    public boolean stopsExecution() {
+        return this == COMPLETED;
+    }
+
     public @NotNull String getShortcutText() {
         return Shortcuts.shortcutText(shortcut);
     }
@@ -120,9 +125,6 @@ public enum TestRunStatus implements MenuItem {
             }
         }.registerCustomShortcutSet(Shortcuts.customShortcut(shortcut), component);
     }
-
-    // UC-TREE-PANEL-020, Rule-TREE-PANEL-068
-    private enum SetBy {TESTER, TESTIN}
 
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-092
     private static final class Stage {

@@ -177,17 +177,4 @@ public final class TestNGRunner implements TestRunner {
         execution.started(testCases, List.of());
         execution.launch(testCases, settings);
     }
-
-    private record Prepared(@NotNull List<Generated> found, @NotNull List<TestCaseDto> withoutCode, @NotNull Optional<Module> module) {
-    }
-
-    private record Generated(@NotNull TestCaseDto tc, @NotNull List<String> fqcn) {
-        private @NotNull String pattern() {
-            return String.join(".", fqcn.subList(0, fqcn.size() - 1)) + "," + fqcn.getLast();
-        }
-
-        private @NotNull String simpleClassName() {
-            return fqcn.get(fqcn.size() - 2);
-        }
-    }
 }

@@ -141,6 +141,20 @@ public abstract class DirectoryDto {
         return false;
     }
 
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-099
+    public @NotNull String statusShownInTree() {
+        return getMarker().status().isActive() ? "" : getMarker().getStatusLabel();
+    }
+
+    // UC-TREE-PANEL-001, Rule-TREE-PANEL-127
+    public boolean mayHaveChildren() {
+        return !fixedChildren().isEmpty() || getType().acceptsAnything();
+    }
+
+    public boolean holdsTestCases() {
+        return false;
+    }
+
     @NotNull
     public abstract DirectoryType getType();
 }

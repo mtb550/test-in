@@ -57,7 +57,7 @@ public class BadgesTest {
 
     @Test
     public void aTestCaseThatNeverFailedDrawsNoPill() {
-        final List<Badges.Badge> badges = new ArrayList<>();
+        final List<Badge> badges = new ArrayList<>();
 
         Badges.addBugBadge(badges, BugSeverity.EMPTY.getLabel(), BugSeverity.EMPTY.getColor());
         Badges.addBugBadge(badges, BugPriority.EMPTY.getLabel(), BugPriority.EMPTY.getColor());
@@ -67,35 +67,35 @@ public class BadgesTest {
 
     @Test
     public void oneHalfOnItsOwnIsThatHalf() {
-        final List<Badges.Badge> severityOnly = new ArrayList<>();
+        final List<Badge> severityOnly = new ArrayList<>();
         Badges.addBugBadge(severityOnly, BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
         assertEquals(severityOnly.size(), 1);
-        assertTrue(severityOnly.getFirst() instanceof Badges.Bug bug && bug.text().equals("Major"));
+        assertTrue(severityOnly.getFirst() instanceof BugBadge bug && bug.text().equals("Major"));
 
-        final List<Badges.Badge> priorityOnly = new ArrayList<>();
+        final List<Badge> priorityOnly = new ArrayList<>();
         Badges.addBugBadge(priorityOnly, BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
         assertEquals(priorityOnly.size(), 1);
-        assertTrue(priorityOnly.getFirst() instanceof Badges.Bug bug && bug.text().equals("High"),
+        assertTrue(priorityOnly.getFirst() instanceof BugBadge bug && bug.text().equals("High"),
                 "the survivor keeps its own color, which is why BugPriority still declares one");
     }
 
     @Test
     public void bothHalvesJoinIntoOneBadge() {
-        final List<Badges.Badge> badges = new ArrayList<>();
+        final List<Badge> badges = new ArrayList<>();
 
         Badges.addBugBadge(badges, BugSeverity.MAJOR.getLabel(), BugSeverity.MAJOR.getColor());
         Badges.addBugBadge(badges, BugPriority.HIGH.getLabel(), BugPriority.HIGH.getColor());
 
         assertEquals(badges.size(), 1, "two halves, one badge");
-        assertTrue(badges.getFirst() instanceof Badges.Bug bug && bug.text().equals("Major / High"),
+        assertTrue(badges.getFirst() instanceof BugBadge bug && bug.text().equals("Major / High"),
                 "severity first, because the enum offers it first");
-        assertEquals(((Badges.Bug) badges.getFirst()).color(), BugSeverity.MAJOR.getColor(),
+        assertEquals(((BugBadge) badges.getFirst()).color(), BugSeverity.MAJOR.getColor(),
                 "the color is the first half's");
     }
 
     @Test
     public void lowPriorityDrawsNoPill() {
-        final List<Badges.Badge> badges = new ArrayList<>();
+        final List<Badge> badges = new ArrayList<>();
 
         Badges.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.LOW));
         assertEquals(badges.size(), 0, "Low is the default, and the default needs no badge");

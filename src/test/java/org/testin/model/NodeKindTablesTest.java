@@ -53,12 +53,12 @@ public class NodeKindTablesTest {
 
     private static @NotNull Set<String> gatheredWaysOfCounting() {
         try {
-            return Arrays.stream(Class.forName("org.testin.indexer.NodeCounter$Gathered").getEnumConstants())
+            return Arrays.stream(Class.forName("org.testin.indexer.Gathered").getEnumConstants())
                     .map(c -> ((Enum<?>) c).name())
                     .collect(Collectors.toSet());
 
         } catch (final ClassNotFoundException ex) {
-            fail("NodeCounter.Gathered is gone, so nothing checks that the ways of counting still match");
+            fail("Gathered is gone, so nothing checks that the ways of counting still match");
             return Set.of();
         }
     }
@@ -83,7 +83,7 @@ public class NodeKindTablesTest {
         final @NotNull Set<String> gathered = gatheredWaysOfCounting();
 
         assertEquals(gathered, Arrays.stream(NodeStatistics.values()).map(Enum::name).collect(Collectors.toSet()),
-                "NodeCounter.Gathered and NodeStatistics no longer name the same ways of counting,"
+                "Gathered and NodeStatistics no longer name the same ways of counting,"
                         + " so NodeCounter.figures throws on a node counted the way that is missing");
     }
 

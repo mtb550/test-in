@@ -342,6 +342,12 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
         walk.launching(testCaseId);
     }
 
+    // UC-REPORT-001
+    @Override
+    public @NotNull Optional<TestRunDirectoryDto> shownRun() {
+        return Optional.of(getParent());
+    }
+
     // UC-EDITOR-PANEL-044
     @Override
     public void runWhenLoaded() {

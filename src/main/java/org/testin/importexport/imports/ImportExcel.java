@@ -26,9 +26,9 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.Can;
+import org.testin.testcase.ImportedRow;
 import org.testin.testcase.TestEditorAttributes;
-import org.testin.testcase.TestEditorAttributes.ImportedRow;
-import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.util.FailureText;
 
 import java.io.File;
@@ -123,9 +123,5 @@ public class ImportExcel {
         }
 
         return new Parsed(sheetList, refused);
-    }
-
-    private record Parsed(@NotNull List<TestCaseDto> testCases, int refused) {
-        private static final @NotNull Parsed NOTHING = new Parsed(List.of(), 0);
     }
 }

@@ -45,7 +45,7 @@ public final class ReportBug {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
         final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
         final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
-        final @NotNull BugReports.RunItem item = new BugReports.RunItem(runDirectory.getPath(), runItemId);
+        final @NotNull RunItem item = new RunItem(runDirectory.getPath(), runItemId);
 
         final @NotNull Optional<TestRunDto> run = testRuns.findTestRun(item.run());
         final @NotNull Optional<TestRunItems> failed = run.flatMap(item::failedIn);
@@ -61,7 +61,7 @@ public final class ReportBug {
                 indicator -> prepare(p, BugFacts.of(failedItem, tc, runDirectory.getMarker(), runDirectory.getName(), testRuns.screenshots(item.run(), failedItem)), file, indicator),
                 bug -> open(p, item, bug, redraw),
                 () -> {
-                    reports.end(item, BugReports.Stage.PREPARING);
+                    reports.end(item, Stage.PREPARING);
                     redraw.run();
                 });
     }
@@ -77,14 +77,14 @@ public final class ReportBug {
         return new PreparedBug(facts, BugTemplate.body(facts, link), BugRepository.of(bugRepoUrl), whyNotReady);
     }
 
-    private static void open(final @NotNull Project p, final @NotNull BugReports.RunItem item, final @NotNull PreparedBug bug, final @NotNull Runnable redraw) {
+    private static void open(final @NotNull Project p, final @NotNull RunItem item, final @NotNull PreparedBug bug, final @NotNull Runnable redraw) {
         final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
         if (reports.anotherIsOpen(item)) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("bug.finish.open.report"));
             return;
         }
 
-        reports.moveTo(item, BugReports.Stage.OPEN);
+        reports.moveTo(item, Stage.OPEN);
         new ReportBugDialog(p, item, bug, redraw).open();
     }
 }

@@ -239,10 +239,4 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
                 PUSH.equals(commit.getChosen()), branch.getValue(), branch.isNew()));
         closeOk();
     }
-
-    private record Row(@NotNull PendingChange diff, @NotNull FieldChange change) {
-    }
-
-    public record Request(@NotNull List<PendingChange> changes, @NotNull String message, boolean push, @NotNull String branch, boolean newBranch) {
-    }
 }

@@ -39,23 +39,23 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BugFiling {
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-073, Rule-VIEW-PANEL-077
-    public static void send(final @NotNull Project p, final @NotNull BugReports.RunItem item, final @NotNull BugRepository repository, final @NotNull BugReports.Edits edits, final @NotNull List<byte[]> screenshots, final @NotNull Runnable redraw) {
+    public static void send(final @NotNull Project p, final @NotNull RunItem item, final @NotNull BugRepository repository, final @NotNull Edits edits, final @NotNull List<byte[]> screenshots, final @NotNull Runnable redraw) {
         final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
         reports.keep(item, edits);
-        reports.moveTo(item, BugReports.Stage.SENDING);
+        reports.moveTo(item, Stage.SENDING);
         redraw.run();
 
         BackgroundWork.run(p, Bundle.message("bug.sending"), Bundle.message("bug.send.failed.title"), false,
                 indicator -> GitHubCli.onPath(indicator).create(repository, edits.title(), edits.body(), screenshots),
                 answer -> record(p, item, answer),
                 () -> {
-                    reports.end(item, BugReports.Stage.SENDING);
+                    reports.end(item, Stage.SENDING);
                     redraw.run();
                 });
     }
 
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-089
-    static void record(final @NotNull Project p, final @NotNull BugReports.RunItem item, final @NotNull IssueCreation answer) {
+    static void record(final @NotNull Project p, final @NotNull RunItem item, final @NotNull IssueCreation answer) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
         answer.url().ifPresentOrElse(url -> {
@@ -72,7 +72,7 @@ public final class BugFiling {
     }
 
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-074
-    static @NotNull Optional<String> store(final @NotNull Project p, final @NotNull BugReports.RunItem item, final @NotNull String url) {
+    static @NotNull Optional<String> store(final @NotNull Project p, final @NotNull RunItem item, final @NotNull String url) {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
         final @NotNull Optional<TestRunItems> found = testRuns.findTestRun(item.run()).flatMap(item::in);
         if (found.isEmpty()) return Optional.of(Bundle.message("bug.not.stored.moved"));

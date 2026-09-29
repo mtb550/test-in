@@ -20,9 +20,9 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.AbstractFrameworkDialog;
+import org.testin.ui.framework.Answer;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogSize;
-import org.testin.ui.framework.Rows;
 import org.testin.ui.framework.SelectionList;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.ui.framework.TextFieldWithSelections;
@@ -61,16 +61,16 @@ public final class GlobalSearchDialog extends AbstractFrameworkDialog {
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-072, Rule-INTERNAL-073
-    private static @NotNull Rows.Answer<Hit> rowsFor(final @NotNull Project p, final @NotNull String query) {
-        final @NotNull Hits.Found found = Hits.forQuery(p, query);
+    private static @NotNull Answer<Hit> rowsFor(final @NotNull Project p, final @NotNull String query) {
+        final @NotNull Found found = Hits.forQuery(p, query);
 
         final @NotNull List<SelectionList<Hit>> rows = found.hits().stream()
                 .map(hit -> SelectionList.add(hit.icon(), hit.name(), hit.where(), hit))
                 .toList();
 
-        if (query.isBlank() || found.matched() == 0) return Rows.Answer.of(rows);
+        if (query.isBlank() || found.matched() == 0) return Answer.of(rows);
 
-        return new Rows.Answer<>(rows, Bundle.message("dialog.search.found", found.matched()));
+        return new Answer<>(rows, Bundle.message("dialog.search.found", found.matched()));
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-002

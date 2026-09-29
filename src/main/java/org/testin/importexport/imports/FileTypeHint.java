@@ -20,8 +20,8 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
+import org.testin.testcase.Can;
 import org.testin.testcase.TestEditorAttributes;
-import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.util.Fonts;
 import org.testin.util.Html;
 

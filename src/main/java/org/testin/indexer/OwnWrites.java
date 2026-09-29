@@ -104,7 +104,4 @@ public final class OwnWrites {
 
         written.values().removeIf(one -> now - one.at() >= SETTLES_IN_MILLIS);
     }
-
-    private record Claim(long at, byte @NotNull [] content, @NotNull String by) {
-    }
 }

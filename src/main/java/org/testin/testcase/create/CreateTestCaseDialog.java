@@ -59,7 +59,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
             section.setupShortcut(keys, slot, this, this::refit);
 
-            if (section instanceof DescriptionSection) {
+            if (section == descriptionSection) {
                 section.showSection(slot);
             }
         }

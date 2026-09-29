@@ -18,16 +18,7 @@ package org.testin.ui.framework;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 @FunctionalInterface
 public interface Rows<T> {
     @NotNull Answer<T> forQuery(final @NotNull String query);
-
-    // UC-INTERNAL-001, Rule-INTERNAL-073
-    record Answer<T>(@NotNull List<SelectionList<T>> rows, @NotNull String note) {
-        public static <T> @NotNull Answer<T> of(final @NotNull List<SelectionList<T>> rows) {
-            return new Answer<>(rows, "");
-        }
-    }
 }

@@ -27,6 +27,7 @@ import org.testin.model.TestRunItems;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.ToolBarDefault;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
@@ -44,7 +45,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             _ -> ""
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         }
     },
 
@@ -54,7 +55,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             item -> item.shownTestCase().getDescription()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         }
     },
 
@@ -76,7 +77,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             item -> item.shownTestCase().getPriority().getLabel()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
             Badges.addPriorityBadge(badges, runItem.shownTestCase());
         }
     },
@@ -87,7 +88,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             item -> Groups.text(item.shownTestCase().getGroup())
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
             runItem.shownTestCase().getGroup().stream().map(Badges::createGroupBadge).forEach(badges::add);
         }
     },
@@ -111,7 +112,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             item -> item.getBugSeverity().getLabel()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
             Badges.addBugBadge(badges, runItem.getBugSeverity().getLabel(), runItem.getBugSeverity().getColor());
         }
     },
@@ -122,7 +123,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             item -> item.getBugPriority().getLabel()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
             Badges.addBugBadge(badges, runItem.getBugPriority().getLabel(), runItem.getBugPriority().getColor());
         }
     },
@@ -183,7 +184,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
         return runValueSetter != RunValueSetter.NONE;
     }
 
-    public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
+    public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         details.put(name, runValueExtractor.apply(runItem));
     }
 }

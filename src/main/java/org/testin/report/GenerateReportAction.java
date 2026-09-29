@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.run.RunEditor;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.exports.ExportNotice;
@@ -62,7 +61,7 @@ public class GenerateReportAction extends AbstractProjectAction {
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor) {
         super(p, Bundle.message("report.action.text"), Bundle.message("report.action.description"), AllIcons.Actions.Report);
-        this.selectedRun = () -> editor instanceof RunEditor re ? Optional.of(re.getParent()) : Optional.empty();
+        this.selectedRun = editor::shownRun;
     }
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {

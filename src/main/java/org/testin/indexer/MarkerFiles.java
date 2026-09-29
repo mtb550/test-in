@@ -69,13 +69,13 @@ final class MarkerFiles {
         }
     }
 
-    boolean write(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Object marker) {
+    boolean write(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Marker marker) {
         final @NotNull Path file = dirPath.resolve(markerFileName);
 
         // UC-INTERNAL-002, Rule-INTERNAL-083
-        if (marker instanceof Marker m && m.getCreatedBy().isEmpty()) {
+        if (marker.getCreatedBy().isEmpty()) {
             if (!Files.exists(file)) {
-                m.stampCreated(tester());
+                marker.stampCreated(tester());
             } else if (!parses(file, marker.getClass())) {
                 Logger.warn("Left the unreadable marker " + file + " as it is rather than writing defaults over it");
                 return false;
@@ -83,7 +83,7 @@ final class MarkerFiles {
         }
 
         // Rule-INTERNAL-090
-        if (marker instanceof Marker m && m.getId().isEmpty()) m.setId(UUID.randomUUID().toString());
+        if (marker.getId().isEmpty()) marker.setId(UUID.randomUUID().toString());
 
         return testDataFiles.write(p, file, marker);
     }

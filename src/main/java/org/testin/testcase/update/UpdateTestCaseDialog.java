@@ -23,10 +23,7 @@ import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testcase.UpdateTestCaseFields;
-import org.testin.testcase.create.AbstractMultiValueSection;
 import org.testin.testcase.create.CreateTestCaseSection;
-import org.testin.testcase.create.DescriptionSection;
-import org.testin.testcase.create.ExpectedResultSection;
 import org.testin.testcase.create.TestCaseBaseDialog;
 import org.testin.testcase.create.TestCaseForm;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -62,15 +59,9 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
             final boolean isTarget = (section == targetSection);
 
-            if (isTarget && section instanceof AbstractMultiValueSection s) {
-                if (s.getFields().isEmpty()) {
-                    s.addField("");
-                }
-            }
+            if (isTarget) section.readyForEditing();
 
-            final boolean showAlways = section instanceof DescriptionSection;
-            final boolean showIfNotEmpty = section instanceof ExpectedResultSection && !existingDto.getExpectedResult().isEmpty();
-            if (!(showAlways || showIfNotEmpty || isTarget)) continue;
+            if (!(section.isShownWith(existingDto) || isTarget)) continue;
 
             final @NotNull JBPanel<?> slot = form.newSlot();
             section.showSection(slot);

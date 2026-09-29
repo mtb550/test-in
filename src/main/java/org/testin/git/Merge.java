@@ -54,7 +54,4 @@ record Merge(@NotNull ObjectNode merged, @NotNull List<Question> questions, @Not
 
         merged.withObjectProperty(object).set(key, value.deepCopy());
     }
-
-    public record Question(@NotNull String field, @NotNull String mine, @NotNull String theirs) {
-    }
 }

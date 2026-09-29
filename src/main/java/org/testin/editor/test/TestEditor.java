@@ -291,6 +291,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         }
     }
 
+    @Override
     public void reorderAndPersist() {
         reorderAndPersist(() -> {
         });

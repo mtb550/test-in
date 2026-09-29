@@ -54,6 +54,15 @@ public interface CreateTestCaseSection {
         return true;
     }
 
+    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-036
+    default boolean isShownWith(final @NotNull TestCaseDto dto) {
+        return false;
+    }
+
+    // UC-EDITOR-PANEL-006
+    default void readyForEditing() {
+    }
+
     @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto);
 
     void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction);

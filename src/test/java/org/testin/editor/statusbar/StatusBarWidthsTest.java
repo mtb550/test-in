@@ -27,7 +27,7 @@ public class StatusBarWidthsTest {
     private static final int ARROWS = 160;
     private static final int FIGURES = 420;
 
-    private static void assertCoherent(final int inner, final @NotNull StatusBar.Widths widths) {
+    private static void assertCoherent(final int inner, final @NotNull Widths widths) {
         final @NotNull String at = "inner=" + inner + " -> " + widths;
 
         assertTrue(widths.arrows() >= 0 && widths.figures() >= 0 && widths.arrowsAt() >= 0, at);
@@ -54,7 +54,7 @@ public class StatusBarWidthsTest {
     @Test
     public void theSentenceKeepsItsFloorWheneverTheBarCanAffordOne() {
         for (int inner = 200; inner <= 1400; inner++) {
-            final @NotNull StatusBar.Widths widths = StatusBar.budget(inner, ARROWS, FIGURES);
+            final @NotNull Widths widths = StatusBar.budget(inner, ARROWS, FIGURES);
 
             assertTrue(widths.arrowsAt() > 0, "the sentence was given nothing at inner=" + inner);
         }
@@ -63,7 +63,7 @@ public class StatusBarWidthsTest {
     @Test
     public void aWideBarGrantsEveryRegionItsWidthAndCentersTheArrows() {
         final int inner = 1200;
-        final @NotNull StatusBar.Widths widths = StatusBar.budget(inner, ARROWS, FIGURES);
+        final @NotNull Widths widths = StatusBar.budget(inner, ARROWS, FIGURES);
 
         assertEquals(widths.arrows(), ARROWS);
         assertEquals(widths.figures(), FIGURES);
@@ -72,7 +72,7 @@ public class StatusBarWidthsTest {
 
     @Test
     public void theFiguresGiveRoomUpBeforeTheArrowsOrTheSentenceDo() {
-        final @NotNull StatusBar.Widths tight = StatusBar.budget(500, ARROWS, FIGURES);
+        final @NotNull Widths tight = StatusBar.budget(500, ARROWS, FIGURES);
 
         assertEquals(tight.arrows(), ARROWS, "the arrows are the last thing to shrink");
         assertTrue(tight.figures() < FIGURES, "the figures should have given room up at 500");
@@ -85,6 +85,6 @@ public class StatusBarWidthsTest {
             assertCoherent(inner, StatusBar.budget(inner, ARROWS, FIGURES));
         }
 
-        assertEquals(StatusBar.budget(0, ARROWS, FIGURES), new StatusBar.Widths(0, 0, 0));
+        assertEquals(StatusBar.budget(0, ARROWS, FIGURES), new Widths(0, 0, 0));
     }
 }

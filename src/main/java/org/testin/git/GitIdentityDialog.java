@@ -80,7 +80,4 @@ final class GitIdentityDialog extends AbstractFrameworkDialog {
         onSet.accept(new Identity(name, email, scope.getSelected()));
         closeOk();
     }
-
-    record Identity(@NotNull String name, @NotNull String email, boolean global) {
-    }
 }
