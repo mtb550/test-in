@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 @Service(Service.Level.PROJECT)
 public final class TestNGExecution implements Disposable {
     private final @NotNull Project p;
+    private final @NotNull Notifier notifier;
 
     private final @NotNull RunRegistry registry = new RunRegistry();
 
@@ -56,6 +57,7 @@ public final class TestNGExecution implements Disposable {
 
     public TestNGExecution(final @NotNull Project p) {
         this.p = p;
+        this.notifier = Services.getInstance(p, Notifier.class);
 
         p.getMessageBus().connect(this).subscribe(ExecutionManager.EXECUTION_TOPIC, new ExecutionListener() {
             @Override
@@ -129,8 +131,6 @@ public final class TestNGExecution implements Disposable {
     // UC-CODEGEN-008, Rule-CODEGEN-033, Rule-CODEGEN-074, Rule-CODEGEN-034
     @FromContentModule
     public void started(final @NotNull List<TestCaseDto> running, final @NotNull List<TestCaseDto> withoutCode) {
-        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-
         notifier.softShowCounted(p, RunStatus.RUNNING.getBadge().label(), running.size());
         if (withoutCode.isEmpty()) return;
 

@@ -51,6 +51,8 @@ import java.util.function.Supplier;
 
 public class GenerateReportAction extends AbstractProjectAction {
     private final @NotNull Supplier<Optional<TestRunDirectoryDto>> selectedRun;
+    private final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
+    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, Bundle.message("report.action.text"), Bundle.message("report.action.description"), AllIcons.ToolbarDecorator.Export);
@@ -99,7 +101,7 @@ public class GenerateReportAction extends AbstractProjectAction {
     public void execute() {
         selectedRun.get().ifPresent(tr -> new GenerateReportDialog(p,
                 ReportFileName.suggestedFor(p, tr, ZonedDateTime.now()),
-                (format, file) -> processAndSave(p, tr, format, file)).show());
+                (format, file) -> processAndSave(tr, format, file)).show());
     }
 
     @Override
@@ -108,11 +110,10 @@ public class GenerateReportAction extends AbstractProjectAction {
     }
 
     // UC-REPORT-001, Rule-REPORT-003
-    private void processAndSave(final @NotNull Project p, final @NotNull TestRunDirectoryDto tr, final @NotNull FileTypes format, final @NotNull File outputFile) {
+    private void processAndSave(final @NotNull TestRunDirectoryDto tr, final @NotNull FileTypes format, final @NotNull File outputFile) {
         BackgroundWork.run(p, Bundle.message("report.task.generating", format.getLabel(), tr.getName()), Bundle.message("report.failed.title", format.getLabel()), indicator -> {
             final @NotNull Path dirPath = tr.getPath();
 
-            final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
             final @NotNull TestRunDto runData = testRuns.getTestRunByPath(dirPath);
 
             final byte[] fileBytes = format.generateReport(p, tr, runData);
@@ -121,8 +122,6 @@ public class GenerateReportAction extends AbstractProjectAction {
             indicator.checkCanceled();
 
             write(outputFile, fileBytes);
-
-            final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
             notifier.infoWithActions(p,
                     Bundle.message("report.generated.title", format.getLabel()),
