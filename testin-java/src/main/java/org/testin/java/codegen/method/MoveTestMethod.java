@@ -27,7 +27,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiImportList;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
@@ -137,9 +136,5 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction<MovedTes
 
         Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(TESTNG_TEST, GlobalSearchScope.allScope(p)))
                 .ifPresent(testClass -> imports.orElseThrow().add(factory.createImportStatement(testClass)));
-    }
-
-    private void reformat(final @NotNull Project p, final @NotNull PsiClass pc) {
-        CodeStyleManager.getInstance(p).reformat(pc);
     }
 }
