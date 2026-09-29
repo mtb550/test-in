@@ -17,7 +17,6 @@
 package org.testin.testproject;
 
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.DirectoryMapper;
@@ -30,11 +29,24 @@ import org.testin.services.Services;
 import java.nio.file.Path;
 
 // UC-TREE-PANEL-002
-@AllArgsConstructor
 public final class NewTestProject {
     private final @NotNull Project p;
     private final @NotNull TreePanel tp;
     private final @NotNull String tpName;
+    private final @NotNull DirectoryMapper directoryMapper;
+    private final @NotNull Nodes nodes;
+    private final @NotNull BoundTestProject boundTestProject;
+    private final @NotNull Notifier notifier;
+
+    public NewTestProject(final @NotNull Project p, final @NotNull TreePanel tp, final @NotNull String tpName) {
+        this.p = p;
+        this.tp = tp;
+        this.tpName = tpName;
+        this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
+        this.nodes = Services.getInstance(p, Nodes.class);
+        this.boundTestProject = Services.getInstance(p, BoundTestProject.class);
+        this.notifier = Services.getInstance(p, Notifier.class);
+    }
 
     // UC-TREE-PANEL-002, Rule-TREE-PANEL-017
     public void execute() {
@@ -43,14 +55,14 @@ public final class NewTestProject {
 
     // UC-TREE-PANEL-002, Rule-TREE-PANEL-017
     private void create(final @NotNull Path tpPath) {
-        final @NotNull TestProjectDirectoryDto created = Services.getInstance(p, DirectoryMapper.class).setTestProjectNode(p, tpPath);
+        final @NotNull TestProjectDirectoryDto created = directoryMapper.setTestProjectNode(p, tpPath);
 
-        if (!Services.getInstance(p, Nodes.class).addTestProject(created)) return;
+        if (!nodes.addTestProject(created)) return;
 
         // Rule-TREE-PANEL-106
-        Services.getInstance(p, BoundTestProject.class).choose(created.getName());
+        boundTestProject.choose(created.getName());
 
         tp.refresh();
-        Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
+        notifier.softShow(p, Done.CREATED);
     }
 }

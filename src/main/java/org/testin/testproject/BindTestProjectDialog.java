@@ -37,6 +37,8 @@ import java.util.Map;
 public final class BindTestProjectDialog extends AbstractFrameworkDialog {
     private final @NotNull SelectionTable projects;
     private final @NotNull Runnable onBound;
+    private final @NotNull BoundTestProject boundTestProject = Services.getInstance(p, BoundTestProject.class);
+    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     public BindTestProjectDialog(final @NotNull Project p, final @NotNull Map<String, ProjectStatus> underRoot, final @NotNull Runnable onBound) {
         super(p);
@@ -65,7 +67,7 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog {
     }
 
     private void selectCurrent() {
-        final @NotNull String bound = Services.getInstance(p, BoundTestProject.class).name();
+        final @NotNull String bound = boundTestProject.name();
 
         for (int row = 0; row < projects.getRowCount(); row++) {
             if (projects.getValueAt(row, 0).equals(bound)) {
@@ -81,10 +83,10 @@ public final class BindTestProjectDialog extends AbstractFrameworkDialog {
         final @NotNull List<Integer> selected = projects.getSelectedRows();
         if (selected.isEmpty()) return;
 
-        Services.getInstance(p, BoundTestProject.class).choose(projects.getValueAt(selected.getFirst(), 0));
+        boundTestProject.choose(projects.getValueAt(selected.getFirst(), 0));
         closeOk();
 
-        Services.getInstance(p, Notifier.class).softShow(p, Done.BOUND);
+        notifier.softShow(p, Done.BOUND);
         onBound.run();
     }
 }

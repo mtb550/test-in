@@ -36,6 +36,9 @@ import java.util.Map;
 
 public final class SelectTestProjectAction extends AbstractProjectAction {
     private final @NotNull TreePanel tp;
+    private final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+    private final @NotNull TestinRoot testinRoot = Services.getInstance(p, TestinRoot.class);
 
     public SelectTestProjectAction(final @NotNull Project p, final @NotNull TreePanel tp) {
         super(p, Bundle.message("project.select.text"), Bundle.message("project.select.description"), AllIcons.Actions.ModuleDirectory);
@@ -46,13 +49,13 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final @NotNull Map<String, ProjectStatus> underRoot = Services.getInstance(p, ProjectIndexer.class).testProjects();
+            final @NotNull Map<String, ProjectStatus> underRoot = indexer.testProjects();
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (p.isDisposed()) return;
 
                 if (underRoot.isEmpty()) {
-                    Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("project.none.title"),
+                    notifier.softRefuse(p, Bundle.message("project.none.title"),
                             Bundle.message("project.none.message"));
                     return;
                 }
@@ -65,7 +68,7 @@ public final class SelectTestProjectAction extends AbstractProjectAction {
     // UC-TREE-PANEL-028, Rule-TREE-PANEL-115
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        GrayWithReason.unless(this, e, Services.getInstance(p, TestinRoot.class).isConfigured(), Bundle.message("toolbar.disabled.no.root"));
+        GrayWithReason.unless(this, e, testinRoot.isConfigured(), Bundle.message("toolbar.disabled.no.root"));
     }
 
     @Override

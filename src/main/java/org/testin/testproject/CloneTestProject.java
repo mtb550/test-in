@@ -23,7 +23,6 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import git4idea.commands.Git;
 import git4idea.commands.GitCommandResult;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
@@ -45,12 +44,26 @@ import java.util.Locale;
 import java.util.Optional;
 
 // UC-TREE-PANEL-003
-@AllArgsConstructor
 public final class CloneTestProject {
     private final @NotNull Project p;
     private final @NotNull String gitUrl;
     private final @NotNull String projectName;
     private final @NotNull TreePanel tp;
+    private final @NotNull Notifier notifier;
+    private final @NotNull TestinRoot testinRoot;
+    private final @NotNull ProjectIndexer indexer;
+    private final @NotNull BoundTestProject boundTestProject;
+
+    public CloneTestProject(final @NotNull Project p, final @NotNull String gitUrl, final @NotNull String projectName, final @NotNull TreePanel tp) {
+        this.p = p;
+        this.gitUrl = gitUrl;
+        this.projectName = projectName;
+        this.tp = tp;
+        this.notifier = Services.getInstance(p, Notifier.class);
+        this.testinRoot = Services.getInstance(p, TestinRoot.class);
+        this.indexer = Services.getInstance(p, ProjectIndexer.class);
+        this.boundTestProject = Services.getInstance(p, BoundTestProject.class);
+    }
 
     public static @NotNull String nameFor(final @NotNull Project p, final @NotNull String url) {
         final @NotNull String named = TestinYml.projectName(p);
@@ -97,7 +110,7 @@ public final class CloneTestProject {
     // UC-TREE-PANEL-003, Rule-TREE-PANEL-107
     public void execute() {
         if (gitUrl.trim().isEmpty() || projectName.trim().isEmpty()) {
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("clone.error.title"), Bundle.message("clone.error.missing"));
+            notifier.error(p, Bundle.message("clone.error.title"), Bundle.message("clone.error.missing"));
             return;
         }
 
@@ -108,29 +121,29 @@ public final class CloneTestProject {
                 indicator.setText(Bundle.message("clone.progress", projectName));
 
                 try {
-                    final @NotNull Path parentPath = Services.getInstance(p, TestinRoot.class).absolutePath();
+                    final @NotNull Path parentPath = testinRoot.absolutePath();
 
                     // UC-TREE-PANEL-003
                     final @NotNull GitCommandResult result = Git.getInstance().clone(p, parentPath, gitUrl, projectName);
                     result.throwOnError();
 
-                    final @NotNull Path projectPath = Services.getInstance(p, TestinRoot.class).absolutePath().resolve(projectName);
+                    final @NotNull Path projectPath = testinRoot.absolutePath().resolve(projectName);
                     keepNoCredentials(projectPath);
-                    Services.getInstance(p, ProjectIndexer.class).scanSingleProject(projectPath, indicator);
+                    indexer.scanSingleProject(projectPath, indicator);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         // Rule-TREE-PANEL-106
-                        Services.getInstance(p, BoundTestProject.class).choose(projectName);
+                        boundTestProject.choose(projectName);
 
                         tp.refresh();
-                        Services.getInstance(p, Notifier.class).softShow(p, Done.CLONED);
+                        notifier.softShow(p, Done.CLONED);
                     });
 
                 } catch (final Exception ex) {
                     // UC-TREE-PANEL-003, Rule-SHARE-062
                     final @NotNull String said = GitSafeText.withoutCredentials(FailureText.of(ex));
 
-                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("clone.failed.title"), Bundle.message("clone.failed.message", said));
+                    notifier.error(p, Bundle.message("clone.failed.title"), Bundle.message("clone.failed.message", said));
                 }
             }
         });
