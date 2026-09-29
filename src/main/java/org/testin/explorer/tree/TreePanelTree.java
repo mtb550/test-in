@@ -59,6 +59,7 @@ public class TreePanelTree implements Disposable {
     private static final long QUIET_MILLIS = 100;
 
     private final @NotNull Project p;
+    private final @NotNull BoundTestProject boundTestProject;
     private final @NotNull JBScrollPane scrollPane;
     private final @NotNull TreePanelStructure treeStructure;
     private final @NotNull StructureTreeModel<TreePanelStructure> structureModel;
@@ -76,6 +77,7 @@ public class TreePanelTree implements Disposable {
 
     public TreePanelTree(final @NotNull Project p) {
         this.p = p;
+        this.boundTestProject = Services.getInstance(p, BoundTestProject.class);
 
         this.treeStructure = new TreePanelStructure(p, bound());
         this.structureModel = new StructureTreeModel<>(treeStructure, this);
@@ -235,7 +237,7 @@ public class TreePanelTree implements Disposable {
     }
 
     private @NotNull Optional<TestProjectDirectoryDto> bound() {
-        return Services.getInstance(p, BoundTestProject.class).get();
+        return boundTestProject.get();
     }
 
     public @NotNull JComponent getComponent() {

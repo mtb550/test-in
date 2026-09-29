@@ -39,10 +39,14 @@ import java.util.Optional;
 
 public final class TreePanelNode extends AbstractTreeNode<Object> {
     private final @NotNull Project p;
+    private final @NotNull ProjectIndexer indexer;
+    private final @NotNull Nodes nodes;
 
     public TreePanelNode(final @NotNull Project p, final @NotNull Object value) {
         super(p, value);
         this.p = p;
+        this.indexer = Services.getInstance(p, ProjectIndexer.class);
+        this.nodes = Services.getInstance(p, Nodes.class);
     }
 
     // UC-TREE-PANEL-018, Rule-TREE-PANEL-063
@@ -59,9 +63,6 @@ public final class TreePanelNode extends AbstractTreeNode<Object> {
         if (!(value instanceof DirectoryDto directory)) return List.of();
 
         try {
-            final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
-
             // Rule-INTERNAL-091
             final @NotNull Optional<String> refused = indexer.whyNotRead(directory.getPath());
             if (refused.isPresent()) return List.of(child(new TreeLoadError(refused.orElseThrow())));

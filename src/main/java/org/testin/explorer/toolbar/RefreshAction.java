@@ -43,6 +43,14 @@ public class RefreshAction extends AbstractProjectAction {
 
     private final @NotNull TreePanel tp;
 
+    private final @NotNull BoundTestProject boundTestProject;
+
+    private final @NotNull ProjectIndexer indexer;
+
+    private final @NotNull TestinEditors testinEditors;
+
+    private final @NotNull Notifier notifier;
+
     private final @NotNull AtomicBoolean refreshGuard = new AtomicBoolean(false);
 
     // UC-TREE-PANEL-025, UC-TREE-PANEL-026, Rule-TREE-PANEL-081
@@ -51,6 +59,10 @@ public class RefreshAction extends AbstractProjectAction {
     public RefreshAction(final @NotNull Project p, final @NotNull TreePanel tp) {
         super(p, Bundle.message("toolbar.refresh"), Bundle.message("toolbar.refresh.description"), AllIcons.Actions.Refresh);
         this.tp = tp;
+        this.boundTestProject = Services.getInstance(p, BoundTestProject.class);
+        this.indexer = Services.getInstance(p, ProjectIndexer.class);
+        this.testinEditors = Services.getInstance(p, TestinEditors.class);
+        this.notifier = Services.getInstance(p, Notifier.class);
     }
 
     // UC-TREE-PANEL-025
@@ -70,9 +82,8 @@ public class RefreshAction extends AbstractProjectAction {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                Services.getInstance(p, BoundTestProject.class).reread();
+                boundTestProject.reread();
 
-                final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.resetForReindex();
                 indexer.indexWithProgress();
                 indexer.awaitIndexing();
@@ -84,7 +95,7 @@ public class RefreshAction extends AbstractProjectAction {
             } catch (final Exception ex) {
                 Logger.error("Refresh: re-indexing failed - " + ex.getMessage());
                 releaseAndRunWhatWaited();
-                Services.getInstance(p, Notifier.class).error(p, Bundle.message("toolbar.refresh.failed.title"), FailureText.of(ex));
+                notifier.error(p, Bundle.message("toolbar.refresh.failed.title"), FailureText.of(ex));
             }
         });
     }
@@ -94,14 +105,14 @@ public class RefreshAction extends AbstractProjectAction {
         try {
             if (p.isDisposed()) return;
 
-            Services.getInstance(p, TestinEditors.class).refreshOpen(p);
+            testinEditors.refreshOpen(p);
 
             tp.refresh();
             Logger.info("Refresh: tree rebuilt");
 
             tp.fetchBranches();
 
-            Services.getInstance(p, Notifier.class).softShow(p, outcome);
+            notifier.softShow(p, outcome);
 
         } finally {
             releaseAndRunWhatWaited();

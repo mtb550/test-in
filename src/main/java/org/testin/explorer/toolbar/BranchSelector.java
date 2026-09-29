@@ -47,6 +47,8 @@ public class BranchSelector {
     private final @NotNull Project p;
     private final @NotNull TreePanel tp;
     private final @NotNull GitRepositoryService git;
+    private final @NotNull Nodes nodes;
+    private final @NotNull Notifier notifier;
     private final @NotNull ComboBox<String> comboBox;
     private final @NotNull DefaultComboBoxModel<String> model;
 
@@ -64,6 +66,8 @@ public class BranchSelector {
         this.p = p;
         this.tp = tp;
         this.git = new GitRepositoryService(p);
+        this.nodes = Services.getInstance(p, Nodes.class);
+        this.notifier = Services.getInstance(p, Notifier.class);
         this.model = new DefaultComboBoxModel<>();
         this.comboBox = new ComboBox<>(model);
 
@@ -187,7 +191,7 @@ public class BranchSelector {
 
                 currentBranch = checkedOut;
 
-                Services.getInstance(p, Nodes.class).refreshDirectory(repositoryPath);
+                nodes.refreshDirectory(repositoryPath);
 
                 ApplicationManager.getApplication().invokeLater(() -> tp.reindex(Bundle.message("git.switched.to", checkedOut)));
             }
@@ -198,7 +202,6 @@ public class BranchSelector {
     private void refuseSwitch(final @NotNull Path repositoryPath, final @NotNull String targetBranch) {
         restoreSelectedBranch();
 
-        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
         notifier.warnWithAction(p, Bundle.message("git.branch.not.switched.title"),
                 Bundle.message("branch.not.switched.message", targetBranch),
                 Bundle.message("branch.review.changes"),
@@ -249,8 +252,7 @@ public class BranchSelector {
             Logger.error("Could not read branches: " + ex.getMessage());
             ApplicationManager.getApplication().invokeLater(() -> {
                 showPlaceholder(Bundle.message("branch.load.failed"));
-                Services.getInstance(p, Notifier.class)
-                        .error(p, Bundle.message("git.error.title"), Bundle.message("branch.load.failed.message", FailureText.of(ex)));
+                notifier.error(p, Bundle.message("git.error.title"), Bundle.message("branch.load.failed.message", FailureText.of(ex)));
             });
         }
     }
@@ -262,7 +264,7 @@ public class BranchSelector {
         } catch (final Exception fetchError) {
             Logger.error("Could not refresh remote branches: " + fetchError.getMessage());
             ApplicationManager.getApplication().invokeLater(() ->
-                    Services.getInstance(p, Notifier.class).warn(p, Bundle.message("branch.fetch.warning.title"),
+                    notifier.warn(p, Bundle.message("branch.fetch.warning.title"),
                             Bundle.message("branch.fetch.warning.message", FailureText.of(fetchError))));
         }
     }

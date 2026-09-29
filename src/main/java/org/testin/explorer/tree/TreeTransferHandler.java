@@ -78,6 +78,9 @@ public class TreeTransferHandler extends TransferHandler {
     private final @NotNull SimpleTree tree;
 
     private final @NotNull Consumer<Path> revealAfterRefresh;
+    private final @NotNull Nodes nodes;
+    private final @NotNull Notifier notifier;
+    private final @NotNull UndoHistories undoHistories;
     @Getter
     private final @NotNull Set<Path> selectedNodes;
     private int clipboardAction = COPY;
@@ -87,6 +90,9 @@ public class TreeTransferHandler extends TransferHandler {
         this.tree = tree;
         this.selectedNodes = selectedNodes;
         this.revealAfterRefresh = revealAfterRefresh;
+        this.nodes = Services.getInstance(p, Nodes.class);
+        this.notifier = Services.getInstance(p, Notifier.class);
+        this.undoHistories = Services.getInstance(p, UndoHistories.class);
     }
 
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014
@@ -285,13 +291,13 @@ public class TreeTransferHandler extends TransferHandler {
     public boolean canTransferInto(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
         return target.acceptsTransferred(source)
                 && sameTestProject(source, target)
-                && isValidDestination(source, target, path -> Services.getInstance(p, Nodes.class).nodeExists(path));
+                && isValidDestination(source, target, nodes::nodeExists);
     }
 
     private boolean isNameCollision(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
         return target.acceptsTransferred(source)
                 && isValidDestination(source, target, _ -> false)
-                && Services.getInstance(p, Nodes.class).nodeExists(target.getPath().resolve(source.getName()));
+                && nodes.nodeExists(target.getPath().resolve(source.getName()));
     }
 
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-004
@@ -305,7 +311,7 @@ public class TreeTransferHandler extends TransferHandler {
         final @NotNull String said = collided.size() == 1
                 ? Bundle.message("transfer.exists.one", describe(collided), target.getName())
                 : Bundle.message("transfer.exists.many", describe(collided), target.getName());
-        Services.getInstance(p, Notifier.class).softRefuse(p, said);
+        notifier.softRefuse(p, said);
 
         return true;
     }
@@ -315,7 +321,7 @@ public class TreeTransferHandler extends TransferHandler {
             moveNodes(sources, target);
         } else {
             final @NotNull List<Path> sourcePaths = sources.stream().map(DirectoryDto::getPath).toList();
-            Services.getInstance(p, Nodes.class).copyNodes(sourcePaths, target.getPath(), copied -> {
+            nodes.copyNodes(sourcePaths, target.getPath(), copied -> {
                 generateForCopies(sources, target);
 
                 if (copied > 0) revealAfterRefresh.accept(target.getPath().resolve(sources.getFirst().getName()));
@@ -328,7 +334,7 @@ public class TreeTransferHandler extends TransferHandler {
     private void confirmLanded(final @NotNull Done outcome, final int landed) {
         if (landed == 0) return;
 
-        Services.getInstance(p, Notifier.class).softShowCounted(p, outcome, landed);
+        notifier.softShowCounted(p, outcome, landed);
     }
 
     private @NotNull Optional<DirectoryDto> targetDirectory(final @NotNull TransferSupport support) {
@@ -368,7 +374,7 @@ public class TreeTransferHandler extends TransferHandler {
             confirmLanded(Done.MOVED, moved);
             if (moved == 0) return;
 
-            Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
+            undoHistories.push(UndoScope.TREE, new UndoHistories.Operation(
                     Bundle.message("transfer.undo.move", describe(sources)),
                     () -> moveBatch(newPaths, oldPaths),
                     () -> moveBatch(oldPaths, newPaths)));
@@ -389,7 +395,7 @@ public class TreeTransferHandler extends TransferHandler {
         for (int i = 0; i < from.size(); i++) {
             final @NotNull Path source = from.get(i);
 
-            Services.getInstance(p, Nodes.class).moveNode(source, to.get(i), wasMoved -> {
+            nodes.moveNode(source, to.get(i), wasMoved -> {
                 if (p.isDisposed()) return;
 
                 if (wasMoved) moved.incrementAndGet();
@@ -404,8 +410,6 @@ public class TreeTransferHandler extends TransferHandler {
 
     // Rule-CODEGEN-082
     private void generateForCopies(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
-        final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
-
         for (final DirectoryDto source : sources) {
             nodes.find(target.getPath().resolve(source.getName())).ifPresent(copy -> SubtreeCode.generate(p, copy));
         }
@@ -427,7 +431,7 @@ public class TreeTransferHandler extends TransferHandler {
 
     private void moveCodeOf(final @NotNull Path from, final @NotNull Path to) {
         Optional.ofNullable(to.getParent()).ifPresent(target ->
-                Services.getInstance(p, Nodes.class).find(from)
+                nodes.find(from)
                         .ifPresent(dir -> JavaCode.of(dir.getType()).getMoved().execute(p, new Moved(dir, target))));
     }
 
@@ -457,8 +461,7 @@ public class TreeTransferHandler extends TransferHandler {
                 directories.toArray(DirectoryDto[]::new), action)));
         updateClipboardState(action, directories);
 
-        Services.getInstance(p, Notifier.class)
-                .softShowCounted(p, cut ? Done.CUT : Done.COPIED, directories.size());
+        notifier.softShowCounted(p, cut ? Done.CUT : Done.COPIED, directories.size());
     }
 
     // UC-TREE-PANEL-013, Rule-TREE-PANEL-050, Rule-TREE-PANEL-006
