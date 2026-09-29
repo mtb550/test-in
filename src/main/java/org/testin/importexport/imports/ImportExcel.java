@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes.ImportedRow;
 import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.util.FailureText;
 
@@ -38,7 +39,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 public class ImportExcel {
     private static boolean isEmpty(final @NotNull Row row, final @NotNull DataFormatter dataFormatter) {
@@ -114,13 +114,12 @@ public class ImportExcel {
         for (final Row row : sheet) {
             if (row.getRowNum() == headerRow.getRowNum() || isEmpty(row, dataFormatter)) continue;
 
-            final @NotNull TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
-
-            refused += TestEditorAttributes.importRow(p, currentTestCase, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
+            final @NotNull ImportedRow imported = TestEditorAttributes.importRow(p, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
                     .map(colIndex -> dataFormatter.formatCellValue(row.getCell(colIndex)).trim())
                     .orElse(""));
 
-            sheetList.add(currentTestCase);
+            refused += imported.refused();
+            sheetList.add(imported.testCase());
         }
 
         return new Parsed(sheetList, refused);

@@ -192,8 +192,9 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog {
             return;
         }
 
-        writers.forEach(section -> section.applyTo(dto));
-        onSave.accept(dto);
+        TestCaseDto edited = dto;
+        for (final CreateTestCaseSection section : writers) edited = section.applyTo(edited);
+        onSave.accept(edited);
 
         closeOk();
     }

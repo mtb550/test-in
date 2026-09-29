@@ -30,6 +30,7 @@ import org.testin.testcase.TestCaseOrder;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -119,8 +120,16 @@ final class TestCaseSequenceStore {
         return store(testSetPath, testCase);
     }
 
-    // UC-INTERNAL-004, Rule-INTERNAL-033
+    // UC-INTERNAL-004, Rule-INTERNAL-033, Rule-INTERNAL-117
     private boolean store(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
+        if (!written(testSetPath, testCase)) return false;
+
+        testCasesById.merge(testCase.getId(), testCase, TestCaseDto::takeValuesOf);
+        return true;
+    }
+
+    // UC-INTERNAL-004, Rule-INTERNAL-033
+    private boolean written(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
         final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
         final @NotNull Path file = named(testSetPath, testCase.getId());
         if (!files.write(p, file, testCase)) return false;
@@ -131,7 +140,6 @@ final class TestCaseSequenceStore {
             return false;
         }
 
-        testCasesById.put(testCase.getId(), testCase);
         final @NotNull List<UUID> ids = testCaseIdsByTestSet.computeIfAbsent(testSetPath.toString(), _ -> testCaseIds(List.of()));
         if (!ids.contains(testCase.getId())) ids.add(testCase.getId());
 
@@ -156,11 +164,12 @@ final class TestCaseSequenceStore {
         final @NotNull Optional<TestCaseDto> was = Optional.ofNullable(testCasesById.get(id));
 
         final boolean wasHandNamed = handNamed.remove(id, from);
-        if (!store(toSet, testCase)) {
+        if (!written(toSet, testCase)) {
             if (wasHandNamed) handNamed.put(id, from);
             return false;
         }
 
+        testCasesById.put(id, testCase);
         if (from.equals(to)) return true;
 
         final @NotNull TestDataFiles files = Services.getInstance(p, TestDataFiles.class);
@@ -191,14 +200,14 @@ final class TestCaseSequenceStore {
         return true;
     }
 
-    // UC-INTERNAL-004, Rule-INTERNAL-031
+    // UC-INTERNAL-004, Rule-INTERNAL-031, Rule-INTERNAL-117
     void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
         final @NotNull String path = testSetPath.toString();
         final @NotNull List<UUID> ids = new ArrayList<>(orderedList.size());
         final @NotNull Set<UUID> newIds = new HashSet<>();
 
-        final @NotNull Set<UUID> movedIds = new HashSet<>();
-        for (final TestCaseDto testCase : moved) movedIds.add(testCase.getId());
+        final @NotNull Map<UUID, TestCaseDto> placed = new HashMap<>();
+        for (final TestCaseDto testCase : moved) placed.put(testCase.getId(), testCase);
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
 
@@ -206,15 +215,17 @@ final class TestCaseSequenceStore {
             ids.add(testCase.getId());
             newIds.add(testCase.getId());
 
+            final @NotNull TestCaseDto written = placed.getOrDefault(testCase.getId(), testCase);
             final boolean firstSight = !testCasesById.containsKey(testCase.getId());
-            if (firstSight) testCase.stampCreated(tester);
+            if (firstSight) {
+                written.stampCreated(tester);
+                testCasesById.put(testCase.getId(), testCase);
+            }
 
-            testCasesById.put(testCase.getId(), testCase);
-
-            if (!firstSight && !movedIds.contains(testCase.getId())) continue;
+            if (!firstSight && !placed.containsKey(testCase.getId())) continue;
 
             // Rule-INTERNAL-084
-            store(testSetPath, testCase);
+            store(testSetPath, written);
         }
 
         Optional.ofNullable(testCaseIdsByTestSet.get(path)).ifPresent(oldIds -> oldIds.stream()

@@ -34,8 +34,8 @@ public class TestDataSection extends AbstractMultiLineSection {
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
-    public void applyTo(final @NotNull TestCaseDto dto) {
-        dto.setTestData(field.getText().trim());
+    public @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto) {
+        return dto.edit().testData(field.getText().trim()).build();
     }
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-028

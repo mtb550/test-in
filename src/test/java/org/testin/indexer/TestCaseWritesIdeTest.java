@@ -165,6 +165,18 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
         assertEquals("a moved case took a new creation date", createdAt, indexed.getCreatedAt());
     }
 
+    public void testAnEditedCopyIsWrittenIntoTheTestCaseTheIndexHolds() {
+        final TestSetDirectoryDto ts = oneTestSet();
+        final TestCaseDto held = testCase(ts, "m");
+        testCases().putTestCaseVerbatim(ts.getPath(), held);
+
+        final TestCaseDto edited = held.edit().description("Log in with a locked user").build();
+        assertTrue("the edit said it failed", testCases().putTestCase(ts.getPath(), edited));
+
+        assertSame("the index swapped its test case for the copy, so an open editor lost it", held, testCases().findTestCase(held.getId()).orElseThrow());
+        assertEquals("the test case the index holds did not take the edit", "Log in with a locked user", held.getDescription());
+    }
+
     public void testACreatedTestCaseIsWrittenByTheOrderWriteWithItsRankAndItsCreator() {
         final TestSetDirectoryDto ts = oneTestSet();
         final TestCaseDto created = testCase(ts, "");

@@ -34,8 +34,8 @@ public class PreConditionsSection extends AbstractMultiLineSection {
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
-    public void applyTo(final @NotNull TestCaseDto dto) {
-        dto.setPreConditions(field.getText().trim());
+    public @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto) {
+        return dto.edit().preConditions(field.getText().trim()).build();
     }
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-028

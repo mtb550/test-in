@@ -48,8 +48,8 @@ public class GroupSection extends AbstractMultiValueSection {
     }
 
     @Override
-    protected void write(final @NotNull TestCaseDto dto, final @NotNull List<String> values) {
-        dto.setGroup(values);
+    protected @NotNull TestCaseDto write(final @NotNull TestCaseDto dto, final @NotNull List<String> values) {
+        return dto.edit().group(values).build();
     }
 
     @Override

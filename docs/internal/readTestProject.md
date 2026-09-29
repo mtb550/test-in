@@ -108,6 +108,12 @@ There is no key for this. It starts on its own.
 - **Rule-INTERNAL-116** — A folder is known by its path. Two readings of the
   same folder are the same node, however much of it each one read, and two kinds
   of node at one path are not.
+- **Rule-INTERNAL-117** — Only Testin's index changes a test case, a test run or
+  a marker it holds. A test case is edited as a copy, and the index writes the
+  copy into the one it holds once the file is written; a run or a marker is
+  changed by asking the index, which saves it. Whatever shows one of them keeps
+  showing the same one and sees the change, and nothing else can change it under
+  a reader.
 
 ## The budget
 

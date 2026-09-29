@@ -82,7 +82,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
         editors.bindKeysToEditor(shortcuts);
     }
 
-    protected abstract void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<List<String>> newValues);
+    protected abstract @NotNull List<TestCaseDto> applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<List<String>> newValues);
 
     protected abstract @NotNull String getPopupTitle();
 
@@ -121,9 +121,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
             editedValues.add(activeValues.get(i));
         }
 
-        if (!edited.isEmpty()) applyValues(edited, editedValues);
-
-        updatedItems.accept(edited);
+        updatedItems.accept(applyValues(edited, editedValues));
 
         closeOk();
     }

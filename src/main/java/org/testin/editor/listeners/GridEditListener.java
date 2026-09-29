@@ -73,42 +73,45 @@ public class GridEditListener extends AbstractGridEditListener {
 
         if (!attr.can(Can.EDIT)) return GridEdit.UNCHANGED;
 
-        final @NotNull TestCaseSnapshot undoFrom = Optional.ofNullable(changedThisGesture.get(tc.getId()))
-                .map(Changed::before)
+        final @NotNull Optional<Changed> pending = Optional.ofNullable(changedThisGesture.get(tc.getId()));
+        final @NotNull TestCaseSnapshot undoFrom = pending.map(Changed::before)
                 .orElseGet(() -> TestCaseSnapshot.of(p, testSetPath, List.of(tc.getId())));
+        final @NotNull TestCaseDto current = pending.map(Changed::tc).orElse(tc);
 
         final @NotNull String typed = String.valueOf(model.getValueAt(row, col));
 
-        final @NotNull Object before = attr.gridValue(tc);
-        final boolean took = attr.getImportSetter().execute(p, tc, typed);
-        final @NotNull Object after = attr.gridValue(tc);
+        final @NotNull Object before = attr.gridValue(current);
+        final @NotNull Optional<TestCaseDto> took = attr.getImportSetter().execute(p, current, typed);
+        final @NotNull Object after = attr.gridValue(took.orElse(current));
 
         model.setValueAt(after, row, col);
 
         // Rule-EDITOR-PANEL-206
-        if (!took) {
+        if (took.isEmpty()) {
             Services.getInstance(p, Notifier.class).softRefuse(p, Refused.UNREADABLE, quoted(typed, attr));
             return GridEdit.REFUSED;
         }
 
         if (Objects.equals(before, after)) return GridEdit.UNCHANGED;
 
-        persistAndGenerate(tc, attr, undoFrom);
-        onEdited.run();
+        persistAndGenerate(took.orElseThrow(), attr, undoFrom);
 
         return GridEdit.WROTE;
     }
 
     // UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-053
-    private void persistAndGenerate(final @NotNull TestCaseDto tc, final @NotNull TestEditorAttributes attr, final @NotNull TestCaseSnapshot undoFrom) {
+    private void persistAndGenerate(final @NotNull TestCaseDto edited, final @NotNull TestEditorAttributes attr, final @NotNull TestCaseSnapshot undoFrom) {
         if (testSetPath.toString().isEmpty()) {
             Logger.warn("[grid] edit not persisted - the editor has no test set path");
             return;
         }
 
         final boolean first = changedThisGesture.isEmpty();
-        changedThisGesture.computeIfAbsent(tc.getId(), _ -> new Changed(tc, undoFrom, new LinkedHashSet<>()))
-                .generators().add(attr.getGenType());
+        final @NotNull Set<GenType> generators = Optional.ofNullable(changedThisGesture.get(edited.getId()))
+                .map(Changed::generators)
+                .orElseGet(LinkedHashSet::new);
+        generators.add(attr.getGenType());
+        changedThisGesture.put(edited.getId(), new Changed(edited, undoFrom, generators));
 
         if (first) ApplicationManager.getApplication().invokeLater(this::saveTheGesture);
     }
@@ -130,6 +133,8 @@ public class GridEditListener extends AbstractGridEditListener {
                 written.add(changed.tc());
                 before.add(changed.before());
             }
+
+            ApplicationManager.getApplication().invokeLater(onEdited);
 
             if (written.isEmpty()) return;
 

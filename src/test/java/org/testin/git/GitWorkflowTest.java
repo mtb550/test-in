@@ -19,6 +19,7 @@ package org.testin.git;
 import org.testin.TempTree;
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.Rank;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.util.RealMapper;
 import org.testng.SkipException;
@@ -179,7 +180,8 @@ public class GitWorkflowTest {
                 testCase("a registered user signs in"),
                 testCase("a wrong password is refused"));
 
-        TestCaseOrder.rankAll(testCases);
+        final List<String> ranks = Rank.spread(testCases.size());
+        for (int i = 0; i < testCases.size(); i++) testCases.get(i).setOrder(ranks.get(i));
 
         for (final TestCaseDto testCase : testCases) {
             write(work, "Test Cases/login flow/" + testCase.getId() + ".tc", testCase);

@@ -64,8 +64,8 @@ public class StatusSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void applyTo(final @NotNull TestCaseDto dto) {
-        dto.setStatus((TestCaseStatus) Objects.requireNonNull(status.getSelectedItem()));
+    public @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto) {
+        return dto.edit().status((TestCaseStatus) Objects.requireNonNull(status.getSelectedItem())).build();
     }
 
     // Rule-EDITOR-PANEL-194, Rule-PRODUCT-017

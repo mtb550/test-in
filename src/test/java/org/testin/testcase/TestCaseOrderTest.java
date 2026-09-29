@@ -75,10 +75,14 @@ public class TestCaseOrderTest {
 
         final List<TestCaseDto> arranged = new ArrayList<>(List.of(first, third, second));
         final List<TestCaseDto> moved = TestCaseOrder.place(arranged);
+        final List<TestCaseDto> placed = arranged.stream()
+                .map(tc -> moved.stream().filter(copy -> copy.getId().equals(tc.getId())).findFirst().orElse(tc))
+                .toList();
 
         assertEquals(moved.size(), 1, "one drag, one file");
-        assertEquals(TestCaseOrder.ordered(new ArrayList<>(arranged)), arranged, "and the list now sorts as arranged");
+        assertEquals(TestCaseOrder.ordered(placed), placed, "and the list now sorts as arranged");
         assertEquals(first.getOrder(), "c", "the case at the top never moved, so its rank is untouched");
+        assertEquals(second.getOrder(), "m", "the move is a copy, so the test case the index holds is untouched until it is written");
     }
 
     @Test
@@ -88,9 +92,10 @@ public class TestCaseOrderTest {
 
         final List<TestCaseDto> moved = TestCaseOrder.place(new ArrayList<>(List.of(ranked, arrived)));
 
-        assertEquals(moved, List.of(arrived));
+        assertEquals(moved.size(), 1);
+        assertEquals(moved.getFirst().getId(), arrived.getId());
         assertEquals(ranked.getOrder(), "c");
-        assertEquals(TestCaseOrder.ordered(List.of(arrived, ranked)), List.of(ranked, arrived));
+        assertEquals(TestCaseOrder.ordered(List.of(moved.getFirst(), ranked)), List.of(ranked, moved.getFirst()));
     }
 
     @Test

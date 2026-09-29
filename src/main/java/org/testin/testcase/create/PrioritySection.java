@@ -49,8 +49,8 @@ public class PrioritySection implements CreateTestCaseSection {
     }
 
     @Override
-    public void applyTo(final @NotNull TestCaseDto dto) {
-        dto.setPriority(priority.getSelected());
+    public @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto) {
+        return dto.edit().priority(priority.getSelected()).build();
     }
 
     @Override

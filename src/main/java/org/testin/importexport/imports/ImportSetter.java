@@ -19,25 +19,16 @@ package org.testin.importexport.imports;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto.TestCaseDtoBuilder;
 
 import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 
 @FunctionalInterface
 public interface ImportSetter {
-    static @NotNull ImportSetter always(final @NotNull BiConsumer<TestCaseDto, String> write) {
-        return (_, tc, value) -> {
-            write.accept(tc, value);
-            return true;
-        };
+    static @NotNull ImportSetter always(final @NotNull BiFunction<TestCaseDtoBuilder, String, TestCaseDtoBuilder> write) {
+        return (_, tc, value) -> Optional.of(write.apply(tc.edit(), value).build());
     }
 
-    static <T> boolean took(final @NotNull Optional<T> read, final @NotNull Consumer<T> onto) {
-        read.ifPresent(onto);
-
-        return read.isPresent();
-    }
-
-    boolean execute(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String value);
+    @NotNull Optional<TestCaseDto> execute(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String value);
 }

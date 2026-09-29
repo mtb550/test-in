@@ -33,7 +33,6 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
-import org.testin.testcase.TestCaseSnapshot;
 import org.testin.testrun.failure.FailureFields;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;
@@ -51,8 +50,8 @@ import java.util.function.Consumer;
 @Service(Service.Level.PROJECT)
 public final class RunStatusService {
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-238
-    private static @NotNull TestCaseDto asItIsNow(final @NotNull Project p, final @NotNull TestRunItems item) {
-        return TestCaseSnapshot.copy(p, item.liveTestCase());
+    private static @NotNull TestCaseDto asItIsNow(final @NotNull TestRunItems item) {
+        return item.liveTestCase().copy();
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130
@@ -68,7 +67,7 @@ public final class RunStatusService {
         final @NotNull TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        if (!recordOn(p, editor, currentTc.getId(), status, item -> item.recordVerdict(status, tester, asItIsNow(p, item))))
+        if (!recordOn(p, editor, currentTc.getId(), status, item -> item.recordVerdict(status, tester, asItIsNow(item))))
             return;
 
         confirmVerdict(p, status, 1);
@@ -90,14 +89,14 @@ public final class RunStatusService {
         recordOn(p, editor, tc.getId(), status, item -> {
             if (!clockCounted) item.recordDuration(duration);
             failure.recordOn(item);
-            item.recordVerdict(status, tester, asItIsNow(p, item));
+            item.recordVerdict(status, tester, asItIsNow(item));
         });
     }
 
     // UC-EDITOR-PANEL-038, Rule-EDITOR-PANEL-240
     private boolean correct(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        return recordOn(p, editor, tc.getId(), status, item -> item.correctVerdict(status, tester, asItIsNow(p, item)));
+        return recordOn(p, editor, tc.getId(), status, item -> item.correctVerdict(status, tester, asItIsNow(item)));
     }
 
     // Rule-EDITOR-PANEL-225
@@ -228,7 +227,7 @@ public final class RunStatusService {
 
             final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
             final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
-            judged.forEach(id -> testRuns.changeResult(editor.getParent().getPath(), id, item -> item.correctVerdict(status, tester, asItIsNow(p, item))));
+            judged.forEach(id -> testRuns.changeResult(editor.getParent().getPath(), id, item -> item.correctVerdict(status, tester, asItIsNow(item))));
             triggerFilterRefresh(editor);
 
             confirmVerdict(p, status, judged.size());

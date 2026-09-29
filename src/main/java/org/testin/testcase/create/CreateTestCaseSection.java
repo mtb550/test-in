@@ -54,7 +54,7 @@ public interface CreateTestCaseSection {
         return true;
     }
 
-    void applyTo(final @NotNull TestCaseDto dto);
+    @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto);
 
     void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction);
 

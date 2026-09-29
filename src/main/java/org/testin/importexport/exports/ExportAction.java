@@ -32,7 +32,6 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseSnapshot;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.ui.dialogs.DestinationForm;
@@ -44,6 +43,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ExportAction extends AbstractAnyProjectAction {
     public static final @NotNull String NAME = Bundle.message("export.action.name");
@@ -154,8 +154,8 @@ public class ExportAction extends AbstractAnyProjectAction {
         // UC-SHARE-003, Rule-SHARE-020
         private @NotNull List<TestCaseDto> detached(final @NotNull List<TestCaseDto> testCases) {
             return testCases.stream()
-                    .map(tc -> TestCaseSnapshot.copy(p, tc))
-                    .toList();
+                    .map(TestCaseDto::copy)
+                    .collect(Collectors.toCollection(ArrayList::new));
         }
 
         private void walk(final @NotNull DirectoryDto node, final @NotNull List<String> path, final @NotNull List<Sheet> found, final @NotNull List<String> unreadable) {

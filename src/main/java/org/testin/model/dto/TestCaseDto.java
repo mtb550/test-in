@@ -45,7 +45,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-@Builder
+@Builder(toBuilder = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
 public final class TestCaseDto {
@@ -145,5 +145,33 @@ public final class TestCaseDto {
         createdAt = other.createdAt;
         updatedBy = other.updatedBy;
         updatedAt = other.updatedAt;
+    }
+
+    // Rule-INTERNAL-117
+    public @NotNull TestCaseDtoBuilder edit() {
+        return toBuilder().steps(new ArrayList<>(steps)).group(new ArrayList<>(group));
+    }
+
+    // Rule-INTERNAL-117, Rule-EDITOR-PANEL-238
+    public @NotNull TestCaseDto copy() {
+        return edit().build();
+    }
+
+    // Rule-INTERNAL-117
+    public @NotNull TestCaseDto takeValuesOf(final @NotNull TestCaseDto edited) {
+        order = edited.order;
+        description = edited.description;
+        expectedResult = edited.expectedResult;
+        status = edited.status;
+        steps = new ArrayList<>(edited.steps);
+        priority = edited.priority;
+        parent = edited.parent;
+        reference = edited.reference;
+        group = new ArrayList<>(edited.group);
+        module = edited.module;
+        testData = edited.testData;
+        preConditions = edited.preConditions;
+        takeAuditOf(edited);
+        return this;
     }
 }

@@ -65,7 +65,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
 
     protected abstract @NotNull List<String> valuesOf(final @NotNull TestCaseDto dto);
 
-    protected abstract void write(final @NotNull TestCaseDto dto, final @NotNull List<String> values);
+    protected abstract @NotNull TestCaseDto write(final @NotNull TestCaseDto dto, final @NotNull List<String> values);
 
     protected abstract @NotNull Shortcuts addKey();
 
@@ -116,7 +116,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-033
     @Override
-    public void applyTo(final @NotNull TestCaseDto dto) {
+    public @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto) {
         final @NotNull List<String> values = new ArrayList<>();
 
         for (final EditorTextField box : fields) {
@@ -124,7 +124,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
             if (!typed.isEmpty()) values.add(typed);
         }
 
-        write(dto, values);
+        return write(dto, values);
     }
 
     @Override

@@ -53,7 +53,9 @@ public class StepsBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
     }
 
     @Override
-    protected void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<List<String>> newValues) {
+    protected @NotNull List<TestCaseDto> applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<List<String>> newValues) {
+        final @NotNull List<TestCaseDto> written = new ArrayList<>();
+
         for (int i = 0; i < items.size(); i++) {
             final @NotNull List<String> cleanSteps = new ArrayList<>();
 
@@ -65,7 +67,9 @@ public class StepsBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
                 }
             }
 
-            items.get(i).setSteps(cleanSteps);
+            written.add(items.get(i).edit().steps(cleanSteps).build());
         }
+
+        return written;
     }
 }

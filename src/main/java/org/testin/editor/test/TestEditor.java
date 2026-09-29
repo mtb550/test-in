@@ -141,8 +141,6 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
                     currentTestCases.clear();
                     currentTestCases.addAll(ordered);
 
-                    ordered.forEach(tc -> tc.setParent(parent));
-
                     jumpToPageOfPendingSelection();
 
                     list.setPaintBusy(false);

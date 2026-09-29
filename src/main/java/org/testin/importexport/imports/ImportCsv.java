@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestEditorAttributes.ImportedRow;
 import org.testin.testcase.TestEditorAttributes.Can;
 import org.testin.util.SeparatedValues;
 
@@ -34,7 +35,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 public class ImportCsv {
     // UC-SHARE-006
@@ -80,14 +80,13 @@ public class ImportCsv {
 
             if (values.stream().allMatch(String::isBlank)) continue;
 
-            final @NotNull TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
-
-            refused += TestEditorAttributes.importRow(p, currentTestCase, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
+            final @NotNull ImportedRow imported = TestEditorAttributes.importRow(p, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
                     .filter(colIndex -> colIndex < values.size())
                     .map(colIndex -> values.get(colIndex).trim())
                     .orElse(""));
 
-            result.add(currentTestCase);
+            refused += imported.refused();
+            result.add(imported.testCase());
         }
 
         TestEditorAttributes.sayWhatWasRefused(p, refused);

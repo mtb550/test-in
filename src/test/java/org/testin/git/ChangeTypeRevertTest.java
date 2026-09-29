@@ -63,6 +63,12 @@ public class ChangeTypeRevertTest {
                 .build();
     }
 
+    private static TestCaseDto reverted(final ChangeType type, final TestCaseDto current, final TestCaseDto committed) {
+        final TestCaseDto.TestCaseDtoBuilder draft = current.edit();
+        type.getRevertAction().apply(draft, committed);
+        return draft.build();
+    }
+
     @Test
     public void everyChangeTheReviewCanShowCanBeReverted() {
         final List<FieldChange> changes = TestCaseChangeComparator.compare(committed(), edited());
@@ -83,8 +89,7 @@ public class ChangeTypeRevertTest {
     @Test
     public void eachRevertRestoresItsOwnFieldAndNothingElse() {
         for (final FieldChange change : TestCaseChangeComparator.compare(committed(), edited())) {
-            final TestCaseDto current = edited();
-            change.changeType().getRevertAction().apply(current, committed());
+            final TestCaseDto current = reverted(change.changeType(), edited(), committed());
 
             final List<FieldChange> left = TestCaseChangeComparator.compare(committed(), current);
 
@@ -97,9 +102,9 @@ public class ChangeTypeRevertTest {
 
     @Test
     public void revertingEveryChangeRestoresTheCommittedTestCase() {
-        final TestCaseDto current = edited();
+        TestCaseDto current = edited();
         for (final FieldChange change : TestCaseChangeComparator.compare(committed(), edited())) {
-            change.changeType().getRevertAction().apply(current, committed());
+            current = reverted(change.changeType(), current, committed());
         }
 
         assertEquals(TestCaseChangeComparator.compare(committed(), current), List.of(),
@@ -112,9 +117,7 @@ public class ChangeTypeRevertTest {
                 .setCreatedBy("Sara Al-Otaibi")
                 .setUpdatedBy("Sara Al-Otaibi")
                 .setUpdatedAt(ZonedDateTime.parse("2026-09-01T10:00:00Z"));
-        final TestCaseDto current = committed().setModule("edited module").setUpdatedBy("Muteb");
-
-        ChangeType.CHANGE_MODULE.getRevertAction().apply(current, committed);
+        final TestCaseDto current = reverted(ChangeType.CHANGE_MODULE, committed().setModule("edited module").setUpdatedBy("Muteb"), committed);
         assertEquals(TestCaseChangeComparator.compare(committed, current), List.of(), "nothing reviewable is left");
 
         current.takeAuditOf(committed);
@@ -128,10 +131,7 @@ public class ChangeTypeRevertTest {
     @Test
     public void revertingAListCopiesItRatherThanSharingIt() {
         final TestCaseDto committed = committed();
-        final TestCaseDto current = edited();
-
-        ChangeType.CHANGE_STEPS.getRevertAction().apply(current, committed);
-        ChangeType.CHANGE_GROUP.getRevertAction().apply(current, committed);
+        final TestCaseDto current = reverted(ChangeType.CHANGE_GROUP, reverted(ChangeType.CHANGE_STEPS, edited(), committed), committed);
 
         current.getSteps().add("typed after the revert");
         current.getGroup().add("Regression");

@@ -27,6 +27,7 @@ import org.testin.model.Groups;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.ToolBarDefault;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto.TestCaseDtoBuilder;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
@@ -41,12 +42,12 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.testin.importexport.imports.ImportSetter.always;
-import static org.testin.importexport.imports.ImportSetter.took;
 
 @Getter
 public enum TestEditorAttributes implements ToolBarAttribute {
@@ -54,7 +55,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.order"),
             ToolBarDefault.LOCKED_CHECKED,
             _ -> "",
-            (_, _, _) -> true,
+            (_, tc, _) -> Optional.of(tc),
             GenType.NO_CODE_CHANGE
     ) {
         @Override
@@ -66,7 +67,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.description"),
             ToolBarDefault.LOCKED_CHECKED,
             TestCaseDto::getDescription,
-            always((tc, v) -> tc.setDescription(NameSanitizer.description(v))),
+            always((draft, v) -> draft.description(NameSanitizer.description(v))),
             GenType.UPDATE_TEST_CASE_DESCRIPTION,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
@@ -79,7 +80,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.id"),
             ToolBarDefault.OFF,
             tc -> String.valueOf(tc.getId()),
-            (_, _, _) -> true,
+            (_, tc, _) -> Optional.of(tc),
             GenType.NO_CODE_CHANGE,
             Can.EXPORT
     ),
@@ -88,7 +89,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.expected.result"),
             ToolBarDefault.ON,
             TestCaseDto::getExpectedResult,
-            always(TestCaseDto::setExpectedResult),
+            always(TestCaseDtoBuilder::expectedResult),
             GenType.UPDATE_TEST_CASE_EXPECTED_RESULT,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
@@ -97,7 +98,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.steps"),
             ToolBarDefault.OFF,
             tc -> String.join(", ", tc.getSteps()),
-            always((tc, v) -> tc.setSteps(TestDataParser.steps(v))),
+            always((draft, v) -> draft.steps(TestDataParser.steps(v))),
             GenType.UPDATE_TEST_CASE_STEPS,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
@@ -106,7 +107,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.priority"),
             ToolBarDefault.ON,
             tc -> tc.getPriority().getLabel(),
-            (_, tc, v) -> took(TestDataParser.priority(v, tc.getPriority()), tc::setPriority),
+            (_, tc, v) -> TestDataParser.priority(v, tc.getPriority()).map(priority -> tc.edit().priority(priority).build()),
             GenType.UPDATE_TEST_CASE_PRIORITY,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
@@ -120,7 +121,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.fqcn"),
             ToolBarDefault.OFF,
             tc -> String.join(" > ", Fqcn.ofMethod(tc)),
-            (_, _, _) -> true,
+            (_, tc, _) -> Optional.of(tc),
             GenType.NO_CODE_CHANGE,
             Can.EXPORT
     ),
@@ -129,7 +130,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.reference"),
             ToolBarDefault.OFF,
             TestCaseDto::getReference,
-            always(TestCaseDto::setReference),
+            always(TestCaseDtoBuilder::reference),
             GenType.NO_CODE_CHANGE,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
@@ -138,7 +139,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.test.data"),
             ToolBarDefault.OFF,
             TestCaseDto::getTestData,
-            always(TestCaseDto::setTestData),
+            always(TestCaseDtoBuilder::testData),
             GenType.UPDATE_TEST_CASE_TEST_DATA,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
@@ -147,7 +148,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.pre.conditions"),
             ToolBarDefault.OFF,
             TestCaseDto::getPreConditions,
-            always(TestCaseDto::setPreConditions),
+            always(TestCaseDtoBuilder::preConditions),
             GenType.UPDATE_TEST_CASE_PRE_CONDITIONS,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
@@ -156,7 +157,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.group"),
             ToolBarDefault.ON,
             tc -> Groups.text(tc.getGroup()),
-            (_, tc, v) -> took(TestDataParser.groups(v), tc::setGroup),
+            (_, tc, v) -> TestDataParser.groups(v).map(groups -> tc.edit().group(groups).build()),
             GenType.UPDATE_TEST_CASE_GROUP,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ) {
@@ -170,7 +171,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.path"),
             ToolBarDefault.OFF,
             tc -> String.join(" > ", tc.getParent().getPath2()),
-            (_, _, _) -> true,
+            (_, tc, _) -> Optional.of(tc),
             GenType.NO_CODE_CHANGE,
             Can.EXPORT
     ),
@@ -179,7 +180,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.module"),
             ToolBarDefault.OFF,
             TestCaseDto::getModule,
-            always(TestCaseDto::setModule),
+            always(TestCaseDtoBuilder::module),
             GenType.UPDATE_TEST_CASE_MODULE,
             Can.EDIT, Can.IMPORT, Can.COPY, Can.EXPORT
     ),
@@ -188,7 +189,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.status"),
             ToolBarDefault.OFF,
             tc -> tc.getStatus().getLabel(),
-            (_, tc, v) -> took(TestDataParser.testCaseStatus(v, tc.getStatus()), tc::setStatus),
+            (_, tc, v) -> TestDataParser.testCaseStatus(v, tc.getStatus()).map(status -> tc.edit().status(status).build()),
             GenType.UPDATE_TEST_CASE_STATUS,
             Can.EDIT, Can.COPY, Can.EXPORT
     ),
@@ -197,7 +198,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.created.by"),
             ToolBarDefault.OFF,
             TestCaseDto::getCreatedBy,
-            always(TestCaseDto::setCreatedBy),
+            always(TestCaseDtoBuilder::createdBy),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
     ),
@@ -206,7 +207,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.updated.by"),
             ToolBarDefault.OFF,
             TestCaseDto::getUpdatedBy,
-            always(TestCaseDto::setUpdatedBy),
+            always(TestCaseDtoBuilder::updatedBy),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
     ),
@@ -215,7 +216,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.created.at"),
             ToolBarDefault.OFF,
             tc -> Display.formatDate(tc.getCreatedAt()),
-            (_, tc, v) -> took(TestDataParser.date(v), tc::setCreatedAt),
+            (_, tc, v) -> TestDataParser.date(v).map(at -> tc.edit().createdAt(at).build()),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
     ),
@@ -224,7 +225,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.updated.at"),
             ToolBarDefault.OFF,
             tc -> Display.formatDate(tc.getUpdatedAt()),
-            (_, tc, v) -> took(TestDataParser.date(v), tc::setUpdatedAt),
+            (_, tc, v) -> TestDataParser.date(v).map(at -> tc.edit().updatedAt(at).build()),
             GenType.NO_CODE_CHANGE,
             Can.IMPORT, Can.EXPORT
     );
@@ -263,15 +264,19 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     }
 
     // UC-SHARE-006, Rule-SHARE-106, Rule-EDITOR-PANEL-206
-    public static int importRow(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull Function<TestEditorAttributes, String> cell) {
+    public static @NotNull ImportedRow importRow(final @NotNull Project p, final @NotNull Function<TestEditorAttributes, String> cell) {
+        TestCaseDto tc = TestCaseDto.builder().build();
         int refused = 0;
 
         for (final TestEditorAttributes attr : values()) {
             if (!attr.can(Can.IMPORT)) continue;
-            if (!attr.importSetter.execute(p, tc, cell.apply(attr))) refused++;
+
+            final @NotNull Optional<TestCaseDto> took = attr.importSetter.execute(p, tc, cell.apply(attr));
+            if (took.isPresent()) tc = took.orElseThrow();
+            else refused++;
         }
 
-        return refused;
+        return new ImportedRow(tc, refused);
     }
 
     // UC-SHARE-006, Rule-SHARE-106, Rule-EDITOR-PANEL-206
@@ -312,6 +317,9 @@ public enum TestEditorAttributes implements ToolBarAttribute {
 
     public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<Badges.Badge> badges, final @NotNull Map<String, String> details) {
         details.put(name, displayValue(tc));
+    }
+
+    public record ImportedRow(@NotNull TestCaseDto testCase, int refused) {
     }
 
     public enum Can {

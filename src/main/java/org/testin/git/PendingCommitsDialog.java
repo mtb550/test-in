@@ -22,6 +22,7 @@ import org.testin.codegen.GenType;
 import org.testin.indexer.TestCases;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto.TestCaseDtoBuilder;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -199,9 +200,10 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
             return false;
         }
 
-        final @NotNull TestCaseDto working = current.orElseThrow();
+        final @NotNull TestCaseDtoBuilder draft = current.orElseThrow().edit();
         final @NotNull TestCaseDto committed = diff.committed();
-        changeType.getRevertAction().apply(working, committed);
+        changeType.getRevertAction().apply(draft, committed);
+        final @NotNull TestCaseDto working = draft.build();
 
         if (TestCaseChangeComparator.compare(committed, working).isEmpty()) {
             working.takeAuditOf(committed);

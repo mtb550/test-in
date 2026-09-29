@@ -48,8 +48,8 @@ public class StepsSection extends AbstractMultiValueSection {
     }
 
     @Override
-    protected void write(final @NotNull TestCaseDto dto, final @NotNull List<String> values) {
-        dto.setSteps(values);
+    protected @NotNull TestCaseDto write(final @NotNull TestCaseDto dto, final @NotNull List<String> values) {
+        return dto.edit().steps(values).build();
     }
 
     @Override

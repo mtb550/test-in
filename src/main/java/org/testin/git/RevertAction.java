@@ -18,11 +18,12 @@ package org.testin.git;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto.TestCaseDtoBuilder;
 
 @FunctionalInterface
 public interface RevertAction {
     RevertAction NONE = (_, _) -> {
     };
 
-    void apply(final @NotNull TestCaseDto currentDto, final @NotNull TestCaseDto oldDto);
+    void apply(final @NotNull TestCaseDtoBuilder draft, final @NotNull TestCaseDto oldDto);
 }

@@ -26,6 +26,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class CellEditListener implements TableModelListener {
@@ -49,14 +50,12 @@ public class CellEditListener implements TableModelListener {
                     final @NotNull DefaultTableModel model = (DefaultTableModel) e.getSource();
                     final @NotNull String updatedValue = String.valueOf(model.getValueAt(row, col));
                     final @NotNull TestEditorAttributes currentAttr = importAttributes.get(col - 2);
-                    final @NotNull TestCaseDto tc = testCases.get(row);
+                    final @NotNull Optional<TestCaseDto> took = currentAttr.getImportSetter().execute(p, testCases.get(row), updatedValue);
 
                     // Rule-SHARE-106
-                    if (!currentAttr.getImportSetter().execute(p, tc, updatedValue)) {
-                        TestEditorAttributes.sayWhatWasRefused(p, 1);
-                    }
+                    took.ifPresentOrElse(tc -> testCases.set(row, tc), () -> TestEditorAttributes.sayWhatWasRefused(p, 1));
 
-                    final @NotNull String formattedValue = currentAttr.gridValue(tc);
+                    final @NotNull String formattedValue = currentAttr.gridValue(testCases.get(row));
                     model.setValueAt(formattedValue, row, col);
                 } finally {
                     isUpdating = false;

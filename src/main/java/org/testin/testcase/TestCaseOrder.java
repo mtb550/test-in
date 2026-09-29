@@ -72,23 +72,13 @@ public final class TestCaseOrder {
             final @NotNull String upperBound = anchor < arranged.size() ? arranged.get(anchor).getOrder() : "";
 
             for (int j = i; j < anchor; j++) {
-                final @NotNull TestCaseDto placed = arranged.get(j);
-                placed.setOrder(Rank.between(previous, upperBound));
-                previous = placed.getOrder();
-                moved.add(placed);
+                previous = Rank.between(previous, upperBound);
+                moved.add(arranged.get(j).edit().order(previous).build());
             }
 
             i = anchor;
         }
 
         return List.copyOf(moved);
-    }
-
-    public static void rankAll(final @NotNull List<TestCaseDto> ordered) {
-        final @NotNull List<String> ranks = Rank.spread(ordered.size());
-
-        for (int i = 0; i < ordered.size(); i++) {
-            ordered.get(i).setOrder(ranks.get(i));
-        }
     }
 }

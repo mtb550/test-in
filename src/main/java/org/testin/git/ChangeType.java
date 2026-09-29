@@ -38,50 +38,50 @@ public enum ChangeType {
 
     CHANGE_DESCRIPTION(
             Bundle.message("change.change.description"),
-            (current, old) -> current.setDescription(old.getDescription())
+            (draft, old) -> draft.description(old.getDescription())
     ),
 
     CHANGE_EXPECTED_RESULT(
             Bundle.message("change.change.expected.result"),
-            (current, old) -> current.setExpectedResult(old.getExpectedResult())),
+            (draft, old) -> draft.expectedResult(old.getExpectedResult())),
 
     CHANGE_STEPS(
             Bundle.message("change.change.steps"),
-            (current, old) -> current.setSteps(new ArrayList<>(old.getSteps()))),
+            (draft, old) -> draft.steps(new ArrayList<>(old.getSteps()))),
 
     CHANGE_PRIORITY(
             Bundle.message("change.change.priority"),
-            (current, old) -> current.setPriority(old.getPriority())
+            (draft, old) -> draft.priority(old.getPriority())
     ),
 
     CHANGE_GROUP(
             Bundle.message("change.change.group"),
-            (current, old) -> current.setGroup(new ArrayList<>(old.getGroup()))
+            (draft, old) -> draft.group(new ArrayList<>(old.getGroup()))
     ),
 
     CHANGE_STATUS(
             Bundle.message("change.change.status"),
-            (current, old) -> current.setStatus(old.getStatus())
+            (draft, old) -> draft.status(old.getStatus())
     ),
 
     CHANGE_REFERENCE(
             Bundle.message("change.change.reference"),
-            (current, old) -> current.setReference(old.getReference())
+            (draft, old) -> draft.reference(old.getReference())
     ),
 
     CHANGE_MODULE(
             Bundle.message("change.change.module"),
-            (current, old) -> current.setModule(old.getModule())
+            (draft, old) -> draft.module(old.getModule())
     ),
 
     CHANGE_TEST_DATA(
             Bundle.message("change.change.test.data"),
-            (current, old) -> current.setTestData(old.getTestData())
+            (draft, old) -> draft.testData(old.getTestData())
     ),
 
     CHANGE_PRECONDITIONS(
             Bundle.message("change.change.preconditions"),
-            (current, old) -> current.setPreConditions(old.getPreConditions())
+            (draft, old) -> draft.preConditions(old.getPreConditions())
     ),
 
     CREATE_RUN_ITEM(

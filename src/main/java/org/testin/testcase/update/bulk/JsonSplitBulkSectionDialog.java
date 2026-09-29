@@ -31,6 +31,7 @@ import org.testin.util.Shortcuts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -81,7 +82,7 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
         return attribute().gridValue(tc);
     }
 
-    protected boolean setValue(final @NotNull TestCaseDto tc, final @NotNull String value) {
+    protected @NotNull Optional<TestCaseDto> withValue(final @NotNull TestCaseDto tc, final @NotNull String value) {
         return attribute().getImportSetter().execute(p, tc, value);
     }
 
@@ -116,12 +117,13 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
 
             if (clashing.contains(i)) continue;
 
-            if (!setValue(items.get(i), edited.value())) {
+            final @NotNull Optional<TestCaseDto> took = withValue(items.get(i), edited.value());
+            if (took.isEmpty()) {
                 refused++;
                 continue;
             }
 
-            written.add(items.get(i));
+            written.add(took.orElseThrow());
         }
 
         TestEditorAttributes.sayWhatWasRefused(p, refused);

@@ -49,7 +49,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         for (final UUID id : ids)
             testCases.findTestCase(id)
                     .filter(tc -> tc.getParent().getPath().equals(testSetPath))
-                    .ifPresentOrElse(tc -> present.add(copy(p, tc)), () -> absent.add(id));
+                    .ifPresentOrElse(tc -> present.add(tc.copy()), () -> absent.add(id));
 
         return new TestCaseSnapshot(p, testSetPath, present, absent);
     }
@@ -122,11 +122,6 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return true;
     }
 
-    // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-238
-    public static @NotNull TestCaseDto copy(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        return Services.getInstance(p, Mapper.class).convertValue(tc, TestCaseDto.class).setParent(tc.getParent());
-    }
-
     private boolean stillStands() {
         return Services.getInstance(p, Nodes.class).nodeExists(testSetPath) && sameAs(of(p, testSetPath, ids()));
     }
@@ -167,21 +162,19 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
         final @NotNull TestSetDirectoryDto parent = nodes.getTestSetByPath(testSetPath);
-        present.forEach(tc -> tc.setParent(parent));
 
         boolean allBack = true;
         for (final TestCaseDto tc : present) {
             final boolean isComingBack = testCases.findTestCase(tc.getId()).isEmpty();
 
-            final @NotNull TestCaseDto stored = copy(p, tc);
-            stored.setParent(parent);
+            final @NotNull TestCaseDto stored = tc.edit().parent(parent).build();
             if (!testCases.putTestCaseVerbatim(testSetPath, stored)) {
                 allBack = false;
                 continue;
             }
 
-            written.landed().add(tc);
-            if (isComingBack) written.comingBack().add(tc);
+            written.landed().add(stored);
+            if (isComingBack) written.comingBack().add(stored);
         }
 
         return allBack;

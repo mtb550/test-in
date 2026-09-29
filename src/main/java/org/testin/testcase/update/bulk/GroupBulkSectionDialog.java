@@ -48,9 +48,13 @@ public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
 
     // UC-EDITOR-PANEL-007
     @Override
-    protected void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<List<String>> newValues) {
+    protected @NotNull List<TestCaseDto> applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<List<String>> newValues) {
+        final @NotNull List<TestCaseDto> written = new ArrayList<>();
+
         for (int i = 0; i < items.size(); i++) {
-            items.get(i).setGroup(Groups.read(String.join(",", newValues.get(i))));
+            written.add(items.get(i).edit().group(Groups.read(String.join(",", newValues.get(i)))).build());
         }
+
+        return written;
     }
 }

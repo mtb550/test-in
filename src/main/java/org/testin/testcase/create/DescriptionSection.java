@@ -113,8 +113,8 @@ public class DescriptionSection extends AbstractOneLineSection {
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-032
     @Override
-    public void applyTo(final @NotNull TestCaseDto dto) {
-        dto.setDescription(typed());
+    public @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto) {
+        return dto.edit().description(typed()).build();
     }
 
     public @NotNull String typed() {
