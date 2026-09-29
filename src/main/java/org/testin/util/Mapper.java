@@ -47,7 +47,7 @@ public final class Mapper {
 
         } catch (final Exception ex) {
             Logger.error("Mapper.readValue() failed for file '" + src.getAbsolutePath() + "' to class " + valueType.getSimpleName() + ": " + ex.getMessage());
-            throw new RuntimeException(ex.getMessage());
+            throw new IllegalStateException(FailureText.of(ex), ex);
         }
     }
 
@@ -58,7 +58,7 @@ public final class Mapper {
         } catch (final Exception ex) {
             Logger.error("Failed to read file path " + src + " to TypeReference");
             Logger.error("Exception: " + ex.getMessage());
-            throw new RuntimeException(ex.getMessage());
+            throw new IllegalStateException(FailureText.of(ex), ex);
         }
     }
 
@@ -68,7 +68,7 @@ public final class Mapper {
 
         } catch (final Exception ex) {
             Logger.error("Failed to parse JSON string to class " + valueType.getSimpleName());
-            throw new RuntimeException(ex.getMessage());
+            throw new IllegalStateException(FailureText.of(ex), ex);
         }
     }
 
@@ -78,7 +78,7 @@ public final class Mapper {
 
         } catch (final Exception ex) {
             Logger.error("Failed to parse JSON string to TypeReference.");
-            throw new RuntimeException(ex.getMessage());
+            throw new IllegalStateException(FailureText.of(ex), ex);
         }
     }
 
@@ -120,7 +120,7 @@ public final class Mapper {
 
         } catch (final Exception ex) {
             Logger.error("Failed to convert value to class " + toValueType.getSimpleName());
-            throw new RuntimeException(ex.getMessage());
+            throw new IllegalStateException(FailureText.of(ex), ex);
         }
     }
 }
