@@ -44,16 +44,20 @@ public final class CodeOn {
 
     // Rule-CODEGEN-082
     public static boolean isOn(final @NotNull Project p) {
-        return OptionalPlugin.JAVA.isAvailable() && whyOff(p).isEmpty();
+        return OptionalPlugin.JAVA.isAvailable() && TestinYml.names(p, openProject(p));
     }
 
     // Rule-CODEGEN-082
     public static @NotNull Optional<String> whyOff(final @NotNull Project p) {
-        final @NotNull String open = Services.getInstance(p, BoundTestProject.class).name();
+        final @NotNull String open = openProject(p);
         if (TestinYml.names(p, open)) return Optional.empty();
 
         final @NotNull String named = TestinYml.projectName(p);
         return Optional.of(named.isEmpty() ? Bundle.message("code.off.not.named") : Bundle.message("code.off.names.other", named, open));
+    }
+
+    private static @NotNull String openProject(final @NotNull Project p) {
+        return Services.getInstance(p, BoundTestProject.class).name();
     }
 
     // Rule-CODEGEN-082
