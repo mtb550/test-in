@@ -160,7 +160,7 @@ public enum GenType {
 
     // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-EDITOR-PANEL-046
     public void executeAll(final @NotNull Project p, final @NotNull List<?> items) {
-        ApplicationManager.getApplication().invokeLater(() -> executeAllNow(p, items));
+        ApplicationManager.getApplication().invokeLater(() -> executeAllNow(p, items), p.getDisposed());
     }
 
     // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-018
