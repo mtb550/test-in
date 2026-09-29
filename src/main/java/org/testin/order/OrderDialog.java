@@ -36,6 +36,7 @@ final class OrderDialog extends AbstractFrameworkDialog {
     private final @NotNull TextInput orderInput;
 
     private final @NotNull IntConsumer onSubmit;
+    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     // UC-TREE-PANEL-015, Rule-TREE-PANEL-055
     OrderDialog(final @NotNull Project p, final int current, final @NotNull IntConsumer onSubmit) {
@@ -81,7 +82,7 @@ final class OrderDialog extends AbstractFrameworkDialog {
         final @NotNull OptionalInt number = typed(text);
 
         if (number.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("dialog.order.refused.title"),
+            notifier.softRefuse(p, Bundle.message("dialog.order.refused.title"),
                     Bundle.message("dialog.order.refused.message", Marker.NOT_ORDERED));
             return;
         }

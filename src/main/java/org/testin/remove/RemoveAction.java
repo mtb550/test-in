@@ -77,7 +77,11 @@ public class RemoveAction extends AbstractAnyProjectAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p) {
+    private record Work(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEditors editors, @NotNull Notifier notifier, @NotNull UndoHistories undoHistories) {
+        private Work(final @NotNull Project p) {
+            this(p, Services.getInstance(p, Nodes.class), Services.getInstance(p, TestinEditors.class), Services.getInstance(p, Notifier.class), Services.getInstance(p, UndoHistories.class));
+        }
+
         // UC-TREE-PANEL-012, Rule-TREE-PANEL-038
         private void confirm(final @NotNull List<DirectoryDto> nodesToRemove) {
             final @NotNull String holds = nodesToRemove.size() == 1
@@ -97,8 +101,6 @@ public class RemoveAction extends AbstractAnyProjectAction {
         private void removeNodes(final @NotNull List<DirectoryDto> nodesToRemove) {
             if (nodesToRemove.isEmpty()) return;
 
-            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
-
             final @NotNull List<Kept> kept = new ArrayList<>(nodesToRemove.size());
 
             // Rule-TREE-PANEL-102
@@ -116,7 +118,7 @@ public class RemoveAction extends AbstractAnyProjectAction {
 
             // Rule-TREE-PANEL-116
             for (final DirectoryDto node : nodesToRemove) {
-                Services.getInstance(p, TestinEditors.class).close(p, node);
+                editors.close(p, node);
             }
 
             removeEach(nodesToRemove, went -> {
@@ -128,11 +130,11 @@ public class RemoveAction extends AbstractAnyProjectAction {
                 if (went.isEmpty()) return;
 
                 recordRemoval(went, undoable);
-                Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, went.size());
+                notifier.softShowCounted(p, Done.REMOVED, went.size());
 
                 final int lost = went.size() - undoable.size();
                 if (lost > 0) {
-                    Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("remove.not.undoable.title"),
+                    notifier.softRefuse(p, Bundle.message("remove.not.undoable.title"),
                             lost == 1
                                     ? Bundle.message("remove.not.undoable.one", Declared.shortcutText(IdeActions.ACTION_UNDO))
                                     : Bundle.message("remove.not.undoable.many", String.valueOf(lost), Declared.shortcutText(IdeActions.ACTION_UNDO)));
@@ -161,25 +163,23 @@ public class RemoveAction extends AbstractAnyProjectAction {
                     ? Bundle.message("remove.undo.one", asked.getFirst().getName())
                     : Bundle.message("remove.undo.many", String.valueOf(asked.size()));
 
-            Services.getInstance(p, UndoHistories.class).push(UndoScope.TREE, new UndoHistories.Operation(
+            undoHistories.push(UndoScope.TREE, new UndoHistories.Operation(
                     what,
                     () -> restoreAll(kept),
                     () -> {
                         removeAll(kept);
                         return true;
                     },
-                    () -> kept.forEach(one -> Services.getInstance(p, Nodes.class).forgetKept(one.copy()))));
+                    () -> kept.forEach(one -> nodes.forgetKept(one.copy()))));
         }
 
         // UC-TREE-PANEL-016, Rule-TREE-PANEL-040, Rule-INTERNAL-063
         private boolean restoreAll(final @NotNull List<Kept> kept) {
             if (kept.isEmpty()) {
-                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("remove.not.undoable.title"),
+                notifier.softRefuse(p, Bundle.message("remove.not.undoable.title"),
                         Bundle.message("remove.nothing.kept"));
                 return false;
             }
-
-            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
             // Rule-TREE-PANEL-102
             final @NotNull Map<Path, Path> originalByKept = new LinkedHashMap<>();
@@ -192,7 +192,7 @@ public class RemoveAction extends AbstractAnyProjectAction {
 
             if (lost.isEmpty()) return true;
 
-            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("remove.undo.incomplete.title"), Bundle.message("remove.undo.incomplete.message", String.valueOf(lost.size()), String.valueOf(kept.size())));
+            notifier.softRefuse(p, Bundle.message("remove.undo.incomplete.title"), Bundle.message("remove.undo.incomplete.message", String.valueOf(lost.size()), String.valueOf(kept.size())));
             return false;
         }
 

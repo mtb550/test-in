@@ -31,6 +31,8 @@ import javax.swing.JComponent;
 public class UndoAction extends AbstractProjectAction {
     private final @NotNull UndoDirection direction;
     private final @NotNull UndoScope scope;
+    private final @NotNull UndoHistories undoHistories = Services.getInstance(p, UndoHistories.class);
+    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     public UndoAction(final @NotNull Project p, final @NotNull JComponent on, final @NotNull UndoScope scope, final @NotNull UndoDirection direction) {
         super(p, direction.getTitle(), Bundle.message("undo.action.description", direction.getTitle()), direction.getIcon());
@@ -42,20 +44,16 @@ public class UndoAction extends AbstractProjectAction {
     // UC-TREE-PANEL-016, UC-EDITOR-PANEL-012
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final @NotNull UndoHistories service = Services.getInstance(p, UndoHistories.class);
+        if (!direction.can(undoHistories, scope)) return;
 
-        if (!direction.can(service, scope)) return;
-
-        if (direction.apply(service, scope)) Services.getInstance(p, Notifier.class).softShow(p, direction.getDone());
+        if (direction.apply(undoHistories, scope)) notifier.softShow(p, direction.getDone());
     }
 
     // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-067
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final @NotNull UndoHistories service = Services.getInstance(p, UndoHistories.class);
-
-        e.getPresentation().setEnabled(direction.can(service, scope));
-        e.getPresentation().setText((direction.getTitle() + " " + direction.next(service, scope)).trim());
+        e.getPresentation().setEnabled(direction.can(undoHistories, scope));
+        e.getPresentation().setText((direction.getTitle() + " " + direction.next(undoHistories, scope)).trim());
     }
 
     @Override
