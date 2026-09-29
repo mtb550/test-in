@@ -98,7 +98,9 @@ allprojects {
 // #378: pmdMain, part of check, fails on a production method over the cognitive
 // complexity or if-nesting limit in .github/complexity-rules.xml, which exempts
 // no method (#382). Both rules read the syntax tree only, so PMD is given no
-// classpath and does not wait for compileJava.
+// compiled classes and does not wait for compileJava. The core gets its library
+// jars so PMD can resolve platform types; the two modules' jars would include
+// the core's own, which would wait for it.
 allprojects {
     apply(plugin = "pmd")
 
@@ -111,7 +113,7 @@ allprojects {
 
     tasks.withType<Pmd>().configureEach {
         enabled = name == "pmdMain"
-        classpath = files()
+        classpath = if (project == rootProject) project.the<SourceSetContainer>()["main"].compileClasspath else files()
     }
 }
 
