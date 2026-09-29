@@ -43,16 +43,22 @@ import java.util.Optional;
 // Rule-CODEGEN-014
 public class UpdateTestOrder extends UpdateTestBase implements GenAction {
     // UC-CODEGEN-011, Rule-CODEGEN-067
-    private static @NotNull PsiElement place(final @NotNull PsiClass pc, final @NotNull PsiMethod pm, final @Nullable PsiElement after) {
-        if (after == null) {
-            final @NotNull Optional<PsiMethod> first = firstGenerated(pc).filter(found -> found != pm);
-            if (first.isEmpty()) return pm;
+    private static @NotNull PsiElement place(final @NotNull PsiClass pc, final @NotNull PsiMethod pm, final @NotNull Optional<PsiElement> after) {
+        return after.map(previous -> placeAfter(pc, pm, previous)).orElseGet(() -> placeFirst(pc, pm));
+    }
 
-            final @NotNull PsiElement moved = pc.addBefore(pm, first.get());
-            pm.delete();
-            return moved;
-        }
+    // UC-CODEGEN-011, Rule-CODEGEN-067
+    private static @NotNull PsiElement placeFirst(final @NotNull PsiClass pc, final @NotNull PsiMethod pm) {
+        final @NotNull Optional<PsiMethod> first = firstGenerated(pc).filter(found -> found != pm);
+        if (first.isEmpty()) return pm;
 
+        final @NotNull PsiElement moved = pc.addBefore(pm, first.get());
+        pm.delete();
+        return moved;
+    }
+
+    // UC-CODEGEN-011, Rule-CODEGEN-067
+    private static @NotNull PsiElement placeAfter(final @NotNull PsiClass pc, final @NotNull PsiMethod pm, final @NotNull PsiElement after) {
         if (nextAfter(after).filter(next -> next == pm).isPresent()) return pm;
 
         final @NotNull PsiElement moved = pc.addAfter(pm, after);
@@ -108,7 +114,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
 
         final @NotNull Map<String, PsiMethod> methods = GeneratedMethod.byTestCaseId(pc);
 
-        @Nullable PsiElement after = null;
+        @NotNull Optional<PsiElement> after = Optional.empty();
         int position = 0;
         int written = 0;
 
@@ -119,7 +125,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction {
             if (pm == null) continue;
 
             updateTestAnnotationAttribute(p, pm, "priority", String.valueOf(position));
-            after = place(pc, pm, after);
+            after = Optional.of(place(pc, pm, after));
             written++;
         }
 
