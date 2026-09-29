@@ -28,6 +28,9 @@ import java.util.function.Function;
 
 public final class FailureFields {
     private final @NotNull ActualResultSection actualResult;
+    private final @NotNull BugSeveritySection bugSeverity;
+    private final @NotNull BugPrioritySection bugPriority;
+    private final @NotNull StacktraceSection stacktrace;
     private final @NotNull ScreenshotsSection screenshots;
 
     private final @NotNull List<FailureSection> sections;
@@ -35,9 +38,12 @@ public final class FailureFields {
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
     public FailureFields(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem) {
         actualResult = new ActualResultSection(p, runItem);
+        bugSeverity = BugSeveritySection.of(runItem);
+        bugPriority = BugPrioritySection.of(runItem);
+        stacktrace = StacktraceSection.of(p, runItem);
         screenshots = new ScreenshotsSection(p, runPath, runItem);
 
-        sections = List.of(actualResult, BugSeveritySection.of(runItem), BugPrioritySection.of(runItem), StacktraceSection.of(p, runItem), screenshots);
+        sections = List.of(actualResult, bugSeverity, bugPriority, stacktrace, screenshots);
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
@@ -47,7 +53,7 @@ public final class FailureFields {
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145
     public void applyTo(final @NotNull TestRunItems runItem) {
-        sections.forEach(section -> section.applyTo(runItem));
+        runItem.recordFailure(actualResult.typed(), bugSeverity.selected(), bugPriority.selected(), stacktrace.typed(), screenshots.names());
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219

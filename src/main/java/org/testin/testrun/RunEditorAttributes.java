@@ -96,7 +96,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             Bundle.message("attribute.run.actual.result"),
             ToolBarDefault.ON,
             TestRunItems::getActualResult,
-            TestRunItems::setActualResult
+            TestRunItems::recordActualResult
     ),
 
     STACKTRACE(

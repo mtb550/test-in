@@ -27,7 +27,6 @@ import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunStatus;
-import org.testin.model.TestStatus;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
@@ -50,7 +49,7 @@ public final class TestRunStatusChange {
 
         if (newStatus == TestRunStatus.COMPLETED) open.ifPresent(editor -> editor.getWalk().stopExecution());
 
-        run.getMarker().setStatus(newStatus);
+        run.getMarker().changeStatus(newStatus);
 
         persist(run, open);
         redraw(open);
@@ -66,7 +65,7 @@ public final class TestRunStatusChange {
         if (status.isTerminal()) finish(run.getPath());
 
         testRuns.changeRunMarker(run.getPath(), marker -> {
-            marker.setStatus(status);
+            marker.changeStatus(status);
             marker.touch(tester);
         });
 
@@ -79,10 +78,7 @@ public final class TestRunStatusChange {
         testRuns.changeRun(runPath, run -> {
             int closed = 0;
             for (final TestRunItems item : run.getResults()) {
-                if (item.shownStatus() == TestStatus.PENDING) {
-                    item.setStatus(TestStatus.UNTESTED);
-                    closed++;
-                }
+                if (item.markUntestedIfPending()) closed++;
             }
 
             if (closed > 0)

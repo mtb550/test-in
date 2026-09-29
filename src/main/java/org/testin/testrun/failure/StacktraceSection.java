@@ -31,8 +31,7 @@ public record StacktraceSection(@NotNull ComponentDialogBase<MultiLineField> com
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145
-    @Override
-    public void applyTo(final @NotNull TestRunItems runItem) {
-        runItem.setStacktrace(component.getComponent().getText().trim());
+    public @NotNull String typed() {
+        return component.getComponent().getText().trim();
     }
 }

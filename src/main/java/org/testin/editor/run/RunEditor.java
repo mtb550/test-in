@@ -228,7 +228,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
                 parent.getMarker().getResultAnalysis(),
                 analysis -> {
                     Services.getInstance(p, TestRuns.class).changeRunMarker(parent.getPath(),
-                            marker -> marker.setResultAnalysis(ResultAnalysis.written(analysis)));
+                            marker -> marker.recordAnalysis(ResultAnalysis.written(analysis)));
                     Services.getInstance(p, Notifier.class).softShow(p, Done.SAVED);
                 }).show());
     }

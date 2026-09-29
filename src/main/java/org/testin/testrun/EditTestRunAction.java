@@ -126,8 +126,8 @@ public class EditTestRunAction extends AbstractAnyProjectAction {
             final @NotNull Map<TestRunConfiguration, String> configuration = TestRunConfiguration.answered(form.configuration());
 
             applyEdit(run, name, runPath -> {
-                testRuns.changeRun(runPath, held -> held.setResults(held.coverOnly(wanted(held, checked, offered::contains)).getResults()));
-                testRuns.changeRunMarker(runPath, marker -> marker.setConfiguration(configuration));
+                testRuns.changeRun(runPath, held -> held.cover(wanted(held, checked, offered::contains)));
+                testRuns.changeRunMarker(runPath, marker -> marker.configure(configuration));
             }, () -> notifier.softShow(p, Done.UPDATED));
 
             return true;

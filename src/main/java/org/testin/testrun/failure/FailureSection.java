@@ -17,12 +17,10 @@
 package org.testin.testrun.failure;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunItems;
 import org.testin.ui.framework.ComponentDialogBase;
 
 // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
 public interface FailureSection {
     @NotNull ComponentDialogBase<?> component();
 
-    void applyTo(@NotNull TestRunItems runItem);
 }

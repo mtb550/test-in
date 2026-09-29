@@ -69,6 +69,11 @@ public class TestRunDto {
         return new TestRunDto().setResults(covered);
     }
 
+    // UC-TREE-PANEL-022, Rule-TREE-PANEL-076, Rule-INTERNAL-117
+    public void cover(final @NotNull Set<UUID> wanted) {
+        results = coverOnly(wanted).getResults();
+    }
+
     @JsonIgnore
     public boolean isFullyJudged() {
         return !results.isEmpty() && results.stream().allMatch(TestRunItems::isJudged);

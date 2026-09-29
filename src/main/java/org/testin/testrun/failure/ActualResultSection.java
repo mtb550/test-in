@@ -38,9 +38,8 @@ public final class ActualResultSection implements FailureSection {
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145
-    @Override
-    public void applyTo(final @NotNull TestRunItems runItem) {
-        runItem.setActualResult(component.getComponent().getText().trim());
+    public @NotNull String typed() {
+        return component.getComponent().getText().trim();
     }
 
     // Rule-INTERNAL-097

@@ -65,6 +65,16 @@ public class TestRunMarker extends AbstractMarker {
         configuration = answered;
     }
 
+    // UC-TREE-PANEL-020, Rule-TREE-PANEL-091, Rule-INTERNAL-117
+    public void changeStatus(final @NotNull TestRunStatus next) {
+        status = next;
+    }
+
+    // UC-EDITOR-PANEL-045, Rule-EDITOR-PANEL-191, Rule-INTERNAL-117
+    public void recordAnalysis(final @NotNull Map<ResultAnalysis, String> written) {
+        resultAnalysis = written;
+    }
+
     public void markExecutionStarted() {
         if (Config.isNotExecuted(executionStartedAt))
             executionStartedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);

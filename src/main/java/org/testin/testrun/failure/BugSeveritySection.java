@@ -33,8 +33,7 @@ public record BugSeveritySection(@NotNull ComponentDialogBase<RadioSelection<Bug
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145
-    @Override
-    public void applyTo(final @NotNull TestRunItems runItem) {
-        runItem.setBugSeverity(component.getComponent().getSelected());
+    public @NotNull BugSeverity selected() {
+        return component.getComponent().getSelected();
     }
 }

@@ -61,15 +61,7 @@ public class OrderNodeAction extends AbstractAnyProjectAction {
 
     // UC-TREE-PANEL-015, Rule-TREE-PANEL-055
     private boolean place(final @NotNull Project p, final @NotNull DirectoryDto node, final int order) {
-        final int was = node.getOrder();
-        node.getMarker().setOrder(order);
-
-        if (!Services.getInstance(p, Nodes.class).persistMarker(node)) {
-            node.getMarker().setOrder(was);
-            return false;
-        }
-
-        return true;
+        return Services.getInstance(p, Nodes.class).reorder(node, order);
     }
 
     private @NotNull Optional<DirectoryDto> orderable(final @NotNull AnActionEvent e) {

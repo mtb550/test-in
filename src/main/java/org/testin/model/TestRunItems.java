@@ -136,6 +136,33 @@ public class TestRunItems {
         return bugIssueUrl.isBlank() ? Optional.empty() : Optional.of(bugIssueUrl);
     }
 
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-074, Rule-INTERNAL-117
+    public void linkBug(final @NotNull String url) {
+        bugIssueUrl = url;
+    }
+
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145, Rule-INTERNAL-117
+    public void recordFailure(final @NotNull String actual, final @NotNull BugSeverity severity, final @NotNull BugPriority priority, final @NotNull String trace, final @NotNull List<String> screenshotNames) {
+        actualResult = actual;
+        bugSeverity = severity;
+        bugPriority = priority;
+        stacktrace = trace;
+        screenshots = screenshotNames;
+    }
+
+    // UC-EDITOR-PANEL-041, Rule-INTERNAL-117
+    public void recordActualResult(final @NotNull String actual) {
+        actualResult = actual;
+    }
+
+    // UC-TREE-PANEL-020, Rule-INTERNAL-117
+    public boolean markUntestedIfPending() {
+        if (shownStatus() != TestStatus.PENDING) return false;
+
+        status = TestStatus.UNTESTED;
+        return true;
+    }
+
     public void recordDuration(final @NotNull Duration measured) {
         if (measured.isZero()) return;
 

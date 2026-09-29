@@ -28,13 +28,11 @@ import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.NodeStatus;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.markers.Marker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.util.Bundle;
 
-import java.time.ZonedDateTime;
 import java.util.Optional;
 
 public class UpdateStatusAction extends AbstractAnyProjectAction {
@@ -53,22 +51,8 @@ public class UpdateStatusAction extends AbstractAnyProjectAction {
 
     // UC-TREE-PANEL-018, Rule-TREE-PANEL-062
     private void mark(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        final @NotNull Marker marker = dir.getMarker();
-        final @NotNull NodeStatus before = marker.status();
-
-        final @NotNull String modifiedByBefore = marker.getModifiedBy();
-        final @NotNull ZonedDateTime modifiedAtBefore = marker.getModifiedAt();
-
         try {
-            marker.applyStatus(status);
-            marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
-
-            if (!Services.getInstance(p, Nodes.class).persistMarker(dir)) {
-                marker.applyStatus(before);
-                marker.setModifiedBy(modifiedByBefore);
-                marker.setModifiedAt(modifiedAtBefore);
-                return;
-            }
+            if (!Services.getInstance(p, Nodes.class).mark(dir, status, Services.getInstance(p, AppSettingsState.class).testerName)) return;
 
             Services.getInstance(p, Notifier.class).softShow(p, status.getLabel());
 

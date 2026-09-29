@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
+import org.testin.model.NodeStatus;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -29,11 +30,13 @@ import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.model.markers.AbstractMarker;
+import org.testin.model.markers.Marker;
 import org.testin.services.Services;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -190,6 +193,36 @@ public final class Nodes {
 
     public boolean persistMarker(final @NotNull DirectoryDto dto) {
         return indexer().announcedIf(store().persistMarker(dto), dto.getPath());
+    }
+
+    // UC-TREE-PANEL-015, Rule-TREE-PANEL-055, Rule-INTERNAL-117
+    public boolean reorder(final @NotNull DirectoryDto node, final int order) {
+        final @NotNull Marker marker = node.getMarker();
+        final int was = marker.getOrder();
+        marker.setOrder(order);
+
+        if (persistMarker(node)) return true;
+
+        marker.setOrder(was);
+        return false;
+    }
+
+    // UC-TREE-PANEL-018, Rule-TREE-PANEL-062, Rule-INTERNAL-117
+    public boolean mark(final @NotNull DirectoryDto node, final @NotNull NodeStatus status, final @NotNull String tester) {
+        final @NotNull Marker marker = node.getMarker();
+        final @NotNull NodeStatus before = marker.status();
+        final @NotNull String modifiedByBefore = marker.getModifiedBy();
+        final @NotNull ZonedDateTime modifiedAtBefore = marker.getModifiedAt();
+
+        marker.applyStatus(status);
+        marker.touch(tester);
+
+        if (persistMarker(node)) return true;
+
+        marker.applyStatus(before);
+        marker.setModifiedBy(modifiedByBefore);
+        marker.setModifiedAt(modifiedAtBefore);
+        return false;
     }
 
     public <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name, final @NotNull Class<M> markerClass) {

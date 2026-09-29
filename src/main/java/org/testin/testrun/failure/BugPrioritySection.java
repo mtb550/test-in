@@ -33,8 +33,7 @@ public record BugPrioritySection(@NotNull ComponentDialogBase<RadioSelection<Bug
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145
-    @Override
-    public void applyTo(final @NotNull TestRunItems runItem) {
-        runItem.setBugPriority(component.getComponent().getSelected());
+    public @NotNull BugPriority selected() {
+        return component.getComponent().getSelected();
     }
 }

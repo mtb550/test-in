@@ -51,9 +51,8 @@ public final class ScreenshotsSection implements FailureSection {
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145, Rule-EDITOR-PANEL-219
-    @Override
-    public void applyTo(final @NotNull TestRunItems runItem) {
-        runItem.setScreenshots(screenshots().stream().map(named::get).toList());
+    public @NotNull List<String> names() {
+        return screenshots().stream().map(named::get).toList();
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
