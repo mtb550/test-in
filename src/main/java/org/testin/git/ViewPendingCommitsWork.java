@@ -66,7 +66,10 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
                 _ -> {
                     final @NotNull Optional<List<String>> unfinished = git.unfinished(path);
                     if (unfinished.isPresent()) {
-                        showConflictActions(path, git.getRemoteName(path), git.syncBranch(path), unfinished.orElseThrow());
+                        final @NotNull String remote = git.getRemoteName(path);
+                        final @NotNull String branch = git.syncBranch(path);
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                showConflictActions(path, remote, branch, unfinished.orElseThrow()), p.getDisposed());
                         return;
                     }
 
@@ -280,7 +283,8 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
                 ex -> {
                     final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
                     if (!conflicting.isEmpty()) {
-                        showConflictActions(repoPath, remote, branch, conflicting);
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                showConflictActions(repoPath, remote, branch, conflicting), p.getDisposed());
                         return;
                     }
 
@@ -350,7 +354,9 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
                 },
                 ex -> {
                     final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
-                    if (!conflicting.isEmpty()) showConflictActions(repoPath, remote, branch, conflicting);
+                    if (!conflicting.isEmpty())
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                showConflictActions(repoPath, remote, branch, conflicting), p.getDisposed());
                     else
                         notifier.error(p, Bundle.message("git.conflict.operation.failed.title"), FailureText.of(ex));
                 });
