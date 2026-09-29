@@ -34,6 +34,7 @@ import com.intellij.psi.PsiNameValuePair;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.CodeOn;
+import org.testin.codegen.TestName;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
@@ -52,14 +53,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class TestMethodGutter extends RelatedItemLineMarkerProvider implements DumbAware {
-    private static @NotNull Optional<UUID> parseUuid(final @NotNull String value) {
-        try {
-            return Optional.of(UUID.fromString(value));
-        } catch (final IllegalArgumentException notAnId) {
-            return Optional.empty();
-        }
-    }
-
     // UC-CODEGEN-007, Rule-CODEGEN-029
     private static boolean namesATestCase(final @NotNull PsiLiteralExpression literal) {
         return Optional.ofNullable(PsiTreeUtil.getParentOfType(literal, PsiNameValuePair.class))
@@ -93,7 +86,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         Optional.ofNullable(PsiTreeUtil.getParentOfType(token, PsiLiteralExpression.class))
                 .filter(TestMethodGutter::namesATestCase)
                 .map(literal -> StringUtil.unquoteString(literal.getText()).trim())
-                .flatMap(TestMethodGutter::parseUuid)
+                .flatMap(TestName::testCaseId)
                 .filter(_ -> CodeOn.isOn(p))
                 .ifPresent(testCaseId -> result.add(new RelatedItemLineMarkerInfo<>(
                         element,

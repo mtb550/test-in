@@ -22,6 +22,7 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.TestName;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.Failure;
@@ -31,15 +32,10 @@ import org.testin.services.Services;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.regex.Pattern;
 
 @Service(Service.Level.PROJECT)
 public final class TestCaseExecutionSubscriber implements Disposable {
-    private static final @NotNull Pattern TEST_CASE_ID = Pattern.compile("\\p{XDigit}{8}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{4}-\\p{XDigit}{12}");
-
     private final @NotNull Project p;
 
     private final @NotNull List<Reported> surfaces = new CopyOnWriteArrayList<>();
@@ -67,7 +63,7 @@ public final class TestCaseExecutionSubscriber implements Disposable {
     private void record(final @NotNull String testName, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         Logger.debug("Execution report: testName='" + testName + "', status='" + status + "'");
 
-        parseUuid(testName).flatMap(Services.getInstance(p, TestCases.class)::findTestCase).ifPresentOrElse(
+        TestName.testCaseId(testName).flatMap(Services.getInstance(p, TestCases.class)::findTestCase).ifPresentOrElse(
                 tc -> report(tc, status, duration, failure),
                 () -> Logger.debug("  '" + testName + "' is not a generated test case - reported against none"));
     }
@@ -93,10 +89,6 @@ public final class TestCaseExecutionSubscriber implements Disposable {
                 && Services.getInstance(p, TestNGExecution.class).isStopped(tc);
 
         return stopped ? RunStatus.IDLE : status;
-    }
-
-    private @NotNull Optional<UUID> parseUuid(final @NotNull String s) {
-        return TEST_CASE_ID.matcher(s).matches() ? Optional.of(UUID.fromString(s)) : Optional.empty();
     }
 
     @FunctionalInterface
