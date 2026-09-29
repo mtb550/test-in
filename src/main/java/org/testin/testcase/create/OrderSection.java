@@ -47,6 +47,8 @@ import java.util.stream.Collectors;
 
 public class OrderSection implements CreateTestCaseSection {
     private final @NotNull Project p;
+    private final @NotNull Notifier notifier;
+    private final @NotNull TestCases testCases;
 
     @Getter
     private final @NotNull IntegerField position;
@@ -55,6 +57,8 @@ public class OrderSection implements CreateTestCaseSection {
 
     public OrderSection(final @NotNull Project p) {
         this.p = p;
+        this.notifier = Services.getInstance(p, Notifier.class);
+        this.testCases = Services.getInstance(p, TestCases.class);
 
         this.position = new IntegerField(Bundle.message("order.section.position"), 1, 1);
         DialogStyle.asField(this.position);
@@ -99,7 +103,7 @@ public class OrderSection implements CreateTestCaseSection {
             return true;
 
         } catch (final ConfigurationException invalid) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, invalid.getMessageHtml().toString());
+            notifier.softRefuse(p, invalid.getMessageHtml().toString());
             return false;
         }
     }
@@ -137,7 +141,7 @@ public class OrderSection implements CreateTestCaseSection {
 
             final @NotNull Path setPath = dto.getParent().getPath();
             ApplicationManager.getApplication().executeOnPooledThread(() ->
-                    ranked.forEach(moved -> Services.getInstance(p, TestCases.class).putTestCase(setPath, moved)));
+                    ranked.forEach(moved -> testCases.putTestCase(setPath, moved)));
         }
 
         return inSet.stream().map(tc -> placed.getOrDefault(tc.getId(), tc)).toList();

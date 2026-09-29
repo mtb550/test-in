@@ -38,12 +38,14 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class UpdateTestCaseDialog extends TestCaseBaseDialog {
+    private final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
+
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-036
     public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p, existingDto, onSave);
 
         // Rule-CODEGEN-001
-        descriptionSection.compareAgainst(() -> Services.getInstance(p, TestCases.class)
+        descriptionSection.compareAgainst(() -> testCases
                 .getTestCasesForTestSet(existingDto.getParent().getPath()).stream()
                 .filter(sibling -> !sibling.getId().equals(existingDto.getId()))
                 .toList());

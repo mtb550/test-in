@@ -37,13 +37,16 @@ import java.util.function.Consumer;
 
 public class CreateTestCaseDialog extends TestCaseBaseDialog {
     private final @NotNull TestSetDirectoryDto dir;
+    private final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
+    private final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
+    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     // UC-EDITOR-PANEL-005, Rule-CODEGEN-001
     public CreateTestCaseDialog(final @NotNull Project p, final @NotNull TestSetDirectoryDto dir, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p, TestCaseDto.builder().parent(dir).build(), onSave);
         this.dir = dir;
 
-        descriptionSection.compareAgainst(() -> Services.getInstance(p, TestCases.class).getTestCasesForTestSet(dir.getPath()));
+        descriptionSection.compareAgainst(() -> testCases.getTestCasesForTestSet(dir.getPath()));
 
         final @NotNull TestCaseForm form = new TestCaseForm(descriptionSection::getFocusComponent, true);
         final @NotNull JComponent keys = form.getPanel();
@@ -76,8 +79,8 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
     // UC-EDITOR-PANEL-005
     @Override
     protected void submit() {
-        if (!Services.getInstance(p, Nodes.class).nodeExists(dir.getPath())) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("create.test.case.set.gone", dir.getName()));
+        if (!nodes.nodeExists(dir.getPath())) {
+            notifier.softRefuse(p, Bundle.message("create.test.case.set.gone", dir.getName()));
             return;
         }
 

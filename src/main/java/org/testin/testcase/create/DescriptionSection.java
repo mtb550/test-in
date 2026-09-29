@@ -42,6 +42,7 @@ public class DescriptionSection extends AbstractOneLineSection {
     private static final @NotNull Icon REFUSED = Icons.fieldLetter(CreateTestCaseFields.DESCRIPTION.getIcon().letter(), Icons.RED);
 
     private final @NotNull Project p;
+    private final @NotNull Notifier notifier;
 
     private final @NotNull TextAttributes hint = new TextAttributes();
 
@@ -52,6 +53,7 @@ public class DescriptionSection extends AbstractOneLineSection {
                 CreateTestCaseFields.DESCRIPTION, Shortcuts.CreateTestCaseDescription);
 
         this.p = p;
+        this.notifier = Services.getInstance(p, Notifier.class);
         field.addSettingsProvider(editor -> editor.setPlaceholderAttributes(hint));
     }
 
@@ -91,7 +93,7 @@ public class DescriptionSection extends AbstractOneLineSection {
 
         if (NameSanitizer.cannotMakeMethodName(description)) {
             setError(true);
-            Services.getInstance(p, Notifier.class).softRefuse(p,
+            notifier.softRefuse(p,
                     Bundle.message("description.not.a.method.title"),
                     Bundle.message("description.not.a.method.message", methodName));
 
@@ -100,7 +102,7 @@ public class DescriptionSection extends AbstractOneLineSection {
 
         if (takenMethodKeys().contains(NameSanitizer.methodKey(methodName))) {
             setError(true);
-            Services.getInstance(p, Notifier.class).softRefuse(p,
+            notifier.softRefuse(p,
                     Bundle.message("description.taken.title"),
                     Bundle.message("description.taken.message", methodName));
 

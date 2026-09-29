@@ -68,7 +68,11 @@ public class RemoveTestCaseAction extends AbstractAnyProjectAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p, @NotNull TestinEditor editor, @NotNull DirectoryDto dir, @NotNull List<TestCaseDto> selected) {
+    private record Work(@NotNull Project p, @NotNull TestinEditor editor, @NotNull DirectoryDto dir, @NotNull List<TestCaseDto> selected, @NotNull CutState cutState, @NotNull TestCases testCases, @NotNull TestinEditors editors, @NotNull Notifier notifier) {
+        private Work(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull DirectoryDto dir, final @NotNull List<TestCaseDto> selected) {
+            this(p, editor, dir, selected, Services.getInstance(p, CutState.class), Services.getInstance(p, TestCases.class), Services.getInstance(p, TestinEditors.class), Services.getInstance(p, Notifier.class));
+        }
+
         // UC-EDITOR-PANEL-011, Rule-EDITOR-PANEL-062
         void remove() {
             final @NotNull List<TestCaseDto> selectedItems = selected;
@@ -87,13 +91,12 @@ public class RemoveTestCaseAction extends AbstractAnyProjectAction {
         private void performDeletion(final @NotNull List<TestCaseDto> selectedItems) {
             editor.getAllTestCases().removeAll(selectedItems);
 
-            Services.getInstance(p, CutState.class).clear();
+            cutState.clear();
 
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(selectedItems);
                 final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, dir.getPath(), ids);
 
-                final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
                 final @NotNull List<TestCaseDto> removed = new ArrayList<>();
                 for (final TestCaseDto tc : selectedItems) {
                     if (testCases.removeTestCase(dir.getPath(), tc.getId())) removed.add(tc);
@@ -105,10 +108,10 @@ public class RemoveTestCaseAction extends AbstractAnyProjectAction {
                     if (!removed.isEmpty()) GenType.REMOVE_TEST_CASE.executeAll(p, removed);
 
                     if (removed.size() == selectedItems.size()) editor.refreshView();
-                    else Services.getInstance(p, TestinEditors.class).reloadOpen(p, dir.getPath());
+                    else editors.reloadOpen(p, dir.getPath());
 
                     if (!removed.isEmpty())
-                        Services.getInstance(p, Notifier.class).softShowCounted(p, Done.REMOVED, removed.size());
+                        notifier.softShowCounted(p, Done.REMOVED, removed.size());
                 });
             });
         }

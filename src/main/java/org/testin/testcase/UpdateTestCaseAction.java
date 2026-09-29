@@ -71,7 +71,11 @@ public class UpdateTestCaseAction extends AbstractAnyProjectAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p, @NotNull TestinEditor editor) {
+    private record Work(@NotNull Project p, @NotNull TestinEditor editor, @NotNull TestCases testCases, @NotNull Notifier notifier) {
+        private Work(final @NotNull Project p, final @NotNull TestinEditor editor) {
+            this(p, editor, Services.getInstance(p, TestCases.class), Services.getInstance(p, Notifier.class));
+        }
+
         private void overSelection(final @NotNull Consumer<TestCaseUpdateMenuDialog> open) {
             final @NotNull List<TestCaseDto> selectedItems = editor.getSelectedTestCases();
             if (selectedItems.isEmpty()) return;
@@ -84,7 +88,6 @@ public class UpdateTestCaseAction extends AbstractAnyProjectAction {
             final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, path, ids);
 
             open.accept(new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
                 int counted = 0;
                 for (final TestCaseDto tc : updatedItems)
                     if (testCases.putTestCase(path, tc)) counted++;
@@ -96,7 +99,7 @@ public class UpdateTestCaseAction extends AbstractAnyProjectAction {
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     // Rule-EDITOR-PANEL-008
-                    Services.getInstance(p, Notifier.class).softShowCounted(p,
+                    notifier.softShowCounted(p,
                             gt == GenType.UPDATE_TEST_CASE_ORDER ? Done.RE_SORTED : Done.UPDATED, written);
 
                     if (editor instanceof Toolbar)

@@ -41,6 +41,9 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
+    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
+    private final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
+
     public DescriptionBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems, final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
         super(p, selectedItems, updatedItems);
     }
@@ -111,7 +114,6 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
             }
         }
 
-        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
         if (!notANameYet.isEmpty()) {
             notifier.softRefuse(p, Bundle.message("description.not.a.method.title"), Bundle.message("description.not.a.method.message", notANameYet.getFirst()));
         }
@@ -125,7 +127,7 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
     private @NotNull Set<String> keysOutside(final @NotNull Path testSet, final @NotNull Set<UUID> inThisDialog) {
         final @NotNull Set<String> keys = new HashSet<>();
 
-        Services.getInstance(p, TestCases.class).getTestCasesForTestSet(testSet).stream()
+        testCases.getTestCasesForTestSet(testSet).stream()
                 .filter(sibling -> !inThisDialog.contains(sibling.getId()))
                 .forEach(sibling -> keyOf(sibling.getDescription()).ifPresent(keys::add));
 

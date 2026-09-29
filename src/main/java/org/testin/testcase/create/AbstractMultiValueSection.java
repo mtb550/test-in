@@ -42,6 +42,7 @@ import java.util.Set;
 // UC-EDITOR-PANEL-005
 public abstract class AbstractMultiValueSection implements CreateTestCaseSection {
     protected final @NotNull Project p;
+    private final @NotNull TestCaseValues testCaseValues;
 
     @Getter
     private final @NotNull List<EditorTextField> fields = new ArrayList<>();
@@ -51,6 +52,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
 
     protected AbstractMultiValueSection(final @NotNull Project p) {
         this.p = p;
+        this.testCaseValues = Services.getInstance(p, TestCaseValues.class);
 
         this.container = new JBPanel<>();
         this.container.setLayout(new BoxLayout(this.container, BoxLayout.Y_AXIS));
@@ -97,7 +99,7 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
 
     public void addField(final @NotNull String text) {
         final @NotNull EditorTextField box = SpellChecker.createCompletionField(p,
-                new TextFieldWithAutoCompletion.StringsCompletionProvider(completions(Services.getInstance(p, TestCaseValues.class)), field().getIcon()), text);
+                new TextFieldWithAutoCompletion.StringsCompletionProvider(completions(testCaseValues), field().getIcon()), text);
 
         box.setOneLineMode(true);
         DialogStyle.asChoice(box);
