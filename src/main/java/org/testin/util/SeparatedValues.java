@@ -38,6 +38,14 @@ public final class SeparatedValues {
         return new SeparatedValues(text, separator).records();
     }
 
+    // UC-EDITOR-PANEL-018, UC-SHARE-002, Rule-EDITOR-PANEL-087
+    public static @NotNull String field(final @NotNull String value, final char separator) {
+        if (value.indexOf(separator) < 0 && value.indexOf('"') < 0 && value.indexOf('\n') < 0 && value.indexOf('\r') < 0) {
+            return value;
+        }
+        return '"' + value.replace("\"", "\"\"") + '"';
+    }
+
     private @NotNull List<List<String>> records() {
         int next = text.startsWith(BYTE_ORDER_MARK) ? 1 : 0;
         while (next < text.length()) {

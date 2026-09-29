@@ -92,7 +92,7 @@ public final class GridExcelBehavior {
     // UC-EDITOR-PANEL-018, Rule-EDITOR-PANEL-086
     private static @NotNull String rowAsTsv(final @NotNull JBTable table, final int row, final int @NotNull [] cols) {
         return Arrays.stream(cols)
-                .mapToObj(col -> escapeTsvField(Objects.toString(table.getValueAt(row, col), "")))
+                .mapToObj(col -> SeparatedValues.field(Objects.toString(table.getValueAt(row, col), ""), '\t'))
                 .collect(Collectors.joining("\t"));
     }
 
@@ -137,13 +137,5 @@ public final class GridExcelBehavior {
     // Rule-EDITOR-PANEL-089
     private static void setIfEditable(final @NotNull JBTable table, final @NotNull String value, final int row, final int col) {
         if (table.isCellEditable(row, col)) table.setValueAt(value, row, col);
-    }
-
-    // UC-EDITOR-PANEL-018, Rule-EDITOR-PANEL-087
-    private static @NotNull String escapeTsvField(final @NotNull String value) {
-        if (value.indexOf('\t') < 0 && value.indexOf('\n') < 0 && value.indexOf('\r') < 0 && value.indexOf('"') < 0) {
-            return value;
-        }
-        return '"' + value.replace("\"", "\"\"") + '"';
     }
 }

@@ -22,6 +22,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.Can;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.util.FailureText;
+import org.testin.util.SeparatedValues;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -48,7 +49,7 @@ public class ExportCsv {
                 for (final TestCaseDto tc : entry.getValue()) {
                     final @NotNull List<String> rowValues = new ArrayList<>();
                     for (final TestEditorAttributes attr : TestEditorAttributes.all(Can.EXPORT)) {
-                        rowValues.add(escapeCsvField(attr.gridValue(tc)));
+                        rowValues.add(SeparatedValues.field(attr.gridValue(tc), ','));
                     }
                     writer.write(String.join(",", rowValues));
                     writer.newLine();
@@ -58,16 +59,5 @@ public class ExportCsv {
             Logger.error(FailureText.of(ex));
             throw new RuntimeException(ex);
         }
-    }
-
-    private @NotNull String escapeCsvField(final @NotNull String value) {
-        if (value.contains(",") ||
-                value.contains("\"") ||
-                value.contains("\n") ||
-                value.contains("\r")
-        )
-            return "\"" + value.replace("\"", "\"\"") + "\"";
-
-        return value;
     }
 }
