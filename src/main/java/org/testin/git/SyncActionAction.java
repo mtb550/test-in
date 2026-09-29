@@ -82,9 +82,9 @@ public class SyncActionAction extends AbstractAnyProjectAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits) {
+    private record Work(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits, @NotNull Notifier notifier) {
         private Work(final @NotNull Project p) {
-            this(p, new GitRepositoryService(p), new GitCommits(p));
+            this(p, new GitRepositoryService(p), new GitCommits(p), Services.getInstance(p, Notifier.class));
         }
 
         // UC-SHARE-016, Rule-SHARE-070
@@ -101,7 +101,7 @@ public class SyncActionAction extends AbstractAnyProjectAction {
         // UC-SHARE-016, Rule-SHARE-069
         private void syncRepository(final @NotNull Path repoPath) {
             if (git.isNotRepository(repoPath)) {
-                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("git.sync.nothing.title"),
+                notifier.softRefuse(p, Bundle.message("git.sync.nothing.title"),
                         Bundle.message("git.sync.nothing.message", repoPath.getFileName()));
                 return;
             }
@@ -116,7 +116,7 @@ public class SyncActionAction extends AbstractAnyProjectAction {
 
                         if (remoteUrl.isEmpty()) {
                             ApplicationManager.getApplication().invokeLater(() ->
-                                    Services.getInstance(p, Notifier.class).warn(p, Bundle.message("git.sync.aborted.title"), Bundle.message("git.sync.aborted.message"))
+                                    notifier.warn(p, Bundle.message("git.sync.aborted.title"), Bundle.message("git.sync.aborted.message"))
                             );
                             return;
                         }
@@ -178,12 +178,12 @@ public class SyncActionAction extends AbstractAnyProjectAction {
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (!conflicting.isEmpty()) showConflictActions(repoPath, conflicting);
                 else
-                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), message);
+                    notifier.error(p, Bundle.message("git.conflict.operation.failed.title"), message);
             });
         }
 
         private void reportSyncFailure(final @NotNull String detail) {
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.sync.failed.title"), detail);
+            notifier.error(p, Bundle.message("git.sync.failed.title"), detail);
         }
 
         // UC-SHARE-017, Rule-SHARE-077
@@ -199,7 +199,7 @@ public class SyncActionAction extends AbstractAnyProjectAction {
                             }
                             refreshRepository(repoPath);
                             ApplicationManager.getApplication().invokeLater(() ->
-                                    Services.getInstance(p, Notifier.class).info(p, Bundle.message("git.rebase.aborted.title"), Bundle.message("git.rebase.aborted.pull.message")));
+                                    notifier.info(p, Bundle.message("git.rebase.aborted.title"), Bundle.message("git.rebase.aborted.pull.message")));
                             return;
                         }
 
@@ -227,7 +227,7 @@ public class SyncActionAction extends AbstractAnyProjectAction {
                         } catch (final Exception ex) {
                             Logger.error("Could not push after resolving: " + ex.getMessage());
                             ApplicationManager.getApplication().invokeLater(() ->
-                                    Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.push.failed.title"),
+                                    notifier.error(p, Bundle.message("git.push.failed.title"),
                                             Bundle.message("git.push.failed.after.resolve", FailureText.of(ex))));
 
                             indicator.setText(Bundle.message("git.progress.refreshing"));
@@ -258,7 +258,7 @@ public class SyncActionAction extends AbstractAnyProjectAction {
         private void refreshAfterSync(final @NotNull Path repoPath, final @NotNull OptionalInt pushed) {
             RepositoryRefresh.after(p, repoPath);
             ApplicationManager.getApplication().invokeLater(() ->
-                    Services.getInstance(p, Notifier.class).info(p, Bundle.message("git.synced.title"), pushedMessage(pushed)));
+                    notifier.info(p, Bundle.message("git.synced.title"), pushedMessage(pushed)));
         }
 
         private void refreshRepository(final @NotNull Path repoPath) {

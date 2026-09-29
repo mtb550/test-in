@@ -73,15 +73,15 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits) {
+    private record Work(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits, @NotNull Notifier notifier, @NotNull Nodes nodes) {
         private Work(final @NotNull Project p) {
-            this(p, new GitRepositoryService(p), new GitCommits(p));
+            this(p, new GitRepositoryService(p), new GitCommits(p), Services.getInstance(p, Notifier.class), Services.getInstance(p, Nodes.class));
         }
 
         // UC-SHARE-009, Rule-SHARE-042
         private void openFor(final @NotNull Path path) {
             if (git.isNotRepository(path)) {
-                Services.getInstance(p, Notifier.class).warnWithAction(p,
+                notifier.warnWithAction(p,
                         Bundle.message("git.no.repository.title"),
                         Bundle.message("git.no.repository.message", path.getFileName()),
                         Bundle.message("git.no.repository.action"),
@@ -114,7 +114,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                         ApplicationManager.getApplication().invokeLater(() ->
                                 reviewChanges(path, changes, branches, current, unpushed));
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.diffs", FailureText.of(ex))));
+                    ex -> notifier.error(p, Bundle.message("git.error.title"), Bundle.message("git.error.diffs", FailureText.of(ex))));
         }
 
         // UC-SHARE-010
@@ -152,7 +152,6 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                         // Rule-SHARE-065
                         if (!moved) {
                             ApplicationManager.getApplication().invokeLater(() -> {
-                                final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
                                 notifier.errorWithActions(p, Bundle.message("git.branch.not.switched.title"),
                                         Bundle.message("git.branch.not.switched.message", target),
                                         notifier.action(Bundle.message("branch.review.changes"), () -> reviewFor(p, repoPath)));
@@ -161,7 +160,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                         }
 
                         if (!request.newBranch()) {
-                            Services.getInstance(p, Nodes.class).refreshDirectory(repoPath);
+                            nodes.refreshDirectory(repoPath);
                         }
 
                         ApplicationManager.getApplication().invokeLater(() -> {
@@ -173,14 +172,12 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                             performCommitWorkflow(repoPath, request, target);
                         });
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"),
+                    ex -> notifier.error(p, Bundle.message("git.error.title"),
                             Bundle.message("git.error.prepare", target, FailureText.of(ex))));
         }
 
         // UC-SHARE-015, Rule-SHARE-067
         private void offerThePush(final @NotNull Path path, final @NotNull String currentBranch, final @NotNull OptionalInt unpushed) {
-            final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-
             if (unpushed.orElse(-1) == 0) {
                 notifier.softRefuse(p, Bundle.message("git.no.changes"));
                 return;
@@ -218,14 +215,14 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                                 return;
                             }
 
-                            Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("git.committed"), commitLabel(commitId));
+                            notifier.softShow(p, Bundle.message("git.committed"), commitLabel(commitId));
                         });
                     },
                     ex -> {
                         if (isIdentityError(Objects.toString(ex.getMessage(), ""))) {
                             promptAndSetGitIdentity(repoPath, request, branch);
                         } else {
-                            Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.commit.failed.title"), Bundle.message("git.commit.failed.message") + System.lineSeparator() + ex.getMessage());
+                            notifier.error(p, Bundle.message("git.commit.failed.title"), Bundle.message("git.commit.failed.message") + System.lineSeparator() + ex.getMessage());
                         }
                     });
         }
@@ -236,12 +233,12 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                     _ -> {
                         git.initialize(repoPath);
                         ApplicationManager.getApplication().invokeLater(() -> {
-                            Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("git.initialized"));
+                            notifier.softShow(p, Bundle.message("git.initialized"));
 
                             scanForChanges(repoPath);
                         });
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.init.failed.title"), Bundle.message("git.init.failed.message", FailureText.of(ex))));
+                    ex -> notifier.error(p, Bundle.message("git.init.failed.title"), Bundle.message("git.init.failed.message", FailureText.of(ex))));
         }
 
         // UC-SHARE-013
@@ -263,7 +260,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                             }
                         });
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.read.remote", FailureText.of(ex))));
+                    ex -> notifier.error(p, Bundle.message("git.error.title"), Bundle.message("git.error.read.remote", FailureText.of(ex))));
         }
 
         // UC-SHARE-013, Rule-SHARE-060
@@ -286,7 +283,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                         git.configureRemote(repoPath, remoteName, remoteUrl);
                         ApplicationManager.getApplication().invokeLater(() -> executeGitPush(repoPath, remoteName, remoteUrl, branch, commitId));
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.error.title"), Bundle.message("git.error.add.remote", FailureText.of(ex))));
+                    ex -> notifier.error(p, Bundle.message("git.error.title"), Bundle.message("git.error.add.remote", FailureText.of(ex))));
         }
 
         // UC-SHARE-013, Rule-SHARE-061
@@ -298,7 +295,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
 
                         RepositoryRefresh.after(p, repoPath);
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(p, Notifier.class).info(p, Bundle.message("git.pushed.title"),
+                                notifier.info(p, Bundle.message("git.pushed.title"),
                                         Bundle.message("git.pushed.message", commitLabel(commitId), remote, branch)));
                     },
                     ex -> {
@@ -308,7 +305,6 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                             return;
                         }
 
-                        final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
                         notifier.errorWithActions(p, Bundle.message("git.push.failed.title"), FailureText.of(ex),
                                 notifier.action(Bundle.message("git.try.again"), () -> pushToRemote(repoPath, () -> commitId, branch)));
                     });
@@ -338,10 +334,10 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                         RepositoryRefresh.after(p, repoPath);
 
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(p, Notifier.class).info(p, Bundle.message("git.rebase.continued.title"),
+                                notifier.info(p, Bundle.message("git.rebase.continued.title"),
                                         Bundle.message("git.rebase.continued.message")));
                     },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.push.failed.title"), FailureText.of(ex)));
+                    ex -> notifier.error(p, Bundle.message("git.push.failed.title"), FailureText.of(ex)));
         }
 
         // UC-SHARE-017, Rule-SHARE-077
@@ -360,7 +356,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                         RepositoryRefresh.after(p, repoPath);
 
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(p, Notifier.class).info(p,
+                                notifier.info(p,
                                         abort ? Bundle.message("git.rebase.aborted.title") : Bundle.message("git.rebase.continued.title"),
                                         abort ? Bundle.message("git.rebase.aborted.message") : Bundle.message("git.rebase.continued.message")));
                     },
@@ -368,7 +364,7 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                         final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
                         if (!conflicting.isEmpty()) showConflictActions(repoPath, remote, branch, conflicting);
                         else
-                            Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.conflict.operation.failed.title"), FailureText.of(ex));
+                            notifier.error(p, Bundle.message("git.conflict.operation.failed.title"), FailureText.of(ex));
                     });
         }
 
@@ -379,11 +375,11 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
                             _ -> {
                                 git.configureIdentity(repoPath, identity.name(), identity.email(), identity.global());
                                 ApplicationManager.getApplication().invokeLater(() -> {
-                                    Services.getInstance(p, Notifier.class).softShow(p, Bundle.message("git.identity.set"));
+                                    notifier.softShow(p, Bundle.message("git.identity.set"));
                                     performCommitWorkflow(repoPath, request, branch);
                                 });
                             },
-                            ex -> Services.getInstance(p, Notifier.class).error(p, Bundle.message("git.config.failed.title"),
+                            ex -> notifier.error(p, Bundle.message("git.config.failed.title"),
                                     Bundle.message("git.config.failed.message") + System.lineSeparator() + ex.getMessage()))
             ).show());
         }
