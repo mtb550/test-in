@@ -89,7 +89,7 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
         moved.setParent(destination);
         final List<UUID> ids = List.of(moved.getId());
 
-        final TestCaseSnapshot sourceBefore = new TestCaseSnapshot(getProject(), source, List.of(moved), List.of());
+        final TestCaseSnapshot sourceBefore = new TestCaseSnapshot(source, List.of(moved), List.of());
         final TestCaseSnapshot destinationBefore = TestCaseSnapshot.of(getProject(), destination.getPath(), ids);
 
         testCases().putTestCaseVerbatim(destination.getPath(), moved);

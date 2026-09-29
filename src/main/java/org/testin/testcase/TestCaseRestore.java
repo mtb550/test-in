@@ -28,6 +28,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
+import org.testin.util.Mapper;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.util.List;
@@ -67,7 +68,7 @@ final class TestCaseRestore {
 
     private static boolean stillStands(final @NotNull Project p, final @NotNull TestCaseSnapshot snapshot) {
         return Services.getInstance(p, Nodes.class).nodeExists(snapshot.testSetPath())
-                && snapshot.sameAs(TestCaseSnapshot.of(p, snapshot.testSetPath(), snapshot.ids()));
+                && snapshot.sameAs(TestCaseSnapshot.of(p, snapshot.testSetPath(), snapshot.ids()), Services.getInstance(p, Mapper.class));
     }
 
     // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-215

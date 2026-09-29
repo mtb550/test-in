@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @NotNull List<TestCaseDto> present, @NotNull List<UUID> absent) {
+public record TestCaseSnapshot(@NotNull Path testSetPath, @NotNull List<TestCaseDto> present, @NotNull List<UUID> absent) {
     // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-228
     public static @NotNull TestCaseSnapshot of(final @NotNull Project p, final @NotNull Path testSetPath, final @NotNull List<UUID> ids) {
         final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
@@ -45,7 +45,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
                     .filter(tc -> tc.getParent().getPath().equals(testSetPath))
                     .ifPresentOrElse(tc -> present.add(tc.copy()), () -> absent.add(id));
 
-        return new TestCaseSnapshot(p, testSetPath, present, absent);
+        return new TestCaseSnapshot(testSetPath, present, absent);
     }
 
     // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-067
@@ -66,7 +66,7 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
 
     // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-070
     public static void record(final @NotNull Project p, final @NotNull UndoScope scope, final @NotNull String description, final @NotNull List<TestCaseSnapshot> before, final @NotNull List<TestCaseSnapshot> after) {
-        if (same(before, after)) return;
+        if (same(before, after, Services.getInstance(p, Mapper.class))) return;
 
         ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, UndoHistories.class).push(scope, new Operation(
                 description,
@@ -76,11 +76,11 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
                 })));
     }
 
-    private static boolean same(final @NotNull List<TestCaseSnapshot> before, final @NotNull List<TestCaseSnapshot> after) {
+    private static boolean same(final @NotNull List<TestCaseSnapshot> before, final @NotNull List<TestCaseSnapshot> after, final @NotNull Mapper mapper) {
         if (before.size() != after.size()) return false;
 
         for (int i = 0; i < before.size(); i++)
-            if (!before.get(i).sameAs(after.get(i))) return false;
+            if (!before.get(i).sameAs(after.get(i), mapper)) return false;
 
         return true;
     }
@@ -91,12 +91,11 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return ids;
     }
 
-    boolean sameAs(final @NotNull TestCaseSnapshot other) {
-        return absent.equals(other.absent) && asJson().equals(other.asJson());
+    boolean sameAs(final @NotNull TestCaseSnapshot other, final @NotNull Mapper mapper) {
+        return absent.equals(other.absent) && asJson(mapper).equals(other.asJson(mapper));
     }
 
-    private @NotNull List<String> asJson() {
-        final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
+    private @NotNull List<String> asJson(final @NotNull Mapper mapper) {
         return present.stream().map(mapper::writeValueAsString).sorted().toList();
     }
 }
