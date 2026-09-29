@@ -94,7 +94,11 @@ public class ExportAction extends AbstractAnyProjectAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p) {
+    private record Work(@NotNull Project p, @NotNull Notifier notifier, @NotNull TestCases testCases, @NotNull Nodes nodes) {
+        private Work(final @NotNull Project p) {
+            this(p, Services.getInstance(p, Notifier.class), Services.getInstance(p, TestCases.class), Services.getInstance(p, Nodes.class));
+        }
+
         // UC-SHARE-001, Rule-SHARE-015
         private void exportFrom(final @NotNull DirectoryDto dirDto) {
             final @NotNull Optional<VirtualFile> resolved = resolveTargetDir(dirDto);
@@ -106,7 +110,7 @@ public class ExportAction extends AbstractAnyProjectAction {
                 final @NotNull Map<String, List<TestCaseDto>> sheets = gathered.sheets();
                 if (sheets.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("notification.export.empty.title"), Bundle.message("export.none.found")));
+                            notifier.softRefuse(p, Bundle.message("notification.export.empty.title"), Bundle.message("export.none.found")));
                     return;
                 }
 
@@ -159,9 +163,6 @@ public class ExportAction extends AbstractAnyProjectAction {
         }
 
         private void walk(final @NotNull DirectoryDto node, final @NotNull List<String> path, final @NotNull List<Sheet> found, final @NotNull List<String> unreadable) {
-            final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
-            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
-
             final @NotNull List<TestCaseDto> here = testCases.getTestCasesForTestSet(node.getPath());
             if (!here.isEmpty()) found.add(new Sheet(path, detached(here)));
 

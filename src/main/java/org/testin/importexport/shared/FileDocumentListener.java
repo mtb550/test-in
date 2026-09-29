@@ -20,7 +20,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.util.concurrency.AppExecutorUtil;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.logger.Logger;
@@ -41,13 +40,13 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-@AllArgsConstructor
 public class FileDocumentListener implements DocumentListener {
     // UC-SHARE-005, Rule-SHARE-107, Rule-EDITOR-PANEL-090
     private static final long QUIET_MILLIS = 300;
 
     private final @NotNull TextFieldWithBrowseButton fileField;
     private final @NotNull Project p;
+    private final @NotNull Notifier notifier;
 
     private final @NotNull Consumer<String> onStatus;
 
@@ -55,6 +54,15 @@ public class FileDocumentListener implements DocumentListener {
     private final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader;
 
     private final @NotNull AtomicReference<String> awaiting = new AtomicReference<>("");
+
+    public FileDocumentListener(final @NotNull TextFieldWithBrowseButton fileField, final @NotNull Project p, final @NotNull Consumer<String> onStatus, final @NotNull BiConsumer<FileTypes, Map<String, List<TestCaseDto>>> onDataLoaded, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {
+        this.fileField = fileField;
+        this.p = p;
+        this.notifier = Services.getInstance(p, Notifier.class);
+        this.onStatus = onStatus;
+        this.onDataLoaded = onDataLoaded;
+        this.importLoader = importLoader;
+    }
 
     @Override
     public void insertUpdate(final @NotNull DocumentEvent e) {
@@ -102,7 +110,7 @@ public class FileDocumentListener implements DocumentListener {
     private void loadFile(final @NotNull File importFile, final @NotNull String typed) {
         FileTypes.importerFor(importFile.getName().toLowerCase())
                 .ifPresentOrElse(format -> loadFile(importFile, format, typed),
-                        () -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("import.cannot.title"),
+                        () -> notifier.softRefuse(p, Bundle.message("import.cannot.title"),
                                 Bundle.message("import.cannot.message", importFile.getName(), FileTypes.importableExtensions())));
     }
 
@@ -120,7 +128,7 @@ public class FileDocumentListener implements DocumentListener {
                     if (!isStillWanted(typed)) return;
 
                     if (parsedData.isEmpty()) {
-                        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("import.no.data.title"), Bundle.message("import.no.data.message"));
+                        notifier.softRefuse(p, Bundle.message("import.no.data.title"), Bundle.message("import.no.data.message"));
                         return;
                     }
                     onDataLoaded.accept(format, parsedData);
@@ -132,7 +140,7 @@ public class FileDocumentListener implements DocumentListener {
                     onStatus.accept("");
 
                     if (isStillWanted(typed)) {
-                        Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.parse.error.format", format.getLabel()), FailureText.of(ex));
+                        notifier.error(p, Bundle.message("import.parse.error.format", format.getLabel()), FailureText.of(ex));
                     }
                 });
             }

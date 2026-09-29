@@ -106,7 +106,11 @@ public class ImportAction extends AbstractAnyProjectAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p) {
+    private record Work(@NotNull Project p, @NotNull Notifier notifier, @NotNull TestinEditors editors, @NotNull Nodes nodes, @NotNull TestCases indexedTestCases) {
+        private Work(final @NotNull Project p) {
+            this(p, Services.getInstance(p, Notifier.class), Services.getInstance(p, TestinEditors.class), Services.getInstance(p, Nodes.class), Services.getInstance(p, TestCases.class));
+        }
+
         private void openImportDialog(final @NotNull DirectoryDto dirDto) {
             new ImportDialog(p, TestEditorAttributes.all(Can.IMPORT),
                     (file, format) -> format.importToFile(p, file),
@@ -161,7 +165,7 @@ public class ImportAction extends AbstractAnyProjectAction {
                             // UC-SHARE-007, Rule-SHARE-037
                             Logger.error("Import failed after at least " + imported + " of " + total + ": " + FailureText.of(ex));
 
-                            Services.getInstance(p, Notifier.class).error(p, Bundle.message("import.failed.title"),
+                            notifier.error(p, Bundle.message("import.failed.title"),
                                     Bundle.message("import.failed.partial", String.valueOf(imported), String.valueOf(total), FailureText.of(ex)));
 
                             refreshTarget(targetPath);
@@ -169,10 +173,10 @@ public class ImportAction extends AbstractAnyProjectAction {
                         }
 
                         if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                            onEdt(() -> Services.getInstance(p, TestinEditors.class).closeThenOpen(p, ts));
+                            onEdt(() -> editors.closeThenOpen(p, ts));
                         }
 
-                        Services.getInstance(p, Notifier.class).softShowCounted(p, Done.IMPORTED, imported);
+                        notifier.softShowCounted(p, Done.IMPORTED, imported);
 
                         reportEmptySets(List.copyOf(stillEmpty));
 
@@ -183,7 +187,7 @@ public class ImportAction extends AbstractAnyProjectAction {
         }
 
         private void refreshTarget(final @NotNull Path targetPath) {
-            Services.getInstance(p, Nodes.class).refreshDirectory(targetPath);
+            nodes.refreshDirectory(targetPath);
         }
 
         // UC-SHARE-007, Rule-SHARE-037
@@ -198,7 +202,7 @@ public class ImportAction extends AbstractAnyProjectAction {
                     ? Bundle.message("import.empty.one")
                     : Bundle.message("import.empty.many", String.valueOf(empty.size()));
 
-            Services.getInstance(p, Notifier.class).warn(p, Bundle.message("import.empty.title"),
+            notifier.warn(p, Bundle.message("import.empty.title"),
                     Bundle.message("import.empty.message", count, named, rest));
         }
 
@@ -253,8 +257,6 @@ public class ImportAction extends AbstractAnyProjectAction {
 
         // UC-SHARE-005, Rule-SHARE-025, Rule-SHARE-037
         private @NotNull List<TestCaseDto> linkAndSaveTestCases(final @NotNull TestSetDirectoryDto into, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
-            final @NotNull TestCases indexedTestCases = Services.getInstance(p, TestCases.class);
-
             String rank = tailRank;
 
             final @NotNull List<TestCaseDto> placed = new ArrayList<>(testCases.size());
@@ -284,7 +286,7 @@ public class ImportAction extends AbstractAnyProjectAction {
 
         private @NotNull Optional<TestCaseDto> findExistingTail(final @NotNull Path directory) {
             final @NotNull List<TestCaseDto> existing =
-                    TestCaseOrder.ordered(Services.getInstance(p, TestCases.class).getTestCasesForTestSet(directory));
+                    TestCaseOrder.ordered(indexedTestCases.getTestCasesForTestSet(directory));
 
             return existing.isEmpty() ? Optional.empty() : Optional.of(existing.getLast());
         }

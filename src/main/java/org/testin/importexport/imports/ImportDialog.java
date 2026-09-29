@@ -43,6 +43,7 @@ public final class ImportDialog extends AbstractFrameworkDialog {
     private final @NotNull Consumer<@NotNull Map<String, List<TestCaseDto>>> onImport;
 
     private final @NotNull SheetPreview preview;
+    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     public ImportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader, final @NotNull Consumer<@NotNull Map<String, List<TestCaseDto>>> onImport) {
         super(p);
@@ -73,13 +74,13 @@ public final class ImportDialog extends AbstractFrameworkDialog {
         if (form.resolve().isEmpty()) return;
 
         if (preview.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("notification.import.empty.title"), Bundle.message("notification.import.empty.nothing.loaded"));
+            notifier.softRefuse(p, Bundle.message("notification.import.empty.title"), Bundle.message("notification.import.empty.nothing.loaded"));
             return;
         }
 
         final @NotNull Map<String, List<TestCaseDto>> selected = preview.selected();
         if (selected.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("notification.import.empty.title"), Bundle.message("notification.import.empty.none.selected"));
+            notifier.softRefuse(p, Bundle.message("notification.import.empty.title"), Bundle.message("notification.import.empty.none.selected"));
             return;
         }
 

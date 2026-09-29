@@ -42,12 +42,12 @@ import java.util.Objects;
 
 public class GroupMultiSelectEditor extends AbstractCellEditor implements TableCellEditor {
     private final @NotNull JButton button = new JButton();
-    private final @NotNull Project p;
+    private final @NotNull TestCaseValues testCaseValues;
 
     private @NotNull String currentValue = "";
 
     public GroupMultiSelectEditor(final @NotNull Project p) {
-        this.p = p;
+        this.testCaseValues = Services.getInstance(p, TestCaseValues.class);
 
         button.setBorderPainted(false);
         button.setHorizontalAlignment(SwingConstants.LEFT);
@@ -65,7 +65,7 @@ public class GroupMultiSelectEditor extends AbstractCellEditor implements TableC
         DialogStyle.styleContent(list);
         DialogStyle.asRow(list);
 
-        Services.getInstance(p, TestCaseValues.class).getGroups().stream().sorted()
+        testCaseValues.getGroups().stream().sorted()
                 .forEach(group -> list.addItem(group, group, picked.contains(group)));
 
         list.setCheckBoxListListener((index, state) -> {

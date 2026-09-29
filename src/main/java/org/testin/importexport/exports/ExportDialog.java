@@ -44,6 +44,7 @@ public final class ExportDialog extends AbstractFrameworkDialog {
     private final @NotNull SheetPreview preview;
     private final @NotNull BiConsumer<DestinationForm.@NotNull Destination,
             @NotNull Map<String, List<TestCaseDto>>> onExport;
+    private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     public ExportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> exportAttributes, final @NotNull Map<String, List<TestCaseDto>> sheetsData, final @NotNull VirtualFile exportTarget, final @NotNull BiConsumer<DestinationForm.@NotNull Destination, @NotNull Map<String, List<TestCaseDto>>> onExport) {
         super(p);
@@ -80,7 +81,7 @@ public final class ExportDialog extends AbstractFrameworkDialog {
         form.resolve().ifPresent(destination -> {
             final @NotNull Map<String, List<TestCaseDto>> selected = preview.selected();
             if (selected.isEmpty()) {
-                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("notification.export.empty.title"), Bundle.message("notification.export.empty.message"));
+                notifier.softRefuse(p, Bundle.message("notification.export.empty.title"), Bundle.message("notification.export.empty.message"));
                 return;
             }
 
