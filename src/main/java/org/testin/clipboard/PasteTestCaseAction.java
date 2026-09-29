@@ -104,7 +104,11 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
     private record Answered(@NotNull Transferable contents, boolean holdsTestCases) {
     }
 
-    private record Work(@NotNull Project p, @NotNull TestinEditor editor) {
+    private record Work(@NotNull Project p, @NotNull TestinEditor editor, @NotNull CutState cutState, @NotNull TestCases testCases, @NotNull Notifier notifier, @NotNull Mapper mapper, @NotNull AppSettingsState settings) {
+        private Work(final @NotNull Project p, final @NotNull TestinEditor editor) {
+            this(p, editor, Services.getInstance(p, CutState.class), Services.getInstance(p, TestCases.class), Services.getInstance(p, Notifier.class), Services.getInstance(p, Mapper.class), Services.getInstance(p, AppSettingsState.class));
+        }
+
         void paste() {
             final @NotNull List<TestCaseDto> pastedTestCases = getFromClipboard();
             if (pastedTestCases.isEmpty()) return;
@@ -112,7 +116,6 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (!(editor instanceof TestEditor destUI)) return;
 
-                final @NotNull CutState cutState = Services.getInstance(p, CutState.class);
                 final boolean isCut = cutState.isCutOf(pastedTestCases);
 
                 final @NotNull Optional<DirectoryDto> cutFromSet =
@@ -143,7 +146,7 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
 
                     if (!isCut) {
                         copied.add(new CopiedTestCase(clonedTc,
-                                Services.getInstance(p, TestCases.class).findTestCase(tc.getId()).orElse(tc)));
+                                testCases.findTestCase(tc.getId()).orElse(tc)));
                     }
                 }
 
@@ -173,7 +176,7 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
                     else cutFromSet.ifPresent(source -> GenType.MOVE_TEST_CASE.executeAll(p,
                             pastedHere.stream().map(moved -> new MovedTestCase(moved, source)).toList()));
 
-                    Services.getInstance(p, Notifier.class).softShowCounted(p, Done.PASTED, pasted);
+                    notifier.softShowCounted(p, Done.PASTED, pasted);
                 });
 
                 if (isCut) cutState.clear();
@@ -184,7 +187,6 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
         private void moveCut(final @NotNull TestinEditor sourceUI, final @NotNull TestEditor destUI, final @NotNull List<TestCaseDto> cutItems, final @NotNull List<TestCaseDto> pastedHere) {
             final @NotNull Path from = sourceUI.getParent().getPath();
             final @NotNull Path to = destUI.getParent().getPath();
-            final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
 
             final @NotNull List<TestCaseDto> stayed = new ArrayList<>();
             for (final TestCaseDto moved : pastedHere) {
@@ -214,7 +216,7 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
                 final @NotNull String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
                 if (!json.trim().startsWith("[")) return List.of();
 
-                final @NotNull List<TestCaseDto> parsed = Services.getInstance(p, Mapper.class).readValue(json, new TypeReference<>() {
+                final @NotNull List<TestCaseDto> parsed = mapper.readValue(json, new TypeReference<>() {
                 });
 
                 return parsed.stream().filter(Objects::nonNull).toList();
@@ -251,7 +253,7 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
 
             if (isCut) {
                 final @NotNull TestCaseDto moved = draft.build();
-                moved.touch(Services.getInstance(p, AppSettingsState.class).testerName);
+                moved.touch(settings.testerName);
                 return moved;
             }
 

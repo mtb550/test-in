@@ -63,7 +63,11 @@ public class PasteNodeAction extends AbstractAnyProjectAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p, @NotNull TreeTransferHandler transferHandler) {
+    private record Work(@NotNull Project p, @NotNull TreeTransferHandler transferHandler, @NotNull Notifier notifier) {
+        private Work(final @NotNull Project p, final @NotNull TreeTransferHandler transferHandler) {
+            this(p, transferHandler, Services.getInstance(p, Notifier.class));
+        }
+
         // UC-TREE-PANEL-013, Rule-TREE-PANEL-006
         private void paste(final @NotNull Transferable contents, final @NotNull DirectoryDto target) {
             try {
@@ -77,7 +81,7 @@ public class PasteNodeAction extends AbstractAnyProjectAction {
 
                 if (nodes.isEmpty()) {
                     if (!collisionsReported) {
-                        Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("paste.select.folder"));
+                        notifier.softRefuse(p, Bundle.message("paste.select.folder"));
                     }
 
                     return;
@@ -100,7 +104,7 @@ public class PasteNodeAction extends AbstractAnyProjectAction {
 
             } catch (final Exception ex) {
                 Logger.error("Paste Node failed: " + FailureText.of(ex));
-                Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("clipboard.paste.failed.title"), FailureText.of(ex));
+                notifier.softRefuse(p, Bundle.message("clipboard.paste.failed.title"), FailureText.of(ex));
             }
         }
     }

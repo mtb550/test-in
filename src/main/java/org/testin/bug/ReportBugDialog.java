@@ -38,6 +38,8 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
     private final @NotNull BugReports.RunItem item;
     private final @NotNull PreparedBug bug;
     private final @NotNull Runnable redraw;
+    private final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
+    private final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
 
     private final @NotNull ComponentDialogBase<TextInput> titleField;
     private final @NotNull ComponentDialogBase<TextArea> bodyArea;
@@ -51,7 +53,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
         this.bug = bug;
         this.redraw = redraw;
 
-        final @NotNull BugReports.Edits opening = Services.getInstance(p, BugReports.class).unsent(item)
+        final @NotNull BugReports.Edits opening = reports.unsent(item)
                 .orElse(new BugReports.Edits(bug.facts().title(), bug.body()));
 
         titleField = ComponentDialogBase.textField()
@@ -83,7 +85,6 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
 
     void open() {
         if (!show()) {
-            final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
             reports.discard(item);
             if (reports.end(item, BugReports.Stage.OPEN)) redraw.run();
             return;
@@ -92,7 +93,6 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
         getPopup().addListener(new JBPopupListener() {
             @Override
             public void onClosed(final @NotNull LightweightWindowEvent event) {
-                final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
                 if (!event.isOk()) reports.discard(item);
 
                 if (reports.end(item, BugReports.Stage.OPEN)) redraw.run();
@@ -111,7 +111,7 @@ final class ReportBugDialog extends AbstractFrameworkDialog {
     }
 
     private @NotNull Optional<String> noLongerFailed() {
-        return item.stillFailed(Services.getInstance(p, TestRuns.class)).isPresent()
+        return item.stillFailed(testRuns).isPresent()
                 ? Optional.empty()
                 : Optional.of(Bundle.message("bug.no.longer.failed"));
     }
