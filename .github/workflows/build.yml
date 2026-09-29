@@ -5,9 +5,9 @@
 #
 # Deliberately not here, both with a reason and neither a matter of effort:
 #
-# The IDE inspection gate. tools/inspect.ps1 costs a full indexing pass and is
-# written for PowerShell only, so it joins CI after the cross-platform story
-# lands (#106). It stays a sweep gate run by hand.
+# The IDE inspection gate. tools/inspect.ps1 costs a full indexing pass, so it
+# runs in its own workflow, inspect.yml, on every push rather than inside this
+# build.
 #
 # Coverage. There is none, and that is decided rather than pending (#130, closed
 # 2026-09-11).
