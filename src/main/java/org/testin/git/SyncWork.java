@@ -99,7 +99,7 @@ record SyncWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull 
                         if (!conflicting.isEmpty()) {
                             showConflictActions(repoPath, conflicting);
                         } else {
-                            reportSyncFailure(Bundle.message("git.sync.failed.remote", FailureText.of(ex)));
+                            reportSyncFailure(FailureText.of(ex));
                         }
                     });
                 });

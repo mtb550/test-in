@@ -87,12 +87,11 @@ remote.*
 anything else. That is [UC-SHARE-017](resolveConflicts.md).
 
 **If the remote cannot be asked for its branches** — nothing is pulled or
-pushed. A message titled **Sync Failed** reads *Could not sync with the
-remote:*, then *Could not ask* the remote *whether it has the branch*, the
-branch, *so nothing was pulled or pushed:*, and Git's reason on the next line.
+pushed. A message titled **Sync Failed** reads *Could not ask* the remote
+*whether it has the branch*, the branch, *so nothing was pulled or pushed:*,
+and Git's reason on the next line.
 
-**If anything else fails** — a message titled **Sync Failed** reads *Could not
-sync with the remote:*. The reason is on the next line.
+**If anything else fails** — a message titled **Sync Failed** gives the reason.
 
 **If the IDE has no Git plugin** — the menu entry is still there, grayed,
 reading *(needs the Git plugin)*.
