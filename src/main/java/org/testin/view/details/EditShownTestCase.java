@@ -80,7 +80,7 @@ public final class EditShownTestCase {
         final @NotNull Optional<Path> undoPath = writesTo(p, dto, currentPath);
         final @NotNull Optional<TestCaseSnapshot> before = undoPath.map(editPath -> TestCaseSnapshot.of(p, editPath, ids));
 
-        new TestCaseUpdateMenuDialog(p, items, (tcs, gt) -> save(p, dto, currentPath, tcs, gt, ids, before)).show();
+        new TestCaseUpdateMenuDialog(p, items, (tcs, field) -> save(p, dto, currentPath, tcs, field.getGt(), ids, before)).show();
     }
 
     // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007

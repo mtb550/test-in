@@ -26,6 +26,7 @@ import org.testin.codegen.GenType;
 import org.testin.model.MenuItem;
 import org.testin.model.StatusBarItem;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.create.CreateTestCaseSection;
@@ -62,6 +63,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Shortcuts.UpdateTestCaseDescription,
             CreateTestCaseFields.DESCRIPTION.getIcon(),
             GenType.UPDATE_TEST_CASE_DESCRIPTION,
+            Done.UPDATED,
             (p, items, updatedItems) -> new DescriptionBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getDescriptionSection,
             new TestCaseDialogKey[]{CORRECTIONS}
@@ -72,6 +74,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Shortcuts.UpdateTestCaseExpectedResult,
             CreateTestCaseFields.EXPECTED_RESULT.getIcon(),
             GenType.UPDATE_TEST_CASE_EXPECTED_RESULT,
+            Done.UPDATED,
             (p, items, updatedItems) -> new ExpectedResultBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getExpectedResultSection,
             new TestCaseDialogKey[]{CORRECTIONS}
@@ -82,6 +85,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Shortcuts.UpdateTestCaseModule,
             CreateTestCaseFields.MODULE.getIcon(),
             GenType.UPDATE_TEST_CASE_MODULE,
+            Done.UPDATED,
             (p, items, updatedItems) -> new ModuleBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getModuleSection,
             new TestCaseDialogKey[]{CORRECTIONS}
@@ -92,6 +96,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Shortcuts.UpdateTestCaseTestData,
             CreateTestCaseFields.TEST_DATA.getIcon(),
             GenType.UPDATE_TEST_CASE_TEST_DATA,
+            Done.UPDATED,
             (p, items, updatedItems) -> new TestDataBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getTestDataSection,
             new TestCaseDialogKey[]{}
@@ -102,6 +107,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Shortcuts.UpdateTestCasePreConditions,
             CreateTestCaseFields.PRE_CONDITIONS.getIcon(),
             GenType.UPDATE_TEST_CASE_PRE_CONDITIONS,
+            Done.UPDATED,
             (p, items, updatedItems) -> new PreConditionsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPreConditionsSection,
             new TestCaseDialogKey[]{CORRECTIONS}
@@ -112,6 +118,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Shortcuts.UpdateTestCaseSteps,
             CreateTestCaseFields.STEPS.getIcon(),
             GenType.UPDATE_TEST_CASE_STEPS,
+            Done.UPDATED,
             (p, items, updatedItems) -> new StepsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getStepsSection,
             new TestCaseDialogKey[]{CORRECTIONS, ADD_STEP, NAVIGATE_TAB, AUTO_COMPLETE}
@@ -122,6 +129,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Shortcuts.UpdateTestCasePriority,
             CreateTestCaseFields.PRIORITY.getIcon(),
             GenType.UPDATE_TEST_CASE_PRIORITY,
+            Done.UPDATED,
             (p, items, updatedItems) -> new PriorityBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPrioritySection,
             new TestCaseDialogKey[]{NAVIGATE_ARROWS}
@@ -132,6 +140,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Shortcuts.UpdateTestCaseGroup,
             CreateTestCaseFields.GROUP.getIcon(),
             GenType.UPDATE_TEST_CASE_GROUP,
+            Done.UPDATED,
             (p, items, updatedItems) -> new GroupBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getGroupSection,
             new TestCaseDialogKey[]{ADD_GROUP, AUTO_COMPLETE, NAVIGATE_TAB}
@@ -143,6 +152,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Shortcuts.EMPTY,
             AllIcons.Actions.Preview,
             GenType.UPDATE_TEST_CASE_STATUS,
+            Done.UPDATED,
             (p, items, updatedItems) -> new StatusBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getStatusSection,
             new TestCaseDialogKey[]{}
@@ -153,6 +163,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Shortcuts.UpdateTestCaseOrder,
             Icons.fieldLetter("O", Icons.GRAY),
             GenType.UPDATE_TEST_CASE_ORDER,
+            Done.RE_SORTED,
             (p, _, _) -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("update.order.one.at.a.time")),
             TestCaseBaseDialog::getOrderSection,
             new TestCaseDialogKey[]{}
@@ -162,6 +173,7 @@ public enum UpdateTestCaseFields implements MenuItem {
     private final @NotNull Shortcuts shortcut;
     private final @NotNull Icon icon;
     private final @NotNull GenType<TestCaseDto> gt;
+    private final @NotNull Done done;
     private final @NotNull BulkEditorAction bulkAction;
     private final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor;
 

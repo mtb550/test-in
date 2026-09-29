@@ -19,12 +19,10 @@ package org.testin.testcase;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.create.TestCaseUpdateMenuDialog;
@@ -52,11 +50,11 @@ record UpdateTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @Not
         final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(selectedItems);
         final @NotNull TestCaseSnapshot before = TestCaseSnapshot.of(p, path, ids);
 
-        open.accept(new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> ApplicationManager.getApplication().executeOnPooledThread(() ->
-                save(path, ids, before, updatedItems, gt))));
+        open.accept(new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, field) -> ApplicationManager.getApplication().executeOnPooledThread(() ->
+                save(path, ids, before, updatedItems, field))));
     }
 
-    private void save(final @NotNull Path path, final @NotNull List<UUID> ids, final @NotNull TestCaseSnapshot before, final @NotNull List<TestCaseDto> updatedItems, final @NotNull GenType<TestCaseDto> gt) {
+    private void save(final @NotNull Path path, final @NotNull List<UUID> ids, final @NotNull TestCaseSnapshot before, final @NotNull List<TestCaseDto> updatedItems, final @NotNull UpdateTestCaseFields field) {
         int counted = 0;
         for (final TestCaseDto tc : updatedItems)
             if (testCases.putTestCase(path, tc)) counted++;
@@ -68,13 +66,12 @@ record UpdateTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @Not
 
         ApplicationManager.getApplication().invokeLater(() -> {
             // Rule-EDITOR-PANEL-008
-            notifier.softShowCounted(p,
-                    gt == GenType.UPDATE_TEST_CASE_ORDER ? Done.RE_SORTED : Done.UPDATED, written);
+            notifier.softShowCounted(p, field.getDone(), written);
 
             editor.onToolBarFilterSelectionChanged();
 
             editor.refreshOrdered();
-            TestCaseUpdateMenuDialog.applyAftermath(p, updatedItems, gt);
+            TestCaseUpdateMenuDialog.applyAftermath(p, updatedItems, field.getGt());
         });
     }
 }

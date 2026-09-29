@@ -92,7 +92,7 @@ public class GridEditConfirmationTest {
     public void theSharedOneSaysWhatTheUpdateDialogSays() {
         final String parent = sourceOf(LISTENERS.resolve(PARENT + ".java"));
         final String dialog = sourceOf(Paths.get("src", "main", "java", "org", "testin", "testcase",
-                "UpdateTestCaseWork.java"));
+                "UpdateTestCaseFields.java"));
 
         assertTrue(parent.contains("Done.UPDATED"),
                 PARENT + " confirms a grid edit in words of its own rather than naming the outcome");

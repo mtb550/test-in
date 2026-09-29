@@ -35,9 +35,9 @@ import java.util.function.BiConsumer;
 public class TestCaseUpdateMenuDialog {
     private final @NotNull Project p;
     private final @NotNull List<TestCaseDto> items;
-    private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GenType<TestCaseDto>> updatedItems;
+    private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull UpdateTestCaseFields> updatedItems;
 
-    public TestCaseUpdateMenuDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GenType<TestCaseDto>> updatedItems) {
+    public TestCaseUpdateMenuDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull UpdateTestCaseFields> updatedItems) {
         this.p = p;
         this.items = items;
         this.updatedItems = updatedItems;
@@ -76,7 +76,7 @@ public class TestCaseUpdateMenuDialog {
         if (items.size() == 1) {
             new UpdateTestCaseDialog(p, items.getFirst(), field, edited -> {
                 Logger.trace("Single Edit Save -> changeType = " + gt);
-                updatedItems.accept(List.of(edited), gt);
+                updatedItems.accept(List.of(edited), field);
             }).show();
 
             return;
@@ -84,7 +84,7 @@ public class TestCaseUpdateMenuDialog {
 
         field.getBulkAction().execute(p, items, list -> {
             Logger.trace("Bulk Edit Save -> changeType = " + gt);
-            updatedItems.accept(list, gt);
+            updatedItems.accept(list, field);
         });
     }
 }
