@@ -24,7 +24,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.concurrency.ThreadingAssertions;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -37,22 +37,24 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 final class VfsExecutor {
+    private final @NotNull Project p;
+
     private static @NotNull Optional<VirtualFile> find(final @NotNull Path path) {
         ThreadingAssertions.assertBackgroundThread();
         return Optional.ofNullable(LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path));
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-019, Rule-INTERNAL-113
-    private static void claim(final @NotNull Project p, final @NotNull Path path) {
+    private void claim(final @NotNull Path path) {
         Services.getInstance(OwnWrites.class).record(p, path);
     }
 
-    void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull VfsOperation operation) {
+    void executeVfsAction(final @NotNull Path path, final @NotNull VfsOperation operation) {
         final @NotNull String errorTitle = Bundle.message("vfs.rename.failed.title");
-        claim(p, path);
+        claim(path);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Optional<VirtualFile> vf = find(path);
@@ -70,9 +72,9 @@ final class VfsExecutor {
         });
     }
 
-    void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull VfsBiOperation operation, final @NotNull Runnable onSuccess, final @NotNull Runnable onFailure) {
-        claim(p, sourcePath);
-        claim(p, targetPath);
+    void executeVfsAction(final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull VfsBiOperation operation, final @NotNull Runnable onSuccess, final @NotNull Runnable onFailure) {
+        claim(sourcePath);
+        claim(targetPath);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @NotNull Optional<VirtualFile> sourceVf = find(sourcePath);
@@ -99,8 +101,8 @@ final class VfsExecutor {
     }
 
     // UC-INTERNAL-005, Rule-INTERNAL-036
-    void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onDeleted) {
-        claim(p, path);
+    void removeVf(final @NotNull Object requester, final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onDeleted) {
+        claim(path);
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             if (Trash.accepted(p, path)) {
                 ApplicationManager.getApplication().invokeLater(() -> onDeleted.accept(true));

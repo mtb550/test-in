@@ -64,7 +64,7 @@ final class NodeFiles {
     void remove(final @NotNull Path path, final @NotNull Runnable cacheUpdate, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         final @NotNull Path folder = Optional.ofNullable(path.getParent()).orElse(path);
 
-        vfs.removeVf(p, indexer, path,
+        vfs.removeVf(indexer, path,
                 deleted -> ApplicationManager.getApplication().executeOnPooledThread(() ->
                         LocalFileSystem.getInstance().refreshNioFiles(List.of(folder), true, false, () -> {
                             if (deleted) cacheUpdate.run();
@@ -82,7 +82,7 @@ final class NodeFiles {
 
         final @NotNull Path targetParent = found.orElseThrow();
 
-        vfs.executeVfsAction(p, oldPath, targetParent, Bundle.message("vfs.move.failed.title"), (sourceVf, targetVf) -> {
+        vfs.executeVfsAction(oldPath, targetParent, Bundle.message("vfs.move.failed.title"), (sourceVf, targetVf) -> {
             try {
                 sourceVf.move(indexer, targetVf);
             } catch (final IOException ex) {
@@ -138,7 +138,7 @@ final class NodeFiles {
             };
 
             ownWrites.record(p, copiedRoot);
-            vfs.executeVfsAction(p, sourcePath, targetPath, Bundle.message("vfs.copy.failed.title"), (sourceVf, targetVf) -> {
+            vfs.executeVfsAction(sourcePath, targetPath, Bundle.message("vfs.copy.failed.title"), (sourceVf, targetVf) -> {
                 try {
                     sourceVf.copy(indexer, targetVf, sourceVf.getName());
                 } catch (final IOException ex) {
@@ -150,7 +150,7 @@ final class NodeFiles {
     }
 
     void rename(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
-        vfs.executeVfsAction(p, oldPath, vf -> {
+        vfs.executeVfsAction(oldPath, vf -> {
             try {
                 vf.rename(indexer, newPath.getFileName().toString());
             } catch (final IOException ex) {
