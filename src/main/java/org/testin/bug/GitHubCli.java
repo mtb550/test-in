@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.config.BugRepository;
 import org.testin.logger.Logger;
 import org.testin.util.Bundle;
+import org.testin.util.FailureText;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -59,8 +60,8 @@ public final class GitHubCli {
     }
 
     private static @NotNull IssueCreation notWritten(final @NotNull IOException ex) {
-        Logger.warn("A bug report could not be written for gh: " + ex.getMessage());
-        return IssueCreation.failed(Bundle.message("bug.send.not.written", String.valueOf(ex.getMessage())));
+        Logger.warn("A bug report could not be written for gh: " + FailureText.of(ex));
+        return IssueCreation.failed(Bundle.message("bug.send.not.written", FailureText.of(ex)));
     }
 
     static @NotNull List<String> arguments(final @NotNull BugRepository repository, final @NotNull String title, final int screenshots) {
