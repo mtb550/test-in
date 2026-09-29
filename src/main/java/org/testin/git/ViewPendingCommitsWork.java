@@ -290,8 +290,8 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
     private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final @NotNull List<String> conflicting) {
         GitConflictOffer.show(p, conflicting,
                 () -> resolveConflicts(repoPath, remote, branch),
-                () -> finishRebase(repoPath, remote, branch, false),
-                () -> finishRebase(repoPath, remote, branch, true));
+                () -> finishRebase(repoPath, remote, branch, RebaseEnd.CONTINUE),
+                () -> finishRebase(repoPath, remote, branch, RebaseEnd.ABORT));
     }
 
     // UC-SHARE-017
@@ -320,18 +320,7 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
     }
 
     // UC-SHARE-017, Rule-SHARE-077
-    private void continueRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
-        if (git.couldNotContinueRebase(repoPath))
-            throw new IllegalStateException(Bundle.message("git.error.continue.rebase"));
-
-        pushRebased(repoPath, remote, branch);
-    }
-
-    // UC-SHARE-017, Rule-SHARE-077
-    private void abortRebase(final @NotNull Path repoPath) {
-        if (git.couldNotAbortRebase(repoPath))
-            throw new IllegalStateException(Bundle.message("git.error.abort.rebase"));
-
+    private void reportAborted(final @NotNull Path repoPath) {
         RepositoryRefresh.after(p, repoPath);
 
         ApplicationManager.getApplication().invokeLater(() ->
@@ -339,11 +328,13 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
     }
 
     // UC-SHARE-017, Rule-SHARE-077
-    private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final boolean abort) {
-        GitBackgroundTask.run(p, abort ? Bundle.message("git.task.aborting.rebase") : Bundle.message("git.task.continuing.rebase"), false,
+    private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch, final @NotNull RebaseEnd end) {
+        GitBackgroundTask.run(p, end.getTaskTitle(), false,
                 _ -> {
-                    if (abort) abortRebase(repoPath);
-                    else continueRebase(repoPath, remote, branch);
+                    end.runIn(git, repoPath);
+
+                    if (end == RebaseEnd.ABORT) reportAborted(repoPath);
+                    else pushRebased(repoPath, remote, branch);
                 },
                 ex -> GitConflictOffer.showIfConflicting(p, git, repoPath,
                         conflicting -> showConflictActions(repoPath, remote, branch, conflicting),

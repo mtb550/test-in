@@ -101,8 +101,8 @@ record SyncWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull 
     private void showConflictActions(final @NotNull Path repoPath, final @NotNull List<String> conflicting) {
         GitConflictOffer.show(p, conflicting,
                 () -> resolveConflicts(repoPath),
-                () -> finishRebase(repoPath, false),
-                () -> finishRebase(repoPath, true));
+                () -> finishRebase(repoPath, RebaseEnd.CONTINUE),
+                () -> finishRebase(repoPath, RebaseEnd.ABORT));
     }
 
     // UC-SHARE-017
@@ -113,43 +113,31 @@ record SyncWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull 
                         leftOver -> showConflictActions(repoPath, leftOver)));
     }
 
-    private void reportRebaseFailure(final @NotNull Path repoPath, final @NotNull String message) {
-        GitConflictOffer.showIfConflicting(p, git, repoPath,
-                conflicting -> showConflictActions(repoPath, conflicting),
-                () -> notifier.error(p, Bundle.message("git.conflict.operation.failed.title"), message));
-    }
-
     private void reportSyncFailure(final @NotNull String detail) {
         notifier.error(p, Bundle.message("git.sync.failed.title"), detail);
     }
 
     // UC-SHARE-017, Rule-SHARE-077
-    private void finishRebase(final @NotNull Path repoPath, final boolean abort) {
-        final @NotNull String failure = abort ? Bundle.message("git.error.abort.rebase") : Bundle.message("git.error.continue.rebase");
+    private void reportAborted(final @NotNull Path repoPath) {
+        refreshRepository(repoPath);
+        ApplicationManager.getApplication().invokeLater(() ->
+                notifier.info(p, Bundle.message("git.rebase.aborted.title"), Bundle.message("git.rebase.aborted.pull.message")));
+    }
 
-        GitBackgroundTask.run(p, abort ? Bundle.message("git.task.aborting.rebase") : Bundle.message("git.task.continuing.rebase"), false,
+    // UC-SHARE-017, Rule-SHARE-077
+    private void finishRebase(final @NotNull Path repoPath, final @NotNull RebaseEnd end) {
+        GitBackgroundTask.run(p, end.getTaskTitle(), false,
                 _ -> {
-                    if (abort) {
-                        if (git.couldNotAbortRebase(repoPath)) {
-                            reportRebaseFailure(repoPath, failure);
-                            return;
-                        }
-                        refreshRepository(repoPath);
-                        ApplicationManager.getApplication().invokeLater(() ->
-                                notifier.info(p, Bundle.message("git.rebase.aborted.title"), Bundle.message("git.rebase.aborted.pull.message")));
-                        return;
-                    }
+                    end.runIn(git, repoPath);
 
-                    if (git.couldNotContinueRebase(repoPath)) {
-                        reportRebaseFailure(repoPath, failure);
-                        return;
-                    }
-
-                    finishSyncInBackground(repoPath);
+                    if (end == RebaseEnd.ABORT) reportAborted(repoPath);
+                    else finishSyncInBackground(repoPath);
                 },
                 ex -> {
                     Logger.error(FailureText.of(ex));
-                    reportRebaseFailure(repoPath, failure);
+                    GitConflictOffer.showIfConflicting(p, git, repoPath,
+                            conflicting -> showConflictActions(repoPath, conflicting),
+                            () -> notifier.error(p, Bundle.message("git.conflict.operation.failed.title"), end.getFailure()));
                 });
     }
 
