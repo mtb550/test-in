@@ -268,8 +268,8 @@ silently has no effect costs more than the setting it was meant to hold.
   `DeclaredContractsTest.MAY_THROW` naming the contract, and a line here. The
   list said five while seven stood (#66, finding 268), which is why the test now
   owns the count. Its twin, `MAY_RETURN_NULL`, does the same for a `@Nullable`
-  return: nine are platform overrides whose contract uses null, and three are
-  Testin's own and are debt.
+  return: all nine are platform overrides whose contract uses null. Testin's own
+  last three went to `Optional` in #352.
 
 ## Process
 
@@ -317,13 +317,12 @@ silently has no effect costs more than the setting it was meant to hold.
   javac reports one error per use. Read the first error rather than the file the
   hundredth blames. CONTRIBUTING.md has the worked example.
 
-- **A green build is not evidence of a working plugin.** `@NotNull` is not a
-  compile-time contract: javac ignores it, and the IDE's instrumenter rewrites
-  it into a throw that exists only inside a running IDE. `return null` from a
-  method declared to return `Optional` compiles. A null literal passed to a
-  `@NotNull` parameter compiles. Both throw in front of the tester. So a change
-  a tester can see is not finished until it has been run in a sandbox, whatever
-  the build says.
+- **A green build is not evidence of a working plugin.** NullAway now makes
+  `@NotNull` a compile-time contract in the production code (#377): a null
+  passed to a `@NotNull` parameter, or returned where the type says it cannot
+  be, fails `compileJava`. The tests are not checked, and nothing checks what a
+  platform callback hands over at run time. So a change a tester can see is not
+  finished until it has been run in a sandbox, whatever the build says.
 
 - **Never run `./gradlew inspect` by hand.** It runs in CI on every push, on
   every branch, and the result is read from the run afterward — twenty minutes
