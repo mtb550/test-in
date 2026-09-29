@@ -58,14 +58,14 @@ public class UpdateRunItemAction extends AbstractAnyProjectAction {
         final @NotNull TestRunItems runItem = found.orElseThrow();
 
         if (runItem.isRemoved()) {
-            Services.getInstance(p, RunStatusService.class).refuseRemoved(p);
+            Services.getInstance(p, RunStatusService.class).refuseRemoved();
             return;
         }
 
         Logger.trace("update test run item for: " + testCase.getDescription());
 
         new FailedResultDialog(p, runEditor.getParent().getPath(), runItem, fields -> {
-            if (!Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, runEditor.getParent().getPath(), testCase.getId(), fields))
+            if (!Services.getInstance(p, RunStatusService.class).recordFailureDetails(runEditor.getParent().getPath(), testCase.getId(), fields))
                 return;
 
             ApplicationManager.getApplication().invokeLater(() -> {

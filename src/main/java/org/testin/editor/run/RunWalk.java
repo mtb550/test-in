@@ -197,7 +197,7 @@ public final class RunWalk {
         status.getVerdict().ifPresent(verdict -> {
             sayWhatTheVerdictCleared(tc, verdict, failure);
 
-            runStatusService.recordReported(p, editor, tc, verdict, duration, failure);
+            runStatusService.recordReported(editor, tc, verdict, duration, failure);
 
             if (launchedHere.isEmpty()) sayWhatTheRunRecorded();
         });

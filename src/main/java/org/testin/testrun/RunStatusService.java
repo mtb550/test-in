@@ -20,7 +20,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.indexer.TestRuns;
@@ -46,16 +46,18 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class RunStatusService {
+    private final @NotNull Project p;
+
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-238
     private static @NotNull TestCaseDto asItIsNow(final @NotNull TestRunItems item) {
         return item.liveTestCase().copy();
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130
-    public void executeNext(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestStatus status) {
+    public void executeNext(final @NotNull RunEditor editor, final @NotNull TestStatus status) {
         final int executingIndex = editor.getWalk().getCurrentlyExecutingIndex();
         if (executingIndex == -1) {
             // Rule-EDITOR-PANEL-227
@@ -67,17 +69,17 @@ public final class RunStatusService {
         final @NotNull TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        if (!recordOn(p, editor, currentTc.getId(), status, item -> item.recordVerdict(status, tester, asItIsNow(item))))
+        if (!recordOn(editor, currentTc.getId(), status, item -> item.recordVerdict(status, tester, asItIsNow(item))))
             return;
 
-        confirmVerdict(p, status, 1);
+        confirmVerdict(status, 1);
 
         // Rule-EDITOR-PANEL-130
         ApplicationManager.getApplication().invokeLater(() -> editor.getWalk().startTimerForIndex(executingIndex));
     }
 
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-241, Rule-EDITOR-PANEL-242
-    public void recordReported(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
+    public void recordReported(final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         final boolean clockCounted = editor.getWalk().clockIsOn(tc.getId());
 
         if (editor.getWalk().isExecuting(tc.getId())) {
@@ -85,7 +87,7 @@ public final class RunStatusService {
         }
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        recordOn(p, editor, tc.getId(), status, item -> {
+        recordOn(editor, tc.getId(), status, item -> {
             if (!clockCounted) item.recordDuration(duration);
             failure.recordOn(item);
             item.recordVerdict(status, tester, asItIsNow(item));
@@ -93,16 +95,16 @@ public final class RunStatusService {
     }
 
     // UC-EDITOR-PANEL-038, Rule-EDITOR-PANEL-240
-    private boolean correct(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
+    private boolean correct(final @NotNull RunEditor editor, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        return recordOn(p, editor, tc.getId(), status, item -> item.correctVerdict(status, tester, asItIsNow(item)));
+        return recordOn(editor, tc.getId(), status, item -> item.correctVerdict(status, tester, asItIsNow(item)));
     }
 
     // Rule-EDITOR-PANEL-225
-    private boolean recordOn(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull UUID testCaseId, final @NotNull TestStatus status, final @NotNull Consumer<TestRunItems> verdict) {
+    private boolean recordOn(final @NotNull RunEditor editor, final @NotNull UUID testCaseId, final @NotNull TestStatus status, final @NotNull Consumer<TestRunItems> verdict) {
         final @NotNull Path runPath = editor.getParent().getPath();
-        final @NotNull Optional<TestRunDto> held = heldRun(p, runPath);
-        if (held.isEmpty() || liveItem(p, held.orElseThrow(), runPath, testCaseId).isEmpty()) return false;
+        final @NotNull Optional<TestRunDto> held = heldRun(runPath);
+        if (held.isEmpty() || liveItem(held.orElseThrow(), runPath, testCaseId).isEmpty()) return false;
 
         Services.getInstance(p, TestRuns.class).changeResult(runPath, testCaseId, verdict);
 
@@ -113,12 +115,12 @@ public final class RunStatusService {
     }
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167
-    public boolean recordFailureDetails(final @NotNull Project p, final @NotNull Path runPath, final @NotNull UUID testCaseId, final @NotNull FailureFields fields) {
+    public boolean recordFailureDetails(final @NotNull Path runPath, final @NotNull UUID testCaseId, final @NotNull FailureFields fields) {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
-        final @NotNull Optional<TestRunDto> run = heldRun(p, runPath);
+        final @NotNull Optional<TestRunDto> run = heldRun(runPath);
         if (run.isEmpty()) return false;
 
-        if (liveItem(p, run.orElseThrow(), runPath, testCaseId).isEmpty()) return false;
+        if (liveItem(run.orElseThrow(), runPath, testCaseId).isEmpty()) return false;
 
         fields.storePasted(pasted -> testRuns.storeScreenshots(runPath, pasted));
 
@@ -128,7 +130,7 @@ public final class RunStatusService {
     }
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-225
-    public @NotNull Optional<TestRunDto> heldRun(final @NotNull Project p, final @NotNull Path runPath) {
+    public @NotNull Optional<TestRunDto> heldRun(final @NotNull Path runPath) {
         final @NotNull Optional<TestRunDto> run = Services.getInstance(p, TestRuns.class).findTestRun(runPath);
 
         if (run.isEmpty()) {
@@ -139,7 +141,7 @@ public final class RunStatusService {
         return run;
     }
 
-    private @NotNull Optional<TestRunItems> liveItem(final @NotNull Project p, final @NotNull TestRunDto run, final @NotNull Path runPath, final @NotNull UUID testCaseId) {
+    private @NotNull Optional<TestRunItems> liveItem(final @NotNull TestRunDto run, final @NotNull Path runPath, final @NotNull UUID testCaseId) {
         final @NotNull Optional<TestRunItems> found = run.resultOf(testCaseId);
 
         if (found.isEmpty()) {
@@ -151,28 +153,28 @@ public final class RunStatusService {
         }
 
         if (found.orElseThrow().isRemoved()) {
-            refuseRemoved(p);
+            refuseRemoved();
             return Optional.empty();
         }
 
         return found;
     }
 
-    public void refuseRemoved(final @NotNull Project p) {
+    public void refuseRemoved() {
         Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.status.case.removed"));
     }
 
-    public void applyStatus(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems, final @NotNull TestStatus status) {
+    public void applyStatus(final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems, final @NotNull TestStatus status) {
         if (selectedItems.isEmpty()) return;
 
         final @NotNull List<String> losing = wouldBeErased(editor, selectedItems, status);
         if (losing.isEmpty()) {
-            record(p, status, editor, selectedItems);
+            record(status, editor, selectedItems);
             return;
         }
 
         new ConfirmDialog(p, status.getLabel(), erasureWarning(losing, selectedItems.size()), "", "",
-                status.getLabel(), () -> record(p, status, editor, selectedItems)).show();
+                status.getLabel(), () -> record(status, editor, selectedItems)).show();
     }
 
     private @NotNull List<String> wouldBeErased(final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selected, final @NotNull TestStatus status) {
@@ -193,25 +195,25 @@ public final class RunStatusService {
         return Bundle.message("run.status.passing.clears", where, Display.andJoin(losing));
     }
 
-    private void record(final @NotNull Project p, final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
-        if (selectedItems.size() == 1) recordOne(p, status, editor, selectedItems.getFirst());
-        else recordMany(p, status, editor, selectedItems);
+    private void record(final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+        if (selectedItems.size() == 1) recordOne(status, editor, selectedItems.getFirst());
+        else recordMany(status, editor, selectedItems);
     }
 
-    private void recordOne(final @NotNull Project p, final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc) {
+    private void recordOne(final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull TestCaseDto tc) {
         if (editor.runItem(tc.getId()).filter(TestRunItems::isRemoved).isPresent()) {
-            refuseRemoved(p);
+            refuseRemoved();
             return;
         }
 
-        if (editor.getWalk().isExecuting(tc.getId())) executeNext(p, editor, status);
-        else if (correct(p, editor, tc, status)) confirmVerdict(p, status, 1);
+        if (editor.getWalk().isExecuting(tc.getId())) executeNext(editor, status);
+        else if (correct(editor, tc, status)) confirmVerdict(status, 1);
 
         editor.getWalk().finishIfEverythingIsJudged();
     }
 
-    private void recordMany(final @NotNull Project p, final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
-        final @NotNull Optional<TestRunDto> held = heldRun(p, editor.getParent().getPath());
+    private void recordMany(final @NotNull TestStatus status, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+        final @NotNull Optional<TestRunDto> held = heldRun(editor.getParent().getPath());
         if (held.isEmpty()) return;
 
         final @NotNull List<UUID> judged = new ArrayList<>();
@@ -229,12 +231,12 @@ public final class RunStatusService {
         judged.forEach(id -> testRuns.changeResult(editor.getParent().getPath(), id, item -> item.correctVerdict(status, tester, asItIsNow(item))));
         triggerFilterRefresh(editor);
 
-        confirmVerdict(p, status, judged.size());
+        confirmVerdict(status, judged.size());
 
         editor.getWalk().finishIfEverythingIsJudged();
     }
 
-    private void confirmVerdict(final @NotNull Project p, final @NotNull TestStatus status, final int count) {
+    private void confirmVerdict(final @NotNull TestStatus status, final int count) {
         Services.getInstance(p, Notifier.class).softShowCounted(p, status.getLabel(), count);
     }
 

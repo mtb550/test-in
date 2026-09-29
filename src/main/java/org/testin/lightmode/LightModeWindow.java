@@ -342,7 +342,7 @@ final class LightModeWindow {
     }
 
     private void record(final @NotNull TestStatus status) {
-        runStatusService.executeNext(editor.getProject(), editor, status);
+        runStatusService.executeNext(editor, status);
     }
 
     private void openCapture() {

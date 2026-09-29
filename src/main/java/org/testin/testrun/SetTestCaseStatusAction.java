@@ -63,7 +63,7 @@ public class SetTestCaseStatusAction extends AbstractAnyProjectAction {
         }
 
         new FailedResultDialog(p, editor.getParent().getPath(), runItem.orElseThrow(), fields -> {
-            if (Services.getInstance(p, RunStatusService.class).recordFailureDetails(p, editor.getParent().getPath(), selectedItems.getFirst().getId(), fields)) {
+            if (Services.getInstance(p, RunStatusService.class).recordFailureDetails(editor.getParent().getPath(), selectedItems.getFirst().getId(), fields)) {
                 applyStatus(p, editor, selectedItems);
             }
         }).show();
@@ -77,7 +77,7 @@ public class SetTestCaseStatusAction extends AbstractAnyProjectAction {
     }
 
     private void applyStatus(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
-        Services.getInstance(p, RunStatusService.class).applyStatus(p, editor, selectedItems, status);
+        Services.getInstance(p, RunStatusService.class).applyStatus(editor, selectedItems, status);
     }
 
     // UC-EDITOR-PANEL-032

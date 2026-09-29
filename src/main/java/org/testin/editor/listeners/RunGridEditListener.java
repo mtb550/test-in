@@ -68,12 +68,12 @@ public class RunGridEditListener extends AbstractGridEditListener {
 
         if (item.isRemoved()) {
             model.setValueAt(before, row, col);
-            runStatusService.refuseRemoved(p);
+            runStatusService.refuseRemoved();
             return GridEdit.REFUSED;
         }
 
         // Rule-EDITOR-PANEL-174
-        if (runStatusService.heldRun(p, editor.getParent().getPath()).isEmpty()) {
+        if (runStatusService.heldRun(editor.getParent().getPath()).isEmpty()) {
             model.setValueAt(before, row, col);
             return GridEdit.REFUSED;
         }
