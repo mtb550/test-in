@@ -70,8 +70,15 @@ public class ViewPanel implements Disposable {
     @Getter
     private final @NotNull Project p;
 
+    private final @NotNull TestCases testCases;
+    private final @NotNull TestRuns testRuns;
+    private final @NotNull TestinRoot testinRoot;
+
     public ViewPanel(final @NotNull Project p) {
         this.p = p;
+        this.testCases = Services.getInstance(p, TestCases.class);
+        this.testRuns = Services.getInstance(p, TestRuns.class);
+        this.testinRoot = Services.getInstance(p, TestinRoot.class);
         Disposer.register(ProjectLifetime.of(p), this);
         detailsTab = new JBPanel<>(new BorderLayout());
         historyTab = new JBPanel<>(new BorderLayout());
@@ -215,7 +222,7 @@ public class ViewPanel implements Disposable {
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-083
     @NotNull Optional<TestCaseDto> shownTestCase() {
         return getCurrentTestCase().map(shown -> shownRunItem().map(TestRunItems::shownTestCase)
-                .orElseGet(() -> Services.getInstance(p, TestCases.class).findTestCase(shown.getId()).orElse(shown)));
+                .orElseGet(() -> testCases.findTestCase(shown.getId()).orElse(shown)));
     }
 
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-083
@@ -223,8 +230,7 @@ public class ViewPanel implements Disposable {
         final @NotNull List<String> path = page.getCurrentPath();
         if (path.isEmpty()) return Optional.empty();
 
-        return getCurrentTestCase().flatMap(shown -> Services.getInstance(p, TestRuns.class)
-                .findTestRun(Services.getInstance(p, TestinRoot.class).resolve(path))
+        return getCurrentTestCase().flatMap(shown -> testRuns.findTestRun(testinRoot.resolve(path))
                 .flatMap(run -> run.resultOf(shown.getId())));
     }
 
