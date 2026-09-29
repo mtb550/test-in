@@ -79,14 +79,13 @@ public class RunGridEditListener extends AbstractGridEditListener {
         }
 
         final @NotNull String typed = String.valueOf(model.getValueAt(row, col));
-        attr.getRunValueSetter().execute(item, typed);
+        testRuns.changeResult(editor.getParent().getPath(), onThisRow.getId(), result -> attr.getRunValueSetter().execute(result, typed));
         final @NotNull String after = attr.getRunValueExtractor().apply(item);
 
         model.setValueAt(after, row, col);
 
         if (Objects.equals(before, after)) return GridEdit.UNCHANGED;
 
-        testRuns.changeResult(editor.getParent().getPath(), onThisRow.getId(), result -> attr.getRunValueSetter().execute(result, typed));
         onEdited.run();
 
         return GridEdit.WROTE;
