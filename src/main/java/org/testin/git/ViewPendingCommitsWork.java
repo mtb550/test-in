@@ -280,17 +280,10 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
                             notifier.info(p, Bundle.message("git.pushed.title"),
                                     Bundle.message("git.pushed.message", commitLabel(commitId), remote, branch)));
                 },
-                ex -> {
-                    final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
-                    if (!conflicting.isEmpty()) {
-                        ApplicationManager.getApplication().invokeLater(() ->
-                                showConflictActions(repoPath, remote, branch, conflicting), p.getDisposed());
-                        return;
-                    }
-
-                    notifier.errorWithActions(p, Bundle.message("git.push.failed.title"), FailureText.of(ex),
-                            notifier.action(Bundle.message("git.try.again"), () -> pushToRemote(repoPath, () -> commitId, branch)));
-                });
+                ex -> GitConflictOffer.showIfConflicting(p, git, repoPath,
+                        conflicting -> showConflictActions(repoPath, remote, branch, conflicting),
+                        () -> notifier.errorWithActions(p, Bundle.message("git.push.failed.title"), FailureText.of(ex),
+                                notifier.action(Bundle.message("git.try.again"), () -> pushToRemote(repoPath, () -> commitId, branch)))));
     }
 
     // UC-SHARE-017
@@ -352,14 +345,9 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
                     if (abort) abortRebase(repoPath);
                     else continueRebase(repoPath, remote, branch);
                 },
-                ex -> {
-                    final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
-                    if (!conflicting.isEmpty())
-                        ApplicationManager.getApplication().invokeLater(() ->
-                                showConflictActions(repoPath, remote, branch, conflicting), p.getDisposed());
-                    else
-                        notifier.error(p, Bundle.message("git.conflict.operation.failed.title"), FailureText.of(ex));
-                });
+                ex -> GitConflictOffer.showIfConflicting(p, git, repoPath,
+                        conflicting -> showConflictActions(repoPath, remote, branch, conflicting),
+                        () -> notifier.error(p, Bundle.message("git.conflict.operation.failed.title"), FailureText.of(ex))));
     }
 
     // UC-SHARE-008, Rule-SHARE-040

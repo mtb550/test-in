@@ -92,16 +92,9 @@ record SyncWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull 
                 },
                 ex -> {
                     Logger.error(FailureText.of(ex));
-
-                    final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
-
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        if (!conflicting.isEmpty()) {
-                            showConflictActions(repoPath, conflicting);
-                        } else {
-                            reportSyncFailure(FailureText.of(ex));
-                        }
-                    });
+                    GitConflictOffer.showIfConflicting(p, git, repoPath,
+                            conflicting -> showConflictActions(repoPath, conflicting),
+                            () -> reportSyncFailure(FailureText.of(ex)));
                 });
     }
 
@@ -121,13 +114,9 @@ record SyncWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull 
     }
 
     private void reportRebaseFailure(final @NotNull Path repoPath, final @NotNull String message) {
-        final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
-
-        ApplicationManager.getApplication().invokeLater(() -> {
-            if (!conflicting.isEmpty()) showConflictActions(repoPath, conflicting);
-            else
-                notifier.error(p, Bundle.message("git.conflict.operation.failed.title"), message);
-        });
+        GitConflictOffer.showIfConflicting(p, git, repoPath,
+                conflicting -> showConflictActions(repoPath, conflicting),
+                () -> notifier.error(p, Bundle.message("git.conflict.operation.failed.title"), message));
     }
 
     private void reportSyncFailure(final @NotNull String detail) {

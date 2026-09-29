@@ -16,6 +16,7 @@
 
 package org.testin.git;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -24,10 +25,22 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
+import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Consumer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class GitConflictOffer {
+    // UC-SHARE-017
+    static void showIfConflicting(final @NotNull Project p, final @NotNull GitRepositoryService git, final @NotNull Path repoPath, final @NotNull Consumer<List<String>> offer, final @NotNull Runnable otherwise) {
+        final @NotNull List<String> conflicting = git.conflictingPaths(repoPath);
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (conflicting.isEmpty()) otherwise.run();
+            else offer.accept(conflicting);
+        }, p.getDisposed());
+    }
+
     // UC-SHARE-017
     static void show(final @NotNull Project p, final @NotNull List<String> conflicting, final @NotNull Runnable onResolve, final @NotNull Runnable onContinue, final @NotNull Runnable onAbort) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
