@@ -42,6 +42,8 @@ import java.awt.datatransfer.StringSelection;
 public class EscapeAction extends AbstractProjectAction {
     private static final @NotNull String TITLE = Bundle.message("escape.title");
 
+    private final @NotNull CutState cutState = Services.getInstance(p, CutState.class);
+
     private final @NotNull Runnable onEscape;
 
     public EscapeAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
@@ -101,9 +103,9 @@ public class EscapeAction extends AbstractProjectAction {
 
     // UC-EDITOR-PANEL-026, Rule-EDITOR-PANEL-114, Rule-VIEW-PANEL-058
     private boolean dropPendingCut() {
-        if (!Services.getInstance(p, CutState.class).isCutting()) return false;
+        if (!cutState.isCutting()) return false;
 
-        Services.getInstance(p, CutState.class).clear();
+        cutState.clear();
         CopyPasteManager.getInstance().setContents(new StringSelection(""));
         return true;
     }

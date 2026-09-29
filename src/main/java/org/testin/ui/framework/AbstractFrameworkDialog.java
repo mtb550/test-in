@@ -33,8 +33,6 @@ import com.intellij.ui.InplaceButton;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.StatusBarItem;
 import org.testin.notifications.Notifier;
@@ -62,9 +60,12 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractFrameworkDialog implements DialogHost {
     protected final @NotNull Project p;
+
+    private final @NotNull Notifier notifier;
+
+    private final @NotNull OpenDialogs openDialogs;
 
     protected @NotNull String title = "";
     protected @NotNull List<? extends ComponentDialogBase<?>> components = List.of();
@@ -85,6 +86,12 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
 
     private @NotNull Optional<StatusBarBase> strip = Optional.empty();
     private @NotNull Optional<StatusBarItem[]> keysShown = Optional.empty();
+
+    protected AbstractFrameworkDialog(final @NotNull Project p) {
+        this.p = p;
+        this.notifier = Services.getInstance(p, Notifier.class);
+        this.openDialogs = Services.getInstance(p, OpenDialogs.class);
+    }
 
     private static @NotNull JBPanel<?> verticalStack(final @NotNull List<DialogComponent> dialogComponents) {
         final @NotNull JBPanel<?> stack = new JBPanel<>();
@@ -148,15 +155,13 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         final @NotNull Optional<Refused> refusal = refusing.apply(value);
         if (refusal.isEmpty()) return value;
 
-        Services.getInstance(p, Notifier.class).softRefuse(p, refusal.orElseThrow(), value);
+        notifier.softRefuse(p, refusal.orElseThrow(), value);
         return "";
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-061, Rule-INTERNAL-075
     public final boolean show() {
-        final @NotNull OpenDialogs open = Services.getInstance(p, OpenDialogs.class);
-
-        final @NotNull Optional<JBPopup> already = open.shown(getClass());
+        final @NotNull Optional<JBPopup> already = openDialogs.shown(getClass());
         if (already.isPresent()) {
             if (!replacesItsKind()) {
                 already.orElseThrow().getContent().requestFocusInWindow();
@@ -172,7 +177,7 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
             throw new IllegalStateException("This dialog was already shown and closed - create a new instance");
         }
 
-        open.remember(getClass(), getPopup());
+        openDialogs.remember(getClass(), getPopup());
         getPopup().showCenteredInCurrentWindow(p);
 
         // Rule-INTERNAL-100

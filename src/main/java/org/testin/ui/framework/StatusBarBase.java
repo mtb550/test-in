@@ -53,6 +53,8 @@ public class StatusBarBase {
 
     private final @NotNull JBPanel<?> statusBar;
 
+    private final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
+
     private final @NotNull Color labelColor = JBUI.CurrentTheme.Label.foreground();
     private final @NotNull Color dotColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
     private final @NotNull Color separatorColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
@@ -75,7 +77,7 @@ public class StatusBarBase {
 
     // UC-SETTING-008, Rule-SETTING-029
     public void setShown(final boolean wanted) {
-        statusBar.setVisible(wanted && Services.getInstance(AppSettingsState.class).showShortcutHints);
+        statusBar.setVisible(wanted && settings.showShortcutHints);
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-078
