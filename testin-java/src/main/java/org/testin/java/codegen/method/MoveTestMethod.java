@@ -22,12 +22,7 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElementFactory;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiImportList;
-import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
@@ -47,7 +42,6 @@ import java.util.Set;
 
 // UC-CODEGEN-002, Rule-CODEGEN-077
 public class MoveTestMethod extends UpdateTestBase implements GenAction<MovedTestCase> {
-    private static final @NotNull String TESTNG_TEST = "org.testng.annotations.Test";
 
     // UC-CODEGEN-002, Rule-CODEGEN-077
     @Override
@@ -113,7 +107,7 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction<MovedTes
             return Optional.empty();
         }
 
-        addTestImport(p, target);
+        GeneratedMethod.importTest(p, target.getContainingFile());
 
         final @NotNull PsiMethod carried = JavaPsiFacade.getElementFactory(p)
                 .createMethodFromText(method.orElseThrow().getText(), target);
@@ -125,16 +119,4 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction<MovedTes
         return from;
     }
 
-    private void addTestImport(final @NotNull Project p, final @NotNull PsiClass target) {
-        final @NotNull PsiFile file = target.getContainingFile();
-        if (!(file instanceof PsiJavaFile javaFile)) return;
-
-        final @NotNull Optional<PsiImportList> imports = Optional.ofNullable(javaFile.getImportList());
-        if (imports.isEmpty() || imports.orElseThrow().findSingleClassImportStatement(TESTNG_TEST) != null) return;
-
-        final @NotNull PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
-
-        Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(TESTNG_TEST, GlobalSearchScope.allScope(p)))
-                .ifPresent(testClass -> imports.orElseThrow().add(factory.createImportStatement(testClass)));
-    }
 }

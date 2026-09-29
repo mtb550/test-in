@@ -37,6 +37,7 @@ import org.testin.codegen.CodeOn;
 import org.testin.codegen.TestName;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
+import org.testin.java.codegen.GeneratedMethod;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
@@ -58,7 +59,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         return Optional.ofNullable(PsiTreeUtil.getParentOfType(literal, PsiNameValuePair.class))
                 .filter(pair -> "testName".equals(pair.getName()))
                 .map(pair -> PsiTreeUtil.getParentOfType(pair, PsiAnnotation.class))
-                .filter(annotation -> annotation.hasQualifiedName("org.testng.annotations.Test"))
+                .filter(annotation -> annotation.hasQualifiedName(GeneratedMethod.TESTNG_TEST))
                 .isPresent();
     }
 

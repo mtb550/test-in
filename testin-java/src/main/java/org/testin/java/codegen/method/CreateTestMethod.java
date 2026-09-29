@@ -26,12 +26,10 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementFactory;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiImportList;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.ExecutionPosition;
 import org.testin.codegen.Fqcn;
@@ -59,7 +57,6 @@ import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 public class CreateTestMethod implements GenAction<TestCaseDto> {
-    private static final @NotNull String TESTNG_TEST = "org.testng.annotations.Test";
 
     static @NotNull Optional<Target> parse(final @NotNull List<String> fqcn) {
         if (fqcn.size() < 2) return Optional.empty();
@@ -83,9 +80,6 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
         return testCases.size() > 3 ? Bundle.message("codegen.named.and.more", names, String.valueOf(testCases.size() - 3)) : names;
     }
 
-    private static boolean alreadyImportsTest(final @NotNull PsiImportList imports) {
-        return imports.findSingleClassImportStatement(TESTNG_TEST) != null;
-    }
 
     private static @NotNull String testMethods(final int howMany) {
         return howMany + " test method" + (howMany == 1 ? "" : "s");
@@ -226,7 +220,7 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
         final @NotNull PsiFile file = targetClass.getContainingFile();
         final @NotNull PsiDocumentManager documents = PsiDocumentManager.getInstance(p);
 
-        if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, JavaPsiFacade.getElementFactory(p));
+        GeneratedMethod.importTest(p, file);
 
         documents.doPostponedOperationsAndUnblockDocument(document);
 
@@ -312,22 +306,13 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
         }
     }
 
-    // UC-CODEGEN-002
-    private void addTestImport(final @NotNull Project p, final @NotNull PsiJavaFile javaFile, final @NotNull PsiElementFactory factory) {
-        Optional.ofNullable(javaFile.getImportList())
-                .filter(imports -> !alreadyImportsTest(imports))
-                .ifPresent(imports -> Optional
-                        .ofNullable(JavaPsiFacade.getInstance(p).findClass(TESTNG_TEST, GlobalSearchScope.allScope(p)))
-                        .ifPresent(testClass -> imports.add(factory.createImportStatement(testClass))));
-    }
-
     // UC-CODEGEN-002, Rule-CODEGEN-016
     private @NotNull Optional<PsiElement> injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
             final @NotNull PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
             final @NotNull PsiFile file = targetClass.getContainingFile();
 
-            if (file instanceof PsiJavaFile javaFile) addTestImport(p, javaFile, factory);
+            GeneratedMethod.importTest(p, file);
 
             if (GeneratedMethod.forTestCase(targetClass, tc).isPresent()) {
                 Logger.info("Method already exists: " + methodName);

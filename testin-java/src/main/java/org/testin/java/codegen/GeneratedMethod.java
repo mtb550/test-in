@@ -20,8 +20,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiLiteralValue;
 import com.intellij.psi.PsiMethod;
+import com.intellij.psi.search.GlobalSearchScope;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +36,8 @@ import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GeneratedMethod {
+    public static final @NotNull String TESTNG_TEST = "org.testng.annotations.Test";
+
     private static final @NotNull String TEST_NAME = "testName";
 
     private static final @NotNull String TODO = "// TODO: Auto-generated test steps for ";
@@ -89,6 +94,16 @@ public final class GeneratedMethod {
     }
 
     public static @NotNull Optional<PsiAnnotation> testAnnotationOf(final @NotNull PsiMethod pm) {
-        return Optional.ofNullable(pm.getModifierList().findAnnotation("org.testng.annotations.Test"));
+        return Optional.ofNullable(pm.getModifierList().findAnnotation(TESTNG_TEST));
+    }
+
+    // UC-CODEGEN-002
+    public static void importTest(final @NotNull Project p, final @NotNull PsiFile file) {
+        if (!(file instanceof PsiJavaFile javaFile)) return;
+
+        Optional.ofNullable(javaFile.getImportList())
+                .filter(imports -> imports.findSingleClassImportStatement(TESTNG_TEST) == null)
+                .ifPresent(imports -> Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(TESTNG_TEST, GlobalSearchScope.allScope(p)))
+                        .ifPresent(testClass -> imports.add(JavaPsiFacade.getElementFactory(p).createImportStatement(testClass))));
     }
 }
