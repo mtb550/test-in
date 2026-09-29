@@ -20,7 +20,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
@@ -32,15 +32,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class LastOpenEditors {
     private static final @NotNull String OPEN_EDITORS_KEY = "testin.openEditors";
 
+    private final @NotNull Project p;
+
     // Rule-EDITOR-PANEL-015
-    public void remember(final @NotNull Project p) {
+    public void remember() {
         try {
-            final @NotNull List<String> entries = pathsOfOpen(p);
+            final @NotNull List<String> entries = pathsOfOpen();
 
             PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY,
                     entries.isEmpty() ? null : String.join(";", entries));
@@ -50,7 +52,7 @@ public final class LastOpenEditors {
         }
     }
 
-    private @NotNull List<String> pathsOfOpen(final @NotNull Project p) {
+    private @NotNull List<String> pathsOfOpen() {
         final @NotNull List<String> entries = new ArrayList<>();
 
         for (final Path path : Services.getInstance(p, TestinEditors.class).openNodePaths(p)) {
@@ -61,7 +63,7 @@ public final class LastOpenEditors {
     }
 
     // UC-INTERNAL-002
-    public void reopen(final @NotNull Project p) {
+    public void reopen() {
         try {
             final @NotNull String saved = Objects.requireNonNullElse(
                     PropertiesComponent.getInstance(p).getValue(OPEN_EDITORS_KEY), "");
@@ -76,7 +78,7 @@ public final class LastOpenEditors {
 
             Logger.info("restoring " + entries.length + " open editors");
 
-            openAll(p, stillIndexed(p, entries));
+            openAll(stillIndexed(entries));
 
             PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY, null);
             Logger.info("cleared saved editor state");
@@ -86,7 +88,7 @@ public final class LastOpenEditors {
         }
     }
 
-    private @NotNull List<DirectoryDto> stillIndexed(final @NotNull Project p, final String @NotNull [] entries) {
+    private @NotNull List<DirectoryDto> stillIndexed(final String @NotNull [] entries) {
         final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
         final @NotNull List<DirectoryDto> found = new ArrayList<>();
 
@@ -102,7 +104,7 @@ public final class LastOpenEditors {
         return found;
     }
 
-    private void openAll(final @NotNull Project p, final @NotNull List<DirectoryDto> found) {
+    private void openAll(final @NotNull List<DirectoryDto> found) {
         final @NotNull TestinEditors editors = Services.getInstance(p, TestinEditors.class);
 
         for (int i = 0; i < found.size(); i++) editors.open(p, found.get(i), i == found.size() - 1);

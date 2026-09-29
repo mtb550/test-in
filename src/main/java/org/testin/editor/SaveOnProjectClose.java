@@ -25,7 +25,7 @@ public final class SaveOnProjectClose implements ProjectCloseListener {
     // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-015
     @Override
     public void projectClosingBeforeSave(final @NotNull Project p) {
-        Services.getInstance(p, LastOpenEditors.class).remember(p);
+        Services.getInstance(p, LastOpenEditors.class).remember();
         Services.getInstance(p, TestinEditors.class).closeAll(p);
     }
 }
