@@ -82,7 +82,8 @@ editor panel. They are drawn on
 4. The tester presses the field's letter, or picks the row.
 5. That field's dialog opens with the current value in it.
 6. The tester types and presses `Enter`.
-7. Testin writes the test case and shows *Updated*.
+7. Testin writes the test case and shows *Updated*, or *Re-sorted* when the
+   field was **Order**, the same words the editor gives.
 8. The panel redraws with the new value.
 
 ## What Testin refuses

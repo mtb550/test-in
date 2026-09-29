@@ -26,18 +26,17 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
-import org.testin.codegen.GenType;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.testcase.TestCaseSnapshot;
+import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testcase.create.TestCaseUpdateMenuDialog;
 import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
@@ -80,11 +79,11 @@ public final class EditShownTestCase {
         final @NotNull Optional<Path> undoPath = writesTo(p, dto, currentPath);
         final @NotNull Optional<TestCaseSnapshot> before = undoPath.map(editPath -> TestCaseSnapshot.of(p, editPath, ids));
 
-        new TestCaseUpdateMenuDialog(p, items, (tcs, field) -> save(p, dto, currentPath, tcs, field.getGt(), ids, before)).show();
+        new TestCaseUpdateMenuDialog(p, items, (tcs, field) -> save(p, dto, currentPath, tcs, field, ids, before)).show();
     }
 
     // UC-VIEW-PANEL-011, Rule-VIEW-PANEL-007
-    private static void save(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath, final @NotNull List<TestCaseDto> tcs, final @NotNull GenType<TestCaseDto> gt, final @NotNull List<UUID> ids, final @NotNull Optional<TestCaseSnapshot> before) {
+    private static void save(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath, final @NotNull List<TestCaseDto> tcs, final @NotNull UpdateTestCaseFields field, final @NotNull List<UUID> ids, final @NotNull Optional<TestCaseSnapshot> before) {
         final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
 
         writesTo(p, dto, currentPath).ifPresentOrElse(editPath -> {
@@ -95,9 +94,9 @@ public final class EditShownTestCase {
 
             before.ifPresent(taken -> TestCaseSnapshot.record(p, TestCaseSnapshot.describe(Bundle.message("snapshot.verb.update"), tcs), taken, TestCaseSnapshot.of(p, editPath, ids)));
 
-            Services.getInstance(p, Notifier.class).softShow(p, Done.UPDATED);
+            Services.getInstance(p, Notifier.class).softShow(p, field.getDone());
 
-            ApplicationManager.getApplication().invokeLater(() -> TestCaseUpdateMenuDialog.applyAftermath(p, tcs, gt));
+            ApplicationManager.getApplication().invokeLater(() -> TestCaseUpdateMenuDialog.applyAftermath(p, tcs, field.getGt()));
         }, () -> nowhereToWrite(p, dto));
     }
 
