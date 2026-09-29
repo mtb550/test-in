@@ -95,6 +95,8 @@ final class LightModeWindow {
     private static final float ZOOM_MAX = 2.0f;
 
     private final @NotNull RunEditor editor;
+    private final @NotNull RunStatusService runStatusService;
+    private final @NotNull AutomationState automationState;
     private final @NotNull Runnable onClosed;
 
     private final @NotNull TitleBarBtn start = new TitleBarBtn(ExecutionControl.START.getLabel(), ExecutionControl.START.getIcon());
@@ -137,6 +139,8 @@ final class LightModeWindow {
 
     LightModeWindow(final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
         this.editor = editor;
+        this.runStatusService = Services.getInstance(editor.getProject(), RunStatusService.class);
+        this.automationState = Services.getInstance(editor.getProject(), AutomationState.class);
         this.details = new TestCaseDetails();
         this.onClosed = onClosed;
 
@@ -338,9 +342,7 @@ final class LightModeWindow {
     }
 
     private void record(final @NotNull TestStatus status) {
-        final @NotNull Project p = editor.getProject();
-
-        Services.getInstance(p, RunStatusService.class).executeNext(p, editor, status);
+        runStatusService.executeNext(editor.getProject(), editor, status);
     }
 
     private void openCapture() {
@@ -425,7 +427,7 @@ final class LightModeWindow {
 
         testCaseForButtons().ifPresent(tc -> {
             final @NotNull Project p = editor.getProject();
-            final @NotNull Automated automation = Services.getInstance(p, AutomationState.class).of(tc.getId());
+            final @NotNull Automated automation = automationState.of(tc.getId());
 
             CardHoverAction.onCard(p, editor.getParent(), tc).stream()
                     .filter(offered -> viewMenu.getSelectedDetails().stream().anyMatch(part -> part.governs(offered.action())))
