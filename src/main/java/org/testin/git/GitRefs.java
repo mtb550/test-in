@@ -52,19 +52,15 @@ public final class GitRefs {
             final @NotNull String from = moved && records.hasNext() ? records.next() : "";
             if (code.charAt(0) == '!') continue;
 
-            if (code.indexOf('R') >= 0 && !from.isEmpty()) entries.add(new StatusEntry(DiffType.DELETED, slashed(from)));
+            if (code.indexOf('R') >= 0 && !from.isEmpty()) entries.add(new StatusEntry(DiffType.DELETED, from));
 
-            entries.add(new StatusEntry(typeOf(code), slashed(record.substring(3))));
+            entries.add(new StatusEntry(typeOf(code), record.substring(3)));
         }
         return entries;
     }
 
     static @NotNull List<String> records(final @NotNull String nulSeparated) {
         return Arrays.stream(nulSeparated.split("\0")).filter(record -> !record.isEmpty()).toList();
-    }
-
-    private static @NotNull String slashed(final @NotNull String path) {
-        return path.replace('\\', '/');
     }
 
     // UC-SHARE-017
