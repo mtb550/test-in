@@ -17,6 +17,7 @@
 package org.testin;
 
 import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaAccess;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
@@ -30,8 +31,11 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+import static com.tngtech.archunit.core.domain.AccessTarget.Predicates.declaredIn;
 import static com.tngtech.archunit.core.domain.JavaCall.Predicates.target;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
 import static com.tngtech.archunit.core.domain.properties.HasName.Predicates.name;
+import static com.tngtech.archunit.core.domain.properties.HasName.Predicates.nameMatching;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
@@ -191,6 +195,26 @@ public class ArchitectureTest {
                         + " (CLAUDE.md, Decision-013)");
 
         oneCaller.check(CLASSES);
+        oneWriter.check(CLASSES);
+    }
+
+    @Test
+    public void onlyTheModelAndTheIndexerChangeAModelValue() {
+        final @NotNull ArchRule noSetter = noClasses()
+                .that().resideOutsideOfPackages("org.testin.model..", "org.testin.indexer..")
+                .should().accessTargetWhere(JavaAccess.Predicates.target(declaredIn(resideInAPackage("org.testin.model..")).and(nameMatching("set[A-Z].*"))))
+                .because("the index holds one instance of every test case, run and marker, read by the EDT and by pooled"
+                        + " threads alike; a feature changes one by asking the indexer, which writes the new values into"
+                        + " the instance it holds, never by calling a setter on it (Rule-INTERNAL-117, #376)");
+
+        final @NotNull ArchRule oneWriter = methods()
+                .that().areDeclaredIn("org.testin.model.dto.TestCaseDto")
+                .and().haveName("takeValuesOf")
+                .should().onlyBeCalled().byClassesThat().resideInAPackage("org.testin.indexer..")
+                .because("an edited copy lands in the test case the index holds only once its file is written,"
+                        + " and the index is the one that knows when that is (Rule-INTERNAL-117)");
+
+        noSetter.check(CLASSES);
         oneWriter.check(CLASSES);
     }
 

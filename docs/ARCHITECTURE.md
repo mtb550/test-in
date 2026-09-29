@@ -172,6 +172,17 @@ a bound test project; anything else waits for something to need the index
 refreshes the tree or reloads the open editors itself, and `ArchitectureTest`
 fails if something does (#361, Rule-INTERNAL-114).
 
+**Who changes a value the index holds.** The index holds one instance of every
+test case, test run and marker, and the EDT and pooled threads read the same
+one. Only `model` and `indexer` call a setter on them, and `ArchitectureTest`
+fails if anything else does (#376, Rule-INTERNAL-117). A test case is edited as
+a copy - `TestCaseDto.edit()` - and handed to `TestCases`, which writes the file
+and then writes the copy into the instance it holds, so every surface showing
+that test case sees the change without being handed a new object. A run item, a
+run or a marker is changed inside the lambda `TestRuns` runs before it saves,
+through a method named for the change - `linkBug`, `recordFailure`,
+`configure` - and a node's order and status through `Nodes`.
+
 What is **not** there: **`model` imports nothing above it at all** - not
 `editor`, not `explorer`, not `view`, and since 11 September not `indexer`,
 `codegen`, `creator`, `services`, `notifications`, `importexport`, `ui` or
