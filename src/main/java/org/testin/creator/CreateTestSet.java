@@ -17,7 +17,6 @@
 package org.testin.creator;
 
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
@@ -28,15 +27,22 @@ import org.testin.services.Services;
 import java.nio.file.Path;
 import java.util.Optional;
 
-@AllArgsConstructor
 public class CreateTestSet implements NodeCreator {
     private final @NotNull Project p;
+    private final @NotNull DirectoryMapper directoryMapper;
+    private final @NotNull Nodes nodes;
+
+    public CreateTestSet(final @NotNull Project p) {
+        this.p = p;
+        this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
+        this.nodes = Services.getInstance(p, Nodes.class);
+    }
 
     // UC-TREE-PANEL-007
     @Override
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
-        final @NotNull TestSetDirectoryDto ts = Services.getInstance(p, DirectoryMapper.class).getTestSetNode(p, newDirPath, parentDir);
+        final @NotNull TestSetDirectoryDto ts = directoryMapper.getTestSetNode(p, newDirPath, parentDir);
 
-        return Services.getInstance(p, Nodes.class).addTestSet(ts) ? Optional.of(ts) : Optional.empty();
+        return nodes.addTestSet(ts) ? Optional.of(ts) : Optional.empty();
     }
 }

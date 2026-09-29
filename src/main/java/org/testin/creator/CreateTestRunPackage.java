@@ -17,7 +17,6 @@
 package org.testin.creator;
 
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
@@ -28,15 +27,22 @@ import org.testin.services.Services;
 import java.nio.file.Path;
 import java.util.Optional;
 
-@AllArgsConstructor
 public class CreateTestRunPackage implements NodeCreator {
     private final @NotNull Project p;
+    private final @NotNull DirectoryMapper directoryMapper;
+    private final @NotNull Nodes nodes;
+
+    public CreateTestRunPackage(final @NotNull Project p) {
+        this.p = p;
+        this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
+        this.nodes = Services.getInstance(p, Nodes.class);
+    }
 
     // UC-TREE-PANEL-010, Rule-TREE-PANEL-033
     @Override
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
-        TestRunPackageDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).getTestRunPackageNode(p, newDirPath, parentDir);
+        TestRunPackageDirectoryDto tr = directoryMapper.getTestRunPackageNode(p, newDirPath, parentDir);
 
-        return Services.getInstance(p, Nodes.class).addTestRunPackage(tr) ? Optional.of(tr) : Optional.empty();
+        return nodes.addTestRunPackage(tr) ? Optional.of(tr) : Optional.empty();
     }
 }

@@ -89,25 +89,29 @@ public class CreateTreeNodeAction extends AbstractAnyProjectAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p) {
+    private record Work(@NotNull Project p, @NotNull Nodes nodes, @NotNull Notifier notifier, @NotNull TestinEditors editors) {
+        private Work(final @NotNull Project p) {
+            this(p, Services.getInstance(p, Nodes.class), Services.getInstance(p, Notifier.class), Services.getInstance(p, TestinEditors.class));
+        }
+
         // UC-TREE-PANEL-007, UC-TREE-PANEL-008, UC-TREE-PANEL-009, UC-TREE-PANEL-010, Rule-TREE-PANEL-004
         private void createUnder(final @NotNull DirectoryDto pDir) {
             final @NotNull BiConsumer<String, DirectoryType> onCreate = (s, dt) -> {
                 if (s.isEmpty()) return;
                 final @NotNull Path newDirPath = pDir.getPath().resolve(s);
 
-                if (Services.getInstance(p, Nodes.class).nodeExists(newDirPath)) {
-                    Services.getInstance(p, Notifier.class).softRefuse(p, Refused.ALREADY_EXISTS, s);
+                if (nodes.nodeExists(newDirPath)) {
+                    notifier.softRefuse(p, Refused.ALREADY_EXISTS, s);
                     return;
                 }
 
                 final @NotNull Optional<DirectoryDto> created = NodeCreators.of(p, dt).execute(s, pDir, newDirPath);
 
                 created.ifPresent(dir -> {
-                    Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
+                    notifier.softShow(p, Done.CREATED);
 
                     if (dt == DirectoryType.TS)
-                        Services.getInstance(p, TestinEditors.class).open(p, dir);
+                        editors.open(p, dir);
 
                     JavaCode.of(dt).getCreated().execute(p, dir);
                 });

@@ -37,6 +37,7 @@ import org.testin.util.Bundle;
 
 public class CreateTestProjectAction extends AbstractProjectAction {
     private final @NotNull TreePanel tp;
+    private final @NotNull TestinRoot testinRoot = Services.getInstance(p, TestinRoot.class);
 
     public CreateTestProjectAction(final @NotNull Project p, final @NotNull TreePanel tp) {
         super(p, Bundle.message("project.new.text"), Bundle.message("project.new.description"), AllIcons.General.Add);
@@ -71,7 +72,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
     // UC-TREE-PANEL-028, Rule-TREE-PANEL-115
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        GrayWithReason.unless(this, e, Services.getInstance(p, TestinRoot.class).isConfigured(), Bundle.message("toolbar.disabled.no.root"));
+        GrayWithReason.unless(this, e, testinRoot.isConfigured(), Bundle.message("toolbar.disabled.no.root"));
     }
 
     @Override
