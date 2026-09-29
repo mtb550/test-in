@@ -208,6 +208,11 @@ public class GitRefsTest {
     }
 
     @Test
+    public void aRenameOrACopyIsCountedAsOneChange() {
+        assertEquals(GitRefs.changeCount(List.of("R  new.json", "old.json", "C  b.json", "a.json", " M c.json")), 3);
+    }
+
+    @Test
     public void aPathIsTakenAsGitWroteItWithNoQuotingToUndo() {
         assertEquals(GitRefs.parseStatus(List.of("?? Test Cases/\"quoted\" تسجيل/a.json")).getFirst().path(),
                 "Test Cases/\"quoted\" تسجيل/a.json");

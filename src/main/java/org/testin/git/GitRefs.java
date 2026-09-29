@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -41,6 +42,24 @@ public final class GitRefs {
     // UC-SHARE-010, Rule-SHARE-048
     public static @NotNull List<StatusEntry> parseStatus(final @NotNull List<String> statusRecords) {
         final @NotNull List<StatusEntry> entries = new ArrayList<>();
+
+        for (final Map.Entry<String, String> change : changes(statusRecords)) {
+            final @NotNull String code = change.getKey().substring(0, 2);
+            final @NotNull String from = change.getValue();
+            if (code.indexOf('R') >= 0 && !from.isEmpty()) entries.add(new StatusEntry(DiffType.DELETED, from));
+
+            entries.add(new StatusEntry(typeOf(code), change.getKey().substring(3)));
+        }
+        return entries;
+    }
+
+    // UC-TREE-PANEL-026, Rule-TREE-PANEL-085
+    public static int changeCount(final @NotNull List<String> statusRecords) {
+        return changes(statusRecords).size();
+    }
+
+    private static @NotNull List<Map.Entry<String, String>> changes(final @NotNull List<String> statusRecords) {
+        final @NotNull List<Map.Entry<String, String>> changes = new ArrayList<>();
         final @NotNull Iterator<String> records = statusRecords.iterator();
 
         while (records.hasNext()) {
@@ -50,13 +69,9 @@ public final class GitRefs {
             final @NotNull String code = record.substring(0, 2);
             final boolean moved = code.indexOf('R') >= 0 || code.indexOf('C') >= 0;
             final @NotNull String from = moved && records.hasNext() ? records.next() : "";
-            if (code.charAt(0) == '!') continue;
-
-            if (code.indexOf('R') >= 0 && !from.isEmpty()) entries.add(new StatusEntry(DiffType.DELETED, from));
-
-            entries.add(new StatusEntry(typeOf(code), record.substring(3)));
+            if (code.charAt(0) != '!') changes.add(Map.entry(record, from));
         }
-        return entries;
+        return changes;
     }
 
     static @NotNull List<String> records(final @NotNull String nulSeparated) {
