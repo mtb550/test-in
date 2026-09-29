@@ -24,7 +24,6 @@ import org.testin.editor.TestinEditors;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.undo.Operation;
@@ -159,15 +158,12 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
     // UC-EDITOR-PANEL-017
     private boolean restorePresent(final @NotNull Written written) {
         final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
-        final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
-
-        final @NotNull TestSetDirectoryDto parent = nodes.getTestSetByPath(testSetPath);
 
         boolean allBack = true;
         for (final TestCaseDto tc : present) {
             final boolean isComingBack = testCases.findTestCase(tc.getId()).isEmpty();
 
-            final @NotNull TestCaseDto stored = tc.edit().parent(parent).build();
+            final @NotNull TestCaseDto stored = tc.copy();
             if (!testCases.putTestCaseVerbatim(testSetPath, stored)) {
                 allBack = false;
                 continue;

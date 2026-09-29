@@ -160,6 +160,7 @@ final class IndexerDataStore {
 
     // UC-INTERNAL-004, Rule-INTERNAL-035
     boolean putTestCaseVerbatim(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
+        Optional.ofNullable(testSetsDirByPath.get(testSetPath.toString())).ifPresent(tc::setParent);
         if (!testCaseStore.putVerbatim(testSetPath, tc)) return false;
 
         markTestSetModified(testSetPath);
