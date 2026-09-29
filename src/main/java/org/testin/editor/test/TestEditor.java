@@ -37,7 +37,6 @@ import org.testin.editor.listeners.TransferListener;
 import org.testin.editor.toolbar.TestToolbar;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.TestDetailsPopupBtn;
-import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.Modules;
 import org.testin.model.dto.TestCaseDto;
@@ -58,8 +57,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestSetDirectoryDto> implements Toolbar {
-    private final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
-
     private final @NotNull ModelChangeNotifier modelChangeNotifier;
 
     @Getter
@@ -255,6 +252,11 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
     @Override
     protected @NotNull Class<TestEditorAttributes> attributeType() {
         return TestEditorAttributes.class;
+    }
+
+    @Override
+    protected @NotNull Class<TestSetDirectoryDto> nodeType() {
+        return TestSetDirectoryDto.class;
     }
 
     @Override

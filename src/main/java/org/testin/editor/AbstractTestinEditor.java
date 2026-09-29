@@ -39,6 +39,7 @@ import org.testin.editor.statusbar.PageAction;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.editor.toolbar.Toolbar;
+import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
@@ -69,7 +70,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     protected final @NotNull Project p;
 
     @Getter
-    protected final @NotNull N parent;
+    protected volatile @NotNull N parent;
 
     @Getter
     protected final @NotNull List<TestCaseDto> allTestCases;
@@ -78,6 +79,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     protected final @NotNull List<TestCaseDto> currentTestCases;
 
     protected final @NotNull ProjectIndexer indexer;
+    protected final @NotNull Nodes nodes;
     protected final @NotNull TestCases testCases;
     protected final @NotNull TestCaseValues testCaseValues;
     protected final @NotNull AutomationState automationState;
@@ -121,6 +123,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         this.p = p;
         this.parent = parent;
         this.indexer = Services.getInstance(p, ProjectIndexer.class);
+        this.nodes = Services.getInstance(p, Nodes.class);
         this.testCases = Services.getInstance(p, TestCases.class);
         this.testCaseValues = Services.getInstance(p, TestCaseValues.class);
         this.automationState = Services.getInstance(p, AutomationState.class);
@@ -159,6 +162,8 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     protected abstract @NotNull AbstractEditorContextMenu buildContextMenu();
 
     protected abstract @NotNull Class<A> attributeType();
+
+    protected abstract @NotNull Class<N> nodeType();
 
     @Override
     public abstract @NotNull Set<A> getSelectedDetails();
@@ -311,6 +316,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     }
 
     protected void reloadData(final @NotNull Runnable onLoaded) {
+        followTheIndex();
         beforeReload();
 
         rememberSelection();
@@ -324,6 +330,11 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         list.getEmptyText().setText(Bundle.message("editor.refreshing"));
 
         loadDataAsync(onLoaded);
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-114
+    private void followTheIndex() {
+        parent = nodes.find(parent.getPath()).filter(nodeType()::isInstance).map(nodeType()::cast).orElse(parent);
     }
 
     protected void beforeReload() {

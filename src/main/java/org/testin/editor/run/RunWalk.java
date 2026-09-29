@@ -29,7 +29,6 @@ import org.testin.model.TestRunSummary;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
@@ -54,7 +53,6 @@ import java.util.stream.Collectors;
 public final class RunWalk {
     private final @NotNull RunEditor editor;
     private final @NotNull Project p;
-    private final @NotNull TestRunDirectoryDto parent;
     private final @NotNull TestRuns testRuns;
     private final @NotNull TestRunStatusChange testRunStatusChange;
     private final @NotNull RunStatusService runStatusService;
@@ -66,10 +64,9 @@ public final class RunWalk {
 
     private @NotNull Optional<UUID> executingTestCase = Optional.empty();
 
-    RunWalk(final @NotNull RunEditor editor, final @NotNull Project p, final @NotNull TestRunDirectoryDto parent) {
+    RunWalk(final @NotNull RunEditor editor, final @NotNull Project p) {
         this.editor = editor;
         this.p = p;
-        this.parent = parent;
         this.testRuns = Services.getInstance(p, TestRuns.class);
         this.testRunStatusChange = Services.getInstance(p, TestRunStatusChange.class);
         this.runStatusService = Services.getInstance(p, RunStatusService.class);
@@ -145,7 +142,7 @@ public final class RunWalk {
 
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-181
     private void markStartedByAutomation() {
-        final @NotNull TestRunStatus status = parent.getMarker().getStatus();
+        final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();
         if (status == TestRunStatus.IN_PROGRESS || status.isTerminal()) return;
 
         markStarted();
@@ -153,15 +150,15 @@ public final class RunWalk {
 
     // UC-EDITOR-PANEL-031, UC-EDITOR-PANEL-043
     private void markStarted() {
-        testRuns.changeRunMarker(parent.getPath(), TestRunMarker::markExecutionStarted);
-        testRunStatusChange.apply(parent, TestRunStatus.IN_PROGRESS);
+        testRuns.changeRunMarker(editor.getParent().getPath(), TestRunMarker::markExecutionStarted);
+        testRunStatusChange.apply(editor.getParent(), TestRunStatus.IN_PROGRESS);
     }
 
     // UC-EDITOR-PANEL-044, Rule-EDITOR-PANEL-184
     void runPending() {
         if (!canStartExecution()) {
             if (isExecuting())
-                notifier.softRefuse(p, Refused.ALREADY_RUNNING, parent.getName());
+                notifier.softRefuse(p, Refused.ALREADY_RUNNING, editor.getParent().getName());
             return;
         }
 
@@ -171,11 +168,11 @@ public final class RunWalk {
                 .toList();
 
         if (pending.isEmpty()) {
-            notifier.softRefuse(p, Refused.NOTHING_TO_RUN, parent.getName());
+            notifier.softRefuse(p, Refused.NOTHING_TO_RUN, editor.getParent().getName());
             return;
         }
 
-        Logger.info("Running " + parent.getName() + " with " + pending.size() + " pending test case(s)");
+        Logger.info("Running " + editor.getParent().getName() + " with " + pending.size() + " pending test case(s)");
 
         pending.forEach(tc -> launching(tc.getId()));
 
@@ -190,7 +187,7 @@ public final class RunWalk {
 
         if (editor.runItem(tc.getId()).filter(item -> !item.isRemoved()).isEmpty()) return;
 
-        if (parent.getMarker().getStatus().isTerminal()) return;
+        if (editor.getParent().getMarker().getStatus().isTerminal()) return;
 
         status.getVerdict().ifPresent(verdict -> {
             sayWhatTheVerdictCleared(tc, verdict, failure);
@@ -221,7 +218,7 @@ public final class RunWalk {
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-008
     private void sayWhatTheRunRecorded() {
         final @NotNull String recorded = ResultAnalysis
-                .segments(TestRunSummary.of(editor.results()), parent.getMarker().getStatus())
+                .segments(TestRunSummary.of(editor.results()), editor.getParent().getMarker().getStatus())
                 .stream().map(Segment::text).collect(Collectors.joining(", "));
 
         if (!recorded.isEmpty()) notifier.softShow(p, recorded);
@@ -229,11 +226,11 @@ public final class RunWalk {
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-134
     public void finishIfEverythingIsJudged() {
-        if (parent.getMarker().getStatus().isTerminal()) return;
+        if (editor.getParent().getMarker().getStatus().isTerminal()) return;
 
         if (editor.run().filter(TestRunDto::isFullyJudged).isEmpty()) return;
 
-        testRunStatusChange.apply(parent, TestRunStatus.COMPLETED);
+        testRunStatusChange.apply(editor.getParent(), TestRunStatus.COMPLETED);
     }
 
     // UC-EDITOR-PANEL-046
@@ -252,7 +249,7 @@ public final class RunWalk {
     }
 
     private boolean canStartExecution() {
-        return !isExecuting() && !parent.getMarker().getStatus().isTerminal();
+        return !isExecuting() && !editor.getParent().getMarker().getStatus().isTerminal();
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
@@ -267,7 +264,7 @@ public final class RunWalk {
 
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-151
     public void stopExecution() {
-        testRuns.changeRunMarker(parent.getPath(), TestRunMarker::markExecutionEnded);
+        testRuns.changeRunMarker(editor.getParent().getPath(), TestRunMarker::markExecutionEnded);
 
         halt();
     }
@@ -285,7 +282,7 @@ public final class RunWalk {
         final int stopped = testNGExecution.stopTestCases(launchedHere);
         if (stopped == 0) return;
 
-        Logger.info("Stopped " + stopped + " test case(s) running from '" + parent.getName() + "'");
+        Logger.info("Stopped " + stopped + " test case(s) running from '" + editor.getParent().getName() + "'");
     }
 
     // UC-EDITOR-PANEL-035, Rule-EDITOR-PANEL-150
@@ -311,7 +308,7 @@ public final class RunWalk {
     }
 
     private void saveRun() {
-        testRuns.saveRun(parent.getPath());
+        testRuns.saveRun(editor.getParent().getPath());
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
@@ -319,7 +316,7 @@ public final class RunWalk {
         if (editor.run().isEmpty()) return;
 
         if (!hasSomethingToWalk()) {
-            notifier.softRefuse(p, Refused.NOTHING_SHOWING, parent.getName());
+            notifier.softRefuse(p, Refused.NOTHING_SHOWING, editor.getParent().getName());
             return;
         }
 

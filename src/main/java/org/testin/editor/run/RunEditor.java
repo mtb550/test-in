@@ -83,7 +83,7 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     private final @NotNull RunToolbar toolBar;
 
     @Getter
-    private final @NotNull RunWalk walk = new RunWalk(this, p, parent);
+    private final @NotNull RunWalk walk = new RunWalk(this, p);
 
     private final @NotNull AtomicInteger loadGeneration = new AtomicInteger();
 
@@ -250,6 +250,11 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     @Override
     protected @NotNull Class<RunEditorAttributes> attributeType() {
         return RunEditorAttributes.class;
+    }
+
+    @Override
+    protected @NotNull Class<TestRunDirectoryDto> nodeType() {
+        return TestRunDirectoryDto.class;
     }
 
     @Override
