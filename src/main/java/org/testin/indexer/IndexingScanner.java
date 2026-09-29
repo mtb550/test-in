@@ -213,16 +213,21 @@ final class IndexingScanner {
             for (final Path dirPath : dirs) {
                 if (indicator.isCanceled()) return;
 
-                store.markedAs(dirPath, DirectoryType.UNDER_TEST_CASES).ifPresentOrElse(
-                        marked -> {
-                            if (marked == DirectoryType.TS) scanTestSet(dirPath, parent, indicator, scanned);
-                            else scanTestSetPackage(dirPath, parent, indicator, unread, scanned);
-                        },
-                        () -> skipped(dirPath, DirectoryType.UNDER_TEST_CASES, unread));
+                scanTestSetOrPackage(dirPath, parent, indicator, unread, scanned);
             }
         } catch (final Exception ex) {
             Logger.error("Failed to list test sets: " + ex.getMessage());
         }
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-008, Rule-INTERNAL-015
+    private void scanTestSetOrPackage(final @NotNull Path dirPath, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
+        store.markedAs(dirPath, DirectoryType.UNDER_TEST_CASES).ifPresentOrElse(
+                marked -> {
+                    if (marked == DirectoryType.TS) scanTestSet(dirPath, parent, indicator, scanned);
+                    else scanTestSetPackage(dirPath, parent, indicator, unread, scanned);
+                },
+                () -> skipped(dirPath, DirectoryType.UNDER_TEST_CASES, unread));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-008, Rule-INTERNAL-015
@@ -234,10 +239,7 @@ final class IndexingScanner {
 
             try (Stream<Path> subPaths = Files.list(path)) {
                 subPaths.filter(Files::isDirectory)
-                        .forEach(subPath -> store.markedAs(subPath, DirectoryType.UNDER_TEST_CASES).ifPresentOrElse(marked -> {
-                            if (marked == DirectoryType.TS) scanTestSet(subPath, tsp, indicator, scanned);
-                            else scanTestSetPackage(subPath, tsp, indicator, unread, scanned);
-                        }, () -> skipped(subPath, DirectoryType.UNDER_TEST_CASES, unread)));
+                        .forEach(subPath -> scanTestSetOrPackage(subPath, tsp, indicator, unread, scanned));
             }
 
         } catch (final Exception ex) {
@@ -303,16 +305,21 @@ final class IndexingScanner {
             for (final Path dirPath : dirs) {
                 if (indicator.isCanceled()) return;
 
-                store.markedAs(dirPath, DirectoryType.UNDER_TEST_RUNS).ifPresentOrElse(
-                        marked -> {
-                            if (marked == DirectoryType.TR) scanTestRun(dirPath, parent, indicator, scanned);
-                            else scanTestRunPackageDir(dirPath, parent, indicator, unread, scanned);
-                        },
-                        () -> skipped(dirPath, DirectoryType.UNDER_TEST_RUNS, unread));
+                scanTestRunOrPackage(dirPath, parent, indicator, unread, scanned);
             }
         } catch (final Exception ex) {
             Logger.error("Failed to list test runs: " + ex.getMessage());
         }
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-010, Rule-INTERNAL-015
+    private void scanTestRunOrPackage(final @NotNull Path dirPath, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull List<Path> unread, final @NotNull ScannedProject scanned) {
+        store.markedAs(dirPath, DirectoryType.UNDER_TEST_RUNS).ifPresentOrElse(
+                marked -> {
+                    if (marked == DirectoryType.TR) scanTestRun(dirPath, parent, indicator, scanned);
+                    else scanTestRunPackageDir(dirPath, parent, indicator, unread, scanned);
+                },
+                () -> skipped(dirPath, DirectoryType.UNDER_TEST_RUNS, unread));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-010, Rule-INTERNAL-015
@@ -324,10 +331,7 @@ final class IndexingScanner {
 
             try (Stream<Path> subPaths = Files.list(path)) {
                 subPaths.filter(Files::isDirectory)
-                        .forEach(subPath -> store.markedAs(subPath, DirectoryType.UNDER_TEST_RUNS).ifPresentOrElse(marked -> {
-                            if (marked == DirectoryType.TR) scanTestRun(subPath, trp, indicator, scanned);
-                            else scanTestRunPackageDir(subPath, trp, indicator, unread, scanned);
-                        }, () -> skipped(subPath, DirectoryType.UNDER_TEST_RUNS, unread)));
+                        .forEach(subPath -> scanTestRunOrPackage(subPath, trp, indicator, unread, scanned));
             }
 
         } catch (final Exception ex) {
