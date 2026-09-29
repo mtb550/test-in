@@ -33,7 +33,9 @@ import org.testin.editor.test.TestEditor;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto.TestCaseDtoBuilder;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -129,10 +131,13 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
                 // Rule-CODEGEN-078
                 final @NotNull List<CopiedTestCase> copied = new ArrayList<>(pastedTestCases.size());
 
-                for (final TestCaseDto tc : pastedTestCases) {
-                    final @NotNull TestCaseDto clonedTc = cloneForPasting(tc, isCut);
+                // Rule-EDITOR-PANEL-083
+                final @NotNull List<String> ranks = ranksUnderTheSelection(destUI, isCut ? Set.copyOf(TestCaseSnapshot.idsOf(pastedTestCases)) : Set.of(), pastedTestCases.size());
 
-                    clonedTc.setParent(destUI.getParent());
+                for (int i = 0; i < pastedTestCases.size(); i++) {
+                    final @NotNull TestCaseDto tc = pastedTestCases.get(i);
+                    final @NotNull TestCaseDto clonedTc = cloneForPasting(tc, isCut, destUI.getParent(), ranks.get(i));
+
                     destUI.getAllTestCases().add(clonedTc);
                     pastedHere.add(clonedTc);
 
@@ -152,9 +157,6 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
                 cutState.source().ifPresent(sourceUI -> moveCut(sourceUI, destUI, cutItems, pastedHere));
 
                 if (pastedHere.isEmpty()) return;
-
-                // Rule-EDITOR-PANEL-083
-                rankUnderTheSelection(destUI, pastedHere);
 
                 final int pasted = pastedHere.size();
 
@@ -223,9 +225,8 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
         }
 
         // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-083
-        private void rankUnderTheSelection(final @NotNull TestEditor destUI, final @NotNull List<TestCaseDto> pastedHere) {
-            final @NotNull Set<TestCaseDto> pasted = new HashSet<>(pastedHere);
-            final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(destUI.getAllTestCases().stream().filter(tc -> !pasted.contains(tc)).toList());
+        private @NotNull List<String> ranksUnderTheSelection(final @NotNull TestEditor destUI, final @NotNull Set<UUID> leaving, final int count) {
+            final @NotNull List<TestCaseDto> ordered = TestCaseOrder.ordered(destUI.getAllTestCases().stream().filter(tc -> !leaving.contains(tc.getId())).toList());
             final @NotNull Optional<TestCaseDto> anchor = destUI.getSelectedTestCases().stream()
                     .filter(selected -> !selected.getOrder().isEmpty())
                     .reduce((_, last) -> last);
@@ -235,27 +236,32 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
             @NotNull String previous = under > 0 && under <= ordered.size() ? ordered.get(under - 1).getOrder() : "";
             final @NotNull String upperBound = under < ordered.size() ? ordered.get(under).getOrder() : "";
 
-            for (final TestCaseDto tc : pastedHere) {
+            final @NotNull List<String> ranks = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
                 previous = Rank.between(previous, upperBound);
-                tc.setOrder(previous);
+                ranks.add(previous);
             }
+
+            return ranks;
         }
 
-        private @NotNull TestCaseDto cloneForPasting(final @NotNull TestCaseDto original, final boolean isCut) {
-            final @NotNull ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-
-            final @NotNull TestCaseDto clonedTc = original.copy();
+        // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-081, Rule-EDITOR-PANEL-082
+        private @NotNull TestCaseDto cloneForPasting(final @NotNull TestCaseDto original, final boolean isCut, final @NotNull TestSetDirectoryDto parent, final @NotNull String rank) {
+            final @NotNull TestCaseDtoBuilder draft = original.edit().parent(parent).order(rank);
 
             if (isCut) {
-                clonedTc.touch(Services.getInstance(p, AppSettingsState.class).testerName);
-            } else {
-                clonedTc.setId(UUID.randomUUID())
-                        .setDescription(Bundle.message("paste.copy.suffix", original.getDescription()))
-                        .setCreatedAt(now)
-                        .setUpdatedAt(now);
+                final @NotNull TestCaseDto moved = draft.build();
+                moved.touch(Services.getInstance(p, AppSettingsState.class).testerName);
+                return moved;
             }
 
-            return clonedTc;
+            final @NotNull ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+
+            return draft.id(UUID.randomUUID())
+                    .description(Bundle.message("paste.copy.suffix", original.getDescription()))
+                    .createdAt(now)
+                    .updatedAt(now)
+                    .build();
         }
     }
 }

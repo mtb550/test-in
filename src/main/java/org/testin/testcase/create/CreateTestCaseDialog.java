@@ -40,7 +40,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
     // UC-EDITOR-PANEL-005, Rule-CODEGEN-001
     public CreateTestCaseDialog(final @NotNull Project p, final @NotNull TestSetDirectoryDto dir, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
-        super(p, new TestCaseDto(), onSave);
+        super(p, TestCaseDto.builder().parent(dir).build(), onSave);
         this.dir = dir;
 
         descriptionSection.compareAgainst(() -> Services.getInstance(p, TestCases.class).getTestCasesForTestSet(dir.getPath()));

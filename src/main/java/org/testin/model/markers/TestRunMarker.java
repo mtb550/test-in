@@ -60,6 +60,11 @@ public class TestRunMarker extends AbstractMarker {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = Config.DATE_FORMAT_LOCALE)
     private ZonedDateTime executionEndedAt = Config.NOT_EXECUTED;
 
+    // UC-TREE-PANEL-009, UC-TREE-PANEL-022, Rule-INTERNAL-117
+    public void configure(final @NotNull Map<TestRunConfiguration, String> answered) {
+        configuration = answered;
+    }
+
     public void markExecutionStarted() {
         if (Config.isNotExecuted(executionStartedAt))
             executionStartedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);

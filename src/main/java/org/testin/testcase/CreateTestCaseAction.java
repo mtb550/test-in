@@ -43,8 +43,6 @@ public class CreateTestCaseAction extends AbstractAnyProjectAction {
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-008, Rule-EDITOR-PANEL-030
     public static void openCreateDialog(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull TestSetDirectoryDto dir) {
         new CreateTestCaseDialog(p, dir, tc -> {
-            tc.setParent(dir);
-
             final @NotNull List<TestCaseDto> affectedNodes = List.of(tc);
 
             final @NotNull List<UUID> ids = TestCaseSnapshot.idsOf(affectedNodes);

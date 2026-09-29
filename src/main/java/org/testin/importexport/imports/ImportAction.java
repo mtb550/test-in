@@ -147,10 +147,8 @@ public class ImportAction extends AbstractAnyProjectAction {
                                 final @NotNull List<TestCaseDto> testCases = set.getValue();
                                 final @NotNull Path setPath = into.getPath();
 
-                                final @NotNull List<TestCaseDto> written = linkAndSaveTestCases(setPath, testCases, rankOfTail(setPath), indicator, imported, total);
+                                final @NotNull List<TestCaseDto> written = linkAndSaveTestCases(into, testCases, rankOfTail(setPath), indicator, imported, total);
                                 if (!written.isEmpty()) stillEmpty.remove(into.getName());
-
-                                for (final TestCaseDto tc : testCases) tc.setParent(into);
 
                                 if (generateCode) generateTestMethods(written, into.getName(), indicator);
 
@@ -254,22 +252,23 @@ public class ImportAction extends AbstractAnyProjectAction {
         }
 
         // UC-SHARE-005, Rule-SHARE-025, Rule-SHARE-037
-        private @NotNull List<TestCaseDto> linkAndSaveTestCases(final @NotNull Path dirPath, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
+        private @NotNull List<TestCaseDto> linkAndSaveTestCases(final @NotNull TestSetDirectoryDto into, final @NotNull List<TestCaseDto> testCases, final @NotNull String tailRank, final @NotNull ProgressIndicator indicator, final int done, final int total) {
             final @NotNull TestCases indexedTestCases = Services.getInstance(p, TestCases.class);
 
             String rank = tailRank;
 
+            final @NotNull List<TestCaseDto> placed = new ArrayList<>(testCases.size());
             for (final TestCaseDto currentTestCase : testCases) {
                 rank = Rank.after(rank);
-                currentTestCase.setOrder(rank);
+                placed.add(currentTestCase.edit().order(rank).parent(into).build());
             }
 
             final @NotNull List<TestCaseDto> written = new ArrayList<>(testCases.size());
             int tried = 0;
-            for (final TestCaseDto tc : testCases) {
+            for (final TestCaseDto tc : placed) {
                 if (indicator.isCanceled()) break;
 
-                if (indexedTestCases.putTestCaseVerbatim(dirPath, tc)) written.add(tc);
+                if (indexedTestCases.putTestCaseVerbatim(into.getPath(), tc)) written.add(tc);
 
                 tried++;
                 indicator.setFraction((done + tried) / (double) total);

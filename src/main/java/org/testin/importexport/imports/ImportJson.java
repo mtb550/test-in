@@ -40,9 +40,11 @@ public class ImportJson {
     private static @NotNull TestCaseDto asNewTestCase(final @NotNull TestCaseDto read) {
         final @NotNull TestCaseDto fresh = TestCaseDto.builder().build();
 
-        return read.setId(UUID.randomUUID())
-                .setStatus(fresh.getStatus())
-                .setOrder(fresh.getOrder());
+        return read.edit()
+                .id(UUID.randomUUID())
+                .status(fresh.getStatus())
+                .order(fresh.getOrder())
+                .build();
     }
 
     // UC-SHARE-005, Rule-SHARE-024

@@ -29,7 +29,6 @@ import org.testin.model.TestRunConfiguration;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
@@ -106,9 +105,7 @@ public class CreateTestRun implements NodeCreator {
             final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
             final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
 
-            final @NotNull TestRunMarker marker = new TestRunMarker();
-            marker.setConfiguration(TestRunConfiguration.answered(configuration));
-            trDir.setMarker(marker);
+            trDir.getMarker().configure(TestRunConfiguration.answered(configuration));
 
             if (!nodes.addTestRunDir(trDir)) return;
 
