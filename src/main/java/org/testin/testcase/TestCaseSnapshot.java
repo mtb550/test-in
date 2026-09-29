@@ -17,21 +17,16 @@
 package org.testin.testcase;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.TestinEditors;
-import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.undo.Operation;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
-import org.testin.view.ViewToolWindowFactory;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -75,41 +70,10 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
 
         ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, UndoHistories.class).push(scope, new Operation(
                 description,
-                () -> restore(p, before, after),
-                () -> restore(p, after, before),
+                () -> TestCaseRestore.restore(p, before, after),
+                () -> TestCaseRestore.restore(p, after, before),
                 () -> {
                 })));
-    }
-
-    // UC-INTERNAL-005, Rule-INTERNAL-063
-    private static boolean restore(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> target, final @NotNull List<TestCaseSnapshot> expected) {
-        if (!expected.stream().allMatch(TestCaseSnapshot::stillStands)) {
-            Services.getInstance(p, Notifier.class).softRefuse(p,
-                    Bundle.message("snapshot.changed.title"),
-                    Bundle.message("snapshot.changed.message"));
-            return false;
-        }
-
-        // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-215
-        final @NotNull Written written = new Written();
-        final boolean allBack = ProgressManager.getInstance().<Boolean, RuntimeException>runProcessWithProgressSynchronously(() -> {
-            boolean all = true;
-            for (final TestCaseSnapshot snapshot : target) all &= snapshot.removeAbsent(written);
-            for (final TestCaseSnapshot snapshot : target) all &= snapshot.restorePresent(written);
-            return all;
-        }, Bundle.message("remove.undo.progress"), false, p);
-
-        written.generate(p);
-        tellTheSurfaces(p, target);
-        return allBack;
-    }
-
-    private static void tellTheSurfaces(final @NotNull Project p, final @NotNull List<TestCaseSnapshot> written) {
-        final @NotNull TestinEditors editors = Services.getInstance(p, TestinEditors.class);
-
-        written.forEach(snapshot -> editors.reloadOpen(p, snapshot.testSetPath()));
-
-        written.forEach(snapshot -> ViewToolWindowFactory.refreshIfShowing(p, snapshot.present()));
     }
 
     private static boolean same(final @NotNull List<TestCaseSnapshot> before, final @NotNull List<TestCaseSnapshot> after) {
@@ -121,58 +85,18 @@ public record TestCaseSnapshot(@NotNull Project p, @NotNull Path testSetPath, @N
         return true;
     }
 
-    private boolean stillStands() {
-        return Services.getInstance(p, Nodes.class).nodeExists(testSetPath) && sameAs(of(p, testSetPath, ids()));
-    }
-
     public @NotNull List<UUID> ids() {
         final @NotNull List<UUID> ids = new ArrayList<>(idsOf(present));
         ids.addAll(absent);
         return ids;
     }
 
-    private boolean sameAs(final @NotNull TestCaseSnapshot other) {
+    boolean sameAs(final @NotNull TestCaseSnapshot other) {
         return absent.equals(other.absent) && asJson().equals(other.asJson());
     }
 
     private @NotNull List<String> asJson() {
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
         return present.stream().map(mapper::writeValueAsString).sorted().toList();
-    }
-
-    // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-215
-    private boolean removeAbsent(final @NotNull Written written) {
-        final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
-
-        final @NotNull List<TestCaseDto> stillThere = absent.stream().flatMap(id -> testCases.findTestCase(id).stream()).toList();
-
-        boolean allWent = true;
-        for (final TestCaseDto tc : stillThere) {
-            if (testCases.removeTestCase(testSetPath, tc.getId())) written.removed().add(tc);
-            else allWent = false;
-        }
-
-        return allWent;
-    }
-
-    // UC-EDITOR-PANEL-017
-    private boolean restorePresent(final @NotNull Written written) {
-        final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
-
-        boolean allBack = true;
-        for (final TestCaseDto tc : present) {
-            final boolean isComingBack = testCases.findTestCase(tc.getId()).isEmpty();
-
-            final @NotNull TestCaseDto stored = tc.copy();
-            if (!testCases.putTestCaseVerbatim(testSetPath, stored)) {
-                allBack = false;
-                continue;
-            }
-
-            written.landed().add(stored);
-            if (isComingBack) written.comingBack().add(stored);
-        }
-
-        return allBack;
     }
 }
