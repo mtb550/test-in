@@ -19,7 +19,6 @@ package org.testin.testrun;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CheckedTreeNode;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
@@ -39,9 +38,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-@AllArgsConstructor
 public final class RunForm {
     private final @NotNull Project p;
+    private final @NotNull ProjectIndexer indexer;
+    private final @NotNull TestCases testCases;
+    private final @NotNull Nodes nodes;
+
+    public RunForm(final @NotNull Project p) {
+        this.p = p;
+        this.indexer = Services.getInstance(p, ProjectIndexer.class);
+        this.testCases = Services.getInstance(p, TestCases.class);
+        this.nodes = Services.getInstance(p, Nodes.class);
+    }
 
     public static @NotNull Set<UUID> checkedTestCases(final @NotNull SelectionTree selection) {
         final @NotNull Set<UUID> ids = new LinkedHashSet<>();
@@ -103,9 +111,6 @@ public final class RunForm {
 
     // UC-TREE-PANEL-009, Rule-TREE-PANEL-030
     private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder, final @NotNull DirectoryDto thisNodeDto) {
-        final @NotNull ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
-        final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
         indexer.awaitIndexing();
 
         final @NotNull DefaultMutableTreeNode node = new DefaultMutableTreeNode(thisNodeDto);

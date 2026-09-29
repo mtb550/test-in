@@ -19,7 +19,6 @@ package org.testin.testrun;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditors;
 import org.testin.editor.run.RunEditor;
@@ -37,13 +36,24 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @Service(Service.Level.PROJECT)
-@AllArgsConstructor
 public final class TestRunStatusChange {
     private final @NotNull Project p;
+    private final @NotNull TestinEditors editors;
+    private final @NotNull Notifier notifier;
+    private final @NotNull TestRuns testRuns;
+    private final @NotNull AppSettingsState settings;
+
+    public TestRunStatusChange(final @NotNull Project p) {
+        this.p = p;
+        this.editors = Services.getInstance(p, TestinEditors.class);
+        this.notifier = Services.getInstance(p, Notifier.class);
+        this.testRuns = Services.getInstance(p, TestRuns.class);
+        this.settings = Services.getInstance(p, AppSettingsState.class);
+    }
 
     // UC-TREE-PANEL-020, Rule-EDITOR-PANEL-008, Rule-TREE-PANEL-091
     public void apply(final @NotNull TestRunDirectoryDto run, final @NotNull TestRunStatus newStatus) {
-        final @NotNull Optional<RunEditor> open = Services.getInstance(p, TestinEditors.class).runEditorFor(p, run);
+        final @NotNull Optional<RunEditor> open = editors.runEditorFor(p, run);
 
         Logger.trace("Test run status changed: " + run.getName() + " = " + newStatus.getLabel());
 
@@ -54,13 +64,12 @@ public final class TestRunStatusChange {
         persist(run, open);
         redraw(open);
 
-        Services.getInstance(p, Notifier.class).softShow(p, newStatus.getLabel());
+        notifier.softShow(p, newStatus.getLabel());
     }
 
     private void persist(final @NotNull TestRunDirectoryDto run, final @NotNull Optional<RunEditor> open) {
-        final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
         final @NotNull TestRunStatus status = run.getMarker().getStatus();
-        final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
+        final @NotNull String tester = settings.testerName;
 
         if (status.isTerminal()) finish(run.getPath());
 
@@ -73,8 +82,6 @@ public final class TestRunStatusChange {
     }
 
     private void finish(final @NotNull Path runPath) {
-        final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
-
         testRuns.changeRun(runPath, run -> {
             int closed = 0;
             for (final TestRunItems item : run.getResults()) {

@@ -80,15 +80,19 @@ public class EditTestRunAction extends AbstractAnyProjectAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p) {
+    private record Work(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull BoundTestProject boundTestProject, @NotNull Notifier notifier, @NotNull Nodes nodes, @NotNull TestinEditors editors) {
+        private Work(final @NotNull Project p) {
+            this(p, Services.getInstance(p, TestRuns.class), Services.getInstance(p, BoundTestProject.class), Services.getInstance(p, Notifier.class), Services.getInstance(p, Nodes.class), Services.getInstance(p, TestinEditors.class));
+        }
+
         private void editAt(final @NotNull TreePath path) {
             selectedRun(TreeValues.directoryAt(path)).ifPresent(this::edit);
         }
 
         private void edit(final @NotNull TestRunDirectoryDto run) {
-            final @NotNull Set<UUID> covered = Services.getInstance(p, TestRuns.class).getTestRunByPath(run.getPath()).coveredIds();
+            final @NotNull Set<UUID> covered = testRuns.getTestRunByPath(run.getPath()).coveredIds();
 
-            Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
+            boundTestProject.get().ifPresentOrElse(
                     tp -> new RunForm(p).open(tp.getTestCasesDirectory(), run.getName(), covered, run.getMarker().getConfiguration(), saves(run)),
                     () -> Logger.warn("Edit test run: no test project is bound to " + p.getName()));
         }
@@ -99,10 +103,6 @@ public class EditTestRunAction extends AbstractAnyProjectAction {
 
         // UC-TREE-PANEL-022, Rule-TREE-PANEL-074, Rule-TREE-PANEL-076
         private boolean save(final @NotNull TestRunDirectoryDto run, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection) {
-            final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
-            final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
-
             final @NotNull String name = form.getRunName();
             if (name.isEmpty()) {
                 notifier.softRefuse(p, Bundle.message("run.needs.a.name"));
@@ -157,10 +157,10 @@ public class EditTestRunAction extends AbstractAnyProjectAction {
             writeTo.accept(runPath);
 
             BackgroundWork.run(p, Bundle.message("run.task.updating", runPath.getFileName()), Bundle.message("run.update.failed.title"), _ -> {
-                Services.getInstance(p, Nodes.class).refreshDirectory(runPath);
+                nodes.refreshDirectory(runPath);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    Services.getInstance(p, TestinEditors.class).reloadOpen(p, runPath);
+                    editors.reloadOpen(p, runPath);
 
                     onDone.run();
                 });

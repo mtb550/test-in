@@ -31,6 +31,7 @@ import org.testin.util.Bundle;
 
 public class SetTestRunStatusAction extends AbstractProjectAction {
     final @NotNull SimpleTree tree;
+    private final @NotNull TestRunStatusChange statusChange = Services.getInstance(p, TestRunStatusChange.class);
 
     public SetTestRunStatusAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, Bundle.message("run.set.status.text"), Bundle.message("run.set.status.description"), AllIcons.Nodes.Test);
@@ -45,7 +46,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
 
     private void askForStatus(final @NotNull TestRunDirectoryDto testRunDto) {
         new TestRunStatusMenuDialog(p, testRunDto.getMarker().getStatus(), selectedStatus ->
-                Services.getInstance(p, TestRunStatusChange.class).apply(testRunDto, selectedStatus)).show();
+                statusChange.apply(testRunDto, selectedStatus)).show();
     }
 
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-067

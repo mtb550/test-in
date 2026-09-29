@@ -61,7 +61,11 @@ public class ReCreateTestRunAction extends AbstractAnyProjectAction {
         return ActionUpdateThread.EDT;
     }
 
-    private record Work(@NotNull Project p) {
+    private record Work(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull Nodes nodes, @NotNull BoundTestProject boundTestProject) {
+        private Work(final @NotNull Project p) {
+            this(p, Services.getInstance(p, TestRuns.class), Services.getInstance(p, Nodes.class), Services.getInstance(p, BoundTestProject.class));
+        }
+
         private void reCreateAt(final @NotNull TreePath path) {
             TreeValues.directoryAt(path)
                     .filter(TestRunDirectoryDto.class::isInstance)
@@ -71,16 +75,13 @@ public class ReCreateTestRunAction extends AbstractAnyProjectAction {
         }
 
         private void reCreate(final @NotNull TestRunDirectoryDto source, final @NotNull DirectoryDto parent) {
-            final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
-            final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
-
             final @NotNull Set<UUID> testCases = testRuns.getTestRunByPath(source.getPath()).coveredIds();
 
             final @NotNull Set<String> taken = nodes.getChildren(parent.getPath()).stream()
                     .map(DirectoryDto::getName)
                     .collect(Collectors.toSet());
 
-            Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
+            boundTestProject.get().ifPresentOrElse(
                     tp -> new CreateTestRun(p).configureRun(tp.getTestCasesDirectory(), NextRunName.after(source.getName(), taken), parent, testCases, source.getMarker().getConfiguration()),
                     () -> Logger.warn("Re-create test run: no test project is bound to " + p.getName()));
         }
