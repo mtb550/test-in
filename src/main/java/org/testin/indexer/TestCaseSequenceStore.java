@@ -41,7 +41,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 final class TestCaseSequenceStore {
-    private final @NotNull Project p;
     private final @NotNull TestDataFiles testDataFiles;
     private final @NotNull AppSettingsState settings;
     @Getter(AccessLevel.PACKAGE)
@@ -56,7 +55,6 @@ final class TestCaseSequenceStore {
     private final @NotNull Map<String, Set<String>> unreadable = new ConcurrentHashMap<>();
 
     TestCaseSequenceStore(final @NotNull Project p) {
-        this.p = p;
         this.testDataFiles = Services.getInstance(p, TestDataFiles.class);
         this.settings = Services.getInstance(p, AppSettingsState.class);
     }
@@ -104,7 +102,7 @@ final class TestCaseSequenceStore {
 
     // UC-INTERNAL-004, Rule-INTERNAL-033, Rule-INTERNAL-034
     boolean put(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
-        if (testDataFiles.alreadyHolds(p, fileOf(testSetPath, testCase.getId()), testCase))
+        if (testDataFiles.alreadyHolds(fileOf(testSetPath, testCase.getId()), testCase))
             return false;
 
         final @NotNull String tester = settings.testerName;
@@ -137,11 +135,11 @@ final class TestCaseSequenceStore {
     // UC-INTERNAL-004, Rule-INTERNAL-033
     private boolean written(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
         final @NotNull Path file = named(testSetPath, testCase.getId());
-        if (!testDataFiles.write(p, file, testCase)) return false;
+        if (!testDataFiles.write(file, testCase)) return false;
 
         // Rule-INTERNAL-084
         if (!leftHandNamedFile(testCase.getId(), file)) {
-            testDataFiles.discard(p, file);
+            testDataFiles.discard(file);
             return false;
         }
 
@@ -154,7 +152,7 @@ final class TestCaseSequenceStore {
     // UC-INTERNAL-004, Rule-INTERNAL-084
     private boolean leftHandNamedFile(final @NotNull UUID id, final @NotNull Path idFile) {
         final @NotNull Optional<Path> original = Optional.ofNullable(handNamed.get(id)).filter(path -> !path.equals(idFile));
-        if (original.isPresent() && !testDataFiles.discard(p, original.orElseThrow()))
+        if (original.isPresent() && !testDataFiles.discard(original.orElseThrow()))
             return false;
 
         handNamed.remove(id);
@@ -177,13 +175,13 @@ final class TestCaseSequenceStore {
         testCasesById.put(id, testCase);
         if (from.equals(to)) return true;
 
-        if (testDataFiles.discard(p, from)) {
+        if (testDataFiles.discard(from)) {
             if (!fromSet.equals(toSet))
                 Optional.ofNullable(testCaseIdsByTestSet.get(fromSet.toString())).ifPresent(ids -> ids.remove(id));
             return true;
         }
 
-        testDataFiles.discard(p, to);
+        testDataFiles.discard(to);
         if (!fromSet.equals(toSet))
             Optional.ofNullable(testCaseIdsByTestSet.get(toSet.toString())).ifPresent(ids -> ids.remove(id));
         was.ifPresent(original -> testCasesById.put(id, original));
@@ -195,7 +193,7 @@ final class TestCaseSequenceStore {
         // Rule-INTERNAL-084
         final @NotNull Path file = fileOf(testSetPath, testCaseId);
 
-        if (!testDataFiles.delete(p, file)) return false;
+        if (!testDataFiles.delete(file)) return false;
 
         testCasesById.remove(testCaseId);
         Optional.ofNullable(testCaseIdsByTestSet.get(testSetPath.toString()))

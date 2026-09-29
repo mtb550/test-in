@@ -198,7 +198,7 @@ final class NodeFiles {
             final @NotNull UUID fresh = UUID.randomUUID();
 
             tc.setId(fresh);
-            if (!testDataFiles.write(p, testCaseFile.resolveSibling(FileKind.TEST_CASE.fileName(fresh)), tc))
+            if (!testDataFiles.write(testCaseFile.resolveSibling(FileKind.TEST_CASE.fileName(fresh)), tc))
                 return false;
 
             ownWrites.record(p, testCaseFile);

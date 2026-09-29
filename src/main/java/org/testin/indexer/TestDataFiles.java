@@ -20,7 +20,7 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
@@ -39,12 +39,14 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service(Service.Level.PROJECT)
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 final class TestDataFiles {
+    private final @NotNull Project p;
+
     private final @NotNull OwnWrites ownWrites = Services.getInstance(OwnWrites.class);
 
     // UC-INTERNAL-004, Rule-INTERNAL-033
-    <T> boolean alreadyHolds(final @NotNull Project p, final @NotNull Path path, final @NotNull T content) {
+    <T> boolean alreadyHolds(final @NotNull Path path, final @NotNull T content) {
         try {
             return Arrays.equals(Files.readAllBytes(path), Services.getInstance(p, Mapper.class).writeValueAsBytes(content));
         } catch (final IOException absentOrUnreadable) {
@@ -60,12 +62,12 @@ final class TestDataFiles {
         }
     }
 
-    <T> boolean write(final @NotNull Project p, final @NotNull Path path, final @NotNull T content) {
-        return writeBytes(p, path, Services.getInstance(p, Mapper.class).writeValueAsBytes(content));
+    <T> boolean write(final @NotNull Path path, final @NotNull T content) {
+        return writeBytes(path, Services.getInstance(p, Mapper.class).writeValueAsBytes(content));
     }
 
-    void write(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
-        writeBytes(p, path, jsonBytes);
+    void write(final @NotNull Path path, final byte @NotNull [] jsonBytes) {
+        writeBytes(path, jsonBytes);
     }
 
     byte @NotNull [] readBytes(final @NotNull Path path) {
@@ -97,7 +99,7 @@ final class TestDataFiles {
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-019, Rule-INTERNAL-113
-    private boolean writeBytes(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
+    private boolean writeBytes(final @NotNull Path path, final byte @NotNull [] jsonBytes) {
         if (jsonBytes.length == 0) {
             Logger.error("Refusing to write an empty file, which would erase it: " + path);
             Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.nothing.written", path.getFileName()));
@@ -113,19 +115,19 @@ final class TestDataFiles {
             ownWrites.wrote(p, path, jsonBytes);
             return true;
         } catch (final IOException ex) {
-            reportWriteFailure(p, path, ex);
+            reportWriteFailure(path, ex);
             return false;
         }
     }
 
     // UC-INTERNAL-005, Rule-INTERNAL-036, Rule-INTERNAL-113
-    boolean delete(final @NotNull Project p, final @NotNull Path path) {
+    boolean delete(final @NotNull Path path) {
         try {
             ownWrites.record(p, path);
 
             if (!Trash.accepted(p, path)) Files.deleteIfExists(path);
         } catch (final IOException ex) {
-            reportRemoveFailure(p, path, ex);
+            reportRemoveFailure(path, ex);
             return false;
         }
 
@@ -133,25 +135,25 @@ final class TestDataFiles {
     }
 
     // Rule-INTERNAL-113
-    boolean discard(final @NotNull Project p, final @NotNull Path path) {
+    boolean discard(final @NotNull Path path) {
         try {
             ownWrites.record(p, path);
 
             Files.deleteIfExists(path);
         } catch (final IOException ex) {
-            reportRemoveFailure(p, path, ex);
+            reportRemoveFailure(path, ex);
             return false;
         }
 
         return true;
     }
 
-    private void reportRemoveFailure(final @NotNull Project p, final @NotNull Path path, final @NotNull IOException ex) {
+    private void reportRemoveFailure(final @NotNull Path path, final @NotNull IOException ex) {
         Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.remove", FailureText.of(ex)));
         Logger.error("unable to remove " + path + ": " + ex.getMessage());
     }
 
-    private void reportWriteFailure(final @NotNull Project p, final @NotNull Path path, final @NotNull IOException ex) {
+    private void reportWriteFailure(final @NotNull Path path, final @NotNull IOException ex) {
         Services.getInstance(p, Notifier.class).error(p, Bundle.message("files.unable.to.write", FailureText.of(ex)));
         Logger.error("unable to write content: " + ex.getMessage());
         Logger.error("path" + path);

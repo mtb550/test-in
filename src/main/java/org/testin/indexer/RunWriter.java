@@ -41,7 +41,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 final class RunWriter {
-    private final @NotNull Project p;
     private final @NotNull IndexerDataStore store;
     private final @NotNull TestDataFiles files;
     private final @NotNull Mapper mapper;
@@ -52,7 +51,6 @@ final class RunWriter {
     private final @NotNull Map<Path, byte[]> unwritten = new ConcurrentHashMap<>();
 
     RunWriter(final @NotNull Project p, final @NotNull IndexerDataStore store) {
-        this.p = p;
         this.store = store;
         this.files = Services.getInstance(p, TestDataFiles.class);
         this.mapper = Services.getInstance(p, Mapper.class);
@@ -103,7 +101,7 @@ final class RunWriter {
                 results.forEach((file, bytes) -> {
                     if (files.alreadyHolds(file, bytes)) return;
 
-                    files.write(p, file, bytes);
+                    files.write(file, bytes);
                     Logger.trace("Result written for " + runPath.getFileName() + ": " + file.getFileName());
                 });
 
@@ -122,7 +120,7 @@ final class RunWriter {
             if (!Files.exists(file)) continue;
 
             Logger.info("Removing the result of a case the run no longer covers: " + file.getFileName());
-            files.delete(p, file);
+            files.delete(file);
         }
     }
 
@@ -130,7 +128,7 @@ final class RunWriter {
     private void sweepScreenshots(final @NotNull Path runPath, final @NotNull Set<String> named) {
         files.screenshotsIn(runPath).stream()
                 .filter(file -> !named.contains(file.getFileName().toString()))
-                .forEach(file -> files.delete(p, file));
+                .forEach(file -> files.delete(file));
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
@@ -152,7 +150,7 @@ final class RunWriter {
                     return;
                 }
 
-                byName.forEach((name, png) -> files.write(p, TestRunDirectoryDto.screenshotFile(runPath, name), png));
+                byName.forEach((name, png) -> files.write(TestRunDirectoryDto.screenshotFile(runPath, name), png));
             } catch (final Exception ex) {
                 Logger.error("Failed to write the screenshots of " + runPath.getFileName() + ": " + ex.getMessage());
             } finally {

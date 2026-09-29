@@ -35,7 +35,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 final class MarkerFiles {
-    private final @NotNull Project p;
 
     private final @NotNull Mapper mapper;
 
@@ -46,7 +45,6 @@ final class MarkerFiles {
     private final @NotNull Set<Path> damaged = ConcurrentHashMap.newKeySet();
 
     MarkerFiles(final @NotNull Project p) {
-        this.p = p;
         this.mapper = Services.getInstance(p, Mapper.class);
         this.testDataFiles = Services.getInstance(p, TestDataFiles.class);
         this.settings = Services.getInstance(p, AppSettingsState.class);
@@ -85,7 +83,7 @@ final class MarkerFiles {
         // Rule-INTERNAL-090
         if (marker.getId().isEmpty()) marker.setId(UUID.randomUUID().toString());
 
-        return testDataFiles.write(p, file, marker);
+        return testDataFiles.write(file, marker);
     }
 
     // Rule-INTERNAL-090, Rule-TREE-PANEL-051
@@ -97,7 +95,7 @@ final class MarkerFiles {
             final @NotNull AbstractMarker marker = mapper.readValue(markerFile.toFile(), kind.orElseThrow().getMarkerClass());
             marker.setId(UUID.randomUUID().toString());
 
-            return testDataFiles.write(p, markerFile, marker);
+            return testDataFiles.write(markerFile, marker);
 
         } catch (final Exception ex) {
             Logger.warn("Left the copied marker " + markerFile + " without an id of its own: " + ex.getMessage());
@@ -116,7 +114,7 @@ final class MarkerFiles {
 
     void touched(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Marker marker) {
         marker.touch(tester());
-        if (testDataFiles.alreadyHolds(p, dirPath.resolve(markerFileName), marker)) return;
+        if (testDataFiles.alreadyHolds(dirPath.resolve(markerFileName), marker)) return;
 
         write(dirPath, markerFileName, marker);
     }
