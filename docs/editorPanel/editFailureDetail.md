@@ -99,7 +99,7 @@ The same dialog the `F` key opens, with what was written already in it.
 2. **The first box** — what actually happened. It opens holding what was written
    before.
 3. **Bug Severity** and **Bug Priority** — the choices made last time are the
-   ones already selected.
+   ones already selected, or Enhancement and Low where nobody chose.
 4. **The big box** — for the error or the exception. This is usually what the
    tester came back to add.
 5. **The verdict** — not on this dialog at all. It stays **Failed**.

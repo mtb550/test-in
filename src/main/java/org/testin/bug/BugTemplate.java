@@ -59,8 +59,8 @@ public final class BugTemplate {
         final @NotNull String shortId = facts.testCaseId().toString().substring(0, 8);
 
         return fill(Map.ofEntries(
-                Map.entry("severity", cell(facts.severity().getInBugReport())),
-                Map.entry("priority", cell(facts.priority().getInBugReport())),
+                Map.entry("severity", facts.severity().getInBugReport()),
+                Map.entry("priority", facts.priority().getInBugReport()),
                 Map.entry("platform", cell(facts.platform())),
                 Map.entry("notAvailable", NOT_AVAILABLE),
                 Map.entry("actualResult", section(facts.actualResult())),

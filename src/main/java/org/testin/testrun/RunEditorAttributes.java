@@ -109,22 +109,22 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     BUG_SEVERITY(
             Bundle.message("attribute.run.bug.severity"),
             ToolBarDefault.ON,
-            item -> item.getBugSeverity().getLabel()
+            item -> item.isFailed() ? item.getBugSeverity().getLabel() : ""
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
-            Badges.addBugBadge(badges, runItem.getBugSeverity().getLabel(), runItem.getBugSeverity().getColor());
+            Badges.addBugBadge(badges, getRunValueExtractor().apply(runItem), runItem.getBugSeverity().getColor());
         }
     },
 
     BUG_PRIORITY(
             Bundle.message("attribute.run.bug.priority"),
             ToolBarDefault.ON,
-            item -> item.getBugPriority().getLabel()
+            item -> item.isFailed() ? item.getBugPriority().getLabel() : ""
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
-            Badges.addBugBadge(badges, runItem.getBugPriority().getLabel(), runItem.getBugPriority().getColor());
+            Badges.addBugBadge(badges, getRunValueExtractor().apply(runItem), runItem.getBugPriority().getColor());
         }
     },
 

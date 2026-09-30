@@ -41,8 +41,9 @@ Press the right verdict's key on the test case.
 - **Rule-EDITOR-PANEL-160** — Correcting a verdict re-stamps who recorded it and
   when. The original tester and the original time are gone.
 - **Rule-EDITOR-PANEL-161** — Changing a failed test case to passed asks first,
-  because it clears six things: the actual result, the error, the screenshots,
-  the bug severity, the bug priority and the bug issue link.
+  because it clears the actual result, the error, the screenshots and the bug
+  issue link. It also puts a bug severity or priority the tester chose back to
+  Enhancement and Low.
 - **Rule-EDITOR-PANEL-162** — Only passing clears anything. Failing and blocking
   clear nothing.
 - **Rule-EDITOR-PANEL-240** — Correcting a verdict keeps the test case it was

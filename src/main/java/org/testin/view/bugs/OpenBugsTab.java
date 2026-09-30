@@ -25,7 +25,6 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.TestRuns;
 import org.testin.model.BugIssueUrl;
-import org.testin.model.FailureDetail;
 import org.testin.model.OpenBug;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
@@ -54,7 +53,7 @@ public class OpenBugsTab {
 
         for (final OpenBug bug : bugs) {
             panel.add(left(heading(bug)));
-            if (FailureDetail.isTriaged(bug.item())) panel.add(left(severity(bug)));
+            if (bug.item().isFailed()) panel.add(left(severity(bug)));
             bug.item().bugIssue().ifPresent(url -> panel.add(left(issue(url))));
 
             if (!bug.item().getActualResult().isBlank()) panel.add(left(note(bug.item().getActualResult())));

@@ -23,12 +23,14 @@ import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
 
+import java.util.List;
+
 public record BugPrioritySection(@NotNull ComponentDialogBase<RadioSelection<BugPriority>> component) implements FailureSection {
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
     public static @NotNull BugPrioritySection of(final @NotNull TestRunItems runItem) {
         return new BugPrioritySection(ComponentDialogBase.<BugPriority>radios(RunEditorAttributes.BUG_PRIORITY.getName())
-                .options(BugPriority.CHOICES, BugPriority::getLabel)
-                .select(BugPriority.orDefault(runItem.getBugPriority()))
+                .options(List.of(BugPriority.values()), BugPriority::getLabel)
+                .select(runItem.getBugPriority())
                 .build());
     }
 

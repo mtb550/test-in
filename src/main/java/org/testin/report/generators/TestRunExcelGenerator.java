@@ -122,8 +122,8 @@ public final class TestRunExcelGenerator {
             ws.value(row, 1, orNotAvailable(details.getDescription()));
             ws.value(row, 2, result.shownStatus().getLabel());
             ws.value(row, 3, result.getActualResult());
-            ws.value(row, 4, result.getBugSeverity().getLabel());
-            ws.value(row, 5, result.getBugPriority().getLabel());
+            ws.value(row, 4, RunEditorAttributes.BUG_SEVERITY.getRunValueExtractor().apply(result));
+            ws.value(row, 5, RunEditorAttributes.BUG_PRIORITY.getRunValueExtractor().apply(result));
             ws.value(row, 6, Display.formatDuration(result.getDuration()));
             ws.value(row, 7, orNotAvailable(details.getExpectedResult()));
 

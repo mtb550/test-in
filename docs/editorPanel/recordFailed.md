@@ -45,8 +45,9 @@ form before it records anything.
   saving writes.
 - **Rule-EDITOR-PANEL-146** — The dialog opens for one test case. Several at
   once are failed with no detail collected.
-- **Rule-EDITOR-PANEL-147** — The bug severity starts at **Enhancement** and the
-  bug priority at **Low**.
+- **Rule-EDITOR-PANEL-147** — A bug severity nobody chose is **Enhancement**, and
+  a bug priority nobody chose is **Low**. The dialog starts there, and so does
+  an automated failure.
 - **Rule-EDITOR-PANEL-148** — The five fields - what happened, the bug severity,
   the bug priority, the stacktrace and the screenshots - are the same five the
   failure form in light mode uses, and each is drawn by a section of its own.

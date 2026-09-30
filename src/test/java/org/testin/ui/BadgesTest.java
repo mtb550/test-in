@@ -19,11 +19,15 @@ package org.testin.ui;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.Priority;
+import org.testin.model.TestRunItems;
+import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testrun.RunEditorAttributes;
 import org.testng.annotations.Test;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,12 +61,27 @@ public class BadgesTest {
 
     @Test
     public void aTestCaseThatNeverFailedDrawsNoPill() {
+        final List<Badge> badges = bugBadges(TestRunItems.builder().status(TestStatus.PASSED).build());
+
+        assertEquals(badges.size(), 0, "a severity is shown only on a failure, so a pass draws no badge");
+    }
+
+    @Test
+    public void aFailureTheTesterDidNotTriageDrawsItsDefaults() {
+        final List<Badge> badges = bugBadges(TestRunItems.builder().status(TestStatus.FAILED).build());
+
+        assertEquals(badges.size(), 1);
+        assertTrue(badges.getFirst() instanceof BugBadge bug && bug.text().equals("Enhancement / Low"),
+                "a severity and a priority nobody chose are Enhancement and Low");
+    }
+
+    private static List<Badge> bugBadges(final TestRunItems item) {
         final List<Badge> badges = new ArrayList<>();
 
-        Badges.addBugBadge(badges, BugSeverity.EMPTY.getLabel(), BugSeverity.EMPTY.getColor());
-        Badges.addBugBadge(badges, BugPriority.EMPTY.getLabel(), BugPriority.EMPTY.getColor());
+        RunEditorAttributes.BUG_SEVERITY.applyToUI(item, badges, new HashMap<>());
+        RunEditorAttributes.BUG_PRIORITY.applyToUI(item, badges, new HashMap<>());
 
-        assertEquals(badges.size(), 0, "an empty value is not a badge with no text, it is no badge");
+        return badges;
     }
 
     @Test
@@ -122,8 +141,6 @@ public class BadgesTest {
         final Set<Color> colors = new HashSet<>();
 
         for (final BugSeverity severity : BugSeverity.values()) {
-            if (severity == BugSeverity.EMPTY) continue;
-
             assertFalse(severity.getLabel().isBlank(), severity + " is drawn, so it needs a name");
             assertTrue(names.add(severity.getLabel()), severity + " repeats another severity's name");
             assertTrue(colors.add(new Color(severity.getColor().getRGB())), severity + " repeats another severity's color");

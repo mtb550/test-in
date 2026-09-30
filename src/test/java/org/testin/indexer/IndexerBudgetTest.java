@@ -64,8 +64,8 @@ public class IndexerBudgetTest {
                       "executedAt" : "Monday 14-09-2026 At 10:22:05 [Asia/Riyadh]",
                       "actualResult" : "The dashboard opened and the header showed the account name",
                       "stacktrace" : "",
-                      "bugSeverity" : "EMPTY",
-                      "bugPriority" : "EMPTY",
+                      "bugSeverity" : "ENHANCEMENT",
+                      "bugPriority" : "LOW",
                       "bugIssueUrl" : ""
                     }""".formatted(UUID.randomUUID(), i % 4 == 0 ? "FAILED" : "PASSED"));
         }

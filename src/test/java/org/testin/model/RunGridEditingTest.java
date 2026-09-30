@@ -113,8 +113,8 @@ public class RunGridEditingTest {
 
         assertEquals(row.getActualResult(), "");
         assertEquals(row.getStacktrace(), "");
-        assertEquals(row.getBugSeverity(), BugSeverity.EMPTY);
-        assertEquals(row.getBugPriority(), BugPriority.EMPTY);
+        assertEquals(row.getBugSeverity(), BugSeverity.ENHANCEMENT);
+        assertEquals(row.getBugPriority(), BugPriority.LOW);
         assertEquals(row.getStatus(), TestStatus.PASSED);
         assertEquals(row.getExecutedBy(), "mtb");
     }

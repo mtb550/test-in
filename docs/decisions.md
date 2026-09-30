@@ -105,9 +105,11 @@ and marker fields carry Lombok's `@NonNull`, which generates the runtime check;
 everything else carries the JetBrains `@NotNull` / `@Nullable` so the annotation
 is the contract.
 
-**Consequences.** `BugSeverity.EMPTY` and `BugPriority.EMPTY` are the pattern to
-copy. `Optional` is used as a field type on purpose — a popup built on first
-show, a service the application has not started, a run an editor has not loaded.
+**Consequences.** `Duration.ZERO` and `Config.NOT_EXECUTED` on a run result are
+the pattern to copy. `BugSeverity.EMPTY` and `BugPriority.EMPTY` were, until a
+severity nobody chose became Enhancement and a priority Low. `Optional` is used
+as a field type on purpose — a popup built on first show, a service the
+application has not started, a run an editor has not loaded.
 
 **If you are about to reverse it.** The `OptionalUsedAsFieldOrParameterType`
 inspection is switched off in `.idea/inspectionProfiles/Testin.xml`, and it is

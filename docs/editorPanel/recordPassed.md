@@ -41,8 +41,9 @@ duration.
 - **Rule-EDITOR-PANEL-137** — A verdict recorded on the test case the walk is
   timing also records how long it took.
 - **Rule-EDITOR-PANEL-138** — Recording a pass clears the actual result, the
-  error, the screenshots, the bug severity, the bug priority and the bug issue
-  link. A test case that passed has nothing to explain.
+  error, the screenshots and the bug issue link, and puts the bug severity and
+  priority back to Enhancement and Low. A test case that passed has nothing to
+  explain.
 - **Rule-EDITOR-PANEL-139** — The walk then moves to the next test case and
   starts timing it.
 - **Rule-EDITOR-PANEL-140** — One test case is one message. Several at once is
@@ -104,9 +105,9 @@ one, still saves it, and still says *Passed*. That is difference 19 on
 **An automated pass destroys a tester's notes without asking.** The confirmation
 in Rule-EDITOR-PANEL-138 is only on the keyboard path. A test case is failed and
 written up by hand. Automation re-runs it later and it passes. The actual
-result, the error, the screenshots, the severity, the priority and the bug issue
-link all go, with no dialog. A message titled *Failure detail cleared* names
-them afterward. That is difference 26.
+result, the error, the screenshots and the bug issue link all go, and the
+severity and priority go back to Enhancement and Low, with no dialog. A message
+titled *Failure detail cleared* names them afterward. That is difference 26.
 
 ---
 

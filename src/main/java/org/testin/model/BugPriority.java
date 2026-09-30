@@ -23,19 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 
 import java.awt.Color;
-import java.util.Arrays;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public enum BugPriority {
-    EMPTY(
-            "",
-            JBColor.background(),
-            ReportEmphasis.MUTED,
-            ""
-    ),
-
     HIGH(
             Bundle.message("bug.priority.high"),
             JBColor.RED.brighter().brighter(),
@@ -57,14 +48,10 @@ public enum BugPriority {
             "⚪ Low"
     );
 
-    public static final @NotNull List<BugPriority> CHOICES =
-            Arrays.stream(values()).filter(priority -> priority != EMPTY).toList();
+    // Rule-EDITOR-PANEL-147
+    public static final @NotNull BugPriority DEFAULT = LOW;
     private final @NotNull String label;
     private final @NotNull Color color;
     private final @NotNull ReportEmphasis emphasis;
     private final @NotNull String inBugReport;
-
-    public static @NotNull BugPriority orDefault(final @NotNull BugPriority stored) {
-        return stored == EMPTY ? LOW : stored;
-    }
 }

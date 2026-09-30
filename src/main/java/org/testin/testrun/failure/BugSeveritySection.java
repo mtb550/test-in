@@ -23,12 +23,14 @@ import org.testin.testrun.RunEditorAttributes;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
 
+import java.util.List;
+
 public record BugSeveritySection(@NotNull ComponentDialogBase<RadioSelection<BugSeverity>> component) implements FailureSection {
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
     public static @NotNull BugSeveritySection of(final @NotNull TestRunItems runItem) {
         return new BugSeveritySection(ComponentDialogBase.<BugSeverity>radios(RunEditorAttributes.BUG_SEVERITY.getName())
-                .options(BugSeverity.CHOICES, BugSeverity::getLabel)
-                .select(BugSeverity.orDefault(runItem.getBugSeverity()))
+                .options(List.of(BugSeverity.values()), BugSeverity::getLabel)
+                .select(runItem.getBugSeverity())
                 .build());
     }
 

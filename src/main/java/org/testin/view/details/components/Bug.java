@@ -30,7 +30,6 @@ import org.testin.editor.run.RunEditor;
 import org.testin.indexer.Nodes;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
@@ -53,7 +52,7 @@ public final class Bug {
     // UC-VIEW-PANEL-005, UC-VIEW-PANEL-016, Rule-VIEW-PANEL-031, Rule-VIEW-PANEL-086
     public static @NotNull Optional<JComponent> of(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull List<String> currentPath, final @NotNull TestCaseDto dto) {
         final @NotNull Optional<String> bugIssue = runItem.bugIssue();
-        if (runItem.shownStatus() != TestStatus.FAILED && bugIssue.isEmpty()) return Optional.empty();
+        if (!runItem.isFailed() && bugIssue.isEmpty()) return Optional.empty();
 
         return Services.getInstance(p, Nodes.class).find(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
                 .filter(TestRunDirectoryDto.class::isInstance)
@@ -98,11 +97,11 @@ public final class Bug {
 
     // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-086
     private static @NotNull Optional<JComponent> chip(final @NotNull TestRunItems runItem) {
+        if (!runItem.isFailed()) return Optional.empty();
+
         final @NotNull List<Badge> bug = new ArrayList<>();
         Badges.addBugBadge(bug, runItem.getBugSeverity().getLabel(), runItem.getBugSeverity().getColor());
         Badges.addBugBadge(bug, runItem.getBugPriority().getLabel(), runItem.getBugSeverity().getColor());
-
-        if (bug.isEmpty()) return Optional.empty();
 
         final @NotNull JBPanel<?> holder = AbstractDetails.row(0);
         Badges.showBadges(holder, bug);

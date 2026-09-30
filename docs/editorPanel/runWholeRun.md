@@ -100,9 +100,9 @@ test cases to run*.
 
 **A pass clears what a tester wrote by hand.** A test case is failed and written
 up in the morning. It is re-run in the afternoon and passes. The actual result,
-the error, the screenshots, the severity, the priority and the bug issue link
-all go, with no dialog. A message titled *Failure detail cleared* names them
-afterward. That is difference 26.
+the error, the screenshots and the bug issue link all go, and the severity and
+priority go back to Enhancement and Low, with no dialog. A message titled
+*Failure detail cleared* names them afterward. That is difference 26.
 
 ---
 

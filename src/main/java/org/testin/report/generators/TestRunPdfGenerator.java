@@ -329,7 +329,7 @@ public final class TestRunPdfGenerator {
         table.addCell(verdictCell(pri.getLabel(), rgb(pri.getEmphasis().getHexColor()), rowBg, boldFont));
 
         final @NotNull BugSeverity sev = item.getBugSeverity();
-        table.addCell(verdictCell(sev.getLabel().isEmpty() ? "—" : sev.getLabel(), rgb(sev.getEmphasis().getHexColor()), rowBg, boldFont));
+        table.addCell(verdictCell(sev.getLabel(), rgb(sev.getEmphasis().getHexColor()), rowBg, boldFont));
     }
 
     private @NotNull Cell verdictCell(final @NotNull String text, final @NotNull DeviceRgb color, final @NotNull DeviceRgb rowBg, final @NotNull PdfFont boldFont) {

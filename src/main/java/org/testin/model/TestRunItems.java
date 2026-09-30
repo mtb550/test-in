@@ -71,10 +71,10 @@ public class TestRunItems {
     private String actualResult = "";
     @NotNull
     @Builder.Default
-    private BugSeverity bugSeverity = BugSeverity.EMPTY;
+    private BugSeverity bugSeverity = BugSeverity.DEFAULT;
     @NotNull
     @Builder.Default
-    private BugPriority bugPriority = BugPriority.EMPTY;
+    private BugPriority bugPriority = BugPriority.DEFAULT;
     @NotNull
     @Builder.Default
     private Duration duration = Duration.ZERO;
@@ -130,6 +130,12 @@ public class TestRunItems {
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239
     public @NotNull TestStatus shownStatus() {
         return isRemoved() && !status.isVerdict() ? TestStatus.REMOVED : status;
+    }
+
+    // Rule-EDITOR-PANEL-253, Rule-VIEW-PANEL-064
+    @JsonIgnore
+    public boolean isFailed() {
+        return shownStatus() == TestStatus.FAILED;
     }
 
     public @NotNull Optional<String> bugIssue() {

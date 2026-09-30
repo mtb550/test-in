@@ -68,8 +68,9 @@ There is no key for this. The tab is called **Open Bugs**.
 1. **The run's name** — which cycle found this bug. It is the only thing that
    says when, so it is the heading rather than a detail.
 2. **The severity and the priority** — in the severity's own color, the same one
-   the run grid and every report paint it. Left out when neither was set, which
-   is how Report Bug files an automated failure.
+   the run grid and every report paint it. A failure nobody triaged reads
+   `Enhancement / Low`. Left out for a row that is not a failure, such as a
+   blocked one with a filed issue.
 3. **The issue** — the one the failure was filed as, when it was. Clicking it
    opens it in the browser, as the Details tab's link does.
 4. **What happened** — the actual result the tester wrote, when they wrote one.
@@ -89,9 +90,8 @@ The newest run comes first.
 test case in any test run*. That is an answer, not an apology: a test case with
 no bugs is the ordinary case.
 
-**If a row records a failure but no bug** — it is not drawn. An actual result
-without a severity, a priority or a filed issue is somebody saying what
-happened, not somebody filing a defect.
+**If a row is not a failure and has no filed issue** — it is not drawn. A
+pass, a block or a pending row records no bug.
 
 **If no test case is shown** — the tab reads *Select a test case to view its
 bugs*, and says nothing about any test case (Rule-VIEW-PANEL-038).

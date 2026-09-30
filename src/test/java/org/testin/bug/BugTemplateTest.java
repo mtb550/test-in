@@ -63,8 +63,6 @@ public class BugTemplateTest {
 
     private static @NotNull BugFacts nothingKnown() {
         return facts().toBuilder()
-                .severity(BugSeverity.EMPTY)
-                .priority(BugPriority.EMPTY)
                 .platform("")
                 .actualResult("")
                 .expectedResult(" ")
@@ -136,8 +134,8 @@ public class BugTemplateTest {
     public void everyPartTestinCannotGetSaysNotAvailable() {
         final String body = BugTemplate.body(nothingKnown(), Optional.empty());
 
-        assertEquals(body.split("n\\\\a", -1).length - 1, 17,
-                "5 in the summary, 7 sections and 5 in where it was found - 3 of them always");
+        assertEquals(body.split("n\\\\a", -1).length - 1, 15,
+                "3 in the summary, 7 sections and 5 in where it was found - 3 of them always");
         assertTrue(body.contains("| **Test case**                   | 07f7e754 in test set ActivateApp |"), "the test case shows without its link");
     }
 

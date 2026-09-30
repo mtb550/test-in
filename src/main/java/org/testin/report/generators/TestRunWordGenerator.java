@@ -328,7 +328,7 @@ public final class TestRunWordGenerator {
         shadeCell(sevCell, rowBg);
         setCellPadding(sevCell, 4, 6, 4, 6);
         final @NotNull BugSeverity sev = item.getBugSeverity();
-        setCellText(sevCell, sev.getLabel().isEmpty() ? "—" : sev.getLabel(), ReportFont.BODY.ptRounded(), true, sev.getEmphasis().getHexColor());
+        setCellText(sevCell, sev.getLabel(), ReportFont.BODY.ptRounded(), true, sev.getEmphasis().getHexColor());
     }
 
     private void autoFitToContent(final @NotNull XWPFTable table) {

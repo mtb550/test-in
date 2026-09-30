@@ -51,8 +51,8 @@ public class TestRunVerdictTest {
         item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
 
         assertEquals(item.getStatus(), TestStatus.PASSED);
-        assertEquals(item.getBugSeverity(), BugSeverity.EMPTY);
-        assertEquals(item.getBugPriority(), BugPriority.EMPTY);
+        assertEquals(item.getBugSeverity(), BugSeverity.ENHANCEMENT);
+        assertEquals(item.getBugPriority(), BugPriority.LOW);
         assertEquals(item.getActualResult(), "", "the failure text describes a failure that no longer exists");
         assertEquals(item.getStacktrace(), "", "likewise the stacktrace");
         assertTrue(item.getScreenshots().isEmpty(), "and the screenshots pasted with it (#50)");
@@ -82,8 +82,8 @@ public class TestRunVerdictTest {
         item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
 
         assertEquals(item.getStatus(), TestStatus.PASSED);
-        assertEquals(item.getBugSeverity(), BugSeverity.EMPTY);
-        assertEquals(item.getBugPriority(), BugPriority.EMPTY);
+        assertEquals(item.getBugSeverity(), BugSeverity.ENHANCEMENT);
+        assertEquals(item.getBugPriority(), BugPriority.LOW);
     }
 
     @Test
@@ -103,8 +103,8 @@ public class TestRunVerdictTest {
         item.recordVerdict(TestStatus.BLOCKED, "tester", new TestCaseDto());
         item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
 
-        assertEquals(item.getBugSeverity(), BugSeverity.EMPTY);
-        assertEquals(item.getBugPriority(), BugPriority.EMPTY);
+        assertEquals(item.getBugSeverity(), BugSeverity.ENHANCEMENT);
+        assertEquals(item.getBugPriority(), BugPriority.LOW);
         assertEquals(item.getActualResult(), "");
         assertEquals(item.getStacktrace(), "");
         assertEquals(item.getBugIssueUrl(), "");
@@ -132,5 +132,15 @@ public class TestRunVerdictTest {
         assertEquals(item.wouldClear(TestStatus.FAILED, new Failure("boom", "at Login.click")),
                 List.of("the actual result", "the stacktrace", "the screenshots"));
         assertEquals(item.wouldClear(TestStatus.FAILED, Failure.NONE), List.of(), "the keyboard's F asks nothing");
+    }
+
+    @Test
+    public void everyFailureRecordsABug() {
+        final TestRunItems failed = TestRunItems.builder().id(UUID.randomUUID()).status(TestStatus.FAILED).build();
+        final TestRunItems blocked = TestRunItems.builder().id(UUID.randomUUID()).status(TestStatus.BLOCKED).build();
+
+        assertTrue(FailureDetail.recordsABug(failed), "a failure is Enhancement / Low until the tester says otherwise");
+        assertFalse(FailureDetail.recordsABug(blocked), "a result that is not a failure records no bug");
+        assertTrue(FailureDetail.recordsABug(blocked.setBugIssueUrl(ISSUE)), "unless an issue was filed for it");
     }
 }

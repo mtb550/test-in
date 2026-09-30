@@ -48,14 +48,14 @@ public enum FailureDetail {
 
     BUG_SEVERITY(
             Bundle.message("failure.detail.bug.severity"),
-            item -> item.getBugSeverity() != BugSeverity.EMPTY,
-            item -> item.setBugSeverity(BugSeverity.EMPTY)
+            item -> item.getBugSeverity() != BugSeverity.DEFAULT,
+            item -> item.setBugSeverity(BugSeverity.DEFAULT)
     ),
 
     BUG_PRIORITY(
             Bundle.message("failure.detail.bug.priority"),
-            item -> item.getBugPriority() != BugPriority.EMPTY,
-            item -> item.setBugPriority(BugPriority.EMPTY)
+            item -> item.getBugPriority() != BugPriority.DEFAULT,
+            item -> item.setBugPriority(BugPriority.DEFAULT)
     ),
 
     BUG_ISSUE_URL(
@@ -72,12 +72,7 @@ public enum FailureDetail {
 
     // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-064
     public static boolean recordsABug(final @NotNull TestRunItems item) {
-        return isTriaged(item) || BUG_ISSUE_URL.filled.test(item);
-    }
-
-    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-006
-    public static boolean isTriaged(final @NotNull TestRunItems item) {
-        return BUG_SEVERITY.filled.test(item) || BUG_PRIORITY.filled.test(item);
+        return item.isFailed() || BUG_ISSUE_URL.filled.test(item);
     }
 
     public static @NotNull List<String> filledIn(final @NotNull TestRunItems item) {

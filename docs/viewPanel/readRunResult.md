@@ -38,8 +38,8 @@ test run.
   panel and a report on the same test run can never disagree.
 - **Rule-VIEW-PANEL-031** — A run value with nothing in it is not drawn.
 - **Rule-VIEW-PANEL-032** — Recording a pass clears the actual result, the
-  stacktrace, the bug severity, the bug priority and the bug issue link. The
-  band is left holding its line of pills.
+  stacktrace and the bug issue link, and puts the bug severity and priority back
+  to Enhancement and Low. The band is left holding its line of pills.
 - **Rule-VIEW-PANEL-033** — A test case the test run has not reached yet reads **Pending**.
 
 ## The screen
@@ -77,7 +77,8 @@ badges and above **Test case** (Rule-VIEW-PANEL-085).
    filled in. It is a measurement, not a verdict, and the frame says so.
 4. **The bug** — one chip carrying the severity and the priority together, in
    the severity's color, then the issue as `#123` - the whole address is on
-   hover - or **Report a bug** where there is no issue yet.
+   hover - or **Report a bug** where there is no issue yet. Only a failed
+   result has the chip, and a failure nobody triaged reads `Enhancement / Low`.
 5. **Actual result** — the one sentence the band holds, its caption on a line of
    its own above it (Rule-VIEW-PANEL-082).
 6. **Stacktrace** — the application's own error, which the panel never shows.
@@ -96,7 +97,7 @@ badges and above **Test case** (Rule-VIEW-PANEL-085).
 |-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | The first badge   | The verdict: **Passed**, **Failed**, **Blocked**, **Pending**, **Untested** or **Removed**, in the verdict's own color                                                                                                   |
 | The second badge  | How long the test case took, with a clock, in a plain frame with nothing filled in                                                                                                                                       |
-| The bug chip      | The severity and the priority in one chip, as `Blocker / High`, in the severity's color                                                                                                                                  |
+| The bug chip      | The severity and the priority in one chip, as `Blocker / High`, in the severity's color, on a failed result only                                                                                                         |
 | After the chip    | The GitHub issue the failure was reported as, as `#123` with the address on hover — or, where nothing has been reported, the **Report a bug** link that files one, never both. That is [UC-VIEW-PANEL-016](reportBug.md) |
 | **Actual Result** | What the tester says actually happened                                                                                                                                                                                   |
 | **Stacktrace**    | A link, never the error itself, and a thumbnail of each screenshot pasted with the failure. That is [UC-VIEW-PANEL-006](readStacktrace.md)                                                                               |
@@ -119,9 +120,10 @@ band is not drawn at all, not even its name. There is no test run to read from.
 The test case is drawn on its own. It then looks like a test case nobody has run.
 That is question 3 on [the view panel page](main.md#not-decided).
 
-**If the test case passed** — five values were cleared when the pass was
-recorded: the actual result, the stacktrace, the bug severity, the bug priority
-and the bug issue link. The band is left holding the verdict and the duration.
+**If the test case passed** — three values were cleared when the pass was
+recorded: the actual result, the stacktrace and the bug issue link. The bug
+severity and priority went back to Enhancement and Low, and a pass draws no bug
+chip. The band is left holding the verdict and the duration.
 
 **If nothing was timed** — the duration badge disappears and what is beside it
 closes the gap. A verdict recorded from the menu, or on several test cases at

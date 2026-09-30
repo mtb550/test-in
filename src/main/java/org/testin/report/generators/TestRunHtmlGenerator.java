@@ -195,7 +195,6 @@ public final class TestRunHtmlGenerator {
 
         final @NotNull BugPriority priority = item.getBugPriority();
         final @NotNull BugSeverity severity = item.getBugSeverity();
-        final @NotNull String severityText = severity.getLabel();
 
         html.append("</td>")
                 .append("<td class='verdict' style='color: ")
@@ -203,7 +202,7 @@ public final class TestRunHtmlGenerator {
                 .append(StringUtil.escapeXmlEntities(priority.getLabel())).append("</td>")
                 .append("<td class='verdict' style='color: ")
                 .append(severity.getEmphasis().getCssToken()).append("'>")
-                .append(StringUtil.escapeXmlEntities(severityText.isEmpty() ? "—" : severityText)).append("</td>");
+                .append(StringUtil.escapeXmlEntities(severity.getLabel())).append("</td>");
     }
 
     // UC-REPORT-001, Rule-REPORT-023, Rule-REPORT-024

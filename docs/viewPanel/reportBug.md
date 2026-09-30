@@ -151,8 +151,8 @@ Anything Testin cannot get reads `n\a`.
 
 | Part                             | Where it comes from                                               | Reads `n\a` when   |
 |----------------------------------|-------------------------------------------------------------------|--------------------|
-| **Severity**                     | The bug severity, with a colored dot                              | It is not set      |
-| **Priority**                     | The bug priority, with a colored dot                              | It is not set      |
+| **Severity**                     | The bug severity, with a colored dot                              | Never              |
+| **Priority**                     | The bug priority, with a colored dot                              | Never              |
 | **Platform**                     | The test run's platform and component                             | Both are empty     |
 | **Environment**                  | Nothing in Testin                                                 | Always             |
 | **Build**                        | Nothing in Testin                                                 | Always             |

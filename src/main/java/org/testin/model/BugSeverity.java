@@ -23,19 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 
 import java.awt.Color;
-import java.util.Arrays;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public enum BugSeverity {
-    EMPTY(
-            "",
-            JBColor.background(),
-            ReportEmphasis.MUTED,
-            ""
-    ),
-
     BLOCKER(
             Bundle.message("bug.severity.blocker"),
             JBColor.RED,
@@ -64,14 +55,10 @@ public enum BugSeverity {
             "🟢 Enhancement"
     );
 
-    public static final @NotNull List<BugSeverity> CHOICES =
-            Arrays.stream(values()).filter(severity -> severity != EMPTY).toList();
+    // Rule-EDITOR-PANEL-147
+    public static final @NotNull BugSeverity DEFAULT = ENHANCEMENT;
     private final @NotNull String label;
     private final @NotNull Color color;
     private final @NotNull ReportEmphasis emphasis;
     private final @NotNull String inBugReport;
-
-    public static @NotNull BugSeverity orDefault(final @NotNull BugSeverity stored) {
-        return stored == EMPTY ? ENHANCEMENT : stored;
-    }
 }
