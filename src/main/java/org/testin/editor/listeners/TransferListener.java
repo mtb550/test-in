@@ -96,7 +96,7 @@ public class TransferListener extends TransferHandler {
             }
 
             @Override
-            public @NotNull Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException {
+            public @NotNull Object getTransferData(final @NotNull DataFlavor flavor) throws UnsupportedFlavorException {
                 if (!FLAVOR.equals(flavor)) throw new UnsupportedFlavorException(flavor);
                 return items;
             }
