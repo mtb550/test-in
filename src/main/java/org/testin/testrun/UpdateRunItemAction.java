@@ -27,7 +27,6 @@ import org.testin.actions.TestinData;
 import org.testin.editor.run.RunEditor;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -83,7 +82,7 @@ public class UpdateRunItemAction extends AbstractAnyProjectAction {
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         GrayWithReason.unless(this, e, TestinData.runEditor(e)
                         .flatMap(runEditor -> TestinData.singleSelectedTestCase(e).flatMap(tc -> runEditor.runItem(tc.getId())))
-                        .filter(item -> item.shownStatus() == TestStatus.FAILED)
+                        .filter(TestRunItems::isFailed)
                         .isPresent(),
                 Bundle.message("run.item.details.disabled.description"));
     }
