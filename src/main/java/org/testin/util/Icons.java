@@ -43,9 +43,9 @@ public final class Icons {
     // UC-EDITOR-PANEL-001, UC-INTERNAL-001
     public static final @NotNull Icon TEST_CASE = gray(AllIcons.Nodes.Type);
 
-    public static final @NotNull Color GRAY = inBothThemes(0x6C707E);
-    public static final @NotNull Color RED = inBothThemes(0xDB3B4B);
-    public static final @NotNull Color GREEN = inBothThemes(0x208A3C);
+    public static final @NotNull Color GRAY = inBothThemes(Color.GRAY.darker());
+    public static final @NotNull Color RED = inBothThemes(Color.RED.darker());
+    public static final @NotNull Color GREEN = inBothThemes(Color.GREEN.darker());
 
     // UC-EDITOR-PANEL-005
     public static final @NotNull Icon TEST_CASE_LETTER = fieldLetter("tc", GREEN);
@@ -54,9 +54,7 @@ public final class Icons {
     private static final int DOT_SIZE = 10;
 
     // UC-EDITOR-PANEL-005
-    private static @NotNull JBColor inBothThemes(final int rgb) {
-        final @NotNull Color color = new Color(rgb);
-
+    private static @NotNull JBColor inBothThemes(final @NotNull Color color) {
         return new JBColor(color, color);
     }
 
