@@ -16,8 +16,8 @@
 
 package org.testin.ui.framework;
 
-import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
+import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -26,8 +26,8 @@ import java.awt.Color;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RowStripe {
-    private static final @NotNull Color EVEN = new JBColor(Gray._245, Gray._60);
-    private static final @NotNull Color ODD = new JBColor(Gray._230, Gray._45);
+    private static final @NotNull Color EVEN = JBColor.lazy(UIUtil::getListBackground);
+    private static final @NotNull Color ODD = JBColor.lazy(UIUtil::getDecoratedRowColor);
 
     public static @NotNull Color of(final int index) {
         return index % 2 == 0 ? EVEN : ODD;

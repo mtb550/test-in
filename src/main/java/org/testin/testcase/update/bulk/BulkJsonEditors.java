@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diff.DiffColors;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Document;
@@ -46,8 +47,6 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.ui.Gray;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.DialogComponent;
@@ -107,7 +106,7 @@ final class BulkJsonEditors implements DialogComponent {
 
         final @NotNull Color caretRowColor = Optional
                 .ofNullable(rightEditor.getColorsScheme().getColor(EditorColors.CARET_ROW_COLOR))
-                .orElseGet(() -> new JBColor(Gray._245, Gray._50));
+                .orElseGet(rightEditor.getColorsScheme()::getDefaultBackground);
         leftLineAttr.setBackgroundColor(caretRowColor);
 
         splitter = new JBSplitter(false, 0.5f);
@@ -268,17 +267,14 @@ final class BulkJsonEditors implements DialogComponent {
             if (highlighter.getLayer() == HighlighterLayer.SELECTION - 1) markup.removeHighlighter(highlighter);
         }
 
-        final @NotNull TextAttributes diffAttr = new TextAttributes();
-        diffAttr.setBackgroundColor(new JBColor(new Color(228, 250, 228), new Color(43, 61, 44)));
-
         for (int i = 0; i < markers.size(); i++) {
             final int index = i;
             valueAt(index)
                     .filter(current -> !current.equals(originalTextAt.apply(index)))
                     .ifPresent(_ -> {
                         final @NotNull RangeMarker marker = markers.get(index);
-                        markup.addRangeHighlighter(marker.getStartOffset(), marker.getEndOffset(),
-                                HighlighterLayer.SELECTION - 1, diffAttr, HighlighterTargetArea.EXACT_RANGE);
+                        markup.addRangeHighlighter(DiffColors.DIFF_INSERTED, marker.getStartOffset(), marker.getEndOffset(),
+                                HighlighterLayer.SELECTION - 1, HighlighterTargetArea.EXACT_RANGE);
                     });
         }
     }

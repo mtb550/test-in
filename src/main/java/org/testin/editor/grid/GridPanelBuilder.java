@@ -49,7 +49,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.event.TableModelEvent;
-import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -130,7 +129,7 @@ public class GridPanelBuilder {
                 final @NotNull String raw = Objects.toString(value, "");
                 textArea.setText(raw);
                 textArea.setFont(table.getFont());
-                textArea.setForeground(table.getForeground());
+                textArea.setForeground(isSelected ? EditorColors.SELECTION_FOREGROUND : table.getForeground());
                 wrapper.setBackground(isSelected ? SELECTION_BACKGROUND : RowStripe.of(row));
 
                 if (isSelected) {
@@ -418,12 +417,11 @@ public class GridPanelBuilder {
             }
         };
         table.putClientProperty(GRID_KIND_KEY, kind);
-        table.setUI(new BasicTableUI());
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         GridExcelBehavior.install(table);
         table.setSelectionBackground(SELECTION_BACKGROUND);
-        table.setSelectionForeground(table.getForeground());
+        table.setSelectionForeground(EditorColors.SELECTION_FOREGROUND);
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         table.setDefaultRenderer(Object.class, wrappingRenderer());
         table.setShowGrid(false);

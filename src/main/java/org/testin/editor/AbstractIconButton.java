@@ -18,11 +18,12 @@ package org.testin.editor;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
+import com.intellij.openapi.actionSystem.ActionButtonComponent;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionUiKind;
+import com.intellij.openapi.actionSystem.ex.ActionButtonLook;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.openapi.util.text.HtmlChunk;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.ActionSystem;
 import org.testin.ui.Tooltip;
@@ -35,8 +36,6 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -145,17 +144,7 @@ public abstract class AbstractIconButton extends JButton {
         g.fillRect(0, 0, getWidth(), getHeight());
 
         if ((on || hovered) && isEnabled()) {
-            final @NotNull Graphics2D g2 = (Graphics2D) g.create();
-            try {
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(on
-                        ? JBUI.CurrentTheme.ActionButton.pressedBackground()
-                        : JBUI.CurrentTheme.ActionButton.hoverBackground());
-                final int arc = JBUI.scale(6);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), arc, arc);
-            } finally {
-                g2.dispose();
-            }
+            ActionButtonLook.SYSTEM_LOOK.paintBackground(g, this, on ? ActionButtonComponent.PUSHED : ActionButtonComponent.POPPED);
         }
 
         super.paintComponent(g);

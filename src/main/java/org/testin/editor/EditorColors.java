@@ -18,6 +18,7 @@ package org.testin.editor;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -26,10 +27,8 @@ import java.awt.Color;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EditorColors {
-    public static final @NotNull Color SELECTION_BACKGROUND = new JBColor(
-            new Color(214, 230, 250),
-            new Color(37, 55, 76)
-    );
+    public static final @NotNull Color SELECTION_BACKGROUND = JBColor.lazy(() -> UIUtil.getListSelectionBackground(true));
+    public static final @NotNull Color SELECTION_FOREGROUND = JBColor.lazy(() -> UIUtil.getListSelectionForeground(true));
     public static final @NotNull Color SELECTION_BORDER = JBColor.blue;
 
     public static final @NotNull Color FILTER_ACTIVE = JBUI.CurrentTheme.Link.Foreground.ENABLED;
