@@ -1,7 +1,8 @@
 ---
-# Front matter, deliberately empty. Jekyll only processes a file that has it, and
-# without processing this would be served as literal SCSS.
 ---
+
+/* The empty front matter above is deliberate. Jekyll only processes a file that
+   has it, and without processing this would be served as literal SCSS. */
 
 @import "{{ site.theme }}";
 
