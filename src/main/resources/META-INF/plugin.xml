@@ -283,10 +283,6 @@
     <!-- testin-java.xml)                                                   -->
     <!-- ================================================================== -->
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Tab titles of Testin editors use the normal foreground, not the
-             "unknown file" color their non-physical virtual file would get -->
-        <editorTabColorProvider implementation="org.testin.editor.TestinTabColorProvider" order="first"/>
-
         <!-- Notices test data changing on disk - a hand edit, a pull, a branch
              switch - and reads the projects that changed again (#20) -->
         <vfs.asyncListener implementation="org.testin.indexer.TestinFileWatcher"/>

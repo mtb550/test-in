@@ -43,7 +43,6 @@ These are recorded decisions. They are listed so nobody "cleans" them.
 | What                                                          | Where                                                    | The decision                                                                            |
 |---------------------------------------------------------------|----------------------------------------------------------|-----------------------------------------------------------------------------------------|
 | `GRAY`, `RED`, `GREEN` are a `JBColor` whose halves are equal | `util/Icons.java` `GRAY`, `RED`, `GREEN`                 | Testin's icons are one color in both themes, on purpose - the pair says so              |
-| `@SuppressWarnings("UnstableApiUsage")`                       | `editor/TestinTabColorProvider.java` `getEditorTabColor` | The tab title color is the experimental half of the tab color interface. Open in #324   |
 | Run status badge colors                                       | `model/RunStatus.java` `PASSED`, `FAILED`, `RUNNING`     | Passed, failed and running read as green, red and amber to a tester regardless of theme |
 | The dialog surfaces                                           | `ui/dialogs/DialogStyle.java` `CONTENT`                  | Two named theme colors, chosen per theme by luminance. Rule-INTERNAL-099                |
 

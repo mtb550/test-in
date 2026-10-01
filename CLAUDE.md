@@ -268,7 +268,7 @@ silently has no effect costs more than the setting it was meant to hold.
   `DeclaredContractsTest.MAY_THROW` naming the contract, and a line here. The
   list said five while seven stood (#66, finding 268), which is why the test now
   owns the count. Its twin, `MAY_RETURN_NULL`, does the same for a `@Nullable`
-  return: all nine are platform overrides whose contract uses null. Testin's own
+  return: all seven are platform overrides whose contract uses null. Testin's own
   last three went to `Optional` in #352.
 
 ## Process

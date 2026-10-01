@@ -434,6 +434,9 @@ a code project that is about another.
 
 ## Decision-014 — The tab foreground hook is experimental, and Testin uses it
 
+*Superseded by Decision-017, 1 October 2026: the platform already gives a
+Testin tab the label color, so the hook went. Left as it was written.*
+
 **Context.** A Testin editor opens a file that is not on disk, and the IDE
 paints the tab title of such a file in the "unknown file" color — the brown a
 file with no status gets. Beside an ordinary Java tab it reads as a warning
@@ -526,6 +529,34 @@ is what this decision removed.
 
 ---
 
+## Decision-017 — A Testin tab takes the platform's own title color
+
+**Context.** Decision-014 kept an override of the experimental
+`EditorTabColorProvider.getEditorTabForegroundColor`, so every Marketplace
+verification carried *1 usage of experimental API* and the verifier gate had to
+leave `EXPERIMENTAL_API_USAGES` off (#324). Read in the 2026.2.1 jars, the
+platform colors a tab title from `FileStatusManager.getStatus(file)`, and a file
+that is not in the local file system and not special is `NOT_CHANGED`, which has
+no color, so the title gets `UIUtil.getLabelForeground()`. A Testin file is a
+`LightVirtualFile` on `TestinFileSystem`, a `NonPhysicalFileSystem`: it is
+neither. The override returned that same label color.
+
+**Decision.** `TestinTabColorProvider` is deleted, and `EXPERIMENTAL_API_USAGES`
+is back on the verifier's failure level. Decided 1 October 2026, after a sandbox
+run showed the tabs in the label color in both themes.
+
+**Consequences.** The plugin makes no experimental API call, the Marketplace
+page carries no warning line, and a new experimental call fails `Build` instead
+of reaching it. Nothing paints a Testin tab title any more; the platform does.
+
+**If you are about to reverse it.** Check first why the title turned brown. The
+brown is `FileStatus.UNKNOWN`, which only a file in the local file system can
+get, so a Testin file that starts answering `isInLocalFileSystem()` with true, or
+moves to the local file system, is the cause, and putting the override back
+would hide it behind an experimental call.
+
+---
+
 ## Superseded decisions
 
 Each is listed here with the number that replaced it, and its section above is
@@ -537,6 +568,7 @@ left exactly as it was written.
 | Decision-007 — An unknown SSH host is refused                        | Decision-012  | 19 September 2026 |
 | Decision-011 — Testin reads `testin.yml` and never writes it         | Decision-013  | 19 September 2026 |
 | Decision-010 — Testin's translations are reached by the IDE's locale | Decision-016  | 27 September 2026 |
+| Decision-014 — The tab foreground hook is experimental               | Decision-017  | 1 October 2026    |
 
 ---
 

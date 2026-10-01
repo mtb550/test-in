@@ -276,9 +276,9 @@ intellijPlatform {
             }
         }
 
-        // Ten of the twelve levels the verifier offers, so the gate fails on
-        // anything new rather than on the two it was narrowed to. Both of the
-        // levels that are off are named below, with what each would cost.
+        // Eleven of the twelve levels the verifier offers, so the gate fails on
+        // anything new rather than on the two it was narrowed to. The one level
+        // that is off is named below, with what it would cost.
         //
         // It was down to COMPATIBILITY_PROBLEMS and INVALID_PLUGIN while one
         // internal-API call needed the exception - ExecutionManager
@@ -286,26 +286,12 @@ intellijPlatform {
         // The stop now records the handler the execution topic hands it, so the
         // plugin makes no internal call and the level goes back on (#140).
         //
-        // EXPERIMENTAL_API_USAGES is the one level deliberately left off, for
-        // one usage that has no stable equivalent at all:
-        // EditorTabColorProvider.getEditorTabForegroundColor, overridden to
-        // color a Testin tab's title. The stable half of that interface colors
-        // the background, and the other route, the VCS file status provider, is
-        // internal. It is still experimental in 2026.2. Drop it, with its
-        // SuppressWarnings, the release JetBrains makes it stable.
+        // EXPERIMENTAL_API_USAGES is on since #324: the last experimental call,
+        // the tab title color override, went once the platform was found to give
+        // a Testin tab the label color by itself (Decision-017).
         //
-        // WriteIntentReadAction.run was the other one, in light mode's failure
-        // form and on the toolbar buttons. Both now hand their work to the
-        // action system through ActionSystem.perform, which takes the lock with
-        // stable calls only.
-        //
-        // The override fails to compile if the platform drops it, which is the
-        // warning that matters. Turning this level on would fail the build for
-        // a decision already made rather than for anything new.
-        //
-        // MISSING_DEPENDENCIES is the second, and it is off for the opposite
-        // reason - not a decision to live with, but a report of the thing
-        // working. Testin declares com.intellij.java, com.intellij.modules.java
+        // MISSING_DEPENDENCIES is off, and not as a decision to live with but as
+        // a report of the thing working. Testin declares com.intellij.java, com.intellij.modules.java
         // and TestNG-J optional so the Java and TestNG code loads only in an IDE
         // that has them, which is what took PyCharm from 159 compatibility
         // problems to zero (#144). The verifier then lists all three as
@@ -321,6 +307,7 @@ intellijPlatform {
                 FailureLevel.COMPATIBILITY_WARNINGS,
                 FailureLevel.COMPATIBILITY_PROBLEMS,
                 FailureLevel.DEPRECATED_API_USAGES,
+                FailureLevel.EXPERIMENTAL_API_USAGES,
                 FailureLevel.SCHEDULED_FOR_REMOVAL_API_USAGES,
                 FailureLevel.INTERNAL_API_USAGES,
                 FailureLevel.OVERRIDE_ONLY_API_USAGES,

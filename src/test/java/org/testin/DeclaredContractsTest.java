@@ -54,8 +54,6 @@ public class DeclaredContractsTest {
     private static final @NotNull Map<String, String> MAY_RETURN_NULL = Map.ofEntries(
             entry("TestinFileSystem.findFileByPath", "VirtualFileSystem's contract: null is no such file"),
             entry("TestinFileSystem.refreshAndFindFileByPath", "VirtualFileSystem's contract: null is no such file"),
-            entry("TestinTabColorProvider.getEditorTabColor", "EditorTabColorProvider's contract: null is the default tab color"),
-            entry("TestinTabColorProvider.getEditorTabForegroundColor", "EditorTabColorProvider's contract: null is the default foreground"),
             entry("TransferListener.createTransferable", "TransferHandler's contract: null is nothing to drag"),
             entry("TreeTransferHandler.createTransferable", "TransferHandler's contract: null is nothing to drag"),
             entry("TreeDropHandler.handleDrop", "FileDropHandler is a Kotlin suspend function, whose Java face answers an Object that may be null"),
