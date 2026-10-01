@@ -78,6 +78,9 @@ This changes a test run that is not signed off yet.
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
+- **Rule-TREE-PANEL-128** — Saving changes the test run as it is when the save
+  lands, not as it was when the dialog opened. A verdict that arrived while the
+  dialog was open, from a pull or from the test run being worked on, is kept.
 
 ## What the tester sees
 

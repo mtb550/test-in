@@ -49,9 +49,6 @@ public class PackagesWithoutTestsTest {
             "navigate",
             "an extension point whose in-core answer is the empty one; the implementation that navigates lives in testin-java and needs that plugin",
 
-            "lightmode",
-            "one window that paints, animates and reads the run editor beside it - a sandbox pass, not an assertion",
-
             "open",
             "two actions that open the node the tester selected, through the editors and the tool window - ideTest",
 

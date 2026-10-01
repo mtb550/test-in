@@ -234,7 +234,7 @@ silently has no effect costs more than the setting it was meant to hold.
   that remain are declarations rather than work, and this list is the record of
   why - not a comment above each one, which the no-comment rule forbids and the
   September sweep removed. Counted on 1 October 2026: five in `src/main`,
-  twenty-four in `src/test`, none in `testin-java` or `testin-testng`, and every
+  twenty-eight in `src/test`, none in `testin-java` or `testin-testng`, and every
   one of them is below. `DeclaredContractsTest` holds the same five with their
   reasons and fails on a sixth, so this list can no longer drift from the code
   unnoticed. Do not sweep them again:
@@ -254,8 +254,8 @@ silently has no effect costs more than the setting it was meant to hold.
     catches it: throwing is how the platform is told to stay open and print the
     message under the field. Catching it and notifying instead would hand the
     dialog a success it did not have, and close it over a refused value.
-  - The 24 `protected void setUp() throws Exception` and `tearDown() throws
-    Exception` overrides in the twelve `*IdeTest` classes — `BasePlatformTestCase`
+  - The 28 `protected void setUp() throws Exception` and `tearDown() throws
+    Exception` overrides in the fourteen `*IdeTest` classes — `BasePlatformTestCase`
     declares both that way, so an override cannot narrow them. The test framework
     is the one owner above, and it is the right one: a fixture that failed to set
     up or to clean up is an error about the test rather than something to report

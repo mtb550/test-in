@@ -67,9 +67,12 @@ record EditTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull 
         return new RunFormAction(Bundle.message("run.edit.title"), StatusBarShortcut.SAVE, (form, selection) -> save(run, form, selection));
     }
 
-    // UC-TREE-PANEL-022, Rule-TREE-PANEL-074, Rule-TREE-PANEL-076
     private boolean save(final @NotNull TestRunDirectoryDto run, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection) {
-        final @NotNull String name = form.getRunName();
+        return saveEdit(run, form.getRunName(), RunForm.checkedTestCases(selection), RunForm.offeredTestCases(selection), TestRunConfiguration.answered(form.configuration()));
+    }
+
+    // UC-TREE-PANEL-022, Rule-TREE-PANEL-060, Rule-TREE-PANEL-074, Rule-TREE-PANEL-076, Rule-TREE-PANEL-128
+    boolean saveEdit(final @NotNull TestRunDirectoryDto run, final @NotNull String name, final @NotNull Set<UUID> checked, final @NotNull Set<UUID> offered, final @NotNull Map<TestRunConfiguration, String> configuration) {
         if (name.isEmpty()) {
             notifier.softRefuse(p, Bundle.message("run.needs.a.name"));
             return false;
@@ -86,10 +89,6 @@ record EditTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull 
         }
 
         if (!name.equals(run.getName()) && NodeRename.refused(p, run, name)) return false;
-
-        final @NotNull Set<UUID> checked = RunForm.checkedTestCases(selection);
-        final @NotNull Set<UUID> offered = RunForm.offeredTestCases(selection);
-        final @NotNull Map<TestRunConfiguration, String> configuration = TestRunConfiguration.answered(form.configuration());
 
         applyEdit(run, name, runPath -> {
             testRuns.changeRun(runPath, held -> held.cover(wanted(held, checked, offered::contains)));

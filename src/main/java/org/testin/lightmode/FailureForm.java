@@ -123,7 +123,7 @@ class FailureForm extends JBPanel<FailureForm> implements DialogHost {
         }
     }
 
-    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145, Rule-EDITOR-PANEL-219
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145, Rule-EDITOR-PANEL-219, Rule-EDITOR-PANEL-256
     boolean save() {
         return runStatusService.recordFailureDetails(runPath, runItem.getId(), fields);
     }

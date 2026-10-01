@@ -642,6 +642,11 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
   a short floor, and the page arrows keep their width to the last.
 - **Rule-EDITOR-PANEL-252** — A badge's words are printed white or dark,
   whichever reads on its color, so a pale badge never carries white text.
+- **Rule-EDITOR-PANEL-256** — Saving the failure form writes the actual result,
+  the bug severity and priority, the error and the screenshots onto the test run
+  as the index holds it, never onto the copy the window was drawn from. A
+  failure saved while the test run is read again, or while a sync is bringing it
+  in, is kept.
 
 **Why 200 milliseconds.** `P` is pressed once per test case, so a run of a
 hundred test cases is a hundred of these, and the tester is watching the

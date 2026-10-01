@@ -114,7 +114,7 @@ public final class RunStatusService {
         return true;
     }
 
-    // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167
+    // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167, Rule-EDITOR-PANEL-256
     public boolean recordFailureDetails(final @NotNull Path runPath, final @NotNull UUID testCaseId, final @NotNull FailureFields fields) {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
         final @NotNull Optional<TestRunDto> run = heldRun(runPath);
