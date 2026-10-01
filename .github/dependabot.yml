@@ -2,9 +2,8 @@
 # build.yml like any other - which is the point. An update that breaks the
 # plugin says so before it is merged rather than after.
 #
-# Not covered here: the Gradle wrapper. Dependabot's Gradle ecosystem reads
-# build files and the version catalog, and does not touch
-# gradle/wrapper/gradle-wrapper.properties, so that one stays a hand edit.
+# The Gradle ecosystem covers the wrapper as well: it opened the 9.7.1 to
+# 9.8.0 update (#356), which arrives as its own pull request like any other.
 version: 2
 
 updates:
