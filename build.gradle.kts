@@ -77,12 +77,15 @@ java {
 // #377: NullAway fails compileJava on a null reaching what the annotations say
 // cannot take one, in all three modules. Every other Error Prone check is off,
 // so this is a null gate and not an Error Prone sweep; the tests are not checked.
+val errorprone = libs.errorprone
+val nullaway = libs.nullaway
+
 allprojects {
     apply(plugin = "net.ltgt.errorprone")
 
     dependencies {
-        "errorprone"(rootProject.libs.errorprone)
-        "errorprone"(rootProject.libs.nullaway)
+        "errorprone"(errorprone)
+        "errorprone"(nullaway)
     }
 
     tasks.withType<JavaCompile>().configureEach {
@@ -101,11 +104,13 @@ allprojects {
 // compiled classes and does not wait for compileJava. The core gets its library
 // jars so PMD can resolve platform types; the two modules' jars would include
 // the core's own, which would wait for it.
+val pmdVersion = libs.versions.pmd.get()
+
 allprojects {
     apply(plugin = "pmd")
 
     pmd {
-        toolVersion = rootProject.libs.versions.pmd.get()
+        toolVersion = pmdVersion
         ruleSets = listOf()
         ruleSetFiles = rootProject.files(".github/complexity-rules.xml")
         isConsoleOutput = true
@@ -186,6 +191,12 @@ dependencies {
     implementation(libs.fastexcel)
     implementation(libs.poi)
     implementation(libs.poi.ooxml)
+
+    // POI 5.5.1, the latest, brings log4j-api 2.24.3, which CVE-2026-49844 covers
+    // (2.13.1 to 2.25.4): it ships in the plugin, so the fixed release is pinned.
+    constraints {
+        implementation(libs.log4j.api)
+    }
 
     // The architecture rules, read off the bytecode rather than off CLAUDE.md
     // (#114). testImplementation only: it never reaches the distribution.
