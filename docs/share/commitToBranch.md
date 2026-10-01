@@ -32,6 +32,10 @@ There is no key for this. The **Branch** box is in the review.
   branch yet starts one.
 - **Rule-SHARE-065** — If the branch cannot be checked out, nothing at all is
   committed.
+- **Rule-SHARE-126** — Choosing a branch in the box checks out the branch the
+  box names. A local branch whose name holds a slash, such as feature/login, is
+  that local branch, never a remote one, so nothing is checked out under a
+  shortened name.
 
 ## The screen
 

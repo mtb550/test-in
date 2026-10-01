@@ -76,6 +76,7 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
         });
     }
 
+    // Rule-EDITOR-PANEL-255
     public void testUndoingAPasteWhoseSourceSetIsGoneLeavesTheTestCasesInTheDestination() {
         final TestSetDirectoryDto destination = checkoutSet();
 

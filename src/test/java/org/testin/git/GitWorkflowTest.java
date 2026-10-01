@@ -42,6 +42,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
+import static org.testin.git.LocalGit.git;
+import static org.testin.git.LocalGit.mustGit;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -53,34 +55,10 @@ public class GitWorkflowTest {
 
     private Path work;
 
-    private static @NotNull Optional<String> git(final Path directory, final String... arguments) {
-        final List<String> command = new ArrayList<>();
-        command.add("git");
-        command.addAll(List.of(arguments));
-
-        try {
-            final Process process = new ProcessBuilder(command)
-                    .directory(directory.toFile())
-                    .redirectErrorStream(true)
-                    .start();
-
-            final String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            return process.waitFor() == 0 ? Optional.of(output) : Optional.empty();
-
-        } catch (final IOException | InterruptedException ex) {
-            return Optional.empty();
-        }
-    }
-
-    private static @NotNull String mustGit(final Path directory, final String... arguments) {
-        return git(directory, arguments).orElseThrow(() -> new AssertionError(
-                "git " + String.join(" ", arguments) + " failed in " + directory));
-    }
-
     @BeforeMethod
     public void createRepositories() {
         try {
-            if (git(Path.of("."), "--version").isEmpty()) {
+            if (!LocalGit.onThePath()) {
                 throw new SkipException("Git is not on the PATH, so the workflow cannot be exercised");
             }
 

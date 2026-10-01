@@ -68,6 +68,9 @@ own.
   a short floor, and the page arrows keep their width to the last.
 - **Rule-EDITOR-PANEL-252** — A badge's words are printed white or dark,
   whichever reads on its color, so a pale badge never carries white text.
+- **Rule-EDITOR-PANEL-255** — An undo of a move whose test set they came from is
+  gone, or renamed since, is refused. The test cases stay where they landed and
+  nothing is deleted from either set.
 
 ## What the tester sees
 

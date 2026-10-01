@@ -95,6 +95,7 @@ public class GitRefsTest {
         assertEquals(GitRefs.localNameOf("main"), "main");
     }
 
+    // Rule-SHARE-126
     @Test
     public void aLocalBranchWithASlashIsNotARemoteBranch() {
         assertFalse(GitRefs.isRemoteBranch("feature/login", List.of("feature/login", "main"), List.of("origin")));

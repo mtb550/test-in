@@ -139,7 +139,7 @@ public final class GitRefs {
         return remoteBranchName.substring(remoteBranchName.indexOf('/') + 1);
     }
 
-    // UC-TREE-PANEL-026, Rule-TREE-PANEL-086
+    // UC-TREE-PANEL-026, Rule-TREE-PANEL-086, Rule-SHARE-126
     public static boolean isRemoteBranch(final @NotNull String branch, final @NotNull List<String> localBranches, final @NotNull List<String> remotes) {
         return !localBranches.contains(branch)
                 && remotes.stream().map(String::trim).filter(remote -> !remote.isEmpty()).anyMatch(remote -> branch.startsWith(remote + "/"));

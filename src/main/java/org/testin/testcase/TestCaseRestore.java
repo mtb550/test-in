@@ -66,6 +66,7 @@ final class TestCaseRestore {
         written.forEach(snapshot -> ViewToolWindowFactory.refreshIfShowing(p, snapshot.present()));
     }
 
+    // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-255
     private static boolean stillStands(final @NotNull Project p, final @NotNull TestCaseSnapshot snapshot) {
         return Services.getInstance(p, Nodes.class).nodeExists(snapshot.testSetPath())
                 && snapshot.sameAs(TestCaseSnapshot.of(p, snapshot.testSetPath(), snapshot.ids()), Services.getInstance(p, Mapper.class));

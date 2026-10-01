@@ -65,6 +65,7 @@ public class RescanKeepsTheIndexIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
+    // Rule-INTERNAL-081
     public void testNothingDisappearsWhileTheProjectIsReadAgain() {
         final Path project = SyntheticTree.write(root, SETS, TEST_CASES_PER_SET);
         indexer().scanSingleProject(project);
