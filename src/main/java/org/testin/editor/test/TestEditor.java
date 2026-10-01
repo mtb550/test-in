@@ -42,7 +42,6 @@ import org.testin.model.Modules;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.runner.TestCaseExecutionSubscriber;
-import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestEditorAttributes;

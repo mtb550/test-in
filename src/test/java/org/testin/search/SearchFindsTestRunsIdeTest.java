@@ -77,11 +77,11 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), DirectoryMapper.class);
     }
 
-    private @NotNull TestCases testCases() {
+    private @NotNull TestCases indexedTestCases() {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
-    private @NotNull TestRuns testRuns() {
+    private @NotNull TestRuns indexedTestRuns() {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
@@ -104,7 +104,7 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
                 .build();
         tc.setParent(login);
 
-        testCases().putTestCaseVerbatim(login.getPath(), tc);
+        indexedTestCases().putTestCaseVerbatim(login.getPath(), tc);
         return tc;
     }
 
@@ -117,7 +117,7 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
             return path;
         });
 
-        testRuns().putTestRun(runPath, new TestRunDto().setResults(List.of(new TestRunItems().setId(testCaseId).setStatus(TestStatus.PASSED))));
+        indexedTestRuns().putTestRun(runPath, new TestRunDto().setResults(List.of(new TestRunItems().setId(testCaseId).setStatus(TestStatus.PASSED))));
         return runPath;
     }
 

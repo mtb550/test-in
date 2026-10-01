@@ -145,11 +145,6 @@ final class IndexerDataStore {
         return Optional.ofNullable(testCaseStore.getTestCasesById().get(id));
     }
 
-    @NotNull
-    TestSetDirectoryDto getTestSetDirByPath(final @NotNull Path path) {
-        return indexed(testSetsDirByPath.get(path.toString()), TestSetDirectoryDto.class, path);
-    }
-
     // UC-INTERNAL-004, Rule-INTERNAL-033
     boolean putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
         if (!testCaseStore.put(testSetPath, tc)) return false;

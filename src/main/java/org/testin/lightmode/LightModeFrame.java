@@ -176,7 +176,7 @@ final class LightModeFrame {
     }
 
     // UC-EDITOR-PANEL-046
-    void resizable(final @NotNull Runnable onWidthChanged) {
+    void resizable(final @NotNull Runnable onResized) {
         frame.setMinimumSize(new Dimension(JBUI.scale(MIN_WIDTH), 0));
 
         final @NotNull JComponent content = content();
@@ -191,7 +191,7 @@ final class LightModeFrame {
                 if (frame.getWidth() == lastWidth) return;
 
                 lastWidth = frame.getWidth();
-                onWidthChanged.run();
+                onResized.run();
             }
         });
     }

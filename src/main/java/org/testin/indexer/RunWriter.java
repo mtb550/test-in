@@ -129,7 +129,7 @@ final class RunWriter {
     private void sweepScreenshots(final @NotNull Path runPath, final @NotNull Set<String> named) {
         files.screenshotsIn(runPath).stream()
                 .filter(file -> !named.contains(file.getFileName().toString()))
-                .forEach(file -> files.delete(file));
+                .forEach(files::delete);
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219

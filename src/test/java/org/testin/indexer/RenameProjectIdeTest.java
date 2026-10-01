@@ -58,7 +58,7 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), ProjectIndexer.class);
     }
 
-    private @NotNull TestCases testCases() {
+    private @NotNull TestCases indexedTestCases() {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
@@ -145,8 +145,8 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         final Path to = root.resolve("Nafath_App");
         rename(tp.getPath(), to);
 
-        final TestCaseDto tc = testCases().findTestCase(id).orElseThrow();
-        final TestCaseFile file = testCases().testCaseFile(tc).orElseThrow();
+        final TestCaseDto tc = indexedTestCases().findTestCase(id).orElseThrow();
+        final TestCaseFile file = indexedTestCases().testCaseFile(tc).orElseThrow();
 
         assertEquals("the case is placed in the renamed project", to, file.testProject());
         assertEquals("the case lost its hand-named file", "login.tc", file.inProject().getFileName().toString());

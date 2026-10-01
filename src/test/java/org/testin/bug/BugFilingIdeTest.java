@@ -85,11 +85,11 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private @NotNull TestCases testCases() {
+    private @NotNull TestCases indexedTestCases() {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
-    private @NotNull TestRuns testRuns() {
+    private @NotNull TestRuns indexedTestRuns() {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
@@ -107,7 +107,7 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
 
     private @NotNull RunItem runItem(final UUID testCaseId, final TestStatus status) {
         final TestRunItems item = TestRunItems.builder().id(testCaseId).status(status).build();
-        testRuns().putTestRun(runPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
+        indexedTestRuns().putTestRun(runPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
         return new RunItem(runPath(), testCaseId);
     }
 
@@ -124,12 +124,12 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
 
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
         tc.setParent(ts);
-        testCases().putTestCase(ts.getPath(), tc);
+        indexedTestCases().putTestCase(ts.getPath(), tc);
         return tc.getId();
     }
 
     private @NotNull String storedLink(final RunItem item) {
-        return testRuns().findTestRun(item.run()).flatMap(item::in).orElseThrow().getBugIssueUrl();
+        return indexedTestRuns().findTestRun(item.run()).flatMap(item::in).orElseThrow().getBugIssueUrl();
     }
 
     public void testAFailedRunItemKeepsTheIssue() {
@@ -153,7 +153,7 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         final RunItem gone = new RunItem(runPath(), UUID.randomUUID());
 
         assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), gone, ISSUE));
-        assertTrue("storing on the old path registered the run again", testRuns().findTestRun(runPath()).isEmpty());
+        assertTrue("storing on the old path registered the run again", indexedTestRuns().findTestRun(runPath()).isEmpty());
     }
 
     public void testARemovedRunItemIsNotWritten() {

@@ -48,7 +48,6 @@ import java.util.Map;
 class FailureForm extends JBPanel<FailureForm> implements DialogHost {
     private final @NotNull FailureFields fields;
     private final @NotNull TestRunItems runItem;
-    private final @NotNull Project p;
     private final @NotNull Path runPath;
     private final @NotNull RunStatusService runStatusService;
     private final @NotNull Map<Component, Font> baseFonts = new HashMap<>();
@@ -57,7 +56,6 @@ class FailureForm extends JBPanel<FailureForm> implements DialogHost {
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-202
     FailureForm(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem, final float zoom, final @NotNull Runnable resized, final @NotNull Runnable onEnter) {
-        this.p = p;
         this.runPath = runPath;
         this.runStatusService = Services.getInstance(p, RunStatusService.class);
         this.runItem = runItem;

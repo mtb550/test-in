@@ -16,6 +16,8 @@
 
 package org.testin.model;
 
+import org.jetbrains.annotations.NotNull;
+import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testng.annotations.Test;
@@ -42,7 +44,10 @@ public class DirectoryIdentityTest {
 
     @Test
     public void twoKindsAtOnePathAreTwoNodes() {
-        assertNotEquals(TestSetPackageDirectoryDto.builder().path(LOGIN).build(), TestSetDirectoryDto.builder().path(LOGIN).build());
+        final @NotNull DirectoryDto testSetPackage = TestSetPackageDirectoryDto.builder().path(LOGIN).build();
+        final @NotNull DirectoryDto testSet = TestSetDirectoryDto.builder().path(LOGIN).build();
+
+        assertNotEquals(testSetPackage, testSet);
     }
 
     @Test

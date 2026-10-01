@@ -28,7 +28,6 @@ import org.testin.util.SeparatedValues;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -98,7 +97,7 @@ public class ImportCsv {
     // UC-SHARE-005, Rule-SHARE-124
     private @NotNull List<List<String>> parseCsvRecords(final @NotNull File file) {
         try {
-            final @NotNull String text = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+            final @NotNull String text = Files.readString(file.toPath());
             return SeparatedValues.split(text, ',').stream()
                     .filter(fields -> !fields.stream().allMatch(String::isEmpty))
                     .toList();

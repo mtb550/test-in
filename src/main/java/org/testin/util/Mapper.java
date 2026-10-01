@@ -113,14 +113,4 @@ public final class Mapper {
             return mapper.createObjectNode();
         }
     }
-
-    public @NotNull <T> T convertValue(final @NotNull Object fromValue, final @NotNull Class<T> toValueType) {
-        try {
-            return mapper.convertValue(fromValue, toValueType);
-
-        } catch (final Exception ex) {
-            Logger.error("Failed to convert value to class " + toValueType.getSimpleName());
-            throw new IllegalStateException(FailureText.of(ex), ex);
-        }
-    }
 }

@@ -54,7 +54,7 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private @NotNull TestCases testCases() {
+    private @NotNull TestCases indexedTestCases() {
         return Services.getInstance(getProject(), TestCases.class);
     }
 
@@ -84,7 +84,7 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
         testProject("NAFATH2");
         final TestCaseDto tc = testCase(testSet(tp));
 
-        final TestCaseFile file = testCases().testCaseFile(tc).orElseThrow();
+        final TestCaseFile file = indexedTestCases().testCaseFile(tc).orElseThrow();
 
         assertEquals("the case was placed in the wrong test project", tp.getPath(), file.testProject());
         assertEquals("the case's file is not where the store writes it",
@@ -94,6 +94,6 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
     public void testATestCaseNoIndexedTestProjectHoldsHasNoFile() {
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).build();
 
-        assertTrue("a case with no test set was given a file", testCases().testCaseFile(tc).isEmpty());
+        assertTrue("a case with no test set was given a file", indexedTestCases().testCaseFile(tc).isEmpty());
     }
 }

@@ -108,7 +108,7 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
         }
     }
 
-    private @NotNull TestRuns testRuns() {
+    private @NotNull TestRuns indexedTestRuns() {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
@@ -134,7 +134,7 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
             results.add(new TestRunItems().setId(testCaseId).setStatus(TestStatus.PASSED));
         }
 
-        testRuns().putTestRun(runPath, new TestRunDto().setResults(results));
+        indexedTestRuns().putTestRun(runPath, new TestRunDto().setResults(results));
         return runPath;
     }
 
@@ -151,7 +151,7 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
 
         writePulledResult(resultOf(run, PULLED_TEST_CASE));
 
-        testRuns().changeRun(run, tr -> tr.setResults(new ArrayList<>(tr.getResults().stream()
+        indexedTestRuns().changeRun(run, tr -> tr.setResults(new ArrayList<>(tr.getResults().stream()
                 .filter(item -> item.getId().equals(JUDGED_TEST_CASE))
                 .toList())));
 
@@ -173,8 +173,8 @@ public class RunResultFilesIdeTest extends BasePlatformTestCase {
         awaitFile(resultOf(run, UNTICKED_TEST_CASE), "the run's results never reached disk");
         final String untouched = read(resultOf(run, UNTICKED_TEST_CASE));
 
-        testRuns().findTestRun(run).orElseThrow().resultOf(UNTICKED_TEST_CASE).orElseThrow().setActualResult("Not saved yet");
-        testRuns().changeResult(run, JUDGED_TEST_CASE, item -> item.setStatus(TestStatus.FAILED));
+        indexedTestRuns().findTestRun(run).orElseThrow().resultOf(UNTICKED_TEST_CASE).orElseThrow().setActualResult("Not saved yet");
+        indexedTestRuns().changeResult(run, JUDGED_TEST_CASE, item -> item.setStatus(TestStatus.FAILED));
 
         await("the verdict never reached its result file", () -> read(resultOf(run, JUDGED_TEST_CASE)).contains("FAILED"));
         assertEquals("a verdict on one case rewrote the result of another", untouched, read(resultOf(run, UNTICKED_TEST_CASE)));

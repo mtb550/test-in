@@ -122,18 +122,18 @@ public class RuleCoverageTest {
         }
 
         final @NotNull String summary = "Rules a test proves: " + covered + " of " + total;
-        write(REPORT, "# " + summary + "\n\nA rule is proven when a test method carries its marker - `// Rule-PART-NNN` above the method.\n\n"
+        writeReport("# " + summary + "\n\nA rule is proven when a test method carries its marker - `// Rule-PART-NNN` above the method.\n\n"
                 + parts + "\n# The rules no test proves\n" + unproven);
 
         Logger.info(summary + " - the rules no test proves are listed in " + REPORT);
     }
 
-    private static void write(final @NotNull Path file, final @NotNull String text) {
+    private static void writeReport(final @NotNull String text) {
         try {
-            Files.createDirectories(file.getParent());
-            Files.writeString(file, text);
+            Files.createDirectories(REPORT.getParent());
+            Files.writeString(REPORT, text);
         } catch (final IOException ex) {
-            fail("Could not write " + file + ": " + ex.getMessage());
+            fail("Could not write " + REPORT + ": " + ex.getMessage());
         }
     }
 }

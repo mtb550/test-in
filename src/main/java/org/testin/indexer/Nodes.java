@@ -72,10 +72,6 @@ public final class Nodes {
         return indexer().getStore();
     }
 
-    public @NotNull TestSetDirectoryDto getTestSetByPath(final @NotNull Path path) {
-        return store().getTestSetDirByPath(path);
-    }
-
     public @NotNull Map<String, TestProjectDirectoryDto> getTestProjectsByPath() {
         return store().getTestProjectsByPath();
     }

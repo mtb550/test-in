@@ -22,7 +22,6 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.Icon;
 import java.util.Optional;
 
 public abstract class AbstractAnyProjectAction extends DumbAwareAction {
@@ -32,10 +31,6 @@ public abstract class AbstractAnyProjectAction extends DumbAwareAction {
 
     protected AbstractAnyProjectAction(final @NotNull @Nls String text) {
         super(text);
-    }
-
-    protected AbstractAnyProjectAction(final @NotNull @Nls String text, final @NotNull @Nls String description, final @NotNull Icon icon) {
-        super(text, description, icon);
     }
 
     @Override

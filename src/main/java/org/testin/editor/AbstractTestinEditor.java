@@ -179,7 +179,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     public @NotNull JComponent getPreferredFocusedComponent() {
         if (getToolBar().getCurrentView() != ViewMode.GRID_VIEW) return list;
 
-        return grid.table().<JComponent>map(JComponent.class::cast).orElse(list);
+        return grid.table().map(JComponent.class::cast).orElse(list);
     }
 
     @Override
@@ -333,10 +333,10 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-114
-    // UC-INTERNAL-002, Rule-INTERNAL-114
     @Override
     public void followTheIndex() {
-        parent = nodes.find(parent.getPath()).filter(nodeType()::isInstance).map(nodeType()::cast).orElse(parent);
+        final @NotNull N was = parent;
+        parent = nodes.find(was.getPath()).filter(nodeType()::isInstance).map(nodeType()::cast).orElse(was);
     }
 
     protected void beforeReload() {

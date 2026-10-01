@@ -40,7 +40,9 @@ public class UpdateStatusAction extends AbstractAnyProjectAction {
     private final @NotNull NodeStatus status;
 
     public UpdateStatusAction(final @NotNull NodeStatus status) {
-        super(status.getButtonName(), status.getButtonDescription(), AllIcons.Actions.Edit);
+        super(status.getButtonName());
+        getTemplatePresentation().setDescription(status.getButtonDescription());
+        getTemplatePresentation().setIcon(AllIcons.Actions.Edit);
         this.status = status;
     }
 

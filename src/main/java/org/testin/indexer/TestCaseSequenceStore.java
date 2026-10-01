@@ -126,27 +126,27 @@ final class TestCaseSequenceStore {
 
     // UC-INTERNAL-004, Rule-INTERNAL-033, Rule-INTERNAL-117
     private boolean store(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
-        if (!written(testSetPath, testCase)) return false;
+        if (failedToWrite(testSetPath, testCase)) return false;
 
         testCasesById.merge(testCase.getId(), testCase, TestCaseDto::takeValuesOf);
         return true;
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-033
-    private boolean written(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
+    private boolean failedToWrite(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
         final @NotNull Path file = named(testSetPath, testCase.getId());
-        if (!testDataFiles.write(file, testCase)) return false;
+        if (!testDataFiles.write(file, testCase)) return true;
 
         // Rule-INTERNAL-084
         if (!leftHandNamedFile(testCase.getId(), file)) {
             testDataFiles.discard(file);
-            return false;
+            return true;
         }
 
         final @NotNull List<UUID> ids = testCaseIdsByTestSet.computeIfAbsent(testSetPath.toString(), _ -> testCaseIds(List.of()));
         if (!ids.contains(testCase.getId())) ids.add(testCase.getId());
 
-        return true;
+        return false;
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-084
@@ -167,7 +167,7 @@ final class TestCaseSequenceStore {
         final @NotNull Optional<TestCaseDto> was = Optional.ofNullable(testCasesById.get(id));
 
         final boolean wasHandNamed = handNamed.remove(id, from);
-        if (!written(toSet, testCase)) {
+        if (failedToWrite(toSet, testCase)) {
             if (wasHandNamed) handNamed.put(id, from);
             return false;
         }

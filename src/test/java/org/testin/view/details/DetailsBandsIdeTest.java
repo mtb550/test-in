@@ -58,10 +58,12 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
     }
 
     private static @NotNull String text(final @NotNull Component component) {
-        if (component instanceof final AbstractButton button) return words(button.getText());
-        if (component instanceof final JLabel label) return words(label.getText());
-        if (component instanceof final JTextComponent area) return words(area.getText());
-        return "";
+        return switch (component) {
+            case final AbstractButton button -> words(button.getText());
+            case final JLabel label -> words(label.getText());
+            case final JTextComponent area -> words(area.getText());
+            default -> "";
+        };
     }
 
     private static @NotNull String words(final String text) {
