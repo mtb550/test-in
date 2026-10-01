@@ -318,7 +318,7 @@
                 id="testin.tree"
                 factoryClass="org.testin.explorer.Main"
                 anchor="left"
-                icon="/icons/pluginIcon.svg"
+                icon="org.testin.util.Icons.TOOL_WINDOW"
                 secondary="false"
                 doNotActivateOnStart="true"
         />
@@ -327,7 +327,7 @@
                 id="testin.view"
                 factoryClass="org.testin.view.ViewToolWindowFactory"
                 anchor="right"
-                icon="/icons/pluginIcon.svg"
+                icon="org.testin.util.Icons.TOOL_WINDOW"
                 secondary="false"
                 doNotActivateOnStart="true"
         />

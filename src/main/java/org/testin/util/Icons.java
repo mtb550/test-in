@@ -17,6 +17,7 @@
 package org.testin.util;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.JBColor;
 import com.intellij.util.IconUtil;
@@ -42,6 +43,8 @@ import java.awt.geom.RoundRectangle2D;
 public final class Icons {
     // UC-EDITOR-PANEL-001, UC-INTERNAL-001
     public static final @NotNull Icon TEST_CASE = gray(AllIcons.Nodes.Type);
+
+    public static final @NotNull Icon TOOL_WINDOW = IconLoader.getIcon("/icons/pluginIcon.svg", Icons.class);
 
     public static final @NotNull Color GRAY = inBothThemes(Color.GRAY.darker());
     public static final @NotNull Color RED = inBothThemes(Color.RED.darker());
