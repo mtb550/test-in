@@ -64,6 +64,11 @@ cannot.
 - **Rule-REPORT-024** — In the web page and the PDF, a test case table's columns
   are as wide as what they hold: the number and the verdict take only their own
   width, and the description gets the rest.
+- **Rule-REPORT-025** — A verdict has one color in every report and every
+  format. Failed is the same red on its count tile, its table heading, its
+  result analysis line and a bug priority or severity that alarms; passed,
+  blocked and untested the same. The color is the verdict's own, so changing it
+  once changes every report.
 
 ## The screen
 

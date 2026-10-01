@@ -34,35 +34,29 @@ public enum ResultAnalysis {
     PASSED(
             TestStatus.PASSED,
             TestStatus.PASSED,
-            "2E7D32",
             TestRunSummary::passed
     ),
 
     FAILED(
             TestStatus.FAILED,
             TestStatus.FAILED,
-            "C0392B",
             TestRunSummary::failed
     ),
 
     BLOCKED(
             TestStatus.BLOCKED,
             TestStatus.BLOCKED,
-            "B8860B",
             TestRunSummary::blocked
     ),
 
     UNTESTED(
             TestStatus.PENDING,
             TestStatus.UNTESTED,
-            "595959",
             TestRunSummary::untested
     );
 
     private final @NotNull TestStatus whileRunning;
     private final @NotNull TestStatus onceFinished;
-
-    private final @NotNull String hexColor;
 
     private final @NotNull ToLongFunction<TestRunSummary> count;
 
@@ -99,6 +93,11 @@ public enum ResultAnalysis {
         }
 
         return kept;
+    }
+
+    // Rule-REPORT-025
+    public @NotNull String getHexColor() {
+        return onceFinished.getReportHex();
     }
 
     public @NotNull String getLabel() {

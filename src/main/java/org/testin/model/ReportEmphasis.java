@@ -24,17 +24,17 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public enum ReportEmphasis {
     ALARMING(
-            "C0392B",
+            TestStatus.FAILED.getReportHex(),
             "var(--verdict-failed)"
     ),
 
     CAUTIONARY(
-            "B8860B",
+            TestStatus.BLOCKED.getReportHex(),
             "var(--verdict-blocked)"
     ),
 
     MUTED(
-            "595959",
+            TestStatus.UNTESTED.getReportHex(),
             "var(--muted)"
     );
 

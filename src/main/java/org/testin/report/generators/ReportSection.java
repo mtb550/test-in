@@ -34,7 +34,6 @@ enum ReportSection {
     FAILED(
             Bundle.message("report.section.failed.title"),
             Bundle.message("report.section.failed.description"),
-            "F2685A",
             TestRunSummary::failed,
             List.of(RunEditorAttributes.BUG_PRIORITY, RunEditorAttributes.BUG_SEVERITY),
             TestStatus.FAILED),
@@ -42,7 +41,6 @@ enum ReportSection {
     PASSED(
             Bundle.message("report.section.passed.title"),
             Bundle.message("report.section.passed.description"),
-            "4FBF60",
             TestRunSummary::passed,
             List.of(),
             TestStatus.PASSED),
@@ -50,7 +48,6 @@ enum ReportSection {
     BLOCKED(
             Bundle.message("report.section.blocked.title"),
             Bundle.message("report.section.blocked.description"),
-            "F5B940",
             TestRunSummary::blocked,
             List.of(),
             TestStatus.BLOCKED),
@@ -58,7 +55,6 @@ enum ReportSection {
     UNTESTED(
             Bundle.message("report.section.untested.title"),
             Bundle.message("report.section.untested.description"),
-            "96A1B0",
             TestRunSummary::untested,
             List.of(),
             TestStatus.PENDING,
@@ -67,7 +63,6 @@ enum ReportSection {
     REMOVED(
             Bundle.message("report.section.removed.title"),
             Bundle.message("report.section.removed.description"),
-            "96A1B0",
             TestRunSummary::removed,
             List.of(),
             TestStatus.REMOVED);
@@ -82,10 +77,10 @@ enum ReportSection {
     private final @NotNull List<RunEditorAttributes> failureDetailColumns;
     private final @NotNull Set<TestStatus> statuses;
 
-    ReportSection(final @NotNull String title, final @NotNull String descriptionFmt, final @NotNull String hexColor, final @NotNull ToLongFunction<TestRunSummary> count, final @NotNull List<RunEditorAttributes> failureDetailColumns, final @NotNull TestStatus... statuses) {
+    ReportSection(final @NotNull String title, final @NotNull String descriptionFmt, final @NotNull ToLongFunction<TestRunSummary> count, final @NotNull List<RunEditorAttributes> failureDetailColumns, final @NotNull TestStatus... statuses) {
         this.title = title;
         this.descriptionFmt = descriptionFmt;
-        this.hexColor = hexColor;
+        this.hexColor = statuses[0].getReportHex();
         this.count = count;
         this.failureDetailColumns = failureDetailColumns;
         this.statuses = EnumSet.copyOf(Arrays.asList(statuses));

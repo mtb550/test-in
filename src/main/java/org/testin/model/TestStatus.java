@@ -32,6 +32,8 @@ import java.awt.event.KeyEvent;
 public enum TestStatus {
     PASSED(
             JBColor.GREEN,
+            "2E7D32",
+            "6CC47A",
             Bundle.message("status.verdict.passed"),
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
             false
@@ -39,6 +41,8 @@ public enum TestStatus {
 
     FAILED(
             JBColor.RED.darker(),
+            "C0392B",
+            "E5675A",
             Bundle.message("status.verdict.failed"),
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)),
             true
@@ -46,6 +50,8 @@ public enum TestStatus {
 
     BLOCKED(
             JBColor.ORANGE,
+            "B8860B",
+            "E8A33D",
             Bundle.message("status.verdict.blocked"),
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
             false
@@ -53,6 +59,8 @@ public enum TestStatus {
 
     PENDING(
             JBColor.lazy(UIUtil::getContextHelpForeground),
+            "595959",
+            "A3A9B1",
             Bundle.message("status.verdict.pending"),
             MenuEntry.NONE,
             false
@@ -60,6 +68,8 @@ public enum TestStatus {
 
     REMOVED(
             JBColor.GRAY,
+            "595959",
+            "A3A9B1",
             Bundle.message("status.verdict.removed"),
             MenuEntry.NONE,
             false
@@ -67,12 +77,16 @@ public enum TestStatus {
 
     UNTESTED(
             JBColor.GRAY.brighter(),
+            "595959",
+            "A3A9B1",
             Bundle.message("status.verdict.untested"),
             MenuEntry.NONE,
             false
     );
 
     private final @NotNull Color rowColor;
+    private final @NotNull String reportHex;
+    private final @NotNull String reportDarkHex;
     private final @NotNull String label;
 
     private final @NotNull MenuEntry menuEntry;

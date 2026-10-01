@@ -40,7 +40,7 @@ public enum ReportTile {
 
     PASSED(
             TestStatus.PASSED.getLabel(),
-            "2E7D32",
+            TestStatus.PASSED.getReportHex(),
             "var(--verdict-passed)",
             TestRunSummary::passed,
             ""
@@ -48,7 +48,7 @@ public enum ReportTile {
 
     FAILED(
             TestStatus.FAILED.getLabel(),
-            "C0392B",
+            TestStatus.FAILED.getReportHex(),
             "var(--verdict-failed)",
             TestRunSummary::failed,
             ""
@@ -56,7 +56,7 @@ public enum ReportTile {
 
     BLOCKED(
             TestStatus.BLOCKED.getLabel(),
-            "B8860B",
+            TestStatus.BLOCKED.getReportHex(),
             "var(--verdict-blocked)",
             TestRunSummary::blocked,
             ""
@@ -64,13 +64,13 @@ public enum ReportTile {
 
     UNTESTED(
             TestStatus.UNTESTED.getLabel(),
-            "595959",
+            TestStatus.UNTESTED.getReportHex(),
             "var(--verdict-untested)",
             TestRunSummary::untested,
             ""
     ),
 
-    REMOVED(TestStatus.REMOVED.getLabel(), "595959", "var(--verdict-removed)", TestRunSummary::removed, "") {
+    REMOVED(TestStatus.REMOVED.getLabel(), TestStatus.REMOVED.getReportHex(), "var(--verdict-removed)", TestRunSummary::removed, "") {
         @Override
         public boolean isShownFor(final @NotNull TestRunSummary summary) {
             return summary.hasRemoved();

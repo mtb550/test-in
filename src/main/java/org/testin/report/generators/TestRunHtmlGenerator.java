@@ -27,6 +27,7 @@ import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunSummary;
+import org.testin.model.TestStatus;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.DetailRow;
@@ -42,13 +43,11 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 public final class TestRunHtmlGenerator {
     final String DARK_BLUE = "#1f3864";
     final String MEDIUM_BLUE = "#2e5496";
-    final String GREEN = "#748F74";
-    final String RED = "#9C4B4F";
-    final String ORANGE = "#BD7740";
     final String GRAY = "#595959";
     final String LIGHT_BG = "#f2f5fa";
     final String BORDER_COLOR = "#d0d7e5";
@@ -290,18 +289,25 @@ public final class TestRunHtmlGenerator {
         return "--page: #fff; --ink: #000; --heading: " + DARK_BLUE + "; --accent: " + MEDIUM_BLUE + ";"
                 + "--muted: " + GRAY + "; --panel: " + LIGHT_BG + "; --line: " + BORDER_COLOR + ";"
                 + "--footer-ink: #888; --link: #0052cc;"
-                + "--verdict-passed: " + GREEN + "; --verdict-failed: " + RED + ";"
-                + "--verdict-blocked: " + ORANGE + "; --verdict-untested: " + GRAY + ";"
-                + "--verdict-removed: " + GRAY + ";";
+                + verdictTokens(TestStatus::getReportHex);
+    }
+
+    // Rule-REPORT-025
+    private static @NotNull String verdictTokens(final @NotNull Function<TestStatus, String> shade) {
+        final @NotNull StringBuilder tokens = new StringBuilder();
+
+        for (final TestStatus verdict : List.of(TestStatus.PASSED, TestStatus.FAILED, TestStatus.BLOCKED, TestStatus.UNTESTED, TestStatus.REMOVED)) {
+            tokens.append("--verdict-").append(verdict.name().toLowerCase(Locale.ROOT)).append(": #").append(shade.apply(verdict)).append(";");
+        }
+
+        return tokens.toString();
     }
 
     private @NotNull String darkTokens() {
         return "--page: #1e1f22; --ink: #dfe1e5; --heading: #8fb4f2; --accent: #6f9ae8;"
                 + "--muted: #9aa0a8; --panel: #2b2d30; --line: #3d4045;"
                 + "--footer-ink: #8a9099; --link: #7aa7f0;"
-                + "--verdict-passed: #6cc47a; --verdict-failed: #e5675a;"
-                + "--verdict-blocked: #e8a33d; --verdict-untested: #a3a9b1;"
-                + "--verdict-removed: #a3a9b1;";
+                + verdictTokens(TestStatus::getReportDarkHex);
     }
 
     private @NotNull String themeScript() {
