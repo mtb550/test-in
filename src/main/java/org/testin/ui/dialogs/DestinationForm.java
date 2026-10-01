@@ -16,10 +16,14 @@
 
 package org.testin.ui.dialogs;
 
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
+import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogComponent;
+import org.testin.ui.framework.TextInput;
+import org.testin.util.Bundle;
 
 import javax.swing.JComponent;
 import java.io.File;
@@ -29,8 +33,8 @@ import java.util.Optional;
 public final class DestinationForm implements DialogComponent {
     private static final boolean EXPANDED = true;
 
-    private final @NotNull FolderSection folder;
-    private final @NotNull FileNameSection fileName;
+    private final @NotNull TextInput folder;
+    private final @NotNull TextInput fileName;
     private final @NotNull FormatSection format;
     private final @NotNull JComponent panel;
 
@@ -45,15 +49,25 @@ public final class DestinationForm implements DialogComponent {
     }
 
     private DestinationForm(final @NotNull Project p, final FileTypes @NotNull [] formats, final @NotNull FileTypes defaultFormat, final @NotNull String suggestedName, final @NotNull String chooserTitle, final @NotNull String chooserDescription, final @NotNull String section) {
-        folder = FolderSection.of(p, chooserTitle, chooserDescription);
-        fileName = FileNameSection.of(suggestedName);
+        folder = ComponentDialogBase.textField()
+                .caption(Bundle.message("destination.caption.folder"))
+                .placeholder(Bundle.message("destination.choose.folder"))
+                .value(DownloadFolder.of(p))
+                .browse(p, FileChooserDescriptorFactory.singleDir().withTitle(chooserTitle).withDescription(chooserDescription))
+                .build().getComponent();
+
+        fileName = ComponentDialogBase.textField()
+                .caption(Bundle.message("destination.caption.file"))
+                .placeholder(Bundle.message("destination.name.the.file"))
+                .value(suggestedName)
+                .build().getComponent();
         format = FormatSection.of(formats, defaultFormat);
 
         final boolean roomy = !section.isEmpty();
 
         final @NotNull FormRows rows = roomy
-                ? new FormRows().pair(folder.panel(), fileName.panel()).wideRow(format.panel())
-                : new FormRows().wideRow(folder.panel()).wideRow(fileName.panel()).wideRow(format.panel());
+                ? new FormRows().pair(folder.getPanel(), fileName.getPanel()).wideRow(format.panel())
+                : new FormRows().wideRow(folder.getPanel()).wideRow(fileName.getPanel()).wideRow(format.panel());
 
         panel = roomy ? CollapsiblePanel.build(section, rows, EXPANDED) : DialogStyle.asSection(rows);
     }
@@ -71,17 +85,17 @@ public final class DestinationForm implements DialogComponent {
         return tailIsAnExtension ? fileName.substring(0, dot) + extension : fileName + extension;
     }
 
-    // UC-SHARE-001
+    // UC-SHARE-001, Rule-INTERNAL-067
     public @NotNull Optional<Destination> resolve() {
-        final @NotNull Optional<String> named = fileName.accepted();
+        final @NotNull String named = fileName.accepted();
         if (named.isEmpty()) return Optional.empty();
 
-        final @NotNull Optional<String> chosenFolder = folder.accepted();
+        final @NotNull String chosenFolder = folder.accepted();
         if (chosenFolder.isEmpty()) return Optional.empty();
 
         final @NotNull FileTypes chosen = format.chosen();
 
-        return Optional.of(new Destination(new File(chosenFolder.orElseThrow(), withExtension(named.orElseThrow(), chosen.getExtension())), chosen));
+        return Optional.of(new Destination(new File(chosenFolder, withExtension(named, chosen.getExtension())), chosen));
     }
 
     @Override
@@ -91,7 +105,7 @@ public final class DestinationForm implements DialogComponent {
 
     @Override
     public @NotNull JComponent getFocusComponent() {
-        return fileName.field();
+        return fileName.getFocusComponent();
     }
 
     @Override

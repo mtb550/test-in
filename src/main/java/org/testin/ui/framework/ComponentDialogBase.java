@@ -16,6 +16,7 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,7 @@ import javax.swing.Icon;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -213,6 +215,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         private @NotNull String placeholder = "";
         private @NotNull String value = "";
         private @NotNull String accepts = TextInput.ANYTHING;
+        private @NotNull Optional<Consumer<TextInput>> browsing = Optional.empty();
 
         public @NotNull TextInputBuilder icon(final @NotNull Icon icon) {
             this.icon = icon;
@@ -239,8 +242,16 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             return this;
         }
 
+        // Rule-INTERNAL-118
+        public @NotNull TextInputBuilder browse(final @NotNull Project p, final @NotNull FileChooserDescriptor descriptor) {
+            this.browsing = Optional.of(input -> input.browseWith(p, descriptor));
+            return this;
+        }
+
         public @NotNull ComponentDialogBase<TextInput> build() {
-            return new ComponentDialogBase<>(new TextInput(icon, caption, placeholder, value, accepts));
+            final @NotNull TextInput input = new TextInput(icon, caption, placeholder, value, accepts);
+            browsing.ifPresent(browse -> browse.accept(input));
+            return new ComponentDialogBase<>(input);
         }
     }
 

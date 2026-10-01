@@ -16,6 +16,7 @@
 
 package org.testin.ui.dialogs;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.ui.laf.darcula.ui.DarculaButtonUI;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -34,6 +35,7 @@ import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 import org.testin.util.Icons;
 
@@ -45,6 +47,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DialogStyle {
@@ -142,11 +145,12 @@ public final class DialogStyle {
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-073
-    public static void setDecorations(final @NotNull ExtendableTextField textField, final @NotNull Icon icon, final @NotNull String note) {
+    public static void setDecorations(final @NotNull ExtendableTextField textField, final @NotNull Icon icon, final @NotNull String note, final @NotNull Optional<Runnable> browse) {
         final @NotNull List<ExtendableTextComponent.Extension> extensions = new ArrayList<>();
 
         if (icon != NO_ICON) extensions.add(leading(icon));
         if (!note.isEmpty()) extensions.add(trailing(note, textField));
+        browse.ifPresent(open -> extensions.add(browsing(open)));
 
         textField.setExtensions(extensions);
 
@@ -174,6 +178,11 @@ public final class DialogStyle {
                 return JBUI.scale(8);
             }
         };
+    }
+
+    // Rule-INTERNAL-077, Rule-INTERNAL-118
+    private static @NotNull ExtendableTextComponent.Extension browsing(final @NotNull Runnable open) {
+        return ExtendableTextComponent.Extension.create(Icons.gray(AllIcons.General.OpenDisk), AllIcons.General.OpenDiskHover, Bundle.message("dialog.browse"), open);
     }
 
     private static @NotNull ExtendableTextComponent.Extension trailing(final @NotNull String note, final @NotNull ExtendableTextField textField) {

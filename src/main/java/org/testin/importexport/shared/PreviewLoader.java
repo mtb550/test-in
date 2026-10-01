@@ -18,7 +18,6 @@ package org.testin.importexport.shared;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
@@ -26,11 +25,10 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.ui.framework.TextValue;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -40,11 +38,11 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-public class FileDocumentListener implements DocumentListener {
+public class PreviewLoader {
     // UC-SHARE-005, Rule-SHARE-107, Rule-EDITOR-PANEL-090
     private static final long QUIET_MILLIS = 300;
 
-    private final @NotNull TextFieldWithBrowseButton fileField;
+    private final @NotNull TextValue fileField;
     private final @NotNull Project p;
     private final @NotNull Notifier notifier;
 
@@ -55,7 +53,7 @@ public class FileDocumentListener implements DocumentListener {
 
     private final @NotNull AtomicReference<String> awaiting = new AtomicReference<>("");
 
-    public FileDocumentListener(final @NotNull TextFieldWithBrowseButton fileField, final @NotNull Project p, final @NotNull Consumer<String> onStatus, final @NotNull BiConsumer<FileTypes, Map<String, List<TestCaseDto>>> onDataLoaded, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {
+    public PreviewLoader(final @NotNull TextValue fileField, final @NotNull Project p, final @NotNull Consumer<String> onStatus, final @NotNull BiConsumer<FileTypes, Map<String, List<TestCaseDto>>> onDataLoaded, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {
         this.fileField = fileField;
         this.p = p;
         this.notifier = Services.getInstance(p, Notifier.class);
@@ -64,23 +62,8 @@ public class FileDocumentListener implements DocumentListener {
         this.importLoader = importLoader;
     }
 
-    @Override
-    public void insertUpdate(final @NotNull DocumentEvent e) {
-        triggerLoadIfValid();
-    }
-
-    @Override
-    public void removeUpdate(final @NotNull DocumentEvent e) {
-        triggerLoadIfValid();
-    }
-
-    @Override
-    public void changedUpdate(final @NotNull DocumentEvent e) {
-        triggerLoadIfValid();
-    }
-
     // UC-SHARE-005, Rule-SHARE-028, Rule-SHARE-107
-    private void triggerLoadIfValid() {
+    public void pathChanged() {
         final @NotNull String typed = fileField.getText().trim();
         awaiting.set(typed);
 

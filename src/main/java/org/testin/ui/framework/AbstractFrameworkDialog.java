@@ -136,10 +136,7 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
 
     // UC-INTERNAL-007, Rule-INTERNAL-067
     protected final @NotNull String accepted(final @NotNull TextValue field) {
-        final @NotNull String value = field.getText().trim();
-        if (value.isEmpty()) field.showEmptyWarning();
-
-        return value;
+        return field.accepted();
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-067

@@ -34,6 +34,7 @@ import javax.swing.text.JTextComponent;
 import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.Optional;
 
 final class FrameworkTextField {
     private final @NotNull ExtendableTextField field;
@@ -41,6 +42,7 @@ final class FrameworkTextField {
 
     private @NotNull Icon icon;
     private @NotNull String note = "";
+    private @NotNull Optional<Runnable> browse = Optional.empty();
 
     private boolean emptyWarningShown;
 
@@ -48,7 +50,7 @@ final class FrameworkTextField {
         this.placeholder = placeholder;
         this.field = new ExtendableTextField(initialValue);
         this.icon = icon;
-        DialogStyle.setDecorations(field, icon, note);
+        DialogStyle.setDecorations(field, icon, note, browse);
 
         DialogStyle.asField(field);
         DialogStyle.framed(field);
@@ -86,13 +88,19 @@ final class FrameworkTextField {
 
     void setLeadingIcon(final @NotNull Icon icon) {
         this.icon = icon;
-        DialogStyle.setDecorations(field, icon, note);
+        DialogStyle.setDecorations(field, icon, note, browse);
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-073
     void setNote(final @NotNull String note) {
         this.note = note;
-        DialogStyle.setDecorations(field, icon, note);
+        DialogStyle.setDecorations(field, icon, note, browse);
+    }
+
+    // Rule-INTERNAL-118
+    void setBrowse(final @NotNull Runnable browse) {
+        this.browse = Optional.of(browse);
+        DialogStyle.setDecorations(field, icon, note, this.browse);
     }
 
     @NotNull JTextField component() {

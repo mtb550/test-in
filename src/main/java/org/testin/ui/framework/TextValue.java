@@ -23,4 +23,12 @@ public interface TextValue {
     @NotNull String getText();
 
     void showEmptyWarning();
+
+    // UC-INTERNAL-007, Rule-INTERNAL-067
+    default @NotNull String accepted() {
+        final @NotNull String value = getText().trim();
+        if (value.isEmpty()) showEmptyWarning();
+
+        return value;
+    }
 }

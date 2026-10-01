@@ -16,6 +16,10 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.openapi.fileChooser.FileChooser;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.ui.DocumentAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +36,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public final class TextInput implements DialogComponent, TextValue {
@@ -40,6 +45,8 @@ public final class TextInput implements DialogComponent, TextValue {
     private final @NotNull FrameworkTextField input;
     private final @NotNull JTextField textField;
     private final @NotNull JComponent panel;
+
+    private @NotNull Optional<Runnable> chooser = Optional.empty();
 
     TextInput(final @NotNull Icon icon, final @NotNull String caption, final @NotNull String placeHolderText, final @NotNull String initialValue, final @NotNull String accepts) {
         input = new FrameworkTextField(icon, placeHolderText, initialValue);
@@ -90,6 +97,20 @@ public final class TextInput implements DialogComponent, TextValue {
                 return !next.isEmpty() && !pattern.matcher(next).matches();
             }
         });
+    }
+
+    // Rule-INTERNAL-118, Rule-SETTING-021
+    void browseWith(final @NotNull Project p, final @NotNull FileChooserDescriptor descriptor) {
+        final @NotNull Runnable choose = () -> FileChooser.chooseFile(descriptor, p, textField,
+                LocalFileSystem.getInstance().findFileByPath(getText().trim()), chosen -> textField.setText(chosen.getPresentableUrl()));
+
+        chooser = Optional.of(choose);
+        input.setBrowse(choose);
+    }
+
+    // Rule-INTERNAL-118
+    public void browseNow() {
+        chooser.ifPresent(Runnable::run);
     }
 
     @Override

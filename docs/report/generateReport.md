@@ -77,7 +77,7 @@ cannot.
 │  Generate Report                                             │
 ├──────────────────────────────────────────────────────────────┤
 │                                                              │
-│  Save to      [ C:\Users\mtb\Downloads              ] [...]  │
+│  Save to      [ C:\Users\mtb\Downloads              [...] ]  │
 │                                                              │
 │  File name    [ TestRun_Demo_cycle2_07-09-2026_02-14-33PM ]  │
 │                                                              │

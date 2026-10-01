@@ -19,61 +19,40 @@ package org.testin.importexport.imports;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComponentWithBrowseButton;
-import com.intellij.openapi.ui.TextComponentAccessor;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
-import org.testin.ui.Caption;
-import org.testin.ui.dialogs.DialogStyle;
 import org.testin.ui.dialogs.DownloadFolder;
+import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.TextInput;
 import org.testin.util.Bundle;
 
-import javax.swing.JComponent;
-import javax.swing.JTextField;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Optional;
 
-public record SourceSection(@NotNull TextFieldWithBrowseButton field, @NotNull FileChooserDescriptor descriptor) {
-    // Rule-INTERNAL-095, Rule-INTERNAL-096
+public record SourceSection(@NotNull TextInput field) {
+    // Rule-INTERNAL-095, Rule-INTERNAL-096, Rule-INTERNAL-118, Rule-SETTING-021
     public static @NotNull SourceSection of(final @NotNull Project p) {
-        final @NotNull TextFieldWithBrowseButton field = new TextFieldWithBrowseButton();
-        DialogStyle.asField(field.getTextField());
-        DialogStyle.framed(field.getTextField());
-
         final @NotNull FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, false, false, false, false)
                 .withExtensionFilter("", FileTypes.importableExtensionsForChooser())
                 .withTitle(Bundle.message("import.file.title"))
                 .withDescription(Bundle.message("import.file.description"));
 
-        field.addBrowseFolderListener(p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
-
-        return new SourceSection(field, descriptor);
-    }
-
-    // Rule-INTERNAL-087
-    public @NotNull JComponent panel() {
-        return Caption.above(Bundle.message("import.caption.source"), field);
+        return new SourceSection(ComponentDialogBase.textField()
+                .caption(Bundle.message("import.caption.source"))
+                .placeholder(Bundle.message("import.choose.file"))
+                .value(DownloadFolder.of(p))
+                .browse(p, descriptor)
+                .build().getComponent());
     }
 
     // UC-SHARE-005, Rule-SETTING-021
-    public void browse(final @NotNull Project p) {
-        field.setText(DownloadFolder.of(p));
-
-        final @NotNull ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browsing =
-                new ComponentWithBrowseButton.BrowseFolderActionListener<>(field, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
-
-        ApplicationManager.getApplication().invokeLater(() ->
-                browsing.actionPerformed(new ActionEvent(field.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
+    public void browse() {
+        ApplicationManager.getApplication().invokeLater(field::browseNow);
     }
 
-    // UC-SHARE-005
+    // UC-SHARE-005, Rule-INTERNAL-067
     public @NotNull Optional<File> accepted() {
-        final @NotNull String path = field.getText().trim();
-        if (!path.isEmpty()) return Optional.of(new File(path));
-
-        field.getTextField().requestFocus();
-        return Optional.empty();
+        final @NotNull String path = field.accepted();
+        return path.isEmpty() ? Optional.empty() : Optional.of(new File(path));
     }
 }
