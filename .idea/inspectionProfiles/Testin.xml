@@ -32,6 +32,8 @@
       <option name="processLiterals" value="true" />
       <option name="processComments" value="true" />
     </inspection_tool>
+    <inspection_tool class="SplitModeApiUsage" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="SplitModeXmlApiUsage" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="SuppressionAnnotation" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myAllowedSuppressions">
         <list>
@@ -40,6 +42,7 @@
       </option>
     </inspection_tool>
     <inspection_tool class="UnusedProperty" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="UseOptimizedEelFunctions" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="groupsTestNG" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="groups">
         <value>

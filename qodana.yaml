@@ -28,6 +28,16 @@ linter: qodana-jvm
 # exactly those three prefixes; everyDeclaredActionIsNamedInTheBundle fails when
 # a declared action has no action.<id>.text key at all. So the inspection was
 # reporting as dead the keys a test demands exist.
+#
+# SplitModeApiUsage, SplitModeXmlApiUsage and UseOptimizedEelFunctions are off
+# too, decided 1 October 2026. They ran once the Gradle import was whole and
+# reported 66 of the 121 findings on 51f5a9e1. Split Mode asks for the plugin to
+# be cut into frontend and backend modules so it can run under JetBrains remote
+# development; Testin runs in one IDE process and remote development is not a
+# target, so an issue for it brings these back if it ever is. Eel asks file
+# reads and writes to go through the remote-environment Eel API, and that API is
+# mostly @ApiStatus.Internal or Experimental - the verifier gate in
+# build.gradle.kts fails on both, so following the advice would break the build.
 profile:
   path: .idea/inspectionProfiles/Testin.xml
 
