@@ -117,6 +117,23 @@ allprojects {
     }
 }
 
+// The IntelliJ Platform Gradle Plugin points each bundled plugin and module at
+// its jar inside the IDE with a component metadata rule, and registers that rule
+// only once intellijPlatformDependency has resolved. A command-line build gets
+// there first through its tasks. A Gradle sync builds no task graph: it resolved
+// compileClasspath first, lost 1,066 bundled jars, and IntelliJ and Qodana
+// imported all three modules with no compile scope - Lombok, the platform and
+// the core unresolved. Every other configuration now resolves it first.
+allprojects {
+    pluginManager.withPlugin("org.jetbrains.intellij.platform.base") {
+        val platform = configurations.named("intellijPlatformDependency")
+
+        configurations.matching { it.isCanBeResolved && it.name != platform.name }.configureEach {
+            incoming.beforeResolve { platform.get().incoming.files.files }
+        }
+    }
+}
+
 dependencies {
     intellijPlatform {
         intellijIdea(providers.gradleProperty("intellij.version"))
