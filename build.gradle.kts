@@ -81,7 +81,7 @@ val errorprone = libs.errorprone
 val nullaway = libs.nullaway
 
 allprojects {
-    apply(plugin = "net.ltgt.errorprone")
+    pluginManager.apply("net.ltgt.errorprone")
 
     dependencies {
         "errorprone"(errorprone)
@@ -107,7 +107,7 @@ allprojects {
 val pmdVersion = libs.versions.pmd.get()
 
 allprojects {
-    apply(plugin = "pmd")
+    pluginManager.apply("pmd")
 
     pmd {
         toolVersion = pmdVersion
