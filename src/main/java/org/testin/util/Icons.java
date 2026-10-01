@@ -19,7 +19,6 @@ package org.testin.util;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.scale.JBUIScale;
-import com.intellij.ui.JBColor;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
@@ -46,20 +45,15 @@ public final class Icons {
 
     public static final @NotNull Icon TOOL_WINDOW = IconLoader.getIcon("/icons/pluginIcon.svg", Icons.class);
 
-    public static final @NotNull Color GRAY = inBothThemes(Color.GRAY.darker());
-    public static final @NotNull Color RED = inBothThemes(Color.RED.darker());
-    public static final @NotNull Color GREEN = inBothThemes(Color.GREEN.darker());
+    public static final @NotNull Color GRAY = FixedColors.GRAY.darker();
+    public static final @NotNull Color RED = FixedColors.RED.darker();
+    public static final @NotNull Color GREEN = FixedColors.GREEN.darker();
 
     // UC-EDITOR-PANEL-005
     public static final @NotNull Icon TEST_CASE_LETTER = fieldLetter("tc", GREEN);
 
     private static final float SCALE_FACTOR = 1.3f;
     private static final int DOT_SIZE = 10;
-
-    // UC-EDITOR-PANEL-005
-    private static @NotNull JBColor inBothThemes(final @NotNull Color color) {
-        return new JBColor(color, color);
-    }
 
     public static @NotNull LetterIcon fieldLetter(final @NotNull String letter, final @NotNull Color color) {
         final @NotNull Font font = Fonts.iconLetter();

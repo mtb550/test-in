@@ -18,59 +18,60 @@ package org.testin.model;
 
 import com.intellij.ui.ColorUtil;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.FixedColors;
 
 import java.awt.Color;
 import java.util.function.Function;
 
 public enum ReportColor {
     PAGE(
-            Color.WHITE,
-            ColorUtil.darker(Color.DARK_GRAY, 5),
+            FixedColors.WHITE,
+            ColorUtil.darker(FixedColors.DARK_GRAY, 5),
             "page"
     ),
 
     INK(
-            Color.BLACK,
-            ColorUtil.brighter(Color.LIGHT_GRAY, 2),
+            FixedColors.BLACK,
+            ColorUtil.brighter(FixedColors.LIGHT_GRAY, 2),
             "ink"
     ),
 
     HEADING(
-            Color.BLUE.darker().darker(),
+            FixedColors.BLUE.darker().darker(),
             "heading"
     ),
 
     ACCENT(
-            Color.BLUE.darker(),
+            FixedColors.BLUE.darker(),
             "accent"
     ),
 
     MUTED(
-            Color.GRAY.darker(),
-            Color.GRAY.brighter(),
+            FixedColors.GRAY.darker(),
+            FixedColors.GRAY.brighter(),
             "muted"
     ),
 
     PANEL(
-            ColorUtil.mix(Color.WHITE, Color.BLUE, 0.04),
-            ColorUtil.darker(Color.DARK_GRAY, 2),
+            ColorUtil.mix(FixedColors.WHITE, FixedColors.BLUE, 0.04),
+            ColorUtil.darker(FixedColors.DARK_GRAY, 2),
             "panel"
     ),
 
     LINE(
-            ColorUtil.mix(Color.WHITE, Color.BLUE, 0.15),
-            Color.DARK_GRAY,
+            ColorUtil.mix(FixedColors.WHITE, FixedColors.BLUE, 0.15),
+            FixedColors.DARK_GRAY,
             "line"
     ),
 
     FOOTER_INK(
-            Color.GRAY,
-            Color.GRAY,
+            FixedColors.GRAY,
+            FixedColors.GRAY,
             "footer-ink"
     ),
 
     LINK(
-            Color.BLUE.darker(),
+            FixedColors.BLUE.darker(),
             "link"
     );
 
@@ -90,7 +91,7 @@ public enum ReportColor {
 
     // Rule-REPORT-025
     public static @NotNull Color forDarkPage(final @NotNull Color onLightPage) {
-        return ColorUtil.mix(Color.WHITE, onLightPage, 0.5);
+        return ColorUtil.mix(FixedColors.WHITE, onLightPage, 0.5);
     }
 
     public static @NotNull String cssTokens(final @NotNull Function<ReportColor, String> shade) {

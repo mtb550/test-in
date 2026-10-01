@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
+import org.testin.util.FixedColors;
 
 import javax.swing.KeyStroke;
 import java.awt.Color;
@@ -33,7 +34,7 @@ import java.awt.event.KeyEvent;
 public enum TestStatus {
     PASSED(
             JBColor.GREEN,
-            Color.GREEN.darker(),
+            FixedColors.GREEN.darker(),
             Bundle.message("status.verdict.passed"),
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
             false
@@ -41,7 +42,7 @@ public enum TestStatus {
 
     FAILED(
             JBColor.RED.darker(),
-            Color.RED.darker(),
+            FixedColors.RED.darker(),
             Bundle.message("status.verdict.failed"),
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)),
             true
@@ -49,7 +50,7 @@ public enum TestStatus {
 
     BLOCKED(
             JBColor.ORANGE,
-            Color.ORANGE.darker(),
+            FixedColors.ORANGE.darker(),
             Bundle.message("status.verdict.blocked"),
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
             false
@@ -57,7 +58,7 @@ public enum TestStatus {
 
     PENDING(
             JBColor.lazy(UIUtil::getContextHelpForeground),
-            Color.GRAY.darker(),
+            FixedColors.GRAY.darker(),
             Bundle.message("status.verdict.pending"),
             MenuEntry.NONE,
             false
@@ -65,7 +66,7 @@ public enum TestStatus {
 
     REMOVED(
             JBColor.GRAY,
-            Color.GRAY.darker(),
+            FixedColors.GRAY.darker(),
             Bundle.message("status.verdict.removed"),
             MenuEntry.NONE,
             false
@@ -73,7 +74,7 @@ public enum TestStatus {
 
     UNTESTED(
             JBColor.GRAY.brighter(),
-            Color.GRAY.darker(),
+            FixedColors.GRAY.darker(),
             Bundle.message("status.verdict.untested"),
             MenuEntry.NONE,
             false

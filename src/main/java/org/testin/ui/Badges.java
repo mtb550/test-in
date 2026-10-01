@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
 import org.testin.model.RunStatusBadge;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.FixedColors;
 import org.testin.util.Fonts;
 
 import javax.swing.Icon;
@@ -52,11 +53,11 @@ public final class Badges {
     private static final int BADGE_PAD_V = 2;
     private static final int BADGE_PAD_H = 10;
 
-    private static final @NotNull Color TEXT_ON_LIGHT = new JBColor(Color.DARK_GRAY, Color.DARK_GRAY);
-    private static final @NotNull Color TEXT_ON_DARK = new JBColor(Color.WHITE, Color.WHITE);
+    private static final @NotNull Color TEXT_ON_LIGHT = FixedColors.DARK_GRAY;
+    private static final @NotNull Color TEXT_ON_DARK = FixedColors.WHITE;
 
     private static final @NotNull Color GROUP_COLOR = JBColor.darkGray;
-    static final @NotNull Icon BUG_MARK = IconUtil.colorize(IconUtil.resizeSquared(AllIcons.Toolwindows.ToolWindowDebugger, 20), new JBColor(Color.BLACK, Color.BLACK));
+    static final @NotNull Icon BUG_MARK = IconUtil.colorize(IconUtil.resizeSquared(AllIcons.Toolwindows.ToolWindowDebugger, 20), FixedColors.BLACK);
     private static final @NotNull Icon CLOCK = IconUtil.resizeSquared(AllIcons.Vcs.History, 14);
 
     public static void addPriorityBadge(final @NotNull List<Badge> badges, final @NotNull TestCaseDto tc) {
