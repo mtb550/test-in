@@ -85,18 +85,9 @@ public final class CodeNavigator implements CodeNavigation {
 
     // UC-CODEGEN-006, Rule-CODEGEN-026
     private @NotNull Map<UUID, PsiMethod> generatedMethodsOf(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
-        final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
-
-        for (final TestCaseDto tc : testCases) {
-            final @NotNull String classFqcn = Fqcn.classOfMethod(tc);
-            if (classFqcn.isEmpty()) continue;
-
-            byClass.computeIfAbsent(classFqcn, _ -> new ArrayList<>()).add(tc);
-        }
-
         final @NotNull Map<UUID, PsiMethod> found = new LinkedHashMap<>();
 
-        for (final Map.Entry<String, List<TestCaseDto>> group : byClass.entrySet()) {
+        for (final Map.Entry<String, List<TestCaseDto>> group : Fqcn.byClassOfMethod(testCases).entrySet()) {
             final @NotNull Optional<PsiClass> owner = GeneratedClass.byName(p, group.getKey());
 
             if (owner.isEmpty()) continue;

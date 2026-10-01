@@ -27,7 +27,9 @@ import org.testin.util.FromContentModule;
 import org.testin.util.NameSanitizer;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Fqcn {
@@ -58,6 +60,19 @@ public final class Fqcn {
     public static @NotNull String classOfMethod(final @NotNull TestCaseDto tc) {
         final @NotNull List<String> method = ofMethod(tc);
         return method.isEmpty() ? "" : String.join(".", method.subList(0, method.size() - 1));
+    }
+
+    // UC-CODEGEN-002, Rule-CODEGEN-002
+    @FromContentModule
+    public static @NotNull Map<String, List<TestCaseDto>> byClassOfMethod(final @NotNull List<? extends TestCaseDto> testCases) {
+        final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
+
+        for (final TestCaseDto tc : testCases) {
+            final @NotNull String classFqcn = classOfMethod(tc);
+            if (!classFqcn.isEmpty()) byClass.computeIfAbsent(classFqcn, _ -> new ArrayList<>()).add(tc);
+        }
+
+        return byClass;
     }
 
     // UC-CODEGEN-001, Rule-CODEGEN-007

@@ -43,9 +43,7 @@ import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.NameSanitizer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -162,14 +160,7 @@ public class UpdateTestBase {
 
     // UC-CODEGEN-012, Rule-CODEGEN-045
     protected void applyToEach(final @NotNull Project p, final @NotNull List<? extends TestCaseDto> items, final @NotNull String title, final @NotNull BiConsumer<PsiMethod, TestCaseDto> updater) {
-        final @NotNull Map<String, List<TestCaseDto>> byClass = new LinkedHashMap<>();
-
-        for (final TestCaseDto tc : items) {
-            final @NotNull String classFqcn = Fqcn.classOfMethod(tc);
-            if (classFqcn.isEmpty()) continue;
-
-            byClass.computeIfAbsent(classFqcn, _ -> new ArrayList<>()).add(tc);
-        }
+        final @NotNull Map<String, List<TestCaseDto>> byClass = Fqcn.byClassOfMethod(items);
         if (byClass.isEmpty()) return;
 
         final @NotNull Runnable inCommand = () ->
