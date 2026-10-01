@@ -71,7 +71,7 @@ The tester types the position they want. Testin moves the test case there.
 │                                                              │
 │  Log in with a valid user                                    │
 │                                                              │
-│  [   3 ]  of 12                                              │
+│  [   3 ]  / 12                                               │
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤
 │  [k]  Enter Save       Escape Cancel                         │
