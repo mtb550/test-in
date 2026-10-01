@@ -31,6 +31,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.NlsSafe;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VfsUtilCore;
@@ -84,7 +85,7 @@ public final class TestinYml {
                 }
             });
 
-    public static @NotNull String fileName() {
+    public static @NotNull @NlsSafe String fileName() {
         return FILE_NAMES[0];
     }
 
@@ -184,7 +185,7 @@ public final class TestinYml {
         }
 
         final @NotNull String name = String.valueOf(path.orElseThrow().getFileName());
-        final boolean saved = WriteCommandAction.writeCommandAction(p).withName(Bundle.message("yml.save.command"))
+        final boolean saved = WriteCommandAction.writeCommandAction(p).withName(Bundle.message("yml.save.command", fileName()))
                 .compute(() -> write(folder.orElseThrow(), name, owned));
         reload(p);
         return saved;

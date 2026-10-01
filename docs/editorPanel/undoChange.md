@@ -67,7 +67,7 @@ touched.
 
 ## What the tester sees
 
-This opens no screen. While the test cases are written back, a bar reads *Putting back*; it cannot be canceled, because
+This opens no screen. While the test cases are written back, a bar reads *Putting Back*; it cannot be canceled, because
 a change half taken back is worse
 than one not taken back at all. The test cases the change touched are then drawn
 again as they were before it.
@@ -78,7 +78,7 @@ A small message then appears at the bottom of the IDE and fades. It reads *Undon
 
 1. The tester changes the module on 30 test cases.
 2. The tester presses `Ctrl+Z`.
-3. A bar reads *Putting back* while all 30 are written back exactly as they
+3. A bar reads *Putting Back* while all 30 are written back exactly as they
    were.
 4. Every editor open on that test set reloads, keeping its filters and its
    search.

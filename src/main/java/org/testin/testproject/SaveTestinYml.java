@@ -63,7 +63,7 @@ public final class SaveTestinYml {
             final @NotNull String preview = preview(p, open.getName(), lines);
 
             ApplicationManager.getApplication().invokeLater(() ->
-                    new ConfirmDialog(p, Bundle.message("yml.save.name"), preview, "", "", Bundle.message("yml.save.confirm"), () -> save(p, lines)).show(), p.getDisposed());
+                    new ConfirmDialog(p, Bundle.message("yml.save.name", TestinYml.fileName()), preview, "", "", Bundle.message("yml.save.confirm"), () -> save(p, lines)).show(), p.getDisposed());
         });
     }
 

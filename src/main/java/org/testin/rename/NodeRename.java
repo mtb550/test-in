@@ -95,7 +95,7 @@ public final class NodeRename {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
         notifier.infoWithActions(p, Bundle.message("rename.config.names.old.title", oldName),
                 Bundle.message("rename.config.names.old.message", newName),
-                notifier.action(Bundle.message("yml.save.name"), () -> SaveTestinYml.start(p)),
+                notifier.action(Bundle.message("yml.save.name", TestinYml.fileName()), () -> SaveTestinYml.start(p)),
                 notifier.action(Bundle.message("rename.config.open"), () -> TestinYml.openInEditor(p)));
     }
 }

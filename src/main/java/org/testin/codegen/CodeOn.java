@@ -79,7 +79,7 @@ public final class CodeOn {
         if (Once.claim(p, SAID)) {
             final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
             notifier.infoWithActions(p, Bundle.message("code.off.title"), why.orElseThrow(),
-                    notifier.action(Bundle.message("yml.save.name"), () -> SaveTestinYml.start(p)));
+                    notifier.action(Bundle.message("yml.save.name", TestinYml.fileName()), () -> SaveTestinYml.start(p)));
         }
 
         Logger.debug("Automation code left as it is: " + why.orElseThrow());
@@ -100,7 +100,7 @@ public final class CodeOn {
         }
 
         presentation.setEnabled(false);
-        presentation.setText(Bundle.message("code.needs", Objects.requireNonNullElse(own.getText(), "")));
+        presentation.setText(Bundle.message("code.needs", Objects.requireNonNullElse(own.getText(), ""), TestinYml.fileName()));
         presentation.setDescription(why.orElseThrow());
         return false;
     }

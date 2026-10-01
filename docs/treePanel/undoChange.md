@@ -82,7 +82,7 @@ status bar at the bottom right of the IDE.
 2. The tester presses `Ctrl+Z`, or chooses **Actions → Undo \<what\>**.
 3. Testin reverses the change. Moved nodes go back. A renamed node gets its old
    name. An ordered node gets its old place. Removed nodes are restored from the copy kept aside, under a progress
-   bar reading *Putting back*.
+   bar reading *Putting Back*.
 4. Testin shows *Undone*.
 
 To put an undone change back, see [UC-TREE-PANEL-017](redoChange.md).

@@ -23,6 +23,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.GrayWithReason;
+import org.testin.config.TestinYml;
 import org.testin.testproject.SaveTestinYml;
 import org.testin.util.Bundle;
 
@@ -33,7 +34,7 @@ public class SaveTestinYmlAction extends DumbAwareAction {
     private final @NotNull Project p;
 
     public SaveTestinYmlAction(final @NotNull Project p) {
-        super(Bundle.message("yml.save.name"), Bundle.message("yml.save.description"), AllIcons.FileTypes.Yaml);
+        super(Bundle.message("yml.save.name", TestinYml.fileName()), Bundle.message("yml.save.description"), AllIcons.FileTypes.Yaml);
         this.p = p;
     }
 

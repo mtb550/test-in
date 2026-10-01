@@ -23,6 +23,7 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.NlsSafe;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBPanelWithEmptyText;
@@ -59,6 +60,8 @@ import java.util.Set;
 @Service(Service.Level.PROJECT)
 public final class TreePanel implements Disposable {
     private static final int INLINE_CHOICES = 6;
+
+    private static final @NotNull @NlsSafe String AUTHOR = "Muteb Almughyiri";
     private final @NotNull Project p;
     private final @NotNull TestinRoot testinRoot;
     private final @NotNull ProjectIndexer indexer;
@@ -235,7 +238,7 @@ public final class TreePanel implements Disposable {
         emptyText.appendSecondaryText(Bundle.message("welcome.tagline"), StatusText.DEFAULT_ATTRIBUTES, null);
         emptyText.appendLine("");
         emptyText.appendLine(Bundle.message("welcome.by"), SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
-        emptyText.appendLine(Bundle.message("welcome.author"), SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
+        emptyText.appendLine(AUTHOR, SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
         emptyText.appendLine("");
         emptyText.appendLine("");
 
