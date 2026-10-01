@@ -97,8 +97,7 @@ public final class CloneTestProject {
         return DirectoryType.TP.canTakeName(last) ? last : NameSanitizer.packageName(last);
     }
 
-    // UC-TREE-PANEL-003, Rule-TREE-PANEL-107
-    // UC-TREE-PANEL-003, Rule-SHARE-062
+    // UC-TREE-PANEL-003, Rule-TREE-PANEL-107, Rule-SHARE-062
     private void keepNoCredentials(final @NotNull Path projectPath) {
         final @NotNull String address = TestinYml.addressWithoutCredentials(gitUrl);
         if (address.equals(gitUrl.strip())) return;

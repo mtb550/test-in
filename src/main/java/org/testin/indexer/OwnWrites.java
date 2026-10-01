@@ -80,7 +80,6 @@ public final class OwnWrites {
     }
 
     // UC-INTERNAL-003, Rule-INTERNAL-019, Rule-INTERNAL-064
-    // UC-INTERNAL-003, Rule-INTERNAL-019
     public boolean areOurs(final @NotNull Path path, final @NotNull Project p) {
         return areOurs(path, p.getLocationHash());
     }

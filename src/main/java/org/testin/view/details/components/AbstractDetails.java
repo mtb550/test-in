@@ -32,8 +32,7 @@ import java.awt.Insets;
 import java.awt.event.ActionListener;
 
 public abstract class AbstractDetails {
-    // Rule-VIEW-PANEL-080
-    // Rule-VIEW-PANEL-082
+    // Rule-VIEW-PANEL-080, Rule-VIEW-PANEL-082
     static @NotNull JBPanel<?> row(final int gap) {
         final @NotNull JBPanel<?> row = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(gap), 0));
 

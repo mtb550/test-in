@@ -156,7 +156,6 @@ final class IndexingScanner {
             }
 
             // UC-INTERNAL-003, Rule-INTERNAL-021
-            // Rule-INTERNAL-021
             final @NotNull ScannedProject scanned = new ScannedProject();
             scanned.getProjects().put(projectPath.toString(), tp);
             store.readable(projectPath);

@@ -54,8 +54,7 @@ record SyncWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull 
             return;
         }
 
-        // Rule-SHARE-005
-        // Rule-SHARE-072
+        // Rule-SHARE-005, Rule-SHARE-072
         GitBackgroundTask.run(p, Bundle.message("git.task.syncing"), false,
                 indicator -> {
                     indicator.setText(Bundle.message("git.progress.checking.remote"));
