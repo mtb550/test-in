@@ -2,11 +2,13 @@
 
     <!-- ================================================================== -->
     <!-- Identity                                                           -->
-    <!-- Name, version, vendor and compatibility range are declared once in -->
-    <!-- build.gradle.kts (intellijPlatform.pluginConfiguration) and        -->
-    <!-- patched into this file at build time.                              -->
+    <!-- The id, name and vendor are declared here and nowhere else. The    -->
+    <!-- version and compatibility range are worked out in build.gradle.kts -->
+    <!-- (intellijPlatform.pluginConfiguration) and patched in at build.    -->
     <!-- ================================================================== -->
     <id>org.testin</id>
+    <name>Testin</name>
+    <vendor email="mtb550@gmail.com" url="https://github.com/mtb550/test-in">Muteb Almughyiri</vendor>
     <resource-bundle>messages</resource-bundle>
     <description><![CDATA[
     <b>Testin</b> brings test case management into the IDE. Design test cases, run them, and report on the results in the same window as the code they cover.

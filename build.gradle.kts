@@ -205,15 +205,7 @@ dependencies {
 
 intellijPlatform {
     pluginConfiguration {
-        id.set("org.testin")
-        name.set("Testin")
         version.set(project.version.toString())
-
-        vendor {
-            name.set("Muteb Almughyiri")
-            email.set("mtb550@gmail.com")
-            url.set("https://github.com/mtb550/test-in")
-        }
 
         ideaVersion {
             sinceBuild.set("262")
