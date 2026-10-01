@@ -112,4 +112,5 @@ jobs:
           path: |
             build/reports/tests/test
             build/reports/tests/ideTest
+            build/reports/rule-coverage
             build/reports/pluginVerifier

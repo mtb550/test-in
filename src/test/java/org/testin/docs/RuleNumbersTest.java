@@ -24,11 +24,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -39,63 +37,11 @@ import static org.testng.Assert.fail;
 
 public class RuleNumbersTest {
 
-    private static final Path DOCS = Paths.get("docs");
-
-    private static final String PRODUCT = "product.md";
     private static final Path SOURCES = Paths.get("src", "main", "java");
-
-    private static final Pattern DEFINITION = Pattern.compile(
-            "^\\s*-\\s+\\*\\*Rule-([A-Z][A-Z-]*)-(\\d+)\\*\\*(.*?)(?=\\r?\\n\\s*-\\s+\\*\\*Rule-|\\r?\\n\\r?\\n|$)",
-            Pattern.MULTILINE | Pattern.DOTALL);
-
-    private static final Pattern IN_A_TABLE = Pattern.compile(
-            "^\\| \\*\\*Rule-([A-Z][A-Z-]*)-(\\d+)\\*\\* \\|(.*?)\\|\\s*$", Pattern.MULTILINE);
 
     private static final Pattern REFERENCE = Pattern.compile("Rule-([A-Z][A-Z-]*)-(\\d+)");
 
     private static final Pattern RANGE = Pattern.compile("Rules are `Rule-([A-Z][A-Z-]*)-\\d+` to `Rule-[A-Z][A-Z-]*-(\\d+)`");
-
-    private static @NotNull Map<String, Map<Integer, Map<String, List<String>>>> definitions() {
-        final Map<String, Map<Integer, Map<String, List<String>>>> byPart = new TreeMap<>();
-
-        for (final Path page : partPages()) {
-            final String text = read(page);
-
-            for (final Pattern form : List.of(DEFINITION, IN_A_TABLE)) {
-                final Matcher written = form.matcher(text);
-
-                while (written.find()) {
-                    byPart.computeIfAbsent(written.group(1), _ -> new TreeMap<>())
-                            .computeIfAbsent(Integer.parseInt(written.group(2)), _ -> new LinkedHashMap<>())
-                            .computeIfAbsent(oneLine(written.group(3)), _ -> new ArrayList<>())
-                            .add(page.getFileName().toString());
-                }
-            }
-        }
-
-        return byPart;
-    }
-
-    private static @NotNull String oneLine(final String text) {
-        return text.replaceAll("\\s+", " ").trim();
-    }
-
-    private static @NotNull List<Path> partPages() {
-        final List<Path> pages = new ArrayList<>();
-
-        try (Stream<Path> tree = Files.walk(DOCS)) {
-            for (final Path file : tree.toList()) {
-                if (!file.toString().endsWith(".md")) continue;
-                if (file.getParent().equals(DOCS) && !file.getFileName().toString().equals(PRODUCT)) continue;
-
-                pages.add(file);
-            }
-        } catch (final IOException ex) {
-            fail("Could not read " + DOCS + ": " + ex.getMessage());
-        }
-
-        return pages;
-    }
 
     private static @NotNull List<Path> javaFiles() {
         final List<Path> files = new ArrayList<>();
@@ -110,7 +56,7 @@ public class RuleNumbersTest {
     }
 
     private static @NotNull Path numberingPage(final String part) {
-        if ("PRODUCT".equals(part)) return DOCS.resolve(PRODUCT);
+        if ("PRODUCT".equals(part)) return DocumentedRules.DOCS.resolve(DocumentedRules.PRODUCT);
 
         return partFolder(part).resolve("main.md");
     }
@@ -129,21 +75,12 @@ public class RuleNumbersTest {
         final String folder = folders.get(part);
         if (folder == null) fail("Rule-" + part + "-… names a part with no folder under docs");
 
-        return DOCS.resolve(folder);
-    }
-
-    private static @NotNull String read(final Path file) {
-        try {
-            return Files.readString(file);
-        } catch (final IOException ex) {
-            fail("Could not read " + file + ": " + ex.getMessage());
-            return "";
-        }
+        return DocumentedRules.DOCS.resolve(folder);
     }
 
     @Test
     public void everyCopyOfARuleSaysTheSameThing() {
-        final Map<String, Map<Integer, Map<String, List<String>>>> byPart = definitions();
+        final Map<String, Map<Integer, Map<String, List<String>>>> byPart = DocumentedRules.definitions();
 
         final List<String> disagreements = new ArrayList<>();
         byPart.forEach((part, numbers) -> numbers.forEach((number, texts) -> {
@@ -165,11 +102,11 @@ public class RuleNumbersTest {
 
     @Test
     public void everyPartSaysItsLastNumber() {
-        final Map<String, Map<Integer, Map<String, List<String>>>> byPart = definitions();
+        final Map<String, Map<Integer, Map<String, List<String>>>> byPart = DocumentedRules.definitions();
 
         for (final Map.Entry<String, Map<Integer, Map<String, List<String>>>> part : byPart.entrySet()) {
             final Path main = numberingPage(part.getKey());
-            final Matcher claimed = RANGE.matcher(read(main));
+            final Matcher claimed = RANGE.matcher(DocumentedRules.read(main));
 
             if (!claimed.find()) fail(main + " has no Numbering row saying the range its rules cover");
 
@@ -182,13 +119,11 @@ public class RuleNumbersTest {
 
     @Test
     public void everyRuleTheCodeCitesExists() {
-        final Set<String> written = new LinkedHashSet<>();
-        definitions().forEach((part, numbers) ->
-                numbers.keySet().forEach(number -> written.add(String.format("Rule-%s-%03d", part, number))));
+        final Set<String> written = DocumentedRules.names();
 
         final List<String> dangling = new ArrayList<>();
         for (final Path source : javaFiles()) {
-            final Matcher cited = REFERENCE.matcher(read(source));
+            final Matcher cited = REFERENCE.matcher(DocumentedRules.read(source));
 
             while (cited.find()) {
                 if (!written.contains(cited.group())) dangling.add(cited.group() + " in " + source.getFileName());

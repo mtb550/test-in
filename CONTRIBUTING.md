@@ -174,6 +174,21 @@ method over the limit is split, not listed. The report is in
 `build/reports/pmd/main.html` of each module, and the console names the method
 and its score.
 
+### Which rules a test proves
+
+A rule is proven when a test method carries its marker, the same marker the
+code carries: `// Rule-TREE-PANEL-038` on the line above the test method, or
+`// UC-TREE-PANEL-012, Rule-TREE-PANEL-038`. `RuleCoverageTest` reads every
+test root and does two things with them (#325):
+
+| Check                        | What happens                                                                                                                                                      |
+|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `everyRuleATestNamesExists`  | Fails when a test marker names a rule no document writes, as `RuleNumbersTest` does for the production code                                                       |
+| `reportTheRulesNoTestProves` | Writes `build/reports/rule-coverage/unproven.md` - proven against total per part, then every rule no test proves - and prints the count. It never fails the build |
+
+CI keeps the report with the other test reports. When a test you write proves a
+rule, give it the marker: that is how the count goes up.
+
 ### The inspection gate
 
 **It runs in CI on every push, on every branch, and that is where to read it.**
