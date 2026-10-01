@@ -19,6 +19,8 @@ package org.testin.model;
 import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 
-public record RunStatusBadge(@NotNull String label, @NotNull JBColor color) {
+import java.awt.Color;
+
+public record RunStatusBadge(@NotNull String label, @NotNull Color color) {
     public static final @NotNull RunStatusBadge NONE = new RunStatusBadge("", JBColor.GRAY);
 }

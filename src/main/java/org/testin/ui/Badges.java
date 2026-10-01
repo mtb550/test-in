@@ -17,7 +17,6 @@
 package org.testin.ui;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -53,10 +52,11 @@ public final class Badges {
     private static final int BADGE_PAD_V = 2;
     private static final int BADGE_PAD_H = 10;
 
-    private static final @NotNull Color TEXT_ON_LIGHT = Gray._30;
+    private static final @NotNull Color TEXT_ON_LIGHT = new JBColor(Color.DARK_GRAY, Color.DARK_GRAY);
+    private static final @NotNull Color TEXT_ON_DARK = new JBColor(Color.WHITE, Color.WHITE);
 
     private static final @NotNull Color GROUP_COLOR = JBColor.darkGray;
-    static final @NotNull Icon BUG_MARK = IconUtil.colorize(IconUtil.resizeSquared(AllIcons.Toolwindows.ToolWindowDebugger, 20), Gray._0);
+    static final @NotNull Icon BUG_MARK = IconUtil.colorize(IconUtil.resizeSquared(AllIcons.Toolwindows.ToolWindowDebugger, 20), new JBColor(Color.BLACK, Color.BLACK));
     private static final @NotNull Icon CLOCK = IconUtil.resizeSquared(AllIcons.Vcs.History, 14);
 
     public static void addPriorityBadge(final @NotNull List<Badge> badges, final @NotNull TestCaseDto tc) {
@@ -127,7 +127,7 @@ public final class Badges {
 
     // Rule-EDITOR-PANEL-252
     static @NotNull Color readableOn(final @NotNull Color fill) {
-        return isLight(fill) ? TEXT_ON_LIGHT : JBColor.WHITE;
+        return isLight(fill) ? TEXT_ON_LIGHT : TEXT_ON_DARK;
     }
 
     static void fillPill(final @NotNull Graphics2D g2, final @NotNull Color fill, final int width, final int height) {

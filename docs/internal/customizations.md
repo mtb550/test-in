@@ -37,7 +37,6 @@ part (#348, sandbox-checked 1 October 2026):
 | The verdict donut                               | `view/marker/VerdictDonut.java` `paintComponent`, `view/marker/Swatch.java` `paintIcon` | No platform chart of any kind                                                                                                                                                                                           | None                                                             |
 | The grid's selected-cell edge                   | `editor/grid/SelectionCellBorder.java` `paintBorder`                                    | A table cell border is the caller's in Swing                                                                                                                                                                            | None                                                             |
 | Light mode's key button                         | `lightmode/KeyBtn.java` `paintComponent`                                                | Related: `ui/framework/Keycap` draws the same idea for dialogs, so **these two are each other's duplicate**, not the platform's                                                                                         | None                                                             |
-| Analysis category colors parsed from `#rrggbb`  | `model/ResultAnalysis.java` `onScreen`                                                  | The colors are the tester's own data, not the IDE's                                                                                                                                                                     | None                                                             |
 
 ## Decided, not drift
 
@@ -46,7 +45,6 @@ These are recorded decisions. They are listed so nobody "cleans" them.
 | What                                                          | Where                                                | The decision                                                                            | Rule in docs/                      |
 |---------------------------------------------------------------|------------------------------------------------------|-----------------------------------------------------------------------------------------|------------------------------------|
 | `GRAY`, `RED`, `GREEN` are a `JBColor` whose halves are equal | `util/Icons.java` `GRAY`, `RED`, `GREEN`             | Testin's icons are one color in both themes, on purpose - the pair says so              | Rule-INTERNAL-077                  |
-| Run status badge colors                                       | `model/RunStatus.java` `PASSED`, `FAILED`, `RUNNING` | Passed, failed and running read as green, red and amber to a tester regardless of theme | None - a decision with no rule yet |
 | The dialog surfaces                                           | `ui/dialogs/DialogStyle.java` `CONTENT`              | Two named theme colors, chosen per theme by luminance. Rule-INTERNAL-099                | Rule-INTERNAL-099                  |
 
 ## Not customizations at all

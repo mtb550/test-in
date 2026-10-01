@@ -74,9 +74,7 @@ public class ResultAnalysisSegmentsTest {
     public void aVerdictIsPaintedInItsOwnColor() {
         final @NotNull Color painted = of(run(0, 3, 0, 0, 0), TestRunStatus.IN_PROGRESS).getFirst().color();
 
-        assertTrue(painted.getRGB() == Color.decode("#" + ResultAnalysis.FAILED.getHexColor()).getRGB()
-                        || painted.getRGB() == Color.decode("#" + ResultAnalysis.FAILED.getDarkHexColor()).getRGB(),
-                "failed should be painted red, in whichever of its two reds suits the theme");
+        assertEquals(painted, TestStatus.FAILED.getRowColor(), "failed should be painted in the failed verdict's own color");
     }
 
     @Test

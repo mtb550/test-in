@@ -16,13 +16,11 @@
 
 package org.testin.model;
 
-import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -37,7 +35,6 @@ public enum ResultAnalysis {
             TestStatus.PASSED,
             TestStatus.PASSED,
             "2E7D32",
-            "4FBF60",
             TestRunSummary::passed
     ),
 
@@ -45,7 +42,6 @@ public enum ResultAnalysis {
             TestStatus.FAILED,
             TestStatus.FAILED,
             "C0392B",
-            "F2685A",
             TestRunSummary::failed
     ),
 
@@ -53,7 +49,6 @@ public enum ResultAnalysis {
             TestStatus.BLOCKED,
             TestStatus.BLOCKED,
             "B8860B",
-            "F5B940",
             TestRunSummary::blocked
     ),
 
@@ -61,7 +56,6 @@ public enum ResultAnalysis {
             TestStatus.PENDING,
             TestStatus.UNTESTED,
             "595959",
-            "96A1B0",
             TestRunSummary::untested
     );
 
@@ -70,8 +64,6 @@ public enum ResultAnalysis {
 
     private final @NotNull String hexColor;
 
-    private final @NotNull String darkHexColor;
-
     private final @NotNull ToLongFunction<TestRunSummary> count;
 
     public static @NotNull List<Segment> segments(final @NotNull TestRunSummary summary, final @NotNull TestRunStatus run) {
@@ -79,7 +71,7 @@ public enum ResultAnalysis {
 
         for (final ResultAnalysis section : values()) {
             final long testCases = section.count.applyAsLong(summary);
-            if (testCases > 0) segments.add(new Segment(section.labelIn(run) + " " + testCases, section.onScreen()));
+            if (testCases > 0) segments.add(new Segment(section.labelIn(run) + " " + testCases, section.getOnceFinished().getRowColor()));
         }
 
         if (summary.hasRemoved()) {
@@ -119,10 +111,6 @@ public enum ResultAnalysis {
 
     public @NotNull String heading(final @NotNull TestRunSummary summary) {
         return getLabel() + " (" + count.applyAsLong(summary) + ")";
-    }
-
-    private @NotNull JBColor onScreen() {
-        return new JBColor(Color.decode("#" + hexColor), Color.decode("#" + darkHexColor));
     }
 
     public @NotNull String writtenIn(final @NotNull Map<ResultAnalysis, String> analysis) {

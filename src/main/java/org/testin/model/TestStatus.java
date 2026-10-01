@@ -31,7 +31,6 @@ import java.awt.event.KeyEvent;
 @AllArgsConstructor
 public enum TestStatus {
     PASSED(
-            "008000",
             JBColor.GREEN,
             Bundle.message("status.verdict.passed"),
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
@@ -39,7 +38,6 @@ public enum TestStatus {
     ),
 
     FAILED(
-            "FF0000",
             JBColor.RED.darker(),
             Bundle.message("status.verdict.failed"),
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)),
@@ -47,7 +45,6 @@ public enum TestStatus {
     ),
 
     BLOCKED(
-            "FFA500",
             JBColor.ORANGE,
             Bundle.message("status.verdict.blocked"),
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
@@ -55,7 +52,6 @@ public enum TestStatus {
     ),
 
     PENDING(
-            "808080",
             JBColor.lazy(UIUtil::getContextHelpForeground),
             Bundle.message("status.verdict.pending"),
             MenuEntry.NONE,
@@ -63,7 +59,6 @@ public enum TestStatus {
     ),
 
     REMOVED(
-            "9E9E9E",
             JBColor.GRAY,
             Bundle.message("status.verdict.removed"),
             MenuEntry.NONE,
@@ -71,14 +66,12 @@ public enum TestStatus {
     ),
 
     UNTESTED(
-            "808080",
             JBColor.GRAY.brighter(),
             Bundle.message("status.verdict.untested"),
             MenuEntry.NONE,
             false
     );
 
-    private final @NotNull String hex;
     private final @NotNull Color rowColor;
     private final @NotNull String label;
 
