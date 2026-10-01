@@ -151,7 +151,7 @@ public final class ProjectIndexer {
                         } catch (final Exception ex) {
                             Logger.error("Failed to index project: " + projectName + " - " + FailureText.of(ex));
                         }
-                        Logger.info("First read of '" + projectName + "' took " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started) + " ms");
+                        Logger.info("Reading '" + projectName + "' took " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started) + " ms");
 
                         indicator.setFraction(1.0);
                         indicator.setText(Bundle.message("indexer.progress.done", projectName));
