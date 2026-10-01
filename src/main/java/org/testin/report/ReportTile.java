@@ -19,6 +19,7 @@ package org.testin.report;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.ReportColor;
 import org.testin.model.TestRunSummary;
 import org.testin.model.TestStatus;
 import org.testin.util.Bundle;
@@ -32,7 +33,7 @@ import java.util.function.Function;
 public enum ReportTile {
     TOTAL_TEST_CASES(
             Bundle.message("report.tile.total.cases"),
-            "1F3864",
+            ReportColor.HEADING.hex(),
             "var(--heading)",
             TestRunSummary::total,
             ""
@@ -79,7 +80,7 @@ public enum ReportTile {
 
     PASS_RATE(
             Bundle.message("report.tile.pass.rate"),
-            "2E5496",
+            ReportColor.ACCENT.hex(),
             "var(--heading)",
             TestRunSummary::passRate,
             "%"

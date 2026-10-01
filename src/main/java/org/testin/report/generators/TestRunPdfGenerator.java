@@ -45,6 +45,7 @@ import org.testin.logger.Logger;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
+import org.testin.model.ReportColor;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
@@ -72,14 +73,14 @@ import java.util.Set;
 
 public final class TestRunPdfGenerator {
     private final @NotNull Set<String> leftOut = new LinkedHashSet<>();
-    private final @NotNull DeviceRgb DARK_NAVY = new DeviceRgb(0x1F, 0x38, 0x64);
-    private final @NotNull DeviceRgb MEDIUM_BLUE = new DeviceRgb(0x2E, 0x54, 0x96);
-    private final @NotNull DeviceRgb DARK_GRAY = new DeviceRgb(0x59, 0x59, 0x59);
-    private final @NotNull DeviceRgb LIGHT_BG = new DeviceRgb(0xF2, 0xF5, 0xFA);
-    private final @NotNull DeviceRgb BORDER_GRAY = new DeviceRgb(0xD0, 0xD7, 0xE5);
-    private final @NotNull DeviceRgb WHITE = new DeviceRgb(0xFF, 0xFF, 0xFF);
-    private final @NotNull DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
-    private final @NotNull DeviceRgb LINK_BLUE = rgb(ReportText.LINK_BLUE);
+    private final @NotNull DeviceRgb DARK_NAVY = rgb(ReportColor.HEADING.hex());
+    private final @NotNull DeviceRgb MEDIUM_BLUE = rgb(ReportColor.ACCENT.hex());
+    private final @NotNull DeviceRgb DARK_GRAY = rgb(ReportColor.MUTED.hex());
+    private final @NotNull DeviceRgb LIGHT_BG = rgb(ReportColor.PANEL.hex());
+    private final @NotNull DeviceRgb BORDER_GRAY = rgb(ReportColor.LINE.hex());
+    private final @NotNull DeviceRgb WHITE = rgb(ReportColor.PAGE.hex());
+    private final @NotNull DeviceRgb BLACK = rgb(ReportColor.INK.hex());
+    private final @NotNull DeviceRgb LINK_BLUE = rgb(ReportColor.LINK.hex());
     private @NotNull Optional<PdfFont> printsWith = Optional.empty();
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005

@@ -28,8 +28,6 @@ public final class ReportText {
     public static final @NotNull String PLUGIN_NAME = "Testin";
     public static final @NotNull String PLUGIN_URL = "https://plugins.jetbrains.com/plugin/31514-testin";
 
-    public static final @NotNull String LINK_BLUE = "0052CC";
-
     public static @NotNull String joined(final @NotNull String separator, final String @NotNull ... parts) {
         return Arrays.stream(parts)
                 .map(String::trim)

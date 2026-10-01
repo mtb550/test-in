@@ -18,6 +18,7 @@ package org.testin.report.generators;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.ReportColor;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunSummary;
 import org.testin.model.TestStatus;
@@ -117,7 +118,7 @@ enum ReportSection {
 
     // UC-REPORT-001, Rule-REPORT-022
     public @NotNull String textHex() {
-        return contrast(hexColor, "FFFFFF") >= contrast(hexColor, "14171A") ? "FFFFFF" : "14171A";
+        return contrast(hexColor, ReportColor.PAGE.hex()) >= contrast(hexColor, ReportColor.INK.hex()) ? ReportColor.PAGE.hex() : ReportColor.INK.hex();
     }
 
     public boolean isWithFailureDetail() {

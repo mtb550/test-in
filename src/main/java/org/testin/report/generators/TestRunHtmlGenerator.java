@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
+import org.testin.model.ReportColor;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
@@ -46,11 +47,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 public final class TestRunHtmlGenerator {
-    final String DARK_BLUE = "#1f3864";
-    final String MEDIUM_BLUE = "#2e5496";
-    final String GRAY = "#595959";
-    final String LIGHT_BG = "#f2f5fa";
-    final String BORDER_COLOR = "#d0d7e5";
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
     public @NotNull String generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {
@@ -286,10 +282,7 @@ public final class TestRunHtmlGenerator {
     }
 
     private @NotNull String lightTokens() {
-        return "--page: #fff; --ink: #000; --heading: " + DARK_BLUE + "; --accent: " + MEDIUM_BLUE + ";"
-                + "--muted: " + GRAY + "; --panel: " + LIGHT_BG + "; --line: " + BORDER_COLOR + ";"
-                + "--footer-ink: #888; --link: #0052cc;"
-                + verdictTokens(TestStatus::getReportHex);
+        return ReportColor.cssTokens(ReportColor::hex) + verdictTokens(TestStatus::getReportHex);
     }
 
     // Rule-REPORT-025
@@ -304,10 +297,7 @@ public final class TestRunHtmlGenerator {
     }
 
     private @NotNull String darkTokens() {
-        return "--page: #1e1f22; --ink: #dfe1e5; --heading: #8fb4f2; --accent: #6f9ae8;"
-                + "--muted: #9aa0a8; --panel: #2b2d30; --line: #3d4045;"
-                + "--footer-ink: #8a9099; --link: #7aa7f0;"
-                + verdictTokens(TestStatus::getReportDarkHex);
+        return ReportColor.cssTokens(ReportColor::darkHex) + verdictTokens(TestStatus::getReportDarkHex);
     }
 
     private @NotNull String themeScript() {

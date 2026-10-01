@@ -49,6 +49,7 @@ import org.testin.logger.Logger;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
+import org.testin.model.ReportColor;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
@@ -75,14 +76,14 @@ import java.util.List;
 public final class TestRunWordGenerator {
     final String NO_BORDER = "";
 
-    final String DARK_NAVY = "1F3864";
-    final String MEDIUM_BLUE = "2E5496";
-    final String DARK_GRAY = "595959";
-    final String LINK_BLUE = ReportText.LINK_BLUE;
-    final String LIGHT_BG = "F2F5FA";
-    final String BORDER_GRAY = "D0D7E5";
-    final String WHITE = "FFFFFF";
-    final String BLACK = "000000";
+    final String DARK_NAVY = ReportColor.HEADING.hex();
+    final String MEDIUM_BLUE = ReportColor.ACCENT.hex();
+    final String DARK_GRAY = ReportColor.MUTED.hex();
+    final String LINK_BLUE = ReportColor.LINK.hex();
+    final String LIGHT_BG = ReportColor.PANEL.hex();
+    final String BORDER_GRAY = ReportColor.LINE.hex();
+    final String WHITE = ReportColor.PAGE.hex();
+    final String BLACK = ReportColor.INK.hex();
 
     // UC-REPORT-001, Rule-REPORT-002, Rule-REPORT-005
     public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr) {

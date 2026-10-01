@@ -24,6 +24,7 @@ import org.dhatim.fastexcel.Worksheet;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.BugIssueUrl;
+import org.testin.model.ReportColor;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunSummary;
@@ -110,7 +111,7 @@ public final class TestRunExcelGenerator {
         ws.value(0, 6, RunEditorAttributes.DURATION.getName());
         ws.value(0, 7, RunEditorAttributes.EXPECTED_RESULT.getName());
         ws.value(0, 8, RunEditorAttributes.BUG_ISSUE.getName());
-        ws.range(0, 0, 0, 8).style().bold().fillColor("E0E0E0").set();
+        ws.range(0, 0, 0, 8).style().bold().fillColor(ReportColor.PANEL.hex()).set();
 
         int row = 1;
         for (final TestRunItems result : tr.getResults()) {

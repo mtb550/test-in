@@ -16,6 +16,7 @@
 
 package org.testin.model;
 
+import com.intellij.ui.ColorUtil;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 import lombok.AllArgsConstructor;
@@ -32,8 +33,7 @@ import java.awt.event.KeyEvent;
 public enum TestStatus {
     PASSED(
             JBColor.GREEN,
-            "2E7D32",
-            "6CC47A",
+            Color.GREEN.darker(),
             Bundle.message("status.verdict.passed"),
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
             false
@@ -41,8 +41,7 @@ public enum TestStatus {
 
     FAILED(
             JBColor.RED.darker(),
-            "C0392B",
-            "E5675A",
+            Color.RED.darker(),
             Bundle.message("status.verdict.failed"),
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)),
             true
@@ -50,8 +49,7 @@ public enum TestStatus {
 
     BLOCKED(
             JBColor.ORANGE,
-            "B8860B",
-            "E8A33D",
+            Color.ORANGE.darker(),
             Bundle.message("status.verdict.blocked"),
             new MenuEntry(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
             false
@@ -59,8 +57,7 @@ public enum TestStatus {
 
     PENDING(
             JBColor.lazy(UIUtil::getContextHelpForeground),
-            "595959",
-            "A3A9B1",
+            Color.GRAY.darker(),
             Bundle.message("status.verdict.pending"),
             MenuEntry.NONE,
             false
@@ -68,8 +65,7 @@ public enum TestStatus {
 
     REMOVED(
             JBColor.GRAY,
-            "595959",
-            "A3A9B1",
+            Color.GRAY.darker(),
             Bundle.message("status.verdict.removed"),
             MenuEntry.NONE,
             false
@@ -77,21 +73,29 @@ public enum TestStatus {
 
     UNTESTED(
             JBColor.GRAY.brighter(),
-            "595959",
-            "A3A9B1",
+            Color.GRAY.darker(),
             Bundle.message("status.verdict.untested"),
             MenuEntry.NONE,
             false
     );
 
     private final @NotNull Color rowColor;
-    private final @NotNull String reportHex;
-    private final @NotNull String reportDarkHex;
+    private final @NotNull Color reportColor;
     private final @NotNull String label;
 
     private final @NotNull MenuEntry menuEntry;
 
     private final boolean collectsFailureDetails;
+
+    // Rule-REPORT-025
+    public @NotNull String getReportHex() {
+        return ColorUtil.toHex(reportColor);
+    }
+
+    // Rule-REPORT-025
+    public @NotNull String getReportDarkHex() {
+        return ColorUtil.toHex(ReportColor.forDarkPage(reportColor));
+    }
 
     public boolean isVerdict() {
         return menuEntry != MenuEntry.NONE;
