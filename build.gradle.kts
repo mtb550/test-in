@@ -99,7 +99,7 @@ allprojects {
 }
 
 // #378: pmdMain, part of check, fails on a production method over the cognitive
-// complexity or if-nesting limit in .github/complexity-rules.xml, which exempts
+// complexity or if-nesting limit in .gitHub/complexity-rules.xml, which exempts
 // no method (#382). Both rules read the syntax tree only, so PMD is given no
 // compiled classes and does not wait for compileJava. The core gets its library
 // jars so PMD can resolve platform types; the two modules' jars would include
