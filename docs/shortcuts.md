@@ -7,9 +7,11 @@ so a key that means different things in two places appears twice - which is the
 honest way to read this, because that is how a tester meets them.
 
 `Ctrl` here is `Cmd` on a Mac for the keys the platform decides: copy, cut,
-paste, undo, redo, find, and select every value. Everything else is `Ctrl` on
-every machine, because it is Testin's own key rather than the operating
-system's.
+paste, undo, redo, find, and select every value. So are Testin's own keys whose
+`Cmd` form nothing else takes: `Ctrl+Enter` for a new line in a step or a new
+list item, `Ctrl+D` for the details, and the create dialog's `Ctrl+D`, `Ctrl+E`,
+`Ctrl+S` and `Ctrl+T`. Everything else is `Ctrl` on every machine, because its
+`Cmd` form belongs to macOS or to the IDE's own editor.
 
 Three of Testin's own keys are the exception, and each says so where it appears:
 search is `Cmd+Alt+F` on a Mac, creating a test case is `Cmd+M`, and writing the

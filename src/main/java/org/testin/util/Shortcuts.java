@@ -51,11 +51,11 @@ public enum Shortcuts {
     ),
 
     InsertNewLine(
-            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, menuMask())
     ),
 
     AddArrayItem(
-            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, menuMask())
     ),
 
     RemoveArrayItem(
@@ -83,7 +83,7 @@ public enum Shortcuts {
     ),
 
     ToggleDetails(
-            KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_D, menuMask())
     ),
 
     ContextMenu(
@@ -203,11 +203,11 @@ public enum Shortcuts {
     ),
 
     CreateTestCaseDescription(
-            KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_D, menuMask())
     ),
 
     CreateTestCaseExpectedResult(
-            KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_E, menuMask())
     ),
 
     CreateTestCaseModule(
@@ -215,7 +215,7 @@ public enum Shortcuts {
     ),
 
     CreateTestCaseAddStep(
-            KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_S, menuMask())
     ),
 
     CreateTestCaseGroup(
@@ -227,7 +227,7 @@ public enum Shortcuts {
     ),
 
     CreateTestCaseTestData(
-            KeyStroke.getKeyStroke(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_T, menuMask())
     ),
 
     CreateTestCasePreConditions(
