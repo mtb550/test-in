@@ -547,13 +547,13 @@ run showed the tabs in the label color in both themes.
 
 **Consequences.** The plugin makes no experimental API call, the Marketplace
 page carries no warning line, and a new experimental call fails `Build` instead
-of reaching it. Nothing paints a Testin tab title any more; the platform does.
+of reaching it. Nothing paints a Testin tab title anymore; the platform does.
 
 **If you are about to reverse it.** Check first why the title turned brown. The
 brown is `FileStatus.UNKNOWN`, which only a file in the local file system can
-get, so a Testin file that starts answering `isInLocalFileSystem()` with true, or
-moves to the local file system, is the cause, and putting the override back
-would hide it behind an experimental call.
+get. So the cause is a Testin file that starts answering `isInLocalFileSystem()`
+with true, or moves to the local file system. Putting the override back would
+hide that behind an experimental call.
 
 ---
 

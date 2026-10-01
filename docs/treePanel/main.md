@@ -397,7 +397,7 @@ at all depends on which plugins are installed.
 │  Export                          (4)   │  Remove             Delete │      │
 │  Import                                │  Rename           Shift+F6 │      │
 │  ──────────────────────────────        │  Order                     │      │
-│  Sync With Remote                (5)   │  Copy               Ctrl+C │      │
+│  Sync with Remote                (5)   │  Copy               Ctrl+C │      │
 │  View Pending Commits                  │  Cut                Ctrl+X │      │
 │  ──────────────────────────────        │  Paste              Ctrl+V │      │
 │  Edit Run                        (6)   └────────────────────────────┘      │
@@ -424,7 +424,7 @@ at all depends on which plugins are installed.
    shown are a test project's.
 3. **Run Tests** — only when the TestNG plugin is present.
 4. **Export**, **Import** — these belong to reports, export, import and sync.
-5. **Sync With Remote**, **View Pending Commits** — only when the Git plugin is
+5. **Sync with Remote**, **View Pending Commits** — only when the Git plugin is
    present. Otherwise, the whole section disappears, dividing line included.
 6. **Edit Run** and **Set Status** — a test run's own two entries. Grayed once
    the test run is signed off.
@@ -444,7 +444,7 @@ documented there:
 |------------------------------------------------|----------------------------------|
 | **Export**, **Import**                         | Reports, export, import and sync |
 | **Generate Report** (`Ctrl+P`)                 | The same                         |
-| **Sync With Remote**, **View Pending Commits** | The same, the Git half           |
+| **Sync with Remote**, **View Pending Commits** | The same, the Git half           |
 
 ---
 

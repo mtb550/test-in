@@ -143,7 +143,7 @@ public class StatusBar extends JBPanel<StatusBar> {
 
         final @NotNull GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridy = 0;
-        gbc.insets = JBUI.insets(0, 4, 0, 0);
+        gbc.insets = JBUI.insetsLeft(4);
 
         for (final JComponent item : items) row.add(item, gbc);
 

@@ -8,7 +8,7 @@ sends mine out, **so that** I do not have to remember two.
 A sync takes the team's changes first, then sends the tester's. One press does
 both, so nothing is left behind.
 
-There is no key for this. The menu entry is **Sync With Remote**.
+There is no key for this. The menu entry is **Sync with Remote**.
 
 ## Rules
 
@@ -58,7 +58,7 @@ list.
 
 ## Main flow
 
-1. The tester selects the test project and chooses **Sync With Remote**.
+1. The tester selects the test project and chooses **Sync with Remote**.
 2. A bar titled *Syncing with remote* opens. It cannot be canceled: what
    follows writes to the repository and to the remote.
 3. The bar reads *Checking remote configuration...*.

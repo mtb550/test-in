@@ -44,7 +44,7 @@ sits under it, reading **Push**.
 3. Nothing has changed since, so there is nothing to review.
 4. A message titled **Not Pushed** reads the count, then *commits are committed
    here and not on the remote.*
-5. The tester clicks **Push** on the message, or chooses **Sync With Remote**.
+5. The tester clicks **Push** on the message, or chooses **Sync with Remote**.
    Either one sends them.
 
 **A branch the remote has never had** reaches the same message by a different

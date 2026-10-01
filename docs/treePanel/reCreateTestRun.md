@@ -2,7 +2,7 @@
 
 # UC-TREE-PANEL-021: Re-create a test run
 
-> **No key.** On the menu: **Actions → Re-create Test Run**.
+> **No key.** On the menu: **Actions → Re-Create Test Run**.
 
 **As a** tester, **I want** to make the next cycle from a finished test run, **so that** starting the next round of
 testing takes one step. The new one has
@@ -82,7 +82,7 @@ status bar at the bottom right of the IDE.
 ## Main flow
 
 1. The tester selects a test run in any status.
-2. The tester chooses **Actions → Re-create Test Run**.
+2. The tester chooses **Actions → Re-Create Test Run**.
 3. The **Create Test Run** dialog opens, with the next name suggested: *cycle-1*
    becomes *cycle-2*. The same test cases are ticked, and the same configuration
    is filled in.

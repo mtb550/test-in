@@ -114,7 +114,7 @@ class TestCaseDetails extends JBPanel<TestCaseDetails> {
         gbc.gridy = GridBagConstraints.RELATIVE;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = JBUI.insets(0, 0, GAP, 0);
+        gbc.insets = JBUI.insetsBottom(GAP);
 
         gbc.gridx = 0;
         gbc.weightx = 0;

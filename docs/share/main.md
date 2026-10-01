@@ -138,7 +138,7 @@ ignored. A heading Testin does not know is left alone.
 |----------------------------------------------------------------------------|----------|
 | Export and import                                                          | No       |
 | Reports                                                                    | No       |
-| **Sync With Remote**, and everything reached from **View Pending Commits** | **Yes**  |
+| **Sync with Remote**, and everything reached from **View Pending Commits** | **Yes**  |
 
 Without the Git plugin those two menu entries are still in the menu, grayed, and
 each says what it needs: *(needs the Git plugin)*. The menu has the same shape

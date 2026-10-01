@@ -95,11 +95,11 @@ final class IndexerDataStore {
         this.markers = new MarkerFiles(p);
     }
 
-    private static <T> @NotNull T indexed(final @Nullable T node, final @NotNull Class<T> kind, final @NotNull Path path) {
+    private static @NotNull TestRunDto indexed(final @Nullable TestRunDto node, final @NotNull Path path) {
         if (node != null) return node;
 
-        Logger.error("No " + kind.getSimpleName() + " indexed at " + path);
-        throw new IllegalStateException("No " + kind.getSimpleName() + " indexed at " + path);
+        Logger.error("No test run indexed at " + path);
+        throw new IllegalStateException("No test run indexed at " + path);
     }
 
     private static void dropUnseen(final @NotNull Map<String, ?> held, final @NotNull Path projectPath, final @NotNull Map<String, ?> found) {
@@ -137,7 +137,7 @@ final class IndexerDataStore {
 
     @NotNull
     TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
-        return indexed(testRunsByPath.get(testRunPath.toString()), TestRunDto.class, testRunPath);
+        return indexed(testRunsByPath.get(testRunPath.toString()), testRunPath);
     }
 
     @NotNull

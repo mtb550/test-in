@@ -57,7 +57,7 @@ public final class CaptionValueRow {
         panel.add(Caption.of(caption, Fonts.panelCaption()), gbc);
 
         gbc.gridy = row + 1;
-        gbc.insets = JBUI.insets(0, SIDE, 0, SIDE);
+        gbc.insets = JBUI.insets(0, SIDE);
         panel.add(value, gbc);
 
         return row + 2;
