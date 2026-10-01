@@ -17,6 +17,7 @@
 package org.testin.docs;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -124,7 +125,7 @@ public class RuleCoverageTest {
         write(REPORT, "# " + summary + "\n\nA rule is proven when a test method carries its marker - `// Rule-PART-NNN` above the method.\n\n"
                 + parts + "\n# The rules no test proves\n" + unproven);
 
-        System.out.println(summary + " - the rules no test proves are listed in " + REPORT);
+        Logger.info(summary + " - the rules no test proves are listed in " + REPORT);
     }
 
     private static void write(final @NotNull Path file, final @NotNull String text) {
