@@ -12,6 +12,7 @@ plugins {
     id("java")
     id("idea")
     id("pmd")
+    id("jacoco")
     id("org.jetbrains.intellij.platform")
     alias(libs.plugins.errorprone)
     alias(libs.plugins.changelog)
@@ -122,6 +123,67 @@ allprojects {
         enabled = name == "pmdMain"
         classpath = if (project == rootProject) project.the<SourceSetContainer>()["main"].compileClasspath else files()
     }
+}
+
+// #325: line coverage, from test and ideTest together, in one report across the
+// three modules, and check fails below the minimum. JaCoCo recorded nothing here
+// once (#130) because the platform's class loader gives a class no code location
+// and the agent skips such a class unless told otherwise. The report reads the
+// instrumentCode output: JaCoCo matches a class by a checksum of its bytes, and
+// those are the bytes the tests load, not the ones in build/classes. The minimum
+// is the whole percent under the 40.72% measured on 2 October 2026: it stops
+// coverage falling, and raising it is a decision rather than a side effect.
+allprojects {
+    pluginManager.apply("jacoco")
+
+    tasks.withType<Test>().configureEach {
+        extensions.configure<JacocoTaskExtension> {
+            isIncludeNoLocationClasses = true
+            excludes = listOf("jdk.internal.*")
+        }
+    }
+
+    tasks.withType<JacocoReportBase>().configureEach {
+        enabled = project == rootProject
+    }
+}
+
+tasks.withType<JacocoReportBase>().configureEach {
+    executionData.setFrom()
+    classDirectories.setFrom()
+    sourceDirectories.setFrom()
+
+    allprojects.forEach { module ->
+        dependsOn(module.tasks.withType<Test>())
+        executionData.from(module.fileTree(module.layout.buildDirectory.dir("jacoco")).include("*.exec"))
+        classDirectories.from(module.tasks.named("instrumentCode"))
+        sourceDirectories.from(module.the<SourceSetContainer>()["main"].java.srcDirs)
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+}
+
+// The report follows the gate rather than preceding it, so a build the gate
+// fails still leaves the report that says where the coverage went.
+tasks.jacocoTestCoverageVerification {
+    finalizedBy(tasks.jacocoTestReport)
+
+    violationRules {
+        rule {
+            limit {
+                counter = "LINE"
+                minimum = "0.40".toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }
 
 // The IntelliJ Platform Gradle Plugin points each bundled plugin and module at

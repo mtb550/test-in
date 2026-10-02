@@ -85,6 +85,7 @@ work had it not been noticed immediately.
 | `./gradlew runIde`                           | It actually works                                                                                                          | Anything a tester can see — see below                                                                                                                                                |
 | `./gradlew inspect`                          | Every finding in the Inspected scope, and the display-string ratchet                                                       | Never by hand. CI runs it on every push, on every branch, and the run is where it is read                                                                                            |
 | `pwsh tools/inspect.ps1 -Quick`              | The rules that read the source as text, not what an IDE indexes                                                            | Every change, before you hand it over. Five seconds, no IDE                                                                                                                          |
+| `./gradlew check`                            | The unit tests, the IDE tests, the complexity gate and the coverage gate, with the coverage report                         | Before you hand over a change that reaches the indexer or the tree. About ten minutes from clean                                                                                     |
 | `./gradlew pmdMain`                          | No production method is over the cognitive complexity or nesting limit                                                     | Every change. Part of `check` and of `build.yml`; fifteen seconds, and it does not wait for a compile                                                                                |
 | `git worktree add ../testin-<what> <branch>` | A second branch, checked out at once                                                                                       | Whenever two pieces of work run at the same time — see below                                                                                                                         |
 | `./gradlew verifyDistribution`               | No test classes and no compile-only dependencies reached the jar                                                           | Runs in CI; run it if you touched packaging                                                                                                                                          |
@@ -188,6 +189,25 @@ test root and does two things with them (#325):
 
 CI keeps the report with the other test reports. When a test you write proves a
 rule, give it the marker: that is how the count goes up.
+
+### The coverage gate
+
+JaCoCo measures the lines both test tasks run, `test` and `ideTest`, across the
+three modules, and reports them per package in one report (#325).
+
+```bash
+./gradlew check                            # both test tasks, every gate, and the report
+./gradlew jacocoTestCoverageVerification   # the coverage gate alone, with the tests it needs
+```
+
+|            |                                                                                                                                                 |
+|------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Report** | `build/reports/jacoco/test/html/index.html`, one row per package, and `jacocoTestReport.xml` beside it. CI keeps it with the other test reports |
+| **Gate**   | `jacocoTestCoverageVerification`, part of `check`. Fails under the line minimum in `build.gradle.kts`: 40%, from 40.72% on 2 October 2026       |
+
+The gate stops coverage falling and asks for nothing more. Raise the minimum when
+the figure has risen, as a change of its own. A line reached is not a rule
+proven, which is why the rule count above is kept beside it.
 
 ### The inspection gate
 
@@ -295,7 +315,7 @@ string a tester reads should have one owner; the number may go down and never up
 
 | Workflow      | When                                                                                                                                                                                                                                                                                                               |
 |---------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `build.yml`   | Every push to `main` and every pull request. Compiles, runs the unit tests, the complexity gate and the IDE tests, and verifies against **IntelliJ IDEA** - the one result that turns a pull request red                                                                                                           |
+| `build.yml`   | Every push to `main` and every pull request. Compiles, runs the unit tests, the complexity gate, the IDE tests and the coverage gate, and verifies against **IntelliJ IDEA** - the one result that turns a pull request red                                                                                        |
 | `verify.yml`  | Every push to `main`, plus every second day and on demand. The same verifier against **all six targets** - IntelliJ IDEA, PyCharm and Rider at both ends of the 262 branch - compared against `.github/verification-baseline.txt`. This is the number the JetBrains Marketplace shows a tester before they install |
 | `inspect.yml` | Every push, on every branch, and on demand                                                                                                                                                                                                                                                                         |
 
