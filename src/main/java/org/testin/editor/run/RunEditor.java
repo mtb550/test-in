@@ -32,7 +32,6 @@ import org.testin.editor.listeners.RunListRenderer;
 import org.testin.editor.listeners.StatusBarListener;
 import org.testin.editor.toolbar.RunToolbar;
 import org.testin.editor.toolbar.Toolbar;
-import org.testin.editor.toolbar.components.FilterPopupBtn;
 import org.testin.editor.toolbar.components.GenerateReportBtn;
 import org.testin.editor.toolbar.components.LightModeBtn;
 import org.testin.editor.toolbar.components.ResultAnalysisBtn;
@@ -47,7 +46,6 @@ import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunStatus;
 import org.testin.model.TestRunSummary;
-import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -322,18 +320,10 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
     @Override
     protected @NotNull List<TestCaseDto> getFilteredList() {
         final @NotNull EditorFilters filters = EditorFilters.of(toolBar);
-        final @NotNull Set<TestStatus> statusFilter = toolBar.getToolbarItem(FilterPopupBtn.class).getSelectedStatus();
 
         final @NotNull List<TestCaseDto> matched;
         synchronized (allTestCases) {
-            matched = TestCaseFilter.filter(
-                    allTestCases,
-                    filters.query(),
-                    filters.groups(),
-                    filters.priorities(),
-                    filters.modules(),
-                    statusFilter,
-                    this::runItem);
+            matched = TestCaseFilter.filter(allTestCases, filters, this::runItem);
         }
 
         return automationState.matching(matched, filters.automation());

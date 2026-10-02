@@ -30,23 +30,24 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.EditorColors;
-import org.testin.editor.toolbar.Toolbar;
 import org.testin.model.Automated;
 import org.testin.model.Groups;
 import org.testin.model.Priority;
+import org.testin.model.TestCaseStatus;
 import org.testin.model.TestStatus;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 import org.testin.util.Icons;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 
 public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     @Getter
@@ -66,31 +67,24 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     private final Set<TestStatus> selectedStatus = new HashSet<>();
 
     @Getter
+    private final @NotNull Set<TestCaseStatus> selectedTestCaseStatus = new HashSet<>();
+
+    @Getter
     private final Set<Automated> selectedAutomation = new HashSet<>();
 
-    @NotNull
-    private final Supplier<Set<String>> availableModulesSupplier;
+    @Getter
+    private final @NotNull Set<Path> selectedTestSet = new HashSet<>();
 
-    private final Supplier<Set<String>> availableGroupsSupplier;
+    private final @NotNull FilterSource source;
 
     @NotNull
     private final DefaultActionGroup cachedActionGroup;
 
-    @NotNull
-    private final Runnable onToolBarFilterReset;
-
-    @NotNull
-    private final Toolbar callbacks;
-
-    public FilterPopupBtn(final @NotNull Toolbar callbacks, final @NotNull Runnable onToolBarFilterReset, final @NotNull Runnable onToolBarFilterSelectedChanged, final @NotNull Supplier<Set<String>> availableModulesSupplier, final @NotNull Supplier<Set<String>> availableGroupsSupplier) {
+    public FilterPopupBtn(final @NotNull FilterSource source) {
         super(Bundle.message("filter.button"), AllIcons.General.Filter);
-        this.callbacks = callbacks;
-        this.onToolBarFilterReset = onToolBarFilterReset;
+        this.source = source;
 
-        this.availableModulesSupplier = availableModulesSupplier;
-        this.availableGroupsSupplier = availableGroupsSupplier;
-
-        this.cachedActionGroup = buildActionGroup(onToolBarFilterSelectedChanged);
+        this.cachedActionGroup = buildActionGroup();
 
         addActionListener(_ -> showFilterPopup());
         updateToolBarFilterState();
@@ -116,7 +110,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     }
 
     private @NotNull List<Set<?>> filters() {
-        return List.of(selectedPriority, selectedGroup, selectedModule, selectedStatus, selectedAutomation);
+        return List.of(selectedPriority, selectedGroup, selectedModule, selectedTestCaseStatus, selectedStatus, selectedAutomation, selectedTestSet);
     }
 
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-098
@@ -148,7 +142,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     // UC-EDITOR-PANEL-021
     public void resetToolBarFilter() {
         clearFilters();
-        onToolBarFilterReset.run();
+        source.onToolBarFilterResetButtonClicked();
     }
 
     // UC-EDITOR-PANEL-021, Rule-EDITOR-PANEL-099
@@ -158,10 +152,10 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
     }
 
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
-    private @NotNull DefaultActionGroup buildActionGroup(final @NotNull Runnable onToolBarFilterSelectedChanged) {
+    private @NotNull DefaultActionGroup buildActionGroup() {
         final @NotNull Runnable onChanged = () -> {
             updateToolBarFilterState();
-            onToolBarFilterSelectedChanged.run();
+            source.onToolBarFilterSelectionChanged();
         };
 
         final @NotNull DefaultActionGroup filterResetBtn = new DefaultActionGroup();
@@ -207,7 +201,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
                 actions.add(new ToggleFilterAction<>(Groups.NONE, null,
                         Groups.NONE, selectedGroup, FilterMembership.plain(), onChanged));
 
-                availableGroupsSupplier.get().stream().sorted().forEach(group ->
+                source.getAvailableGroups().stream().sorted().forEach(group ->
                         actions.add(new ToggleFilterAction<>(group, null,
                                 group, selectedGroup, FilterMembership.plain(), onChanged)));
 
@@ -220,7 +214,7 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
             // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-095
             @Override
             public AnAction @NotNull [] getChildren(final @Nullable AnActionEvent e) {
-                final @NotNull List<String> orderedModules = new ArrayList<>(availableModulesSupplier.get());
+                final @NotNull List<String> orderedModules = new ArrayList<>(source.getAvailableModules());
                 Collections.sort(orderedModules);
 
                 final @NotNull List<AnAction> actions = new ArrayList<>();
@@ -233,17 +227,35 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
         };
         filterResetBtn.add(filterModuleMenu);
 
-        if (callbacks.hasRunStatuses()) {
-            final @NotNull DefaultActionGroup filterStatusMenu = new DefaultActionGroup(TestEditorAttributes.STATUS.getName(), true);
+        final @NotNull DefaultActionGroup filterTestCaseStatusMenu = new DefaultActionGroup(Bundle.message("filter.test.case.status"), true);
+        Arrays.stream(TestCaseStatus.values()).forEach(s ->
+                filterTestCaseStatusMenu.add(new ToggleFilterAction<>(s.getLabel(), null,
+                        s, selectedTestCaseStatus, FilterMembership.plain(), onChanged)));
+        filterResetBtn.add(filterTestCaseStatusMenu);
+
+        if (source.hasRunStatuses()) {
+            final @NotNull DefaultActionGroup filterStatusMenu = new DefaultActionGroup(Bundle.message("filter.run.item.status"), true);
             Arrays.stream(TestStatus.values()).forEach(s ->
                     filterStatusMenu.add(new ToggleFilterAction<>(s.getLabel(), null,
                             s, selectedStatus, FilterMembership.plain(), onChanged)));
             filterResetBtn.add(filterStatusMenu);
-        } else {
-            filterResetBtn.add(nothingToFilterOn(Bundle.message("filter.status.no.run")));
         }
 
+        filterResetBtn.add(testSetMenu(onChanged));
+
         return filterResetBtn;
+    }
+
+    // Rule-EDITOR-PANEL-260, Rule-TREE-PANEL-129
+    private @NotNull AnAction testSetMenu(final @NotNull Runnable onChanged) {
+        final @NotNull Map<Path, String> testSets = source.getAvailableTestSets();
+        if (testSets.isEmpty()) return nothingToFilterOn(Bundle.message("filter.test.set.one"));
+
+        final @NotNull DefaultActionGroup filterTestSetMenu = new DefaultActionGroup(Bundle.message("filter.test.set"), true);
+        testSets.forEach((path, name) -> filterTestSetMenu.add(new ToggleFilterAction<>(name, null,
+                path, selectedTestSet, FilterMembership.plain(), onChanged)));
+
+        return filterTestSetMenu;
     }
 
     private void showFilterPopup() {

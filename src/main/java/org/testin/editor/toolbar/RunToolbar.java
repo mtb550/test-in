@@ -55,7 +55,7 @@ public class RunToolbar extends AbstractToolbarPanel {
                 new GenerateReportBtn(p, editor),
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),
                 new RunDetailsPopupBtn(getCallbacks()::onToolBarDetailsSelectionChanged),
-                new FilterPopupBtn(getCallbacks(), getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules, getCallbacks()::getAvailableGroups),
+                new FilterPopupBtn(getCallbacks()),
                 new ListViewBtn(getCallbacks()::onToolBarSwitchedToListView),
                 new GridViewBtn(getCallbacks()::onToolBarSwitchedToGridView)
         );

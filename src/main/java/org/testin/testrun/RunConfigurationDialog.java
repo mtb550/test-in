@@ -34,11 +34,11 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog {
     private final @NotNull RunConfigurationForm form;
     private final @NotNull SelectionTree selection;
 
-    public RunConfigurationDialog(final @NotNull Project p, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull RunFormAction action) {
+    public RunConfigurationDialog(final @NotNull Project p, final @NotNull RunConfigurationForm form, final @NotNull TestRunFormFilter filter, final @NotNull RunFormAction action) {
         super(p);
         this.action = action;
         this.form = form;
-        this.selection = selection;
+        this.selection = filter.getSelection();
 
         title = action.title();
 
@@ -57,13 +57,21 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog {
 
         final @NotNull DialogButton confirmButton = confirm.getComponent();
         final @NotNull Runnable refresh = () -> {
-            confirmButton.tally(Bundle.message("run.form.tally", selection.checkedLeaves(), selection.branchesHoldingChecked()));
+            confirmButton.tally(tally());
             confirmButton.enableUnless(whyNot());
         };
 
         refresh.run();
         selection.onCheckChanged(refresh);
         form.onAnswerChanged(refresh);
+    }
+
+    // Rule-TREE-PANEL-130
+    private @NotNull String tally() {
+        final int hidden = selection.hiddenChecked();
+        if (hidden == 0) return Bundle.message("run.form.tally", selection.checkedLeaves(), selection.branchesHoldingChecked());
+
+        return Bundle.message("run.form.tally.hidden", selection.checkedLeaves(), selection.branchesHoldingChecked(), hidden);
     }
 
     // UC-TREE-PANEL-009, Rule-TREE-PANEL-029, Rule-TREE-PANEL-121

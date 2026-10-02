@@ -18,22 +18,13 @@ package org.testin.editor.toolbar;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.toolbar.components.FilterSource;
 import org.testin.model.dto.dirs.DirectoryDto;
 
-import java.util.Set;
-
-public interface Toolbar {
-    default boolean hasRunStatuses() {
-        return false;
-    }
-
+public interface Toolbar extends FilterSource {
     void onToolBarSearchValueChanged();
 
     void onToolBarSearchFocusReleased();
-
-    void onToolBarFilterSelectionChanged();
-
-    void onToolBarFilterResetButtonClicked();
 
     void onToolBarDetailsSelectionChanged();
 
@@ -60,8 +51,4 @@ public interface Toolbar {
 
     default void onStopExecutionClicked() {
     }
-
-    @NotNull Set<String> getAvailableModules();
-
-    @NotNull Set<String> getAvailableGroups();
 }

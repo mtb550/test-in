@@ -28,7 +28,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
 import org.testin.ui.framework.SelectionTree;
-import org.testin.util.Bundle;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Path;
@@ -82,9 +81,7 @@ public final class RunForm {
             ApplicationManager.getApplication().invokeLater(() -> {
                 final @NotNull RunConfigurationForm form = new RunConfigurationForm(p, name, configuration);
 
-                final @NotNull SelectionTree selection = new SelectionTree(Bundle.message("run.form.test.cases.caption"), root, RunTreeCellRenderer.create());
-
-                new RunConfigurationDialog(p, form, selection, action).show();
+                new RunConfigurationDialog(p, form, new TestRunFormFilter(p, testCasesRoot.getPath(), root), action).show();
             });
         });
     }

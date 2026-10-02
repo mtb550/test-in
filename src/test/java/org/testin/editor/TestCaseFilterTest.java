@@ -17,6 +17,7 @@
 package org.testin.editor;
 
 import org.testin.model.Priority;
+import org.testin.model.TestCaseStatus;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -49,10 +50,7 @@ public class TestCaseFilterTest {
 
         final List<TestCaseDto> result = TestCaseFilter.filter(
                 List.of(matching, other),
-                "  LOGIN ",
-                Set.of("Regression"),
-                Set.of(Priority.HIGH),
-                Set.of("accounts"));
+                new EditorFilters("  LOGIN ", Set.of("Regression"), Set.of(Priority.HIGH), Set.of("accounts"), Set.of(), Set.of(), Set.of()));
 
         assertEquals(result, List.of(matching));
     }
@@ -71,11 +69,7 @@ public class TestCaseFilterTest {
 
         final List<TestCaseDto> result = TestCaseFilter.filter(
                 List.of(passed, missing),
-                "",
-                Set.of(),
-                Set.of(),
-                Set.of(),
-                Set.of(TestStatus.PASSED),
+                new EditorFilters("", Set.of(), Set.of(), Set.of(), Set.of(), Set.of(TestStatus.PASSED), Set.of()),
                 id -> Optional.ofNullable(recorded.get(id)));
 
         assertEquals(result, List.of(passed));
@@ -93,16 +87,26 @@ public class TestCaseFilterTest {
                 .build();
 
         for (final String wanted : List.of("accounts", "admin@example.com", "The account exists", "JIRA-123", "Regression")) {
-            final List<TestCaseDto> result = TestCaseFilter.filter(List.of(tc), wanted, Set.of(), Set.of(), Set.of());
+            final List<TestCaseDto> result = TestCaseFilter.filter(List.of(tc), new EditorFilters(wanted, Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of()));
 
             assertEquals(result, List.of(tc), "the search did not read the field holding '" + wanted + "'");
         }
     }
 
     @Test
+    public void filtersOnTheTestCaseStatus() {
+        final TestCaseDto reviewed = TestCaseDto.builder().description("reviewed").status(TestCaseStatus.REVIEWED).build();
+        final TestCaseDto pending = TestCaseDto.builder().description("pending").status(TestCaseStatus.PENDING).build();
+
+        final List<TestCaseDto> result = TestCaseFilter.filter(List.of(reviewed, pending), new EditorFilters("", Set.of(), Set.of(), Set.of(), Set.of(TestCaseStatus.REVIEWED), Set.of(), Set.of()));
+
+        assertEquals(result, List.of(reviewed));
+    }
+
+    @Test
     public void aQueryNoFieldHoldsFindsNothing() {
         final TestCaseDto tc = TestCaseDto.builder().description("Log in").build();
 
-        assertEquals(TestCaseFilter.filter(List.of(tc), "nothing holds this", Set.of(), Set.of(), Set.of()), List.of());
+        assertEquals(TestCaseFilter.filter(List.of(tc), new EditorFilters("nothing holds this", Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of())), List.of());
     }
 }

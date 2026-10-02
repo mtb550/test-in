@@ -44,8 +44,8 @@ tell you what changes and which message appears.
 
 | Part                                                  | What it covers                                                                                       | Use cases | Rules |
 |-------------------------------------------------------|------------------------------------------------------------------------------------------------------|-----------|-------|
-| **[The tree panel](treePanel/main.md)**               | The tree on the left. Test projects, test sets, test runs, and everything done to them               | 28        | 119   |
-| **[The editor panel](editorPanel/main.md)**           | Writing test cases, and running a test run. Both editors, and [light mode](editorPanel/lightMode.md) | 48        | 256   |
+| **[The tree panel](treePanel/main.md)**               | The tree on the left. Test projects, test sets, test runs, and everything done to them               | 28        | 122   |
+| **[The editor panel](editorPanel/main.md)**           | Writing test cases, and running a test run. Both editors, and [light mode](editorPanel/lightMode.md) | 48        | 258   |
 | **[The view panel](viewPanel/main.md)**               | The panel on the right. One test case in full, and what a test run recorded about it                 | 17        | 87    |
 | **[The settings page](setting/main.md)**              | Everything set once per machine, and where each value is kept                                        | 9         | 34    |
 | **[Automation code and the gutter](codegen/main.md)** | The test methods Testin writes, and how they are kept in step with the tree                          | 21        | 93    |
@@ -53,7 +53,7 @@ tell you what changes and which message appears.
 | **[Sharing work with the team](share/main.md)**       | Export, import and Git. Every way test data leaves and arrives                                       | 18        | 100   |
 | **[Inside Testin](internal/main.md)**                 | The parts that belong to no panel: the search, and the one thing that owns every file                | 7         | 117   |
 
-**151 use cases and 831 rules**, each one checked against the code it describes.
+**151 use cases and 836 rules**, each one checked against the code it describes.
 
 Every part also lists two more things at the end of its page: where the plugin
 breaks its own rules today, and what nobody has decided yet. Both are honest

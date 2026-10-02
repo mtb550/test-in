@@ -36,8 +36,9 @@ There is no key for this. The button's tooltip reads **Filter**.
   reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
-- **Rule-EDITOR-PANEL-094** — Five things can be filtered on: the priority, the
-  automation, the group, the module and, in a test run, the run status.
+- **Rule-EDITOR-PANEL-094** — Seven things can be filtered on: the priority,
+  the automation, the group, the module, the status, in a test run editor the
+  run item status, and in the Create Test Run dialog the test set.
 - **Rule-EDITOR-PANEL-095** — The module list is built from the test cases in
   this test set, so it only ever offers modules that exist.
 - **Rule-EDITOR-PANEL-096** — Choosing nothing in a filter means every test case
@@ -62,6 +63,15 @@ There is no key for this. The button's tooltip reads **Filter**.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
+- **Rule-EDITOR-PANEL-260** — Test Set is on the Filter menu in every editor,
+  gray, and reads Test Set (only Create Test Run picks across test sets): a test
+  set editor shows one test set, and a test run does not record which test set
+  each of its test cases came from.
+- **Rule-EDITOR-PANEL-261** — Status filters on the test case's own status -
+  Reviewed, Pending, Disabled, To Be Updated - and works in both editors and the
+  Create Test Run dialog. Run Item Status is a different thing: what a test run
+  recorded for each run item, such as Passed or Failed. It is on the menu only
+  in a test run editor, the one place run items have a status.
 
 ## The screen
 
@@ -74,6 +84,8 @@ There is no key for this. The button's tooltip reads **Filter**.
 │  Group                             > │
 │  Module                            > │
 │  Status                            > │
+│  Run Item Status                   > │
+│  Test Set                            │
 └──────────────────────────────────────┘
 ```
 
@@ -86,7 +98,15 @@ There is no key for this. The button's tooltip reads **Filter**.
    [When that list changes](refreshEditor.md#what-completion-and-the-group-filter-offer)
    is written on the refresh page.
 5. **Module** — the modules the test cases in this test set actually carry.
-6. **Status** — the run statuses. In a test set editor the row is gray and reads *Status (only a test run records one)*.
+6. **Status** — the test case's own status: **Reviewed**, **Pending**,
+   **Disabled** and **To Be Updated**. It works in both editors and in the
+   Create Test Run dialog.
+7. **Run Item Status** — what the test run recorded for each run item, such as
+   **Passed** or **Failed**. Only a test run editor has this row.
+8. **Test Set** — gray in both editors, reading *Test Set (only Create Test Run
+   picks across test sets)*. The same menu opens in the
+   [Create Test Run](../treePanel/createTestRun.md) dialog, where it offers the
+   test sets the dialog holds.
 
 While a filter is on, the button shows the count in brackets. Its tooltip
 becomes **Filter**, then the count, then **active**.
@@ -108,9 +128,8 @@ becomes **Filter**, then the count, then **active**.
 **If the module has never been used** — it is not offered. The list is built
 from what is there.
 
-**In a test set editor** — the **Status** row reads *Status (only a test run
-records one)* and is gray. A verdict is something a test run holds, so there is
-nothing to filter on here, and the row says that rather than going missing.
+**In a test set editor** — there is no **Run Item Status** row. Only a test
+run holds run items, so there is nothing for it to filter on.
 
 ---
 

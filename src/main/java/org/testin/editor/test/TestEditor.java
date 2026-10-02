@@ -368,12 +368,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
 
         final @NotNull List<TestCaseDto> matched;
         synchronized (allTestCases) {
-            matched = TestCaseFilter.filter(
-                    allTestCases,
-                    filters.query(),
-                    filters.groups(),
-                    filters.priorities(),
-                    filters.modules());
+            matched = TestCaseFilter.filter(allTestCases, filters);
         }
 
         return automationState.matching(matched, filters.automation());

@@ -28,52 +28,140 @@ import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
+import javax.swing.tree.DefaultTreeModel;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public final class SelectionTree implements DialogComponent {
     private static final int VISIBLE_ROWS = 8;
 
     private final @NotNull CheckboxTree tree;
-    private final @NotNull CheckedTreeNode root;
+    private final @NotNull CheckedTreeNode full;
+    private final @NotNull Set<Object> leaves = new LinkedHashSet<>();
+    private final @NotNull Set<Object> chosen = new LinkedHashSet<>();
+    private final @NotNull List<Runnable> changed = new ArrayList<>();
     private final @NotNull JComponent panel;
 
-    public SelectionTree(final @NotNull String caption, final @NotNull CheckedTreeNode root, final @NotNull CheckboxTree.CheckboxTreeCellRenderer renderer) {
-        this.root = root;
-        tree = new CheckboxTree(renderer, root, new CheckboxTreeBase.CheckPolicy(true, true, true, true));
+    public SelectionTree(final @NotNull String caption, final @NotNull CheckedTreeNode root, final @NotNull CheckboxTree.CheckboxTreeCellRenderer renderer, final @NotNull Optional<JComponent> trailing) {
+        this.full = root;
+        collectLeaves(root);
+
+        tree = new CheckboxTree(renderer, copyShown(root, _ -> true), new CheckboxTreeBase.CheckPolicy(true, true, true, true));
         // Rule-INTERNAL-095
         DialogStyle.asRow(tree);
         // Rule-INTERNAL-102
         tree.setVisibleRowCount(VISIBLE_ROWS);
         TreeUtil.expandAll(tree);
 
+        tree.addCheckboxTreeListener(new CheckboxTreeListener() {
+            @Override
+            public void nodeStateChanged(final @NotNull CheckedTreeNode node) {
+                keepTicks();
+                changed.forEach(Runnable::run);
+            }
+        });
+
         // Rule-INTERNAL-087, Rule-INTERNAL-099
-        panel = DialogStyle.section(Caption.header(Caption.of(caption, Fonts.caption()), Optional.empty()), ScrollPaneFactory.createScrollPane(tree, true));
+        panel = DialogStyle.section(Caption.header(Caption.of(caption, Fonts.caption()), trailing), ScrollPaneFactory.createScrollPane(tree, true));
     }
 
+    // Rule-TREE-PANEL-130, Rule-TREE-PANEL-131
+    public void show(final @NotNull Predicate<Object> leafShown) {
+        tree.setModel(new DefaultTreeModel(copyShown(full, leafShown)));
+        TreeUtil.expandAll(tree);
+        changed.forEach(Runnable::run);
+    }
+
+    // Rule-TREE-PANEL-130
     public void forEachChecked(final @NotNull Consumer<Object> visitor) {
-        visitChecked(root, visitor);
+        leavesOf(full).stream().filter(chosen::contains).forEach(visitor);
     }
 
     public void forEachLeaf(final @NotNull Consumer<Object> visitor) {
-        visitLeaves(root, visitor);
+        leavesOf(full).forEach(visitor);
     }
 
     public int checkedLeaves() {
-        final int[] counted = {0};
-        forEachChecked(_ -> counted[0]++);
+        return chosen.size();
+    }
 
-        return counted[0];
+    // Rule-TREE-PANEL-130
+    public int hiddenChecked() {
+        return chosen.size() - (int) leavesOf(shownRoot()).stream().filter(chosen::contains).count();
     }
 
     public int branchesHoldingChecked() {
-        return countBranches(root);
+        return countBranches(full);
+    }
+
+    public boolean hasChecked() {
+        return !chosen.isEmpty();
+    }
+
+    public void onCheckChanged(final @NotNull Runnable listener) {
+        changed.add(listener);
+    }
+
+    private @NotNull CheckedTreeNode shownRoot() {
+        return (CheckedTreeNode) tree.getModel().getRoot();
+    }
+
+    // Rule-TREE-PANEL-131
+    private void keepTicks() {
+        for (final CheckedTreeNode leaf : leafNodesOf(shownRoot())) {
+            if (leaf.isChecked()) chosen.add(leaf.getUserObject());
+            else chosen.remove(leaf.getUserObject());
+        }
+    }
+
+    private @NotNull CheckedTreeNode copyShown(final @NotNull CheckedTreeNode node, final @NotNull Predicate<Object> leafShown) {
+        final @NotNull CheckedTreeNode copy = new CheckedTreeNode(node.getUserObject());
+
+        if (isLeaf(node)) {
+            copy.setChecked(chosen.contains(node.getUserObject()));
+            return copy;
+        }
+
+        for (int i = 0; i < node.getChildCount(); i++) {
+            final @NotNull CheckedTreeNode child = (CheckedTreeNode) node.getChildAt(i);
+            if (holdsShown(child, leafShown)) copy.add(copyShown(child, leafShown));
+        }
+
+        copy.setChecked(copy.getChildCount() > 0 && allChecked(copy));
+        return copy;
+    }
+
+    private boolean holdsShown(final @NotNull CheckedTreeNode node, final @NotNull Predicate<Object> leafShown) {
+        if (isLeaf(node)) return leafShown.test(node.getUserObject());
+
+        for (int i = 0; i < node.getChildCount(); i++) {
+            if (holdsShown((CheckedTreeNode) node.getChildAt(i), leafShown)) return true;
+        }
+
+        return false;
+    }
+
+    private static boolean allChecked(final @NotNull CheckedTreeNode node) {
+        for (int i = 0; i < node.getChildCount(); i++) {
+            if (!((CheckedTreeNode) node.getChildAt(i)).isChecked()) return false;
+        }
+
+        return true;
+    }
+
+    private boolean isLeaf(final @NotNull CheckedTreeNode node) {
+        return leaves.contains(node.getUserObject());
     }
 
     private int countBranches(final @NotNull CheckedTreeNode node) {
-        if (node.isLeaf()) return 0;
+        if (isLeaf(node)) return 0;
 
-        int branches = hasCheckedLeaf(node) && holdsALeaf(node) ? 1 : 0;
+        int branches = hasChosenLeaf(node) && holdsALeaf(node) ? 1 : 0;
         for (int i = 0; i < node.getChildCount(); i++) {
             branches += countBranches((CheckedTreeNode) node.getChildAt(i));
         }
@@ -83,48 +171,46 @@ public final class SelectionTree implements DialogComponent {
 
     private boolean holdsALeaf(final @NotNull CheckedTreeNode node) {
         for (int i = 0; i < node.getChildCount(); i++) {
-            if (node.getChildAt(i).isLeaf()) return true;
+            if (isLeaf((CheckedTreeNode) node.getChildAt(i))) return true;
         }
 
         return false;
     }
 
-    public boolean hasChecked() {
-        return hasCheckedLeaf(root);
-    }
+    private boolean hasChosenLeaf(final @NotNull CheckedTreeNode node) {
+        if (isLeaf(node)) return chosen.contains(node.getUserObject());
 
-    public void onCheckChanged(final @NotNull Runnable listener) {
-        tree.addCheckboxTreeListener(new CheckboxTreeListener() {
-            @Override
-            public void nodeStateChanged(final @NotNull CheckedTreeNode node) {
-                listener.run();
-            }
-        });
-    }
-
-    private boolean hasCheckedLeaf(final @NotNull CheckedTreeNode node) {
-        if (node.isLeaf() && node.isChecked()) return true;
         for (int i = 0; i < node.getChildCount(); i++) {
-            if (hasCheckedLeaf((CheckedTreeNode) node.getChildAt(i))) return true;
+            if (hasChosenLeaf((CheckedTreeNode) node.getChildAt(i))) return true;
         }
+
         return false;
     }
 
-    private void visitLeaves(final @NotNull CheckedTreeNode node, final @NotNull Consumer<Object> visitor) {
-        if (node.isLeaf()) visitor.accept(node.getUserObject());
+    private void collectLeaves(final @NotNull CheckedTreeNode node) {
+        if (node.isLeaf()) {
+            leaves.add(node.getUserObject());
+            if (node.isChecked()) chosen.add(node.getUserObject());
+        }
 
         for (int i = 0; i < node.getChildCount(); i++) {
-            visitLeaves((CheckedTreeNode) node.getChildAt(i), visitor);
+            collectLeaves((CheckedTreeNode) node.getChildAt(i));
         }
     }
 
-    private void visitChecked(final @NotNull CheckedTreeNode node, final @NotNull Consumer<Object> visitor) {
-        if (node.isLeaf() && node.isChecked()) {
-            visitor.accept(node.getUserObject());
-        }
+    private @NotNull List<Object> leavesOf(final @NotNull CheckedTreeNode node) {
+        return leafNodesOf(node).stream().map(CheckedTreeNode::getUserObject).toList();
+    }
+
+    private @NotNull List<CheckedTreeNode> leafNodesOf(final @NotNull CheckedTreeNode node) {
+        final @NotNull List<CheckedTreeNode> found = new ArrayList<>();
+        if (isLeaf(node)) found.add(node);
+
         for (int i = 0; i < node.getChildCount(); i++) {
-            visitChecked((CheckedTreeNode) node.getChildAt(i), visitor);
+            found.addAll(leafNodesOf((CheckedTreeNode) node.getChildAt(i)));
         }
+
+        return found;
     }
 
     @Override

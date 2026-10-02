@@ -77,6 +77,16 @@ A test run is one round of testing, with a verdict for each test case.
   needs: Ctrl+Enter inserts a line break, the same bargain a grid cell makes.
   Enter does nothing at all here - it neither breaks the line nor creates the
   test run - whichever field holds the keyboard.
+- **Rule-TREE-PANEL-129** — The test case tree carries the editor's Filter
+  button, and its menu is the editor's menu: a group, priority, module,
+  automation or status filter picks the same test cases here as in an editor.
+  Run Item Status is not on it: the tree holds test cases, and every run item of
+  a new test run starts Pending. Test Set offers the test sets the tree holds.
+- **Rule-TREE-PANEL-130** — A filter changes which test cases the tree shows,
+  never which are ticked. A ticked test case the filter hides stays in the run,
+  and the line beside the button counts it as hidden.
+- **Rule-TREE-PANEL-131** — Ticking a row while a filter is on ticks only the
+  test cases it shows.
 
 Rule-TREE-PANEL-032 holds here too. It says what can be created under **Test
 Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
@@ -100,6 +110,7 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
 │ │     ( ) Chrome (o) Firefox ( ) Safari ( ) Edge                        │ │
 │ └────────────────────────────────────────────────────────────────────────┘ │
 │ ┌────────────────────────────────────────────────────────────────────────┐ │
+│ │ Test Cases                                            [Filter]   (6)  │ │
 │ │ [x] v Test Cases                                                 (4)  │ │
 │ │ [x]   v Accounts                                                      │ │
 │ │ [x]       Login                                                       │ │
@@ -132,7 +143,7 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
    says otherwise; every other row arrives with nothing picked. The answers are:
 
    | Field       | Offers                                |
-         |-------------|---------------------------------------|
+   |-------------|---------------------------------------|
    | Test Type   | *Functional Test*, *Performance Test* |
    | Platform    | *Web*, *Mobile*                       |
    | Component   | *Frontend*, *Backend*                 |
@@ -144,13 +155,24 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
    The **Test Cases** row is at the top. Under it come each package, each test
    set, and each test case. The tree opens fully expanded. Ticking a folder
    ticks everything under it. An empty test set is left out, and so is a package
-   that holds only empty test sets.
+   that holds only empty test sets. While a filter is on, ticking a row ticks
+   only the test cases it shows. (Rule-TREE-PANEL-131)
 5. **Create** — enabled only while at least one test case is ticked and every row
    on the form is answered. While it is disabled, the line to its left says what is
    missing: *Check at least one test case*, or *Pick a Platform*, naming the first
    row with no answer. `Enter` does nothing here. The button is the only way to
    confirm. A click outside the dialog does not close it either. Only `Escape`
-   closes it.
+   closes it. The line to its left counts what is ticked, and while a filter
+   hides ticked test cases it says how many: *1 hidden by the filter*. They
+   stay in the test run. (Rule-TREE-PANEL-130)
+6. **Filter** — the editor's own Filter button, opening the editor's own menu,
+   drawn on [UC-EDITOR-PANEL-020](../editorPanel/filterTestCases.md). Priority,
+   Automation, Group and Module narrow the tree as they narrow an editor.
+   **Status** narrows it by the test case's own status. There is no **Run Item
+   Status**: every run item of a new test run starts Pending.
+   **Test Set** offers the test sets the tree holds, each named by its path
+   under **Test Cases**, such as *pkg / Checkout*. Every opening starts with no
+   filter. (Rule-TREE-PANEL-129)
 
 **Edit Test Run** is this same dialog with the button **Save**. It opens filled
 with the test run's own name, test cases and settings.
@@ -169,6 +191,8 @@ with the test run's own name, test cases and settings.
    retired test sets, anything under an **Archived** package, and empty test
    sets.
 6. The tester ticks and unticks with `Space`, moves with `Tab`, and presses **Create**.
+   To build a run for one purpose, the tester first opens **Filter**, chooses
+   **Group**, then **Smoke**, and the tree shows only the Smoke test cases.
 7. Testin writes the test run. A progress bar reads *Creating test run
    \<name\>*, and it cannot be canceled. Every ticked test case is **Pending**.
    The test run's status is **Created**.

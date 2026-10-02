@@ -21,18 +21,24 @@ import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.editor.toolbar.components.FilterPopupBtn;
 import org.testin.model.Automated;
 import org.testin.model.Priority;
+import org.testin.model.TestCaseStatus;
+import org.testin.model.TestStatus;
 
 import java.util.Set;
 
-public record EditorFilters(@NotNull String query, @NotNull Set<String> groups, @NotNull Set<Priority> priorities, @NotNull Set<String> modules, @NotNull Set<Automated> automation) {
+public record EditorFilters(@NotNull String query, @NotNull Set<String> groups, @NotNull Set<Priority> priorities, @NotNull Set<String> modules, @NotNull Set<TestCaseStatus> testCaseStatuses, @NotNull Set<TestStatus> runItemStatuses, @NotNull Set<Automated> automation) {
     public static @NotNull EditorFilters of(final @NotNull AbstractToolbarPanel toolBar) {
-        final @NotNull FilterPopupBtn filters = toolBar.getToolbarItem(FilterPopupBtn.class);
+        return of(toolBar.getToolbarItem(FilterPopupBtn.class), toolBar.getSearchTxt().getSearchQuery());
+    }
 
+    public static @NotNull EditorFilters of(final @NotNull FilterPopupBtn filters, final @NotNull String query) {
         return new EditorFilters(
-                toolBar.getSearchTxt().getSearchQuery(),
+                query,
                 filters.getSelectedGroup(),
                 filters.getSelectedPriority(),
                 filters.getSelectedModule(),
+                filters.getSelectedTestCaseStatus(),
+                filters.getSelectedStatus(),
                 filters.getSelectedAutomation());
     }
 }
