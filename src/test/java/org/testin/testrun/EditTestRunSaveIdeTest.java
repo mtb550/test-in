@@ -18,9 +18,8 @@ package org.testin.testrun;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
-import org.testin.TempTree;
+import org.testin.AbstractTempRootIdeTest;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
@@ -33,34 +32,15 @@ import org.testin.services.Services;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class EditTestRunSaveIdeTest extends BasePlatformTestCase {
+public class EditTestRunSaveIdeTest extends AbstractTempRootIdeTest {
     private static final @NotNull UUID JUDGED_WHILE_OPEN = UUID.fromString("22222222-2222-4222-8222-222222222201");
     private static final @NotNull UUID STILL_PENDING = UUID.fromString("22222222-2222-4222-8222-222222222202");
     private static final @NotNull UUID ADDED_BY_THE_EDIT = UUID.fromString("22222222-2222-4222-8222-222222222203");
-
-    private Path root;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-edit-run");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            TempTree.delete(root);
-        } finally {
-            super.tearDown();
-        }
-    }
 
     private @NotNull TestRuns indexedTestRuns() {
         return Services.getInstance(getProject(), TestRuns.class);

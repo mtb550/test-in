@@ -232,29 +232,28 @@ silently has no effect costs more than the setting it was meant to hold.
 - **The rule is about methods, and the whole tree obeys it.** The `throws`
   that remain are declarations rather than work, and this list is the record of
   why - not a comment above each one, which the no-comment rule forbids and the
-  September sweep removed. Counted on 2 October 2026: four in `src/main`,
-  twenty-eight in `src/test`, none in `testin-java` or `testin-testng`, and every
-  one of them is below. `DeclaredContractsTest` holds the same four with their
-  reasons and fails on a fifth, so this list can no longer drift from the code
-  unnoticed. Do not sweep them again:
+  September sweep removed. Counted on 2 October 2026: three in `src/main`, none
+  in `src/test`, `testin-java` or `testin-testng`, and every one of them is
+  below. `DeclaredContractsTest` scans the main and test trees for them, holds
+  the same three with their reasons and fails on a fourth, so this list can no
+  longer drift from the code unnoticed. Do not sweep them again:
   - `NodesTransferable.getTransferData`, and the one `TransferListener` builds
     for a drag of test cases — AWT's `Transferable` contract is that an
     unsupported flavor throws. Catching it hands the platform a wrong object
     instead of "I do not have that".
-  - `SettingsConfigurable.apply`, and `refuseAnImpossibleRoot`, the one check
-    it hands the refusal to — `Configurable.apply` declares
+  - `SettingsConfigurable.apply` — `Configurable.apply` declares
     `ConfigurationException`, and the settings dialog is the one owner that
     catches it: throwing is how the platform is told to stay open and print the
     message under the field. Catching it and notifying instead would hand the
-    dialog a success it did not have, and close it over a refused value.
-  - The 28 `protected void setUp() throws Exception` and `tearDown() throws
-    Exception` overrides in the fourteen `*IdeTest` classes — `BasePlatformTestCase`
-    declares both that way, so an override cannot narrow them. The test framework
-    is the one owner above, and it is the right one: a fixture that failed to set
-    up or to clean up is an error about the test rather than something to report
-    to a tester, and a broad catch inside either would hide it behind whatever
-    the test then asserted. These carry no comment of their own, because the
-    `@Override` is the whole reason.
+    dialog a success it did not have, and close it over a refused value. The
+    check behind it, `refusalOfTheRoot`, returns the refusal rather than
+    throwing it, so `apply` is the only method that declares it.
+
+  An `*IdeTest` that needs a folder on disk extends `AbstractTempRootIdeTest`.
+  It owns `root`, creates it before the fixture and deletes it after, and is the
+  one place that turns `BasePlatformTestCase`'s `throws Exception` into an
+  `AssertionError`. Its subclasses override `setUp` and `tearDown` without
+  `throws`, and catch their own checked calls the same way.
 
   Adding another is a decision, not a shortcut: it needs the same shape (a
   declaration, one owner catching above it), an entry in

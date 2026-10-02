@@ -16,9 +16,8 @@
 
 package org.testin.git;
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
-import org.testin.TempTree;
+import org.testin.AbstractTempRootIdeTest;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,21 +25,24 @@ import java.nio.file.Path;
 
 import static org.testin.git.LocalGit.mustGit;
 
-public class SyncToANewBranchIdeTest extends BasePlatformTestCase {
+public class SyncToANewBranchIdeTest extends AbstractTempRootIdeTest {
     private static final @NotNull String BRANCH = "feature/new-cases";
 
-    private Path base;
     private Path remote;
     private Path work;
 
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() {
         super.setUp();
         assertTrue("Git is not on the PATH, so a sync cannot be exercised", LocalGit.onThePath());
 
-        base = Files.createTempDirectory("testin-sync");
-        remote = Files.createDirectories(base.resolve("remote.git"));
-        work = Files.createDirectories(base.resolve("work"));
+        try {
+            remote = Files.createDirectories(root.resolve("remote.git"));
+            work = Files.createDirectories(root.resolve("work"));
+            Files.writeString(work.resolve("first.tc"), "{}");
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not lay out the repositories: " + ex.getMessage(), ex);
+        }
 
         mustGit(remote, "init", "--bare", "--initial-branch=main");
         mustGit(work, "init", "--initial-branch=main");
@@ -48,19 +50,9 @@ public class SyncToANewBranchIdeTest extends BasePlatformTestCase {
         mustGit(work, "config", "user.email", "testin@example.invalid");
         mustGit(work, "remote", "add", "origin", remoteUrl());
 
-        Files.writeString(work.resolve("first.tc"), "{}");
         mustGit(work, "add", "first.tc");
         mustGit(work, "commit", "-m", "first");
         mustGit(work, "push", "-u", "origin", "main");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            TempTree.delete(base);
-        } finally {
-            super.tearDown();
-        }
     }
 
     private @NotNull String remoteUrl() {

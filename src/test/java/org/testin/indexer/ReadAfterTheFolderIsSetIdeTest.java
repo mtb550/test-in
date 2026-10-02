@@ -16,8 +16,7 @@
 
 package org.testin.indexer;
 
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.testin.TempTree;
+import org.testin.AbstractTempRootIdeTest;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.setting.StartupActivity;
@@ -25,9 +24,8 @@ import org.testin.setting.StartupActivity;
 import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 
-public class ReadAfterTheFolderIsSetIdeTest extends BasePlatformTestCase {
+public class ReadAfterTheFolderIsSetIdeTest extends AbstractTempRootIdeTest {
 
-    private Path root;
     private String wasSet;
 
     private static @NotNull AppSettingsState settings() {
@@ -35,21 +33,16 @@ public class ReadAfterTheFolderIsSetIdeTest extends BasePlatformTestCase {
     }
 
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() {
         super.setUp();
-        root = SyntheticTree.tempRoot();
         wasSet = settings().rootTestinPath;
         settings().rootTestinPath = "";
     }
 
     @Override
-    protected void tearDown() throws Exception {
-        try {
-            settings().rootTestinPath = wasSet;
-            TempTree.delete(root);
-        } finally {
-            super.tearDown();
-        }
+    protected void tearDown() {
+        settings().rootTestinPath = wasSet;
+        super.tearDown();
     }
 
     private @NotNull ProjectIndexer indexer() {

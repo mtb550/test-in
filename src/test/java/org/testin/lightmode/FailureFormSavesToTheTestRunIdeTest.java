@@ -17,9 +17,8 @@
 package org.testin.lightmode;
 
 import com.intellij.openapi.application.WriteAction;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
-import org.testin.TempTree;
+import org.testin.AbstractTempRootIdeTest;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
@@ -32,31 +31,13 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
-public class FailureFormSavesToTheTestRunIdeTest extends BasePlatformTestCase {
+public class FailureFormSavesToTheTestRunIdeTest extends AbstractTempRootIdeTest {
     private static final @NotNull UUID FAILED_TEST_CASE = UUID.fromString("33333333-3333-4333-8333-333333333301");
     private static final @NotNull String TYPED = "The expired card was accepted";
-
-    private Path root;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-failure-form");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            TempTree.delete(root);
-        } finally {
-            super.tearDown();
-        }
-    }
 
     private @NotNull TestRuns indexedTestRuns() {
         return Services.getInstance(getProject(), TestRuns.class);

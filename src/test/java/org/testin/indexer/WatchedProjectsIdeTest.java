@@ -18,8 +18,7 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.testin.TempTree;
+import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.DirectoryType;
 import org.testin.services.Services;
 
@@ -28,24 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 
-public class WatchedProjectsIdeTest extends BasePlatformTestCase {
-
-    private Path root;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-watched");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            TempTree.delete(root);
-        } finally {
-            super.tearDown();
-        }
-    }
+public class WatchedProjectsIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull ProjectIndexer indexer() {
         return Services.getInstance(getProject(), ProjectIndexer.class);

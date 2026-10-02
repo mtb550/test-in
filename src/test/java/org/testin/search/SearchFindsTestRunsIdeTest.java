@@ -16,8 +16,7 @@
 package org.testin.search;
 
 import com.intellij.openapi.application.WriteAction;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.testin.TempTree;
+import org.testin.AbstractTempRootIdeTest;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
@@ -31,15 +30,12 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 
-public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
-
-    private Path root;
+public class SearchFindsTestRunsIdeTest extends AbstractTempRootIdeTest {
 
     private TestCaseDto testCase;
 
@@ -48,9 +44,8 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
     private Path ranSomethingElse;
 
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() {
         super.setUp();
-        root = Files.createTempDirectory("testin-search");
 
         final TestProjectDirectoryDto tp = WriteAction.computeAndWait(() -> {
             final TestProjectDirectoryDto project = mapper().setTestProjectNode(root.resolve("NAFATH"));
@@ -62,15 +57,6 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
         testCase = aTestCaseIn(tp);
         ranIt = aTestRunOver(tp, "Cycle-1", testCase.getId());
         ranSomethingElse = aTestRunOver(tp, "Cycle-2", UUID.randomUUID());
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            TempTree.delete(root);
-        } finally {
-            super.tearDown();
-        }
     }
 
     private @NotNull DirectoryMapper mapper() {

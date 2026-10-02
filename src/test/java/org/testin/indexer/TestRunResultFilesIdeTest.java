@@ -18,9 +18,8 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.util.TimeoutUtil;
-import org.testin.TempTree;
+import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.FileKind;
 import org.testin.model.TestRunItems;
 import org.testin.model.RunItemStatus;
@@ -38,7 +37,7 @@ import java.util.UUID;
 import java.util.function.BooleanSupplier;
 import org.jetbrains.annotations.NotNull;
 
-public class TestRunResultFilesIdeTest extends BasePlatformTestCase {
+public class TestRunResultFilesIdeTest extends AbstractTempRootIdeTest {
 
     private static final UUID JUDGED_TEST_CASE = UUID.fromString("11111111-1111-4111-8111-111111111101");
 
@@ -52,8 +51,6 @@ public class TestRunResultFilesIdeTest extends BasePlatformTestCase {
               "status" : "PASSED",
               "actualResult" : "Judged on the other machine"
             }""";
-
-    private Path root;
 
     private static @NotNull Path resultOf(final Path testRunPath, final UUID testCaseId) {
         return testRunPath.resolve(FileKind.RUN_ITEM.fileName(testCaseId));
@@ -90,21 +87,6 @@ public class TestRunResultFilesIdeTest extends BasePlatformTestCase {
             Files.writeString(file, A_PULLED_RESULT);
         } catch (final IOException ex) {
             throw new AssertionError("could not put " + file.getFileName() + " in the test run's folder", ex);
-        }
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-run-results");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            TempTree.delete(root);
-        } finally {
-            super.tearDown();
         }
     }
 

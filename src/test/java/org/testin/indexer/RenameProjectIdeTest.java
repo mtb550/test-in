@@ -18,9 +18,8 @@ package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.util.TimeoutUtil;
-import org.testin.TempTree;
+import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -35,24 +34,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.jetbrains.annotations.NotNull;
 
-public class RenameProjectIdeTest extends BasePlatformTestCase {
-
-    private Path root;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-rename");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            if (root != null) TempTree.delete(root);
-        } finally {
-            super.tearDown();
-        }
-    }
+public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull ProjectIndexer indexer() {
         return Services.getInstance(getProject(), ProjectIndexer.class);

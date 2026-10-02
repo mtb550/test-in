@@ -46,6 +46,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 public final class SettingsConfigurable implements SearchableConfigurable {
     private final @NotNull TestinPathPanel testinPathPanel;
@@ -124,33 +125,36 @@ public final class SettingsConfigurable implements SearchableConfigurable {
     }
 
     // UC-SETTING-001, Rule-SETTING-042
-    private void refuseAnImpossibleRoot() throws ConfigurationException {
+    private @NotNull Optional<ConfigurationException> refusalOfTheRoot() {
         final @NotNull String typed = testinPathPanel.getPathText().trim();
-        if (typed.isEmpty()) return;
+        if (typed.isEmpty()) return Optional.empty();
 
         final @NotNull Path root;
         try {
             root = Path.of(typed);
         } catch (final InvalidPathException notAPath) {
             Logger.info("The Testin folder typed is not a path: " + FailureText.of(notAPath));
-            throw new ConfigurationException(Bundle.message("settings.no.folder", typed), Bundle.message("settings.no.folder.title"));
+            return Optional.of(new ConfigurationException(Bundle.message("settings.no.folder", typed), Bundle.message("settings.no.folder.title")));
         }
 
         // Rule-SETTING-013
         if (!root.isAbsolute())
-            throw new ConfigurationException(Bundle.message("settings.not.absolute", root), Bundle.message("settings.not.absolute.title"));
+            return Optional.of(new ConfigurationException(Bundle.message("settings.not.absolute", root), Bundle.message("settings.not.absolute.title")));
 
         if (!Files.exists(root))
-            throw new ConfigurationException(Bundle.message("settings.no.folder", root), Bundle.message("settings.no.folder.title"));
+            return Optional.of(new ConfigurationException(Bundle.message("settings.no.folder", root), Bundle.message("settings.no.folder.title")));
 
         if (!Files.isDirectory(root))
-            throw new ConfigurationException(Bundle.message("settings.not.a.folder", root), Bundle.message("settings.not.a.folder.title"));
+            return Optional.of(new ConfigurationException(Bundle.message("settings.not.a.folder", root), Bundle.message("settings.not.a.folder.title")));
+
+        return Optional.empty();
     }
 
     // UC-SETTING-001, Rule-SETTING-009, Rule-SETTING-024, Rule-SETTING-042
     @Override
     public void apply() throws ConfigurationException {
-        refuseAnImpossibleRoot();
+        final @NotNull Optional<ConfigurationException> refusal = refusalOfTheRoot();
+        if (refusal.isPresent()) throw refusal.get();
 
         final boolean rootChanged = TestinRoot.isRootChanged(settings.rootTestinPath, testinPathPanel.getPathText());
 

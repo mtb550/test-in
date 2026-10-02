@@ -18,8 +18,7 @@ package org.testin.testcase;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.testin.TempTree;
+import org.testin.AbstractTempRootIdeTest;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
@@ -36,24 +35,7 @@ import java.util.List;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 
-public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
-
-    private Path root;
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-snapshot");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            TempTree.delete(root);
-        } finally {
-            super.tearDown();
-        }
-    }
+public class TestCaseSnapshotIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull TestCases indexedTestCases() {
         return Services.getInstance(getProject(), TestCases.class);

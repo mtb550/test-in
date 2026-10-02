@@ -37,7 +37,7 @@ import static org.testng.Assert.assertTrue;
 
 public class DeclaredContractsTest {
 
-    private static final @NotNull List<Path> ROOTS = List.of(Path.of("src", "main", "java"), Path.of("testin-java", "src", "main", "java"), Path.of("testin-testng", "src", "main", "java"));
+    private static final @NotNull List<Path> ROOTS = List.of(Path.of("src", "main", "java"), Path.of("src", "test", "java"), Path.of("testin-java", "src", "main", "java"), Path.of("testin-java", "src", "test", "java"), Path.of("testin-testng", "src", "main", "java"));
 
     private static final @NotNull Pattern THROWS = Pattern.compile("^\\s+(?!return\\b)[^=;]*?\\b(\\w+)\\s*\\(.*\\)\\s+throws\\s+[\\w., ]+\\s*[{;]\\s*$");
 
@@ -46,8 +46,7 @@ public class DeclaredContractsTest {
     private static final @NotNull Map<String, String> MAY_THROW = Map.ofEntries(
             entry("TransferListener.getTransferData", "AWT's Transferable contract: a flavor the transferable does not carry throws"),
             entry("NodesTransferable.getTransferData", "AWT's Transferable contract: a flavor the transferable does not carry throws"),
-            entry("SettingsConfigurable.apply", "Configurable.apply declares ConfigurationException, and the settings dialog shows its message"),
-            entry("SettingsConfigurable.refuseAnImpossibleRoot", "Called only by apply, whose ConfigurationException the settings dialog shows")
+            entry("SettingsConfigurable.apply", "Configurable.apply declares ConfigurationException, and the settings dialog shows its message")
     );
 
     private static final @NotNull Map<String, String> MAY_RETURN_NULL = Map.ofEntries(

@@ -17,8 +17,7 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.testin.TempTree;
+import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
@@ -33,10 +32,9 @@ import java.util.List;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 
-public class TestCaseWritesIdeTest extends BasePlatformTestCase {
+public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
 
     private static final String HAND_NAMED = "Log in by hand.tc";
-    private Path root;
 
     private static @NotNull TestCaseDto pastedInto(final TestSetDirectoryDto ts, final TestCaseDto cut) {
         final TestCaseDto pasted = TestCaseDto.builder()
@@ -71,21 +69,6 @@ public class TestCaseWritesIdeTest extends BasePlatformTestCase {
 
     private static @NotNull Path fileOf(final TestSetDirectoryDto ts, final TestCaseDto tc) {
         return ts.getPath().resolve(tc.getId() + ".tc");
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-writes");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            TempTree.delete(root);
-        } finally {
-            super.tearDown();
-        }
     }
 
     private @NotNull ProjectIndexer indexer() {

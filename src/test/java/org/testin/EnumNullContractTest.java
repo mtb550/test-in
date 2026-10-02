@@ -17,67 +17,18 @@
 package org.testin;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testng.annotations.Test;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.testng.Assert.fail;
 
 public class EnumNullContractTest {
 
-    private static final @NotNull Path SOURCE_ROOT = Paths.get("src", "main", "java");
-    private static final @NotNull String ROOT_PACKAGE = "org.testin";
-
     private static @NotNull List<Class<?>> findEnums() {
-
-        try {
-            final ClassLoader loader = EnumNullContractTest.class.getClassLoader();
-
-            final Path dir = SOURCE_ROOT.resolve(ROOT_PACKAGE.replace('.', '/'));
-            if (!Files.isDirectory(dir)) {
-                throw new IllegalStateException("No sources at " + dir.toAbsolutePath()
-                        + " - this test expects to run from the project root");
-            }
-
-            final List<Class<?>> enums = new ArrayList<>();
-
-            try (Stream<Path> files = Files.walk(dir)) {
-                files.filter(f -> f.toString().endsWith(".java"))
-                        .map(EnumNullContractTest::toClassName)
-                        .forEach(name -> {
-                            final Class<?> type = loadWithoutInitializing(loader, name);
-                            if (type != null && type.isEnum()) enums.add(type);
-                        });
-            }
-
-            return enums;
-
-        } catch (final Exception ex) {
-
-            throw new AssertionError(ex);
-
-        }
-
-    }
-
-    private static @NotNull String toClassName(final @NotNull Path file) {
-        final String relative = SOURCE_ROOT.relativize(file).toString().replace('\\', '/');
-        return relative.substring(0, relative.length() - ".java".length()).replace('/', '.');
-    }
-
-    private static @Nullable Class<?> loadWithoutInitializing(final @NotNull ClassLoader loader, final @NotNull String name) {
-        try {
-            return Class.forName(name, false, loader);
-        } catch (final Throwable t) {
-            return null;
-        }
+        return MainClasses.all().stream().filter(Class::isEnum).toList();
     }
 
     private static boolean isNullContractBreach(final @NotNull Throwable cause) {
@@ -100,7 +51,7 @@ public class EnumNullContractTest {
 
             final List<Class<?>> enums = findEnums();
             if (enums.isEmpty())
-                fail("No enums found under " + ROOT_PACKAGE + ": the scan is looking in the wrong place");
+                fail("No enums found in src/main/java: the scan is looking in the wrong place");
             Logger.info("Checked " + enums.size() + " enums");
 
             for (final Class<?> type : enums) {
@@ -119,8 +70,8 @@ public class EnumNullContractTest {
             }
 
             if (!breaches.isEmpty()) {
-                fail("An enum constant passes null to a field annotated @NotNull. Annotate the field @Nullable if "
-                        + "null is legitimate, or give the constant a value:\n  " + String.join("\n  ", breaches));
+                fail("An enum constant passes null to a field annotated @NotNull. Give the constant a value, or "
+                        + "an empty value of the field's own type:\n  " + String.join("\n  ", breaches));
             }
         } catch (final Exception ex) {
             throw new AssertionError(ex);

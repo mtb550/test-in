@@ -19,6 +19,7 @@ package org.testin.indexer;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 import org.testin.logger.Logger;
 import org.testin.model.FileKind;
 import org.testin.model.TestRunItems;
@@ -38,7 +39,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 final class TestRunWriter {
@@ -183,6 +187,19 @@ final class TestRunWriter {
                 Logger.error("Failed to persist marker: " + FailureText.of(ex));
             }
         });
+    }
+
+    @TestOnly
+    void awaitWrites() {
+        try {
+            queue.submit(() -> {
+            }).get(10, TimeUnit.SECONDS);
+        } catch (final InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while the test run writer was writing", ex);
+        } catch (final ExecutionException | TimeoutException ex) {
+            throw new IllegalStateException("The test run writer did not finish: " + FailureText.of(ex), ex);
+        }
     }
 
     private @NotNull Optional<byte[]> snapshot(final @NotNull TestRunItems item) {

@@ -17,41 +17,22 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.testin.TempTree;
+import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 
-public class TestCaseFileIdeTest extends BasePlatformTestCase {
-
-    private Path root;
+public class TestCaseFileIdeTest extends AbstractTempRootIdeTest {
 
     private static @NotNull TestCaseDto testCase(final TestSetDirectoryDto ts) {
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
         tc.setParent(ts);
         return tc;
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-case-file");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            TempTree.delete(root);
-        } finally {
-            super.tearDown();
-        }
     }
 
     private @NotNull TestCases indexedTestCases() {

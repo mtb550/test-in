@@ -18,9 +18,8 @@ package org.testin.bug;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.util.TimeoutUtil;
-import org.testin.TempTree;
+import org.testin.AbstractTempRootIdeTest;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
@@ -44,11 +43,9 @@ import java.util.Optional;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 
-public class BugFilingIdeTest extends BasePlatformTestCase {
+public class BugFilingIdeTest extends AbstractTempRootIdeTest {
 
     private static final String ISSUE = "https://github.com/mtb550/test-in/issues/412";
-
-    private Path root;
 
     private static @NotNull String awaitFileHoldingTheIssue(final Path file) {
         final long deadline = System.currentTimeMillis() + 10_000;
@@ -67,21 +64,6 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
             return Files.exists(file) ? Files.readString(file) : "";
         } catch (final IOException beingWritten) {
             return "";
-        }
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        root = Files.createTempDirectory("testin-bug-filing");
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        try {
-            if (root != null) TempTree.delete(root);
-        } finally {
-            super.tearDown();
         }
     }
 

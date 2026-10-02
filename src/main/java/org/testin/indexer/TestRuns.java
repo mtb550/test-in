@@ -19,6 +19,7 @@ package org.testin.indexer;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestRunDto;
@@ -117,6 +118,11 @@ public final class TestRuns {
 
     public byte @NotNull [] screenshot(final @NotNull Path testRunPath, final @NotNull String name) {
         return testRunWriter().readScreenshot(testRunPath, name);
+    }
+
+    @TestOnly
+    public void awaitWrites() {
+        testRunWriter().awaitWrites();
     }
 
     public @NotNull List<byte[]> screenshots(final @NotNull Path testRunPath, final @NotNull TestRunItems item) {

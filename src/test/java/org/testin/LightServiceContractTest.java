@@ -18,27 +18,18 @@ package org.testin;
 
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.testng.Assert.fail;
 
 public class LightServiceContractTest {
-
-    private static final @NotNull Path SOURCE_ROOT = Paths.get("src", "main", "java");
-
-    private static final @NotNull String ROOT_PACKAGE = "org.testin";
 
     private static final @NotNull List<String> ACCEPTED = List.of(
             "",
@@ -55,48 +46,7 @@ public class LightServiceContractTest {
     }
 
     private static @NotNull List<Class<?>> findServices() {
-
-        try {
-            final ClassLoader loader = LightServiceContractTest.class.getClassLoader();
-            final Path dir = SOURCE_ROOT.resolve(ROOT_PACKAGE.replace('.', '/'));
-
-            if (!Files.isDirectory(dir)) {
-                throw new IllegalStateException("No sources at " + dir.toAbsolutePath()
-                        + " - this test expects to run from the project root");
-            }
-
-            final List<Class<?>> services = new ArrayList<>();
-
-            try (Stream<Path> files = Files.walk(dir)) {
-                files.filter(f -> f.toString().endsWith(".java"))
-                        .map(LightServiceContractTest::toClassName)
-                        .forEach(name -> {
-                            final Class<?> type = loadWithoutInitializing(loader, name);
-                            if (type != null && type.isAnnotationPresent(Service.class)) services.add(type);
-                        });
-            }
-
-            return services;
-
-        } catch (final Exception ex) {
-
-            throw new AssertionError(ex);
-
-        }
-
-    }
-
-    private static @NotNull String toClassName(final @NotNull Path file) {
-        final String relative = SOURCE_ROOT.relativize(file).toString().replace('\\', '/');
-        return relative.substring(0, relative.length() - ".java".length()).replace('/', '.');
-    }
-
-    private static @Nullable Class<?> loadWithoutInitializing(final @NotNull ClassLoader loader, final @NotNull String name) {
-        try {
-            return Class.forName(name, false, loader);
-        } catch (final Throwable t) {
-            return null;
-        }
+        return MainClasses.all().stream().filter(type -> type.isAnnotationPresent(Service.class)).toList();
     }
 
     @Test
@@ -104,7 +54,7 @@ public class LightServiceContractTest {
         try {
             final List<Class<?>> services = findServices();
             if (services.isEmpty()) {
-                fail("No @Service classes found under " + ROOT_PACKAGE + ": the scan is looking in the wrong place");
+                fail("No @Service classes found in src/main/java: the scan is looking in the wrong place");
             }
 
             Logger.info("Checked " + services.size() + " light services");
