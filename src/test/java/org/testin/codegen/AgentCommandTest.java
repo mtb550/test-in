@@ -17,9 +17,11 @@
 package org.testin.codegen;
 
 import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
@@ -88,6 +90,18 @@ public class AgentCommandTest {
         assertEquals(written, "signInWithAValidAccount: Sign in with a valid account / The dashboard opens"
                 + " / 1098765432 / Passw0rd! / The account is active / Accounts / ");
         assertFalse(written.contains(tc.getId().toString()), "the test case id is not the agent's business");
+    }
+
+    // Rule-CODEGEN-086
+    @Test
+    public void thePromptSaysWhereTheTestCaseSitsAndWhichClassHoldsItsMethod() {
+        final TestSetDirectoryDto login = new TestSetDirectoryDto();
+        login.setPath2(new ArrayList<>(List.of("NAFATH", "Test Cases", "Accounts", "Login")));
+        final TestCaseDto tc = aTestCase();
+        tc.setParent(login);
+
+        assertEquals(BodyPrompt.of("{testSetPath} | {class}", tc, "signInWithAValidAccount"), "NAFATH > Test Cases > Accounts > Login | " + Fqcn.classOfMethod(tc));
+        assertFalse(Fqcn.classOfMethod(tc).isEmpty(), "a class that does not exist yet is still named");
     }
 
     // Rule-CODEGEN-086

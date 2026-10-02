@@ -55,11 +55,12 @@ Connecting an agent changes what that gesture produces, not where it lives.
   was tried. It waits twenty seconds and can be canceled, because a settings page
   that hangs is worse than one that says nothing.
 - **Rule-CODEGEN-086** — What is sent is one test case - its description,
-  expected result, steps, test data, pre-conditions and module - filled into a
-  prompt the tester can read and change. Nothing else ever leaves: not the
-  class, not another test case, not the test data root. An empty prompt means
-  the one Testin ships, so a tester who never edited it gets the better wording
-  a later release brings.
+  expected result, steps, test data, pre-conditions and module, where it sits
+  in the tree and the name of the class its method is written into - filled
+  into a prompt the tester can read and change. Nothing else ever leaves: not
+  the class's code, not another test case, not the test data root. An empty
+  prompt means the one Testin ships, so a tester who never edited it gets the
+  better wording a later release brings.
 - **Rule-CODEGEN-087** — A key is never Testin's to hold, to read, or even to
   ask about. An agent signs itself in, with its own account or with a key it
   reads from the environment the IDE was started in. Testin has no field for one,
@@ -112,7 +113,8 @@ the agent; the second is what it asks for.
 ┌─ Settings › Tools › Testin › Automation Agent › Prompt ─────────┐
 │                                                                     │
 │  One test case: its description, expected result, steps, test       │
-│  data, pre-conditions and module. Nothing else ever leaves.         │
+│  data, pre-conditions and module, where it sits in the tree and     │
+│  the class its method is written into. Nothing else ever leaves.    │
 │                                                                     │
 │  Prompt       ┌──────────────────────────────────────────┐          │
 │               │ Write the body of {method}.              │          │
@@ -120,7 +122,8 @@ the agent; the second is what it asks for.
 │               │ Expected result: {expectedResult}        │          │
 │               └──────────────────────────────────────────┘          │
 │               {description} {expectedResult} {steps} {testData}     │
-│               {preConditions} {module} {method}      [ Reset ]      │
+│               {preConditions} {module} {testSetPath}                │
+│               {class} {method}                       [ Reset ]      │
 │                                                                     │
 │  Timeout      [ 180 ]  seconds one test case may take               │
 └──────────────────────────────────────────────────────────────────┘

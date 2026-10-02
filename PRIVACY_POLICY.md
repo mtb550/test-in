@@ -47,9 +47,10 @@ The Plugin can ask an AI coding agent that you have installed and signed in your
 test method. This happens only when you press **Automate Test Case** and only while an agent is configured on the
 Settings page; with no agent configured, nothing is sent and nothing runs.
 
-* **What is sent:** one test case - its description, expected result, steps, test data, pre-conditions and module -
-  filled into a prompt you can read and change on the Settings page. Nothing else is sent: not your other test cases,
-  not the class the method sits in, not your test data folder, not your repository.
+* **What is sent:** one test case - its description, expected result, steps, test data, pre-conditions and module,
+  where it sits in the Testin tree and the name of the class its method is written into - filled into a prompt you can
+  read and change on the Settings page. Nothing else is sent: not your other test cases, not the code of the class the
+  method sits in, not your test data folder, not your repository.
 * **Where it goes:** to the command you named, running on your own machine, and from there wherever that agent sends
   it, under your own account with that provider and subject to their terms and privacy policy.
 * **Who sends it:** you do. The Plugin starts the agent's own command line, already installed and signed in on your

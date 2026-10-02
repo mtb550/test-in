@@ -27,7 +27,7 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BodyPrompt {
     public static final @NotNull List<String> PLACEHOLDERS =
-            List.of("{description}", "{expectedResult}", "{steps}", "{testData}", "{preConditions}", "{module}", "{method}");
+            List.of("{description}", "{expectedResult}", "{steps}", "{testData}", "{preConditions}", "{module}", "{testSetPath}", "{class}", "{method}");
 
     // UC-CODEGEN-021, Rule-CODEGEN-086
     public static @NotNull String of(final @NotNull String template, final @NotNull TestCaseDto tc, final @NotNull String methodName) {
@@ -38,6 +38,8 @@ public final class BodyPrompt {
                 "{testData}", tc.getTestData(),
                 "{preConditions}", tc.getPreConditions(),
                 "{module}", tc.getModule(),
+                "{testSetPath}", String.join(" > ", tc.getParent().getPath2()),
+                "{class}", Fqcn.classOfMethod(tc),
                 "{method}", methodName);
 
         @NotNull String written = template;
