@@ -12,10 +12,11 @@ shows both and lets the tester pick.
 about a field both sides rewrote. A test run's own `.tr` asks about a key both
 sides wrote differently into its configuration or its result analysis. The row
 is named as the tester already knows that key - **Platform**, or the heading the
-analysis was written under. A result - one test case's verdict - is never asked
-about at all: it is kept whole from whoever gave it last, because the status,
-the actual result, the stacktrace and the screenshots are one account of one
-execution and travel together ([UC-SHARE-017](resolveConflicts.md)).
+analysis was written under. A result - one test case's run item status - is
+never asked about at all: it is kept whole from whoever gave it last, because
+the status, the actual result, the stacktrace and the screenshots are one
+account of one execution and travel together
+([UC-SHARE-017](resolveConflicts.md)).
 
 There is no key that opens this. It opens during a merge.
 
@@ -36,14 +37,14 @@ There is no key that opens this. It opens during a merge.
 - **Rule-SHARE-006** — Nothing here is in the IDE's keymap, so none of these
   keys can be changed there.
 - **Rule-SHARE-080** — Only what both sides really changed is asked about, and
-  only where an answer is the tester's to give. Everything else is merged without
-  a question: a field one side left alone, a run's start and end and status, and
-  a whole result.
+  only where an answer is the tester's to give. Everything else is merged
+  without a question: a field one side left alone, a test run's start and end
+  and status, and a whole result.
 - **Rule-SHARE-081** — One window for each conflicted file, holding one question
   for each thing that disagrees: a field of a test case, or a key both sides
   wrote differently into a test run's own marker. A result raises no question,
-  because a verdict is kept whole from whoever gave it last rather than merged
-  piece by piece.
+  because a run item status is kept whole from whoever gave it last rather than
+  merged piece by piece.
 - **Rule-SHARE-082** — The tester's own value is chosen to start with.
 - **Rule-SHARE-083** — A value is shown on one line, cut at 70 characters. An
   empty one says that it is empty rather than showing nothing.
@@ -72,14 +73,14 @@ There is no key that opens this. It opens during a merge.
 ```
 
 1. **The title** — the words **Both Changed**, then what the tester calls the
-   thing: a test case's description, and for a test run's marker the run itself,
-   which is the folder it sits in. Neither is ever the file's name: every run
-   holds a marker called `.tr`, so three run conflicts in a row would all be
-   titled the same.
+   thing: a test case's description, and for a test run's marker the test run
+   itself, which is the folder it sits in. Neither is ever the file's name:
+   every test run holds a marker called `.tr`, so three test run conflicts in a
+   row would all be titled the same.
 2. **Each row** — the field, then the two values. **Mine** is chosen to start
-   with. A run's key is named as the tester already knows it: the question they
-   answered when the run was created, or the heading they wrote their analysis
-   under.
+   with. A test run's key is named as the tester already knows it: the question
+   they answered when the test run was created, or the heading they wrote their
+   analysis under.
 3. **Keep Selected** — writes the answers for this file.
 
 ## Main flow
@@ -104,11 +105,13 @@ whole value is still what gets written.
 `executedAt` is later takes the file whole, and nothing is asked. Nothing is
 said either, because the settled list is carried by this window and the window
 never opens. That is difference 20. Two testers judging *different* test cases
-of one run never conflict at all: their verdicts are in different files.
+of one test run never conflict at all: their run item statuses are in different
+files.
 
-**If two testers only moved a run along** — no window opens either. The start,
-the end, the status and the audit block are settled by rule, and a question comes
-only from a configuration or result analysis key both of them wrote differently.
+**If two testers only moved a test run along** — no window opens either. The
+start, the end, the status and the audit block are settled by rule, and a
+question comes only from a configuration or result analysis key both of them
+wrote differently.
 
 ---
 

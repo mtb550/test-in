@@ -6,9 +6,9 @@
 > **`Ctrl+Z`** does not take it back.
 >
 > `F2` changes the thing in front of the tester, and which thing that is depends
-> on where they are standing: Update Test Case answers it in the test editor,
-> Failed Test Case Details in the run editor, and this one in the tree. Each is
-> gray where the others answer, so only one can ever take the key.
+> on where they are standing: Update Test Case answers it in the test case
+> editor, Failed Test Case Details in the test run editor, and this one in the
+> tree. Each is gray where the others answer, so only one can ever take the key.
 
 **As a** tester, **I want** to change which test cases a test run covers, its
 name and its configuration, **so that** a test run can be corrected without
@@ -40,7 +40,7 @@ This changes a test run that is not signed off yet.
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
-  signed off. Its test cases, verdicts and configuration can no longer change.
+  signed off. Its test cases, run item statuses and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
     1. live nodes, then retired ones
     2. the number the tester gave the node
@@ -67,20 +67,21 @@ This changes a test run that is not signed off yet.
   the test run was made, and one in a test set deprecated, or under a package
   archived, since then. What the test run recorded about it is kept, and saving
   the dialog never removes it.
-- **Rule-TREE-PANEL-093** — The dialog opens with every row saying what the run
-  actually covers, folders included. A folder is ticked only when everything
-  under it is ticked, so a folder is never ticked over test cases the run does
-  not cover.
+- **Rule-TREE-PANEL-093** — The dialog opens with every row saying what the test
+  run actually covers, folders included. A folder is ticked only when everything
+  under it is ticked, so a folder is never ticked over test cases the test run
+  does not cover.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is, drawn with Inactive beside its name like any other status. Its test sets,
-  test cases and runs are not read, because a project nobody is working on is
+  test cases and test runs are not read, because a project nobody is working on is
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-128** — Saving changes the test run as it is when the save
-  lands, not as it was when the dialog opened. A verdict that arrived while the
-  dialog was open, from a pull or from the test run being worked on, is kept.
+  lands, not as it was when the dialog opened. A run item status that arrived
+  while the dialog was open, from a pull or from the test run being worked on,
+  is kept.
 
 ## What the tester sees
 
@@ -116,11 +117,11 @@ the IDE.
 **If the test run is Completed or Closed** — **Edit Test Run** is gray.
 
 **If the test run was signed off from its editor while the dialog was open** —
-the dialog stays open, and *'\<run\>' was Completed while this was open -
+the dialog stays open, and *'\<test run\>' was Completed while this was open -
 nothing saved* is shown in red.
 
-**If the test run was removed while the dialog was open** — *'\<run\>' no longer
-exists - nothing saved* is shown in red.
+**If the test run was removed while the dialog was open** — *'\<test run\>' no
+longer exists - nothing saved* is shown in red.
 
 **If the name is emptied** — *A test run needs a name* is shown in red, and the
 dialog stays open.
@@ -133,9 +134,9 @@ a clash.
 the same on an empty new test run.
 
 **If a row on the form has no answer** — **Save** is disabled, and *Pick a
-\<field\>* beside it names the first row that has none. The test run's own file is
-not touched until **Save**, so a run left unanswered is left exactly as it was.
-(Rule-TREE-PANEL-121)
+\<field\>* beside it names the first row that has none. The test run's own file
+is not touched until **Save**, so a test run left unanswered is left exactly as
+it was. (Rule-TREE-PANEL-121)
 
 **If several rows are selected** — **Edit Test Run** is gray. It needs exactly one.
 

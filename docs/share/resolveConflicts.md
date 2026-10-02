@@ -89,26 +89,27 @@ That was the same situation answered two ways, and the way out on screen only
 once.
 
 **A result two testers judged** — kept whole from whoever judged it last. A
-verdict is one tester's account of executing one test case: the status, when
+run item is one tester's account of executing one test case: the status, when
 they gave it, what they saw, the stacktrace, the screenshots and the bug they
 filed.
 Those travel together, or they say something nobody recorded, so the later
 `executedAt` takes the file and nothing is asked. Nothing is said either: the
 line naming what was settled belongs to the merge window, and that window opens
-only when a question is left. That is difference 20. Two testers judging **different** test cases of one run never
-conflict at all: their verdicts are
+only when a question is left. That is difference 20. Two testers judging **different** test cases of one test run never
+conflict at all: their run item statuses are
 in different files.
 
-**A run two testers executed** — merged by rule, with nothing to answer: the run
-started when the earlier of the two says it started, ended when the later says it
-ended, its status is the one further along, and its audit block takes the later
-edit. What they each wrote - the configuration, the result analysis - merges key
-by key, and only a key both of them changed differently is a question.
+**A test run two testers executed** — merged by rule, with nothing to answer:
+the test run started when the earlier of the two says it started, ended when the
+later says it ended, its status is the one further along, and its audit block
+takes the later edit. What they each wrote - the configuration, the result
+analysis - merges key by key, and only a key both of them changed differently is
+a question.
 
 **If the conflicted file is none of those** — a folder's marker other than a
-run's, or anything Testin did not write, is named in that same message and left
-as it is. The tester settles those by hand, in files the IDE may not draw as
-conflicted, because a Testin folder is not a version control root.
+test run's, or anything Testin did not write, is named in that same message and
+left as it is. The tester settles those by hand, in files the IDE may not draw
+as conflicted, because a Testin folder is not a version control root.
 
 **If the repository has no remote** — the rebase is carried to the end and the
 push is refused, reading *This repository has no remote, so there is nothing to
@@ -135,11 +136,11 @@ finished sentence for each:
 > Who changed it last and when, taken from the later edit
 > The position in the test set, taken from the remote
 
-Each entry carries its own reason, because the reasons differ: a run's marker
-settles its status, its execution stamps and every key only one tester wrote, and
-none of those is settled by a rule about positions. The dialog adds nothing to
-them - it used to end the sentence with one explanation for the lot, which was
-true of a test case and of nothing else.
+Each entry carries its own reason, because the reasons differ: a test run's
+marker settles its status, its execution stamps and every key only one tester
+wrote, and none of those is settled by a rule about positions. The dialog adds
+nothing to them - it used to end the sentence with one explanation for the lot,
+which was true of a test case and of nothing else.
 
 Only when it happened. A field one side never touched is settled by the ordinary
 three-way rule, which is nobody's decision, and nothing is said about it.

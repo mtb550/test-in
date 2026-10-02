@@ -64,8 +64,8 @@ public class TestRunDirectoryDto extends DirectoryDto {
         return SCREENSHOT_NAME.matcher(fileName).matches();
     }
 
-    public static @NotNull Path screenshotFile(final @NotNull Path runPath, final @NotNull String name) {
-        return runPath.resolve(name);
+    public static @NotNull Path screenshotFile(final @NotNull Path testRunPath, final @NotNull String name) {
+        return testRunPath.resolve(name);
     }
 
     @Override

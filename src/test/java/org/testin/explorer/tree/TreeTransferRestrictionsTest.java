@@ -93,15 +93,15 @@ public class TreeTransferRestrictionsTest {
     }
 
     @Test
-    public void runNodesNeverEnterTheTestSetFamily() {
+    public void testRunNodesNeverEnterTheTestSetFamily() {
         final DirectoryDto[] testSetFamilyTargets = {
                 new TestCasesMainDirectoryDto(),
                 new TestSetPackageDirectoryDto()
         };
-        final DirectoryDto[] runSources = {new TestRunDirectoryDto(), new TestRunPackageDirectoryDto()};
+        final DirectoryDto[] testRunSources = {new TestRunDirectoryDto(), new TestRunPackageDirectoryDto()};
 
         for (final DirectoryDto target : testSetFamilyTargets) {
-            for (final DirectoryDto source : runSources) {
+            for (final DirectoryDto source : testRunSources) {
                 assertFalse(target.acceptsTransferred(source),
                         target.getClass().getSimpleName() + " must reject " + source.getClass().getSimpleName());
             }
@@ -117,28 +117,28 @@ public class TreeTransferRestrictionsTest {
         assertFalse(testSet.isTransferTarget(), "a test set holds test cases only");
         assertFalse(testSet.acceptsTransferred(new TestSetPackageDirectoryDto()), "no package into a test set");
         assertFalse(testSet.acceptsTransferred(new TestSetDirectoryDto()), "no test set into a test set");
-        assertFalse(testSet.acceptsTransferred(new TestRunDirectoryDto()), "no run node into a test set");
+        assertFalse(testSet.acceptsTransferred(new TestRunDirectoryDto()), "no test run node into a test set");
     }
 
     @Test
-    public void testSetNodesNeverEnterTheRunFamily() {
-        final DirectoryDto[] runFamilyTargets = {
+    public void testSetNodesNeverEnterTheTestRunFamily() {
+        final DirectoryDto[] testRunFamilyTargets = {
                 new TestRunsMainDirectoryDto(),
                 new TestRunPackageDirectoryDto(),
                 new TestRunDirectoryDto()
         };
         final DirectoryDto[] testSetSources = {new TestSetDirectoryDto(), new TestSetPackageDirectoryDto()};
 
-        for (final DirectoryDto target : runFamilyTargets) {
+        for (final DirectoryDto target : testRunFamilyTargets) {
             for (final DirectoryDto source : testSetSources) {
                 assertFalse(target.acceptsTransferred(source),
                         target.getClass().getSimpleName() + " must reject " + source.getClass().getSimpleName());
             }
         }
         assertTrue(new TestRunsMainDirectoryDto().acceptsTransferred(new TestRunPackageDirectoryDto()),
-                "the runs root must accept run packages");
+                "the test runs root must accept test run packages");
         assertTrue(new TestRunPackageDirectoryDto().acceptsTransferred(new TestRunPackageDirectoryDto()),
-                "run packages must accept run packages");
+                "test run packages must accept test run packages");
     }
 
     @Test
@@ -148,12 +148,12 @@ public class TreeTransferRestrictionsTest {
         assertFalse(testRun.acceptsTransferred(new TestRunDirectoryDto()),
                 "no test run into a test run");
         assertFalse(testRun.acceptsTransferred(new TestRunPackageDirectoryDto()),
-                "no run package into a test run");
+                "no test run package into a test run");
 
         assertTrue(new TestRunsMainDirectoryDto().acceptsTransferred(new TestRunDirectoryDto()),
-                "the runs root must still accept test runs");
+                "the test runs root must still accept test runs");
         assertTrue(new TestRunPackageDirectoryDto().acceptsTransferred(new TestRunDirectoryDto()),
-                "run packages must still accept test runs");
+                "test run packages must still accept test runs");
     }
 
     @Test

@@ -40,8 +40,8 @@ public enum LightModePart implements ToolBarAttribute {
             List.of()
     ),
 
-    VERDICT_BUTTONS(
-            Bundle.message("light.part.verdict.buttons"),
+    RUN_ITEM_STATUS_BUTTONS(
+            Bundle.message("light.part.run.item.status.buttons"),
             List.of()
     ),
 

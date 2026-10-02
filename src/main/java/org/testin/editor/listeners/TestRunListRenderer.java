@@ -1,0 +1,51 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.editor.listeners;
+
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
+import org.testin.editor.CardHoverAction;
+import org.testin.editor.testrun.TestRunCard;
+import org.testin.editor.testrun.TestRunEditor;
+import org.testin.model.TestRunItems;
+import org.testin.model.dto.TestCaseDto;
+
+import javax.swing.JList;
+import java.util.Optional;
+
+public class TestRunListRenderer extends AbstractListRenderer<TestRunEditor> {
+    private final @NotNull TestRunCard card;
+
+    public TestRunListRenderer(final @NotNull Project p, final @NotNull TestRunEditor editor) {
+        super(editor);
+        this.card = new TestRunCard(p);
+    }
+
+    // UC-EDITOR-PANEL-030
+    @Override
+    protected @NotNull TestRunCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int row, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover) {
+        final @NotNull TestRunItems runItem = editor.runItem(tc.getId())
+                .orElseGet(() -> TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc)));
+
+        card.updateData(row, editor.getSelectedDetails(), runItem, editor.cardTitle(tc));
+        card.setHoverButtons(CardHoverAction.onCard(editor.getProject(), editor.getParent(), tc));
+        card.setActionsState(isSelected, isRowHovered, hover);
+        card.applyListLayout(list);
+
+        return card;
+    }
+}

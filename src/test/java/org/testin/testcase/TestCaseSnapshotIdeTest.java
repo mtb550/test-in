@@ -103,7 +103,7 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
 
         assertFalse("an undo into a set no longer indexed was not refused",
                 Services.getInstance(getProject(), UndoHistories.class).undo(scope));
-        assertTrue("the pasted case was taken out of the destination by a refused undo",
+        assertTrue("the pasted test case was taken out of the destination by a refused undo",
                 indexedTestCases().findTestCase(moved.getId()).isPresent());
     }
 
@@ -125,8 +125,8 @@ public class TestCaseSnapshotIdeTest extends BasePlatformTestCase {
         TestCaseSnapshot.record(getProject(), scope, "Remove", List.of(before), List.of(TestCaseSnapshot.of(getProject(), ts.getPath(), ids)));
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
-        assertTrue("the undo said it could not put the case back", Services.getInstance(getProject(), UndoHistories.class).undo(scope));
-        assertTrue("the case is not back in the index", indexedTestCases().findTestCase(removed.getId()).isPresent());
-        assertTrue("the case's file is not back on disk", Files.isRegularFile(ts.getPath().resolve(removed.getId() + ".tc")));
+        assertTrue("the undo said it could not put the test case back", Services.getInstance(getProject(), UndoHistories.class).undo(scope));
+        assertTrue("the test case is not back in the index", indexedTestCases().findTestCase(removed.getId()).isPresent());
+        assertTrue("the test case's file is not back on disk", Files.isRegularFile(ts.getPath().resolve(removed.getId() + ".tc")));
     }
 }

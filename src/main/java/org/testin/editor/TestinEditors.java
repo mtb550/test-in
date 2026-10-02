@@ -26,7 +26,7 @@ import com.intellij.util.concurrency.ThreadingAssertions;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.run.RunEditor;
+import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -132,8 +132,8 @@ public final class TestinEditors {
         });
     }
 
-    public @NotNull Optional<RunEditor> runEditorFor(final @NotNull TestRunDirectoryDto run) {
-        return editorFor(run).filter(RunEditor.class::isInstance).map(RunEditor.class::cast);
+    public @NotNull Optional<TestRunEditor> testRunEditorFor(final @NotNull TestRunDirectoryDto testRun) {
+        return editorFor(testRun).filter(TestRunEditor.class::isInstance).map(TestRunEditor.class::cast);
     }
 
     public @NotNull Optional<TestinEditor> editorFor(final @NotNull DirectoryDto dir) {

@@ -35,7 +35,7 @@ import java.awt.event.KeyEvent;
 @AllArgsConstructor
 public enum TestRunStatus implements MenuItem {
     CREATED(
-            Bundle.message("status.run.created"),
+            Bundle.message("status.test.run.created"),
             Shortcuts.NO_KEY,
             AllIcons.General.Add,
             Stage.MADE,
@@ -43,7 +43,7 @@ public enum TestRunStatus implements MenuItem {
     ),
 
     IN_PROGRESS(
-            Bundle.message("status.run.in.progress"),
+            Bundle.message("status.test.run.in.progress"),
             Shortcuts.NO_KEY,
             AllIcons.Actions.BuildAutoReloadChanges,
             Stage.RUNNING,
@@ -51,7 +51,7 @@ public enum TestRunStatus implements MenuItem {
     ),
 
     COMPLETED(
-            Bundle.message("status.run.completed"),
+            Bundle.message("status.test.run.completed"),
             KeyStroke.getKeyStroke(KeyEvent.VK_2, 0),
             AllIcons.Toolwindows.ToolWindowCoverage,
             Stage.OVER,
@@ -59,7 +59,7 @@ public enum TestRunStatus implements MenuItem {
     ),
 
     ASSIGNED(
-            Bundle.message("status.run.assigned"),
+            Bundle.message("status.test.run.assigned"),
             KeyStroke.getKeyStroke(KeyEvent.VK_1, 0),
             AllIcons.Gutter.ExtAnnotation,
             Stage.HANDED_OUT,
@@ -67,7 +67,7 @@ public enum TestRunStatus implements MenuItem {
     ),
 
     CLOSED(
-            Bundle.message("status.run.closed"),
+            Bundle.message("status.test.run.closed"),
             KeyStroke.getKeyStroke(KeyEvent.VK_3, 0),
             AllIcons.Actions.Cancel,
             Stage.OVER,

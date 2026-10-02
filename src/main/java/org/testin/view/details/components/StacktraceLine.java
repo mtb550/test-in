@@ -72,10 +72,10 @@ public final class StacktraceLine extends AbstractDetails {
 
         final @NotNull List<JComponent> parts = new ArrayList<>();
 
-        final @NotNull Path runPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
+        final @NotNull Path testRunPath = Services.getInstance(p, TestinRoot.class).resolve(currentPath);
 
         if (!stacktrace.isBlank()) parts.add(stacktraceLink(p, dto, stacktrace));
-        screenshots.forEach(name -> parts.add(thumbnail(p, runPath, name)));
+        screenshots.forEach(name -> parts.add(thumbnail(p, testRunPath, name)));
 
         return addFullWidthRow(panel, gbc, line(parts), JBUI.insets(INSETS_TOP, INSETS_SIDE, 0, INSETS_SIDE), currentRow);
     }
@@ -87,7 +87,7 @@ public final class StacktraceLine extends AbstractDetails {
     }
 
     // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-081
-    private @NotNull JComponent thumbnail(final @NotNull Project p, final @NotNull Path runPath, final @NotNull String name) {
+    private @NotNull JComponent thumbnail(final @NotNull Project p, final @NotNull Path testRunPath, final @NotNull String name) {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
 
         final @NotNull JBLabel square = new JBLabel(Picture.noThumbnail());
@@ -96,12 +96,12 @@ public final class StacktraceLine extends AbstractDetails {
         square.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                new ScreenshotDialog(p, name, testRuns.screenshot(runPath, name)).show();
+                new ScreenshotDialog(p, name, testRuns.screenshot(testRunPath, name)).show();
             }
         });
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final @NotNull Icon thumbnail = Picture.thumbnail(testRuns.screenshot(runPath, name));
+            final @NotNull Icon thumbnail = Picture.thumbnail(testRuns.screenshot(testRunPath, name));
             ApplicationManager.getApplication().invokeLater(() -> square.setIcon(thumbnail));
         });
 

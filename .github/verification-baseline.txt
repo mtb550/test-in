@@ -12,7 +12,7 @@
 # Java 25. A 2026.1 IDE runs on Java 21 and cannot load it.
 #
 # Rider was verified on every sweep from 2026-09-14 and had no row here, so
-# the report called it a new target and its verdict changed nothing. It reads
+# the report called it a new target and its result changed nothing. It reads
 # Compatible on both ends of 262, so 0 is what it is held to.
 #
 # All zero since #144 moved the Java and TestNG code into content modules of

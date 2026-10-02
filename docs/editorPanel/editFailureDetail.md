@@ -4,10 +4,10 @@
 
 **As a** tester, **I want** to add to what I wrote about a failure, **so that** I can paste the error in after I have
 found it, without touching the
-verdict.
+run item status.
 
 This reopens the failure form on a test case that is already **Failed**. The
-verdict is not touched.
+run item status is not touched.
 
 `F2` on the failed test case.
 
@@ -37,10 +37,10 @@ verdict is not touched.
   reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
-- **Rule-EDITOR-PANEL-167** — The verdict is not touched. Only the four fields
-  are written.
+- **Rule-EDITOR-PANEL-167** — The run item status is not touched. Only the four
+  fields are written.
 - **Rule-EDITOR-PANEL-168** — The entry works on exactly one test case, and only
-  when its verdict is **Failed**.
+  when its run item status is **Failed**.
 - **Rule-EDITOR-PANEL-169** — The message comes after the test run is written,
   so an edit that was dropped never reports itself as saved.
 - **Rule-EDITOR-PANEL-170** — The dialog is the same one `F` opens, filled in
@@ -106,7 +106,7 @@ The same dialog the `F` key opens, with what was written already in it.
    ones already selected, or Enhancement and Low where nobody chose.
 4. **The big box** — for the error or the exception. This is usually what the
    tester came back to add.
-5. **The verdict** — not on this dialog at all. It stays **Failed**.
+5. **The run item status** — not on this dialog at all. It stays **Failed**.
 
 ## Main flow
 
@@ -115,7 +115,7 @@ The same dialog the `F` key opens, with what was written already in it.
 3. The tester selects the test case and presses `F2`.
 4. The **Failed Test Case Details** dialog opens with what was already written.
 5. The tester pastes the error into the big box and presses `Enter`.
-6. The four fields are written. The verdict stays **Failed**.
+6. The four fields are written. The run item status stays **Failed**.
 7. The test run is written to disk.
 8. A message reads *Details updated*.
 
@@ -127,7 +127,7 @@ The same dialog the `F` key opens, with what was written already in it.
 case has nothing to explain.
 
 **If the test case was deleted from its test set** — a message reads *The test
-case was removed - the run keeps what it recorded.*
+case was removed - the test run keeps what it recorded.*
 
 **If the test run is being read again at that moment** — nothing is written, and
 nothing is said. Only the log records it.

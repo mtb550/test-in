@@ -3,7 +3,8 @@
 # UC-CODEGEN-008: Run a test case's automation
 
 **As a** tester, **I want** to run the generated method for one or more test
-cases, **so that** the verdict is recorded without me judging it by hand.
+cases, **so that** the run item status is recorded without me judging it by
+hand.
 
 The code runs, and Testin writes down whether each test case passed.
 
@@ -30,8 +31,8 @@ The code runs, and Testin writes down whether each test case passed.
   renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
-- **Rule-CODEGEN-031** — Whatever the tester selected is one run, not one run
-  for each test case.
+- **Rule-CODEGEN-031** — Whatever the tester selected is one execution, not one
+  execution for each test case.
 - **Rule-CODEGEN-032** — The method is found by the test case's identity, never
   by its name.
 - **Rule-CODEGEN-033** — One message with a count, however many test cases
@@ -44,21 +45,21 @@ The code runs, and Testin writes down whether each test case passed.
 - **Rule-CODEGEN-074** — A test case that cannot run is reported once. One says
   its description; several say how many, because the descriptions are on the
   cards in front of the tester.
-- **Rule-CODEGEN-075** — A test the framework does not run to a verdict is
-  recorded as Failed, with Skipped/Terminated as its actual result. TestNG skips
-  a test whose dependency failed, whose group is excluded or that is disabled,
-  and stops the rest when the run is terminated: all of them come back as a
-  defect with no verdict, and a run that quietly left them Pending would report
-  a cycle as finished when part of it never ran.
-- **Rule-CODEGEN-076** — A second run started while the first is still going
-  gets a name of its own - the same name with a number after it, such as
-  LoginTest (2). The two runs are then separate everywhere: each has its own
-  process, Stop reaches one without touching the other, and each test case
-  reports its verdict under the run it belongs to.
-- **Rule-CODEGEN-092** — A run that ends without reporting a test case, whether
-  its build failed, its JVM crashed or the IDE's own Stop ended it, takes that
-  test case out of Running with no verdict recorded. Nothing is left running
-  after the run has ended.
+- **Rule-CODEGEN-075** — A test the framework does not run to a run item status
+  is recorded as Failed, with Skipped/Terminated as its actual result. TestNG
+  skips a test whose dependency failed, whose group is excluded or that is
+  disabled, and stops the rest when the execution is terminated: all of them
+  come back as a defect with no run item status, and an execution that quietly
+  left them Pending would report a cycle as finished when part of it never ran.
+- **Rule-CODEGEN-076** — A second execution started while the first is still
+  going gets a name of its own - the same name with a number after it, such as
+  LoginTest (2). The two executions are then separate everywhere: each has its
+  own process, Stop reaches one without touching the other, and each test case
+  reports its run item status under the execution it belongs to.
+- **Rule-CODEGEN-092** — An execution that ends without reporting a test case,
+  whether its build failed, its JVM crashed or the IDE's own Stop ended it,
+  takes that test case out of Running with no run item status recorded. Nothing
+  is left running after the execution has ended.
 
 ## The four ways in
 
@@ -70,7 +71,7 @@ The code runs, and Testin writes down whether each test case passed.
 | Presses `F5` or clicks the run button | [Light mode](../editorPanel/lightMode.md), on the test case it is showing |
 
 Running everything a test run has not judged yet is different, and is
-[UC-EDITOR-PANEL-044](../editorPanel/runWholeRun.md).
+[UC-EDITOR-PANEL-044](../editorPanel/runWholeTestRun.md).
 
 ## What the tester sees
 
@@ -106,22 +107,22 @@ appears. The message saying how many have no generated code still does.
 **If every selected test case is already running** — nothing starts and nothing
 is said.
 
-**If a run of that name is already going** - the second one is named after it
-with a number, such as *LoginTest (2)*, and runs alongside. Each has its own
-process: stopping one leaves the other running, and each test case records its
-verdict under the run it actually belongs to.
+**If an execution of that name is already going** - the second one is named
+after it with a number, such as *LoginTest (2)*, and runs alongside. Each has
+its own process: stopping one leaves the other running, and each test case
+records its run item status under the execution it actually belongs to.
 
 **If the framework skips a test** - the test case is recorded as **Failed**, and
 its actual result reads *Skipped/Terminated*. A dependency that failed, an
-excluded group, a disabled test and a terminated run all arrive the same way: the
-framework says the test did not pass and gives no verdict. Leaving it Pending
-would report the cycle as finished when part of it never ran.
+excluded group, a disabled test and a terminated execution all arrive the same
+way: the framework says the test did not pass and gives no run item status.
+Leaving it Pending would report the cycle as finished when part of it never ran.
 
 **If the IDE is indexing** — every test case is put back and a message reads *Tests cannot run while the IDE is
 indexing. Wait a moment and run them again.*
 
 **If indexing starts part way through** — every test case is put back and a
-message reads *Indexing interrupted the test run. Run it again.*
+message reads *Indexing interrupted the execution. Run it again.*
 
 **If the IDE has no TestNG or no Java plugin** — the menu entry is still there,
 grayed, naming the first one missing: *(needs the Java plugin)* or *(needs the
@@ -135,7 +136,7 @@ It stays live, and pressing it says the same sentence and starts nothing. That
 is difference 10 on
 [the automation code page](main.md#where-the-plugin-breaks-its-own-rules).
 
-## What the run is called
+## What the execution is called
 
 The name in the IDE's run widget depends on the selection.
 

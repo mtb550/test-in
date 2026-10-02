@@ -22,6 +22,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-record Stop(@NotNull Set<String> runs, @NotNull List<UUID> testCases) {
+record Stop(@NotNull Set<String> executions, @NotNull List<UUID> testCases) {
     static final @NotNull Stop NOTHING = new Stop(Set.of(), List.of());
 }

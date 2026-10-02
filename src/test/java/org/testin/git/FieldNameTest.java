@@ -18,7 +18,7 @@ package org.testin.git;
 
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunConfiguration;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -27,16 +27,16 @@ public class FieldNameTest {
 
     @Test
     public void aTestCaseFieldIsNamedByTheEditorsOwnEnum() {
-        assertEquals(FieldName.of("updatedAt"), TestEditorAttributes.UPDATED_AT.getName(),
+        assertEquals(FieldName.of("updatedAt"), TestCaseEditorAttributes.UPDATED_AT.getName(),
                 "a camelCase JSON field is the enum constant with the underscore");
     }
 
     @Test
-    public void aRunsConfigurationKeyIsNamedByTheQuestionTheTesterAnswered() {
+    public void aTestRunsConfigurationKeyIsNamedByTheQuestionTheTesterAnswered() {
         final TestRunConfiguration question = TestRunConfiguration.values()[0];
 
         assertEquals(FieldName.of("configuration." + question.name()), question.getDisplayName(),
-                "the key is named as the run creation dialog names it");
+                "the key is named as the test run creation dialog names it");
     }
 
     @Test

@@ -3,8 +3,8 @@
 # UC-CODEGEN-012: Change a test case's groups
 
 **As a** tester, **I want** the groups on the test method to follow the groups
-on the test case, **so that** a run of the smoke group runs what the tree calls
-smoke.
+on the test case, **so that** an execution of the smoke group runs what the tree
+calls smoke.
 
 The groups on the test case become the groups on the method.
 
@@ -71,8 +71,9 @@ so.
 ## What the tester sees elsewhere
 
 In the code the groups are written as they read everywhere else in Testin, as
-`"Regression"` and `"Smoke"`. TestNG compares group names exactly, so a run
-selecting `Regression` finds them and one selecting `REGRESSION` does not.
+`"Regression"` and `"Smoke"`. TestNG compares group names exactly, so an
+execution selecting `Regression` finds them and one selecting `REGRESSION` does
+not.
 
 ---
 

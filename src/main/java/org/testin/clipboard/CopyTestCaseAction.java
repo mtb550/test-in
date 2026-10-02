@@ -60,7 +60,7 @@ public class CopyTestCaseAction extends AbstractAnyProjectAction {
         // Rule-EDITOR-PANEL-214
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             e.getPresentation().setEnabled(false);
-            e.getPresentation().setDescription(Bundle.message("copy.case.disabled.description"));
+            e.getPresentation().setDescription(Bundle.message("copy.test.case.disabled.description"));
             return;
         }
 

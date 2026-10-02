@@ -18,9 +18,9 @@ came from a real test project, and nothing here should.
     testin-root/         what the rootTestinPath setting points at
       Demo/                                  .tp   the test project, format 2
         Test Cases/                          .tcd
-          Login/                             .ts   3 cases, one .tc each
+          Login/                             .ts   3 test cases, one .tc each
           Checkout/                          .tsp  a test set package
-            Payment/                         .ts   3 cases, one .tc each
+            Payment/                         .ts   3 test cases, one .tc each
         Test Runs/                           .trd
           Cycle-1/                           .tr   completed; six results, one .ri each
           Regression/                        .trp  a test run package
@@ -54,14 +54,14 @@ to this folder in **Settings → Testin**.
 reads it with, and asserts that:
 
 - all seven markers are present;
-- each case's file name is its id;
-- each case carries a rank;
-- a run holds one result file per case and no results file of its own;
-- every result names a case that exists.
+- each test case's file name is its id;
+- each test case carries a rank;
+- a test run holds one result file per test case and no results file of its own;
+- every result names a test case that exists.
 
 So this sample cannot rot quietly. If a format changes, that test fails and names
 the file — which is the entire reason it is worth committing sample data rather
 than writing it by hand each time.
 
-Keep it small. It is meant to be read in one sitting; a set with forty cases in
-it would demonstrate nothing the six here do not.
+Keep it small. It is meant to be read in one sitting; a set with forty test
+cases in it would demonstrate nothing the six here do not.

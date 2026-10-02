@@ -60,9 +60,9 @@ the product.
 
 ## What the tester sees
 
-This opens no screen. The card's verdict badge turns to **Blocked**, and the
-figures in the status bar move. Nothing already written about the test case is
-cleared.
+This opens no screen. The card's run item status badge turns to **Blocked**, and
+the figures in the status bar move. Nothing already written about the test case
+is cleared.
 
 A small message appears at the bottom of the IDE and fades. It reads *Blocked*.
 
@@ -80,7 +80,7 @@ A small message appears at the bottom of the IDE and fades. It reads *Blocked*.
 **If nothing is selected** — nothing happens.
 
 **If the test case was deleted from its test set** — a message reads *The test
-case was removed - the run keeps what it recorded.*
+case was removed - the test run keeps what it recorded.*
 
 **If a grid cell is open for editing** — the key belongs to the cell.
 

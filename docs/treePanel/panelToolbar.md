@@ -35,7 +35,7 @@ These eight buttons act on the whole panel, not on one node.
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
-  signed off. Its test cases, verdicts and configuration can no longer change.
+  signed off. Its test cases, run item statuses and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
     1. live nodes, then retired ones
     2. the number the tester gave the node
@@ -58,7 +58,7 @@ These eight buttons act on the whole panel, not on one node.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is, drawn with Inactive beside its name like any other status. Its test sets,
-  test cases and runs are not read, because a project nobody is working on is
+  test cases and test runs are not read, because a project nobody is working on is
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
@@ -93,7 +93,7 @@ happens when the tester presses one.
 
 |   | Button                  | Hovering says                                                                                                              | Where it is written                            |
 |---|-------------------------|----------------------------------------------------------------------------------------------------------------------------|------------------------------------------------|
-| 1 | **Search Test Project** | *Find a test case, test set, package or run and go to it*                                                                  | [UC-INTERNAL-001](../internal/globalSearch.md) |
+| 1 | **Search Test Project** | *Find a test case, test set, package or test run and go to it*                                                             | [UC-INTERNAL-001](../internal/globalSearch.md) |
 | 2 | **Settings**            | *Configure Testin settings*                                                                                                | Below                                          |
 | 3 | **Expand All**          | *Expand all nodes*                                                                                                         | Below                                          |
 | 4 | **Collapse All**        | *Collapse all nodes*                                                                                                       | Below                                          |

@@ -29,7 +29,7 @@ public enum NodeStatistics {
             List.of()
     ),
 
-    VERDICTS(List.of(
+    RUN_ITEM_STATUSES(List.of(
             NodeCount.PASSED, NodeCount.FAILED, NodeCount.BLOCKED, NodeCount.UNTESTED, NodeCount.REMOVED));
 
     private final @NotNull List<NodeCount> slices;

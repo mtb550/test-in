@@ -21,7 +21,7 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditors;
-import org.testin.editor.run.RunEditor;
+import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
@@ -52,51 +52,51 @@ public final class TestRunStatusChange {
     }
 
     // UC-TREE-PANEL-020, Rule-EDITOR-PANEL-008, Rule-TREE-PANEL-091
-    public void apply(final @NotNull TestRunDirectoryDto run, final @NotNull TestRunStatus newStatus) {
-        final @NotNull Optional<RunEditor> open = editors.runEditorFor(run);
+    public void apply(final @NotNull TestRunDirectoryDto testRun, final @NotNull TestRunStatus newStatus) {
+        final @NotNull Optional<TestRunEditor> open = editors.testRunEditorFor(testRun);
 
-        Logger.trace("Test run status changed: " + run.getName() + " = " + newStatus.getLabel());
+        Logger.trace("Test run status changed: " + testRun.getName() + " = " + newStatus.getLabel());
 
         if (newStatus.stopsExecution()) open.ifPresent(editor -> editor.getWalk().stopExecution());
 
-        run.getMarker().changeStatus(newStatus);
+        testRun.getMarker().changeStatus(newStatus);
 
-        persist(run, open);
+        persist(testRun, open);
         redraw(open);
 
         notifier.softShow(p, newStatus.getLabel());
     }
 
-    private void persist(final @NotNull TestRunDirectoryDto run, final @NotNull Optional<RunEditor> open) {
-        final @NotNull TestRunStatus status = run.getMarker().getStatus();
+    private void persist(final @NotNull TestRunDirectoryDto testRun, final @NotNull Optional<TestRunEditor> open) {
+        final @NotNull TestRunStatus status = testRun.getMarker().getStatus();
         final @NotNull String tester = settings.testerName;
 
-        if (status.isTerminal()) finish(run.getPath());
+        if (status.isTerminal()) finish(testRun.getPath());
 
-        testRuns.changeRunMarker(run.getPath(), marker -> {
+        testRuns.changeTestRunMarker(testRun.getPath(), marker -> {
             marker.changeStatus(status);
             marker.touch(tester);
         });
 
-        if (open.isPresent()) testRuns.saveRun(run.getPath());
+        if (open.isPresent()) testRuns.saveTestRun(testRun.getPath());
     }
 
-    private void finish(final @NotNull Path runPath) {
-        testRuns.changeRun(runPath, run -> {
+    private void finish(final @NotNull Path testRunPath) {
+        testRuns.changeTestRun(testRunPath, testRun -> {
             int closed = 0;
-            for (final TestRunItems item : run.getResults()) {
+            for (final TestRunItems item : testRun.getResults()) {
                 if (item.markUntestedIfPending()) closed++;
             }
 
             if (closed > 0)
-                Logger.info("Run finished with " + closed + " case(s) not executed; marked untested: " + runPath);
+                Logger.info("Test run finished with " + closed + " test case(s) not executed; marked untested: " + testRunPath);
         });
 
-        testRuns.changeRunMarker(runPath, TestRunMarker::markExecutionEnded);
+        testRuns.changeTestRunMarker(testRunPath, TestRunMarker::markExecutionEnded);
     }
 
     // UC-TREE-PANEL-020, Rule-TREE-PANEL-091
-    private void redraw(final @NotNull Optional<RunEditor> open) {
-        ApplicationManager.getApplication().invokeLater(() -> open.ifPresent(RunEditor::refreshAfterRunStatusChanged));
+    private void redraw(final @NotNull Optional<TestRunEditor> open) {
+        ApplicationManager.getApplication().invokeLater(() -> open.ifPresent(TestRunEditor::refreshAfterTestRunStatusChanged));
     }
 }

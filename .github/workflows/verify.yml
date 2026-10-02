@@ -1,7 +1,7 @@
 # The Plugin Verifier against every IDE the plugin claims to run in, on every
 # push to main.
 #
-# build.yml verifies against IntelliJ IDEA only, because that is the one verdict
+# build.yml verifies against IntelliJ IDEA only, because that is the one result
 # that can turn a pull request red for a real reason. This is the other half:
 # what the JetBrains Marketplace will say about the plugin when it is published.
 # The Marketplace runs this same verifier and shows its findings on the plugin

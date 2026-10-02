@@ -25,10 +25,10 @@ import org.testin.util.Bundle;
 
 import java.util.Map;
 
-public record ChangeLogSection(@NotNull ComponentDialogBase<MultiLineField> component) implements RunSection {
+public record ChangeLogSection(@NotNull ComponentDialogBase<MultiLineField> component) implements TestRunSection {
     // UC-TREE-PANEL-021, Rule-INTERNAL-096
     public static @NotNull ChangeLogSection of(final @NotNull Project p, final @NotNull String value) {
-        return new ChangeLogSection(ComponentDialogBase.multiLineField(p, TestRunConfiguration.CHANGE_LOG.getDisplayName(), Bundle.message("run.form.change.log.hint"), value));
+        return new ChangeLogSection(ComponentDialogBase.multiLineField(p, TestRunConfiguration.CHANGE_LOG.getDisplayName(), Bundle.message("test.run.form.change.log.hint"), value));
     }
 
     // Rule-TREE-PANEL-122

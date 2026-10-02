@@ -34,9 +34,9 @@ import org.testin.notifications.Refused;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
-import org.testin.testrun.RunConfigurationForm;
-import org.testin.testrun.RunForm;
-import org.testin.testrun.RunFormAction;
+import org.testin.testrun.TestRunConfigurationForm;
+import org.testin.testrun.TestRunForm;
+import org.testin.testrun.TestRunFormAction;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.util.Bundle;
 
@@ -69,28 +69,28 @@ public class CreateTestRun implements NodeCreator {
     @Override
     public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         boundTestProject.get().ifPresentOrElse(
-                tp -> configureRun(tp.getTestCasesDirectory(), name, parentDir, Set.of(), Map.of()),
+                tp -> configureTestRun(tp.getTestCasesDirectory(), name, parentDir, Set.of(), Map.of()),
                 () -> Logger.warn("Create test run: no test project is bound to " + p.getName()));
 
         return Optional.empty();
     }
 
     // UC-TREE-PANEL-009, UC-TREE-PANEL-021
-    public void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Set<UUID> sourceTestCases, final @NotNull Map<TestRunConfiguration, String> sourceConfiguration) {
-        new RunForm(p).open(testCasesRoot, name, sourceTestCases, sourceConfiguration,
-                new RunFormAction(Bundle.message("run.create.title"), Bundle.message("run.create.button"), (form, selection) -> create(form, selection, parentDir)));
+    public void configureTestRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Set<UUID> sourceTestCases, final @NotNull Map<TestRunConfiguration, String> sourceConfiguration) {
+        new TestRunForm(p).open(testCasesRoot, name, sourceTestCases, sourceConfiguration,
+                new TestRunFormAction(Bundle.message("test.run.create.title"), Bundle.message("test.run.create.button"), (form, selection) -> create(form, selection, parentDir)));
     }
 
     // UC-TREE-PANEL-009, Rule-TREE-PANEL-004
-    private boolean create(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull DirectoryDto parentDir) {
-        final @NotNull String name = form.getRunName();
+    private boolean create(final @NotNull TestRunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull DirectoryDto parentDir) {
+        final @NotNull String name = form.getTestRunName();
         if (name.isEmpty()) {
-            notifier.softRefuse(p, Bundle.message("run.needs.a.name"));
+            notifier.softRefuse(p, Bundle.message("test.run.needs.a.name"));
             return false;
         }
 
         if (!nodes.nodeExists(parentDir.getPath())) {
-            notifier.softRefuse(p, Bundle.message("run.parent.gone", parentDir.getName()));
+            notifier.softRefuse(p, Bundle.message("test.run.parent.gone", parentDir.getName()));
             return false;
         }
 
@@ -100,19 +100,19 @@ public class CreateTestRun implements NodeCreator {
             return false;
         }
 
-        final @NotNull TestRunDirectoryDto runDir = directoryMapper.setTestRunNode(savePath, parentDir);
-        write(form, selection, savePath, runDir);
+        final @NotNull TestRunDirectoryDto testRunDir = directoryMapper.setTestRunNode(savePath, parentDir);
+        write(form, selection, savePath, testRunDir);
 
         return true;
     }
 
     // UC-TREE-PANEL-009, Rule-TREE-PANEL-031
-    private void write(final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull TestRunDirectoryDto trDir) {
+    private void write(final @NotNull TestRunConfigurationForm form, final @NotNull SelectionTree selection, final @NotNull Path savePath, final @NotNull TestRunDirectoryDto trDir) {
         final @NotNull Map<TestRunConfiguration, String> configuration = form.configuration();
 
-        final @NotNull TestRunDto tr = new TestRunDto().coverOnly(RunForm.checkedTestCases(selection));
+        final @NotNull TestRunDto tr = new TestRunDto().coverOnly(TestRunForm.checkedTestCases(selection));
 
-        BackgroundWork.run(p, Bundle.message("run.task.creating", savePath.getFileName()), Bundle.message("run.create.failed.title"), _ -> {
+        BackgroundWork.run(p, Bundle.message("test.run.task.creating", savePath.getFileName()), Bundle.message("test.run.create.failed.title"), _ -> {
             trDir.getMarker().configure(TestRunConfiguration.answered(configuration));
 
             if (!nodes.addTestRunDir(trDir)) return;

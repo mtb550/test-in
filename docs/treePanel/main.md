@@ -30,7 +30,7 @@ Each one is a page of its own: the story, its rules, its screens and its steps.
 | **UC-TREE-PANEL-004** | [Choose which test project this code project uses](chooseTestProject.md) | Point this code project at a different test project.                                 |
 |                       | **Nodes**                                                                |                                                                                      |
 | **UC-TREE-PANEL-005** | [Open a test set](openTestSet.md)                                        | Read and write the test cases inside a test set.                                     |
-| **UC-TREE-PANEL-006** | [Open a test run](openTestRun.md)                                        | Record a verdict for each test case in a run.                                        |
+| **UC-TREE-PANEL-006** | [Open a test run](openTestRun.md)                                        | Record a run item status for each test case in a test run.                           |
 | **UC-TREE-PANEL-007** | [Create a test set](createTestSet.md)                                    | Make a place for the test cases about to be written.                                 |
 | **UC-TREE-PANEL-008** | [Create a test set package](createTestSetPackage.md)                     | Group test sets so a big tree stays readable.                                        |
 | **UC-TREE-PANEL-009** | [Create a test run](createTestRun.md)                                    | Record one round of testing over chosen test cases.                                  |
@@ -120,13 +120,13 @@ tree. It is always one click away.
   choice is kept on this machine; a `testin.yml` in the code project can name
   one for everyone, and **Save to testin.yml** writes it there (Rule-TREE-PANEL-106, Rule-TREE-PANEL-112).
 - **Signed off** means a test run is **Completed** or **Closed**. Its test
-  cases, verdicts and settings can no longer change, though the tree can still
-  rename, move and remove it.
+  cases, run item statuses and settings can no longer change, though the tree
+  can still rename, move and remove it.
 - A **container** is **Test Cases** or **Test Runs**. There are always exactly
   two, and they come with the test project.
-- A **verdict** is what a tester records against one test case in one test
-  run: **Passed**, **Failed** or **Blocked**. **Pending** means the test run
-  has not reached that test case yet. **Untested** means it never will,
+- A **run item status** is what a tester records against one test case in one
+  test run: **Passed**, **Failed** or **Blocked**. **Pending** means the test
+  run has not reached that test case yet. **Untested** means it never will,
   because the test run was signed off first.
 
 The panel's job is small and strict. It shows one test project, the one this
@@ -186,8 +186,8 @@ its status bar, at the foot of the dialog.
 | The menu key, beside the right `Ctrl` | Opens the node menu                                    | Below, under **What the tree shows**           |
 
 Six things a tester might expect have **no key** on the tree. **Order**, the
-statuses, **Re-create**, **Edit Run**, **Run Tests** and **Details** are menu
-items only. Each one is a decision the tester thinks about, not a reflex, and
+statuses, **Re-create**, **Edit Test Run**, **Run Tests** and **Details** are
+menu items only. Each one is a decision the tester thinks about, not a reflex, and
 none is used often enough to need a key.
 
 The panel's own eight buttons have no keys either, except search. They are
@@ -242,8 +242,8 @@ A refusal fades too. It says what stopped the action, and nothing was changed.
 | *'\<name\>' already exists in '\<folder\>'*, *N items already exist in '\<folder\>'* | The destination already holds that name. The rest of the paste still moves   | [UC-TREE-PANEL-013](moveNodes.md)                                                                                                                                                                                                         |
 | *A test run needs a name*                                                            | The name box was emptied                                                     | [UC-TREE-PANEL-009](createTestRun.md), [UC-TREE-PANEL-021](reCreateTestRun.md), [UC-TREE-PANEL-022](editTestRun.md)                                                                                                                       |
 | *'\<parent\>' no longer exists - test run not created*                               | The folder went away while the dialog was open                               | [UC-TREE-PANEL-009](createTestRun.md)                                                                                                                                                                                                     |
-| *'\<run\>' no longer exists - nothing saved*                                         | The test run went away while the dialog was open                             | [UC-TREE-PANEL-022](editTestRun.md)                                                                                                                                                                                                       |
-| *'\<run\>' was \<status\> while this was open - nothing saved*                       | Someone signed the test run off while the dialog was open                    | [UC-TREE-PANEL-022](editTestRun.md)                                                                                                                                                                                                       |
+| *'\<test run\>' no longer exists - nothing saved*                                    | The test run went away while the dialog was open                             | [UC-TREE-PANEL-022](editTestRun.md)                                                                                                                                                                                                       |
+| *'\<test run\>' was \<status\> while this was open - nothing saved*                  | Someone signed the test run off while the dialog was open                    | [UC-TREE-PANEL-022](editTestRun.md)                                                                                                                                                                                                       |
 | *\<name\> has no test cases to run*                                                  | Nothing under the node can be run                                            | [UC-TREE-PANEL-023](runTests.md)                                                                                                                                                                                                          |
 | *No Test Projects*                                                                   | There is nothing to choose. It adds *Create one in the Testin folder first*  | [UC-TREE-PANEL-004](chooseTestProject.md)                                                                                                                                                                                                 |
 | *Java Test Source Not Found*                                                         | The IDE project has no Java test folder, so no automation code is written    | [UC-TREE-PANEL-007](createTestSet.md)                                                                                                                                                                                                     |
@@ -362,8 +362,8 @@ two of them are quiet:
 - **Open**, **Remove**, **Copy** and **Cut** act on all of them.
 - **Order**, **Paste**, **Create** and **Details** stay black and act on the
   first row alone, saying nothing about the rest.
-- **Rename**, **Re-create**, **Edit Run**, **Set Status**, **Export**, **Import**
-  and every status entry go gray instead.
+- **Rename**, **Re-create**, **Edit Test Run**, **Set Status**, **Export**,
+  **Import** and every status entry go gray instead.
 
 **The menu key**, the one beside the right `Ctrl`, opens the node menu over the
 selected row.
@@ -426,8 +426,8 @@ at all depends on which plugins are installed.
 4. **Export**, **Import** — these belong to reports, export, import and sync.
 5. **Sync with Remote**, **View Pending Commits** — only when the Git plugin is
    present. Otherwise, the whole section disappears, dividing line included.
-6. **Edit Run** and **Set Status** — a test run's own two entries. Grayed once
-   the test run is signed off.
+6. **Edit Test Run** and **Set Status** — a test run's own two entries. Grayed
+   once the test run is signed off.
 7. **Generate Report** and **Details** — last.
 
 Every entry that changes something confirms itself once. The confirmation is
@@ -524,20 +524,20 @@ documentation describes. None of them has a bug report yet.
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.
 
-| Gone              | Was                                                                                                                                                                                                                                                                                                                                                                                                                |
-|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Difference 3**  | A signed-off test run could still be renamed, moved, reordered and removed from the tree. Fixed 7 September 2026, [#184](https://github.com/mtb550/test-in/issues/184)                                                                                                                                                                                                                                             |
-| **Difference 7**  | Three of the four ways to bind a test project reported success without checking the write. Fixed 7 September 2026, [#188](https://github.com/mtb550/test-in/issues/188)                                                                                                                                                                                                                                            |
-| **Difference 8**  | **New Test Project** stayed gray for the rest of the session once it had been drawn without a Testin folder. Fixed 7 September 2026, [#189](https://github.com/mtb550/test-in/issues/189)                                                                                                                                                                                                                          |
-| **Difference 15** | A removal whose copy could not be kept aside was not undoable, said nothing, and left CTRL+Z pointing at an unrelated change. Fixed 7 September 2026, [#196](https://github.com/mtb550/test-in/issues/196)                                                                                                                                                                                                         |
-| **Difference 9**  | An edit deleted the verdicts of test cases removed from their test set. Fixed 7 September 2026, [#190](https://github.com/mtb550/test-in/issues/190)                                                                                                                                                                                                                                                               |
-| **Difference 4**  | Neither create dialog named its two kinds, so both rows showed only their hints. Fixed 8 September 2026, [#185](https://github.com/mtb550/test-in/issues/185)                                                                                                                                                                                                                                                      |
-| **Difference 6**  | Neither canceling a cut nor pasting it emptied the clipboard, so the same move was offered again. Fixed 8 September 2026, [#187](https://github.com/mtb550/test-in/issues/187)                                                                                                                                                                                                                                     |
-| **Difference 12** | A position too large to hold silently cleared the order and still said *Ordered*. Fixed 7 September 2026 in `b28e9af7`, and the document did not follow                                                                                                                                                                                                                                                            |
-| **Difference 13** | The **Select Test Project** dialog's first column had no heading. Fixed 8 September 2026, [#194](https://github.com/mtb550/test-in/issues/194)                                                                                                                                                                                                                                                                     |
-| **Difference 14** | The **Uncommitted Changes** dialog read *1 change ... are not committed*. Fixed 9 September 2026, [#195](https://github.com/mtb550/test-in/issues/195)                                                                                                                                                                                                                                                             |
-| **Difference 5**  | The popup offered all five statuses, including the two that are the run's own record of itself, and let a run go from **Assigned** back to **Created**. It offers what the run can be moved to and nothing else: the three a tester sets, and only those ahead of where it is now (Rule-TREE-PANEL-092). That settles question 1. Fixed 10 September 2026, [#186](https://github.com/mtb550/test-in/issues/186)    |
-| **Difference 10** | Setting a test run's status from the tree did not tell that run's open editor, which kept the old status and the rows that had just become **Untested**. The tree was doing the work itself instead of asking the one place that owns a status change; now both go through it, and the editor and the tree each hear about the other. Fixed 9 September 2026, [#191](https://github.com/mtb550/test-in/issues/191) |
+| Gone              | Was                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Difference 3**  | A signed-off test run could still be renamed, moved, reordered and removed from the tree. Fixed 7 September 2026, [#184](https://github.com/mtb550/test-in/issues/184)                                                                                                                                                                                                                                                         |
+| **Difference 7**  | Three of the four ways to bind a test project reported success without checking the write. Fixed 7 September 2026, [#188](https://github.com/mtb550/test-in/issues/188)                                                                                                                                                                                                                                                        |
+| **Difference 8**  | **New Test Project** stayed gray for the rest of the session once it had been drawn without a Testin folder. Fixed 7 September 2026, [#189](https://github.com/mtb550/test-in/issues/189)                                                                                                                                                                                                                                      |
+| **Difference 15** | A removal whose copy could not be kept aside was not undoable, said nothing, and left CTRL+Z pointing at an unrelated change. Fixed 7 September 2026, [#196](https://github.com/mtb550/test-in/issues/196)                                                                                                                                                                                                                     |
+| **Difference 9**  | An edit deleted the run item statuses of test cases removed from their test set. Fixed 7 September 2026, [#190](https://github.com/mtb550/test-in/issues/190)                                                                                                                                                                                                                                                                  |
+| **Difference 4**  | Neither create dialog named its two kinds, so both rows showed only their hints. Fixed 8 September 2026, [#185](https://github.com/mtb550/test-in/issues/185)                                                                                                                                                                                                                                                                  |
+| **Difference 6**  | Neither canceling a cut nor pasting it emptied the clipboard, so the same move was offered again. Fixed 8 September 2026, [#187](https://github.com/mtb550/test-in/issues/187)                                                                                                                                                                                                                                                 |
+| **Difference 12** | A position too large to hold silently cleared the order and still said *Ordered*. Fixed 7 September 2026 in `b28e9af7`, and the document did not follow                                                                                                                                                                                                                                                                        |
+| **Difference 13** | The **Select Test Project** dialog's first column had no heading. Fixed 8 September 2026, [#194](https://github.com/mtb550/test-in/issues/194)                                                                                                                                                                                                                                                                                 |
+| **Difference 14** | The **Uncommitted Changes** dialog read *1 change ... are not committed*. Fixed 9 September 2026, [#195](https://github.com/mtb550/test-in/issues/195)                                                                                                                                                                                                                                                                         |
+| **Difference 5**  | The popup offered all five statuses, including the two that are the test run's own record of itself, and let a test run go from **Assigned** back to **Created**. It offers what the test run can be moved to and nothing else: the three a tester sets, and only those ahead of where it is now (Rule-TREE-PANEL-092). That settles question 1. Fixed 10 September 2026, [#186](https://github.com/mtb550/test-in/issues/186) |
+| **Difference 10** | Setting a test run's status from the tree did not tell that test run's open editor, which kept the old status and the rows that had just become **Untested**. The tree was doing the work itself instead of asking the one place that owns a status change; now both go through it, and the editor and the tree each hear about the other. Fixed 9 September 2026, [#191](https://github.com/mtb550/test-in/issues/191)        |
 
 ---
 
@@ -550,11 +550,11 @@ closed up, so an issue that quotes one still points at the right thing.
 
 **Settled.** Question 1 asked whether a test run may go backwards, so that **Created** follows **Assigned** or **In
 Progress**. It may not:
-the popup offers only the statuses ahead of where the run is now, so there is no
-way to ask (Rule-TREE-PANEL-092, [#186](https://github.com/mtb550/test-in/issues/186)).
+the popup offers only the statuses ahead of where the test run is now, so there
+is no way to ask (Rule-TREE-PANEL-092, [#186](https://github.com/mtb550/test-in/issues/186)).
 
 Question 2 asked whether a signed-off test run should be locked in the tree as
-well as in its editor. It is. A **Completed** or **Closed** run cannot be
+well as in its editor. It is. A **Completed** or **Closed** test run cannot be
 renamed, moved, reordered or removed from the tree ([#184](https://github.com/mtb550/test-in/issues/184)).
 The same question for the whole product is [question 1 in the product's own
 document](../product.md#9-undecided).

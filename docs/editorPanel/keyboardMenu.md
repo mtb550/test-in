@@ -74,7 +74,7 @@ The `Context Menu` key.
 
 ## The screen
 
-This is the menu in a test set editor.
+This is the menu in a test case editor.
 
 ```
 ┌──────────────────────────────────┐
@@ -115,7 +115,7 @@ In the grid the menu opens on the selected cell instead.
 
 ## What the menu holds
 
-In a test set editor, in this order: **Create Test Case**, **View Test Case
+In a test case editor, in this order: **Create Test Case**, **View Test Case
 Details**, **Update Test Case**, **Actions**, **Automate Test Case**, **Run Test
 Method**, **Navigate to Test Method**.
 
@@ -141,8 +141,8 @@ editors teaches a tester nothing, and they cannot learn that the gesture exists
 or where it does work.
 
 **Copy Test Case Value** is not one of the four. It copies the text of what is
-selected, which a run reads out as well as a set does. **Copy Test Case** is the
-one that reaches for the test case itself.
+selected, which a test run reads out as well as a test set does. **Copy Test
+Case** is the one that reaches for the test case itself.
 
 Each entry decides this for itself, from the node its editor is open on — the
 same flag Import and Export read to find out whether a node can hold test
@@ -155,10 +155,10 @@ print their own key.
 The last group of three is gray in an IDE without the Java plugin or the
 TestNG plugin, and each entry says which plugin it is waiting for.
 
-In a test run editor, the menu holds the three verdicts first: **Passed**, **Failed** and **Blocked**. Then come
+In a test run editor, the menu holds the three run item statuses first: **Passed**, **Failed** and **Blocked**. Then come
 **Failed Test Case Details**, then **View Test Case Details** and **Navigate to Test Case**, then **Actions**, then
 **Run Test Method** and **Navigate to Test Method**. **Create Test Case**, **Update Test Case** and **Automate Test
-Case** are not on it. A test run records verdicts
+Case** are not on it. A test run records run item statuses
 rather than the test case, and it covers test cases that already exist.
 
 ---

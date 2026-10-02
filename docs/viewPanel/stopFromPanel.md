@@ -76,8 +76,8 @@ needs the TestNG plugin.
 
 ## What the tester should expect
 
-The panel shows one test case, and stopping it can report *Stopped 12*. A test
-run started with one gesture runs as one process. Stopping any test case in it
+The panel shows one test case, and stopping it can report *Stopped 12*. An
+execution started with one gesture runs as one process. Stopping any test case in it
 stops all the rest. The count says how many really stopped, not how many the
 tester aimed at.
 

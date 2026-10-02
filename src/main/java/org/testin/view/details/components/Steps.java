@@ -21,7 +21,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.ui.framework.Prose;
 import org.testin.util.Display;
 import org.testin.util.Fonts;
@@ -54,7 +54,7 @@ public class Steps extends AbstractDetails {
             stepsContainer.add(createStepComponent(stepText, marginBottom));
         }
 
-        return addRow(panel, gbc, TestEditorAttributes.STEPS.getName(), stepsContainer, row);
+        return addRow(panel, gbc, TestCaseEditorAttributes.STEPS.getName(), stepsContainer, row);
     }
 
     private @NotNull JTextArea createStepComponent(final @NotNull String text, final int marginBottom) {

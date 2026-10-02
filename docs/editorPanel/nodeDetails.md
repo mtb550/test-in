@@ -94,7 +94,7 @@ There is no key for this. The button is at the far right of the toolbar.
    row here.
 4. **The counts** — how much the node holds. A test set counts its test cases.
 5. **The ring** — a chart under the rows. In a test set it shows what the node
-   holds. In a test run it shows one slice for each verdict.
+   holds. In a test run it shows one slice for each run item status.
 6. **The strip at the bottom** — the only key the dialog answers.
 
 A test run shows more rows: when it started, when it ended, how long it took,

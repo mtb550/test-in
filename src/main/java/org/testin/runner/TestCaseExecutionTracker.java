@@ -25,7 +25,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Failure;
-import org.testin.model.RunStatus;
+import org.testin.model.ExecutionStatus;
 import org.testin.services.ProjectLifetime;
 import org.testin.util.Bundle;
 
@@ -39,7 +39,7 @@ public final class TestCaseExecutionTracker {
         p.getMessageBus().connect(ProjectLifetime.of(p)).subscribe(SMTRunnerEventsListener.TEST_STATUS, new SMTRunnerEventsAdapter() {
             @Override
             public void onTestStarted(final @NotNull SMTestProxy test) {
-                TestCaseExecutionListener.broadcast(p, test.getPresentableName().toLowerCase(Locale.ROOT), RunStatus.RUNNING, Duration.ZERO, Failure.NONE);
+                TestCaseExecutionListener.broadcast(p, test.getPresentableName().toLowerCase(Locale.ROOT), ExecutionStatus.RUNNING, Duration.ZERO, Failure.NONE);
             }
 
             @Override
@@ -47,14 +47,14 @@ public final class TestCaseExecutionTracker {
                 final @NotNull String testName = test.getPresentableName().toLowerCase(Locale.ROOT);
 
                 if (test.isPassed()) {
-                    TestCaseExecutionListener.broadcast(p, testName, RunStatus.PASSED, durationOf(test), Failure.NONE);
+                    TestCaseExecutionListener.broadcast(p, testName, ExecutionStatus.PASSED, durationOf(test), Failure.NONE);
 
                 } else if (test.isDefect()) {
-                    TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED, durationOf(test), failureOf(test, ""));
+                    TestCaseExecutionListener.broadcast(p, testName, ExecutionStatus.FAILED, durationOf(test), failureOf(test, ""));
 
                     // Rule-CODEGEN-075
                 } else {
-                    TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED, durationOf(test), failureOf(test, Bundle.message("runner.skipped")));
+                    TestCaseExecutionListener.broadcast(p, testName, ExecutionStatus.FAILED, durationOf(test), failureOf(test, Bundle.message("runner.skipped")));
                 }
             }
         });

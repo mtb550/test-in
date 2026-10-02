@@ -81,8 +81,8 @@ public class CreateTestCaseAction extends AbstractAnyProjectAction {
 
         if (!enabled && editor.isPresent()) {
             e.getPresentation().setDescription(loading
-                    ? Bundle.message("create.case.still.loading")
-                    : Bundle.message("create.case.disabled.description"));
+                    ? Bundle.message("create.test.case.still.loading")
+                    : Bundle.message("create.test.case.disabled.description"));
         }
     }
 

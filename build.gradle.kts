@@ -214,7 +214,7 @@ intellijPlatform {
     }
 
     pluginVerification {
-        // IntelliJ IDEA, PyCharm and Rider, because all three verdicts are news.
+        // IntelliJ IDEA, PyCharm and Rider, because all three results are news.
         //
         // PyCharm used to be behind the flag below with GoLand and WebStorm: the
         // verifier reported every PSI and TestNG reference as unresolved - 53
@@ -274,7 +274,7 @@ intellijPlatform {
         //
         // It was down to COMPATIBILITY_PROBLEMS and INVALID_PLUGIN while one
         // internal-API call needed the exception - ExecutionManager
-        // .getRunningDescriptors, how the stop found the process behind a run.
+        // .getRunningDescriptors, how the stop found the process behind an execution.
         // The stop now records the handler the execution topic hands it, so the
         // plugin makes no internal call and the level goes back on (#140).
         //
@@ -474,8 +474,8 @@ mapOf("runIde" to "config", "runPyCharm" to "config_runPyCharm").forEach { (runT
             // that root's project name straight back into a committed file. It happened
             // twice; SampleProjectTest is what caught it.
             //
-            // Copied once and then left alone, so runs created while testing survive to
-            // the next launch. Deleting .sandbox/sample is how to get the sample back.
+            // Copied once and then left alone, so test runs created while testing survive
+            // to the next launch. Deleting .sandbox/sample is how to get the sample back.
             if (!workingSample.exists()) {
                 committedSample.copyRecursively(workingSample)
 
@@ -547,7 +547,7 @@ mapOf("runIde" to "config", "runPyCharm" to "config_runPyCharm").forEach { (runT
  *
  * Matched on what compileTestJava actually produced, never on names. This plugin
  * is about test cases, so a check that looked for the word "test" would fail on
- * TestEditor, TestCard and sixty others, and be switched off within a week.
+ * TestCaseEditor, TestCaseCard and sixty others, and be switched off within a week.
  */
 // compileOnly cannot be resolved - it is a declaration bucket - so the check
 // resolves a configuration that extends it and can be.
@@ -637,8 +637,8 @@ tasks.register<Exec>("inspect") {
     commandLine("pwsh", "-NoProfile", "-File", file("tools/inspect.ps1").absolutePath)
 
     // The script exits non-zero for DataFlowIssue, ReturnNull and
-    // WrappedMethodDeclaration, and that verdict is the point of running it -
-    // so it is the task's verdict too.
+    // WrappedMethodDeclaration, and that result is the point of running it -
+    // so it is the task's result too.
     isIgnoreExitValue = false
 }
 

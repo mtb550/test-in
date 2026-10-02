@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.TestRunItems;
-import org.testin.testrun.RunEditorAttributes;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 
@@ -35,18 +35,18 @@ final class RunItemChangeComparator {
     static @NotNull List<FieldChange> compare(final @NotNull TestRunItems oldItem, final @NotNull TestRunItems newItem) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
 
-        addIfChanged(changes, RunEditorAttributes.RUN_STATUS.getName(), oldItem.getStatus().getLabel(), newItem.getStatus().getLabel());
-        addIfChanged(changes, RunEditorAttributes.ACTUAL_RESULT.getName(), oldItem.getActualResult(), newItem.getActualResult());
-        addIfChanged(changes, RunEditorAttributes.STACKTRACE.getName(), oldItem.getStacktrace(), newItem.getStacktrace());
-        addIfChanged(changes, RunEditorAttributes.BUG_SEVERITY.getName(), oldItem.getBugSeverity().getLabel(), newItem.getBugSeverity().getLabel());
-        addIfChanged(changes, RunEditorAttributes.BUG_PRIORITY.getName(), oldItem.getBugPriority().getLabel(), newItem.getBugPriority().getLabel());
-        addIfChanged(changes, RunEditorAttributes.BUG_ISSUE.getName(), BugIssueUrl.reference(oldItem.getBugIssueUrl()), BugIssueUrl.reference(newItem.getBugIssueUrl()));
-        addIfChanged(changes, RunEditorAttributes.EXECUTED_BY.getName(), oldItem.getExecutedBy(), newItem.getExecutedBy());
-        addIfChanged(changes, RunEditorAttributes.EXECUTED_AT.getName(), Display.formatDate(oldItem.getExecutedAt()), Display.formatDate(newItem.getExecutedAt()));
+        addIfChanged(changes, TestRunEditorAttributes.RUN_STATUS.getName(), oldItem.getStatus().getLabel(), newItem.getStatus().getLabel());
+        addIfChanged(changes, TestRunEditorAttributes.ACTUAL_RESULT.getName(), oldItem.getActualResult(), newItem.getActualResult());
+        addIfChanged(changes, TestRunEditorAttributes.STACKTRACE.getName(), oldItem.getStacktrace(), newItem.getStacktrace());
+        addIfChanged(changes, TestRunEditorAttributes.BUG_SEVERITY.getName(), oldItem.getBugSeverity().getLabel(), newItem.getBugSeverity().getLabel());
+        addIfChanged(changes, TestRunEditorAttributes.BUG_PRIORITY.getName(), oldItem.getBugPriority().getLabel(), newItem.getBugPriority().getLabel());
+        addIfChanged(changes, TestRunEditorAttributes.BUG_ISSUE.getName(), BugIssueUrl.reference(oldItem.getBugIssueUrl()), BugIssueUrl.reference(newItem.getBugIssueUrl()));
+        addIfChanged(changes, TestRunEditorAttributes.EXECUTED_BY.getName(), oldItem.getExecutedBy(), newItem.getExecutedBy());
+        addIfChanged(changes, TestRunEditorAttributes.EXECUTED_AT.getName(), Display.formatDate(oldItem.getExecutedAt()), Display.formatDate(newItem.getExecutedAt()));
         addIfChanged(changes, Bundle.message("git.change.screenshots"), String.join(", ", oldItem.getScreenshots()), String.join(", ", newItem.getScreenshots()));
 
         if (changes.isEmpty()) {
-            changes.add(new FieldChange(RunEditorAttributes.RUN_STATUS.getName(), "", Bundle.message("git.change.changed"), ChangeType.CHANGE_RUN_ITEM));
+            changes.add(new FieldChange(TestRunEditorAttributes.RUN_STATUS.getName(), "", Bundle.message("git.change.changed"), ChangeType.CHANGE_RUN_ITEM));
         }
 
         return changes;

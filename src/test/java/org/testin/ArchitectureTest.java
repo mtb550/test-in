@@ -203,7 +203,7 @@ public class ArchitectureTest {
         final @NotNull ArchRule noSetter = noClasses()
                 .that().resideOutsideOfPackages("org.testin.model..", "org.testin.indexer..")
                 .should().accessTargetWhere(JavaAccess.Predicates.target(declaredIn(resideInAPackage("org.testin.model..")).and(nameMatching("set[A-Z].*"))))
-                .because("the index holds one instance of every test case, run and marker, read by the EDT and by pooled"
+                .because("the index holds one instance of every test case, test run and marker, read by the EDT and by pooled"
                         + " threads alike; a feature changes one by asking the indexer, which writes the new values into"
                         + " the instance it holds, never by calling a setter on it (Rule-INTERNAL-117, #376)");
 

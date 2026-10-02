@@ -79,14 +79,15 @@ There is no key for this. It starts on its own.
   everywhere.
 - **Rule-INTERNAL-090** — Every folder carries an id of its own in its marker:
   stamped the first time Testin writes that marker, never changed afterward,
-  and fresh on a copied folder. Nothing in Testin reads it; it names a project,
-  a set or a run for a tool outside the IDE.
+  and fresh on a copied folder. Nothing in Testin reads it; it names a test
+  project, a test set or a test run for a tool outside the IDE.
 - **Rule-INTERNAL-093** — A result file Testin could not read is never written
-  over and never removed. The scan reports it and leaves it out of the run, so
-  the run covers the test cases it could read; a later write touches only the
-  results the run holds, and a removal takes only the file whose test case a
-  change stopped covering. A verdict nobody can read is still a verdict
-  somebody recorded, and the tester repairs the file and presses Refresh.
+  over and never removed. The scan reports it and leaves it out of the test run,
+  so the test run covers the test cases it could read; a later write touches
+  only the results the test run holds, and a removal takes only the file whose
+  test case a change stopped covering. A run item status nobody can read is
+  still a run item status somebody recorded, and the tester repairs the file and
+  presses Refresh.
 - **Rule-INTERNAL-094** — A result is known by its file name, as a test case is.
   A result file whose name is not a test case id is not read, and a warning
   names it; renamed to its test case's id, it is read again at the next Refresh.
@@ -110,7 +111,7 @@ There is no key for this. It starts on its own.
   of node at one path are not.
 - **Rule-INTERNAL-117** — Only Testin's index changes a test case, a test run or
   a marker it holds. A test case is edited as a copy, and the index writes the
-  copy into the one it holds once the file is written; a run or a marker is
+  copy into the one it holds once the file is written; a test run or a marker is
   changed by asking the index, which saves it. Whatever shows one of them keeps
   showing the same one and sees the change, and nothing else can change it under
   a reader.
@@ -126,15 +127,15 @@ measured rather than estimated.
 | **Reading ten thousand**          | 214 ms   | 400 ms |
 | **Held in memory, per test case** | 1.5 KB   | 4 KB   |
 | **Held in memory, ten thousand**  | 14.6 MB  | 40 MB  |
-| **Reading one run result**        | 8.8 µs   | 20 µs  |
+| **Reading one test run result**   | 8.8 µs   | 20 µs  |
 | **Reading four thousand**         | 35 ms    | 80 ms  |
 
-The results are their own line because they are their own files: since #305 a run
-of two thousand test cases is two thousand `.ri` files rather than one
+The results are their own line because they are their own files: since #305 a
+test run of two thousand test cases is two thousand `.ri` files rather than one
 `run.json`, so the question "what does a big cycle cost to read" is a question
 about four thousand small documents - one cycle of two thousand test cases and
-fifty of forty, which is the shape of a real Testin folder. Two thousand of
-them parse in about 18 milliseconds.
+fifty of forty, which is the shape of a real Testin folder. Two thousand of them
+parse in about 18 milliseconds.
 
 Measured on 9 September 2026 (the test cases) and 20 September 2026 (the
 results), Windows 11 with JBR 25, by `IndexerBudgetTest`. CI asserts the budget
@@ -199,10 +200,10 @@ the bottom of the IDE, beside the other background jobs.
 8. After each test set the bar reads *Test set:*, then its name, then how many
    test cases it holds.
 9. The bar reads the test project's name, then *test runs...*.
-10. Testin walks `Test Runs`. Each test run reads its own facts from its `.tr`
-    - its status, how it was configured, what the tester wrote about the
-      verdicts, when it was executed - and one file per result, `<test case
-    id>.ri`, in the order their test cases sit in their test sets.
+10. Testin walks `Test Runs`. Each test run reads its own facts from its
+    `.tr` - its status, how it was configured, what the tester wrote about the
+    run item statuses, when it was executed - and one file per result,
+    `<test case id>.ri`, in the order their test cases sit in their test sets.
 11. The bar reads *Done -*, then the test project's name, and closes.
 12. The tree draws itself from memory. Every editor that was open when the IDE
     closed opens again.
@@ -228,12 +229,12 @@ directory:* and the file name.
 marker yet, so Testin uses defaults and the node appears normally.
 
 **If a marker file is there but damaged** — the node still appears, with default
-values, and once the read has finished one message names every node whose
-marker would not parse. Testin never writes over that file, whatever writes it:
-a test case saved into the test set, and a test run's status changed from the
-tree, both leave the marker exactly as it is. So the number, the status, who
-made it, how the run was configured and what the tester wrote about the verdicts
-are all still there to repair (Rule-INTERNAL-083).
+values, and once the read has finished one message names every node whose marker
+would not parse. Testin never writes over that file, whatever writes it: a test
+case saved into the test set, and a test run's status changed from the tree,
+both leave the marker exactly as it is. So the number, the status, who made it,
+how the test run was configured and what the tester wrote about the run item
+statuses are all still there to repair (Rule-INTERNAL-083).
 
 **If a folder under `Test Cases` holds no `.ts` and no `.tsp` file** — the
 folder is skipped. Everything inside it is skipped too. When it holds test
@@ -249,11 +250,12 @@ noise.
 test set. The others are read. The set is drawn one row shorter, and nothing
 says which row is missing.
 
-**If one result file cannot be read** — the run is drawn without that result,
-and once the read has finished one message names all of them. It is titled **Results not read in \<project\>** and it
-says the file names, up to five of
-them, then how many more there are. Nothing writes over a result Testin cannot
-read and nothing removes it, so the repair is to fix the file and press **Refresh**.
+**If one result file cannot be read** — the test run is drawn without that
+result, and once the read has finished one message names all of them. It is
+titled **Results not read in \<project\>** and it says the file names, up to
+five of them, then how many more there are. Nothing writes over a result Testin
+cannot read and nothing removes it, so the repair is to fix the file and press
+**Refresh**.
 
 **If two test case files claim the same identity** — the second one read goes
 over the first, and a notification titled **Test cases sharing an identity in

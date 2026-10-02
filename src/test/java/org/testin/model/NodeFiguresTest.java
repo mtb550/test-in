@@ -27,29 +27,29 @@ import static org.testng.Assert.assertSame;
 
 public class NodeFiguresTest {
 
-    private static @NotNull TestRunItems item(final TestStatus status) {
+    private static @NotNull TestRunItems item(final RunItemStatus status) {
         return TestRunItems.builder().id(UUID.randomUUID()).status(status).build();
     }
 
     @Test
-    public void aRunHoldsItsSummaryRatherThanACopyOfTheNumbers() {
+    public void aTestRunHoldsItsSummaryRatherThanACopyOfTheNumbers() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.FAILED)));
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.FAILED)));
 
-        assertSame(NodeFigures.ofRun(summary).run(), summary,
+        assertSame(NodeFigures.ofTestRun(summary).testRun(), summary,
                 "seven fields copied out of the summary would make the popup a second "
-                        + "implementation of how a run went, which is what the summary exists to prevent");
+                        + "implementation of how a test run went, which is what the summary exists to prevent");
     }
 
     @Test
-    public void everyVerdictReadsThroughThatSummary() {
-        final NodeFigures figures = NodeFigures.ofRun(TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.PASSED),
-                item(TestStatus.FAILED),
-                item(TestStatus.BLOCKED),
-                item(TestStatus.UNTESTED))));
+    public void everyRunItemStatusReadsThroughThatSummary() {
+        final NodeFigures figures = NodeFigures.ofTestRun(TestRunSummary.of(List.of(
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.FAILED),
+                item(RunItemStatus.BLOCKED),
+                item(RunItemStatus.UNTESTED))));
 
         assertEquals(NodeCount.PASSED.of(figures), "2");
         assertEquals(NodeCount.FAILED.of(figures), "1");
@@ -61,34 +61,34 @@ public class NodeFiguresTest {
     }
 
     @Test
-    public void aRunNobodyHasStartedSaysSoRatherThanReportingZeroPercent() {
-        final NodeFigures untouched = NodeFigures.ofRun(TestRunSummary.of(List.of(
-                item(TestStatus.PENDING),
-                item(TestStatus.PENDING))));
+    public void aTestRunNobodyHasStartedSaysSoRatherThanReportingZeroPercent() {
+        final NodeFigures untouched = NodeFigures.ofTestRun(TestRunSummary.of(List.of(
+                item(RunItemStatus.PENDING),
+                item(RunItemStatus.PENDING))));
 
         assertEquals(untouched.rateLabel(), "Not run");
     }
 
     @Test
-    public void aRunWithAVerdictReportsItsRate() {
-        final NodeFigures run = NodeFigures.ofRun(TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.PASSED),
-                item(TestStatus.PASSED),
-                item(TestStatus.FAILED))));
+    public void aTestRunWithARunItemStatusReportsItsRate() {
+        final NodeFigures testRun = NodeFigures.ofTestRun(TestRunSummary.of(List.of(
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.FAILED))));
 
-        assertEquals(run.rateLabel(), "75%");
+        assertEquals(testRun.rateLabel(), "75%");
     }
 
     @Test
-    public void aContainerCountsWhatIsBeneathItAndHasNoRun() {
+    public void aContainerCountsWhatIsBeneathItAndHasNoTestRun() {
         final NodeFigures container = NodeFigures.ofChildren(9, 4, 2770, 2770, 2);
 
         assertEquals(container.testSets(), 9);
         assertEquals(container.packages(), 4);
         assertEquals(container.testCases(), 2770);
         assertEquals(container.testRuns(), 2);
-        assertSame(container.run(), TestRunSummary.EMPTY, "a container has no run to report");
+        assertSame(container.testRun(), TestRunSummary.EMPTY, "a container has no test run to report");
     }
 
     @Test
@@ -102,7 +102,7 @@ public class NodeFiguresTest {
     }
 
     @Test
-    public void aCountSaysWhatANewRunWouldTakeWhenThatIsFewer() {
+    public void aCountSaysWhatANewTestRunWouldTakeWhenThatIsFewer() {
         assertEquals(NodeCount.TEST_CASES.of(NodeFigures.ofChildren(9, 4, 40, 31, 2)), "40 (31 for a new test run)");
     }
 

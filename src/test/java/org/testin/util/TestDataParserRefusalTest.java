@@ -30,7 +30,7 @@ public class TestDataParserRefusalTest {
     @Test
     public void aPriorityItCannotReadIsRefused() {
         assertTrue(TestDataParser.priority("Urgent", Priority.HIGH).isEmpty(),
-                "answering P3 is how 200 imported cases all became the lowest priority");
+                "answering P3 is how 200 imported test cases all became the lowest priority");
     }
 
     @Test

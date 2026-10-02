@@ -3,17 +3,16 @@
 # UC-VIEW-PANEL-016: Report a failed test case as a bug
 
 **As a** tester, **I want** to file a failed test case as a GitHub issue already
-written in my team's template, **so that** I retype nothing the run knows and
-never report a bug twice.
+written in my team's template, **so that** I retype nothing the test run knows
+and never report a bug twice.
 
 Testin writes the bug from the test case, its test run and what the test run
 recorded. The tester reads it, edits it if they want, and sends it. Testin files
 it with the GitHub command line tool, `gh`. The screenshots pasted into the error
 go with it.
 
-There is no key for this. The **Report Bug** link is on the run band's summary
-line in
-the Details tab.
+There is no key for this. The **Report Bug** link is on the test run band's
+summary line in the Details tab.
 
 ## Rules
 
@@ -37,8 +36,9 @@ the Details tab.
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
 - **Rule-VIEW-PANEL-066** — A failed test case viewed under a test run carries
-  the bug on the run band's summary line, with a **Report Bug** link. It stays
-  for as long as the test case has a bug issue link, whatever its verdict.
+  the bug on the test run band's summary line, with a **Report Bug** link. It
+  stays for as long as the test case has a bug issue link, whatever its run item
+  status.
 - **Rule-VIEW-PANEL-067** — Report Bug prepares the bug under the IDE's progress
   bar, and reads `testin.yml` again first. Then the bug opens. Stopping the
   progress bar opens nothing.
@@ -63,11 +63,11 @@ the Details tab.
   still failed. The message says *Reported* either way. It says why when the
   address was not stored. A completed or closed test run takes the address too.
   It is the one change a signed-off test run accepts, because it changes no
-  verdict.
+  run item status.
 - **Rule-VIEW-PANEL-075** — A reported test case shows its issue as `#123`, the
   number and nothing else, with the whole address on hover. It is a link, and it
   opens the issue in the browser. The repository is not repeated on every row:
-  `testin.yml` names one, and a tester reading a run already knows which.
+  `testin.yml` names one, and a tester reading a test run already knows which.
 - **Rule-VIEW-PANEL-076** — Every screenshot pasted with the failure is attached
   to the issue and shown under **Screenshots**. The error's text is folded under
   its first line.
@@ -164,7 +164,7 @@ Anything Testin cannot get reads `n\a`.
 | **Exception**                    | The error's text, folded under its first line                     | There is no text   |
 | **Screenshots**                  | Every screenshot pasted into the error                            | There are none     |
 | **Test run**                     | The test run's name                                               | Never              |
-| **Executed**                     | Who recorded the verdict, and when                                | Nobody has         |
+| **Executed**                     | Who recorded the run item status, and when                        | Nobody has         |
 | **Browser, device and language** | The test run's answers, each on its own                           | Each one is empty  |
 | **Commit**                       | The test run's commit                                             | It is empty        |
 | **Test case**                    | The first eight characters of its identity, and its test set      | Never              |
@@ -181,7 +181,7 @@ mention a GitHub user or link another issue either.
 ## Main flow
 
 1. The tester opens a failed test case's details from a test run.
-2. The run band's summary line shows **Report Bug**. The tester clicks it.
+2. The test run band's summary line shows **Report Bug**. The tester clicks it.
 3. The IDE's progress bar reads *Preparing the bug report*.
 4. The **Report Bug** dialog opens, with the title and the body written.
 5. The tester edits the title or the body, or leaves them.

@@ -65,7 +65,7 @@ public class OpenBugsTab {
     }
 
     private static @NotNull JBLabel heading(final @NotNull OpenBug bug) {
-        final @NotNull JBLabel label = new JBLabel(bug.runName());
+        final @NotNull JBLabel label = new JBLabel(bug.testRunName());
         label.setFont(Fonts.strong());
 
         return label;

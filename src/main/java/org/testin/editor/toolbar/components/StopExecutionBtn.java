@@ -17,7 +17,7 @@
 package org.testin.editor.toolbar.components;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.run.ExecutionControl;
+import org.testin.editor.testrun.ExecutionControl;
 import org.testin.ui.framework.AbstractIconButton;
 
 public class StopExecutionBtn extends AbstractIconButton implements ToolbarItem {

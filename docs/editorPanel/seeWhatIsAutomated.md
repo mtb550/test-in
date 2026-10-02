@@ -5,8 +5,8 @@
 > There is no key for this. It is drawn on every card.
 
 **As a** tester, **I want** to see which of my test cases have automation behind
-them, **so that** I can tell what a run will actually cover without opening the
-code.
+them, **so that** I can tell what an execution will actually cover without
+opening the code.
 
 The icon that jumps to the generated method now also says whether there is any
 automation to jump to. The filter beside it is how a tester sees a whole test
@@ -84,9 +84,10 @@ everything. **Reset Filters** clears it with the rest.
 This is how a tester reads a whole test set at once. The icon answers for the
 card under the pointer; the filter answers for all of them.
 
-It is offered in the test set editor and in the test run editor. A test run is
-where the question matters most: a run whose test cases have no methods will not
-execute much, and the filter is how a tester sees that before starting it.
+It is offered in the test case editor and in the test run editor. A test run is
+where the question matters most: a test run whose test cases have no methods
+will not execute much, and the filter is how a tester sees that before starting
+it.
 
 ## The count in the status bar
 
@@ -102,9 +103,10 @@ page in front of the tester and not what the filter has left: automation is a
 property of the set, and a number that changed when a filter was switched on
 would be answering a different question every time it was read.
 
-The corner it sits in is the run editor's verdict counts, which are blank in a
-test set editor — so the two bars differ by exactly the figures their editor has.
-A test run editor shows the verdicts and no automation count.
+The corner it sits in is the test run editor's run item status counts, which are
+blank in a test case editor — so the two bars differ by exactly the figures
+their editor has. A test run editor shows the run item statuses and no
+automation count.
 
 It is written twice, and that is deliberate: blank when the editor draws, filled
 in when the reading lands a moment later. Rule-EDITOR-PANEL-196 is why — nothing

@@ -135,7 +135,7 @@ public final class TestNGRunner implements TestRunner {
 
         final @NotNull Set<TestCaseDto> stillWanted = new HashSet<>(execution.stillWanted(found.stream().map(Generated::tc).toList()));
         if (stillWanted.isEmpty()) {
-            Logger.info("Not starting: every case in the run was stopped before it began");
+            Logger.info("Not starting: every test case in the execution was stopped before it began");
             return;
         }
 
@@ -158,7 +158,7 @@ public final class TestNGRunner implements TestRunner {
                 });
 
         if (!(settings.getConfiguration() instanceof TestNGConfiguration configuration)) {
-            Logger.warn("'" + name + "' is not a TestNG configuration, so the run was not started");
+            Logger.warn("'" + name + "' is not a TestNG configuration, so the execution was not started");
             return;
         }
 

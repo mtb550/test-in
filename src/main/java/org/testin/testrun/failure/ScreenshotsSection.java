@@ -38,8 +38,8 @@ public final class ScreenshotsSection implements FailureSection {
     private final @NotNull Map<byte[], String> named = new IdentityHashMap<>();
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
-    public ScreenshotsSection(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem) {
-        final @NotNull List<byte[]> stored = Services.getInstance(p, TestRuns.class).screenshots(runPath, runItem);
+    public ScreenshotsSection(final @NotNull Project p, final @NotNull Path testRunPath, final @NotNull TestRunItems runItem) {
+        final @NotNull List<byte[]> stored = Services.getInstance(p, TestRuns.class).screenshots(testRunPath, runItem);
         IntStream.range(0, stored.size()).forEach(index -> named.put(stored.get(index), runItem.getScreenshots().get(index)));
 
         component = ComponentDialogBase.screenshots(Bundle.message("dialog.failure.caption.screenshots"), stored);

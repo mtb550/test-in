@@ -63,6 +63,6 @@ public class TestDataParserDateTest {
     @Test
     public void textThatIsNeitherShapeIsRefused() {
         assertTrue(TestDataParser.date("last Tuesday").isEmpty(),
-                "inventing 'now' for it is what put today's date on every imported case, and blanking it silently is the same mistake");
+                "inventing 'now' for it is what put today's date on every imported test case, and blanking it silently is the same mistake");
     }
 }

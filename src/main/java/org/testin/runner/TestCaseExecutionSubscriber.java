@@ -26,7 +26,7 @@ import org.testin.codegen.TestName;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.Failure;
-import org.testin.model.RunStatus;
+import org.testin.model.ExecutionStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 
@@ -60,7 +60,7 @@ public final class TestCaseExecutionSubscriber implements Disposable {
         Disposer.register(parentDisposable, () -> recorder.surfaces.remove(onUpdated));
     }
 
-    private void record(final @NotNull String testName, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
+    private void record(final @NotNull String testName, final @NotNull ExecutionStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         Logger.debug("Execution report: testName='" + testName + "', status='" + status + "'");
 
         TestName.testCaseId(testName).flatMap(Services.getInstance(p, TestCases.class)::findTestCase).ifPresentOrElse(
@@ -68,8 +68,8 @@ public final class TestCaseExecutionSubscriber implements Disposable {
                 () -> Logger.debug("  '" + testName + "' is not a generated test case - reported against none"));
     }
 
-    private void report(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
-        final @NotNull RunStatus reportedStatus = verdictFor(tc, status);
+    private void report(final @NotNull TestCaseDto tc, final @NotNull ExecutionStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
+        final @NotNull ExecutionStatus reportedStatus = runItemStatusFor(tc, status);
 
         Logger.debug("  reporting on '" + tc.getDescription() + "': " + reportedStatus + " " + failure.message());
 
@@ -84,15 +84,15 @@ public final class TestCaseExecutionSubscriber implements Disposable {
     }
 
     // UC-CODEGEN-009, Rule-CODEGEN-038
-    private @NotNull RunStatus verdictFor(final @NotNull TestCaseDto tc, final @NotNull RunStatus status) {
-        final boolean stopped = status == RunStatus.FAILED
+    private @NotNull ExecutionStatus runItemStatusFor(final @NotNull TestCaseDto tc, final @NotNull ExecutionStatus status) {
+        final boolean stopped = status == ExecutionStatus.FAILED
                 && Services.getInstance(p, TestNGExecution.class).isStopped(tc);
 
-        return stopped ? RunStatus.IDLE : status;
+        return stopped ? ExecutionStatus.IDLE : status;
     }
 
     @FunctionalInterface
     public interface Reported {
-        void accept(final @NotNull TestCaseDto tc, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure);
+        void accept(final @NotNull TestCaseDto tc, final @NotNull ExecutionStatus status, final @NotNull Duration duration, final @NotNull Failure failure);
     }
 }

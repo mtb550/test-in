@@ -1,4 +1,4 @@
-// Starting a TestNG run (#144).
+// Starting a TestNG execution (#144).
 //
 // Its own module rather than part of testin-java, because it needs both
 // plugins: a TestNGConfiguration from TestNG-J and a PsiClass from

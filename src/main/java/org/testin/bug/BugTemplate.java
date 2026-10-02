@@ -159,7 +159,7 @@ public final class BugTemplate {
     }
 
     private static int longestBackticks(final @NotNull String text) {
-        return BACKTICKS.matcher(text).results().mapToInt(run -> run.group().length()).max().orElse(0);
+        return BACKTICKS.matcher(text).results().mapToInt(match -> match.group().length()).max().orElse(0);
     }
 
     private static @NotNull String load() {

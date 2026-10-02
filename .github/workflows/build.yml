@@ -89,7 +89,7 @@ jobs:
       # reports below are uploaded either way.
       #
       # verifyPlugin here means IntelliJ IDEA, which is the only one of the four
-      # whose verdict is news - build.gradle.kts records why, and how to run the
+      # whose result is news - build.gradle.kts records why, and how to run the
       # full sweep by hand.
       #
       # ideTest runs the tests that need a running IDE: the indexer, the tree,

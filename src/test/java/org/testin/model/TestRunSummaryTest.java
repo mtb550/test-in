@@ -29,18 +29,18 @@ import static org.testng.Assert.assertTrue;
 
 public class TestRunSummaryTest {
 
-    private static @NotNull TestRunItems item(final TestStatus status) {
+    private static @NotNull TestRunItems item(final RunItemStatus status) {
         return TestRunItems.builder().id(UUID.randomUUID()).status(status).build();
     }
 
     private static @NotNull TestRunItems executedBy(final String tester) {
-        return TestRunItems.builder().id(UUID.randomUUID()).status(TestStatus.PASSED).executedBy(tester).build();
+        return TestRunItems.builder().id(UUID.randomUUID()).status(RunItemStatus.PASSED).executedBy(tester).build();
     }
 
     private static int rateOf(final int passed, final int failed) {
         final List<TestRunItems> results = new ArrayList<>();
-        for (int i = 0; i < passed; i++) results.add(item(TestStatus.PASSED));
-        for (int i = 0; i < failed; i++) results.add(item(TestStatus.FAILED));
+        for (int i = 0; i < passed; i++) results.add(item(RunItemStatus.PASSED));
+        for (int i = 0; i < failed; i++) results.add(item(RunItemStatus.FAILED));
 
         return TestRunSummary.of(results).passRate();
     }
@@ -55,14 +55,14 @@ public class TestRunSummaryTest {
     }
 
     @Test
-    public void aDeletedTestCaseCountsUnderItsVerdictOnceJudgedAndUnderRemovedOtherwise() {
+    public void aDeletedTestCaseCountsUnderItsRunItemStatusOnceJudgedAndUnderRemovedOtherwise() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.FAILED),
-                TestRunItems.builder().id(UUID.randomUUID()).status(TestStatus.PASSED).removed(true).build(),
-                TestRunItems.builder().id(UUID.randomUUID()).status(TestStatus.PENDING).removed(true).build()));
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.FAILED),
+                TestRunItems.builder().id(UUID.randomUUID()).status(RunItemStatus.PASSED).removed(true).build(),
+                TestRunItems.builder().id(UUID.randomUUID()).status(RunItemStatus.PENDING).removed(true).build()));
 
-        assertEquals(summary.passed(), 2, "the deleted case's Passed is still a result");
+        assertEquals(summary.passed(), 2, "the deleted test case's Passed is still a result");
         assertEquals(summary.removed(), 1, "only the row never judged is Removed");
         assertEquals(summary.passRate(), 67, "two passed of the three judged");
         assertEquals(summary.total(), 4, "the total still counts every row");
@@ -71,32 +71,32 @@ public class TestRunSummaryTest {
     @Test
     public void untestedCountsBothWaysOfNotHavingBeenRun() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                item(TestStatus.UNTESTED),
-                item(TestStatus.UNTESTED),
-                item(TestStatus.PENDING)));
+                item(RunItemStatus.UNTESTED),
+                item(RunItemStatus.UNTESTED),
+                item(RunItemStatus.PENDING)));
 
-        assertEquals(summary.untested(), 3, "PENDING is untested that the run has not reached yet");
+        assertEquals(summary.untested(), 3, "PENDING is untested that the test run has not reached yet");
     }
 
     @Test
-    public void aCompletedRunDoesNotReportZeroOutstanding() {
+    public void aCompletedTestRunDoesNotReportZeroOutstanding() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.UNTESTED)));
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.UNTESTED)));
 
         assertEquals(summary.untested(), 1);
         assertEquals(summary.passed(), 1);
-        assertEquals(summary.passRate(), 100, "one case ran and it passed; the untested one is not a failure");
+        assertEquals(summary.passRate(), 100, "one test case ran and it passed; the untested one is not a failure");
     }
 
     @Test
     public void eachStatusIsCountedUnderItsOwnName() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.PASSED),
-                item(TestStatus.FAILED),
-                item(TestStatus.BLOCKED),
-                item(TestStatus.PENDING)));
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.FAILED),
+                item(RunItemStatus.BLOCKED),
+                item(RunItemStatus.PENDING)));
 
         assertEquals(summary.total(), 5);
         assertEquals(summary.passed(), 2);
@@ -110,13 +110,13 @@ public class TestRunSummaryTest {
     @Test
     public void theFiguresUnderTheTotalAddUpToIt() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.FAILED),
-                item(TestStatus.BLOCKED),
-                item(TestStatus.UNTESTED),
-                item(TestStatus.PENDING),
-                item(TestStatus.REMOVED),
-                item(TestStatus.REMOVED)));
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.FAILED),
+                item(RunItemStatus.BLOCKED),
+                item(RunItemStatus.UNTESTED),
+                item(RunItemStatus.PENDING),
+                item(RunItemStatus.REMOVED),
+                item(RunItemStatus.REMOVED)));
 
         assertEquals(summary.total(), 7);
         assertEquals(summary.removed(), 2);
@@ -127,30 +127,30 @@ public class TestRunSummaryTest {
     @Test
     public void theRemovedTileShowsOnlyWhenThereIsSomethingToShow() {
         final TestRunSummary ordinary = TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.UNTESTED)));
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.UNTESTED)));
 
         final TestRunSummary withRemoved = TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.REMOVED)));
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.REMOVED)));
 
-        assertFalse(ordinary.hasRemoved(), "an ordinary run prints six figures, not a seventh reading zero");
+        assertFalse(ordinary.hasRemoved(), "an ordinary test run prints six figures, not a seventh reading zero");
         assertTrue(withRemoved.hasRemoved());
     }
 
     @Test
     public void aRemovedTestCaseIsNeitherUntestedNorExecuted() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.REMOVED)));
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.REMOVED)));
 
         assertEquals(summary.untested(), 0);
         assertEquals(summary.executed(), 1);
-        assertEquals(summary.passRate(), 100, "the removed case is not a case that failed to pass");
+        assertEquals(summary.passRate(), 100, "the removed test case is not a test case that failed to pass");
     }
 
     @Test
-    public void anEmptyRunHasNoPassRateRatherThanDividingByZero() {
+    public void anEmptyTestRunHasNoPassRateRatherThanDividingByZero() {
         final TestRunSummary summary = TestRunSummary.of(List.of());
 
         assertEquals(summary.total(), 0);
@@ -160,11 +160,11 @@ public class TestRunSummaryTest {
     @Test
     public void untestedTestCasesDoNotDragThePassRateDown() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.PASSED),
-                item(TestStatus.UNTESTED),
-                item(TestStatus.UNTESTED),
-                item(TestStatus.PENDING)));
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.UNTESTED),
+                item(RunItemStatus.UNTESTED),
+                item(RunItemStatus.PENDING)));
 
         assertEquals(summary.total(), 5);
         assertEquals(summary.executed(), 2);
@@ -174,25 +174,25 @@ public class TestRunSummaryTest {
     @Test
     public void blockedCountsAgainstThePassRate() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                item(TestStatus.PASSED),
-                item(TestStatus.BLOCKED)));
+                item(RunItemStatus.PASSED),
+                item(RunItemStatus.BLOCKED)));
 
         assertEquals(summary.executed(), 2);
         assertEquals(summary.passRate(), 50);
     }
 
     @Test
-    public void aRunNobodyStartedHasNoRateRatherThanZeroPercentOfNothing() {
+    public void aTestRunNobodyStartedHasNoRateRatherThanZeroPercentOfNothing() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                item(TestStatus.PENDING),
-                item(TestStatus.PENDING)));
+                item(RunItemStatus.PENDING),
+                item(RunItemStatus.PENDING)));
 
         assertEquals(summary.executed(), 0);
         assertEquals(summary.passRate(), 0);
     }
 
     @Test
-    public void executedByNamesEveryoneWhoRecordedAVerdict() {
+    public void executedByNamesEveryoneWhoRecordedARunItemStatus() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
                 executedBy("Omar"), executedBy("Sara"), executedBy("Omar")));
 
@@ -202,14 +202,14 @@ public class TestRunSummaryTest {
     @Test
     public void executedByIgnoresTestCasesNobodyRan() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
-                executedBy("Omar"), item(TestStatus.UNTESTED), executedBy("   ")));
+                executedBy("Omar"), item(RunItemStatus.UNTESTED), executedBy("   ")));
 
         assertEquals(summary.executedBy(), "Omar");
     }
 
     @Test
-    public void executedByIsEmptyRatherThanNullOnARunNobodyTouched() {
-        assertEquals(TestRunSummary.of(List.of(item(TestStatus.PENDING))).executedBy(), "");
+    public void executedByIsEmptyRatherThanNullOnATestRunNobodyTouched() {
+        assertEquals(TestRunSummary.of(List.of(item(RunItemStatus.PENDING))).executedBy(), "");
         assertEquals(TestRunSummary.of(List.of()).executedBy(), "");
     }
 }

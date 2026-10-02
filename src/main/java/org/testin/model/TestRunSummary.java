@@ -27,16 +27,16 @@ public record TestRunSummary(long total, long passed, long failed, long blocked,
 
     // UC-INTERNAL-006, Rule-INTERNAL-048, Rule-INTERNAL-049
     public static @NotNull TestRunSummary of(final @NotNull List<TestRunItems> results) {
-        final @NotNull Map<TestStatus, Long> counts = results.stream()
+        final @NotNull Map<RunItemStatus, Long> counts = results.stream()
                 .collect(Collectors.groupingBy(TestRunItems::shownStatus, Collectors.counting()));
 
         return new TestRunSummary(
                 results.size(),
-                counts.getOrDefault(TestStatus.PASSED, 0L),
-                counts.getOrDefault(TestStatus.FAILED, 0L),
-                counts.getOrDefault(TestStatus.BLOCKED, 0L),
-                counts.getOrDefault(TestStatus.PENDING, 0L) + counts.getOrDefault(TestStatus.UNTESTED, 0L),
-                counts.getOrDefault(TestStatus.REMOVED, 0L),
+                counts.getOrDefault(RunItemStatus.PASSED, 0L),
+                counts.getOrDefault(RunItemStatus.FAILED, 0L),
+                counts.getOrDefault(RunItemStatus.BLOCKED, 0L),
+                counts.getOrDefault(RunItemStatus.PENDING, 0L) + counts.getOrDefault(RunItemStatus.UNTESTED, 0L),
+                counts.getOrDefault(RunItemStatus.REMOVED, 0L),
                 whoExecuted(results));
     }
 

@@ -24,7 +24,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.run.RunEditor;
+import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 
@@ -51,8 +51,8 @@ public final class TestinData {
         return Optional.ofNullable(EDITOR.getData(e.getDataContext()));
     }
 
-    public static @NotNull Optional<RunEditor> runEditor(final @NotNull AnActionEvent e) {
-        return editor(e).filter(RunEditor.class::isInstance).map(RunEditor.class::cast);
+    public static @NotNull Optional<TestRunEditor> testRunEditor(final @NotNull AnActionEvent e) {
+        return editor(e).filter(TestRunEditor.class::isInstance).map(TestRunEditor.class::cast);
     }
 
     public static @NotNull List<TestCaseDto> selectedTestCases(final @NotNull AnActionEvent e) {

@@ -49,8 +49,8 @@ record RemoveTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @Not
         final @NotNull Runnable delete = () -> ApplicationManager.getApplication().runWriteAction(() -> performDeletion(selectedItems));
 
         final @NotNull String msg = selectedItems.size() == 1
-                ? Bundle.message("remove.case.confirm.one", selectedItems.getFirst().getDescription())
-                : Bundle.message("remove.case.confirm.many", String.valueOf(selectedItems.size()));
+                ? Bundle.message("remove.test.case.confirm.one", selectedItems.getFirst().getDescription())
+                : Bundle.message("remove.test.case.confirm.many", String.valueOf(selectedItems.size()));
 
         new ConfirmDialog(p, Bundle.message("remove.confirm.title"), msg, dir.getPath().toString(), "", Bundle.message("remove.confirm.button"), delete).show();
     }

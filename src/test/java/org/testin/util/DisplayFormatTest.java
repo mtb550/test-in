@@ -79,15 +79,15 @@ public class DisplayFormatTest {
     }
 
     @Test
-    public void aRunClockAlwaysCarriesItsHours() {
-        assertEquals(Display.formatRunClock(Duration.ofSeconds(45)), "00:00:45");
-        assertEquals(Display.formatRunClock(Duration.ofMinutes(3).plusSeconds(7)), "00:03:07");
-        assertEquals(Display.formatRunClock(Duration.ofHours(2).plusMinutes(5)), "02:05:00");
+    public void aTestRunClockAlwaysCarriesItsHours() {
+        assertEquals(Display.formatTestRunClock(Duration.ofSeconds(45)), "00:00:45");
+        assertEquals(Display.formatTestRunClock(Duration.ofMinutes(3).plusSeconds(7)), "00:03:07");
+        assertEquals(Display.formatTestRunClock(Duration.ofHours(2).plusMinutes(5)), "02:05:00");
     }
 
     @Test
-    public void aRunNobodyStartedShowsNothing() {
-        assertEquals(Display.formatRunClock(Duration.ZERO), "", "the status bar hides the label rather than showing zero");
+    public void aTestRunNobodyStartedShowsNothing() {
+        assertEquals(Display.formatTestRunClock(Duration.ZERO), "", "the status bar hides the label rather than showing zero");
     }
 
     @Test
@@ -99,7 +99,7 @@ public class DisplayFormatTest {
 
     @Test
     public void nothingMeasuredShowsNothing() {
-        assertEquals(Display.formatDuration(Duration.ZERO), "", "a case nobody ran has no duration line at all");
+        assertEquals(Display.formatDuration(Duration.ZERO), "", "a test case nobody ran has no duration line at all");
     }
 
     @Test

@@ -17,7 +17,7 @@
 package org.testin.bug;
 
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.util.Bundle;
 import org.testng.annotations.Test;
 
@@ -36,7 +36,7 @@ public class BugReportsTest {
     private static final RunItem SAME_TEST_CASE_OTHER_RUN = new RunItem(Path.of("NAFATH", "Test Runs", "Sprint 8"), ITEM.id());
 
     private static @NotNull TestRunItems failed() {
-        return TestRunItems.builder().id(ITEM.id()).status(TestStatus.FAILED).build();
+        return TestRunItems.builder().id(ITEM.id()).status(RunItemStatus.FAILED).build();
     }
 
     @Test
@@ -63,7 +63,7 @@ public class BugReportsTest {
     @Test
     public void aReportedBugKeepsReportBugOff() {
         final BugReports reports = new BugReports();
-        final TestRunItems reported = TestRunItems.builder().id(ITEM.id()).status(TestStatus.FAILED).bugIssueUrl("https://github.com/mtb550/test-in/issues/412").build();
+        final TestRunItems reported = TestRunItems.builder().id(ITEM.id()).status(RunItemStatus.FAILED).bugIssueUrl("https://github.com/mtb550/test-in/issues/412").build();
 
         assertEquals(reports.whyReportBugIsOff(ITEM, reported), Optional.of(Bundle.message("bug.already.reported")));
     }
@@ -73,7 +73,7 @@ public class BugReportsTest {
         final BugReports reports = new BugReports();
         reports.begin(SAME_TEST_CASE_OTHER_RUN);
 
-        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.empty(), "one being prepared, even for the same test case in another run, does not hold the others");
+        assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.empty(), "one being prepared, even for the same test case in another test run, does not hold the others");
 
         reports.moveTo(SAME_TEST_CASE_OTHER_RUN, Stage.OPEN);
         assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.of(Bundle.message("bug.finish.open.report")));

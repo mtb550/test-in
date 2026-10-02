@@ -2,10 +2,11 @@
 
 # UC-EDITOR-PANEL-045: Write the result analysis
 
-**As a** tester, **I want** to say what the run as a whole showed, **so that** the report carries my judgment and not
-only the figures.
+**As a** tester, **I want** to say what the test run as a whole showed, **so
+that** the report carries my judgment and not only the figures.
 
-Four boxes, one for each verdict. What the tester writes goes into the report.
+Four boxes, one for each run item status. What the tester writes goes into the
+report.
 
 There is no key for this. The button's tooltip reads **Result Analysis**.
 
@@ -37,8 +38,8 @@ There is no key for this. The button's tooltip reads **Result Analysis**.
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-189** — The analysis can be written only once the test run
   is **Completed**.
-- **Rule-EDITOR-PANEL-190** — There are four sections, one for each verdict,
-  each carrying its own count in the heading.
+- **Rule-EDITOR-PANEL-190** — There are four sections, one for each run item
+  status, each carrying its own count in the heading.
 - **Rule-EDITOR-PANEL-191** — A section left blank is not saved, and does not
   appear in the report.
 - **Rule-EDITOR-PANEL-192** — `Enter` in a box makes a new paragraph. A box
@@ -71,19 +72,19 @@ There is no key for this. The button's tooltip reads **Result Analysis**.
 ├──────────────────────────────────────────────────────────────┤
 │  Passed (10)                                                 │
 │  ┌────────────────────────────────────────────────────────┐  │
-│  │ what the passed cases say about this run...            │  │
+│  │ what the passed test cases say about this test run     │  │
 │  └────────────────────────────────────────────────────────┘  │
 │  Failed (2)                                                  │
 │  ┌────────────────────────────────────────────────────────┐  │
-│  │ what the failed cases say about this run...            │  │
+│  │ what the failed test cases say about this test run     │  │
 │  └────────────────────────────────────────────────────────┘  │
 │  Blocked (0)                                                 │
 │  ┌────────────────────────────────────────────────────────┐  │
-│  │ what the blocked cases say about this run...           │  │
+│  │ what the blocked test cases say about this test run    │  │
 │  └────────────────────────────────────────────────────────┘  │
 │  Untested (0)                                                │
 │  ┌────────────────────────────────────────────────────────┐  │
-│  │ what the untested cases say about this run...          │  │
+│  │ what the untested test cases say about this test run   │  │
 │  └────────────────────────────────────────────────────────┘  │
 │                                          [ Save ]            │
 ├──────────────────────────────────────────────────────────────┤
@@ -91,7 +92,7 @@ There is no key for this. The button's tooltip reads **Result Analysis**.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **Each heading** — the verdict and how many test cases carry it.
+1. **Each heading** — the run item status and how many test cases carry it.
 2. **Each box** — three lines tall, with its own gray hint.
 3. **Save** — a button, because `Enter` makes a paragraph here.
 
@@ -110,8 +111,8 @@ There is no key for this. The button's tooltip reads **Result Analysis**.
 ## What Testin refuses
 
 **If the test run is not exactly Completed** — the button is gray. Its tooltip
-reads *Result Analysis is written once the run is completed — it is*, then the
-status. A **Closed** test run is refused as well.
+reads *Result Analysis is written once the test run is completed — it is*, then
+the status. A **Closed** test run is refused as well.
 
 **If a section is left blank** — it is dropped, and the report leaves that
 heading out.

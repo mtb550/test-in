@@ -43,12 +43,12 @@ bug** without anyone copying anything.
   otherwise.
 - **Rule-VIEW-PANEL-063** — Going to the test case is an icon of its own,
   the third under the title, and the only thing that does it. It opens the
-  test case's own test set editor and selects it there. The tree does not move:
-  the tester is already looking at the test case and asked for the editor, so
-  revealing the node is an answer to a question nobody asked. The path is what
-  moves the tree, and it still does. A test case with no test set to open — one
-  shown from a test run after it was removed from its set — leaves the icon
-  gray and says so.
+  test case editor of the test case's own test set and selects it there. The
+  tree does not move: the tester is already looking at the test case and asked
+  for the editor, so revealing the node is an answer to a question nobody asked.
+  The path is what moves the tree, and it still does. A test case with no test
+  set to open — one shown from a test run after it was removed from its set —
+  leaves the icon gray and says so.
 
 ## The screen
 
@@ -81,8 +81,8 @@ the two: a breadcrumb step names a place, and the icon names the test case.
 **If the test case has no test set to open** — the icon is gray, it does not
 grow under the pointer, and clicking it reads *There is no test set to open
 this test case in.* This is the only way to meet it: a test run keeps the
-verdict of a test case its test set no longer holds, and the panel shows that
-test case from the run.
+run item status of a test case its test set no longer holds, and the panel shows
+that test case from the test run.
 
 ## Why it works this way
 

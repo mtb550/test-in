@@ -19,7 +19,7 @@ package org.testin.testrun;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.util.Shortcuts;
 
 import javax.swing.JComponent;
@@ -29,18 +29,18 @@ import java.util.List;
 public class SetTestCaseStatusGroup extends DefaultActionGroup {
     // UC-EDITOR-PANEL-032
     public SetTestCaseStatusGroup() {
-        super(verdicts());
+        super(runItemStatuses());
     }
 
     // UC-EDITOR-PANEL-032
     public static void bindLettersTo(final @NotNull JComponent list) {
-        verdicts().forEach(action -> action.registerCustomShortcutSet(action.getShortcutSet(), list));
+        runItemStatuses().forEach(action -> action.registerCustomShortcutSet(action.getShortcutSet(), list));
     }
 
     // UC-EDITOR-PANEL-032, Rule-EDITOR-PANEL-213
-    private static @NotNull List<SetTestCaseStatusAction> verdicts() {
-        return Arrays.stream(TestStatus.values())
-                .filter(TestStatus::isVerdict)
+    private static @NotNull List<SetTestCaseStatusAction> runItemStatuses() {
+        return Arrays.stream(RunItemStatus.values())
+                .filter(RunItemStatus::isRunItemStatus)
                 .map(status -> {
                     final @NotNull SetTestCaseStatusAction action = new SetTestCaseStatusAction(status);
 

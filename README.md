@@ -27,8 +27,8 @@ they exercise.
 - **Execute** — run a test case, a test set, or a whole test run from the
   gutter, the tree or the editor. Results are recorded per test case with
   status, duration and failure details.
-- **Report** — export a run to PDF, Word, Excel or HTML. Test cases export as
-  XLSX, CSV, JSON or HTML, and import from XLSX, XLS, CSV or JSON.
+- **Report** — export a test run to PDF, Word, Excel or HTML. Test cases export
+  as XLSX, CSV, JSON or HTML, and import from XLSX, XLS, CSV or JSON.
 - **Version** — commit and sync test case changes from inside the panel, with a
   diff of what changed in each test case.
 
@@ -45,11 +45,12 @@ a folder is a node because of the marker inside it:
 | `.trp` / `.tr`  | Test run package, test run              |
 
 The records beside those markers are JSON too, and **each one is named by what it
-is about**: a test case is `<id>.tc`, and one case's result in a test run is
-`<test case id>.ri`. So renaming or moving anything leaves every file still
-valid, two testers recording verdicts on different cases of the same run never
-touch the same file, and what a run recorded about itself — its status, when it
-ran, how it was configured — lives in the run's own `.tr`.
+is about**: a test case is `<id>.tc`, and one test case's result in a test run
+is `<test case id>.ri`. So renaming or moving anything leaves every file still
+valid, two testers recording run item statuses on different test cases of the
+same test run never touch the same file, and what a test run recorded about
+itself — its status, when it ran, how it was configured — lives in the test
+run's own `.tr`.
 
 **Stored values are byte-identical to what you typed** — Testin formats for
 display only, never on save — so a diff shows the change you made and nothing
@@ -80,8 +81,8 @@ Testin's settings are per-IDE, not per-project: the root you choose is the one
 every open project uses.
 
 **New to it?** [First run](docs/firstRun.md) takes ten minutes and ends at a
-recorded verdict and a report — install, a test case you wrote, the Java method
-Testin wrote for it, and the document you send to someone who has no IDE.
+recorded run item status and a report — install, a test case you wrote, the Java
+method Testin wrote for it, and the document you send to someone who has no IDE.
 
 ## Building from source
 

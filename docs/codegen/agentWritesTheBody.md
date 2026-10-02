@@ -71,22 +71,23 @@ Connecting an agent changes what that gesture produces, not where it lives.
   and where it fenced a block the largest one is taken. An answer that does not
   end as Java statements do is dropped: the TODO stays, the log says what came
   back, and the tester is shown nothing.
-- **Rule-CODEGEN-089** — A run reports the bodies that landed, once, with a
-  count. Canceling keeps every body already written and leaves the rest with
+- **Rule-CODEGEN-089** — An execution reports the bodies that landed, once, with
+  a count. Canceling keeps every body already written and leaves the rest with
   their TODO. Each body is one named write command, so Ctrl+Z takes one back.
-- **Rule-CODEGEN-090** — Every exchange is kept while the run lasts and offered
-  once it ends: the notification says how many of how many test cases got a
-  body, and carries Show what the agent said, which opens a read-only window
-  holding what was asked and what came back for each of them, in order, with the
-  ones that were dropped marked. Nothing opens on its own - a tester who only
-  wanted the body reads one line and closes it - and the same pair goes to the
-  log at debug level, so a run nobody watched can still be read afterward.
+- **Rule-CODEGEN-090** — Every exchange is kept while the execution lasts and
+  offered once it ends: the notification says how many of how many test cases
+  got a body, and carries Show what the agent said, which opens a read-only
+  window holding what was asked and what came back for each of them, in order,
+  with the ones that were dropped marked. Nothing opens on its own - a tester
+  who only wanted the body reads one line and closes it - and the same pair goes
+  to the log at debug level, so an execution nobody watched can still be read
+  afterward.
 - **Rule-CODEGEN-091** — A test case whose method already holds a body of its
-  own is not sent to the agent, and the run says so before it starts: one dialog
-  names how many they are and offers Write over them or Leave them as they are,
-  with Escape leaving them. Nothing is replaced without that answer, and what
-  replaces it is one named write command, so Ctrl+Z takes the tester's own body
-  back.
+  own is not sent to the agent, and the execution says so before it starts: one
+  dialog names how many they are and offers Write over them or Leave them as
+  they are, with Escape leaving them. Nothing is replaced without that answer,
+  and what replaces it is one named write command, so Ctrl+Z takes the tester's
+  own body back.
 
 ## The screen
 
@@ -156,13 +157,13 @@ command and why, and the tester is not shown a stack trace (Rule-CODEGEN-006).
 half-written body is never left behind.
 
 **If the tester has written the body already** — that test case is not sent, and
-the run asks first: one dialog says how many such test cases there are, and
-offers **Write over them** or **Leave them as they are**. Escape leaves them.
-Nothing is replaced without that answer, and `Ctrl+Z` takes the tester's own body
-back.
+the execution asks first: one dialog says how many such test cases there are,
+and offers **Write over them** or **Leave them as they are**. Escape leaves
+them. Nothing is replaced without that answer, and `Ctrl+Z` takes the tester's
+own body back.
 
-**If the run is canceled** — the bodies already written stay, the rest keep their
-`// TODO`, and the count reports what landed.
+**If the execution is canceled** — the bodies already written stay, the rest
+keep their `// TODO`, and the count reports what landed.
 
 ## Why it works this way
 

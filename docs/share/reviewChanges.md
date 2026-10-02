@@ -49,7 +49,7 @@ uncommitted work.
 - **Rule-SHARE-050** — Reading Git happens off the main thread, so the IDE stays
   usable.
 - **Rule-SHARE-112** — A test run's screenshots travel with it. The review lists
-  none of them on its own, and committing the run commits the screenshots its
+  none of them on its own, and committing the test run commits the screenshots its
   folder gained or lost.
 
 ## The screen
@@ -77,7 +77,7 @@ uncommitted work.
 1. **The tick column** — every row arrives ticked.
 2. **Change Type** — what kind of change this row is.
 3. **Test Set** — filled for a test case, and for a result: the set its test
-   case sits in. Blank for a run, a marker, or any other file.
+   case sits in. Blank for a test run, a marker, or any other file.
 4. **Name** — the test case's description; for a result, the description of the
    test case it is about; for a marker, the folder it sits in; otherwise the
    file's name.

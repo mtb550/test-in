@@ -27,7 +27,7 @@ import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.FileKind;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -97,18 +97,18 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private @NotNull Path runPath() {
+    private @NotNull Path testRunPath() {
         return root.resolve("NAFATH").resolve("Test Runs").resolve("Sprint 7");
     }
 
-    private @NotNull RunItem indexedRunItem(final TestStatus status) {
+    private @NotNull RunItem indexedRunItem(final RunItemStatus status) {
         return runItem(indexedTestCase(), status);
     }
 
-    private @NotNull RunItem runItem(final UUID testCaseId, final TestStatus status) {
+    private @NotNull RunItem runItem(final UUID testCaseId, final RunItemStatus status) {
         final TestRunItems item = TestRunItems.builder().id(testCaseId).status(status).build();
-        indexedTestRuns().putTestRun(runPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
-        return new RunItem(runPath(), testCaseId);
+        indexedTestRuns().putTestRun(testRunPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
+        return new RunItem(testRunPath(), testCaseId);
     }
 
     private @NotNull UUID indexedTestCase() {
@@ -129,41 +129,41 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
     }
 
     private @NotNull String storedLink(final RunItem item) {
-        return indexedTestRuns().findTestRun(item.run()).flatMap(item::in).orElseThrow().getBugIssueUrl();
+        return indexedTestRuns().findTestRun(item.testRunPath()).flatMap(item::in).orElseThrow().getBugIssueUrl();
     }
 
     public void testAFailedRunItemKeepsTheIssue() {
-        final RunItem item = indexedRunItem(TestStatus.FAILED);
+        final RunItem item = indexedRunItem(RunItemStatus.FAILED);
 
         assertEquals(Optional.empty(), BugFiling.store(getProject(), item, ISSUE));
         assertEquals("the run item the indexer holds did not take the link", ISSUE, storedLink(item));
 
-        final Path result = item.run().resolve(FileKind.RUN_ITEM.fileName(item.id()));
-        assertTrue("the link did not reach the case's own result file", awaitFileHoldingTheIssue(result).contains(ISSUE));
+        final Path result = item.testRunPath().resolve(FileKind.RUN_ITEM.fileName(item.id()));
+        assertTrue("the link did not reach the test case's own result file", awaitFileHoldingTheIssue(result).contains(ISSUE));
     }
 
     public void testARunItemNoLongerFailedIsNotWritten() {
-        final RunItem item = indexedRunItem(TestStatus.PASSED);
+        final RunItem item = indexedRunItem(RunItemStatus.PASSED);
 
         assertEquals(Optional.of(Bundle.message("bug.not.stored.no.longer.failed")), BugFiling.store(getProject(), item, ISSUE));
         assertEquals("a passed run item was given a bug", "", storedLink(item));
     }
 
-    public void testARunRenamedOrRemovedIsNotBroughtBack() {
-        final RunItem gone = new RunItem(runPath(), UUID.randomUUID());
+    public void testATestRunRenamedOrRemovedIsNotBroughtBack() {
+        final RunItem gone = new RunItem(testRunPath(), UUID.randomUUID());
 
         assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), gone, ISSUE));
-        assertTrue("storing on the old path registered the run again", indexedTestRuns().findTestRun(runPath()).isEmpty());
+        assertTrue("storing on the old path registered the test run again", indexedTestRuns().findTestRun(testRunPath()).isEmpty());
     }
 
     public void testARemovedRunItemIsNotWritten() {
-        final RunItem item = indexedRunItem(TestStatus.REMOVED);
+        final RunItem item = indexedRunItem(RunItemStatus.REMOVED);
 
         assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), item, ISSUE));
     }
 
     public void testARunItemWhoseTestCaseIsGoneIsNotWritten() {
-        final RunItem item = runItem(UUID.randomUUID(), TestStatus.FAILED);
+        final RunItem item = runItem(UUID.randomUUID(), RunItemStatus.FAILED);
 
         assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), item, ISSUE));
     }

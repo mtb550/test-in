@@ -17,8 +17,8 @@ them opens.
   nowhere. A number that is never saved cannot be stale.
 - **Rule-INTERNAL-047** — A container is the sum of everything beneath it, at
   any depth.
-- **Rule-INTERNAL-048** — A test run is counted from the verdicts it recorded,
-  not from the test cases it was made from.
+- **Rule-INTERNAL-048** — A test run is counted from the run item statuses it
+  recorded, not from the test cases it was made from.
 - **Rule-INTERNAL-049** — A test run's numbers come from one place, so its
   Details and its report can never disagree.
 - **Rule-INTERNAL-050** — Retired test sets and archived packages are counted.
@@ -31,7 +31,7 @@ them opens.
 - **Rule-INTERNAL-065** — When a new test run would not take every test case
   beneath a node, the count says how many it would. Both numbers are right, and
   they answer different questions, so the one on screen names the other rather
-  than leaving a tester to find the difference by making a run.
+  than leaving a tester to find the difference by making a test run.
 
 ## Where the counts appear
 
@@ -50,10 +50,10 @@ them opens.
 | A test set package | Test sets, Packages, Test cases            |
 | A test run package | Packages, Test runs                        |
 | A test set         | Test cases                                 |
-| A test run         | Total, and a ring of its verdicts          |
+| A test run         | Total, and a ring of its run item statuses |
 
-The verdicts on the ring are **Passed**, **Failed**, **Blocked**, **Untested**
-and **Removed**. The pass rate sits in the middle of it.
+The run item statuses on the ring are **Passed**, **Failed**, **Blocked**,
+**Untested** and **Removed**. The pass rate sits in the middle of it.
 
 ## The screen
 
@@ -85,8 +85,8 @@ drawn on [UC-TREE-PANEL-027](../treePanel/nodeDetails.md).
 2. **The number** — worked out the moment the dialog opened. It is never saved.
 
 A test run is different. It shows one row reading **Total**, and a ring beside
-it. The ring has one color for each verdict. The pass rate sits in the middle.
-A test run nobody has judged reads **Not run** there instead.
+it. The ring has one color for each run item status. The pass rate sits in the
+middle. A test run nobody has judged reads **Not run** there instead.
 
 The removal confirmation shows the same counts as one line. That dialog is
 drawn on [UC-TREE-PANEL-012](../treePanel/removeNode.md).
@@ -111,7 +111,8 @@ drawn on [UC-TREE-PANEL-012](../treePanel/removeNode.md).
 4. Test cases are counted from how many the test set holds. They are not
    sorted first. Sorting 2,770 test cases to make a number nobody reads is work
    for nothing.
-5. A test run is not walked. Its recorded verdicts are added up instead.
+5. A test run is not walked. Its recorded run item statuses are added up
+   instead.
 6. The screen draws the rows. The removal confirmation draws one line, reading *Holds*, then the test sets, the test
    cases and the test runs.
 7. Nothing is saved. The next screen that asks counts again.
@@ -121,8 +122,8 @@ drawn on [UC-TREE-PANEL-012](../treePanel/removeNode.md).
 **If the node holds nothing** — the removal confirmation shows no *Holds* line
 at all, rather than a line of zeros.
 
-**If a test run has no verdicts yet** — the middle of the ring reads *Not run*.
-A *0%* there would read as every test case having failed.
+**If a test run has no run item statuses yet** — the middle of the ring reads
+*Not run*. A *0%* there would read as every test case having failed.
 
 **If a test run cannot be read** — every count is zero and nothing fails. The
 node is still in the tree, so Details still opens on it.

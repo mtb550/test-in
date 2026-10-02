@@ -56,9 +56,9 @@ public final class NodeCounter {
     }
 
     // UC-INTERNAL-006, Rule-INTERNAL-048, Rule-INTERNAL-049, Rule-INTERNAL-051
-    public static @NotNull NodeFigures runVerdicts(final @NotNull Project p, final @NotNull DirectoryDto dto) {
+    public static @NotNull NodeFigures testRunFigures(final @NotNull Project p, final @NotNull DirectoryDto dto) {
         return Services.getInstance(p, TestRuns.class).findTestRun(dto.getPath())
-                .map(run -> NodeFigures.ofRun(TestRunSummary.of(run.getResults())))
+                .map(testRun -> NodeFigures.ofTestRun(TestRunSummary.of(testRun.getResults())))
                 .orElse(NodeFigures.NONE);
     }
 

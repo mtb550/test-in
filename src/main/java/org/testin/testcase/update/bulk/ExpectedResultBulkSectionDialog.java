@@ -19,7 +19,7 @@ package org.testin.testcase.update.bulk;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.util.Bundle;
 
 import java.util.List;
@@ -31,8 +31,8 @@ public class ExpectedResultBulkSectionDialog extends JsonSplitBulkSectionDialog 
     }
 
     @Override
-    protected @NotNull TestEditorAttributes attribute() {
-        return TestEditorAttributes.EXPECTED_RESULT;
+    protected @NotNull TestCaseEditorAttributes attribute() {
+        return TestCaseEditorAttributes.EXPECTED_RESULT;
     }
 
     @Override

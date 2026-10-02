@@ -138,7 +138,7 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
             Files.writeString(ts.getPath().resolve("login.tc"), Services.getInstance(getProject(), Mapper.class)
                     .writeValueAsString(TestCaseDto.builder().id(id).description("Log in with a valid user").build()));
         } catch (final Exception ex) {
-            throw new AssertionError("Could not write the hand-named case: " + ex.getMessage(), ex);
+            throw new AssertionError("Could not write the hand-named test case: " + ex.getMessage(), ex);
         }
         indexer().scanSingleProject(tp.getPath());
 
@@ -148,8 +148,8 @@ public class RenameProjectIdeTest extends BasePlatformTestCase {
         final TestCaseDto tc = indexedTestCases().findTestCase(id).orElseThrow();
         final TestCaseFile file = indexedTestCases().testCaseFile(tc).orElseThrow();
 
-        assertEquals("the case is placed in the renamed project", to, file.testProject());
-        assertEquals("the case lost its hand-named file", "login.tc", file.inProject().getFileName().toString());
+        assertEquals("the test case is placed in the renamed project", to, file.testProject());
+        assertEquals("the test case lost its hand-named file", "login.tc", file.inProject().getFileName().toString());
     }
 
     public void testANameIsTakenOnDiskButNotByTheNodeItself() {

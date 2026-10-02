@@ -1,7 +1,7 @@
 # How many places write a user-facing string that another file also writes.
 #
 # A caption, a status name, a button - each belongs to the type that owns the
-# concept, asked for as TestStatus.getLabel() or
+# concept, asked for as RunItemStatus.getLabel() or
 # TestRunConfiguration.getDisplayName(). A second file spelling it out is a
 # divergence nothing fails over: both read correctly alone, and they stop
 # agreeing the day one is renamed.
@@ -13,22 +13,23 @@
 #
 # 304 when the check was written. The four report generators had already been
 # fixed by then: they spelled out Passed, Failed, Blocked, Untested and Removed
-# seventeen times between them, and now ask TestStatus.
+# seventeen times between them, and now ask RunItemStatus.
 #
 # 278 after StatusBarShortcut gained cancel() and confirm(). Twenty-one dialogs
 # declared Escape/"Cancel"/closeCancel identically and seven declared
 # Enter/"Confirm"/submit, which was the largest cluster in the plugin.
 #
 # 262 after Priority, Group and Description started coming from
-# TestEditorAttributes, which owns what a test case's fields are called.
+# TestCaseEditorAttributes, which owns what a test case's fields are called.
 #
 # 246 after the rest followed: every caption the create dialog, the update
-# dialog and the run grid share with a test case attribute now asks for it.
+# dialog and the test run grid share with a test case attribute now asks for
+# it.
 #
 # 195 after the node names, the report headings, the two Git comparators and
-# the verdict words followed the same route. Two that could not: NodeCount
-# cannot ask DirectoryType for a node's name, because DirectoryType names its
-# counts and the two would initialize each other.
+# the run item status words followed the same route. Two that could not:
+# NodeCount cannot ask DirectoryType for a node's name, because DirectoryType
+# names its counts and the two would initialize each other.
 #
 # 191 after Done gave the past-tense notification vocabulary an owner. That one
 # is worth less to the count than to the rule: CLAUDE.md has always said a
@@ -62,20 +63,20 @@
 #
 # 148 after light mode (#13), which is the largest single drop since the check
 # was written and almost none of it was aimed at this number. A window that shows
-# the same test case, offers the same verdicts and asks for the same failure
-# details as the run editor had every chance to spell all of it out a second
-# time, and the rule against that is what kept it from happening:
+# the same test case, offers the same run item statuses and asks for the same
+# failure details as the test run editor had every chance to spell all of it
+# out a second time, and the rule against that is what kept it from happening:
 #
 #   FailureFields    the four failure captions, their defaults and their wording,
-#                    declared once and filled in twice - the run editor's dialog
-#                    and light mode's own form
+#                    declared once and filled in twice - the test run editor's
+#                    dialog and light mode's own form
 #   Toolbar          START_MANUAL_EXECUTION and a new STOP_EXECUTION, so the
 #                    window's execution buttons read the toolbar's words instead
 #                    of inventing their own pair
 #   Display          numberedStep, so the details panel and light mode number a
 #                    step the same way
 #   Keycap           the look of a printed key, which is where 28 dialogs and
-#                    light mode's verdict buttons now agree
+#                    light mode's run item status buttons now agree
 #
 # Two of it came from deleting rather than sharing. Cancel and Save & next left
 # the failure form once Enter and Escape were found to be enough, and each of
@@ -100,10 +101,10 @@
 #
 # The other three were left, and the reasons are worth more than the count.
 # "Created" and "Updated" are three concepts sharing a spelling - a
-# notification, a run status, a row caption - so one owner would mean renaming a
-# status renames a balloon; a fourth site is a Javadoc the filter cannot tell
-# from a caption. "test cases" and "test runs" are the circular initialization
-# this file already records. "Navigate to Code" is written on opposite sides of
+# notification, a test run status, a row caption - so one owner would mean
+# renaming a status renames a balloon; a fourth site is a Javadoc the filter
+# cannot tell from a caption. "test cases" and "test runs" are the circular
+# initialization this file already records. "Navigate to Code" is written on opposite sides of
 # the leaf rule: Automated is in model, CardHoverAction is in editor, and model
 # may not import editor.
 #

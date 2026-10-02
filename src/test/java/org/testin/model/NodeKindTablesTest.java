@@ -98,12 +98,12 @@ public class NodeKindTablesTest {
     public void theTwoFamiliesNeverMix() {
         assertTrue(DirectoryType.TCD.accepts(DirectoryType.TS), "a test set belongs under Test Cases");
         assertTrue(DirectoryType.TSP.accepts(DirectoryType.TSP), "a package belongs in a package");
-        assertTrue(DirectoryType.TRD.accepts(DirectoryType.TR), "a run belongs under Test Runs");
-        assertTrue(DirectoryType.TRP.accepts(DirectoryType.TR), "a run belongs in a run package");
+        assertTrue(DirectoryType.TRD.accepts(DirectoryType.TR), "a test run belongs under Test Runs");
+        assertTrue(DirectoryType.TRP.accepts(DirectoryType.TR), "a test run belongs in a test run package");
 
-        assertFalse(DirectoryType.TCD.accepts(DirectoryType.TR), "a run does not belong under Test Cases");
+        assertFalse(DirectoryType.TCD.accepts(DirectoryType.TR), "a test run does not belong under Test Cases");
         assertFalse(DirectoryType.TRD.accepts(DirectoryType.TS), "a test set does not belong under Test Runs");
-        assertFalse(DirectoryType.TSP.accepts(DirectoryType.TRP), "a run package does not belong in a set package");
+        assertFalse(DirectoryType.TSP.accepts(DirectoryType.TRP), "a test run package does not belong in a set package");
 
         for (final DirectoryType source : DirectoryType.values()) {
             assertFalse(DirectoryType.TR.accepts(source), "a test run holds run items, so " + source + " cannot be dropped into it");

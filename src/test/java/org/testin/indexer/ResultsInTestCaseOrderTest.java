@@ -18,7 +18,7 @@ package org.testin.indexer;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
@@ -43,7 +43,7 @@ public class ResultsInTestCaseOrderTest {
         return scanned;
     }
 
-    private static @NotNull TestRunItems result(final @NotNull UUID testCaseId, final @NotNull TestStatus status) {
+    private static @NotNull TestRunItems result(final @NotNull UUID testCaseId, final @NotNull RunItemStatus status) {
         return TestRunItems.builder().id(testCaseId).status(status).build();
     }
 
@@ -54,31 +54,31 @@ public class ResultsInTestCaseOrderTest {
     @Test
     public void theResultsComeBackInTheirTestCasesTestSetOrder() {
         final @NotNull List<TestRunItems> asTheFolderListedThem =
-                List.of(result(SECOND, TestStatus.FAILED), result(FIRST, TestStatus.PASSED));
+                List.of(result(SECOND, RunItemStatus.FAILED), result(FIRST, RunItemStatus.PASSED));
 
         final @NotNull List<TestRunItems> ordered = IndexingScanner.inTestCaseOrder(asTheFolderListedThem, aProjectHoldingBothTestCases());
 
         assertEquals(idsOf(ordered), List.of(FIRST, SECOND),
-                "A run's results are drawn, printed and exported in this order, so it is the order the cases sit"
+                "A test run's results are drawn, printed and exported in this order, so it is the order the test cases sit"
                         + " in their test sets - never the order the folder happened to list their files in");
     }
 
     @Test
-    public void aResultWhoseTestCaseIsGoneComesLastWithItsVerdict() {
+    public void aResultWhoseTestCaseIsGoneComesLastWithItsRunItemStatus() {
         final @NotNull List<TestRunItems> asTheFolderListedThem = List.of(
-                result(DELETED_TEST_CASE, TestStatus.FAILED),
-                result(SECOND, TestStatus.PASSED),
-                result(FIRST, TestStatus.PASSED));
+                result(DELETED_TEST_CASE, RunItemStatus.FAILED),
+                result(SECOND, RunItemStatus.PASSED),
+                result(FIRST, RunItemStatus.PASSED));
 
         final @NotNull List<TestRunItems> ordered = IndexingScanner.inTestCaseOrder(asTheFolderListedThem, aProjectHoldingBothTestCases());
 
         assertEquals(idsOf(ordered), List.of(FIRST, SECOND, DELETED_TEST_CASE),
-                "A run outlives the cases it was made from, and a result whose case is gone has no place in their"
+                "A test run outlives the test cases it was made from, and a result whose test case is gone has no place in their"
                         + " order - so it comes after them rather than being dropped or sorted among them");
 
-        assertEquals(ordered.getLast().getStatus(), TestStatus.FAILED,
-                "What the run recorded about a case that has since been deleted is still its record: deleting the"
-                        + " case must not change what the run found");
+        assertEquals(ordered.getLast().getStatus(), RunItemStatus.FAILED,
+                "What the test run recorded about a test case that has since been deleted is still its record: deleting the"
+                        + " test case must not change what the test run found");
     }
 
 }

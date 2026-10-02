@@ -1,0 +1,154 @@
+[Documentation](../README.md) › [The editor panel](main.md) › UC-EDITOR-PANEL-043
+
+# UC-EDITOR-PANEL-043: Run one test case's automation
+
+**As a** tester, **I want** to run the generated method for a test case and have
+its run item status land in this test run, **so that** I do not have to judge by
+hand what the machine can judge.
+
+The machine runs the test and writes the run item status. The tester does not
+press `P` or `F`.
+
+`F5` on the selection.
+
+## Rules
+
+- **Rule-EDITOR-PANEL-001** — A test set opens in one editor and a test run in
+  another. Both are the same shape: a toolbar on top, the rows in the middle, a
+  status bar at the bottom.
+- **Rule-EDITOR-PANEL-002** — Both editors open showing cards. The grid is built
+  the first time the tester asks for it.
+- **Rule-EDITOR-PANEL-003** — A card is drawn to the width of the list. A title
+  too long for that width wraps onto more lines, and the cards never scroll
+  sideways.
+- **Rule-EDITOR-PANEL-004** — A page holds 50 test cases until the tester says
+  otherwise. The most a page can hold is 1000.
+- **Rule-EDITOR-PANEL-005** — What the tester types is stored exactly. Testin
+  may draw it differently, and never saves the drawn form.
+- **Rule-EDITOR-PANEL-006** — A save that would leave the file as it is writes
+  nothing, and says nothing.
+- **Rule-EDITOR-PANEL-007** — Each editor keeps an undo history of its own, and
+  the tree keeps another.
+- **Rule-EDITOR-PANEL-008** — Every change confirms itself with one message in
+  the past tense. A change to several test cases gets one message with a count.
+- **Rule-EDITOR-PANEL-009** — Moving the view says nothing and changes nothing.
+  Paging, filtering, searching and opening the details panel are all silent.
+  None of them throws a filter away: a test case the filter is hiding is
+  reported rather than brought into view.
+- **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
+  that would act on the row is refused.
+- **Rule-EDITOR-PANEL-180** — This editor claims each test case first, so the
+  run item status comes back to this test run and not to another editor showing
+  the same test case.
+- **Rule-EDITOR-PANEL-181** — Claiming marks the test run **In Progress** if it
+  is not already.
+- **Rule-EDITOR-PANEL-182** — A run item status from the automation is written
+  the same way a run item status set from the keyboard is.
+- **Rule-EDITOR-PANEL-183** — The framework's own timing replaces whatever the
+  clock counted.
+- **Rule-EDITOR-PANEL-220** — A failure from the automation clears what the last
+  failure said happened - the actual result, the error and its screenshots -
+  before it writes its own, and keeps the bug severity, the bug priority and the
+  bug issue link. The message that names what a pass cleared names what it
+  cleared too.
+- **Rule-EDITOR-PANEL-241** — Running a judged row again records the new run
+  item status against the test case as it is now.
+- **Rule-EDITOR-PANEL-242** — A status from the automation for the test case the
+  walk is on moves the walk to the next test case waiting for a run item status,
+  exactly as the tester's own run item status does, and execution goes on. Until
+  the status comes, the walk stays on that test case.
+- **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
+  it loses its hover look at once, so a control that has stopped working never
+  looks ready to press.
+- **Rule-EDITOR-PANEL-249** — A grid that held the keyboard when it was rebuilt
+  holds it again afterward, so the next key lands in the grid rather than
+  nowhere.
+- **Rule-EDITOR-PANEL-250** — A grid row is drawn in its stripe, or in the
+  selection color while it is selected, and in nothing else. The pointer passing
+  over it changes nothing.
+- **Rule-EDITOR-PANEL-251** — When the status bar is too narrow for everything,
+  the figures on the right give way first, then the sentence on the left down to
+  a short floor, and the page arrows keep their width to the last.
+- **Rule-EDITOR-PANEL-252** — A badge's words are printed white or dark,
+  whichever reads on its color, so a pale badge never carries white text.
+- **Rule-EDITOR-PANEL-257** — An editor narrower than its toolbar or its status
+  bar scrolls that bar sideways under the pointer, with the mouse wheel or a
+  touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
+  is cut off and the editor below does not move.
+
+## What the tester sees
+
+This opens no screen of Testin's own. The selected cards turn to running at
+once, and the IDE's own run window opens below the editor.
+
+Each result comes back on its own and its card takes the new run item status.
+Nothing is said per test case. When the last one is in, one small message
+appears at the bottom of the IDE and fades. It reads a figure for each run item
+status the test run now carries, such as *Passed 42, Failed 8*. Those are the
+status bar's own words, so the message and the bar cannot count one test run
+differently.
+
+## Main flow
+
+1. The tester selects three test cases in the test run and presses `F5`.
+2. Testin claims all three for this editor.
+3. The cards turn to running at once.
+4. The three are handed to TestNG as one configuration.
+5. A message reads *Running 3*.
+6. Each result comes back and is written into the test run, silently.
+7. When the last one is in, one message reads the whole test run's figures, such
+   as *Passed 42, Failed 8*.
+
+**During a walk** ([UC-EDITOR-PANEL-031](startExecution.md)), running the test
+case the walk is on keeps the walk there, its clock counting, until the status
+comes back. The status then moves the walk to the next test case waiting for a
+run item status, as the tester's own run item status does, and execution goes on
+(Rule-EDITOR-PANEL-242). The time recorded is still the framework's own
+(Rule-EDITOR-PANEL-183).
+
+Everything about how the execution is built and named is on
+[UC-CODEGEN-008](../codegen/runAutomation.md).
+
+## What is recorded
+
+| Written                         | From                                           |
+|---------------------------------|------------------------------------------------|
+| The run item status             | Whether the framework said it passed or failed |
+| The duration                    | The framework's own timing                     |
+| The actual result and the error | The framework's message and stacktrace         |
+| Who ran it, and when            | The name on the settings page, and now         |
+
+A failure clears what the last failure said happened first: the actual result,
+the error and the screenshots pasted with it. It keeps the bug severity, the bug
+priority and the bug issue link, because the same test case failing again is
+most often the same bug. A message titled **Failure detail cleared** names what
+went, as it does for a pass.
+
+A result with no message and no error does not clear what the tester wrote by
+hand.
+
+## What Testin refuses
+
+**If the test run is completed or closed** — the result is ignored. This is the
+one path that respects a signed off test run.
+
+**If the test case is not covered by this test run** — the result is ignored.
+
+**If a test case has no generated method** — it is dropped and a message says
+so. The others still run.
+
+## Where the plugin breaks its own rules
+
+**An automated run item status still clears the tester's notes.** A pass clears
+all of them and a failure clears what happened. Each now says so afterward, in a
+message titled **Failure detail cleared** that names what went and stays in the
+notification list. The dialog that asks first is still on the keyboard path
+only. That is difference 26.
+
+**Closing the tab stops the automation this editor started.** It is the same
+gesture as pressing **Stop Execution**, so the results of tests still running
+are lost, exactly as a stop loses them.
+
+---
+
+[Documentation](../README.md) › [The editor panel](main.md)

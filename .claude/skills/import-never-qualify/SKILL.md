@@ -9,20 +9,20 @@ A class is written by its simple name, and the import says where it comes from:
 
 ```java
 // no
-void pending(final org.testin.model.TestStatus passed) {
+void pending(final org.testin.model.RunItemStatus passed) {
     final TestRunItems item = TestRunItems.builder().build().showing(java.util.Optional.of(passed));
-    assertEquals(item.getStatus(), org.testin.model.TestStatus.PENDING);
+    assertEquals(item.getStatus(), org.testin.model.RunItemStatus.PENDING);
 }
 ```
 
 ```java
 // yes
 import java.util.Optional;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 
-void pending(final TestStatus passed) {
+void pending(final RunItemStatus passed) {
     final TestRunItems item = TestRunItems.builder().build().showing(Optional.of(passed));
-    assertEquals(item.getStatus(), TestStatus.PENDING);
+    assertEquals(item.getStatus(), RunItemStatus.PENDING);
 }
 ```
 

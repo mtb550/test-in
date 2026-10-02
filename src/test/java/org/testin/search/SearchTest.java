@@ -63,8 +63,8 @@ public class SearchTest {
 
         final Hit hit = Hit.of(tc);
 
-        assertSame(hit.node(), login, "a case is not a node of its own, so the tree goes to its set");
-        assertEquals(hit.testCase(), Optional.of(tc), "and the editor lands on the case");
+        assertSame(hit.node(), login, "a test case is not a node of its own, so the tree goes to its set");
+        assertEquals(hit.testCase(), Optional.of(tc), "and the editor lands on the test case");
         assertEquals(hit.name(), "Sign in with a valid user");
     }
 
@@ -85,7 +85,7 @@ public class SearchTest {
 
         assertEquals(Hit.of(login).where(), "test-01 > Test Cases > Auth > Login");
         assertEquals(Hit.of(testCase("Sign in", login)).where(), "test-01 > Test Cases > Auth > Login",
-                "three cases can be called the same thing in three sets, so the row has to say which");
+                "three test cases can be called the same thing in three sets, so the row has to say which");
     }
 
     @Test
@@ -175,8 +175,8 @@ public class SearchTest {
 
     @Test
     public void onlyTestSetsAndTestRunsHaveAnEditorToOpen() {
-        assertTrue(testSet("Login", "test-01").isOpenableInEditor(), "a test set opens the test editor");
-        assertTrue(TestRunDirectoryDto.builder().build().isOpenableInEditor(), "a run opens the run editor");
+        assertTrue(testSet("Login", "test-01").isOpenableInEditor(), "a test set opens the test case editor");
+        assertTrue(TestRunDirectoryDto.builder().build().isOpenableInEditor(), "a test run opens the test run editor");
     }
 
     @Test

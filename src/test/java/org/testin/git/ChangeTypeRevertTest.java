@@ -125,7 +125,7 @@ public class ChangeTypeRevertTest {
 
         assertEquals(current.getCreatedBy(), committed.getCreatedBy());
         assertEquals(current.getCreatedAt(), committed.getCreatedAt());
-        assertEquals(current.getUpdatedBy(), committed.getUpdatedBy(), "the reverting tester's stamp stayed on a case nobody changed");
+        assertEquals(current.getUpdatedBy(), committed.getUpdatedBy(), "the reverting tester's stamp stayed on a test case nobody changed");
         assertEquals(current.getUpdatedAt(), committed.getUpdatedAt());
     }
 

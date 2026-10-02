@@ -26,19 +26,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public record OpenBug(@NotNull Path runPath, @NotNull TestRunItems item) {
+public record OpenBug(@NotNull Path testRunPath, @NotNull TestRunItems item) {
     // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-064
-    public static @NotNull List<OpenBug> of(final @NotNull Map<Path, TestRunDto> runs, final @NotNull UUID testCaseId) {
-        return runs.entrySet().stream()
-                .flatMap(run -> run.getValue().resultOf(testCaseId)
+    public static @NotNull List<OpenBug> of(final @NotNull Map<Path, TestRunDto> testRuns, final @NotNull UUID testCaseId) {
+        return testRuns.entrySet().stream()
+                .flatMap(testRun -> testRun.getValue().resultOf(testCaseId)
                         .filter(FailureDetail::recordsABug)
-                        .map(item -> new OpenBug(run.getKey(), item))
+                        .map(item -> new OpenBug(testRun.getKey(), item))
                         .stream())
                 .sorted(Comparator.comparing((OpenBug bug) -> bug.item().getExecutedAt()).reversed())
                 .toList();
     }
 
-    public @NotNull String runName() {
-        return Optional.ofNullable(runPath.getFileName()).map(Path::toString).orElse(runPath.toString());
+    public @NotNull String testRunName() {
+        return Optional.ofNullable(testRunPath.getFileName()).map(Path::toString).orElse(testRunPath.toString());
     }
 }

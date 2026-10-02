@@ -136,14 +136,14 @@ public class PendingChangeFactoryTest {
                 DiffType.MODIFIED, before, after, Path.of("Test Runs", "cycle 4", testCaseId + ".ri"), RealMapper.build(), _ -> Optional.empty());
 
         assertEquals(change.subject(), ChangeSubject.RUN_ITEM);
-        assertEquals(change.testCaseId(), testCaseId.toString(), "the result says which case it is about");
-        assertFalse(change.isRevertible(), "a verdict is a record of work, not an edit to undo");
-        assertFalse(change.fieldChanges().isEmpty(), "and the row says what the verdict became");
+        assertEquals(change.testCaseId(), testCaseId.toString(), "the result says which test case it is about");
+        assertFalse(change.isRevertible(), "a run item status is a record of work, not an edit to undo");
+        assertFalse(change.fieldChanges().isEmpty(), "and the row says what the run item status became");
         assertEquals(change.fieldChanges().getFirst().newValue(), "Passed");
     }
 
     @Test
-    public void aRunsMarkerSaysWhichOfItsFactsChanged() {
+    public void aTestRunsMarkerSaysWhichOfItsFactsChanged() {
         final PendingChange change = PendingChangeFactory.fromFile(
                 DiffType.MODIFIED,
                 "{\"status\":\"CREATED\",\"createdBy\":\"mtb\",\"configuration\":{\"PLATFORM\":\"Web\"}}",
@@ -201,10 +201,10 @@ public class PendingChangeFactoryTest {
                 .name(), "added");
 
         assertEquals(PendingChangeFactory.fromFile(DiffType.DELETED, json(before), "", PATH, RealMapper.build(), _ -> Optional.empty())
-                .name(), "before", "a deletion is about the case that was there");
+                .name(), "before", "a deletion is about the test case that was there");
 
         assertEquals(PendingChangeFactory.fromFile(DiffType.MODIFIED, json(before), json(after), PATH, RealMapper.build(), _ -> Optional.empty())
-                .name(), "after", "a modification is about the case as it is now");
+                .name(), "after", "a modification is about the test case as it is now");
     }
 
     @Test

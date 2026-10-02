@@ -69,7 +69,7 @@ table; this is all of them together.
 
 ## The editor panel: writing test cases
 
-On the cards of a test set editor.
+On the cards of a test case editor.
 
 | Key                                 | What it does                                    |
 |-------------------------------------|-------------------------------------------------|
@@ -87,11 +87,12 @@ On the cards of a test run editor.
 | `P`         | Records **Passed**                                                                        |
 | `F`         | Records **Failed**, and asks why                                                          |
 | `B`         | Records **Blocked**                                                                       |
-| `F2`        | Changes the failure details without changing the verdict                                  |
+| `F2`        | Changes the failure details without changing the run item status                          |
 | `Alt+Enter` | In the failure details, offers the corrections for a misspelled word in the actual result |
 
-`P` and `B` mean a field in the test set editor and a verdict in the test run
-editor. They are different keys on different screens, not one key with two jobs.
+`P` and `B` mean a field in the test case editor and a run item status in the
+test run editor. They are different keys on different screens, not one key with
+two jobs.
 
 ## Light mode
 
@@ -99,7 +100,7 @@ The always on top window, which has its own keys.
 
 | Key             | What it does                                                                           |
 |-----------------|----------------------------------------------------------------------------------------|
-| `P` `F` `B`     | The three verdicts, as on the cards                                                    |
+| `P` `F` `B`     | The three run item statuses, as on the cards                                           |
 | `Enter`         | Saves the failure detail and moves on                                                  |
 | `Escape`        | Leaves the failure form, or closes the window                                          |
 | `Alt+Enter`     | In the failure form, offers the corrections for a misspelled word in the actual result |
@@ -212,16 +213,16 @@ Testin**, where any key can be put on it. Thirty-one entries are declared: 29
 actions, and two more that each stand for a list and become one entry per
 status. Nine of them carry a default key, on seven keys:
 
-| Key                        | The action                                                | Where it works                                                                                                                                 |
-|----------------------------|-----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
-| `Ctrl+Alt+F`               | Search Test Project                                       | Anywhere in the IDE                                                                                                                            |
-| `Ctrl+M`, `Cmd+M` on a Mac | Create Test Case                                          | A test set editor. Create Testin Node is declared with no key - it is in Find Action and the Keymap page, so a tester who wants one can set it |
-| `Shift+F6`                 | Rename Testin Node                                        | The tree                                                                                                                                       |
-| `F2`                       | Update Test Case, Failed Test Case Details, Edit Test Run | Both editors, the view panel, and the tree                                                                                                     |
-| *none by default*          | Copy, Cut and Paste Test Case                             | Both editors. Declared with no key, so Find Action offers them and a tester who wants one can set it                                           |
-| `F5`                       | Run Test Method                                           | Both editors and the view panel                                                                                                                |
-| `Shift+F5`                 | Navigate to Test Method                                   | Both editors and the view panel                                                                                                                |
-| `F12`, `Cmd+F12` on a Mac  | Automate Test Case                                        | Both editors                                                                                                                                   |
+| Key                        | The action                                                | Where it works                                                                                                                                  |
+|----------------------------|-----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Ctrl+Alt+F`               | Search Test Project                                       | Anywhere in the IDE                                                                                                                             |
+| `Ctrl+M`, `Cmd+M` on a Mac | Create Test Case                                          | A test case editor. Create Testin Node is declared with no key - it is in Find Action and the Keymap page, so a tester who wants one can set it |
+| `Shift+F6`                 | Rename Testin Node                                        | The tree                                                                                                                                        |
+| `F2`                       | Update Test Case, Failed Test Case Details, Edit Test Run | Both editors, the view panel, and the tree                                                                                                      |
+| *none by default*          | Copy, Cut and Paste Test Case                             | Both editors. Declared with no key, so Find Action offers them and a tester who wants one can set it                                            |
+| `F5`                       | Run Test Method                                           | Both editors and the view panel                                                                                                                 |
+| `Shift+F5`                 | Navigate to Test Method                                   | Both editors and the view panel                                                                                                                 |
+| `F12`, `Cmd+F12` on a Mac  | Automate Test Case                                        | Both editors                                                                                                                                    |
 
 Rebinding one of these moves it everywhere it works at once, including the
 tooltips and status bars that print it — those ask the keymap rather than
@@ -264,7 +265,7 @@ particular thing is on screen.
 |-------------------------------------------------------------------------|------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `D` `E` `M` `T` `B` `S` `P` `G` `O`                                     | The update menu, and a selected card           | Bare letters that stand for a field. They mean nothing outside a test case, and in the Keymap they would answer while a tester types                                 |
 | `A` `D` `E` `S` `B` `T` `P` `M` `G` `U` `R` `F` `I` `H`                 | The copy menu                                  | The same, for the fourteen values a copy can take                                                                                                                    |
-| `1` `2` `3`                                                             | The test run status popup                      | Numbers standing for the three run statuses, live only while that popup is open                                                                                      |
+| `1` `2` `3`                                                             | The test run status popup                      | Numbers standing for the three test run statuses, live only while that popup is open                                                                                 |
 | `Ctrl+D` `Ctrl+E` `Ctrl+M` `Ctrl+S` `Ctrl+T` `Ctrl+B` `Ctrl+G` `Ctrl+P` | The create and update test case dialogs        | Each opens one field of the dialog in front of the tester. Outside it there is no field to open                                                                      |
 | `Tab` `Shift+Tab` `Up` `Down` `Space`                                   | Any dialog                                     | Moving between fields and choices is the platform's own gesture, not a command                                                                                       |
 | `Tab` `Shift+Tab`                                                       | The view panel                                 | Moving between its three tabs, which exist only there                                                                                                                |

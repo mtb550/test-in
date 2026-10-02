@@ -28,7 +28,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -64,7 +64,7 @@ public class TestRunDto {
 
         wanted.stream()
                 .filter(id -> !held.containsKey(id))
-                .forEach(id -> covered.add(new TestRunItems().setId(id).setStatus(TestStatus.PENDING)));
+                .forEach(id -> covered.add(new TestRunItems().setId(id).setStatus(RunItemStatus.PENDING)));
 
         return new TestRunDto().setResults(covered);
     }

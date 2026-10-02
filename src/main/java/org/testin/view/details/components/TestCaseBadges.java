@@ -19,7 +19,7 @@ package org.testin.view.details.components;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.RunStatus;
+import org.testin.model.ExecutionStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.Services;
@@ -38,8 +38,8 @@ public final class TestCaseBadges {
 
         final @NotNull List<Badge> badges = Badges.testCaseBadges(dto);
 
-        final @NotNull RunStatus tempStatus = Services.getInstance(p, TestNGExecution.class).statusOf(dto);
-        if (tempStatus.hasBadge()) badges.add(Badges.createRunStatusBadge(tempStatus.getBadge()));
+        final @NotNull ExecutionStatus tempStatus = Services.getInstance(p, TestNGExecution.class).statusOf(dto);
+        if (tempStatus.hasBadge()) badges.add(Badges.createExecutionStatusBadge(tempStatus.getBadge()));
 
         Badges.showBadges(badgesPanel, badges);
 

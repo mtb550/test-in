@@ -281,7 +281,7 @@ The report lands in `.inspection/`, deliberately outside `build/` so
 `./gradlew clean` does not delete the list you are working from. Start with
 `summary.txt` for the counts and `findings.txt` for the lines.
 
-**An "unused" verdict is evidence, not a fact.** Two runs minutes apart over the
+**An "unused" result is evidence, not a fact.** Two runs minutes apart over the
 same tree returned 74 findings and 13. The 74 included a whole cascade — three
 classes and twenty-eight unused imports — that the second run did not reproduce
 and that reading the code disproved: a global unused check depends on how far the
@@ -295,7 +295,7 @@ string a tester reads should have one owner; the number may go down and never up
 
 | Workflow      | When                                                                                                                                                                                                                                                                                                               |
 |---------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `build.yml`   | Every push to `main` and every pull request. Compiles, runs the unit tests, the complexity gate and the IDE tests, and verifies against **IntelliJ IDEA** - the one verdict that turns a pull request red                                                                                                          |
+| `build.yml`   | Every push to `main` and every pull request. Compiles, runs the unit tests, the complexity gate and the IDE tests, and verifies against **IntelliJ IDEA** - the one result that turns a pull request red                                                                                                           |
 | `verify.yml`  | Every push to `main`, plus every second day and on demand. The same verifier against **all six targets** - IntelliJ IDEA, PyCharm and Rider at both ends of the 262 branch - compared against `.github/verification-baseline.txt`. This is the number the JetBrains Marketplace shows a tester before they install |
 | `inspect.yml` | Every push, on every branch, and on demand                                                                                                                                                                                                                                                                         |
 

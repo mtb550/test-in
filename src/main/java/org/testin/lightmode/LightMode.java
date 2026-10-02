@@ -19,7 +19,7 @@ package org.testin.lightmode;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.run.RunEditor;
+import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 
 import java.util.Optional;
@@ -29,12 +29,12 @@ public final class LightMode implements Disposable {
     private @NotNull Optional<LightModeWindow> window = Optional.empty();
 
     // UC-EDITOR-PANEL-046
-    public void toggle(final @NotNull RunEditor editor, final @NotNull Runnable onChange) {
-        final boolean wasShowingThisRun = isOpenOn(editor.getParent());
+    public void toggle(final @NotNull TestRunEditor editor, final @NotNull Runnable onChange) {
+        final boolean wasShowingThisTestRun = isOpenOn(editor.getParent());
 
         window.ifPresent(LightModeWindow::close);
 
-        if (!wasShowingThisRun) {
+        if (!wasShowingThisTestRun) {
             window = Optional.of(new LightModeWindow(editor, () -> {
                 window = Optional.empty();
                 onChange.run();
@@ -45,34 +45,34 @@ public final class LightMode implements Disposable {
     }
 
     // UC-EDITOR-PANEL-046
-    public void refresh(final @NotNull TestRunDirectoryDto run) {
-        if (!run.isStillOpen()) {
-            closeIfShowing(run);
+    public void refresh(final @NotNull TestRunDirectoryDto testRun) {
+        if (!testRun.isStillOpen()) {
+            closeIfShowing(testRun);
             return;
         }
 
-        window.filter(open -> open.shows(run)).ifPresent(LightModeWindow::refresh);
+        window.filter(open -> open.shows(testRun)).ifPresent(LightModeWindow::refresh);
     }
 
-    private void closeIfShowing(final @NotNull TestRunDirectoryDto run) {
-        window.filter(open -> open.shows(run)).ifPresent(LightModeWindow::close);
+    private void closeIfShowing(final @NotNull TestRunDirectoryDto testRun) {
+        window.filter(open -> open.shows(testRun)).ifPresent(LightModeWindow::close);
     }
 
     // UC-EDITOR-PANEL-046
-    public void editorClosing(final @NotNull TestRunDirectoryDto run) {
-        window.filter(open -> open.shows(run)).ifPresent(open -> {
+    public void editorClosing(final @NotNull TestRunDirectoryDto testRun) {
+        window.filter(open -> open.shows(testRun)).ifPresent(open -> {
             open.closeQuietly();
             window = Optional.empty();
         });
     }
 
     // UC-EDITOR-PANEL-046
-    public void tick(final @NotNull TestRunDirectoryDto run) {
-        window.filter(open -> open.shows(run)).ifPresent(LightModeWindow::tick);
+    public void tick(final @NotNull TestRunDirectoryDto testRun) {
+        window.filter(open -> open.shows(testRun)).ifPresent(LightModeWindow::tick);
     }
 
-    public boolean isOpenOn(final @NotNull TestRunDirectoryDto run) {
-        return window.filter(open -> open.shows(run)).isPresent();
+    public boolean isOpenOn(final @NotNull TestRunDirectoryDto testRun) {
+        return window.filter(open -> open.shows(testRun)).isPresent();
     }
 
     @Override

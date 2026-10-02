@@ -329,10 +329,10 @@ final class IndexerDataStore {
             testRunsDirByPath.remove(key);
         }
 
-        final @NotNull List<String> toRemoveRuns = testRunsByPath.keySet().stream()
+        final @NotNull List<String> toRemoveTestRuns = testRunsByPath.keySet().stream()
                 .filter(key -> Path.of(key).startsWith(path))
                 .toList();
-        for (final String key : toRemoveRuns) {
+        for (final String key : toRemoveTestRuns) {
             testRunsByPath.remove(key);
         }
     }
@@ -400,8 +400,8 @@ final class IndexerDataStore {
     }
 
     // Rule-INTERNAL-083, Rule-INTERNAL-090
-    boolean persistRunMarker(final @NotNull Path runPath) {
-        return findTestRunDir(runPath).map(this::persistMarker).orElse(false);
+    boolean persistTestRunMarker(final @NotNull Path testRunPath) {
+        return findTestRunDir(testRunPath).map(this::persistMarker).orElse(false);
     }
 
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {

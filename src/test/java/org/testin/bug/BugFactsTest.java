@@ -20,7 +20,7 @@ import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testng.annotations.Test;
@@ -37,20 +37,20 @@ import static org.testng.Assert.assertEquals;
 public class BugFactsTest {
 
     @Test
-    public void theFactsAreReadOffTheRunItemItsTestCaseAndItsRun() {
+    public void theFactsAreReadOffTheRunItemItsTestCaseAndItsTestRun() {
         final UUID id = UUID.randomUUID();
         final TestCaseDto tc = TestCaseDto.builder().id(id).description("  Log in with a valid user ").expectedResult("Welcome")
                 .steps(List.of("Open", "Log in")).testData("user=a").build();
-        final TestRunItems item = TestRunItems.builder().id(id).status(TestStatus.FAILED).actualResult("Error page")
+        final TestRunItems item = TestRunItems.builder().id(id).status(RunItemStatus.FAILED).actualResult("Error page")
                 .bugSeverity(BugSeverity.MAJOR).bugPriority(BugPriority.HIGH).stacktrace("boom")
                 .executedBy("Muteb").executedAt(ZonedDateTime.of(2026, 9, 13, 14, 14, 0, 0, ZoneId.of("Asia/Riyadh"))).build();
-        final TestRunMarker run = new TestRunMarker();
-        run.setConfiguration(new EnumMap<>(Map.of(
+        final TestRunMarker testRunMarker = new TestRunMarker();
+        testRunMarker.setConfiguration(new EnumMap<>(Map.of(
                 TestRunConfiguration.PLATFORM, "Web",
                 TestRunConfiguration.BROWSER, "Chrome",
                 TestRunConfiguration.COMMIT_ID, "933a3984")));
 
-        final BugFacts facts = BugFacts.of(item, tc, run, "Sprint 7", List.of());
+        final BugFacts facts = BugFacts.of(item, tc, testRunMarker, "Sprint 7", List.of());
 
         assertEquals(facts.title(), "Log in with a valid user.", "the description as the Details tab shows it");
         assertEquals(facts.expectedResult(), "Welcome.");

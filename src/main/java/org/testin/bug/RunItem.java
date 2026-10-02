@@ -19,23 +19,23 @@ package org.testin.bug;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestRunDto;
 
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
 
-public record RunItem(@NotNull Path run, @NotNull UUID id) {
+public record RunItem(@NotNull Path testRunPath, @NotNull UUID id) {
     public @NotNull Optional<TestRunItems> in(final @NotNull TestRunDto testRun) {
         return testRun.resultOf(id).filter(result -> !result.isRemoved());
     }
 
     public @NotNull Optional<TestRunItems> failedIn(final @NotNull TestRunDto testRun) {
-        return in(testRun).filter(result -> result.getStatus() == TestStatus.FAILED);
+        return in(testRun).filter(result -> result.getStatus() == RunItemStatus.FAILED);
     }
 
     public @NotNull Optional<TestRunItems> stillFailed(final @NotNull TestRuns testRuns) {
-        return testRuns.findTestRun(run).flatMap(this::failedIn);
+        return testRuns.findTestRun(testRunPath).flatMap(this::failedIn);
     }
 }

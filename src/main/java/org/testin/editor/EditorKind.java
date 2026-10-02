@@ -19,8 +19,8 @@ package org.testin.editor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.run.RunEditor;
-import org.testin.editor.test.TestEditor;
+import org.testin.editor.testrun.TestRunEditor;
+import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.util.Bundle;
@@ -32,12 +32,12 @@ public enum EditorKind {
     // UC-EDITOR-PANEL-001
     TEST(
             "test",
-            new EditorType("Test Case", Bundle.message("editor.type.case.description"), DirectoryType.TS.getIcon(), TestEditor::new)
+            new EditorType("Test Case", Bundle.message("editor.type.test.case.description"), DirectoryType.TS.getIcon(), TestCaseEditor::new)
     ),
 
     RUN(
             "run",
-            new EditorType("Test Run", Bundle.message("editor.type.run.description"), DirectoryType.TR.getIcon(), RunEditor::new)
+            new EditorType("Test Run", Bundle.message("editor.type.test.run.description"), DirectoryType.TR.getIcon(), TestRunEditor::new)
     );
 
     // Rule-EDITOR-PANEL-001

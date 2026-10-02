@@ -30,7 +30,7 @@ public class PreviousTestCaseAction extends DumbAwareAction {
     private final @NotNull ViewPagination controller;
 
     public PreviousTestCaseAction(final @NotNull ViewPagination controller, final @NotNull JComponent component) {
-        super(Bundle.message("page.previous.case"), Bundle.message("page.previous.case.description"), AllIcons.Actions.Back);
+        super(Bundle.message("page.previous.test.case"), Bundle.message("page.previous.test.case.description"), AllIcons.Actions.Back);
         this.controller = controller;
 
         this.registerCustomShortcutSet(Shortcuts.Previous.getCustomShortcut(), component);

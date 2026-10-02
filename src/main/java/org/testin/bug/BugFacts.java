@@ -25,7 +25,7 @@ import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.report.generators.ReportText;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.util.Display;
 
 import java.util.List;
@@ -34,24 +34,24 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 public record BugFacts(@NotNull String title, @NotNull BugSeverity severity, @NotNull BugPriority priority, @NotNull String platform, @NotNull String actualResult, @NotNull String expectedResult, @NotNull List<String> steps, @NotNull String testData, @NotNull String stacktrace, @NotNull List<byte[]> screenshots, @NotNull String testRun, @NotNull String executed, @NotNull String browser, @NotNull String device, @NotNull String language, @NotNull String commit, @NotNull UUID testCaseId, @NotNull String testSetName) {
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-068
-    public static @NotNull BugFacts of(final @NotNull TestRunItems item, final @NotNull TestCaseDto tc, final @NotNull TestRunMarker run, final @NotNull String testRun, final @NotNull List<byte[]> screenshots) {
+    public static @NotNull BugFacts of(final @NotNull TestRunItems item, final @NotNull TestCaseDto tc, final @NotNull TestRunMarker testRunMarker, final @NotNull String testRun, final @NotNull List<byte[]> screenshots) {
         return new BugFacts(
-                TestEditorAttributes.DESCRIPTION.displayValue(tc),
+                TestCaseEditorAttributes.DESCRIPTION.displayValue(tc),
                 item.getBugSeverity(),
                 item.getBugPriority(),
-                ReportText.joined(BugTemplate.SEPARATOR, TestRunConfiguration.PLATFORM.valueIn(run), TestRunConfiguration.COMPONENT.valueIn(run)),
+                ReportText.joined(BugTemplate.SEPARATOR, TestRunConfiguration.PLATFORM.valueIn(testRunMarker), TestRunConfiguration.COMPONENT.valueIn(testRunMarker)),
                 item.getActualResult(),
-                TestEditorAttributes.EXPECTED_RESULT.displayValue(tc),
+                TestCaseEditorAttributes.EXPECTED_RESULT.displayValue(tc),
                 tc.getSteps().stream().map(Display::format).toList(),
                 tc.getTestData(),
                 item.getStacktrace(),
                 screenshots,
                 testRun,
                 ReportText.joined(BugTemplate.SEPARATOR, item.getExecutedBy(), Display.formatDate(item.getExecutedAt())),
-                TestRunConfiguration.BROWSER.valueIn(run),
-                TestRunConfiguration.DEVICE_TYPE.valueIn(run),
-                TestRunConfiguration.LANGUAGE.valueIn(run),
-                TestRunConfiguration.COMMIT_ID.valueIn(run),
+                TestRunConfiguration.BROWSER.valueIn(testRunMarker),
+                TestRunConfiguration.DEVICE_TYPE.valueIn(testRunMarker),
+                TestRunConfiguration.LANGUAGE.valueIn(testRunMarker),
+                TestRunConfiguration.COMMIT_ID.valueIn(testRunMarker),
                 tc.getId(),
                 tc.getParent().getName());
     }

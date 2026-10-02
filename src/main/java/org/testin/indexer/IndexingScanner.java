@@ -454,14 +454,14 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-011, Rule-INTERNAL-012
-    private @NotNull List<TestRunItems> resultsIn(final @NotNull Path runPath, final @NotNull ScannedProject scanned) {
+    private @NotNull List<TestRunItems> resultsIn(final @NotNull Path testRunPath, final @NotNull ScannedProject scanned) {
         final @NotNull List<TestRunItems> read = new ArrayList<>();
 
-        for (final Path file : testDataFiles.resultsIn(runPath)) {
+        for (final Path file : testDataFiles.resultsIn(testRunPath)) {
             // Rule-INTERNAL-094
             final @NotNull Optional<UUID> id = FileKind.RUN_ITEM.idIn(file);
             if (id.isEmpty()) {
-                scanned.getHandNamedResults().add(runPath.getFileName() + "/" + file.getFileName());
+                scanned.getHandNamedResults().add(testRunPath.getFileName() + "/" + file.getFileName());
                 continue;
             }
 
@@ -472,7 +472,7 @@ final class IndexingScanner {
 
             } catch (final Exception ex) {
                 Logger.error("Failed to read the result '" + file.toAbsolutePath() + "': " + FailureText.of(ex));
-                scanned.getUnreadableResults().add(runPath.getFileName() + "/" + file.getFileName());
+                scanned.getUnreadableResults().add(testRunPath.getFileName() + "/" + file.getFileName());
             }
         }
 

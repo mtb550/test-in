@@ -18,18 +18,18 @@ package org.testin.editor.toolbar.components;
 
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.run.RunEditor;
+import org.testin.editor.testrun.TestRunEditor;
 import org.testin.lightmode.LightMode;
 import org.testin.services.Services;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 
 public class LightModeBtn extends AbstractIconButton implements ToolbarItem {
-    private final @NotNull RunEditor editor;
+    private final @NotNull TestRunEditor editor;
     private final @NotNull LightMode lightMode;
 
     // UC-EDITOR-PANEL-046
-    public LightModeBtn(final @NotNull RunEditor editor) {
+    public LightModeBtn(final @NotNull TestRunEditor editor) {
         super(Bundle.message("toolbar.light.mode"), AllIcons.MeetNewUi.LightTheme);
         this.editor = editor;
         this.lightMode = Services.getInstance(editor.getProject(), LightMode.class);

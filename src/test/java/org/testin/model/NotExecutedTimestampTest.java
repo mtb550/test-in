@@ -40,10 +40,10 @@ public class NotExecutedTimestampTest {
     }
 
     @Test
-    public void aVerdictGivesTheTestCaseARealTime() {
+    public void aRunItemStatusGivesTheTestCaseARealTime() {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
 
-        item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", new TestCaseDto());
 
         assertFalse(Config.isNotExecuted(item.getExecutedAt()));
         assertFalse(Display.formatDate(item.getExecutedAt()).isEmpty());
@@ -58,38 +58,38 @@ public class NotExecutedTimestampTest {
     }
 
     @Test
-    public void aFreshRunHasNeitherStartedNorEnded() {
-        final TestRunMarker run = new TestRunMarker();
+    public void aFreshTestRunHasNeitherStartedNorEnded() {
+        final TestRunMarker testRun = new TestRunMarker();
 
-        assertEquals(Display.formatDate(run.getExecutionStartedAt()), "");
-        assertEquals(Display.formatDate(run.getExecutionEndedAt()), "");
+        assertEquals(Display.formatDate(testRun.getExecutionStartedAt()), "");
+        assertEquals(Display.formatDate(testRun.getExecutionEndedAt()), "");
     }
 
     @Test
-    public void aRunThatNeverStartedHasNoEndToStamp() {
-        final TestRunMarker run = new TestRunMarker();
+    public void aTestRunThatNeverStartedHasNoEndToStamp() {
+        final TestRunMarker testRun = new TestRunMarker();
 
-        run.markExecutionEnded();
+        testRun.markExecutionEnded();
 
-        assertEquals(Display.formatDate(run.getExecutionEndedAt()), "");
+        assertEquals(Display.formatDate(testRun.getExecutionEndedAt()), "");
     }
 
     @Test
     public void theFirstStartIsKeptAndTheLastEndWins() {
         try {
-            final TestRunMarker run = new TestRunMarker();
+            final TestRunMarker testRun = new TestRunMarker();
 
-            run.markExecutionStarted();
-            final ZonedDateTime firstStart = run.getExecutionStartedAt();
-            run.markExecutionEnded();
-            final ZonedDateTime firstEnd = run.getExecutionEndedAt();
+            testRun.markExecutionStarted();
+            final ZonedDateTime firstStart = testRun.getExecutionStartedAt();
+            testRun.markExecutionEnded();
+            final ZonedDateTime firstEnd = testRun.getExecutionEndedAt();
 
             Thread.sleep(1100);
-            run.markExecutionStarted();
-            run.markExecutionEnded();
+            testRun.markExecutionStarted();
+            testRun.markExecutionEnded();
 
-            assertEquals(run.getExecutionStartedAt(), firstStart, "a resumed run still started when it started");
-            assertTrue(run.getExecutionEndedAt().isAfter(firstEnd), "the run ended when it last stopped");
+            assertEquals(testRun.getExecutionStartedAt(), firstStart, "a resumed test run still started when it started");
+            assertTrue(testRun.getExecutionEndedAt().isAfter(firstEnd), "the test run ended when it last stopped");
         } catch (final InterruptedException ex) {
             throw new AssertionError(ex);
         }

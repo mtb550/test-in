@@ -82,7 +82,7 @@ Nothing. Any width can be dragged.
 ## What is remembered separately
 
 A width is remembered per column name and per kind of editor. The Description
-column in a test set editor and the Description column in a test run editor are
+column in a test case editor and the Description column in a test run editor are
 remembered apart, so the two can be different widths.
 
 ---

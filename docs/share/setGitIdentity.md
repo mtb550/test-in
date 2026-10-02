@@ -94,9 +94,9 @@ reason.
 ## This is not the tester name
 
 Testin has a tester name of its own, on the settings page. It stamps that name
-on test cases and verdicts. The name here is Git's, and it is used only on
-commits. The two can be different, and nothing keeps them the same. The Testin
-one is [UC-SETTING-004](../setting/setTesterName.md).
+on test cases and run item statuses. The name here is Git's, and it is used only
+on commits. The two can be different, and nothing keeps them the same. The
+Testin one is [UC-SETTING-004](../setting/setTesterName.md).
 
 ---
 

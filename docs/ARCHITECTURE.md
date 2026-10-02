@@ -51,8 +51,8 @@ explorer          editor           view          lightmode      the surfaces
 
 Two content modules sit outside this entirely, loaded only where their platform
 plugin is: `testin-java` writes and reconciles the generated Java, and
-`testin-testng` starts a TestNG run. The core declares extension points and never
-learns whether anything answered — see [The two content
+`testin-testng` starts a TestNG execution. The core declares extension points
+and never learns whether anything answered — see [The two content
 modules](#the-two-content-modules).
 
 ### The layers and what each is allowed to do
@@ -92,8 +92,8 @@ were one concern split over two names - `run` started an execution and `runner`
 watched it - and a side module owning the actions that invoke it is what `git`
 and `importexport` already do. What is left is a pair that cannot be confused:
 `runner` executes test cases, `testrun` is the test run a tester creates, names
-and records verdicts into. Merging those two would lose the distinction, which
-is why the triple folded to two rather than to one.
+and records run item statuses into. Merging those two would lose the
+distinction, which is why the triple folded to two rather than to one.
 
 `statusbar` left the table on the same day, and it was never the surface this
 picture drew. Nothing in Testin adds a widget to the IDE's status bar; what the
@@ -127,7 +127,7 @@ rather than listed one by one:
   gestures row and is infrastructure: everything that opens a dialog reaches it,
   which is what it is for.
 - **`testcase` and `testrun` hold vocabulary as well as operations.** #111 moved
-  `TestEditorAttributes` and `RunEditorAttributes` out of `model` into the
+  `TestCaseEditorAttributes` and `TestRunEditorAttributes` out of `model` into the
   packages that own those fields, so a feature asking what a test case's columns
   are now reaches the operations row to ask. `importexport` does it 30 times,
   `report` 8, `git` twice. That is what the move cost, and it is not a package
@@ -147,7 +147,7 @@ goes stale the same week (#66, findings 61 and 77).
 | `codegen/AutomationState`                                      | `navigate/CodeNavigation`           | Whether a test case has automation behind it is answered by resolving the generated method, and resolving is what `navigate` knows how to do.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `codegen/ExecutionPosition`                                    | `testcase/TestCaseOrder`            | The number a generated method carries is the test case's place in its set, and the set's order is `testcase`'s answer. The third shape above, in one import.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `actions/TestinData`, `actions/Declared`                       | `editor`, `model`, `util`, `logger` | Deliberate, and new with #119. A declared action is built by the platform with a no-arg constructor, so it asks the surface that has the keyboard what is selected - and a data key has to name the type it answers with. `actions` was a leaf until then, and typing the keys as `Object` to keep it one would be worse than the edge.                                                                                                                                                                                                                                                                                                                                         |
-| `testcase/TestEditorAttributes`, `testrun/RunEditorAttributes` | `ui/Badges`                         | Deliberate. An enum carries its own presentation and its own action rather than being read by an `instanceof` chain at every call site — see the conventions in [CLAUDE.md](https://github.com/mtb550/test-in/blob/main/CLAUDE.md). What is new is where it points *from*: these two were in `model` until 11 September 2026, so the vocabulary every layer speaks pulled the badge painter in behind it (#111). A field of a test case is a fact about `testcase`. What is left is one import each, for the badge a card draws; the other four - `codegen`, `importexport`, `notifications`, `indexer` - are a feature calling a side module and a service, which points down. |
+| `testcase/TestCaseEditorAttributes`, `testrun/TestRunEditorAttributes` | `ui/Badges`                         | Deliberate. An enum carries its own presentation and its own action rather than being read by an `instanceof` chain at every call site — see the conventions in [CLAUDE.md](https://github.com/mtb550/test-in/blob/main/CLAUDE.md). What is new is where it points *from*: these two were in `model` until 11 September 2026, so the vocabulary every layer speaks pulled the badge painter in behind it (#111). A field of a test case is a fact about `testcase`. What is left is one import each, for the badge a card draws; the other four - `codegen`, `importexport`, `notifications`, `indexer` - are a feature calling a side module and a service, which points down. |
 
 **Side modules are not quite "none on each other".** The drawing above says they
 are, and three pairs say otherwise:
@@ -179,8 +179,8 @@ fails if anything else does (#376, Rule-INTERNAL-117). A test case is edited as
 a copy - `TestCaseDto.edit()` - and handed to `TestCases`. It writes the file
 first, then writes the copy into the instance it holds. So every surface showing
 that test case sees the change without being handed a new object. A run item, a
-run or a marker is changed inside the lambda `TestRuns` runs before it saves,
-through a method named for the change - `linkBug`, `recordFailure`,
+test run or a marker is changed inside the lambda `TestRuns` runs before it
+saves, through a method named for the change - `linkBug`, `recordFailure`,
 `configure` - and a node's order and status through `Nodes`.
 
 What is **not** there: **`model` imports nothing above it at all** - not
@@ -216,10 +216,10 @@ one for what it holds:
 |------------------|------------------------------------------------------------------------------------------|
 | `ProjectIndexer` | Scanning and the index's lifecycle: the first read, a rescan, whether it is indexed yet  |
 | `TestCases`      | Test cases: find, save, move, remove, order, and the file each one lives in              |
-| `TestRuns`       | Test runs: find, change a run, a result or its marker, and a run's screenshots           |
+| `TestRuns`       | Test runs: find, change a test run, a result or its marker, and a test run's screenshots |
 | `Nodes`          | The tree's folders: find, add, rename, move, copy, remove and restore, and their markers |
 
-All four share one store, one run writer and one announcer, which
+All four share one store, one test run writer and one announcer, which
 `ProjectIndexer` builds and hands out inside the package only, so there is still
 one cache and one `IndexChanged` announcement per change.
 
@@ -231,13 +231,14 @@ one cache and one `IndexChanged` announcement per change.
   never touches disk.
 
 Test runs in particular are saved and read only through the indexer —
-`TestRuns.putTestRun` to create one, `changeRun` and `saveRun` to change one,
-`changeRunMarker`, and `Nodes.addTestRunDir` for its folder. The sequential run
-writer lives inside the package, and writes one file per result -
-`<test case id>.ri` - so recording a verdict writes that one file and two
-testers judging different test cases of a run never touch the same one. A run's
-screenshots are its files too: `TestRuns.storeScreenshots` writes them,
-`screenshot` reads one, and the run writer removes those no result names.
+`TestRuns.putTestRun` to create one, `changeTestRun` and `saveTestRun` to change
+one, `changeTestRunMarker`, and `Nodes.addTestRunDir` for its folder. The
+sequential test run writer lives inside the package, and writes one file per
+result - `<test case id>.ri` - so recording a run item status writes that one
+file and two testers judging different test cases of a test run never touch the
+same one. A test run's screenshots are its files too:
+`TestRuns.storeScreenshots` writes them, `screenshot` reads one, and the test
+run writer removes those no result names.
 
 The rule is enforced by the compiler rather than by review: `TestDataFiles` and
 `VfsExecutor` are package-private and live in `indexer`, so nothing outside the
@@ -290,7 +291,7 @@ their `update()` reads Swing state.
 Rendering may reformat a value. Saving never does. The stored JSON is always
 byte-identical to what the tester typed.
 
-Two methods on `testcase/TestEditorAttributes` are the whole rule:
+Two methods on `testcase/TestCaseEditorAttributes` are the whole rule:
 
 - `gridValue(tc)` — the raw value, for anything typed into.
 - `displayValue(tc)` — the same value with a sentence made of it where the tester
@@ -355,25 +356,26 @@ it (#164, #165).
 The tester right-clicks a test set and picks Run Tests. The plugin does not know
 how to run anything; a content module does.
 
-| #  | Where                                                              | What happens                                                                                                                                                                                                                                            |
-|----|--------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 1  | `runner/RunTestsAction`                                            | Asks the selected node which gesture this is. A node that *holds* test cases hands them straight to the runner; a **test run** is opened in its editor first, because a verdict reaches a named run only through the editor that claimed the test case. |
-| 2  | `runner/RunTestCases.run`                                          | Refuses if the TestNG plugin is absent, drops the test cases already running, and starts what is left **as one run** — one compile and one JVM, not twelve. Notifies once, with a count.                                                                |
-| 3  | `runner/TestRunner.available()`                                    | The extension point `org.testin.testRunners`. Empty in an IDE where nothing can run — an answer, not a missing one.                                                                                                                                     |
-| 4  | `testin-testng/TestNGRunner.run`                                   | Finds each test case's generated method as a `PsiClass`, reports the ones with no generated code, and builds a `TestNGConfiguration` whose pattern set names class and method.                                                                          |
-| 5  | `runner/TestNGExecution.launch`                                    | Hands the configuration to the platform and remembers which test cases this environment covers, so a stop knows what to put back.                                                                                                                       |
-| 6  | `runner/TestNGExecution.starting`                                  | Broadcasts each test case as running before the process exists, so the cards change at the click rather than at the first report.                                                                                                                       |
-| 7  | the platform                                                       | Compiles, starts a JVM, runs TestNG.                                                                                                                                                                                                                    |
-| 8  | `runner/TestCaseExecutionTracker`                                  | Subscribed to `SMTRunnerEventsListener.TEST_STATUS` for the life of the project. Turns each started and finished event into a `TestCaseExecutionListener.broadcast`.                                                                                    |
-| 9  | `runner/TestCaseExecutionSubscriber.record`                        | On the EDT. The test name **is** the test case's id, because that is what Testin named the generated method — so there is nothing to look up. A name that is not an id is nobody's, and is logged.                                                      |
-| 10 | `runner/TestCaseExecutionSubscriber.report`                        | Decides what the report means: a test case the tester stopped reports itself failed, and that is not a failure. Records the verdict against the **id**, then tells the surfaces.                                                                        |
-| 11 | `editor/test/TestEditor`, `editor/run/RunEditor`, `view/ViewPanel` | Repaint.                                                                                                                                                                                                                                                |
+| #  | Where                                                                              | What happens                                                                                                                                                                                                                                                         |
+|----|------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1  | `runner/ExecuteTestsAction`                                                        | Asks the selected node which gesture this is. A node that *holds* test cases hands them straight to the runner; a **test run** is opened in its editor first, because a run item status reaches a named test run only through the editor that claimed the test case. |
+| 2  | `runner/ExecuteTestCases.run`                                                      | Refuses if the TestNG plugin is absent, drops the test cases already running, and starts what is left **as one execution** — one compile and one JVM, not twelve. Notifies once, with a count.                                                                       |
+| 3  | `runner/TestRunner.available()`                                                    | The extension point `org.testin.testRunners`. Empty in an IDE where nothing can run — an answer, not a missing one.                                                                                                                                                  |
+| 4  | `testin-testng/TestNGRunner.run`                                                   | Finds each test case's generated method as a `PsiClass`, reports the ones with no generated code, and builds a `TestNGConfiguration` whose pattern set names class and method.                                                                                       |
+| 5  | `runner/TestNGExecution.launch`                                                    | Hands the configuration to the platform and remembers which test cases this environment covers, so a stop knows what to put back.                                                                                                                                    |
+| 6  | `runner/TestNGExecution.starting`                                                  | Broadcasts each test case as running before the process exists, so the cards change at the click rather than at the first report.                                                                                                                                    |
+| 7  | the platform                                                                       | Compiles, starts a JVM, runs TestNG.                                                                                                                                                                                                                                 |
+| 8  | `runner/TestCaseExecutionTracker`                                                  | Subscribed to `SMTRunnerEventsListener.TEST_STATUS` for the life of the project. Turns each started and finished event into a `TestCaseExecutionListener.broadcast`.                                                                                                 |
+| 9  | `runner/TestCaseExecutionSubscriber.record`                                        | On the EDT. The test name **is** the test case's id, because that is what Testin named the generated method — so there is nothing to look up. A name that is not an id is nobody's, and is logged.                                                                   |
+| 10 | `runner/TestCaseExecutionSubscriber.report`                                        | Decides what the report means: a test case the tester stopped reports itself failed, and that is not a failure. Records the run item status against the **id**, then tells the surfaces.                                                                             |
+| 11 | `editor/testcase/TestCaseEditor`, `editor/testrun/TestRunEditor`, `view/ViewPanel` | Repaint.                                                                                                                                                                                                                                                             |
 
-**One recorder per project, not one per surface.** Step 10 runs even when nothing
-is open. Each surface used to subscribe and record for itself, so the model was
-updated once per open surface and not at all when none was open. Running a test
-set from the tree in a session where no editor had been opened stored no verdict
-at all. Every card afterward showed no result for a run that had passed (#66).
+**One recorder per project, not one per surface.** Step 10 runs even when
+nothing is open. Each surface used to subscribe and record for itself, so the
+model was updated once per open surface and not at all when none was open.
+Running a test set from the tree in a session where no editor had been opened
+stored no run item status at all. Every card afterward showed no result for an
+execution that had passed (#66).
 
 The order in step 10 is guaranteed rather than hoped for. A surface asked to
 redraw reads what is running from `TestNGExecution`, so it must not be told before
@@ -381,10 +383,10 @@ redraw reads what is running from `TestNGExecution`, so it must not be told befo
 surfaces gives that; two independent subscriptions would have run in whichever
 order the message bus chose.
 
-**The verdict is recorded against the id, not the object.** The `TestCaseDto` in
-hand is replaced by the next rescan, and a verdict that lived on it went with it —
-which is how a test case that had just passed lost its badge at the tester's
-next keystroke (#116).
+**The run item status is recorded against the id, not the object.** The
+`TestCaseDto` in hand is replaced by the next rescan, and a run item status that
+lived on it went with it — which is how a test case that had just passed lost
+its badge at the tester's next keystroke (#116).
 
 ---
 

@@ -141,7 +141,7 @@ public final class AutomationState implements Disposable {
 
         if (answer.states().equals(asking)) return;
 
-        Logger.debug("Automation state read: " + answer.states().size() + " case(s), "
+        Logger.debug("Automation state read: " + answer.states().size() + " test case(s), "
                 + answer.states().values().stream().filter(state -> state == Automated.WRITTEN).count() + " automated");
 
         onAnswered.run();

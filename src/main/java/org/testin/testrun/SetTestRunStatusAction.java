@@ -34,7 +34,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
     private final @NotNull TestRunStatusChange statusChange = Services.getInstance(p, TestRunStatusChange.class);
 
     public SetTestRunStatusAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, Bundle.message("run.set.status.text"), Bundle.message("run.set.status.description"), AllIcons.Nodes.Test);
+        super(p, Bundle.message("test.run.set.status.text"), Bundle.message("test.run.set.status.description"), AllIcons.Nodes.Test);
         this.tree = tree;
     }
 
@@ -53,7 +53,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
         GrayWithReason.unless(this, e, TreeValues.selected(tree, TestRunDirectoryDto.class).filter(TestRunDirectoryDto::isStillOpen).isPresent(),
-                Bundle.message("run.not.open.description"));
+                Bundle.message("test.run.not.open.description"));
     }
 
     @Override

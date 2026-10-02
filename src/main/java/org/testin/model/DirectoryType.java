@@ -117,7 +117,7 @@ public enum DirectoryType {
             ".tr",
             TestRunMarker.class,
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
-            NodeStatistics.VERDICTS,
+            NodeStatistics.RUN_ITEM_STATUSES,
             List.of(NodeCount.TOTAL)
     );
 

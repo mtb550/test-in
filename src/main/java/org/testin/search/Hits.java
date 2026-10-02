@@ -28,7 +28,7 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -76,7 +76,7 @@ public final class Hits {
         if (tooShort(wanted)) return List.of();
 
         return Services.getInstance(p, TestCases.class).getAllTestCases().stream()
-                .filter(tc -> TestEditorAttributes.anyContains(tc, wanted))
+                .filter(tc -> TestCaseEditorAttributes.anyContains(tc, wanted))
                 .toList();
     }
 

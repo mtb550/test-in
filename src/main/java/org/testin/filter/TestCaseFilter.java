@@ -1,0 +1,79 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.filter;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.testin.model.Groups;
+import org.testin.model.TestRunItems;
+import org.testin.model.RunItemStatus;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.TestCaseEditorAttributes;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class TestCaseFilter {
+    public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull FilterSelection wanted) {
+        return filter(source, wanted, _ -> Optional.empty());
+    }
+
+    // UC-EDITOR-PANEL-019, UC-EDITOR-PANEL-020
+    public static @NotNull List<TestCaseDto> filter(final @NotNull Collection<TestCaseDto> source, final @NotNull FilterSelection wanted, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
+        if (source.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final @NotNull String normalizedQuery = wanted.query().trim().toLowerCase(Locale.ROOT);
+        return source.stream()
+                .filter(testCase -> matches(testCase, normalizedQuery, wanted, runItemProvider))
+                .collect(Collectors.toList());
+    }
+
+    // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-091, Rule-EDITOR-PANEL-239, Rule-EDITOR-PANEL-261
+    private static boolean matches(final @NotNull TestCaseDto testCase, final @NotNull String query, final @NotNull FilterSelection wanted, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
+        final @NotNull TestCaseDto shown = runItemProvider.apply(testCase.getId()).map(TestRunItems::shownTestCase).orElse(testCase);
+
+        final boolean matchesSearch = query.isEmpty() || TestCaseEditorAttributes.anyContains(shown, query);
+        final boolean matchesPriority = wanted.priorities().isEmpty() || wanted.priorities().contains(shown.getPriority());
+        final boolean matchesGroup = wanted.groups().isEmpty()
+                || (wanted.groups().contains(Groups.NONE) && shown.getGroup().isEmpty())
+                || shown.getGroup().stream().anyMatch(wanted.groups()::contains);
+        final boolean matchesModule = wanted.modules().isEmpty() || wanted.modules().contains(shown.getModule());
+        final boolean matchesTestCaseStatus = wanted.testCaseStatuses().isEmpty() || wanted.testCaseStatuses().contains(shown.getStatus());
+        final boolean matchesRunItemStatus = wanted.runItemStatuses().isEmpty()
+                || matchesStatus(testCase.getId(), wanted.runItemStatuses(), runItemProvider);
+
+        return matchesSearch && matchesPriority && matchesGroup && matchesModule && matchesTestCaseStatus && matchesRunItemStatus;
+    }
+
+    private static boolean matchesStatus(final @NotNull UUID id, final @NotNull Set<RunItemStatus> statuses, final @NotNull Function<UUID, Optional<TestRunItems>> runItemProvider) {
+        return runItemProvider.apply(id)
+                .map(TestRunItems::shownStatus)
+                .filter(statuses::contains)
+                .isPresent();
+    }
+}

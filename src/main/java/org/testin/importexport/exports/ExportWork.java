@@ -29,7 +29,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.testcase.Can;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.ui.dialogs.Destination;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Bundle;
@@ -101,7 +101,7 @@ record ExportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull TestC
     }
 
     private void chooseWhatToExport(final @NotNull Map<String, List<TestCaseDto>> sheets, final @NotNull VirtualFile targetDir) {
-        new ExportDialog(p, TestEditorAttributes.all(Can.EXPORT), sheets, targetDir, this::writeExport).show();
+        new ExportDialog(p, TestCaseEditorAttributes.all(Can.EXPORT), sheets, targetDir, this::writeExport).show();
     }
 
     // UC-SHARE-001, Rule-SHARE-005

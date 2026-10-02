@@ -19,7 +19,7 @@ package org.testin.testrun.failure;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.BugSeverity;
 import org.testin.model.TestRunItems;
-import org.testin.testrun.RunEditorAttributes;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
 
@@ -28,7 +28,7 @@ import java.util.List;
 public record BugSeveritySection(@NotNull ComponentDialogBase<RadioSelection<BugSeverity>> component) implements FailureSection {
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-148
     public static @NotNull BugSeveritySection of(final @NotNull TestRunItems runItem) {
-        return new BugSeveritySection(ComponentDialogBase.<BugSeverity>radios(RunEditorAttributes.BUG_SEVERITY.getName())
+        return new BugSeveritySection(ComponentDialogBase.<BugSeverity>radios(TestRunEditorAttributes.BUG_SEVERITY.getName())
                 .options(List.of(BugSeverity.values()), BugSeverity::getLabel)
                 .select(runItem.getBugSeverity())
                 .build());

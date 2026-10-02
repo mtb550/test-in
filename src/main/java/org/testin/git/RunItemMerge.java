@@ -41,7 +41,7 @@ final class RunItemMerge {
 
         final boolean takeTheirs = executedAt(theirsNode).isAfter(executedAt(mineNode));
 
-        return new Merge(takeTheirs ? theirsNode : mineNode, List.of(), List.of(Bundle.message("git.merge.verdict")));
+        return new Merge(takeTheirs ? theirsNode : mineNode, List.of(), List.of(Bundle.message("git.merge.run.item.status")));
     }
 
     private static @NotNull ZonedDateTime executedAt(final @NotNull ObjectNode item) {

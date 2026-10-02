@@ -231,7 +231,7 @@ public class ViewPanel implements Disposable {
         if (path.isEmpty()) return Optional.empty();
 
         return getCurrentTestCase().flatMap(shown -> testRuns.findTestRun(testinRoot.resolve(path))
-                .flatMap(run -> run.resultOf(shown.getId())));
+                .flatMap(testRun -> testRun.resultOf(shown.getId())));
     }
 
     // UC-VIEW-PANEL-001, Rule-VIEW-PANEL-011, Rule-VIEW-PANEL-012

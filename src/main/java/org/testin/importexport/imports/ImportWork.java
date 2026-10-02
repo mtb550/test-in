@@ -42,7 +42,7 @@ import org.testin.services.Services;
 import org.testin.testcase.Can;
 import org.testin.testcase.Rank;
 import org.testin.testcase.TestCaseOrder;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 import org.testin.util.NameSanitizer;
@@ -63,7 +63,7 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
 
     private static void report(final int testCases, final long startedAt, final long readyAt) {
         final long finishedAt = System.currentTimeMillis();
-        Logger.info("Import: " + testCases + " cases in " + (finishedAt - startedAt) + "ms"
+        Logger.info("Import: " + testCases + " test cases in " + (finishedAt - startedAt) + "ms"
                 + " (waiting for the index " + (readyAt - startedAt) + "ms,"
                 + " writing and generating " + (finishedAt - readyAt) + "ms)");
     }
@@ -84,7 +84,7 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
     }
 
     void openImportDialog(final @NotNull DirectoryDto dirDto) {
-        new ImportDialog(p, TestEditorAttributes.all(Can.IMPORT),
+        new ImportDialog(p, TestCaseEditorAttributes.all(Can.IMPORT),
                 (file, format) -> format.importToFile(p, file),
                 selectedTestCasesBySheet -> executeImportWriteAction(dirDto, selectedTestCasesBySheet))
                 .show();

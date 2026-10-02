@@ -37,13 +37,13 @@ public class ScreenshotsInGitTest {
     private static final String REMOVED = "runs/cycle38/q81zd.png";
     private static final String OTHER_RUN = "runs/cycle39/m4x0c.png";
 
-    private static void markARun(final Path root) {
+    private static void markATestRun(final Path root) {
         try {
             final Path at = root.resolve("runs/cycle38");
             Files.createDirectories(at);
             Files.writeString(at.resolve(DirectoryType.TR.getMarker()), "{}");
         } catch (final Exception e) {
-            throw new AssertionError("could not write the run's marker", e);
+            throw new AssertionError("could not write the test run's marker", e);
         }
     }
 
@@ -51,17 +51,17 @@ public class ScreenshotsInGitTest {
     public void theReviewListsNoScreenshotRow() {
         try {
             final Path root = Files.createTempDirectory("testin-git-screenshots");
-            markARun(root);
+            markATestRun(root);
 
             assertTrue(GitDiffProcessor.toDiffs(List.of(" D " + REMOVED), root, RealMapper.build(), _ -> Map.of(), _ -> Optional.empty()).isEmpty(),
-                    "a screenshot arrives or goes with its run, so it has no row of its own");
+                    "a screenshot arrives or goes with its test run, so it has no row of its own");
         } catch (final Exception e) {
             throw new AssertionError("the review could not be built", e);
         }
     }
 
     @Test
-    public void aPictureOutsideARunIsAFileLikeAnyOther() {
+    public void aPictureOutsideATestRunIsAFileLikeAnyOther() {
         try {
             final Path root = Files.createTempDirectory("testin-git-screenshots");
             final String beside = "cases/ts2/k3f9a.png";
@@ -69,14 +69,14 @@ public class ScreenshotsInGitTest {
             Files.writeString(root.resolve(beside), "not really a picture");
 
             assertEquals(GitDiffProcessor.toDiffs(List.of("?? " + beside), root, RealMapper.build(), _ -> Map.of(), _ -> Optional.empty()).size(), 1,
-                    "a PNG in a test set has no run to travel with, so the review has to list it");
+                    "a PNG in a test set has no test run to travel with, so the review has to list it");
         } catch (final Exception e) {
             throw new AssertionError("the review could not be built", e);
         }
     }
 
     @Test
-    public void committingARunCarriesTheScreenshotsItsFolderGainedOrLost() {
+    public void committingATestRunCarriesTheScreenshotsItsFolderGainedOrLost() {
         final List<String> status = List.of(" M " + RESULT, "?? " + ADDED, " D " + REMOVED, "?? " + OTHER_RUN);
 
         assertEquals(GitCommits.screenshotsAlongside(status, Set.of(RESULT)), Set.of(ADDED, REMOVED),
@@ -84,7 +84,7 @@ public class ScreenshotsInGitTest {
     }
 
     @Test
-    public void committingNoRunCarriesNoScreenshot() {
+    public void committingNoTestRunCarriesNoScreenshot() {
         assertTrue(GitCommits.screenshotsAlongside(List.of("?? " + ADDED), Set.of("cases/ts2/4fd2a19b.tc")).isEmpty());
     }
 }

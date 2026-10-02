@@ -37,13 +37,13 @@ public final class ReportFileName {
             DateTimeFormatter.ofPattern("dd-MM-yyyy_hh-mm-ssa", Locale.US);
 
     // UC-REPORT-001, Rule-REPORT-006
-    public static @NotNull String suggestedFor(final @NotNull Project p, final @NotNull TestRunDirectoryDto run, final @NotNull ZonedDateTime at) {
-        return of(Services.getInstance(p, BoundTestProject.class).name(), run.getName(), at);
+    public static @NotNull String suggestedFor(final @NotNull Project p, final @NotNull TestRunDirectoryDto testRun, final @NotNull ZonedDateTime at) {
+        return of(Services.getInstance(p, BoundTestProject.class).name(), testRun.getName(), at);
     }
 
     // UC-REPORT-001, Rule-REPORT-007, Rule-REPORT-008
-    static @NotNull String of(final @NotNull String projectName, final @NotNull String runName, final @NotNull ZonedDateTime at) {
-        return Stream.of("TestRun", safe(projectName), safe(runName), STAMP.format(at))
+    static @NotNull String of(final @NotNull String projectName, final @NotNull String testRunName, final @NotNull ZonedDateTime at) {
+        return Stream.of("TestRun", safe(projectName), safe(testRunName), STAMP.format(at))
                 .filter(part -> !part.isBlank())
                 .collect(Collectors.joining("_"));
     }

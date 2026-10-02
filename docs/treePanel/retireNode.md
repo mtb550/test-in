@@ -34,7 +34,7 @@ Retiring deletes nothing. It only moves the node out of the way.
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
-  signed off. Its test cases, verdicts and configuration can no longer change.
+  signed off. Its test cases, run item statuses and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
     1. live nodes, then retired ones
     2. the number the tester gave the node
@@ -64,7 +64,7 @@ Retiring deletes nothing. It only moves the node out of the way.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is, drawn with Inactive beside its name like any other status. Its test sets,
-  test cases and runs are not read, because a project nobody is working on is
+  test cases and test runs are not read, because a project nobody is working on is
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
@@ -83,7 +83,7 @@ shows above the status bar at the bottom right of the IDE. It reads *Inactive*, 
    kind. The status the node already has is gray.
 
    | Node         | Retire it with      | Statuses it can have |
-         |--------------|---------------------|----------------------|
+   |--------------|---------------------|----------------------|
    | Test project | **Deactivate**      | Active, Inactive     |
    | Test set     | **Mark Deprecated** | Active, Deprecated   |
    | Package      | **Archive**         | Active, Archived     |

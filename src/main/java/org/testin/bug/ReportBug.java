@@ -41,14 +41,14 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReportBug {
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-067
-    public static void start(final @NotNull Project p, final @NotNull TestRunDirectoryDto runDirectory, final @NotNull UUID runItemId, final @NotNull TestCaseDto tc, final @NotNull Runnable redraw) {
+    public static void start(final @NotNull Project p, final @NotNull TestRunDirectoryDto testRunDirectory, final @NotNull UUID runItemId, final @NotNull TestCaseDto tc, final @NotNull Runnable redraw) {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
         final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
         final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
-        final @NotNull RunItem item = new RunItem(runDirectory.getPath(), runItemId);
+        final @NotNull RunItem item = new RunItem(testRunDirectory.getPath(), runItemId);
 
-        final @NotNull Optional<TestRunDto> run = testRuns.findTestRun(item.run());
-        final @NotNull Optional<TestRunItems> failed = run.flatMap(item::failedIn);
+        final @NotNull Optional<TestRunDto> testRun = testRuns.findTestRun(item.testRunPath());
+        final @NotNull Optional<TestRunItems> failed = testRun.flatMap(item::failedIn);
         if (failed.isEmpty() || reports.whyReportBugIsOff(item, failed.orElseThrow()).isPresent()) return;
 
         reports.begin(item);
@@ -58,7 +58,7 @@ public final class ReportBug {
         final @NotNull Optional<TestCaseFile> file = testCases.testCaseFile(tc);
 
         BackgroundWork.run(p, Bundle.message("bug.preparing"), Bundle.message("bug.send.failed.title"), true,
-                indicator -> prepare(p, BugFacts.of(failedItem, tc, runDirectory.getMarker(), runDirectory.getName(), testRuns.screenshots(item.run(), failedItem)), file, indicator),
+                indicator -> prepare(p, BugFacts.of(failedItem, tc, testRunDirectory.getMarker(), testRunDirectory.getName(), testRuns.screenshots(item.testRunPath(), failedItem)), file, indicator),
                 bug -> open(p, item, bug, redraw),
                 () -> {
                     reports.end(item, Stage.PREPARING);

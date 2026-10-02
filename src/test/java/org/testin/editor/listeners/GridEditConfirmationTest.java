@@ -65,7 +65,7 @@ public class GridEditConfirmationTest {
     @Test
     public void bothGridsHaveAnEditListenerToCheck() {
         assertEquals(gridEditListeners().size(), 2,
-                "the test grid and the run grid, and this test needs updating if a third arrives");
+                "the test case grid and the test run grid, and this test needs updating if a third arrives");
     }
 
     @Test

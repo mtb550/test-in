@@ -169,7 +169,7 @@ public class GitDiffProcessorTest {
                     "?? Test Cases/login flow/case-2.tc",
                     "?? Test Cases/login flow/case-3.tc");
 
-            assertEquals(review.size(), 4, "three cases and the marker that makes the directory a test set");
+            assertEquals(review.size(), 4, "three test cases and the marker that makes the directory a test set");
             assertTrue(review.stream().allMatch(diff -> diff.type() == DiffType.ADDED));
             assertEquals(review.stream().filter(diff -> diff.subject() == ChangeSubject.TEST_CASE).count(), 3);
         } catch (final IOException ex) {

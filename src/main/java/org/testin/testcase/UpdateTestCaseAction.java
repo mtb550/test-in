@@ -44,7 +44,7 @@ public class UpdateTestCaseAction extends AbstractAnyProjectAction {
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
-            GrayWithReason.unless(this, e, false, Bundle.message("update.case.disabled.description"));
+            GrayWithReason.unless(this, e, false, Bundle.message("update.test.case.disabled.description"));
             return;
         }
 

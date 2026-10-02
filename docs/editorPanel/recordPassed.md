@@ -5,7 +5,7 @@
 **As a** tester, **I want** one key to say a test case worked, **so that** walking a test run of 80 is 80 keystrokes and
 nothing else.
 
-One key. Testin writes the verdict, the tester's name, the time and the
+One key. Testin writes the run item status, the tester's name, the time and the
 duration.
 
 `P`.
@@ -36,10 +36,10 @@ duration.
   reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
-- **Rule-EDITOR-PANEL-136** — A verdict records what it was, who recorded it,
-  and when, to the second.
-- **Rule-EDITOR-PANEL-137** — A verdict recorded on the test case the walk is
-  timing also records how long it took.
+- **Rule-EDITOR-PANEL-136** — A run item status records what it was, who
+  recorded it, and when, to the second.
+- **Rule-EDITOR-PANEL-137** — A run item status recorded on the test case the
+  walk is timing also records how long it took.
 - **Rule-EDITOR-PANEL-138** — Recording a pass clears the actual result, the
   error, the screenshots and the bug issue link, and puts the bug severity and
   priority back to Enhancement and Low. A test case that passed has nothing to
@@ -69,9 +69,9 @@ duration.
 
 ## What the tester sees
 
-This opens no screen. The card's verdict badge turns to **Passed**, the run
-status line follows, and the figures in the status bar move. The walk then
-selects the next test case waiting for a verdict.
+This opens no screen. The card's run item status badge turns to **Passed**, the
+test run status line follows, and the figures in the status bar move. The walk
+then selects the next test case waiting for a run item status.
 
 A small message appears at the bottom of the IDE and fades. It reads *Passed*.
 
@@ -90,20 +90,21 @@ A small message appears at the bottom of the IDE and fades. It reads *Passed*.
 **If nothing is selected** — nothing happens, and nothing is said.
 
 **If the test case was deleted from its test set** — a message reads *The test
-case was removed - the run keeps what it recorded.* Nothing is written.
+case was removed - the test run keeps what it recorded.* Nothing is written.
 
 **If the test case already holds failure detail** — a confirmation opens first,
 and names which of the six it is about to clear. That is
-[UC-EDITOR-PANEL-038](correctVerdict.md).
+[UC-EDITOR-PANEL-038](correctRunItemStatus.md).
 
 **If a grid cell is open for editing** — the key belongs to the cell, and does
 nothing else.
 
 ## Where the plugin breaks its own rules
 
-**A signed off test run still records verdicts.** The status bar's own tooltip
-says a completed or closed test run records no more verdicts. `P` still records
-one, still saves it, and still says *Passed*. That is difference 19 on
+**A signed off test run still records run item statuses.** The status bar's own
+tooltip says a completed or closed test run records no more run item statuses.
+`P` still records one, still saves it, and still says *Passed*. That is
+difference 19 on
 [the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
 
 **An automated pass destroys a tester's notes without asking.** The confirmation

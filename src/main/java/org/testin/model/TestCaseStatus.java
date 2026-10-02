@@ -25,22 +25,22 @@ import org.testin.util.Bundle;
 @AllArgsConstructor
 public enum TestCaseStatus {
     REVIEWED(
-            Bundle.message("status.case.reviewed"),
+            Bundle.message("status.test.case.reviewed"),
             true
     ),
 
     PENDING(
-            Bundle.message("status.case.pending"),
+            Bundle.message("status.test.case.pending"),
             true
     ),
 
     DISABLED(
-            Bundle.message("status.case.disabled"),
+            Bundle.message("status.test.case.disabled"),
             false
     ),
 
     TO_BE_UPDATED(
-            Bundle.message("status.case.to.be.updated"),
+            Bundle.message("status.test.case.to.be.updated"),
             true
     );
 

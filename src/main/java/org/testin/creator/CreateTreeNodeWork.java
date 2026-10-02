@@ -19,7 +19,7 @@ package org.testin.creator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.JavaCode;
-import org.testin.creator.dialogs.CreateRunDialog;
+import org.testin.creator.dialogs.CreateTestRunDialog;
 import org.testin.creator.dialogs.CreateTestDialog;
 import org.testin.editor.TestinEditors;
 import org.testin.indexer.Nodes;
@@ -66,6 +66,6 @@ record CreateTreeNodeWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull Not
 
         final @NotNull List<DirectoryType> kinds = pDir.childKinds();
         if (kinds.equals(DirectoryType.UNDER_TEST_CASES)) new CreateTestDialog(p, onCreate).show();
-        else if (kinds.equals(DirectoryType.UNDER_TEST_RUNS)) new CreateRunDialog(p, onCreate).show();
+        else if (kinds.equals(DirectoryType.UNDER_TEST_RUNS)) new CreateTestRunDialog(p, onCreate).show();
     }
 }

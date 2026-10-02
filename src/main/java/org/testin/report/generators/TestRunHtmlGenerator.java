@@ -28,14 +28,14 @@ import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunSummary;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.DetailRow;
 import org.testin.report.ReportTile;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
-import org.testin.testrun.RunEditorAttributes;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.util.ReportFont;
@@ -55,7 +55,7 @@ public final class TestRunHtmlGenerator {
         final @NotNull TestRunSummary summary = TestRunSummary.of(results);
         final int passRate = summary.passRate();
 
-        final @NotNull String runName = trDir.getName();
+        final @NotNull String testRunName = trDir.getName();
 
         final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
 
@@ -74,7 +74,7 @@ public final class TestRunHtmlGenerator {
         html.append("<div class='report-title'>").append(Bundle.message("report.title")).append("</div>")
                 .append("<div class='report-subtitle'>")
                 .append(StringUtil.escapeXmlEntities(ReportText.joined("  |  ", projectName, ReportText.joined(", ", TestRunConfiguration.PLATFORM.valueIn(trDir.getMarker()), TestRunConfiguration.COMPONENT.valueIn(trDir.getMarker()))))).append("</div>")
-                .append("<div class='report-run-name'>").append(StringUtil.escapeXmlEntities(runName)).append("</div>")
+                .append("<div class='report-test-run-name'>").append(StringUtil.escapeXmlEntities(testRunName)).append("</div>")
                 .append("<div class='report-conf'>").append(Bundle.message("report.confidential")).append("</div>");
 
         html.append("<div class='section-title-bar'><div class='section-title'>").append(Bundle.message("report.heading.overview")).append("</div></div>");
@@ -88,7 +88,7 @@ public final class TestRunHtmlGenerator {
 
         html.append("<div class='summary-text'>")
                 .append(Bundle.message("report.summary.named",
-                        "<b>" + StringUtil.escapeXmlEntities(runName) + "</b>",
+                        "<b>" + StringUtil.escapeXmlEntities(testRunName) + "</b>",
                         "<b>" + total + "</b>",
                         "<b>" + summary.executed() + "</b>",
                         "<b>" + passRate + "%</b>"))
@@ -109,7 +109,7 @@ public final class TestRunHtmlGenerator {
                 final @NotNull String written = section.writtenIn(trDir.getMarker().getResultAnalysis());
                 if (written.isEmpty()) continue;
 
-                html.append("<div class='analysis-heading' style='color: var(--verdict-")
+                html.append("<div class='analysis-heading' style='color: var(--run-item-status-")
                         .append(section.name().toLowerCase(Locale.ROOT)).append(")'>")
                         .append(section.heading(summary)).append("</div>")
                         .append("<div class='analysis-text'>")
@@ -148,8 +148,8 @@ public final class TestRunHtmlGenerator {
                 .append("; color: var(--section-").append(name).append("-ink)'>")
                 .append("<th class='seq'>#</th><th>").append(Bundle.message("caption.test.case")).append("</th>");
 
-        for (final RunEditorAttributes detail : section.getFailureDetailColumns()) {
-            html.append("<th class='verdict'>").append(detail.getName()).append("</th>");
+        for (final TestRunEditorAttributes detail : section.getFailureDetailColumns()) {
+            html.append("<th class='run-item-status'>").append(detail.getName()).append("</th>");
         }
 
         html.append("</tr>");
@@ -192,10 +192,10 @@ public final class TestRunHtmlGenerator {
         final @NotNull BugSeverity severity = item.getBugSeverity();
 
         html.append("</td>")
-                .append("<td class='verdict' style='color: ")
+                .append("<td class='run-item-status' style='color: ")
                 .append(priority.getEmphasis().getCssToken()).append("'>")
                 .append(StringUtil.escapeXmlEntities(priority.getLabel())).append("</td>")
-                .append("<td class='verdict' style='color: ")
+                .append("<td class='run-item-status' style='color: ")
                 .append(severity.getEmphasis().getCssToken()).append("'>")
                 .append(StringUtil.escapeXmlEntities(severity.getLabel())).append("</td>");
     }
@@ -219,7 +219,7 @@ public final class TestRunHtmlGenerator {
 
                 + ".report-title { font-size: " + ReportFont.TITLE.css() + "; font-weight: bold; color: var(--heading); }"
                 + ".report-subtitle { font-size: " + ReportFont.SUBTITLE.css() + "; color: var(--accent); margin-top: 4px; }"
-                + ".report-run-name { font-size: " + ReportFont.LEAD.css() + "; color: var(--accent); margin-top: 2px; "
+                + ".report-test-run-name { font-size: " + ReportFont.LEAD.css() + "; color: var(--accent); margin-top: 2px; "
                 + "padding-bottom: 6px; border-bottom: 2px solid var(--heading); }"
                 + ".analysis-heading { font-size: " + ReportFont.LEAD.css() + "; font-weight: bold; margin-top: 10px; }"
                 + ".analysis-text { font-size: " + ReportFont.BODY.css() + "; color: var(--ink); margin-bottom: 8px; white-space: pre-wrap; }"
@@ -246,8 +246,8 @@ public final class TestRunHtmlGenerator {
                 + ".detail-table tr:nth-child(even) td { background: var(--panel); }"
                 + ".detail-table tr:nth-child(odd) td { background: var(--page); }"
                 + ".detail-table td.seq { text-align: center; color: var(--muted); }"
-                + ".detail-table td.verdict, .detail-table th.verdict { width: 1%; white-space: nowrap; }"
-                + ".detail-table td.verdict { text-align: center; font-weight: bold; }"
+                + ".detail-table td.run-item-status, .detail-table th.run-item-status { width: 1%; white-space: nowrap; }"
+                + ".detail-table td.run-item-status { text-align: center; font-weight: bold; }"
                 + ".detail-table td.seq, .detail-table th.seq { width: 1%; white-space: nowrap; }"
                 + ".actual { font-size: " + ReportFont.SMALL.css() + "; color: var(--muted); margin-top: 3px; white-space: pre-wrap; }"
                 + ".stacktrace { font-family: " + ReportFont.CSS_MONO + "; font-size: " + ReportFont.SMALL.css() + "; color: var(--muted); margin-top: 6px; white-space: pre-wrap; word-break: break-word; }"
@@ -282,22 +282,22 @@ public final class TestRunHtmlGenerator {
     }
 
     private @NotNull String lightTokens() {
-        return ReportColor.cssTokens(ReportColor::hex) + verdictTokens(TestStatus::getReportHex);
+        return ReportColor.cssTokens(ReportColor::hex) + runItemStatusTokens(RunItemStatus::getReportHex);
     }
 
     // Rule-REPORT-025
-    private static @NotNull String verdictTokens(final @NotNull Function<TestStatus, String> shade) {
+    private static @NotNull String runItemStatusTokens(final @NotNull Function<RunItemStatus, String> shade) {
         final @NotNull StringBuilder tokens = new StringBuilder();
 
-        for (final TestStatus verdict : List.of(TestStatus.PASSED, TestStatus.FAILED, TestStatus.BLOCKED, TestStatus.UNTESTED, TestStatus.REMOVED)) {
-            tokens.append("--verdict-").append(verdict.name().toLowerCase(Locale.ROOT)).append(": #").append(shade.apply(verdict)).append(";");
+        for (final RunItemStatus runItemStatus : List.of(RunItemStatus.PASSED, RunItemStatus.FAILED, RunItemStatus.BLOCKED, RunItemStatus.UNTESTED, RunItemStatus.REMOVED)) {
+            tokens.append("--run-item-status-").append(runItemStatus.name().toLowerCase(Locale.ROOT)).append(": #").append(shade.apply(runItemStatus)).append(";");
         }
 
         return tokens.toString();
     }
 
     private @NotNull String darkTokens() {
-        return ReportColor.cssTokens(ReportColor::darkHex) + verdictTokens(TestStatus::getReportDarkHex);
+        return ReportColor.cssTokens(ReportColor::darkHex) + runItemStatusTokens(RunItemStatus::getReportDarkHex);
     }
 
     private @NotNull String themeScript() {

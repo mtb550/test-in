@@ -21,7 +21,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ReportColor;
 import org.testin.model.TestRunSummary;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.util.Bundle;
 
 import java.util.Arrays;
@@ -32,7 +32,7 @@ import java.util.function.Function;
 @AllArgsConstructor
 public enum ReportTile {
     TOTAL_TEST_CASES(
-            Bundle.message("report.tile.total.cases"),
+            Bundle.message("report.tile.total.test.cases"),
             ReportColor.HEADING.hex(),
             "var(--heading)",
             TestRunSummary::total,
@@ -40,38 +40,38 @@ public enum ReportTile {
     ),
 
     PASSED(
-            TestStatus.PASSED.getLabel(),
-            TestStatus.PASSED.getReportHex(),
-            "var(--verdict-passed)",
+            RunItemStatus.PASSED.getLabel(),
+            RunItemStatus.PASSED.getReportHex(),
+            "var(--run-item-status-passed)",
             TestRunSummary::passed,
             ""
     ),
 
     FAILED(
-            TestStatus.FAILED.getLabel(),
-            TestStatus.FAILED.getReportHex(),
-            "var(--verdict-failed)",
+            RunItemStatus.FAILED.getLabel(),
+            RunItemStatus.FAILED.getReportHex(),
+            "var(--run-item-status-failed)",
             TestRunSummary::failed,
             ""
     ),
 
     BLOCKED(
-            TestStatus.BLOCKED.getLabel(),
-            TestStatus.BLOCKED.getReportHex(),
-            "var(--verdict-blocked)",
+            RunItemStatus.BLOCKED.getLabel(),
+            RunItemStatus.BLOCKED.getReportHex(),
+            "var(--run-item-status-blocked)",
             TestRunSummary::blocked,
             ""
     ),
 
     UNTESTED(
-            TestStatus.UNTESTED.getLabel(),
-            TestStatus.UNTESTED.getReportHex(),
-            "var(--verdict-untested)",
+            RunItemStatus.UNTESTED.getLabel(),
+            RunItemStatus.UNTESTED.getReportHex(),
+            "var(--run-item-status-untested)",
             TestRunSummary::untested,
             ""
     ),
 
-    REMOVED(TestStatus.REMOVED.getLabel(), TestStatus.REMOVED.getReportHex(), "var(--verdict-removed)", TestRunSummary::removed, "") {
+    REMOVED(RunItemStatus.REMOVED.getLabel(), RunItemStatus.REMOVED.getReportHex(), "var(--run-item-status-removed)", TestRunSummary::removed, "") {
         @Override
         public boolean isShownFor(final @NotNull TestRunSummary summary) {
             return summary.hasRemoved();

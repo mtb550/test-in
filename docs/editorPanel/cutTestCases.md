@@ -92,8 +92,8 @@ are, drawn faded until the cut is called off.
 
 ## What a moved test case keeps
 
-It keeps its identity, so the verdicts in every test run still point at it. It
-keeps its own test method too. Only its place changes.
+It keeps its identity, so the run item statuses in every test run still point
+at it. It keeps its own test method too. Only its place changes.
 
 ## Undoing a move
 

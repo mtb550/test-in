@@ -61,50 +61,50 @@ public enum NodeCount {
     ),
 
     PASSED(
-            TestStatus.PASSED.getLabel(),
-            figures -> figures.run().passed(),
+            RunItemStatus.PASSED.getLabel(),
+            figures -> figures.testRun().passed(),
             NodeCount::plain,
-            TestStatus.PASSED.getRowColor()
+            RunItemStatus.PASSED.getRowColor()
     ),
 
     FAILED(
-            TestStatus.FAILED.getLabel(),
-            figures -> figures.run().failed(),
+            RunItemStatus.FAILED.getLabel(),
+            figures -> figures.testRun().failed(),
             NodeCount::plain,
-            TestStatus.FAILED.getRowColor()
+            RunItemStatus.FAILED.getRowColor()
     ),
 
     BLOCKED(
-            TestStatus.BLOCKED.getLabel(),
-            figures -> figures.run().blocked(),
+            RunItemStatus.BLOCKED.getLabel(),
+            figures -> figures.testRun().blocked(),
             NodeCount::plain,
-            TestStatus.BLOCKED.getRowColor()
+            RunItemStatus.BLOCKED.getRowColor()
     ),
 
     UNTESTED(
-            TestStatus.UNTESTED.getLabel(),
-            figures -> figures.run().untested(),
+            RunItemStatus.UNTESTED.getLabel(),
+            figures -> figures.testRun().untested(),
             NodeCount::plain,
-            TestStatus.UNTESTED.getRowColor()
+            RunItemStatus.UNTESTED.getRowColor()
     ),
 
     REMOVED(
-            TestStatus.REMOVED.getLabel(),
-            figures -> figures.run().removed(),
+            RunItemStatus.REMOVED.getLabel(),
+            figures -> figures.testRun().removed(),
             NodeCount::plain,
-            TestStatus.REMOVED.getRowColor()
+            RunItemStatus.REMOVED.getRowColor()
     ),
 
     TOTAL(
             Bundle.message("count.total"),
-            figures -> figures.run().total(),
+            figures -> figures.testRun().total(),
             NodeCount::plain,
             Uncharted.COLOR
     ),
 
     PASS_RATE(
             Bundle.message("count.pass.rate"),
-            figures -> figures.run().passRate(),
+            figures -> figures.testRun().passRate(),
             NodeCount::percentage,
             Uncharted.COLOR
     );

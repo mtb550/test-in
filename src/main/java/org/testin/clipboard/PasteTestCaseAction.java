@@ -47,11 +47,11 @@ public class PasteTestCaseAction extends AbstractAnyProjectAction {
         // Rule-EDITOR-PANEL-214
         if (TestinData.editor(e).filter(editor -> !editor.getParent().isTestCaseContainer()).isPresent()) {
             e.getPresentation().setEnabled(false);
-            e.getPresentation().setDescription(Bundle.message("paste.case.disabled.description"));
+            e.getPresentation().setDescription(Bundle.message("paste.test.case.disabled.description"));
             return;
         }
 
-        GrayWithReason.unless(this, e, work(e, p).map(this::clipboardHoldsTestCases).orElse(false), Bundle.message("paste.case.nothing.description"));
+        GrayWithReason.unless(this, e, work(e, p).map(this::clipboardHoldsTestCases).orElse(false), Bundle.message("paste.test.case.nothing.description"));
     }
 
     private boolean clipboardHoldsTestCases(final @NotNull PasteTestCaseWork work) {

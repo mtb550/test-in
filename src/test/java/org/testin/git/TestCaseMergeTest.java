@@ -124,7 +124,7 @@ public class TestCaseMergeTest {
 
         final Merge merge = TestCaseMerge.of(RealMapper.build(), base, mine, theirs);
 
-        assertTrue(merge.isSettled(), "where a case sits is not a question a tester can answer about a merge");
+        assertTrue(merge.isSettled(), "where a test case sits is not a question a tester can answer about a merge");
         assertEquals(merge.merged().get("order").asText(), "s");
     }
 
@@ -157,11 +157,11 @@ public class TestCaseMergeTest {
     }
 
     @Test
-    public void aMarkerARunOrAnythingElseIsNot() {
+    public void aMarkerATestRunOrAnythingElseIsNot() {
         assertFalse(TestCaseMerge.isTestCase("Test Cases/Login/.ts"), "a marker has no named fields to merge");
         assertFalse(TestCaseMerge.isTestCase(".tp"));
         assertFalse(TestCaseMerge.isTestCase("Test Runs/Cycle 1/Cycle 1.json"),
-                "a run records what happened; it is not something two people edit into one");
+                "a test run records what happened; it is not something two people edit into one");
         assertFalse(TestCaseMerge.isTestCase("Test Cases/Login/notes.txt"));
     }
 }

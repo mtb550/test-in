@@ -18,7 +18,7 @@ package org.testin.report.generators;
 
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunSummary;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class ReportSectionTest {
 
     @Test
     public void everyStatusBelongsToExactlyOneSection() {
-        for (final TestStatus status : TestStatus.values()) {
+        for (final RunItemStatus status : RunItemStatus.values()) {
             final List<ReportSection> claiming = Arrays.stream(ReportSection.values())
                     .filter(section -> section.matches(item(status)))
                     .toList();
@@ -47,7 +47,7 @@ public class ReportSectionTest {
     @Test
     public void everySectionCountMatchesTheRowsItWillPrint() {
         final List<TestRunItems> results = new ArrayList<>();
-        for (final TestStatus status : TestStatus.values()) {
+        for (final RunItemStatus status : RunItemStatus.values()) {
             results.add(item(status));
             results.add(item(status));
         }
@@ -61,10 +61,10 @@ public class ReportSectionTest {
     }
 
     @Test
-    public void theSectionsAccountForEveryTestCaseInTheRun() {
+    public void theSectionsAccountForEveryTestCaseInTheTestRun() {
         final List<TestRunItems> results = List.of(
-                item(TestStatus.PASSED), item(TestStatus.PASSED), item(TestStatus.FAILED),
-                item(TestStatus.BLOCKED), item(TestStatus.PENDING), item(TestStatus.UNTESTED));
+                item(RunItemStatus.PASSED), item(RunItemStatus.PASSED), item(RunItemStatus.FAILED),
+                item(RunItemStatus.BLOCKED), item(RunItemStatus.PENDING), item(RunItemStatus.UNTESTED));
 
         final TestRunSummary summary = TestRunSummary.of(results);
         final long printed = Arrays.stream(ReportSection.values())
@@ -93,7 +93,7 @@ public class ReportSectionTest {
         assertTrue(description.contains("<b>7</b>"), description);
     }
 
-    private @NotNull TestRunItems item(final TestStatus status) {
+    private @NotNull TestRunItems item(final RunItemStatus status) {
         final TestRunItems item = new TestRunItems();
         item.setId(UUID.randomUUID());
         item.setStatus(status);

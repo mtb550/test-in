@@ -4,10 +4,10 @@
 
 > **No key.** On the menu: **Actions → Re-Create Test Run**.
 
-**As a** tester, **I want** to make the next cycle from a finished test run, **so that** starting the next round of
-testing takes one step. The new one has
-the same test cases and settings and no verdicts, so nobody builds the whole
-test run again by hand.
+**As a** tester, **I want** to make the next cycle from a finished test run,
+**so that** starting the next round of testing takes one step. The new one has
+the same test cases and settings and no run item statuses, so nobody builds the
+whole test run again by hand.
 
 This copies a test run's test cases and settings into a new, empty one.
 
@@ -35,7 +35,7 @@ This copies a test run's test cases and settings into a new, empty one.
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
-  signed off. Its test cases, verdicts and configuration can no longer change.
+  signed off. Its test cases, run item statuses and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
     1. live nodes, then retired ones
     2. the number the tester gave the node
@@ -56,7 +56,7 @@ This copies a test run's test cases and settings into a new, empty one.
 - **Rule-TREE-PANEL-069** — Re-create works on a test run in any status,
   including a signed-off one. That is what it is for.
 - **Rule-TREE-PANEL-070** — Only the test cases and the configuration are
-  carried over. Verdicts, durations and failure details start fresh.
+  carried over. Run item statuses, durations and failure details start fresh.
 - **Rule-TREE-PANEL-071** — The next name is suggested by counting up. *cycle-1*
   becomes *cycle-2*, and a name with no number on it gets one: *smoke* becomes *smoke-2*. A name already taken is
   skipped.
@@ -65,7 +65,7 @@ This copies a test run's test cases and settings into a new, empty one.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is, drawn with Inactive beside its name like any other status. Its test sets,
-  test cases and runs are not read, because a project nobody is working on is
+  test cases and test runs are not read, because a project nobody is working on is
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
@@ -73,11 +73,11 @@ This copies a test run's test cases and settings into a new, empty one.
 ## What the tester sees
 
 The **Create Test Run** dialog opens. It is the dialog drawn under
-[UC-TREE-PANEL-009](createTestRun.md), with the same title and the same **Create** button. It arrives filled in. The
-next name is in *Test Run name*,
-the same test cases are ticked, and the same configuration is set. After **Create**, the new test run's editor opens and
-*Run created* shows above the
-status bar at the bottom right of the IDE.
+[UC-TREE-PANEL-009](createTestRun.md), with the same title and the same
+**Create** button. It arrives filled in. The next name is in *Test Run name*,
+the same test cases are ticked, and the same configuration is set. After
+**Create**, the new test run's editor opens and *Created* shows above the status
+bar at the bottom right of the IDE.
 
 ## Main flow
 
@@ -90,7 +90,7 @@ status bar at the bottom right of the IDE.
    there.
 5. The tester presses **Create**.
 6. Testin writes a new test run, with every ticked test case **Pending**.
-7. Its editor opens, and Testin shows *Run created*.
+7. Its editor opens, and Testin shows *Created*.
 
 ## What Testin refuses
 

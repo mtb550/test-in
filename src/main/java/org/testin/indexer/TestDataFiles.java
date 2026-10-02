@@ -80,20 +80,20 @@ final class TestDataFiles {
     }
 
     // Rule-INTERNAL-011
-    @NotNull List<Path> resultsIn(final @NotNull Path runPath) {
-        try (Stream<Path> inside = Files.list(runPath)) {
+    @NotNull List<Path> resultsIn(final @NotNull Path testRunPath) {
+        try (Stream<Path> inside = Files.list(testRunPath)) {
             return inside.filter(file -> FileKind.of(file) == FileKind.RUN_ITEM).toList();
         } catch (final IOException ex) {
-            Logger.warn("Could not list the results in " + runPath + ": " + FailureText.of(ex));
+            Logger.warn("Could not list the results in " + testRunPath + ": " + FailureText.of(ex));
             return List.of();
         }
     }
 
-    @NotNull List<Path> screenshotsIn(final @NotNull Path runPath) {
-        try (Stream<Path> inside = Files.list(runPath)) {
+    @NotNull List<Path> screenshotsIn(final @NotNull Path testRunPath) {
+        try (Stream<Path> inside = Files.list(testRunPath)) {
             return inside.filter(file -> FileKind.of(file, DirectoryType.TR) == FileKind.SCREENSHOT).toList();
         } catch (final IOException ex) {
-            Logger.warn("Could not list the screenshots in " + runPath + ": " + FailureText.of(ex));
+            Logger.warn("Could not list the screenshots in " + testRunPath + ": " + FailureText.of(ex));
             return List.of();
         }
     }

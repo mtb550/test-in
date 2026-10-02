@@ -60,7 +60,7 @@ import org.testin.model.markers.DetailRow;
 import org.testin.report.ReportTile;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
-import org.testin.testrun.RunEditorAttributes;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.util.FailureText;
@@ -259,7 +259,7 @@ public final class TestRunWordGenerator {
         addHeading(doc, sectionNumber + ". " + section.getTitle(), 20, 12);
         addText(doc, description, ReportFont.LEAD.ptRounded(), false, BLACK, NO_BORDER, 12);
 
-        final @NotNull List<RunEditorAttributes> failureDetail = section.getFailureDetailColumns();
+        final @NotNull List<TestRunEditorAttributes> failureDetail = section.getFailureDetailColumns();
         XWPFTable table = doc.createTable(1, 2 + failureDetail.size());
         table.setWidth("100%");
         table.setWidthType(TableWidthType.PCT);
@@ -270,7 +270,7 @@ public final class TestRunWordGenerator {
         addTestCaseHeader(headerRow, 0, "#", headerBg, headerFg);
         addTestCaseHeader(headerRow, 1, Bundle.message("caption.test.case"), headerBg, headerFg);
         int column = 2;
-        for (final RunEditorAttributes detail : failureDetail) {
+        for (final TestRunEditorAttributes detail : failureDetail) {
             addTestCaseHeader(headerRow, column++, detail.getName(), headerBg, headerFg);
         }
 

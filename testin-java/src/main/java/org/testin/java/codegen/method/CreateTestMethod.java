@@ -207,7 +207,7 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
 
         if (adopted > 0) {
             Logger.info("Linked " + adopted + " hand-written method(s) in "
-                    + targetClass.getQualifiedName() + " to the cases that describe them");
+                    + targetClass.getQualifiedName() + " to the test cases that describe them");
         }
 
         reportLostTheName(p, targetClass, lostTheName);
@@ -242,7 +242,7 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
     private void reportCannotBeNamed(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> cannotBeNamed) {
         if (cannotBeNamed.isEmpty()) return;
 
-        Logger.warn("No method for " + cannotBeNamed.size() + " case(s) in " + targetClass.getQualifiedName()
+        Logger.warn("No method for " + cannotBeNamed.size() + " test case(s) in " + targetClass.getQualifiedName()
                 + ": the description cannot name a Java method");
 
         Services.getInstance(p, Notifier.class).warn(p, noMethodTitle(cannotBeNamed),
@@ -253,7 +253,7 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
     private void reportLostTheName(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> lost) {
         if (lost.isEmpty()) return;
 
-        Logger.warn("No method for " + lost.size() + " case(s) in " + targetClass.getQualifiedName()
+        Logger.warn("No method for " + lost.size() + " test case(s) in " + targetClass.getQualifiedName()
                 + ": the name is already taken by another method");
 
         Services.getInstance(p, Notifier.class).warn(p, noMethodTitle(lost),

@@ -8,7 +8,7 @@
 **As a** tester, **I want** to start a test run over the test cases I choose, **so that** a pass through the product is
 recorded on its own.
 
-A test run is one round of testing, with a verdict for each test case.
+A test run is one round of testing, with a run item status for each test case.
 
 ## Rules
 
@@ -34,7 +34,7 @@ A test run is one round of testing, with a verdict for each test case.
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
-  signed off. Its test cases, verdicts and configuration can no longer change.
+  signed off. Its test cases, run item statuses and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
     1. live nodes, then retired ones
     2. the number the tester gave the node
@@ -62,12 +62,12 @@ A test run is one round of testing, with a verdict for each test case.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is, drawn with Inactive beside its name like any other status. Its test sets,
-  test cases and runs are not read, because a project nobody is working on is
+  test cases and test runs are not read, because a project nobody is working on is
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-120** — A configuration row is shown only while the answers
-  above it call for it: pick a kind of run that needs no commit id and the
+  above it call for it: pick a kind of test run that needs no commit id and the
   commit id row goes, and comes back the moment the answer changes. A row that
   is not shown is not asked, so what is saved holds nothing for it.
 - **Rule-TREE-PANEL-121** — Every configuration row that is shown is answered
@@ -83,8 +83,8 @@ A test run is one round of testing, with a verdict for each test case.
   Run Item Status is not on it: the tree holds test cases, and every run item of
   a new test run starts Pending. Test Set offers the test sets the tree holds.
 - **Rule-TREE-PANEL-130** — A filter changes which test cases the tree shows,
-  never which are ticked. A ticked test case the filter hides stays in the run,
-  and the line beside the button counts it as hidden.
+  never which are ticked. A ticked test case the filter hides stays in the test
+  run, and the line beside the button counts it as hidden.
 - **Rule-TREE-PANEL-131** — Ticking a row while a filter is on ticks only the
   test cases it shows.
 
@@ -139,8 +139,9 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
    *Platform* is **Mobile** and *Component* is **Frontend**. A field that is not on
    the form is not asked and is saved empty. So switching *Platform* from **Web**
    to **Mobile** drops the browser that was picked. **Browser** arrives with
-   *Chrome* already picked, because a run on the web is on Chrome until the tester
-   says otherwise; every other row arrives with nothing picked. The answers are:
+   *Chrome* already picked, because a test run on the web is on Chrome until the
+   tester says otherwise; every other row arrives with nothing picked. The
+   answers are:
 
    | Field       | Offers                                |
    |-------------|---------------------------------------|
@@ -181,9 +182,9 @@ with the test run's own name, test cases and settings.
 
 1. The tester selects **Test Runs** or a test run package.
 2. The tester presses `Ctrl+M`, or chooses **Create**.
-3. The **Create Run Node** dialog opens. Its first row is selected, and reads *Records execution results*. Its gray hint
-   text reads *set name, like Sprint
-   3 Cycle 1...*.
+3. The **Create Test Run Node** dialog opens. Its first row is selected, and
+   reads *Records execution results*. Its gray hint text reads *set name, like
+   Sprint 3 Cycle 1...*.
 4. The tester types a name and presses `Enter`.
 5. The **Create Test Run** dialog opens. It holds the typed name in *Test Run
    name*. It also holds the *Configuration details* form, and a tree of test
@@ -191,12 +192,13 @@ with the test run's own name, test cases and settings.
    retired test sets, anything under an **Archived** package, and empty test
    sets.
 6. The tester ticks and unticks with `Space`, moves with `Tab`, and presses **Create**.
-   To build a run for one purpose, the tester first opens **Filter**, chooses
-   **Group**, then **Smoke**, and the tree shows only the Smoke test cases.
+   To build a test run for one purpose, the tester first opens **Filter**,
+   chooses **Group**, then **Smoke**, and the tree shows only the Smoke test
+   cases.
 7. Testin writes the test run. A progress bar reads *Creating test run
    \<name\>*, and it cannot be canceled. Every ticked test case is **Pending**.
    The test run's status is **Created**.
-8. Its editor opens, and Testin shows *Run created*.
+8. Its test run editor opens, and Testin shows *Created*.
 
 ## What Testin refuses
 

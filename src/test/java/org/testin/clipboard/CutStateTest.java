@@ -56,7 +56,7 @@ public class CutStateTest {
         state.cut(anyEditor(), List.of(testCase()));
 
         assertTrue(state.isCutting(), "the cut is still waiting");
-        assertFalse(state.isCutOf(List.of(testCase())), "a different case on the clipboard is not the cut, so pasting it moves nothing");
+        assertFalse(state.isCutOf(List.of(testCase())), "a different test case on the clipboard is not the cut, so pasting it moves nothing");
     }
 
     @Test

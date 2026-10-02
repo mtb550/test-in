@@ -163,7 +163,7 @@ public interface TestinEditor extends Disposable {
     void onToolBarFilterSelectionChanged();
 
     // UC-REPORT-001
-    default @NotNull Optional<TestRunDirectoryDto> shownRun() {
+    default @NotNull Optional<TestRunDirectoryDto> shownTestRun() {
         return Optional.empty();
     }
 

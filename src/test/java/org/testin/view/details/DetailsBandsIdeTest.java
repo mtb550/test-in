@@ -19,7 +19,7 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Bundle;
 
@@ -39,7 +39,7 @@ import java.util.UUID;
 public class DetailsBandsIdeTest extends BasePlatformTestCase {
 
     private static final @NotNull String RUN = Bundle.message("details.band.run").toUpperCase(Locale.ROOT);
-    private static final @NotNull String TEST_CASE = Bundle.message("details.band.case").toUpperCase(Locale.ROOT);
+    private static final @NotNull String TEST_CASE = Bundle.message("details.band.test.case").toUpperCase(Locale.ROOT);
     private static final @NotNull UUID ID = UUID.fromString("3f2a05c1-8b44-4e2a-9f31-0c7d6b1a9c1b");
     private static final @NotNull String LAST_STEP = "Login";
     private static final @NotNull String STACKTRACE = """
@@ -83,7 +83,7 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
     }
 
     private static @NotNull TestRunItems failed() {
-        return TestRunItems.builder().id(ID).status(TestStatus.FAILED).actualResult("The session was dropped").duration(Duration.ofSeconds(134)).executedBy("muteb").stacktrace(STACKTRACE).build();
+        return TestRunItems.builder().id(ID).status(RunItemStatus.FAILED).actualResult("The session was dropped").duration(Duration.ofSeconds(134)).executedBy("muteb").stacktrace(STACKTRACE).build();
     }
 
     private @NotNull List<String> shown(final @NotNull Optional<TestRunItems> runItem) {
@@ -102,18 +102,18 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
         assertFalse("the stacktrace itself was drawn on the panel: " + words, holds(words, "java.lang.AssertionError"));
     }
 
-    public void testTheRunBandComesBeforeTheTestCaseBand() {
+    public void testTheTestRunBandComesBeforeTheTestCaseBand() {
         final @NotNull List<String> words = shown(Optional.of(failed()));
 
-        assertTrue("the run band was not drawn for a test case the run holds: " + words, words.contains(RUN));
+        assertTrue("the test run band was not drawn for a test case the test run holds: " + words, words.contains(RUN));
         assertTrue("the test case band was not drawn: " + words, words.contains(TEST_CASE));
-        assertTrue("the test case band was drawn above the run band", words.indexOf(RUN) < words.indexOf(TEST_CASE));
+        assertTrue("the test case band was drawn above the test run band", words.indexOf(RUN) < words.indexOf(TEST_CASE));
     }
 
-    public void testATestCaseWithNoRunIsDrawnWithNoBandsAtAll() {
+    public void testATestCaseWithNoTestRunIsDrawnWithNoBandsAtAll() {
         final @NotNull List<String> words = shown(Optional.empty());
 
-        assertFalse("the run band was drawn with nothing to put in it: " + words, words.contains(RUN));
+        assertFalse("the test run band was drawn with nothing to put in it: " + words, words.contains(RUN));
         assertFalse("a band's name was drawn over the only thing on the panel: " + words, words.contains(TEST_CASE));
         assertTrue("the test case's fields were not drawn: " + words, holds(words, "The dashboard opens"));
     }
@@ -122,7 +122,7 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
         assertFalse("the panel is still drawing the id", shown(Optional.empty()).contains(ID.toString()));
     }
 
-    public void testTheTestCaseBandIsFoldedWhereARunStandsAboveIt() {
+    public void testTheTestCaseBandIsFoldedWhereATestRunStandsAboveIt() {
         final @NotNull List<String> words = shown(Optional.of(failed()));
 
         assertTrue("the test case band's name was not drawn: " + words, words.contains(TEST_CASE));

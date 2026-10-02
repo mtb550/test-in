@@ -5,8 +5,8 @@
 **As a** tester, **I want** to write down what actually happened at the moment I
 see it, **so that** the bug report writes itself later.
 
-**Failed** is the one verdict that asks a question first. Testin opens a small
-form before it records anything.
+**Failed** is the one run item status that asks a question first. Testin opens
+a small form before it records anything.
 
 `F`.
 
@@ -36,11 +36,11 @@ form before it records anything.
   reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
-- **Rule-EDITOR-PANEL-143** — Failing is the one verdict that asks for detail.
-  The dialog opens before the verdict is recorded.
+- **Rule-EDITOR-PANEL-143** — Failing is the one run item status that asks for
+  detail. The dialog opens before the run item status is recorded.
 - **Rule-EDITOR-PANEL-144** — `Escape` in the dialog records nothing at all,
-  neither the detail nor the verdict. The dialog closes at once, without asking,
-  even when something was typed.
+  neither the detail nor the run item status. The dialog closes at once, without
+  asking, even when something was typed.
 - **Rule-EDITOR-PANEL-145** — Nothing is written as the tester types. Only
   saving writes.
 - **Rule-EDITOR-PANEL-146** — The dialog opens for one test case. Several at
@@ -172,10 +172,10 @@ form before it records anything.
 
 **If the tester presses `Escape`** — the dialog closes at once, without asking.
 Nothing at all is recorded, what was typed is gone, and the test case keeps
-whatever verdict it had.
+whatever run item status it had.
 
 **If the test case was deleted from its test set** — a message reads *The test
-case was removed - the run keeps what it recorded.*
+case was removed - the test run keeps what it recorded.*
 
 **If the test run is no longer there, or no longer covers the test case** — a
 message is shown. It reads *This test run is no longer here, so nothing was recorded*, or *This test run does not cover

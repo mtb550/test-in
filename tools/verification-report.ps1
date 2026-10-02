@@ -13,7 +13,7 @@
     The question that matters is not "is there a problem" but "is there a new
     one". This answers that: it fails when a count is above its baseline, says so
     when a count has come down, and fails when an IDE the baseline names produced
-    no verdict at all - a check that did not happen must never read as a pass.
+    no result at all - a check that did not happen must never read as a pass.
 
     The numbers live in .github/verification-baseline.txt, and every line's target
     is 0. That is what the JetBrains Marketplace shows on the plugin page.
@@ -55,7 +55,7 @@ function Read-Baseline([string] $path) {
     return $expected
 }
 
-function Read-Verdicts([string] $path) {
+function Read-Results([string] $path) {
     $found = @{}
     if (-not (Test-Path $path)) { return $found }
 
@@ -84,10 +84,10 @@ $baselinePath = Join-Path $repo $Baseline
 $reportsPath = Join-Path $repo $Reports
 
 $expected = Read-Baseline $baselinePath
-$found = Read-Verdicts $reportsPath
+$found = Read-Results $reportsPath
 
 if ($found.Count -eq 0) {
-    Write-Host "No verification verdicts under $reportsPath - the verifier produced nothing." -ForegroundColor Red
+    Write-Host "No verification results under $reportsPath - the verifier produced nothing." -ForegroundColor Red
     exit 1
 }
 
@@ -102,7 +102,7 @@ foreach ($prefix in ($expected.Keys + $found.Keys | Sort-Object -Unique)) {
     $now = $found[$prefix]
 
     if (-not $now) {
-        # A target the baseline names and this run did not reach. A verdict that
+        # A target the baseline names and this run did not reach. A result that
         # never arrived proves nothing, and reading it as "no problems" is how a
         # gate quietly stops gating.
         $missing += $prefix
@@ -117,7 +117,7 @@ foreach ($prefix in ($expected.Keys + $found.Keys | Sort-Object -Unique)) {
 
     if ($now.Count -lt 0) {
         $unreadable += $prefix
-        $rows += [pscustomobject]@{ Ide = $prefix; Build = $now.Ide; Was = $was; Now = '?'; Note = 'verdict not understood' }
+        $rows += [pscustomobject]@{ Ide = $prefix; Build = $now.Ide; Was = $was; Now = '?'; Note = 'result not understood' }
     }
     elseif ($now.Count -gt $was) {
         $worse += [pscustomobject]@{ Prefix = $prefix; Was = $was; Now = $now.Count }
@@ -165,13 +165,13 @@ if ($worse) {
 if ($missing) {
     Write-Host ''
     $labels = ($missing | ForEach-Object { if ($names.ContainsKey($_)) { $names[$_] } else { $_ } }) -join ', '
-    Write-Host "No verdict for: $labels. The verifier did not reach them, so this run proves nothing about them." -ForegroundColor Red
+    Write-Host "No result for: $labels. The verifier did not reach them, so this run proves nothing about them." -ForegroundColor Red
     exit 1
 }
 
 if ($unreadable) {
     Write-Host ''
-    Write-Host "Could not read the verdict for: $($unreadable -join ', ')" -ForegroundColor Red
+    Write-Host "Could not read the result for: $($unreadable -join ', ')" -ForegroundColor Red
     exit 1
 }
 

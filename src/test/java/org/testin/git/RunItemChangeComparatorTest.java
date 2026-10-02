@@ -19,8 +19,8 @@ package org.testin.git;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
-import org.testin.testrun.RunEditorAttributes;
+import org.testin.model.RunItemStatus;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
@@ -44,7 +44,7 @@ public class RunItemChangeComparatorTest {
     private static @NotNull TestRunItems base() {
         return TestRunItems.builder()
                 .id(JUDGED_TEST_CASE)
-                .status(TestStatus.FAILED)
+                .status(RunItemStatus.FAILED)
                 .actualResult("The dashboard never opened")
                 .stacktrace("java.lang.AssertionError: no dashboard")
                 .bugSeverity(BugSeverity.MAJOR)
@@ -73,12 +73,12 @@ public class RunItemChangeComparatorTest {
     }
 
     @Test
-    public void aVerdictChangeShowsTheLabels() {
-        final FieldChange change = onlyChange(base().setStatus(TestStatus.PASSED));
+    public void aRunItemStatusChangeShowsTheLabels() {
+        final FieldChange change = onlyChange(base().setStatus(RunItemStatus.PASSED));
 
-        assertEquals(change.fieldName(), RunEditorAttributes.RUN_STATUS.getName());
-        assertEquals(change.oldValue(), TestStatus.FAILED.getLabel());
-        assertEquals(change.newValue(), TestStatus.PASSED.getLabel());
+        assertEquals(change.fieldName(), TestRunEditorAttributes.RUN_STATUS.getName());
+        assertEquals(change.oldValue(), RunItemStatus.FAILED.getLabel());
+        assertEquals(change.newValue(), RunItemStatus.PASSED.getLabel());
     }
 
     @Test
@@ -102,11 +102,11 @@ public class RunItemChangeComparatorTest {
     }
 
     @Test
-    public void oneLineSaysTheVerdictAndWhatWasSeen() {
+    public void oneLineSaysTheRunItemStatusAndWhatWasSeen() {
         assertEquals(RunItemChangeComparator.summary(base()),
-                TestStatus.FAILED.getLabel() + " - The dashboard never opened");
+                RunItemStatus.FAILED.getLabel() + " - The dashboard never opened");
 
-        assertEquals(RunItemChangeComparator.summary(base().setStatus(TestStatus.PASSED).setActualResult("")),
-                TestStatus.PASSED.getLabel());
+        assertEquals(RunItemChangeComparator.summary(base().setStatus(RunItemStatus.PASSED).setActualResult("")),
+                RunItemStatus.PASSED.getLabel());
     }
 }

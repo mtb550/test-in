@@ -23,7 +23,7 @@ import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -60,8 +60,8 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
         });
 
         testCase = aTestCaseIn(tp);
-        ranIt = aRunOver(tp, "Cycle-1", testCase.getId());
-        ranSomethingElse = aRunOver(tp, "Cycle-2", UUID.randomUUID());
+        ranIt = aTestRunOver(tp, "Cycle-1", testCase.getId());
+        ranSomethingElse = aTestRunOver(tp, "Cycle-2", UUID.randomUUID());
     }
 
     @Override
@@ -108,8 +108,8 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
         return tc;
     }
 
-    private @NotNull Path aRunOver(final TestProjectDirectoryDto tp, final String named, final UUID testCaseId) {
-        final Path runPath = WriteAction.computeAndWait(() -> {
+    private @NotNull Path aTestRunOver(final TestProjectDirectoryDto tp, final String named, final UUID testCaseId) {
+        final Path testRunPath = WriteAction.computeAndWait(() -> {
             final Path path = tp.getTestRunsDirectory().getPath().resolve(named);
             final TestRunDirectoryDto tr = mapper().setTestRunNode(path, tp.getTestRunsDirectory());
             nodes().addTestRunDir(tr);
@@ -117,8 +117,8 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
             return path;
         });
 
-        indexedTestRuns().putTestRun(runPath, new TestRunDto().setResults(List.of(new TestRunItems().setId(testCaseId).setStatus(TestStatus.PASSED))));
-        return runPath;
+        indexedTestRuns().putTestRun(testRunPath, new TestRunDto().setResults(List.of(new TestRunItems().setId(testCaseId).setStatus(RunItemStatus.PASSED))));
+        return testRunPath;
     }
 
     private @NotNull List<Hit> forTheId() {
@@ -127,25 +127,25 @@ public class SearchFindsTestRunsIdeTest extends BasePlatformTestCase {
 
     // UC-INTERNAL-001, Rule-INTERNAL-098
     public void testSearchingATestCaseIdAlsoFindsTheTestRunThatRanIt() {
-        assertTrue("a test case id found no row for the test run holding its verdict",
+        assertTrue("a test case id found no row for the test run holding its run item status",
                 forTheId().stream().anyMatch(hit -> hit.node().getPath().equals(ranIt)));
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-098
-    public void testTheRunRowCarriesTheTestCaseSoItOpensWhereTheVerdictIs() {
-        final Hit inTheRun = forTheId().stream()
+    public void testTheTestRunRowCarriesTheTestCaseSoItOpensWhereTheRunItemStatusIs() {
+        final Hit inTheTestRun = forTheId().stream()
                 .filter(hit -> hit.node().getPath().equals(ranIt))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("no row for the test run that ran the test case"));
 
-        assertEquals("the row does not carry the test case, so choosing it would open the run at no row",
-                testCase.getId(), inTheRun.testCase().orElseThrow().getId());
-        assertEquals("a run row is named by the test case it holds", testCase.getDescription(), inTheRun.name());
+        assertEquals("the row does not carry the test case, so choosing it would open the test run at no row",
+                testCase.getId(), inTheTestRun.testCase().orElseThrow().getId());
+        assertEquals("a test run row is named by the test case it holds", testCase.getDescription(), inTheTestRun.name());
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-098
     public void testATestRunThatDoesNotCoverTheTestCaseIsNoRow() {
-        assertFalse("a test run with no verdict for the test case was listed",
+        assertFalse("a test run with no run item status for the test case was listed",
                 forTheId().stream().anyMatch(hit -> hit.node().getPath().equals(ranSomethingElse)));
     }
 

@@ -49,19 +49,19 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class GenerateReportAction extends AbstractProjectAction {
-    private final @NotNull Supplier<Optional<TestRunDirectoryDto>> selectedRun;
+    private final @NotNull Supplier<Optional<TestRunDirectoryDto>> selectedTestRun;
     private final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
     private final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, Bundle.message("report.action.text"), Bundle.message("report.action.description"), AllIcons.ToolbarDecorator.Export);
-        this.selectedRun = () -> TreeValues.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
+        this.selectedTestRun = () -> TreeValues.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
         registerCustomShortcutSet(Shortcuts.GenerateReport.getCustomShortcut(), tree);
     }
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor) {
         super(p, Bundle.message("report.action.text"), Bundle.message("report.action.description"), AllIcons.Actions.Report);
-        this.selectedRun = editor::shownRun;
+        this.selectedTestRun = editor::shownTestRun;
     }
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
@@ -86,19 +86,19 @@ public class GenerateReportAction extends AbstractProjectAction {
     // UC-REPORT-001, Rule-REPORT-001
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        GrayWithReason.unless(this, e, isAvailable(), selectedRun.get()
+        GrayWithReason.unless(this, e, isAvailable(), selectedTestRun.get()
                 .map(tr -> Bundle.message("toolbar.report.disabled", tr.getMarker().getStatus().getLabel()))
-                .orElseGet(() -> Bundle.message("report.select.run.description")));
+                .orElseGet(() -> Bundle.message("report.select.test.run.description")));
     }
 
     // UC-REPORT-001, Rule-REPORT-016
     public boolean isAvailable() {
-        return selectedRun.get().map(tr -> tr.getMarker().getStatus().isReportable()).orElse(false);
+        return selectedTestRun.get().map(tr -> tr.getMarker().getStatus().isReportable()).orElse(false);
     }
 
     // UC-REPORT-001
     public void execute() {
-        selectedRun.get().ifPresent(tr -> new GenerateReportDialog(p,
+        selectedTestRun.get().ifPresent(tr -> new GenerateReportDialog(p,
                 ReportFileName.suggestedFor(p, tr, ZonedDateTime.now()),
                 (format, file) -> processAndSave(tr, format, file)).show());
     }
@@ -113,9 +113,9 @@ public class GenerateReportAction extends AbstractProjectAction {
         BackgroundWork.run(p, Bundle.message("report.task.generating", format.getLabel(), tr.getName()), Bundle.message("report.failed.title", format.getLabel()), indicator -> {
             final @NotNull Path dirPath = tr.getPath();
 
-            final @NotNull TestRunDto runData = testRuns.getTestRunByPath(dirPath);
+            final @NotNull TestRunDto testRunData = testRuns.getTestRunByPath(dirPath);
 
-            final byte[] fileBytes = format.generateReport(p, tr, runData);
+            final byte[] fileBytes = format.generateReport(p, tr, testRunData);
 
             // Rule-REPORT-003
             indicator.checkCanceled();

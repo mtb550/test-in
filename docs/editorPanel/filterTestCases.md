@@ -65,7 +65,7 @@ There is no key for this. The button's tooltip reads **Filter**.
   is cut off and the editor below does not move.
 - **Rule-EDITOR-PANEL-260** — Test Set is on the Filter menu in every editor,
   gray, and reads Test Set (only Create Test Run picks across test sets): a test
-  set editor shows one test set, and a test run does not record which test set
+  case editor shows one test set, and a test run does not record which test set
   each of its test cases came from.
 - **Rule-EDITOR-PANEL-261** — Status filters on the test case's own status -
   Reviewed, Pending, Disabled, To Be Updated - and works in both editors and the
@@ -128,7 +128,7 @@ becomes **Filter**, then the count, then **active**.
 **If the module has never been used** — it is not offered. The list is built
 from what is there.
 
-**In a test set editor** — there is no **Run Item Status** row. Only a test
+**In a test case editor** — there is no **Run Item Status** row. Only a test
 run holds run items, so there is nothing for it to filter on.
 
 ---

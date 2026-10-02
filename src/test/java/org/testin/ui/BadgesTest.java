@@ -20,9 +20,9 @@ import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testin.model.Priority;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testrun.RunEditorAttributes;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testng.annotations.Test;
 
 import java.awt.Color;
@@ -61,14 +61,14 @@ public class BadgesTest {
 
     @Test
     public void aTestCaseThatNeverFailedDrawsNoPill() {
-        final List<Badge> badges = bugBadges(TestRunItems.builder().status(TestStatus.PASSED).build());
+        final List<Badge> badges = bugBadges(TestRunItems.builder().status(RunItemStatus.PASSED).build());
 
         assertEquals(badges.size(), 0, "a severity is shown only on a failure, so a pass draws no badge");
     }
 
     @Test
     public void aFailureTheTesterDidNotTriageDrawsItsDefaults() {
-        final List<Badge> badges = bugBadges(TestRunItems.builder().status(TestStatus.FAILED).build());
+        final List<Badge> badges = bugBadges(TestRunItems.builder().status(RunItemStatus.FAILED).build());
 
         assertEquals(badges.size(), 1);
         assertTrue(badges.getFirst() instanceof BugBadge bug && bug.text().equals("Enhancement / Low"),
@@ -78,8 +78,8 @@ public class BadgesTest {
     private static List<Badge> bugBadges(final TestRunItems item) {
         final List<Badge> badges = new ArrayList<>();
 
-        RunEditorAttributes.BUG_SEVERITY.applyToUI(item, badges, new HashMap<>());
-        RunEditorAttributes.BUG_PRIORITY.applyToUI(item, badges, new HashMap<>());
+        TestRunEditorAttributes.BUG_SEVERITY.applyToUI(item, badges, new HashMap<>());
+        TestRunEditorAttributes.BUG_PRIORITY.applyToUI(item, badges, new HashMap<>());
 
         return badges;
     }

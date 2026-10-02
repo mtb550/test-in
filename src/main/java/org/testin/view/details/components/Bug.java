@@ -26,7 +26,7 @@ import org.testin.bug.BugReports;
 import org.testin.bug.ReportBug;
 import org.testin.bug.RunItem;
 import org.testin.editor.TestinEditors;
-import org.testin.editor.run.RunEditor;
+import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.Nodes;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.TestRunItems;
@@ -57,17 +57,17 @@ public final class Bug {
         return Services.getInstance(p, Nodes.class).find(Services.getInstance(p, TestinRoot.class).resolve(currentPath))
                 .filter(TestRunDirectoryDto.class::isInstance)
                 .map(TestRunDirectoryDto.class::cast)
-                .map(runDirectory -> drawn(p, runItem, dto, bugIssue, runDirectory));
+                .map(testRunDirectory -> drawn(p, runItem, dto, bugIssue, testRunDirectory));
     }
 
     // UC-VIEW-PANEL-005, UC-VIEW-PANEL-016, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075, Rule-VIEW-PANEL-086
-    private static @NotNull JComponent drawn(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull TestCaseDto dto, final @NotNull Optional<String> bugIssue, final @NotNull TestRunDirectoryDto runDirectory) {
+    private static @NotNull JComponent drawn(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull TestCaseDto dto, final @NotNull Optional<String> bugIssue, final @NotNull TestRunDirectoryDto testRunDirectory) {
         final @NotNull JBPanel<?> line = AbstractDetails.row(LINK_GAP);
 
         chip(runItem).ifPresent(line::add);
         bugIssue.ifPresentOrElse(
                 url -> line.add(issue(url)),
-                () -> line.add(report(p, runItem, dto, runDirectory)));
+                () -> line.add(report(p, runItem, dto, testRunDirectory)));
 
         return line;
     }
@@ -82,12 +82,12 @@ public final class Bug {
     }
 
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075
-    private static @NotNull ActionLink report(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto runDirectory) {
+    private static @NotNull ActionLink report(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto testRunDirectory) {
         final @NotNull Optional<String> off = Services.getInstance(p, BugReports.class)
-                .whyReportBugIsOff(new RunItem(runDirectory.getPath(), runItem.getId()), runItem);
+                .whyReportBugIsOff(new RunItem(testRunDirectory.getPath(), runItem.getId()), runItem);
 
         final @NotNull ActionLink report = AbstractDetails.link(Bundle.message("bug.dialog.title"),
-                _ -> ReportBug.start(p, runDirectory, runItem.getId(), dto, () -> redraw(p, dto, runDirectory)));
+                _ -> ReportBug.start(p, testRunDirectory, runItem.getId(), dto, () -> redraw(p, dto, testRunDirectory)));
 
         report.setEnabled(off.isEmpty());
         Tooltip.set(report, off.orElse(""));
@@ -109,8 +109,8 @@ public final class Bug {
         return Optional.of(holder);
     }
 
-    private static void redraw(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto runDirectory) {
+    private static void redraw(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull TestRunDirectoryDto testRunDirectory) {
         ViewToolWindowFactory.refreshIfShowing(p, List.of(dto));
-        Services.getInstance(p, TestinEditors.class).runEditorFor(runDirectory).ifPresent(RunEditor::refreshView);
+        Services.getInstance(p, TestinEditors.class).testRunEditorFor(testRunDirectory).ifPresent(TestRunEditor::refreshView);
     }
 }

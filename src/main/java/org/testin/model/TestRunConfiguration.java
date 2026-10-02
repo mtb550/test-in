@@ -106,9 +106,9 @@ public enum TestRunConfiguration {
     private final @NotNull ShownWhen shownWhen;
     private final @NotNull String defaultAnswer;
 
-    public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunMarker run) {
+    public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunMarker testRun) {
         return Arrays.stream(values())
-                .map(field -> new DetailRow(field.displayName, field.valueIn(run)))
+                .map(field -> new DetailRow(field.displayName, field.valueIn(testRun)))
                 .toList();
     }
 
@@ -123,8 +123,8 @@ public enum TestRunConfiguration {
         return stored;
     }
 
-    public @NotNull String valueIn(final @NotNull TestRunMarker run) {
-        return run.getConfiguration().getOrDefault(this, "");
+    public @NotNull String valueIn(final @NotNull TestRunMarker testRun) {
+        return testRun.getConfiguration().getOrDefault(this, "");
     }
 
     public boolean isChoice() {

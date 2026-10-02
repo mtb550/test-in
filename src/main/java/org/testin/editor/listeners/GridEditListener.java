@@ -27,7 +27,7 @@ import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseSnapshot;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 
@@ -59,19 +59,19 @@ public class GridEditListener extends AbstractGridEditListener {
         this.testCases = Services.getInstance(p, TestCases.class);
     }
 
-    private static @NotNull String quoted(final @NotNull String typed, final @NotNull TestEditorAttributes attr) {
+    private static @NotNull String quoted(final @NotNull String typed, final @NotNull TestCaseEditorAttributes attr) {
         return Bundle.message("grid.refused.as", typed.trim(), attr.getName());
     }
 
     @Override
     protected int columnCount() {
-        return TestEditorAttributes.values().length;
+        return TestCaseEditorAttributes.values().length;
     }
 
     // UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-050
     @Override
     protected @NotNull GridEdit apply(final @NotNull DefaultTableModel model, final @NotNull TestCaseDto tc, final int row, final int col) {
-        final @NotNull TestEditorAttributes attr = TestEditorAttributes.values()[col];
+        final @NotNull TestCaseEditorAttributes attr = TestCaseEditorAttributes.values()[col];
 
         if (!attr.can(Can.EDIT)) return GridEdit.UNCHANGED;
 
@@ -102,7 +102,7 @@ public class GridEditListener extends AbstractGridEditListener {
     }
 
     // UC-EDITOR-PANEL-008, Rule-EDITOR-PANEL-053
-    private void persistAndGenerate(final @NotNull TestCaseDto edited, final @NotNull TestEditorAttributes attr, final @NotNull TestCaseSnapshot undoFrom) {
+    private void persistAndGenerate(final @NotNull TestCaseDto edited, final @NotNull TestCaseEditorAttributes attr, final @NotNull TestCaseSnapshot undoFrom) {
         if (testSetPath.toString().isEmpty()) {
             Logger.warn("[grid] edit not persisted - the editor has no test set path");
             return;

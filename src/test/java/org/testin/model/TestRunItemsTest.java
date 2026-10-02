@@ -36,7 +36,7 @@ public class TestRunItemsTest {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build().showing(Optional.of(tc));
 
         assertSame(item.shownTestCase(), tc);
-        assertFalse(item.isRemoved(), "a row showing a live case is not removed");
+        assertFalse(item.isRemoved(), "a row showing a live test case is not removed");
     }
 
     @Test
@@ -46,7 +46,7 @@ public class TestRunItemsTest {
                 .showing(Optional.of(TestCaseDto.builder().id(id).build()))
                 .showing(Optional.empty());
 
-        assertTrue(item.isRemoved(), "the live case and the removed mark are set by one call, so they cannot disagree");
+        assertTrue(item.isRemoved(), "the live test case and the removed mark are set by one call, so they cannot disagree");
         assertEquals(item.shownTestCase().getDescription(), TestCaseDto.deleted(id).getDescription());
     }
 
@@ -63,7 +63,7 @@ public class TestRunItemsTest {
     public void anUnrunItemIsPending() {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
 
-        assertEquals(item.getStatus(), TestStatus.PENDING, "an unrun item defaults to PENDING");
+        assertEquals(item.getStatus(), RunItemStatus.PENDING, "an unrun item defaults to PENDING");
     }
 
     @Test
@@ -78,15 +78,15 @@ public class TestRunItemsTest {
     }
 
     @Test
-    public void theClockStopsCountingOnceTheVerdictIsIn() {
+    public void theClockStopsCountingOnceTheRunItemStatusIsIn() {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
         item.recordDuration(Duration.ofMillis(10017));
-        item.recordVerdict(TestStatus.PASSED, "Muteb", TestCaseDto.builder().build());
+        item.recordRunItemStatus(RunItemStatus.PASSED, "Muteb", TestCaseDto.builder().build());
 
         item.recordClock(Duration.ofSeconds(24));
 
         assertEquals(item.getDuration(), Duration.ofMillis(10017),
-                "a clock still ticking on a judged case would save the tester's watching time as the method's");
+                "a clock still ticking on a judged test case would save the tester's watching time as the method's");
     }
 
     @Test
@@ -106,9 +106,9 @@ public class TestRunItemsTest {
         item.recordDuration(Duration.ofMillis(84));
         item.setActualResult("expected [true] but found [false]");
 
-        item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", new TestCaseDto());
 
         assertEquals(item.getActualResult(), "");
-        assertEquals(item.getDuration(), Duration.ofMillis(84), "a case that passed still took time");
+        assertEquals(item.getDuration(), Duration.ofMillis(84), "a test case that passed still took time");
     }
 }

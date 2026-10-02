@@ -37,7 +37,7 @@ need five dialogs.
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-171** — **Actual Result** is the only column of a test run
   that can be typed into.
-- **Rule-EDITOR-PANEL-172** — Typing there does not change the verdict.
+- **Rule-EDITOR-PANEL-172** — Typing there does not change the run item status.
 - **Rule-EDITOR-PANEL-173** — A cell tabbed through unchanged writes nothing and
   says nothing.
 - **Rule-EDITOR-PANEL-174** — What is stored is written back into the cell,
@@ -67,11 +67,11 @@ No dialog opens. The cell itself becomes a box.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│  #  | Description               | Run Status  | Actual Result            │
+│  #  | Description               | Run Item Status | Actual Result        │
 ├──────────────────────────────────────────────────────────────────────────┤
-│  1  | Log in with a valid user  | Passed      |                          │
-│  2  | Log in with a locked acc. | Failed      | [The session was dropped]│
-│  3  | Log in with wrong passwo. | Pending     |                          │
+│  1  | Log in with a valid user  | Passed          |                      │
+│  2  | Log in with a locked acc. | Failed          | [Session was dropped]│
+│  3  | Log in with wrong passwo. | Pending         |                      │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -98,8 +98,8 @@ No dialog opens. The cell itself becomes a box.
 test run is read only.
 
 **If the test case was deleted from its test set** — the cell is put back to
-what it held, and a message reads *The test case was removed - the run keeps
-what it recorded.*
+what it held, and a message reads *The test case was removed - the test run
+keeps what it recorded.*
 
 **If the test run is no longer there** — removed, renamed, or being brought in
 by a sync — the cell is put back to what it held. A message reads *This test run is no longer here, so nothing was
@@ -114,10 +114,10 @@ and `B` do nothing until the cell is closed.
 
 ## Why so little can be typed into
 
-A test run records what happened. The verdict, the duration, who ran it and when
-are all written by the act of judging. Typing them in would let the record say
-something nobody did. The actual result is the one thing a tester writes in
-their own words, so it is the one thing the grid lets them type.
+A test run records what happened. The run item status, the duration, who ran it
+and when are all written by the act of judging. Typing them in would let the
+record say something nobody did. The actual result is the one thing a tester
+writes in their own words, so it is the one thing the grid lets them type.
 
 ---
 

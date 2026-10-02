@@ -81,7 +81,7 @@ public final class Display {
         return duration.toHours() == 0 ? minutes : duration.toHours() + ":" + minutes;
     }
 
-    public static @NotNull String formatRunClock(final @NotNull Duration duration) {
+    public static @NotNull String formatTestRunClock(final @NotNull Duration duration) {
         return duration.isZero() ? "" : String.format(Locale.ROOT, "%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
     }
 

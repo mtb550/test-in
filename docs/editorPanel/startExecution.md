@@ -37,13 +37,13 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-130** — The walk only ever lands on a test case waiting
-  for a verdict. It starts at the first one and moves to the next, passing over
-  any that has been judged, whoever judged it.
+  for a run item status. It starts at the first one and moves to the next,
+  passing over any that has been judged, whoever judged it.
 - **Rule-EDITOR-PANEL-131** — Starting marks the test run **In Progress**, and
   stamps when execution began. That stamp is set once and never overwritten.
 - **Rule-EDITOR-PANEL-132** — The clock starts on the test case the walk lands
-  on, and ticks once a second. It stops the moment that test case has a
-  verdict, and what it counted is the duration the test run keeps: a tester who
+  on, and ticks once a second. It stops the moment that test case has a run item
+  status, and what it counted is the duration the test run keeps: a tester who
   read for ten seconds and then ran the automation spent twenty, and twenty is
   what the row says. A test case no clock was counting takes the automation's
   own measure instead, so a row run from its card is still timed.
@@ -52,21 +52,21 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
 - **Rule-EDITOR-PANEL-134** — Reaching the end of the list ends the walk, and
   nothing more. The test run is marked **Completed** only when every test case
   in it has been judged. That question is asked of the test run rather than of
-  the walk, and it is asked wherever a verdict is recorded, however the last one
-  arrived.
+  the walk, and it is asked wherever a run item status is recorded, however the
+  last one arrived.
 - **Rule-EDITOR-PANEL-135** — Start is offered only when there is something to
   walk. Three things leave nothing to walk: a test run holding no test cases, a
   filter that matches nothing, and a list where every test case has been judged.
   All three gray the button. A press that reaches Testin anyway is refused, and
   says so.
 - **Rule-EDITOR-PANEL-227** — The walk follows the test case being executed, not
-  its place in the list, so narrowing the list with the filter never moves a
-  verdict onto another test case. While the filter hides the test case being
-  executed, a verdict key records nothing and says so, and clearing the filter
-  brings it back.
-- **Rule-EDITOR-PANEL-238** — A verdict records a copy of the test case as it is
-  at that moment, so a fix made to the test case while running it is what the
-  verdict keeps.
+  its place in the list, so narrowing the list with the filter never moves a run
+  item status onto another test case. While the filter hides the test case being
+  executed, a run item status key records nothing and says so, and clearing the
+  filter brings it back.
+- **Rule-EDITOR-PANEL-238** — A run item status records a copy of the test case
+  as it is at that moment, so a fix made to the test case while running it is
+  what the run item status keeps.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
   it loses its hover look at once, so a control that has stopped working never
   looks ready to press.
@@ -89,8 +89,8 @@ There is no key for this. The button's tooltip reads **Start Manual Execution**.
 ## What the tester sees
 
 This opens no screen. The toolbar button becomes **Stop Execution**. The editor
-turns to the page holding the first test case with no verdict, and selects its
-row.
+turns to the page holding the first test case with no run item status, and
+selects its row.
 
 The status bar reads **In Progress**, and the clock starts ticking once a
 second. A small message appears at the bottom of the IDE and fades, reading *In Progress*.
@@ -99,27 +99,29 @@ second. A small message appears at the bottom of the IDE and fades, reading *In 
 
 1. The tester presses **Start Manual Execution**.
 2. The test run becomes **In Progress**, and a message says so.
-3. Testin finds the first test case with no verdict.
+3. Testin finds the first test case with no run item status.
 4. The editor turns to the page holding it and selects its row.
-5. The clock starts, and the card and the run clock redraw once a second.
+5. The clock starts, and the card and the test run clock redraw once a second.
 6. The tester judges it with `P`, `F` or `B`.
-7. The walk moves to the next test case waiting for a verdict, passing over
-   any that already has one, and times that one.
+7. The walk moves to the next test case waiting for a run item status,
+   passing over any that already has one, and times that one.
 8. When the walk runs out of test cases it stops, and the test run is written.
-9. If every test case in the test run now has a verdict, the test run is marked **Completed**.
+9. If every test case in the test run now has a run item status, the test run is
+   marked **Completed**.
 
 ## What Testin refuses
 
 **If a walk is already going** — the button is gray, and its tooltip reads *Execution in progress*.
 
 **If the test run is completed or closed** — the button is gray, and its tooltip
-reads *Execution disabled — run status is*, then the status.
+reads *Execution disabled — test run status is*, then the status.
 
-**If nothing is waiting for a verdict** — the button is gray, and its tooltip
-reads *Nothing to execute — no test case is waiting for a verdict*. Three things
-lead to this: a test run holding no test cases, a filter that matches nothing,
-and a list whose test cases have all been judged. [Light mode](lightMode.md)
-grays no button, so its start refuses instead, in a message that fades.
+**If nothing is waiting for a run item status** — the button is gray, and its
+tooltip reads *Nothing to execute — no test case is waiting for a run item
+status*. Three things lead to this: a test run holding no test cases, a filter
+that matches nothing, and a list whose test cases have all been judged. [Light
+mode](lightMode.md) grays no button, so its start refuses instead, in a message
+that fades.
 
 ---
 

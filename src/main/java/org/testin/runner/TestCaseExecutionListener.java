@@ -20,18 +20,18 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Failure;
-import org.testin.model.RunStatus;
+import org.testin.model.ExecutionStatus;
 
 import java.time.Duration;
 
 public interface TestCaseExecutionListener {
     Topic<TestCaseExecutionListener> TOPIC = Topic.create("RunTestCaseNotification", TestCaseExecutionListener.class);
 
-    static void broadcast(final @NotNull Project p, final @NotNull String testName, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
+    static void broadcast(final @NotNull Project p, final @NotNull String testName, final @NotNull ExecutionStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         if (p.isDisposed()) return;
 
         p.getMessageBus().syncPublisher(TOPIC).onStatusChanged(testName, status, duration, failure);
     }
 
-    void onStatusChanged(final @NotNull String testName, final @NotNull RunStatus status, final @NotNull Duration duration, final @NotNull Failure failure);
+    void onStatusChanged(final @NotNull String testName, final @NotNull ExecutionStatus status, final @NotNull Duration duration, final @NotNull Failure failure);
 }

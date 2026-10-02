@@ -143,7 +143,8 @@ the count, then **Test Cases**. Picking a field opens the bulk editor instead.
 That is [UC-EDITOR-PANEL-007](bulkEdit.md).
 
 **In a test run editor** — **Update Test Case** is gray, reading *A test run
-records verdicts, not the test case. Change the test case in its test set.*
+records run item statuses, not the test case. Change the test case in its test
+set.*
 
 ## The dialog cannot be moved
 

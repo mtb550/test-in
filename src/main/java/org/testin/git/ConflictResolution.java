@@ -95,7 +95,7 @@ public final class ConflictResolution {
         if (FileKind.of(file) == FileKind.RUN_ITEM)
             return Optional.of((mapper, _, mine, theirs) -> RunItemMerge.of(mapper, mine, theirs));
         if (DirectoryType.TR.isMarkerOf(String.valueOf(file.getFileName()))) {
-            return Optional.of(RunMarkerMerge::of);
+            return Optional.of(TestRunMarkerMerge::of);
         }
 
         return Optional.empty();

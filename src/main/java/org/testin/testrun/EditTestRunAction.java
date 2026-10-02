@@ -31,7 +31,7 @@ import org.testin.util.Bundle;
 import java.util.Optional;
 
 public class EditTestRunAction extends AbstractAnyProjectAction {
-    static @NotNull Optional<TestRunDirectoryDto> selectedRun(final @NotNull Optional<DirectoryDto> dir) {
+    static @NotNull Optional<TestRunDirectoryDto> selectedTestRun(final @NotNull Optional<DirectoryDto> dir) {
         return dir.filter(TestRunDirectoryDto.class::isInstance)
                 .map(TestRunDirectoryDto.class::cast)
                 .filter(TestRunDirectoryDto::isStillOpen);
@@ -48,7 +48,7 @@ public class EditTestRunAction extends AbstractAnyProjectAction {
     // UC-TREE-PANEL-022, Rule-TREE-PANEL-073
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        GrayWithReason.unless(this, e, selectedRun(TestinData.singleSelectedNode(e)).isPresent(), Bundle.message("run.not.open.description"));
+        GrayWithReason.unless(this, e, selectedTestRun(TestinData.singleSelectedNode(e)).isPresent(), Bundle.message("test.run.not.open.description"));
     }
 
     @Override

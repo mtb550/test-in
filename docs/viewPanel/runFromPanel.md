@@ -59,9 +59,10 @@ The three buttons sit on the line under the title, beside the badges.
 1. The panel is showing a test case.
 2. The tester moves the pointer over the run button, and it grows.
 3. The tester clicks it.
-4. Testin starts the test case as a run of one.
+4. Testin starts the test case as an execution of one.
 5. A message reads *Running*.
-6. When the result comes back, the whole panel redraws with the new verdict.
+6. When the result comes back, the whole panel redraws with the new run item
+   status.
 
 ## What Testin refuses
 

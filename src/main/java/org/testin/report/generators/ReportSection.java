@@ -21,8 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.ReportColor;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunSummary;
-import org.testin.model.TestStatus;
-import org.testin.testrun.RunEditorAttributes;
+import org.testin.model.RunItemStatus;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 
 import java.util.Arrays;
@@ -36,37 +36,37 @@ enum ReportSection {
             Bundle.message("report.section.failed.title"),
             Bundle.message("report.section.failed.description"),
             TestRunSummary::failed,
-            List.of(RunEditorAttributes.BUG_PRIORITY, RunEditorAttributes.BUG_SEVERITY),
-            TestStatus.FAILED),
+            List.of(TestRunEditorAttributes.BUG_PRIORITY, TestRunEditorAttributes.BUG_SEVERITY),
+            RunItemStatus.FAILED),
 
     PASSED(
             Bundle.message("report.section.passed.title"),
             Bundle.message("report.section.passed.description"),
             TestRunSummary::passed,
             List.of(),
-            TestStatus.PASSED),
+            RunItemStatus.PASSED),
 
     BLOCKED(
             Bundle.message("report.section.blocked.title"),
             Bundle.message("report.section.blocked.description"),
             TestRunSummary::blocked,
             List.of(),
-            TestStatus.BLOCKED),
+            RunItemStatus.BLOCKED),
 
     UNTESTED(
             Bundle.message("report.section.untested.title"),
             Bundle.message("report.section.untested.description"),
             TestRunSummary::untested,
             List.of(),
-            TestStatus.PENDING,
-            TestStatus.UNTESTED),
+            RunItemStatus.PENDING,
+            RunItemStatus.UNTESTED),
 
     REMOVED(
             Bundle.message("report.section.removed.title"),
             Bundle.message("report.section.removed.description"),
             TestRunSummary::removed,
             List.of(),
-            TestStatus.REMOVED);
+            RunItemStatus.REMOVED);
 
     @Getter
     private final @NotNull String title;
@@ -75,10 +75,10 @@ enum ReportSection {
     private final @NotNull String hexColor;
     private final @NotNull ToLongFunction<TestRunSummary> count;
     @Getter
-    private final @NotNull List<RunEditorAttributes> failureDetailColumns;
-    private final @NotNull Set<TestStatus> statuses;
+    private final @NotNull List<TestRunEditorAttributes> failureDetailColumns;
+    private final @NotNull Set<RunItemStatus> statuses;
 
-    ReportSection(final @NotNull String title, final @NotNull String descriptionFmt, final @NotNull ToLongFunction<TestRunSummary> count, final @NotNull List<RunEditorAttributes> failureDetailColumns, final @NotNull TestStatus... statuses) {
+    ReportSection(final @NotNull String title, final @NotNull String descriptionFmt, final @NotNull ToLongFunction<TestRunSummary> count, final @NotNull List<TestRunEditorAttributes> failureDetailColumns, final @NotNull RunItemStatus... statuses) {
         this.title = title;
         this.descriptionFmt = descriptionFmt;
         this.hexColor = statuses[0].getReportHex();

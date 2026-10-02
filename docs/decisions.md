@@ -41,8 +41,8 @@ reason: a decision nobody can find the history of gets made again every year.
 
 **Context.** Test data is JSON on disk, and every panel wants it: the tree draws
 nodes from it, both editors read test cases out of it, the view panel shows one
-test case, the report writes a run out. When each of them read the disk for
-itself, "does this node exist" was a `Files.exists` in one place, a cache
+test case, the report writes a test run out. When each of them read the disk
+for itself, "does this node exist" was a `Files.exists` in one place, a cache
 lookup in another, and a stale `DirectoryDto` in a third.
 
 **Decision.** `org.testin.indexer` is the only package that touches test data.
@@ -79,7 +79,7 @@ and never saves the drawn form; an editable surface loads the **raw** value when
 editing begins. `Rule-EDITOR-PANEL-005` states it for a tester, and
 `Rule-VIEW-PANEL-026` names the four fields that are formatted at all.
 
-**Consequences.** `TestEditorAttributes` answers both questions in one place:
+**Consequences.** `TestCaseEditorAttributes` answers both questions in one place:
 `displayValue` for a reader and `gridValue` for a cell. Reference, module and
 test data are never formatted. An identifier and a label are not sentences. Test
 data is a value that gets used rather than read, so a character the display
@@ -105,11 +105,11 @@ and marker fields carry Lombok's `@NonNull`, which generates the runtime check;
 everything else carries the JetBrains `@NotNull` / `@Nullable` so the annotation
 is the contract.
 
-**Consequences.** `Duration.ZERO` and `Config.NOT_EXECUTED` on a run result are
+**Consequences.** `Duration.ZERO` and `Config.NOT_EXECUTED` on a run item are
 the pattern to copy. `BugSeverity.EMPTY` and `BugPriority.EMPTY` were, until a
 severity nobody chose became Enhancement and a priority Low. `Optional` is used
 as a field type on purpose — a popup built on first show, a service the
-application has not started, a run an editor has not loaded.
+application has not started, a test run an editor has not loaded.
 
 **If you are about to reverse it.** The `OptionalUsedAsFieldOrParameterType`
 inspection is switched off in `.idea/inspectionProfiles/Testin.xml`, and it is
@@ -264,8 +264,8 @@ like a merged pull request.
 
 **Context.** A test run is created by answering eight questions: Test Type,
 Platform, Component, Language, Browser, Device Type and two more. Each offers a
-list to pick from, and what the tester picks is written into the run's JSON
-word for word. `TestRunConfiguration.is(PLATFORM, Answer.WEB)` then reads that
+list to pick from, and what the tester picks is written into the test run's
+JSON word for word. `TestRunConfiguration.is(PLATFORM, Answer.WEB)` then reads that
 stored string back to decide whether the Browser question is asked at all, and
 all four report generators print it.
 
@@ -273,28 +273,28 @@ So one string is three things at once: a caption on a form, a value on disk, and
 half of a rule about which questions follow which answers. The field **names**
 are translated. The options are not.
 
-`TestStatus` solved the same problem the other way round. The constant name is
+`RunItemStatus` solved the same problem the other way round. The constant name is
 what is stored, the label is what is shown, and an import matches the constant
-whatever language the file was written in. The run configuration has no such
-split: its option list is a `String[]` and the stored value is the display
+whatever language the file was written in. The test run configuration has no
+such split: its option list is a `String[]` and the stored value is the display
 string.
 
 **Decision.** The eight option lists stay English. They are values, not labels,
 and Testin does not translate values.
 
-**Consequences.** A run created in a French IDE reads the same as one created in
-an English IDE, in the file and in every report. Nothing that was saved before
-today stops matching the cross-field rule. What it costs is that a French tester
-picks *Web* from a list of English words under a French caption, which reads as
-an oversight until somebody finds this page.
+**Consequences.** A test run created in a French IDE reads the same as one
+created in an English IDE, in the file and in every report. Nothing that was
+saved before today stops matching the cross-field rule. What it costs is that a
+French tester picks *Web* from a list of English words under a French caption,
+which reads as an oversight until somebody finds this page.
 
 **If you are about to reverse it.** Translating an option changes what a saved
-run says. Every run saved before the change keeps the English word, so the rule
-that shows the Browser question stops matching them, and a run created in French
-reads differently in a report generated in English. The way out is the
-`TestStatus` shape - a small enum per field, the constant stored and the label
-shown, plus a read that maps the old stored strings onto the constants. It is
-that read, not the enums, that is the work.
+test run says. Every test run saved before the change keeps the English word, so
+the rule that shows the Browser question stops matching them, and a test run
+created in French reads differently in a report generated in English. The way
+out is the `RunItemStatus` shape - a small enum per field, the constant stored
+and the label shown, plus a read that maps the old stored strings onto the
+constants. It is that read, not the enums, that is the work.
 
 ---
 
@@ -372,16 +372,16 @@ it with an SFTP server (#94). The server sync was the larger of the two to
 carry. It had its own SSH client, a field-by-field merge, a lock so one machine
 synced at a time, and a record of what each machine had agreed with the server.
 It kept a password in the IDE's password store and needed two settings. While a
-sync ran, every run write was held back. That came to 5,183 lines in the `sftp`
-package and its tests, for teams without a Git repository. Muteb, 19 September
-2026: *"we have git only now"*.
+sync ran, every test run write was held back. That came to 5,183 lines in the
+`sftp` package and its tests, for teams without a Git repository. Muteb, 19
+September 2026: *"we have git only now"*.
 
 **Decision.** A test project is shared through Git, or not at all. Export and
 import still hand test cases to somebody without an IDE. The SFTP sync, its
 settings, its dependency and its local test server are removed (#334).
 
 **Consequences.** No SSH client ships in the plugin, and Testin keeps no
-password of its own. A run change is written the moment it is made, with
+password of its own. A test run change is written the moment it is made, with
 nothing held for a sync. `testin.yml` loses the `connection` key, which only
 ever told Git from SFTP: `location: remote` with a `RepoUrl` is a Git project.
 A file that still has `connection` or the server keys has them skipped as
@@ -444,7 +444,7 @@ about the tab rather than a name, and `7c7688fa` ("Grid view: multi-line steps,
 ESC, details on ENTER") fixed it by overriding
 `EditorTabColorProvider.getEditorTabForegroundColor`. That method is a default
 method marked `@ApiStatus.Experimental`, so every Marketplace verification
-report says *1 usage of experimental API* beside the Compatible verdict. The
+report says *1 usage of experimental API* beside the Compatible result. The
 stable way to reach a tab's foreground is the file's status, and the hook for
 that lives in the VCS module.
 
@@ -454,7 +454,7 @@ file, and a release carries the experimental-API line on its plugin page.
 Decided 22 September 2026.
 
 **Consequences.** Each verification report lists one experimental usage, which
-is a warning and not a compatibility problem — the verdict stays Compatible and
+is a warning and not a compatibility problem — the result stays Compatible and
 the release publishes. If the platform changes the method or takes it away,
 nothing throws: an override nobody calls leaves the tabs the color they had
 before, so the cost of being wrong is a tab color rather than a failure.
@@ -472,8 +472,8 @@ runs in PyCharm, Rider, GoLand and WebStorm at all.
 **Context.** Rule-INTERNAL-059 says Escape closes a dialog at once and saves
 nothing, and every dialog in the plugin does. A review counted what that throws
 away: Create Test Case, the nine bulk editors and Result Analysis lose
-everything typed, and the create and edit run form, Update Test Case and the
-commit message lose less (#66, finding 296). Two dialogs had already decided
+everything typed, and the create and edit test run form, Update Test Case and
+the commit message lose less (#66, finding 296). Two dialogs had already decided
 not to ask - the failure form, where a half-written failure is worse than none (Rule-EDITOR-PANEL-144), and Report Bug
 (Rule-VIEW-PANEL-070). The framework is
 one class, so a question on Escape would have been written once and inherited

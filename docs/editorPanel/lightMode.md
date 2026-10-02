@@ -3,12 +3,13 @@
 # UC-EDITOR-PANEL-046: Work in light mode
 
 **As a** tester, **I want** the test case I am judging to stay on top of the
-application I am testing, **so that** I can record a verdict without hunting for
-the IDE.
+application I am testing, **so that** I can record a run item status without
+hunting for the IDE.
 
 Light mode is a separate window that stays above every other window. It shows **one test case at a time**. The tester
 can work in the application under test
-with IntelliJ minimized, and still record a verdict without switching windows.
+with IntelliJ minimized, and still record a run item status without switching
+windows.
 
 |                     |                                                                                                                                                                                                                  |
 |---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -27,12 +28,12 @@ This document describes the window as it was built.
 
 A tester running a test case by hand is not looking at the IDE. They are in a
 browser, or an app, or on a phone, doing what the test case says. The test case
-is behind the window they are working in. Every verdict costs them a window
-switch. They find IntelliJ, find the test run, find the row, click, and come
-back.
+is behind the window they are working in. Every run item status costs them a
+window switch. They find IntelliJ, find the test run, find the row, click, and
+come back.
 
 Light mode removes that switch. The window stays above the application under
-test. The three verdicts are one keystroke away.
+test. The three run item statuses are one keystroke away.
 
 **It is a window of its own, not a panel inside the IDE.** That is the whole
 requirement. A panel disappears when the IDE is minimized. This window does
@@ -42,7 +43,7 @@ not, and staying visible is the reason it exists.
 
 ## Where it opens from
 
-One button on the run editor toolbar. It sits beside the Start and Stop
+One button on the test run editor toolbar. It sits beside the Start and Stop
 buttons it belongs with. Its icon is a sun, borrowed from the IDE's own set of
 icons. The icon names the mode, not the action.
 
@@ -57,9 +58,9 @@ The button is a **toggle**. The tester presses it to open light mode. They press
 it again to close the window and carry on in the editor. It stays pressed for as
 long as the window is there. It works only while the test run is open. It turns
 gray the moment the test run reaches Completed or Closed, and its tooltip then
-says why — *Light Mode records verdicts, and this test run is Completed*. The
-same question grays out Start, and the same question closes this window if it is
-open.
+says why — *Light Mode records run item statuses, and this test run is
+Completed*. The same question grays out Start, and the same question closes this
+window if it is open.
 
 ---
 
@@ -83,15 +84,15 @@ start with.
 
 There is no test case at all. The window shows three things: the test run name,
 how many test cases it holds, and the prompt. There is no description, there are
-no verdict buttons, and there are no clocks.
+no run item status buttons, and there are no clocks.
 
 The window would contradict itself if it showed a test case and offered the
-three verdicts while telling the tester to press Start. The tester would be
-right to ignore the prompt and start judging. This is **stricter than the run
-editor**. The run editor records a verdict whether execution is running or not.
-The difference is deliberate. A test case judged before Start carries a zero
-duration. Here that cannot happen, because there is nothing to judge until the
-test run is going.
+three run item statuses while telling the tester to press Start. The tester
+would be right to ignore the prompt and start judging. This is **stricter than
+the test run editor**. The test run editor records a run item status whether
+execution is running or not. The difference is deliberate. A test case judged
+before Start carries a zero duration. Here that cannot happen, because there is
+nothing to judge until the test run is going.
 
 ### While tests are running, showing the test case alone
 
@@ -155,10 +156,11 @@ being minimized.
 
 ### 2. Start, then Stop
 
-One button that swaps between Start and Stop. It uses the run editor toolbar's
-own two icons. They are read from one place, so the toolbar and this window can
-never end up different. A tester who presses Start in the toolbar and Stop in
-this window is pressing the same two buttons, and should be looking at them.
+One button that swaps between Start and Stop. It uses the test run editor
+toolbar's own two icons. They are read from one place, so the toolbar and this
+window can never end up different. A tester who presses Start in the toolbar and
+Stop in this window is pressing the same two buttons, and should be looking at
+them.
 
 The icon is not the IDE's arrow for running *code*, because a tester running a
 test case by hand runs no code. Stop is a pause symbol rather than a square.
@@ -169,7 +171,7 @@ Seven checkboxes decide what the window shows:
 
 - the test set name
 - the durations
-- the verdict buttons
+- the run item status buttons
 - the status bar
 - Navigate to Test Method
 - Run Test Method
@@ -179,7 +181,7 @@ It carries the toolbar's own Details icon, a tick box with a tick in it. It is
 the same picture in the IDE and in the window, and it is a picture of exactly
 what it opens.
 
-### 4. Run and counter
+### 4. Test run and counter
 
 This says which test run is being executed, and how far through it the tester
 is. `3 / 6` counts the test cases the editor is showing. With a filter on, it
@@ -218,12 +220,13 @@ on the button: the button's name and its key, or the reason it is gray.
 They belong to the test case, so they slide in with it, and the description
 keeps the whole width of a narrow window. Each is an entry of its own in the
 view menu (Rule-EDITOR-PANEL-244). The line shows while the name or any button
-is on it. The buttons go while the failure form is open, as the verdict buttons
-do.
+is on it. The buttons go while the failure form is open, as the run item status
+buttons do.
 
-Run claims the test case for this test run first, as the card's Run does (Rule-EDITOR-PANEL-180), so its verdict comes
-back here. When it does, the walk
-moves on exactly as after the tester's own verdict (Rule-EDITOR-PANEL-242).
+Run claims the test case for this test run first, as the card's Run does
+(Rule-EDITOR-PANEL-180), so its run item status comes back here. When it does,
+the walk moves on exactly as after the tester's own run item status
+(Rule-EDITOR-PANEL-242).
 
 ### 7. The two clocks
 
@@ -297,10 +300,10 @@ spacing come from.
 
 **Its background is the title bar's, not the body's.** The window uses two
 shades, and they mean something. The working area is the pale one. That is the
-test case, the verdict buttons and the clocks. The surrounding frame is the gray
-one. That is the title bar and this row. So the verdict row and the status bar
-look like the two separate things they are, rather than one band split by a
-hairline.
+test case, the run item status buttons and the clocks. The surrounding frame is
+the gray one. That is the title bar and this row. So the run item status row and
+the status bar look like the two separate things they are, rather than one band
+split by a hairline.
 
 **It can be turned off in two places.** It is a tick box in the view menu, so a
 tester who has learned the keys can win the row back in this window. It is also
@@ -318,15 +321,16 @@ row back for that one state.
 and the rest is simply not there. So the order was chosen, not left to chance.
 The two keys with no button to teach them come first. The ones that fall off
 a narrow window are exactly the ones with buttons sitting above them - the two
-button keys first, at the window's starting width, then the three verdicts.
-Making the window wider brings them back. So the edge of the window has a second job.
+button keys first, at the window's starting width, then the three run item
+statuses. Making the window wider brings them back. So the edge of the window
+has a second job.
 
-### 11. The verdict bar
+### 11. The run item status buttons
 
 Three buttons, each printing its own key, all in one color. `P`, `F` and `B` are
-not new keys. The three verdicts already answer to them everywhere else in
-Testin. That is why a fourth verdict will appear here without this window
-changing. The fourth is Out Of Scope, once
+not new keys. The three run item statuses already answer to them everywhere else
+in Testin. That is why a fourth run item status will appear here without this
+window changing. The fourth is Out Of Scope, once
 [#10](https://github.com/mtb550/test-in/issues/10) is done. The words tell the
 three apart. Color would only say "button".
 
@@ -339,7 +343,7 @@ project.
 
 - **Test set name**
 - **Duration** — both clocks, one entry
-- **Verdict buttons**
+- **Run Item Status buttons**
 - **Status bar**
 - **Navigate to Test Method**
 - **Run Test Method** — Run and Stop are one button, so one entry
@@ -354,17 +358,17 @@ rather than a page in Settings.
 one and keeping the other would leave a lopsided row. It would also leave a
 toggle nobody would reach for twice.
 
-**The verdict buttons and the clocks are one strip, with two halves that switch
-on and off.** Turn the buttons off, and the clocks stay where they are. Turn
-the clocks off, and the buttons close up over them. Turn both off, and the
-whole strip is gone, leaving the body sitting directly on the status bar.
+**The run item status buttons and the clocks are one strip, with two halves
+that switch on and off.** Turn the buttons off, and the clocks stay where they
+are. Turn the clocks off, and the buttons close up over them. Turn both off, and
+the whole strip is gone, leaving the body sitting directly on the status bar.
 Nothing is left behind as an empty band, because the window's height is its
 content.
 
-**Hiding the verdict buttons costs nothing, because the status bar still names
-the keys.** That is what makes the smallest window usable, rather than merely
-small. The buttons go. The row that says `P` Passed is still there. Nobody hides
-the buttons and thinks the window stopped working. This is also the one case
+**Hiding the run item status buttons costs nothing, because the status bar
+still names the keys.** That is what makes the smallest window usable, rather
+than merely small. The buttons go. The row that says `P` Passed is still there.
+Nobody hides the buttons and thinks the window stopped working. This is also the one case
 where the tail of that row matters, because no button is left to teach those
 three keys.
 
@@ -388,19 +392,19 @@ project they open.
 
 **The failure form overrides five of the seven.** Pressing `F` shows the actual
 result, the severity, the priority and the error box, whatever is hidden. If a
-verdict needs detail, the window must show that detail, whatever is switched
-off.
-The verdict buttons and the three test case buttons go while the form is open.
-The test case is already judged, and the form is the only thing left to do. The status bar comes back,
-because it is what says how the form is finished.
+run item status needs detail, the window must show that detail, whatever is
+switched off. The run item status buttons and the three test case buttons go
+while the form is open. The test case is already judged, and the form is the
+only thing left to do. The status bar comes back, because it is what says how
+the form is finished.
 
 ---
 
 ## What happens when a test case fails
 
-Passed and Blocked are one keystroke. The verdict is recorded, and the window
-moves to the next test case. Failed is the one verdict that asks for something
-back. A failure nobody described is a failure nobody can act on.
+Passed and Blocked are one keystroke. The run item status is recorded, and the
+window moves to the next test case. Failed is the one run item status that asks
+for something back. A failure nobody described is a failure nobody can act on.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
@@ -453,33 +457,35 @@ have moved the problem, not solved it. Each part remembers the size it was built
 at, and zoom multiplies that starting size. Multiplying the size on screen
 instead would make every turn of the wheel grow on top of the last.
 
-### 13. The same four fields as the run editor's failure dialog
+### 13. The same four fields as the test run editor's failure dialog
 
 The four fields are the actual result, the bug severity, the bug priority and
-the error box. They are exactly the fields the run editor's own failure dialog
-asks for, with the same starting values and the same wording. A failure
-recorded here and one recorded in the run editor are the same record. The actual
-result underlines a misspelled word here as it does there, and `Alt+Enter`
-offers the corrections. It is the same growing box as well: it starts one line
-tall, grows a line at a time as the tester writes, and the window grows with it (Rule-INTERNAL-097).
+the error box. They are exactly the fields the test run editor's own failure
+dialog asks for, with the same starting values and the same wording. A failure
+recorded here and one recorded in the test run editor are the same record. The
+actual result underlines a misspelled word here as it does there, and
+`Alt+Enter` offers the corrections. It is the same growing box as well: it
+starts one line tall, grows a line at a time as the tester writes, and the
+window grows with it (Rule-INTERNAL-097).
 
 ### 14. Inside the window, in a box it already has
 
 There is no second dialog. `Ctrl+D` fills the details box with the badges, the
-steps, the test data and the pre-conditions. While a failure is being written, that same box holds
-these four fields instead. Nothing is added to the window, and nothing is taken
-away. One box swaps what it is showing, and so does the verdict strip below it.
+steps, the test data and the pre-conditions. While a failure is being written,
+that same box holds these four fields instead. Nothing is added to the window,
+and nothing is taken away. One box swaps what it is showing, and so does the run
+item status strip below it.
 
-That is also the decision the `F` key forces. The run editor's own failure
+That is also the decision the `F` key forces. The test run editor's own failure
 dialog belongs to the IDE window, and blocks it until it is closed. Opening it
 would bring IntelliJ to the front. That is exactly what this window exists to
-avoid. The feature would defeat itself on its most common verdict.
+avoid. The feature would defeat itself on its most common run item status.
 
-### 15. Real radio buttons, the same ones the run editor uses
+### 15. Real radio buttons, the same ones the test run editor uses
 
 Real radio buttons, not something smaller. The four fields are written down
-once and shared with the run editor's own dialog, so the same four fields can
-never end up looking different in the two places. The choices come from one
+once and shared with the test run editor's own dialog, so the same four fields
+can never end up looking different in the two places. The choices come from one
 list each, so a new severity or priority appears here on its own.
 
 ### 16. Ctrl+V reads the clipboard, not the cursor
@@ -495,11 +501,11 @@ there only while it holds a picture.
 
 This removes a way to lose work. Passing a test case clears everything recorded
 about a failure on it. So pasting evidence onto a test case and then pressing
-`P` would have destroyed that evidence. The run editor asks first. A window
-where one keystroke records a verdict cannot ask. So evidence only ever lives
-inside a form that `Enter` saves and `Escape` throws away.
+`P` would have destroyed that evidence. The test run editor asks first. A window
+where one keystroke records a run item status cannot ask. So evidence only ever
+lives inside a form that `Enter` saves and `Escape` throws away.
 
-### 17. The verdict buttons disappear while the form is open
+### 17. The run item status buttons disappear while the form is open
 
 There is no **Cancel** button and no **Save & next** button. `Enter` and
 `Escape` already do the same, and two buttons repeating them would cost a row in
@@ -511,7 +517,7 @@ That is the one thing the removal had to pay for. With no buttons, the status
 bar is the only place `Enter` and `Escape` are written down. So while a form is
 open, that row is shown whatever the view menu says.
 
-### 18. Escape puts the test case back to no verdict
+### 18. Escape puts the test case back to no run item status
 
 A tester who presses `F` by mistake gets the test case back unjudged. They do
 not get a Failed with an empty actual result. Only Save records anything.
@@ -526,8 +532,8 @@ the grid behind it. Not the details panel. Not the IDE's editors.
 
 **The text changes size. The window's furniture does not.** Four things change
 size: the test set name, the description, the expected result and the detail
-fields. The title bar, the verdict buttons and the clocks stay the same at
-every zoom. Zoom exists so the
+fields. The title bar, the run item status buttons and the clocks stay the same
+at every zoom. Zoom exists so the
 test case can be read from where the tester is sitting. Making the icons and the
 clocks bigger would only cost the screen space they were trying to free.
 
@@ -584,10 +590,11 @@ plugin where zooming needs no other key held down.
 
 ## How it moves
 
-The window used to change instantly. A verdict was recorded, and the next test
-case was simply there — different words in the same place, and the window a
-different height. On a window that sits above the application under test and is
-looked at rather than worked in, that reads as a redraw rather than as progress.
+The window used to change instantly. A run item status was recorded, and the
+next test case was simply there — different words in the same place, and the
+window a different height. On a window that sits above the application under
+test and is looked at rather than worked in, that reads as a redraw rather than
+as progress.
 
 - **Rule-EDITOR-PANEL-201** — A new test case comes in from above while the one
   it replaces goes down and out. The first test case does not arrive this way,
@@ -606,9 +613,9 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
   is the IDE's own rather than a second one of ours that could disagree with it.
 - **Rule-EDITOR-PANEL-217** — Light mode never grows past the display it is on.
   A test case longer than the screen stops at the edge and says so on its last
-  row. This is because the verdict buttons and the status bar finish a test
-  case, and a window taller than the screen puts them where nobody can reach
-  them.
+  row. This is because the run item status buttons and the status bar finish a
+  test case, and a window taller than the screen puts them where nobody can
+  reach them.
 - **Rule-EDITOR-PANEL-232** — The test set's name sits in a rounded frame with
   no icon. The name and the frame are in the gray of the letter frames beside
   the description, so it reads as a label above the test case rather than as
@@ -626,8 +633,9 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
 - **Rule-EDITOR-PANEL-245** — Light mode answers the keys the IDE's keymap gives
   Navigate to Test Method and Run Test Method, Shift+F5 and F5 by default, and
   F5 stops the test case while its automation runs. The tooltips name the keys,
-  and the status bar lists them after the verdict keys. The buttons and their
-  keys go while the failure form is open, as the verdict buttons do.
+  and the status bar lists them after the run item status keys. The buttons and
+  their keys go while the failure form is open, as the run item status buttons
+  do.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
   it loses its hover look at once, so a control that has stopped working never
   looks ready to press.
@@ -652,7 +660,7 @@ looked at rather than worked in, that reads as a redraw rather than as progress.
   failure saved while the test run is read again, or while a sync is bringing it
   in, is kept.
 
-**Why 200 milliseconds.** `P` is pressed once per test case, so a run of a
+**Why 200 milliseconds.** `P` is pressed once per test case, so a test run of a
 hundred test cases is a hundred of these, and the tester is watching the
 application under test rather than this window. The movement has to be seen
 without being waited for.
@@ -666,29 +674,29 @@ that is the tester's hand on the edge, not a state change.
 
 | Gesture                                        | What happens                                                                                                                                                                                                                                                                                                                                                                                                                 |
 |------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Start**                                      | Sets the test run to In Progress. Begins timing. Shows the first test case that has no verdict. It does exactly what the toolbar's Start button does. Opening the window does not start the test run, because opening a window should not change a test run's status.                                                                                                                                                        |
-| **Stop**                                       | Ends the execution flow. The test run keeps every verdict already recorded. Only the clock stops.                                                                                                                                                                                                                                                                                                                            |
-| **`P` / `B`**                                  | Records the verdict on the current test case. Advances to the next test case that has not been judged.                                                                                                                                                                                                                                                                                                                       |
+| **Start**                                      | Sets the test run to In Progress. Begins timing. Shows the first test case that has no run item status. It does exactly what the toolbar's Start button does. Opening the window does not start the test run, because opening a window should not change a test run's status.                                                                                                                                                |
+| **Stop**                                       | Ends the execution flow. The test run keeps every run item status already recorded. Only the clock stops.                                                                                                                                                                                                                                                                                                                    |
+| **`P` / `B`**                                  | Records the run item status on the current test case. Advances to the next test case that has not been judged.                                                                                                                                                                                                                                                                                                               |
 | **`F`**                                        | Opens the failure capture in place. `Enter` saves and advances. `Escape` returns, with the test case still unjudged.                                                                                                                                                                                                                                                                                                         |
 | **`Ctrl+V`**                                   | On the failure form: a picture on the clipboard is added as a screenshot, wherever the cursor is, and anything else is pasted as text into the box that has it. It does nothing when no failure form is open, so evidence cannot be attached to a test case that is about to be passed and cleared.                                                                                                                          |
 | **`Escape`**                                   | Closes the window. The test run is untouched. Reopening returns to the first unjudged test case.                                                                                                                                                                                                                                                                                                                             |
 | **`Ctrl+D`**                                   | Shows the detail fields, or hides them when they are shown.                                                                                                                                                                                                                                                                                                                                                                  |
-| **`F5`**, or **Run Test Method**               | Runs the test case on screen's generated method, claiming it for this test run first. While it runs, the button is **Stop Test Method** and `F5` stops it. The status that comes back is the verdict, and the walk moves on. The key is the one the IDE's keymap gives Run Test Method.                                                                                                                                      |
+| **`F5`**, or **Run Test Method**               | Runs the test case on screen's generated method, claiming it for this test run first. While it runs, the button is **Stop Test Method** and `F5` stops it. The status that comes back is the run item status, and the walk moves on. The key is the one the IDE's keymap gives Run Test Method.                                                                                                                              |
 | **`Shift+F5`**, or **Navigate to Test Method** | Opens the test case's generated test method in the IDE, behind the window. The key is the one the IDE's keymap gives Navigate to Test Method.                                                                                                                                                                                                                                                                                |
-| **Navigate to Test Case**                      | Opens the test case in its own test set's editor, behind the window. It has no key.                                                                                                                                                                                                                                                                                                                                          |
+| **Navigate to Test Case**                      | Opens the test case in the test case editor of its own test set, behind the window. It has no key.                                                                                                                                                                                                                                                                                                                           |
 | **Wheel**                                      | Zooms the test case and the failure form, inside this window only, with no modifier.                                                                                                                                                                                                                                                                                                                                         |
 | **Drag an edge**                               | Width only. The left and right edges resize. The top and bottom do not. Height is whatever the content needs.                                                                                                                                                                                                                                                                                                                |
 | **Show details, or a view toggle**             | The window grows or shrinks to fit. That is the only way its height changes. It changes immediately, rather than leaving a gap or a scrollbar.                                                                                                                                                                                                                                                                               |
 | **Drag the bar**                               | Moves the window. Its position, width, zoom level and seven view toggles are remembered per machine, not per project.                                                                                                                                                                                                                                                                                                        |
-| **Light Mode pressed again**                   | The window closes. The editor carries on from wherever the test run got to. Nothing is saved or discarded on the way out, because every verdict was written as it was recorded.                                                                                                                                                                                                                                              |
-| **Window closed any other way**                | The button pops back out. That covers `Escape`, the project closing, and the run editor's tab closing. The button shows whether the window is open, rather than remembering that someone opened it.                                                                                                                                                                                                                          |
-| **Verdict set in either view**                 | The other view follows it. Both read the same test run, and neither keeps a copy. So a test case judged in light mode is already judged in the grid behind it, and one judged in the grid moves the window on.                                                                                                                                                                                                               |
+| **Light Mode pressed again**                   | The window closes. The editor carries on from wherever the test run got to. Nothing is saved or discarded on the way out, because every run item status was written as it was recorded.                                                                                                                                                                                                                                      |
+| **Window closed any other way**                | The button pops back out. That covers `Escape`, the project closing, and the test run editor's tab closing. The button shows whether the window is open, rather than remembering that someone opened it.                                                                                                                                                                                                                     |
+| **Run item status set in either view**         | The other view follows it. Both read the same test run, and neither keeps a copy. So a test case judged in light mode is already judged in the grid behind it, and one judged in the grid moves the window on.                                                                                                                                                                                                               |
 | **Last test case judged**                      | The test run finishes itself. Testin marks it **Completed** the moment nothing is left waiting. So this is not something the window decides. The window has already closed, so nothing is left to announce it.                                                                                                                                                                                                               |
-| **Wrong verdict recorded**                     | Press Light Mode to return to the editor. Correct the test case there. Press it again to carry on. The window advances only forward. The grid is where a test run is edited.                                                                                                                                                                                                                                                 |
+| **Wrong run item status recorded**             | Press Light Mode to return to the editor. Correct the test case there. Press it again to carry on. The window advances only forward. The grid is where a test run is edited.                                                                                                                                                                                                                                                 |
 | **Test run reaches Completed or Closed**       | The window closes, and the Light Mode button goes gray. Both ask the same question Start already asks. So a signed-off test run cannot be reopened in light mode, and cannot be started.                                                                                                                                                                                                                                     |
 | **Project or IDE closes**                      | The window closes with the project. Nothing is left running behind it.                                                                                                                                                                                                                                                                                                                                                       |
 | **A clock is read**                            | The whole plugin uses two formats, not four. A test run always shows hours, minutes and seconds, even at zero, so the number never suddenly gets wider. A test case shows minutes and seconds, here, in the grid and in an exported sheet. Milliseconds are measured and saved, and never shown. So a fast automated test case reads `00:00` in the grid where it used to read `84ms`. The real figure is still in the file. |
-| **A test case nobody timed**                   | Blank, in the grid and the sheet. A verdict set from the menu, or set on many test cases at once, was never timed, and `00:00` would claim a measurement nobody took. A test case sitting in front of a tester at zero is the opposite: it has only just started. So light mode's clock shows `00:00`, rather than going blank for its first second.                                                                         |
+| **A test case nobody timed**                   | Blank, in the grid and the sheet. A run item status set from the menu, or set on many test cases at once, was never timed, and `00:00` would claim a measurement nobody took. A test case sitting in front of a tester at zero is the opposite: it has only just started. So light mode's clock shows `00:00`, rather than going blank for its first second.                                                                 |
 
 ---
 
@@ -729,22 +737,22 @@ asks, and the two can never disagree.
 
 ### It only goes forward
 
-A verdict moves to the next test case with no verdict. There is no way back to
-the last one. That is the window's whole shape: one test case, one decision, on
-to the next. The run editor's own menu goes both ways, because that is where a
-test run is edited rather than run.
+Recording a run item status moves on to the next test case that has none. There
+is no way back to the last one. That is the window's whole shape: one test case,
+one decision, on to the next. The test run editor's own menu goes both ways,
+because that is where a test run is edited rather than run.
 
-Correcting a verdict is an editing gesture, so it happens where editing lives.
-The toolbar toggle makes that cheap. The tester presses Light Mode to drop back
-into the grid, fixes the test case, and presses it again to carry on. A Back
-button here would turn this into a second, smaller editor, inside a window
+Correcting a run item status is an editing gesture, so it happens where editing
+lives. The toolbar toggle makes that cheap. The tester presses Light Mode to drop
+back into the grid, fixes the test case, and presses it again to carry on. A
+Back button here would turn this into a second, smaller editor, inside a window
 built to be no such thing.
 
 ### Closing it abandons nothing
 
-Every verdict is written as it is recorded. So there is no session to resume.
-Reopening returns to the first test case with no verdict. That is why `Escape`
-needs no confirmation.
+Every run item status is written as it is recorded. So there is no session to
+resume. Reopening returns to the first test case with no run item status. That
+is why `Escape` needs no confirmation.
 
 ### There is no finished state, because the window is gone
 
@@ -758,7 +766,7 @@ three things already ask whether a test run has reached it:
 
 One question, three answers. There is no fourth state to draw, and no "well
 done" screen to write. A window left open after its test run had ended would
-offer verdicts that nothing could take.
+offer run item statuses that nothing could take.
 
 ### The view menu chooses parts, not fields
 
@@ -792,8 +800,8 @@ window is holding. It changes when the tester opens details, or turns a part
 off. Those are the gestures that actually change how much there is to show.
 
 That removes two problems, not one. A window taller than what it shows has a
-strip of empty gray under the verdict buttons, and looks broken. A window
-shorter than what it shows needs a scrollbar, and a scrollbar in a window
+strip of empty gray under the run item status buttons, and looks broken. A
+window shorter than what it shows needs a scrollbar, and a scrollbar in a window
 showing one test case means scrolling to read the thing you came for. Neither
 happens, because the tester cannot set the height.
 
@@ -824,7 +832,7 @@ for the test case being worked on. A window that puts a climbing number in front
 of a tester is asking them to go faster. A tester going faster is the failure
 this window was built to avoid.
 
-### A verdict color means a verdict was given
+### A run item status color means a run item status was given
 
 Green, red and amber belong to a test case that has been judged. That is what
 they mean everywhere else in the plugin: in the grid, in the tree and in every
@@ -833,10 +841,10 @@ Painting them permanently in all three colors would make color mean "button"
 instead. A tester scanning for color would learn nothing from it. They might
 read the strip as the test case's status.
 
-So the verdict bar is one color, and the words tell the three apart. Color
-returns on the failure form, where **Failed** has actually been chosen. The
-window never shows a test case that already carries a verdict, so there is
-nothing else for color to say.
+So the run item status buttons are one color, and the words tell the three
+apart. Color returns on the failure form, where **Failed** has actually been
+chosen. The window never shows a test case that already carries a run item
+status, so there is nothing else for color to say.
 
 ---
 
@@ -853,14 +861,14 @@ Three of the six:
 - Start and Stop drew the IDE's arrow for running code
 - the window stayed open after a test run was signed off
 
-**Reading the code later found two more.** A right click on a verdict button
-recorded that verdict. With one test run open in two editors, the toolbar button
-updated the wrong one.
+**Reading the code later found two more.** A right click on a run item status
+button recorded that run item status. With one test run open in two editors,
+the toolbar button updated the wrong one.
 
 ---
 
-*The colors are Testin's own green, red and amber, the same three the verdicts
-use everywhere else, and the same blue the reports use.*
+*The colors are Testin's own green, red and amber, the same three the run item
+statuses use everywhere else, and the same blue the reports use.*
 
 ---
 

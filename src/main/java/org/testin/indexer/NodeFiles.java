@@ -206,7 +206,7 @@ final class NodeFiles {
             return true;
 
         } catch (final Exception ex) {
-            Logger.error("Could not give the copied case " + testCaseFile.getFileName() + " a new id: " + FailureText.of(ex));
+            Logger.error("Could not give the copied test case " + testCaseFile.getFileName() + " a new id: " + FailureText.of(ex));
             return false;
         }
     }

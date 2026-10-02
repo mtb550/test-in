@@ -26,7 +26,7 @@ import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.logger.Logger;
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
@@ -39,18 +39,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TablePanelBuilder {
-    public String @NotNull [] buildColumnNames(final @NotNull List<TestEditorAttributes> attributes) {
+    public String @NotNull [] buildColumnNames(final @NotNull List<TestCaseEditorAttributes> attributes) {
         final @NotNull List<String> columnNames = new ArrayList<>();
         columnNames.add("");
         columnNames.add("#");
-        for (final TestEditorAttributes attr : attributes) {
+        for (final TestCaseEditorAttributes attr : attributes) {
             columnNames.add(attr.getName());
         }
         return columnNames.toArray(new String[0]);
     }
 
     // UC-SHARE-003, Rule-SHARE-017
-    public @NotNull DefaultTableModel createModel(final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull List<TestCaseDto> testCases) {
+    public @NotNull DefaultTableModel createModel(final @NotNull List<TestCaseEditorAttributes> importAttributes, final @NotNull List<TestCaseDto> testCases) {
         final String @NotNull [] columns = buildColumnNames(importAttributes);
         final @NotNull DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
@@ -101,14 +101,14 @@ public class TablePanelBuilder {
         );
 
         try {
-            final @NotNull TableColumn priorityCol = table.getColumn(TestEditorAttributes.PRIORITY.getName());
+            final @NotNull TableColumn priorityCol = table.getColumn(TestCaseEditorAttributes.PRIORITY.getName());
             final @NotNull ComboBox<String> priorityBox = new ComboBox<>();
             for (final Priority pr : Priority.values()) {
                 priorityBox.addItem(pr.getLabel());
             }
             priorityCol.setCellEditor(new DefaultCellEditor(priorityBox));
 
-            final @NotNull TableColumn groupCol = table.getColumn(TestEditorAttributes.GROUP.getName());
+            final @NotNull TableColumn groupCol = table.getColumn(TestCaseEditorAttributes.GROUP.getName());
             groupCol.setCellEditor(new GroupMultiSelectEditor(p));
         } catch (final IllegalArgumentException ex) {
             Logger.error(FailureText.of(ex));

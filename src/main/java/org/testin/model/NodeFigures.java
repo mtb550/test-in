@@ -19,20 +19,20 @@ package org.testin.model;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Bundle;
 
-public record NodeFigures(long testSets, long packages, long testCases, long runnableTestCases, long testRuns, @NotNull TestRunSummary run) {
+public record NodeFigures(long testSets, long packages, long testCases, long runnableTestCases, long testRuns, @NotNull TestRunSummary testRun) {
     public static final @NotNull NodeFigures NONE = new NodeFigures(0, 0, 0, 0, 0, TestRunSummary.EMPTY);
 
     public static @NotNull NodeFigures ofChildren(final long testSets, final long packages, final long testCases, final long runnableTestCases, final long testRuns) {
         return new NodeFigures(testSets, packages, testCases, runnableTestCases, testRuns, TestRunSummary.EMPTY);
     }
 
-    public static @NotNull NodeFigures ofRun(final @NotNull TestRunSummary summary) {
+    public static @NotNull NodeFigures ofTestRun(final @NotNull TestRunSummary summary) {
         return new NodeFigures(0, 0, 0, 0, 0, summary);
     }
 
     // UC-INTERNAL-006, Rule-INTERNAL-052
     public @NotNull String rateLabel() {
-        return run.executed() == 0 ? Bundle.message("figures.not.run") : run.passRate() + "%";
+        return testRun.executed() == 0 ? Bundle.message("figures.not.run") : testRun.passRate() + "%";
     }
 
     // UC-TREE-PANEL-012, Rule-TREE-PANEL-038
@@ -45,10 +45,10 @@ public record NodeFigures(long testSets, long packages, long testCases, long run
         final @NotNull String testCasesText = testCases == 1
                 ? Bundle.message("figures.test.cases.one")
                 : Bundle.message("figures.test.cases.many", String.valueOf(testCases));
-        final @NotNull String runsText = testRuns == 1
+        final @NotNull String testRunsText = testRuns == 1
                 ? Bundle.message("figures.test.runs.one")
                 : Bundle.message("figures.test.runs.many", String.valueOf(testRuns));
 
-        return Bundle.message("figures.holds", setsText, testCasesText, runsText);
+        return Bundle.message("figures.holds", setsText, testCasesText, testRunsText);
     }
 }

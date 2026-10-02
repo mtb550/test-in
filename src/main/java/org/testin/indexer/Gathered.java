@@ -27,8 +27,8 @@ enum Gathered {
             NodeCounter::childCounts
     ),
 
-    VERDICTS(
-            NodeCounter::runVerdicts
+    RUN_ITEM_STATUSES(
+            NodeCounter::testRunFigures
     );
 
     private final @NotNull FiguresGatherer gather;

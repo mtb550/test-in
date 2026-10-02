@@ -50,19 +50,19 @@ public class FailureTest {
 
         Failure.NONE.recordOn(item);
 
-        assertEquals(item.getActualResult(), "the dialog never opened", "a manual verdict must not erase this");
+        assertEquals(item.getActualResult(), "the dialog never opened", "a manual run item status must not erase this");
         assertEquals(item.getStacktrace(), "pasted by hand");
     }
 
     @Test
-    public void aFailureWithNoStacktraceDoesNotInheritTheLastRunsOne() {
+    public void aFailureWithNoStacktraceDoesNotInheritTheLastExecutionsOne() {
         final TestRunItems item = row();
         item.setStacktrace("at testProject.SPTestTest.check(SPTestTest.java:42)");
 
         new Failure("Skipped/Terminated", "").recordOn(item);
 
         assertEquals(item.getStacktrace(), "",
-                "the row describes this run, and an older stacktrace would read as the explanation of this one");
+                "the row describes this execution, and an older stacktrace would read as the explanation of this one");
     }
 
     @Test
@@ -70,9 +70,9 @@ public class FailureTest {
         final TestRunItems item = row();
 
         new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
-        item.recordVerdict(TestStatus.PASSED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", new TestCaseDto());
 
-        assertEquals(item.getActualResult(), "", "a case that passed has nothing to explain");
+        assertEquals(item.getActualResult(), "", "a test case that passed has nothing to explain");
         assertEquals(item.getStacktrace(), "");
     }
 
@@ -81,7 +81,7 @@ public class FailureTest {
         final TestRunItems item = row();
 
         new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
-        item.recordVerdict(TestStatus.FAILED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.FAILED, "tester", new TestCaseDto());
 
         assertEquals(item.getActualResult(), "expected [true] but found [false]");
         assertEquals(item.getExecutedBy(), "tester");
@@ -92,7 +92,7 @@ public class FailureTest {
         final TestRunItems item = row().setBugIssueUrl("https://github.com/mtb550/product/issues/123");
 
         new Failure("expected [true] but found [false]", "at testProject.SPTestTest.check").recordOn(item);
-        item.recordVerdict(TestStatus.FAILED, "tester", new TestCaseDto());
+        item.recordRunItemStatus(RunItemStatus.FAILED, "tester", new TestCaseDto());
 
         assertEquals(item.getBugIssueUrl(), "https://github.com/mtb550/product/issues/123");
     }
@@ -112,7 +112,7 @@ public class FailureTest {
 
         Failure.NONE.recordOn(item);
 
-        assertEquals(item.getScreenshots().size(), 1, "a manual verdict must not erase them");
+        assertEquals(item.getScreenshots().size(), 1, "a manual run item status must not erase them");
     }
 
     @Test
@@ -120,6 +120,6 @@ public class FailureTest {
         final TestRunItems item = row().setActualResult("typed by hand").setScreenshots(List.of("k3f9a.png")).setBugSeverity(BugSeverity.MAJOR);
 
         assertEquals(new Failure("boom", "").wouldClear(item), List.of("the actual result", "the screenshots"));
-        assertEquals(Failure.NONE.wouldClear(item), List.of(), "a verdict given by hand clears nothing");
+        assertEquals(Failure.NONE.wouldClear(item), List.of(), "a run item status given by hand clears nothing");
     }
 }

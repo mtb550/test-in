@@ -65,7 +65,7 @@ public class TestRunItems {
     private UUID id = new UUID(0L, 0L);
     @NotNull
     @Builder.Default
-    private TestStatus status = TestStatus.PENDING;
+    private RunItemStatus status = RunItemStatus.PENDING;
     @NotNull
     @Builder.Default
     private String actualResult = "";
@@ -106,8 +106,8 @@ public class TestRunItems {
         return TestCaseDto.builder().id(NOT_JUDGED).build();
     }
 
-    private static boolean clears(final @NotNull TestStatus next) {
-        return next == TestStatus.PASSED;
+    private static boolean clears(final @NotNull RunItemStatus next) {
+        return next == RunItemStatus.PASSED;
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
@@ -124,18 +124,18 @@ public class TestRunItems {
 
     @JsonIgnore
     public boolean isRemoved() {
-        return removed || status == TestStatus.REMOVED;
+        return removed || status == RunItemStatus.REMOVED;
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-EDITOR-PANEL-239
-    public @NotNull TestStatus shownStatus() {
-        return isRemoved() && !status.isVerdict() ? TestStatus.REMOVED : status;
+    public @NotNull RunItemStatus shownStatus() {
+        return isRemoved() && !status.isRunItemStatus() ? RunItemStatus.REMOVED : status;
     }
 
     // Rule-EDITOR-PANEL-253, Rule-VIEW-PANEL-064
     @JsonIgnore
     public boolean isFailed() {
-        return shownStatus() == TestStatus.FAILED;
+        return shownStatus() == RunItemStatus.FAILED;
     }
 
     public @NotNull Optional<String> bugIssue() {
@@ -163,9 +163,9 @@ public class TestRunItems {
 
     // UC-TREE-PANEL-020, Rule-INTERNAL-117
     public boolean markUntestedIfPending() {
-        if (shownStatus() != TestStatus.PENDING) return false;
+        if (shownStatus() != RunItemStatus.PENDING) return false;
 
-        status = TestStatus.UNTESTED;
+        status = RunItemStatus.UNTESTED;
         return true;
     }
 
@@ -184,22 +184,22 @@ public class TestRunItems {
 
     @JsonIgnore
     public boolean isJudged() {
-        return status.isVerdict() || isRemoved();
+        return status.isRunItemStatus() || isRemoved();
     }
 
     // UC-EDITOR-PANEL-031, UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-238, Rule-EDITOR-PANEL-241
-    public void recordVerdict(final @NotNull TestStatus next, final @NotNull String tester, final @NotNull TestCaseDto asItIsNow) {
+    public void recordRunItemStatus(final @NotNull RunItemStatus next, final @NotNull String tester, final @NotNull TestCaseDto asItIsNow) {
         testCase = asItIsNow;
         judge(next, tester);
     }
 
     // UC-EDITOR-PANEL-038, UC-EDITOR-PANEL-039, Rule-EDITOR-PANEL-240
-    public void correctVerdict(final @NotNull TestStatus next, final @NotNull String tester, final @NotNull TestCaseDto asItIsNow) {
+    public void correctRunItemStatus(final @NotNull RunItemStatus next, final @NotNull String tester, final @NotNull TestCaseDto asItIsNow) {
         if (!isJudgedAgainst()) testCase = asItIsNow;
         judge(next, tester);
     }
 
-    private void judge(final @NotNull TestStatus next, final @NotNull String tester) {
+    private void judge(final @NotNull RunItemStatus next, final @NotNull String tester) {
         if (clears(next)) FailureDetail.clearAll(this);
 
         status = next;
@@ -207,7 +207,7 @@ public class TestRunItems {
         executedBy = tester;
     }
 
-    public @NotNull List<String> wouldClear(final @NotNull TestStatus next, final @NotNull Failure failure) {
+    public @NotNull List<String> wouldClear(final @NotNull RunItemStatus next, final @NotNull Failure failure) {
         return clears(next) ? FailureDetail.filledIn(this) : failure.wouldClear(this);
     }
 

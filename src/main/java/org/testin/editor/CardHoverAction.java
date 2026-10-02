@@ -32,7 +32,7 @@ import org.testin.navigate.NavigateToTestCaseAction;
 import org.testin.navigate.NavigateToTestMethodAction;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
-import org.testin.runner.RunTestCases;
+import org.testin.runner.ExecuteTestCases;
 import org.testin.runner.TestNGExecution;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
@@ -62,7 +62,7 @@ public enum CardHoverAction {
             "Testin.RunTestMethod",
             List.of(OptionalPlugin.JAVA, OptionalPlugin.TESTNG),
             AllIcons.RunConfigurations.TestState.Run,
-            RunTestCases::run,
+            ExecuteTestCases::run,
             _ -> Optional.empty()
     ),
 
@@ -71,7 +71,7 @@ public enum CardHoverAction {
             "",
             List.of(OptionalPlugin.TESTNG),
             AllIcons.Actions.Suspend,
-            CardHoverAction::stopRun,
+            CardHoverAction::stopExecution,
             _ -> Optional.empty()
     ),
 
@@ -109,18 +109,18 @@ public enum CardHoverAction {
     }
 
     // UC-EDITOR-PANEL-043
-    private static void stopRun(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+    private static void stopExecution(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         final int stopped = Services.getInstance(p, TestNGExecution.class).stop(testCases);
 
         if (stopped > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, Done.STOPPED, stopped);
     }
 
-    public static @NotNull CardHoverAction runSlot(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        return runSlot(p, List.of(tc));
+    public static @NotNull CardHoverAction executionSlot(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        return executionSlot(p, List.of(tc));
     }
 
     // UC-EDITOR-PANEL-043
-    public static @NotNull CardHoverAction runSlot(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
+    public static @NotNull CardHoverAction executionSlot(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         final @NotNull TestNGExecution execution = Services.getInstance(p, TestNGExecution.class);
 
         return testCases.stream().anyMatch(tc -> execution.isRunning(tc.getId()))
@@ -137,7 +137,7 @@ public enum CardHoverAction {
 
     // UC-EDITOR-PANEL-043
     public @NotNull CardHoverAction gestureOn(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        return this == RUN_TEST_METHOD ? runSlot(p, tc) : this;
+        return this == RUN_TEST_METHOD ? executionSlot(p, tc) : this;
     }
 
     // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-180

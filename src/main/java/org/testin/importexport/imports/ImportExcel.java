@@ -28,7 +28,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.Can;
 import org.testin.testcase.ImportedRow;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.util.FailureText;
 
 import java.io.File;
@@ -53,7 +53,7 @@ public class ImportExcel {
         final @NotNull Map<String, List<TestCaseDto>> result = new LinkedHashMap<>(parseFile(p, file));
 
         Logger.info("Import: parsed " + result.values().stream().mapToInt(List::size).sum()
-                + " cases from " + result.size() + " sheet(s) of " + file.getName());
+                + " test cases from " + result.size() + " sheet(s) of " + file.getName());
         return result;
     }
 
@@ -87,7 +87,7 @@ public class ImportExcel {
         }
 
         // Rule-SHARE-106
-        TestEditorAttributes.sayWhatWasRefused(p, refused);
+        TestCaseEditorAttributes.sayWhatWasRefused(p, refused);
     }
 
     private @NotNull Parsed parseSheet(final @NotNull Project p, final @NotNull Sheet sheet, final @NotNull DataFormatter dataFormatter) {
@@ -100,7 +100,7 @@ public class ImportExcel {
         final @NotNull Map<String, Integer> headerIndexMap = new HashMap<>();
         for (final Cell cell : headerRow) {
             final @NotNull String headerName = dataFormatter.formatCellValue(cell).trim();
-            for (final TestEditorAttributes reqCol : TestEditorAttributes.all(Can.IMPORT)) {
+            for (final TestCaseEditorAttributes reqCol : TestCaseEditorAttributes.all(Can.IMPORT)) {
                 if (reqCol.isColumn(headerName)) {
                     headerIndexMap.put(reqCol.getName().toLowerCase(), cell.getColumnIndex());
                 }
@@ -114,7 +114,7 @@ public class ImportExcel {
         for (final Row row : sheet) {
             if (row.getRowNum() == headerRow.getRowNum() || isEmpty(row, dataFormatter)) continue;
 
-            final @NotNull ImportedRow imported = TestEditorAttributes.importRow(p, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
+            final @NotNull ImportedRow imported = TestCaseEditorAttributes.importRow(p, attr -> Optional.ofNullable(headerIndexMap.get(attr.getName().toLowerCase()))
                     .map(colIndex -> dataFormatter.formatCellValue(row.getCell(colIndex)).trim())
                     .orElse(""));
 

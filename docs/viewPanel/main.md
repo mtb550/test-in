@@ -24,10 +24,10 @@ it.
 |                       | **Getting a test case into the panel**                          |                                                                  |
 | **UC-VIEW-PANEL-001** | [Open a test case's details](openDetails.md)                    | See the whole test case, not only its title.                     |
 | **UC-VIEW-PANEL-002** | [Let the panel follow the selection](followSelection.md)        | Read one test case after another without asking each time.       |
-| **UC-VIEW-PANEL-003** | [Page through several test cases](pageThroughCases.md)          | Walk the selected test cases with two keys.                      |
+| **UC-VIEW-PANEL-003** | [Page through several test cases](pageThroughTestCases.md)          | Walk the selected test cases with two keys.                      |
 |                       | **Reading**                                                     |                                                                  |
 | **UC-VIEW-PANEL-004** | [Read what a test case says](readTestCase.md)                   | Follow the steps and check the expected result.                  |
-| **UC-VIEW-PANEL-005** | [Read what a test run recorded](readRunResult.md)               | See the verdict and what went wrong last time.                   |
+| **UC-VIEW-PANEL-005** | [Read what a test run recorded](readRunItemResult.md)               | See the run item status and what went wrong last time.           |
 | **UC-VIEW-PANEL-006** | [Read the stacktrace behind a failure](readStacktrace.md)       | Copy the whole error into a bug report.                          |
 | **UC-VIEW-PANEL-007** | [Read a test case's history](readHistory.md)                    | See what changed on the test case, and when.                     |
 | **UC-VIEW-PANEL-008** | [See the bugs still open on a test case](seeOpenBugs.md)        | Avoid raising a bug somebody has already raised.                 |
@@ -37,7 +37,7 @@ it.
 | **UC-VIEW-PANEL-010** | [Go to the test set the test case lives in](goToTestSet.md)     | Open the test set and see the test cases around it.              |
 | **UC-VIEW-PANEL-011** | [Change one field without leaving the panel](changeOneField.md) | Fix a wrong field without going back to the editor.              |
 | **UC-VIEW-PANEL-012** | [Run a test case from the panel](runFromPanel.md)               | Try the test case again while reading it.                        |
-| **UC-VIEW-PANEL-013** | [Stop a test case from the panel](stopFromPanel.md)             | Stop a run that is taking too long.                              |
+| **UC-VIEW-PANEL-013** | [Stop a test case from the panel](stopFromPanel.md)             | Stop an execution that is taking too long.                       |
 | **UC-VIEW-PANEL-014** | [Go to the automation code](goToCode.md)                        | Read or change the code behind the test case.                    |
 | **UC-VIEW-PANEL-015** | [Close the panel](closePanel.md)                                | Give the editor the whole width of the screen.                   |
 | **UC-VIEW-PANEL-016** | [Report a failed test case as a bug](reportBug.md)              | File the failure on GitHub without retyping it, and never twice. |
@@ -58,7 +58,7 @@ in front of them while they write down what actually happened.
 
 - A **field** is one thing a test case carries, such as its expected result, its
   steps or its module.
-- A **verdict** is what one test run recorded against this test case:
+- A **run item status** is what one test run recorded against this test case:
   **Passed**, **Failed** or **Blocked**.
 - To **follow the selection** is what the panel does once it is open. The tester
   moves to another test case, and the panel moves with them.
@@ -71,8 +71,8 @@ in front of them while they write down what actually happened.
 |----------------------------|-------------------------------------------------------------|-----------------------------------------------------------------------------|
 | `Enter`                    | Opens the panel on the selected test cases                  | [UC-VIEW-PANEL-001](openDetails.md)                                         |
 | `F2`                       | Opens the menu that changes one field                       | [UC-VIEW-PANEL-011](changeOneField.md)                                      |
-| `Ctrl+Right`               | Moves to the next test case                                 | [UC-VIEW-PANEL-003](pageThroughCases.md)                                    |
-| `Ctrl+Left`                | Moves to the previous test case                             | [UC-VIEW-PANEL-003](pageThroughCases.md)                                    |
+| `Ctrl+Right`               | Moves to the next test case                                 | [UC-VIEW-PANEL-003](pageThroughTestCases.md)                                    |
+| `Ctrl+Left`                | Moves to the previous test case                             | [UC-VIEW-PANEL-003](pageThroughTestCases.md)                                    |
 | `Escape`                   | Closes the panel, pressed in the editor or inside the panel | [UC-VIEW-PANEL-015](closePanel.md)                                          |
 | `Ctrl` and the mouse wheel | Makes every Testin text bigger or smaller                   | [UC-SETTING-011](../setting/changeTextSize.md)                              |
 | `F5`                       | Runs the test case on display, or stops it while it runs    | [UC-VIEW-PANEL-012](runFromPanel.md), [UC-VIEW-PANEL-013](stopFromPanel.md) |
@@ -121,15 +121,16 @@ in front of them while they write down what actually happened.
    the test case's own editor. All three are always drawn; one that cannot work
    here is gray, does not grow under the pointer, and says what it is waiting for (Rule-VIEW-PANEL-085).
 6. **Execution result** — what one test run recorded. The whole band, its name
-   included, is drawn only when the panel was opened from a test run (Rule-VIEW-PANEL-085). Its verdict, its duration
-   and its bug are one line
-   under the band's name, the duration is framed rather than filled, and who ran
-   it and when close the band as a row (Rule-VIEW-PANEL-086). That is
-   [UC-VIEW-PANEL-005](readRunResult.md).
-7. **Test case** — folded until a tester clicks its name, and then every
-   field the test case has, with every empty one left out. The state is
-   remembered for the IDE rather than for one test case. In the test case editor
-   there is no run above it, so the fields are drawn with no heading and no fold (Rule-VIEW-PANEL-087).
+   included, is drawn only when the panel was opened from a test run
+   (Rule-VIEW-PANEL-085). Its run item status, its duration and its bug are one
+   line under the band's name, the duration is framed rather than filled, and
+   who ran it and when close the band as a row (Rule-VIEW-PANEL-086). That is
+   [UC-VIEW-PANEL-005](readRunItemResult.md).
+7. **Test case** — folded until a tester clicks its name, and then every field
+   the test case has, with every empty one left out. The state is remembered for
+   the IDE rather than for one test case. In the test case editor there is no
+   test run above it, so the fields are drawn with no heading and no fold
+   (Rule-VIEW-PANEL-087).
 8. **The captions** — each on a line of its own above its value, in the
    caption font: JetBrains Mono, smaller than the value, in capitals, in gray.
    The value has the whole width of the panel (Rule-VIEW-PANEL-082).
@@ -166,7 +167,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 11** | Every result a running test reported redrew the whole panel, whichever test case reported it. A test run of 200 test cases rebuilt the panel 400 times, each rebuild walking every test run in the project for Open Bugs. The report goes through the same filtered refresh every other writer uses now, so the panel redraws only for the test case it is showing. Fixed 18 September 2026, [#66](https://github.com/mtb550/test-in/issues/66) |
 | **Difference 10** | An F2 edit that Testin could find no place to write was dropped in silence. Fixed 7 September 2026, [#234](https://github.com/mtb550/test-in/issues/234)                                                                                                                                                                                                                                                                                        |
 | **Difference 3**  | The last step of the path looked for a test set where a test run was, and stopped with an internal error. Fixed 8 September 2026, [#227](https://github.com/mtb550/test-in/issues/227)                                                                                                                                                                                                                                                          |
-| **Difference 8**  | Run captions had no colon and test case captions did, in one column. The colon was part of the caption; it belongs to the one surface that needs it, which is copied text. Fixed 9 September 2026, [#232](https://github.com/mtb550/test-in/issues/232)                                                                                                                                                                                         |
+| **Difference 8**  | Test run captions had no colon and test case captions did, in one column. The colon was part of the caption; it belongs to the one surface that needs it, which is copied text. Fixed 9 September 2026, [#232](https://github.com/mtb550/test-in/issues/232)                                                                                                                                                                                    |
 | **Difference 4**  | Every step took a hand pointer and underlined itself and only the last one did anything, so clicking **Test Cases** to go up a level did nothing and said nothing. Every step goes where it says now, through the same `GoTo` the global search uses - the tree comes up and expands to it, and a step with an editor opens that too. Fixed 10 September 2026, [#228](https://github.com/mtb550/test-in/issues/228)                             |
 | **Difference 7**  | Both stripes read **Testin**, so the side a panel was docked on was the only thing that told them apart - and no document could say "open the Testin tool window" without meaning either. They read **Testin Tree** and **Testin View** now: both keep the plugin's name, and each says which of the two it is. Fixed 10 September 2026, [#231](https://github.com/mtb550/test-in/issues/231)                                                   |
 | **Difference 1**  | The run button's tooltip said `F5` and the go to code button's said `Shift+F5`, and neither key did anything while the focus was in the panel. Both are bound there now, to the same `CardHoverAction` that printed them into the tooltip - so the key and the words cannot drift apart. Fixed 10 September 2026, [#225](https://github.com/mtb550/test-in/issues/225)                                                                          |
@@ -181,11 +182,11 @@ closed up, so an issue that quotes one still points at the right thing.
 test case's history should hold, or where it would be read from.
 
 **Question 2** — The Open Bugs tab is empty and says so. Nothing in Testin
-tracks a bug beyond the severity and the priority written on a failed verdict.
+tracks a bug beyond the severity and the priority written on a failed run item.
 
 **Question 3** — Should the panel show a test case at all when it was opened
-from a test run that does not hold it? It shows the test case with no run band
-today, which reads as a test case nobody has run.
+from a test run that does not hold it? It shows the test case with no execution
+result band today, which reads as a test case nobody has run.
 
 ---
 

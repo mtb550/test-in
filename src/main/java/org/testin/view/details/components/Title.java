@@ -21,7 +21,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.ui.framework.Prose;
 import org.testin.util.Fonts;
 
@@ -37,7 +37,7 @@ public class Title extends AbstractDetails {
     // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-025
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        final @NotNull String titleText = TestEditorAttributes.DESCRIPTION.displayValue(dto);
+        final @NotNull String titleText = TestCaseEditorAttributes.DESCRIPTION.displayValue(dto);
         final @NotNull String finalValue = titleText.trim().isEmpty() ? "-" : titleText;
 
         final @NotNull JTextArea mainTitleArea = Prose.of(finalValue);

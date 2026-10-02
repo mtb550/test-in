@@ -33,7 +33,7 @@ public class ReportFileNameTest {
             ZonedDateTime.of(2026, 8, 25, 21, 40, 15, 0, ZoneId.of("Asia/Riyadh"));
 
     @Test
-    public void itSaysTheProjectTheRunAndWhen() {
+    public void itSaysTheProjectTheTestRunAndWhen() {
         assertEquals(ReportFileName.of("Nafath", "Sprint 7 Cycle 3", AT),
                 "TestRun_Nafath_Sprint7Cycle3_25-08-2026_09-40-15PM");
     }
@@ -47,7 +47,7 @@ public class ReportFileNameTest {
     }
 
     @Test
-    public void aRunNamedWithPunctuationStillMakesAFileName() {
+    public void aTestRunNamedWithPunctuationStillMakesAFileName() {
         final @NotNull String name = ReportFileName.of("Nafath", "API / UI: v1.2", AT);
 
         for (final String forbidden : new String[]{"/", "\\", ":", "*", "?", "\"", "<", ">", "|"}) {
@@ -66,7 +66,7 @@ public class ReportFileNameTest {
     }
 
     @Test
-    public void aSecondReportOfTheSameRunIsASecondFile() {
+    public void aSecondReportOfTheSameTestRunIsASecondFile() {
         assertNotEquals(ReportFileName.of("Nafath", "Sprint 7", AT.plusSeconds(1)), ReportFileName.of("Nafath", "Sprint 7", AT));
     }
 }

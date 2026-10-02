@@ -36,7 +36,7 @@ public class RunItemScreenshotsJsonTest {
     private static final String NAME = "k3f9a.png";
 
     @Test
-    public void theRunFileNamesTheScreenshotsAndHoldsNoPicture() {
+    public void theTestRunFileNamesTheScreenshotsAndHoldsNoPicture() {
         final TestRunItems written = TestRunItems.builder().id(UUID.randomUUID()).stacktrace("boom").screenshots(List.of(NAME)).build();
 
         try {
@@ -64,14 +64,14 @@ public class RunItemScreenshotsJsonTest {
     }
 
     @Test
-    public void aNewScreenshotNameIsShortAndNotOneTheRunHolds() {
+    public void aNewScreenshotNameIsShortAndNotOneTheTestRunHolds() {
         final Set<String> taken = new HashSet<>();
 
         IntStream.range(0, 1000).forEach(_ -> {
             final String name = TestRunDirectoryDto.newScreenshotName(taken);
 
             assertTrue(name.matches("[0-9a-z]{5}\\.png"), name);
-            assertTrue(taken.add(name), "a name the run already holds: " + name);
+            assertTrue(taken.add(name), "a name the test run already holds: " + name);
             assertTrue(TestRunDirectoryDto.isScreenshotName(name));
         });
 

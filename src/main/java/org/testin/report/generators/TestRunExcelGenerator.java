@@ -35,7 +35,7 @@ import org.testin.model.markers.DetailRow;
 import org.testin.report.ReportTile;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
-import org.testin.testrun.RunEditorAttributes;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.util.FailureText;
@@ -103,14 +103,14 @@ public final class TestRunExcelGenerator {
     // Rule-REPORT-020
     private static void writeTestCases(final @NotNull Worksheet ws, final @NotNull TestRunDto tr) {
         ws.value(0, 0, Bundle.message("report.excel.caption.id"));
-        ws.value(0, 1, RunEditorAttributes.DESCRIPTION.getName());
-        ws.value(0, 2, RunEditorAttributes.RUN_STATUS.getName());
-        ws.value(0, 3, RunEditorAttributes.ACTUAL_RESULT.getName());
-        ws.value(0, 4, RunEditorAttributes.BUG_SEVERITY.getName());
-        ws.value(0, 5, RunEditorAttributes.BUG_PRIORITY.getName());
-        ws.value(0, 6, RunEditorAttributes.DURATION.getName());
-        ws.value(0, 7, RunEditorAttributes.EXPECTED_RESULT.getName());
-        ws.value(0, 8, RunEditorAttributes.BUG_ISSUE.getName());
+        ws.value(0, 1, TestRunEditorAttributes.DESCRIPTION.getName());
+        ws.value(0, 2, TestRunEditorAttributes.RUN_STATUS.getName());
+        ws.value(0, 3, TestRunEditorAttributes.ACTUAL_RESULT.getName());
+        ws.value(0, 4, TestRunEditorAttributes.BUG_SEVERITY.getName());
+        ws.value(0, 5, TestRunEditorAttributes.BUG_PRIORITY.getName());
+        ws.value(0, 6, TestRunEditorAttributes.DURATION.getName());
+        ws.value(0, 7, TestRunEditorAttributes.EXPECTED_RESULT.getName());
+        ws.value(0, 8, TestRunEditorAttributes.BUG_ISSUE.getName());
         ws.range(0, 0, 0, 8).style().bold().fillColor(ReportColor.PANEL.hex()).set();
 
         int row = 1;
@@ -123,18 +123,18 @@ public final class TestRunExcelGenerator {
             ws.value(row, 1, orNotAvailable(details.getDescription()));
             ws.value(row, 2, result.shownStatus().getLabel());
             ws.value(row, 3, result.getActualResult());
-            ws.value(row, 4, RunEditorAttributes.BUG_SEVERITY.getRunValueExtractor().apply(result));
-            ws.value(row, 5, RunEditorAttributes.BUG_PRIORITY.getRunValueExtractor().apply(result));
+            ws.value(row, 4, TestRunEditorAttributes.BUG_SEVERITY.getRunItemValueExtractor().apply(result));
+            ws.value(row, 5, TestRunEditorAttributes.BUG_PRIORITY.getRunItemValueExtractor().apply(result));
             ws.value(row, 6, Display.formatDuration(result.getDuration()));
             ws.value(row, 7, orNotAvailable(details.getExpectedResult()));
 
-            final @NotNull ReportSection verdict = ReportSection.of(result);
-            ws.range(row, 0, row, 8).style().fillColor(verdict.getHexColor()).fontColor(verdict.textHex()).wrapText(true).set();
+            final @NotNull ReportSection runItemStatus = ReportSection.of(result);
+            ws.range(row, 0, row, 8).style().fillColor(runItemStatus.getHexColor()).fontColor(runItemStatus.textHex()).wrapText(true).set();
 
             final int line = row;
             result.bugIssue().ifPresent(url -> {
                 ws.hyperlink(line, 8, HyperLink.external(url, BugIssueUrl.shortReference(url)));
-                ws.style(line, 8).fillColor(verdict.getHexColor()).fontColor(verdict.textHex()).underlined().set();
+                ws.style(line, 8).fillColor(runItemStatus.getHexColor()).fontColor(runItemStatus.textHex()).underlined().set();
             });
 
             row++;
@@ -158,7 +158,7 @@ public final class TestRunExcelGenerator {
             final @NotNull TestRunSummary summary = TestRunSummary.of(tr.getResults());
 
             writeOverview(wb.newWorksheet(Bundle.message("report.excel.sheet.overview")), Services.getInstance(p, BoundTestProject.class).name(), trDir, summary);
-            writeTestCases(wb.newWorksheet(Bundle.message("report.excel.sheet.cases")), tr);
+            writeTestCases(wb.newWorksheet(Bundle.message("report.excel.sheet.test.cases")), tr);
 
             wb.finish();
 

@@ -46,8 +46,8 @@ public final class TestRuns {
         return indexer.getStore();
     }
 
-    private @NotNull RunWriter runWriter() {
-        return indexer.getRunWriter();
+    private @NotNull TestRunWriter testRunWriter() {
+        return indexer.getTestRunWriter();
     }
 
     public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
@@ -55,10 +55,10 @@ public final class TestRuns {
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-REPORT-021, Rule-VIEW-PANEL-083
-    private @NotNull TestRunDto withTestCasesShown(final @NotNull TestRunDto run) {
+    private @NotNull TestRunDto withTestCasesShown(final @NotNull TestRunDto testRun) {
         final @NotNull IndexerDataStore store = store();
-        run.getResults().forEach(item -> item.showing(store.findTestCase(item.getId())));
-        return run;
+        testRun.getResults().forEach(item -> item.showing(store.findTestCase(item.getId())));
+        return testRun;
     }
 
     // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-065
@@ -72,54 +72,54 @@ public final class TestRuns {
         return store().findTestRun(testRunPath).map(this::withTestCasesShown);
     }
 
-    public void changeRun(final @NotNull Path runPath, final @NotNull Consumer<TestRunDto> change) {
-        findTestRun(runPath).ifPresentOrElse(run -> {
+    public void changeTestRun(final @NotNull Path testRunPath, final @NotNull Consumer<TestRunDto> change) {
+        findTestRun(testRunPath).ifPresentOrElse(testRun -> {
             // Rule-INTERNAL-011
-            final @NotNull Set<UUID> gone = run.coveredIds();
-            change.accept(run);
-            gone.removeAll(run.coveredIds());
+            final @NotNull Set<UUID> gone = testRun.coveredIds();
+            change.accept(testRun);
+            gone.removeAll(testRun.coveredIds());
 
-            runWriter().persist(runPath, run, gone);
-        }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
+            testRunWriter().persist(testRunPath, testRun, gone);
+        }, () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + testRunPath.getFileName()));
     }
 
     // Rule-INTERNAL-011
-    public void changeResult(final @NotNull Path runPath, final @NotNull UUID testCaseId, final @NotNull Consumer<TestRunItems> change) {
-        findTestRun(runPath).ifPresentOrElse(run -> run.resultOf(testCaseId).ifPresentOrElse(result -> {
+    public void changeResult(final @NotNull Path testRunPath, final @NotNull UUID testCaseId, final @NotNull Consumer<TestRunItems> change) {
+        findTestRun(testRunPath).ifPresentOrElse(testRun -> testRun.resultOf(testCaseId).ifPresentOrElse(result -> {
             change.accept(result);
-            runWriter().persistResult(runPath, run, result);
-        }, () -> Logger.warn("'" + runPath.getFileName() + "' no longer covers " + testCaseId + ", so a change to its result was dropped")),
-                () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + runPath.getFileName()));
+            testRunWriter().persistResult(testRunPath, testRun, result);
+        }, () -> Logger.warn("'" + testRunPath.getFileName() + "' no longer covers " + testCaseId + ", so a change to its result was dropped")),
+                () -> Logger.warn("Test run no longer indexed, so a change to it was dropped: " + testRunPath.getFileName()));
     }
 
-    public void changeRunMarker(final @NotNull Path runPath, final @NotNull Consumer<TestRunMarker> change) {
-        store().findTestRunDir(runPath).ifPresentOrElse(dir -> {
+    public void changeTestRunMarker(final @NotNull Path testRunPath, final @NotNull Consumer<TestRunMarker> change) {
+        store().findTestRunDir(testRunPath).ifPresentOrElse(dir -> {
             final @NotNull TestRunMarker marker = dir.getMarker();
             change.accept(marker);
-            runWriter().persistMarker(runPath);
-            indexer.announce(runPath);
-        }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + runPath.getFileName()));
+            testRunWriter().persistMarker(testRunPath);
+            indexer.announce(testRunPath);
+        }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + testRunPath.getFileName()));
     }
 
-    public void saveRun(final @NotNull Path runPath) {
-        changeRun(runPath, _ -> {
+    public void saveTestRun(final @NotNull Path testRunPath) {
+        changeTestRun(testRunPath, _ -> {
         });
     }
 
     public void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
-        runWriter().create(testRunPath, tr);
+        testRunWriter().create(testRunPath, tr);
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
-    public @NotNull List<String> storeScreenshots(final @NotNull Path runPath, final @NotNull List<byte[]> pngs) {
-        return runWriter().storeScreenshots(runPath, pngs);
+    public @NotNull List<String> storeScreenshots(final @NotNull Path testRunPath, final @NotNull List<byte[]> pngs) {
+        return testRunWriter().storeScreenshots(testRunPath, pngs);
     }
 
-    public byte @NotNull [] screenshot(final @NotNull Path runPath, final @NotNull String name) {
-        return runWriter().readScreenshot(runPath, name);
+    public byte @NotNull [] screenshot(final @NotNull Path testRunPath, final @NotNull String name) {
+        return testRunWriter().readScreenshot(testRunPath, name);
     }
 
-    public @NotNull List<byte[]> screenshots(final @NotNull Path runPath, final @NotNull TestRunItems item) {
-        return item.getScreenshots().stream().map(name -> screenshot(runPath, name)).toList();
+    public @NotNull List<byte[]> screenshots(final @NotNull Path testRunPath, final @NotNull TestRunItems item) {
+        return item.getScreenshots().stream().map(name -> screenshot(testRunPath, name)).toList();
     }
 }

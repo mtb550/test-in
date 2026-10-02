@@ -38,11 +38,11 @@ public class MarkerDetailRowsTest {
     }
 
     @Test
-    public void aRunMarkerAnswersForItsExecutionAndItsConfiguration() {
-        final @NotNull TestRunMarker run = new TestRunMarker();
-        run.setConfiguration(new EnumMap<>(Map.of(TestRunConfiguration.PLATFORM, "Web")));
+    public void aTestRunMarkerAnswersForItsExecutionAndItsConfiguration() {
+        final @NotNull TestRunMarker testRun = new TestRunMarker();
+        testRun.setConfiguration(new EnumMap<>(Map.of(TestRunConfiguration.PLATFORM, "Web")));
 
-        final @NotNull List<DetailRow> rows = run.getDetailRows();
+        final @NotNull List<DetailRow> rows = testRun.getDetailRows();
 
         assertEquals(rows.size(), TestRunExecution.values().length + 1 + TestRunConfiguration.values().length,
                 "every execution row, how long it took, and every question: " + rows);
@@ -50,15 +50,15 @@ public class MarkerDetailRowsTest {
     }
 
     @Test
-    public void aRunListsWhatItWasCreatedWith() {
+    public void aTestRunListsWhatItWasCreatedWith() {
         final @NotNull Map<TestRunConfiguration, String> answers = new EnumMap<>(TestRunConfiguration.class);
         answers.put(TestRunConfiguration.PLATFORM, "Web");
         answers.put(TestRunConfiguration.BROWSER, "Firefox");
 
-        final @NotNull TestRunMarker run = new TestRunMarker();
-        run.setConfiguration(answers);
+        final @NotNull TestRunMarker testRun = new TestRunMarker();
+        testRun.setConfiguration(answers);
 
-        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(run);
+        final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(testRun);
 
         assertEquals(rows.size(), TestRunConfiguration.values().length,
                 "every question is offered; a blank answer is dropped when the row is drawn, not here");
@@ -76,7 +76,7 @@ public class MarkerDetailRowsTest {
     }
 
     @Test
-    public void anOlderRunWithNoConfigurationStillAnswers() {
+    public void anOlderTestRunWithNoConfigurationStillAnswers() {
         final @NotNull List<DetailRow> rows = TestRunConfiguration.rowsOf(new TestRunMarker());
 
         assertEquals(rows.size(), TestRunConfiguration.values().length);

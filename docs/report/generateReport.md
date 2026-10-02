@@ -37,7 +37,7 @@ cannot.
 - **Rule-REPORT-006** — The file name is filled in already. It names the test
   project, the test run, the date and the time.
 - **Rule-REPORT-007** — Spaces and special characters are taken out of the
-  project and run names in the file name.
+  project and test run names in the file name.
 - **Rule-REPORT-008** — A part of the name that is empty is left out, rather
   than leaving a gap.
 - **Rule-REPORT-009** — The dialog closes before the work starts.
@@ -51,24 +51,24 @@ cannot.
 - **Rule-REPORT-020** — The spreadsheet has two sheets. Overview holds what the
   other formats print before their tables: the overview, the execution summary
   and the result analysis. Test Cases holds the column names and one row for
-  each test case, and nothing else, each row filled with the color of its
-  verdict.
+  each test case, and nothing else, each row filled with the color of its run
+  item status.
 - **Rule-REPORT-021** — Every row names its test case the way the test run shows
-  it, in every format. A test case deleted since the run was made is named as
-  the run names it, Deleted test case and its id; no row is left blank or
-  printed as a dash.
-- **Rule-REPORT-022** — Words printed on a verdict's color, in every format, are
-  white or near-black, whichever contrasts more with that color.
+  it, in every format. A test case deleted since the test run was made is named
+  as the test run names it, Deleted test case and its id; no row is left blank
+  or printed as a dash.
+- **Rule-REPORT-022** — Words printed on a run item status's color, in every
+  format, are white or near-black, whichever contrasts more with that color.
 - **Rule-REPORT-023** — A line break in what the tester wrote stays a line break
   in every format, so nothing is run together onto one line.
 - **Rule-REPORT-024** — In the web page and the PDF, a test case table's columns
-  are as wide as what they hold: the number and the verdict take only their own
-  width, and the description gets the rest.
-- **Rule-REPORT-025** — A verdict has one color in every report and every
-  format. Failed is the same red on its count tile, its table heading, its
+  are as wide as what they hold: the number and the run item status take only
+  their own width, and the description gets the rest.
+- **Rule-REPORT-025** — A run item status has one color in every report and
+  every format. Failed is the same red on its count tile, its table heading, its
   result analysis line and a bug priority or severity that alarms; passed,
-  blocked and untested the same. The color is the verdict's own, so changing it
-  once changes every report.
+  blocked and untested the same. The color is the run item status's own, so
+  changing it once changes every report.
 
 ## The screen
 
@@ -116,11 +116,11 @@ is [UC-SETTING-006](../setting/setDownloadFolder.md).
 
 ## The three ways in
 
-| The tester does this        | Where                                                                        |
-|-----------------------------|------------------------------------------------------------------------------|
-| Presses `Ctrl+P`            | On a selected test run in the tree, or in a run editor                       |
-| Chooses **Generate Report** | The tree's menu, or the run editor's menu                                    |
-| Presses the report button   | The run editor's toolbar. Its tooltip reads **Generate Test Summary Report** |
+| The tester does this        | Where                                                                             |
+|-----------------------------|-----------------------------------------------------------------------------------|
+| Presses `Ctrl+P`            | On a selected test run in the tree, or in a test run editor                       |
+| Chooses **Generate Report** | The tree's menu, or the test run editor's menu                                    |
+| Presses the report button   | The test run editor's toolbar. Its tooltip reads **Generate Test Summary Report** |
 
 ## What Testin refuses
 
@@ -132,8 +132,9 @@ keep them (Rule-REPORT-018).
 
 **If the test run is still In Progress** — every way of asking is gray: the
 toolbar button, the tree entry and `Ctrl+P`. The button's tooltip reads *A
-report is written once the run has stopped — it is In Progress*. A report is
-about what a run recorded, and a run still going is still recording (Rule-REPORT-016).
+report is written once the test run has stopped — it is In Progress*. A report
+is about what a test run recorded, and a test run still going is still recording
+(Rule-REPORT-016).
 
 **If the selection is not a test run** — **Generate Report** is gray in the tree
 menu, and its tooltip reads *Select a test run to report on.* A report is about

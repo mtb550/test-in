@@ -52,47 +52,47 @@ record EditTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull 
     }
 
     void editAt(final @NotNull TreePath path) {
-        EditTestRunAction.selectedRun(TreeValues.directoryAt(path)).ifPresent(this::edit);
+        EditTestRunAction.selectedTestRun(TreeValues.directoryAt(path)).ifPresent(this::edit);
     }
 
-    private void edit(final @NotNull TestRunDirectoryDto run) {
-        final @NotNull Set<UUID> covered = testRuns.getTestRunByPath(run.getPath()).coveredIds();
+    private void edit(final @NotNull TestRunDirectoryDto testRun) {
+        final @NotNull Set<UUID> covered = testRuns.getTestRunByPath(testRun.getPath()).coveredIds();
 
         boundTestProject.get().ifPresentOrElse(
-                tp -> new RunForm(p).open(tp.getTestCasesDirectory(), run.getName(), covered, run.getMarker().getConfiguration(), saves(run)),
+                tp -> new TestRunForm(p).open(tp.getTestCasesDirectory(), testRun.getName(), covered, testRun.getMarker().getConfiguration(), saves(testRun)),
                 () -> Logger.warn("Edit test run: no test project is bound to " + p.getName()));
     }
 
-    private @NotNull RunFormAction saves(final @NotNull TestRunDirectoryDto run) {
-        return new RunFormAction(Bundle.message("run.edit.title"), StatusBarShortcut.SAVE, (form, selection) -> save(run, form, selection));
+    private @NotNull TestRunFormAction saves(final @NotNull TestRunDirectoryDto testRun) {
+        return new TestRunFormAction(Bundle.message("test.run.edit.title"), StatusBarShortcut.SAVE, (form, selection) -> save(testRun, form, selection));
     }
 
-    private boolean save(final @NotNull TestRunDirectoryDto run, final @NotNull RunConfigurationForm form, final @NotNull SelectionTree selection) {
-        return saveEdit(run, form.getRunName(), RunForm.checkedTestCases(selection), RunForm.offeredTestCases(selection), TestRunConfiguration.answered(form.configuration()));
+    private boolean save(final @NotNull TestRunDirectoryDto testRun, final @NotNull TestRunConfigurationForm form, final @NotNull SelectionTree selection) {
+        return saveEdit(testRun, form.getTestRunName(), TestRunForm.checkedTestCases(selection), TestRunForm.offeredTestCases(selection), TestRunConfiguration.answered(form.configuration()));
     }
 
     // UC-TREE-PANEL-022, Rule-TREE-PANEL-060, Rule-TREE-PANEL-074, Rule-TREE-PANEL-076, Rule-TREE-PANEL-128
-    boolean saveEdit(final @NotNull TestRunDirectoryDto run, final @NotNull String name, final @NotNull Set<UUID> checked, final @NotNull Set<UUID> offered, final @NotNull Map<TestRunConfiguration, String> configuration) {
+    boolean saveEdit(final @NotNull TestRunDirectoryDto testRun, final @NotNull String name, final @NotNull Set<UUID> checked, final @NotNull Set<UUID> offered, final @NotNull Map<TestRunConfiguration, String> configuration) {
         if (name.isEmpty()) {
-            notifier.softRefuse(p, Bundle.message("run.needs.a.name"));
+            notifier.softRefuse(p, Bundle.message("test.run.needs.a.name"));
             return false;
         }
 
-        if (!nodes.nodeExists(run.getPath())) {
-            notifier.softRefuse(p, Bundle.message("run.gone", run.getName()));
+        if (!nodes.nodeExists(testRun.getPath())) {
+            notifier.softRefuse(p, Bundle.message("test.run.gone", testRun.getName()));
             return false;
         }
 
-        if (!run.isStillOpen()) {
-            notifier.softRefuse(p, Bundle.message("run.status.changed", run.getName(), run.getMarker().getStatusLabel()));
+        if (!testRun.isStillOpen()) {
+            notifier.softRefuse(p, Bundle.message("test.run.status.changed", testRun.getName(), testRun.getMarker().getStatusLabel()));
             return false;
         }
 
-        if (!name.equals(run.getName()) && NodeRename.refused(p, run, name)) return false;
+        if (!name.equals(testRun.getName()) && NodeRename.refused(p, testRun, name)) return false;
 
-        applyEdit(run, name, runPath -> {
-            testRuns.changeRun(runPath, held -> held.cover(wanted(held, checked, offered::contains)));
-            testRuns.changeRunMarker(runPath, marker -> marker.configure(configuration));
+        applyEdit(testRun, name, testRunPath -> {
+            testRuns.changeTestRun(testRunPath, held -> held.cover(wanted(held, checked, offered::contains)));
+            testRuns.changeTestRunMarker(testRunPath, marker -> marker.configure(configuration));
         }, () -> notifier.softShow(p, Done.UPDATED));
 
         return true;
@@ -107,25 +107,25 @@ record EditTestRunWork(@NotNull Project p, @NotNull TestRuns testRuns, @NotNull 
         return wanted;
     }
 
-    private void applyEdit(final @NotNull TestRunDirectoryDto run, final @NotNull String toName, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
-        final @NotNull Path from = run.getPath();
+    private void applyEdit(final @NotNull TestRunDirectoryDto testRun, final @NotNull String toName, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
+        final @NotNull Path from = testRun.getPath();
 
-        if (toName.equals(run.getName())) {
+        if (toName.equals(testRun.getName())) {
             write(from, writeTo, onDone);
             return;
         }
 
-        NodeRename.apply(p, run, toName, () -> write(from.resolveSibling(toName), writeTo, onDone));
+        NodeRename.apply(p, testRun, toName, () -> write(from.resolveSibling(toName), writeTo, onDone));
     }
 
-    private void write(final @NotNull Path runPath, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
-        writeTo.accept(runPath);
+    private void write(final @NotNull Path testRunPath, final @NotNull Consumer<Path> writeTo, final @NotNull Runnable onDone) {
+        writeTo.accept(testRunPath);
 
-        BackgroundWork.run(p, Bundle.message("run.task.updating", runPath.getFileName()), Bundle.message("run.update.failed.title"), _ -> {
-            nodes.refreshDirectory(runPath);
+        BackgroundWork.run(p, Bundle.message("test.run.task.updating", testRunPath.getFileName()), Bundle.message("test.run.update.failed.title"), _ -> {
+            nodes.refreshDirectory(testRunPath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                editors.reloadOpen(runPath);
+                editors.reloadOpen(testRunPath);
 
                 onDone.run();
             });

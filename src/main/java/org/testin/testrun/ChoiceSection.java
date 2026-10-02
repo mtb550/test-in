@@ -23,7 +23,7 @@ import org.testin.ui.framework.RadioSelection;
 import java.util.List;
 import java.util.Map;
 
-public record ChoiceSection(@NotNull TestRunConfiguration field, @NotNull ComponentDialogBase<RadioSelection<String>> component) implements RunSection {
+public record ChoiceSection(@NotNull TestRunConfiguration field, @NotNull ComponentDialogBase<RadioSelection<String>> component) implements TestRunSection {
     // UC-TREE-PANEL-022, Rule-TREE-PANEL-121
     public static @NotNull ChoiceSection of(final @NotNull TestRunConfiguration field, final @NotNull String answer, final @NotNull Runnable changed) {
         final @NotNull ComponentDialogBase<RadioSelection<String>> radios = ComponentDialogBase.<String>radios(field.getDisplayName())

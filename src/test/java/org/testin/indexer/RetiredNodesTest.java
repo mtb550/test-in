@@ -72,9 +72,9 @@ public class RetiredNodesTest {
         assertFalse(testSetPackage("p", PackageStatus.ACTIVE).isRetired());
         assertTrue(testSetPackage("p", PackageStatus.ARCHIVED).isRetired());
 
-        final TestRunPackageDirectoryDto runPackage = new TestRunPackageDirectoryDto();
-        runPackage.getMarker().setStatus(PackageStatus.ARCHIVED);
-        assertTrue(runPackage.isRetired());
+        final TestRunPackageDirectoryDto testRunPackage = new TestRunPackageDirectoryDto();
+        testRunPackage.getMarker().setStatus(PackageStatus.ARCHIVED);
+        assertTrue(testRunPackage.isRetired());
     }
 
     @Test

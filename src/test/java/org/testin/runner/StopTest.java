@@ -17,7 +17,7 @@
 package org.testin.runner;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.RunStatus;
+import org.testin.model.ExecutionStatus;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -36,63 +36,63 @@ public class StopTest {
 
     @Test
     public void aTestCaseStoppedBeforeItsLaunchIsNeverTaken() {
-        final RunRegistry registry = new RunRegistry();
+        final ExecutionRegistry registry = new ExecutionRegistry();
         registry.starting(ONE);
         registry.starting(TWO);
 
         registry.stopping(List.of(ONE));
 
-        assertFalse(registry.take(ONE), "a stopped case was still handed to the launch");
-        assertTrue(registry.take(TWO), "the case beside it was dropped from the launch as well");
+        assertFalse(registry.take(ONE), "a stopped test case was still handed to the launch");
+        assertTrue(registry.take(TWO), "the test case beside it was dropped from the launch as well");
     }
 
     @Test
-    public void aStopTakesItsOwnRunAndNoOther() {
-        final RunRegistry registry = new RunRegistry();
+    public void aStopTakesItsOwnExecutionAndNoOther() {
+        final ExecutionRegistry registry = new ExecutionRegistry();
         registry.launched(List.of(ONE, TWO), "cycle 1");
         registry.launched(List.of(THREE), "cycle 2");
 
         final Stop stop = registry.stopping(List.of(ONE));
 
-        assertEquals(stop.runs(), Set.of("cycle 1"), "the stop killed the wrong runs");
-        assertEquals(Set.copyOf(stop.testCases()), Set.of(ONE, TWO), "a case sharing the process was left running");
-        assertTrue(registry.isRunning(THREE), "a case in another run was stopped too");
-        assertFalse(registry.isStopped(THREE), "a case in another run was recorded as stopped");
+        assertEquals(stop.executions(), Set.of("cycle 1"), "the stop killed the wrong executions");
+        assertEquals(Set.copyOf(stop.testCases()), Set.of(ONE, TWO), "a test case sharing the process was left running");
+        assertTrue(registry.isRunning(THREE), "a test case in another execution was stopped too");
+        assertFalse(registry.isStopped(THREE), "a test case in another execution was recorded as stopped");
     }
 
     @Test
-    public void aPassedTestCaseKeepsItsVerdictThroughAStop() {
-        final RunRegistry registry = new RunRegistry();
+    public void aPassedTestCaseKeepsItsRunItemStatusThroughAStop() {
+        final ExecutionRegistry registry = new ExecutionRegistry();
         registry.launched(List.of(ONE, TWO), "cycle 1");
-        registry.reported(ONE, RunStatus.PASSED);
+        registry.reported(ONE, ExecutionStatus.PASSED);
 
         final Stop stop = registry.stopping(List.of(TWO));
 
-        assertEquals(registry.statusOf(ONE), RunStatus.PASSED, "a stop took back a verdict that had already landed");
-        assertFalse(stop.testCases().contains(ONE), "a finished case was swept up as a casemate");
-        assertFalse(registry.isStopped(ONE), "a finished case was recorded as stopped");
+        assertEquals(registry.statusOf(ONE), ExecutionStatus.PASSED, "a stop took back a run item status that had already landed");
+        assertFalse(stop.testCases().contains(ONE), "a finished test case was swept up as a casemate");
+        assertFalse(registry.isStopped(ONE), "a finished test case was recorded as stopped");
     }
 
     @Test
     public void stoppingNothingIsItsOwnAnswer() {
-        final RunRegistry registry = new RunRegistry();
+        final ExecutionRegistry registry = new ExecutionRegistry();
 
         assertEquals(registry.stopping(List.of(ONE)), Stop.NOTHING);
     }
 
     @Test
-    public void aRunThatEndsQuietlyReleasesTheTestCasesItHeld() {
-        final RunRegistry registry = new RunRegistry();
+    public void anExecutionThatEndsQuietlyReleasesTheTestCasesItHeld() {
+        final ExecutionRegistry registry = new ExecutionRegistry();
         registry.launched(List.of(ONE, TWO), "cycle 1");
 
         assertEquals(Set.copyOf(registry.ended("cycle 1")), Set.of(ONE, TWO));
-        assertFalse(registry.isRunning(ONE), "a case was still running after its process ended");
-        assertEquals(registry.statusOf(ONE), RunStatus.IDLE, "a case left behind by a dead process still showed a status");
+        assertFalse(registry.isRunning(ONE), "a test case was still running after its process ended");
+        assertEquals(registry.statusOf(ONE), ExecutionStatus.IDLE, "a test case left behind by a dead process still showed a status");
     }
 
     @Test
-    public void aRunTestinDidNotStartIsLeftAlone() {
-        final RunRegistry registry = new RunRegistry();
+    public void anExecutionTestinDidNotStartIsLeftAlone() {
+        final ExecutionRegistry registry = new ExecutionRegistry();
 
         assertEquals(registry.ended("someone else's run"), List.of());
     }

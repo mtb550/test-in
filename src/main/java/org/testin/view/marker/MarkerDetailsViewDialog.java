@@ -23,7 +23,7 @@ import org.testin.model.DirectoryType;
 import org.testin.model.NodeFigures;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.markers.Marker;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
@@ -46,11 +46,11 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog {
         final @NotNull ComponentDialogBase.DetailsBuilder details = ComponentDialogBase.details()
                 .row(Bundle.message("caption.name"), dto.getName())
                 .row(Bundle.message("caption.path"), dto.getPath().toString())
-                .row(TestEditorAttributes.CREATED_BY.getName(), marker.getCreatedBy())
-                .row(TestEditorAttributes.CREATED_AT.getName(), Display.formatDate(marker.getCreatedAt()))
-                .row(TestEditorAttributes.UPDATED_BY.getName(), marker.getModifiedBy())
-                .row(TestEditorAttributes.UPDATED_AT.getName(), Display.formatDate(marker.getModifiedAt()))
-                .row(TestEditorAttributes.STATUS.getName(), marker.getStatusLabel());
+                .row(TestCaseEditorAttributes.CREATED_BY.getName(), marker.getCreatedBy())
+                .row(TestCaseEditorAttributes.CREATED_AT.getName(), Display.formatDate(marker.getCreatedAt()))
+                .row(TestCaseEditorAttributes.UPDATED_BY.getName(), marker.getModifiedBy())
+                .row(TestCaseEditorAttributes.UPDATED_AT.getName(), Display.formatDate(marker.getModifiedAt()))
+                .row(TestCaseEditorAttributes.STATUS.getName(), marker.getStatusLabel());
 
         marker.getDetailRows().forEach(extra -> details.row(extra.caption(), extra.value()));
 
@@ -58,7 +58,7 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog {
 
         components = List.of(
                 details.build(),
-                ComponentDialogBase.of(new VerdictDonut(type.getStatistics().getSlices(), figures)));
+                ComponentDialogBase.of(new RunItemStatusDonut(type.getStatistics().getSlices(), figures)));
 
         shortcuts = List.of(StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("shortcut.close"), this::closeCancel));
 

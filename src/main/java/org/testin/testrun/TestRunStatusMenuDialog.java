@@ -40,6 +40,6 @@ public class TestRunStatusMenuDialog {
                 .filter(status -> status.canBeSetFrom(current))
                 .toArray(TestRunStatus[]::new);
 
-        new ShortcutMenuPopup<>(p, Bundle.message("run.set.status.menu"), offered, onStatusSelected).show();
+        new ShortcutMenuPopup<>(p, Bundle.message("test.run.set.status.menu"), offered, onStatusSelected).show();
     }
 }

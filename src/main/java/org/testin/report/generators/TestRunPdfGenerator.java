@@ -57,7 +57,7 @@ import org.testin.notifications.Notifier;
 import org.testin.report.ReportTile;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
-import org.testin.testrun.RunEditorAttributes;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.util.FailureText;
@@ -266,7 +266,7 @@ public final class TestRunPdfGenerator {
                 .setFont(regularFont).setFontSize(ReportFont.LEAD.pt()).setFontColor(BLACK)
                 .setMarginBottom(12));
 
-        final @NotNull List<RunEditorAttributes> failureDetail = section.getFailureDetailColumns();
+        final @NotNull List<TestRunEditorAttributes> failureDetail = section.getFailureDetailColumns();
         Table table = new Table(2 + failureDetail.size())
                 .useAllAvailableWidth()
                 .setAutoLayout()
@@ -276,7 +276,7 @@ public final class TestRunPdfGenerator {
         final @NotNull DeviceRgb headerFg = rgb(section.textHex());
         addTestCaseTableHeader(table, "#", headerBg, headerFg, boldFont);
         addTestCaseTableHeader(table, Bundle.message("caption.test.case"), headerBg, headerFg, boldFont);
-        for (final RunEditorAttributes detail : failureDetail) {
+        for (final TestRunEditorAttributes detail : failureDetail) {
             addTestCaseTableHeader(table, detail.getName(), headerBg, headerFg, boldFont);
         }
 
@@ -327,13 +327,13 @@ public final class TestRunPdfGenerator {
         testCaseCell.add(actual);
 
         final @NotNull BugPriority pri = item.getBugPriority();
-        table.addCell(verdictCell(pri.getLabel(), rgb(pri.getEmphasis().getHexColor()), rowBg, boldFont));
+        table.addCell(runItemStatusCell(pri.getLabel(), rgb(pri.getEmphasis().getHexColor()), rowBg, boldFont));
 
         final @NotNull BugSeverity sev = item.getBugSeverity();
-        table.addCell(verdictCell(sev.getLabel(), rgb(sev.getEmphasis().getHexColor()), rowBg, boldFont));
+        table.addCell(runItemStatusCell(sev.getLabel(), rgb(sev.getEmphasis().getHexColor()), rowBg, boldFont));
     }
 
-    private @NotNull Cell verdictCell(final @NotNull String text, final @NotNull DeviceRgb color, final @NotNull DeviceRgb rowBg, final @NotNull PdfFont boldFont) {
+    private @NotNull Cell runItemStatusCell(final @NotNull String text, final @NotNull DeviceRgb color, final @NotNull DeviceRgb rowBg, final @NotNull PdfFont boldFont) {
         return new Cell()
                 .setBackgroundColor(rowBg)
                 .setBorder(new SolidBorder(BORDER_GRAY, 1))

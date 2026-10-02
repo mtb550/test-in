@@ -35,7 +35,7 @@ There is no key for this. **Commit** is behind the arrow of the split button.
 - **Rule-SHARE-058** — The list of paths reaches Git in a file, not on the
   command line, so a very large commit does not fail for length.
 - **Rule-SHARE-112** — A test run's screenshots travel with it. The review lists
-  none of them on its own, and committing the run commits the screenshots its
+  none of them on its own, and committing the test run commits the screenshots its
   folder gained or lost.
 
 ## The screen

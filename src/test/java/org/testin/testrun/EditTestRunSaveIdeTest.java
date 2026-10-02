@@ -25,7 +25,7 @@ import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -66,8 +66,8 @@ public class EditTestRunSaveIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
-    private @NotNull TestRunDirectoryDto anOpenRun() {
-        final @NotNull TestRunDirectoryDto run = WriteAction.computeAndWait(() -> {
+    private @NotNull TestRunDirectoryDto anOpenTestRun() {
+        final @NotNull TestRunDirectoryDto testRun = WriteAction.computeAndWait(() -> {
             final @NotNull DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
             final @NotNull Nodes nodes = Services.getInstance(getProject(), Nodes.class);
             final @NotNull TestProjectDirectoryDto tp = mapper.setTestProjectNode(root.resolve("NAFATH"));
@@ -78,40 +78,40 @@ public class EditTestRunSaveIdeTest extends BasePlatformTestCase {
             return tr;
         });
 
-        indexedTestRuns().putTestRun(run.getPath(), new TestRunDto().setResults(List.of(
-                new TestRunItems().setId(JUDGED_WHILE_OPEN).setStatus(TestStatus.PENDING),
-                new TestRunItems().setId(STILL_PENDING).setStatus(TestStatus.PENDING))));
-        return run;
+        indexedTestRuns().putTestRun(testRun.getPath(), new TestRunDto().setResults(List.of(
+                new TestRunItems().setId(JUDGED_WHILE_OPEN).setStatus(RunItemStatus.PENDING),
+                new TestRunItems().setId(STILL_PENDING).setStatus(RunItemStatus.PENDING))));
+        return testRun;
     }
 
-    private @NotNull TestStatus statusOf(final @NotNull TestRunDirectoryDto run, final @NotNull UUID testCaseId) {
-        return indexedTestRuns().getTestRunByPath(run.getPath()).resultOf(testCaseId).map(TestRunItems::getStatus).orElse(TestStatus.REMOVED);
+    private @NotNull RunItemStatus statusOf(final @NotNull TestRunDirectoryDto testRun, final @NotNull UUID testCaseId) {
+        return indexedTestRuns().getTestRunByPath(testRun.getPath()).resultOf(testCaseId).map(TestRunItems::getStatus).orElse(RunItemStatus.REMOVED);
     }
 
-    private boolean save(final @NotNull TestRunDirectoryDto run) {
+    private boolean save(final @NotNull TestRunDirectoryDto testRun) {
         final @NotNull Set<UUID> chosen = Set.of(JUDGED_WHILE_OPEN, STILL_PENDING, ADDED_BY_THE_EDIT);
-        final boolean saved = new EditTestRunWork(getProject()).saveEdit(run, run.getName(), chosen, chosen, Map.of());
+        final boolean saved = new EditTestRunWork(getProject()).saveEdit(testRun, testRun.getName(), chosen, chosen, Map.of());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
         return saved;
     }
 
     // Rule-TREE-PANEL-128, Rule-TREE-PANEL-074
-    public void testSavingKeepsAVerdictThatArrivedWhileTheDialogWasOpen() {
-        final @NotNull TestRunDirectoryDto run = anOpenRun();
+    public void testSavingKeepsARunItemStatusThatArrivedWhileTheDialogWasOpen() {
+        final @NotNull TestRunDirectoryDto testRun = anOpenTestRun();
 
-        indexedTestRuns().changeRun(run.getPath(), held -> held.resultOf(JUDGED_WHILE_OPEN).ifPresent(result -> result.setStatus(TestStatus.FAILED)));
+        indexedTestRuns().changeTestRun(testRun.getPath(), held -> held.resultOf(JUDGED_WHILE_OPEN).ifPresent(result -> result.setStatus(RunItemStatus.FAILED)));
 
-        assertTrue("the edit was refused", save(run));
-        assertEquals("the verdict that arrived while the dialog was open was replaced", TestStatus.FAILED, statusOf(run, JUDGED_WHILE_OPEN));
-        assertEquals(TestStatus.PENDING, statusOf(run, STILL_PENDING));
-        assertEquals("a test case the edit added is not Pending", TestStatus.PENDING, statusOf(run, ADDED_BY_THE_EDIT));
+        assertTrue("the edit was refused", save(testRun));
+        assertEquals("the run item status that arrived while the dialog was open was replaced", RunItemStatus.FAILED, statusOf(testRun, JUDGED_WHILE_OPEN));
+        assertEquals(RunItemStatus.PENDING, statusOf(testRun, STILL_PENDING));
+        assertEquals("a test case the edit added is not Pending", RunItemStatus.PENDING, statusOf(testRun, ADDED_BY_THE_EDIT));
     }
 
     // Rule-TREE-PANEL-060
     public void testASavedEditCannotBeUndone() {
-        final @NotNull TestRunDirectoryDto run = anOpenRun();
+        final @NotNull TestRunDirectoryDto testRun = anOpenTestRun();
 
-        assertTrue("the edit was refused", save(run));
+        assertTrue("the edit was refused", save(testRun));
         assertFalse("a saved edit of a test run went onto the tree's undo history",
                 Services.getInstance(getProject(), UndoHistories.class).canUndo(UndoScope.TREE));
     }

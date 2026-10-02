@@ -30,7 +30,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.Failure;
-import org.testin.model.RunStatus;
+import org.testin.model.ExecutionStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
@@ -51,7 +51,7 @@ public final class TestNGExecution implements Disposable {
     private final @NotNull Project p;
     private final @NotNull Notifier notifier;
 
-    private final @NotNull RunRegistry registry = new RunRegistry();
+    private final @NotNull ExecutionRegistry registry = new ExecutionRegistry();
 
     private final @NotNull Map<ProcessHandler, String> live = new ConcurrentHashMap<>();
 
@@ -62,8 +62,8 @@ public final class TestNGExecution implements Disposable {
         p.getMessageBus().connect(this).subscribe(ExecutionManager.EXECUTION_TOPIC, new ExecutionListener() {
             @Override
             public void processStarted(final @NotNull String executorId, final @NotNull ExecutionEnvironment env, final @NotNull ProcessHandler handler) {
-                final @NotNull String runName = env.getRunProfile().getName();
-                if (registry.launchedHere(runName)) live.put(handler, runName);
+                final @NotNull String testRunName = env.getRunProfile().getName();
+                if (registry.launchedHere(testRunName)) live.put(handler, testRunName);
             }
 
             @Override
@@ -92,7 +92,7 @@ public final class TestNGExecution implements Disposable {
     public void starting(final @NotNull TestCaseDto tc) {
         registry.starting(tc.getId());
 
-        TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.RUNNING, Duration.ZERO, Failure.NONE);
+        TestCaseExecutionListener.broadcast(p, key(tc.getId()), ExecutionStatus.RUNNING, Duration.ZERO, Failure.NONE);
     }
 
     @FromContentModule
@@ -118,7 +118,7 @@ public final class TestNGExecution implements Disposable {
     public void notStarting(final @NotNull TestCaseDto tc) {
         registry.notStarting(tc.getId());
 
-        TestCaseExecutionListener.broadcast(p, key(tc.getId()), RunStatus.IDLE, Duration.ZERO, Failure.NONE);
+        TestCaseExecutionListener.broadcast(p, key(tc.getId()), ExecutionStatus.IDLE, Duration.ZERO, Failure.NONE);
     }
 
     // UC-CODEGEN-008
@@ -131,7 +131,7 @@ public final class TestNGExecution implements Disposable {
     // UC-CODEGEN-008, Rule-CODEGEN-033, Rule-CODEGEN-074, Rule-CODEGEN-034
     @FromContentModule
     public void started(final @NotNull List<TestCaseDto> running, final @NotNull List<TestCaseDto> withoutCode) {
-        notifier.softShowCounted(p, RunStatus.RUNNING.getBadge().label(), running.size());
+        notifier.softShowCounted(p, ExecutionStatus.RUNNING.getBadge().label(), running.size());
         if (withoutCode.isEmpty()) return;
 
         final boolean one = withoutCode.size() == 1;
@@ -149,12 +149,12 @@ public final class TestNGExecution implements Disposable {
         return registry.isRunning(id);
     }
 
-    public @NotNull RunStatus statusOf(final @NotNull TestCaseDto tc) {
+    public @NotNull ExecutionStatus statusOf(final @NotNull TestCaseDto tc) {
         return registry.statusOf(tc.getId());
     }
 
     // UC-CODEGEN-008
-    void reported(final @NotNull UUID id, final @NotNull RunStatus status) {
+    void reported(final @NotNull UUID id, final @NotNull ExecutionStatus status) {
         registry.reported(id, status);
     }
 
@@ -168,35 +168,35 @@ public final class TestNGExecution implements Disposable {
         final @NotNull Stop stop = registry.stopping(List.copyOf(ids));
         if (stop.testCases().isEmpty()) return 0;
 
-        final @NotNull Map<ProcessHandler, String> theirs = running(stop.runs());
-        Logger.info("Stopping " + stop.testCases().size() + " test case(s) in " + stop.runs().size()
-                + " run(s): " + theirs.size() + " had reached a process");
+        final @NotNull Map<ProcessHandler, String> theirs = running(stop.executions());
+        Logger.info("Stopping " + stop.testCases().size() + " test case(s) in " + stop.executions().size()
+                + " execution(s): " + theirs.size() + " had reached a process");
 
         theirs.forEach(this::kill);
-        stop.testCases().forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, Duration.ZERO, Failure.NONE));
+        stop.testCases().forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), ExecutionStatus.IDLE, Duration.ZERO, Failure.NONE));
 
         return stop.testCases().size();
     }
 
     // UC-CODEGEN-008, Rule-CODEGEN-092
     private void ended(final @NotNull ExecutionEnvironment env) {
-        final @NotNull String runName = env.getRunProfile().getName();
-        final @NotNull List<UUID> abandoned = registry.ended(runName);
+        final @NotNull String testRunName = env.getRunProfile().getName();
+        final @NotNull List<UUID> abandoned = registry.ended(testRunName);
         if (abandoned.isEmpty()) return;
 
-        Logger.info("'" + runName + "' ended with " + abandoned.size() + " test case(s) that never reported");
-        abandoned.forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), RunStatus.IDLE, Duration.ZERO, Failure.NONE));
+        Logger.info("'" + testRunName + "' ended with " + abandoned.size() + " test case(s) that never reported");
+        abandoned.forEach(id -> TestCaseExecutionListener.broadcast(p, key(id), ExecutionStatus.IDLE, Duration.ZERO, Failure.NONE));
     }
 
-    private void kill(final @NotNull ProcessHandler handler, final @NotNull String runName) {
+    private void kill(final @NotNull ProcessHandler handler, final @NotNull String testRunName) {
         handler.putUserData(ProcessHandler.TERMINATION_REQUESTED, Boolean.TRUE);
 
         if (handler instanceof KillableProcess killable && killable.canKillProcess()) {
-            Logger.info("Killing '" + runName + "'");
+            Logger.info("Killing '" + testRunName + "'");
             killable.killProcess();
 
         } else {
-            Logger.info("Destroying '" + runName + "', which cannot be killed");
+            Logger.info("Destroying '" + testRunName + "', which cannot be killed");
             handler.destroyProcess();
         }
     }

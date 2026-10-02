@@ -86,14 +86,14 @@ public class TestCaseFileIdeTest extends BasePlatformTestCase {
 
         final TestCaseFile file = indexedTestCases().testCaseFile(tc).orElseThrow();
 
-        assertEquals("the case was placed in the wrong test project", tp.getPath(), file.testProject());
-        assertEquals("the case's file is not where the store writes it",
+        assertEquals("the test case was placed in the wrong test project", tp.getPath(), file.testProject());
+        assertEquals("the test case's file is not where the store writes it",
                 Path.of(tp.getTestCasesDirectory().getPath().getFileName().toString(), "Login", tc.getId() + ".tc"), file.inProject());
     }
 
     public void testATestCaseNoIndexedTestProjectHoldsHasNoFile() {
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).build();
 
-        assertTrue("a case with no test set was given a file", indexedTestCases().testCaseFile(tc).isEmpty());
+        assertTrue("a test case with no test set was given a file", indexedTestCases().testCaseFile(tc).isEmpty());
     }
 }

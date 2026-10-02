@@ -36,7 +36,7 @@ The status says how far the test run has got.
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
-  signed off. Its test cases, verdicts and configuration can no longer change.
+  signed off. Its test cases, run item statuses and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
     1. live nodes, then retired ones
     2. the number the tester gave the node
@@ -55,20 +55,21 @@ The status says how far the test run has got.
   never. A test run always says its status, because where a cycle stands is what
   the tree is read for.
 - **Rule-TREE-PANEL-067** — **Completed** and **Closed** are final. The test run
-  accepts no more verdicts. Every test case still **Pending** becomes **Untested**. (Rule-TREE-PANEL-009)
+  accepts no more run item statuses. Every test case still **Pending** becomes
+  **Untested**. (Rule-TREE-PANEL-009)
 - **Rule-TREE-PANEL-068** — A tester sets **Assigned**, **Completed** and **Closed**. **Created** and **In Progress**
   are the test run's own record of
   itself.
 - **Rule-TREE-PANEL-092** — The popup offers the statuses this test run can be
   moved to and no others: the three a tester sets, and only those ahead of where
-  the run is now. A run is never sent backwards through its own life.
+  the test run is now. A test run is never sent backwards through its own life.
 - **Rule-TREE-PANEL-091** — A test run's status is set on the test run, not on
   whichever surface set it. The tree row and any open editor of that test run
   both follow it, whichever of them the tester used.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is, drawn with Inactive beside its name like any other status. Its test sets,
-  test cases and runs are not read, because a project nobody is working on is
+  test cases and test runs are not read, because a project nobody is working on is
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
@@ -87,15 +88,16 @@ The status says how far the test run has got.
 └──────────────────────────────────────────────────────────────┘
 ```
 
-1. **One row for each status the run can move to** — each with its icon, the same
-   icon the tree draws for a test run in that status. Drawn here for a run that
-   is *Created*, which can move to any of the three. From *Assigned* or *In
-   Progress* there are two rows, Completed and Closed.
-2. **Only forward, and only what a tester sets.** *Created* and *In Progress* are
-   the test run's own record of itself and are never rows; nor is the status the
-   run already has, because moving to it would say nothing. The keys belong to
-   the statuses rather than to the positions: **Assigned** is `1`, **Completed**
-   is `2`, **Closed** is `3`, whichever of them the popup is showing.
+1. **One row for each status the test run can move to** — each with its icon,
+   the same icon the tree draws for a test run in that status. Drawn here for a
+   test run that is *Created*, which can move to any of the three. From
+   *Assigned* or *In Progress* there are two rows, Completed and Closed.
+2. **Only forward, and only what a tester sets.** *Created* and *In Progress*
+   are the test run's own record of itself and are never rows; nor is the status
+   the test run already has, because moving to it would say nothing. The keys
+   belong to the statuses rather than to the positions: **Assigned** is `1`,
+   **Completed** is `2`, **Closed** is `3`, whichever of them the popup is
+   showing.
 3. **The status bar says how to choose.** The popup opens in the middle of the
    IDE window, not at the pointer, with the first row selected. The tester
    chooses with `↑` `↓` and `Enter`, with a key, or with a click.
@@ -113,13 +115,13 @@ The status says how far the test run has got.
 6. Setting **Completed** or **Closed** signs the test run off. Every test case
    still **Pending** becomes **Untested**, except one removed from its test set,
    which stays as the test run recorded it. Testin records the time the test run
-   finished, but only if it had been started. From then on **Set Status**, **Edit Run** and **Run Tests** are gray on
-   it.
+   finished, but only if it had been started. From then on **Set Status**,
+   **Edit Test Run** and **Run Tests** are gray on it.
 
 **Signing off a test run cannot be undone.** A status change is not on the
 tree's history (Rule-TREE-PANEL-060). Testin asks for no confirmation before it.
-Every **Pending** verdict becomes **Untested** at that moment, except on a test
-case removed from its test set.
+Every **Pending** run item status becomes **Untested** at that moment, except on
+a test case removed from its test set.
 
 ## What Testin refuses
 
@@ -128,8 +130,8 @@ case removed from its test set.
 **If several rows are selected** — **Set Status** stays black and acts on the
 last row the tester clicked.
 
-> **An open editor of that test run follows.** Its status, its verdict counts
-> and the rows that just became **Untested** all redraw where they are
+> **An open editor of that test run follows.** Its status, its run item status
+> counts and the rows that just became **Untested** all redraw where they are
 > (Rule-TREE-PANEL-091). The same holds the other way: a status the editor sets
 > redraws the tree row.
 

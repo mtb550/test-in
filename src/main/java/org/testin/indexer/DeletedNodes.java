@@ -48,8 +48,8 @@ public final class DeletedNodes {
         if (!swept.compareAndSet(false, true)) return;
         if (!Files.isDirectory(staging)) return;
 
-        if (FileUtil.delete(staging.toFile())) Logger.info("Cleared the copies kept for undo by the previous run.");
-        else Logger.warn("Could not clear " + staging + "; copies from the previous run are still there.");
+        if (FileUtil.delete(staging.toFile())) Logger.info("Cleared the copies kept for undo by the previous session.");
+        else Logger.warn("Could not clear " + staging + "; copies from the previous session are still there.");
     }
 
     // UC-INTERNAL-005, Rule-INTERNAL-037, Rule-INTERNAL-039, Rule-INTERNAL-041

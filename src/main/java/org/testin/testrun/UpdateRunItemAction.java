@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
-import org.testin.editor.run.RunEditor;
+import org.testin.editor.testrun.TestRunEditor;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
@@ -43,32 +43,32 @@ public class UpdateRunItemAction extends AbstractAnyProjectAction {
     @Override
     protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull Optional<TestCaseDto> selected = TestinData.singleSelectedTestCase(e);
-        final @NotNull Optional<RunEditor> runEditor = TestinData.runEditor(e);
-        if (selected.isEmpty() || runEditor.isEmpty()) return;
+        final @NotNull Optional<TestRunEditor> testRunEditor = TestinData.testRunEditor(e);
+        if (selected.isEmpty() || testRunEditor.isEmpty()) return;
 
-        edit(p, runEditor.orElseThrow(), selected.orElseThrow());
+        edit(p, testRunEditor.orElseThrow(), selected.orElseThrow());
     }
 
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-167
-    private void edit(final @NotNull Project p, final @NotNull RunEditor runEditor, final @NotNull TestCaseDto testCase) {
-        final @NotNull Optional<TestRunItems> found = runEditor.runItem(testCase.getId());
+    private void edit(final @NotNull Project p, final @NotNull TestRunEditor testRunEditor, final @NotNull TestCaseDto testCase) {
+        final @NotNull Optional<TestRunItems> found = testRunEditor.runItem(testCase.getId());
         if (found.isEmpty()) return;
 
         final @NotNull TestRunItems runItem = found.orElseThrow();
 
         if (runItem.isRemoved()) {
-            Services.getInstance(p, RunStatusService.class).refuseRemoved();
+            Services.getInstance(p, RunItemStatusService.class).refuseRemoved();
             return;
         }
 
         Logger.trace("update test run item for: " + testCase.getDescription());
 
-        new FailedResultDialog(p, runEditor.getParent().getPath(), runItem, fields -> {
-            if (!Services.getInstance(p, RunStatusService.class).recordFailureDetails(runEditor.getParent().getPath(), testCase.getId(), fields))
+        new FailedResultDialog(p, testRunEditor.getParent().getPath(), runItem, fields -> {
+            if (!Services.getInstance(p, RunItemStatusService.class).recordFailureDetails(testRunEditor.getParent().getPath(), testCase.getId(), fields))
                 return;
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                runEditor.refreshView();
+                testRunEditor.refreshView();
 
                 ViewToolWindowFactory.refreshIfShowing(p, List.of(testCase));
             });
@@ -80,8 +80,8 @@ public class UpdateRunItemAction extends AbstractAnyProjectAction {
     // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-168
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        GrayWithReason.unless(this, e, TestinData.runEditor(e)
-                        .flatMap(runEditor -> TestinData.singleSelectedTestCase(e).flatMap(tc -> runEditor.runItem(tc.getId())))
+        GrayWithReason.unless(this, e, TestinData.testRunEditor(e)
+                        .flatMap(testRunEditor -> TestinData.singleSelectedTestCase(e).flatMap(tc -> testRunEditor.runItem(tc.getId())))
                         .filter(TestRunItems::isFailed)
                         .isPresent(),
                 Bundle.message("run.item.details.disabled.description"));

@@ -1,9 +1,10 @@
 [Documentation](README.md) › First run
 
-# First run — ten minutes, install to a verdict
+# First run — ten minutes, install to a run item status
 
 > Nine steps, from a freshly installed plugin to a test case you wrote, a Java
-> method Testin wrote for it, a recorded verdict and a report you can send.
+> method Testin wrote for it, a recorded run item status and a report you can
+> send.
 > Nothing here needs the rest of the documentation.
 
 |                     |                                                                                                   |
@@ -24,10 +25,10 @@ it looks like.
 
 **Two folders, and they are not the same thing.**
 
-|                            | What it holds                                           | Who owns it                                           |
-|----------------------------|---------------------------------------------------------|-------------------------------------------------------|
-| **The Testin folder**      | Your test projects: sets, test cases, runs, all as JSON | You. It is a setting on this machine                  |
-| **The automation project** | The Java code — the test methods Testin writes          | Your team. It is the repository you already have open |
+|                            | What it holds                                                | Who owns it                                           |
+|----------------------------|--------------------------------------------------------------|-------------------------------------------------------|
+| **The Testin folder**      | Your test projects: sets, test cases, test runs, all as JSON | You. It is a setting on this machine                  |
+| **The automation project** | The Java code — the test methods Testin writes               | Your team. It is the repository you already have open |
 
 Testin keeps them apart on purpose: test data changes when a tester writes a
 test case, code changes when a developer commits, and putting them in one
@@ -67,10 +68,10 @@ Press **Configure Testin settings**, or go to **Settings → Tools → Testin**.
 
 Set two things and leave the rest:
 
-| Setting           | What to put                                                                |
-|-------------------|----------------------------------------------------------------------------|
-| **Testin folder** | The empty folder you picked                                                |
-| **Tester name**   | Your name. It is written into every test case and every verdict you record |
+| Setting           | What to put                                                                        |
+|-------------------|------------------------------------------------------------------------------------|
+| **Testin folder** | The empty folder you picked                                                        |
+| **Tester name**   | Your name. It is written into every test case and every run item status you record |
 
 Everything on this page belongs to this machine and this person. Nothing here is
 committed — [the settings page](setting/main.md) says where each value lives and
@@ -111,7 +112,7 @@ Double-click it, or press `Enter`, and it opens in an editor.
 
 ## 5. Write a test case
 
-In the test set editor, press `Ctrl+M`.
+In the test case editor, press `Ctrl+M`.
 
 Fill in the description — *Log in with a valid user* — and the expected result — *The dashboard opens*. Save.
 
@@ -124,7 +125,7 @@ The card appears:
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-Write two more, so the run in step 8 has something to move through.
+Write two more, so the test run in step 8 has something to move through.
 
 > **The period is not in your data.** Testin capitalizes and closes a
 > description when it draws it, and stores exactly what you typed. Open the
@@ -173,18 +174,19 @@ A test run is one round of testing over the test cases you choose.
 Select **Test Runs**, press `Ctrl+M`, choose **Test Run**, call it `Cycle-1`,
 and pick the `Login` set.
 
-## 8. Record a verdict
+## 8. Record a run item status
 
-Open the run. Each test case is a card, and three keys record what happened:
+Open the test run. Each test case is a card, and three keys record what
+happened:
 
-| Key | Verdict                              |
+| Key | Run Item Status                      |
 |-----|--------------------------------------|
 | `P` | Passed                               |
 | `F` | Failed — and it asks what went wrong |
 | `B` | Blocked                              |
 
 Press `P` on the first card. The cursor moves to the next one on its own, so a
-whole run is `P P P` without touching the mouse.
+whole test run is `P P P` without touching the mouse.
 
 Press `F` on one of them and fill in the actual result, so the report in step 9
 has a failure in it.
@@ -195,7 +197,7 @@ has a failure in it.
 
 ## 9. Send the result to someone with no IDE
 
-Select the run and press `Ctrl+P`.
+Select the test run and press `Ctrl+P`.
 
 Choose a format:
 
@@ -206,15 +208,15 @@ Choose a format:
 | **HTML**  | The one to open in a browser — it carries a light and dark switch |
 | **Excel** | The one to filter and sort                                        |
 
-The document holds what the run recorded: the totals, the test cases that
+The document holds what the test run recorded: the totals, the test cases that
 passed, and every failure with what you wrote about it.
 
 ---
 
 ## That is the loop
 
-Write test cases → Testin writes the code → run them → record verdicts → send
-the report. Everything else in Testin is a shorter or wider version of those
+Write test cases → Testin writes the code → run them → record run item statuses
+→ send the report. Everything else in Testin is a shorter or wider version of those
 five things.
 
 ## Where to go next
@@ -231,5 +233,6 @@ five things.
 
 You do not need steps 1 to 5. `./gradlew runIde` opens a sandbox IDE pointed at
 `samples/testin-root`, which already holds a `Demo` test project with two test
-sets, six test cases and two runs — one completed, one in progress. Start at
-step 7, or open the run that is still in progress and go straight to step 8.
+sets, six test cases and two test runs — one completed, one in progress. Start
+at step 7, or open the test run that is still in progress and go straight to
+step 8.

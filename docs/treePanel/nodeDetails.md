@@ -4,9 +4,9 @@
 
 > **No key.** On the menu: **Details**.
 
-**As a** tester, **I want** to see a node's counts, dates, status and verdict
-breakdown without opening anything, **so that** I can see how big a part of the
-tree is at a glance.
+**As a** tester, **I want** to see a node's counts, dates, status and run item
+status breakdown without opening anything, **so that** I can see how big a part
+of the tree is at a glance.
 
 It is a read-only window. Nothing in it can be changed.
 
@@ -34,7 +34,7 @@ It is a read-only window. Nothing in it can be changed.
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
-  signed off. Its test cases, verdicts and configuration can no longer change.
+  signed off. Its test cases, run item statuses and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
     1. live nodes, then retired ones
     2. the number the tester gave the node
@@ -59,16 +59,16 @@ It is a read-only window. Nothing in it can be changed.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is, drawn with Inactive beside its name like any other status. Its test sets,
-  test cases and runs are not read, because a project nobody is working on is
+  test cases and test runs are not read, because a project nobody is working on is
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-125** — A test set's **Updated** row changes whenever one of
   its test cases is added, saved, moved in or out, reordered or removed, and
   names the tester who did it.
-- **Rule-TREE-PANEL-126** — Every verdict that at least one test case carries
-  takes at least a sliver of the ring, so a single failure among a thousand
-  passes is still there to see.
+- **Rule-TREE-PANEL-126** — Every run item status that at least one test case
+  carries takes at least a sliver of the ring, so a single failure among a
+  thousand passes is still there to see.
 
 ## The Details dialog
 
@@ -116,17 +116,17 @@ It is a read-only window. Nothing in it can be changed.
 1. **Name and Path** — **Path** is the node's full path on disk.
 2. **Who and when** — who created the node, who last changed it, and the dates.
 3. **Status** — left out on **Test Cases** and **Test Runs**, which have none.
-4. **The execution rows** — **Execution Started**, **Execution Ended** and **Execution Time**, which is how long the run
-   took. Only a test run has
-   them, and a test run that never started shows none of them. A run that
+4. **The execution rows** — **Execution Started**, **Execution Ended** and
+   **Execution Time**, which is how long the test run took. Only a test run has
+   them, and a test run that never started shows none of them. A test run that
    started and has not ended shows the first alone: there is no length yet.
 5. **The settings** — every answer the tester gave when the test run was made.
    Only a test run has them.
 6. **The counts** — what the node holds. Which counts appear depends on the
    kind of node. The table under **Main flow** says which.
-7. **The verdict chart** — a ring with the pass rate inside it, and the five
-   verdicts beside it. Each verdict has a color and a count. Only a test run has
-   this chart.
+7. **The run item status chart** — a ring with the pass rate inside it, and the
+   five run item statuses beside it. Each run item status has a color and a
+   count. Only a test run has this chart.
 8. **The status bar** — `Escape` closes the dialog.
 
 A row with nothing in it is not drawn. So a test set shows **Name**, **Path**,
@@ -148,7 +148,7 @@ else.
    asks, and never saved. Which counts appear depends on the kind of node:
 
    | Node             | Counts                                                     |
-         |------------------|------------------------------------------------------------|
+   |------------------|------------------------------------------------------------|
    | Test project     | **Test sets**, **Packages**, **Test cases**, **Test runs** |
    | **Test Cases**   | **Test sets**, **Packages**, **Test cases**                |
    | **Test Runs**    | **Packages**, **Test runs**                                |
@@ -157,8 +157,8 @@ else.
    | Test set         | **Test cases**                                             |
    | Test run         | **Total**                                                  |
 
-8. **A test run, and only a test run**, also shows a verdict chart. It is a
-   ring, with **Passed**, **Failed**, **Blocked**, **Untested** and **Removed**
+8. **A test run, and only a test run**, also shows a run item status chart. It
+   is a ring, with **Passed**, **Failed**, **Blocked**, **Untested** and **Removed**
    listed beside it. Each one has a color and a count. Inside the ring is the
    pass rate. It reads **Not run** when nothing in the test run has been
    executed.

@@ -61,7 +61,7 @@ public final class GitCommits {
 
     // UC-SHARE-012, Rule-SHARE-112
     static @NotNull Set<String> screenshotsAlongside(final @NotNull List<String> statusLines, final @NotNull Set<String> paths) {
-        final @NotNull Set<String> runFolders = paths.stream()
+        final @NotNull Set<String> testRunFolders = paths.stream()
                 .filter(path -> FileKind.of(Path.of(path)) == FileKind.RUN_ITEM)
                 .map(GitCommits::folderOf)
                 .collect(Collectors.toSet());
@@ -69,7 +69,7 @@ public final class GitCommits {
         return GitRefs.parseStatus(statusLines).stream()
                 .map(StatusEntry::path)
                 .filter(path -> FileKind.of(Path.of(path), DirectoryType.TR) == FileKind.SCREENSHOT)
-                .filter(path -> runFolders.contains(folderOf(path)))
+                .filter(path -> testRunFolders.contains(folderOf(path)))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

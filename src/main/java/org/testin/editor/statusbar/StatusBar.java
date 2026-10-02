@@ -57,9 +57,9 @@ public class StatusBar extends JBPanel<StatusBar> {
 
     private final @NotNull JBLabel statusLabel = new JBLabel();
 
-    private final @NotNull JBLabel runStatusLabel = new JBLabel();
+    private final @NotNull JBLabel testRunStatusLabel = new JBLabel();
 
-    private final @NotNull JBPanel<?> verdictsRow = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    private final @NotNull JBPanel<?> runItemStatusesRow = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
 
     private final @NotNull JBLabel executionTimeLabel = new JBLabel();
 
@@ -84,20 +84,20 @@ public class StatusBar extends JBPanel<StatusBar> {
         ));
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
         statusLabel.setForeground(UIUtil.getContextHelpForeground());
-        runStatusLabel.setForeground(UIUtil.getContextHelpForeground());
-        runStatusLabel.setBorder(JBUI.Borders.emptyRight(10));
-        runStatusLabel.setIconTextGap(JBUI.scale(4));
+        testRunStatusLabel.setForeground(UIUtil.getContextHelpForeground());
+        testRunStatusLabel.setBorder(JBUI.Borders.emptyRight(10));
+        testRunStatusLabel.setIconTextGap(JBUI.scale(4));
         new HelpTooltip()
-                .setDescription(HtmlChunk.text(Bundle.message("statusbar.run.status.tip")))
-                .installOn(runStatusLabel);
+                .setDescription(HtmlChunk.text(Bundle.message("statusbar.test.run.status.tip")))
+                .installOn(testRunStatusLabel);
 
-        verdictsRow.setOpaque(false);
-        verdictsRow.setBorder(JBUI.Borders.emptyRight(10));
+        runItemStatusesRow.setOpaque(false);
+        runItemStatusesRow.setBorder(JBUI.Borders.emptyRight(10));
 
         executionTimeLabel.setForeground(UIUtil.getInactiveTextColor());
         executionTimeLabel.setBorder(JBUI.Borders.emptyRight(10));
         new HelpTooltip()
-                .setDescription(HtmlChunk.text(Bundle.message("statusbar.run.time.tip")))
+                .setDescription(HtmlChunk.text(Bundle.message("statusbar.test.run.time.tip")))
                 .installOn(executionTimeLabel);
 
         automatedLabel.setForeground(UIUtil.getInactiveTextColor());
@@ -106,8 +106,8 @@ public class StatusBar extends JBPanel<StatusBar> {
                 .setDescription(HtmlChunk.text(Bundle.message("statusbar.automated.tip")))
                 .installOn(automatedLabel);
 
-        runStatusLabel.setVisible(false);
-        verdictsRow.setVisible(false);
+        testRunStatusLabel.setVisible(false);
+        runItemStatusesRow.setVisible(false);
         executionTimeLabel.setVisible(false);
         automatedLabel.setVisible(false);
 
@@ -118,7 +118,7 @@ public class StatusBar extends JBPanel<StatusBar> {
 
         navigationRow = centeredRow(button(PageStep.FIRST), button(PageStep.PREVIOUS), currentPageLabel,
                 button(PageStep.NEXT), button(PageStep.LAST));
-        rightRow = centeredRow(runStatusLabel, verdictsRow, executionTimeLabel, automatedLabel, pageSizeField);
+        rightRow = centeredRow(testRunStatusLabel, runItemStatusesRow, executionTimeLabel, automatedLabel, pageSizeField);
 
         add(statusLabel);
         add(navigationRow);
@@ -155,7 +155,7 @@ public class StatusBar extends JBPanel<StatusBar> {
 
         label.setForeground(color);
         new HelpTooltip()
-                .setDescription(HtmlChunk.text(Bundle.message("statusbar.run.progress.tip")))
+                .setDescription(HtmlChunk.text(Bundle.message("statusbar.test.run.progress.tip")))
                 .installOn(label);
 
         return label;
@@ -234,26 +234,26 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-175
-    public void showVerdicts(final @NotNull List<Segment> verdicts) {
-        verdictsRow.removeAll();
+    public void showRunItemStatuses(final @NotNull List<Segment> runItemStatuses) {
+        runItemStatusesRow.removeAll();
 
-        for (final Segment verdict : verdicts) {
-            if (verdictsRow.getComponentCount() > 0) verdictsRow.add(painted(" · ", UIUtil.getInactiveTextColor()));
+        for (final Segment runItemStatus : runItemStatuses) {
+            if (runItemStatusesRow.getComponentCount() > 0) runItemStatusesRow.add(painted(" · ", UIUtil.getInactiveTextColor()));
 
-            verdictsRow.add(painted(verdict.text(), verdict.color()));
+            runItemStatusesRow.add(painted(runItemStatus.text(), runItemStatus.color()));
         }
 
-        verdictsRow.setVisible(!verdicts.isEmpty());
+        runItemStatusesRow.setVisible(!runItemStatuses.isEmpty());
 
         revalidate();
         repaint();
     }
 
     // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-179
-    public void showRunStatus(final @NotNull TestRunStatus status) {
-        runStatusLabel.setIcon(status.getIcon());
-        runStatusLabel.setText(status.getLabel());
-        runStatusLabel.setVisible(true);
+    public void showTestRunStatus(final @NotNull TestRunStatus status) {
+        testRunStatusLabel.setIcon(status.getIcon());
+        testRunStatusLabel.setText(status.getLabel());
+        testRunStatusLabel.setVisible(true);
     }
 
     // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-102
@@ -271,8 +271,8 @@ public class StatusBar extends JBPanel<StatusBar> {
     public void updateSelectionState(final int @NotNull [] selectedIndices, final int firstSelectedPosition, final int shownCount, final int totalCount) {
         final int selectedCount = selectedIndices.length;
         final @NotNull String testCases = shownCount == 1
-                ? Bundle.message("statusbar.cases.one")
-                : Bundle.message("statusbar.cases.many", String.valueOf(shownCount));
+                ? Bundle.message("statusbar.test.cases.one")
+                : Bundle.message("statusbar.test.cases.many", String.valueOf(shownCount));
         final @NotNull String of = testCases + narrowedFrom(shownCount, totalCount);
 
         if (selectedCount > 1) {

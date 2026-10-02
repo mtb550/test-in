@@ -23,7 +23,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testrun.RunEditorAttributes;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.Badge;
 import org.testin.ui.Badges;
 import org.testin.ui.Pill;
@@ -66,7 +66,7 @@ public final class RunItemSummary extends AbstractDetails {
         final @NotNull List<Badge> badges = new ArrayList<>();
         badges.add(new Pill(runItem.shownStatus().getLabel(), runItem.shownStatus().getRowColor()));
 
-        final @NotNull String duration = RunEditorAttributes.DURATION.getRunValueExtractor().apply(runItem);
+        final @NotNull String duration = TestRunEditorAttributes.DURATION.getRunItemValueExtractor().apply(runItem);
         if (!duration.isBlank()) badges.add(Badges.createDurationBadge(duration));
 
         return badges;

@@ -114,7 +114,7 @@ public class GitWorkflowTest {
             final long committed = mustGit(work, "show", "--name-only", "--pretty=format:", "HEAD")
                     .lines().filter(line -> !line.isBlank()).count();
 
-            assertEquals(committed, 1200, "every selected case belongs in the commit");
+            assertEquals(committed, 1200, "every selected test case belongs in the commit");
             assertTrue(mustGit(work, "status", "--porcelain").isBlank(), "nothing should be left behind");
 
             Files.deleteIfExists(pathspec);
@@ -253,7 +253,7 @@ public class GitWorkflowTest {
         assertTrue(Files.exists(colleague.resolve(".tp")), "the test project marker travelled");
         assertTrue(Files.exists(colleague.resolve("Test Cases/.tcd")), "the test cases container marker travelled");
         assertTrue(Files.exists(colleague.resolve("Test Cases/login flow/.ts")),
-                "the test set marker travelled - without it the cases are in a directory nothing recognises");
+                "the test set marker travelled - without it the test cases are in a directory nothing recognises");
     }
 
     @Test
@@ -428,7 +428,7 @@ public class GitWorkflowTest {
             commit(stagedFor(review()), "added the sign out case");
 
             assertTrue(git(work, "pull", "--rebase", "--autostash", "origin", "main").isPresent(),
-                    "two appended cases touch two files and merge on their own");
+                    "two appended test cases touch two files and merge on their own");
 
             final List<TestCaseDto> after = new ArrayList<>();
             try (Stream<Path> files = Files.list(work.resolve("Test Cases/login flow"))) {
@@ -437,7 +437,7 @@ public class GitWorkflowTest {
                 }
             }
 
-            assertEquals(after.size(), 4, "both testers keep their case");
+            assertEquals(after.size(), 4, "both testers keep their test case");
 
             final List<TestCaseDto> ordered = TestCaseOrder.ordered(after);
             assertEquals(ordered, TestCaseOrder.ordered(new ArrayList<>(after.reversed())),

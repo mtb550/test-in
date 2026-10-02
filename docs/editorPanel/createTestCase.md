@@ -179,9 +179,9 @@ case that exists nowhere.
 
 **In a test run editor** — **Create Test Case** is gray, and its reason reads *A
 test run covers test cases that already exist - write a new one in its test set,
-then edit the run to include it.* The editor is not asked what class it is; the
-node is asked whether it holds test cases, which is the question Delete beside it
-already asks.
+then edit the test run to include it.* The editor is not asked what class it is;
+the node is asked whether it holds test cases, which is the question Delete
+beside it already asks.
 
 **While the test set is still being read** — the entry and `Ctrl+M` are gray,
 reading *This test set is still being read - the new test case would be placed

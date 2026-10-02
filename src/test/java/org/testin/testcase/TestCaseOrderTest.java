@@ -82,7 +82,7 @@ public class TestCaseOrderTest {
 
         assertEquals(moved.size(), 1, "one drag, one file");
         assertEquals(TestCaseOrder.ordered(placed), placed, "and the list now sorts as arranged");
-        assertEquals(first.getOrder(), "c", "the case at the top never moved, so its rank is untouched");
+        assertEquals(first.getOrder(), "c", "the test case at the top never moved, so its rank is untouched");
         assertEquals(second.getOrder(), "m", "the move is a copy, so the test case the index holds is untouched until it is written");
     }
 

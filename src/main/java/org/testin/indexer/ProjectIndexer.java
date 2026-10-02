@@ -66,7 +66,7 @@ public final class ProjectIndexer {
     private final @NotNull AtomicBoolean indexing = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean restoreEditorsOnComplete = new AtomicBoolean(true);
     @Getter(AccessLevel.PACKAGE)
-    private final @NotNull RunWriter runWriter;
+    private final @NotNull TestRunWriter testRunWriter;
     @Getter(AccessLevel.PACKAGE)
     private final @NotNull NodeFiles nodeFiles;
     private final @NotNull TestinRoot testinRoot;
@@ -85,7 +85,7 @@ public final class ProjectIndexer {
         this.lastOpenEditors = Services.getInstance(p, LastOpenEditors.class);
         this.store = new IndexerDataStore(p);
         this.scanCoordinator = new ProjectScanCoordinator(new IndexingScanner(p, store));
-        this.runWriter = new RunWriter(p, store);
+        this.testRunWriter = new TestRunWriter(p, store);
         this.nodeFiles = new NodeFiles(p, this, store);
     }
 

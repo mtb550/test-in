@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.ui.framework.DialogComponent;
 
 import javax.swing.JComponent;
@@ -38,7 +38,7 @@ public final class SheetPreview implements DialogComponent {
     private static final @NotNull DefaultTableModel NO_MODEL = new DefaultTableModel();
 
     private final @NotNull Project p;
-    private final @NotNull List<TestEditorAttributes> attributes;
+    private final @NotNull List<TestCaseEditorAttributes> attributes;
 
     private final @NotNull JBTabbedPane tabs = new JBTabbedPane();
     private final @NotNull Map<String, DefaultTableModel> models = new LinkedHashMap<>();
@@ -48,7 +48,7 @@ public final class SheetPreview implements DialogComponent {
     // UC-SHARE-007, Rule-SHARE-036
     public void show(final @NotNull Map<String, List<TestCaseDto>> newSheets) {
         Logger.debug("Import preview: showing " + newSheets.values().stream().mapToInt(List::size).sum()
-                + " cases in " + newSheets.size() + " sheet(s), replacing " + sheets.size() + " sheet(s)");
+                + " test cases in " + newSheets.size() + " sheet(s), replacing " + sheets.size() + " sheet(s)");
         sheets = newSheets;
 
         models.clear();
@@ -86,7 +86,7 @@ public final class SheetPreview implements DialogComponent {
             }
 
             Logger.info("Import preview: sheet '" + entry.getKey() + "' holds " + testCasesInSheet.size()
-                    + " cases, table has " + model.getRowCount() + " rows, " + selected.size() + " ticked");
+                    + " test cases, table has " + model.getRowCount() + " rows, " + selected.size() + " ticked");
 
             if (!selected.isEmpty()) selectedBySheet.put(entry.getKey(), selected);
         }

@@ -71,7 +71,7 @@ public class SampleProjectTest {
         }
     }
 
-    private static @NotNull List<Path> runFolders() {
+    private static @NotNull List<Path> testRunFolders() {
         return filesNamed(demo(), DirectoryType.TR.getMarker()).stream().map(Path::getParent).toList();
     }
 
@@ -79,7 +79,7 @@ public class SampleProjectTest {
         try (Stream<Path> children = Files.list(folder)) {
             return children.filter(path -> FileKind.of(path) == FileKind.RUN_ITEM).toList();
         } catch (final IOException ex) {
-            throw new AssertionError("Could not list the run folder " + folder + ": " + ex.getMessage(), ex);
+            throw new AssertionError("Could not list the test run folder " + folder + ": " + ex.getMessage(), ex);
         }
     }
 
@@ -87,7 +87,7 @@ public class SampleProjectTest {
         try (Stream<Path> children = Files.list(folder)) {
             return children.filter(path -> path.getFileName().toString().endsWith(".json")).toList();
         } catch (final IOException ex) {
-            throw new AssertionError("Could not list the run folder " + folder + ": " + ex.getMessage(), ex);
+            throw new AssertionError("Could not list the test run folder " + folder + ": " + ex.getMessage(), ex);
         }
     }
 
@@ -141,29 +141,29 @@ public class SampleProjectTest {
             final @NotNull TestCaseDto tc = read(file, TestCaseDto.class);
 
             assertEquals(tc.getId().toString(), file.getFileName().toString().replace(".tc", ""),
-                    "A case's file name is its identity, so the sample must agree with itself: " + file);
+                    "A test case's file name is its identity, so the sample must agree with itself: " + file);
             assertFalse(tc.getOrder().isEmpty(),
                     "The sample is what a project written by the current build looks like, and that means ranked: " + file);
             assertFalse(tc.getDescription().isBlank(),
-                    "A case with no description generates no method, which is not what this sample is showing: " + file);
+                    "A test case with no description generates no method, which is not what this sample is showing: " + file);
         }
     }
 
     @Test
-    public void everyRunParsesAndItsResultsNameTestCasesThatExist() {
+    public void everyTestRunParsesAndItsResultsNameTestCasesThatExist() {
         final @NotNull List<String> testCaseIds = testCaseFiles().stream()
                 .map(file -> file.getFileName().toString().replace(".tc", ""))
                 .toList();
 
-        final @NotNull List<Path> runs = runFolders();
-        assertEquals(runs.size(), 2, "The sample is meant to carry two runs, and carries " + runs);
+        final @NotNull List<Path> testRuns = testRunFolders();
+        assertEquals(testRuns.size(), 2, "The sample is meant to carry two test runs, and carries " + testRuns);
 
-        for (final Path folder : runs) {
+        for (final Path folder : testRuns) {
             final @NotNull List<Path> results = resultFilesIn(folder);
 
-            assertFalse(results.isEmpty(), "A run with no results shows nothing: " + folder);
+            assertFalse(results.isEmpty(), "A test run with no results shows nothing: " + folder);
             assertTrue(jsonFilesIn(folder).isEmpty(),
-                    "A run folder holds one file per result, named by its test case, and no results file of its own."
+                    "A test run folder holds one file per result, named by its test case, and no results file of its own."
                             + " A JSON file there is the format this build does not read: " + folder);
 
             for (final Path file : results) {
@@ -172,7 +172,7 @@ public class SampleProjectTest {
                 assertEquals(item.getId().toString(), file.getFileName().toString().replace(".ri", ""),
                         "A result's file name is its test case's id, so the sample must agree with itself: " + file);
                 assertTrue(testCaseIds.contains(item.getId().toString()),
-                        "The result " + file.getFileName() + " names a case the sample does not hold: " + item.getId());
+                        "The result " + file.getFileName() + " names a test case the sample does not hold: " + item.getId());
             }
         }
     }

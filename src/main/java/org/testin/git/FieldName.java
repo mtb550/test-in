@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunConfiguration;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 
 import java.util.Locale;
 
@@ -32,20 +32,20 @@ final class FieldName {
         final int dot = jsonField.indexOf('.');
         if (dot < 0) return ofTestCaseField(jsonField);
 
-        return ofRunKey(jsonField.substring(dot + 1), jsonField);
+        return ofTestRunKey(jsonField.substring(dot + 1), jsonField);
     }
 
     private static @NotNull String ofTestCaseField(final @NotNull String jsonField) {
         final @NotNull String constant = jsonField.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toUpperCase(Locale.ROOT);
 
-        for (final TestEditorAttributes attribute : TestEditorAttributes.values()) {
+        for (final TestCaseEditorAttributes attribute : TestCaseEditorAttributes.values()) {
             if (attribute.name().equals(constant)) return attribute.getName();
         }
 
         return jsonField;
     }
 
-    private static @NotNull String ofRunKey(final @NotNull String key, final @NotNull String jsonField) {
+    private static @NotNull String ofTestRunKey(final @NotNull String key, final @NotNull String jsonField) {
         for (final TestRunConfiguration question : TestRunConfiguration.values()) {
             if (question.name().equals(key)) return question.getDisplayName();
         }

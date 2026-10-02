@@ -31,8 +31,8 @@ public record Hit(@NotNull Icon icon, @NotNull String name, @NotNull String wher
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-072, Rule-INTERNAL-098
-    public static @NotNull Hit of(final @NotNull TestCaseDto tc, final @NotNull DirectoryDto run) {
-        return new Hit(run.getType().getIcon(), tc.getDescription(), where(run), run, Optional.of(tc));
+    public static @NotNull Hit of(final @NotNull TestCaseDto tc, final @NotNull DirectoryDto testRun) {
+        return new Hit(testRun.getType().getIcon(), tc.getDescription(), where(testRun), testRun, Optional.of(tc));
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-072

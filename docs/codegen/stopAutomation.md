@@ -2,9 +2,10 @@
 
 # UC-CODEGEN-009: Stop a running test case
 
-**As a** tester, **I want** to end a run that is going, **so that** I can change something and start it again.
+**As a** tester, **I want** to end an execution that is going, **so that** I can
+change something and start it again.
 
-Stopping ends the whole run. Every test case in it goes back to not run.
+Stopping ends the whole execution. Every test case in it goes back to not run.
 
 There is no key of its own. `F5` on a running test case stops it.
 
@@ -32,12 +33,12 @@ There is no key of its own. `F5` on a running test case stops it.
 - **Rule-CODEGEN-036** — While a test case is running, the run button and the
   menu entry both become the stop.
 - **Rule-CODEGEN-037** — Stopping one test case stops every test case running
-  with it. One run is one process.
+  with it. One execution is one process.
 - **Rule-CODEGEN-038** — A test case the tester stopped is recorded as not run,
   never as failed.
-- **Rule-CODEGEN-094** — Stop ends only runs Testin started. A run the tester
-  started outside Testin, from a run configuration or the IDE's own gutter icon,
-  is left running.
+- **Rule-CODEGEN-094** — Stop ends only executions Testin started. An execution
+  the tester started outside Testin, from a run configuration or the IDE's own
+  gutter icon, is left running.
 
 ## What the tester sees
 
@@ -63,8 +64,8 @@ about five seconds.
 ## What the tester should expect
 
 The count in the message is what really went back. It can be more than the
-tester aimed at. Stopping one test case in a run of twelve reports *Stopped 12*,
-because the twelve share one process.
+tester aimed at. Stopping one test case in an execution of twelve reports
+*Stopped 12*, because the twelve share one process.
 
 A result arriving after the tester stopped a test case is ignored, so a stop is
 never read as a failure.

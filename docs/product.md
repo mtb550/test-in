@@ -53,9 +53,9 @@ is genuinely undecided it is listed as undecided rather than invented.
 >   the file, nothing is generated and Testin says so once. See Decision-013 on
 >   [the decisions page](decisions.md).
 > - **A test run's results are one file per test case now**, named by the test
->   case, beside the run's own file. Section 4's tree is right about what exists
->   and says nothing about the files. [The formats on disk](formats.md) is the
->   contract.
+>   case, beside the test run's own file. Section 4's tree is right about what
+>   exists and says nothing about the files. [The formats on disk](formats.md) is
+>   the contract.
 > - **Rule-PRODUCT-018 is not what the product does.** One keystroke carries
 >   three actions today, and it is deliberate: `F2` changes the thing in front of
 >   the tester, and which thing that is depends on where they are standing. The
@@ -115,16 +115,16 @@ anyone can work in them.
 |----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|
 | **Who owns the keyboard**  | The browser. `Ctrl+N`, `Ctrl+W`, `Ctrl+T`, `F5`, `F6` and `F12` are already taken, and what is left works only while no text field has focus | The IDE, which hands its key map to the plugin     |
 | **What one change costs**  | A trip to the server. Click the dropdown, wait, click the option, wait for the save                                                          | A write on this machine, straight away             |
-| **Whether work stacks up** | It does not. There is no way to reach a verdict from the keyboard, so eight rows cannot be judged in one go                                  | Select the rows, press one key. Any number of rows |
+| **Whether work stacks up** | It does not. There is no way to reach a run item status from the keyboard, so eight rows cannot be judged in one go                          | Select the rows, press one key. Any number of rows |
 
-So a tester executing a 200 test case run in a browser tool does it with the
-mouse, one test case at a time. The tool can never be faster than the browser
-it is trapped in.
+So a tester executing a test run of 200 test cases in a browser tool does it
+with the mouse, one test case at a time. The tool can never be faster than the
+browser it is trapped in.
 
 **A tester using Testin can execute a whole test run without touching the
-mouse.** Move to the test case, read it, press one key for the verdict, move
-on. Every other capability is a reason to be in Testin: the tree, the grid, the
-reports, the Git integration. The keyboard is the reason the work is faster
+mouse.** Move to the test case, read it, press one key for the run item
+status, move on. Every other capability is a reason to be in Testin: the tree,
+the grid, the reports, the Git integration. The keyboard is the reason the work is faster
 once the tester is there.
 
 That idea is written down here as a capability, with rules behind it - **Rule-PRODUCT-015** to **Rule-PRODUCT-018**, and
@@ -144,11 +144,11 @@ platform's behavior, not Testin's.
 > **There is exactly one actor today: the Tester.**
 
 The product stores a tester's **name** and a tester's **role**. The name is
-real. It is stamped on every verdict, and on every record the tester touches,
-so a test run always says who judged it. **The role is read by nothing at all
-today.** It is typed into the settings page, written to disk, and never used
-again. The HTML report once printed it above the footer. That line was removed,
-and nothing replaced it.
+real. It is stamped on every run item status, and on every record the tester
+touches, so a test run always says who judged it. **The role is read by
+nothing at all today.** It is typed into the settings page, written to disk,
+and never used again. The HTML report once printed it above the footer. That
+line was removed, and nothing replaced it.
 
 It is **reserved rather than abandoned**. A planned feature will read it to
 decide who may approve a test case, and who may remove a test project. Until
@@ -182,17 +182,17 @@ Test Project
         └── Test Run Result   (one per test case in the run)
 ```
 
-| Thing                | What it is                                                                                                                       | Notes                                                       |
-|----------------------|----------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
-| **Test Project**     | The top of one tree, and one folder on disk                                                                                      | Carries a status. Removing it removes everything beneath it |
-| **Test Cases**       | The fixed folder holding everything there is to test                                                                             | Cannot be created, renamed, moved or removed                |
-| **Test Runs**        | The fixed folder holding every test run                                                                                          | Cannot be created, renamed, moved or removed                |
-| **Test Set Package** | A folder that groups test sets. One package can hold another                                                                     | Carries a status                                            |
-| **Test Set**         | A named group of test cases. A test run is built from one                                                                        | Carries a status                                            |
-| **Test Case**        | One thing to test: description, preconditions, steps, expected result, test data, module, group, priority                        | The only thing in the tree a tester writes                  |
-| **Test Run Package** | A folder that groups test runs. One package can hold another                                                                     | Carries a status                                            |
-| **Test Run**         | One pass through a chosen set of test cases, at one moment                                                                       | Carries a status. Holds one result per test case            |
-| **Test Run Result**  | What happened to one test case in one run: verdict, who recorded it, when, how long it took, and the failure detail if it failed | Belongs to the run, not to the test case                    |
+| Thing                | What it is                                                                                                                                    | Notes                                                       |
+|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+| **Test Project**     | The top of one tree, and one folder on disk                                                                                                   | Carries a status. Removing it removes everything beneath it |
+| **Test Cases**       | The fixed folder holding everything there is to test                                                                                          | Cannot be created, renamed, moved or removed                |
+| **Test Runs**        | The fixed folder holding every test run                                                                                                       | Cannot be created, renamed, moved or removed                |
+| **Test Set Package** | A folder that groups test sets. One package can hold another                                                                                  | Carries a status                                            |
+| **Test Set**         | A named group of test cases. A test run is built from one                                                                                     | Carries a status                                            |
+| **Test Case**        | One thing to test: description, preconditions, steps, expected result, test data, module, group, priority                                     | The only thing in the tree a tester writes                  |
+| **Test Run Package** | A folder that groups test runs. One package can hold another                                                                                  | Carries a status                                            |
+| **Test Run**         | One pass through a chosen set of test cases, at one moment                                                                                    | Carries a status. Holds one result per test case            |
+| **Test Run Result**  | What happened to one test case in one test run: run item status, who recorded it, when, how long it took, and the failure detail if it failed | Belongs to the test run, not to the test case               |
 
 > **The difference that matters most.** A test case is the *question*. A test
 > run result is one *answer*, at one moment, by one person. A test case can be
@@ -205,31 +205,32 @@ Test Project
 
 There are seven kinds of status, and **26 values** in all. The seven do not
 affect each other, and that is on purpose. Where a test run has got to is one
-question. The verdict a test case got is another. What the team thinks of the
-test case itself is a third.
+question. The run item status a test case got is another. What the team thinks
+of the test case itself is a third.
 
 > Issue [#72](https://github.com/mtb550/test-in/issues/72) counts 22 values
 > across 6 kinds of status. Measured against the product, **it is 26 across
 > 7**. Two corrections. First, "Removed" moved. It used to sit with a test
-> project's status, and it belongs with the verdict a test case gets. A test
-> project has no removed state, because removing one deletes it. A test case
-> deleted out from under a test run leaves a row the test run still owns.
+> project's status, and it belongs with the run item status a test case gets. A
+> test project has no removed state, because removing one deletes it. A test
+> case deleted out from under a test run leaves a row the test run still owns.
 > Second, a **seventh kind of status was missed entirely**. A test case carries
-> its own status, separate from any verdict. It is section 5.7, and it is the
-> one worth reading.
+> its own status, separate from any run item status. It is section 5.7, and it
+> is the one worth reading.
 
-### 5.1 The verdict a test case gets in one test run — six values
+### 5.1 The run item status a test case gets in one test run — six values
 
-| Verdict      | Meaning                                                                    | Who sets it                      | Key |
-|--------------|----------------------------------------------------------------------------|----------------------------------|-----|
-| **Pending**  | Waiting. This test run holds the test case and has not reached it          | The test run, when it is created | —   |
-| **Passed**   | The test case behaved as expected                                          | Tester                           | `P` |
-| **Failed**   | It did not. The failure detail is collected in the same gesture            | Tester                           | `F` |
-| **Blocked**  | The test case could not be judged. Something outside it prevented the test | Tester                           | `B` |
-| **Untested** | The test run ended without ever reaching this test case                    | The test run, when it ends       | —   |
-| **Removed**  | The test case itself has been deleted. The row is history now              | The test run, when it notices    | —   |
+| Run Item Status | Meaning                                                                    | Who sets it                      | Key |
+|-----------------|----------------------------------------------------------------------------|----------------------------------|-----|
+| **Pending**     | Waiting. This test run holds the test case and has not reached it          | The test run, when it is created | —   |
+| **Passed**      | The test case behaved as expected                                          | Tester                           | `P` |
+| **Failed**      | It did not. The failure detail is collected in the same gesture            | Tester                           | `F` |
+| **Blocked**     | The test case could not be judged. Something outside it prevented the test | Tester                           | `B` |
+| **Untested**    | The test run ended without ever reaching this test case                    | The test run, when it ends       | —   |
+| **Removed**     | The test case itself has been deleted. The row is history now              | The test run, when it notices    | —   |
 
-**Three verdicts are a tester's to give, and exactly those three carry a key.**
+**Three run item statuses are a tester's to give, and exactly those three carry
+a key.**
 The other three are the test run's record of its own state. They have no key on
 purpose, because there is nothing for a person to apply.
 
@@ -263,10 +264,10 @@ Created and In Progress carry no key, because the product sets them itself. A
 test run is Created when it is made. It moves to In Progress the moment
 anything in it is executed, however it was started.
 
-**A signed-off test run records nothing further.** Its verdicts are history.
-It cannot be started, and any result arriving from anywhere else is refused.
-The one thing it still takes is the bug issue a failed test case is reported
-as. That changes no verdict. (UC-VIEW-PANEL-016)
+**A signed-off test run records nothing further.** Its run item statuses are
+history. It cannot be started, and any result arriving from anywhere else is
+refused. The one thing it still takes is the bug issue a failed test case is
+reported as. That changes no run item status. (UC-VIEW-PANEL-016)
 
 ```mermaid
 stateDiagram-v2
@@ -313,9 +314,10 @@ because it means the same thing in both. See **Rule-PRODUCT-023**.
 
 ### 5.7 A test case's own status — four values
 
-This is separate from the verdict, and easy to confuse with it. A **verdict**
-says what happened to the test case in one test run. **This** says what the
-team thinks of the test case itself, across every test run it is ever in.
+This is separate from the run item status, and easy to confuse with it. A
+**run item status** says what happened to the test case in one test run.
+**This** says what the team thinks of the test case itself, across every test
+run it is ever in.
 
 | Status            | What it means                                                    |
 |-------------------|------------------------------------------------------------------|
@@ -362,38 +364,38 @@ editor toolbar, or a key. **A capability with no key says so, and says why.**
 
 ### 6.2 Execution — the flow the product exists for
 
-| Capability                                         | Key                 | Notes                                                          |
-|----------------------------------------------------|---------------------|----------------------------------------------------------------|
-| Start execution                                    | —                   | Toolbar. Begins at the first test case the run has not reached |
-| Run the selected test cases through the automation | `F5`                |                                                                |
-| Run everything a node holds                        | —                   | Context menu, on a test set or a test run                      |
-| Stop                                               | —                   | Toolbar. Puts every test case it started back                  |
-| **Record Passed**                                  | **`P`**             |                                                                |
-| **Record Failed**                                  | **`F`**             | Opens the failure detail dialog in the same gesture            |
-| **Record Blocked**                                 | **`B`**             |                                                                |
-| Move to the next / previous test case              | `Ctrl+→` / `Ctrl+←` |                                                                |
-| Set the run's status                               | `1` `2` `3`         | Assigned, Completed, Closed                                    |
-| Jump to the generated automation method            | `Shift+F5`          |                                                                |
-| Generate the automation method                     | `F12`               |                                                                |
+| Capability                                         | Key                 | Notes                                                               |
+|----------------------------------------------------|---------------------|---------------------------------------------------------------------|
+| Start execution                                    | —                   | Toolbar. Begins at the first test case the test run has not reached |
+| Run the selected test cases through the automation | `F5`                |                                                                     |
+| Run everything a node holds                        | —                   | Context menu, on a test set or a test run                           |
+| Stop                                               | —                   | Toolbar. Puts every test case it started back                       |
+| **Record Passed**                                  | **`P`**             |                                                                     |
+| **Record Failed**                                  | **`F`**             | Opens the failure detail dialog in the same gesture                 |
+| **Record Blocked**                                 | **`B`**             |                                                                     |
+| Move to the next / previous test case              | `Ctrl+→` / `Ctrl+←` |                                                                     |
+| Set the test run's status                          | `1` `2` `3`         | Assigned, Completed, Closed                                         |
+| Jump to the generated automation method            | `Shift+F5`          |                                                                     |
+| Generate the automation method                     | `F12`               |                                                                     |
 
 > **ℹ Light mode is missing from this table.** It was built after this draft: a
 > standalone always-on-top window showing one test case at a time, so a tester
-> can work with the IDE minimized and still record a verdict. The keys are `P`,
-> `F` and `B`, with `Ctrl+D` for the rest of the test case and `Escape` to
-> close. It is the clearest example of section 2's idea, and it is not
+> can work with the IDE minimized and still record a run item status. The keys
+> are `P`, `F` and `B`, with `Ctrl+D` for the rest of the test case and `Escape`
+> to close. It is the clearest example of section 2's idea, and it is not
 > described here.
 > See
 > [the light mode document](editorPanel/lightMode.md).
 
 ### 6.3 Evidence and exchange
 
-| Capability        | Key      | Formats                                               |
-|-------------------|----------|-------------------------------------------------------|
-| Generate a report | `Ctrl+P` | HTML, PDF, Word, Excel                                |
-| Export            | —        | CSV, Excel, HTML, JSON                                |
-| Import            | —        | CSV, Excel, JSON                                      |
-| Show node details | —        | Counts for a container, a verdict breakdown for a run |
-| Sync with Git     | —        | Needs the Git plugin                                  |
+| Capability        | Key      | Formats                                                            |
+|-------------------|----------|--------------------------------------------------------------------|
+| Generate a report | `Ctrl+P` | HTML, PDF, Word, Excel                                             |
+| Export            | —        | CSV, Excel, HTML, JSON                                             |
+| Import            | —        | CSV, Excel, JSON                                                   |
+| Show node details | —        | Counts for a container, a run item status breakdown for a test run |
+| Sync with Git     | —        | Needs the Git plugin                                               |
 
 ### 6.4 Use cases
 
@@ -448,28 +450,28 @@ Numbered so an issue or a commit can cite one.
 
 ### Structure
 
-| BR                   | Rule                                                                                                                                                     |
-|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Rule-PRODUCT-005** | A node may only be moved into a place that can legally hold it. A test set cannot be dropped among runs, and a run cannot be dropped inside another run. |
-| **Rule-PRODUCT-006** | Test Cases and Test Runs are fixed containers. They cannot be created, renamed, moved or removed.                                                        |
-| **Rule-PRODUCT-022** | A deprecated test set is not deleted. It is kept, and drawn as deprecated.                                                                               |
-| **Rule-PRODUCT-023** | Active and Archived mean the same thing for a test set package as for a test run package.                                                                |
+| BR                   | Rule                                                                                                                                                                    |
+|----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Rule-PRODUCT-005** | A node may only be moved into a place that can legally hold it. A test set cannot be dropped among test runs, and a test run cannot be dropped inside another test run. |
+| **Rule-PRODUCT-006** | Test Cases and Test Runs are fixed containers. They cannot be created, renamed, moved or removed.                                                                       |
+| **Rule-PRODUCT-022** | A deprecated test set is not deleted. It is kept, and drawn as deprecated.                                                                                              |
+| **Rule-PRODUCT-023** | Active and Archived mean the same thing for a test set package as for a test run package.                                                                               |
 
-### Runs and history
+### Test runs and history
 
-| BR                   | Rule                                                                                                                                                                                                                                                                                    |
-|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Rule-PRODUCT-007** | A test run is a record of an execution at a point in time, not a live view of the test set. Changing a test case after a run has judged it does not change what the run recorded.                                                                                                       |
-| **Rule-PRODUCT-008** | A result is written into the run the tester started, and no other. The same test case running in another run does not affect this one.                                                                                                                                                  |
-| **Rule-PRODUCT-009** | A test case may belong to any number of runs and carry a different verdict in each. The verdict belongs to the run.                                                                                                                                                                     |
-| **Rule-PRODUCT-010** | Every verdict records who gave it and when, whether a person typed it or the automation reported it.                                                                                                                                                                                    |
-| **Rule-PRODUCT-011** | A signed-off run records nothing further. Once Completed or Closed, execution cannot be started on it and no result arriving from anywhere is written into it. The one exception is the bug issue link a failed test case is reported as, which changes no verdict (UC-VIEW-PANEL-016). |
+| BR                   | Rule                                                                                                                                                                                                                                                                                                 |
+|----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Rule-PRODUCT-007** | A test run is a record of an execution at a point in time, not a live view of the test set. Changing a test case after a test run has judged it does not change what the test run recorded.                                                                                                          |
+| **Rule-PRODUCT-008** | A result is written into the test run the tester started, and no other. The same test case running in another test run does not affect this one.                                                                                                                                                     |
+| **Rule-PRODUCT-009** | A test case may belong to any number of test runs and carry a different run item status in each. The run item status belongs to the test run.                                                                                                                                                        |
+| **Rule-PRODUCT-010** | Every run item status records who gave it and when, whether a person typed it or the automation reported it.                                                                                                                                                                                         |
+| **Rule-PRODUCT-011** | A signed-off test run records nothing further. Once Completed or Closed, execution cannot be started on it and no result arriving from anywhere is written into it. The one exception is the bug issue link a failed test case is reported as, which changes no run item status (UC-VIEW-PANEL-016). |
 
-### Verdicts
+### Run item statuses
 
 | BR                   | Rule                                                                                                                                                                |
 |----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Rule-PRODUCT-012** | A tester may record exactly three verdicts: Passed, Failed, Blocked.                                                                                                |
+| **Rule-PRODUCT-012** | A tester may record exactly three run item statuses: Passed, Failed, Blocked.                                                                                       |
 | **Rule-PRODUCT-013** | Pending and Untested are the test run's own record, and a person cannot apply them. Pending means not reached yet. Untested means never reached, and never will be. |
 
 ### Feedback
@@ -535,8 +537,8 @@ answered.
 
 | Planned actor | What they would do                                                                                                                                                                                                              | Tracked in                                                                                               |
 |---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
-| **Lead**      | Assign a run to a tester and watch its progress without executing it                                                                                                                                                            | [#14](https://github.com/mtb550/test-in/issues/14)                                                       |
-| **Lead**      | Be notified when a run completes or a test case fails, without opening the IDE                                                                                                                                                  | [#15](https://github.com/mtb550/test-in/issues/15), [#159](https://github.com/mtb550/test-in/issues/159) |
+| **Lead**      | Assign a test run to a tester and watch its progress without executing it                                                                                                                                                       | [#14](https://github.com/mtb550/test-in/issues/14)                                                       |
+| **Lead**      | Be notified when a test run completes or a test case fails, without opening the IDE                                                                                                                                             | [#15](https://github.com/mtb550/test-in/issues/15), [#159](https://github.com/mtb550/test-in/issues/159) |
 | **Any role**  | Gate capabilities by role: who may approve a test case, and who may remove a test project. This is what the stored `Tester role` is reserved for — it is the reason the field stays on the settings page while nothing reads it | [#14](https://github.com/mtb550/test-in/issues/14)                                                       |
 
 ---
@@ -549,13 +551,13 @@ answered.
 | **Test Set**        | A named group of test cases. A test run is built from one                                       |
 | **Test Case**       | One testable thing, with its steps and expected result. The question                            |
 | **Test Run**        | One execution of a chosen set of test cases at a point in time                                  |
-| **Test Run Result** | What happened to one test case in one run. The answer                                           |
-| **Verdict**         | Passed, Failed or Blocked — the three a tester can give                                         |
-| **Pending**         | This run holds the test case and has not reached it yet                                         |
-| **Untested**        | The run ended without ever reaching the test case                                               |
+| **Test Run Result** | What happened to one test case in one test run. The answer                                      |
+| **Run Item Status** | Passed, Failed or Blocked — the three a tester can give                                         |
+| **Pending**         | This test run holds the test case and has not reached it yet                                    |
+| **Untested**        | The test run ended without ever reaching the test case                                          |
 | **Removed**         | The test case has been deleted. The test run keeps what it recorded                             |
 | **Signed off**      | Completed or Closed. A signed-off test run records nothing further, apart from a bug issue link |
-| **Deprecated**      | A test set kept for its history but no longer offered for new runs                              |
+| **Deprecated**      | A test set kept for its history but no longer offered for new test runs                         |
 | **Archived**        | A package kept but moved out of the way                                                         |
 | **Automation**      | The generated test method that executes a test case without a person                            |
 

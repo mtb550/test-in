@@ -17,16 +17,16 @@
 package org.testin.editor.toolbar.components;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.run.ExecutionControl;
-import org.testin.editor.run.RunEditor;
+import org.testin.editor.testrun.ExecutionControl;
+import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.TestRunStatus;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 
 public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem {
-    private final @NotNull RunEditor editor;
+    private final @NotNull TestRunEditor editor;
 
-    public StartExecutionBtn(final @NotNull RunEditor editor, final @NotNull Runnable onStartExecutionClicked) {
+    public StartExecutionBtn(final @NotNull TestRunEditor editor, final @NotNull Runnable onStartExecutionClicked) {
         super(ExecutionControl.START.getLabel(), ExecutionControl.START.getIcon());
         this.editor = editor;
 
@@ -34,7 +34,7 @@ public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem
     }
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-135
-    public static @NotNull String tooltipFor(final @NotNull RunEditor editor) {
+    public static @NotNull String tooltipFor(final @NotNull TestRunEditor editor) {
         if (editor.getWalk().isExecuting()) return Bundle.message("toolbar.executing");
 
         final @NotNull TestRunStatus status = editor.getParent().getMarker().getStatus();

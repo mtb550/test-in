@@ -80,7 +80,7 @@ public class IndexerBudgetTest {
             try {
                 parsed.add(MAPPER.readValue(document, TestRunItems.class));
             } catch (final Exception ex) {
-                throw new AssertionError("A result the run writer would write did not parse: " + ex.getMessage(), ex);
+                throw new AssertionError("A result the test run writer would write did not parse: " + ex.getMessage(), ex);
             }
         }
 
@@ -92,7 +92,7 @@ public class IndexerBudgetTest {
         final @NotNull List<TestCaseDto> weighed = parse(documents);
         final long after = usedBytes();
 
-        assertEquals(weighed.size(), TEST_CASES, "The cases were collected before they could be weighed");
+        assertEquals(weighed.size(), TEST_CASES, "The test cases were collected before they could be weighed");
         return Math.max(0, after - before) / 1024;
     }
 
@@ -108,7 +108,7 @@ public class IndexerBudgetTest {
         final int read = readAll(project).size();
         final long elapsed = System.nanoTime() - started;
 
-        assertEquals(read, expected, "The walk read the wrong number of cases, so the timing is of the wrong thing");
+        assertEquals(read, expected, "The walk read the wrong number of test cases, so the timing is of the wrong thing");
         return elapsed;
     }
 
@@ -166,7 +166,7 @@ public class IndexerBudgetTest {
             final @NotNull List<TestCaseDto> parsed = parse(documents);
             final long elapsed = System.nanoTime() - started;
 
-            assertEquals(parsed.size(), TEST_CASES, "The parse read a different number of cases than it was given");
+            assertEquals(parsed.size(), TEST_CASES, "The parse read a different number of test cases than it was given");
 
             fastest = Math.min(fastest, elapsed);
             slowest = Math.max(slowest, elapsed);
@@ -186,7 +186,7 @@ public class IndexerBudgetTest {
     }
 
     @Test(groups = "budget")
-    public void parsingAProjectsRunResultsStaysInsideTheBudget() {
+    public void parsingAProjectsTestRunResultsStaysInsideTheBudget() {
         final @NotNull List<String> documents = results();
 
         parseResults(documents.subList(0, 1_000));
@@ -212,7 +212,7 @@ public class IndexerBudgetTest {
                 RESULTS, fastest / 1e6, micros, PASSES, slowest / 1e6));
 
         assertTrue(micros < BUDGET_MICROS_PER_RESULT,
-                "Parsing a run result costs " + String.format("%.1f", micros) + " us, over the "
+                "Parsing a test run result costs " + String.format("%.1f", micros) + " us, over the "
                         + BUDGET_MICROS_PER_RESULT + " us budget in docs/internal/readTestProject.md."
                         + " Either the read got slower or the budget needs re-measuring - decide which,"
                         + " and if it is the budget, say why in that document.");

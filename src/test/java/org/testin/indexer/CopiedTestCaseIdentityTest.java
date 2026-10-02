@@ -41,13 +41,13 @@ public class CopiedTestCaseIdentityTest {
     @Test
     public void aTestCaseTheTesterNamedIsATestCaseFileToo() {
         assertTrue(ProjectIndexer.isTestCaseFile(TEST_SET.resolve("login.tc"), IS_TEST_SET),
-                "a hand-named case is still a test case, so a copy of it has to get an id of its own");
+                "a hand-named test case file is still a test case, so a copy of it has to get an id of its own");
     }
 
     @Test
-    public void aRunsOwnFileIsNotATestCaseFile() {
+    public void aTestRunsOwnFileIsNotATestCaseFile() {
         assertFalse(ProjectIndexer.isTestCaseFile(TEST_RUN.resolve("Cycle 1.json"), IS_TEST_SET),
-                "a run's file is named for its folder and must keep the case ids it executed");
+                "a test run's file is named for its folder and must keep the test case ids it executed");
     }
 
     @Test

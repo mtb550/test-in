@@ -18,16 +18,16 @@ package org.testin.editor.toolbar.components;
 
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.run.RunEditor;
+import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.TestRunStatus;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 
 public class ResultAnalysisBtn extends AbstractIconButton implements ToolbarItem {
-    private final @NotNull RunEditor editor;
+    private final @NotNull TestRunEditor editor;
 
     // UC-EDITOR-PANEL-045
-    public ResultAnalysisBtn(final @NotNull RunEditor editor, final @NotNull Runnable onResultAnalysisClicked) {
+    public ResultAnalysisBtn(final @NotNull TestRunEditor editor, final @NotNull Runnable onResultAnalysisClicked) {
         super(Bundle.message("toolbar.analysis"), AllIcons.Actions.ProjectWideAnalysisOff);
         this.editor = editor;
 

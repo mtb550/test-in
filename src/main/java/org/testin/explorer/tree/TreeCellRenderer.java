@@ -60,11 +60,11 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
             final @NotNull DirectoryDto dir = shown.get();
             final @NotNull DirectoryType type = dir.getType();
 
-            final @NotNull Optional<TestRunStatus> runStatus = dir instanceof TestRunDirectoryDto trDir
+            final @NotNull Optional<TestRunStatus> testRunStatus = dir instanceof TestRunDirectoryDto trDir
                     ? Optional.of(trDir.getMarker().getStatus())
                     : Optional.empty();
 
-            setIcon(runStatus.map(TestRunStatus::getIcon).orElseGet(type::getIcon));
+            setIcon(testRunStatus.map(TestRunStatus::getIcon).orElseGet(type::getIcon));
             final boolean grayed = selectedNodes.contains(dir.getPath()) || dir.isRetired();
             append(dir.getName(), grayed ? SimpleTextAttributes.GRAYED_ATTRIBUTES : type.getAttributes());
 

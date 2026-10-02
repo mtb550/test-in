@@ -26,7 +26,7 @@ going stale (#99).
 4. **Formatting is display-only.** Rendering may reformat a value; saving never
    does. The stored JSON is byte-identical to what the tester typed, so an
    editable surface loads the raw value and a read-only one loads the formatted
-   value - `gridValue` and `displayValue` on `TestEditorAttributes`.
+   value - `gridValue` and `displayValue` on `TestCaseEditorAttributes`.
 
 The fifth is not in that document, because it is about where a value is kept
 rather than how the plugin is shaped:
@@ -119,8 +119,8 @@ silently has no effect costs more than the setting it was meant to hold.
   are assigned is one.
 - **`Optional` is how a field says "not set yet", and a parameter says
   "possibly nothing".** A popup built on first show, a service the application
-  has not started, a run an editor has not loaded: each holds an empty Optional
-  rather than a null, so no reader has to test for one. The
+  has not started, a test run an editor has not loaded: each holds an empty
+  Optional rather than a null, so no reader has to test for one. The
   `OptionalUsedAsFieldOrParameterType` inspection is switched off in
   `.idea/inspectionProfiles/Testin.xml` for exactly this reason — what it argues
   for instead is a nullable field, which is the thing the codebase spent a sweep
@@ -128,7 +128,7 @@ silently has no effect costs more than the setting it was meant to hold.
 - Node behavior is declared on the node: capability flags on `DirectoryDto`
   (`isRenamable`, `isTransferable`, `acceptsTransferred`, ...) instead of
   instanceof chains at call sites. Enums carry their own presentation and
-  actions (see `TestStatus`, `TestRunStatus`).
+  actions (see `RunItemStatus`, `TestRunStatus`).
 - Dialogs are built on the declarative framework (`org.testin.ui.framework`):
   a dialog assigns `title`, `components`, `shortcuts` in its constructor and
   implements `submit()`. Never hand-build popup layouts.

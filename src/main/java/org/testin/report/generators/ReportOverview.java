@@ -25,7 +25,7 @@ import org.testin.model.TestRunSummary;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.DetailRow;
 import org.testin.model.markers.TestRunMarker;
-import org.testin.testrun.RunEditorAttributes;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 
 import java.util.ArrayList;
@@ -45,9 +45,9 @@ public final class ReportOverview {
 
         for (final TestRunConfiguration field : TestRunConfiguration.values()) addConfiguration(rows, field, marker);
 
-        add(rows, RunEditorAttributes.EXECUTED_BY.getName(), summary.executedBy());
+        add(rows, TestRunEditorAttributes.EXECUTED_BY.getName(), summary.executedBy());
         TestRunExecution.rowsOf(marker).forEach(row -> add(rows, row.caption(), row.value()));
-        add(rows, RunEditorAttributes.RUN_STATUS.getName(), marker.getStatus().getLabel());
+        add(rows, TestRunEditorAttributes.RUN_STATUS.getName(), marker.getStatus().getLabel());
 
         return List.copyOf(rows);
     }

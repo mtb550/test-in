@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Groups;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.TestEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,19 +31,19 @@ import java.util.Objects;
 final class TestCaseChangeComparator {
     static @NotNull List<FieldChange> compare(final @NotNull TestCaseDto oldState, final @NotNull TestCaseDto newState) {
         final @NotNull List<FieldChange> changes = new ArrayList<>();
-        addIfChanged(changes, TestEditorAttributes.DESCRIPTION.getName(), oldState.getDescription(), newState.getDescription(), ChangeType.CHANGE_DESCRIPTION);
-        addIfChanged(changes, TestEditorAttributes.EXPECTED_RESULT.getName(), oldState.getExpectedResult(), newState.getExpectedResult(), ChangeType.CHANGE_EXPECTED_RESULT);
-        addIfChanged(changes, TestEditorAttributes.STEPS.getName(), formatSteps(oldState), formatSteps(newState), ChangeType.CHANGE_STEPS);
-        addIfChanged(changes, TestEditorAttributes.PRIORITY.getName(), oldState.getPriority().getLabel(), newState.getPriority().getLabel(), ChangeType.CHANGE_PRIORITY);
-        addIfChanged(changes, TestEditorAttributes.STATUS.getName(), oldState.getStatus().getLabel(), newState.getStatus().getLabel(), ChangeType.CHANGE_STATUS);
-        addIfChanged(changes, TestEditorAttributes.REFERENCE.getName(), oldState.getReference(), newState.getReference(), ChangeType.CHANGE_REFERENCE);
-        addIfChanged(changes, TestEditorAttributes.MODULE.getName(), oldState.getModule(), newState.getModule(), ChangeType.CHANGE_MODULE);
-        addIfChanged(changes, TestEditorAttributes.TEST_DATA.getName(), oldState.getTestData(), newState.getTestData(), ChangeType.CHANGE_TEST_DATA);
-        addIfChanged(changes, TestEditorAttributes.PRE_CONDITIONS.getName(), oldState.getPreConditions(), newState.getPreConditions(), ChangeType.CHANGE_PRECONDITIONS);
+        addIfChanged(changes, TestCaseEditorAttributes.DESCRIPTION.getName(), oldState.getDescription(), newState.getDescription(), ChangeType.CHANGE_DESCRIPTION);
+        addIfChanged(changes, TestCaseEditorAttributes.EXPECTED_RESULT.getName(), oldState.getExpectedResult(), newState.getExpectedResult(), ChangeType.CHANGE_EXPECTED_RESULT);
+        addIfChanged(changes, TestCaseEditorAttributes.STEPS.getName(), formatSteps(oldState), formatSteps(newState), ChangeType.CHANGE_STEPS);
+        addIfChanged(changes, TestCaseEditorAttributes.PRIORITY.getName(), oldState.getPriority().getLabel(), newState.getPriority().getLabel(), ChangeType.CHANGE_PRIORITY);
+        addIfChanged(changes, TestCaseEditorAttributes.STATUS.getName(), oldState.getStatus().getLabel(), newState.getStatus().getLabel(), ChangeType.CHANGE_STATUS);
+        addIfChanged(changes, TestCaseEditorAttributes.REFERENCE.getName(), oldState.getReference(), newState.getReference(), ChangeType.CHANGE_REFERENCE);
+        addIfChanged(changes, TestCaseEditorAttributes.MODULE.getName(), oldState.getModule(), newState.getModule(), ChangeType.CHANGE_MODULE);
+        addIfChanged(changes, TestCaseEditorAttributes.TEST_DATA.getName(), oldState.getTestData(), newState.getTestData(), ChangeType.CHANGE_TEST_DATA);
+        addIfChanged(changes, TestCaseEditorAttributes.PRE_CONDITIONS.getName(), oldState.getPreConditions(), newState.getPreConditions(), ChangeType.CHANGE_PRECONDITIONS);
 
         if (!Objects.equals(oldState.getGroup(), newState.getGroup())) {
             changes.add(new FieldChange(
-                    TestEditorAttributes.GROUP.getName(), Groups.text(oldState.getGroup()), Groups.text(newState.getGroup()), ChangeType.CHANGE_GROUP));
+                    TestCaseEditorAttributes.GROUP.getName(), Groups.text(oldState.getGroup()), Groups.text(newState.getGroup()), ChangeType.CHANGE_GROUP));
         }
         return changes;
     }

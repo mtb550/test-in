@@ -23,12 +23,12 @@ import org.testin.util.Bundle;
 
 import java.util.Map;
 
-public record CommitIdSection(@NotNull ComponentDialogBase<TextInput> component) implements RunSection {
+public record CommitIdSection(@NotNull ComponentDialogBase<TextInput> component) implements TestRunSection {
     // UC-TREE-PANEL-021
     public static @NotNull CommitIdSection of(final @NotNull String value) {
         return new CommitIdSection(ComponentDialogBase.textField()
                 .caption(TestRunConfiguration.COMMIT_ID.getDisplayName())
-                .placeholder(Bundle.message("run.form.commit.hint"))
+                .placeholder(Bundle.message("test.run.form.commit.hint"))
                 .value(value)
                 .build());
     }

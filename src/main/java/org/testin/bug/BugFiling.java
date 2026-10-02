@@ -25,7 +25,7 @@ import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
@@ -74,13 +74,13 @@ public final class BugFiling {
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-074
     static @NotNull Optional<String> store(final @NotNull Project p, final @NotNull RunItem item, final @NotNull String url) {
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
-        final @NotNull Optional<TestRunItems> found = testRuns.findTestRun(item.run()).flatMap(item::in);
+        final @NotNull Optional<TestRunItems> found = testRuns.findTestRun(item.testRunPath()).flatMap(item::in);
         if (found.isEmpty()) return Optional.of(Bundle.message("bug.not.stored.moved"));
-        if (found.orElseThrow().getStatus() != TestStatus.FAILED)
+        if (found.orElseThrow().getStatus() != RunItemStatus.FAILED)
             return Optional.of(Bundle.message("bug.not.stored.no.longer.failed"));
 
-        testRuns.changeRun(item.run(), run -> item.failedIn(run).ifPresentOrElse(result -> result.linkBug(url),
-                () -> Logger.warn("The run a sync brought in no longer has this failure, so its bug link was not stored: " + url)));
+        testRuns.changeTestRun(item.testRunPath(), testRun -> item.failedIn(testRun).ifPresentOrElse(result -> result.linkBug(url),
+                () -> Logger.warn("The test run a sync brought in no longer has this failure, so its bug link was not stored: " + url)));
         return Optional.empty();
     }
 }

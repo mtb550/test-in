@@ -46,7 +46,7 @@ class KeyBtn extends JBPanel<KeyBtn> {
         super(new FlowLayout(FlowLayout.CENTER, JBUI.scale(6), JBUI.scale(PADDING)));
         this.onClick = onClick;
 
-        Tooltip.set(this, Bundle.message("light.record.verdict", text.toLowerCase(Locale.ROOT)));
+        Tooltip.set(this, Bundle.message("light.record.run.item.status", text.toLowerCase(Locale.ROOT)));
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1));
         setOpaque(false);

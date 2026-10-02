@@ -73,11 +73,11 @@ lists, not apologies.
 
 You installed the plugin and want to use it well.
 
-| Document                           | What it answers                                                  | Where it stands                                                           |
-|------------------------------------|------------------------------------------------------------------|---------------------------------------------------------------------------|
-| **[Every shortcut](shortcuts.md)** | Every key Testin answers to, on every screen                     | Written                                                                   |
-| **Task guides**                    | How to set up what a feature needs by hand, reached from the IDE | Planned, not built — [#307](https://github.com/mtb550/test-in/issues/307) |
-| **[First run](firstRun.md)**       | From installing the plugin to a first verdict, in ten minutes    | Written                                                                   |
+| Document                           | What it answers                                                       | Where it stands                                                           |
+|------------------------------------|-----------------------------------------------------------------------|---------------------------------------------------------------------------|
+| **[Every shortcut](shortcuts.md)** | Every key Testin answers to, on every screen                          | Written                                                                   |
+| **Task guides**                    | How to set up what a feature needs by hand, reached from the IDE      | Planned, not built — [#307](https://github.com/mtb550/test-in/issues/307) |
+| **[First run](firstRun.md)**       | From installing the plugin to a first run item status, in ten minutes | Written                                                                   |
 
 ## For contributors
 
@@ -88,5 +88,5 @@ What a person needs before their first change.
 | **[Architecture](ARCHITECTURE.md)**                                             | The layers, the four rules the plugin is built on, and two operations traced class by class                     | Written         |
 | **[Contributing](https://github.com/mtb550/test-in/blob/main/CONTRIBUTING.md)** | Setup, the checks that must pass, the run configurations and the terms                                          | Written         |
 | **[Standing decisions](decisions.md)**                                          | Sixteen decisions made once, with the reason each one looks wrong, so they are not argued again in every review | Written         |
-| **[The formats on disk](formats.md)**                                           | Every marker, the test case and run files, and `testin.yml` — field by field, with the versioning rules         | Written         |
+| **[The formats on disk](formats.md)**                                           | Every marker, the test case and test run files, and `testin.yml` — field by field, with the versioning rules    | Written         |
 | **[The indexer's budget](internal/readTestProject.md)**                         | What reading ten thousand test cases costs, measured, and the test that holds it there                          | Written         |

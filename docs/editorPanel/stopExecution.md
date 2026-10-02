@@ -6,7 +6,7 @@
 run is written
 as it stands.
 
-Stopping changes no verdict. It only ends the walk and stops the clock.
+Stopping changes no run item status. It only ends the walk and stops the clock.
 
 There is no key for this. The button's tooltip reads **Stop Execution**.
 
@@ -37,9 +37,9 @@ There is no key for this. The button's tooltip reads **Stop Execution**.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-149** — Stopping writes the test run to disk as it stands.
-- **Rule-EDITOR-PANEL-150** — Stopping changes no verdict already recorded, and
-  no status either. Only a gesture that starts something stamps when execution
-  began or moves a test run to **In Progress**.
+- **Rule-EDITOR-PANEL-150** — Stopping changes no run item status already
+  recorded, and no status either. Only a gesture that starts something stamps
+  when execution began or moves a test run to **In Progress**.
 - **Rule-EDITOR-PANEL-151** — Stopping stamps when execution ended. That stamp
   is written again by every stop.
 - **Rule-EDITOR-PANEL-152** — The tester's own stop ends any automation this
@@ -66,7 +66,8 @@ There is no key for this. The button's tooltip reads **Stop Execution**.
 ## What the tester sees
 
 This opens no screen. The clock stops, and the toolbar button becomes **Start
-Manual Execution** again. Every verdict already recorded stays where it is.
+Manual Execution** again. Every run item status already recorded stays where it
+is.
 
 A small message appears at the bottom of the IDE and fades. It reads *Stopped*.
 
@@ -87,7 +88,7 @@ Nothing. The button is never gray while it is on the toolbar.
 
 ## What the tester should expect
 
-**Stopping one test case stops every test case running with it.** One test run
+**Stopping one test case stops every test case running with it.** One execution
 started as one gesture is one process, so ending it ends all of them.
 
 **Stopping something that had already finished says *Stopped* anyway.** The
@@ -97,7 +98,7 @@ button has no gray state. A stop that reached nothing still reports itself.
 
 **Refresh** stops it, and says *Refreshed, and the execution stopped*. The time
 spent so far on the test case being executed is written with the test run. The
-run is not stamped as ended.
+test run is not stamped as ended.
 
 **Closing the tab** stops the walk and the automation both, writes the test run,
 and asks nothing. It is the same thing as pressing **Stop Execution**.

@@ -72,12 +72,12 @@ only comment a method carries, so it is always the `//` line above the signature
 
 ```java
 // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-144
-public void recordVerdict(final @NotNull TestCaseDto testCase) {
+public void recordRunItemStatus(final @NotNull TestCaseDto testCase) {
 }
 ```
 
 The sentence that used to sit under it now goes in the commit message: *"Escape
-records nothing at all, neither the detail nor the verdict, because a
+records nothing at all, neither the detail nor the run item status, because a
 half-written failure is worse than no failure"*. The behavior itself is in
 `Rule-EDITOR-PANEL-144` on its page. Read the comment rule in `CLAUDE.md`.
 

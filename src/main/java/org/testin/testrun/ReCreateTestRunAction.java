@@ -40,7 +40,7 @@ public class ReCreateTestRunAction extends AbstractAnyProjectAction {
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         GrayWithReason.unless(this, e, TestinData.singleSelected(e, TestRunDirectoryDto.class).isPresent(),
-                Bundle.message("recreate.run.disabled.description"));
+                Bundle.message("recreate.test.run.disabled.description"));
     }
 
     @Override

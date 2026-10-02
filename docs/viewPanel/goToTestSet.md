@@ -35,8 +35,8 @@ There is no key for this. The path is at the top of the panel.
   the test case.
 - **Rule-VIEW-PANEL-042** — Every step goes to the place it names. The tree
   opens on it and expands to it; a step that names something with an editor —
-  the test set, or the test run when the panel was opened from a run — opens
-  that too.
+  the test set, or the test run when the panel was opened from a test run —
+  opens that too.
 - **Rule-VIEW-PANEL-043** — Opening a test set that is already open brings it to
   the front.
 

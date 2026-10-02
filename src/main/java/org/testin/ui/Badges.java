@@ -26,7 +26,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
-import org.testin.model.RunStatusBadge;
+import org.testin.model.ExecutionStatusBadge;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.FixedColors;
 import org.testin.util.Fonts;
@@ -78,8 +78,8 @@ public final class Badges {
         return badges;
     }
 
-    public static @NotNull Badge createRunStatusBadge(final @NotNull RunStatusBadge runStatus) {
-        return new Pill(runStatus.label(), runStatus.color());
+    public static @NotNull Badge createExecutionStatusBadge(final @NotNull ExecutionStatusBadge executionStatus) {
+        return new Pill(executionStatus.label(), executionStatus.color());
     }
 
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-253

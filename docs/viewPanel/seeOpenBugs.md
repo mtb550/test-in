@@ -7,8 +7,8 @@ twice.
 
 A bug in Testin is not a thing of its own. It is what a test run's row records
 about a failure — how bad it is, how soon it must be fixed, and the issue it was
-filed as. So a test case's bugs are found by looking through the runs it has
-been in.
+filed as. So a test case's bugs are found by looking through the test runs it
+has been in.
 
 That is why the same test case can carry a **Blocker** from cycle 5 and nothing
 at all from cycle 14, and why both are worth seeing at once.
@@ -39,11 +39,11 @@ There is no key for this. The tab is called **Open Bugs**.
 - **Rule-VIEW-PANEL-038** — With no test case shown, the Open Bugs tab says to
   select one. It does not describe a test case that is not there.
 - **Rule-VIEW-PANEL-064** — The Open Bugs tab lists every bug the test case has
-  recorded, and which test run recorded it. A bug is what a run row says about a
-  failure - how bad it is, how soon it must be fixed, or the issue it was filed
-  as. So a test case that has never failed has none, and the same test case can
-  carry a different bug in every cycle. A filed issue is shown as its link, and
-  opens when clicked.
+  recorded, and which test run recorded it. A bug is what a test run's row says
+  about a failure - how bad it is, how soon it must be fixed, or the issue it
+  was filed as. So a test case that has never failed has none, and the same test
+  case can carry a different bug in every cycle. A filed issue is shown as its
+  link, and opens when clicked.
 - **Rule-VIEW-PANEL-065** — The bugs are read from the test runs the indexer
   already holds, so the tab costs a walk over what is in memory and reads
   nothing from disk.
@@ -65,18 +65,18 @@ There is no key for this. The tab is called **Open Bugs**.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The run's name** — which cycle found this bug. It is the only thing that
-   says when, so it is the heading rather than a detail.
+1. **The test run's name** — which cycle found this bug. It is the only thing
+   that says when, so it is the heading rather than a detail.
 2. **The severity and the priority** — in the severity's own color, the same one
-   the run grid and every report paint it. A failure nobody triaged reads
-   `Enhancement / Low`. Left out for a row that is not a failure, such as a
-   blocked one with a filed issue.
+   the test run editor's grid and every report paint it. A failure nobody
+   triaged reads `Enhancement / Low`. Left out for a row that is not a failure,
+   such as a blocked one with a filed issue.
 3. **The issue** — the one the failure was filed as, when it was. Clicking it
    opens it in the browser, as the Details tab's link does.
 4. **What happened** — the actual result the tester wrote, when they wrote one.
    Left out when they did not, like every other empty field in this panel.
 
-The newest run comes first.
+The newest test run comes first.
 
 ## Main flow
 

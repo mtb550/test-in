@@ -34,7 +34,7 @@ A test run package is a folder that holds test runs. This makes one.
   means a **Deprecated** test set or an **Archived** package. It is drawn gray.
   It sorts after live nodes. It is not offered when a test run is created.
 - **Rule-TREE-PANEL-009** — A test run that is **Completed** or **Closed** is
-  signed off. Its test cases, verdicts and configuration can no longer change.
+  signed off. Its test cases, run item statuses and configuration can no longer change.
 - **Rule-TREE-PANEL-010** — Siblings are shown in one order:
     1. live nodes, then retired ones
     2. the number the tester gave the node
@@ -61,26 +61,27 @@ A test run package is a folder that holds test runs. This makes one.
 - **Rule-TREE-PANEL-100** — A test project that is not active is shown in the
   tree and holds nothing. It is indexed as a node so the tree can say what it
   is, drawn with Inactive beside its name like any other status. Its test sets,
-  test cases and runs are not read, because a project nobody is working on is
+  test cases and test runs are not read, because a project nobody is working on is
   not worth the walk.
 - **Rule-TREE-PANEL-104** — A menu entry that cannot work on the selected row is
   gray, and says why when the pointer rests on it.
 
 ## What the tester sees
 
-The **Create Run Node** dialog opens. It is the test run side of the dialog
+The **Create Test Run Node** dialog opens. It is the test run side of the dialog
 drawn under [UC-TREE-PANEL-007](createTestSet.md). It carries the same two rows,
 reading *test run* and *test run package*. Its gray hint text reads *set name,
-like Sprint 3 Cycle 1...*. The tester moves to the second row, which reads *Groups test runs*. After `Enter`, a new
-folder row appears in the tree. *Created* shows above the status bar at the bottom right of the IDE. Nothing
+like Sprint 3 Cycle 1...*. The tester moves to the second row, which reads
+*Groups test runs*. After `Enter`, a new folder row appears in the tree.
+*Created* shows above the status bar at the bottom right of the IDE. Nothing
 opens.
 
 ## Main flow
 
 1. The tester selects **Test Runs** or another test run package.
 2. The tester presses `Ctrl+M`, or chooses **Create**.
-3. The **Create Run Node** dialog opens. The tester moves to *test run package*
-   with `↓`, and beside it the dialog says *Groups test runs*.
+3. The **Create Test Run Node** dialog opens. The tester moves to *test run
+   package* with `↓`, and beside it the dialog says *Groups test runs*.
 4. The tester types a name and presses `Enter`.
 5. Testin creates the package, refreshes the tree, and shows *Created*.
 6. Nothing else opens. That is the whole of it.

@@ -32,44 +32,44 @@ import java.util.function.ToLongFunction;
 @AllArgsConstructor
 public enum ResultAnalysis {
     PASSED(
-            TestStatus.PASSED,
-            TestStatus.PASSED,
+            RunItemStatus.PASSED,
+            RunItemStatus.PASSED,
             TestRunSummary::passed
     ),
 
     FAILED(
-            TestStatus.FAILED,
-            TestStatus.FAILED,
+            RunItemStatus.FAILED,
+            RunItemStatus.FAILED,
             TestRunSummary::failed
     ),
 
     BLOCKED(
-            TestStatus.BLOCKED,
-            TestStatus.BLOCKED,
+            RunItemStatus.BLOCKED,
+            RunItemStatus.BLOCKED,
             TestRunSummary::blocked
     ),
 
     UNTESTED(
-            TestStatus.PENDING,
-            TestStatus.UNTESTED,
+            RunItemStatus.PENDING,
+            RunItemStatus.UNTESTED,
             TestRunSummary::untested
     );
 
-    private final @NotNull TestStatus whileRunning;
-    private final @NotNull TestStatus onceFinished;
+    private final @NotNull RunItemStatus whileRunning;
+    private final @NotNull RunItemStatus onceFinished;
 
     private final @NotNull ToLongFunction<TestRunSummary> count;
 
-    public static @NotNull List<Segment> segments(final @NotNull TestRunSummary summary, final @NotNull TestRunStatus run) {
+    public static @NotNull List<Segment> segments(final @NotNull TestRunSummary summary, final @NotNull TestRunStatus testRun) {
         final @NotNull List<Segment> segments = new ArrayList<>();
 
         for (final ResultAnalysis section : values()) {
             final long testCases = section.count.applyAsLong(summary);
-            if (testCases > 0) segments.add(new Segment(section.labelIn(run) + " " + testCases, section.getOnceFinished().getRowColor()));
+            if (testCases > 0) segments.add(new Segment(section.labelIn(testRun) + " " + testCases, section.getOnceFinished().getRowColor()));
         }
 
         if (summary.hasRemoved()) {
-            segments.add(new Segment(TestStatus.REMOVED.getLabel() + " " + summary.removed(), UIUtil.getInactiveTextColor()));
+            segments.add(new Segment(RunItemStatus.REMOVED.getLabel() + " " + summary.removed(), UIUtil.getInactiveTextColor()));
         }
 
         return segments;
@@ -104,8 +104,8 @@ public enum ResultAnalysis {
         return onceFinished.getLabel();
     }
 
-    public @NotNull String labelIn(final @NotNull TestRunStatus run) {
-        return (run.isTerminal() ? onceFinished : whileRunning).getLabel();
+    public @NotNull String labelIn(final @NotNull TestRunStatus testRun) {
+        return (testRun.isTerminal() ? onceFinished : whileRunning).getLabel();
     }
 
     public @NotNull String heading(final @NotNull TestRunSummary summary) {

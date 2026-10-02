@@ -25,7 +25,7 @@ public class PageSizeTest {
     @Test
     public void aNumberInRangeIsTheNumber() {
         assertEquals(TestinEditor.pageSizeOf("25"), 25);
-        assertEquals(TestinEditor.pageSizeOf("1"), 1, "one case per page is a small page, not a mistake");
+        assertEquals(TestinEditor.pageSizeOf("1"), 1, "one test case per page is a small page, not a mistake");
     }
 
     @Test

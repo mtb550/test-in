@@ -43,8 +43,8 @@ There is no key for this. The button's tooltip reads **Refresh**.
   a grid cell open. A refresh Testin starts on its own leaves a busy editor
   alone.
 - **Rule-EDITOR-PANEL-120** — In a test run editor, refresh also stops the
-  execution, and the message says so. Refresh reads the run again from disk and
-  the walk goes with the copy it replaces.
+  execution, and the message says so. Refresh reads the test run again from disk
+  and the walk goes with the copy it replaces.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
   it loses its hover look at once, so a control that has stopped working never
   looks ready to press.
@@ -109,7 +109,7 @@ one list of the values Testin knows. That list changes only at these moments.
 | Creates a test case                                                                                                                | Its values are added at once                                                                                                                            |
 | Changes a test case: Update Test Case, a grid cell, the details panel or a bulk edit                                               | Nothing. A value it no longer has is still offered, and a new value is offered only once an editor reloads or the tester presses Refresh                |
 | Copies test cases into a test set                                                                                                  | Nothing, until an editor reloads or the tester presses Refresh                                                                                          |
-| Imports test cases                                                                                                                 | The test set's editor opens again, and their values are added                                                                                           |
+| Imports test cases                                                                                                                 | The test set opens again in the test case editor, and their values are added                                                                            |
 | Removes a test case: Delete, cutting it into another test set, undoing its creation, or reverting it in the pending changes review | The list is rebuilt in the background from the test cases left. A value only that test case used is no longer offered                                   |
 | Undoes or redoes a change                                                                                                          | The open editors of the test sets it changed reload, and their values are added. A test case the undo takes out rebuilds the list, as removing one does |
 | Presses Refresh on the tree, syncs with Git, or changes a file outside Testin                                                      | The open editors reload, and their values are added. Nothing is taken out                                                                               |

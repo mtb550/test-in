@@ -50,23 +50,23 @@ public enum TestRunExecution {
     @Getter(AccessLevel.NONE)
     private final @NotNull Function<TestRunMarker, ZonedDateTime> at;
 
-    private static @NotNull String tookIn(final @NotNull TestRunMarker run) {
-        final @NotNull ZonedDateTime from = run.getExecutionStartedAt();
-        final @NotNull ZonedDateTime to = run.getExecutionEndedAt();
+    private static @NotNull String tookIn(final @NotNull TestRunMarker testRun) {
+        final @NotNull ZonedDateTime from = testRun.getExecutionStartedAt();
+        final @NotNull ZonedDateTime to = testRun.getExecutionEndedAt();
 
         if (Config.isNotExecuted(from) || Config.isNotExecuted(to)) return "";
 
-        return Display.formatRunClock(Duration.between(from, to));
+        return Display.formatTestRunClock(Duration.between(from, to));
     }
 
-    public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunMarker run) {
+    public static @NotNull List<DetailRow> rowsOf(final @NotNull TestRunMarker testRun) {
         return Stream.concat(
-                        Arrays.stream(values()).map(field -> new DetailRow(field.displayName, field.valueIn(run))),
-                        Stream.of(new DetailRow(Bundle.message("execution.time"), tookIn(run))))
+                        Arrays.stream(values()).map(field -> new DetailRow(field.displayName, field.valueIn(testRun))),
+                        Stream.of(new DetailRow(Bundle.message("execution.time"), tookIn(testRun))))
                 .toList();
     }
 
-    public @NotNull String valueIn(final @NotNull TestRunMarker run) {
-        return Display.formatDate(at.apply(run));
+    public @NotNull String valueIn(final @NotNull TestRunMarker testRun) {
+        return Display.formatDate(at.apply(testRun));
     }
 }

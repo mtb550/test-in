@@ -495,9 +495,9 @@ function Read-DriftedCaptions([string[]] $enums) {
 
         The enums that name a test case's fields declare the same constants -
         EXPECTED_RESULT, STEPS, MODULE - and each used to spell its own caption.
-        Two of them said "Expected Results" while the grid, the run editor and
-        the details panel said "Expected Result", and it stayed that way for as
-        long as each was written out separately.
+        Two of them said "Expected Results" while the grid, the test run editor
+        and the details panel said "Expected Result", and it stayed that way for
+        as long as each was written out separately.
 
         Read-DuplicatedDisplayStrings cannot see this. It matches literals that
         are the same, and a caption that has already drifted is two different
@@ -570,7 +570,7 @@ function Read-DuplicatedDisplayStrings([string[]] $scopes) {
 
         This is the check the rest of the design rests on. A caption, a status
         name, a button - each belongs to the type that owns the concept, asked
-        for as TestStatus.getLabel() or TestRunConfiguration.getDisplayName().
+        for as RunItemStatus.getLabel() or TestRunConfiguration.getDisplayName().
         A second file spelling it out is a divergence that nothing fails over:
         both read correctly alone, and they stop agreeing the day one is
         renamed.
@@ -990,8 +990,8 @@ function Read-OrphanedJavadoc([string[]] $scopes) {
         One file is frozen by name, the way ArchitectureTest freezes a known
         violation: TestRunDto's block separates a @JsonIgnore from the method
         it was written for, which is a data bug rather than a documentation
-        one - the derived field reaches every run file a tester commits. It is
-        #73's, and deleting that name is how that story closes.
+        one - the derived field reaches every test run file a tester commits. It
+        is #73's, and deleting that name is how that story closes.
     #>
     $frozen = @('src/main/java/org/testin/model/dto/TestRunDto.java')
 
@@ -1371,8 +1371,8 @@ $problems += @(Read-ModelStatics @((Join-Path $repo 'src/main/java/org/testin/mo
 # on being listed after #111 moved them and the check quietly shrank to comparing
 # one pair - printing "Gate clear" either way (#66, finding 98).
 $problems += @(Read-DriftedCaptions @(
-        (Join-Path $repo 'src/main/java/org/testin/testcase/TestEditorAttributes.java'),
-        (Join-Path $repo 'src/main/java/org/testin/testrun/RunEditorAttributes.java'),
+        (Join-Path $repo 'src/main/java/org/testin/testcase/TestCaseEditorAttributes.java'),
+        (Join-Path $repo 'src/main/java/org/testin/testrun/TestRunEditorAttributes.java'),
         (Join-Path $repo 'src/main/java/org/testin/testcase/CreateTestCaseFields.java'),
         (Join-Path $repo 'src/main/java/org/testin/testcase/UpdateTestCaseFields.java')))
 

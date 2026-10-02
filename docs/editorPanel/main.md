@@ -21,64 +21,64 @@ in a tab. It is where test cases are written, and where a test run is executed.
 
 Two editors share this panel. A test set opens in one, a test run in the other.
 They share the toolbar, the status bar, the two views and every key that is not
-about a verdict.
+about a run item status.
 
-|                         | What the tester does                                            | Why a tester would use it                                |
-|-------------------------|-----------------------------------------------------------------|----------------------------------------------------------|
-|                         | **Opening and reading**                                         |                                                          |
-| **UC-EDITOR-PANEL-001** | [Open a test set and see its test cases](openTestSet.md)        | Read and work on the test cases in a test set.           |
-| **UC-EDITOR-PANEL-002** | [Switch between cards and a grid](switchView.md)                | Compare many test cases at once in a table.              |
-| **UC-EDITOR-PANEL-003** | [Choose which fields are shown](chooseFields.md)                | Hide the fields you do not need, so rows stay short.     |
-| **UC-EDITOR-PANEL-004** | [Change a grid column's width](changeColumnWidth.md)            | Widen a column so long text is not cut off.              |
-|                         | **Writing test cases**                                          |                                                          |
-| **UC-EDITOR-PANEL-005** | [Create a test case](createTestCase.md)                         | Write down a new test case before you forget it.         |
-| **UC-EDITOR-PANEL-006** | [Change one field of one test case](changeOneField.md)          | Fix one field, such as a typo, in two keys.              |
-| **UC-EDITOR-PANEL-007** | [Change one field on many test cases at once](bulkEdit.md)      | Correct the same field on many test cases in one go.     |
-| **UC-EDITOR-PANEL-008** | [Type straight into a grid cell](editGridCell.md)               | Correct a value in the table where you can see it.       |
-| **UC-EDITOR-PANEL-009** | [Move a test case by typing its number](setOrderByNumber.md)    | Put a test case in the right place without dragging.     |
-| **UC-EDITOR-PANEL-010** | [Reorder test cases by dragging](dragToReorder.md)              | Drag test cases into the order somebody would run them.  |
-| **UC-EDITOR-PANEL-011** | [Remove test cases](removeTestCases.md)                         | Delete test cases nobody wants any more.                 |
-| **UC-EDITOR-PANEL-012** | [Undo a change](undoChange.md)                                  | Take back the last change with one key.                  |
-| **UC-EDITOR-PANEL-013** | [Redo a change](redoChange.md)                                  | Put back a change you took back by mistake.              |
-|                         | **The clipboard**                                               |                                                          |
-| **UC-EDITOR-PANEL-014** | [Copy a test case's details as text](copyAsText.md)             | Get a test case as text for a chat or a ticket.          |
-| **UC-EDITOR-PANEL-015** | [Copy test cases](copyTestCases.md)                             | Copy test cases to start another test set from them.     |
-| **UC-EDITOR-PANEL-016** | [Cut test cases](cutTestCases.md)                               | Move test cases into the test set they belong in.        |
-| **UC-EDITOR-PANEL-017** | [Paste test cases](pasteTestCases.md)                           | Drop the test cases you copied or cut into this set.     |
-| **UC-EDITOR-PANEL-018** | [Copy, cut and paste the grid's cells](gridClipboard.md)        | Move values between the grid and a spreadsheet.          |
-|                         | **Finding what I want**                                         |                                                          |
-| **UC-EDITOR-PANEL-019** | [Search the test cases](searchTestCases.md)                     | Find a test case by a word inside it.                    |
-| **UC-EDITOR-PANEL-020** | [Filter the test cases](filterTestCases.md)                     | Show only the test cases you want to work on.            |
-| **UC-EDITOR-PANEL-021** | [Clear the filters](clearFilters.md)                            | Get the whole test set back in one click.                |
-| **UC-EDITOR-PANEL-022** | [Page through the test cases](pageThrough.md)                   | Move through a long test set one page at a time.         |
-| **UC-EDITOR-PANEL-023** | [Change how many a page holds](changePageSize.md)               | See more test cases at once, without turning pages.      |
-| **UC-EDITOR-PANEL-024** | [Select test cases](selectTestCases.md)                         | Pick several test cases so one gesture changes them all. |
-|                         | **Working from the editor**                                     |                                                          |
-| **UC-EDITOR-PANEL-025** | [Open the details panel](openDetailsPanel.md)                   | Read the whole of one test case beside the list.         |
-| **UC-EDITOR-PANEL-026** | [Step back](stepBack.md)                                        | One key to get back to a plain list.                     |
-| **UC-EDITOR-PANEL-027** | [Refresh the editor from disk](refreshEditor.md)                | See the changes a colleague's sync brought in.           |
-| **UC-EDITOR-PANEL-028** | [See the test set's own details](nodeDetails.md)                | Check who made this test set and what it holds.          |
-| **UC-EDITOR-PANEL-029** | [Open the menu from the keyboard](keyboardMenu.md)              | Reach every menu entry without touching the mouse.       |
-|                         | **The test run editor**                                         |                                                          |
-| **UC-EDITOR-PANEL-030** | [Open a test run and see what it covers](openTestRun.md)        | See what a test run covers and what it recorded.         |
-| **UC-EDITOR-PANEL-031** | [Start executing by hand](startExecution.md)                    | Walk the test run one test case at a time.               |
-| **UC-EDITOR-PANEL-032** | [Record that a test case passed](recordPassed.md)               | Say a test case worked, with one key.                    |
-| **UC-EDITOR-PANEL-033** | [Record that a test case is blocked](recordBlocked.md)          | Say a test case could not be tried at all.               |
-| **UC-EDITOR-PANEL-034** | [Record that a test case failed, and say why](recordFailed.md)  | Say what really happened while you can still see it.     |
-| **UC-EDITOR-PANEL-035** | [Stop executing](stopExecution.md)                              | Stop the walk and the clock part way through.            |
-| **UC-EDITOR-PANEL-036** | [Resume a run I stopped](resumeExecution.md)                    | Pick the test run up where you left it.                  |
-| **UC-EDITOR-PANEL-037** | [Record a verdict out of order](recordOutOfOrder.md)            | Judge a test case the walk is not on.                    |
-| **UC-EDITOR-PANEL-038** | [Correct a verdict I got wrong](correctVerdict.md)              | Change a verdict you recorded by mistake.                |
-| **UC-EDITOR-PANEL-039** | [Record one verdict on many test cases](bulkVerdict.md)         | Mark many test cases blocked, or passed, at once.        |
-| **UC-EDITOR-PANEL-040** | [Change the failure details on their own](editFailureDetail.md) | Add the error later, without touching the verdict.       |
-| **UC-EDITOR-PANEL-041** | [Type an actual result into the grid](typeActualResult.md)      | Note what happened straight into the table.              |
-| **UC-EDITOR-PANEL-042** | [Watch how the run is going](watchProgress.md)                  | See how many passed and how long it is taking.           |
-| **UC-EDITOR-PANEL-043** | [Run one test case's automation](runOneCase.md)                 | Let the machine judge one test case for you.             |
-| **UC-EDITOR-PANEL-044** | [Run everything not yet judged](runWholeRun.md)                 | Set the whole test run going and come back later.        |
-| **UC-EDITOR-PANEL-045** | [Write the result analysis](writeResultAnalysis.md)             | Say what the test run as a whole showed.                 |
-| **UC-EDITOR-PANEL-046** | [Work in light mode](lightMode.md)                              | Judge test cases in a small window above your app.       |
-| **UC-EDITOR-PANEL-047** | [See which test cases are automated](seeWhatIsAutomated.md)     | Tell what a run will cover without opening the code.     |
-| **UC-EDITOR-PANEL-048** | [Go from a test run to a test case](navigateToTestCase.md)      | Open the test case behind a row, in its own test set.    |
+|                         | What the tester does                                            | Why a tester would use it                                  |
+|-------------------------|-----------------------------------------------------------------|------------------------------------------------------------|
+|                         | **Opening and reading**                                         |                                                            |
+| **UC-EDITOR-PANEL-001** | [Open a test set and see its test cases](openTestSet.md)        | Read and work on the test cases in a test set.             |
+| **UC-EDITOR-PANEL-002** | [Switch between cards and a grid](switchView.md)                | Compare many test cases at once in a table.                |
+| **UC-EDITOR-PANEL-003** | [Choose which fields are shown](chooseFields.md)                | Hide the fields you do not need, so rows stay short.       |
+| **UC-EDITOR-PANEL-004** | [Change a grid column's width](changeColumnWidth.md)            | Widen a column so long text is not cut off.                |
+|                         | **Writing test cases**                                          |                                                            |
+| **UC-EDITOR-PANEL-005** | [Create a test case](createTestCase.md)                         | Write down a new test case before you forget it.           |
+| **UC-EDITOR-PANEL-006** | [Change one field of one test case](changeOneField.md)          | Fix one field, such as a typo, in two keys.                |
+| **UC-EDITOR-PANEL-007** | [Change one field on many test cases at once](bulkEdit.md)      | Correct the same field on many test cases in one go.       |
+| **UC-EDITOR-PANEL-008** | [Type straight into a grid cell](editGridCell.md)               | Correct a value in the table where you can see it.         |
+| **UC-EDITOR-PANEL-009** | [Move a test case by typing its number](setOrderByNumber.md)    | Put a test case in the right place without dragging.       |
+| **UC-EDITOR-PANEL-010** | [Reorder test cases by dragging](dragToReorder.md)              | Drag test cases into the order somebody would run them.    |
+| **UC-EDITOR-PANEL-011** | [Remove test cases](removeTestCases.md)                         | Delete test cases nobody wants any more.                   |
+| **UC-EDITOR-PANEL-012** | [Undo a change](undoChange.md)                                  | Take back the last change with one key.                    |
+| **UC-EDITOR-PANEL-013** | [Redo a change](redoChange.md)                                  | Put back a change you took back by mistake.                |
+|                         | **The clipboard**                                               |                                                            |
+| **UC-EDITOR-PANEL-014** | [Copy a test case's details as text](copyAsText.md)             | Get a test case as text for a chat or a ticket.            |
+| **UC-EDITOR-PANEL-015** | [Copy test cases](copyTestCases.md)                             | Copy test cases to start another test set from them.       |
+| **UC-EDITOR-PANEL-016** | [Cut test cases](cutTestCases.md)                               | Move test cases into the test set they belong in.          |
+| **UC-EDITOR-PANEL-017** | [Paste test cases](pasteTestCases.md)                           | Drop the test cases you copied or cut into this set.       |
+| **UC-EDITOR-PANEL-018** | [Copy, cut and paste the grid's cells](gridClipboard.md)        | Move values between the grid and a spreadsheet.            |
+|                         | **Finding what I want**                                         |                                                            |
+| **UC-EDITOR-PANEL-019** | [Search the test cases](searchTestCases.md)                     | Find a test case by a word inside it.                      |
+| **UC-EDITOR-PANEL-020** | [Filter the test cases](filterTestCases.md)                     | Show only the test cases you want to work on.              |
+| **UC-EDITOR-PANEL-021** | [Clear the filters](clearFilters.md)                            | Get the whole test set back in one click.                  |
+| **UC-EDITOR-PANEL-022** | [Page through the test cases](pageThrough.md)                   | Move through a long test set one page at a time.           |
+| **UC-EDITOR-PANEL-023** | [Change how many a page holds](changePageSize.md)               | See more test cases at once, without turning pages.        |
+| **UC-EDITOR-PANEL-024** | [Select test cases](selectTestCases.md)                         | Pick several test cases so one gesture changes them all.   |
+|                         | **Working from the editor**                                     |                                                            |
+| **UC-EDITOR-PANEL-025** | [Open the details panel](openDetailsPanel.md)                   | Read the whole of one test case beside the list.           |
+| **UC-EDITOR-PANEL-026** | [Step back](stepBack.md)                                        | One key to get back to a plain list.                       |
+| **UC-EDITOR-PANEL-027** | [Refresh the editor from disk](refreshEditor.md)                | See the changes a colleague's sync brought in.             |
+| **UC-EDITOR-PANEL-028** | [See the test set's own details](nodeDetails.md)                | Check who made this test set and what it holds.            |
+| **UC-EDITOR-PANEL-029** | [Open the menu from the keyboard](keyboardMenu.md)              | Reach every menu entry without touching the mouse.         |
+|                         | **The test run editor**                                         |                                                            |
+| **UC-EDITOR-PANEL-030** | [Open a test run and see what it covers](openTestRun.md)        | See what a test run covers and what it recorded.           |
+| **UC-EDITOR-PANEL-031** | [Start executing by hand](startExecution.md)                    | Walk the test run one test case at a time.                 |
+| **UC-EDITOR-PANEL-032** | [Record that a test case passed](recordPassed.md)               | Say a test case worked, with one key.                      |
+| **UC-EDITOR-PANEL-033** | [Record that a test case is blocked](recordBlocked.md)          | Say a test case could not be tried at all.                 |
+| **UC-EDITOR-PANEL-034** | [Record that a test case failed, and say why](recordFailed.md)  | Say what really happened while you can still see it.       |
+| **UC-EDITOR-PANEL-035** | [Stop executing](stopExecution.md)                              | Stop the walk and the clock part way through.              |
+| **UC-EDITOR-PANEL-036** | [Resume a test run I stopped](resumeExecution.md)               | Pick the test run up where you left it.                    |
+| **UC-EDITOR-PANEL-037** | [Record a run item status out of order](recordOutOfOrder.md)    | Judge a test case the walk is not on.                      |
+| **UC-EDITOR-PANEL-038** | [Correct a run item status I got wrong](correctRunItemStatus.md)      | Change a run item status you recorded by mistake.          |
+| **UC-EDITOR-PANEL-039** | [Record one run item status on many test cases](bulkRunItemStatus.md) | Mark many test cases blocked, or passed, at once.          |
+| **UC-EDITOR-PANEL-040** | [Change the failure details on their own](editFailureDetail.md) | Add the error later, without touching the run item status. |
+| **UC-EDITOR-PANEL-041** | [Type an actual result into the grid](typeActualResult.md)      | Note what happened straight into the table.                |
+| **UC-EDITOR-PANEL-042** | [Watch how the test run is going](watchProgress.md)             | See how many passed and how long it is taking.             |
+| **UC-EDITOR-PANEL-043** | [Run one test case's automation](runOneTestCase.md)                 | Let the machine judge one test case for you.               |
+| **UC-EDITOR-PANEL-044** | [Run everything not yet judged](runWholeTestRun.md)                 | Set the whole test run going and come back later.          |
+| **UC-EDITOR-PANEL-045** | [Write the result analysis](writeResultAnalysis.md)             | Say what the test run as a whole showed.                   |
+| **UC-EDITOR-PANEL-046** | [Work in light mode](lightMode.md)                              | Judge test cases in a small window above your app.         |
+| **UC-EDITOR-PANEL-047** | [See which test cases are automated](seeWhatIsAutomated.md)     | Tell what a test run will cover without opening the code.  |
+| **UC-EDITOR-PANEL-048** | [Go from a test run to a test case](navigateToTestCase.md)      | Open the test case behind a row, in its own test set.      |
 
 ---
 
@@ -87,8 +87,8 @@ about a verdict.
 The tree says what exists. The editor is where the work happens.
 
 A test set opens as a list of its test cases, and the tester writes them there.
-A test run opens as the same list with a verdict beside each row, and the tester
-walks it, judging each test case in turn.
+A test run opens as the same list with a run item status beside each row, and
+the tester walks it, judging each test case in turn.
 
 Everything else in the panel exists to make those two things fast: two views of
 the same rows, a filter, a search, and a key for every gesture.
@@ -99,9 +99,9 @@ the same rows, a filter, a search, and a key for every gesture.
   its fields under it.
 - The **grid** is the same test cases drawn as a table, one row each.
 - A **field** is one thing a test case carries, such as its expected result.
-- A **verdict** is what a test run records against one test case: **Passed**, **Failed** or **Blocked**.
+- A **run item status** is what a test run records against one test case: **Passed**, **Failed** or **Blocked**.
 - To **execute** a test run is to walk it test case by test case, recording a
-  verdict for each.
+  run item status for each.
 
 ---
 
@@ -146,16 +146,16 @@ the same rows, a filter, a search, and a key for every gesture.
 
 **Executing a test run**
 
-| Key        | What it does                                             | The page that owns it                            |
-|------------|----------------------------------------------------------|--------------------------------------------------|
-| `P`        | Records **Passed**                                       | [UC-EDITOR-PANEL-032](recordPassed.md)           |
-| `F`        | Records **Failed**, and asks why                         | [UC-EDITOR-PANEL-034](recordFailed.md)           |
-| `B`        | Records **Blocked**                                      | [UC-EDITOR-PANEL-033](recordBlocked.md)          |
-| `F2`       | Changes the failure details without changing the verdict | [UC-EDITOR-PANEL-040](editFailureDetail.md)      |
-| `F5`       | Runs the selected test cases, or stops them              | [UC-EDITOR-PANEL-043](runOneCase.md)             |
-| `Shift+F5` | Goes to the automation code                              | [UC-CODEGEN-006](../codegen/goToCode.md)         |
-| `F12`      | Writes the method for a test case that has none          | [UC-CODEGEN-005](../codegen/automateTestCase.md) |
-| `Ctrl+P`   | Generates a report on this test run                      | [UC-REPORT-001](../report/generateReport.md)     |
+| Key        | What it does                                                     | The page that owns it                            |
+|------------|------------------------------------------------------------------|--------------------------------------------------|
+| `P`        | Records **Passed**                                               | [UC-EDITOR-PANEL-032](recordPassed.md)           |
+| `F`        | Records **Failed**, and asks why                                 | [UC-EDITOR-PANEL-034](recordFailed.md)           |
+| `B`        | Records **Blocked**                                              | [UC-EDITOR-PANEL-033](recordBlocked.md)          |
+| `F2`       | Changes the failure details without changing the run item status | [UC-EDITOR-PANEL-040](editFailureDetail.md)      |
+| `F5`       | Runs the selected test cases, or stops them                      | [UC-EDITOR-PANEL-043](runOneTestCase.md)             |
+| `Shift+F5` | Goes to the automation code                                      | [UC-CODEGEN-006](../codegen/goToCode.md)         |
+| `F12`      | Writes the method for a test case that has none                  | [UC-CODEGEN-005](../codegen/automateTestCase.md) |
+| `Ctrl+P`   | Generates a report on this test run                              | [UC-REPORT-001](../report/generateReport.md)     |
 
 **Nothing has a key** for: **Refresh**, **Grid View**, **List View**, the **Fields** button, the **Filter** button, the
 **Details** button, **Start Manual
@@ -207,11 +207,11 @@ The same shape, with three things added.
 ├────────────────────────────────────────────────────────────────────────────┤
 │                                                                            │
 │   1. Log in with a valid user.                       ( P1 ) ( Passed )     │
-│      Run Status: Passed                                                    │
+│      Run Item Status: Passed                                               │
 │      Duration: 00:42                                                       │
 │                                                                            │
 │   2. Log in with a locked account.                   ( P2 ) ( Failed )     │
-│      Run Status: Failed                                                    │
+│      Run Item Status: Failed                                               │
 │      Actual Result: The session was dropped.                               │
 │                                                                            │
 ├────────────────────────────────────────────────────────────────────────────┤
@@ -221,14 +221,14 @@ The same shape, with three things added.
 ```
 
 1. **Start Manual Execution** — the first button. It becomes **Stop Execution**
-   while a run is going.
+   while an execution is going.
 2. **Light mode** — the always on top window, on [its own page](lightMode.md).
 3. **Result Analysis** — the last button before the test run's own details and
    the search field.
-4. **The run status** — on the right of the status bar, with the tree's own
+4. **The test run status** — on the right of the status bar, with the tree's own
    icon.
-5. **The figures** — one for each verdict any test case carries, separated by a
-   dot. A verdict nobody recorded is not drawn.
+5. **The figures** — one for each run item status any test case carries,
+   separated by a dot. A run item status nobody recorded is not drawn.
 6. **The clock** — how long this test run has been executing. It ticks once a
    second.
 
@@ -265,10 +265,10 @@ bug report yet.
 
 ## Where the plugin breaks its own rules, executing a test run
 
-|                   | The rule it breaks                                                 | What a tester sees                                                                                                                                                                                                                                                                                                                                                                         |
-|-------------------|--------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Difference 19** | Rule-EDITOR-PANEL-008 — a signed off test run records nothing more | The status bar's own tooltip says a completed or closed test run records no more verdicts. `P`, `F` and `B` still record one, still save it, and still say *Passed*. Only the automation refuses.                                                                                                                                                                                          |
-| **Difference 26** | Rule-EDITOR-PANEL-005 — what the tester typed is kept              | An automated pass still clears the actual result, the error, the screenshots and the bug issue link, and resets the bug severity and priority to Enhancement and Low. An automated failure clears the actual result, the error and the screenshots. Each says so afterwards, in a message that stays in the notification list. The dialog that asks first is on the manual path only.      |
+|                   | The rule it breaks                                                 | What a tester sees                                                                                                                                                                                                                                                                                                                                                                    |
+|-------------------|--------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Difference 19** | Rule-EDITOR-PANEL-008 — a signed off test run records nothing more | The status bar's own tooltip says a completed or closed test run records no more run item statuses. `P`, `F` and `B` still record one, still save it, and still say *Passed*. Only the automation refuses.                                                                                                                                                                            |
+| **Difference 26** | Rule-EDITOR-PANEL-005 — what the tester typed is kept              | An automated pass still clears the actual result, the error, the screenshots and the bug issue link, and resets the bug severity and priority to Enhancement and Low. An automated failure clears the actual result, the error and the screenshots. Each says so afterwards, in a message that stays in the notification list. The dialog that asks first is on the manual path only. |
 
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.
@@ -280,11 +280,11 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 14** | A card dragged between two visible cards landed after whatever the filter was hiding between them. Fixed 7 September 2026, [#209](https://github.com/mtb550/test-in/issues/209)                                                                                                                                                                                                                                                                                                                               |
 | **Difference 20** | A filtered walk completed the whole test run and turned every other pending test case untested. Fixed 7 September 2026, [#214](https://github.com/mtb550/test-in/issues/214)                                                                                                                                                                                                                                                                                                                                  |
 | **Difference 21** | **Start Manual Execution** was live on a test run holding no test cases and on a filter matching nothing, and pressing it marked the test run **In Progress**. Fixed 7 September 2026, [#215](https://github.com/mtb550/test-in/issues/215)                                                                                                                                                                                                                                                                   |
-| **Difference 22** | The walk landed on test cases that already had a verdict, timed them again, and re-stamped who judged them and when. Fixed 7 September 2026                                                                                                                                                                                                                                                                                                                                                                   |
-| **Difference 23** | A test run whose every test case was judged from the menu or the keyboard stayed **In Progress**. Only an automated verdict completed it. Fixed 7 September 2026, [#217](https://github.com/mtb550/test-in/issues/217)                                                                                                                                                                                                                                                                                        |
+| **Difference 22** | The walk landed on test cases that already had a run item status, timed them again, and re-stamped who judged them and when. Fixed 7 September 2026                                                                                                                                                                                                                                                                                                                                                           |
+| **Difference 23** | A test run whose every test case was judged from the menu or the keyboard stayed **In Progress**. Only an automated run item status completed it. Fixed 7 September 2026, [#217](https://github.com/mtb550/test-in/issues/217)                                                                                                                                                                                                                                                                                |
 | **Difference 24** | **Refresh** stopped an execution and said only *Refreshed*. Fixed 7 September 2026, [#218](https://github.com/mtb550/test-in/issues/218)                                                                                                                                                                                                                                                                                                                                                                      |
 | **Difference 27** | Stopping a test case marked the test run **In Progress** first, and so did clicking the icon that only navigates to the test method. Fixed 7 September 2026, [#221](https://github.com/mtb550/test-in/issues/221)                                                                                                                                                                                                                                                                                             |
-| **Difference 28** | Closing the tab left the automation running and its verdicts homeless. Fixed 7 September 2026, [#222](https://github.com/mtb550/test-in/issues/222)                                                                                                                                                                                                                                                                                                                                                           |
+| **Difference 28** | Closing the tab left the automation running and its run item statuses homeless. Fixed 7 September 2026, [#222](https://github.com/mtb550/test-in/issues/222)                                                                                                                                                                                                                                                                                                                                                  |
 | **Difference 29** | `Escape` in the failure dialog threw away everything typed with no confirmation. Fixed 7 September 2026, [#223](https://github.com/mtb550/test-in/issues/223). Reversed 14 September 2026: the question never showed, because the IDE closes a Testin dialog on `Escape` before Testin sees the key, and by decision no Testin dialog asks before `Escape` any more ([#66](https://github.com/mtb550/test-in/issues/66), finding 154)                                                                         |
 | **Difference 2**  | **Test Data** and **Pre Conditions** were drawn in the create dialog with no key that opened either. Fixed 8 September 2026, [#198](https://github.com/mtb550/test-in/issues/198)                                                                                                                                                                                                                                                                                                                             |
 | **Difference 15** | Dragging cards said *Re-sorted* and moving a test case by typing its number said *Updated* - the same act, two words. Reordering says *Re-sorted* whichever way it was done. Fixed 9 September 2026, [#210](https://github.com/mtb550/test-in/issues/210)                                                                                                                                                                                                                                                     |
@@ -300,7 +300,7 @@ closed up, so an issue that quotes one still points at the right thing.
 | **Difference 12** | Unticking **Order** stopped three gestures in the grid: clicking a row to select it, `Enter` to open the details panel, and the double-click. **Order** is locked on now, the way **Description** already was - it is the grid's row header and the target of the two gestures that are not edits, not a field a tester chooses, and `ToolBarDefault.LOCKED_CHECKED` named it in its own text while the constant said otherwise. Fixed 9 September 2026, [#207](https://github.com/mtb550/test-in/issues/207) |
 | **Difference 17** | The search read the description, the identity, the expected result and the steps, and knew nothing of the module, the group, the test data or the pre-conditions - each of which has its own column, and three of which have their own filter. It reads every field the tester writes now, the reference included (Rule-EDITOR-PANEL-091). Fixed 9 September 2026, [#212](https://github.com/mtb550/test-in/issues/212)                                                                                       |
 | **Difference 6**  | Cutting or pasting a block of grid cells raised one message per cell, so a row cut across its columns read *Updated 17* for one test case. The writes of one gesture all land in one event now, so they are counted together, and saved and undone together (Rule-EDITOR-PANEL-226). Fixed 18 September 2026, [#66](https://github.com/mtb550/test-in/issues/66) finding 171; retired from this list 20 September 2026                                                                                        |
-| **Difference 25** | An automated run raised one message per test case, so 50 test cases raised 50 balloons. It says nothing per test case now, and one line when it has nothing left to report — *Passed 42, Failed 8*. The words are the status bar's own, so the balloon and the bar cannot count one test run differently. Fixed 9 September 2026, [#219](https://github.com/mtb550/test-in/issues/219); retired from this list 20 September 2026                                                                              |
+| **Difference 25** | An automated execution raised one message per test case, so 50 test cases raised 50 balloons. It says nothing per test case now, and one line when it has nothing left to report — *Passed 42, Failed 8*. The words are the status bar's own, so the balloon and the bar cannot count one test run differently. Fixed 9 September 2026, [#219](https://github.com/mtb550/test-in/issues/219); retired from this list 20 September 2026                                                                        |
 
 ---
 
@@ -311,12 +311,13 @@ the filtered list? It walks the filtered list today, and finishing it completes
 the whole test run. Either the walk should ignore the filter, or completing
 should only count what was walked.
 
-**Question 2** — Should a verdict be recordable on a completed or closed test
-run? The keyboard allows it, the automation refuses it, and the tooltip says it
-is refused.
+**Question 2** — Should a run item status be recordable on a completed or
+closed test run? The keyboard allows it, the automation refuses it, and the
+tooltip says it is refused.
 
-**Question 3** — Should a test case that already has a verdict be offered again
-by the walk? It is offered today, and judging it again re-stamps who and when.
+**Question 3** — Should a test case that already has a run item status be
+offered again by the walk? It is offered today, and judging it again re-stamps
+who and when.
 
 **Question 4** — Four groups can be filtered on and never assigned. Either the
 create dialog should offer them or the filter should not.

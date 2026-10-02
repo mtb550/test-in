@@ -19,11 +19,11 @@ to somebody who does not have the IDE.
 
 ## The use cases
 
-|                   | What the tester does                                 |                                                    |
-|-------------------|------------------------------------------------------|----------------------------------------------------|
-| **UC-REPORT-001** | [Generate a report on a test run](generateReport.md) | Send a run's results to someone who has no IDE.    |
-| **UC-REPORT-002** | [Open the report that was just made](openReport.md)  | Check the document before sending it.              |
-| **UC-REPORT-003** | [Copy the report's path](copyReportPath.md)          | Paste the file's location into a ticket or a chat. |
+|                   | What the tester does                                 |                                                      |
+|-------------------|------------------------------------------------------|------------------------------------------------------|
+| **UC-REPORT-001** | [Generate a report on a test run](generateReport.md) | Send a test run's results to someone who has no IDE. |
+| **UC-REPORT-002** | [Open the report that was just made](openReport.md)  | Check the document before sending it.                |
+| **UC-REPORT-003** | [Copy the report's path](copyReportPath.md)          | Paste the file's location into a ticket or a chat.   |
 
 ---
 
@@ -38,11 +38,11 @@ a ticket, mailed to a manager, or kept as the record that a release was tested.
 
 **Two words, before the rules use them.**
 
-- A **verdict** is what one test run recorded against one test case: **Passed**, **Failed**, **Blocked**, **Pending**,
-  **Untested** or **Removed**.
-- The **result analysis** is what the tester writes about the run as a whole,
-  once it is completed. It is written in the run editor, and it appears in the
-  report.
+- A **run item status** is what one test run recorded against one test case:
+  **Passed**, **Failed**, **Blocked**, **Pending**, **Untested** or **Removed**.
+- The **result analysis** is what the tester writes about the test run as a
+  whole, once it is completed. It is written in the test run editor, and it
+  appears in the report.
 
 ---
 
@@ -52,8 +52,8 @@ a ticket, mailed to a manager, or kept as the record that a release was tested.
 |----------|---------------------------------------------|------------------------------------|
 | `Ctrl+P` | Generates a report on the selected test run | [UC-REPORT-001](generateReport.md) |
 
-The key works on the tree, and on the list of test cases inside a run editor. It
-is not in the IDE's keymap, so it cannot be changed there.
+The key works on the tree, and on the list of test cases inside a test run
+editor. It is not in the IDE's keymap, so it cannot be changed there.
 
 ---
 
@@ -78,23 +78,24 @@ The PDF, the Word document and the web page each hold these, in this order.
 2. **Report Overview** — a table of two columns. It holds the project, the test
    run, the test type, the change log, the commit, the platform and component,
    the language, the browser and the device type. It also holds everyone who
-   recorded a verdict, when execution started, when it ended, how long it took,
-   and the run's status. A row nobody answered is left out. The commit is the
-   one row that stays when nobody answered it, and reads *n/a*.
-3. **Execution Summary** — one sentence naming the run and saying how many test
-   cases it holds, how many were executed and what share passed. All four
+   recorded a run item status, when execution started, when it ended, how long
+   it took, and the test run status. A row nobody answered is left out. The
+   commit is the one row that stays when nobody answered it, and reads *n/a*.
+3. **Execution Summary** — one sentence naming the test run and saying how many
+   test cases it holds, how many were executed and what share passed. All four
    formats open it with the same sentence. Under it a row of
    figures: **Total Test Cases**, **Passed**, **Failed**, **Blocked**, **Untested**, **Removed** and **Pass Rate**.
    **Removed** appears only when
-   the run has any. A test case deleted before it was judged is counted only
-   under **Removed**, so it is left out of **Pass Rate**; one deleted after its
-   verdict is counted under that verdict, as the run recorded it.
-4. **Result Analysis** — what the tester wrote about the run, under a heading
-   for each verdict with its count. The whole section is left out when the
-   tester wrote nothing.
-5. **One section for each verdict that has test cases**, in this order: failed,
-   passed, blocked, untested, removed. Each is a numbered table of test cases. A
-   verdict with no test cases gets no section.
+   the test run has any. A test case deleted before it was judged is counted
+   only under **Removed**, so it is left out of **Pass Rate**; one deleted after
+   its run item status is counted under that run item status, as the test run
+   recorded it.
+4. **Result Analysis** — what the tester wrote about the test run, under a
+   heading for each run item status with its count. The whole section is left
+   out when the tester wrote nothing.
+5. **One section for each run item status that has test cases**, in this order:
+   failed, passed, blocked, untested, removed. Each is a numbered table of test
+   cases. A run item status with no test cases gets no section.
 6. **The footer** — the date, and a line saying the document was generated by
    Testin.
 
@@ -120,13 +121,13 @@ and **Result Analysis**, left out when the tester wrote nothing.
 
 **Test Cases** — a header row and one row for each test case, nothing above it,
 so the sheet sorts and filters as one list. Each row is filled with the color
-its verdict's table is headed with in the other formats: red for failed, green
-for passed, amber for blocked, gray for untested and removed.
+that heads the table for its run item status in the other formats: red for
+failed, green for passed, amber for blocked, gray for untested and removed.
 
 The last column, **Bug Issue**, holds the issue a test case was reported as, as *#12*. Clicking it opens the issue. It
 is empty for a test case with no issue.
 There is no column for the error, and the test cases are one table rather than
-one per verdict.
+one per run item status.
 
 ---
 
@@ -139,15 +140,15 @@ one per verdict.
 **Fixed since this list was written.** The numbers are left out rather than
 closed up, so an issue that quotes one still points at the right thing.
 
-| Gone             | Was                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Difference 1** | An empty folder, file name or format moved the cursor and said nothing, so the dialog read as a button that does not work. The empty box's own hint turns red now and takes the cursor — *Choose a folder*, *Name the file*. The format cannot be empty any more: it is radios that open on one (Rule-INTERNAL-107). Fixed 9 September 2026, [#251](https://github.com/mtb550/test-in/issues/251)                                                    |
-| **Difference 2** | `Enter` did nothing in the report dialog, so the tester had to press **Generate**. `Enter` generates the report now, and the status bar says so. Fixed 9 September 2026, [#252](https://github.com/mtb550/test-in/issues/252)                                                                                                                                                                                                                        |
-| **Difference 3** | The report button was offered on a test run still being written, so the document described a state that had already moved on. Every way of asking is gray while a run is **In Progress**, with the reason in the tooltip (Rule-REPORT-016). The row also overstated the defect: the button could never be unavailable, because it is only ever built with a run editor. Fixed 9 September 2026, [#253](https://github.com/mtb550/test-in/issues/253) |
-| **Difference 4** | A test run nobody executed printed **Execution Started** and **Execution Ended** as empty rows, because three rows went round the helper that drops a blank. Fixed 9 September 2026, [#254](https://github.com/mtb550/test-in/issues/254)                                                                                                                                                                                                            |
-| **Difference 5** | The message named the format in capitals — *WORD Report Generated*. Formats read as words now, in the message and in the dialog alike. Fixed 9 September 2026, [#255](https://github.com/mtb550/test-in/issues/255)                                                                                                                                                                                                                                  |
-| **Difference 6** | A web page opened in whatever application claimed the file when it was a report, and in the browser when it was an export. Every web page goes to the browser now. Fixed 9 September 2026, [#256](https://github.com/mtb550/test-in/issues/256)                                                                                                                                                                                                      |
-| **Difference 7** | The report, export and import bars could not be canceled. All three can be. Fixed 9 September 2026, [#257](https://github.com/mtb550/test-in/issues/257)                                                                                                                                                                                                                                                                                             |
+| Gone             | Was                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Difference 1** | An empty folder, file name or format moved the cursor and said nothing, so the dialog read as a button that does not work. The empty box's own hint turns red now and takes the cursor — *Choose a folder*, *Name the file*. The format cannot be empty any more: it is radios that open on one (Rule-INTERNAL-107). Fixed 9 September 2026, [#251](https://github.com/mtb550/test-in/issues/251)                                                              |
+| **Difference 2** | `Enter` did nothing in the report dialog, so the tester had to press **Generate**. `Enter` generates the report now, and the status bar says so. Fixed 9 September 2026, [#252](https://github.com/mtb550/test-in/issues/252)                                                                                                                                                                                                                                  |
+| **Difference 3** | The report button was offered on a test run still being written, so the document described a state that had already moved on. Every way of asking is gray while a test run is **In Progress**, with the reason in the tooltip (Rule-REPORT-016). The row also overstated the defect: the button could never be unavailable, because it is only ever built with a test run editor. Fixed 9 September 2026, [#253](https://github.com/mtb550/test-in/issues/253) |
+| **Difference 4** | A test run nobody executed printed **Execution Started** and **Execution Ended** as empty rows, because three rows went round the helper that drops a blank. Fixed 9 September 2026, [#254](https://github.com/mtb550/test-in/issues/254)                                                                                                                                                                                                                      |
+| **Difference 5** | The message named the format in capitals — *WORD Report Generated*. Formats read as words now, in the message and in the dialog alike. Fixed 9 September 2026, [#255](https://github.com/mtb550/test-in/issues/255)                                                                                                                                                                                                                                            |
+| **Difference 6** | A web page opened in whatever application claimed the file when it was a report, and in the browser when it was an export. Every web page goes to the browser now. Fixed 9 September 2026, [#256](https://github.com/mtb550/test-in/issues/256)                                                                                                                                                                                                                |
+| **Difference 7** | The report, export and import bars could not be canceled. All three can be. Fixed 9 September 2026, [#257](https://github.com/mtb550/test-in/issues/257)                                                                                                                                                                                                                                                                                                       |
 
 ---
 

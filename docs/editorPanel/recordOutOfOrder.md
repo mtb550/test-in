@@ -1,13 +1,13 @@
 [Documentation](../README.md) › [The editor panel](main.md) › UC-EDITOR-PANEL-037
 
-# UC-EDITOR-PANEL-037: Record a verdict out of order
+# UC-EDITOR-PANEL-037: Record a run item status out of order
 
 **As a** tester, **I want** to judge a test case that is not the one the walk is
 on, **so that** I can record something I happened to try while doing something
 else.
 
-A verdict can go on any test case at any time. The walk is not in charge of
-that.
+A run item status can go on any test case at any time. The walk is not in
+charge of that.
 
 `P`, `F` or `B` on any selected test case.
 
@@ -37,10 +37,10 @@ that.
   reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
-- **Rule-EDITOR-PANEL-156** — A verdict can be recorded on any test case at any
-  time. The walk does not have to be going.
-- **Rule-EDITOR-PANEL-157** — A verdict recorded away from the walk is not
-  timed. The test case keeps whatever duration it had.
+- **Rule-EDITOR-PANEL-156** — A run item status can be recorded on any test case
+  at any time. The walk does not have to be going.
+- **Rule-EDITOR-PANEL-157** — A run item status recorded away from the walk is
+  not timed. The test case keeps whatever duration it had.
 - **Rule-EDITOR-PANEL-158** — Recording away from the walk does not stop the
   walk, and does not move it.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
@@ -64,9 +64,9 @@ that.
 
 ## What the tester sees
 
-This opens no screen. The verdict badge on the test case the tester clicked
-changes, and the figures in the status bar move. Its duration column stays
-blank.
+This opens no screen. The run item status badge on the test case the tester
+clicked changes, and the figures in the status bar move. Its duration column
+stays blank.
 
 The walk does not move. It stays on the test case it was timing, and the clock
 keeps running there.
@@ -85,15 +85,16 @@ keeps running there.
 **If nothing is selected** — nothing happens.
 
 **If the test case was deleted from its test set** — a message reads *The test
-case was removed - the run keeps what it recorded.*
+case was removed - the test run keeps what it recorded.*
 
 **If the test run does not cover this test case** — nothing is recorded, and
 only the log says so.
 
 ## Why the duration is blank
 
-The clock times the test case the walk is on. A verdict recorded anywhere else
-was never timed. Nothing is written to the duration, so the column stays blank.
+The clock times the test case the walk is on. A run item status recorded
+anywhere else was never timed. Nothing is written to the duration, so the column
+stays blank.
 A blank duration means nothing was measured. It does not mean the test case took
 no time.
 

@@ -34,19 +34,19 @@ import org.testin.codegen.AutomationState;
 import org.testin.editor.CardHoverAction;
 import org.testin.editor.HoverButton;
 import org.testin.editor.ShownTestCaseAction;
-import org.testin.editor.run.ExecutionControl;
-import org.testin.editor.run.RunEditor;
+import org.testin.editor.testrun.ExecutionControl;
+import org.testin.editor.testrun.TestRunEditor;
 import org.testin.editor.toolbar.components.StartExecutionBtn;
 import org.testin.model.Automated;
 import org.testin.model.StatusBarItem;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.TestEditorAttributes;
-import org.testin.testrun.RunStatusService;
+import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testrun.RunItemStatusService;
 import org.testin.ui.Motion;
 import org.testin.ui.Tooltip;
 import org.testin.ui.framework.Prose;
@@ -94,8 +94,8 @@ final class LightModeWindow {
     private static final float ZOOM_MIN = 0.8f;
     private static final float ZOOM_MAX = 2.0f;
 
-    private final @NotNull RunEditor editor;
-    private final @NotNull RunStatusService runStatusService;
+    private final @NotNull TestRunEditor editor;
+    private final @NotNull RunItemStatusService runItemStatusService;
     private final @NotNull AutomationState automationState;
     private final @NotNull Runnable onClosed;
 
@@ -120,13 +120,13 @@ final class LightModeWindow {
     private final @NotNull LightModeFrame frame = new LightModeFrame(motionScope);
     private final @NotNull TestCaseDetails details;
     private final @NotNull JBPanel<?> underTestCase = new JBPanel<>(new BorderLayout());
-    private final @NotNull JBLabel testCaseClock = clock(Bundle.message("light.case.clock"));
-    private final @NotNull JBLabel runClock = clock(Bundle.message("light.run.clock"));
+    private final @NotNull JBLabel testCaseClock = clock(Bundle.message("light.test.case.clock"));
+    private final @NotNull JBLabel testRunClock = clock(Bundle.message("light.test.run.clock"));
     private final @NotNull JBPanel<?> strip = new JBPanel<>(new BorderLayout());
     private final @NotNull JBPanel<?> setLine = new JBPanel<>(new GridBagLayout());
     private final @NotNull JBPanel<?> buttons = new JBPanel<>(new GridLayout(1, 0, JBUI.scale(BUTTON_GAP), 0));
     private final @NotNull JBPanel<?> footer = new JBPanel<>(new BorderLayout());
-    private final @NotNull JComponent verdictRow = verdictButtons();
+    private final @NotNull JComponent runItemStatusRow = runItemStatusButtons();
     private final @NotNull StatusBarBase statusBar = new StatusBarBase(new StatusBarItem[0]);
     private final @NotNull ViewMenuBtn viewMenu = new ViewMenuBtn(this::applyView);
     private @NotNull Optional<UUID> shownTestCase = Optional.empty();
@@ -137,9 +137,9 @@ final class LightModeWindow {
 
     private boolean detailsKeyHeld = false;
 
-    LightModeWindow(final @NotNull RunEditor editor, final @NotNull Runnable onClosed) {
+    LightModeWindow(final @NotNull TestRunEditor editor, final @NotNull Runnable onClosed) {
         this.editor = editor;
-        this.runStatusService = Services.getInstance(editor.getProject(), RunStatusService.class);
+        this.runItemStatusService = Services.getInstance(editor.getProject(), RunItemStatusService.class);
         this.automationState = Services.getInstance(editor.getProject(), AutomationState.class);
         this.details = new TestCaseDetails();
         this.onClosed = onClosed;
@@ -158,7 +158,7 @@ final class LightModeWindow {
         frame.show();
     }
 
-    private static @NotNull String keyOf(final @NotNull TestStatus status) {
+    private static @NotNull String keyOf(final @NotNull RunItemStatus status) {
         return Shortcuts.shortcutText(status.getMenuEntry().shortcut());
     }
 
@@ -186,7 +186,7 @@ final class LightModeWindow {
 
         counter.setText(executing
                 ? Bundle.message("light.counter.position", String.valueOf(index + 1), String.valueOf(testCases.size()))
-                : Bundle.message("light.counter.cases", String.valueOf(testCases.size())));
+                : Bundle.message("light.counter.test.cases", String.valueOf(testCases.size())));
 
         idle.setVisible(!executing);
         testCaseView.setVisible(executing);
@@ -215,7 +215,7 @@ final class LightModeWindow {
 
     void tick() {
         testCaseClock.setText(Display.formatTestCaseClock(editor.getWalk().getCurrentTestCaseElapsed()));
-        runClock.setText(Display.formatRunClock(editor.getElapsed()));
+        testRunClock.setText(Display.formatTestRunClock(editor.getElapsed()));
     }
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-202, Rule-EDITOR-PANEL-204
@@ -231,8 +231,8 @@ final class LightModeWindow {
         if (arrived) testCaseView.captureLeaving();
 
         set.setText(tc.getParent().getName());
-        description.setText(TestEditorAttributes.DESCRIPTION.displayValue(tc));
-        expected.setText(TestEditorAttributes.EXPECTED_RESULT.displayValue(tc));
+        description.setText(TestCaseEditorAttributes.DESCRIPTION.displayValue(tc));
+        expected.setText(TestCaseEditorAttributes.EXPECTED_RESULT.displayValue(tc));
 
         details.show(tc);
 
@@ -268,8 +268,8 @@ final class LightModeWindow {
         frame.bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK, true), "testin.lightMode.releaseDetails", () -> detailsKeyHeld = false);
         frame.bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, true), "testin.lightMode.releaseDetailsAlone", () -> detailsKeyHeld = false);
 
-        for (final TestStatus status : TestStatus.values()) {
-            if (!status.isVerdict()) continue;
+        for (final RunItemStatus status : RunItemStatus.values()) {
+            if (!status.isRunItemStatus()) continue;
 
             frame.bind(status.getMenuEntry().shortcut(), "testin.lightMode." + status.name(), () -> judge(status));
         }
@@ -330,7 +330,7 @@ final class LightModeWindow {
     }
 
     // UC-EDITOR-PANEL-046
-    private void judge(final @NotNull TestStatus status) {
+    private void judge(final @NotNull RunItemStatus status) {
         if (capture.isPresent()) return;
 
         if (status.isCollectsFailureDetails()) {
@@ -341,8 +341,8 @@ final class LightModeWindow {
         record(status);
     }
 
-    private void record(final @NotNull TestStatus status) {
-        runStatusService.executeNext(editor, status);
+    private void record(final @NotNull RunItemStatus status) {
+        runItemStatusService.executeNext(editor, status);
     }
 
     private void openCapture() {
@@ -370,7 +370,7 @@ final class LightModeWindow {
 
             capture = Optional.empty();
 
-            record(TestStatus.FAILED);
+            record(RunItemStatus.FAILED);
             refresh();
         });
     }
@@ -406,14 +406,14 @@ final class LightModeWindow {
 
         set.setVisible(shows(LightModePart.SET_NAME));
         chosen.setVisible(writing);
-        chosen.setText(set.isVisible() ? " · " + TestStatus.FAILED.getLabel() : TestStatus.FAILED.getLabel());
+        chosen.setText(set.isVisible() ? " · " + RunItemStatus.FAILED.getLabel() : RunItemStatus.FAILED.getLabel());
         showButtons();
         setLine.setVisible(set.isVisible() || chosen.isVisible() || buttons.isVisible());
 
         expectedRow.setVisible(!expected.getText().isBlank());
 
         strip.setVisible(shows(LightModePart.DURATION));
-        verdictRow.setVisible(shows(LightModePart.VERDICT_BUTTONS) && !writing);
+        runItemStatusRow.setVisible(shows(LightModePart.RUN_ITEM_STATUS_BUTTONS) && !writing);
         statusBar.setShown(shows(LightModePart.STATUS_BAR) || writing);
     }
 
@@ -489,10 +489,10 @@ final class LightModeWindow {
         counter.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
         bar.add(left, BorderLayout.WEST);
-        final @NotNull JBLabel runName = new JBLabel(editor.getParent().getName());
-        runName.setFont(Fonts.body());
+        final @NotNull JBLabel testRunName = new JBLabel(editor.getParent().getName());
+        testRunName.setFont(Fonts.body());
 
-        bar.add(runName, BorderLayout.CENTER);
+        bar.add(testRunName, BorderLayout.CENTER);
         bar.add(counter, BorderLayout.EAST);
 
         frame.dragBy(bar);
@@ -506,7 +506,7 @@ final class LightModeWindow {
         set.setBorder(JBUI.Borders.compound(new RoundedLineBorder(Icons.GRAY, JBUI.scale(SET_FRAME_ARC), 1), JBUI.Borders.empty(1, 7)));
         idle.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
-        chosen.setForeground(TestStatus.FAILED.getRowColor());
+        chosen.setForeground(RunItemStatus.FAILED.getRowColor());
 
         final @NotNull JBPanel<?> text = new JBPanel<>(new BorderLayout(0, JBUI.scale(10)));
         text.setOpaque(false);
@@ -551,23 +551,23 @@ final class LightModeWindow {
         return panel;
     }
 
-    private @NotNull JComponent verdictButtons() {
-        final @NotNull JBPanel<?> verdicts = new JBPanel<>(new GridLayout(1, 0, JBUI.scale(6), 0));
-        verdicts.setBorder(JBUI.Borders.empty(0, 10, 10, 10));
-        verdicts.setOpaque(false);
+    private @NotNull JComponent runItemStatusButtons() {
+        final @NotNull JBPanel<?> runItemStatuses = new JBPanel<>(new GridLayout(1, 0, JBUI.scale(6), 0));
+        runItemStatuses.setBorder(JBUI.Borders.empty(0, 10, 10, 10));
+        runItemStatuses.setOpaque(false);
 
-        for (final TestStatus status : TestStatus.values()) {
-            if (!status.isVerdict()) continue;
+        for (final RunItemStatus status : RunItemStatus.values()) {
+            if (!status.isRunItemStatus()) continue;
 
-            verdicts.add(new KeyBtn(keyOf(status), status.getLabel(), () -> judge(status)));
+            runItemStatuses.add(new KeyBtn(keyOf(status), status.getLabel(), () -> judge(status)));
         }
 
-        return verdicts;
+        return runItemStatuses;
     }
 
     private @NotNull JComponent footer() {
         footer.setOpaque(false);
-        footer.add(verdictRow, BorderLayout.NORTH);
+        footer.add(runItemStatusRow, BorderLayout.NORTH);
         footer.add(durationStrip(), BorderLayout.CENTER);
         footer.add(statusBar.getPanel(), BorderLayout.SOUTH);
 
@@ -578,7 +578,7 @@ final class LightModeWindow {
         strip.setBorder(JBUI.Borders.empty(0, 10, 8, 10));
         strip.setOpaque(false);
         strip.add(testCaseClock, BorderLayout.WEST);
-        strip.add(runClock, BorderLayout.EAST);
+        strip.add(testRunClock, BorderLayout.EAST);
 
         return strip;
     }
@@ -588,8 +588,8 @@ final class LightModeWindow {
         items.add(StatusBarShortcut.hint(Shortcuts.ToggleDetails.getShortcutText(), Bundle.message("shortcut.details")));
         items.add(StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), Bundle.message("shortcut.close")));
 
-        for (final TestStatus status : TestStatus.values()) {
-            if (status.isVerdict()) items.add(StatusBarShortcut.hint(keyOf(status), status.getLabel()));
+        for (final RunItemStatus status : RunItemStatus.values()) {
+            if (status.isRunItemStatus()) items.add(StatusBarShortcut.hint(keyOf(status), status.getLabel()));
         }
 
         KEYED.forEach(button -> items.add(keyHint(button)));

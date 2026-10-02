@@ -6,9 +6,9 @@
 row in its own test set, **so that** I can read it or fix it where it lives.
 I do not have to hunt for it in the tree.
 
-The test case's own test set editor opens with the test case selected, as
-clicking its identity in the view panel does. The test run editor stays open
-behind it.
+The test case's own test set opens in the test case editor with the test case
+selected, as clicking its identity in the view panel does. The test run editor
+stays open behind it.
 
 No key. The card's last button, or the right-click menu.
 
@@ -39,8 +39,8 @@ No key. The card's last button, or the right-click menu.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-233** — Navigate to Test Case opens the test case's own
-  test set editor and selects it there, as clicking its identity in the view
-  panel does. The tree does not move.
+  test set in the test case editor and selects it there, as clicking its
+  identity in the view panel does. The tree does not move.
 - **Rule-EDITOR-PANEL-234** — It is on a test run's cards and in the right-click
   menu of the test run editor. It is not offered in a test set, on a card or in
   the menu: those are already in the test set.
@@ -99,15 +99,15 @@ in the menu.
    last one reading **tc**.
 3. The tester clicks it, or right-clicks the row and chooses **Navigate to Test
    Case**.
-4. The test case's own test set editor opens, or comes forward if it is already
-   open, with the test case selected.
+4. The test case's own test set opens in the test case editor, or comes forward
+   if it is already open, with the test case selected.
 5. The tree stays where it was. The test run editor stays open behind.
 
 ## What Testin refuses
 
-**If the test case is in no test set** — deleted since the run recorded it — the
-button is gray, and a message reads *There is no test set to open this test case
-in.*, and nothing opens.
+**If the test case is in no test set** — deleted since the test run recorded it
+— the button is gray, and a message reads *There is no test set to open this
+test case in.*, and nothing opens.
 
 ---
 

@@ -1,12 +1,12 @@
 [Documentation](../README.md) › [The editor panel](main.md) › UC-EDITOR-PANEL-036
 
-# UC-EDITOR-PANEL-036: Resume a run I stopped
+# UC-EDITOR-PANEL-036: Resume a test run I stopped
 
 **As a** tester, **I want** to pick a test run up where I left it, **so that** a morning's work is not repeated after
 lunch.
 
 There is no separate resume button. Starting again is resuming, because the walk
-always begins at the first test case with no verdict.
+always begins at the first test case with no run item status.
 
 There is no key for this. Press **Start Manual Execution** again.
 
@@ -37,8 +37,9 @@ There is no key for this. Press **Start Manual Execution** again.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-153** — Starting again finds the first test case with no
-  verdict, so the walk resumes rather than restarting. A test case judged in the
-  first sitting is passed over wherever it sits (Rule-EDITOR-PANEL-130).
+  run item status, so the walk resumes rather than restarting. A test case
+  judged in the first sitting is passed over wherever it sits
+  (Rule-EDITOR-PANEL-130).
 - **Rule-EDITOR-PANEL-154** — The clock adds to the time a test case already
   carried, rather than starting it again.
 - **Rule-EDITOR-PANEL-155** — The stamp saying when execution began is kept.
@@ -65,17 +66,18 @@ There is no key for this. Press **Start Manual Execution** again.
 ## What the tester sees
 
 This opens no screen. It looks exactly like starting. The editor turns to the
-first test case with no verdict, selects its row, and the clock starts again.
+first test case with no run item status, selects its row, and the clock starts
+again.
 
-Every test case judged in the first sitting keeps its verdict, and the walk
-passes over it.
+Every test case judged in the first sitting keeps its run item status, and the
+walk passes over it.
 
 ## Main flow
 
 1. The tester stopped a walk after judging 20 of 80 test cases.
 2. The tester comes back, opens the test run, and presses **Start Manual
    Execution**.
-3. Testin finds test case 21, the first with no verdict.
+3. Testin finds test case 21, the first with no run item status.
 4. The editor turns to the page holding it and selects it.
 5. The clock starts again.
 
@@ -84,16 +86,16 @@ passes over it.
 **If the test run is completed or closed** — the button is gray, and its tooltip
 says which status is stopping it. A test run signed off cannot be resumed.
 
-**If every test case already has a verdict** — the walk reaches the end at once,
-and the test run is marked completed.
+**If every test case already has a run item status** — the walk reaches the end
+at once, and the test run is marked completed.
 
 ## What is kept from before
 
-| Kept                                   | Written again                     |
-|----------------------------------------|-----------------------------------|
-| Every verdict already recorded         | When execution ended              |
-| How long each test case took, added to | The verdicts recorded from now on |
-| When execution began                   |                                   |
+| Kept                                   | Written again                              |
+|----------------------------------------|--------------------------------------------|
+| Every run item status already recorded | When execution ended                       |
+| How long each test case took, added to | The run item statuses recorded from now on |
+| When execution began                   |                                            |
 
 ---
 

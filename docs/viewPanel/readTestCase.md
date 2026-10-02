@@ -67,21 +67,21 @@ There is no key for this. It is what the **Details** tab shows.
   middle of the words. A band with nothing to show is not drawn at all, and
   where only one band has anything to show its name is not drawn either: a
   heading over the whole panel names nothing.
-- **Rule-VIEW-PANEL-086** — What a run recorded is one line under the band's
-  name: the verdict in its own color, how long it took, the bug's severity and
-  priority as one chip, then the issue and the link that raises one. The
-  duration carries a clock and a plain frame with nothing filled in, so it reads
-  as a measurement rather than a verdict, and it is not the notched shape a
-  group badge uses. Who ran it and when close the band as a row of their own, in
+- **Rule-VIEW-PANEL-086** — What a test run recorded is one line under the
+  band's name: the run item status in its own color, how long it took, the bug's
+  severity and priority as one chip, then the issue and the link that raises
+  one. The duration carries a clock and a plain frame with nothing filled in, so
+  it reads as a measurement rather than a run item status, and it is not the
+  notched shape a group badge uses. Who ran it and when close the band as a row of their own, in
   the words **Created** already uses (Rule-VIEW-PANEL-061), because a name and a
   date are read after the failure rather than glanced at before it.
-- **Rule-VIEW-PANEL-087** — The test case's band folds only where a run stands
-  above it, and there it is folded when a tester first meets it: its name carries
-  the arrow that opens it, and opening it shows every field the test case has.
-  In the test case editor there is no run, so the fields are drawn straight under
-  the badges with nothing to open. The state is remembered for the IDE
-  rather than for one test case, so a tester who opens it keeps it open for the
-  next test case they read.
+- **Rule-VIEW-PANEL-087** — The test case's band folds only where a test run
+  stands above it, and there it is folded when a tester first meets it: its name
+  carries the arrow that opens it, and opening it shows every field the test
+  case has. In the test case editor there is no test run, so the fields are
+  drawn straight under the badges with nothing to open. The state is remembered
+  for the IDE rather than for one test case, so a tester who opens it keeps it
+  open for the next test case they read.
 
 ## The screen
 

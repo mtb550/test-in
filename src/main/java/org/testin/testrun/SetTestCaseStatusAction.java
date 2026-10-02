@@ -23,9 +23,9 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
-import org.testin.editor.run.RunEditor;
+import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
+import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testrun.failure.FailedResultDialog;
@@ -36,13 +36,13 @@ import java.util.Optional;
 
 public class SetTestCaseStatusAction extends AbstractAnyProjectAction {
     @Getter
-    private final @NotNull TestStatus status;
+    private final @NotNull RunItemStatus status;
 
-    public SetTestCaseStatusAction(final @NotNull TestStatus status) {
+    public SetTestCaseStatusAction(final @NotNull RunItemStatus status) {
         super(status.getLabel());
         this.status = status;
 
-        getTemplatePresentation().setDescription(Bundle.message("run.case.status.description", status.getLabel()));
+        getTemplatePresentation().setDescription(Bundle.message("run.item.status.description", status.getLabel()));
     }
 
     // UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033, UC-EDITOR-PANEL-034
@@ -51,11 +51,11 @@ public class SetTestCaseStatusAction extends AbstractAnyProjectAction {
         final @NotNull List<TestCaseDto> selectedItems = TestinData.selectedTestCases(e);
         if (selectedItems.isEmpty()) return;
 
-        TestinData.runEditor(e).ifPresent(editor -> record(p, editor, selectedItems));
+        TestinData.testRunEditor(e).ifPresent(editor -> record(p, editor, selectedItems));
     }
 
     // UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033
-    private void record(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+    private void record(final @NotNull Project p, final @NotNull TestRunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
         final @NotNull Optional<TestRunItems> runItem = askingForFailureDetails(editor, selectedItems);
         if (runItem.isEmpty()) {
             applyStatus(p, editor, selectedItems);
@@ -63,27 +63,27 @@ public class SetTestCaseStatusAction extends AbstractAnyProjectAction {
         }
 
         new FailedResultDialog(p, editor.getParent().getPath(), runItem.orElseThrow(), fields -> {
-            if (Services.getInstance(p, RunStatusService.class).recordFailureDetails(editor.getParent().getPath(), selectedItems.getFirst().getId(), fields)) {
+            if (Services.getInstance(p, RunItemStatusService.class).recordFailureDetails(editor.getParent().getPath(), selectedItems.getFirst().getId(), fields)) {
                 applyStatus(p, editor, selectedItems);
             }
         }).show();
     }
 
     // UC-EDITOR-PANEL-034
-    private @NotNull Optional<TestRunItems> askingForFailureDetails(final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+    private @NotNull Optional<TestRunItems> askingForFailureDetails(final @NotNull TestRunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
         if (!status.isCollectsFailureDetails() || selectedItems.size() != 1) return Optional.empty();
 
         return editor.runItem(selectedItems.getFirst().getId()).filter(item -> !item.isRemoved());
     }
 
-    private void applyStatus(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
-        Services.getInstance(p, RunStatusService.class).applyStatus(editor, selectedItems, status);
+    private void applyStatus(final @NotNull Project p, final @NotNull TestRunEditor editor, final @NotNull List<TestCaseDto> selectedItems) {
+        Services.getInstance(p, RunItemStatusService.class).applyStatus(editor, selectedItems, status);
     }
 
     // UC-EDITOR-PANEL-032
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        e.getPresentation().setEnabled(TestinData.runEditor(e).isPresent()
+        e.getPresentation().setEnabled(TestinData.testRunEditor(e).isPresent()
                 && !TestinData.selectedTestCases(e).isEmpty());
     }
 

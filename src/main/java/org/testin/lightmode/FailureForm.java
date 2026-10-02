@@ -27,7 +27,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.services.Services;
-import org.testin.testrun.RunStatusService;
+import org.testin.testrun.RunItemStatusService;
 import org.testin.testrun.failure.FailureFields;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogHost;
@@ -48,18 +48,18 @@ import java.util.Map;
 class FailureForm extends JBPanel<FailureForm> implements DialogHost {
     private final @NotNull FailureFields fields;
     private final @NotNull TestRunItems runItem;
-    private final @NotNull Path runPath;
-    private final @NotNull RunStatusService runStatusService;
+    private final @NotNull Path testRunPath;
+    private final @NotNull RunItemStatusService runItemStatusService;
     private final @NotNull Map<Component, Font> baseFonts = new HashMap<>();
     private final @NotNull Runnable resized;
     private final @NotNull Runnable onEnter;
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-202
-    FailureForm(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunItems runItem, final float zoom, final @NotNull Runnable resized, final @NotNull Runnable onEnter) {
-        this.runPath = runPath;
-        this.runStatusService = Services.getInstance(p, RunStatusService.class);
+    FailureForm(final @NotNull Project p, final @NotNull Path testRunPath, final @NotNull TestRunItems runItem, final float zoom, final @NotNull Runnable resized, final @NotNull Runnable onEnter) {
+        this.testRunPath = testRunPath;
+        this.runItemStatusService = Services.getInstance(p, RunItemStatusService.class);
         this.runItem = runItem;
-        this.fields = new FailureFields(p, runPath, runItem);
+        this.fields = new FailureFields(p, testRunPath, runItem);
         this.resized = resized;
         this.onEnter = onEnter;
 
@@ -125,7 +125,7 @@ class FailureForm extends JBPanel<FailureForm> implements DialogHost {
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145, Rule-EDITOR-PANEL-219, Rule-EDITOR-PANEL-256
     boolean save() {
-        return runStatusService.recordFailureDetails(runPath, runItem.getId(), fields);
+        return runItemStatusService.recordFailureDetails(testRunPath, runItem.getId(), fields);
     }
 
     void focusFirstField() {

@@ -102,9 +102,9 @@ public final class GitDiffProcessor {
     // Rule-INTERNAL-011
     private static @NotNull DirectoryType folderKindOf(final @NotNull Path repositoryRoot, final @NotNull Path relativePath) {
         final @NotNull Optional<Path> folder = Optional.ofNullable(repositoryRoot.resolve(relativePath).getParent());
-        final boolean isRun = folder.filter(at -> Files.exists(at.resolve(DirectoryType.TR.getMarker()))).isPresent();
+        final boolean isTestRun = folder.filter(at -> Files.exists(at.resolve(DirectoryType.TR.getMarker()))).isPresent();
 
-        return isRun ? DirectoryType.TR : DirectoryType.TRD;
+        return isTestRun ? DirectoryType.TR : DirectoryType.TRD;
     }
 
     private static @NotNull String workingContent(final @NotNull Path root, final @NotNull Path relativePath, final @NotNull StatusEntry entry) {

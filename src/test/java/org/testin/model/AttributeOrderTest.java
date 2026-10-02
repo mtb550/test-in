@@ -16,8 +16,8 @@
 
 package org.testin.model;
 
-import org.testin.testcase.TestEditorAttributes;
-import org.testin.testrun.RunEditorAttributes;
+import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertSame;
@@ -26,11 +26,11 @@ public class AttributeOrderTest {
 
     @Test
     public void orderIsTheFirstTestAttribute() {
-        assertSame(TestEditorAttributes.values()[0], TestEditorAttributes.ORDER);
+        assertSame(TestCaseEditorAttributes.values()[0], TestCaseEditorAttributes.ORDER);
     }
 
     @Test
-    public void orderIsTheFirstRunAttribute() {
-        assertSame(RunEditorAttributes.values()[0], RunEditorAttributes.ORDER);
+    public void orderIsTheFirstTestRunAttribute() {
+        assertSame(TestRunEditorAttributes.values()[0], TestRunEditorAttributes.ORDER);
     }
 }

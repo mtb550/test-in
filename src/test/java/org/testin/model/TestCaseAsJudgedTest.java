@@ -43,29 +43,29 @@ public class TestCaseAsJudgedTest {
     }
 
     @Test
-    public void aVerdictKeepsTheTestCaseItWasGivenAgainst() {
+    public void aRunItemStatusKeepsTheTestCaseItWasGivenAgainst() {
         final UUID id = UUID.randomUUID();
         final TestCaseDto live = testCaseReading(id, "before");
         final TestRunItems item = TestRunItems.builder().id(id).build().showing(Optional.of(live));
 
-        item.recordVerdict(TestStatus.PASSED, "tester", copyOf(live));
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", copyOf(live));
         live.setDescription("after");
         item.showing(Optional.of(live));
 
         assertEquals(item.shownTestCase().getDescription(), "before", "the row shows what was executed");
-        assertEquals(item.liveTestCase().getDescription(), "after", "actions still reach the case as it is now");
+        assertEquals(item.liveTestCase().getDescription(), "after", "actions still reach the test case as it is now");
     }
 
     @Test
     public void aCorrectionKeepsTheJudgedTestCase() {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = TestRunItems.builder().id(id).build();
-        item.recordVerdict(TestStatus.PASSED, "tester", testCaseReading(id, "before"));
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", testCaseReading(id, "before"));
 
-        item.correctVerdict(TestStatus.FAILED, "tester", testCaseReading(id, "after"));
+        item.correctRunItemStatus(RunItemStatus.FAILED, "tester", testCaseReading(id, "after"));
 
-        assertEquals(item.getStatus(), TestStatus.FAILED);
-        assertEquals(item.shownTestCase().getDescription(), "before", "only the verdict, who and when change");
+        assertEquals(item.getStatus(), RunItemStatus.FAILED);
+        assertEquals(item.shownTestCase().getDescription(), "before", "only the run item status, who and when change");
     }
 
     @Test
@@ -73,7 +73,7 @@ public class TestCaseAsJudgedTest {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = TestRunItems.builder().id(id).build();
 
-        item.correctVerdict(TestStatus.BLOCKED, "tester", testCaseReading(id, "now"));
+        item.correctRunItemStatus(RunItemStatus.BLOCKED, "tester", testCaseReading(id, "now"));
 
         assertEquals(item.shownTestCase().getDescription(), "now");
     }
@@ -82,23 +82,23 @@ public class TestCaseAsJudgedTest {
     public void runningAJudgedRowAgainTakesTheTestCaseAsItIsNow() {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = TestRunItems.builder().id(id).build();
-        item.recordVerdict(TestStatus.FAILED, "tester", testCaseReading(id, "before"));
+        item.recordRunItemStatus(RunItemStatus.FAILED, "tester", testCaseReading(id, "before"));
 
-        item.recordVerdict(TestStatus.PASSED, "tester", testCaseReading(id, "after"));
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", testCaseReading(id, "after"));
 
         assertEquals(item.shownTestCase().getDescription(), "after");
     }
 
     @Test
-    public void aTestCaseDeletedAfterItsVerdictKeepsItsFullTextAndItsVerdict() {
+    public void aTestCaseDeletedAfterItsRunItemStatusKeepsItsFullTextAndItsRunItemStatus() {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = TestRunItems.builder().id(id).build();
-        item.recordVerdict(TestStatus.PASSED, "tester", testCaseReading(id, "before"));
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", testCaseReading(id, "before"));
 
         item.showing(Optional.empty());
 
-        assertTrue(item.isRemoved(), "nothing may act on the row of a case that no longer exists");
-        assertEquals(item.shownStatus(), TestStatus.PASSED, "the result is shown whatever happened to the test case");
+        assertTrue(item.isRemoved(), "nothing may act on the row of a test case that no longer exists");
+        assertEquals(item.shownStatus(), RunItemStatus.PASSED, "the result is shown whatever happened to the test case");
         assertEquals(item.shownTestCase().getDescription(), "before", "not the placeholder");
     }
 
@@ -107,11 +107,11 @@ public class TestCaseAsJudgedTest {
         final UUID id = UUID.randomUUID();
         final TestSetDirectoryDto set = new TestSetDirectoryDto();
         final TestRunItems item = TestRunItems.builder().id(id).build();
-        item.recordVerdict(TestStatus.PASSED, "tester", testCaseReading(id, "before"));
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", testCaseReading(id, "before"));
 
         item.showing(Optional.of(TestCaseDto.builder().id(id).parent(set).build()));
 
-        assertSame(item.shownTestCase().getParent(), set, "where the case sits is the live case's, so navigation still works");
+        assertSame(item.shownTestCase().getParent(), set, "where the test case sits is the live test case's, so navigation still works");
     }
 
     @Test
@@ -125,7 +125,7 @@ public class TestCaseAsJudgedTest {
     public void aJudgedResultIsWrittenWithItsTestCaseAndReadBack() {
         final UUID id = UUID.randomUUID();
         final TestRunItems item = TestRunItems.builder().id(id).build();
-        item.recordVerdict(TestStatus.PASSED, "tester", testCaseReading(id, "as executed"));
+        item.recordRunItemStatus(RunItemStatus.PASSED, "tester", testCaseReading(id, "as executed"));
 
         final String written = MAPPER.writeValueAsString(item);
         final TestRunItems read = MAPPER.readValue(written, TestRunItems.class);
