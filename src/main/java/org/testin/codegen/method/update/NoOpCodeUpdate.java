@@ -32,7 +32,7 @@ public record NoOpCodeUpdate(@NotNull String fieldName) implements CodeUpdate {
     }
 
     @Override
-    public <T> void executeAll(final @NotNull GenType<T> type, final @NotNull Project p, final @NotNull List<? extends T> items) {
+    public <T> void executeAll(final @NotNull GenType<T> type, final @NotNull Project p, final @NotNull List<? extends T> items, final @NotNull String undoGroup) {
         Logger.info("Update " + fieldName + " on " + items.size() + ": data-only field, no Java code change");
     }
 }

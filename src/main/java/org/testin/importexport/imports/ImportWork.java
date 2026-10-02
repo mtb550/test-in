@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -216,6 +217,8 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
     private void generateTestMethods(final @NotNull List<TestCaseDto> testCases, final @NotNull String targetName, final @NotNull ProgressIndicator indicator) {
         Logger.info("Import: generating test methods for '" + targetName + "' with " + testCases.size() + " cases");
         final long startedAt = System.currentTimeMillis();
+        // Rule-CODEGEN-018
+        final @NotNull String oneUndo = UUID.randomUUID().toString();
 
         for (int from = 0; from < testCases.size(); from += METHODS_PER_COMMAND) {
             final @NotNull List<TestCaseDto> batch =
@@ -223,7 +226,7 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
             final int written = from + batch.size();
 
             indicator.setText2(Bundle.message("import.progress.generating", String.valueOf(written), String.valueOf(testCases.size())));
-            onEdt(() -> GenType.CREATE_TEST_CASE.executeAllNow(p, batch));
+            onEdt(() -> GenType.CREATE_TEST_CASE.executeAllNow(p, batch, oneUndo));
         }
 
         Logger.info("Import: generated " + testCases.size() + " test methods in "

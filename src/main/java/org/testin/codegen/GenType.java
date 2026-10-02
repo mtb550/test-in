@@ -25,6 +25,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.util.Bundle;
 
 import java.util.List;
+import java.util.UUID;
 
 public record GenType<T>(@NotNull Class<T> payload, @NotNull String description, @NotNull CodeUpdate update) {
     public static final @NotNull GenType<DirectoryDto> REMOVE_TEST_PROJECT = new GenType<>(
@@ -189,9 +190,13 @@ public record GenType<T>(@NotNull Class<T> payload, @NotNull String description,
         ApplicationManager.getApplication().invokeLater(() -> executeAllNow(p, items), p.getDisposed());
     }
 
-    // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-018
     public void executeAllNow(final @NotNull Project p, final @NotNull List<? extends T> items) {
-        update.executeAll(this, p, items);
+        executeAllNow(p, items, UUID.randomUUID().toString());
+    }
+
+    // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-CODEGEN-018
+    public void executeAllNow(final @NotNull Project p, final @NotNull List<? extends T> items, final @NotNull String undoGroup) {
+        update.executeAll(this, p, items, undoGroup);
     }
 
     @Override

@@ -44,10 +44,10 @@ public enum JavaCodeUpdate implements CodeUpdate {
 
     // UC-CODEGEN-019, Rule-CODEGEN-005, Rule-EDITOR-PANEL-046
     @Override
-    public <T> void executeAll(final @NotNull GenType<T> type, final @NotNull Project p, final @NotNull List<? extends T> items) {
+    public <T> void executeAll(final @NotNull GenType<T> type, final @NotNull Project p, final @NotNull List<? extends T> items, final @NotNull String undoGroup) {
         if (cannotGenerate(p, type.description()) || items.isEmpty()) return;
 
-        WriteCommandAction.runWriteCommandAction(p, type.description(), null,
+        WriteCommandAction.runWriteCommandAction(p, type.description(), undoGroup,
                 () -> CodeGenerators.find(type).executeAll(p, items));
     }
 

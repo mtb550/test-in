@@ -44,8 +44,9 @@ There is no key for this. It happens when a test case is created, which is
 - **Rule-CODEGEN-016** — Two descriptions that differ only in punctuation or
   capitals are one method.
 - **Rule-CODEGEN-017** — A test case created with no description gets no method.
-- **Rule-CODEGEN-018** — A whole sheet of test cases is written as one change,
-  so it is one undo and one write.
+- **Rule-CODEGEN-018** — A whole sheet of test cases is one undo. Its code is
+  written in steps of 200 test cases, so the IDE stays responsive, and Ctrl+Z
+  takes the whole sheet's code back at once.
 - **Rule-CODEGEN-068** — Undoing a change to a test case writes the test
   case's code again, in every part Testin owns: the description, the method
   name, the groups, whether it is enabled, and where it sits. A test case with
