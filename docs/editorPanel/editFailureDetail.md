@@ -94,7 +94,7 @@ The same dialog the `F` key opens, with what was written already in it.
 │   │ picture│                                               │
 │   └────────┘                                               │
 ├────────────────────────────────────────────────────────────┤
-│  [k]  Enter Save       Escape Cancel                       │
+│  [k]  Enter Save   Escape Cancel   Alt+Enter Corrections … │
 └────────────────────────────────────────────────────────────┘
 ```
 

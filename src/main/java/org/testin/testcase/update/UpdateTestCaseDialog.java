@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.testcase.TestCaseDialogKey;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testcase.create.CreateTestCaseSection;
 import org.testin.testcase.create.TestCaseBaseDialog;
@@ -39,7 +40,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
     // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-036
     public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
-        super(p, existingDto, onSave);
+        super(p, existingDto, onSave, TestCaseDialogKey.SAVE, TestCaseDialogKey.CANCEL);
 
         // Rule-CODEGEN-001
         descriptionSection.compareAgainst(() -> testCases

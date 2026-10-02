@@ -54,6 +54,11 @@ public record StatusBarShortcut(@NotNull Shortcuts shortcut, @NotNull String dis
         return hint(Shortcuts.Corrections.getShortcutText(), Bundle.message("dialog.key.corrections"));
     }
 
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
+    public static @NotNull StatusBarShortcut pasteScreenshot() {
+        return hint(Shortcuts.PasteItem.getShortcutText(), Bundle.message("dialog.key.paste.screenshot"));
+    }
+
     public static @NotNull StatusBarShortcut select() {
         return hint("↑ ↓", SELECT);
     }

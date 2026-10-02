@@ -62,7 +62,8 @@ public class FailedResultDialog extends AbstractFrameworkDialog {
         shortcuts = List.of(
                 StatusBarShortcut.save(this::submit),
                 StatusBarShortcut.cancel(this::closeCancel),
-                StatusBarShortcut.corrections());
+                StatusBarShortcut.corrections(),
+                StatusBarShortcut.pasteScreenshot());
     }
 
     // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-145

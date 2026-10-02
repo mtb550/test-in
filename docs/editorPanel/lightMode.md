@@ -439,7 +439,7 @@ for something back. A failure nobody described is a failure nobody can act on.
 │                                                                            │
 │  00:41                                                    00:12:41         │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  Enter Save & next      Escape Cancel      Alt+Enter Corrections           │
+│  Enter Save & next   Escape Cancel   Alt+Enter Corrections   Ctrl+V Paste …│
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -493,7 +493,8 @@ list each, so a new severity or priority appears here on its own.
 The form answers one paste gesture and the clipboard decides what it means: a
 picture becomes a screenshot, and anything else is text in whichever box has the
 cursor. The error box still says so in its gray hint text, *"paste error or
-exception or screenshot…"*, because that is where a tester is already looking.
+exception or screenshot…"*, because that is where a tester is already looking,
+and the status bar names it as *Ctrl+V Paste Screenshot*.
 The gesture is not tied to that box, so a screenshot arrives wherever they happen
 to be typing. A pasted screenshot shows as a small picture in a **Screenshots** row, never as letters, and its
 **x** takes it out. The row is

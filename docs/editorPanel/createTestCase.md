@@ -93,9 +93,7 @@ This is how every test case in Testin begins.
 │  (a field appears here when its key is pressed)              │
 │                                                              │
 ├──────────────────────────────────────────────────────────────┤
-│      Ctrl+D Description    Ctrl+E Expected Result    Ctrl+.. │
-├──────────────────────────────────────────────────────────────┤
-│  [k] Ctrl+B Pre Conditions   Ctrl+P Priority   Enter Save …  │
+│  [k] Alt+Enter Corrections   Tab / Shift+Tab Navigate   Ctr …│
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -105,7 +103,8 @@ This is how every test case in Testin begins.
    and change as they move between fields; **Save** and **Cancel** are always
    last, so a tester looks for Save in the same place whichever field they are
    in. A field with no keys of its own adds nothing, and the strip still shows
-   those two.
+   those two. Just before them, *Ctrl+Letter Add Field* stands for the keys
+   below: each field opens with Ctrl and the letter on its icon.
 
 ## The fields and the keys that open them
 

@@ -22,11 +22,14 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
+import org.testin.model.StatusBarItem;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseFields;
+import org.testin.testcase.TestCaseDialogKey;
 import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
@@ -37,11 +40,14 @@ import java.util.function.Consumer;
 public class CreateTestCaseDialog extends TestCaseBaseDialog {
     private final @NotNull TestSetDirectoryDto dir;
     private final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
+    // Rule-INTERNAL-054
+    private static final @NotNull StatusBarItem ADD_FIELD = StatusBarShortcut.hint(Bundle.message("dialog.key.add.field.keys"), Bundle.message("dialog.key.add.field"));
+
     private final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
     // UC-EDITOR-PANEL-005, Rule-CODEGEN-001
     public CreateTestCaseDialog(final @NotNull Project p, final @NotNull TestSetDirectoryDto dir, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
-        super(p, TestCaseDto.builder().parent(dir).build(), onSave);
+        super(p, TestCaseDto.builder().parent(dir).build(), onSave, ADD_FIELD, TestCaseDialogKey.SAVE, TestCaseDialogKey.CANCEL);
         this.dir = dir;
 
         descriptionSection.compareAgainst(() -> testCases.getTestCasesForTestSet(dir.getPath()));

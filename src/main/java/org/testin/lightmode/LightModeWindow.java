@@ -610,6 +610,7 @@ final class LightModeWindow {
         return new StatusBarItem[]{
                 StatusBarShortcut.hint(Shortcuts.Enter.getShortcutText(), Bundle.message("shortcut.save.and.next")),
                 StatusBarShortcut.hint(Shortcuts.Escape.getShortcutText(), Bundle.message("shortcut.cancel")),
-                StatusBarShortcut.corrections()};
+                StatusBarShortcut.corrections(),
+                StatusBarShortcut.pasteScreenshot()};
     }
 }

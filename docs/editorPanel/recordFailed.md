@@ -122,7 +122,7 @@ a small form before it records anything.
 │   │ picture│   │ picture│                                    │
 │   └────────┘   └────────┘                                    │
 ├──────────────────────────────────────────────────────────────┤
-│  [k]  Enter Save   Escape Cancel   Alt+Enter Corrections     │
+│  [k]  Enter Save   Escape Cancel   Alt+Enter Corrections …   │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -151,7 +151,8 @@ a small form before it records anything.
    without one shows no caption and no gap. `Ctrl+V` adds a picture wherever the
    cursor is, because the clipboard decides: a picture is a screenshot and
    anything else is text (Rule-EDITOR-PANEL-219).
-7. There is no button. `Enter` saves and `Escape` cancels.
+7. There is no button. `Enter` saves and `Escape` cancels. The status bar names
+   them, then *Alt+Enter Corrections* and *Ctrl+V Paste Screenshot*.
 
 ## Main flow
 

@@ -30,7 +30,6 @@ import org.testin.model.StatusBarItem;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.ProjectLifetime;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.testcase.TestCaseDialogKey;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 
@@ -71,14 +70,17 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog {
     private final @NotNull TestCaseDto dto;
     @Getter(AccessLevel.NONE)
     private final @NotNull Consumer<@NotNull TestCaseDto> onSave;
+    @Getter(AccessLevel.NONE)
+    private final StatusBarItem @NotNull [] dialogKeys;
     private final @NotNull List<CreateTestCaseSection> cachedSections;
     private @NotNull PropertyChangeListener focusListener = NOTHING_ON_FOCUS;
     private @NotNull Optional<CreateTestCaseSection> editableSection = Optional.empty();
 
-    public TestCaseBaseDialog(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
+    public TestCaseBaseDialog(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull Consumer<@NotNull TestCaseDto> onSave, final StatusBarItem @NotNull ... dialogKeys) {
         super(p);
         this.dto = dto;
         this.onSave = onSave;
+        this.dialogKeys = dialogKeys.clone();
         this.dialogDisposable = Disposer.newDisposable("testin.testCaseDialog");
         Disposer.register(ProjectLifetime.of(p), dialogDisposable);
 
@@ -144,7 +146,7 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog {
     // Rule-EDITOR-PANEL-199
     protected final void showSectionKeys(final StatusBarItem @NotNull [] items) {
         final @NotNull List<StatusBarItem> all = new ArrayList<>(List.of(items));
-        all.addAll(List.of(TestCaseDialogKey.SAVE, TestCaseDialogKey.CANCEL));
+        all.addAll(List.of(dialogKeys));
 
         showKeys(all.toArray(StatusBarItem[]::new));
     }

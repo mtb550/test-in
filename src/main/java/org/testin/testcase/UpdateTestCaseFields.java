@@ -179,7 +179,7 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.UPDATED,
             (p, items, updatedItems) -> new ReferenceBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getReferenceSection,
-            new TestCaseDialogKey[]{}
+            new TestCaseDialogKey[]{CORRECTIONS}
     );
 
     private final @NotNull String name;
