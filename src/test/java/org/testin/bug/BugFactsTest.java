@@ -36,6 +36,7 @@ import static org.testng.Assert.assertEquals;
 
 public class BugFactsTest {
 
+    // Rule-VIEW-PANEL-068
     @Test
     public void theFactsAreReadOffTheRunItemItsTestCaseAndItsTestRun() {
         final UUID id = UUID.randomUUID();

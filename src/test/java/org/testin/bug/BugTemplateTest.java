@@ -76,6 +76,7 @@ public class BugTemplateTest {
                 .build();
     }
 
+    // Rule-VIEW-PANEL-068
     @Test
     public void theIssueReadsAsTheDesignSays() {
         final String expected = """
@@ -130,6 +131,7 @@ public class BugTemplateTest {
         assertEquals(BugTemplate.body(facts(), Optional.of(LINK)), expected);
     }
 
+    // Rule-VIEW-PANEL-068
     @Test
     public void everyPartTestinCannotGetSaysNotAvailable() {
         final String body = BugTemplate.body(nothingKnown(), Optional.empty());
@@ -185,6 +187,7 @@ public class BugTemplateTest {
         assertEquals(BugTemplate.steps(List.of("Open", "", "Type\nuser", "# 3")), "1. Open\n2. Type\n   user\n3. \\# 3");
     }
 
+    // Rule-VIEW-PANEL-076
     @Test
     public void everyScreenshotIsReferencedByTheFileItIsAttachedAs() {
         final BugFacts two = facts().toBuilder().screenshots(List.of(SCREENSHOT, SCREENSHOT)).build();

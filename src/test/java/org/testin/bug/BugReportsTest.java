@@ -39,6 +39,7 @@ public class BugReportsTest {
         return TestRunItems.builder().id(ITEM.id()).status(RunItemStatus.FAILED).build();
     }
 
+    // Rule-VIEW-PANEL-072
     @Test
     public void reportBugSaysWhereItsOwnReportIs() {
         final BugReports reports = new BugReports();
@@ -60,6 +61,7 @@ public class BugReportsTest {
         assertEquals(reports.whyReportBugIsOff(ITEM, failed()), Optional.empty());
     }
 
+    // Rule-VIEW-PANEL-072
     @Test
     public void aReportedBugKeepsReportBugOff() {
         final BugReports reports = new BugReports();
@@ -68,6 +70,7 @@ public class BugReportsTest {
         assertEquals(reports.whyReportBugIsOff(ITEM, reported), Optional.of(Bundle.message("bug.already.reported")));
     }
 
+    // Rule-VIEW-PANEL-072
     @Test
     public void anOpenReportKeepsEveryOtherRunItemWaiting() {
         final BugReports reports = new BugReports();

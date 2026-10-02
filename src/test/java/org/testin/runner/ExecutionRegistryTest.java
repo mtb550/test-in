@@ -72,6 +72,7 @@ public class ExecutionRegistryTest {
         assertTrue(stop.testCases().isEmpty(), "so no test case is put back");
     }
 
+    // Rule-VIEW-PANEL-054
     @Test
     public void stoppingOneTestCaseStopsTheOnesSharingItsProcess() {
         final ExecutionRegistry registry = new ExecutionRegistry();

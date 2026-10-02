@@ -16,25 +16,20 @@
 package org.testin.view.details;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Bundle;
+import org.testin.view.Drawn;
 
-import javax.swing.AbstractButton;
-import javax.swing.JLabel;
-import javax.swing.text.JTextComponent;
-import java.awt.Component;
-import java.awt.Container;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.testin.view.Drawn.holds;
 
 public class DetailsBandsIdeTest extends BasePlatformTestCase {
 
@@ -50,34 +45,6 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
                 at four
                 at five""";
 
-    private static void collect(final @NotNull Container container, final @NotNull List<String> words) {
-        for (final Component child : container.getComponents()) {
-            add(words, text(child));
-            if (child instanceof final Container inner) collect(inner, words);
-        }
-    }
-
-    private static @NotNull String text(final @NotNull Component component) {
-        return switch (component) {
-            case final AbstractButton button -> words(button.getText());
-            case final JLabel label -> words(label.getText());
-            case final JTextComponent area -> words(area.getText());
-            default -> "";
-        };
-    }
-
-    private static @NotNull String words(final String text) {
-        return Objects.requireNonNullElse(text, "");
-    }
-
-    private static void add(final @NotNull List<String> words, final @NotNull String text) {
-        if (!text.isBlank()) words.add(text.trim());
-    }
-
-    private static boolean holds(final @NotNull List<String> words, final @NotNull String text) {
-        return words.stream().anyMatch(word -> word.contains(text));
-    }
-
     private static @NotNull TestCaseDto aTestCase() {
         return TestCaseDto.builder().id(ID).description("Log in with a valid user").expectedResult("The dashboard opens").module("Accounts").build();
     }
@@ -87,14 +54,10 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
     }
 
     private @NotNull List<String> shown(final @NotNull Optional<TestRunItems> runItem) {
-        final @NotNull JBPanel<?> tab = new JBPanel<>();
-        new DetailsTab().load(getProject(), tab, Optional.of(aTestCase()), runItem, List.of("Demo", "Test Cases", LAST_STEP));
-
-        final @NotNull List<String> words = new ArrayList<>();
-        collect(tab, words);
-        return words;
+        return Drawn.words(Drawn.detailsTab(getProject(), aTestCase(), runItem, List.of("Demo", "Test Cases", LAST_STEP)));
     }
 
+    // Rule-VIEW-PANEL-034
     public void testTheStacktraceIsALinkAndNotAValue() {
         final @NotNull List<String> words = shown(Optional.of(failed()));
 
@@ -102,6 +65,7 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
         assertFalse("the stacktrace itself was drawn on the panel: " + words, holds(words, "java.lang.AssertionError"));
     }
 
+    // Rule-VIEW-PANEL-085
     public void testTheTestRunBandComesBeforeTheTestCaseBand() {
         final @NotNull List<String> words = shown(Optional.of(failed()));
 
@@ -110,6 +74,7 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
         assertTrue("the test case band was drawn above the test run band", words.indexOf(RUN) < words.indexOf(TEST_CASE));
     }
 
+    // Rule-VIEW-PANEL-085
     public void testATestCaseWithNoTestRunIsDrawnWithNoBandsAtAll() {
         final @NotNull List<String> words = shown(Optional.empty());
 
@@ -122,6 +87,7 @@ public class DetailsBandsIdeTest extends BasePlatformTestCase {
         assertFalse("the panel is still drawing the id", shown(Optional.empty()).contains(ID.toString()));
     }
 
+    // Rule-VIEW-PANEL-087
     public void testTheTestCaseBandIsFoldedWhereATestRunStandsAboveIt() {
         final @NotNull List<String> words = shown(Optional.of(failed()));
 

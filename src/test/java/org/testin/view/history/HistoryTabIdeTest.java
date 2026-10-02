@@ -13,23 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.testin.view.history;
 
-package org.testin.services;
-
-import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.testin.Await;
+import com.intellij.ui.components.JBPanel;
+import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
+import org.testin.view.Drawn;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.awt.BorderLayout;
+import java.util.List;
 
-public class BackgroundWorkIdeTest extends BasePlatformTestCase {
+public class HistoryTabIdeTest extends BasePlatformTestCase {
 
-    // Rule-CODEGEN-089
-    public void testTheEndIsReportedWhenTheTesterCancels() {
-        final AtomicBoolean reported = new AtomicBoolean();
+    // Rule-VIEW-PANEL-037
+    public void testTheHistoryTabShowsOneLineSayingItIsNotBuilt() {
+        final @NotNull JBPanel<?> tab = new JBPanel<>(new BorderLayout());
+        new HistoryTab().load(tab);
 
-        BackgroundWork.run(getProject(), "Writing bodies", "Writing failed", true, ProgressIndicator::cancel, () -> reported.set(true));
-
-        Await.until("a canceled work never reported how it ended", reported::get);
+        assertEquals("the History tab shows something other than its one line", List.of(Bundle.message("view.history.none")), Drawn.words(tab));
     }
 }

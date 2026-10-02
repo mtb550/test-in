@@ -44,6 +44,7 @@ public class RecordRunItemStatusTest {
                 .build();
     }
 
+    // Rule-VIEW-PANEL-032
     @Test
     public void passingAFailedTestCaseClearsEverythingTheFailureDescribed() {
         final TestRunItems item = failedWithBug();

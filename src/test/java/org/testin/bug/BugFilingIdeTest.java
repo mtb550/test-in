@@ -101,6 +101,7 @@ public class BugFilingIdeTest extends AbstractTempRootIdeTest {
         return indexedTestRuns().findTestRun(item.testRunPath()).flatMap(item::in).orElseThrow().getBugIssueUrl();
     }
 
+    // Rule-VIEW-PANEL-074
     public void testAFailedRunItemKeepsTheIssue() {
         final RunItem item = indexedRunItem(RunItemStatus.FAILED);
 
@@ -111,6 +112,7 @@ public class BugFilingIdeTest extends AbstractTempRootIdeTest {
         Await.until("the link did not reach the test case's own result file", () -> read(result).contains(ISSUE));
     }
 
+    // Rule-VIEW-PANEL-074
     public void testARunItemNoLongerFailedIsNotWritten() {
         final RunItem item = indexedRunItem(RunItemStatus.PASSED);
 
@@ -118,6 +120,7 @@ public class BugFilingIdeTest extends AbstractTempRootIdeTest {
         assertEquals("a passed run item was given a bug", "", storedLink(item));
     }
 
+    // Rule-VIEW-PANEL-074
     public void testATestRunRenamedOrRemovedIsNotBroughtBack() {
         final RunItem gone = new RunItem(sprint7TestRunPath(), UUID.randomUUID());
 

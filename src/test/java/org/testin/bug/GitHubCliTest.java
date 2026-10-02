@@ -149,6 +149,7 @@ public class GitHubCliTest {
                 IssueCreation.failed(Bundle.message("bug.reason.signed.out", "github.com")));
     }
 
+    // Rule-VIEW-PANEL-073
     @Test
     public void aTimeoutSaysNobodyKnowsWhetherTheIssueExists() {
         assertEquals(IssueCreation.of(new ProcessOutput("", "", -1, true, false), "github.com", 0),

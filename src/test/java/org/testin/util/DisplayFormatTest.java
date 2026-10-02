@@ -16,14 +16,25 @@
 
 package org.testin.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 
 public class DisplayFormatTest {
+
+    // Rule-VIEW-PANEL-061
+    @Test
+    public void whoAndWhenReadAsOneRow() {
+        final @NotNull ZonedDateTime at = ZonedDateTime.of(2026, 9, 13, 14, 14, 0, 0, ZoneOffset.UTC);
+
+        assertEquals(Display.whoAndWhen("Muteb", at), "Muteb on " + Display.formatDate(at), "the name, then on, then the date");
+    }
 
     @Test
     public void plainTextIsCapitalizedAndClosed() {
