@@ -24,10 +24,10 @@ it.
 |                       | **Getting a test case into the panel**                          |                                                                  |
 | **UC-VIEW-PANEL-001** | [Open a test case's details](openDetails.md)                    | See the whole test case, not only its title.                     |
 | **UC-VIEW-PANEL-002** | [Let the panel follow the selection](followSelection.md)        | Read one test case after another without asking each time.       |
-| **UC-VIEW-PANEL-003** | [Page through several test cases](pageThroughTestCases.md)          | Walk the selected test cases with two keys.                      |
+| **UC-VIEW-PANEL-003** | [Page through several test cases](pageThroughTestCases.md)      | Walk the selected test cases with two keys.                      |
 |                       | **Reading**                                                     |                                                                  |
 | **UC-VIEW-PANEL-004** | [Read what a test case says](readTestCase.md)                   | Follow the steps and check the expected result.                  |
-| **UC-VIEW-PANEL-005** | [Read what a test run recorded](readRunItemResult.md)               | See the run item status and what went wrong last time.           |
+| **UC-VIEW-PANEL-005** | [Read what a test run recorded](readRunItemResult.md)           | See the run item status and what went wrong last time.           |
 | **UC-VIEW-PANEL-006** | [Read the stacktrace behind a failure](readStacktrace.md)       | Copy the whole error into a bug report.                          |
 | **UC-VIEW-PANEL-007** | [Read a test case's history](readHistory.md)                    | See what changed on the test case, and when.                     |
 | **UC-VIEW-PANEL-008** | [See the bugs still open on a test case](seeOpenBugs.md)        | Avoid raising a bug somebody has already raised.                 |
@@ -71,8 +71,8 @@ in front of them while they write down what actually happened.
 |----------------------------|-------------------------------------------------------------|-----------------------------------------------------------------------------|
 | `Enter`                    | Opens the panel on the selected test cases                  | [UC-VIEW-PANEL-001](openDetails.md)                                         |
 | `F2`                       | Opens the menu that changes one field                       | [UC-VIEW-PANEL-011](changeOneField.md)                                      |
-| `Ctrl+Right`               | Moves to the next test case                                 | [UC-VIEW-PANEL-003](pageThroughTestCases.md)                                    |
-| `Ctrl+Left`                | Moves to the previous test case                             | [UC-VIEW-PANEL-003](pageThroughTestCases.md)                                    |
+| `Ctrl+Right`               | Moves to the next test case                                 | [UC-VIEW-PANEL-003](pageThroughTestCases.md)                                |
+| `Ctrl+Left`                | Moves to the previous test case                             | [UC-VIEW-PANEL-003](pageThroughTestCases.md)                                |
 | `Escape`                   | Closes the panel, pressed in the editor or inside the panel | [UC-VIEW-PANEL-015](closePanel.md)                                          |
 | `Ctrl` and the mouse wheel | Makes every Testin text bigger or smaller                   | [UC-SETTING-011](../setting/changeTextSize.md)                              |
 | `F5`                       | Runs the test case on display, or stops it while it runs    | [UC-VIEW-PANEL-012](runFromPanel.md), [UC-VIEW-PANEL-013](stopFromPanel.md) |

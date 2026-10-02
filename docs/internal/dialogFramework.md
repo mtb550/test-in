@@ -190,16 +190,14 @@ and which keys it answers, and the shell builds the rest.
   the shape. What it holds is never wrong, so it is never refused afterward.
 - **Rule-INTERNAL-118** — A dialog builds no input of its own. A field that
   holds a folder or a file is the framework's text field with a browse button
-  inside it, at the field's right edge, which opens the platform's chooser at
-  the path the field holds and puts the chosen path in the field.
+  inside it, at the field's right edge. The button opens the platform's chooser at the path the field holds, and puts the chosen path in the field.
 - **Rule-INTERNAL-119** — Every icon button Testin draws is the framework's one
   icon button, in a toolbar, a status bar, a dialog's title bar or beside a
   screenshot: the icon alone at rest, a gray rounded fill under it while the
   pointer is on it, and the fill a shade darker while it is on. A new button
   takes this button rather than drawing its own.
 - **Rule-INTERNAL-120** — Every file in the dialog framework has a row in its
-  register, saying whether two or more screens ask for it, one does and it is
-  kept on purpose, or it is internal to the framework. A file added or removed
+  register, saying whether it is kept because two or more screens ask for it, kept on purpose for the one screen that does, or internal to the framework. A file added or removed
   changes the register in the same change.
 - **Rule-INTERNAL-121** — Every gap and padding in a dialog is one of five
   steps, named once in Spacing: XS 4, S 6, M 8, L 10 and XL 12. A screen asks

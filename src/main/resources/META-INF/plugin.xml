@@ -124,7 +124,7 @@
     <br/>
     <b>2.10.0-alpha</b>
     <ul>
-        <li><b>Order is the rank a test case carries, and nothing else:</b> test cases used to store it as a chain across their files, and 2.8 and 2.9 rewrote that chain as a rank on each test case the first time they indexed a set. The converter is gone, and with it the only place indexing wrote test data &mdash; a scan is a pure read again. A test case that arrives with no rank, whether from an old project, an import or a file copied in by hand, sorts after the ranked ones and oldest first, which is what an unranked test case has always done. Nothing is hidden and nothing is refused.</li>
+        <li><b>Order is the rank a test case carries, and nothing else:</b> test cases used to store it as a chain across their files, and 2.8 and 2.9 rewrote that chain as a rank on each test case the first time they indexed a set. The converter is gone, and with it the only place indexing wrote test data &mdash; a scan is a pure read again. A test case that arrives with no rank, whether from an old project, an import or a file copied in by hand, sorts after the ranked ones, oldest first. That is what an unranked test case has always done. Nothing is hidden and nothing is refused.</li>
     </ul>
     <br/>
     <b>2.9.3-alpha</b>

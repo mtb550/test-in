@@ -182,7 +182,7 @@ with the test run's own name, test cases and settings.
 
 1. The tester selects **Test Runs** or a test run package.
 2. The tester presses `Ctrl+M`, or chooses **Create**.
-3. The **Create Test Run Node** dialog opens. Its first row is selected, and
+3. A dialog titled **Create Test Run Node** opens. Its first row is selected, and
    reads *Records execution results*. Its gray hint text reads *set name, like
    Sprint 3 Cycle 1...*.
 4. The tester types a name and presses `Enter`.

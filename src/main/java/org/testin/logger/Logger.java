@@ -58,7 +58,7 @@ public final class Logger {
         final @NotNull String callerClass = WALKER.walk(frames -> frames.skip(2).findFirst()).orElseThrow().getDeclaringClass().getSimpleName();
         service.ifPresentOrElse(
                 writer -> writer.log(level, callerClass, message),
-                () -> System.out.println("[" + level.paddedName + "] [" + callerClass + "] " + message));
+                () -> System.getLogger(Logger.class.getName()).log(System.Logger.Level.INFO, "[" + level.paddedName + "] [" + callerClass + "] " + message));
     }
 
     private static @NotNull Optional<LogWriter> getService() {

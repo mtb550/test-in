@@ -81,7 +81,7 @@ Testin's settings are per-IDE, not per-project: the root you choose is the one
 every open project uses.
 
 **New to it?** [First run](docs/firstRun.md) takes ten minutes and ends at a
-recorded run item status and a report — install, a test case you wrote, the Java
+recorded run item status and a report. On the way: install, a test case you wrote, the Java
 method Testin wrote for it, and the document you send to someone who has no IDE.
 
 ## Building from source

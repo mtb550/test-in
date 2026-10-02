@@ -97,7 +97,7 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private @NotNull Path testRunPath() {
+    private @NotNull Path sprint7TestRunPath() {
         return root.resolve("NAFATH").resolve("Test Runs").resolve("Sprint 7");
     }
 
@@ -107,8 +107,8 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
 
     private @NotNull RunItem runItem(final UUID testCaseId, final RunItemStatus status) {
         final TestRunItems item = TestRunItems.builder().id(testCaseId).status(status).build();
-        indexedTestRuns().putTestRun(testRunPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
-        return new RunItem(testRunPath(), testCaseId);
+        indexedTestRuns().putTestRun(sprint7TestRunPath(), TestRunDto.builder().results(new ArrayList<>(List.of(item))).build());
+        return new RunItem(sprint7TestRunPath(), testCaseId);
     }
 
     private @NotNull UUID indexedTestCase() {
@@ -150,10 +150,10 @@ public class BugFilingIdeTest extends BasePlatformTestCase {
     }
 
     public void testATestRunRenamedOrRemovedIsNotBroughtBack() {
-        final RunItem gone = new RunItem(testRunPath(), UUID.randomUUID());
+        final RunItem gone = new RunItem(sprint7TestRunPath(), UUID.randomUUID());
 
         assertEquals(Optional.of(Bundle.message("bug.not.stored.moved")), BugFiling.store(getProject(), gone, ISSUE));
-        assertTrue("storing on the old path registered the test run again", indexedTestRuns().findTestRun(testRunPath()).isEmpty());
+        assertTrue("storing on the old path registered the test run again", indexedTestRuns().findTestRun(sprint7TestRunPath()).isEmpty());
     }
 
     public void testARemovedRunItemIsNotWritten() {

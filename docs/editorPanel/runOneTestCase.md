@@ -2,9 +2,7 @@
 
 # UC-EDITOR-PANEL-043: Run one test case's automation
 
-**As a** tester, **I want** to run the generated method for a test case and have
-its run item status land in this test run, **so that** I do not have to judge by
-hand what the machine can judge.
+**As a** tester, **I want** to run a test case's generated method and have its run item status land in this test run, **so that** the machine judges what it can.
 
 The machine runs the test and writes the run item status. The tester does not
 press `P` or `F`.
@@ -54,8 +52,7 @@ press `P` or `F`.
 - **Rule-EDITOR-PANEL-241** — Running a judged row again records the new run
   item status against the test case as it is now.
 - **Rule-EDITOR-PANEL-242** — A status from the automation for the test case the
-  walk is on moves the walk to the next test case waiting for a run item status,
-  exactly as the tester's own run item status does, and execution goes on. Until
+  walk is on moves the walk to the next test case waiting for a run item status. The tester's own run item status does exactly the same, and execution goes on. Until
   the status comes, the walk stays on that test case.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
   it loses its hover look at once, so a control that has stopped working never

@@ -77,3 +77,19 @@ exclude:
   - name: SpellCheckingInspection
     paths:
       - .github
+  # GitCommandRunnerTest proves a credential in a remote URL is masked before
+  # Git's message reaches the log, so its test data has to be a URL with a
+  # password in it. Every one is fake, and a test fixture is not a secret.
+  - name: HardcodedPasswords
+    paths:
+      - src/test
+  # The documentation site's Jekyll files, which GitHub Pages builds. The
+  # stylesheet opens with the front matter Jekyll needs and imports
+  # {{ site.theme }}, which Qodana reads as plain CSS and reports as nine
+  # errors and warnings; the head include loads Mermaid from its CDN, which is
+  # how a static page gets it. Neither is plugin code, and nothing in either
+  # can change without breaking the site.
+  - name: All
+    paths:
+      - docs/assets/css/style.scss
+      - docs/_includes/head-custom.html

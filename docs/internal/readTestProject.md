@@ -202,7 +202,7 @@ the bottom of the IDE, beside the other background jobs.
 9. The bar reads the test project's name, then *test runs...*.
 10. Testin walks `Test Runs`. Each test run reads its own facts from its
     `.tr` - its status, how it was configured, what the tester wrote about the
-    run item statuses, when it was executed - and one file per result,
+    run item statuses, when it was executed. It also reads one file per result,
     `<test case id>.ri`, in the order their test cases sit in their test sets.
 11. The bar reads *Done -*, then the test project's name, and closes.
 12. The tree draws itself from memory. Every editor that was open when the IDE
