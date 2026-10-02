@@ -53,6 +53,10 @@ the product.
   a short floor, and the page arrows keep their width to the last.
 - **Rule-EDITOR-PANEL-252** — A badge's words are printed white or dark,
   whichever reads on its color, so a pale badge never carries white text.
+- **Rule-EDITOR-PANEL-257** — An editor narrower than its toolbar or its status
+  bar scrolls that bar sideways under the pointer, with the mouse wheel or a
+  touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
+  is cut off and the editor below does not move.
 
 ## What the tester sees
 

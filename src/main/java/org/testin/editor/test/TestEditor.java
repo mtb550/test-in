@@ -45,6 +45,7 @@ import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.ui.SideScroll;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 
@@ -74,7 +75,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
         list.setCellRenderer(new TestListRenderer(p, this));
 
         this.toolBar = new TestToolbar(this);
-        mainPanel.add(toolBar, BorderLayout.NORTH);
+        mainPanel.add(SideScroll.of(toolBar), BorderLayout.NORTH);
         toolBar.installSearchFocusShortcut(mainPanel);
 
         this.modelChangeNotifier = new ModelChangeNotifier();
@@ -83,7 +84,7 @@ public class TestEditor extends AbstractTestinEditor<TestEditorAttributes, TestS
 
         wireList();
 
-        mainPanel.add(statusBar, BorderLayout.SOUTH);
+        mainPanel.add(SideScroll.of(statusBar), BorderLayout.SOUTH);
         StatusBarListener.attach(this);
 
         TestCaseExecutionSubscriber.onReported(p, projectDisposable, (_, _, _, _) -> list.repaint());

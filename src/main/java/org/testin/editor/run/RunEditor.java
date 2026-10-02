@@ -58,6 +58,7 @@ import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestEditorAttributes;
 import org.testin.testrun.ResultAnalysisDialog;
 import org.testin.testrun.RunEditorAttributes;
+import org.testin.ui.SideScroll;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.util.FailureText;
@@ -210,8 +211,8 @@ public class RunEditor extends AbstractTestinEditor<RunEditorAttributes, TestRun
 
         wireList();
 
-        mainPanel.add(toolBar, BorderLayout.NORTH);
-        mainPanel.add(statusBar, BorderLayout.SOUTH);
+        mainPanel.add(SideScroll.of(toolBar), BorderLayout.NORTH);
+        mainPanel.add(SideScroll.of(statusBar), BorderLayout.SOUTH);
         toolBar.installSearchFocusShortcut(mainPanel);
 
         onToolBarSwitchedToListView();

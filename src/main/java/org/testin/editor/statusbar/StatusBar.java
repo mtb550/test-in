@@ -161,6 +161,11 @@ public class StatusBar extends JBPanel<StatusBar> {
         return label;
     }
 
+    // Rule-EDITOR-PANEL-251
+    private static @NotNull String oneLine(final @NotNull String text) {
+        return "<html><nobr>" + text + "</nobr></html>";
+    }
+
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-009
     private static @NotNull String narrowedFrom(final int shownCount, final int totalCount) {
         if (shownCount == totalCount) return "";
@@ -200,6 +205,14 @@ public class StatusBar extends JBPanel<StatusBar> {
         final @NotNull Insets insets = getInsets();
 
         return new Dimension(width + insets.left + insets.right, AbstractToolbarPanel.barHeight(height + insets.top + insets.bottom));
+    }
+
+    // Rule-EDITOR-PANEL-251
+    @Override
+    public @NotNull Dimension getMinimumSize() {
+        final @NotNull Insets insets = getInsets();
+
+        return new Dimension(SENTENCE_FLOOR + navigationRow.getPreferredSize().width + insets.left + insets.right, getPreferredSize().height);
     }
 
     // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-178
@@ -263,13 +276,13 @@ public class StatusBar extends JBPanel<StatusBar> {
         final @NotNull String of = testCases + narrowedFrom(shownCount, totalCount);
 
         if (selectedCount > 1) {
-            statusLabel.setText("<html>" + Bundle.message("statusbar.selected.of", String.valueOf(selectedCount), of) + "</html>");
+            statusLabel.setText(oneLine(Bundle.message("statusbar.selected.of", String.valueOf(selectedCount), of)));
 
         } else if (selectedCount == 1) {
-            statusLabel.setText("<html>" + Bundle.message("statusbar.position.of", String.valueOf(firstSelectedPosition + 1), of) + "</html>");
+            statusLabel.setText(oneLine(Bundle.message("statusbar.position.of", String.valueOf(firstSelectedPosition + 1), of)));
 
         } else {
-            statusLabel.setText(String.format(Locale.ENGLISH, "<html>%s</html>", of));
+            statusLabel.setText(oneLine(of));
         }
     }
 }
