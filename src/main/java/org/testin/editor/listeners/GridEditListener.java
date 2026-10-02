@@ -130,7 +130,7 @@ public class GridEditListener extends AbstractGridEditListener {
             for (final Changed changed : gesture) {
                 if (!testCases.putTestCase(testSetPath, changed.tc())) continue;
 
-                changed.generators().forEach(generator -> generator.getAction().execute(p, changed.tc()));
+                changed.generators().forEach(generator -> generator.execute(p, changed.tc()));
                 written.add(changed.tc());
                 before.add(changed.before());
             }

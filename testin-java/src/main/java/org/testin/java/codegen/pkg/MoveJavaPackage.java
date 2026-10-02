@@ -45,7 +45,7 @@ public class MoveJavaPackage implements GenAction<Moved> {
 
         final @NotNull List<String> destination = destinationFound.get();
 
-        JavaSourceRoot.commandInRoot(p, GenType.MOVE_TEST_SET_PACKAGE.getDescription(), "moving package", sourceRoot -> {
+        JavaSourceRoot.commandInRoot(p, GenType.MOVE_TEST_SET_PACKAGE.description(), "moving package", sourceRoot -> {
             final @NotNull Optional<VirtualFile> found = Optional.ofNullable(sourceRoot.findFileByRelativePath(String.join("/", fqcn)))
                     .filter(VirtualFile::isDirectory);
 

@@ -50,7 +50,7 @@ public class TestCaseUpdateMenuDialog {
 
         // UC-CODEGEN-003, Rule-CODEGEN-019
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            if (updated.size() == 1) gt.getAction().execute(p, updated.getFirst());
+            if (updated.size() == 1) gt.execute(p, updated.getFirst());
             else gt.executeAll(p, updated);
         });
     }

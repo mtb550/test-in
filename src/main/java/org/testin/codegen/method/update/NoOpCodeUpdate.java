@@ -17,25 +17,22 @@
 package org.testin.codegen.method.update;
 
 import com.intellij.openapi.project.Project;
-import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GenAction;
+import org.testin.codegen.CodeUpdate;
+import org.testin.codegen.GenType;
 import org.testin.logger.Logger;
 
 import java.util.List;
 
-@AllArgsConstructor
-public final class NoOpCodeUpdate<T> implements GenAction<T> {
-    private final @NotNull String fieldName;
-
+public record NoOpCodeUpdate(@NotNull String fieldName) implements CodeUpdate {
     // Rule-CODEGEN-003
     @Override
-    public void execute(final @NotNull Project p, final @NotNull T payload) {
+    public <T> void execute(final @NotNull GenType<T> type, final @NotNull Project p, final @NotNull T payload) {
         Logger.info("Update " + fieldName + ": data-only field, no Java code change");
     }
 
     @Override
-    public void executeAll(final @NotNull Project p, final @NotNull List<? extends T> items) {
+    public <T> void executeAll(final @NotNull GenType<T> type, final @NotNull Project p, final @NotNull List<? extends T> items) {
         Logger.info("Update " + fieldName + " on " + items.size() + ": data-only field, no Java code change");
     }
 }

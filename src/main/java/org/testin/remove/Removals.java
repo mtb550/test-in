@@ -31,21 +31,21 @@ public final class Removals {
     public static @NotNull RemoveHandler of(final @NotNull DirectoryType type) {
         return switch (type) {
             case TP -> (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).removeTestProject(dir.getPath(), removed -> {
-                if (removed) GenType.REMOVE_TEST_PROJECT.getAction().execute(p, dir);
+                if (removed) GenType.REMOVE_TEST_PROJECT.execute(p, dir);
                 onRemoved.accept(removed);
             });
 
             case TCD, TRD -> (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).refuseRemove(dir.getPath(), onRemoved);
 
             case TSP -> (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).removeTestSetPackage(dir.getPath(), removed -> {
-                if (removed) GenType.REMOVE_TEST_SET_PACKAGE.getAction().execute(p, dir);
+                if (removed) GenType.REMOVE_TEST_SET_PACKAGE.execute(p, dir);
                 onRemoved.accept(removed);
             });
 
             case TRP -> (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).removeTestRunPackage(dir.getPath(), onRemoved);
 
             case TS -> (p, dir, onRemoved) -> Services.getInstance(p, Nodes.class).removeTestSet(dir.getPath(), removed -> {
-                if (removed) GenType.REMOVE_TEST_SET.getAction().execute(p, dir);
+                if (removed) GenType.REMOVE_TEST_SET.execute(p, dir);
                 onRemoved.accept(removed);
             });
 

@@ -154,7 +154,7 @@ public class UpdateTestBase {
     protected void applyOrCreate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater) {
         applyToMethod(p, tc, title, updater, detail -> {
             Logger.info("Writing the method for '" + tc.getDescription() + "' now that it has a name: " + detail);
-            GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
+            GenType.CREATE_TEST_CASE.execute(p, tc);
         });
     }
 

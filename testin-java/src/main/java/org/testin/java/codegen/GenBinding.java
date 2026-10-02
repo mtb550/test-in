@@ -14,28 +14,32 @@
  * limitations under the License.
  */
 
-package org.testin.java.codegen.method.update;
+package org.testin.java.codegen;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.GenType;
-import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;
 
-public class UpdateTestEnabled extends UpdateTestBase implements GenAction<TestCaseDto> {
-    // UC-CODEGEN-013, Rule-CODEGEN-047, Rule-CODEGEN-048
-    @Override
-    public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        applyUpdate(p, tc, GenType.UPDATE_TEST_CASE_STATUS.description(), pm -> {
-            writeEnabled(p, pm, tc);
-            reformat(p, pm);
-        });
-    }
+record GenBinding<X>(@NotNull GenType<X> type, @NotNull GenAction<X> action) {
+    <T> @NotNull GenAction<T> typed() {
+        return new GenAction<>() {
+            @Override
+            public void execute(final @NotNull Project p, final @NotNull T payload) {
+                action.execute(p, type.payload().cast(payload));
+            }
 
-    @Override
-    public void executeAll(final @NotNull Project p, final @NotNull List<? extends TestCaseDto> items) {
-        applyToEach(p, items, GenType.UPDATE_TEST_CASE_STATUS.description(), (pm, tc) -> writeEnabled(p, pm, tc));
+            @Override
+            public void executeAll(final @NotNull Project p, final @NotNull List<? extends T> items) {
+                action.executeAll(p, items.stream().map(type.payload()::cast).toList());
+            }
+
+            @Override
+            public boolean generates() {
+                return action.generates();
+            }
+        };
     }
 }

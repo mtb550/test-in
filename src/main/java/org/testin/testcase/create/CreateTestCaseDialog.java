@@ -62,7 +62,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
             }
         }
 
-        title = GenType.CREATE_TEST_CASE.getDescription();
+        title = GenType.CREATE_TEST_CASE.description();
         components = List.of(ComponentDialogBase.of(form));
         // Rule-INTERNAL-100
         resizable = true;

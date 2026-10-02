@@ -53,7 +53,7 @@ public class CreateTestCaseAction extends AbstractAnyProjectAction {
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     Services.getInstance(p, Notifier.class).softShow(p, Done.CREATED);
-                    GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
+                    GenType.CREATE_TEST_CASE.execute(p, tc);
                 });
             });
             Services.getInstance(p, TestCaseValues.class).addNewItems(affectedNodes);

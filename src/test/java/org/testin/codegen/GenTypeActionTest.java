@@ -37,7 +37,7 @@ public class GenTypeActionTest {
                 GenType.UPDATE_TEST_CASE_PRIORITY,
                 GenType.NO_CODE_CHANGE)) {
 
-            assertTrue(type.getAction() instanceof NoOpCodeUpdate,
+            assertTrue(type.update() instanceof NoOpCodeUpdate,
                     type + " writes no code, so it must carry the no-op rather than look for a generator");
         }
     }
@@ -54,7 +54,7 @@ public class GenTypeActionTest {
                 GenType.CREATE_TEST_SET,
                 GenType.RENAME_TEST_SET)) {
 
-            assertFalse(type.getAction() instanceof NoOpCodeUpdate,
+            assertFalse(type.update() instanceof NoOpCodeUpdate,
                     type + " writes code, so it must reach a generator");
         }
     }

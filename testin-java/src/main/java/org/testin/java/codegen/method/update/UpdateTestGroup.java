@@ -28,7 +28,7 @@ public class UpdateTestGroup extends UpdateTestBase implements GenAction<TestCas
     // UC-CODEGEN-012, Rule-CODEGEN-045
     @Override
     public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        applyUpdate(p, tc, GenType.UPDATE_TEST_CASE_GROUP.getDescription(), pm -> {
+        applyUpdate(p, tc, GenType.UPDATE_TEST_CASE_GROUP.description(), pm -> {
             writeGroups(p, pm, tc);
             reformat(p, pm);
         });
@@ -36,6 +36,6 @@ public class UpdateTestGroup extends UpdateTestBase implements GenAction<TestCas
 
     @Override
     public void executeAll(final @NotNull Project p, final @NotNull List<? extends TestCaseDto> items) {
-        applyToEach(p, items, GenType.UPDATE_TEST_CASE_GROUP.getDescription(), (pm, tc) -> writeGroups(p, pm, tc));
+        applyToEach(p, items, GenType.UPDATE_TEST_CASE_GROUP.description(), (pm, tc) -> writeGroups(p, pm, tc));
     }
 }

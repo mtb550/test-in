@@ -16,19 +16,13 @@
 
 package org.testin.codegen;
 
-import com.intellij.openapi.extensions.ExtensionPointName;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
-public interface CodeGenerators {
-    @NotNull ExtensionPointName<CodeGenerators> EP = ExtensionPointName.create("org.testin.codeGenerators");
+import java.util.List;
 
-    // UC-CODEGEN-019, Rule-CODEGEN-005
-    static <T> @NotNull GenAction<T> find(final @NotNull GenType<T> type) {
-        return EP.getExtensionList().stream()
-                .findFirst()
-                .map(generators -> generators.actionFor(type))
-                .orElseGet(() -> new NoJavaCode<>(type.description()));
-    }
+public interface CodeUpdate {
+    <T> void execute(final @NotNull GenType<T> type, final @NotNull Project p, final @NotNull T payload);
 
-    <T> @NotNull GenAction<T> actionFor(final @NotNull GenType<T> type);
+    <T> void executeAll(final @NotNull GenType<T> type, final @NotNull Project p, final @NotNull List<? extends T> items);
 }

@@ -46,7 +46,7 @@ public class MoveJavaClass implements GenAction<Moved> {
         final @NotNull List<String> destination = found.get();
         final @NotNull String fileName = fqcn.getLast() + ".java";
 
-        JavaSourceRoot.commandInRoot(p, GenType.MOVE_TEST_SET.getDescription(), "moving class", sourceRoot -> {
+        JavaSourceRoot.commandInRoot(p, GenType.MOVE_TEST_SET.description(), "moving class", sourceRoot -> {
             final @NotNull Optional<VirtualFile> file =
                     Optional.ofNullable(sourceRoot.findFileByRelativePath(String.join("/", fqcn) + ".java"));
 

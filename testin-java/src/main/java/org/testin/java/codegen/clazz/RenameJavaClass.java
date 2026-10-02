@@ -40,7 +40,7 @@ public class RenameJavaClass implements GenAction<Renamed> {
         if (fqcn.isEmpty()) return;
         final @NotNull String path = String.join(".", fqcn);
 
-        WriteCommandAction.runWriteCommandAction(p, GenType.RENAME_TEST_SET.getDescription(), null, () -> {
+        WriteCommandAction.runWriteCommandAction(p, GenType.RENAME_TEST_SET.description(), null, () -> {
             final @NotNull Optional<PsiClass> found = GeneratedClass.byName(p, path);
             if (found.isEmpty()) {
                 Logger.warn("RenameJavaClass: class not found: " + path);

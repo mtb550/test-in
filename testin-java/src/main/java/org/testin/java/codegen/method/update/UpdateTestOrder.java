@@ -95,7 +95,7 @@ public class UpdateTestOrder extends UpdateTestBase implements GenAction<TestCas
         final @NotNull List<List<TestCaseDto>> ordered = new ArrayList<>(sets.values());
 
         final @NotNull Runnable inCommand = () ->
-                WriteCommandAction.runWriteCommandAction(p, GenType.UPDATE_TEST_CASE_ORDER.getDescription(), null,
+                WriteCommandAction.runWriteCommandAction(p, GenType.UPDATE_TEST_CASE_ORDER.description(), null,
                         () -> ordered.forEach(inSet -> arrange(p, inSet)));
 
         if (CommandProcessor.getInstance().getCurrentCommand() != null) inCommand.run();

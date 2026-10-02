@@ -55,7 +55,7 @@ public class MoveTestMethod extends UpdateTestBase implements GenAction<MovedTes
         if (moves.isEmpty()) return;
 
         final @NotNull Runnable inCommand = () ->
-                WriteCommandAction.runWriteCommandAction(p, GenType.MOVE_TEST_CASE.getDescription(), null, () -> {
+                WriteCommandAction.runWriteCommandAction(p, GenType.MOVE_TEST_CASE.description(), null, () -> {
                     final @NotNull Set<PsiClass> left = new LinkedHashSet<>();
                     moves.forEach(moved -> move(p, moved).ifPresent(left::add));
                     left.forEach(pc -> reformat(p, pc));

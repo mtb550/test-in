@@ -45,10 +45,10 @@ import java.util.Optional;
 
 @NoArgsConstructor
 public final class GenRegistry implements CodeGenerators {
-    private final @NotNull Map<GenType<?>, GenAction<?>> actions = byType();
+    private final @NotNull Map<GenType<?>, GenBinding<?>> bindings = byType();
 
-    private static @NotNull Map<GenType<?>, GenAction<?>> byType() {
-        final @NotNull Map<GenType<?>, GenAction<?>> byType = new HashMap<>();
+    private static @NotNull Map<GenType<?>, GenBinding<?>> byType() {
+        final @NotNull Map<GenType<?>, GenBinding<?>> byType = new HashMap<>();
 
         put(byType, GenType.RENAME_TEST_PROJECT, new RenameJavaPackage());
         put(byType, GenType.REMOVE_TEST_PROJECT, new RemoveJavaPackage());
@@ -72,14 +72,14 @@ public final class GenRegistry implements CodeGenerators {
         return byType;
     }
 
-    private static <T> void put(final @NotNull Map<GenType<?>, GenAction<?>> byType, final @NotNull GenType<T> type, final @NotNull GenAction<T> action) {
-        byType.put(type, action);
+    private static <T> void put(final @NotNull Map<GenType<?>, GenBinding<?>> byType, final @NotNull GenType<T> type, final @NotNull GenAction<T> action) {
+        byType.put(type, new GenBinding<>(type, action));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> @NotNull GenAction<T> actionFor(final @NotNull GenType<T> type) {
-        return Optional.ofNullable((GenAction<T>) actions.get(type))
-                .orElseGet(() -> new NoJavaCode<>(type.getDescription()));
+        return Optional.ofNullable(bindings.get(type))
+                .<GenAction<T>>map(GenBinding::typed)
+                .orElseGet(() -> new NoJavaCode<>(type.description()));
     }
 }

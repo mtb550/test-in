@@ -124,7 +124,7 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
                     () -> noMethodFor(tc, fqcn));
         }
 
-        WriteCommandAction.runWriteCommandAction(p, GenType.CREATE_TEST_CASE.getDescription(), null,
+        WriteCommandAction.runWriteCommandAction(p, GenType.CREATE_TEST_CASE.description(), null,
                 () -> byClass.values().forEach(group -> createMethods(p, group)));
     }
 

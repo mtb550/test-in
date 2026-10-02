@@ -40,7 +40,7 @@ public final class JavaCode {
         return switch (type) {
             case TP -> new JavaCode(
                     new NoJavaCode<>(nodeType),
-                    (p, renamed) -> GenType.RENAME_TEST_PROJECT.getAction().execute(p, renamed),
+                    (p, renamed) -> GenType.RENAME_TEST_PROJECT.execute(p, renamed),
                     new NoJavaCode<>(nodeType)
             );
 
@@ -52,14 +52,14 @@ public final class JavaCode {
 
             case TSP -> new JavaCode(
                     new NoJavaCode<>(nodeType),
-                    (p, renamed) -> GenType.RENAME_TEST_SET_PACKAGE.getAction().execute(p, renamed),
-                    (p, moved) -> GenType.MOVE_TEST_SET_PACKAGE.getAction().execute(p, moved)
+                    GenType.RENAME_TEST_SET_PACKAGE::execute,
+                    GenType.MOVE_TEST_SET_PACKAGE::execute
             );
 
             case TS -> new JavaCode(
-                    (p, dir) -> GenType.CREATE_TEST_SET.getAction().execute(p, dir),
-                    (p, renamed) -> GenType.RENAME_TEST_SET.getAction().execute(p, renamed),
-                    (p, moved) -> GenType.MOVE_TEST_SET.getAction().execute(p, moved)
+                    GenType.CREATE_TEST_SET::execute,
+                    GenType.RENAME_TEST_SET::execute,
+                    GenType.MOVE_TEST_SET::execute
             );
         };
     }
