@@ -16,6 +16,7 @@
 
 package org.testin.ui.framework;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -114,7 +115,7 @@ public final class ShortcutMenuPopup<T extends MenuItem> {
     private void select(final @NotNull T item, final @NotNull JBPopup popup) {
         if (refusal.apply(item).isPresent()) return;
 
-        onSelection.accept(item);
         popup.closeOk(null);
+        ApplicationManager.getApplication().invokeLater(() -> onSelection.accept(item));
     }
 }
