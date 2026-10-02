@@ -70,7 +70,7 @@ uncommitted work.
 │                                                                            │
 │                                        [ Commit & Push  v ]                │
 ├────────────────────────────────────────────────────────────────────────────┤
-│  [k]  Enter Commit & Push   Right click Revert a change   Escape Cancel     │
+│  [k]  Enter Commit & Push   Right click Revert a change   Escape Cancel    │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 

@@ -74,7 +74,7 @@ The **Create Project** dialog opens. It is the same one-field dialog a new test
 project uses, and it is drawn under
 [UC-TREE-PANEL-002](createTestProject.md). While Git copies the repository, a
 progress bar reads *Cloning repository*, with the line *Cloning into
-\<name\>...* under it. The tree then appears, and *Project cloned* shows above
+\<name\>...* under it. The tree then appears, and *Cloned* shows above
 the status bar at the bottom right of the IDE.
 
 ## Main flow
@@ -96,7 +96,7 @@ drawn under [UC-TREE-PANEL-001](reachTheTree.md), and it does the same thing.
    \<name\>...*. It cannot be canceled.
 5. Testin chooses it for this code project on this machine, and the tree
    appears. Nothing is written into the code project (Rule-TREE-PANEL-106).
-6. Testin shows *Project cloned*. The name can be changed afterward with **Rename**
+6. Testin shows *Cloned*. The name can be changed afterward with **Rename**
    ([UC-TREE-PANEL-011](renameNode.md)).
 
 ## What Testin refuses

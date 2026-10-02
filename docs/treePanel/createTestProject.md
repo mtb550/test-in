@@ -97,7 +97,7 @@ first test project**. That link is drawn under
 3. Testin creates the test project folder in the Testin folder.
 4. Testin chooses it for this code project on this machine, and the tree
    appears. Nothing is written into the code project (Rule-TREE-PANEL-106).
-5. Testin shows *Project created*.
+5. Testin shows *Created*.
 
 To copy a test project that already exists somewhere else, paste its address
 instead of a name. That is [UC-TREE-PANEL-003](importTestProject.md).
