@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.junit.Assert.assertNotEquals;
+
 public class OpenFolderButtonIdeTest extends AbstractTempRootIdeTest {
 
     private static @NotNull JComponent part(final @NotNull JComponent shown, final @NotNull String where) {
@@ -82,7 +84,7 @@ public class OpenFolderButtonIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-SETTING-016
     public void testOpenReadsTheBoxAsTypedBeforeApply() {
-        assertFalse("the folder typed is already the one stored", root.toString().equals(Services.getInstance(AppSettingsState.class).rootTestinPath));
+        assertNotEquals("the folder typed is already the one stored", root.toString(), Services.getInstance(AppSettingsState.class).rootTestinPath);
 
         final @NotNull TestinPathPanel path = new TestinPathPanel();
         final @NotNull JButton open = (JButton) part(path.getComponent(), BorderLayout.EAST);

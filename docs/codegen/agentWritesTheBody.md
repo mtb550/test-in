@@ -35,13 +35,13 @@ Connecting an agent changes what that gesture produces, not where it lives.
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-083** — An agent is connected by naming the command that runs
   it and the arguments it takes, and by nothing else. There is no list of agents
-  to choose from: the two fields are the whole connection, so an agent published
-  tomorrow is connected by typing it rather than by waiting for a release, and no
-  second place can disagree with what is in them. An empty command means no agent,
+  to choose from: the two fields are the whole connection. An agent published
+  tomorrow is connected by typing it, not by waiting for a release, and no second
+  place can disagree with what is in the fields. An empty command means no agent,
   which changes nothing about what Automate Test Case already did.
 - **Rule-CODEGEN-084** — The agent is asked once per test case, on a background
-  task the tester can cancel, and never while the method is being written:
-  writing a method is a write action, an agent takes seconds to minutes, and a
+  task the tester can cancel, and never while the method is being written.
+  Writing a method is a write action, and an agent takes seconds to minutes: a
   write action that waits on one freezes the IDE. The prompt is sent on standard
   input, because a prompt of several lines handed to a command as an argument is
   cut at the first newline by a `.cmd` shim and nothing says so. An agent that
@@ -50,14 +50,14 @@ Connecting an agent changes what that gesture produces, not where it lives.
 - **Rule-CODEGEN-085** — Check runs the command with `--version` and prints the
   first line it answered. Every agent answers that one, so it is not a field a
   tester can get wrong. A command nothing on PATH answers to is refused by name,
-  and the refusal says what was looked for - `pi.exe, pi.cmd, pi.bat` - because a
-  tester connecting an agent Testin has never heard of needs to know which spelling
-  was tried. It waits twenty seconds and can be canceled, because a settings page
+  and the refusal says what was looked for: `pi.exe, pi.cmd, pi.bat`. A tester
+  connecting an agent Testin has never heard of needs to know which spelling was
+  tried. It waits twenty seconds and can be canceled, because a settings page
   that hangs is worse than one that says nothing.
-- **Rule-CODEGEN-086** — What is sent is one test case - its description,
-  expected result, steps, test data, pre-conditions and module, where it sits
-  in the tree and the name of the class its method is written into - filled
-  into a prompt the tester can read and change. Nothing else ever leaves: not
+- **Rule-CODEGEN-086** — What is sent is one test case, filled into a prompt the
+  tester can read and change: its description, expected result, steps, test
+  data, pre-conditions and module. The prompt also says where the test case sits
+  in the tree and names the class its method is written into. Nothing else ever leaves: not
   the class's code, not another test case, not the test data root. An empty
   prompt means the one Testin ships, so a tester who never edited it gets the
   better wording a later release brings.
@@ -65,9 +65,9 @@ Connecting an agent changes what that gesture produces, not where it lives.
   ask about. An agent signs itself in, with its own account or with a key it
   reads from the environment the IDE was started in. Testin has no field for one,
   writes none to its settings file, and puts none on a command line. A
-  question about a key it never uses is a field that can only be wrong: it named
-  `ANTHROPIC_API_KEY` beside a Claude Code signed in through a Claude account,
-  which reads no such variable, and reported a fault that was not there.
+  question about a key it never uses is a field that can only be wrong. It once
+  named `ANTHROPIC_API_KEY` beside a Claude Code signed in through a Claude
+  account, which reads no such variable, and reported a fault that was not there.
 - **Rule-CODEGEN-088** — What the agent printed is read from standard output,
   and where it fenced a block the largest one is taken. An answer that does not
   end as Java statements do is dropped: the TODO stays, the log says what came
@@ -76,17 +76,17 @@ Connecting an agent changes what that gesture produces, not where it lives.
   a count. Canceling keeps every body already written and leaves the rest with
   their TODO. Each body is one named write command, so Ctrl+Z takes one back.
 - **Rule-CODEGEN-090** — Every exchange is kept while the execution lasts and
-  offered once it ends: the notification says how many of how many test cases
-  got a body, and carries Show what the agent said, which opens a read-only
-  window holding what was asked and what came back for each of them, in order,
-  with the ones that were dropped marked. Nothing opens on its own - a tester
-  who only wanted the body reads one line and closes it - and the same pair goes
-  to the log at debug level, so an execution nobody watched can still be read
+  offered once it ends. The notification says how many of how many test cases
+  got a body, and carries Show what the agent said. That opens a read-only
+  window holding what was asked and what came back for each test case, in order,
+  with the ones that were dropped marked. Nothing opens on its own: a tester who
+  only wanted the body reads one line and closes it. The same pair goes to the
+  log at debug level, so an execution nobody watched can still be read
   afterward.
 - **Rule-CODEGEN-091** — A test case whose method already holds a body of its
-  own is not sent to the agent, and the execution says so before it starts: one
+  own is not sent to the agent, and the execution says so before it starts. One
   dialog names how many they are and offers Write over them or Leave them as
-  they are, with Escape leaving them. Nothing is replaced without that answer,
+  they are. Escape leaves them. Nothing is replaced without that answer,
   and what replaces it is one named write command, so Ctrl+Z takes the tester's
   own body back.
 
@@ -160,7 +160,7 @@ command and why, and the tester is not shown a stack trace (Rule-CODEGEN-006).
 half-written body is never left behind.
 
 **If the tester has written the body already** — that test case is not sent, and
-the execution asks first: one dialog says how many such test cases there are,
+the execution asks first. One dialog says how many such test cases there are,
 and offers **Write over them** or **Leave them as they are**. Escape leaves
 them. Nothing is replaced without that answer, and `Ctrl+Z` takes the tester's
 own body back.

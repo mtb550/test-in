@@ -131,6 +131,7 @@ public class GeneratedNamesTest {
         assertTrue(NameSanitizer.canMakePackageName("4 digit pin"));
     }
 
+    // Rule-CODEGEN-008
     @Test
     public void anOrdinaryNameIsUntouchedByAnyOfThis() {
         assertEquals(NameSanitizer.className("Login"), "LoginTest");
