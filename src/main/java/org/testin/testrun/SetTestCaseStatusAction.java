@@ -46,7 +46,7 @@ public class SetTestCaseStatusAction extends AbstractAnyProjectAction {
         getTemplatePresentation().setDescription(Bundle.message("run.item.status.description", status.getLabel()));
     }
 
-    // UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033, UC-EDITOR-PANEL-034
+    // UC-EDITOR-PANEL-032, UC-EDITOR-PANEL-033, UC-EDITOR-PANEL-034, UC-EDITOR-PANEL-037, Rule-EDITOR-PANEL-156
     @Override
     protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
         final @NotNull List<TestCaseDto> selectedItems = TestinData.selectedTestCases(e);

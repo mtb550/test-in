@@ -150,7 +150,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         return Optional.empty();
     }
 
-    // UC-SETTING-001, Rule-SETTING-009, Rule-SETTING-024, Rule-SETTING-042
+    // UC-SETTING-001, UC-SETTING-004, UC-SETTING-005, UC-SETTING-006, Rule-SETTING-009, Rule-SETTING-024, Rule-SETTING-042
     @Override
     public void apply() throws ConfigurationException {
         final @NotNull Optional<ConfigurationException> refusal = refusalOfTheRoot();

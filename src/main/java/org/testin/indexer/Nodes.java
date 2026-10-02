@@ -226,8 +226,8 @@ public final class Nodes {
         return false;
     }
 
-    public <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name, final @NotNull Class<M> markerClass) {
-        return store().readMarker(dirPath, kind, name, markerClass);
+    <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass) {
+        return store().readMarker(dirPath, kind, markerClass);
     }
 
     public @NotNull Optional<DirectoryDto> find(final @NotNull Path path) {

@@ -41,7 +41,7 @@ public class UndoAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.customShortcut(direction.getShortcut()), on);
     }
 
-    // UC-TREE-PANEL-016, UC-EDITOR-PANEL-012
+    // UC-TREE-PANEL-016, UC-EDITOR-PANEL-012, UC-EDITOR-PANEL-013
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (!direction.can(undoHistories, scope)) return;
@@ -49,7 +49,7 @@ public class UndoAction extends AbstractProjectAction {
         if (direction.apply(undoHistories, scope)) notifier.softShow(p, direction.getDone());
     }
 
-    // UC-EDITOR-PANEL-012, Rule-EDITOR-PANEL-067
+    // UC-EDITOR-PANEL-012, UC-EDITOR-PANEL-013, Rule-EDITOR-PANEL-067, Rule-EDITOR-PANEL-071
     @Override
     public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(direction.can(undoHistories, scope));

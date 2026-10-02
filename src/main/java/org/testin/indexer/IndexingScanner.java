@@ -195,7 +195,7 @@ final class IndexingScanner {
             indicator.setText(Bundle.message("indexer.progress.project.done", tp.getName()));
 
             reportUnread(tp.getName(), unread);
-            reportDamaged(tp.getName(), store.takeDamagedMarkers());
+            reportDamaged(tp.getName(), store.takeDamagedMarkers(projectPath));
             reportUnreadableResults(tp.getName(), scanned.getUnreadableResults());
             reportHandNamedResults(tp.getName(), scanned.getHandNamedResults());
             reportClashing(tp.getName(), List.copyOf(scanned.getClashingTestCases()));
@@ -421,18 +421,11 @@ final class IndexingScanner {
 
     // UC-INTERNAL-002, Rule-INTERNAL-082
     private void reportClashing(final @NotNull String projectName, final @NotNull List<String> clashing) {
-        if (clashing.isEmpty()) return;
+        final @NotNull List<String> names = clashing.stream().sorted().toList();
 
-        final @NotNull String named = clashing.stream().sorted().limit(5).collect(Collectors.joining(", "));
-        final @NotNull String rest = clashing.size() > 5
-                ? Bundle.message("indexer.more", String.valueOf(clashing.size() - 5))
-                : "";
-        final @NotNull String count = clashing.size() == 1
-                ? Bundle.message("indexer.clash.one")
-                : Bundle.message("indexer.clash.many", String.valueOf(clashing.size()));
-
-        notifier.warn(p, Bundle.message("indexer.clash.title", projectName),
-                Bundle.message("indexer.clash.message", count, named, rest));
+        say(Bundle.message("indexer.clash.title", projectName), names,
+                name -> Bundle.message("indexer.clash.message", Bundle.message("indexer.clash.one"), name, ""),
+                (named, rest) -> Bundle.message("indexer.clash.message", Bundle.message("indexer.clash.many", String.valueOf(names.size())), named, rest));
     }
 
     // UC-INTERNAL-002

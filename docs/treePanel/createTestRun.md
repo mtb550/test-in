@@ -2,8 +2,8 @@
 
 # UC-TREE-PANEL-009: Create a test run
 
-> **`Ctrl+M`**, with **Test Runs** or a test run package selected, then pick
-> *Test Run*. On the menu: **Create**.
+> Right-click **Test Runs** or a test run package, choose **Create**, then pick
+> *Test Run*. There is no key for this.
 
 **As a** tester, **I want** to start a test run over the test cases I choose, **so that** a pass through the product is
 recorded on its own.
@@ -181,7 +181,7 @@ with the test run's own name, test cases and settings.
 ## Main flow
 
 1. The tester selects **Test Runs** or a test run package.
-2. The tester presses `Ctrl+M`, or chooses **Create**.
+2. The tester right-clicks it and chooses **Create**.
 3. A dialog titled **Create Test Run Node** opens. Its first row is selected, and
    reads *Records execution results*. Its gray hint text reads *set name, like
    Sprint 3 Cycle 1...*.

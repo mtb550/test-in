@@ -203,7 +203,7 @@ final class TestCaseSequenceStore {
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-031, Rule-INTERNAL-117
-    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
+    boolean updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
         final @NotNull String path = testSetPath.toString();
         final @NotNull List<UUID> ids = new ArrayList<>(orderedList.size());
         final @NotNull Set<UUID> newIds = new HashSet<>();
@@ -212,6 +212,7 @@ final class TestCaseSequenceStore {
         for (final TestCaseDto testCase : moved) placed.put(testCase.getId(), testCase);
 
         final @NotNull String tester = settings.testerName;
+        boolean allWritten = true;
 
         for (final TestCaseDto testCase : orderedList) {
             final @NotNull TestCaseDto written = placed.getOrDefault(testCase.getId(), testCase);
@@ -219,12 +220,15 @@ final class TestCaseSequenceStore {
 
             if (firstSight) {
                 written.stampCreated(tester);
-                if (failedToWrite(testSetPath, written)) continue;
+                if (failedToWrite(testSetPath, written)) {
+                    allWritten = false;
+                    continue;
+                }
 
                 testCasesById.put(testCase.getId(), testCase.takeValuesOf(written));
             } else if (placed.containsKey(testCase.getId())) {
                 // Rule-INTERNAL-084
-                store(testSetPath, written);
+                allWritten &= store(testSetPath, written);
             }
 
             ids.add(testCase.getId());
@@ -235,6 +239,7 @@ final class TestCaseSequenceStore {
                 .filter(id -> !newIds.contains(id))
                 .forEach(testCasesById::remove));
         testCaseIdsByTestSet.put(path, testCaseIds(ids));
+        return allWritten;
     }
 
     void removeForTestSet(final @NotNull String path) {

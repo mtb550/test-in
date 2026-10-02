@@ -141,7 +141,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
         final TestCaseDto pasted = aTestCaseIn(ts, "m");
         undeletable(fileOf(ts, pasted));
 
-        indexedTestCases().updateSequence(ts.getPath(), List.of(pasted), List.of());
+        assertFalse("the order write said every test case landed", indexedTestCases().updateSequence(ts.getPath(), List.of(pasted), List.of()));
 
         assertTrue("the index holds a test case whose file was never written",
                 indexedTestCases().findTestCase(pasted.getId()).isEmpty());

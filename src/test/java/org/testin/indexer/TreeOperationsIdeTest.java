@@ -81,7 +81,7 @@ public class TreeOperationsIdeTest extends AbstractTempRootIdeTest {
 
         assertFalse("a folder Testin wrote carries an id", stamped.isEmpty());
         assertFalse("and so do the two containers under it",
-                nodes().readMarker(testProject.resolve(DirectoryType.TCD.getFolderName()), DirectoryType.TCD, "Test Cases", TestCasesMainDirectoryMarker.class).getId().isEmpty());
+                nodes().readMarker(testProject.resolve(DirectoryType.TCD.getFolderName()), DirectoryType.TCD, TestCasesMainDirectoryMarker.class).getId().isEmpty());
 
         WriteAction.runAndWait(() -> {
             tp.getMarker().setStatus(ProjectStatus.INACTIVE);
@@ -90,7 +90,7 @@ public class TreeOperationsIdeTest extends AbstractTempRootIdeTest {
 
         assertEquals("the id a folder has is the id it keeps",
                 stamped,
-                nodes().readMarker(testProject, DirectoryType.TP, "NAFATH", TestProjectMarker.class).getId());
+                nodes().readMarker(testProject, DirectoryType.TP, TestProjectMarker.class).getId());
     }
 
     public void testACreatedNodeIsOnDiskAndInTheCache() {

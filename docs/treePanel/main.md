@@ -171,7 +171,7 @@ its status bar, at the foot of the dialog.
 |---------------------------------------|--------------------------------------------------------|------------------------------------------------|
 | `Enter`                               | Opens the selected test set or test run                | [UC-TREE-PANEL-005](openTestSet.md)            |
 | `Context Menu`                        | Opens the menu on the selected node, without the mouse | [The menu](#the-menu)                          |
-| `Ctrl+M`                              | Creates a node under the selected one                  | [UC-TREE-PANEL-007](createTestSet.md)          |
+| *no key*                              | Creating a node is a right-click entry, **Create**     | [UC-TREE-PANEL-007](createTestSet.md)          |
 | `Shift+F6`                            | Renames the selected node                              | [UC-TREE-PANEL-011](renameNode.md)             |
 | `Delete`                              | Removes the selected nodes                             | [UC-TREE-PANEL-012](removeNode.md)             |
 | `Ctrl+X`                              | Cuts the selected nodes, to move them                  | [UC-TREE-PANEL-013](moveNodes.md)              |
@@ -386,7 +386,7 @@ at all depends on which plugins are installed.
 ```
 ┌────────────────────────────────────────────────────────────────────────────┐
 │  Open                     Enter  (1)   ┌ Actions ───────────────────┐      │
-│  Create                  Ctrl+M        │  Activate                  │      │
+│  Create                                │  Activate                  │      │
 │  ──────────────────────────────        │  Deactivate                │      │
 │  Actions                     >   (2)   │  Archive                   │      │
 │  ──────────────────────────────        │  Undo Move 'Login'  Ctrl+Z │      │

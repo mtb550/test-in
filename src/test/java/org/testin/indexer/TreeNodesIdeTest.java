@@ -198,7 +198,7 @@ public class TreeNodesIdeTest extends AbstractTempRootIdeTest {
     }
 
     private @NotNull TestSetMarker markerOnDisk(final @NotNull TestSetDirectoryDto testSet) {
-        return nodes().readMarker(testSet.getPath(), DirectoryType.TS, testSet.getName(), TestSetMarker.class);
+        return nodes().readMarker(testSet.getPath(), DirectoryType.TS, TestSetMarker.class);
     }
 
     // Rule-TREE-PANEL-027

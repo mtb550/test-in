@@ -179,9 +179,10 @@ final class IndexerDataStore {
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-031
-    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
-        testCaseStore.updateSequence(testSetPath, orderedList, moved);
+    boolean updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
+        final boolean allWritten = testCaseStore.updateSequence(testSetPath, orderedList, moved);
         markTestSetModified(testSetPath);
+        return allWritten;
     }
 
     // UC-TREE-PANEL-027, Rule-TREE-PANEL-125
@@ -220,12 +221,12 @@ final class IndexerDataStore {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name, final @NotNull Class<M> markerClass) {
-        return markers.read(dirPath, kind, name, markerClass);
+    <M extends AbstractMarker> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass) {
+        return markers.read(dirPath, kind, markerClass);
     }
 
-    @NotNull List<Path> takeDamagedMarkers() {
-        return markers.takeDamaged();
+    @NotNull List<Path> takeDamagedMarkers(final @NotNull Path projectPath) {
+        return markers.takeDamaged(projectPath);
     }
 
     void refuse(final @NotNull Path projectPath, final @NotNull String reason) {

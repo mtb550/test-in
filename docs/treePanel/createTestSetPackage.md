@@ -2,8 +2,8 @@
 
 # UC-TREE-PANEL-008: Create a test set package
 
-> **`Ctrl+M`**, with **Test Cases** or another test set package selected, then
-> pick *Test Set Package*. On the menu: **Create**.
+> Right-click **Test Cases** or another test set package, choose **Create**, then
+> pick *Test Set Package*. There is no key for this.
 
 **As a** tester, **I want** a folder to group test sets, **so that** a tree with
 many test sets still reads the way the product is organized.
@@ -86,7 +86,7 @@ the IDE. Nothing opens.
 ## Main flow
 
 1. The tester selects **Test Cases** or another test set package.
-2. The tester presses `Ctrl+M`, or chooses **Create**.
+2. The tester right-clicks it and chooses **Create**.
 3. The **Create Test Node** dialog opens. The tester moves to *Test Set Package*
    with `↓`, and beside it the dialog says *Groups test sets*.
 4. The tester types a name and presses `Enter`.
@@ -112,7 +112,7 @@ still in the box, and *'\<name\>' cannot name a Java package* is shown in red.
 itself. (Rule-TREE-PANEL-095)
 
 **If the test project, a test set or a test run is selected** — **Create** is
-gray, and `Ctrl+M` does nothing. The entry itself reads **Create Testin Node (a test set holds what it holds)**, naming
+gray. The entry itself reads **Create Testin Node (a test set holds what it holds)**, naming
 the node that
 cannot take a child. A popup never shows a gray entry's description, so the
 reason is in the entry.

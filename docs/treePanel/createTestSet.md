@@ -2,8 +2,8 @@
 
 # UC-TREE-PANEL-007: Create a test set
 
-> **`Ctrl+M`**, with **Test Cases** or a test set package selected, then pick
-> *Test Set*. On the menu: **Create**.
+> Right-click **Test Cases** or a test set package, choose **Create**, then pick
+> *Test Set*. There is no key for this.
 
 **As a** tester, **I want** to add a test set under **Test Cases** or under a
 package, **so that** the test cases I am about to write have somewhere to live.
@@ -102,7 +102,7 @@ Cycle 1...*.
 ## Main flow
 
 1. The tester selects **Test Cases** or a test set package.
-2. The tester presses `Ctrl+M`, or chooses **Create**.
+2. The tester right-clicks it and chooses **Create**.
 3. The **Create Test Node** dialog opens. Its first row is selected, and reads *Test Set*, with the hint *Holds test
    cases* beside it.
 4. The tester types a name and presses `Enter`.
@@ -127,7 +127,7 @@ selected*. Nothing is created.
 closes, nothing is created, and *\<name\> Already Exists* is shown in red.
 
 **If the test project, a test set or a test run is selected** — **Create** is
-gray, and `Ctrl+M` does nothing. The entry itself reads **Create Testin Node (a test set holds what it holds)**, naming
+gray. The entry itself reads **Create Testin Node (a test set holds what it holds)**, naming
 the node that
 cannot take a child. A popup never shows a gray entry's description, so the
 reason is in the entry.

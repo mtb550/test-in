@@ -2,8 +2,8 @@
 
 # UC-TREE-PANEL-010: Create a test run package
 
-> **`Ctrl+M`**, with **Test Runs** or another test run package selected, then
-> pick *test run package*. On the menu: **Create**.
+> Right-click **Test Runs** or another test run package, choose **Create**, then
+> pick *test run package*. There is no key for this.
 
 **As a** tester, **I want** a folder to group test runs, **so that** a year of
 cycles does not sit in one flat list.
@@ -79,7 +79,7 @@ opens.
 ## Main flow
 
 1. The tester selects **Test Runs** or another test run package.
-2. The tester presses `Ctrl+M`, or chooses **Create**.
+2. The tester right-clicks it and chooses **Create**.
 3. A dialog titled **Create Test Run Node** opens. The tester moves to *test run
    package* with `↓`, and beside it the dialog says *Groups test runs*.
 4. The tester types a name and presses `Enter`.
@@ -99,7 +99,7 @@ selected*. Nothing is created.
 closes, nothing is created, and *\<name\> Already Exists* is shown in red.
 
 **If the test project, a test set or a test run is selected** — **Create** is
-gray, and `Ctrl+M` does nothing. The entry itself reads **Create Testin Node (a test set holds what it holds)**, naming
+gray. The entry itself reads **Create Testin Node (a test set holds what it holds)**, naming
 the node that
 cannot take a child. A popup never shows a gray entry's description, so the
 reason is in the entry.

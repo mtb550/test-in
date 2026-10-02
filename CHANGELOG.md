@@ -48,6 +48,8 @@ What each version of Testin changed, for a tester deciding whether to update. Th
 - **Filling in the description of several test cases at once writes the method** of each that had none, as filling in one already did.
 - **Testin runs only its own run configurations:** an execution is named *Testin:* and then the class and method, so Testin no longer reuses or changes a run configuration you made, and its Stop no longer ends a run you started from the gutter.
 - **Escape on a merge question skips that file and asks about the next,** as its status bar says, instead of ending the questions with the files after it unasked.
+- A drag whose new order cannot be written to a test case file says *Could not save* and puts the cards back as they are on disk, instead of **Re-sorted** and an undo entry for an order no file holds.
+- A marker that will not parse is named under the test project that holds it, not under whichever test project finished reading next.
 
 ## 2.13.0-alpha - 2026-09-22
 

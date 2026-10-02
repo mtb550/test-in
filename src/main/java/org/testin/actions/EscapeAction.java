@@ -21,7 +21,6 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
@@ -35,6 +34,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
+import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
 import java.awt.datatransfer.StringSelection;
@@ -96,7 +96,7 @@ public class EscapeAction extends AbstractProjectAction {
     // UC-EDITOR-PANEL-026, UC-VIEW-PANEL-015, Rule-EDITOR-PANEL-114, Rule-VIEW-PANEL-058
     private void stepBack(final @NotNull Runnable clearSelection) {
         if (dropPendingCut()) return;
-        if (hideViewPanelIfVisible()) return;
+        if (ViewToolWindowFactory.panel(p).map(ViewPanel::hide).orElse(false)) return;
 
         clearSelection.run();
     }
@@ -113,16 +113,6 @@ public class EscapeAction extends AbstractProjectAction {
     // UC-VIEW-PANEL-015, Rule-VIEW-PANEL-088
     private void giveTheKeyboardBack() {
         ToolWindowManager.getInstance(p).activateEditorComponent();
-    }
-
-    private boolean hideViewPanelIfVisible() {
-        return ViewToolWindowFactory.toolWindow(p)
-                .filter(ToolWindow::isVisible)
-                .map(toolWindow -> {
-                    toolWindow.hide(null);
-                    return true;
-                })
-                .orElse(false);
     }
 
     @Override

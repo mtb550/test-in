@@ -99,8 +99,8 @@ public final class TestCases {
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-031
-    public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
-        store().updateSequence(testSetPath, orderedList, moved);
+    public boolean updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList, final @NotNull List<TestCaseDto> moved) {
+        return store().updateSequence(testSetPath, orderedList, moved);
     }
 
     // UC-SHARE-002, Rule-SHARE-001

@@ -81,8 +81,7 @@ why.
 
 A test project is one product under test. Press **New Test Project** on the
 panel's toolbar, or the **Create your first test project** link the empty panel
-now offers. There is no key for it: `Ctrl+M` creates the nodes *inside* a test
-project, and a test project is not one of them.
+now offers. There is no key for it.
 
 Call it `Demo`. Testin makes the folder and the two fixed folders inside it:
 
@@ -106,7 +105,8 @@ and the rest of this page works.
 
 A test set is a group of test cases that belong together — usually one feature.
 
-Select **Test Cases**, press `Ctrl+M`, choose **Test Set**, and call it `Login`.
+Right-click **Test Cases**, choose **Create**, then **Test Set**, and call it
+`Login`.
 
 Double-click it, or press `Enter`, and it opens in an editor.
 
@@ -171,8 +171,8 @@ Press `Shift+F5` on a card to jump from a test case to its method.
 
 A test run is one round of testing over the test cases you choose.
 
-Select **Test Runs**, press `Ctrl+M`, choose **Test Run**, call it `Cycle-1`,
-and pick the `Login` set.
+Right-click **Test Runs**, choose **Create**, then **Test Run**, call it
+`Cycle-1`, and pick the `Login` set.
 
 ## 8. Record a run item status
 

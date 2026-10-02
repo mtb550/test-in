@@ -178,7 +178,11 @@ public class TestCaseEditor extends AbstractTestinEditor<TestCaseEditorAttribute
             try {
                 final @NotNull List<TestCaseDto> moved = TestCaseOrder.place(snapshot);
 
-                testCases.updateSequence(dirPath, snapshot, moved);
+                if (!testCases.updateSequence(dirPath, snapshot, moved)) {
+                    Logger.warn("Not every test case of the new order was written: " + dirPath);
+                    ApplicationManager.getApplication().invokeLater(this::refuseSequence);
+                    return;
+                }
 
                 if (!snapshot.isEmpty()) GenType.UPDATE_TEST_CASE_ORDER.executeAll(p, snapshot);
 
@@ -188,12 +192,15 @@ public class TestCaseEditor extends AbstractTestinEditor<TestCaseEditorAttribute
 
             } catch (final Exception ex) {
                 Logger.error("Failed to save the test case sequence: " + FailureText.of(ex));
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    notifier.softRefuse(p, Bundle.message("save.failed"));
-                    loadDataAsync();
-                });
+                ApplicationManager.getApplication().invokeLater(this::refuseSequence);
             }
         });
+    }
+
+    // UC-EDITOR-PANEL-010
+    private void refuseSequence() {
+        notifier.softRefuse(p, Bundle.message("save.failed"));
+        loadDataAsync();
     }
 
     // UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-009

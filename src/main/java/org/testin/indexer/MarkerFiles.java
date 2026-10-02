@@ -52,7 +52,7 @@ final class MarkerFiles {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    <M extends AbstractMarker> @NotNull M read(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull String name, final @NotNull Class<M> markerClass) {
+    <M extends AbstractMarker> @NotNull M read(final @NotNull Path dirPath, final @NotNull DirectoryType kind, final @NotNull Class<M> markerClass) {
         final @NotNull Path markerFile = dirPath.resolve(kind.getMarker());
 
         if (!Files.exists(markerFile)) return defaultFor(markerClass, kind);
@@ -61,7 +61,7 @@ final class MarkerFiles {
             return mapper.readValue(Files.readAllBytes(markerFile), markerClass);
 
         } catch (final Exception ex) {
-            Logger.warn("Unreadable " + kind.getMarkerKind() + " marker '" + name + "', using defaults: " + FailureText.of(ex));
+            Logger.warn("Unreadable " + kind.getMarkerKind() + " marker " + markerFile + ", using defaults: " + FailureText.of(ex));
 
             damaged.add(dirPath);
             return defaultFor(markerClass, kind);
@@ -121,9 +121,9 @@ final class MarkerFiles {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
-    @NotNull List<Path> takeDamaged() {
-        final @NotNull List<Path> taken = List.copyOf(damaged);
-        damaged.clear();
+    @NotNull List<Path> takeDamaged(final @NotNull Path projectPath) {
+        final @NotNull List<Path> taken = damaged.stream().filter(dirPath -> dirPath.startsWith(projectPath)).toList();
+        taken.forEach(damaged::remove);
 
         return taken;
     }

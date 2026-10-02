@@ -166,11 +166,11 @@ public class ViewPanel implements Disposable {
     }
 
     // UC-VIEW-PANEL-015
-    public @NotNull ViewPanel hide() {
-        ViewToolWindowFactory.toolWindow(p)
-                .filter(ToolWindow::isVisible)
-                .ifPresent(ToolWindow::hide);
-        return this;
+    public boolean hide() {
+        if (isClosed()) return false;
+
+        ViewToolWindowFactory.toolWindow(p).ifPresent(ToolWindow::hide);
+        return true;
     }
 
     // UC-VIEW-PANEL-002, Rule-VIEW-PANEL-017

@@ -141,7 +141,8 @@ the IDE, and the tree is only where it lands.
 stays open.
 
 **If no Testin folder is set, or nothing is indexed yet** — the dialog still
-opens. It lists nothing. The key and the button are never gray.
+opens. It lists nothing. The key and the button are gray only while no code
+project is open in the IDE.
 
 **If a package, a container or the test project row is chosen** — the tree goes
 to it and nothing opens. Testin says nothing.

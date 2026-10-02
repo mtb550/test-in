@@ -18,16 +18,12 @@ package org.testin.testcase.create;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.TextFieldWithAutoCompletion;
-import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseFields;
-import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
-
-import javax.swing.JComponent;
 
 public class ExpectedResultSection extends AbstractMultiLineSection {
     public ExpectedResultSection(final @NotNull Project p) {
@@ -38,14 +34,6 @@ public class ExpectedResultSection extends AbstractMultiLineSection {
     @Override
     public @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto) {
         return dto.edit().expectedResult(field.getText().trim()).build();
-    }
-
-    @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction) {
-        base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseExpectedResult.getCustomShortcut(), () -> {
-            showSection(slot);
-            repackAction.run();
-        });
     }
 
     @Override

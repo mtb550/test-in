@@ -52,6 +52,7 @@ public final class ExportNotice {
     }
 
     // UC-SHARE-004
+    // UC-REPORT-002, Rule-REPORT-012
     public static void open(final @NotNull Project p, final @NotNull File file) {
         Optional.ofNullable(LocalFileSystem.getInstance().findFileByPath(file.getAbsolutePath()))
                 .filter(VirtualFile::exists)

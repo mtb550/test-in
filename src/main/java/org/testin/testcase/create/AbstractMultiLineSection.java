@@ -22,6 +22,7 @@ import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.ui.framework.MultiLineField;
+import org.testin.util.Shortcuts;
 
 import javax.swing.JComponent;
 
@@ -30,11 +31,22 @@ public abstract class AbstractMultiLineSection implements CreateTestCaseSection 
     protected final @NotNull MultiLineField field;
 
     private final @NotNull JBPanel<?> wrapper;
+    private final @NotNull Shortcuts shortcut;
 
     protected AbstractMultiLineSection(final @NotNull Project p, final @NotNull EditorTextField field, final @NotNull CreateTestCaseFields describes) {
         this.field = new MultiLineField(p, field, "", describes.getPlaceholder());
+        this.shortcut = describes.getShortcut();
 
         this.wrapper = createWrapper(describes.getIcon(), this.field.getFocusComponent());
+    }
+
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-028
+    @Override
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction) {
+        base.registerShortcut(mainPanel, shortcut.getCustomShortcut(), () -> {
+            showSection(slot);
+            repackAction.run();
+        });
     }
 
     // Rule-INTERNAL-097
