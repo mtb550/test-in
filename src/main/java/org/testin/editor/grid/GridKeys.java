@@ -16,41 +16,43 @@
 
 package org.testin.editor.grid;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Shortcuts;
 
 import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class GridKeys {
-    public static final @NotNull String COPY = "testin.grid.copy";
-    public static final @NotNull String CUT = "testin.grid.cut";
-    public static final @NotNull String PASTE = "testin.grid.paste";
+@AllArgsConstructor
+public enum GridKeys {
+    COPY(
+            KeyEvent.VK_C
+    ),
 
-    // UC-EDITOR-PANEL-018
-    public static @NotNull Map<KeyStroke, String> clipboard() {
-        final int menuMask = Shortcuts.menuMask();
+    CUT(
+            KeyEvent.VK_X
+    ),
 
-        return Map.of(
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask), COPY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_X, menuMask), CUT,
-                KeyStroke.getKeyStroke(KeyEvent.VK_V, menuMask), PASTE);
-    }
+    PASTE(
+            KeyEvent.VK_V
+    );
+
+    private final int keyCode;
 
     public static @NotNull KeyStroke enter() {
         return Shortcuts.Enter.getKey();
     }
 
     public static @NotNull Set<KeyStroke> keptFromMenus() {
-        final @NotNull Set<KeyStroke> kept = new HashSet<>(clipboard().keySet());
-        kept.add(enter());
+        return Stream.concat(Arrays.stream(values()).map(GridKeys::keyStroke), Stream.of(enter())).collect(Collectors.toUnmodifiableSet());
+    }
 
-        return Set.copyOf(kept);
+    // UC-EDITOR-PANEL-018
+    public @NotNull KeyStroke keyStroke() {
+        return KeyStroke.getKeyStroke(keyCode, Shortcuts.menuMask());
     }
 }

@@ -58,7 +58,7 @@ public final class GridExcelBehavior {
 
     private static void installClipboardActions(final @NotNull JBTable table) {
         final @NotNull InputMap inputMap = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        GridKeys.clipboard().forEach(inputMap::put);
+        for (final GridKeys key : GridKeys.values()) inputMap.put(key.keyStroke(), key);
 
         final @NotNull ActionMap actionMap = table.getActionMap();
         actionMap.put(GridKeys.COPY, action(() -> copySelection(table, false)));
