@@ -22,6 +22,7 @@ import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.TestRunItems;
@@ -80,11 +81,13 @@ public class SetTestCaseStatusAction extends AbstractAnyProjectAction {
         Services.getInstance(p, RunItemStatusService.class).applyStatus(editor, selectedItems, status);
     }
 
-    // UC-EDITOR-PANEL-032
+    // UC-EDITOR-PANEL-032, Rule-TREE-PANEL-009
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        e.getPresentation().setEnabled(TestinData.testRunEditor(e).isPresent()
-                && !TestinData.selectedTestCases(e).isEmpty());
+        final @NotNull Optional<String> signedOff = TestinData.testRunEditor(e).flatMap(editor -> editor.getParent().whySignedOff());
+
+        GrayWithReason.unless(this, e, signedOff);
+        e.getPresentation().setEnabled(signedOff.isEmpty() && TestinData.testRunEditor(e).isPresent() && !TestinData.selectedTestCases(e).isEmpty());
     }
 
     @Override

@@ -77,6 +77,10 @@ A small message appears at the bottom of the IDE and fades. It reads *Blocked*.
 
 ## What Testin refuses
 
+**If the test run is completed or closed** — `B` is gray, and its tooltip
+reads *This test run is Completed, so it records nothing further.* Nothing is
+written.
+
 **If nothing is selected** — nothing happens.
 
 **If the test case was deleted from its test set** — a message reads *The test

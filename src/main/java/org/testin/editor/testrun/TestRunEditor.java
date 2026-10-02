@@ -309,7 +309,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
     @Override
     protected @NotNull JBTable buildTable(final @NotNull List<String[]> rows, final @NotNull Set<TestRunEditorAttributes> attributes) {
-        return gridPanelBuilder.buildTestRunTable(rows, attributes);
+        return gridPanelBuilder.buildTestRunTable(rows, attributes, getParent()::isStillOpen);
     }
 
     @Override

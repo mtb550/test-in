@@ -87,6 +87,10 @@ A small message appears at the bottom of the IDE and fades. It reads *Passed*.
 
 ## What Testin refuses
 
+**If the test run is completed or closed** — `P` is gray, and its tooltip
+reads *This test run is Completed, so it records nothing further.* Nothing is
+written.
+
 **If nothing is selected** — nothing happens, and nothing is said.
 
 **If the test case was deleted from its test set** — a message reads *The test
@@ -100,12 +104,6 @@ and names which of the six it is about to clear. That is
 nothing else.
 
 ## Where the plugin breaks its own rules
-
-**A signed off test run still records run item statuses.** The status bar's own
-tooltip says a completed or closed test run records no more run item statuses.
-`P` still records one, still saves it, and still says *Passed*. That is
-difference 19 on
-[the editor panel page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
 
 **An automated pass destroys a tester's notes without asking.** The confirmation
 in Rule-EDITOR-PANEL-138 is only on the keyboard path. A test case is failed and

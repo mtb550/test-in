@@ -96,13 +96,6 @@ There is no key for this. The figures are in the status bar.
 
 Nothing. The status bar only reports.
 
-## Where the plugin breaks its own rules
-
-**The tooltip is not true.** It says a completed or closed test run records no
-more run item statuses. `P`, `F` and `B` still record one on a signed off test
-run. That is difference 19 on [the editor panel
-page](main.md#where-the-plugin-breaks-its-own-rules-executing-a-test-run).
-
 ---
 
 [Documentation](../README.md) › [The editor panel](main.md)

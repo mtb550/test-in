@@ -72,6 +72,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
 import java.util.function.IntPredicate;
 import java.util.function.ToIntFunction;
 
@@ -328,12 +329,12 @@ public class GridPanelBuilder {
         return rows;
     }
 
-    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020
-    public @NotNull JBTable buildTestRunTable(final @NotNull List<String[]> rows, final @NotNull Set<TestRunEditorAttributes> attributes) {
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020, Rule-TREE-PANEL-009
+    public @NotNull JBTable buildTestRunTable(final @NotNull List<String[]> rows, final @NotNull Set<TestRunEditorAttributes> attributes, final @NotNull BooleanSupplier stillOpen) {
         Logger.debug("[GridPanelBuilder] buildRunTable: rows=" + rows.size() + ", attributes=" + attributes);
         final @NotNull List<TestRunEditorAttributes> ordered = Arrays.stream(TestRunEditorAttributes.values()).toList();
 
-        final @NotNull JBTable table = buildTable(buildColumns(ordered), rows, column -> ordered.get(column).isEdited(), EditorKind.RUN);
+        final @NotNull JBTable table = buildTable(buildColumns(ordered), rows, column -> stillOpen.getAsBoolean() && ordered.get(column).isEdited(), EditorKind.RUN);
         applyColumnVisibility(table, TestRunEditorAttributes.class, attributes);
         return table;
     }

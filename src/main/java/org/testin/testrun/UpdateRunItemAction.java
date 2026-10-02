@@ -77,14 +77,16 @@ public class UpdateRunItemAction extends AbstractAnyProjectAction {
         }).show();
     }
 
-    // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-168
+    // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-168, Rule-TREE-PANEL-009
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        GrayWithReason.unless(this, e, TestinData.testRunEditor(e)
+        final @NotNull Optional<String> signedOff = TestinData.testRunEditor(e).flatMap(testRunEditor -> testRunEditor.getParent().whySignedOff());
+
+        GrayWithReason.unless(this, e, signedOff.isEmpty() && TestinData.testRunEditor(e)
                         .flatMap(testRunEditor -> TestinData.singleSelectedTestCase(e).flatMap(tc -> testRunEditor.runItem(tc.getId())))
                         .filter(TestRunItems::isFailed)
                         .isPresent(),
-                Bundle.message("run.item.details.disabled.description"));
+                signedOff.orElse(Bundle.message("run.item.details.disabled.description")));
     }
 
     @Override

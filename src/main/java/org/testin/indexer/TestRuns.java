@@ -23,6 +23,7 @@ import org.jetbrains.annotations.TestOnly;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestRunDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
 
@@ -69,6 +70,10 @@ public final class TestRuns {
     }
 
     // UC-INTERNAL-006, Rule-INTERNAL-051
+    public @NotNull Optional<TestRunDirectoryDto> findTestRunDir(final @NotNull Path testRunPath) {
+        return store().findTestRunDir(testRunPath);
+    }
+
     public @NotNull Optional<TestRunDto> findTestRun(final @NotNull Path testRunPath) {
         return store().findTestRun(testRunPath).map(this::withTestCasesShown);
     }

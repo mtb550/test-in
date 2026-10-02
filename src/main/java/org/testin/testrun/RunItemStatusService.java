@@ -30,6 +30,7 @@ import org.testin.model.TestRunItems;
 import org.testin.model.RunItemStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -129,13 +130,22 @@ public final class RunItemStatusService {
         return true;
     }
 
-    // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-225
+    // UC-EDITOR-PANEL-040, Rule-EDITOR-PANEL-225, Rule-TREE-PANEL-009, Rule-PRODUCT-011
     public @NotNull Optional<TestRunDto> heldTestRun(final @NotNull Path testRunPath) {
-        final @NotNull Optional<TestRunDto> testRun = Services.getInstance(p, TestRuns.class).findTestRun(testRunPath);
+        final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
+        final @NotNull Optional<TestRunDto> testRun = testRuns.findTestRun(testRunPath);
 
         if (testRun.isEmpty()) {
             Logger.warn("[RunItemStatusService]: '" + testRunPath.getFileName() + "' is no longer indexed - nothing recorded");
             Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("run.item.status.test.run.gone"));
+            return testRun;
+        }
+
+        final @NotNull Optional<String> signedOff = testRuns.findTestRunDir(testRunPath).flatMap(TestRunDirectoryDto::whySignedOff);
+        if (signedOff.isPresent()) {
+            Logger.info("[RunItemStatusService]: '" + testRunPath.getFileName() + "' is signed off - nothing recorded");
+            Services.getInstance(p, Notifier.class).softRefuse(p, signedOff.orElseThrow());
+            return Optional.empty();
         }
 
         return testRun;

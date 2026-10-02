@@ -25,8 +25,10 @@ import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
 import org.testin.model.markers.TestRunMarker;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
@@ -75,6 +77,11 @@ public class TestRunDirectoryDto extends DirectoryDto {
 
     public boolean isStillOpen() {
         return !marker.getStatus().isTerminal();
+    }
+
+    // Rule-TREE-PANEL-009, Rule-PRODUCT-011
+    public @NotNull Optional<String> whySignedOff() {
+        return isStillOpen() ? Optional.empty() : Optional.of(Bundle.message("run.item.status.test.run.signed.off", marker.getStatus().getLabel()));
     }
 
     // UC-TREE-PANEL-001, Rule-TREE-PANEL-099
