@@ -32,6 +32,7 @@ public class ReportFileNameTest {
     private static final @NotNull ZonedDateTime AT =
             ZonedDateTime.of(2026, 8, 25, 21, 40, 15, 0, ZoneId.of("Asia/Riyadh"));
 
+    // Rule-REPORT-006
     @Test
     public void itSaysTheProjectTheTestRunAndWhen() {
         assertEquals(ReportFileName.of("Nafath", "Sprint 7 Cycle 3", AT),
@@ -46,6 +47,7 @@ public class ReportFileNameTest {
         assertTrue(name.endsWith("PM"), "the hour is the tester's own twelve-hour clock: " + name);
     }
 
+    // Rule-REPORT-007
     @Test
     public void aTestRunNamedWithPunctuationStillMakesAFileName() {
         final @NotNull String name = ReportFileName.of("Nafath", "API / UI: v1.2", AT);
@@ -55,11 +57,13 @@ public class ReportFileNameTest {
         }
     }
 
+    // Rule-REPORT-008
     @Test
     public void anUnnamedProjectLeavesNoGap() {
         assertEquals(ReportFileName.of("", "Sprint 7", AT), "TestRun_Sprint7_25-08-2026_09-40-15PM");
     }
 
+    // Rule-REPORT-007
     @Test
     public void theNameCarriesNoSpaces() {
         assertFalse(ReportFileName.of("Nafath Test", "Sprint 7 Cycle 3", AT).contains(" "));

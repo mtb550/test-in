@@ -16,9 +16,12 @@
 
 package org.testin.report.generators;
 
+import org.testin.model.ReportColor;
+import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestRunSummary;
 import org.testin.model.RunItemStatus;
+import org.testin.report.ReportTile;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -31,6 +34,52 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 public class ReportSectionTest {
+
+    private static double contrast(final @NotNull String one, final @NotNull String other) {
+        final double lighter = Math.max(luminance(one), luminance(other));
+        final double darker = Math.min(luminance(one), luminance(other));
+        return (lighter + 0.05) / (darker + 0.05);
+    }
+
+    private static double luminance(final @NotNull String hex) {
+        return 0.2126 * linear(hex.substring(0, 2)) + 0.7152 * linear(hex.substring(2, 4)) + 0.0722 * linear(hex.substring(4, 6));
+    }
+
+    private static double linear(final @NotNull String channel) {
+        final double value = Integer.parseInt(channel, 16) / 255.0;
+        return value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+    }
+
+    // Rule-REPORT-022
+    @Test
+    public void wordsOnARunItemStatusColorAreWhiteOrNearBlackWhicheverContrastsMore() {
+        final @NotNull String white = ReportColor.PAGE.hex();
+        final @NotNull String nearBlack = ReportColor.INK.hex();
+
+        for (final ReportSection section : ReportSection.values()) {
+            final @NotNull String chosen = section.textHex();
+            final @NotNull String other = chosen.equals(white) ? nearBlack : white;
+
+            assertTrue(List.of(white, nearBlack).contains(chosen), section + " prints its words in " + chosen);
+            assertTrue(contrast(section.getHexColor(), chosen) >= contrast(section.getHexColor(), other), section + " chose the words that contrast less with its color");
+        }
+    }
+
+    // Rule-REPORT-025
+    @Test
+    public void aRunItemStatusHasOneColorInEveryPartOfAReport() {
+        assertEquals(ReportSection.FAILED.getHexColor(), RunItemStatus.FAILED.getReportHex(), "the failed table heading");
+        assertEquals(ReportTile.FAILED.getHex(), RunItemStatus.FAILED.getReportHex(), "the failed count tile");
+        assertEquals(ResultAnalysis.FAILED.getHexColor(), RunItemStatus.FAILED.getReportHex(), "the failed result analysis line");
+
+        assertEquals(ReportSection.PASSED.getHexColor(), RunItemStatus.PASSED.getReportHex(), "the passed table heading");
+        assertEquals(ReportTile.PASSED.getHex(), RunItemStatus.PASSED.getReportHex(), "the passed count tile");
+        assertEquals(ResultAnalysis.PASSED.getHexColor(), RunItemStatus.PASSED.getReportHex(), "the passed result analysis line");
+
+        assertEquals(ReportSection.BLOCKED.getHexColor(), RunItemStatus.BLOCKED.getReportHex(), "the blocked table heading");
+        assertEquals(ReportTile.BLOCKED.getHex(), RunItemStatus.BLOCKED.getReportHex(), "the blocked count tile");
+        assertEquals(ResultAnalysis.BLOCKED.getHexColor(), RunItemStatus.BLOCKED.getReportHex(), "the blocked result analysis line");
+    }
 
     @Test
     public void everyStatusBelongsToExactlyOneSection() {

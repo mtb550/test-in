@@ -242,7 +242,7 @@ public final class TestRunHtmlGenerator {
 
                 + ".detail-table { border-collapse: collapse; width: 100%; margin-top: 8px; }"
                 + ".detail-table th { text-align: center; padding: 8px 12px; border: 1px solid var(--line); font-weight: bold; font-size: " + ReportFont.HEADING.css() + "; }"
-                + ".detail-table td { padding: 8px 12px; border: 1px solid var(--line); font-size: " + ReportFont.BODY.css() + "; vertical-align: top; }"
+                + ".detail-table td { padding: 8px 12px; border: 1px solid var(--line); font-size: " + ReportFont.BODY.css() + "; vertical-align: top; white-space: pre-wrap; }"
                 + ".detail-table tr:nth-child(even) td { background: var(--panel); }"
                 + ".detail-table tr:nth-child(odd) td { background: var(--page); }"
                 + ".detail-table td.seq { text-align: center; color: var(--muted); }"

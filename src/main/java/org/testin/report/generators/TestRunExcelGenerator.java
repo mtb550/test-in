@@ -100,10 +100,10 @@ public final class TestRunExcelGenerator {
         ws.style(row, 0).bold().fontColor(hex).set();
     }
 
-    // Rule-REPORT-020
+    // Rule-REPORT-019, Rule-REPORT-020
     private static void writeTestCases(final @NotNull Worksheet ws, final @NotNull TestRunDto tr) {
         ws.value(0, 0, Bundle.message("report.excel.caption.id"));
-        ws.value(0, 1, TestRunEditorAttributes.DESCRIPTION.getName());
+        ws.value(0, 1, Bundle.message("caption.test.case"));
         ws.value(0, 2, TestRunEditorAttributes.RUN_STATUS.getName());
         ws.value(0, 3, TestRunEditorAttributes.ACTUAL_RESULT.getName());
         ws.value(0, 4, TestRunEditorAttributes.BUG_SEVERITY.getName());

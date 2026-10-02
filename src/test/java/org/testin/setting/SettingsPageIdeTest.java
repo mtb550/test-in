@@ -18,6 +18,7 @@ package org.testin.setting;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
@@ -71,7 +72,7 @@ public class SettingsPageIdeTest extends AbstractTempRootIdeTest {
         try {
             page.apply();
         } catch (final ConfigurationException ex) {
-            throw new AssertionError("The page refused what was typed: " + ex.getMessage(), ex);
+            throw new AssertionError("The page refused what was typed: " + ex.getMessageHtml(), ex);
         }
     }
 
@@ -119,7 +120,7 @@ public class SettingsPageIdeTest extends AbstractTempRootIdeTest {
         final @NotNull Path missing = root.resolve("missing");
         typedOver(values("", "Sara"), values(missing.toString(), "Omar"));
 
-        assertEquals(Bundle.message("settings.no.folder", missing), refused().getMessage());
+        assertEquals(HtmlChunk.text(Bundle.message("settings.no.folder", missing)).toString(), refused().getMessageHtml().toString());
         assertEquals("the folder was refused, and the page stored it anyway", "", settings().rootTestinPath);
         assertEquals("the folder was refused, and the page stored the tester name typed beside it", "Sara", settings().testerName);
     }
@@ -134,7 +135,7 @@ public class SettingsPageIdeTest extends AbstractTempRootIdeTest {
         }
         typedOver(values("", "Sara"), values(file.toString(), "Omar"));
 
-        assertEquals(Bundle.message("settings.not.a.folder", file), refused().getMessage());
+        assertEquals(HtmlChunk.text(Bundle.message("settings.not.a.folder", file)).toString(), refused().getMessageHtml().toString());
         assertEquals("a file was refused, and the page stored it anyway", "", settings().rootTestinPath);
     }
 
@@ -152,7 +153,7 @@ public class SettingsPageIdeTest extends AbstractTempRootIdeTest {
         final @NotNull Path partial = Path.of("testin", "projects");
         typedOver(values("", "Sara"), values(partial.toString(), "Omar"));
 
-        assertEquals(Bundle.message("settings.not.absolute", partial), refused().getMessage());
+        assertEquals(HtmlChunk.text(Bundle.message("settings.not.absolute", partial)).toString(), refused().getMessageHtml().toString());
         assertEquals("a partial path was refused, and the page stored it anyway", "", settings().rootTestinPath);
     }
 
