@@ -82,6 +82,7 @@ public class ByteIdenticalSaveTest {
         }
     }
 
+    // Rule-PRODUCT-003
     @Test
     public void aSavedTestCaseIsByteIdenticalToTheFixture() {
         assertEquals(saved(), golden(),

@@ -42,6 +42,7 @@ public class TestCaseAsJudgedTest {
         return MAPPER.readValue(MAPPER.writeValueAsString(tc), TestCaseDto.class);
     }
 
+    // Rule-PRODUCT-007
     @Test
     public void aRunItemStatusKeepsTheTestCaseItWasGivenAgainst() {
         final UUID id = UUID.randomUUID();

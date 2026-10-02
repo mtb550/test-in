@@ -99,6 +99,22 @@ public class ArchitectureTest {
         rule.check(CLASSES);
     }
 
+    // Rule-PRODUCT-020
+    @Test
+    public void theCoreWorksWithoutJava() {
+        final @NotNull ArchRule rule = noClasses()
+                .that().resideInAPackage("org.testin..")
+                .should().dependOnClassesThat().resideInAnyPackage("com.intellij.psi.impl.source..", "com.intellij.java..", "com.intellij.codeInsight.daemon.impl.analysis..")
+                .orShould().dependOnClassesThat().haveSimpleNameStartingWith("PsiJava")
+                .orShould().dependOnClassesThat().haveSimpleNameStartingWith("JavaPsi")
+                .orShould().dependOnClassesThat().haveFullyQualifiedName("com.intellij.psi.PsiClass")
+                .orShould().dependOnClassesThat().haveFullyQualifiedName("com.intellij.psi.PsiMethod")
+                .because("Java lives in the optional testin-java module, so an IDE without Java still runs"
+                        + " everything but the automation code");
+
+        rule.check(CLASSES);
+    }
+
     @Test
     public void utilImportsNoFeaturePackage() {
         final @NotNull ArchRule rule = noClasses()

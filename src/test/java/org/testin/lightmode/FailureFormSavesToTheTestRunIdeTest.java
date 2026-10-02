@@ -65,7 +65,7 @@ public class FailureFormSavesToTheTestRunIdeTest extends AbstractTempRootIdeTest
         return testRunPath;
     }
 
-    // Rule-EDITOR-PANEL-256
+    // Rule-EDITOR-PANEL-256, Rule-PRODUCT-008
     public void testTheFormWritesTheFailureOntoTheTestRunTheIndexHolds() {
         final @NotNull Path testRunPath = aTestRunWithOneFailure();
         assertTrue("the test run was not indexed", indexedTestRuns().findTestRun(testRunPath).isPresent());

@@ -86,6 +86,7 @@ public class RecordRunItemStatusTest {
         assertEquals(item.getBugPriority(), BugPriority.LOW);
     }
 
+    // Rule-PRODUCT-010
     @Test
     public void everyRunItemStatusRecordsWhoAndWhen() {
         final TestRunItems item = failedWithBug();

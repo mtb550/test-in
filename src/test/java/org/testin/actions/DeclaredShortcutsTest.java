@@ -87,6 +87,7 @@ public class DeclaredShortcutsTest {
         }
     }
 
+    // Rule-PRODUCT-018
     @Test
     public void noKeyIsClaimedByTwoTestinActionsByAccident() {
         for (final String keymap : List.of("$default", "Mac OS X 10.5+")) {
