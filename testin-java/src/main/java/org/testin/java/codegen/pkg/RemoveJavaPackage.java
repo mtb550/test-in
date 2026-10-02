@@ -29,7 +29,7 @@ public class RemoveJavaPackage implements GenAction<DirectoryDto> {
     public void execute(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final @NotNull String packagePath = String.join("/", Fqcn.ofPackage(dir));
 
-        JavaSourceRoot.writeInRoot(p, "removing package", testSourceRoot ->
+        JavaSourceRoot.writeInRoot(p, testSourceRoot ->
                 JavaSourceRoot.deleteUnder(testSourceRoot, packagePath, this));
     }
 }

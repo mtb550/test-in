@@ -294,12 +294,6 @@
                 implementation="org.testin.setting.StartupActivity"
         />
 
-        <!-- File editors -->
-        <virtualFileSystem
-                key="testin"
-                implementationClass="org.testin.editor.TestinFileSystem"
-                physical="false"
-        />
 
         <fileEditorProvider
                 implementation="org.testin.editor.UnifiedEditorProvider"
@@ -320,7 +314,7 @@
                 id="testin.tree"
                 factoryClass="org.testin.explorer.Main"
                 anchor="left"
-                icon="org.testin.util.Icons.TOOL_WINDOW"
+                icon="/icons/pluginIcon.svg"
                 secondary="false"
                 doNotActivateOnStart="true"
         />
@@ -329,7 +323,7 @@
                 id="testin.view"
                 factoryClass="org.testin.view.ViewToolWindowFactory"
                 anchor="right"
-                icon="org.testin.util.Icons.TOOL_WINDOW"
+                icon="/icons/pluginIcon.svg"
                 secondary="false"
                 doNotActivateOnStart="true"
         />

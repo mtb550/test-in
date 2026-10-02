@@ -45,7 +45,7 @@ public class MoveJavaPackage implements GenAction<Moved> {
 
         final @NotNull List<String> destination = destinationFound.get();
 
-        JavaSourceRoot.commandInRoot(p, GenType.MOVE_TEST_SET_PACKAGE.description(), "moving package", sourceRoot -> {
+        JavaSourceRoot.commandInRoot(p, GenType.MOVE_TEST_SET_PACKAGE.description(), sourceRoot -> {
             final @NotNull Optional<VirtualFile> found = Optional.ofNullable(sourceRoot.findFileByRelativePath(String.join("/", fqcn)))
                     .filter(VirtualFile::isDirectory);
 
@@ -61,7 +61,8 @@ public class MoveJavaPackage implements GenAction<Moved> {
                     || target.get().equals(folder.getParent())
                     || VfsUtil.isAncestor(folder, target.get(), false)) return;
 
-            folder.move(this, target.get());
+            if (!JavaSourceRoot.move(folder, target.get(), this)) return;
+
             PackageDeclarations.retarget(p, sourceRoot, folder);
 
             Logger.info("Moved package " + folder.getName() + " into: " + String.join(".", destination));

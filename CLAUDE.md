@@ -83,8 +83,7 @@ silently has no effect costs more than the setting it was meant to hold.
   that exact name exists. A class is named for what it does — `VfsExecutor`, not
   `TreeUtilImpl`; `SaveOnProjectClose`, not `ProjectCloseListenerImpl`. Where the
   plain noun would collide with a platform type, the plugin prefixes with
-  `Testin`: `TestinEditor` against `com.intellij.openapi.editor.Editor`, as
-  `TestinFileSystem` and `TestinTabColorProvider` already do.
+  `Testin`: `TestinEditor` against `com.intellij.openapi.editor.Editor`.
 - **A `*Service`, `*Handler`, `*Provider` or `*Manager` suffix has to earn its
   place.** The suffix names no job, so the default answer is to name the job
   instead - #291 renamed seven that way. Four reasons keep one, and there are no
@@ -233,21 +232,15 @@ silently has no effect costs more than the setting it was meant to hold.
 - **The rule is about methods, and the whole tree obeys it.** The `throws`
   that remain are declarations rather than work, and this list is the record of
   why - not a comment above each one, which the no-comment rule forbids and the
-  September sweep removed. Counted on 1 October 2026: five in `src/main`,
+  September sweep removed. Counted on 2 October 2026: four in `src/main`,
   twenty-eight in `src/test`, none in `testin-java` or `testin-testng`, and every
-  one of them is below. `DeclaredContractsTest` holds the same five with their
-  reasons and fails on a sixth, so this list can no longer drift from the code
+  one of them is below. `DeclaredContractsTest` holds the same four with their
+  reasons and fails on a fifth, so this list can no longer drift from the code
   unnoticed. Do not sweep them again:
   - `NodesTransferable.getTransferData`, and the one `TransferListener` builds
     for a drag of test cases — AWT's `Transferable` contract is that an
     unsupported flavor throws. Catching it hands the platform a wrong object
     instead of "I do not have that".
-  - `JavaSourceRoot.RootWork.run` — a functional interface whose whole point is
-    to let the lambda fail, so that one owner above it catches: `MoveJavaClass`
-    and `MoveJavaPackage` pass lambdas that call `VirtualFile.move`. Removing the
-    declaration moves the catch into every lambda, which is the duplication
-    `JavaSourceRoot` exists to delete. Its sibling `RootFile.from` lost its
-    `throws` on 27 September 2026, when no lambda passed to it threw.
   - `SettingsConfigurable.apply`, and `refuseAnImpossibleRoot`, the one check
     it hands the refusal to — `Configurable.apply` declares
     `ConfigurationException`, and the settings dialog is the one owner that
@@ -268,7 +261,7 @@ silently has no effect costs more than the setting it was meant to hold.
   `DeclaredContractsTest.MAY_THROW` naming the contract, and a line here. The
   list said five while seven stood (#66, finding 268), which is why the test now
   owns the count. Its twin, `MAY_RETURN_NULL`, does the same for a `@Nullable`
-  return: all seven are platform overrides whose contract uses null. Testin's own
+  return: all five are platform overrides whose contract uses null. Testin's own
   last three went to `Optional` in #352.
 
 ## Process

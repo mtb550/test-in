@@ -83,27 +83,27 @@ and which keys it answers, and the shell builds the rest.
   from the end of its text to the card's far edge, and that is the only line
   inside a dialog.
 - **Rule-INTERNAL-095** — Every font a tester reads comes from one owner,
-  `org.testin.util.Fonts`, which names each role - title, strong, body, label,
-  badge, code, caption, message, field, placeholder, value, choice, option, row, small,
-  hint, keycap, figure and icon letter - and derives them all from the same two
-  sizes: the editor's, which the panels zoom with, and the IDE's label font,
+  `org.testin.util.Fonts`. It names each role - title, strong, body, label,
+  badge, code, caption, message, field, placeholder, value, choice, option, row,
+  small, hint, keycap, figure and icon letter. It derives them all from the same
+  two sizes: the editor's, which the panels zoom with, and the IDE's label font,
   which the dialogs follow. A surface asks for the role it is showing and never
   derives a font of its own, so a title is the same size in every panel and a
   placeholder the same in every dialog. The documents Testin writes are in it
-  too: `ReportFont` holds the point sizes a PDF and a Word file are set in,
-  the pixel sizes an HTML report uses, and the families all three are written
-  in, so a size changes in one place, or it disagrees with itself in three.
+  too. `ReportFont` holds the point sizes a PDF and a Word file are set in, the
+  pixel sizes an HTML report uses, and the families all three are written in. So
+  a size changes in one place, or it disagrees with itself in three.
 - **Rule-INTERNAL-096** — Every typing surface in a dialog is drawn in the same
   frame, whether it holds one line or many: a text area sits in the frame a text
   field has, not in a borderless well. A value the dialog shows read-only is set
   in the size a field would show it in, so a test case's description above the
-  fields is not smaller than the answer being typed under it.
-  A cell inside a table is not a typing surface of the dialog and does not take
-  this: it takes the table's own font, colors and row height, whether it is the
-  tick box in a header, the choice box that opens on a Priority cell or the
-  button that opens the group picker. A field's font is six points above the
-  IDE's label font, and a cell set in it would jump size the moment a tester
-  clicked into it and stand taller than the row that holds it.
+  fields is not smaller than the answer being typed under it. A cell inside a
+  table is not a typing surface of the dialog and does not take this. It takes
+  the table's own font, colors and row height, whether it is the tick box in a
+  header, the choice box that opens on a Priority cell or the button that opens
+  the group picker. A field's font is six points above the IDE's label font, and
+  a cell set in it would jump size the moment a tester clicked into it and stand
+  taller than the row that holds it.
 - **Rule-INTERNAL-097** — A box that holds many lines grows as lines are added,
   and whatever draws it grows with it rather than letting it scroll inside a
   fixed box. Every such box is the same box: the same frame, the same font, Tab
@@ -123,17 +123,18 @@ and which keys it answers, and the shell builds the rest.
   fill, because a theme may paint both surfaces nearly the same and Islands
   light does. One place decides the surfaces, the edge, the corner and the gap,
   for every dialog and every theme.
-- **Rule-INTERNAL-100** — A dialog the tester can resize is six tenths of the IDE
-  frame wide, every one of them, because a width chosen per dialog is a number
-  nobody chose with the others. What a dialog names is how tall it is: half the
-  frame for a form with a list under it, seven tenths for an image or a document
-  read top to bottom, or nothing at all, which means as tall as its content needs
-  and growing as the tester opens more of it. The share is clamped: never
-  narrower or shorter than the dialog needs to show its content, never past the
-  frame less a margin. The frame wins when both cannot hold. A dialog whose
-  content is larger than the frame is the frame's size, not its content's. A dialog the tester cannot resize names no size and is as
-  big as its content, so a confirmation holding one sentence stays the size of
-  that sentence.
+- **Rule-INTERNAL-100** — A dialog the tester can resize is six tenths of the
+  IDE frame wide, every one of them, because a width chosen per dialog is a
+  number nobody chose with the others. What a dialog names is how tall it is:
+  half the frame for a form with a list under it, or seven tenths for an image
+  or a document read top to bottom. A dialog that names nothing is as tall as
+  its content needs, and grows as the tester opens more of it. The share is
+  clamped: never narrower or shorter than the dialog needs to show its content,
+  never past the frame less a margin. The frame wins when both cannot hold. A
+  dialog whose content is larger than the frame is the frame's size, not its
+  content's. A dialog the tester cannot resize names no size and is as big as
+  its content, so a confirmation holding one sentence stays the size of that
+  sentence.
 - **Rule-INTERNAL-101** — A dialog whose size the tester can change can be maximized, from a
   button in its title bar. Maximize fills the IDE frame and the button pressed
   again returns the dialog to the size and place it opened at, with everything
@@ -144,7 +145,7 @@ and which keys it answers, and the shell builds the rest.
 - **Rule-INTERNAL-102** — A dialog made smaller than its content scrolls rather
   than clipping it: a vertical scrollbar appears and the status bar stays where
   it is. Only a dialog whose size the tester owns can be made smaller than its
-  content, so only that dialog scrolls; one that opens at the height its content
+  content, so only that dialog scrolls. One that opens at the height its content
   needs and cannot be resized has nothing to scroll, and a scrollbar there is a
   stray. While the dialog has room, the content takes the whole height and the
   tree or table inside it scrolls on its own. A tree or table asks for eight
@@ -190,15 +191,17 @@ and which keys it answers, and the shell builds the rest.
   the shape. What it holds is never wrong, so it is never refused afterward.
 - **Rule-INTERNAL-118** — A dialog builds no input of its own. A field that
   holds a folder or a file is the framework's text field with a browse button
-  inside it, at the field's right edge. The button opens the platform's chooser at the path the field holds, and puts the chosen path in the field.
+  inside it, at the field's right edge. The button opens the platform's chooser
+  at the path the field holds, and puts the chosen path in the field.
 - **Rule-INTERNAL-119** — Every icon button Testin draws is the framework's one
   icon button, in a toolbar, a status bar, a dialog's title bar or beside a
-  screenshot: the icon alone at rest, a gray rounded fill under it while the
-  pointer is on it, and the fill a shade darker while it is on. A new button
-  takes this button rather than drawing its own.
+  screenshot. It shows the icon alone at rest, a gray rounded fill under it
+  while the pointer is on it, and the fill a shade darker while it is on. A new
+  button takes this button rather than drawing its own.
 - **Rule-INTERNAL-120** — Every file in the dialog framework has a row in its
-  register, saying whether it is kept because two or more screens ask for it, kept on purpose for the one screen that does, or internal to the framework. A file added or removed
-  changes the register in the same change.
+  register. The row says whether the file is kept because two or more screens
+  ask for it, kept on purpose for the one screen that does, or internal to the
+  framework. A file added or removed changes the register in the same change.
 - **Rule-INTERNAL-121** — Every gap and padding in a dialog is one of five
   steps, named once in Spacing: XS 4, S 6, M 8, L 10 and XL 12. A screen asks
   for a step by name and never writes a number, so changing a step changes every

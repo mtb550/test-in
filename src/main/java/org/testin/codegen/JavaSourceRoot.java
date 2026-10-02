@@ -144,12 +144,15 @@ public final class JavaSourceRoot {
         }
     }
 
-    public static void inRoot(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
-        run(find(p), whatFailed, work);
-    }
-
-    private static void inRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull String whatFailed, final @NotNull RootWork work) {
-        run(findOrWarn(p, className), whatFailed, work);
+    // UC-CODEGEN-016, Rule-CODEGEN-053
+    public static boolean move(final @NotNull VirtualFile file, final @NotNull VirtualFile target, final @NotNull Object requestor) {
+        try {
+            file.move(requestor, target);
+            return true;
+        } catch (final IOException ex) {
+            Logger.error("Could not move generated code at " + file.getPath() + " to " + target.getPath() + ": " + FailureText.of(ex));
+            return false;
+        }
     }
 
     // UC-CODEGEN-020, Rule-CODEGEN-064
@@ -158,36 +161,26 @@ public final class JavaSourceRoot {
         return findOrWarn(p, className).flatMap(work::from);
     }
 
-    private static void run(final @NotNull Optional<VirtualFile> root, final @NotNull String whatFailed, final @NotNull RootWork work) {
-        if (root.isEmpty()) return;
+    // UC-CODEGEN-020, Rule-CODEGEN-065
+    @FromContentModule
+    public static void writeInRoot(final @NotNull Project p, final @NotNull RootWork work) {
+        WriteAction.run(() -> find(p).ifPresent(work::run));
+    }
 
-        try {
-            work.run(root.get());
-        } catch (final IOException ex) {
-            Logger.info("Error " + whatFailed + ": " + FailureText.of(ex));
-        }
+    @FromContentModule
+    public static void commandInRoot(final @NotNull Project p, final @NotNull String title, final @NotNull RootWork work) {
+        WriteCommandAction.runWriteCommandAction(p, title, null, () -> find(p).ifPresent(work::run));
     }
 
     // UC-CODEGEN-020, Rule-CODEGEN-065
     @FromContentModule
-    public static void writeInRoot(final @NotNull Project p, final @NotNull String whatFailed, final @NotNull RootWork work) {
-        WriteAction.run(() -> inRoot(p, whatFailed, work));
-    }
-
-    @FromContentModule
-    public static void commandInRoot(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final @NotNull RootWork work) {
-        WriteCommandAction.runWriteCommandAction(p, title, null, () -> inRoot(p, whatFailed, work));
-    }
-
-    // UC-CODEGEN-020, Rule-CODEGEN-065
-    @FromContentModule
-    public static void writeInRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull String whatFailed, final @NotNull RootWork work) {
-        WriteAction.run(() -> inRootOrWarn(p, className, whatFailed, work));
+    public static void writeInRootOrWarn(final @NotNull Project p, final @NotNull String className, final @NotNull RootWork work) {
+        WriteAction.run(() -> findOrWarn(p, className).ifPresent(work::run));
     }
 
     @FunctionalInterface
     public interface RootWork {
-        void run(final @NotNull VirtualFile root) throws IOException;
+        void run(final @NotNull VirtualFile root);
     }
 
     @FunctionalInterface

@@ -44,7 +44,6 @@ public class DeclaredContractsTest {
     private static final @NotNull Pattern NULLABLE_RETURN = Pattern.compile("^\\s+(?:(?:public|protected|private|static|final|default|abstract|synchronized)\\s+)*(?:<[^>]+>\\s+)?@Nullable\\s+[\\w<>\\[\\],.? ]+?\\s+(\\w+)\\s*\\(");
 
     private static final @NotNull Map<String, String> MAY_THROW = Map.ofEntries(
-            entry("JavaSourceRoot.run", "RootWork is a functional interface whose lambdas do file work - MoveJavaClass and MoveJavaPackage call VirtualFile.move - and JavaSourceRoot reports the failure for all of them"),
             entry("TransferListener.getTransferData", "AWT's Transferable contract: a flavor the transferable does not carry throws"),
             entry("NodesTransferable.getTransferData", "AWT's Transferable contract: a flavor the transferable does not carry throws"),
             entry("SettingsConfigurable.apply", "Configurable.apply declares ConfigurationException, and the settings dialog shows its message"),
@@ -52,8 +51,6 @@ public class DeclaredContractsTest {
     );
 
     private static final @NotNull Map<String, String> MAY_RETURN_NULL = Map.ofEntries(
-            entry("TestinFileSystem.findFileByPath", "VirtualFileSystem's contract: null is no such file"),
-            entry("TestinFileSystem.refreshAndFindFileByPath", "VirtualFileSystem's contract: null is no such file"),
             entry("TransferListener.createTransferable", "TransferHandler's contract: null is nothing to drag"),
             entry("TreeTransferHandler.createTransferable", "TransferHandler's contract: null is nothing to drag"),
             entry("TreeDropHandler.handleDrop", "FileDropHandler is a Kotlin suspend function, whose Java face answers an Object that may be null"),

@@ -40,7 +40,7 @@ public final class JavaCode {
         return switch (type) {
             case TP -> new JavaCode(
                     new NoJavaCode<>(nodeType),
-                    (p, renamed) -> GenType.RENAME_TEST_PROJECT.execute(p, renamed),
+                    GenType.RENAME_TEST_PROJECT::execute,
                     new NoJavaCode<>(nodeType)
             );
 

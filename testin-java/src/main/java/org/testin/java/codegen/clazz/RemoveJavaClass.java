@@ -36,7 +36,7 @@ public class RemoveJavaClass implements GenAction<DirectoryDto> {
         final @NotNull String className = fqcn.getLast();
         final @NotNull String fileName = className + ".java";
 
-        JavaSourceRoot.writeInRoot(p, "removing class", testSourceRoot ->
+        JavaSourceRoot.writeInRoot(p, testSourceRoot ->
                 JavaSourceRoot.deleteUnder(testSourceRoot, packagePath + "/" + fileName, this));
     }
 }

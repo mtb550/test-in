@@ -538,8 +538,8 @@ leave `EXPERIMENTAL_API_USAGES` off (#324). Read in the 2026.2.1 jars, the
 platform colors a tab title from `FileStatusManager.getStatus(file)`, and a file
 that is not in the local file system and not special is `NOT_CHANGED`, which has
 no color, so the title gets `UIUtil.getLabelForeground()`. A Testin file is a
-`LightVirtualFile` on `TestinFileSystem`, a `NonPhysicalFileSystem`: it is
-neither. The override returned that same label color.
+`LightVirtualFile` on the platform's light file system, a
+`NonPhysicalFileSystem`: it is neither. The override returned that same label color.
 
 **Decision.** `TestinTabColorProvider` is deleted, and `EXPERIMENTAL_API_USAGES`
 is back on the verifier's failure level. Decided 1 October 2026, after a sandbox
@@ -557,6 +557,38 @@ hide that behind an experimental call.
 
 ---
 
+## Decision-018 — A Testin tab is a light file on the platform's light file system
+
+**Context.** Decision-005 registered a `testin://` file system,
+`TestinFileSystem`, through the `virtualFileSystem` extension point. Qodana
+reports that registration as a critical: the extension point's bean,
+`VirtualFileManagerImpl$VirtualFileSystemBean`, is internal to the platform,
+and Marketplace does not publish a version that uses internal API. The file
+system answered nothing: finding a file by path returned null by design, and
+refreshing did nothing. Its one caller, `UnifiedVirtualFile.getFileSystem`,
+already fell back to the platform's own light file system when ours was absent.
+
+**Decision.** `UnifiedVirtualFile` is a `LightVirtualFile` on the platform's
+light file system, and Testin registers no file system of its own. Decided 2
+October 2026 (#120).
+
+**Consequences.** The plugin uses no internal extension point. A tab keeps its
+`testin:///path` URL, so two test sets with the same name in two packages stay
+two tabs: the light file system's own URL is `mock:///` plus the name, and
+would give both the same one. Asking the platform for a file at a `testin://`
+URL still finds nothing, now because no file system answers that protocol. The
+title color is unchanged, since the light file system is non-physical too
+(Decision-017). Tabs are restored by Testin's own `LastOpenEditors`, and
+`SaveOnProjectClose` closes them before the IDE saves, so the IDE never stores
+a `testin://` URL it cannot resolve.
+
+**If you are about to reverse it.** A file system of Testin's own cannot be
+registered without the internal extension point, so a version that does it
+cannot be published. Answer whatever needed it from `UnifiedVirtualFile` or
+from `LastOpenEditors` instead.
+
+---
+
 ## Superseded decisions
 
 Each is listed here with the number that replaced it, and its section above is
@@ -569,6 +601,7 @@ left exactly as it was written.
 | Decision-011 — Testin reads `testin.yml` and never writes it         | Decision-013  | 19 September 2026 |
 | Decision-010 — Testin's translations are reached by the IDE's locale | Decision-016  | 27 September 2026 |
 | Decision-014 — The tab foreground hook is experimental               | Decision-017  | 1 October 2026    |
+| Decision-005 — A Testin editor tab is on a deprecated file system    | Decision-018  | 2 October 2026    |
 
 ---
 

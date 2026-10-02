@@ -32,48 +32,52 @@ import java.util.List;
 public enum LightModePart implements ToolBarAttribute {
     SET_NAME(
             Bundle.message("light.part.set.name"),
+            ToolBarDefault.ON,
             List.of()
     ),
 
     DURATION(
             Bundle.message("light.part.duration"),
+            ToolBarDefault.ON,
             List.of()
     ),
 
     RUN_ITEM_STATUS_BUTTONS(
             Bundle.message("light.part.run.item.status.buttons"),
+            ToolBarDefault.ON,
             List.of()
     ),
 
     STATUS_BAR(
             Bundle.message("light.part.status.bar"),
+            ToolBarDefault.ON,
             List.of()
     ),
 
     TEST_METHOD_BUTTON(
             Bundle.message("action.Testin.NavigateToTestMethod.text"),
+            ToolBarDefault.ON,
             List.of(CardHoverAction.NAVIGATE_TO_TEST_METHOD)
     ),
 
     RUN_BUTTON(
             Bundle.message("action.Testin.RunTestMethod.text"),
+            ToolBarDefault.ON,
             List.of(CardHoverAction.RUN_TEST_METHOD, CardHoverAction.STOP_TEST_METHOD)
     ),
 
     TEST_CASE_BUTTON(
             Bundle.message("action.Testin.NavigateToTestCase.text"),
+            ToolBarDefault.ON,
             List.of(CardHoverAction.NAVIGATE_TO_TEST_CASE)
     );
 
     private final @NotNull String name;
 
+    private final @NotNull ToolBarDefault toolBarDefault;
+
     @Getter(AccessLevel.NONE)
     private final @NotNull List<CardHoverAction> buttons;
-
-    @Override
-    public @NotNull ToolBarDefault getToolBarDefault() {
-        return ToolBarDefault.ON;
-    }
 
     // UC-EDITOR-PANEL-046, Rule-EDITOR-PANEL-244
     public boolean governs(final @NotNull CardHoverAction button) {

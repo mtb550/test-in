@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ruleset name="Complexity" xmlns="http://pmd.sourceforge.net/ruleset/2.0.0">
+<ruleset name="Complexity">
     <description>
         How hard a method is to read (#378). ./gradlew check runs it through pmdMain and fails on a
         method over either limit. No method is exempt: the ones that were over a limit when the gate

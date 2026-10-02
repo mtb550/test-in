@@ -46,7 +46,7 @@ public class MoveJavaClass implements GenAction<Moved> {
         final @NotNull List<String> destination = found.get();
         final @NotNull String fileName = fqcn.getLast() + ".java";
 
-        JavaSourceRoot.commandInRoot(p, GenType.MOVE_TEST_SET.description(), "moving class", sourceRoot -> {
+        JavaSourceRoot.commandInRoot(p, GenType.MOVE_TEST_SET.description(), sourceRoot -> {
             final @NotNull Optional<VirtualFile> file =
                     Optional.ofNullable(sourceRoot.findFileByRelativePath(String.join("/", fqcn) + ".java"));
 
@@ -59,7 +59,8 @@ public class MoveJavaClass implements GenAction<Moved> {
 
             if (target.isEmpty() || target.get().equals(file.get().getParent())) return;
 
-            file.get().move(this, target.get());
+            if (!JavaSourceRoot.move(file.get(), target.get(), this)) return;
+
             PackageDeclarations.retarget(p, sourceRoot, file.get(), target.get());
 
             Logger.info("Moved " + fileName + " to package: " + String.join(".", destination));
