@@ -197,9 +197,48 @@ and which keys it answers, and the shell builds the rest.
   screenshot: the icon alone at rest, a gray rounded fill under it while the
   pointer is on it, and the fill a shade darker while it is on. A new button
   takes this button rather than drawing its own.
+- **Rule-INTERNAL-120** — Every file in the dialog framework has a row in its
+  register, saying whether two or more screens ask for it, one does and it is
+  kept on purpose, or it is internal to the framework. A file added or removed
+  changes the register in the same change.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.
+
+## The register
+
+Every file in `org.testin.ui.framework`, and why it is there (Rule-INTERNAL-120).
+A screen asks the framework for what it needs by name; a part nobody else will
+ask for lives with its one caller. Counted on 2 October 2026 by how many classes
+outside the framework name each file.
+
+| Standing | Files | Why |
+|:--|:--|:--|
+| **Kept** - two or more screens ask for it | `ComponentDialogBase`, `StatusBarShortcut`, `AbstractFrameworkDialog`, `AbstractIconButton`, `TextInput`, `DialogSize`, `DialogComponent`, `ConfirmDialog`, `RadioSelection`, `Prose`, `SelectionTree`, `Row`, `MultiLineField`, `Answer`, `TextFieldWithSelections`, `RowStripe`, `DialogHost`, `DialogButton`, `ShortcutMenuPopup`, `TextArea`, `StatusBarBase`, `SelectionTable`, `Alternative` | The system's parts |
+| **Kept on purpose** - one screen asks for it today | `SelectionList` (Global Search), `DialogSplitButton` and `ChoiceInput` (Pending Commits), `Screenshots` (the failure form), `Picture` (a stack trace line), `Keycap` (light mode's keys), `DialogPlace` (the rename card), `DialogKeys` (the letter menus), `TextValue` (the import preview) | Each is the one way to ask its question; folded into its caller, the second caller would copy it |
+| **Internal** - reached through a builder | `ButtonFooter`, `FrameworkTextField`, `ScreenshotStrip`, `ShortcutMenuRenderer`, `Rows`, `OpenDialogs`, `EmptyWarning`, `DialogDto`, `DialogDetails`, `DialogMessage`, `ConfirmCard`, `Option` | Parts of the parts |
+
+### The kinds of dialog
+
+Four kinds, written down so a new dialog is shaped like the others of its kind.
+They are a catalog, not code: no dialog declares its kind.
+
+| Kind | What it asks | What the kind fixes | Dialogs |
+|:--|:--|:--|:--|
+| **Form** | Values to type or choose, then one action | Fields stacked; one blue main button; `Enter` runs it; as tall as its content unless it names a size | Create Project, Create Run, Create Test, Create Test Case, Update Test Case and its nine bulk-section editors, Rename, Order, Git Identity, Remote URL, Run Configuration, Result Analysis, Report Bug, Failed Result, Import, Export, Generate Report |
+| **Confirm** | Yes or no about a stated change | The message, the change from and to, one named action; `Escape` cancels | `ConfirmDialog`, from nine places |
+| **Picker** | One or more things chosen from a list | A search or a list fills the space; `Enter` picks; a share of the window | Global Search, Bind Test Project, Pending Commits, Resolve Conflict |
+| **Viewer** | Nothing; it shows something to read | Read-only; no main button; `Escape` closes; can be maximized | Screenshot, Stack Trace, Marker Details, Agent Said |
+
+### Outside the framework, on purpose
+
+| Surface | Owner | Why it stays outside |
+|:--|:--|:--|
+| The Fields popup on the editor toolbar | `AbstractDetailsPopupBtn` | A toolbar control, not a question |
+| The Filter popup | `FilterPopupBtn` | The platform's own action-group popup |
+| The zoom indicator in light mode | `ZoomIndicatorDialog` | An indicator that asks nothing |
+| The group picker in an import table cell | `GroupMultiSelectEditor` | A table cell editor, which takes the table's look |
+| Balloons | `Notifier` | The platform's notifications |
 
 ## What the tester sees
 

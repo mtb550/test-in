@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunStatus;
-import org.testin.ui.dialogs.ShortcutMenuPopup;
+import org.testin.ui.framework.ShortcutMenuPopup;
 import org.testin.util.Bundle;
 
 import java.util.Arrays;

@@ -27,7 +27,7 @@ import org.testin.actions.TestinData;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.ui.dialogs.ShortcutMenuPopup;
+import org.testin.ui.framework.ShortcutMenuPopup;
 import org.testin.util.Bundle;
 
 import java.awt.datatransfer.StringSelection;

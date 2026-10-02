@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.ui.dialogs;
+package org.testin.ui.framework;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -26,9 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.MenuItem;
 import org.testin.model.StatusBarItem;
-import org.testin.ui.framework.DialogKeys;
-import org.testin.ui.framework.StatusBarBase;
-import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.ListValue;
 
 import javax.swing.JComponent;

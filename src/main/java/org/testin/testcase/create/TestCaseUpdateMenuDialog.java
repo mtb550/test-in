@@ -24,7 +24,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testcase.update.UpdateTestCaseDialog;
-import org.testin.ui.dialogs.ShortcutMenuPopup;
+import org.testin.ui.framework.ShortcutMenuPopup;
 import org.testin.util.Bundle;
 import org.testin.view.ViewToolWindowFactory;
 
