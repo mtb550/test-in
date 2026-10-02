@@ -33,6 +33,7 @@ import java.util.Set;
 
 import static com.tngtech.archunit.core.domain.AccessTarget.Predicates.declaredIn;
 import static com.tngtech.archunit.core.domain.JavaCall.Predicates.target;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.assignableTo;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
 import static com.tngtech.archunit.core.domain.properties.HasName.Predicates.name;
 import static com.tngtech.archunit.core.domain.properties.HasName.Predicates.nameMatching;
@@ -61,18 +62,32 @@ public class ArchitectureTest {
             "org.testin.clipboard..", "org.testin.runner..", "org.testin.bug.."
     };
     private static final @NotNull Set<String> UTIL_EXCEPTIONS = Set.of();
-    private static final @NotNull Set<String> FILE_ACCESS_EXCEPTIONS = Set.of();
+    private static final @NotNull Set<String> FILE_ACCESS_EXCEPTIONS = Set.of("org.testin.ui.framework.TextInput");
+    private static final @NotNull Set<String> FILE_APIS = Set.of(
+            "java.nio.file.Files", "java.nio.channels.FileChannel", "java.io.RandomAccessFile",
+            "java.io.FileInputStream", "java.io.FileOutputStream", "java.io.FileReader", "java.io.FileWriter",
+            "com.intellij.openapi.vfs.LocalFileSystem", "com.intellij.openapi.vfs.VfsUtil", "com.intellij.openapi.vfs.VfsUtilCore",
+            "com.intellij.openapi.util.io.FileUtil", "com.intellij.openapi.util.io.FileUtilRt");
+    private static final @NotNull String VIRTUAL_FILE_OPERATIONS = "delete|move|copy|rename|createChildData|createChildDirectory"
+            + "|setBinaryContent|getOutputStream|getInputStream|contentsToByteArray";
+    private static final @NotNull String FILE_ON_DISK = "exists|isFile|isDirectory|list|listFiles|length|lastModified|canRead|canWrite"
+            + "|delete|deleteOnExit|mkdir|mkdirs|renameTo|createNewFile|setLastModified|setReadable|setWritable";
     private static final @NotNull Set<String> REFRESH_EXCEPTIONS = Set.of("org.testin.testproject.SaveTestinYml");
 
     private static @NotNull JavaClasses productionClasses() {
-        final @NotNull Path compiled = Path.of("build", "classes", "java", "main").toAbsolutePath();
+        final @NotNull List<Path> compiled = List.of(
+                Path.of("build", "classes", "java", "main").toAbsolutePath(),
+                Path.of("testin-java", "build", "classes", "java", "main").toAbsolutePath(),
+                Path.of("testin-testng", "build", "classes", "java", "main").toAbsolutePath());
 
-        if (!Files.isDirectory(compiled)) {
-            throw new AssertionError("No compiled classes at " + compiled + " - the architecture rules have"
-                    + " nothing to read. Run this through Gradle, which compiles src/main first.");
+        for (final Path module : compiled) {
+            if (!Files.isDirectory(module)) {
+                throw new AssertionError("No compiled classes at " + module + " - the architecture rules have"
+                        + " nothing to read. Run this through Gradle, which compiles every module first.");
+            }
         }
 
-        return new ClassFileImporter().importPath(compiled);
+        return new ClassFileImporter().importPaths(compiled);
     }
 
     private static @NotNull DescribedPredicate<JavaClass> notOneOf(final @NotNull Set<String> frozen) {
@@ -104,12 +119,13 @@ public class ArchitectureTest {
     public void theCoreWorksWithoutJava() {
         final @NotNull ArchRule rule = noClasses()
                 .that().resideInAPackage("org.testin..")
+                .and().resideOutsideOfPackages("org.testin.java..", "org.testin.testng..")
                 .should().dependOnClassesThat().resideInAnyPackage("com.intellij.psi.impl.source..", "com.intellij.java..", "com.intellij.codeInsight.daemon.impl.analysis..")
                 .orShould().dependOnClassesThat().haveSimpleNameStartingWith("PsiJava")
                 .orShould().dependOnClassesThat().haveSimpleNameStartingWith("JavaPsi")
                 .orShould().dependOnClassesThat().haveFullyQualifiedName("com.intellij.psi.PsiClass")
                 .orShould().dependOnClassesThat().haveFullyQualifiedName("com.intellij.psi.PsiMethod")
-                .because("Java lives in the optional testin-java module, so an IDE without Java still runs"
+                .because("Java lives in the optional testin-java and testin-testng modules, so an IDE without Java still runs"
                         + " everything but the automation code");
 
         rule.check(CLASSES);
@@ -133,12 +149,17 @@ public class ArchitectureTest {
                 .that().resideOutsideOfPackages("org.testin.indexer..", "org.testin.codegen..",
                         "org.testin.config..", "org.testin.git..", "org.testin.importexport..",
                         "org.testin.report..", "org.testin.setting..", "org.testin.logger..",
-                        "org.testin.bug..")
+                        "org.testin.bug..", "org.testin.java.codegen..")
                 .and(notOneOf(FILE_ACCESS_EXCEPTIONS))
-                .should().dependOnClassesThat().haveFullyQualifiedName("java.nio.file.Files")
+                .should().dependOnClassesThat(DescribedPredicate.describe("a file API", javaClass -> FILE_APIS.contains(javaClass.getName())))
+                .orShould().callMethodWhere(target(declaredIn(assignableTo("com.intellij.openapi.vfs.VirtualFile")).and(nameMatching(VIRTUAL_FILE_OPERATIONS))))
+                .orShould().callMethodWhere(target(declaredIn("java.io.File").and(nameMatching(FILE_ON_DISK))))
+                .orShould().callMethodWhere(DescribedPredicate.describe("a method handed a java.io.File", call -> call.getTarget().getRawParameterTypes().stream().anyMatch(type -> type.getName().equals("java.io.File"))))
                 .because("the indexer is the single owner of file access, so its cache stays authoritative over"
                         + " test data and every read is a fast in-memory lookup. The exempt packages are exempt"
-                        + " because none of them touches test data (CLAUDE.md, #49)");
+                        + " because none of them touches test data (CLAUDE.md, #49); codegen includes the Java"
+                        + " module's org.testin.java.codegen. TextInput is the one exception: it asks the VFS for the"
+                        + " folder a file chooser opens at, which is never test data");
 
         rule.check(CLASSES);
     }

@@ -29,8 +29,6 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
-import java.io.File;
-
 @Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Mapper {
@@ -41,23 +39,22 @@ public final class Mapper {
             .disable(SerializationFeature.WRITE_DATES_WITH_CONTEXT_TIME_ZONE)
             .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
 
-    public @NotNull <T> T readValue(final @NotNull File src, final @NotNull Class<T> valueType) {
+    public @NotNull <T> T readValue(final byte @NotNull [] src, final @NotNull Class<T> valueType) {
         try {
             return mapper.readValue(src, valueType);
 
         } catch (final Exception ex) {
-            Logger.error("Mapper.readValue() failed for file '" + src.getAbsolutePath() + "' to class " + valueType.getSimpleName() + ": " + FailureText.of(ex));
+            Logger.error("Failed to parse JSON bytes to class " + valueType.getSimpleName() + ": " + FailureText.of(ex));
             throw new IllegalStateException(FailureText.of(ex), ex);
         }
     }
 
-    public @NotNull <T> T readValue(final @NotNull File src, final @NotNull TypeReference<T> valueTypeRef) {
+    public @NotNull <T> T readValue(final byte @NotNull [] src, final @NotNull TypeReference<T> valueTypeRef) {
         try {
             return mapper.readValue(src, valueTypeRef);
 
         } catch (final Exception ex) {
-            Logger.error("Failed to read file path " + src + " to TypeReference");
-            Logger.error("Exception: " + FailureText.of(ex));
+            Logger.error("Failed to parse JSON bytes to TypeReference: " + FailureText.of(ex));
             throw new IllegalStateException(FailureText.of(ex), ex);
         }
     }

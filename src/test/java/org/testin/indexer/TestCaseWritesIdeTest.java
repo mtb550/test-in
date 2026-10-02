@@ -136,6 +136,18 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
                 Files.isRegularFile(fileOf(ts, pasted)));
     }
 
+    public void testATestCaseWhoseFileCouldNotBeWrittenIsNotIndexed() {
+        final TestSetDirectoryDto ts = oneTestSet();
+        final TestCaseDto pasted = testCase(ts, "m");
+        undeletable(fileOf(ts, pasted));
+
+        indexedTestCases().updateSequence(ts.getPath(), List.of(pasted), List.of());
+
+        assertTrue("the index holds a test case whose file was never written",
+                indexedTestCases().findTestCase(pasted.getId()).isEmpty());
+        assertEquals("the test set counts a test case that is not on disk", 0, indexedTestCases().testCaseCountOf(ts.getPath()));
+    }
+
     public void testATestCaseSavedAsItIsBeforeTheOrderKeepsItsCreator() {
         final TestSetDirectoryDto ts = oneTestSet();
         final TestCaseDto moved = testCase(ts, "m").setCreatedBy("Sara Al-Otaibi");

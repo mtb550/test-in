@@ -262,7 +262,7 @@ final class IndexingScanner {
                         .parallel()
                         .forEach(filePath -> {
                             try {
-                                final @NotNull TestCaseDto tc = mapper.readValue(filePath.toFile(), TestCaseDto.class);
+                                final @NotNull TestCaseDto tc = mapper.readValue(Files.readAllBytes(filePath), TestCaseDto.class);
                                 tc.setParent(ts);
                                 tc.setId(identityOf(filePath, tc));
 
@@ -466,7 +466,7 @@ final class IndexingScanner {
             }
 
             try {
-                final @NotNull TestRunItems item = mapper.readValue(file.toFile(), TestRunItems.class);
+                final @NotNull TestRunItems item = mapper.readValue(Files.readAllBytes(file), TestRunItems.class);
                 item.setId(id.orElseThrow());
                 read.add(item);
 

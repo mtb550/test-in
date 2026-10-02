@@ -243,7 +243,11 @@ The rule is enforced by the compiler rather than by review: `TestDataFiles` and
 package can reach the writer at all.
 
 **The exempt packages**, which may open files directly: `codegen`, `config`,
-`git`, `importexport`, `report`, `setting`, `logger`, `bug`.
+`git`, `importexport`, `report`, `setting`, `logger`, `bug`. `codegen` includes
+the Java module's `org.testin.java.codegen`, which writes the generated classes.
+`ArchitectureTest` reads all three modules and allows one class besides:
+`ui.framework.TextInput`, which asks the VFS which folder a file chooser opens
+at, and that is never test data.
 
 What they have in common is that none of them read or write **test data**. They
 handle generated source, the automation repository's own `testin.yml`, the Git

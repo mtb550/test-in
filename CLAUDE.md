@@ -17,7 +17,9 @@ going stale (#99).
 2. **The VFS operation succeeds first, then the cache is updated.** Never the
    other way round: the cache update persists markers, marker writes create
    directories, and the reverse order produces phantom directories and "already
-   exists in VFS" errors.
+   exists in VFS" errors. One deliberate exception: a test run's results are
+   put in the cache first and written by `TestRunWriter`'s background queue, so
+   recording a run item status never waits on the disk.
 3. **Swing is read and written only on the EDT.** Short work with no UI of its
    own goes to `executeOnPooledThread` and finishes with `invokeLater`; long
    work the tester should be able to cancel goes to `Task.Backgroundable`.

@@ -58,7 +58,7 @@ final class MarkerFiles {
         if (!Files.exists(markerFile)) return defaultFor(markerClass, kind);
 
         try {
-            return mapper.readValue(markerFile.toFile(), markerClass);
+            return mapper.readValue(Files.readAllBytes(markerFile), markerClass);
 
         } catch (final Exception ex) {
             Logger.warn("Unreadable " + kind.getMarkerKind() + " marker '" + name + "', using defaults: " + FailureText.of(ex));
@@ -93,7 +93,7 @@ final class MarkerFiles {
         if (kind.isEmpty()) return false;
 
         try {
-            final @NotNull AbstractMarker marker = mapper.readValue(markerFile.toFile(), kind.orElseThrow().getMarkerClass());
+            final @NotNull AbstractMarker marker = mapper.readValue(Files.readAllBytes(markerFile), kind.orElseThrow().getMarkerClass());
             marker.setId(UUID.randomUUID().toString());
 
             return testDataFiles.write(markerFile, marker);
@@ -106,7 +106,7 @@ final class MarkerFiles {
 
     private boolean parses(final @NotNull Path file, final @NotNull Class<?> markerClass) {
         try {
-            mapper.readValue(file.toFile(), markerClass);
+            mapper.readValue(Files.readAllBytes(file), markerClass);
             return true;
         } catch (final Exception unreadable) {
             return false;

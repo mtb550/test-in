@@ -214,20 +214,21 @@ final class TestCaseSequenceStore {
         final @NotNull String tester = settings.testerName;
 
         for (final TestCaseDto testCase : orderedList) {
-            ids.add(testCase.getId());
-            newIds.add(testCase.getId());
-
             final @NotNull TestCaseDto written = placed.getOrDefault(testCase.getId(), testCase);
             final boolean firstSight = !testCasesById.containsKey(testCase.getId());
+
             if (firstSight) {
                 written.stampCreated(tester);
-                testCasesById.put(testCase.getId(), testCase);
+                if (failedToWrite(testSetPath, written)) continue;
+
+                testCasesById.put(testCase.getId(), testCase.takeValuesOf(written));
+            } else if (placed.containsKey(testCase.getId())) {
+                // Rule-INTERNAL-084
+                store(testSetPath, written);
             }
 
-            if (!firstSight && !placed.containsKey(testCase.getId())) continue;
-
-            // Rule-INTERNAL-084
-            store(testSetPath, written);
+            ids.add(testCase.getId());
+            newIds.add(testCase.getId());
         }
 
         Optional.ofNullable(testCaseIdsByTestSet.get(path)).ifPresent(oldIds -> oldIds.stream()

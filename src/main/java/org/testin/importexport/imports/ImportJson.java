@@ -19,11 +19,15 @@ package org.testin.importexport.imports;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,9 +51,18 @@ public class ImportJson {
                 .build();
     }
 
+    private static byte @NotNull [] bytesOf(final @NotNull File file) {
+        try {
+            return Files.readAllBytes(file.toPath());
+        } catch (final IOException ex) {
+            Logger.error("JSON import could not read " + file + ": " + FailureText.of(ex));
+            throw new IllegalStateException(FailureText.of(ex), ex);
+        }
+    }
+
     // UC-SHARE-005, Rule-SHARE-024
     public @NotNull Map<String, List<TestCaseDto>> parseFile(final @NotNull Project p, final @NotNull File file) {
-        final @NotNull Map<String, List<TestCaseDto>> data = Services.getInstance(p, Mapper.class).readValue(file, new TypeReference<>() {
+        final @NotNull Map<String, List<TestCaseDto>> data = Services.getInstance(p, Mapper.class).readValue(bytesOf(file), new TypeReference<>() {
         });
         final @NotNull Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         for (final Map.Entry<String, List<TestCaseDto>> entry : data.entrySet()) {
