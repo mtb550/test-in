@@ -46,9 +46,6 @@ public class PackagesWithoutTestsTest {
             "notifications",
             "Done and Refused are resolved by BundleKeysTest.theNotificationVocabularyResolves; Notifier only hands them to the platform",
 
-            "navigate",
-            "an extension point whose in-core answer is the empty one; the implementation that navigates lives in testin-java and needs that plugin",
-
             "open",
             "two actions that open the node the tester selected, through the editors and the tool window - ideTest",
 

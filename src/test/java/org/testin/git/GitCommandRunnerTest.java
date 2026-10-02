@@ -70,6 +70,7 @@ public class GitCommandRunnerTest {
                 ":2:Test Cases/a b.tc\n:2:c.tc\n");
     }
 
+    // Rule-SHARE-004, Rule-SHARE-057, Rule-SHARE-062
     @Test
     public void aTokenInARemoteUrlNeverReachesTheLogOrTheTester() {
         assertEquals(GitSafeText.withoutCredentials(

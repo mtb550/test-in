@@ -1,0 +1,163 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.codegen;
+
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.psi.PsiMethod;
+import org.jetbrains.annotations.NotNull;
+import org.testin.AbstractCodegenIdeTest;
+import org.testin.model.TestCaseStatus;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+
+import java.util.List;
+
+public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
+
+    private static final @NotNull String LOGIN_TEST = "nafath.LoginTest";
+
+    private @NotNull TestCaseDto aTestCaseWithAMethod() {
+        return createdTestCase(createdTestSet("Login"), "Log in with a valid user", "b");
+    }
+
+    private void described(final @NotNull TestCaseDto tc, final @NotNull String description) {
+        tc.setDescription(description);
+        GenType.UPDATE_TEST_CASE_DESCRIPTION.execute(getProject(), tc);
+        settled();
+    }
+
+    // Rule-CODEGEN-001, Rule-CODEGEN-039
+    public void testARenamedTestCaseFindsItsMethodByIdentityNotByName() {
+        final @NotNull TestCaseDto tc = aTestCaseWithAMethod();
+        final @NotNull PsiMethod pm = writtenMethodOf(LOGIN_TEST, tc);
+        WriteCommandAction.runWriteCommandAction(getProject(), () -> {
+            pm.setName("whatTheTesterCalledIt");
+        });
+
+        described(tc, "Sign in with a valid user");
+
+        assertEquals("the method was looked up by a name it no longer has, and the rename lost it", "signInWithAValidUser", writtenMethodOf(LOGIN_TEST, tc).getName());
+        assertEquals("a second method was written beside the one the test case already had", 1, generatedClass(LOGIN_TEST).orElseThrow().getMethods().length);
+    }
+
+    // Rule-CODEGEN-020, Rule-CODEGEN-040
+    public void testANewDescriptionRewritesTheAnnotationAndTheMethodName() {
+        final @NotNull TestCaseDto tc = aTestCaseWithAMethod();
+
+        described(tc, "Sign in with a valid user");
+
+        final @NotNull PsiMethod pm = writtenMethodOf(LOGIN_TEST, tc);
+        assertEquals("signInWithAValidUser", pm.getName());
+        assertEquals("\"Sign in with a valid user\"", testAttribute(pm, "description"));
+    }
+
+    // Rule-CODEGEN-079
+    public void testADescriptionThatCannotNameAMethodLeavesTheNameAndStillSavesTheDescription() {
+        final @NotNull TestCaseDto tc = aTestCaseWithAMethod();
+
+        described(tc, "Class");
+
+        final @NotNull PsiMethod pm = writtenMethodOf(LOGIN_TEST, tc);
+        assertEquals("the method took a name Java refuses", "logInWithAValidUser", pm.getName());
+        assertEquals("the description was not saved into the annotation", "\"Class\"", testAttribute(pm, "description"));
+    }
+
+    // Rule-CODEGEN-079
+    public void testADescriptionThatNamesAnotherTestCasesMethodLeavesTheName() {
+        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestCaseDto logIn = createdTestCase(login, "Log in", "b");
+        createdTestCase(login, "Log out", "c");
+
+        described(logIn, "log out!");
+
+        final @NotNull PsiMethod pm = writtenMethodOf(LOGIN_TEST, logIn);
+        assertEquals("two methods now share one name, and the class no longer compiles", "logIn", pm.getName());
+        assertEquals("\"log out!\"", testAttribute(pm, "description"));
+    }
+
+    // Rule-CODEGEN-045
+    public void testTheGroupsAreWrittenAsAListEachAsTyped() {
+        final @NotNull TestCaseDto tc = aTestCaseWithAMethod();
+
+        tc.setGroup(List.of("smoke", "Log in & out"));
+        GenType.UPDATE_TEST_CASE_GROUP.execute(getProject(), tc);
+        settled();
+
+        assertEquals("{\"smoke\", \"Log in & out\"}", testAttribute(writtenMethodOf(LOGIN_TEST, tc), "groups"));
+    }
+
+    // Rule-CODEGEN-046
+    public void testATestCaseInNoGroupHasNoGroupsAttribute() {
+        final @NotNull TestCaseDto tc = aTestCaseWithAMethod();
+        assertEquals("a test case created in no group was written with groups", "", testAttribute(writtenMethodOf(LOGIN_TEST, tc), "groups"));
+
+        tc.setGroup(List.of("smoke"));
+        GenType.UPDATE_TEST_CASE_GROUP.execute(getProject(), tc);
+        settled();
+        tc.setGroup(List.of());
+        GenType.UPDATE_TEST_CASE_GROUP.execute(getProject(), tc);
+        settled();
+
+        assertEquals("a test case taken out of every group kept a groups attribute", "", testAttribute(writtenMethodOf(LOGIN_TEST, tc), "groups"));
+    }
+
+    // Rule-CODEGEN-047
+    public void testTurningATestCaseOffWritesEnabledFalse() {
+        final @NotNull TestCaseDto tc = aTestCaseWithAMethod();
+
+        tc.setStatus(TestCaseStatus.DISABLED);
+        GenType.UPDATE_TEST_CASE_STATUS.execute(getProject(), tc);
+        settled();
+
+        assertEquals("false", testAttribute(writtenMethodOf(LOGIN_TEST, tc), "enabled"));
+    }
+
+    // Rule-CODEGEN-048
+    public void testTurningItBackOnTakesTheAttributeOff() {
+        final @NotNull TestCaseDto tc = aTestCaseWithAMethod();
+        tc.setStatus(TestCaseStatus.DISABLED);
+        GenType.UPDATE_TEST_CASE_STATUS.execute(getProject(), tc);
+        settled();
+
+        tc.setStatus(TestCaseStatus.PENDING);
+        GenType.UPDATE_TEST_CASE_STATUS.execute(getProject(), tc);
+        settled();
+
+        final @NotNull PsiMethod pm = writtenMethodOf(LOGIN_TEST, tc);
+        assertFalse("turning the test case back on wrote an enabled attribute: " + pm.getModifierList().getText(), pm.getModifierList().getText().contains("enabled"));
+    }
+
+    // Rule-CODEGEN-068
+    public void testUndoWritesEveryPartTestinOwnsAndCreatesNoMissingMethod() {
+        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull TestCaseDto restored = createdTestCase(login, "Log in with a valid user", "b");
+        final @NotNull TestCaseDto withoutAMethod = indexedTestCase(login, "Log out", "c");
+
+        restored.setDescription("Sign in");
+        restored.setGroup(List.of("smoke"));
+        restored.setStatus(TestCaseStatus.DISABLED);
+        GenType.RECONCILE_TEST_CASE.executeAllNow(getProject(), List.of(restored, withoutAMethod));
+        settled();
+
+        final @NotNull PsiMethod pm = writtenMethodOf(LOGIN_TEST, restored);
+        assertEquals("signIn", pm.getName());
+        assertEquals("\"Sign in\"", testAttribute(pm, "description"));
+        assertEquals("{\"smoke\"}", testAttribute(pm, "groups"));
+        assertEquals("false", testAttribute(pm, "enabled"));
+        assertTrue("undo created a method for a test case that had none", methodOf(LOGIN_TEST, withoutAMethod).isEmpty());
+    }
+}

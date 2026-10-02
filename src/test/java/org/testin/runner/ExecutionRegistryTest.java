@@ -179,6 +179,7 @@ public class ExecutionRegistryTest {
         assertFalse(status.hasBadge(), "and it draws nothing");
     }
 
+    // Rule-CODEGEN-034
     @Test
     public void runningBeatsWhateverTheLastExecutionSaid() {
         final ExecutionRegistry registry = new ExecutionRegistry();
@@ -260,5 +261,18 @@ public class ExecutionRegistryTest {
 
         registry.ended(RUN);
         assertFalse(registry.launchedHere(RUN), "and the name is not kept for the rest of the session");
+    }
+
+    // Rule-CODEGEN-076
+    @Test
+    public void aSecondExecutionStartedWhileTheFirstRunsGetsANameOfItsOwn() {
+        final @NotNull ExecutionRegistry registry = new ExecutionRegistry();
+        final @NotNull String first = registry.freeName("LoginTest");
+
+        registry.launched(List.of(UUID.randomUUID()), first);
+        assertEquals(registry.freeName("LoginTest"), first + " (2)", "the second execution shared the first one's name, so a stop could not tell them apart");
+
+        registry.launched(List.of(UUID.randomUUID()), first + " (2)");
+        assertEquals(registry.freeName("LoginTest"), first + " (3)");
     }
 }

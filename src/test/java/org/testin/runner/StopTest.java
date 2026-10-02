@@ -46,6 +46,7 @@ public class StopTest {
         assertTrue(registry.take(TWO), "the test case beside it was dropped from the launch as well");
     }
 
+    // Rule-CODEGEN-037
     @Test
     public void aStopTakesItsOwnExecutionAndNoOther() {
         final ExecutionRegistry registry = new ExecutionRegistry();
@@ -80,6 +81,7 @@ public class StopTest {
         assertEquals(registry.stopping(List.of(ONE)), Stop.NOTHING);
     }
 
+    // Rule-CODEGEN-092
     @Test
     public void anExecutionThatEndsQuietlyReleasesTheTestCasesItHeld() {
         final ExecutionRegistry registry = new ExecutionRegistry();

@@ -40,6 +40,7 @@ public class AgentAnswerTest {
                 "the prose around a fenced block would not compile, and the tester never asked for it");
     }
 
+    // Rule-CODEGEN-088
     @Test
     public void theLargestBlockWinsWhenAnAgentShowsSeveral() {
         final String two = "```java\nint x = 1;\n```\nand the real one:\n```java\n" + STATEMENTS + "\n```";
@@ -47,6 +48,7 @@ public class AgentAnswerTest {
         assertEquals(AgentAnswer.statementsIn(two), Optional.of(STATEMENTS));
     }
 
+    // Rule-CODEGEN-088
     @Test
     public void anApologyIsNotABody() {
         assertTrue(AgentAnswer.statementsIn("I am sorry, I cannot help with that").isEmpty(),

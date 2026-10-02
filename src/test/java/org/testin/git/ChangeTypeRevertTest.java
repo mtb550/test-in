@@ -87,6 +87,7 @@ public class ChangeTypeRevertTest {
         assertFalse(ChangeType.REMOVE_TEST_CASE.isRevertible());
     }
 
+    // Rule-SHARE-052
     @Test
     public void eachRevertRestoresItsOwnFieldAndNothingElse() {
         for (final FieldChange change : TestCaseChangeComparator.compare(committed(), edited())) {
@@ -112,6 +113,7 @@ public class ChangeTypeRevertTest {
                 "reverting every listed change leaves nothing to review");
     }
 
+    // Rule-SHARE-052
     @Test
     public void revertingTheLastChangePutsBackTheCommittedAudit() {
         final TestCaseDto committed = committed()

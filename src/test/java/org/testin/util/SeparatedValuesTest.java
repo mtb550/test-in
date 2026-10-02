@@ -30,11 +30,13 @@ public class SeparatedValuesTest {
         assertEquals(SeparatedValues.split("a\tb,c\nd,e", ','), List.of(List.of("a\tb", "c"), List.of("d", "e")));
     }
 
+    // Rule-SHARE-124
     @Test
     public void aQuoteOpensAQuotedValueOnlyAtItsStart() {
         assertEquals(SeparatedValues.split("\"a,\"\"b\"\"\nc\",ab\"c\"d", ','), List.of(List.of("a,\"b\"\nc", "ab\"c\"d")));
     }
 
+    // Rule-SHARE-124
     @Test
     public void aByteOrderMarkAtTheStartIsIgnored() {
         assertEquals(SeparatedValues.split("﻿a\tb", '\t'), List.of(List.of("a", "b")));

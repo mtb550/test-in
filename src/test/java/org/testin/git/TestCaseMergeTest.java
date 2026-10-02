@@ -17,6 +17,7 @@
 package org.testin.git;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.Bundle;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 
@@ -48,6 +49,7 @@ public class TestCaseMergeTest {
         return "Thursday 20-08-2026 At " + time + " [Asia/Riyadh]";
     }
 
+    // Rule-SHARE-078, Rule-SHARE-080
     @Test
     public void differentFieldsMergeWithoutAsking() {
         final String base = testCase("sign in", "dashboard opens", "LOW", "", at("09:00:00"), "m");
@@ -61,6 +63,7 @@ public class TestCaseMergeTest {
         assertEquals(merge.merged().get("expectedResult").asText(), "the account dashboard opens");
     }
 
+    // Rule-SHARE-109
     @Test
     public void theAuditStampsAreNeverAQuestion() {
         final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "m");
@@ -74,6 +77,7 @@ public class TestCaseMergeTest {
         assertEquals(merge.merged().get("updatedAt").asText(), at("11:30:00"));
     }
 
+    // Rule-SHARE-078, Rule-SHARE-081
     @Test
     public void theSameFieldChangedBothWaysIsAskedAbout() {
         final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "m");
@@ -116,6 +120,7 @@ public class TestCaseMergeTest {
         assertEquals(merge.merged().get("description").asText(), "mine");
     }
 
+    // Rule-SHARE-109
     @Test
     public void aPositionIsSettledWithoutAsking() {
         final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "m");
@@ -126,6 +131,21 @@ public class TestCaseMergeTest {
 
         assertTrue(merge.isSettled(), "where a test case sits is not a question a tester can answer about a merge");
         assertEquals(merge.merged().get("order").asText(), "s");
+    }
+
+    // Rule-SHARE-109
+    @Test
+    public void theSettledFieldsAreNamedForTheTester() {
+        final @NotNull String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "m");
+        final @NotNull String mine = testCase("a registered user signs in", "", "LOW", "muteb", at("10:00:00"), "c");
+        final @NotNull String theirs = testCase("sign in", "", "LOW", "sara", at("11:00:00"), "s");
+
+        final @NotNull Merge merge = TestCaseMerge.of(RealMapper.build(), base, mine, theirs);
+        final @NotNull String said = Merge.settledSentence(merge.settled(), "\n");
+
+        assertTrue(merge.isSettled());
+        assertTrue(said.contains(Bundle.message("git.merge.audit")), "who changed it last is named as settled: " + said);
+        assertTrue(said.contains(Bundle.message("git.merge.position")), "the position is named as settled: " + said);
     }
 
     @Test

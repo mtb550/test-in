@@ -114,7 +114,7 @@ public class ArchitectureTest {
         rule.check(CLASSES);
     }
 
-    // Rule-PRODUCT-020
+    // Rule-PRODUCT-020, Rule-CODEGEN-061
     @Test
     public void theCoreWorksWithoutJava() {
         final @NotNull ArchRule rule = noClasses()

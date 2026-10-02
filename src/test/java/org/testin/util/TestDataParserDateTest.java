@@ -29,6 +29,7 @@ public class TestDataParserDateTest {
 
     private final ZonedDateTime when = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS).minusMonths(7);
 
+    // Rule-SHARE-121
     @Test
     public void readsBackWhatThePluginDisplays() {
         final String displayed = Display.formatDate(when);
@@ -37,6 +38,7 @@ public class TestDataParserDateTest {
                 "the export writes this shape, so the import has to read it");
     }
 
+    // Rule-SHARE-121
     @Test
     public void readsThePlainSpreadsheetShape() {
         final String plain = when.format(Config.EXCEL_DATE_FORMATTER);
@@ -54,12 +56,14 @@ public class TestDataParserDateTest {
         assertEquals(read.getYear(), 2026);
     }
 
+    // Rule-SHARE-106, Rule-SHARE-121
     @Test
     public void aBlankCellIsNoTimeAtAll() {
         assertTrue(Config.isNotExecuted(TestDataParser.date("").orElseThrow()), "the file did not say when");
         assertTrue(Config.isNotExecuted(TestDataParser.date("   ").orElseThrow()), "nor here");
     }
 
+    // Rule-SHARE-106, Rule-SHARE-121
     @Test
     public void textThatIsNeitherShapeIsRefused() {
         assertTrue(TestDataParser.date("last Tuesday").isEmpty(),

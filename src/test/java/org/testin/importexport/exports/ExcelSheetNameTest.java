@@ -18,9 +18,12 @@ package org.testin.importexport.exports;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -41,6 +44,7 @@ public class ExcelSheetNameTest {
         }
     }
 
+    // Rule-SHARE-016
     @Test
     public void aSecondShortSheetOfTheSameNameIsNumbered() {
         try {
@@ -49,6 +53,25 @@ public class ExcelSheetNameTest {
 
                 assertEquals(ExportExcel.uniqueSheetName(workbook, "A*B"), "A_B (2)",
                         "both sanitize to A_B, so the second one takes a number");
+            }
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    // Rule-SHARE-016
+    @Test
+    public void theFirstSheetKeepsTheNameAndTheRestAreNumbered() {
+        try {
+            try (Workbook workbook = new XSSFWorkbook()) {
+                final @NotNull List<String> names = new ArrayList<>();
+                for (int i = 0; i < 3; i++) {
+                    final @NotNull String name = ExportExcel.uniqueSheetName(workbook, "Login");
+                    workbook.createSheet(name);
+                    names.add(name);
+                }
+
+                assertEquals(names, List.of("Login", "Login (2)", "Login (3)"));
             }
         } catch (final IOException ex) {
             throw new AssertionError(ex);

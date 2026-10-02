@@ -255,7 +255,7 @@ public class TestinConfigTest {
                 "https://github.com/mtb550/test-01.git");
     }
 
-    // Rule-TREE-PANEL-113
+    // Rule-TREE-PANEL-113, Rule-SHARE-004
     @Test
     public void theLinesSaySharedOnlyWithARemote() {
         assertEquals(TestinYml.lines("NAFATH", ""), Map.of("testinProject", "NAFATH", "location", "local"));

@@ -142,6 +142,7 @@ public class GitDiffProcessorTest {
         }
     }
 
+    // Rule-SHARE-046
     @Test
     public void aFileGitCallsModifiedIsAlwaysARow() {
         final TestCaseDto unchanged = testCase("identical on both sides");

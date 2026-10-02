@@ -17,37 +17,51 @@
 package org.testin;
 
 import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiCodeBlock;
 import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.testFramework.LightProjectDescriptor;
+import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.PsiTestUtil;
 import com.intellij.util.PathUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.jetbrains.jps.model.module.JpsModuleSourceRootType;
+import org.testin.codegen.GenType;
 import org.testin.codegen.JavaCode;
 import org.testin.config.TestinYml;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
+import org.testin.indexer.TestCases;
 import org.testin.model.DirectoryType;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.services.Services;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 
 public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
 
     private static final @NotNull String TEST_PROJECT = "NAFATH";
+
+    private static final @NotNull String TESTNG_TEST = "org.testng.annotations.Test";
 
     private static final @NotNull LightProjectDescriptor JAVA_TEST_SOURCE_ROOT = new LightProjectDescriptor() {
         @Override
@@ -91,20 +105,86 @@ public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    protected @NotNull TestSetDirectoryDto createdTestSet(final @NotNull String name) {
-        final @NotNull TestSetDirectoryDto ts = WriteAction.computeAndWait(() -> {
-            final @NotNull TestSetDirectoryDto created = Services.getInstance(getProject(), DirectoryMapper.class)
-                    .getTestSetNode(testProject.getTestCasesDirectory().getPath().resolve(name), testProject.getTestCasesDirectory());
+    private @NotNull DirectoryMapper mapper() {
+        return Services.getInstance(getProject(), DirectoryMapper.class);
+    }
+
+    protected @NotNull DirectoryDto testCasesDirectory() {
+        return testProject.getTestCasesDirectory();
+    }
+
+    protected @NotNull TestSetPackageDirectoryDto indexedPackage(final @NotNull String name, final @NotNull DirectoryDto parent) {
+        return WriteAction.computeAndWait(() -> {
+            final @NotNull TestSetPackageDirectoryDto created = mapper().getTestSetPackageNode(parent.getPath().resolve(name), parent);
+            nodes().addTestSetPackage(created);
+            return created;
+        });
+    }
+
+    protected @NotNull TestSetDirectoryDto indexedTestSet(final @NotNull String name, final @NotNull DirectoryDto parent) {
+        return WriteAction.computeAndWait(() -> {
+            final @NotNull TestSetDirectoryDto created = mapper().getTestSetNode(parent.getPath().resolve(name), parent);
             nodes().addTestSet(created);
             return created;
         });
+    }
+
+    protected @NotNull TestSetDirectoryDto createdTestSet(final @NotNull String name) {
+        return createdTestSet(name, testCasesDirectory());
+    }
+
+    protected @NotNull TestSetDirectoryDto createdTestSet(final @NotNull String name, final @NotNull DirectoryDto parent) {
+        final @NotNull TestSetDirectoryDto ts = indexedTestSet(name, parent);
 
         JavaCode.of(DirectoryType.TS).getCreated().execute(getProject(), ts);
         return ts;
     }
 
+    protected @NotNull TestCaseDto indexedTestCase(final @NotNull TestSetDirectoryDto ts, final @NotNull String description, final @NotNull String order) {
+        final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description(description).order(order).build();
+        tc.setParent(ts);
+        Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(ts.getPath(), tc);
+        return tc;
+    }
+
+    protected @NotNull TestCaseDto createdTestCase(final @NotNull TestSetDirectoryDto ts, final @NotNull String description, final @NotNull String order) {
+        final @NotNull TestCaseDto tc = indexedTestCase(ts, description, order);
+        GenType.CREATE_TEST_CASE.execute(getProject(), tc);
+        return tc;
+    }
+
     protected @NotNull Optional<PsiClass> generatedClass(final @NotNull String qualifiedName) {
         PsiDocumentManager.getInstance(getProject()).commitAllDocuments();
         return Optional.ofNullable(JavaPsiFacade.getInstance(getProject()).findClass(qualifiedName, GlobalSearchScope.projectScope(getProject())));
+    }
+
+    protected @NotNull Optional<PsiMethod> methodOf(final @NotNull String qualifiedName, final @NotNull TestCaseDto tc) {
+        return generatedClass(qualifiedName).stream()
+                .flatMap(pc -> Arrays.stream(pc.getMethods()))
+                .filter(pm -> testAttribute(pm, "testName").equals("\"" + tc.getId() + "\""))
+                .findFirst();
+    }
+
+    protected @NotNull PsiMethod writtenMethodOf(final @NotNull String qualifiedName, final @NotNull TestCaseDto tc) {
+        return methodOf(qualifiedName, tc).orElseThrow(() -> new AssertionError("'" + tc.getDescription() + "' has no method in " + qualifiedName));
+    }
+
+    protected static @NotNull String testAttribute(final @NotNull PsiMethod pm, final @NotNull String attribute) {
+        return Optional.ofNullable(pm.getModifierList().findAnnotation(TESTNG_TEST))
+                .map(annotation -> annotation.findDeclaredAttributeValue(attribute))
+                .map(PsiElement::getText)
+                .orElse("");
+    }
+
+    protected void settled() {
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+        PsiDocumentManager.getInstance(getProject()).commitAllDocuments();
+    }
+
+    protected void writtenByTheTester(final @NotNull PsiMethod pm, final @NotNull String statements) {
+        final @NotNull PsiCodeBlock body = Optional.ofNullable(pm.getBody()).orElseThrow(() -> new AssertionError(pm.getName() + " has no body to write in"));
+        WriteCommandAction.runWriteCommandAction(getProject(), () -> {
+            body.replace(JavaPsiFacade.getElementFactory(getProject()).createCodeBlockFromText("{ " + statements + " }", body));
+        });
     }
 }

@@ -72,6 +72,7 @@ public class TestRunMergeTest {
               "executionEndedAt" : "Monday 14-09-2026 At 11:35:00 [Asia/Riyadh]"
             }""";
 
+    // Rule-SHARE-080, Rule-SHARE-081
     @Test
     public void theLaterRunItemStatusWinsWhole() {
         final Merge merge = RunItemMerge.of(RealMapper.build(), MINE_ITEM, THEIRS_ITEM);
@@ -100,6 +101,7 @@ public class TestRunMergeTest {
         assertEquals(merge.merged().path("status").asText(), "PASSED");
     }
 
+    // Rule-SHARE-080
     @Test
     public void aTestRunRanFromTheFirstStartToTheLastStop() {
         final Merge merge = TestRunMarkerMerge.of(RealMapper.build(), BASE_MARKER, MINE_MARKER, THEIRS_MARKER);
@@ -120,6 +122,7 @@ public class TestRunMergeTest {
         assertEquals(merge.merged().path("configuration").path("PLATFORM").asText(), "Web", "neither touched it");
     }
 
+    // Rule-SHARE-081
     @Test
     public void onlyAFieldBothChangedIsAskedAbout() {
         final String theirs = THEIRS_MARKER.replace("\"PLATFORM\" : \"Web\"", "\"PLATFORM\" : \"Mobile\"");

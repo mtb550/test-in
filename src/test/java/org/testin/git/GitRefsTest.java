@@ -64,11 +64,13 @@ public class GitRefsTest {
         assertFalse(GitRefs.isRepositoryUrl("https://x.com/r|whoami"), "nor a pipe");
     }
 
+    // Rule-SHARE-122
     @Test
     public void originWinsWhateverOrderTheRemotesArrive() {
         assertEquals(GitRefs.chooseRemote(List.of("upstream", "origin", "fork")), "origin");
     }
 
+    // Rule-SHARE-122
     @Test
     public void withoutOriginTheFirstRemoteIsUsed() {
         assertEquals(GitRefs.chooseRemote(List.of("upstream", "fork")), "upstream");
@@ -176,6 +178,7 @@ public class GitRefsTest {
         assertEquals(GitRefs.parseStatus(List.of("A  a.json")).getFirst().type(), DiffType.ADDED);
     }
 
+    // Rule-SHARE-048
     @Test
     public void aRenameIsBothTheDeletionAndTheAddition() {
         final List<StatusEntry> entries = GitRefs.parseStatus(
@@ -247,6 +250,43 @@ public class GitRefsTest {
     @Test
     public void emptyAndTruncatedLinesAreSkipped() {
         assertEquals(GitRefs.parseStatus(List.of("", "  ", "??")), List.of());
+    }
+
+    // Rule-SHARE-108
+    @Test
+    public void anEmailAddressIsSomethingAnAtSignAndADottedDomain() {
+        assertTrue(GitRefs.isEmailAddress("sara@example.com"));
+        assertTrue(GitRefs.isEmailAddress("sara.otaibi@qa.example.org"));
+        assertTrue(GitRefs.isEmailAddress("  sara@example.com  "), "the space around the address is not part of it");
+    }
+
+    // Rule-SHARE-108
+    @Test
+    public void whatIsPlainlyNotAnEmailAddressIsRefused() {
+        assertFalse(GitRefs.isEmailAddress("sara"), "no at sign");
+        assertFalse(GitRefs.isEmailAddress("@example.com"), "nothing before the at sign");
+        assertFalse(GitRefs.isEmailAddress("sara@localhost"), "no dot after the at sign");
+        assertFalse(GitRefs.isEmailAddress("sara@example."), "nothing after the last dot");
+        assertFalse(GitRefs.isEmailAddress("sara otaibi@example.com"), "a space inside the address");
+        assertFalse(GitRefs.isEmailAddress("sara@@example.com"), "two at signs");
+    }
+
+    // Rule-SHARE-079
+    @Test
+    public void theConflictMessageNamesTheFilesStillInTheWay() {
+        final @NotNull String said = GitRefs.conflictMessage(List.of("notes.txt", "Test Cases/login/a.tc"));
+
+        assertTrue(said.contains("notes.txt") && said.contains("Test Cases/login/a.tc"), said);
+    }
+
+    // Rule-SHARE-079
+    @Test
+    public void aLongListNamesThreeFilesAndCountsTheRest() {
+        final @NotNull String said = GitRefs.conflictMessage(List.of("a.tc", "b.tc", "c.tc", "d.tc", "e.tc"));
+
+        assertTrue(said.contains("a.tc, b.tc, c.tc"), said);
+        assertFalse(said.contains("d.tc"), said);
+        assertTrue(said.contains("2 more"), said);
     }
 
 }

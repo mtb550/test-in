@@ -92,6 +92,7 @@ public class PendingChangeFactoryTest {
         assertEquals(change.newValue(), "");
     }
 
+    // Rule-SHARE-045
     @Test
     public void aModifiedFileListsOnlyTheFieldsThatChanged() {
         final TestCaseDto before = testCase("the original description");
@@ -112,6 +113,7 @@ public class PendingChangeFactoryTest {
                 Set.of(ChangeType.CHANGE_PRIORITY, ChangeType.CHANGE_MODULE));
     }
 
+    // Rule-SHARE-046
     @Test
     public void aModifiedFileWithNoComparedFieldStillGetsARow() {
         final TestCaseDto unchanged = testCase("identical on both sides");
@@ -219,5 +221,27 @@ public class PendingChangeFactoryTest {
 
         assertEquals(TestCaseChangeComparator.compare(original, readBack), List.of(),
                 "a test case written and read back must compare as unchanged");
+    }
+
+    // Rule-SHARE-051
+    @Test
+    public void onlyAChangeToATestCaseCanBePutBack() {
+        final @NotNull TestCaseDto before = testCase("before");
+        final @NotNull TestCaseDto after = testCase("after").setId(before.getId());
+        final @NotNull UUID testCaseId = UUID.randomUUID();
+
+        assertTrue(PendingChangeFactory.fromFile(DiffType.ADDED, "", json(after), PATH, RealMapper.build(), _ -> Optional.empty()).isRevertible(),
+                "a new test case can be taken out again");
+        assertTrue(PendingChangeFactory.fromFile(DiffType.DELETED, json(before), "", PATH, RealMapper.build(), _ -> Optional.empty()).isRevertible(),
+                "a removed test case can be put back");
+        assertTrue(PendingChangeFactory.fromFile(DiffType.MODIFIED, json(before), json(after), PATH, RealMapper.build(), _ -> Optional.empty()).isRevertible(),
+                "a changed field can be put back");
+
+        assertFalse(PendingChangeFactory.fromFile(DiffType.MODIFIED, "{\"status\":\"PENDING\"}", "{\"status\":\"PASSED\"}",
+                Path.of("Test Runs", "cycle 4", testCaseId + ".ri"), RealMapper.build(), _ -> Optional.empty()).isRevertible(), "a run item status is not a change to a test case");
+        assertFalse(PendingChangeFactory.fromFile(DiffType.MODIFIED, "{\"status\":\"ACTIVE\"}", "{\"status\":\"ARCHIVED\"}",
+                Path.of("Test Cases", "login", ".ts"), RealMapper.build(), _ -> Optional.empty()).isRevertible(), "a marker is not a change to a test case");
+        assertFalse(PendingChangeFactory.fromFile(DiffType.ADDED, "", "notes",
+                Path.of("Test Cases", "login", "notes.txt"), RealMapper.build(), _ -> Optional.empty()).isRevertible(), "a file Testin does not own is not a change to a test case");
     }
 }

@@ -55,6 +55,7 @@ public class GeneratedNamesTest {
         }
     }
 
+    // Rule-CODEGEN-011
     @Test
     public void aClassNameIsTheSameEveryTimeItIsAskedFor() {
         for (final String name : UNNAMEABLE) {
@@ -62,6 +63,7 @@ public class GeneratedNamesTest {
         }
     }
 
+    // Rule-CODEGEN-011
     @Test
     public void twoTestSetsNeverWriteIntoOneClass() {
         for (int i = 0; i < UNNAMEABLE.length; i++) {
@@ -93,6 +95,7 @@ public class GeneratedNamesTest {
         }
     }
 
+    // Rule-CODEGEN-073
     @Test
     public void aJavaKeywordNeverBecomesAPackageName() {
         for (final String name : KEYWORDS) {
@@ -102,6 +105,7 @@ public class GeneratedNamesTest {
         }
     }
 
+    // Rule-CODEGEN-073
     @Test
     public void aKeywordNamesTheSamePackageEveryTime() {
         for (final String name : KEYWORDS) {
@@ -138,5 +142,26 @@ public class GeneratedNamesTest {
         assertEquals(NameSanitizer.className("user login"), "UserLoginTest");
         assertEquals(NameSanitizer.packageName("Checkout"), "checkout");
         assertEquals(NameSanitizer.packageName("payment methods"), "paymentMethods");
+    }
+
+    // Rule-CODEGEN-011
+    @Test
+    public void aTestSetWithNoNameAtAllIsDefaultTest() {
+        assertEquals(NameSanitizer.className(""), "DefaultTest");
+        assertEquals(NameSanitizer.className("   "), "DefaultTest");
+    }
+
+    // Rule-CODEGEN-012
+    @Test
+    public void aMethodNameIsTheDescriptionInLowerCamelCaseWithOnlyLettersAndDigits() {
+        assertEquals(NameSanitizer.methodName("Log in, with a VALID user #2!"), "logInWithAValidUser2",
+                "everything but letters and digits is removed, the first word lowercase and every later word capitalized");
+    }
+
+    // Rule-CODEGEN-016
+    @Test
+    public void descriptionsThatDifferOnlyInPunctuationOrCapitalsAreOneMethod() {
+        assertEquals(NameSanitizer.methodName("Log in!"), NameSanitizer.methodName("LOG-IN"),
+                "two descriptions a tester reads as one would write two methods for one test");
     }
 }

@@ -27,12 +27,14 @@ import static org.testng.Assert.assertTrue;
 
 public class TestDataParserRefusalTest {
 
+    // Rule-SHARE-106
     @Test
     public void aPriorityItCannotReadIsRefused() {
         assertTrue(TestDataParser.priority("Urgent", Priority.HIGH).isEmpty(),
                 "answering P3 is how 200 imported test cases all became the lowest priority");
     }
 
+    // Rule-SHARE-106
     @Test
     public void aBlankPriorityKeepsWhatTheTestCaseHad() {
         assertEquals(TestDataParser.priority("  ", Priority.HIGH).orElseThrow(), Priority.HIGH,
@@ -58,6 +60,7 @@ public class TestDataParserRefusalTest {
                 "the bulk editor deduplicated and the grid did not, so one cell had two answers (#295)");
     }
 
+    // Rule-SHARE-106
     @Test
     public void aBlankCellIsNoGroupsAtAll() {
         assertTrue(TestDataParser.groups("   ").orElseThrow().isEmpty(),

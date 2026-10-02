@@ -42,6 +42,7 @@ public class TestCaseStatusParseTest {
         assertEquals(TestDataParser.testCaseStatus("  reviewed  ", TestCaseStatus.PENDING).orElseThrow(), TestCaseStatus.REVIEWED);
     }
 
+    // Rule-SHARE-106
     @Test
     public void anythingElseKeepsTheStatusTheTestCaseAlreadyHad() {
         assertTrue(TestDataParser.testCaseStatus("Nonsense", TestCaseStatus.REVIEWED).isEmpty(), "a word Testin cannot read is refused, so the caller can say so");

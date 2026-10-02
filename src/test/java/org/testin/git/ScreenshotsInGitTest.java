@@ -47,6 +47,7 @@ public class ScreenshotsInGitTest {
         }
     }
 
+    // Rule-SHARE-112
     @Test
     public void theReviewListsNoScreenshotRow() {
         try {
@@ -75,6 +76,7 @@ public class ScreenshotsInGitTest {
         }
     }
 
+    // Rule-SHARE-112
     @Test
     public void committingATestRunCarriesTheScreenshotsItsFolderGainedOrLost() {
         final List<String> status = List.of(" M " + RESULT, "?? " + ADDED, " D " + REMOVED, "?? " + OTHER_RUN);
