@@ -72,7 +72,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -263,9 +262,10 @@ final class LightModeWindow {
     private void bindKeys() {
         frame.bind(Shortcuts.Escape.getKey(), "testin.lightMode.escape", this::escape);
         frame.bind(Shortcuts.Enter.getKey(), "testin.lightMode.commit", this::saveCapture);
-        frame.bind(Shortcuts.ToggleDetails.getKey(), "testin.lightMode.toggleDetails", this::toggleDetailsOnce);
-        frame.bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, Shortcuts.menuMask(), true), "testin.lightMode.releaseDetails", () -> detailsKeyHeld = false);
-        frame.bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, true), "testin.lightMode.releaseDetailsAlone", () -> detailsKeyHeld = false);
+        final @NotNull KeyStroke details = Shortcuts.ToggleDetails.getKey();
+        frame.bind(details, "testin.lightMode.toggleDetails", this::toggleDetailsOnce);
+        frame.bind(KeyStroke.getKeyStroke(details.getKeyCode(), details.getModifiers(), true), "testin.lightMode.releaseDetails", () -> detailsKeyHeld = false);
+        frame.bind(KeyStroke.getKeyStroke(details.getKeyCode(), 0, true), "testin.lightMode.releaseDetailsAlone", () -> detailsKeyHeld = false);
 
         for (final RunItemStatus status : RunItemStatus.values()) {
             if (!status.isRunItemStatus()) continue;

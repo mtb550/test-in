@@ -229,6 +229,7 @@
         >
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt F"/>
             <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta alt F"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta alt F"/>
         </action>
 
         <!-- The tree's actions. Declared rather than constructed so Find Action
@@ -243,7 +244,8 @@
                 icon="org.testin.util.Icons.TEST_CASE_LETTER"
         >
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl M"/>
-            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta M"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="ctrl alt meta M"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="ctrl alt meta M"/>
         </action>
 
         <action
@@ -315,6 +317,7 @@
                  the exception to it, decided deliberately. -->
             <keyboard-shortcut keymap="$default" first-keystroke="F12"/>
             <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta F12"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta F12"/>
         </action>
 
         <action

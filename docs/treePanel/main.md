@@ -182,7 +182,7 @@ its status bar, at the foot of the dialog.
 | `Ctrl+Y`                              | Redoes it                                              | [UC-TREE-PANEL-017](redoChange.md)             |
 | `1` `2` `3`                           | Inside the status popup: Assigned, Completed, Closed   | [UC-TREE-PANEL-020](setTestRunStatus.md)       |
 | `Ctrl+Alt+F`, `Cmd+Alt+F` on a Mac    | Opens search, from anywhere in the IDE                 | [UC-INTERNAL-001](../internal/globalSearch.md) |
-| `Ctrl+P`                              | Generates a report on the selected test run            | [UC-REPORT-001](../report/generateReport.md)   |
+| `Ctrl+P`, `Ctrl+Alt+P` on a Mac       | Generates a report on the selected test run            | [UC-REPORT-001](../report/generateReport.md)   |
 | The menu key, beside the right `Ctrl` | Opens the node menu                                    | Below, under **What the tree shows**           |
 
 Six things a tester might expect have **no key** on the tree. **Order**, the

@@ -7,7 +7,7 @@ before I forget it.
 
 This is how every test case in Testin begins.
 
-`Ctrl+M`.
+`Ctrl+M`, or `Ctrl+Alt+Cmd+M` on a Mac.
 
 ## Rules
 
@@ -108,16 +108,16 @@ This is how every test case in Testin begins.
 
 ## The fields and the keys that open them
 
-| Field           | Key      | The gray hint in the empty box                |
-|-----------------|----------|-----------------------------------------------|
-| Description     | `Ctrl+D` | *set description*                             |
-| Expected Result | `Ctrl+E` | *set expected result*                         |
-| Module          | `Ctrl+M` | *set module*                                  |
-| Steps           | `Ctrl+S` | *set step*, then the number                   |
-| Priority        | `Ctrl+P` | none, it is three radio buttons               |
-| Group           | `Ctrl+G` | *set group*, completing what the project uses |
-| Test Data       | `Ctrl+T` | *set test data*                               |
-| Pre Conditions  | `Ctrl+B` | *set preconditions*                           |
+| Field           | Key                                 | The gray hint in the empty box                |
+|-----------------|-------------------------------------|-----------------------------------------------|
+| Description     | `Ctrl+D`, `Cmd+D` on a Mac          | *set description*                             |
+| Expected Result | `Ctrl+E`, `Cmd+E` on a Mac          | *set expected result*                         |
+| Module          | `Ctrl+M`, `Ctrl+Alt+Cmd+M` on a Mac | *set module*                                  |
+| Steps           | `Ctrl+S`, `Cmd+S` on a Mac          | *set step*, then the number                   |
+| Priority        | `Ctrl+P`, `Ctrl+Alt+P` on a Mac     | none, it is three radio buttons               |
+| Group           | `Ctrl+G`, `Ctrl+Alt+G` on a Mac     | *set group*, completing what the project uses |
+| Test Data       | `Ctrl+T`, `Cmd+T` on a Mac          | *set test data*                               |
+| Pre Conditions  | `Ctrl+B`, `Ctrl+Alt+Cmd+B` on a Mac | *set preconditions*                           |
 
 Each field's icon is the letter of its key in a rounded frame, so Pre Conditions
 shows B. The same icon marks the field's values in its completion list.
@@ -194,7 +194,7 @@ refresh.
 
 **The empty editor names a key a Mac does not have.** A test set with no test
 cases reads *Press Ctrl+M to add* on every machine, while the key itself is
-`Cmd+M` on a Mac. That is difference 9.
+`Ctrl+Alt+Cmd+M` on a Mac. That is difference 9.
 
 ---
 

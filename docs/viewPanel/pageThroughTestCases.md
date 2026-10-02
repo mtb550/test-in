@@ -8,7 +8,8 @@ keys.
 
 The panel was handed a list of test cases. These two keys walk that list.
 
-`Ctrl+Right` moves forward. `Ctrl+Left` moves back.
+`Ctrl+Right` moves forward. `Ctrl+Left` moves back. On a Mac they are
+`Ctrl+Alt+Cmd+Right` and `Ctrl+Alt+Cmd+Left`.
 
 ## Rules
 

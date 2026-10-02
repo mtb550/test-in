@@ -39,6 +39,7 @@ What each version of Testin changed, for a tester deciding whether to update. Th
 - **Large test projects:** an Excel export and an Excel import take far less memory, Cancel stops a report within a row, and the tree redraws only the folders that changed.
 - **Ready for the next IDE:** Report Bug no longer calls a platform method that is scheduled for removal, and Testin no longer registers a file system through an internal platform API.
 - On a Mac, **Cmd+D** in light mode shows and hides the details every time, not only the first.
+- **Every Testin key reaches Testin on a Mac:** Create Test Case is **Ctrl+Alt+Cmd+M**, where **Cmd+M** minimized the window, and paging is **Ctrl+Alt+Cmd+Right** and **Left**, with **Shift** for the ends, because **Ctrl** and an arrow switch desktops. Generate Report is **Ctrl+Alt+P**, and in the test case dialogs Module is **Ctrl+Alt+Cmd+M**, Pre Conditions **Ctrl+Alt+Cmd+B**, Priority **Ctrl+Alt+P** and Group **Ctrl+Alt+G** - keys neither macOS nor the IDE uses. The IntelliJ IDEA Classic keymap gets the same Mac keys as the macOS one. Windows and Linux keep their keys.
 - The web page report keeps the line breaks of a test case description, and the Excel report heads its test case column **Test Case**, as the web page, the PDF and the Word document do.
 - **A signed off test run keeps what it recorded:** on a Completed or Closed test run, **P**, **F** and **B**, the failure details and the grid's Actual Result are gray and say why, as the status bar always claimed.
 

@@ -67,18 +67,18 @@ in front of them while they write down what actually happened.
 
 ## Every key the panel answers to
 
-| Key                        | What it does                                                | The page that owns it                                                       |
-|----------------------------|-------------------------------------------------------------|-----------------------------------------------------------------------------|
-| `Enter`                    | Opens the panel on the selected test cases                  | [UC-VIEW-PANEL-001](openDetails.md)                                         |
-| `F2`                       | Opens the menu that changes one field                       | [UC-VIEW-PANEL-011](changeOneField.md)                                      |
-| `Ctrl+Right`               | Moves to the next test case                                 | [UC-VIEW-PANEL-003](pageThroughTestCases.md)                                |
-| `Ctrl+Left`                | Moves to the previous test case                             | [UC-VIEW-PANEL-003](pageThroughTestCases.md)                                |
-| `Escape`                   | Closes the panel, pressed in the editor or inside the panel | [UC-VIEW-PANEL-015](closePanel.md)                                          |
-| `Ctrl` and the mouse wheel | Makes every Testin text bigger or smaller                   | [UC-SETTING-011](../setting/changeTextSize.md)                              |
-| `F5`                       | Runs the test case on display, or stops it while it runs    | [UC-VIEW-PANEL-012](runFromPanel.md), [UC-VIEW-PANEL-013](stopFromPanel.md) |
-| `Shift+F5`                 | Opens its generated test method                             | [UC-VIEW-PANEL-014](goToCode.md)                                            |
-| `Tab`                      | Brings the next tab to the front, with the keyboard in it   | [UC-VIEW-PANEL-017](moveBetweenTabs.md)                                     |
-| `Shift+Tab`                | Brings the previous tab to the front                        | [UC-VIEW-PANEL-017](moveBetweenTabs.md)                                     |
+| Key                                         | What it does                                                | The page that owns it                                                       |
+|---------------------------------------------|-------------------------------------------------------------|-----------------------------------------------------------------------------|
+| `Enter`                                     | Opens the panel on the selected test cases                  | [UC-VIEW-PANEL-001](openDetails.md)                                         |
+| `F2`                                        | Opens the menu that changes one field                       | [UC-VIEW-PANEL-011](changeOneField.md)                                      |
+| `Ctrl+Right`, `Ctrl+Alt+Cmd+Right` on a Mac | Moves to the next test case                                 | [UC-VIEW-PANEL-003](pageThroughTestCases.md)                                |
+| `Ctrl+Left`, `Ctrl+Alt+Cmd+Left` on a Mac   | Moves to the previous test case                             | [UC-VIEW-PANEL-003](pageThroughTestCases.md)                                |
+| `Escape`                                    | Closes the panel, pressed in the editor or inside the panel | [UC-VIEW-PANEL-015](closePanel.md)                                          |
+| `Ctrl` and the mouse wheel                  | Makes every Testin text bigger or smaller                   | [UC-SETTING-011](../setting/changeTextSize.md)                              |
+| `F5`                                        | Runs the test case on display, or stops it while it runs    | [UC-VIEW-PANEL-012](runFromPanel.md), [UC-VIEW-PANEL-013](stopFromPanel.md) |
+| `Shift+F5`                                  | Opens its generated test method                             | [UC-VIEW-PANEL-014](goToCode.md)                                            |
+| `Tab`                                       | Brings the next tab to the front, with the keyboard in it   | [UC-VIEW-PANEL-017](moveBetweenTabs.md)                                     |
+| `Shift+Tab`                                 | Brings the previous tab to the front                        | [UC-VIEW-PANEL-017](moveBetweenTabs.md)                                     |
 
 ---
 

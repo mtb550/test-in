@@ -48,9 +48,9 @@ a ticket, mailed to a manager, or kept as the record that a release was tested.
 
 ## Every key
 
-| Key      | What it does                                | The page that owns it              |
-|----------|---------------------------------------------|------------------------------------|
-| `Ctrl+P` | Generates a report on the selected test run | [UC-REPORT-001](generateReport.md) |
+| Key                             | What it does                                | The page that owns it              |
+|---------------------------------|---------------------------------------------|------------------------------------|
+| `Ctrl+P`, `Ctrl+Alt+P` on a Mac | Generates a report on the selected test run | [UC-REPORT-001](generateReport.md) |
 
 The key works on the tree, and on the list of test cases inside a test run
 editor. It is not in the IDE's keymap, so it cannot be changed there.

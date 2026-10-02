@@ -23,21 +23,36 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class DeclaredShortcutsTest {
 
     private static final Map<String, List<String>> SHARED_ON_PURPOSE = Map.of(
             "F2", List.of("Testin.UpdateTestCase", "Testin.UpdateRunItem", "Testin.EditTestRun"));
+
+    private static final List<String> MAC_KEYMAPS = List.of("Mac OS X 10.5+", "Mac OS X");
+
+    private static final Map<String, String> MAC_SWAPS = Map.of("ctrl", "meta", "meta", "ctrl");
+
+    private static final List<String> TAKEN_BY_MACOS = Stream.of(
+                    "meta H", "alt meta H", "meta M", "alt meta M", "meta Q", "meta shift Q", "ctrl meta Q", "ctrl meta F",
+                    "meta TAB", "meta BACK_QUOTE", "meta SPACE", "alt meta SPACE", "ctrl meta SPACE", "alt meta ESCAPE", "alt meta D",
+                    "meta shift 3", "meta shift 4", "meta shift 5", "ctrl LEFT", "ctrl RIGHT", "ctrl UP", "ctrl DOWN")
+            .map(DeclaredShortcutsTest::normalize)
+            .toList();
 
     private static @NotNull Map<String, List<String>> declaredKeys(final String keymap) {
         final String actions = actionsSection();
@@ -58,6 +73,20 @@ public class DeclaredShortcutsTest {
             }
         }
         return byKey;
+    }
+
+    private static @NotNull Map<String, List<String>> keysOnAMac(final String keymap) {
+        final Map<String, List<String>> byKey = declaredKeys(keymap);
+        final List<String> withMacKey = byKey.values().stream().flatMap(List::stream).toList();
+
+        declaredKeys("$default").forEach((key, ids) -> ids.stream()
+                .filter(id -> !withMacKey.contains(id))
+                .forEach(id -> byKey.computeIfAbsent(asMacDefault(key), _ -> new ArrayList<>()).add(id)));
+        return byKey;
+    }
+
+    private static @NotNull String asMacDefault(final String key) {
+        return normalize(Arrays.stream(key.split(" ")).map(part -> MAC_SWAPS.getOrDefault(part, part)).collect(Collectors.joining(" ")));
     }
 
     private static @NotNull String actionsSection() {
@@ -87,20 +116,23 @@ public class DeclaredShortcutsTest {
         }
     }
 
+    private static void assertSharedOnlyOnPurpose(final String keymap, final Map<String, List<String>> keys) {
+        keys.forEach((key, ids) -> {
+            if (ids.size() == 1) return;
+
+            assertEquals(ids, SHARED_ON_PURPOSE.get(key),
+                    keymap + " binds " + key + " to " + ids + ". The platform runs whichever of them is"
+                            + " enabled and says nothing when both are, so one of these never runs and nothing"
+                            + " reports it. A key two actions are meant to share belongs in SHARED_ON_PURPOSE,"
+                            + " named by the exact pair that shares it.");
+        });
+    }
+
     // Rule-PRODUCT-018
     @Test
     public void noKeyIsClaimedByTwoTestinActionsByAccident() {
-        for (final String keymap : List.of("$default", "Mac OS X 10.5+")) {
-            declaredKeys(keymap).forEach((key, ids) -> {
-                if (ids.size() == 1) return;
-
-                assertEquals(ids, SHARED_ON_PURPOSE.get(key),
-                        keymap + " binds " + key + " to " + ids + ". The platform runs whichever of them is"
-                                + " enabled and says nothing when both are, so one of these never runs and nothing"
-                                + " reports it. A key two actions are meant to share belongs in SHARED_ON_PURPOSE,"
-                                + " named by the exact pair that shares it.");
-            });
-        }
+        assertSharedOnlyOnPurpose("$default", declaredKeys("$default"));
+        MAC_KEYMAPS.forEach(keymap -> assertSharedOnlyOnPurpose(keymap, keysOnAMac(keymap)));
     }
 
     @Test
@@ -115,10 +147,22 @@ public class DeclaredShortcutsTest {
 
     @Test
     public void everyMacKeyBelongsToAnActionThatHasADefaultKey() {
-        final Map<String, List<String>> mac = declaredKeys("Mac OS X 10.5+");
         final List<String> withDefault = declaredKeys("$default").values().stream().flatMap(List::stream).toList();
 
-        mac.values().stream().flatMap(List::stream).forEach(id -> assertTrue(withDefault.contains(id),
-                id + " has a Mac key and no default key, so it answers on a Mac and nowhere else"));
+        MAC_KEYMAPS.forEach(keymap -> declaredKeys(keymap).values().stream().flatMap(List::stream).forEach(id -> assertTrue(withDefault.contains(id),
+                id + " has a " + keymap + " key and no default key, so it answers on a Mac and nowhere else")));
+    }
+
+    @Test
+    public void bothMacKeymapsGiveTheSameKeys() {
+        assertEquals(declaredKeys("Mac OS X"), declaredKeys("Mac OS X 10.5+"),
+                "The IDE turns a default Ctrl key into Cmd on a Mac keymap that has no entry of its own for the action,"
+                        + " so a Mac key declared on one Mac keymap only leaves the other on the Cmd form");
+    }
+
+    @Test
+    public void noKeyOnAMacIsOneMacOsTakesFirst() {
+        MAC_KEYMAPS.forEach(keymap -> keysOnAMac(keymap).forEach((key, ids) -> assertFalse(TAKEN_BY_MACOS.contains(key),
+                keymap + " puts " + ids + " on " + key + ", which macOS takes before the IDE sees it")));
     }
 }

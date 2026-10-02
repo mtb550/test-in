@@ -7,7 +7,8 @@ opens as fast as one of ten.
 
 Testin never draws the whole test set at once. It draws one page.
 
-`Ctrl+Right` and `Ctrl+Left` for one page. Add `Shift` for the ends of the
+`Ctrl+Right` and `Ctrl+Left` for one page, `Ctrl+Alt+Cmd+Right` and `Left` on a
+Mac. Add `Shift` for the ends of the
 set.
 
 ## Rules
@@ -71,11 +72,11 @@ The five controls sit in the middle of the status bar.
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **First page** — `Ctrl+Shift+Left`.
-2. **Previous page** — `Ctrl+Left`.
+1. **First page** — `Ctrl+Shift+Left`, `Ctrl+Alt+Shift+Cmd+Left` on a Mac.
+2. **Previous page** — `Ctrl+Left`, `Ctrl+Alt+Cmd+Left` on a Mac.
 3. **The label** — which page this is, of how many.
-4. **Next page** — `Ctrl+Right`.
-5. **Last page** — `Ctrl+Shift+Right`.
+4. **Next page** — `Ctrl+Right`, `Ctrl+Alt+Cmd+Right` on a Mac.
+5. **Last page** — `Ctrl+Shift+Right`, `Ctrl+Alt+Shift+Cmd+Right` on a Mac.
 
 Every arrow prints its own key in its tooltip, because the key and the tooltip
 come from the same place.

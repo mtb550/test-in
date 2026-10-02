@@ -19,6 +19,7 @@ package org.testin.util;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.ShortcutSet;
 import com.intellij.openapi.keymap.KeymapUtil;
+import com.intellij.openapi.util.SystemInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.intellij.lang.annotations.MagicConstant;
@@ -107,23 +108,23 @@ public enum Shortcuts {
     ),
 
     GenerateReport(
-            KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK | macAdds(InputEvent.ALT_DOWN_MASK))
     ),
 
     Next(
-            KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK | macAdds(InputEvent.ALT_DOWN_MASK | InputEvent.META_DOWN_MASK))
     ),
 
     Previous(
-            KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK | macAdds(InputEvent.ALT_DOWN_MASK | InputEvent.META_DOWN_MASK))
     ),
 
     First(
-            KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK | macAdds(InputEvent.ALT_DOWN_MASK | InputEvent.META_DOWN_MASK))
     ),
 
     Last(
-            KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK | macAdds(InputEvent.ALT_DOWN_MASK | InputEvent.META_DOWN_MASK))
     ),
 
     CopyAll(
@@ -211,7 +212,7 @@ public enum Shortcuts {
     ),
 
     CreateTestCaseModule(
-            KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK | macAdds(InputEvent.ALT_DOWN_MASK | InputEvent.META_DOWN_MASK))
     ),
 
     CreateTestCaseAddStep(
@@ -219,11 +220,11 @@ public enum Shortcuts {
     ),
 
     CreateTestCaseGroup(
-            KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK | macAdds(InputEvent.ALT_DOWN_MASK))
     ),
 
     CreateTestCasePriority(
-            KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK | macAdds(InputEvent.ALT_DOWN_MASK))
     ),
 
     CreateTestCaseTestData(
@@ -231,7 +232,7 @@ public enum Shortcuts {
     ),
 
     CreateTestCasePreConditions(
-            KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK)
+            KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK | macAdds(InputEvent.ALT_DOWN_MASK | InputEvent.META_DOWN_MASK))
     ),
 
     UpdateTestCaseDescription(
@@ -280,6 +281,11 @@ public enum Shortcuts {
         } catch (final HeadlessException ex) {
             return InputEvent.CTRL_DOWN_MASK;
         }
+    }
+
+    @MagicConstant(flagsFromClass = InputEvent.class)
+    private static int macAdds(@MagicConstant(flagsFromClass = InputEvent.class) final int modifiers) {
+        return SystemInfo.isMac ? modifiers : 0;
     }
 
     public static @NotNull CustomShortcutSet customShortcut(final @NotNull KeyStroke key) {

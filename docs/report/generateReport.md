@@ -12,7 +12,7 @@ A test run can be reported on in four of its five statuses: **Created**, **Assig
 **In Progress** is the one that
 cannot.
 
-`Ctrl+P` on the selected test run.
+`Ctrl+P` on the selected test run, `Ctrl+Alt+P` on a Mac.
 
 ## Rules
 

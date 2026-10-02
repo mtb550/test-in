@@ -109,23 +109,23 @@ the same rows, a filter, a search, and a key for every gesture.
 
 **Reading and moving**
 
-| Key                  | What it does                            | The page that owns it                          |
-|----------------------|-----------------------------------------|------------------------------------------------|
-| `Ctrl+F`             | Puts the cursor in the search box       | [UC-EDITOR-PANEL-019](searchTestCases.md)      |
-| `Ctrl+Right`         | The next page                           | [UC-EDITOR-PANEL-022](pageThrough.md)          |
-| `Ctrl+Left`          | The previous page                       | [UC-EDITOR-PANEL-022](pageThrough.md)          |
-| `Ctrl+Shift+Right`   | The last page                           | [UC-EDITOR-PANEL-022](pageThrough.md)          |
-| `Ctrl+Shift+Left`    | The first page                          | [UC-EDITOR-PANEL-022](pageThrough.md)          |
-| `Enter`              | Opens the details panel, or a grid cell | [UC-EDITOR-PANEL-025](openDetailsPanel.md)     |
-| `Escape`             | Steps back one step                     | [UC-EDITOR-PANEL-026](stepBack.md)             |
-| `Context Menu`       | Opens the menu on the selection         | [UC-EDITOR-PANEL-029](keyboardMenu.md)         |
-| `Ctrl` and the wheel | Changes the text size                   | [UC-SETTING-011](../setting/changeTextSize.md) |
+| Key                                                     | What it does                            | The page that owns it                          |
+|---------------------------------------------------------|-----------------------------------------|------------------------------------------------|
+| `Ctrl+F`                                                | Puts the cursor in the search box       | [UC-EDITOR-PANEL-019](searchTestCases.md)      |
+| `Ctrl+Right`, `Ctrl+Alt+Cmd+Right` on a Mac             | The next page                           | [UC-EDITOR-PANEL-022](pageThrough.md)          |
+| `Ctrl+Left`, `Ctrl+Alt+Cmd+Left` on a Mac               | The previous page                       | [UC-EDITOR-PANEL-022](pageThrough.md)          |
+| `Ctrl+Shift+Right`, `Ctrl+Alt+Shift+Cmd+Right` on a Mac | The last page                           | [UC-EDITOR-PANEL-022](pageThrough.md)          |
+| `Ctrl+Shift+Left`, `Ctrl+Alt+Shift+Cmd+Left` on a Mac   | The first page                          | [UC-EDITOR-PANEL-022](pageThrough.md)          |
+| `Enter`                                                 | Opens the details panel, or a grid cell | [UC-EDITOR-PANEL-025](openDetailsPanel.md)     |
+| `Escape`                                                | Steps back one step                     | [UC-EDITOR-PANEL-026](stepBack.md)             |
+| `Context Menu`                                          | Opens the menu on the selection         | [UC-EDITOR-PANEL-029](keyboardMenu.md)         |
+| `Ctrl` and the wheel                                    | Changes the text size                   | [UC-SETTING-011](../setting/changeTextSize.md) |
 
 **Writing test cases**
 
 | Key                                 | What it does                                    | The page that owns it                     |
 |-------------------------------------|-------------------------------------------------|-------------------------------------------|
-| `Ctrl+M`                            | Creates a test case                             | [UC-EDITOR-PANEL-005](createTestCase.md)  |
+| `Ctrl+M`, `Ctrl+Alt+Cmd+M` on a Mac | Creates a test case                             | [UC-EDITOR-PANEL-005](createTestCase.md)  |
 | `F2`                                | Opens the menu of fields to change              | [UC-EDITOR-PANEL-006](changeOneField.md)  |
 | `D` `E` `M` `T` `B` `S` `P` `G` `O` | Opens that one field straight away              | [UC-EDITOR-PANEL-006](changeOneField.md)  |
 | `Delete`                            | Removes the selected test cases                 | [UC-EDITOR-PANEL-011](removeTestCases.md) |
@@ -146,16 +146,16 @@ the same rows, a filter, a search, and a key for every gesture.
 
 **Executing a test run**
 
-| Key        | What it does                                                     | The page that owns it                            |
-|------------|------------------------------------------------------------------|--------------------------------------------------|
-| `P`        | Records **Passed**                                               | [UC-EDITOR-PANEL-032](recordPassed.md)           |
-| `F`        | Records **Failed**, and asks why                                 | [UC-EDITOR-PANEL-034](recordFailed.md)           |
-| `B`        | Records **Blocked**                                              | [UC-EDITOR-PANEL-033](recordBlocked.md)          |
-| `F2`       | Changes the failure details without changing the run item status | [UC-EDITOR-PANEL-040](editFailureDetail.md)      |
-| `F5`       | Runs the selected test cases, or stops them                      | [UC-EDITOR-PANEL-043](runOneTestCase.md)         |
-| `Shift+F5` | Goes to the automation code                                      | [UC-CODEGEN-006](../codegen/goToCode.md)         |
-| `F12`      | Writes the method for a test case that has none                  | [UC-CODEGEN-005](../codegen/automateTestCase.md) |
-| `Ctrl+P`   | Generates a report on this test run                              | [UC-REPORT-001](../report/generateReport.md)     |
+| Key                             | What it does                                                     | The page that owns it                            |
+|---------------------------------|------------------------------------------------------------------|--------------------------------------------------|
+| `P`                             | Records **Passed**                                               | [UC-EDITOR-PANEL-032](recordPassed.md)           |
+| `F`                             | Records **Failed**, and asks why                                 | [UC-EDITOR-PANEL-034](recordFailed.md)           |
+| `B`                             | Records **Blocked**                                              | [UC-EDITOR-PANEL-033](recordBlocked.md)          |
+| `F2`                            | Changes the failure details without changing the run item status | [UC-EDITOR-PANEL-040](editFailureDetail.md)      |
+| `F5`                            | Runs the selected test cases, or stops them                      | [UC-EDITOR-PANEL-043](runOneTestCase.md)         |
+| `Shift+F5`                      | Goes to the automation code                                      | [UC-CODEGEN-006](../codegen/goToCode.md)         |
+| `F12`                           | Writes the method for a test case that has none                  | [UC-CODEGEN-005](../codegen/automateTestCase.md) |
+| `Ctrl+P`, `Ctrl+Alt+P` on a Mac | Generates a report on this test run                              | [UC-REPORT-001](../report/generateReport.md)     |
 
 **Nothing has a key** for: **Refresh**, **Grid View**, **List View**, the **Fields** button, the **Filter** button, the
 **Details** button, **Start Manual
@@ -261,7 +261,7 @@ bug report yet.
 |                  | The rule it breaks                                                   | What a tester sees                                                                                                                                                                   |
 |------------------|----------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Difference 7** | Rule-EDITOR-PANEL-005 — what the tester typed is stored              | A description typed into a grid cell loses characters Testin will not keep. If nothing else changed, nothing is saved and nothing is said, and the tester watches their text change. |
-| **Difference 9** | Rule-INTERNAL-068 — a key printed on screen is read from the binding | The empty editor's second line reads *Press Ctrl+M to add* whatever machine it is on. The key itself is `Cmd+M` on a Mac, so the sentence names a key that does nothing there.       |
+| **Difference 9** | Rule-INTERNAL-068 — a key printed on screen is read from the binding | The empty editor's second line reads *Press Ctrl+M to add* whatever machine it is on. The key itself is `Ctrl+Alt+Cmd+M` on a Mac, so it names a key that does nothing there.        |
 
 ## Where the plugin breaks its own rules, executing a test run
 
