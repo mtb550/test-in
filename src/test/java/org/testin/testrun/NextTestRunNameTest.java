@@ -24,6 +24,7 @@ import static org.testng.Assert.assertEquals;
 
 public class NextTestRunNameTest {
 
+    // Rule-TREE-PANEL-071
     @Test
     public void aTrailingNumberIsIncremented() {
         assertEquals(NextTestRunName.after("cycle-1", Set.of()), "cycle-2");
@@ -36,11 +37,13 @@ public class NextTestRunNameTest {
         assertEquals(NextTestRunName.after("run09", Set.of()), "run10");
     }
 
+    // Rule-TREE-PANEL-071
     @Test
     public void aNameWithNoNumberGetsOne() {
         assertEquals(NextTestRunName.after("smoke", Set.of()), "smoke-2");
     }
 
+    // Rule-TREE-PANEL-071
     @Test
     public void aTakenNameIsCountedPast() {
         assertEquals(NextTestRunName.after("cycle-1", Set.of("cycle-2", "cycle-3")), "cycle-4");

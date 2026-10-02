@@ -43,6 +43,7 @@ public class RunItemStatusDonutTest {
         return Arrays.stream(sweeps).sum();
     }
 
+    // Rule-TREE-PANEL-126
     @Test
     public void oneFailureInFiveHundredIsStillVisible() {
         final double[] sweeps = RunItemStatusDonut.sweeps(SLICES, run(499, 1, 0, 0));

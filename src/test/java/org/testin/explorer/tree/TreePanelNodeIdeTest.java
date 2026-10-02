@@ -18,6 +18,7 @@ package org.testin.explorer.tree;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.tree.LeafState;
+import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -53,6 +54,7 @@ public class TreePanelNodeIdeTest extends BasePlatformTestCase {
         assertNotEquals(login, checkout);
     }
 
+    // Rule-TREE-PANEL-127
     public void testATestSetAndATestRunHaveNothingToOpen() {
         assertEquals(LeafState.ALWAYS, new TreePanelNode(getProject(), at(new TestSetDirectoryDto(), SET)).getLeafState());
         assertEquals(LeafState.ALWAYS, new TreePanelNode(getProject(), at(new TestRunDirectoryDto(), Path.of("project", "Test Runs", "Cycle 1"))).getLeafState());
@@ -71,5 +73,16 @@ public class TreePanelNodeIdeTest extends BasePlatformTestCase {
 
     public void testAPackageIsAskedForItsChildren() {
         assertEquals(LeafState.ASYNC, new TreePanelNode(getProject(), at(new TestSetPackageDirectoryDto(), SET.getParent())).getLeafState());
+    }
+
+    // Rule-TREE-PANEL-063
+    public void testATestProjectThatIsNotActiveShowsNothingUnderIt() {
+        final @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
+        testProject.setPath(Path.of("project"));
+
+        assertEquals("an active test project does not show its two containers", 2, new TreePanelNode(getProject(), testProject).getChildren().size());
+
+        testProject.getMarker().setStatus(ProjectStatus.INACTIVE);
+        assertTrue("an inactive test project shows what it holds", new TreePanelNode(getProject(), testProject).getChildren().isEmpty());
     }
 }

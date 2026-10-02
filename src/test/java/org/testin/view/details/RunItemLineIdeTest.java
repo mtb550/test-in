@@ -61,7 +61,7 @@ public class RunItemLineIdeTest extends AbstractTempRootIdeTest {
         return row;
     }
 
-    private @NotNull List<String> testRunPath() {
+    private @NotNull List<String> shownTestRunPath() {
         final @NotNull Path testRunPath = WriteAction.computeAndWait(() -> {
             final @NotNull DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
             final @NotNull Nodes nodes = Services.getInstance(getProject(), Nodes.class);
@@ -81,7 +81,7 @@ public class RunItemLineIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-VIEW-PANEL-086
     public void testRunItemStatusDurationAndBugChipAreOneLine() {
-        final @NotNull JBPanel<?> tab = drawn(failed(""), testRunPath());
+        final @NotNull JBPanel<?> tab = drawn(failed(""), shownTestRunPath());
         final @NotNull Component status = Drawn.reading(tab, RunItemStatus.FAILED.getLabel());
         final @NotNull Component duration = Drawn.reading(tab, "02:14");
         final @NotNull Component bugChip = Drawn.components(tab).stream()
@@ -96,14 +96,14 @@ public class RunItemLineIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-VIEW-PANEL-033
     public void testATestCaseTheTestRunHasNotReachedReadsPending() {
-        final @NotNull List<String> words = Drawn.words(drawn(TestRunItems.builder().id(TEST_CASE_ID).build(), testRunPath()));
+        final @NotNull List<String> words = Drawn.words(drawn(TestRunItems.builder().id(TEST_CASE_ID).build(), shownTestRunPath()));
 
         assertTrue("an unreached test case does not read Pending: " + words, words.contains(Bundle.message("status.run.item.pending")));
     }
 
     // Rule-VIEW-PANEL-031
     public void testAnEmptyTestRunValueIsNotDrawn() {
-        final @NotNull List<String> words = Drawn.words(drawn(TestRunItems.builder().id(TEST_CASE_ID).status(RunItemStatus.PASSED).build(), testRunPath()));
+        final @NotNull List<String> words = Drawn.words(drawn(TestRunItems.builder().id(TEST_CASE_ID).status(RunItemStatus.PASSED).build(), shownTestRunPath()));
 
         assertFalse("an empty actual result was drawn: " + words, words.contains(Bundle.message("attribute.run.item.actual.result").toUpperCase(Locale.ROOT)));
         assertFalse("an empty executed by was drawn: " + words, words.contains(Bundle.message("attribute.run.item.executed.by").toUpperCase(Locale.ROOT)));
@@ -113,7 +113,7 @@ public class RunItemLineIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-VIEW-PANEL-080
     public void testNoLinkOnTheDetailsTabTakesTheKeyboard() {
-        final @NotNull List<String> testRunPath = testRunPath();
+        final @NotNull List<String> testRunPath = shownTestRunPath();
         final @NotNull List<ActionLink> links = Stream.of(drawn(failed(""), testRunPath), drawn(failed(ISSUE), testRunPath))
                 .flatMap(tab -> Drawn.components(tab).stream())
                 .filter(ActionLink.class::isInstance)

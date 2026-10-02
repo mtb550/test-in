@@ -85,6 +85,7 @@ public class RetiredNodesTest {
         }
     }
 
+    // Rule-TREE-PANEL-010
     @Test
     public void retiredChildrenSortAfterTheLiveOnesAndByNameWithinEach() {
         final TestCasesMainDirectoryDto parent = new TestCasesMainDirectoryDto();
@@ -103,6 +104,7 @@ public class RetiredNodesTest {
         assertEquals(ordered.stream().map(DirectoryDto::getName).toList(), List.of("beta", "zeta", "alpha", "old"));
     }
 
+    // Rule-TREE-PANEL-010, Rule-TREE-PANEL-055
     @Test
     public void numberedChildrenComeFirstAndTheRestFollowByDate() {
         final TestCasesMainDirectoryDto parent = new TestCasesMainDirectoryDto();
@@ -127,6 +129,7 @@ public class RetiredNodesTest {
                 "numbers first, in order; then the unnumbered ones oldest first, whatever they are called");
     }
 
+    // Rule-TREE-PANEL-056
     @Test
     public void theSameNumberTwiceIsSettledByTheDate() {
         final TestCasesMainDirectoryDto parent = new TestCasesMainDirectoryDto();
@@ -147,6 +150,7 @@ public class RetiredNodesTest {
         assertEquals(ordered.stream().map(DirectoryDto::getName).toList(), List.of("zzz-older", "aaa-newer"));
     }
 
+    // Rule-TREE-PANEL-057
     @Test
     public void aNumberDoesNotBringARetiredNodeBack() {
         final TestCasesMainDirectoryDto parent = new TestCasesMainDirectoryDto();
@@ -166,6 +170,7 @@ public class RetiredNodesTest {
         assertEquals(ordered.stream().map(DirectoryDto::getName).toList(), List.of("active", "deprecated"));
     }
 
+    // Rule-TREE-PANEL-058
     @Test
     public void everythingATesterFilesCanBeOrdered() {
         for (final DirectoryDto node : List.of(testSet("a", TestSetStatus.ACTIVE),

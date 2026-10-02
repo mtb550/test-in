@@ -95,6 +95,7 @@ public class TestinConfigTest {
         assertSame(TestinYml.parse("   \n", "blank"), TestinProjectConfig.EMPTY);
     }
 
+    // Rule-TREE-PANEL-119
     @Test
     public void aBrokenFileIsTheSameValueAndNotTheSameState() {
         final Parsed broken = TestinYml.parsed("testinProject: [unclosed\n", "malformed");
@@ -106,6 +107,7 @@ public class TestinConfigTest {
         assertTrue(absent.readable(), "an absent file is not a broken one, and must not be reported as one");
     }
 
+    // Rule-TREE-PANEL-117
     @Test
     public void keepsTheRepoUrlItWasGiven() {
         assertEquals(TestinYml.parse("RepoUrl: \"https://x.com/r; rm -rf /\"\n", "injected").repoUrl(),
@@ -115,6 +117,7 @@ public class TestinConfigTest {
                 "git@github.com:acme/cases.git");
     }
 
+    // Rule-TREE-PANEL-117
     @Test
     public void stillTakesTheTokenOutOfARepoUrl() {
         assertEquals(TestinYml.parse("RepoUrl: https://ghp_secret@github.com/acme/cases.git\n", "token").repoUrl(),
@@ -171,10 +174,21 @@ public class TestinConfigTest {
         assertEquals(inGit.projectName(), "cases");
     }
 
+    // Rule-TREE-PANEL-124
     @Test
     public void aWordNobodyCanReadIsLocalRatherThanAGuess() {
         assertEquals(TestinYml.parse("location: somewhere\n", "nonsense").location(),
                 TestinLocation.LOCAL, "a project nobody can reach is better left on this machine");
+    }
+
+    // Rule-TREE-PANEL-124
+    @Test
+    public void aRemoteProjectWithNoAddressIsReadAsItIsWritten() {
+        final @NotNull TestinProjectConfig remote =TestinYml.parse("location: remote\ntestinProject: cases\n", "remote with no address");
+
+        assertEquals(remote.location(), TestinLocation.REMOTE, "the file says remote, and it was read as something else");
+        assertEquals(remote.projectName(), "cases", "a remote project with no address cost the file its project");
+        assertFalse(remote.hasRepoUrl());
     }
 
     @Test
@@ -241,6 +255,7 @@ public class TestinConfigTest {
                 "https://github.com/mtb550/test-01.git");
     }
 
+    // Rule-TREE-PANEL-113
     @Test
     public void theLinesSaySharedOnlyWithARemote() {
         assertEquals(TestinYml.lines("NAFATH", ""), Map.of("testinProject", "NAFATH", "location", "local"));
@@ -257,6 +272,7 @@ public class TestinConfigTest {
         assertTrue(TestinYml.parse(written, "saved").hasRepoUrl(), "and a colleague's first open can clone it");
     }
 
+    // Rule-TREE-PANEL-114
     @Test
     public void theRestOfTheFileIsKept() {
         final String before = """

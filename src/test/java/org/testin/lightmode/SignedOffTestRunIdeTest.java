@@ -40,7 +40,7 @@ public class SignedOffTestRunIdeTest extends AbstractTempRootIdeTest {
 
     private final @NotNull UUID failed = UUID.randomUUID();
 
-    private @NotNull TestRuns testRuns() {
+    private @NotNull TestRuns indexedTestRuns() {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
@@ -56,7 +56,7 @@ public class SignedOffTestRunIdeTest extends AbstractTempRootIdeTest {
             return path;
         });
 
-        testRuns().putTestRun(testRunPath, new TestRunDto().setResults(List.of(
+        indexedTestRuns().putTestRun(testRunPath, new TestRunDto().setResults(List.of(
                 new TestRunItems().setId(failed).setStatus(RunItemStatus.FAILED).setActualResult(RECORDED))));
         return testRunPath;
     }
@@ -76,12 +76,12 @@ public class SignedOffTestRunIdeTest extends AbstractTempRootIdeTest {
         assertTrue("an open test run refused a write", service.heldTestRun(testRunPath).isPresent());
 
         for (final TestRunStatus signedOff : List.of(TestRunStatus.COMPLETED, TestRunStatus.CLOSED)) {
-            testRuns().changeTestRunMarker(testRunPath, marker -> marker.setStatus(signedOff));
+            indexedTestRuns().changeTestRunMarker(testRunPath, marker -> marker.setStatus(signedOff));
 
             assertTrue(signedOff + " still took a write", service.heldTestRun(testRunPath).isEmpty());
             assertFalse(signedOff + " saved a failure typed after the sign-off", saveAFailureOnto(testRunPath));
             assertEquals(signedOff + " changed what it recorded", RECORDED,
-                    testRuns().getTestRunByPath(testRunPath).resultOf(failed).map(TestRunItems::getActualResult).orElse(""));
+                    indexedTestRuns().getTestRunByPath(testRunPath).resultOf(failed).map(TestRunItems::getActualResult).orElse(""));
         }
     }
 }

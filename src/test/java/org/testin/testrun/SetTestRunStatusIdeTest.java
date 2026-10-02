@@ -1,0 +1,77 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.testrun;
+
+import com.intellij.testFramework.PlatformTestUtil;
+import org.jetbrains.annotations.NotNull;
+import org.testin.AbstractTempRootIdeTest;
+import org.testin.NodesOnDisk;
+import org.testin.indexer.TestRuns;
+import org.testin.model.RunItemStatus;
+import org.testin.model.TestRunItems;
+import org.testin.model.TestRunStatus;
+import org.testin.model.dto.TestRunDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.services.Services;
+
+import java.util.List;
+import java.util.UUID;
+
+public class SetTestRunStatusIdeTest extends AbstractTempRootIdeTest {
+    private @NotNull TestRuns indexedTestRuns() {
+        return Services.getInstance(getProject(), TestRuns.class);
+    }
+
+    private void finish(final @NotNull TestRunStatus finalStatus) {
+        final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
+        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
+        final @NotNull TestSetDirectoryDto login = made.testSet(tp.getTestCasesDirectory(), "Login");
+        final @NotNull UUID passed = made.testCase(login).getId();
+        final @NotNull UUID stillPending = made.testCase(login).getId();
+        final @NotNull UUID alsoPending = made.testCase(login).getId();
+
+        final @NotNull TestRunDirectoryDto testRun = made.testRun(tp.getTestRunsDirectory(), "Cycle-1");
+        indexedTestRuns().putTestRun(testRun.getPath(), new TestRunDto().setResults(List.of(
+                new TestRunItems().setId(passed).setStatus(RunItemStatus.PASSED),
+                new TestRunItems().setId(stillPending).setStatus(RunItemStatus.PENDING),
+                new TestRunItems().setId(alsoPending).setStatus(RunItemStatus.PENDING))));
+
+        new TestRunStatusChange(getProject()).apply(testRun, finalStatus);
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+
+        assertTrue("a " + finalStatus + " test run still accepts run item statuses", testRun.whySignedOff().isPresent());
+        assertEquals("a run item status recorded before the test run was " + finalStatus + " changed", RunItemStatus.PASSED, statusOf(testRun, passed));
+        assertEquals("a pending test case is still pending once the test run is " + finalStatus, RunItemStatus.UNTESTED, statusOf(testRun, stillPending));
+        assertEquals("a pending test case is still pending once the test run is " + finalStatus, RunItemStatus.UNTESTED, statusOf(testRun, alsoPending));
+    }
+
+    private @NotNull RunItemStatus statusOf(final @NotNull TestRunDirectoryDto testRun, final @NotNull UUID testCaseId) {
+        return indexedTestRuns().getTestRunByPath(testRun.getPath()).resultOf(testCaseId).map(TestRunItems::getStatus).orElse(RunItemStatus.REMOVED);
+    }
+
+    // Rule-TREE-PANEL-067
+    public void testCompletingATestRunMarksEveryPendingTestCaseUntested() {
+        finish(TestRunStatus.COMPLETED);
+    }
+
+    // Rule-TREE-PANEL-067
+    public void testClosingATestRunMarksEveryPendingTestCaseUntested() {
+        finish(TestRunStatus.CLOSED);
+    }
+}

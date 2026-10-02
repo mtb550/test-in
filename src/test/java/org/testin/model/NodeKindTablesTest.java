@@ -94,6 +94,7 @@ public class NodeKindTablesTest {
                 "DirectoryType.ACCEPTS does not have a row per kind, and a kind with no row accepts nothing");
     }
 
+    // Rule-TREE-PANEL-003, Rule-TREE-PANEL-043, Rule-TREE-PANEL-044
     @Test
     public void theTwoFamiliesNeverMix() {
         assertTrue(DirectoryType.TCD.accepts(DirectoryType.TS), "a test set belongs under Test Cases");

@@ -27,6 +27,7 @@ public class PanelStateTest {
         return PanelState.of(rootConfigured, indexed, projectResolved, boundProjectMissing, cloneUrlKnown, anyProjectsUnderRoot);
     }
 
+    // Rule-TREE-PANEL-118
     @Test
     public void nothingIsDecidedBeforeTheIndexIsBuilt() {
         assertEquals(of(true, false, false, false, false, true), PanelState.READING,

@@ -43,7 +43,7 @@ public class TesterNameStampIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private @NotNull TestSetDirectoryDto testSet() {
+    private @NotNull TestSetDirectoryDto loginTestSet() {
         return WriteAction.computeAndWait(() -> {
             final @NotNull DirectoryMapper mapper = Services.getInstance(getProject(), DirectoryMapper.class);
             final @NotNull Nodes nodes = Services.getInstance(getProject(), Nodes.class);
@@ -69,7 +69,7 @@ public class TesterNameStampIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-SETTING-018
     public void testTheNameIsReadAtTheMomentItIsStamped() {
-        final @NotNull TestSetDirectoryDto ts = testSet();
+        final @NotNull TestSetDirectoryDto ts = loginTestSet();
         final @NotNull TestCaseDto tc = aTestCaseIn(ts);
 
         asTester("Sara", () -> put(ts, tc));
@@ -83,7 +83,7 @@ public class TesterNameStampIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-SETTING-019
     public void testAnEmptyNameWritesNoName() {
-        final @NotNull TestSetDirectoryDto ts = testSet();
+        final @NotNull TestSetDirectoryDto ts = loginTestSet();
         final @NotNull TestCaseDto tc = aTestCaseIn(ts);
 
         asTester("", () -> put(ts, tc));

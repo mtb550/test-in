@@ -57,7 +57,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private static @NotNull TestCaseDto testCase(final TestSetDirectoryDto ts, final String rank) {
+    private static @NotNull TestCaseDto aTestCaseIn(final TestSetDirectoryDto ts, final String rank) {
         final TestCaseDto tc = TestCaseDto.builder()
                 .id(UUID.randomUUID())
                 .description("Log in with a valid user")
@@ -128,7 +128,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
 
     public void testATestCaseTheSetHasNeverHeldIsWrittenEvenWhenItsRankStays() {
         final TestSetDirectoryDto ts = oneTestSet();
-        final TestCaseDto pasted = testCase(ts, "m");
+        final TestCaseDto pasted = aTestCaseIn(ts, "m");
 
         indexedTestCases().updateSequence(ts.getPath(), List.of(pasted), List.of());
 
@@ -138,7 +138,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
 
     public void testATestCaseWhoseFileCouldNotBeWrittenIsNotIndexed() {
         final TestSetDirectoryDto ts = oneTestSet();
-        final TestCaseDto pasted = testCase(ts, "m");
+        final TestCaseDto pasted = aTestCaseIn(ts, "m");
         undeletable(fileOf(ts, pasted));
 
         indexedTestCases().updateSequence(ts.getPath(), List.of(pasted), List.of());
@@ -150,7 +150,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
 
     public void testATestCaseSavedAsItIsBeforeTheOrderKeepsItsCreator() {
         final TestSetDirectoryDto ts = oneTestSet();
-        final TestCaseDto moved = testCase(ts, "m").setCreatedBy("Sara Al-Otaibi");
+        final TestCaseDto moved = aTestCaseIn(ts, "m").setCreatedBy("Sara Al-Otaibi");
         final var createdAt = moved.getCreatedAt();
 
         indexedTestCases().putTestCaseVerbatim(ts.getPath(), moved);
@@ -163,7 +163,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
 
     public void testAnEditedCopyIsWrittenIntoTheTestCaseTheIndexHolds() {
         final TestSetDirectoryDto ts = oneTestSet();
-        final TestCaseDto held = testCase(ts, "m");
+        final TestCaseDto held = aTestCaseIn(ts, "m");
         indexedTestCases().putTestCaseVerbatim(ts.getPath(), held);
 
         final TestCaseDto edited = held.edit().description("Log in with a locked user").build();
@@ -175,7 +175,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
 
     public void testACreatedTestCaseIsWrittenByTheOrderWriteWithItsRankAndItsCreator() {
         final TestSetDirectoryDto ts = oneTestSet();
-        final TestCaseDto created = testCase(ts, "");
+        final TestCaseDto created = aTestCaseIn(ts, "");
         final List<TestCaseDto> arranged = List.of(created);
 
         indexedTestCases().updateSequence(ts.getPath(), arranged, TestCaseOrder.place(arranged));
@@ -197,7 +197,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
         final List<TestSetDirectoryDto> sets = twoTestSets();
         final TestSetDirectoryDto login = sets.get(0);
         final TestSetDirectoryDto signUp = sets.get(1);
-        final TestCaseDto cut = testCase(login, "m").setCreatedBy("Sara Al-Otaibi");
+        final TestCaseDto cut = aTestCaseIn(login, "m").setCreatedBy("Sara Al-Otaibi");
         indexedTestCases().putTestCaseVerbatim(login.getPath(), cut);
 
         assertTrue("the move said it failed", indexedTestCases().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
@@ -216,7 +216,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
         final List<TestSetDirectoryDto> sets = twoTestSets();
         final TestSetDirectoryDto login = sets.get(0);
         final TestSetDirectoryDto signUp = sets.get(1);
-        final TestCaseDto cut = testCase(login, "m");
+        final TestCaseDto cut = aTestCaseIn(login, "m");
         indexedTestCases().putTestCaseVerbatim(login.getPath(), cut);
 
         try {
@@ -234,7 +234,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
 
     public void testARemovalWhoseDeleteIsRefusedKeepsTheTestCase() {
         final TestSetDirectoryDto ts = oneTestSet();
-        final TestCaseDto tc = testCase(ts, "m");
+        final TestCaseDto tc = aTestCaseIn(ts, "m");
         indexedTestCases().putTestCaseVerbatim(ts.getPath(), tc);
 
         undeletable(fileOf(ts, tc));
@@ -250,7 +250,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
         final List<TestSetDirectoryDto> sets = twoTestSets();
         final TestSetDirectoryDto login = sets.get(0);
         final TestSetDirectoryDto signUp = sets.get(1);
-        final TestCaseDto cut = testCase(login, "m");
+        final TestCaseDto cut = aTestCaseIn(login, "m");
         indexedTestCases().putTestCaseVerbatim(login.getPath(), cut);
 
         undeletable(fileOf(login, cut));

@@ -71,6 +71,7 @@ public class UndoHistoriesTest {
         assertFalse(service.canRedo(TREE));
     }
 
+    // Rule-TREE-PANEL-061
     @Test
     public void newOperationClearsTheRedoHistory() {
         final UndoHistories service = new UndoHistories();
@@ -86,6 +87,7 @@ public class UndoHistoriesTest {
         assertEquals(service.undoDescription(TREE), "second");
     }
 
+    // Rule-TREE-PANEL-059
     @Test
     public void historyIsBounded() {
         final UndoHistories service = new UndoHistories();
@@ -101,6 +103,7 @@ public class UndoHistoriesTest {
         assertEquals(undone.get(), 20, "the undo stack must be capped");
     }
 
+    // Rule-TREE-PANEL-059
     @Test
     public void eachSurfaceKeepsItsOwnHistory() {
         final UndoHistories service = new UndoHistories();

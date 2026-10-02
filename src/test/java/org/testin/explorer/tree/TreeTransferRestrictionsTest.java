@@ -53,7 +53,7 @@ public class TreeTransferRestrictionsTest {
         return dto;
     }
 
-    // Rule-PRODUCT-006
+    // Rule-PRODUCT-006, Rule-TREE-PANEL-002
     @Test
     public void fixedNodesCannotBeMovedRenamedOrRemoved() {
         final DirectoryDto[] fixed = {
@@ -93,7 +93,7 @@ public class TreeTransferRestrictionsTest {
         }
     }
 
-    // Rule-PRODUCT-005
+    // Rule-PRODUCT-005, Rule-TREE-PANEL-003, Rule-TREE-PANEL-043
     @Test
     public void testRunNodesNeverEnterTheTestSetFamily() {
         final DirectoryDto[] testSetFamilyTargets = {
@@ -112,6 +112,7 @@ public class TreeTransferRestrictionsTest {
         }
     }
 
+    // Rule-TREE-PANEL-044
     @Test
     public void testSetAcceptsNoDirectoryNodes() {
         final DirectoryDto testSet = new TestSetDirectoryDto();
@@ -122,7 +123,7 @@ public class TreeTransferRestrictionsTest {
         assertFalse(testSet.acceptsTransferred(new TestRunDirectoryDto()), "no test run node into a test set");
     }
 
-    // Rule-PRODUCT-005
+    // Rule-PRODUCT-005, Rule-TREE-PANEL-003, Rule-TREE-PANEL-043
     @Test
     public void testSetNodesNeverEnterTheTestRunFamily() {
         final DirectoryDto[] testRunFamilyTargets = {
@@ -144,7 +145,7 @@ public class TreeTransferRestrictionsTest {
                 "test run packages must accept test run packages");
     }
 
-    // Rule-PRODUCT-005
+    // Rule-PRODUCT-005, Rule-TREE-PANEL-044
     @Test
     public void testRunAcceptsNoRunStructure() {
         final DirectoryDto testRun = new TestRunDirectoryDto();
@@ -169,6 +170,7 @@ public class TreeTransferRestrictionsTest {
         assertFalse(testProject.acceptsTransferred(new TestRunDirectoryDto()));
     }
 
+    // Rule-TREE-PANEL-045
     @Test
     public void destinationMustNotBeSelfSubtreeOrParent() {
         final DirectoryDto source = node("test-cases", "pkg");
@@ -184,6 +186,7 @@ public class TreeTransferRestrictionsTest {
                 "an unrelated sibling target must stay valid");
     }
 
+    // Rule-TREE-PANEL-004
     @Test
     public void destinationMustNotAlreadyContainTheName() {
         final DirectoryDto source = node("test-cases", "pkg");
@@ -196,6 +199,7 @@ public class TreeTransferRestrictionsTest {
                 "the same target is valid when the name is free");
     }
 
+    // Rule-TREE-PANEL-013
     @Test
     public void transfersNeverCrossTestProjects() {
         final DirectoryDto projectA = project("projectA");

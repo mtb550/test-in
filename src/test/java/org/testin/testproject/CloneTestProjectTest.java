@@ -24,6 +24,7 @@ import static org.testng.Assert.assertTrue;
 
 public class CloneTestProjectTest {
 
+    // Rule-TREE-PANEL-107
     @Test
     public void everyFormOfAddressGivesTheRepositoryName() {
         assertEquals(CloneTestProject.repositoryName("https://github.com/acme/nafath-test-cases.git"), "nafath-test-cases");
@@ -40,6 +41,7 @@ public class CloneTestProjectTest {
         assertEquals(CloneTestProject.repositoryName("https://muteb@bitbucket.org/acme/tests.git"), "tests");
     }
 
+    // Rule-TREE-PANEL-107
     @Test
     public void aNameJavaRefusesIsMadeIntoOneItAccepts() {
         assertTrue(DirectoryType.TP.canTakeName(CloneTestProject.repositoryName("https://github.com/acme/new.git")),

@@ -39,7 +39,7 @@ public class RunItemStatusPerTestRunIdeTest extends AbstractTempRootIdeTest {
 
     private final @NotNull UUID testCaseId = UUID.randomUUID();
 
-    private @NotNull TestRuns testRuns() {
+    private @NotNull TestRuns indexedTestRuns() {
         return Services.getInstance(getProject(), TestRuns.class);
     }
 
@@ -50,12 +50,12 @@ public class RunItemStatusPerTestRunIdeTest extends AbstractTempRootIdeTest {
             return testRun.getPath();
         });
 
-        testRuns().putTestRun(testRunPath, new TestRunDto().setResults(new ArrayList<>(List.of(new TestRunItems().setId(testCaseId)))));
+        indexedTestRuns().putTestRun(testRunPath, new TestRunDto().setResults(new ArrayList<>(List.of(new TestRunItems().setId(testCaseId)))));
         return testRunPath;
     }
 
     private @NotNull RunItemStatus statusIn(final @NotNull Path testRunPath) {
-        return testRuns().getTestRunByPath(testRunPath).resultOf(testCaseId).orElseThrow().getStatus();
+        return indexedTestRuns().getTestRunByPath(testRunPath).resultOf(testCaseId).orElseThrow().getStatus();
     }
 
     // Rule-PRODUCT-009
@@ -68,8 +68,8 @@ public class RunItemStatusPerTestRunIdeTest extends AbstractTempRootIdeTest {
         final @NotNull Path cycle1 = aTestRunOver(tp, "Cycle-1");
         final @NotNull Path cycle2 = aTestRunOver(tp, "Cycle-2");
 
-        testRuns().changeResult(cycle1, testCaseId, result -> result.recordRunItemStatus(RunItemStatus.FAILED, "Sara", TestCaseDto.builder().id(testCaseId).build()));
-        testRuns().changeResult(cycle2, testCaseId, result -> result.recordRunItemStatus(RunItemStatus.PASSED, "Omar", TestCaseDto.builder().id(testCaseId).build()));
+        indexedTestRuns().changeResult(cycle1, testCaseId, result -> result.recordRunItemStatus(RunItemStatus.FAILED, "Sara", TestCaseDto.builder().id(testCaseId).build()));
+        indexedTestRuns().changeResult(cycle2, testCaseId, result -> result.recordRunItemStatus(RunItemStatus.PASSED, "Omar", TestCaseDto.builder().id(testCaseId).build()));
 
         assertEquals(RunItemStatus.FAILED, statusIn(cycle1));
         assertEquals("passing the test case in one test run changed what another recorded", RunItemStatus.PASSED, statusIn(cycle2));

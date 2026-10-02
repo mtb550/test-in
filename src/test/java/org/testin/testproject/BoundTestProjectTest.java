@@ -35,12 +35,14 @@ public class BoundTestProjectTest {
         assertEquals(BoundTestProject.resolve("", List.of("Nafath", "")), "Nafath");
     }
 
+    // Rule-TREE-PANEL-106
     @Test
     public void aChoiceWinsOverTheNameItWasMadeOver() {
         assertEquals(BoundTestProject.resolve("Checkout", List.of("Nafath", "Checkout")), "Nafath",
                 "picking over what the file says is what picking is for");
     }
 
+    // Rule-TREE-PANEL-106
     @Test
     public void theFileWinsOnceItNamesSomethingElse() {
         assertEquals(BoundTestProject.resolve("Payments", List.of("Nafath", "Checkout")), "Payments",

@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class TestCaseFileIdeTest extends AbstractTempRootIdeTest {
 
-    private static @NotNull TestCaseDto testCase(final TestSetDirectoryDto ts) {
+    private static @NotNull TestCaseDto aTestCaseIn(final TestSetDirectoryDto ts) {
         final TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in with a valid user").build();
         tc.setParent(ts);
         return tc;
@@ -43,7 +43,7 @@ public class TestCaseFileIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private @NotNull TestProjectDirectoryDto testProject(final String name) {
+    private @NotNull TestProjectDirectoryDto aTestProject(final String name) {
         return WriteAction.computeAndWait(() -> {
             final TestProjectDirectoryDto tp = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(root.resolve(name));
             nodes().addTestProject(tp);
@@ -51,7 +51,7 @@ public class TestCaseFileIdeTest extends AbstractTempRootIdeTest {
         });
     }
 
-    private @NotNull TestSetDirectoryDto testSet(final TestProjectDirectoryDto tp) {
+    private @NotNull TestSetDirectoryDto aTestSetIn(final TestProjectDirectoryDto tp) {
         return WriteAction.computeAndWait(() -> {
             final TestSetDirectoryDto ts = Services.getInstance(getProject(), DirectoryMapper.class)
                     .getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
@@ -61,9 +61,9 @@ public class TestCaseFileIdeTest extends AbstractTempRootIdeTest {
     }
 
     public void testATestCaseIsFoundInsideTheTestProjectThatHoldsIt() {
-        final TestProjectDirectoryDto tp = testProject("NAFATH");
-        testProject("NAFATH2");
-        final TestCaseDto tc = testCase(testSet(tp));
+        final TestProjectDirectoryDto tp = aTestProject("NAFATH");
+        aTestProject("NAFATH2");
+        final TestCaseDto tc = aTestCaseIn(aTestSetIn(tp));
 
         final TestCaseFile file = indexedTestCases().testCaseFile(tc).orElseThrow();
 

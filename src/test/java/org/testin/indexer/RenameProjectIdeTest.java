@@ -47,7 +47,7 @@ public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
-    private @NotNull TestProjectDirectoryDto testProject(final String name) {
+    private @NotNull TestProjectDirectoryDto aTestProject(final String name) {
         return WriteAction.computeAndWait(() -> {
             final TestProjectDirectoryDto tp = Services.getInstance(getProject(), DirectoryMapper.class).setTestProjectNode(root.resolve(name));
             nodes().addTestProject(tp);
@@ -55,7 +55,7 @@ public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
         });
     }
 
-    private @NotNull TestSetDirectoryDto testSet(final TestProjectDirectoryDto tp) {
+    private @NotNull TestSetDirectoryDto aTestSetIn(final TestProjectDirectoryDto tp) {
         return WriteAction.computeAndWait(() -> {
             final TestSetDirectoryDto ts = Services.getInstance(getProject(), DirectoryMapper.class)
                     .getTestSetNode(tp.getTestCasesDirectory().getPath().resolve("Login"), tp.getTestCasesDirectory());
@@ -72,7 +72,7 @@ public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
     }
 
     public void testARenamedProjectIsFoundUnderItsNewName() {
-        final Path from = testProject("NAFATH").getPath();
+        final Path from = aTestProject("NAFATH").getPath();
         indexer().scanSingleProject(from);
 
         final Path to = root.resolve("Nafath_App");
@@ -85,7 +85,7 @@ public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
     }
 
     public void testAnInactiveProjectsContainersFollowIt() {
-        final TestProjectDirectoryDto tp = testProject("Checkout");
+        final TestProjectDirectoryDto tp = aTestProject("Checkout");
         WriteAction.runAndWait(() -> {
             tp.getMarker().setStatus(ProjectStatus.INACTIVE);
             nodes().persistMarker(tp);
@@ -102,8 +102,8 @@ public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
     }
 
     public void testAHandNamedTestCaseKeepsItsFile() {
-        final TestProjectDirectoryDto tp = testProject("NAFATH");
-        final TestSetDirectoryDto ts = testSet(tp);
+        final TestProjectDirectoryDto tp = aTestProject("NAFATH");
+        final TestSetDirectoryDto ts = aTestSetIn(tp);
         final UUID id = UUID.randomUUID();
 
         try {
@@ -124,6 +124,7 @@ public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
         assertEquals("the test case lost its hand-named file", "login.tc", file.inProject().getFileName().toString());
     }
 
+    // Rule-TREE-PANEL-004
     public void testANameIsTakenOnDiskButNotByTheNodeItself() {
         final Path other = root.resolve("Payments");
         final Path self = root.resolve("nafath");
