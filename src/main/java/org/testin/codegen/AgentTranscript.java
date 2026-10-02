@@ -27,12 +27,19 @@ import java.util.List;
 // UC-CODEGEN-021, Rule-CODEGEN-090
 public final class AgentTranscript {
     private final @NotNull List<String> exchanges = new ArrayList<>();
+    private int landed;
 
     // UC-CODEGEN-021, Rule-CODEGEN-090
-    public void record(final @NotNull TestCaseDto tc, final @NotNull String prompt, final @NotNull String said, final @NotNull String outcome) {
+    public void record(final @NotNull TestCaseDto tc, final @NotNull String prompt, final @NotNull String said, final boolean bodyLanded, final @NotNull String outcome) {
+        if (bodyLanded) landed++;
         Logger.debug("Agent asked for '" + tc.getDescription() + "':\n" + prompt + "\nand said:\n" + said);
 
         exchanges.add(Bundle.message("agent.transcript.exchange", tc.getDescription(), outcome, prompt, said));
+    }
+
+    // Rule-CODEGEN-089
+    public int landed() {
+        return landed;
     }
 
     public boolean isEmpty() {
