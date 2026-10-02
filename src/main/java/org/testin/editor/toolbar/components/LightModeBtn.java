@@ -18,10 +18,10 @@ package org.testin.editor.toolbar.components;
 
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.AbstractIconButton;
 import org.testin.editor.run.RunEditor;
 import org.testin.lightmode.LightMode;
 import org.testin.services.Services;
+import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 
 public class LightModeBtn extends AbstractIconButton implements ToolbarItem {

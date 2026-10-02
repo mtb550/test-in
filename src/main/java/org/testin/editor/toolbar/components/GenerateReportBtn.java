@@ -19,10 +19,10 @@ package org.testin.editor.toolbar.components;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.AbstractIconButton;
 import org.testin.editor.run.RunEditor;
 import org.testin.model.TestRunStatus;
 import org.testin.report.GenerateReportAction;
+import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 

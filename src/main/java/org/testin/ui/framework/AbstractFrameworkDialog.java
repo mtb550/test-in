@@ -29,7 +29,6 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.ui.ActiveComponent;
-import com.intellij.ui.InplaceButton;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
@@ -219,9 +218,9 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         return resizable || size.namesAHeight();
     }
 
-    // UC-INTERNAL-007, Rule-INTERNAL-101
+    // UC-INTERNAL-007, Rule-INTERNAL-101, Rule-INTERNAL-119
     private @NotNull ActiveComponent maximizeToggle() {
-        final @NotNull InplaceButton button = new InplaceButton(new IconButton(Bundle.message("dialog.maximize"), AllIcons.General.ExpandComponent, AllIcons.General.ExpandComponentHover), _ -> toggleMaximized());
+        final @NotNull AbstractIconButton button = AbstractIconButton.of(Bundle.message("dialog.maximize"), AllIcons.General.ExpandComponent, this::toggleMaximized);
 
         return new ActiveComponent() {
             @Override

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.ui.framework;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
@@ -32,7 +32,6 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
-import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -50,6 +49,14 @@ public abstract class AbstractIconButton extends JButton {
     private boolean on;
 
     private @NotNull Optional<String> shortcutText = Optional.empty();
+
+    // Rule-INTERNAL-119
+    public static @NotNull AbstractIconButton of(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Runnable onClick) {
+        final @NotNull AbstractIconButton button = new AbstractIconButton(tooltip, icon) {
+        };
+        button.addActionListener(_ -> onClick.run());
+        return button;
+    }
 
     public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon) {
         super(null, icon);
@@ -140,9 +147,6 @@ public abstract class AbstractIconButton extends JButton {
 
     @Override
     protected void paintComponent(final @NotNull Graphics g) {
-        g.setColor(Optional.ofNullable(getParent()).map(Container::getBackground).orElseGet(this::getBackground));
-        g.fillRect(0, 0, getWidth(), getHeight());
-
         if ((on || hovered) && isEnabled()) {
             ActionButtonLook.SYSTEM_LOOK.paintBackground(g, this, on ? ActionButtonComponent.PUSHED : ActionButtonComponent.POPPED);
         }

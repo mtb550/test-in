@@ -192,6 +192,11 @@ and which keys it answers, and the shell builds the rest.
   holds a folder or a file is the framework's text field with a browse button
   inside it, at the field's right edge, which opens the platform's chooser at
   the path the field holds and puts the chosen path in the field.
+- **Rule-INTERNAL-119** — Every icon button Testin draws is the framework's one
+  icon button, in a toolbar, a status bar, a dialog's title bar or beside a
+  screenshot: the icon alone at rest, a gray rounded fill under it while the
+  pointer is on it, and the fill a shade darker while it is on. A new button
+  takes this button rather than drawing its own.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

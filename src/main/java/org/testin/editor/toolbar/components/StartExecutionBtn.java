@@ -17,10 +17,10 @@
 package org.testin.editor.toolbar.components;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.AbstractIconButton;
 import org.testin.editor.run.ExecutionControl;
 import org.testin.editor.run.RunEditor;
 import org.testin.model.TestRunStatus;
+import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 
 public class StartExecutionBtn extends AbstractIconButton implements ToolbarItem {

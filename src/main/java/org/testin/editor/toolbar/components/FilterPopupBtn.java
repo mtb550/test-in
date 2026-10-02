@@ -29,7 +29,6 @@ import com.intellij.ui.JBColor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editor.AbstractIconButton;
 import org.testin.editor.EditorColors;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.model.Automated;
@@ -37,6 +36,7 @@ import org.testin.model.Groups;
 import org.testin.model.Priority;
 import org.testin.model.TestStatus;
 import org.testin.testcase.TestEditorAttributes;
+import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 import org.testin.util.Icons;
 

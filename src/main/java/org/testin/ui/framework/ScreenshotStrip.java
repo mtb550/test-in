@@ -17,7 +17,6 @@
 package org.testin.ui.framework;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.ui.InplaceButton;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
@@ -43,12 +42,12 @@ final class ScreenshotStrip {
         stored.forEach(this::add);
     }
 
-    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219
+    // UC-EDITOR-PANEL-034, Rule-EDITOR-PANEL-219, Rule-INTERNAL-119
     void add(final byte @NotNull [] png) {
         final @NotNull JBPanel<?> thumbnail = new JBPanel<>(new BorderLayout());
         thumbnail.setOpaque(false);
         thumbnail.add(new JBLabel(Picture.thumbnail(png)), BorderLayout.CENTER);
-        thumbnail.add(new InplaceButton(Bundle.message("dialog.failure.screenshot.remove"), AllIcons.Actions.Close, _ -> remove(png, thumbnail)), BorderLayout.EAST);
+        thumbnail.add(AbstractIconButton.of(Bundle.message("dialog.failure.screenshot.remove"), AllIcons.Actions.Close, () -> remove(png, thumbnail)), BorderLayout.EAST);
 
         screenshots.add(png);
         panel.add(thumbnail);

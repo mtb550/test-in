@@ -23,10 +23,10 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.CheckBoxList;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.AbstractIconButton;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 
