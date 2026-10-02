@@ -16,7 +16,7 @@ The rest keep `Ctrl` on a Mac and add `Alt`, because their `Cmd` form belongs to
 macOS or to the IDE's own editor: `Ctrl+Alt+P` for a report and for the
 priority, and `Ctrl+Alt+G` for a group. Where `Ctrl+Alt` is taken as well they
 add `Cmd` too: `Ctrl+Alt+Cmd+M` to create a test case and for the module,
-`Ctrl+Alt+Cmd+B` for the pre conditions, and `Ctrl+Alt+Cmd+Right` and `Left` to
+`Ctrl+Alt+Cmd+B` for the pre-conditions, and `Ctrl+Alt+Cmd+Right` and `Left` to
 page, with `Shift` for the ends. Paging cannot stay on `Ctrl` and an arrow,
 which move between desktops on a Mac. Each row below names its Mac key.
 
