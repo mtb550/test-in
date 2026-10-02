@@ -51,11 +51,12 @@ public final class NodeRename {
         final @NotNull Path oldPath = dir.getPath();
         final @NotNull Path newPath = oldPath.resolveSibling(newName);
 
-        Services.getInstance(p, Nodes.class).renameNode(oldPath, newPath, () -> {
-            // Rule-CODEGEN-082
-            if (renamed.toTheFilesName(p)) Services.getInstance(p, BoundTestProject.class).follow(oldName, newName);
-            JavaCode.of(dir.getType()).getRenamed().execute(p, renamed);
+        // Rule-CODEGEN-082
+        if (renamed.toTheFilesName(p)) Services.getInstance(p, BoundTestProject.class).follow(oldName, newName);
+        // Rule-CODEGEN-004, Rule-CODEGEN-051
+        JavaCode.of(dir.getType()).getRenamed().execute(p, renamed);
 
+        Services.getInstance(p, Nodes.class).renameNode(oldPath, newPath, () -> {
             if (dir instanceof TestProjectDirectoryDto) projectFollows(p, oldName, newName);
 
             Logger.info("Success! Renamed to: " + newName);

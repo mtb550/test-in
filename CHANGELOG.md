@@ -42,6 +42,7 @@ What each version of Testin changed, for a tester deciding whether to update. Th
 - **Every Testin key reaches Testin on a Mac:** Create Test Case is **Ctrl+Alt+Cmd+M**, where **Cmd+M** minimized the window, and paging is **Ctrl+Alt+Cmd+Right** and **Left**, with **Shift** for the ends, because **Ctrl** and an arrow switch desktops. Generate Report is **Ctrl+Alt+P**, and in the test case dialogs Module is **Ctrl+Alt+Cmd+M**, Pre Conditions **Ctrl+Alt+Cmd+B**, Priority **Ctrl+Alt+P** and Group **Ctrl+Alt+G** - keys neither macOS nor the IDE uses. The IntelliJ IDEA Classic keymap gets the same Mac keys as the macOS one. Windows and Linux keep their keys.
 - The web page report keeps the line breaks of a test case description, and the Excel report heads its test case column **Test Case**, as the web page, the PDF and the Word document do.
 - **A signed off test run keeps what it recorded:** on a Completed or Closed test run, **P**, **F** and **B**, the failure details and the grid's Actual Result are gray and say why, as the status bar always claimed.
+- Renaming a test set, a test set package or a test project renames its automation class or package again, and so does undoing the rename: the code was looked up under the new name after the tree already carried it, so it was never found.
 
 ## 2.13.0-alpha - 2026-09-22
 

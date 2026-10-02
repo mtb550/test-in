@@ -53,10 +53,7 @@ public class PackagesWithoutTestsTest {
             "two actions that open the node the tester selected, through the editors and the tool window - ideTest",
 
             "order",
-            "an action and a dialog: the number a tester types goes to the marker through the indexer - ideTest",
-
-            "rename",
-            "an action, a dialog and the order the three steps run in - close the editor, rewrite the code, rename the node. Only a running IDE has all three - ideTest");
+            "an action and a dialog: the number a tester types goes to the marker through the indexer - ideTest");
 
     private static @NotNull Set<String> topLevel(final @NotNull Path root) {
         try (Stream<Path> paths = Files.walk(root)) {
