@@ -35,7 +35,9 @@ final class ButtonFooter {
     private @NotNull Optional<String> reason = Optional.empty();
     private @NotNull String tally = "";
 
+    // Rule-INTERNAL-119
     ButtonFooter(final @NotNull JComponent button) {
+        button.setOpaque(false);
         said.setFont(Fonts.small());
 
         panel = new JBPanel<>(new BorderLayout());
