@@ -306,8 +306,16 @@ with `./gradlew publishPlugin`, which reads the Marketplace token from
 promoted to the default channel from the Marketplace page rather than uploaded
 again.
 
+**Release notes are written in [`CHANGELOG.md`](CHANGELOG.md), and nowhere
+else.** A change a tester will notice adds its line under Unreleased in the
+same commit. The build renders the section named after `version` in
+`build.gradle.kts` into plugin.xml's change notes, and Unreleased while no
+section has that name. A release sets `version`, runs `./gradlew
+patchChangelog` to put that version's heading over what Unreleased holds, and
+then publishes.
+
 **2.14.0-alpha's change notes have to say that 2.13.0-alpha is installed
-first.** The converter that brought pre-2.13 test data forward was deleted
+first.** The Unreleased section of `CHANGELOG.md` says so now. The converter that brought pre-2.13 test data forward was deleted
 after 2.13.0-alpha was published (#333), so a tester who updates from
 2.12.0-alpha straight to 2.14.0-alpha meets a refusal naming that release
 rather than a conversion. JetBrains cannot make one plugin version require an

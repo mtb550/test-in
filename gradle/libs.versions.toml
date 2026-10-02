@@ -33,3 +33,4 @@ nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
 
 [plugins]
 errorprone = { id = "net.ltgt.errorprone", version = "5.1.1" }
+changelog = { id = "org.jetbrains.changelog", version = "2.5.0" }

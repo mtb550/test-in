@@ -1,5 +1,6 @@
 import net.ltgt.gradle.errorprone.CheckSeverity
 import net.ltgt.gradle.errorprone.errorprone
+import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask
@@ -13,6 +14,7 @@ plugins {
     id("pmd")
     id("org.jetbrains.intellij.platform")
     alias(libs.plugins.errorprone)
+    alias(libs.plugins.changelog)
 }
 
 // What the IDE and the headless inspector must not index. The sandbox alone is
@@ -203,9 +205,28 @@ dependencies {
     testImplementation(libs.archunit)
 }
 
+// 2.5, 2.6 and 2.7 were released under two-part versions, which the plugin's
+// default SemVer pattern refuses to read as a heading.
+changelog {
+    headerParserRegex.set("""(\d+\.\d+(?:\.\d+)?(?:-[0-9A-Za-z.]+)?)""".toRegex())
+}
+
 intellijPlatform {
     pluginConfiguration {
-        version.set(project.version.toString())
+        val pluginVersion = project.version.toString()
+        val changelog = project.changelog
+
+        version.set(pluginVersion)
+
+        // The change notes are written once, in CHANGELOG.md (#103). The section
+        // named after this version becomes plugin.xml's <change-notes>, and
+        // Unreleased stands in until `./gradlew patchChangelog` names it.
+        changeNotes.set(provider {
+            changelog.renderItem(
+                (changelog.getOrNull(pluginVersion) ?: changelog.getUnreleased()).withHeader(false).withEmptySections(false),
+                Changelog.OutputType.HTML
+            )
+        })
 
         ideaVersion {
             sinceBuild.set("262")
