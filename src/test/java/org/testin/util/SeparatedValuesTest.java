@@ -30,20 +30,30 @@ public class SeparatedValuesTest {
         assertEquals(SeparatedValues.split("a\tb,c\nd,e", ','), List.of(List.of("a\tb", "c"), List.of("d", "e")));
     }
 
-    // Rule-SHARE-124
+    // Rule-SHARE-124, Rule-EDITOR-PANEL-254
     @Test
     public void aQuoteOpensAQuotedValueOnlyAtItsStart() {
         assertEquals(SeparatedValues.split("\"a,\"\"b\"\"\nc\",ab\"c\"d", ','), List.of(List.of("a,\"b\"\nc", "ab\"c\"d")));
     }
 
-    // Rule-SHARE-124
+    // Rule-SHARE-124, Rule-EDITOR-PANEL-254
     @Test
     public void aByteOrderMarkAtTheStartIsIgnored() {
         assertEquals(SeparatedValues.split("﻿a\tb", '\t'), List.of(List.of("a", "b")));
     }
 
+    // Rule-EDITOR-PANEL-254
     @Test
     public void anEmptyLineIsARowOfOneEmptyValueAndAFinalLineBreakIsNot() {
         assertEquals(SeparatedValues.split("a\r\n\r\nb\r\n", '\t'), List.of(List.of("a"), List.of(""), List.of("b")));
+    }
+
+    // Rule-EDITOR-PANEL-087
+    @Test
+    public void aValueHoldingATabALineBreakOrAQuoteIsWrappedInQuotes() {
+        assertEquals(SeparatedValues.field("plain words", '\t'), "plain words", "nothing to protect, so nothing added");
+        assertEquals(SeparatedValues.field("a\tb", '\t'), "\"a\tb\"");
+        assertEquals(SeparatedValues.field("first\nsecond", '\t'), "\"first\nsecond\"");
+        assertEquals(SeparatedValues.field("say \"hi\"", '\t'), "\"say \"\"hi\"\"\"", "a quote inside is doubled, as a spreadsheet writes it");
     }
 }

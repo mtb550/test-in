@@ -47,6 +47,7 @@ public class CardTitleWrapIdeTest extends BasePlatformTestCase {
         return card;
     }
 
+    // Rule-EDITOR-PANEL-003
     public void testWrappingMakesTheCardTaller() {
         final int fits = laidOut("Log in").getPreferredSize().height;
         final int wraps = laidOut(LONG).getPreferredSize().height;
@@ -69,6 +70,7 @@ public class CardTitleWrapIdeTest extends BasePlatformTestCase {
         assertTrue("the icons after a full-width title run off the card", slots.getLast().at().getMaxX() <= 900);
     }
 
+    // Rule-EDITOR-PANEL-235
     public void testTheNewButtonGoesLastAndMovesNeitherOfTheOthers() {
         final @NotNull List<Slot> before = CardTitle.descriptionActionIcons(200, offered(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD)).slots();
         final @NotNull List<Slot> now = CardTitle.descriptionActionIcons(200, everyButton()).slots();

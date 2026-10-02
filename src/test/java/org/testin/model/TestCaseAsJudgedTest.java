@@ -42,7 +42,7 @@ public class TestCaseAsJudgedTest {
         return MAPPER.readValue(MAPPER.writeValueAsString(tc), TestCaseDto.class);
     }
 
-    // Rule-PRODUCT-007
+    // Rule-PRODUCT-007, Rule-EDITOR-PANEL-238, Rule-EDITOR-PANEL-239
     @Test
     public void aRunItemStatusKeepsTheTestCaseItWasGivenAgainst() {
         final UUID id = UUID.randomUUID();
@@ -57,6 +57,7 @@ public class TestCaseAsJudgedTest {
         assertEquals(item.liveTestCase().getDescription(), "after", "actions still reach the test case as it is now");
     }
 
+    // Rule-EDITOR-PANEL-240
     @Test
     public void aCorrectionKeepsTheJudgedTestCase() {
         final UUID id = UUID.randomUUID();
@@ -79,6 +80,7 @@ public class TestCaseAsJudgedTest {
         assertEquals(item.shownTestCase().getDescription(), "now");
     }
 
+    // Rule-EDITOR-PANEL-241
     @Test
     public void runningAJudgedRowAgainTakesTheTestCaseAsItIsNow() {
         final UUID id = UUID.randomUUID();
@@ -90,6 +92,7 @@ public class TestCaseAsJudgedTest {
         assertEquals(item.shownTestCase().getDescription(), "after");
     }
 
+    // Rule-EDITOR-PANEL-239
     @Test
     public void aTestCaseDeletedAfterItsRunItemStatusKeepsItsFullTextAndItsRunItemStatus() {
         final UUID id = UUID.randomUUID();

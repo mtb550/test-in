@@ -96,6 +96,7 @@ public class DisplayFormatTest {
         assertEquals(Display.formatTestRunClock(Duration.ofHours(2).plusMinutes(5)), "02:05:00");
     }
 
+    // Rule-EDITOR-PANEL-178
     @Test
     public void aTestRunNobodyStartedShowsNothing() {
         assertEquals(Display.formatTestRunClock(Duration.ZERO), "", "the status bar hides the label rather than showing zero");

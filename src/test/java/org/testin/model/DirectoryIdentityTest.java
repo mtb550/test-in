@@ -33,6 +33,7 @@ public class DirectoryIdentityTest {
 
     private static final Path LOGIN = Path.of("NAFATH", "testCases", "Login");
 
+    // Rule-INTERNAL-116
     @Test
     public void twoReadingsOfOneFolderAreOneNode() {
         final TestSetDirectoryDto first = TestSetDirectoryDto.builder().path(LOGIN).name("Login").build();
@@ -42,6 +43,7 @@ public class DirectoryIdentityTest {
         assertEquals(new HashSet<>(List.of(first, second)).size(), 1, "a set held one folder twice");
     }
 
+    // Rule-INTERNAL-116
     @Test
     public void twoKindsAtOnePathAreTwoNodes() {
         final @NotNull DirectoryDto testSetPackage = TestSetPackageDirectoryDto.builder().path(LOGIN).build();

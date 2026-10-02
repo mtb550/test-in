@@ -152,6 +152,7 @@ public class IndexerBudgetTest {
         return documents;
     }
 
+    // Rule-INTERNAL-062
     @Test(groups = "budget")
     public void parsingTenThousandTestCasesStaysInsideTheBudget() {
         final @NotNull List<String> documents = documents();

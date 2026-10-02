@@ -63,6 +63,10 @@ final class SyntheticTree {
         return TEST_CASE.formatted(order, id);
     }
 
+    static @NotNull String marker() {
+        return MARKER;
+    }
+
     static @NotNull Path write(final @NotNull Path root, final int sets, final int perSet) {
         final @NotNull Path project = root.resolve("BENCHMARK");
         write(project.resolve(".tp"), MARKER);
@@ -90,7 +94,7 @@ final class SyntheticTree {
         }
     }
 
-    private static void write(final @NotNull Path file, final @NotNull String content) {
+    static void write(final @NotNull Path file, final @NotNull String content) {
         try {
             Files.createDirectories(file.getParent());
             Files.writeString(file, content);

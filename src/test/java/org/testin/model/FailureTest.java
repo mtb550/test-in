@@ -54,6 +54,7 @@ public class FailureTest {
         assertEquals(item.getStacktrace(), "pasted by hand");
     }
 
+    // Rule-EDITOR-PANEL-220
     @Test
     public void aFailureWithNoStacktraceDoesNotInheritTheLastExecutionsOne() {
         final TestRunItems item = row();
@@ -87,6 +88,7 @@ public class FailureTest {
         assertEquals(item.getExecutedBy(), "tester");
     }
 
+    // Rule-EDITOR-PANEL-220
     @Test
     public void anAutomatedFailureKeepsTheBugIssueLink() {
         final TestRunItems item = row().setBugIssueUrl("https://github.com/mtb550/product/issues/123");
@@ -97,6 +99,7 @@ public class FailureTest {
         assertEquals(item.getBugIssueUrl(), "https://github.com/mtb550/product/issues/123");
     }
 
+    // Rule-EDITOR-PANEL-220
     @Test
     public void aReportedFailureClearsTheScreenshotsOfTheLastOne() {
         final TestRunItems item = row().setScreenshots(List.of("k3f9a.png"));
@@ -115,6 +118,7 @@ public class FailureTest {
         assertEquals(item.getScreenshots().size(), 1, "a manual run item status must not erase them");
     }
 
+    // Rule-EDITOR-PANEL-220
     @Test
     public void aReportedFailureNamesWhatHappenedAndNotTheBug() {
         final TestRunItems item = row().setActualResult("typed by hand").setScreenshots(List.of("k3f9a.png")).setBugSeverity(BugSeverity.MAJOR);

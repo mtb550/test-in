@@ -35,6 +35,7 @@ import java.util.Set;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertNotEquals;
 
 public class BadgesTest {
 
@@ -59,6 +60,7 @@ public class BadgesTest {
         assertFalse(Badges.isLight(new Color(0, 0, 255)));
     }
 
+    // Rule-EDITOR-PANEL-253
     @Test
     public void aTestCaseThatNeverFailedDrawsNoPill() {
         final List<Badge> badges = bugBadges(TestRunItems.builder().status(RunItemStatus.PASSED).build());
@@ -66,6 +68,7 @@ public class BadgesTest {
         assertEquals(badges.size(), 0, "a severity is shown only on a failure, so a pass draws no badge");
     }
 
+    // Rule-EDITOR-PANEL-147
     @Test
     public void aFailureTheTesterDidNotTriageDrawsItsDefaults() {
         final List<Badge> badges = bugBadges(TestRunItems.builder().status(RunItemStatus.FAILED).build());
@@ -84,6 +87,7 @@ public class BadgesTest {
         return badges;
     }
 
+    // Rule-EDITOR-PANEL-253
     @Test
     public void oneHalfOnItsOwnIsThatHalf() {
         final List<Badge> severityOnly = new ArrayList<>();
@@ -98,6 +102,7 @@ public class BadgesTest {
                 "the survivor keeps its own color, which is why BugPriority still declares one");
     }
 
+    // Rule-EDITOR-PANEL-253
     @Test
     public void bothHalvesJoinIntoOneBadge() {
         final List<Badge> badges = new ArrayList<>();
@@ -147,5 +152,14 @@ public class BadgesTest {
         }
 
         assertEquals(names.size(), 4, "the four severities a tester can choose");
+    }
+
+    // Rule-EDITOR-PANEL-252
+    @Test
+    public void aPaleBadgeNeverCarriesWhiteText() {
+        assertNotEquals(Badges.readableOn(Color.YELLOW).getRGB(), Color.WHITE.getRGB(), "white on yellow cannot be read");
+        assertNotEquals(Badges.readableOn(Color.GREEN).getRGB(), Color.WHITE.getRGB(), "nor white on bright green");
+        assertEquals(Badges.readableOn(Color.RED).getRGB(), Color.WHITE.getRGB(), "a deep red badge keeps its white words");
+        assertEquals(Badges.readableOn(Color.BLUE).getRGB(), Color.WHITE.getRGB());
     }
 }

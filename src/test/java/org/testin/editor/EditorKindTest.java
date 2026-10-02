@@ -22,6 +22,7 @@ import static org.testng.Assert.assertEquals;
 
 public class EditorKindTest {
 
+    // Rule-EDITOR-PANEL-022
     @Test
     public void theDetailsKeysAreTheOnesAlreadyStored() {
         assertEquals(EditorKind.TEST.detailsKey(4), "testin.selectedDetails.test.v4");

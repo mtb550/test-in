@@ -128,13 +128,14 @@ public class DeclaredShortcutsTest {
         });
     }
 
-    // Rule-PRODUCT-018
+    // Rule-PRODUCT-018, Rule-INTERNAL-071
     @Test
     public void noKeyIsClaimedByTwoTestinActionsByAccident() {
         assertSharedOnlyOnPurpose("$default", declaredKeys("$default"));
         MAC_KEYMAPS.forEach(keymap -> assertSharedOnlyOnPurpose(keymap, keysOnAMac(keymap)));
     }
 
+    // Rule-INTERNAL-071
     @Test
     public void everyDeliberatelySharedKeyIsStillShared() {
         final Map<String, List<String>> declared = declaredKeys("$default");

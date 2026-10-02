@@ -37,6 +37,7 @@ public class WatchedProjectsIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), Nodes.class);
     }
 
+    // Rule-INTERNAL-016
     public void testAChangeInAFolderWithoutAMarkerAddsNothing() {
         final Path notes = root.resolve("notes");
         try {
@@ -51,6 +52,7 @@ public class WatchedProjectsIdeTest extends AbstractTempRootIdeTest {
         assertFalse("a folder with no .tp marker became a test project", nodes().nodeExists(notes));
     }
 
+    // Rule-INTERNAL-016
     public void testATestProjectIsReadAgainAndForgottenOnceItsMarkerIsGone() {
         final Path project = root.resolve("NAFATH");
         WriteAction.runAndWait(() -> nodes().addTestProject(

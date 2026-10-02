@@ -49,7 +49,7 @@ public class TreeOperationsIdeTest extends AbstractTempRootIdeTest {
         });
     }
 
-    // Rule-TREE-PANEL-100
+    // Rule-TREE-PANEL-100, Rule-INTERNAL-005
     public void testAnInactiveProjectIsANodeWithNothingInIt() {
         final Path testProject = root.resolve("NAFATH");
 
@@ -73,6 +73,7 @@ public class TreeOperationsIdeTest extends AbstractTempRootIdeTest {
                 nodes().find(testProject).orElseThrow().getMarker().status());
     }
 
+    // Rule-INTERNAL-090
     public void testAFoldersIdIsWrittenOnceAndKept() {
         final Path testProject = root.resolve("NAFATH");
 

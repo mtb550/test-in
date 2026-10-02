@@ -54,6 +54,7 @@ public class TestRunSummaryTest {
         assertEquals(rateOf(0, 1), 0, "nothing that ran passed");
     }
 
+    // Rule-EDITOR-PANEL-126
     @Test
     public void aDeletedTestCaseCountsUnderItsRunItemStatusOnceJudgedAndUnderRemovedOtherwise() {
         final TestRunSummary summary = TestRunSummary.of(List.of(

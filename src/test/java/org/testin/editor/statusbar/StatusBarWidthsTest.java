@@ -51,6 +51,7 @@ public class StatusBarWidthsTest {
         }
     }
 
+    // Rule-EDITOR-PANEL-251
     @Test
     public void theSentenceKeepsItsFloorWheneverTheBarCanAffordOne() {
         for (int inner = 200; inner <= 1400; inner++) {
@@ -70,6 +71,7 @@ public class StatusBarWidthsTest {
         assertEquals(widths.arrowsAt(), (inner - ARROWS) / 2, "centered in the bar, not between the two ends");
     }
 
+    // Rule-EDITOR-PANEL-251
     @Test
     public void theFiguresGiveRoomUpBeforeTheArrowsOrTheSentenceDo() {
         final @NotNull Widths tight = StatusBar.budget(500, ARROWS, FIGURES);

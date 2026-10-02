@@ -65,6 +65,7 @@ public class DeletedTestCaseInATestRunTest {
                 "the row names itself rather than drawing blank: " + shown.getDescription());
     }
 
+    // Rule-EDITOR-PANEL-126
     @Test
     public void aRowNeverJudgedOfADeletedTestCaseIsShownRemoved() {
         final TestRunItems item = TestRunItems.builder()
@@ -76,6 +77,7 @@ public class DeletedTestCaseInATestRunTest {
         assertEquals(item.shownStatus(), RunItemStatus.REMOVED, "nothing was executed, and now nothing can be");
     }
 
+    // Rule-EDITOR-PANEL-126
     @Test
     public void aJudgedRowOfADeletedTestCaseShowsItsRunItemStatusAndIsWrittenWithIt() {
         final TestRunItems item = TestRunItems.builder()

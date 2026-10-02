@@ -112,6 +112,7 @@ public class TestRunResultFilesIdeTest extends AbstractTempRootIdeTest {
         awaitFile(resultOf(testRun, UNTICKED_TEST_CASE), "a test case the test run covers has no result file");
     }
 
+    // Rule-INTERNAL-093
     public void testUntickingATestCaseRemovesItsResultAndLeavesEverythingElse() {
         final Path testRun = aTestRun();
         awaitFile(resultOf(testRun, UNTICKED_TEST_CASE), "the test run's results never reached disk");

@@ -35,6 +35,7 @@ public class WatchedPathTest {
         return WatchedPath.testProjectOf(changed, ROOT);
     }
 
+    // Rule-INTERNAL-021
     @Test
     public void aTestCaseThatChangedNamesItsProject() {
         assertEquals(of(PROJECT.resolve("Test Cases/Login/6197ec6e.json")), Optional.of(PROJECT),
@@ -47,6 +48,7 @@ public class WatchedPathTest {
         assertEquals(of(PROJECT.resolve(".tp")), Optional.of(PROJECT));
     }
 
+    // Rule-INTERNAL-021
     @Test
     public void everyFileOfOneProjectAnswersTheSameProject() {
         assertEquals(of(PROJECT.resolve("Test Runs/Cycle 1/Cycle 1.tr")), of(PROJECT.resolve(".tp")),
@@ -58,6 +60,7 @@ public class WatchedPathTest {
         assertEquals(of(ROOT.resolve("test-02/.tp")), Optional.of(ROOT.resolve("test-02")));
     }
 
+    // Rule-INTERNAL-017
     @Test
     public void gitsOwnFilesAreNotTestData() {
         assertEquals(of(PROJECT.resolve(".git/HEAD")), Optional.empty(),
@@ -66,12 +69,14 @@ public class WatchedPathTest {
         assertEquals(of(PROJECT.resolve(".git/refs/heads/main")), Optional.empty());
     }
 
+    // Rule-INTERNAL-017
     @Test
     public void aFolderCalledGitDeeperInIsStillGits() {
         assertEquals(of(PROJECT.resolve("Test Cases/.git/config")), Optional.empty(),
                 "checking only the top segment would let every pull through");
     }
 
+    // Rule-INTERNAL-016
     @Test
     public void anythingOutsideTheTestinRootIsIgnored() {
         assertEquals(of(Path.of("C:", "Users", "mtb", "IdeaProjects", "testin", "build", "Foo.class")),
@@ -80,6 +85,7 @@ public class WatchedPathTest {
                 "a sibling folder whose name merely starts the same way is not inside the root");
     }
 
+    // Rule-INTERNAL-018
     @Test
     public void theRootItselfIsAFolderOfProjectsAndNotOne() {
         assertEquals(of(ROOT), Optional.empty());

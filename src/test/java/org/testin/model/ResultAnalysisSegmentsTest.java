@@ -24,6 +24,9 @@ import org.testng.annotations.Test;
 import java.awt.Color;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -50,6 +53,7 @@ public class ResultAnalysisSegmentsTest {
                 "nothing at all rather than a blank piece: the bar hides a test run with nothing recorded the way it hides a zero duration");
     }
 
+    // Rule-EDITOR-PANEL-175
     @Test
     public void aRunItemStatusNoTestCaseCarriesIsLeftOut() {
         assertEquals(words(run(12, 0, 0, 108, 0)), "Passed 12 · Pending 108");
@@ -95,6 +99,7 @@ public class ResultAnalysisSegmentsTest {
                 "removed is not a run item status, so it is drawn in the same color as the rest of the bar");
     }
 
+    // Rule-EDITOR-PANEL-176
     @Test
     public void untouchedTestCasesArePendingUntilTheTestRunGivesUpOnThem() {
         assertEquals(words(run(0, 0, 0, 7, 0)), RunItemStatus.PENDING.getLabel() + " 7");
@@ -118,5 +123,29 @@ public class ResultAnalysisSegmentsTest {
     public void thePlainLabelIsTheFinishedName() {
         assertEquals(ResultAnalysis.UNTESTED.getLabel(), RunItemStatus.UNTESTED.getLabel());
         assertEquals(ResultAnalysis.UNTESTED.heading(run(0, 0, 0, 7, 0)), RunItemStatus.UNTESTED.getLabel() + " (7)");
+    }
+
+    // Rule-EDITOR-PANEL-190
+    @Test
+    public void theAnalysisHasOneSectionForEachRunItemStatusEachCountingItsOwn() {
+        final @NotNull TestRunSummary summary = run(1, 2, 3, 4, 0);
+
+        assertEquals(List.of(ResultAnalysis.values()).stream().map(ResultAnalysis::getLabel).toList(),
+                List.of(RunItemStatus.PASSED.getLabel(), RunItemStatus.FAILED.getLabel(), RunItemStatus.BLOCKED.getLabel(), RunItemStatus.UNTESTED.getLabel()));
+        assertEquals(ResultAnalysis.PASSED.heading(summary), RunItemStatus.PASSED.getLabel() + " (1)");
+        assertEquals(ResultAnalysis.FAILED.heading(summary), RunItemStatus.FAILED.getLabel() + " (2)");
+        assertEquals(ResultAnalysis.BLOCKED.heading(summary), RunItemStatus.BLOCKED.getLabel() + " (3)");
+        assertEquals(ResultAnalysis.UNTESTED.heading(summary), RunItemStatus.UNTESTED.getLabel() + " (4)");
+    }
+
+    // Rule-EDITOR-PANEL-191
+    @Test
+    public void aSectionLeftBlankIsNotSaved() {
+        final @NotNull Map<ResultAnalysis, String> typed = new EnumMap<>(ResultAnalysis.class);
+        typed.put(ResultAnalysis.PASSED, "The checkout flow held up");
+        typed.put(ResultAnalysis.FAILED, "   ");
+        typed.put(ResultAnalysis.BLOCKED, "");
+
+        assertEquals(ResultAnalysis.written(typed).keySet(), Set.of(ResultAnalysis.PASSED), "only the section with words in it is kept");
     }
 }

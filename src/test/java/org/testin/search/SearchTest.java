@@ -173,12 +173,14 @@ public class SearchTest {
         assertTrue(Hits.inTreeOrder(first, second) < 0);
     }
 
+    // Rule-INTERNAL-002
     @Test
     public void onlyTestSetsAndTestRunsHaveAnEditorToOpen() {
         assertTrue(testSet("Login", "test-01").isOpenableInEditor(), "a test set opens the test case editor");
         assertTrue(TestRunDirectoryDto.builder().build().isOpenableInEditor(), "a test run opens the test run editor");
     }
 
+    // Rule-INTERNAL-002
     @Test
     public void aFolderOfNodesHasNoEditorAndIsNotOpened() {
         assertFalse(TestSetPackageDirectoryDto.builder().build().isOpenableInEditor());

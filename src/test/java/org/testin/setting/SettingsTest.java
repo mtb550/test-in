@@ -111,6 +111,7 @@ public class SettingsTest {
         assertFalse(TestinRoot.isRootChanged("  C:/testin", "C:/testin\t"));
     }
 
+    // Rule-INTERNAL-108
     @Test
     public void aPlaceIsWhatIsLeftOfThePathOnceTheTestinRootIsTakenOff() {
         final Path root = Path.of("C:", "Users", "mtb", "Downloads", "Testin");
@@ -121,6 +122,7 @@ public class SettingsTest {
         assertEquals(TestinRoot.place(root, root.toString()), List.of("Testin"), "the root has nothing below it, so it is its own folder name");
     }
 
+    // Rule-INTERNAL-108
     @Test
     public void aPathOutsideTheRootIsStillSaidInFullRatherThanNotAtAll() {
         final Path root = Path.of("C:", "Users", "mtb", "Downloads", "Testin");

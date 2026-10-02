@@ -38,6 +38,7 @@ public class CopiedTestCaseIdentityTest {
         assertTrue(ProjectIndexer.isTestCaseFile(TEST_SET.resolve("3f2b9c14-0d5e-4a71-9c33-8e1f4b2a7d60.tc"), IS_TEST_SET));
     }
 
+    // Rule-INTERNAL-011
     @Test
     public void aTestCaseTheTesterNamedIsATestCaseFileToo() {
         assertTrue(ProjectIndexer.isTestCaseFile(TEST_SET.resolve("login.tc"), IS_TEST_SET),
@@ -55,6 +56,7 @@ public class CopiedTestCaseIdentityTest {
         assertFalse(ProjectIndexer.isTestCaseFile(TEST_SET.resolve(".ts"), IS_TEST_SET));
     }
 
+    // Rule-INTERNAL-011
     @Test
     public void jsonOutsideATestSetIsNotATestCaseFile() {
         assertFalse(ProjectIndexer.isTestCaseFile(Path.of("root", "Test Cases", "notes.tc"), IS_TEST_SET));

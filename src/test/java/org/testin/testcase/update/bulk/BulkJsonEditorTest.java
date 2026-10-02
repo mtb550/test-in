@@ -44,6 +44,7 @@ public class BulkJsonEditorTest {
         assertEquals(BulkJsonEditor.unescapeJson(BulkJsonEditor.escapeJson(original)), original);
     }
 
+    // Rule-EDITOR-PANEL-044
     @Test
     public void newlinesSurviveTheRoundTrip() {
         final String original = "first line\nsecond line";

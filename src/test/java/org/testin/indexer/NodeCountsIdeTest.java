@@ -1,0 +1,146 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.indexer;
+
+import com.intellij.openapi.application.WriteAction;
+import org.jetbrains.annotations.NotNull;
+import org.testin.AbstractTempRootIdeTest;
+import org.testin.model.NodeFigures;
+import org.testin.model.RunItemStatus;
+import org.testin.model.TestRunItems;
+import org.testin.model.TestRunSummary;
+import org.testin.model.TestSetStatus;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.TestRunDto;
+import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.services.Services;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+public class NodeCountsIdeTest extends AbstractTempRootIdeTest {
+
+    private @NotNull DirectoryMapper mapper() {
+        return Services.getInstance(getProject(), DirectoryMapper.class);
+    }
+
+    private @NotNull Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
+    }
+
+    private @NotNull TestProjectDirectoryDto testProject() {
+        return WriteAction.computeAndWait(() -> {
+            final @NotNull TestProjectDirectoryDto tp = mapper().setTestProjectNode(root.resolve("Checkout"));
+            nodes().addTestProject(tp);
+            return tp;
+        });
+    }
+
+    private @NotNull TestSetPackageDirectoryDto testSetPackage(final @NotNull DirectoryDto parent, final @NotNull String name) {
+        return WriteAction.computeAndWait(() -> {
+            final @NotNull TestSetPackageDirectoryDto tsp = mapper().getTestSetPackageNode(parent.getPath().resolve(name), parent);
+            nodes().addTestSetPackage(tsp);
+            return tsp;
+        });
+    }
+
+    private @NotNull List<UUID> testSet(final @NotNull DirectoryDto parent, final @NotNull String name, final int testCases, final @NotNull TestSetStatus status) {
+        final @NotNull TestSetDirectoryDto ts = WriteAction.computeAndWait(() -> {
+            final @NotNull TestSetDirectoryDto created = mapper().getTestSetNode(parent.getPath().resolve(name), parent);
+            created.getMarker().setStatus(status);
+            nodes().addTestSet(created);
+            return created;
+        });
+
+        final @NotNull List<UUID> ids = new ArrayList<>();
+        for (int i = 0; i < testCases; i++) {
+            final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Log in " + i).order("m" + i).build();
+            tc.setParent(ts);
+            Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(ts.getPath(), tc);
+            ids.add(tc.getId());
+        }
+
+        return ids;
+    }
+
+    private @NotNull TestRunDirectoryDto testRunNode(final @NotNull TestProjectDirectoryDto tp, final @NotNull String name) {
+        return WriteAction.computeAndWait(() -> {
+            final @NotNull TestRunDirectoryDto tr = mapper().setTestRunNode(tp.getTestRunsDirectory().getPath().resolve(name), tp.getTestRunsDirectory());
+            nodes().addTestRunDir(tr);
+            return tr;
+        });
+    }
+
+    private @NotNull NodeFigures counted(final @NotNull DirectoryDto node) {
+        return NodeCounter.childCounts(getProject(), node);
+    }
+
+    // UC-INTERNAL-006, Rule-INTERNAL-047
+    public void testAContainerIsTheSumOfEverythingBeneathItAtAnyDepth() {
+        final @NotNull TestProjectDirectoryDto tp = testProject();
+        final @NotNull TestSetPackageDirectoryDto auth = testSetPackage(tp.getTestCasesDirectory(), "Auth");
+        final @NotNull TestSetPackageDirectoryDto admin = testSetPackage(auth, "Admin");
+        testSet(auth, "Login", 2, TestSetStatus.ACTIVE);
+        testSet(admin, "Roles", 3, TestSetStatus.ACTIVE);
+
+        final @NotNull NodeFigures figures = counted(auth);
+
+        assertEquals("a package did not count the test cases two levels beneath it", 5, figures.testCases());
+        assertEquals("a package did not count the test sets two levels beneath it", 2, figures.testSets());
+        assertEquals("a package did not count the package beneath it", 1, figures.packages());
+    }
+
+    // UC-INTERNAL-006, Rule-INTERNAL-050
+    public void testARetiredTestSetIsStillCounted() {
+        final @NotNull TestProjectDirectoryDto tp = testProject();
+        testSet(tp.getTestCasesDirectory(), "Login", 2, TestSetStatus.ACTIVE);
+        testSet(tp.getTestCasesDirectory(), "Old login", 3, TestSetStatus.DEPRECATED);
+
+        final @NotNull NodeFigures figures = counted(tp.getTestCasesDirectory());
+
+        assertEquals("a deprecated test set was left out of the count", 2, figures.testSets());
+        assertEquals("the test cases of a deprecated test set were left out of the count", 5, figures.testCases());
+    }
+
+    // UC-INTERNAL-006, Rule-INTERNAL-048
+    public void testATestRunIsCountedFromTheRunItemStatusesItRecorded() {
+        final @NotNull TestProjectDirectoryDto tp = testProject();
+        final @NotNull List<UUID> testCases = testSet(tp.getTestCasesDirectory(), "Login", 4, TestSetStatus.ACTIVE);
+        final @NotNull TestRunDirectoryDto tr = testRunNode(tp, "Cycle 1");
+        Services.getInstance(getProject(), TestRuns.class).putTestRun(tr.getPath(), new TestRunDto().setResults(new ArrayList<>(List.of(
+                new TestRunItems().setId(testCases.get(0)).setStatus(RunItemStatus.PASSED),
+                new TestRunItems().setId(testCases.get(1)).setStatus(RunItemStatus.FAILED)))));
+
+        final @NotNull TestRunSummary counted = NodeCounter.testRunFigures(getProject(), tr).testRun();
+
+        assertEquals("a test run made from two of four test cases was not counted from its two run item statuses", 2, counted.total());
+        assertEquals(1, counted.passed());
+        assertEquals(1, counted.failed());
+    }
+
+    // UC-INTERNAL-006, Rule-INTERNAL-051
+    public void testATestRunThatCouldNotBeReadCountsAsNothing() {
+        final @NotNull TestRunDirectoryDto tr = testRunNode(testProject(), "Cycle 1");
+
+        assertEquals("a test run the index could not read was not counted as nothing", NodeFigures.NONE, NodeCounter.testRunFigures(getProject(), tr));
+    }
+}

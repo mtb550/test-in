@@ -77,6 +77,7 @@ public class TestRunItemsTest {
                 "a test case no clock was counting takes the framework's own measure");
     }
 
+    // Rule-EDITOR-PANEL-132
     @Test
     public void theClockStopsCountingOnceTheRunItemStatusIsIn() {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();

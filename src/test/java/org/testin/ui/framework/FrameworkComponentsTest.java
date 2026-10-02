@@ -161,6 +161,7 @@ public class FrameworkComponentsTest {
         assertEquals(row.value(), "TS");
     }
 
+    // Rule-INTERNAL-107
     @Test
     public void radioSelectionStartsOnTheDeclaredDefault() {
         final RadioSelection<String> radios = ComponentDialogBase.<String>radios("Severity")
@@ -277,6 +278,7 @@ public class FrameworkComponentsTest {
         assertFalse(entry.getShortcutText().isBlank(), "the keystroke must render as text");
     }
 
+    // Rule-INTERNAL-085
     @Test
     public void aChoiceBoxGivenANewTextFieldStillLeavesEnterToTheDialog() {
         final ChoiceInput choice = ComponentDialogBase.choice("Branch", List.of("main", "release"), "main").getComponent();

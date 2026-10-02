@@ -28,6 +28,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.testcase.TestCaseEditorAttributes;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 
 import static org.testng.Assert.assertEquals;
 
@@ -108,5 +114,52 @@ public class TestCaseFilterTest {
         final TestCaseDto tc = TestCaseDto.builder().description("Log in").build();
 
         assertEquals(TestCaseFilter.filter(List.of(tc), new FilterSelection("nothing holds this", Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of())), List.of());
+    }
+
+    // Rule-EDITOR-PANEL-091
+    @Test
+    public void theSearchReadsEveryFieldTheFieldsPopupLists() {
+        final @NotNull TestSetDirectoryDto set = new TestSetDirectoryDto();
+        set.setPath2(new ArrayList<>(List.of("Shop", "Checkout")));
+        final @NotNull TestCaseDto tc = TestCaseDto.builder()
+                .id(UUID.randomUUID())
+                .description("Refuse an expired card")
+                .expectedResult("The payment is declined")
+                .steps(List.of("Enter the card number"))
+                .priority(Priority.HIGH)
+                .reference("JIRA-77")
+                .testData("card=4111")
+                .preConditions("A basket holds one item")
+                .group(List.of("Regression"))
+                .module("payments")
+                .status(TestCaseStatus.REVIEWED)
+                .createdBy("Sara")
+                .updatedBy("Omar")
+                .createdAt(ZonedDateTime.of(2026, 1, 2, 3, 4, 5, 0, ZoneOffset.UTC))
+                .updatedAt(ZonedDateTime.of(2026, 6, 7, 8, 9, 10, 0, ZoneOffset.UTC))
+                .build();
+        tc.setParent(set);
+
+        final @NotNull List<String> notFound = new ArrayList<>();
+        for (final TestCaseEditorAttributes field : TestCaseEditorAttributes.values()) {
+            final @NotNull String value = field.gridValue(tc);
+            if (value.isBlank()) continue;
+
+            if (TestCaseFilter.filter(List.of(tc), new FilterSelection(value, Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of())).isEmpty()) notFound.add(field.getName() + " = " + value);
+        }
+
+        assertEquals(notFound, List.of(), "the search does not read these fields");
+    }
+
+    // Rule-EDITOR-PANEL-096
+    @Test
+    public void choosingNothingInAFilterMatchesEveryTestCase() {
+        final @NotNull TestCaseDto high = TestCaseDto.builder().description("one").priority(Priority.HIGH).group(List.of("Smoke")).module("accounts").status(TestCaseStatus.REVIEWED).build();
+        final @NotNull TestCaseDto low = TestCaseDto.builder().description("two").priority(Priority.LOW).module("payments").status(TestCaseStatus.DISABLED).build();
+        final @NotNull TestCaseDto bare = TestCaseDto.builder().description("three").build();
+
+        final @NotNull List<TestCaseDto> result = TestCaseFilter.filter(List.of(high, low, bare), new FilterSelection("", Set.of(), Set.of(), Set.of(), Set.of(), Set.of(), Set.of()), _ -> Optional.empty());
+
+        assertEquals(result, List.of(high, low, bare));
     }
 }

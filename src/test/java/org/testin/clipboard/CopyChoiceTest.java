@@ -27,9 +27,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.testin.model.Priority;
+import org.testin.model.TestCaseStatus;
+import org.testin.testcase.TestCaseEditorAttributes;
+import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
 
 public class CopyChoiceTest {
 
@@ -79,5 +84,77 @@ public class CopyChoiceTest {
         tc.setParent(set);
 
         assertEquals(CopyChoice.FQCN.from(tc), "shop.checkout.PaymentTest.cardIsDeclined");
+    }
+
+    private static @NotNull TestCaseDto writtenInFull() {
+        final @NotNull TestSetDirectoryDto set = new TestSetDirectoryDto();
+        set.setPath2(new ArrayList<>(List.of("shop", "checkout", "Payment")));
+
+        final @NotNull TestCaseDto tc = TestCaseDto.builder()
+                .id(UUID.randomUUID())
+                .description("Refuse an expired card")
+                .expectedResult("The payment is declined")
+                .steps(List.of("Enter the card", "Press Pay"))
+                .priority(Priority.HIGH)
+                .reference("JIRA-77")
+                .testData("card=4111")
+                .preConditions("A basket holds one item")
+                .group(List.of("Regression"))
+                .module("payments")
+                .status(TestCaseStatus.REVIEWED)
+                .build();
+        tc.setParent(set);
+        return tc;
+    }
+
+    // Rule-EDITOR-PANEL-073, Rule-EDITOR-PANEL-207
+    @Test
+    public void allDetailsCopiesEveryFieldTheTesterWroteAsNameColonValue() {
+        final @NotNull TestCaseDto tc = writtenInFull();
+        final @NotNull List<TestCaseEditorAttributes> written = List.of(
+                TestCaseEditorAttributes.DESCRIPTION, TestCaseEditorAttributes.EXPECTED_RESULT, TestCaseEditorAttributes.STEPS,
+                TestCaseEditorAttributes.PRIORITY, TestCaseEditorAttributes.REFERENCE, TestCaseEditorAttributes.TEST_DATA,
+                TestCaseEditorAttributes.PRE_CONDITIONS, TestCaseEditorAttributes.GROUP, TestCaseEditorAttributes.MODULE,
+                TestCaseEditorAttributes.STATUS);
+
+        final @NotNull String copied = CopyChoice.ALL_DETAILS.from(tc);
+
+        for (final TestCaseEditorAttributes field : written) {
+            assertTrue(copied.contains(field.getName() + ": " + field.gridValue(tc)), field.getName() + " is not copied as its name, a colon and its value: " + copied);
+        }
+        for (final TestCaseEditorAttributes field : TestCaseEditorAttributes.values()) {
+            if (written.contains(field)) continue;
+
+            assertFalse(copied.contains(field.getName() + ": "), field.getName() + " is not a field the tester wrote, yet All Details copied it: " + copied);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-207
+    @Test
+    public void aFieldLeftEmptyIsNotALine() {
+        final @NotNull TestCaseDto tc = writtenInFull();
+        tc.setReference("");
+
+        assertFalse(CopyChoice.ALL_DETAILS.from(tc).contains(TestCaseEditorAttributes.REFERENCE.getName() + ":"), "an empty reference still got a line");
+    }
+
+    // Rule-EDITOR-PANEL-074
+    @Test
+    public void severalTestCasesAreSeparatedByABlankLine() {
+        final @NotNull TestCaseDto first = TestCaseDto.builder().description("Log in").build();
+        final @NotNull TestCaseDto second = TestCaseDto.builder().description("Log out").build();
+
+        assertEquals(CopyChoice.DESCRIPTION.from(List.of(first, second)), "Log in\n\nLog out");
+    }
+
+    // Rule-EDITOR-PANEL-208
+    @Test
+    public void aSingleValueIsCopiedBareAndSoAreTheValuesTheTesterNeverWrites() {
+        final @NotNull TestCaseDto tc = writtenInFull();
+
+        assertEquals(CopyChoice.DESCRIPTION.from(tc), "Refuse an expired card", "a single value carries no caption");
+        assertEquals(CopyChoice.ID.from(tc), tc.getId().toString(), "the identity can be copied on its own");
+        assertEquals(CopyChoice.FQCN.from(tc), "shop.checkout.PaymentTest.refuseAnExpiredCard", "and the class name");
+        assertEquals(CopyChoice.PATH.from(tc), TestCaseEditorAttributes.PATH.gridValue(tc), "and the path");
     }
 }

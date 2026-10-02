@@ -31,6 +31,7 @@ public class NodeFiguresTest {
         return TestRunItems.builder().id(UUID.randomUUID()).status(status).build();
     }
 
+    // Rule-INTERNAL-049
     @Test
     public void aTestRunHoldsItsSummaryRatherThanACopyOfTheNumbers() {
         final TestRunSummary summary = TestRunSummary.of(List.of(
@@ -60,6 +61,7 @@ public class NodeFiguresTest {
         assertEquals(NodeCount.PASS_RATE.of(figures), "50%", "two of the four that ran passed");
     }
 
+    // Rule-INTERNAL-052
     @Test
     public void aTestRunNobodyHasStartedSaysSoRatherThanReportingZeroPercent() {
         final NodeFigures untouched = NodeFigures.ofTestRun(TestRunSummary.of(List.of(
@@ -101,6 +103,7 @@ public class NodeFiguresTest {
                 "an empty node answers zero; an absent row would read as 'not counted'");
     }
 
+    // Rule-INTERNAL-065
     @Test
     public void aCountSaysWhatANewTestRunWouldTakeWhenThatIsFewer() {
         assertEquals(NodeCount.TEST_CASES.of(NodeFigures.ofChildren(9, 4, 40, 31, 2)), "40 (31 for a new test run)");

@@ -51,6 +51,7 @@ public class ForgetOnCloseTest {
         assertEquals(released.get(), 2, "both stacks are told, so nothing is left holding a copy nobody can reach");
     }
 
+    // Rule-INTERNAL-045
     @Test
     public void forgettingOneSurfaceLeavesTheOthersAlone() {
         final @NotNull UndoHistories histories = new UndoHistories();

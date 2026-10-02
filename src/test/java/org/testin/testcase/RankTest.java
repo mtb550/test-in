@@ -43,6 +43,7 @@ public class RankTest {
         }
     }
 
+    // Rule-INTERNAL-032
     @Test
     public void aRankAlwaysFitsBetweenTwoOthers() {
         String low = Rank.between("", "");

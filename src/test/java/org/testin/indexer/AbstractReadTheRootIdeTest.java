@@ -1,0 +1,132 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.indexer;
+
+import com.intellij.notification.Notification;
+import com.intellij.notification.Notifications;
+import org.jetbrains.annotations.NotNull;
+import org.testin.AbstractTempRootIdeTest;
+import org.testin.Await;
+import org.testin.model.DirectoryType;
+import org.testin.model.FileKind;
+import org.testin.services.Services;
+import org.testin.setting.AppSettingsState;
+import org.testin.testproject.BoundTestProject;
+import org.testin.util.Html;
+
+import java.nio.file.Path;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+public abstract class AbstractReadTheRootIdeTest extends AbstractTempRootIdeTest {
+
+    private final @NotNull List<Notification> said = new CopyOnWriteArrayList<>();
+
+    private @NotNull String rootWas = "";
+
+    protected static @NotNull AppSettingsState settings() {
+        return Services.getInstance(AppSettingsState.class);
+    }
+
+    protected static @NotNull Path testProject(final @NotNull Path folder) {
+        marked(folder, DirectoryType.TP);
+        marked(testCasesOf(folder), DirectoryType.TCD);
+        marked(testRunsOf(folder), DirectoryType.TRD);
+        return folder;
+    }
+
+    protected static @NotNull Path testCasesOf(final @NotNull Path testProject) {
+        return testProject.resolve(DirectoryType.TCD.getFolderName());
+    }
+
+    protected static @NotNull Path testRunsOf(final @NotNull Path testProject) {
+        return testProject.resolve(DirectoryType.TRD.getFolderName());
+    }
+
+    protected static @NotNull Path marked(final @NotNull Path folder, final @NotNull DirectoryType kind) {
+        SyntheticTree.write(folder.resolve(kind.getMarker()), SyntheticTree.marker());
+        return folder;
+    }
+
+    protected static @NotNull UUID testCaseIn(final @NotNull Path folder) {
+        final @NotNull UUID id = UUID.randomUUID();
+        SyntheticTree.write(folder.resolve(FileKind.TEST_CASE.fileName(id)), SyntheticTree.testCase(id, "m"));
+        return id;
+    }
+
+    protected static void resultIn(final @NotNull Path testRun, final @NotNull String fileName, final @NotNull UUID testCaseId) {
+        SyntheticTree.write(testRun.resolve(fileName), "{ \"id\" : \"" + testCaseId + "\", \"status\" : \"PASSED\" }");
+    }
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+        rootWas = settings().rootTestinPath;
+        settings().rootTestinPath = root.toString();
+        unbind();
+        indexer().resetForReindex();
+
+        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
+            @Override
+            public void notify(final @NotNull Notification notification) {
+                said.add(notification);
+            }
+        });
+    }
+
+    @Override
+    protected void tearDown() {
+        unbind();
+        settings().rootTestinPath = rootWas;
+        indexer().resetForReindex();
+        super.tearDown();
+    }
+
+    private void unbind() {
+        Services.getInstance(getProject(), BoundTestProject.class).choose("");
+    }
+
+    protected @NotNull ProjectIndexer indexer() {
+        return Services.getInstance(getProject(), ProjectIndexer.class);
+    }
+
+    protected @NotNull Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
+    }
+
+    protected @NotNull TestCases indexedTestCases() {
+        return Services.getInstance(getProject(), TestCases.class);
+    }
+
+    protected void readEverything() {
+        indexer().resetForReindex();
+        indexer().indexWithProgress();
+        Await.until("the Testin folder was never read", () -> indexer().isIndexed());
+    }
+
+    protected @NotNull List<String> said(final @NotNull String title) {
+        return said.stream()
+                .filter(notification -> notification.getTitle().equals(Html.ofText(title)))
+                .map(Notification::getContent)
+                .toList();
+    }
+
+    protected static boolean names(final @NotNull List<String> messages, final @NotNull String words) {
+        return messages.stream().anyMatch(message -> message.contains(Html.ofText(words)));
+    }
+}

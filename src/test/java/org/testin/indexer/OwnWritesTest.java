@@ -94,6 +94,7 @@ public class OwnWritesTest {
         }
     }
 
+    // Rule-INTERNAL-064
     @Test
     public void aHandEditInsideTheWindowIsNotIgnored() {
         final @NotNull Path file = tempFile();

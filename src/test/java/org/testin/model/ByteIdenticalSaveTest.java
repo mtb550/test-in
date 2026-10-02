@@ -82,7 +82,7 @@ public class ByteIdenticalSaveTest {
         }
     }
 
-    // Rule-PRODUCT-003
+    // Rule-PRODUCT-003, Rule-EDITOR-PANEL-005
     @Test
     public void aSavedTestCaseIsByteIdenticalToTheFixture() {
         assertEquals(saved(), golden(),
@@ -91,6 +91,7 @@ public class ByteIdenticalSaveTest {
                         + "and if it was not, something reformatted a value on the way to disk.");
     }
 
+    // Rule-INTERNAL-070
     @Test
     public void theMachineTimeZoneDoesNotReachTheFile() {
         final TimeZone was = TimeZone.getDefault();

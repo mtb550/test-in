@@ -164,6 +164,7 @@ public class ArchitectureTest {
         rule.check(CLASSES);
     }
 
+    // Rule-INTERNAL-089
     @Test
     public void onlyTestinYmlReadsTheConfigFile() {
         final @NotNull ArchRule rule = noClasses()
@@ -213,6 +214,7 @@ public class ArchitectureTest {
         rule.check(CLASSES);
     }
 
+    // Rule-INTERNAL-089
     @Test
     public void onlyTheSaveButtonWritesTheConfigFile() {
         final @NotNull ArchRule oneCaller = methods()
@@ -235,6 +237,7 @@ public class ArchitectureTest {
         oneWriter.check(CLASSES);
     }
 
+    // Rule-INTERNAL-117
     @Test
     public void onlyTheModelAndTheIndexerChangeAModelValue() {
         final @NotNull ArchRule noSetter = noClasses()

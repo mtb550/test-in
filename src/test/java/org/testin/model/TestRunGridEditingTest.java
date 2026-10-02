@@ -35,6 +35,7 @@ public class TestRunGridEditingTest {
         return TestRunItems.builder().id(UUID.randomUUID()).build();
     }
 
+    // Rule-EDITOR-PANEL-171
     @Test
     public void actualResultIsTheOneColumnATesterCanTypeInto() {
         final List<TestRunEditorAttributes> editable = Arrays.stream(TestRunEditorAttributes.values())

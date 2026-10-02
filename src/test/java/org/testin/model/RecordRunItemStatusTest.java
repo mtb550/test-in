@@ -22,6 +22,8 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -44,7 +46,7 @@ public class RecordRunItemStatusTest {
                 .build();
     }
 
-    // Rule-VIEW-PANEL-032
+    // Rule-VIEW-PANEL-032, Rule-EDITOR-PANEL-138, Rule-EDITOR-PANEL-161
     @Test
     public void passingAFailedTestCaseClearsEverythingTheFailureDescribed() {
         final TestRunItems item = failedWithBug();
@@ -60,6 +62,7 @@ public class RecordRunItemStatusTest {
         assertEquals(item.getBugIssueUrl(), "", "and the bug it was reported as: a later failure can be reported again (#28)");
     }
 
+    // Rule-EDITOR-PANEL-162
     @Test
     public void failingAgainKeepsTheBugTheDialogJustCollected() {
         final TestRunItems item = failedWithBug();
@@ -87,13 +90,14 @@ public class RecordRunItemStatusTest {
         assertEquals(item.getBugPriority(), BugPriority.LOW);
     }
 
-    // Rule-PRODUCT-010
+    // Rule-PRODUCT-010, Rule-EDITOR-PANEL-136
     @Test
     public void everyRunItemStatusRecordsWhoAndWhen() {
         final TestRunItems item = failedWithBug();
 
         item.recordRunItemStatus(RunItemStatus.BLOCKED, "muteb", new TestCaseDto());
 
+        assertEquals(item.getStatus(), RunItemStatus.BLOCKED, "what it was");
         assertEquals(item.getExecutedBy(), "muteb");
         assertEquals(item.getExecutedAt().getNano(), 0, "stamped to the second, as the test run JSON stores it");
     }
@@ -112,6 +116,7 @@ public class RecordRunItemStatusTest {
         assertEquals(item.getBugIssueUrl(), "");
     }
 
+    // Rule-EDITOR-PANEL-142, Rule-EDITOR-PANEL-162
     @Test
     public void blockingAFailedTestCaseKeepsTheDetails() {
         final TestRunItems item = failedWithBug();
@@ -125,6 +130,7 @@ public class RecordRunItemStatusTest {
         assertEquals(item.getBugIssueUrl(), ISSUE);
     }
 
+    // Rule-EDITOR-PANEL-161
     @Test
     public void whatEachRunItemStatusWouldClearIsNamedBeforeItClears() {
         final TestRunItems item = failedWithBug();
@@ -144,5 +150,23 @@ public class RecordRunItemStatusTest {
         assertTrue(FailureDetail.recordsABug(failed), "a failure is Enhancement / Low until the tester says otherwise");
         assertFalse(FailureDetail.recordsABug(blocked), "a result that is not a failure records no bug");
         assertTrue(FailureDetail.recordsABug(blocked.setBugIssueUrl(ISSUE)), "unless an issue was filed for it");
+    }
+
+    // Rule-EDITOR-PANEL-160, Rule-EDITOR-PANEL-159
+    @Test
+    public void correctingARunItemStatusReStampsWhoAndWhen() {
+        final @NotNull ZonedDateTime firstTime = ZonedDateTime.now().minusDays(3).truncatedTo(ChronoUnit.SECONDS);
+        final @NotNull TestRunItems item = TestRunItems.builder()
+                .id(UUID.randomUUID())
+                .status(RunItemStatus.FAILED)
+                .executedBy("Sara")
+                .executedAt(firstTime)
+                .build();
+
+        item.correctRunItemStatus(RunItemStatus.PASSED, "Omar", new TestCaseDto());
+
+        assertEquals(item.getStatus(), RunItemStatus.PASSED, "the run item status is simply written over");
+        assertEquals(item.getExecutedBy(), "Omar", "the original tester is gone");
+        assertTrue(item.getExecutedAt().isAfter(firstTime), "the original time is gone");
     }
 }
