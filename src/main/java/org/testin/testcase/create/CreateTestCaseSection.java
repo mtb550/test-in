@@ -46,10 +46,6 @@ public interface CreateTestCaseSection {
         getFocusComponent().requestFocus();
     }
 
-    default boolean isPopupOpen() {
-        return false;
-    }
-
     default boolean accepts() {
         return true;
     }

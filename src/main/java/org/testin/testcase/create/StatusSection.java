@@ -16,41 +16,31 @@
 
 package org.testin.testcase.create;
 
-import com.intellij.openapi.ui.ComboBox;
-import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestCaseStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.UpdateTestCaseFields;
-import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.Bundle;
+import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.RadioSelection;
 
 import javax.swing.JComponent;
-import javax.swing.JList;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.List;
 
+// Rule-EDITOR-PANEL-258
 public class StatusSection implements CreateTestCaseSection {
-    private final @NotNull ComboBox<TestCaseStatus> status;
+    private final @NotNull RadioSelection<TestCaseStatus> status;
     private final @NotNull JBPanel<?> wrapper;
 
+    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-194, Rule-EDITOR-PANEL-258
     public StatusSection() {
-        this.status = new ComboBox<>(TestCaseStatus.values());
-        this.status.setSelectedItem(TestCaseStatus.PENDING);
-        DialogStyle.asChoice(this.status);
+        status = ComponentDialogBase.<TestCaseStatus>radios("")
+                .options(List.of(TestCaseStatus.values()), TestCaseStatus::getLabel)
+                .select(TestCaseStatus.PENDING)
+                .build()
+                .getComponent();
 
-        this.status.setRenderer(new ColoredListCellRenderer<>() {
-            @Override
-            protected void customizeCellRenderer(final @NotNull JList<? extends TestCaseStatus> list, final TestCaseStatus value, final int index, final boolean selected, final boolean hasFocus) {
-                Optional.ofNullable(value).ifPresent(current -> {
-                    append(Bundle.message("section.status.caption"));
-                    append(current.getLabel());
-                });
-            }
-        });
-
-        this.wrapper = createWrapper(UpdateTestCaseFields.STATUS.getIcon(), this.status);
+        wrapper = createWrapper(UpdateTestCaseFields.STATUS.getIcon(), status.getPanel());
     }
 
     @Override
@@ -59,13 +49,8 @@ public class StatusSection implements CreateTestCaseSection {
     }
 
     @Override
-    public boolean isPopupOpen() {
-        return status.isPopupVisible();
-    }
-
-    @Override
     public @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto) {
-        return dto.edit().status((TestCaseStatus) Objects.requireNonNull(status.getSelectedItem())).build();
+        return dto.edit().status(status.getSelected()).build();
     }
 
     // Rule-EDITOR-PANEL-194, Rule-PRODUCT-017
@@ -75,7 +60,7 @@ public class StatusSection implements CreateTestCaseSection {
 
     @Override
     public @NotNull JComponent getFocusComponent() {
-        return status;
+        return status.getFocusComponent();
     }
 
     @Override
@@ -85,6 +70,6 @@ public class StatusSection implements CreateTestCaseSection {
 
     @Override
     public void fillData(final @NotNull TestCaseDto dto) {
-        status.setSelectedItem(dto.getStatus());
+        status.select(dto.getStatus());
     }
 }

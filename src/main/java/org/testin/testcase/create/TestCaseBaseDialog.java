@@ -177,7 +177,7 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog {
     }
 
     private boolean aPopupIsOpen() {
-        return completionIsOpen() || getAllSections().stream().anyMatch(CreateTestCaseSection::isPopupOpen);
+        return completionIsOpen();
     }
 
     // Rule-EDITOR-PANEL-029, Rule-EDITOR-PANEL-035

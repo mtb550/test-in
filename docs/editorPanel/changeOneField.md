@@ -67,6 +67,10 @@ One field, one small dialog. The rest of the test case is left alone.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
+- **Rule-EDITOR-PANEL-258** — Status is radio buttons, not a list, so a tester
+  sees all four - Reviewed, Pending, Disabled, To Be Updated - and picks one in
+  a single click. A new test case starts Pending; an update starts on the test
+  case's own status.
 
 ## The screen
 
@@ -92,10 +96,9 @@ One field, one small dialog. The rest of the test case is left alone.
    wherever it is offered.
 2. **The first row** — selected when the menu opens.
 3. **Status** — the one row with no letter, so its icon is the platform's eye
-   rather than a letter. It is opened from this menu and nowhere else. While
-   its list is open, `Enter` chooses the status the tester highlighted. It does not save the dialog. The **Priority**
-   list answers
-   `Enter` the same way.
+   rather than a letter. It is opened from this menu and nowhere else. It is
+   four radio buttons, as **Priority** is, and `Enter` saves the dialog from
+   either.
 
 Pressing the letter on the card skips this menu and opens the field straight
 away.
