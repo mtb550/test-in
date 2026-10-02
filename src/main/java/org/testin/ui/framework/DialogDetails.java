@@ -36,14 +36,14 @@ public final class DialogDetails implements DialogComponent {
         final @NotNull JBPanel<?> stack = new JBPanel<>();
         stack.setLayout(new BoxLayout(stack, BoxLayout.Y_AXIS));
         stack.setOpaque(false);
-        stack.setBorder(JBUI.Borders.empty(4, 0));
+        stack.setBorder(JBUI.Borders.empty(Spacing.XS, 0));
 
         for (final Row row : rows) {
             // Rule-INTERNAL-087
             final @NotNull JBLabel value = wrappingValue(row.value());
             row.icon().ifPresent(icon -> {
                 value.setIcon(icon);
-                value.setIconTextGap(JBUI.scale(8));
+                value.setIconTextGap(JBUI.scale(Spacing.M));
             });
             stack.add(Caption.above(row.caption(), value));
         }
@@ -58,7 +58,7 @@ public final class DialogDetails implements DialogComponent {
         final @NotNull JBLabel label = new JBLabel("<html><div style='width:" + JBUI.scale(420) + "px'>"
                 + StringUtil.escapeXmlEntities(value) + "</div></html>");
         label.setFont(Fonts.value());
-        label.setBorder(JBUI.Borders.emptyLeft(12));
+        label.setBorder(JBUI.Borders.emptyLeft(Spacing.XL));
         return label;
     }
 

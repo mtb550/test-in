@@ -32,7 +32,7 @@ import java.util.List;
 final class ScreenshotStrip {
     private final @NotNull List<byte[]> screenshots = new ArrayList<>();
 
-    private final @NotNull JBPanel<?> panel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(8), 0));
+    private final @NotNull JBPanel<?> panel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(Spacing.M), 0));
 
     private @NotNull Runnable changed = () -> {
     };

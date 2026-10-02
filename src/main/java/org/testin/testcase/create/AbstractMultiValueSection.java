@@ -29,6 +29,7 @@ import org.testin.services.Services;
 import org.testin.services.TestCaseValues;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.ui.framework.Spacing;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 
@@ -105,11 +106,11 @@ public abstract class AbstractMultiValueSection implements CreateTestCaseSection
         DialogStyle.asChoice(box);
         box.setPlaceholder(placeholderFor(fields.size()));
         box.setShowPlaceholderWhenFocused(true);
-        box.setBorder(JBUI.Borders.empty(6, 10));
+        box.setBorder(JBUI.Borders.empty(Spacing.S, Spacing.L));
 
         final @NotNull JBPanel<?> row = new JBPanel<>(new BorderLayout());
         row.setOpaque(false);
-        row.setBorder(JBUI.Borders.emptyBottom(6));
+        row.setBorder(JBUI.Borders.emptyBottom(Spacing.S));
         row.add(box, BorderLayout.CENTER);
 
         fields.add(box);

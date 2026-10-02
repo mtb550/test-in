@@ -62,12 +62,12 @@ public class StatusBarBase {
     private final @NotNull Font font = Fonts.small();
 
     private final @NotNull Icon icon = AllIcons.General.Keyboard;
-    private final @NotNull Border border = JBUI.Borders.emptyRight(6);
+    private final @NotNull Border border = JBUI.Borders.emptyRight(Spacing.S);
 
     // UC-INTERNAL-007, Rule-INTERNAL-079
     public StatusBarBase(final StatusBarItem @NotNull [] items) {
         this.statusBar = new OneLine();
-        this.statusBar.setBorder(JBUI.Borders.empty(4, 10));
+        this.statusBar.setBorder(JBUI.Borders.empty(Spacing.XS, Spacing.L));
         this.statusBar.setOpaque(true);
         this.statusBar.setBackground(JBUI.CurrentTheme.Advertiser.background());
 

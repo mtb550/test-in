@@ -23,6 +23,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.ui.framework.Spacing;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -85,14 +86,14 @@ public interface CreateTestCaseSection {
     default @NotNull JBPanel<?> createWrapper(final @NotNull JBLabel iconLabel, final @NotNull JComponent field) {
         final @NotNull JBPanel<?> iconPanel = new JBPanel<>(new GridBagLayout());
         iconPanel.setOpaque(false);
-        iconLabel.setBorder(JBUI.Borders.empty(0, 10, 0, 8));
+        iconLabel.setBorder(JBUI.Borders.empty(0, Spacing.L, 0, Spacing.M));
         iconPanel.add(iconLabel);
 
         final @NotNull JBPanel<?> wrapper = new JBPanel<>(new BorderLayout());
         wrapper.setOpaque(false);
         wrapper.add(iconPanel, BorderLayout.WEST);
         wrapper.add(field, BorderLayout.CENTER);
-        wrapper.setBorder(JBUI.Borders.emptyTop(8));
+        wrapper.setBorder(JBUI.Borders.emptyTop(Spacing.M));
         return wrapper;
     }
 }

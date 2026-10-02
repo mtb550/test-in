@@ -38,7 +38,6 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DialogPlace {
     private static final @NotNull String SEPARATOR = " › ";
-    private static final int ARROW_GAP = 8;
 
     // Rule-INTERNAL-095, Rule-INTERNAL-108
     public static @NotNull JBLabel of(final @NotNull List<String> place) {
@@ -72,7 +71,7 @@ public final class DialogPlace {
     // Rule-INTERNAL-077, Rule-INTERNAL-109
     private static @NotNull JBLabel arrow() {
         final @NotNull JBLabel drawn = new JBLabel(Icons.gray(AllIcons.General.ArrowRight));
-        drawn.setBorder(JBUI.Borders.empty(0, ARROW_GAP));
+        drawn.setBorder(JBUI.Borders.empty(0, Spacing.M));
 
         return drawn;
     }

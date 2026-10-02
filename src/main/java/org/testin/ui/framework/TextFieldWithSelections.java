@@ -257,13 +257,13 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
             setOpaque(false);
 
             setIcon(value.icon());
-            setIconTextGap(JBUI.scale(8));
+            setIconTextGap(JBUI.scale(Spacing.M));
             append(value.name());
             if (!value.hint().isEmpty()) {
                 appendTextPadding(JBUI.scale(COLUMN));
                 append(value.hint(), SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES);
             }
-            setBorder(JBUI.Borders.empty(8, 12));
+            setBorder(JBUI.Borders.empty(Spacing.M, Spacing.XL));
         }
 
         @Override

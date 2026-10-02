@@ -21,6 +21,7 @@ import com.intellij.ui.scale.JBUIScale;
 import com.intellij.util.ui.GraphicsUtil;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.framework.Spacing;
 
 import javax.swing.border.Border;
 import java.awt.BasicStroke;
@@ -34,7 +35,6 @@ import java.awt.geom.RoundRectangle2D;
 final class SectionFill implements Border {
     private static final float ARC = 12;
     private static final float LINE = 1;
-    private static final int PADDING = 12;
 
     @Override
     public void paintBorder(final @NotNull Component c, final @NotNull Graphics g, final int x, final int y, final int width, final int height) {
@@ -58,7 +58,7 @@ final class SectionFill implements Border {
 
     @Override
     public @NotNull Insets getBorderInsets(final @NotNull Component c) {
-        return JBUI.insets(PADDING);
+        return JBUI.insets(Spacing.XL);
     }
 
     @Override

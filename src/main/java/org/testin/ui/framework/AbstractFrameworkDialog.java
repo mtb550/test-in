@@ -413,14 +413,12 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
     // Rule-INTERNAL-102
     private static final class ContentStack extends JBPanel<ContentStack> implements Scrollable {
         private static final int STEP = 16;
-        private static final int GUTTER = 12;
-        private static final int GAP = 12;
 
         // Rule-INTERNAL-099
         private ContentStack() {
-            super(new BorderLayout(0, JBUI.scale(GAP)));
+            super(new BorderLayout(0, JBUI.scale(Spacing.XL)));
             setOpaque(false);
-            setBorder(JBUI.Borders.empty(GUTTER));
+            setBorder(JBUI.Borders.empty(Spacing.XL));
         }
 
         @Override

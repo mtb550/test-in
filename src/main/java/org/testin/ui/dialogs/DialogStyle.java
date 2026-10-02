@@ -35,6 +35,7 @@ import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.framework.Spacing;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 import org.testin.util.Icons;
@@ -52,10 +53,6 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DialogStyle {
     public static final @NotNull Icon NO_ICON = EmptyIcon.ICON_0;
-
-    private static final int PADDING_TOP = 10;
-    private static final int PADDING_SIDE = 12;
-    private static final int SECTION_GAP = 8;
 
     // Rule-INTERNAL-105
     private static final @NotNull Color ACCENT = JBUI.CurrentTheme.Button.defaultButtonColorStart();
@@ -87,7 +84,7 @@ public final class DialogStyle {
 
     // Rule-INTERNAL-099
     public static @NotNull JBPanel<?> section(final @NotNull JComponent top, final @NotNull JComponent content) {
-        final @NotNull JBPanel<?> panel = asSection(new JBPanel<>(new BorderLayout(0, JBUI.scale(SECTION_GAP))));
+        final @NotNull JBPanel<?> panel = asSection(new JBPanel<>(new BorderLayout(0, JBUI.scale(Spacing.M))));
         panel.add(top, BorderLayout.NORTH);
         panel.add(content, BorderLayout.CENTER);
 
@@ -119,7 +116,7 @@ public final class DialogStyle {
     // Rule-INTERNAL-095, Rule-INTERNAL-096
     public static void asField(final @NotNull JComponent component) {
         component.setFont(Fonts.field());
-        component.setBorder(JBUI.Borders.empty(PADDING_TOP, PADDING_SIDE));
+        component.setBorder(JBUI.Borders.empty(Spacing.L, Spacing.XL));
         hint(component);
     }
 
@@ -175,7 +172,7 @@ public final class DialogStyle {
 
             @Override
             public int getIconGap() {
-                return JBUI.scale(8);
+                return JBUI.scale(Spacing.M);
             }
         };
     }
@@ -198,7 +195,7 @@ public final class DialogStyle {
 
             @Override
             public int getIconGap() {
-                return JBUI.scale(8);
+                return JBUI.scale(Spacing.M);
             }
         };
     }

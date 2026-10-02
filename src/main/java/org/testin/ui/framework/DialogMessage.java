@@ -28,8 +28,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 
 public final class DialogMessage implements DialogComponent {
-    private static final int PADDING = 12;
-
     private final @NotNull JBPanel<?> panel;
 
     DialogMessage(final @NotNull String text) {
@@ -43,7 +41,7 @@ public final class DialogMessage implements DialogComponent {
 
         panel = new JBPanel<>(new BorderLayout());
         panel.setOpaque(false);
-        panel.setBorder(JBUI.Borders.empty(PADDING));
+        panel.setBorder(JBUI.Borders.empty(Spacing.XL));
         panel.setFocusable(true);
         panel.add(content, BorderLayout.CENTER);
     }

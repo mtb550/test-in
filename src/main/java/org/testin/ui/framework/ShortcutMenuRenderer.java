@@ -43,6 +43,6 @@ final class ShortcutMenuRenderer<T extends MenuItem> extends ColoredListCellRend
                 : SimpleTextAttributes.GRAYED_ATTRIBUTES);
 
         append("   " + whyNot.orElseGet(value::getShortcutText), SimpleTextAttributes.GRAYED_ATTRIBUTES);
-        setBorder(JBUI.Borders.empty(6, 12));
+        setBorder(JBUI.Borders.empty(Spacing.S, Spacing.XL));
     }
 }

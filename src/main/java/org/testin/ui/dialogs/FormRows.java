@@ -20,6 +20,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
+import org.testin.ui.framework.Spacing;
 
 import javax.swing.JComponent;
 import java.awt.GridBagConstraints;
@@ -27,8 +28,6 @@ import java.awt.GridLayout;
 import java.awt.GridBagLayout;
 
 public final class FormRows extends JBPanel<FormRows> {
-    private static final int COLUMN_GAP = 12;
-
     private final @NotNull GridBagConstraints gbc = new GridBagConstraints();
 
     private int nextRow;
@@ -58,7 +57,7 @@ public final class FormRows extends JBPanel<FormRows> {
 
     // Rule-INTERNAL-087
     public @NotNull FormRows pair(final @NotNull JComponent left, final @NotNull JComponent right) {
-        final @NotNull JBPanel<?> line = new JBPanel<>(new GridLayout(1, 2, JBUI.scale(COLUMN_GAP), 0));
+        final @NotNull JBPanel<?> line = new JBPanel<>(new GridLayout(1, 2, JBUI.scale(Spacing.XL), 0));
         line.setOpaque(false);
         line.add(left);
         line.add(right);

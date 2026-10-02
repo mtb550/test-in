@@ -21,6 +21,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.DialogComponent;
+import org.testin.ui.framework.Spacing;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -42,7 +43,7 @@ public final class TestCaseForm implements DialogComponent {
         this.focus = focus;
 
         sections.setLayout(new BoxLayout(sections, BoxLayout.Y_AXIS));
-        sections.setBorder(JBUI.Borders.empty(12));
+        sections.setBorder(JBUI.Borders.empty(Spacing.XL));
 
         final @NotNull JBPanel<?> anchor = new JBPanel<>(new BorderLayout());
         anchor.setOpaque(false);

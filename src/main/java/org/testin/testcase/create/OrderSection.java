@@ -35,6 +35,7 @@ import org.testin.testcase.Rank;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.ui.framework.Spacing;
 import org.testin.util.Bundle;
 
 import javax.swing.JComponent;
@@ -66,7 +67,7 @@ public class OrderSection implements CreateTestCaseSection {
 
         this.outOf = new JBLabel(Bundle.message("order.section.of", "1"));
         DialogStyle.asField(this.outOf);
-        this.outOf.setBorder(JBUI.Borders.emptyLeft(10));
+        this.outOf.setBorder(JBUI.Borders.emptyLeft(Spacing.L));
 
         final @NotNull JBPanel<?> field = new JBPanel<>(new BorderLayout());
         field.setOpaque(false);

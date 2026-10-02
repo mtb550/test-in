@@ -42,7 +42,7 @@ final class ButtonFooter {
 
         panel = new JBPanel<>(new BorderLayout());
         panel.setOpaque(false);
-        panel.setBorder(JBUI.Borders.empty(8, 12));
+        panel.setBorder(JBUI.Borders.empty(Spacing.M, Spacing.XL));
         panel.add(said, BorderLayout.WEST);
         panel.add(button, BorderLayout.EAST);
     }

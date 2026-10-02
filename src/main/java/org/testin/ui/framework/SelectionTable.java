@@ -64,7 +64,7 @@ public final class SelectionTable implements DialogComponent {
         installRowMenu();
 
         scroll = new JBScrollPane(table);
-        scroll.setBorder(JBUI.Borders.empty(4, 12));
+        scroll.setBorder(JBUI.Borders.empty(Spacing.XS, Spacing.XL));
     }
 
     private void installRowMenu() {
