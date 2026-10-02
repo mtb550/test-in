@@ -26,14 +26,14 @@ import java.awt.Color;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RowStripe {
-    private static final @NotNull Color EVEN = JBColor.lazy(UIUtil::getListBackground);
-    private static final @NotNull Color ODD = JBColor.lazy(UIUtil::getDecoratedRowColor);
+    private static final @NotNull Color PLAIN = JBColor.lazy(UIUtil::getListBackground);
+    private static final @NotNull Color STRIPED = JBColor.lazy(UIUtil::getDecoratedRowColor);
 
     public static @NotNull Color of(final int index) {
-        return index % 2 == 0 ? EVEN : ODD;
+        return index % 2 == 0 ? STRIPED : PLAIN;
     }
 
-    public static @NotNull Color odd() {
-        return ODD;
+    public static @NotNull Color striped() {
+        return STRIPED;
     }
 }

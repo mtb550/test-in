@@ -117,7 +117,7 @@ class FailureForm extends JBPanel<FailureForm> implements DialogHost {
             if (child.getFont() != null) baseFonts.put(child, child.getFont());
 
             if (child instanceof JTextComponent || child instanceof EditorTextField)
-                child.setBackground(RowStripe.odd());
+                child.setBackground(RowStripe.striped());
 
             if (child instanceof Container container) remember(container);
         }
