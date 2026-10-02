@@ -17,9 +17,8 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
-import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.util.TimeoutUtil;
 import org.testin.AbstractTempRootIdeTest;
+import org.testin.Await;
 import org.testin.model.FileKind;
 import org.testin.model.TestRunItems;
 import org.testin.model.RunItemStatus;
@@ -34,7 +33,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.BooleanSupplier;
 import org.jetbrains.annotations.NotNull;
 
 public class TestRunResultFilesIdeTest extends AbstractTempRootIdeTest {
@@ -57,20 +55,7 @@ public class TestRunResultFilesIdeTest extends AbstractTempRootIdeTest {
     }
 
     private static void awaitFile(final Path file, final String what) {
-        await(what + ": " + file.getFileName(), () -> !read(file).isEmpty());
-    }
-
-    private static void await(final String what, final BooleanSupplier landed) {
-        final long deadline = System.currentTimeMillis() + 10_000;
-
-        while (System.currentTimeMillis() < deadline) {
-            if (landed.getAsBoolean()) return;
-
-            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-            TimeoutUtil.sleep(20);
-        }
-
-        fail(what);
+        Await.until(what + ": " + file.getFileName(), () -> !read(file).isEmpty());
     }
 
     private static @NotNull String read(final Path file) {
@@ -137,7 +122,7 @@ public class TestRunResultFilesIdeTest extends AbstractTempRootIdeTest {
                 .filter(item -> item.getId().equals(JUDGED_TEST_CASE))
                 .toList())));
 
-        await("the result of the test case the tester unticked is still in the test run's folder",
+        Await.until("the result of the test case the tester unticked is still in the test run's folder",
                 () -> !Files.exists(resultOf(testRun, UNTICKED_TEST_CASE)));
 
         assertTrue("the result of a test case the change kept went with the one it dropped",
@@ -158,7 +143,7 @@ public class TestRunResultFilesIdeTest extends AbstractTempRootIdeTest {
         indexedTestRuns().findTestRun(testRun).orElseThrow().resultOf(UNTICKED_TEST_CASE).orElseThrow().setActualResult("Not saved yet");
         indexedTestRuns().changeResult(testRun, JUDGED_TEST_CASE, item -> item.setStatus(RunItemStatus.FAILED));
 
-        await("the run item status never reached its result file", () -> read(resultOf(testRun, JUDGED_TEST_CASE)).contains("FAILED"));
+        Await.until("the run item status never reached its result file", () -> read(resultOf(testRun, JUDGED_TEST_CASE)).contains("FAILED"));
         assertEquals("a run item status on one test case rewrote the result of another", untouched, read(resultOf(testRun, UNTICKED_TEST_CASE)));
     }
 }

@@ -17,9 +17,8 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
-import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.util.TimeoutUtil;
 import org.testin.AbstractTempRootIdeTest;
+import org.testin.Await;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -69,16 +68,7 @@ public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
         final AtomicBoolean done = new AtomicBoolean();
         nodes().renameNode(from, to, () -> done.set(true));
 
-        final long deadline = System.currentTimeMillis() + 15_000;
-
-        while (System.currentTimeMillis() < deadline) {
-            if (done.get()) return;
-
-            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-            TimeoutUtil.sleep(20);
-        }
-
-        fail("the rename never finished");
+        Await.until("the rename never finished", done::get);
     }
 
     public void testARenamedProjectIsFoundUnderItsNewName() {

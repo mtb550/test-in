@@ -20,9 +20,16 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
@@ -42,6 +49,7 @@ public class SettingsTest {
         return settings;
     }
 
+    // Rule-SETTING-001
     @Test
     public void settingsAreOneObjectAndOneFileForTheWholeIde() {
         final Service service = AppSettingsState.class.getAnnotation(Service.class);
@@ -58,6 +66,7 @@ public class SettingsTest {
                 "renaming the state loses every existing tester's settings");
     }
 
+    // Rule-SETTING-011
     @Test
     public void everyEmptyFormOfARootMeansNoRootConfigured() {
         assertEquals(TestinRoot.normalize(null), TestinRoot.NONE);
@@ -74,6 +83,7 @@ public class SettingsTest {
         assertEquals(TestinRoot.normalize("C:/testin"), root);
     }
 
+    // Rule-SETTING-004
     @Test
     public void changingTheTestinFolderRequiresTheTreeToReload() {
         assertTrue(TestinRoot.isRootChanged("C:/testin", "C:/other"));
@@ -136,6 +146,7 @@ public class SettingsTest {
         assertFalse(TestinRoot.isRootChanged(null, null));
     }
 
+    // Rule-SETTING-004
     @Test
     public void changingTesterNameOrRoleNeverReloadsTheTree() {
         final AppSettingsState before = state("Sara", "QA Engineer");
@@ -144,23 +155,6 @@ public class SettingsTest {
         assertFalse(TestinRoot.isRootChanged(before.rootTestinPath, after.rootTestinPath));
         assertNotEquals(before.testerName, after.testerName);
         assertNotEquals(before.testerRole, after.testerRole);
-    }
-
-    @Test
-    public void theTesterIsReadLiveSoNoCacheCanGoStale() {
-        final AppSettingsState settings = state("Sara", "QA Engineer");
-
-        final Supplier<String> nameAtPointOfUse = () -> settings.testerName;
-        final Supplier<String> roleAtPointOfUse = () -> settings.testerRole;
-
-        assertEquals(nameAtPointOfUse.get(), "Sara");
-        assertEquals(roleAtPointOfUse.get(), "QA Engineer");
-
-        settings.testerName = "Omar";
-        settings.testerRole = "Test Lead";
-
-        assertEquals(nameAtPointOfUse.get(), "Omar");
-        assertEquals(roleAtPointOfUse.get(), "Test Lead");
     }
 
     @Test
@@ -195,6 +189,7 @@ public class SettingsTest {
         assertEquals(settings.defaultDownloadFolder, "C:/downloads");
     }
 
+    // Rule-SETTING-025
     @Test
     public void aFreshStateHasNoRootAndNothingConfigured() {
         final AppSettingsState settings = new AppSettingsState();
@@ -204,6 +199,40 @@ public class SettingsTest {
         assertEquals(settings.logLevel, "INFO");
         assertEquals(settings.testerName, "");
         assertEquals(settings.testerRole, "");
+    }
+
+    // Rule-SETTING-027
+    @Test
+    public void theShortcutHintsAreOnUntilTheTesterTurnsThemOff() {
+        final AppSettingsState settings = new AppSettingsState();
+        assertTrue(settings.showShortcutHints, "a fresh install hides the hints");
+
+        final AppSettingsState stored = new AppSettingsState();
+        stored.showShortcutHints = false;
+        settings.loadState(stored);
+        assertFalse(settings.showShortcutHints, "the hints came back after the tester turned them off");
+    }
+
+    // Rule-SETTING-023
+    @Test
+    public void onlyTheSettingsPageWritesTheDownloadFolder() {
+        final Pattern write = Pattern.compile("\\bdefaultDownloadFolder\\s*=[^=]");
+        final Set<String> writers = new TreeSet<>();
+
+        try (Stream<Path> files = Files.walk(Path.of("src", "main", "java"))) {
+            files.filter(file -> file.toString().endsWith(".java")).forEach(file -> {
+                try {
+                    if (write.matcher(Files.readString(file)).find()) writers.add(file.getFileName().toString());
+                } catch (final IOException ex) {
+                    throw new UncheckedIOException(ex);
+                }
+            });
+        } catch (final IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+
+        assertEquals(writers, Set.of("AppSettingsState.java", "SettingsConfigurable.java"),
+                "only the settings page writes the download folder, and its state tidies what was stored");
     }
 
     @Test

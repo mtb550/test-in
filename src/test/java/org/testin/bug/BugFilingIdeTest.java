@@ -17,9 +17,8 @@
 package org.testin.bug;
 
 import com.intellij.openapi.application.WriteAction;
-import com.intellij.testFramework.PlatformTestUtil;
-import com.intellij.util.TimeoutUtil;
 import org.testin.AbstractTempRootIdeTest;
+import org.testin.Await;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
@@ -46,18 +45,6 @@ import org.jetbrains.annotations.NotNull;
 public class BugFilingIdeTest extends AbstractTempRootIdeTest {
 
     private static final String ISSUE = "https://github.com/mtb550/test-in/issues/412";
-
-    private static @NotNull String awaitFileHoldingTheIssue(final Path file) {
-        final long deadline = System.currentTimeMillis() + 10_000;
-        while (System.currentTimeMillis() < deadline) {
-            final String held = read(file);
-            if (held.contains(ISSUE)) return held;
-
-            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-            TimeoutUtil.sleep(20);
-        }
-        return read(file);
-    }
 
     private static @NotNull String read(final Path file) {
         try {
@@ -121,7 +108,7 @@ public class BugFilingIdeTest extends AbstractTempRootIdeTest {
         assertEquals("the run item the indexer holds did not take the link", ISSUE, storedLink(item));
 
         final Path result = item.testRunPath().resolve(FileKind.RUN_ITEM.fileName(item.id()));
-        assertTrue("the link did not reach the test case's own result file", awaitFileHoldingTheIssue(result).contains(ISSUE));
+        Await.until("the link did not reach the test case's own result file", () -> read(result).contains(ISSUE));
     }
 
     public void testARunItemNoLongerFailedIsNotWritten() {

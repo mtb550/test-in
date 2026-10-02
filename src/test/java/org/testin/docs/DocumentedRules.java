@@ -71,6 +71,14 @@ final class DocumentedRules {
         return byPart;
     }
 
+    static @NotNull Map<String, Map<Integer, Map<String, List<String>>>> live() {
+        final @NotNull Map<String, Map<Integer, Map<String, List<String>>>> byPart = definitions();
+
+        byPart.values().forEach(numbers -> numbers.values().removeIf(DocumentedRules::isRetired));
+        byPart.values().removeIf(Map::isEmpty);
+        return byPart;
+    }
+
     static @NotNull Set<String> names() {
         final @NotNull Set<String> written = new LinkedHashSet<>();
         definitions().forEach((part, numbers) -> numbers.keySet().forEach(number -> written.add(name(part, number))));
@@ -88,6 +96,10 @@ final class DocumentedRules {
             fail("Could not read " + file + ": " + ex.getMessage());
             return "";
         }
+    }
+
+    private static boolean isRetired(final @NotNull Map<String, List<String>> written) {
+        return written.keySet().stream().allMatch(text -> text.startsWith("*"));
     }
 
     private static @NotNull String oneLine(final @NotNull String text) {
