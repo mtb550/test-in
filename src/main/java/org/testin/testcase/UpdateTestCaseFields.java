@@ -16,9 +16,9 @@
 
 package org.testin.testcase;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.util.ui.EmptyIcon;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +37,7 @@ import org.testin.testcase.update.bulk.GroupBulkSectionDialog;
 import org.testin.testcase.update.bulk.ModuleBulkSectionDialog;
 import org.testin.testcase.update.bulk.PreConditionsBulkSectionDialog;
 import org.testin.testcase.update.bulk.PriorityBulkSectionDialog;
+import org.testin.testcase.update.bulk.ReferenceBulkSectionDialog;
 import org.testin.testcase.update.bulk.StatusBulkSectionDialog;
 import org.testin.testcase.update.bulk.StepsBulkSectionDialog;
 import org.testin.testcase.update.bulk.TestDataBulkSectionDialog;
@@ -146,18 +147,6 @@ public enum UpdateTestCaseFields implements MenuItem {
             new TestCaseDialogKey[]{ADD_GROUP, AUTO_COMPLETE, NAVIGATE_TAB}
     ),
 
-    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194
-    STATUS(
-            TestEditorAttributes.STATUS.getName(),
-            Shortcuts.EMPTY,
-            AllIcons.Actions.Preview,
-            GenType.UPDATE_TEST_CASE_STATUS,
-            Done.UPDATED,
-            (p, items, updatedItems) -> new StatusBulkSectionDialog(p, items, updatedItems).open(),
-            TestCaseBaseDialog::getStatusSection,
-            new TestCaseDialogKey[]{}
-    ),
-
     ORDER(
             TestEditorAttributes.ORDER.getName(),
             Shortcuts.UpdateTestCaseOrder,
@@ -166,6 +155,30 @@ public enum UpdateTestCaseFields implements MenuItem {
             Done.RE_SORTED,
             (p, _, _) -> Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("update.order.one.at.a.time")),
             TestCaseBaseDialog::getOrderSection,
+            new TestCaseDialogKey[]{}
+    ),
+
+    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194
+    STATUS(
+            TestEditorAttributes.STATUS.getName(),
+            Shortcuts.EMPTY,
+            EmptyIcon.ICON_16,
+            GenType.UPDATE_TEST_CASE_STATUS,
+            Done.UPDATED,
+            (p, items, updatedItems) -> new StatusBulkSectionDialog(p, items, updatedItems).open(),
+            TestCaseBaseDialog::getStatusSection,
+            new TestCaseDialogKey[]{}
+    ),
+
+    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-194
+    REFERENCE(
+            TestEditorAttributes.REFERENCE.getName(),
+            Shortcuts.EMPTY,
+            EmptyIcon.ICON_16,
+            GenType.NO_CODE_CHANGE,
+            Done.UPDATED,
+            (p, items, updatedItems) -> new ReferenceBulkSectionDialog(p, items, updatedItems).open(),
+            TestCaseBaseDialog::getReferenceSection,
             new TestCaseDialogKey[]{}
     );
 

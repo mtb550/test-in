@@ -64,6 +64,7 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog {
     protected final @NotNull StepsSection stepsSection;
     protected final @NotNull OrderSection orderSection;
     protected final @NotNull StatusSection statusSection;
+    protected final @NotNull ReferenceSection referenceSection;
     protected final @NotNull Disposable dialogDisposable;
     protected final @NotNull Map<CreateTestCaseSection, StatusBarItem[]> statusBarMapping;
     @Getter(AccessLevel.NONE)
@@ -91,6 +92,7 @@ public abstract class TestCaseBaseDialog extends AbstractFrameworkDialog {
         this.groupSection = new GroupSection(p);
         this.orderSection = new OrderSection(p);
         this.statusSection = new StatusSection();
+        this.referenceSection = new ReferenceSection(p);
 
         this.cachedSections = Stream.concat(
                         Arrays.stream(CreateTestCaseFields.values()).map(CreateTestCaseFields::getSectionExtractor),

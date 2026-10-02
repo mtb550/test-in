@@ -16,32 +16,28 @@
 
 package org.testin.testcase.create;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
-import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.testcase.CreateTestCaseFields;
-import org.testin.util.Shortcuts;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.UpdateTestCaseFields;
+import org.testin.util.Bundle;
+import org.testin.util.SpellChecker;
 
 import javax.swing.JComponent;
 
-public abstract class AbstractOneLineSection implements CreateTestCaseSection {
-    protected final @NotNull EditorTextField field;
-
-    protected final @NotNull JBLabel icon;
-
+// Rule-EDITOR-PANEL-194
+public class ReferenceSection implements CreateTestCaseSection {
+    private final @NotNull EditorTextField field;
     private final @NotNull JBPanel<?> wrapper;
-    private final @NotNull Shortcuts shortcut;
 
-    protected AbstractOneLineSection(final @NotNull EditorTextField field, final @NotNull CreateTestCaseFields describes, final @NotNull Shortcuts shortcut) {
-        this.field = field;
-        this.field.setOneLineMode(true);
-        this.shortcut = shortcut;
+    public ReferenceSection(final @NotNull Project p) {
+        field = SpellChecker.createField(p);
+        field.setOneLineMode(true);
+        styleField(field, Bundle.message("field.set.reference"));
 
-        styleField(this.field, describes.getPlaceholder());
-
-        this.icon = new JBLabel(describes.getIcon());
-        this.wrapper = createWrapper(this.icon, this.field);
+        wrapper = createWrapper(UpdateTestCaseFields.REFERENCE.getIcon(), field);
     }
 
     @Override
@@ -49,13 +45,15 @@ public abstract class AbstractOneLineSection implements CreateTestCaseSection {
         return wrapper;
     }
 
-    // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-028
+    // UC-EDITOR-PANEL-006, Rule-EDITOR-PANEL-032
+    @Override
+    public @NotNull TestCaseDto applyTo(final @NotNull TestCaseDto dto) {
+        return dto.edit().reference(field.getText().trim()).build();
+    }
+
+    // Rule-EDITOR-PANEL-194
     @Override
     public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull Runnable repackAction) {
-        base.registerShortcut(mainPanel, shortcut.getCustomShortcut(), () -> {
-            showSection(slot);
-            repackAction.run();
-        });
     }
 
     @Override
@@ -66,5 +64,10 @@ public abstract class AbstractOneLineSection implements CreateTestCaseSection {
     @Override
     public void setEditable(final boolean editable) {
         field.setEnabled(editable);
+    }
+
+    @Override
+    public void fillData(final @NotNull TestCaseDto dto) {
+        field.setText(dto.getReference());
     }
 }

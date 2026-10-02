@@ -22,7 +22,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.CreateTestCaseFields;
 import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.Icon;
@@ -73,9 +72,9 @@ public interface CreateTestCaseSection {
 
     void fillData(final @NotNull TestCaseDto dto);
 
-    default void styleField(final @NotNull EditorTextField field, final @NotNull CreateTestCaseFields describes) {
+    default void styleField(final @NotNull EditorTextField field, final @NotNull String placeholder) {
         DialogStyle.asField(field);
-        field.setPlaceholder(describes.getPlaceholder());
+        field.setPlaceholder(placeholder);
         field.setShowPlaceholderWhenFocused(true);
     }
 
