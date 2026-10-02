@@ -19,6 +19,7 @@ package org.testin.editor.testrun;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.AbstractTestinEditor;
@@ -135,14 +136,11 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
                     jumpToPageOfPendingSelection();
 
                     list.setPaintBusy(false);
-                    if (allTestCases.isEmpty()) {
-                        list.getEmptyText().setText(Bundle.message("editor.test.run.empty"));
-                    }
+                    loaded = true;
                     onExecutionStateChanged();
                     refreshView();
                     focusIfGoingTo();
 
-                    loaded = true;
                     startIfAsked();
                     onLoaded.run();
                 });
@@ -260,6 +258,17 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
     @Override
     public @NotNull Set<TestRunEditorAttributes> getSelectedDetails() {
         return getToolBar().getToolbarItem(TestRunDetailsPopupBtn.class).getSelectedDetails();
+    }
+
+    @Override
+    protected boolean isReading() {
+        return !loaded;
+    }
+
+    // UC-EDITOR-PANEL-030
+    @Override
+    protected void sayItHoldsNothing(final @NotNull StatusText emptyText) {
+        emptyText.setText(Bundle.message("editor.test.run.empty"));
     }
 
     // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-101

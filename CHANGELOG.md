@@ -43,6 +43,7 @@ What each version of Testin changed, for a tester deciding whether to update. Th
 - The web page report keeps the line breaks of a test case description, and the Excel report heads its test case column **Test Case**, as the web page, the PDF and the Word document do.
 - **A signed off test run keeps what it recorded:** on a Completed or Closed test run, **P**, **F** and **B**, the failure details and the grid's Actual Result are gray and say why, as the status bar always claimed.
 - Renaming a test set, a test set package or a test project renames its automation class or package again, and so does undoing the rename: the code was looked up under the new name after the tree already carried it, so it was never found.
+- A search or filter that matches nothing in a test run reads *No test cases match the search*, as it does in a test set, instead of *Loading...*.
 
 ## 2.13.0-alpha - 2026-09-22
 

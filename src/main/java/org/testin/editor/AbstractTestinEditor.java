@@ -26,6 +26,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.ui.StatusText;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -470,6 +471,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         });
         selectionToRestore = Optional.empty();
 
+        showEmptyStateIfNothingToDraw(totalItems);
         drawStatus(page, totalItems);
 
         refreshSelectionStatus(list.getSelectedIndices());
@@ -490,6 +492,18 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     }
 
     protected abstract void drawStatus(final @NotNull PageWindow page, final int totalItems);
+
+    protected abstract boolean isReading();
+
+    protected abstract void sayItHoldsNothing(final @NotNull StatusText emptyText);
+
+    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-101
+    private void showEmptyStateIfNothingToDraw(final int totalItems) {
+        if (totalItems > 0 || isReading()) return;
+
+        if (allTestCases.isEmpty()) sayItHoldsNothing(list.getEmptyText());
+        else list.getEmptyText().setText(Bundle.message("editor.test.no.match"));
+    }
 
     protected void afterSelectionShown() {
     }

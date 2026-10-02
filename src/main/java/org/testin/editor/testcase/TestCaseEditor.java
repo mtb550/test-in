@@ -19,6 +19,7 @@ package org.testin.editor.testcase;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
@@ -275,8 +276,6 @@ public class TestCaseEditor extends AbstractTestinEditor<TestCaseEditorAttribute
     // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-101
     @Override
     protected void drawStatus(final @NotNull PageWindow page, final int totalItems) {
-        showEmptyStateIfNothingToDraw(totalItems);
-
         final @NotNull List<TestCaseDto> all = snapshotOfAll();
         automationState.read(p, all, this::refreshView);
 
@@ -285,15 +284,15 @@ public class TestCaseEditor extends AbstractTestinEditor<TestCaseEditorAttribute
         statusBar.updatePaginationState(page.page(), page.totalPages());
     }
 
-    // UC-EDITOR-PANEL-001
-    private void showEmptyStateIfNothingToDraw(final int totalItems) {
-        if (totalItems > 0 || loading) return;
+    @Override
+    protected boolean isReading() {
+        return loading;
+    }
 
-        if (allTestCases.isEmpty()) {
-            list.getEmptyText().setText(Bundle.message("editor.test.empty")).appendLine(Bundle.message("editor.test.empty.hint", Declared.shortcutText("Testin.CreateTestCase")));
-        } else {
-            list.getEmptyText().setText(Bundle.message("editor.test.no.match"));
-        }
+    // UC-EDITOR-PANEL-001
+    @Override
+    protected void sayItHoldsNothing(final @NotNull StatusText emptyText) {
+        emptyText.setText(Bundle.message("editor.test.empty")).appendLine(Bundle.message("editor.test.empty.hint", Declared.shortcutText("Testin.CreateTestCase")));
     }
 
     @Override
