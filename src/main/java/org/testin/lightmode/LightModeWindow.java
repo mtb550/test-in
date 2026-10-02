@@ -72,7 +72,6 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -265,7 +264,7 @@ final class LightModeWindow {
         frame.bind(Shortcuts.Escape.getKey(), "testin.lightMode.escape", this::escape);
         frame.bind(Shortcuts.Enter.getKey(), "testin.lightMode.commit", this::saveCapture);
         frame.bind(Shortcuts.ToggleDetails.getKey(), "testin.lightMode.toggleDetails", this::toggleDetailsOnce);
-        frame.bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK, true), "testin.lightMode.releaseDetails", () -> detailsKeyHeld = false);
+        frame.bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, Shortcuts.menuMask(), true), "testin.lightMode.releaseDetails", () -> detailsKeyHeld = false);
         frame.bind(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, true), "testin.lightMode.releaseDetailsAlone", () -> detailsKeyHeld = false);
 
         for (final RunItemStatus status : RunItemStatus.values()) {

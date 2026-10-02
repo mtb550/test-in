@@ -23,6 +23,7 @@ import com.intellij.ui.components.fields.ExtendableTextField;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.Shortcuts;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -31,7 +32,6 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
-import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Optional;
@@ -74,7 +74,7 @@ final class FrameworkTextField {
     }
 
     static void bindClipboard(final @NotNull JTextComponent component) {
-        final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+        final int menuMask = Shortcuts.menuMask();
 
         bind(component, KeyEvent.VK_V, menuMask, DefaultEditorKit.pasteAction);
         bind(component, KeyEvent.VK_C, menuMask, DefaultEditorKit.copyAction);

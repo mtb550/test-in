@@ -38,6 +38,7 @@ What each version of Testin changed, for a tester deciding whether to update. Th
 - A failure with no message, or a bug report that cannot be written, no longer shows the word *null*.
 - **Large test projects:** an Excel export and an Excel import take far less memory, Cancel stops a report within a row, and the tree redraws only the folders that changed.
 - **Ready for the next IDE:** Report Bug no longer calls a platform method that is scheduled for removal, and Testin no longer registers a file system through an internal platform API.
+- On a Mac, **Cmd+D** in light mode shows and hides the details every time, not only the first.
 
 ## 2.13.0-alpha - 2026-09-22
 
