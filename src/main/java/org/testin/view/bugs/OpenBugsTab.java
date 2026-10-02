@@ -31,13 +31,13 @@ import org.testin.services.Services;
 import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
+import org.testin.view.details.components.AbstractDetails;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,12 +81,9 @@ public class OpenBugsTab {
         return label;
     }
 
-    // Rule-VIEW-PANEL-075
+    // Rule-VIEW-PANEL-075, Rule-VIEW-PANEL-080
     private static @NotNull ActionLink issue(final @NotNull String url) {
-        final @NotNull ActionListener open = _ -> BugIssueUrl.open(url);
-        final @NotNull ActionLink link = new ActionLink(BugIssueUrl.shortReference(url), open);
-
-        link.setFont(Fonts.body());
+        final @NotNull ActionLink link = AbstractDetails.link(BugIssueUrl.shortReference(url), _ -> BugIssueUrl.open(url));
         Tooltip.set(link, url);
 
         return link;

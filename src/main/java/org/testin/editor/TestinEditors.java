@@ -33,7 +33,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
-import org.testin.view.ViewToolWindowFactory;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -124,12 +123,9 @@ public final class TestinEditors {
         });
     }
 
+    // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-233, Rule-VIEW-PANEL-016
     public void openAndSelect(final @NotNull DirectoryDto dir, final @NotNull TestCaseDto tc) {
-        openThen(dir, editor -> {
-            editor.selectWhenLoaded(tc.getId());
-
-            ViewToolWindowFactory.showPanel(p, List.of(tc), dir.getPath2());
-        });
+        openThen(dir, editor -> editor.selectWhenLoaded(tc.getId()));
     }
 
     public @NotNull Optional<TestRunEditor> testRunEditorFor(final @NotNull TestRunDirectoryDto testRun) {

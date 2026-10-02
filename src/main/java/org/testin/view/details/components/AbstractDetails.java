@@ -41,7 +41,8 @@ public abstract class AbstractDetails {
         return row;
     }
 
-    static @NotNull ActionLink link(final @NotNull String text, final @NotNull ActionListener onClick) {
+    // Rule-VIEW-PANEL-080
+    public static @NotNull ActionLink link(final @NotNull String text, final @NotNull ActionListener onClick) {
         final @NotNull ActionLink link = new ActionLink(text, onClick);
         link.setAutoHideOnDisable(false);
         link.setFocusable(false);

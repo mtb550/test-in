@@ -27,7 +27,9 @@ import org.testin.explorer.tree.TreePanelTree;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.view.ViewToolWindowFactory;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -48,7 +50,11 @@ public final class GoTo {
     private static void toTestCase(final @NotNull Project p, final @NotNull Hit hit, final @NotNull TestCaseDto tc) {
         showTree(p, WITHOUT_FOCUS, tree -> tree.reveal(hit.node().getPath()));
 
-        Services.getInstance(p, TestinEditors.class).openAndSelect(hit.node(), tc);
+        // Rule-VIEW-PANEL-010
+        Services.getInstance(p, TestinEditors.class).openThen(hit.node(), editor -> {
+            editor.selectWhenLoaded(tc.getId());
+            ViewToolWindowFactory.showPanel(p, List.of(tc), hit.node().getPath2());
+        });
     }
 
     private static void toNode(final @NotNull Project p, final @NotNull Hit hit) {
