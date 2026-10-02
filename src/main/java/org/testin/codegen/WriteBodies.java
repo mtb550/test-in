@@ -65,13 +65,14 @@ public final class WriteBodies {
             return;
         }
 
-        // Rule-CODEGEN-091
-        new ConfirmDialog(p, Bundle.message("agent.over.title"),
-                Bundle.message("agent.over.message", String.valueOf(theirs.size())), "", "",
-                Bundle.message("agent.over.confirm"),
-                () -> ask(p, connection, empty, theirs, editor),
-                List.of(new Alternative(Shortcuts.ConfirmAlternative, Bundle.message("agent.over.skip"),
-                        () -> ask(p, connection, empty, List.of(), editor)))).show();
+        writeOverOrLeave(p, theirs.size(), () -> ask(p, connection, empty, theirs, editor), () -> ask(p, connection, empty, List.of(), editor)).show();
+    }
+
+    // UC-CODEGEN-021, Rule-CODEGEN-091
+    static @NotNull ConfirmDialog writeOverOrLeave(final @NotNull Project p, final int written, final @NotNull Runnable writeOver, final @NotNull Runnable leave) {
+        return new ConfirmDialog(p, Bundle.message("agent.over.title"), Bundle.message("agent.over.message", String.valueOf(written)), "", "",
+                Bundle.message("agent.over.confirm"), writeOver,
+                List.of(new Alternative(Shortcuts.Escape, Bundle.message("agent.over.skip"), leave)));
     }
 
     // UC-CODEGEN-021, Rule-CODEGEN-084, Rule-CODEGEN-089

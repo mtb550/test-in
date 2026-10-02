@@ -231,7 +231,7 @@ They are a catalog, not code: no dialog declares its kind.
 | Kind        | What it asks                              | What the kind fixes                                                                                  | Dialogs                                                                                                                                                                                                                                                          |
 |:------------|:------------------------------------------|:-----------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Form**    | Values to type or choose, then one action | Fields stacked; one blue main button; `Enter` runs it; as tall as its content unless it names a size | Create Project, Create Test Run, Create Test, Create Test Case, Update Test Case and its nine bulk-section editors, Rename, Order, Git Identity, Remote URL, Test Run Configuration, Result Analysis, Report Bug, Failed Result, Import, Export, Generate Report |
-| **Confirm** | Yes or no about a stated change           | The message, the change from and to, one named action; `Escape` cancels                              | `ConfirmDialog`, from nine places                                                                                                                                                                                                                                |
+| **Confirm** | Yes or no about a stated change           | The message, the change from and to, one named action; `Escape` cancels unless a second answer has it | `ConfirmDialog`, from nine places                                                                                                                                                                                                                                |
 | **Picker**  | One or more things chosen from a list     | A search or a list fills the space; `Enter` picks; a share of the window                             | Global Search, Bind Test Project, Pending Commits, Resolve Conflict                                                                                                                                                                                              |
 | **Viewer**  | Nothing; it shows something to read       | Read-only; no main button; `Escape` closes; can be maximized                                         | Screenshot, Stack Trace, Marker Details, Agent Said                                                                                                                                                                                                              |
 
@@ -281,11 +281,16 @@ They are a catalog, not code: no dialog declares its kind.
 
 ## What Testin refuses
 
-**If the tester presses `Escape`** — the dialog closes at once and nothing is
-saved. No dialog asks first today, even when something was typed, and what was
-typed is gone. That is decided for the failure form (Rule-EDITOR-PANEL-144) and
-for Report Bug (Rule-VIEW-PANEL-070). For every other dialog it is only how the
-platform closes a popup: it acts on `Escape` before the dialog sees the key.
+**If the tester presses `Escape`** — the dialog does what its strip names for
+`Escape`, and closes at once. Almost everywhere that is Cancel, and nothing is
+saved. No dialog asks first, even when something was typed, and what was typed
+is gone: Decision-015, after the failure form (Rule-EDITOR-PANEL-144) and Report
+Bug (Rule-VIEW-PANEL-070). Two dialogs give `Escape` an answer of its own, and
+the strip says which: the merge question skips the file (Rule-SHARE-084), and
+the question about bodies the tester wrote leaves them as they are
+(Rule-CODEGEN-091). The platform closes a popup on `Escape` before any key the
+dialog binds is reached, so the shell answers `Escape` first, with what the
+dialog declared (Rule-INTERNAL-054).
 
 **If a dialog is written with two meanings for one key** — it does not open, and
 the plugin says which key. A key that silently replaced another is the failure

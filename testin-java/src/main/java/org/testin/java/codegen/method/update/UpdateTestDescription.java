@@ -34,8 +34,10 @@ public class UpdateTestDescription extends UpdateTestBase implements GenAction<T
         });
     }
 
+    // UC-CODEGEN-010, UC-CODEGEN-003, Rule-CODEGEN-019
     @Override
     public void executeAll(final @NotNull Project p, final @NotNull List<? extends TestCaseDto> items) {
         applyToEach(p, items, GenType.UPDATE_TEST_CASE_DESCRIPTION.description(), (pm, tc) -> writeDescription(p, pm, tc));
+        GenType.CREATE_TEST_CASE.executeAllNow(p, items);
     }
 }

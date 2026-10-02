@@ -44,6 +44,10 @@ What each version of Testin changed, for a tester deciding whether to update. Th
 - **A signed off test run keeps what it recorded:** on a Completed or Closed test run, **P**, **F** and **B**, the failure details and the grid's Actual Result are gray and say why, as the status bar always claimed.
 - Renaming a test set, a test set package or a test project renames its automation class or package again, and so does undoing the rename: the code was looked up under the new name after the tree already carried it, so it was never found.
 - A search or filter that matches nothing in a test run reads *No test cases match the search*, as it does in a test set, instead of *Loading...*.
+- **A skipped or terminated test says so:** a TestNG test skipped by a failed dependency or an excluded group, or ended by a stop, is recorded Failed with *Skipped/Terminated* as its actual result, rather than with none.
+- **Filling in the description of several test cases at once writes the method** of each that had none, as filling in one already did.
+- **Testin runs only its own run configurations:** an execution is named *Testin:* and then the class and method, so Testin no longer reuses or changes a run configuration you made, and its Stop no longer ends a run you started from the gutter.
+- **Escape on a merge question skips that file and asks about the next,** as its status bar says, instead of ending the questions with the files after it unasked.
 
 ## 2.13.0-alpha - 2026-09-22
 

@@ -18,6 +18,7 @@ package org.testin.runner;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ExecutionStatus;
+import org.testin.util.Bundle;
 
 import java.util.Collection;
 import java.util.List;
@@ -58,12 +59,13 @@ final class ExecutionRegistry {
         return launchedNames.contains(testRunName);
     }
 
-    // UC-CODEGEN-008, Rule-CODEGEN-076
+    // UC-CODEGEN-008, Rule-CODEGEN-076, Rule-CODEGEN-094
     @NotNull String freeName(final @NotNull String wanted) {
-        if (!launchedNames.contains(wanted)) return wanted;
+        final @NotNull String own = Bundle.message("runner.execution.name", wanted);
+        if (!launchedNames.contains(own)) return own;
 
         return IntStream.iterate(2, next -> next + 1)
-                .mapToObj(next -> wanted + " (" + next + ")")
+                .mapToObj(next -> own + " (" + next + ")")
                 .filter(candidate -> !launchedNames.contains(candidate))
                 .findFirst()
                 .orElseThrow();

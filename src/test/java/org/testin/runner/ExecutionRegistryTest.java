@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertNotSame;
 import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
@@ -233,6 +234,20 @@ public class ExecutionRegistryTest {
 
         assertTrue(registry.ended("A build the tester left going").isEmpty(),
                 "a configuration of the tester's own is theirs, whatever it is called");
+    }
+
+    // Rule-CODEGEN-094
+    @Test
+    public void anExecutionIsNeverNamedLikeOneTheTesterStarts() {
+        final ExecutionRegistry registry = new ExecutionRegistry();
+        final String gutterName = "LoginTest.logsIn";
+
+        final String name = registry.freeName(gutterName);
+        registry.launched(List.of(UUID.randomUUID()), name);
+
+        assertNotEquals(name, gutterName, "Testin took the name the IDE's own gutter gives, so it could reuse the tester's configuration");
+        assertFalse(registry.launchedHere(gutterName), "so the tester's own run of that test would join the ones a Stop ends");
+        assertNotEquals(registry.freeName(gutterName), name, "and a second execution beside it still gets a name of its own");
     }
 
     @Test

@@ -54,7 +54,7 @@ public final class ConfirmDialog extends AbstractFrameworkDialog {
             }));
         }
 
-        keys.add(StatusBarShortcut.cancel(this::closeCancel));
+        if (alternatives.stream().noneMatch(alternative -> alternative.key() == Shortcuts.Escape)) keys.add(StatusBarShortcut.cancel(this::closeCancel));
         shortcuts = List.copyOf(keys);
     }
 

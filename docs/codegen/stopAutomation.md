@@ -38,7 +38,9 @@ There is no key of its own. `F5` on a running test case stops it.
   never as failed.
 - **Rule-CODEGEN-094** — Stop ends only executions Testin started. An execution
   the tester started outside Testin, from a run configuration or the IDE's own
-  gutter icon, is left running.
+  gutter icon, is left running. Testin's own are the ones whose name starts
+  with *Testin:*, and Testin never changes a configuration it did not name that
+  way.
 
 ## What the tester sees
 

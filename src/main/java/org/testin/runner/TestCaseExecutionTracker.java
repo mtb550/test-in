@@ -42,6 +42,7 @@ public final class TestCaseExecutionTracker {
                 TestCaseExecutionListener.broadcast(p, test.getPresentableName().toLowerCase(Locale.ROOT), ExecutionStatus.RUNNING, Duration.ZERO, Failure.NONE);
             }
 
+            // UC-CODEGEN-008, Rule-CODEGEN-075
             @Override
             public void onTestFinished(final @NotNull SMTestProxy test) {
                 final @NotNull String testName = test.getPresentableName().toLowerCase(Locale.ROOT);
@@ -49,10 +50,9 @@ public final class TestCaseExecutionTracker {
                 if (test.isPassed()) {
                     TestCaseExecutionListener.broadcast(p, testName, ExecutionStatus.PASSED, durationOf(test), Failure.NONE);
 
-                } else if (test.isDefect()) {
+                } else if (test.isDefect() && !test.isIgnored() && !test.wasTerminated()) {
                     TestCaseExecutionListener.broadcast(p, testName, ExecutionStatus.FAILED, durationOf(test), failureOf(test, ""));
 
-                    // Rule-CODEGEN-075
                 } else {
                     TestCaseExecutionListener.broadcast(p, testName, ExecutionStatus.FAILED, durationOf(test), failureOf(test, Bundle.message("runner.skipped")));
                 }

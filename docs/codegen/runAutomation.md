@@ -53,7 +53,7 @@ The code runs, and Testin writes down whether each test case passed.
   left them Pending would report a cycle as finished when part of it never ran.
 - **Rule-CODEGEN-076** — A second execution started while the first is still
   going gets a name of its own - the same name with a number after it, such as
-  LoginTest (2). The two executions are then separate everywhere: each has its
+  Testin: LoginTest (2). The two executions are then separate everywhere: each has its
   own process, Stop reaches one without touching the other, and each test case
   reports its run item status under the execution it belongs to.
 - **Rule-CODEGEN-092** — An execution that ends without reporting a test case,
@@ -108,7 +108,7 @@ appears. The message saying how many have no generated code still does.
 is said.
 
 **If an execution of that name is already going** - the second one is named
-after it with a number, such as *LoginTest (2)*, and runs alongside. Each has
+after it with a number, such as *Testin: LoginTest (2)*, and runs alongside. Each has
 its own process: stopping one leaves the other running, and each test case
 records its run item status under the execution it actually belongs to.
 
@@ -138,7 +138,10 @@ is difference 10 on
 
 ## What the execution is called
 
-The name in the IDE's run widget depends on the selection.
+The name in the IDE's run widget starts with *Testin:*, then depends on the
+selection. The IDE's own gutter icon names a configuration the way the table
+does, without *Testin:*, so a configuration the tester made is never reused,
+changed or stopped by Testin (Rule-CODEGEN-094).
 
 | The tester selected      | The name                                             |
 |--------------------------|------------------------------------------------------|

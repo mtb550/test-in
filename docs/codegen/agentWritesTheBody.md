@@ -161,9 +161,10 @@ half-written body is never left behind.
 
 **If the tester has written the body already** — that test case is not sent, and
 the execution asks first. One dialog says how many such test cases there are,
-and offers **Write over them** or **Leave them as they are**. Escape leaves
-them. Nothing is replaced without that answer, and `Ctrl+Z` takes the tester's
-own body back.
+and offers **Write over them** or **Leave them as they are**. `Enter` writes
+over them; `Escape` leaves them, and the test cases still holding their
+`// TODO` are sent all the same. Nothing is replaced without that answer, and
+`Ctrl+Z` takes the tester's own body back.
 
 **If the execution is canceled** — the bodies already written stay, the rest
 keep their `// TODO`, and the count reports what landed.
