@@ -18,8 +18,6 @@ package org.testin.report.generators;
 
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
-import org.apache.poi.common.usermodel.PictureType;
-import org.apache.poi.util.Units;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.TableWidthType;
@@ -67,7 +65,6 @@ import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 import org.testin.util.ReportFont;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -91,8 +88,6 @@ public final class TestRunWordGenerator {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (XWPFDocument doc = new XWPFDocument()) {
                 final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
-
-                CompanyLogo.fromSettings().ifPresent(logo -> addLogo(doc, logo));
 
                 addText(doc, Bundle.message("report.title"), ReportFont.TITLE.ptRounded(), true, DARK_NAVY, NO_BORDER, 2);
 
@@ -458,16 +453,6 @@ public final class TestRunWordGenerator {
         for (int i = 0; i < row.getTableCells().size() && i < percents.length; i++) {
             getTcPr(row.getCell(i)).addNewTcW().setW(percents[i] * 100);
             getTcPr(row.getCell(i)).getTcW().setType(STTblWidth.Enum.forString("pct"));
-        }
-    }
-
-    // UC-SETTING-012, Rule-SETTING-043
-    private static void addLogo(final @NotNull XWPFDocument doc, final @NotNull CompanyLogo logo) {
-        try {
-            doc.createParagraph().createRun().addPicture(new ByteArrayInputStream(logo.png()), PictureType.PNG, "logo.png",
-                    Units.toEMU(logo.widthAt(CompanyLogo.HEIGHT_PT)), Units.toEMU(CompanyLogo.HEIGHT_PT));
-        } catch (final Exception ex) {
-            Logger.warn("The Word report was written without the company logo: " + FailureText.of(ex));
         }
     }
 

@@ -19,9 +19,7 @@ package org.testin.report;
 import com.intellij.notification.Notification;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.WriteAction;
-import com.intellij.util.ui.ImageUtil;
 import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfName;
 import com.itextpdf.kernel.pdf.PdfReader;
 import com.itextpdf.kernel.pdf.canvas.parser.PdfTextExtractor;
 import org.apache.poi.ss.usermodel.Cell;
@@ -31,7 +29,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFPicture;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
@@ -50,16 +47,12 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
-import org.testin.setting.AppSettingsState;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -266,39 +259,6 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
         for (final String report : List.of(pdf(testRun), word(testRun), excel(testRun))) {
             assertLeavesOut("A report", report, STACKTRACE);
             assertLeavesOut("A report", report, SCREENSHOT);
-        }
-    }
-
-    // Rule-SETTING-043, Rule-SETTING-044
-    public void testTheCompanyLogoTopsTheReportThirtyPointsTallAndIsLeftOutWhenItsFileIsGone() {
-        final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
-        final @NotNull String was = settings.companyLogo;
-        try {
-            final @NotNull Path gif = root.resolve("logo.gif");
-            ImageIO.write(ImageUtil.createImage(60, 20, BufferedImage.TYPE_INT_ARGB), "gif", gif.toFile());
-            settings.companyLogo = gif.toString();
-            final @NotNull TestRunDirectoryDto testRun = theTestRun();
-
-            final @NotNull String html = html(testRun);
-            assertTrue("the web page has no company logo", html.contains("<img class='company-logo'"));
-            assertTrue("the web page prints the logo below its title", html.indexOf("class='company-logo'") < html.indexOf("class='report-title'"));
-
-            try (PdfDocument pdf = new PdfDocument(new PdfReader(new ByteArrayInputStream(report(FileTypes.PDF, testRun))))) {
-                assertFalse("the PDF has no company logo", pdf.getPage(1).getResources().getResourceNames(PdfName.XObject).isEmpty());
-            }
-
-            try (XWPFDocument word = new XWPFDocument(new ByteArrayInputStream(report(FileTypes.WORD, testRun)))) {
-                final @NotNull XWPFPicture logo = word.getParagraphs().getFirst().getRuns().getFirst().getEmbeddedPictures().getFirst();
-                assertEquals("the logo is not 30 points tall", 30.0, logo.getDepth(), 0.5);
-                assertEquals("the logo lost its proportions", 90.0, logo.getWidth(), 0.5);
-            }
-
-            settings.companyLogo = root.resolve("gone.gif").toString();
-            assertFalse("a missing logo file still printed a logo", html(testRun).contains("<img class='company-logo'"));
-        } catch (final IOException ex) {
-            throw new AssertionError("Could not write or read back a report with a logo: " + ex.getMessage(), ex);
-        } finally {
-            settings.companyLogo = was;
         }
     }
 

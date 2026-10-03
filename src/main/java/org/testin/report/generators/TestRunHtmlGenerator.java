@@ -39,7 +39,6 @@ import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.ReportFont;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -69,9 +68,6 @@ public final class TestRunHtmlGenerator {
                 .append(" data-light='").append(StringUtil.escapeXmlEntities(Bundle.message("report.theme.light"))).append("'")
                 .append(" data-dark='").append(StringUtil.escapeXmlEntities(Bundle.message("report.theme.dark"))).append("'>")
                 .append(Bundle.message("report.theme.light")).append("</button>");
-
-        // UC-SETTING-012, Rule-SETTING-043
-        CompanyLogo.fromSettings().ifPresent(logo -> html.append("<img class='company-logo' alt='' src='data:image/png;base64,").append(Base64.getEncoder().encodeToString(logo.png())).append("'>"));
 
         html.append("<div class='report-title'>").append(Bundle.message("report.title")).append("</div>")
                 .append("<div class='report-subtitle'>")
@@ -218,7 +214,6 @@ public final class TestRunHtmlGenerator {
                 + "background: var(--panel); color: var(--ink); border: 1px solid var(--line); }"
                 + ".theme-toggle:hover { border-color: var(--accent); }"
 
-                + ".company-logo { display: block; height: " + CompanyLogo.HEIGHT_PX + "px; width: auto; margin-bottom: 8px; }"
                 + ".report-title { font-size: " + ReportFont.TITLE.css() + "; font-weight: bold; color: var(--heading); }"
                 + ".report-subtitle { font-size: " + ReportFont.SUBTITLE.css() + "; color: var(--accent); margin-top: 4px; }"
                 + ".report-test-run-name { font-size: " + ReportFont.LEAD.css() + "; color: var(--accent); margin-top: 2px; "
