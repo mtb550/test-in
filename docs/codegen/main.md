@@ -10,7 +10,7 @@ test case they came from.
 |---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Part of Testin**  | Automation code and the gutter                                                                                                                                                                                                   |
 | **Answers**         | What Testin writes into the code, when it rewrites it, and what a tester sees when it cannot                                                                                                                                     |
-| **Numbering**       | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-021`. Rules are `Rule-CODEGEN-001` to `Rule-CODEGEN-094`                                                                                                                           |
+| **Numbering**       | Use cases are `UC-CODEGEN-001` to `UC-CODEGEN-021`. Rules are `Rule-CODEGEN-001` to `Rule-CODEGEN-096`                                                                                                                           |
 | **Retired**         | `Rule-CODEGEN-015` said what `Rule-CODEGEN-046` says — the groups attribute is written only when the test case belongs to one. Retired 8 September 2026; read Rule-CODEGEN-046 instead. The number is not given to anything else |
 | **State**           | **Written** — [#181](https://github.com/mtb550/test-in/issues/181)                                                                                                                                                               |
 | **Checked against** | `main` at `1270e599`, 20 September 2026                                                                                                                                                                                          |
@@ -105,11 +105,11 @@ For a test set, one class holding those methods. For a package, a folder.
 
 ## Every key
 
-| Key        | What it does                                    | The page that owns it                 |
-|------------|-------------------------------------------------|---------------------------------------|
-| `Shift+F5` | Goes to the generated method                    | [UC-CODEGEN-006](goToCode.md)         |
-| `F5`       | Runs the selected test cases, or stops them     | [UC-CODEGEN-008](runAutomation.md)    |
-| `F12`      | Writes the method for a test case that has none | [UC-CODEGEN-005](automateTestCase.md) |
+| Key                                | What it does                                    | The page that owns it                 |
+|------------------------------------|-------------------------------------------------|---------------------------------------|
+| `Shift+F5`                         | Goes to the generated method                    | [UC-CODEGEN-006](goToCode.md)         |
+| `F5`                               | Runs the selected test cases, or stops them     | [UC-CODEGEN-008](runAutomation.md)    |
+| `F12`, `Ctrl+Alt+Cmd+F12` on a Mac | Writes the method for a test case that has none | [UC-CODEGEN-005](automateTestCase.md) |
 
 The gutter mark has no key. Stopping has no key of its own.
 

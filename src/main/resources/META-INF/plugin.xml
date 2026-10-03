@@ -74,6 +74,7 @@
     <depends optional="true" config-file="testin-java.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="testin-testng.xml">TestNG-J</depends>
     <depends optional="true" config-file="testin-git.xml">Git4Idea</depends>
+    <depends optional="true" config-file="testin-json.xml">com.intellij.modules.json</depends>
 
     <!-- ================================================================== -->
     <!-- Content modules                                                    -->
@@ -141,7 +142,7 @@
                 id="testin.tree"
                 factoryClass="org.testin.explorer.Main"
                 anchor="left"
-                icon="/icons/pluginIcon.svg"
+                icon="org.testin.util.Icons.TOOL_WINDOW"
                 secondary="false"
                 doNotActivateOnStart="true"
         />
@@ -150,7 +151,7 @@
                 id="testin.view"
                 factoryClass="org.testin.view.ViewToolWindowFactory"
                 anchor="right"
-                icon="/icons/pluginIcon.svg"
+                icon="org.testin.util.Icons.TOOL_WINDOW"
                 secondary="false"
                 doNotActivateOnStart="true"
         />
@@ -311,13 +312,13 @@
         >
             <!-- F12 is JumpToLastWindow in the IDE's own keymap, and it is kept
                  anyway: a shared key is fine where it works, and no code goes in
-                 to win it. CTRL+F12 was worse - FileStructurePopup owns that and
-                 there was no Mac entry at all, so generating code was unreachable
-                 by key on a Mac. Rule-INTERNAL-069 says the opposite and this is
-                 the exception to it, decided deliberately. -->
+                 to win it. CTRL+F12 was worse - FileStructurePopup owns that, and
+                 on a Mac it owns CMD+F12 too, so the Mac key is CTRL+ALT+CMD+F12,
+                 which nothing else uses. Rule-INTERNAL-069 says the opposite and
+                 this is the exception to it, decided deliberately. -->
             <keyboard-shortcut keymap="$default" first-keystroke="F12"/>
-            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta F12"/>
-            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta F12"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="ctrl alt meta F12"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="ctrl alt meta F12"/>
         </action>
 
         <action

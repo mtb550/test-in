@@ -49,7 +49,7 @@ public class TestCaseMethodIdeTest extends AbstractCodegenIdeTest {
 
         final @NotNull PsiMethod pm = generatedClass(LOGIN_TEST).orElseThrow().getMethods()[0];
 
-        assertEquals("testName does not carry the test case id, so nothing could find the method afterward", "\"" + tc.getId() + "\"", testAttribute(pm, "testName"));
+        assertEquals("testName does not carry the test case id, so nothing could find the method afterward", "\"" + tc.getId() + "\"", attributeOf(pm, "testName"));
     }
 
     // Rule-CODEGEN-003
@@ -72,9 +72,9 @@ public class TestCaseMethodIdeTest extends AbstractCodegenIdeTest {
         final @NotNull TestCaseDto second = createdTestCase(login, "Log in with a valid user", "c");
         final @NotNull TestCaseDto third = createdTestCase(login, "Log out", "d");
 
-        assertEquals("1", testAttribute(writtenMethodOf(LOGIN_TEST, first), "priority"));
-        assertEquals("2", testAttribute(writtenMethodOf(LOGIN_TEST, second), "priority"));
-        assertEquals("3", testAttribute(writtenMethodOf(LOGIN_TEST, third), "priority"));
+        assertEquals("1", attributeOf(writtenMethodOf(LOGIN_TEST, first), "priority"));
+        assertEquals("2", attributeOf(writtenMethodOf(LOGIN_TEST, second), "priority"));
+        assertEquals("3", attributeOf(writtenMethodOf(LOGIN_TEST, third), "priority"));
     }
 
     // Rule-CODEGEN-014
@@ -86,7 +86,7 @@ public class TestCaseMethodIdeTest extends AbstractCodegenIdeTest {
         GenType.CREATE_TEST_CASE.execute(getProject(), tc);
 
         final @NotNull String annotation = writtenMethodOf(LOGIN_TEST, tc).getModifierList().getText();
-        assertEquals("the test case's High was written as the execution position", "1", testAttribute(writtenMethodOf(LOGIN_TEST, tc), "priority"));
+        assertEquals("the test case's High was written as the execution position", "1", attributeOf(writtenMethodOf(LOGIN_TEST, tc), "priority"));
         assertFalse("the test case's own priority reached the code: " + annotation, annotation.toLowerCase().contains("high"));
     }
 

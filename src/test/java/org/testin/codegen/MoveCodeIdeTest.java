@@ -38,7 +38,7 @@ public class MoveCodeIdeTest extends AbstractCodegenIdeTest {
     // Rule-CODEGEN-053
     public void testAMovedTestSetTakesItsClassAndItsPackageLineWithIt() {
         final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", testCasesDirectory());
+        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
 
         JavaCode.of(DirectoryType.TS).getMoved().execute(getProject(), new Moved(login, checkout.getPath()));
 
@@ -65,7 +65,7 @@ public class MoveCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-056
     public void testRenamingAPackageRewritesThePackageLineOfEveryClassBeneathIt() {
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", testCasesDirectory());
+        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
         createdTestSet("Login", checkout);
         createdTestSet("Visa", indexedPackage("Cards", checkout));
 
@@ -78,10 +78,10 @@ public class MoveCodeIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-057
     public void testMovingAPackageMovesItsFolderAndRewritesThePackageLines() {
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", testCasesDirectory());
+        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
         final @NotNull TestSetPackageDirectoryDto cards = indexedPackage("Cards", checkout);
         createdTestSet("Visa", cards);
-        final @NotNull TestSetPackageDirectoryDto payment = indexedPackage("Payment", testCasesDirectory());
+        final @NotNull TestSetPackageDirectoryDto payment = indexedPackage("Payment", theTestCasesDirectory());
 
         JavaCode.of(DirectoryType.TSP).getMoved().execute(getProject(), new Moved(cards, payment.getPath()));
 
@@ -94,7 +94,7 @@ public class MoveCodeIdeTest extends AbstractCodegenIdeTest {
         final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
         final @NotNull TestCaseDto tc = createdTestCase(login, "Log in with a valid user", "b");
         writtenByTheTester(writtenMethodOf("nafath.LoginTest", tc), WRITTEN_BY_THE_TESTER);
-        final @NotNull TestSetDirectoryDto visa = indexedTestSet("Visa", indexedPackage("Cards", testCasesDirectory()));
+        final @NotNull TestSetDirectoryDto visa = indexedTestSet("Visa", indexedPackage("Cards", theTestCasesDirectory()));
 
         final @NotNull TestCases testCases = Services.getInstance(getProject(), TestCases.class);
         testCases.removeTestCase(login.getPath(), tc.getId());

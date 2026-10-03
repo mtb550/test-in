@@ -37,19 +37,23 @@ import static org.testng.Assert.fail;
 
 public class RuleNumbersTest {
 
-    private static final Path SOURCES = Paths.get("src", "main", "java");
+    private static final List<Path> SOURCES = List.of(Paths.get("src", "main", "java"), Paths.get("testin-java", "src", "main", "java"), Paths.get("testin-testng", "src", "main", "java"));
 
     private static final Pattern REFERENCE = Pattern.compile("Rule-([A-Z][A-Z-]*)-(\\d+)");
+
+    private static final Pattern USE_CASE_REFERENCE = Pattern.compile("UC-[A-Z][A-Z-]*-\\d+");
 
     private static final Pattern RANGE = Pattern.compile("Rules are `Rule-([A-Z][A-Z-]*)-\\d+` to `Rule-[A-Z][A-Z-]*-(\\d+)`");
 
     private static @NotNull List<Path> javaFiles() {
         final List<Path> files = new ArrayList<>();
 
-        try (Stream<Path> tree = Files.walk(SOURCES)) {
-            files.addAll(tree.filter(file -> file.toString().endsWith(".java")).toList());
-        } catch (final IOException ex) {
-            fail("Could not read " + SOURCES + ": " + ex.getMessage());
+        for (final Path root : SOURCES) {
+            try (Stream<Path> tree = Files.walk(root)) {
+                files.addAll(tree.filter(file -> file.toString().endsWith(".java")).toList());
+            } catch (final IOException ex) {
+                fail("Could not read " + root + ": " + ex.getMessage());
+            }
         }
 
         return files;
@@ -132,6 +136,24 @@ public class RuleNumbersTest {
 
         if (!dangling.isEmpty()) {
             fail("These markers name rules no document writes:\n  " + String.join("\n  ", dangling));
+        }
+    }
+
+    @Test
+    public void everyUseCaseTheCodeCitesExists() {
+        final Set<String> written = DocumentedRules.useCases();
+
+        final List<String> dangling = new ArrayList<>();
+        for (final Path source : javaFiles()) {
+            final Matcher cited = USE_CASE_REFERENCE.matcher(DocumentedRules.read(source));
+
+            while (cited.find()) {
+                if (!written.contains(cited.group())) dangling.add(cited.group() + " in " + source.getFileName());
+            }
+        }
+
+        if (!dangling.isEmpty()) {
+            fail("These markers name use cases no page writes:\n  " + String.join("\n  ", dangling));
         }
     }
 }

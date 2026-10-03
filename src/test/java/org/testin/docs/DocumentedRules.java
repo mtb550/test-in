@@ -43,6 +43,8 @@ final class DocumentedRules {
 
     static final @NotNull String PRODUCT = "product.md";
 
+    private static final @NotNull Pattern USE_CASE_PAGE = Pattern.compile("^# (UC-[A-Z][A-Z-]*-\\d+):", Pattern.MULTILINE);
+
     private static final @NotNull Pattern DEFINITION = Pattern.compile(
             "^\\s*-\\s+\\*\\*Rule-([A-Z][A-Z-]*)-(\\d+)\\*\\*(.*?)(?=\\r?\\n\\s*-\\s+\\*\\*Rule-|\\r?\\n\\r?\\n|$)",
             Pattern.MULTILINE | Pattern.DOTALL);
@@ -83,6 +85,15 @@ final class DocumentedRules {
         final @NotNull Set<String> written = new LinkedHashSet<>();
         definitions().forEach((part, numbers) -> numbers.keySet().forEach(number -> written.add(name(part, number))));
         return written;
+    }
+
+    static @NotNull Set<String> useCases() {
+        final @NotNull Set<String> found = new LinkedHashSet<>();
+        for (final Path page : partPages()) {
+            final @NotNull Matcher heading = USE_CASE_PAGE.matcher(read(page));
+            while (heading.find()) found.add(heading.group(1));
+        }
+        return found;
     }
 
     static @NotNull String name(final @NotNull String part, final int number) {

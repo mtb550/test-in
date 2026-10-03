@@ -103,8 +103,10 @@ This is how every test case in Testin begins.
    and change as they move between fields; **Save** and **Cancel** are always
    last, so a tester looks for Save in the same place whichever field they are
    in. A field with no keys of its own adds nothing, and the strip still shows
-   those two. Just before them, *Ctrl+Letter Add Field* stands for the keys
-   below: each field opens with Ctrl and the letter on its icon.
+   those two. Just before them, *Ctrl+Letter Add Field*, *⌘Letter* on a Mac,
+   stands for the keys below: each field opens with that key and the letter
+   on its icon. On a Mac, Module, Pre Conditions, Priority and Group take the
+   keys in the table instead.
 
 ## The fields and the keys that open them
 

@@ -146,6 +146,13 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
                         Fqcn.methodNameOf(tc), tc)));
     }
 
+    // Rule-CODEGEN-095
+    private static @NotNull Optional<PsiMethod> theTestersOwn(final @NotNull Optional<String> owner, final @NotNull Optional<PsiMethod> sameName, final @NotNull Map<String, PsiMethod> describedByHand, final @NotNull TestCaseDto tc) {
+        if (owner.isPresent()) return sameName.filter(pm -> owner.orElseThrow().isEmpty() && GeneratedMethod.testAnnotationOf(pm).isPresent());
+
+        return Optional.ofNullable(describedByHand.remove(tc.getDescription()));
+    }
+
     // UC-CODEGEN-002, Rule-CODEGEN-016
     private void injectAsText(final @NotNull Project p, final @NotNull PsiClass targetClass, final @NotNull List<TestCaseDto> testCases) {
         final @NotNull PsiFile file = targetClass.getContainingFile();
@@ -167,6 +174,7 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
         }
 
         final @NotNull Map<String, PsiMethod> generated = GeneratedMethod.byTestCaseId(targetClass);
+        final @NotNull Map<String, PsiMethod> describedByHand = GeneratedMethod.untaggedByDescription(targetClass);
         final @NotNull ToIntFunction<TestCaseDto> positions = ExecutionPosition.ofEach(p);
 
         final @NotNull List<TestCaseDto> missing = testCases.stream().filter(tc -> !generated.containsKey(tc.getId().toString())).toList();
@@ -183,16 +191,17 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
             final @NotNull String methodName = Fqcn.methodNameOf(tc);
             final @NotNull String key = NameSanitizer.methodKey(methodName);
             final @NotNull Optional<String> owner = Optional.ofNullable(owners.get(key));
+            final @NotNull Optional<PsiMethod> theTestersOwn = theTestersOwn(owner, Optional.ofNullable(byKey.get(key)), describedByHand, tc);
+
+            if (theTestersOwn.isPresent()) {
+                GeneratedMethod.adopt(p, theTestersOwn.orElseThrow(), tc);
+                owners.put(NameSanitizer.methodKey(theTestersOwn.orElseThrow().getName()), id);
+                adopted++;
+                continue;
+            }
 
             if (owner.isPresent()) {
-                final @NotNull Optional<PsiMethod> theTestersOwn = Optional.ofNullable(byKey.get(key))
-                        .filter(pm -> owner.orElseThrow().isEmpty() && GeneratedMethod.testAnnotationOf(pm).isPresent());
-
-                if (theTestersOwn.isPresent()) {
-                    GeneratedMethod.adopt(p, theTestersOwn.orElseThrow(), tc);
-                    owners.put(key, id);
-                    adopted++;
-                } else lostTheName.add(tc);
+                lostTheName.add(tc);
                 continue;
             }
 
@@ -331,6 +340,13 @@ public class CreateTestMethod implements GenAction<TestCaseDto> {
                 else
                     Logger.info("Method already exists: " + methodName);
 
+                return Optional.empty();
+            }
+
+            // Rule-CODEGEN-095
+            final @NotNull Optional<PsiMethod> describedByTheTester = Optional.ofNullable(GeneratedMethod.untaggedByDescription(targetClass).get(tc.getDescription()));
+            if (describedByTheTester.isPresent()) {
+                GeneratedMethod.adopt(p, describedByTheTester.orElseThrow(), tc);
                 return Optional.empty();
             }
 

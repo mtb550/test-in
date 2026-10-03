@@ -24,6 +24,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
+import org.testin.git.GitFailure;
 import org.testin.git.GitRefs;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.ViewPendingCommitsAction;
@@ -254,7 +255,7 @@ public class BranchSelector {
             Logger.error("Could not read branches: " + FailureText.of(ex));
             ApplicationManager.getApplication().invokeLater(() -> {
                 showPlaceholder(Bundle.message("branch.load.failed"));
-                notifier.error(p, Bundle.message("git.error.title"), Bundle.message("branch.load.failed.message", FailureText.of(ex)));
+                GitFailure.show(p, Bundle.message("git.error.title"), Bundle.message("branch.load.failed.message", FailureText.of(ex)));
             });
         }
     }

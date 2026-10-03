@@ -22,7 +22,7 @@ which move between desktops on a Mac. Each row below names its Mac key.
 
 `Ctrl+Space` is `Ctrl+Space` on a Mac too: it is the IDE's own completion key
 there as well, and Testin only names it. Search is `Cmd+Alt+F` on a Mac, and
-writing the automation method is `Cmd+F12`.
+writing the automation method is `Ctrl+Alt+Cmd+F12`.
 
 Each module's own page carries the same keys in its **Every key, in one place**
 table; this is all of them together.
@@ -228,7 +228,7 @@ status. Nine of them carry a default key, on seven keys:
 | *none by default*                   | Copy, Cut and Paste Test Case                             | Both editors. Declared with no key, so Find Action offers them and a tester who wants one can set it                                            |
 | `F5`                                | Run Test Method                                           | Both editors and the view panel                                                                                                                 |
 | `Shift+F5`                          | Navigate to Test Method                                   | Both editors and the view panel                                                                                                                 |
-| `F12`, `Cmd+F12` on a Mac           | Automate Test Case                                        | Both editors                                                                                                                                    |
+| `F12`, `Ctrl+Alt+Cmd+F12` on a Mac  | Automate Test Case                                        | Both editors                                                                                                                                    |
 
 Rebinding one of these moves it everywhere it works at once, including the
 tooltips and status bars that print it — those ask the keymap rather than
@@ -243,8 +243,9 @@ the default keymap if it ever bites, and either action can be rebound in **Setti
 
 **`F12` is also IntelliJ's Jump to Last Window.** It is kept for the same
 reason, and for one more: `Ctrl+F12` is worse, because the IDE's File Structure
-popup owns that and there is no Mac key left for it. Automate Test Case takes
-`Cmd+F12` on a Mac so that generating code is reachable by key there at all.
+popup owns that, and `Cmd+F12` on a Mac. Automate Test Case takes
+`Ctrl+Alt+Cmd+F12` on a Mac, which nothing else uses, so that generating code is
+reachable by key there at all.
 
 These two are the only Testin keys the IDE already uses, and each was decided
 rather than inherited. That is difference 7 on

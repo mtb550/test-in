@@ -36,7 +36,7 @@ import java.util.Map;
 
 public class SheetPreviewIdeTest extends BasePlatformTestCase {
 
-    private static @NotNull TestCaseDto testCase(final @NotNull String description) {
+    private static @NotNull TestCaseDto aTestCase(final @NotNull String description) {
         return TestCaseDto.builder().description(description).priority(Priority.HIGH).build();
     }
 
@@ -56,8 +56,8 @@ public class SheetPreviewIdeTest extends BasePlatformTestCase {
         return (JBTabbedPane) preview.getPanel();
     }
 
-    private static @NotNull JBTable table(final @NotNull SheetPreview preview, final int tab) {
-        return (JBTable) ((JBScrollPane) tabs(preview).getComponentAt(tab)).getViewport().getView();
+    private static @NotNull JBTable table(final @NotNull SheetPreview preview) {
+        return (JBTable) ((JBScrollPane) tabs(preview).getComponentAt(0)).getViewport().getView();
     }
 
     private static int column(final @NotNull Can capability, final @NotNull TestCaseEditorAttributes attribute) {
@@ -79,20 +79,20 @@ public class SheetPreviewIdeTest extends BasePlatformTestCase {
 
     // UC-SHARE-001, Rule-SHARE-008
     public void testOnlyWhatIsTickedIsWritten() {
-        final @NotNull TestCaseDto first = testCase("log in with a valid user");
-        final @NotNull TestCaseDto second = testCase("a wrong password is refused");
-        final @NotNull TestCaseDto third = testCase("a locked account cannot log in");
+        final @NotNull TestCaseDto first = aTestCase("log in with a valid user");
+        final @NotNull TestCaseDto second = aTestCase("a wrong password is refused");
+        final @NotNull TestCaseDto third = aTestCase("a locked account cannot log in");
         final @NotNull SheetPreview preview = shown(Can.EXPORT, sheets("Login", first, second, third));
 
-        table(preview, 0).getModel().setValueAt(Boolean.FALSE, 1, 0);
+        table(preview).getModel().setValueAt(Boolean.FALSE, 1, 0);
 
         assertEquals(Map.of("Login", List.of(first, third)), preview.selected());
     }
 
     // UC-SHARE-003, Rule-SHARE-018
     public void testTheBoxInTheFirstHeadingTicksOrUnticksTheWholeTab() {
-        final @NotNull SheetPreview preview = shown(Can.EXPORT, sheets("Login", testCase("log in with a valid user"), testCase("a wrong password is refused")));
-        final @NotNull JBTable table = table(preview, 0);
+        final @NotNull SheetPreview preview = shown(Can.EXPORT, sheets("Login", aTestCase("log in with a valid user"), aTestCase("a wrong password is refused")));
+        final @NotNull JBTable table = table(preview);
 
         clickTheTickHeading(table);
         assertEquals(List.of(Boolean.FALSE, Boolean.FALSE), ticks(table.getModel()));
@@ -104,10 +104,10 @@ public class SheetPreviewIdeTest extends BasePlatformTestCase {
 
     // UC-SHARE-003, Rule-SHARE-020
     public void testACorrectionChangesTheFileAndNeverTheTestCase() {
-        final @NotNull TestCaseDto typed = testCase("log in with a valid user");
+        final @NotNull TestCaseDto typed = aTestCase("log in with a valid user");
         final @NotNull SheetPreview preview = shown(Can.EXPORT, sheets("Login", typed));
 
-        table(preview, 0).getModel().setValueAt("log in with a valid user and a remembered device", 0, column(Can.EXPORT, TestCaseEditorAttributes.DESCRIPTION));
+        table(preview).getModel().setValueAt("log in with a valid user and a remembered device", 0, column(Can.EXPORT, TestCaseEditorAttributes.DESCRIPTION));
 
         assertEquals("log in with a valid user and a remembered device", preview.selected().get("Login").getFirst().getDescription());
         assertEquals("the test case itself is untouched", "log in with a valid user", typed.getDescription());
@@ -115,10 +115,10 @@ public class SheetPreviewIdeTest extends BasePlatformTestCase {
 
     // UC-SHARE-007, Rule-SHARE-038
     public void testACorrectionChangesWhatIsImportedAndNotWhatWasRead() {
-        final @NotNull TestCaseDto read = testCase("log in with a valid user");
+        final @NotNull TestCaseDto read = aTestCase("log in with a valid user");
         final @NotNull SheetPreview preview = shown(Can.IMPORT, sheets("Login", read));
 
-        table(preview, 0).getModel().setValueAt("the account dashboard opens", 0, column(Can.IMPORT, TestCaseEditorAttributes.EXPECTED_RESULT));
+        table(preview).getModel().setValueAt("the account dashboard opens", 0, column(Can.IMPORT, TestCaseEditorAttributes.EXPECTED_RESULT));
 
         assertEquals("the account dashboard opens", preview.selected().get("Login").getFirst().getExpectedResult());
         assertEquals("what was read from the file is untouched", "", read.getExpectedResult());
@@ -126,8 +126,8 @@ public class SheetPreviewIdeTest extends BasePlatformTestCase {
 
     // UC-SHARE-006, Rule-SHARE-106
     public void testAValueTestinCannotReadIsRefusedAndTheTestCaseKeepsWhatItHad() {
-        final @NotNull SheetPreview preview = shown(Can.IMPORT, sheets("Login", testCase("log in with a valid user")));
-        final @NotNull TableModel model = table(preview, 0).getModel();
+        final @NotNull SheetPreview preview = shown(Can.IMPORT, sheets("Login", aTestCase("log in with a valid user")));
+        final @NotNull TableModel model = table(preview).getModel();
         final int priority = column(Can.IMPORT, TestCaseEditorAttributes.PRIORITY);
 
         model.setValueAt("Urgent", 0, priority);
@@ -138,12 +138,12 @@ public class SheetPreviewIdeTest extends BasePlatformTestCase {
 
     // UC-SHARE-007, Rule-SHARE-036
     public void testChoosingASecondFileReplacesEveryTab() {
-        final @NotNull Map<String, List<TestCaseDto>> first = sheets("Login", testCase("log in with a valid user"));
-        first.put("Signup", new ArrayList<>(List.of(testCase("sign up with a new email address"))));
+        final @NotNull Map<String, List<TestCaseDto>> first = sheets("Login", aTestCase("log in with a valid user"));
+        first.put("Signup", new ArrayList<>(List.of(aTestCase("sign up with a new email address"))));
         final @NotNull SheetPreview preview = shown(Can.IMPORT, first);
         assertEquals(2, tabs(preview).getTabCount());
 
-        final @NotNull TestCaseDto checkout = testCase("pay with a saved card");
+        final @NotNull TestCaseDto checkout = aTestCase("pay with a saved card");
         preview.show(sheets("Checkout", checkout));
 
         assertEquals(1, tabs(preview).getTabCount());

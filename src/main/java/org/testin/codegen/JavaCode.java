@@ -35,16 +35,21 @@ public final class JavaCode {
     // UC-CODEGEN-016, UC-CODEGEN-017, Rule-CODEGEN-053
     private final @NotNull GenAction<Moved> moved;
 
+    // UC-CODEGEN-018, Rule-CODEGEN-096
+    private final @NotNull GenAction<DirectoryDto> removed;
+
     public static @NotNull JavaCode of(final @NotNull DirectoryType type) {
         final @NotNull String nodeType = type.getDescription();
         return switch (type) {
             case TP -> new JavaCode(
                     new NoJavaCode<>(nodeType),
                     GenType.RENAME_TEST_PROJECT::execute,
-                    new NoJavaCode<>(nodeType)
+                    new NoJavaCode<>(nodeType),
+                    GenType.REMOVE_TEST_PROJECT::execute
             );
 
             case TCD, TRD, TRP, TR -> new JavaCode(
+                    new NoJavaCode<>(nodeType),
                     new NoJavaCode<>(nodeType),
                     new NoJavaCode<>(nodeType),
                     new NoJavaCode<>(nodeType)
@@ -53,13 +58,15 @@ public final class JavaCode {
             case TSP -> new JavaCode(
                     new NoJavaCode<>(nodeType),
                     GenType.RENAME_TEST_SET_PACKAGE::execute,
-                    GenType.MOVE_TEST_SET_PACKAGE::execute
+                    GenType.MOVE_TEST_SET_PACKAGE::execute,
+                    GenType.REMOVE_TEST_SET_PACKAGE::execute
             );
 
             case TS -> new JavaCode(
                     GenType.CREATE_TEST_SET::execute,
                     GenType.RENAME_TEST_SET::execute,
-                    GenType.MOVE_TEST_SET::execute
+                    GenType.MOVE_TEST_SET::execute,
+                    GenType.REMOVE_TEST_SET::execute
             );
         };
     }

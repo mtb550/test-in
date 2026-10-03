@@ -26,9 +26,9 @@ public class RenameRefusedIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-080
     public void testARenameToAPackageTheCodeAlreadyHasIsRefusedBeforeAnythingMoves() {
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", testCasesDirectory());
+        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
         createdTestSet("Login", checkout);
-        createdTestSet("Visa", indexedPackage("payment methods", testCasesDirectory()));
+        createdTestSet("Visa", indexedPackage("payment methods", theTestCasesDirectory()));
 
         assertFalse("a rename to a free package name was refused", NodeRename.refused(getProject(), checkout, "Wallet"));
         assertTrue("a rename onto the package payment methods already writes was let through", NodeRename.refused(getProject(), checkout, "Payment, Methods"));

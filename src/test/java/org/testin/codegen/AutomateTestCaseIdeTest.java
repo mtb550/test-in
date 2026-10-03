@@ -20,6 +20,7 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.testFramework.TestActionEvent;
 import org.jetbrains.annotations.NotNull;
@@ -51,13 +52,13 @@ public class AutomateTestCaseIdeTest extends AbstractCodegenIdeTest {
 
     private @NotNull AnActionEvent updated(final @NotNull TestCaseDto tc) {
         final @NotNull AnActionEvent e = selecting(tc);
-        automate().update(e);
+        ActionUtil.updateAction(automate(), e);
         return e;
     }
 
     // Rule-CODEGEN-071
     public void testTheEntryIsGrayWithTheReasonWhereThereIsNoMethodToWrite() {
-        final @NotNull TestSetDirectoryDto login = indexedTestSet("Login", testCasesDirectory());
+        final @NotNull TestSetDirectoryDto login = indexedTestSet("Login", theTestCasesDirectory());
 
         final @NotNull AnActionEvent noDescription = updated(indexedTestCase(login, "", "b"));
         assertTrue("the entry was left off the menu", noDescription.getPresentation().isVisible());
@@ -69,9 +70,9 @@ public class AutomateTestCaseIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-025
     public void testAutomateWritesTheMethodAndItsClassAndTellsATestCaseThatHasOne() {
-        final @NotNull TestCaseDto tc = indexedTestCase(indexedTestSet("Login", indexedPackage("Checkout", testCasesDirectory())), "Log in with a valid user", "b");
+        final @NotNull TestCaseDto tc = indexedTestCase(indexedTestSet("Login", indexedPackage("Checkout", theTestCasesDirectory())), "Log in with a valid user", "b");
 
-        automate().actionPerformed(selecting(tc));
+        ActionUtil.performAction(automate(), selecting(tc));
         Await.until("Automate Test Case wrote no method, class or package folder", () -> methodOf(CHECKOUT_LOGIN_TEST, tc).isPresent());
 
         final @NotNull AutomationState state = Services.getInstance(getProject(), AutomationState.class);

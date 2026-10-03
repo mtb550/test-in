@@ -55,6 +55,11 @@ public enum Refused {
             Bundle.message("refused.nothing.showing")
     ),
 
+    // UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-009
+    HIDDEN_BY_THE_FILTER(
+            Bundle.message("refused.hidden.by.the.filter")
+    ),
+
     ALREADY_RUNNING(
             Bundle.message("refused.already.running")
     ),

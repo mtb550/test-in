@@ -177,7 +177,7 @@ its status bar, at the foot of the dialog.
 | `Ctrl+X`                              | Cuts the selected nodes, to move them                  | [UC-TREE-PANEL-013](moveNodes.md)              |
 | `Ctrl+C`                              | Copies the selected nodes                              | [UC-TREE-PANEL-014](copyNodes.md)              |
 | `Ctrl+V`                              | Pastes into the selected node                          | [UC-TREE-PANEL-013](moveNodes.md)              |
-| `Escape`                              | Takes the gray off nodes the tester cut                | [UC-TREE-PANEL-013](moveNodes.md)              |
+| `Escape`                              | Drops nodes cut or copied, and takes the gray off      | [UC-TREE-PANEL-013](moveNodes.md)              |
 | `Ctrl+Z`                              | Undoes the last tree change                            | [UC-TREE-PANEL-016](undoChange.md)             |
 | `Ctrl+Y`                              | Redoes it                                              | [UC-TREE-PANEL-017](redoChange.md)             |
 | `1` `2` `3`                           | Inside the status popup: Assigned, Completed, Closed   | [UC-TREE-PANEL-020](setTestRunStatus.md)       |

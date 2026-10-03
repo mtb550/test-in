@@ -41,11 +41,13 @@ public class ImportCsvIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-005, Rule-SHARE-124
     public void testACsvFileIsReadTheWayASpreadsheetWritesIt() {
-        final @NotNull List<TestCaseDto> testCases = imported("﻿Description,Expected Result,Module\r\n"
-                + "log in with a valid user,\"the dashboard opens, and \"\"Welcome\"\" shows\",accounts\r\n"
-                + "\r\n"
-                + ",,\r\n"
-                + "log out,the 5\" login page opens,accounts\r\n");
+        final @NotNull List<TestCaseDto> testCases = imported("""
+                \uFEFFDescription,Expected Result,Module\r
+                log in with a valid user,"the dashboard opens, and ""Welcome"" shows",accounts\r
+                \r
+                ,,\r
+                log out,the 5" login page opens,accounts\r
+                """);
 
         assertEquals("a line with no value in it is skipped", 2, testCases.size());
         assertEquals("the byte-order mark is not part of the first heading", "log in with a valid user", testCases.getFirst().getDescription());
@@ -56,8 +58,10 @@ public class ImportCsvIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-005, Rule-SHARE-110
     public void testAHeadingIsMatchedWhateverItsCaseAndUnderscores() {
-        final @NotNull List<TestCaseDto> testCases = imported("description,EXPECTED_RESULT,pre conditions,Test_Data\n"
-                + "log in with a valid user,the dashboard opens,a user exists,user = muteb\n");
+        final @NotNull List<TestCaseDto> testCases = imported("""
+                description,EXPECTED_RESULT,pre conditions,Test_Data
+                log in with a valid user,the dashboard opens,a user exists,user = muteb
+                """);
 
         assertEquals(1, testCases.size());
         assertEquals("log in with a valid user", testCases.getFirst().getDescription());

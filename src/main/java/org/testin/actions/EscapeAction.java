@@ -27,6 +27,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.clipboard.CopiedTestCases;
 import org.testin.clipboard.CutState;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.logger.Logger;
@@ -95,15 +96,15 @@ public class EscapeAction extends AbstractProjectAction {
 
     // UC-EDITOR-PANEL-026, UC-VIEW-PANEL-015, Rule-EDITOR-PANEL-114, Rule-VIEW-PANEL-058
     private void stepBack(final @NotNull Runnable clearSelection) {
-        if (dropPendingCut()) return;
+        if (dropWhatWaitsToBePasted()) return;
         if (ViewToolWindowFactory.panel(p).map(ViewPanel::hide).orElse(false)) return;
 
         clearSelection.run();
     }
 
-    // UC-EDITOR-PANEL-026, Rule-EDITOR-PANEL-114, Rule-VIEW-PANEL-058
-    private boolean dropPendingCut() {
-        if (!cutState.isCutting()) return false;
+    // UC-EDITOR-PANEL-026, Rule-EDITOR-PANEL-114, Rule-EDITOR-PANEL-262, Rule-VIEW-PANEL-058
+    private boolean dropWhatWaitsToBePasted() {
+        if (!cutState.isCutting() && CopiedTestCases.onTheClipboard(p).isEmpty()) return false;
 
         cutState.clear();
         CopyPasteManager.getInstance().setContents(new StringSelection(""));

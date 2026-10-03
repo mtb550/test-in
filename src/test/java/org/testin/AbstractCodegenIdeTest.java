@@ -109,7 +109,7 @@ public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
         return Services.getInstance(getProject(), DirectoryMapper.class);
     }
 
-    protected @NotNull DirectoryDto testCasesDirectory() {
+    protected @NotNull DirectoryDto theTestCasesDirectory() {
         return testProject.getTestCasesDirectory();
     }
 
@@ -130,7 +130,7 @@ public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
     }
 
     protected @NotNull TestSetDirectoryDto createdTestSet(final @NotNull String name) {
-        return createdTestSet(name, testCasesDirectory());
+        return createdTestSet(name, theTestCasesDirectory());
     }
 
     protected @NotNull TestSetDirectoryDto createdTestSet(final @NotNull String name, final @NotNull DirectoryDto parent) {
@@ -161,7 +161,7 @@ public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
     protected @NotNull Optional<PsiMethod> methodOf(final @NotNull String qualifiedName, final @NotNull TestCaseDto tc) {
         return generatedClass(qualifiedName).stream()
                 .flatMap(pc -> Arrays.stream(pc.getMethods()))
-                .filter(pm -> testAttribute(pm, "testName").equals("\"" + tc.getId() + "\""))
+                .filter(pm -> attributeOf(pm, "testName").equals("\"" + tc.getId() + "\""))
                 .findFirst();
     }
 
@@ -169,7 +169,7 @@ public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
         return methodOf(qualifiedName, tc).orElseThrow(() -> new AssertionError("'" + tc.getDescription() + "' has no method in " + qualifiedName));
     }
 
-    protected static @NotNull String testAttribute(final @NotNull PsiMethod pm, final @NotNull String attribute) {
+    protected static @NotNull String attributeOf(final @NotNull PsiMethod pm, final @NotNull String attribute) {
         return Optional.ofNullable(pm.getModifierList().findAnnotation(TESTNG_TEST))
                 .map(annotation -> annotation.findDeclaredAttributeValue(attribute))
                 .map(PsiElement::getText)

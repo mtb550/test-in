@@ -16,7 +16,6 @@
 
 package org.testin.clipboard;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +25,6 @@ import org.testin.codegen.MovedTestCase;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.indexer.TestCases;
-import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestCaseDto.TestCaseDtoBuilder;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -40,11 +38,7 @@ import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestCaseSnapshot;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
-import org.testin.util.ClipboardContents;
-import org.testin.util.FailureText;
-import org.testin.util.Mapper;
 
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
@@ -52,18 +46,17 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-record PasteTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @NotNull CutState cutState, @NotNull TestCases testCases, @NotNull Notifier notifier, @NotNull Mapper mapper, @NotNull AppSettingsState settings) {
+record PasteTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @NotNull CutState cutState, @NotNull TestCases testCases, @NotNull Notifier notifier, @NotNull AppSettingsState settings) {
     PasteTestCaseWork(final @NotNull Project p, final @NotNull TestinEditor editor) {
-        this(p, editor, Services.getInstance(p, CutState.class), Services.getInstance(p, TestCases.class), Services.getInstance(p, Notifier.class), Services.getInstance(p, Mapper.class), Services.getInstance(p, AppSettingsState.class));
+        this(p, editor, Services.getInstance(p, CutState.class), Services.getInstance(p, TestCases.class), Services.getInstance(p, Notifier.class), Services.getInstance(p, AppSettingsState.class));
     }
 
     void paste() {
-        final @NotNull List<TestCaseDto> pastedTestCases = getFromClipboard();
+        final @NotNull List<TestCaseDto> pastedTestCases = CopiedTestCases.onTheClipboard(p);
         if (pastedTestCases.isEmpty()) return;
 
         ApplicationManager.getApplication().invokeLater(() -> {
@@ -167,28 +160,7 @@ record PasteTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @NotN
     }
 
     boolean holdsTestCases(final @NotNull Transferable contents) {
-        return !readTestCases(contents).isEmpty();
-    }
-
-    private @NotNull List<TestCaseDto> getFromClipboard() {
-        return ClipboardContents.withFlavor(DataFlavor.stringFlavor)
-                .map(this::readTestCases)
-                .orElseGet(List::of);
-    }
-
-    private @NotNull List<TestCaseDto> readTestCases(final @NotNull Transferable contents) {
-        try {
-            final @NotNull String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
-            if (!json.trim().startsWith("[")) return List.of();
-
-            final @NotNull List<TestCaseDto> parsed = mapper.readValue(json, new TypeReference<>() {
-            });
-
-            return parsed.stream().filter(Objects::nonNull).toList();
-        } catch (final Exception ex) {
-            Logger.warn("[WARNING] Failed to parse clipboard JSON: " + FailureText.of(ex));
-            return List.of();
-        }
+        return !CopiedTestCases.in(p, contents).isEmpty();
     }
 
     // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-083

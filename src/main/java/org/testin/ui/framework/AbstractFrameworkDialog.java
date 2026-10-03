@@ -53,7 +53,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -204,7 +203,8 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         // Rule-INTERNAL-101
         if (sizeIsTheTesters()) builder.setResizable(true).setMovable(true).setCommandButton(maximizeToggle());
 
-        builder.setKeyEventHandler(this::escapeAsDeclared);
+        // Rule-INTERNAL-059
+        builder.setCancelKeyEnabled(dto().shortcuts().stream().noneMatch(one -> one.shortcut() == Shortcuts.Escape));
         builder.addListener(new JBPopupListener() {
             @Override
             public void onClosed(final @NotNull LightweightWindowEvent event) {
@@ -213,16 +213,6 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         });
 
         return builder.createPopup();
-    }
-
-    // UC-INTERNAL-007, Rule-INTERNAL-054, Rule-INTERNAL-059
-    private boolean escapeAsDeclared(final @NotNull KeyEvent event) {
-        if (event.getID() != KeyEvent.KEY_PRESSED || !Shortcuts.Escape.matches(event)) return false;
-
-        final @NotNull Optional<StatusBarShortcut> declared = dto().shortcuts().stream().filter(one -> one.shortcut() == Shortcuts.Escape).findFirst();
-        declared.ifPresent(one -> one.action().run());
-
-        return declared.isPresent();
     }
 
     // Rule-INTERNAL-101

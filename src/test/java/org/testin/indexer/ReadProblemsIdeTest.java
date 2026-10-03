@@ -32,14 +32,14 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
     private static final @NotNull String PROJECT = "Checkout";
 
     private @NotNull Path project() {
-        return testProject(root.resolve(PROJECT));
+        return aTestProjectAt(root.resolve(PROJECT));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
     public void testOneTestCaseThatCannotBeReadDoesNotStopTheRest() {
-        final @NotNull Path testSet = marked(testCasesOf(project()).resolve("Login"), DirectoryType.TS);
-        final @NotNull UUID first = testCaseIn(testSet);
-        final @NotNull UUID second = testCaseIn(testSet);
+        final @NotNull Path testSet = marked(theTestCasesOf(project()).resolve("Login"), DirectoryType.TS);
+        final @NotNull UUID first = aTestCaseIn(testSet);
+        final @NotNull UUID second = aTestCaseIn(testSet);
         SyntheticTree.write(testSet.resolve(FileKind.TEST_CASE.fileName(UUID.randomUUID())), "{ this is not a test case");
 
         readEverything();
@@ -51,9 +51,9 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
     public void testANodeWhoseMarkerWillNotParseIsDrawnAndNamedByItsPlace() {
-        final @NotNull Path testSet = testCasesOf(project()).resolve("Login");
+        final @NotNull Path testSet = theTestCasesOf(project()).resolve("Login");
         SyntheticTree.write(testSet.resolve(DirectoryType.TS.getMarker()), "{ this is not a marker");
-        final @NotNull UUID testCase = testCaseIn(testSet);
+        final @NotNull UUID testCase = aTestCaseIn(testSet);
 
         readEverything();
 
@@ -66,8 +66,8 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
 
     // UC-INTERNAL-002, Rule-INTERNAL-015
     public void testAnUnmarkedFolderHoldingTestCasesIsReportedByItsPlaceAndAnEmptyOneIsNot() {
-        final @NotNull Path testCases = testCasesOf(project());
-        testCaseIn(testCases.resolve("Loose"));
+        final @NotNull Path testCases = theTestCasesOf(project());
+        aTestCaseIn(testCases.resolve("Loose"));
         SyntheticTree.write(testCases.resolve("Notes").resolve("todo.txt"), "not a test case");
 
         readEverything();
@@ -79,9 +79,9 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
 
     // UC-INTERNAL-002, Rule-INTERNAL-082
     public void testTwoTestCaseFilesClaimingOneIdentityAreReported() {
-        final @NotNull Path login = marked(testCasesOf(project()).resolve("Login"), DirectoryType.TS);
-        final @NotNull Path signUp = marked(testCasesOf(project()).resolve("Sign up"), DirectoryType.TS);
-        final @NotNull UUID shared = testCaseIn(login);
+        final @NotNull Path login = marked(theTestCasesOf(project()).resolve("Login"), DirectoryType.TS);
+        final @NotNull Path signUp = marked(theTestCasesOf(project()).resolve("Sign up"), DirectoryType.TS);
+        final @NotNull UUID shared = aTestCaseIn(login);
         SyntheticTree.write(signUp.resolve(FileKind.TEST_CASE.fileName(shared)), SyntheticTree.testCase(shared, "m"));
 
         readEverything();
@@ -93,7 +93,7 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
 
     // UC-INTERNAL-002, Rule-INTERNAL-094
     public void testAResultNotNamedByATestCaseIdIsNotReadAndIsNamed() {
-        final @NotNull Path testRun = marked(testRunsOf(project()).resolve("Cycle 1"), DirectoryType.TR);
+        final @NotNull Path testRun = marked(theTestRunsOf(project()).resolve("Cycle 1"), DirectoryType.TR);
         final @NotNull UUID named = UUID.randomUUID();
         final @NotNull UUID handNamed = UUID.randomUUID();
         resultIn(testRun, FileKind.RUN_ITEM.fileName(named), named);

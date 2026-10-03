@@ -62,7 +62,7 @@ public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
 
         final @NotNull PsiMethod pm = writtenMethodOf(LOGIN_TEST, tc);
         assertEquals("signInWithAValidUser", pm.getName());
-        assertEquals("\"Sign in with a valid user\"", testAttribute(pm, "description"));
+        assertEquals("\"Sign in with a valid user\"", attributeOf(pm, "description"));
     }
 
     // Rule-CODEGEN-079
@@ -73,7 +73,7 @@ public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
 
         final @NotNull PsiMethod pm = writtenMethodOf(LOGIN_TEST, tc);
         assertEquals("the method took a name Java refuses", "logInWithAValidUser", pm.getName());
-        assertEquals("the description was not saved into the annotation", "\"Class\"", testAttribute(pm, "description"));
+        assertEquals("the description was not saved into the annotation", "\"Class\"", attributeOf(pm, "description"));
     }
 
     // Rule-CODEGEN-079
@@ -86,7 +86,7 @@ public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
 
         final @NotNull PsiMethod pm = writtenMethodOf(LOGIN_TEST, logIn);
         assertEquals("two methods now share one name, and the class no longer compiles", "logIn", pm.getName());
-        assertEquals("\"log out!\"", testAttribute(pm, "description"));
+        assertEquals("\"log out!\"", attributeOf(pm, "description"));
     }
 
     // Rule-CODEGEN-045
@@ -97,13 +97,13 @@ public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
         GenType.UPDATE_TEST_CASE_GROUP.execute(getProject(), tc);
         settled();
 
-        assertEquals("{\"smoke\", \"Log in & out\"}", testAttribute(writtenMethodOf(LOGIN_TEST, tc), "groups"));
+        assertEquals("{\"smoke\", \"Log in & out\"}", attributeOf(writtenMethodOf(LOGIN_TEST, tc), "groups"));
     }
 
     // Rule-CODEGEN-046
     public void testATestCaseInNoGroupHasNoGroupsAttribute() {
         final @NotNull TestCaseDto tc = aTestCaseWithAMethod();
-        assertEquals("a test case created in no group was written with groups", "", testAttribute(writtenMethodOf(LOGIN_TEST, tc), "groups"));
+        assertEquals("a test case created in no group was written with groups", "", attributeOf(writtenMethodOf(LOGIN_TEST, tc), "groups"));
 
         tc.setGroup(List.of("smoke"));
         GenType.UPDATE_TEST_CASE_GROUP.execute(getProject(), tc);
@@ -112,7 +112,7 @@ public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
         GenType.UPDATE_TEST_CASE_GROUP.execute(getProject(), tc);
         settled();
 
-        assertEquals("a test case taken out of every group kept a groups attribute", "", testAttribute(writtenMethodOf(LOGIN_TEST, tc), "groups"));
+        assertEquals("a test case taken out of every group kept a groups attribute", "", attributeOf(writtenMethodOf(LOGIN_TEST, tc), "groups"));
     }
 
     // Rule-CODEGEN-047
@@ -123,7 +123,7 @@ public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
         GenType.UPDATE_TEST_CASE_STATUS.execute(getProject(), tc);
         settled();
 
-        assertEquals("false", testAttribute(writtenMethodOf(LOGIN_TEST, tc), "enabled"));
+        assertEquals("false", attributeOf(writtenMethodOf(LOGIN_TEST, tc), "enabled"));
     }
 
     // Rule-CODEGEN-048
@@ -155,9 +155,9 @@ public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
 
         final @NotNull PsiMethod pm = writtenMethodOf(LOGIN_TEST, restored);
         assertEquals("signIn", pm.getName());
-        assertEquals("\"Sign in\"", testAttribute(pm, "description"));
-        assertEquals("{\"smoke\"}", testAttribute(pm, "groups"));
-        assertEquals("false", testAttribute(pm, "enabled"));
+        assertEquals("\"Sign in\"", attributeOf(pm, "description"));
+        assertEquals("{\"smoke\"}", attributeOf(pm, "groups"));
+        assertEquals("false", attributeOf(pm, "enabled"));
         assertTrue("undo created a method for a test case that had none", methodOf(LOGIN_TEST, withoutAMethod).isEmpty());
     }
 }

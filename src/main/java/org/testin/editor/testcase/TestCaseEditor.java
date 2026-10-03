@@ -42,6 +42,7 @@ import org.testin.logger.Logger;
 import org.testin.model.Modules;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.notifications.Refused;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.TestCaseOrder;
@@ -206,8 +207,7 @@ public class TestCaseEditor extends AbstractTestinEditor<TestCaseEditorAttribute
     // UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-009
     @Override
     protected void notOnAnyPage(final @NotNull TestCaseDto tc) {
-        notifier.softShow(p, Bundle.message("editor.hidden.title"),
-                Bundle.message("editor.hidden.message", tc.getDescription()));
+        notifier.softRefuse(p, Refused.HIDDEN_BY_THE_FILTER, tc.getDescription());
     }
 
     // UC-EDITOR-PANEL-005, Rule-EDITOR-PANEL-030

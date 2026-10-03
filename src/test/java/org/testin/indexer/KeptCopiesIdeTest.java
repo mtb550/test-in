@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.junit.Assert.assertNotEquals;
+
 public class KeptCopiesIdeTest extends AbstractTempRootIdeTest {
 
     private static @NotNull DeletedNodes deletedNodes() {
@@ -38,7 +40,7 @@ public class KeptCopiesIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private @NotNull Path testSet(final @NotNull String project, final @NotNull String content) {
+    private @NotNull Path aTestSet(final @NotNull String project, final @NotNull String content) {
         final @NotNull Path testSet = root.resolve(project).resolve("Test Cases").resolve("Login");
         SyntheticTree.write(testSet.resolve("case.tc"), content);
         return testSet;
@@ -50,7 +52,7 @@ public class KeptCopiesIdeTest extends AbstractTempRootIdeTest {
 
     // UC-INTERNAL-005, Rule-INTERNAL-038
     public void testTheKeptCopyIsNeverUnderTheTestinFolder() {
-        final @NotNull Path kept = kept(testSet("Checkout", "first"));
+        final @NotNull Path kept = kept(aTestSet("Checkout", "first"));
         try {
             assertFalse("the copy kept for undo sits under the Testin folder, where it would be read and committed: " + kept, kept.startsWith(root));
             assertEquals("the kept copy does not hold what was removed", "first", read(kept.resolve("case.tc")));
@@ -61,10 +63,10 @@ public class KeptCopiesIdeTest extends AbstractTempRootIdeTest {
 
     // UC-INTERNAL-005, Rule-INTERNAL-039
     public void testEachRemovalIsKeptInAPlaceOfItsOwn() {
-        final @NotNull Path first = kept(testSet("Checkout", "first"));
-        final @NotNull Path second = kept(testSet("Payments", "second"));
+        final @NotNull Path first = kept(aTestSet("Checkout", "first"));
+        final @NotNull Path second = kept(aTestSet("Payments", "second"));
         try {
-            assertFalse("two test sets of one name were kept in one place", first.equals(second));
+            assertNotEquals("two test sets of one name were kept in one place", first, second);
             assertEquals("the second removal wrote over the first one's copy", "first", read(first.resolve("case.tc")));
             assertEquals("the second removal was not kept", "second", read(second.resolve("case.tc")));
         } finally {
@@ -75,7 +77,7 @@ public class KeptCopiesIdeTest extends AbstractTempRootIdeTest {
 
     // UC-INTERNAL-005, Rule-INTERNAL-042
     public void testPuttingBackNeverWritesOverWhatIsThere() {
-        final @NotNull Path original = testSet("Checkout", "removed");
+        final @NotNull Path original = aTestSet("Checkout", "removed");
         final @NotNull Path kept = kept(original);
         try {
             SyntheticTree.write(original.resolve("case.tc"), "made since");
@@ -89,7 +91,7 @@ public class KeptCopiesIdeTest extends AbstractTempRootIdeTest {
 
     // UC-INTERNAL-005, Rule-INTERNAL-043
     public void testAForgottenRemovalThrowsItsCopyAway() {
-        final @NotNull Path kept = kept(testSet("Checkout", "removed"));
+        final @NotNull Path kept = kept(aTestSet("Checkout", "removed"));
 
         deletedNodes().forget(kept);
 
@@ -98,7 +100,7 @@ public class KeptCopiesIdeTest extends AbstractTempRootIdeTest {
 
     // UC-INTERNAL-005, Rule-INTERNAL-044
     public void testEveryKeptCopyIsThrownAwayAtTheNextStart() {
-        final @NotNull Path kept = kept(testSet("Checkout", "removed"));
+        final @NotNull Path kept = kept(aTestSet("Checkout", "removed"));
 
         new DeletedNodes().sweep();
 

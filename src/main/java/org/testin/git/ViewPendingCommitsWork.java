@@ -306,7 +306,7 @@ record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService 
     private void pushAfterRebase(final @NotNull Path repoPath, final @NotNull String remote, final @NotNull String branch) {
         GitBackgroundTask.run(p, Bundle.message("git.task.pushing.branch", branch), false,
                 _ -> pushRebased(repoPath, remote, branch),
-                ex -> notifier.error(p, Bundle.message("git.push.failed.title"), FailureText.of(ex)));
+                ex -> GitFailure.show(p, Bundle.message("git.push.failed.title"), FailureText.of(ex)));
     }
 
     // UC-SHARE-017

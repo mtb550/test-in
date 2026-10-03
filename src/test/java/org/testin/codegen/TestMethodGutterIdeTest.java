@@ -30,8 +30,8 @@ public class TestMethodGutterIdeTest extends AbstractCodegenIdeTest {
 
     private static final @NotNull String TEST_CASE_ID = UUID.randomUUID().toString();
 
-    private @NotNull List<GutterMark> testinMarksAt(final @NotNull String path, final @NotNull String text, final @NotNull String caretAt) {
-        final @NotNull PsiFile file = myFixture.addFileToProject(path, text);
+    private @NotNull List<GutterMark> gutterMarksAt(final @NotNull String text, final @NotNull String caretAt) {
+        final @NotNull PsiFile file = myFixture.addFileToProject("nafath/LoginTest.java", text);
         myFixture.configureFromExistingVirtualFile(file.getVirtualFile());
         myFixture.getEditor().getCaretModel().moveToOffset(text.indexOf(caretAt));
 
@@ -50,7 +50,7 @@ public class TestMethodGutterIdeTest extends AbstractCodegenIdeTest {
     public void testTheMarkIsBesideTheIdentityOnTheRightOfTheGutter() {
         final @NotNull String text = aTestMethod("import org.testng.annotations.Test;\n", TEST_CASE_ID);
 
-        final @NotNull List<GutterMark> marks = testinMarksAt("nafath/LoginTest.java", text, TEST_CASE_ID);
+        final @NotNull List<GutterMark> marks = gutterMarksAt(text, TEST_CASE_ID);
 
         assertEquals("the identity inside the annotation has no mark beside it", 1, marks.size());
         assertEquals("the mark is not on the right of the gutter", GutterIconRenderer.Alignment.RIGHT, ((GutterIconRenderer) marks.getFirst()).getAlignment());
@@ -60,7 +60,7 @@ public class TestMethodGutterIdeTest extends AbstractCodegenIdeTest {
     public void testATestNameThatIsNotATestCaseIdHasNoMark() {
         final @NotNull String text = aTestMethod("import org.testng.annotations.Test;\n", "Log in");
 
-        assertTrue("a testName Testin did not write was given a mark", testinMarksAt("nafath/LoginTest.java", text, "Log in\")").isEmpty());
+        assertTrue("a testName Testin did not write was given a mark", gutterMarksAt(text, "Log in\")").isEmpty());
     }
 
     // Rule-CODEGEN-029
@@ -68,6 +68,6 @@ public class TestMethodGutterIdeTest extends AbstractCodegenIdeTest {
         myFixture.addFileToProject("nafath/Test.java", "package nafath;\n\npublic @interface Test {\n    String description();\n    String testName();\n}\n");
         final @NotNull String text = aTestMethod("", TEST_CASE_ID);
 
-        assertTrue("an annotation that only looks like TestNG's was given a mark", testinMarksAt("nafath/LoginTest.java", text, TEST_CASE_ID).isEmpty());
+        assertTrue("an annotation that only looks like TestNG's was given a mark", gutterMarksAt(text, TEST_CASE_ID).isEmpty());
     }
 }

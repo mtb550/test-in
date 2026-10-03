@@ -21,6 +21,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.clipboard.CutState;
 import org.testin.codegen.GenType;
+import org.testin.codegen.WaitForIndexing;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.TestinEditors;
 import org.testin.indexer.TestCases;
@@ -46,7 +47,11 @@ record RemoveTestCaseWork(@NotNull Project p, @NotNull TestinEditor editor, @Not
         final @NotNull List<TestCaseDto> selectedItems = selected;
         if (selectedItems.isEmpty()) return;
 
-        final @NotNull Runnable delete = () -> ApplicationManager.getApplication().runWriteAction(() -> performDeletion(selectedItems));
+        final @NotNull Runnable delete = () -> {
+            if (WaitForIndexing.refuses(p, Bundle.message("remove.confirm.button"))) return;
+
+            ApplicationManager.getApplication().runWriteAction(() -> performDeletion(selectedItems));
+        };
 
         final @NotNull String msg = selectedItems.size() == 1
                 ? Bundle.message("remove.test.case.confirm.one", selectedItems.getFirst().getDescription())

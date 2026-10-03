@@ -20,7 +20,7 @@
 # with its reason. The Testin profile names the inspector's rules one by one, so
 # what runs here does not depend on a default.
 #
-# Eight rules are the script's own, because no IntelliJ inspection makes them.
+# Nine rules are the script's own, because no IntelliJ inspection makes them.
 # WrappedMethodDeclaration - a method declaration belongs on one line.
 # StaticMutableState - a static that is not final in the packages that model the
 # data is one slot for the whole IDE, which is how a cached test source root came
@@ -34,7 +34,8 @@
 # .java file that does not open with the Apache 2.0 notice, so a file read away
 # from the repository says nothing about who owns it. HtmlParagraphInMarkdown - a
 # bare <p> in a Markdown file, which turns what follows into raw HTML where
-# backticks stop being code. All eight are at zero, so the
+# backticks stop being code. HelperNamedLikeTest - a helper in a JUnit 3 test
+# named test*, which the IDE reads as a broken test. All nine are at zero, so the
 # first one that appears is the one to look at.
 #
 # DuplicatedDisplayString is counted rather than forbidden: a string a tester

@@ -17,12 +17,14 @@ What each version of Testin changed, for a tester deciding whether to update. Th
 
 - **The Details tab is three bands:** who the test case is, what this test run recorded, and what the test case says. The run item status, the duration and who executed it are pills on one line, and bug severity and bug priority are one chip, **Major / High**. Reference, module, order, created and updated fold behind one line that stays the way you left it. The exception is a link that opens its own window.
 - **Escape steps back one place at a time:** in the view panel it gives the keyboard back to the editor rather than closing the panel.
+- **Escape drops test cases you copied,** as it drops the ones you cut, so nothing is left waiting to be pasted. The tree already did this.
+- **A test case the filter hides is named in a red refusal,** not in a blue notice that looked like the success just before it.
 - **A choice from a fixed list is radio buttons:** the six questions of Create Test Run, Priority — P3 (Low), P2 (Medium), P1 (High) — and Status in the test case dialogs, and the format in Generate Report and Export. A group in the import and export preview is a checkbox list under its cell.
 - **Dialogs read as one card:** every confirmation has a button naming what it does — Remove, Move, Rename — and a move is one row from where a node is to where it lands. Rename says what it is renaming and where, and a place is named inside the test project rather than as a path on disk. A dialog you can resize opens at six tenths of the IDE window and scrolls rather than pushing its buttons out of sight, and a folder or file field has its browse button inside it.
 - **A pasted test case lands under the selected one,** rather than beside the test case it was copied from.
 - **A failure nobody triaged reads Enhancement / Low** in the grid, the Details tab, the Open Bugs tab, the Excel report and a bug report, and every failure is listed on the Open Bugs tab.
 - **A narrow editor scrolls its toolbar and status bar sideways** instead of cutting an icon in half or wrapping the test case count onto three lines.
-- **The status bars name every key that works:** **Alt+Enter** for spelling corrections, **Ctrl+V** for a screenshot, and **Ctrl+Letter** to add a field in Create Test Case. On a Mac, **Ctrl+Enter**, **Ctrl+D**, **Ctrl+E**, **Ctrl+S** and **Ctrl+T** are Cmd keys.
+- **The status bars name every key that works:** **Alt+Enter** for spelling corrections, **Ctrl+V** for a screenshot, and **Ctrl+Letter** to add a field in Create Test Case. On a Mac, **Ctrl+Enter**, **Ctrl+D**, **Ctrl+E**, **Ctrl+S** and **Ctrl+T** are Cmd keys, and the hint reads **Cmd+Letter**.
 - **The IDE draws what it already knows how to:** the selection, the striped rows, the bulk editor's diff tint and the toolbar buttons follow your theme.
 
 ### Removed
@@ -39,7 +41,7 @@ What each version of Testin changed, for a tester deciding whether to update. Th
 - **Large test projects:** an Excel export and an Excel import take far less memory, Cancel stops a report within a row, and the tree redraws only the folders that changed.
 - **Ready for the next IDE:** Report Bug no longer calls a platform method that is scheduled for removal, and Testin no longer registers a file system through an internal platform API.
 - On a Mac, **Cmd+D** in light mode shows and hides the details every time, not only the first.
-- **Every Testin key reaches Testin on a Mac:** Create Test Case is **Ctrl+Alt+Cmd+M**, where **Cmd+M** minimized the window, and paging is **Ctrl+Alt+Cmd+Right** and **Left**, with **Shift** for the ends, because **Ctrl** and an arrow switch desktops. Generate Report is **Ctrl+Alt+P**. In the test case dialogs, Module is **Ctrl+Alt+Cmd+M**, Pre Conditions **Ctrl+Alt+Cmd+B**, Priority **Ctrl+Alt+P** and Group **Ctrl+Alt+G**. Neither macOS nor the IDE uses these keys. The IntelliJ IDEA Classic keymap gets the same Mac keys as the macOS one. Windows and Linux keep their keys.
+- **Every Testin key reaches Testin on a Mac:** Create Test Case is **Ctrl+Alt+Cmd+M**, where **Cmd+M** minimized the window, and paging is **Ctrl+Alt+Cmd+Right** and **Left**, with **Shift** for the ends, because **Ctrl** and an arrow switch desktops. Generate Report is **Ctrl+Alt+P**. In the test case dialogs, Module is **Ctrl+Alt+Cmd+M**, Pre Conditions **Ctrl+Alt+Cmd+B**, Priority **Ctrl+Alt+P** and Group **Ctrl+Alt+G**. Automate Test Case is **Ctrl+Alt+Cmd+F12**, where **Cmd+F12** opened the file structure. Neither macOS nor the IDE uses these keys. The IntelliJ IDEA Classic keymap gets the same Mac keys as the macOS one. Windows and Linux keep their keys.
 - The web page report keeps the line breaks of a test case description, and the Excel report heads its test case column **Test Case**, as the web page, the PDF and the Word document do.
 - **A signed off test run keeps what it recorded:** on a Completed or Closed test run, **P**, **F** and **B**, the failure details and the grid's Actual Result are gray and say why, as the status bar always claimed.
 - Renaming a test set, a test set package or a test project renames its automation class or package again, and so does undo the rename: the code was looked up under the new name after the tree already carried it, so it was never found.
@@ -48,8 +50,12 @@ What each version of Testin changed, for a tester deciding whether to update. Th
 - **Filling in the description of several test cases at once writes the method** of each that had none, as filling in one already did.
 - **Testin runs only its own run configurations:** an execution is named *Testin:* and then the class and method, so Testin no longer reuses or changes a run configuration you made, and its Stop no longer ends a run you started from the gutter.
 - **Escape on a merge question skips that file and asks about the next,** as its status bar says, instead of ending the questions with the files after it unasked.
-- A drag whose new order cannot be written to a test case file says *Could not save* and puts the cards back as they are on disk, instead of **Re-sorted** and an undo entry for an order no file holds.
+- A drag whose new order cannot be written to a test case file says *Could not save* and puts the cards back as they are on disk. It used to say **Re-sorted** and keep an undo entry for an order no file holds.
 - A marker that will not parse is named under the test project that holds it, not under whichever test project finished reading next.
+- **A failed Git step says what to do next:** when Sync, the push after resolving conflicts, or reading the branches fails, the message offers **Show Git log**, which opens the IDE's Git tool window with Git's own output.
+- **A test set's marker file is read as JSON,** not as TypeScript: *.ts* and the other marker files no longer show red errors when opened in the IDE.
+- **Import keeps a test you wrote by hand:** when a test case's description matches a hand-written **@Test** in its class, Testin tags that method with the test case. It no longer writes an empty method beside it.
+- **Removing a test case, test set or package waits for indexing to finish** when it has automation code. It used to remove the test case and leave its **@Test** method behind.
 
 ## 2.13.0-alpha - 2026-09-22
 

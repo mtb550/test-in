@@ -41,7 +41,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
     private final @NotNull TestSetDirectoryDto dir;
     private final @NotNull TestCases testCases = Services.getInstance(p, TestCases.class);
     // Rule-INTERNAL-054
-    private static final @NotNull StatusBarItem ADD_FIELD = StatusBarShortcut.hint(Bundle.message("dialog.key.add.field.keys"), Bundle.message("dialog.key.add.field"));
+    private static final @NotNull StatusBarItem ADD_FIELD = StatusBarShortcut.hint(addFieldKeys(), Bundle.message("dialog.key.add.field"));
 
     private final @NotNull Nodes nodes = Services.getInstance(p, Nodes.class);
 
@@ -78,6 +78,12 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
         registerShortcut(keys, Shortcuts.Enter.getCustomShortcut(), this::submit);
 
         registerShortcut(keys, Shortcuts.Escape.getCustomShortcut(), this::closeCancel);
+    }
+
+    // Rule-INTERNAL-068
+    private static @NotNull String addFieldKeys() {
+        final @NotNull String description = Shortcuts.CreateTestCaseDescription.getShortcutText();
+        return Bundle.message("dialog.key.add.field.keys", description.substring(0, description.length() - 1));
     }
 
     // UC-EDITOR-PANEL-005

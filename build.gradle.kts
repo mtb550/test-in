@@ -211,7 +211,8 @@ dependencies {
             listOf(
                 "com.intellij.java",
                 "TestNG-J",
-                "Git4Idea"
+                "Git4Idea",
+                "com.intellij.modules.json"
             )
         )
 
@@ -438,6 +439,13 @@ tasks {
         // change, and the check silently does not run.
         inputs.dir(layout.projectDirectory.dir("docs"))
             .withPropertyName("docs")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+
+        // The same for the markers: a // Rule- or // UC- line compiles to
+        // nothing, so an edit to one leaves the class files byte for byte the
+        // same, and RuleNumbersTest would not run against the new marker.
+        inputs.files(listOf("src", "testin-java/src", "testin-testng/src").map { layout.projectDirectory.dir("$it/main/java") })
+            .withPropertyName("markedSources")
             .withPathSensitivity(PathSensitivity.RELATIVE)
 
         testLogging {

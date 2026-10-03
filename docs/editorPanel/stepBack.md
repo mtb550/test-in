@@ -61,12 +61,15 @@ are in.
   bar scrolls that bar sideways under the pointer, with the mouse wheel or a
   touchpad. No scrollbar is shown and the bar keeps its height, so nothing on it
   is cut off and the editor below does not move.
+- **Rule-EDITOR-PANEL-262** — Test cases waiting on the clipboard, cut or
+  copied, are one step. The press drops them and empties the clipboard, so
+  nothing is left waiting to be pasted, as in the tree.
 
 ## What the tester sees
 
 This opens no screen, and it never closes the editor tab. One press undoes one
-thing on screen: an open cell, a waiting cut, the details panel, or the
-selection.
+thing on screen: an open cell, test cases cut or copied and waiting to be
+pasted, the details panel, or the selection.
 
 Nothing is said, and no message appears. A press with nothing left to undo does
 nothing at all.
@@ -76,7 +79,7 @@ nothing at all.
 | Press                      | What it does                            |
 |----------------------------|-----------------------------------------|
 | A cell is open for editing | Cancels the edit                        |
-| A cut is waiting           | Drops the cut and empties the clipboard |
+| A cut or a copy is waiting | Drops it and empties the clipboard      |
 | The details panel is open  | Closes it                               |
 | Anything else              | Clears the selection                    |
 

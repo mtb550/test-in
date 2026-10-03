@@ -31,7 +31,7 @@ public class ExportThenImportIdeTest extends AbstractTempRootIdeTest {
     private static final @NotNull ZonedDateTime CREATED = ZonedDateTime.of(2026, 8, 20, 3, 33, 24, 0, ZoneId.of("Asia/Riyadh"));
     private static final @NotNull ZonedDateTime UPDATED = ZonedDateTime.of(2026, 9, 14, 11, 30, 5, 0, ZoneId.of("Asia/Riyadh"));
 
-    private static @NotNull TestCaseDto testCase(final @NotNull String description) {
+    private static @NotNull TestCaseDto aTestCase(final @NotNull String description) {
         return TestCaseDto.builder()
                 .description(description)
                 .expectedResult("the dashboard opens")
@@ -56,8 +56,8 @@ public class ExportThenImportIdeTest extends AbstractTempRootIdeTest {
     // UC-SHARE-002, Rule-SHARE-007, Rule-SHARE-012
     public void testEachTestSetIsOneSheetNamedAfterItselfWithItsRowsInOrder() {
         final @NotNull Map<String, List<TestCaseDto>> sheets = new LinkedHashMap<>();
-        sheets.put("Login", List.of(testCase("log in with a valid user"), testCase("a wrong password is refused"), testCase("a locked account cannot log in")));
-        sheets.put("Checkout", List.of(testCase("pay with a saved card")));
+        sheets.put("Login", List.of(aTestCase("log in with a valid user"), aTestCase("a wrong password is refused"), aTestCase("a locked account cannot log in")));
+        sheets.put("Checkout", List.of(aTestCase("pay with a saved card")));
 
         final @NotNull Map<String, List<TestCaseDto>> read = roundTrip(sheets);
 
@@ -68,7 +68,7 @@ public class ExportThenImportIdeTest extends AbstractTempRootIdeTest {
 
     // UC-SHARE-005, Rule-SHARE-121
     public void testASheetExportedAndImportedUnchangedKeepsItsDates() {
-        final @NotNull TestCaseDto read = roundTrip(Map.of("Login", List.of(testCase("log in with a valid user")))).get("Login").getFirst();
+        final @NotNull TestCaseDto read = roundTrip(Map.of("Login", List.of(aTestCase("log in with a valid user")))).get("Login").getFirst();
 
         assertEquals(CREATED.toInstant(), read.getCreatedAt().toInstant());
         assertEquals(UPDATED.toInstant(), read.getUpdatedAt().toInstant());

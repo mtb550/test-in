@@ -64,6 +64,10 @@ There is no key for this. It happens when a test case is created, which is
   across: the copy's method has the copy's own id, name and attributes, because
   it is a different test case. A copy of a test case that has no method gets
   the empty one a new test case gets.
+- **Rule-CODEGEN-095** — A test case with no method of its own adopts a @Test
+  the tester wrote by hand when that method carries no test case identity and
+  its description is the test case's description. It is tagged with the identity
+  and kept as written, rather than a stub being written beside it.
 
 ## What is written
 

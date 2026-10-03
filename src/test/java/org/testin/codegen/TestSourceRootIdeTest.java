@@ -43,14 +43,14 @@ public class TestSourceRootIdeTest extends AbstractCodegenIdeTest {
         return Services.getInstance(getProject(), TestSourceRoot.class);
     }
 
-    private @NotNull List<VirtualFile> testSourceRoots() {
+    private @NotNull List<VirtualFile> theTestSourceRoots() {
         return ModuleRootManager.getInstance(getModule()).getSourceRoots(JavaSourceRootType.TEST_SOURCE);
     }
 
     private void aRememberedFolderThatWasDeleted() {
         final @NotNull VirtualFile gone = WriteAction.computeAndWait(() -> {
             try {
-                return VfsUtil.createDirectoryIfMissing(testSourceRoots().getFirst(), "deleted since");
+                return VfsUtil.createDirectoryIfMissing(theTestSourceRoots().getFirst(), "deleted since");
             } catch (final IOException ex) {
                 throw new AssertionError("could not make a folder to remember: " + ex.getMessage(), ex);
             }
@@ -71,7 +71,7 @@ public class TestSourceRootIdeTest extends AbstractCodegenIdeTest {
         aRememberedFolderThatWasDeleted();
 
         assertTrue("a deleted test source folder is still remembered", remembered().get().isEmpty());
-        assertEquals("the next look did not find the test source folder again", Optional.of(testSourceRoots().getFirst()), JavaSourceRoot.find(getProject()));
+        assertEquals("the next look did not find the test source folder again", Optional.of(theTestSourceRoots().getFirst()), JavaSourceRoot.find(getProject()));
     }
 
     // Rule-CODEGEN-064
@@ -98,17 +98,17 @@ public class TestSourceRootIdeTest extends AbstractCodegenIdeTest {
         try {
             aRememberedFolderThatWasDeleted();
 
-            assertEquals("the module does not have two test source folders", 2, testSourceRoots().size());
-            assertEquals("a test source folder other than the first was used", Optional.of(testSourceRoots().getFirst()), JavaSourceRoot.find(getProject()));
+            assertEquals("the module does not have two test source folders", 2, theTestSourceRoots().size());
+            assertEquals("a test source folder other than the first was used", Optional.of(theTestSourceRoots().getFirst()), JavaSourceRoot.find(getProject()));
         } finally {
             PsiTestUtil.removeSourceRoot(getModule(), secondRoot);
-            remembered().set(testSourceRoots().getFirst());
+            remembered().set(theTestSourceRoots().getFirst());
         }
     }
 
     // Rule-CODEGEN-065, Rule-CODEGEN-072
     public void testWithNoTestSourceFolderTheFirstWriteSaysSoOnceAndARemovalSaysNothing() {
-        final @NotNull VirtualFile sources = testSourceRoots().getFirst();
+        final @NotNull VirtualFile sources = theTestSourceRoots().getFirst();
         final @NotNull String noRoot = Bundle.message("codegen.no.source.root.title");
         final @NotNull List<Notification> said = new ArrayList<>();
         getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
@@ -121,7 +121,7 @@ public class TestSourceRootIdeTest extends AbstractCodegenIdeTest {
         aRememberedFolderThatWasDeleted();
         PsiTestUtil.removeSourceRoot(getModule(), sources);
         try {
-            GenType.REMOVE_TEST_SET.execute(getProject(), indexedTestSet("Payment", testCasesDirectory()));
+            GenType.REMOVE_TEST_SET.execute(getProject(), indexedTestSet("Payment", theTestCasesDirectory()));
             createdTestSet("Login");
             createdTestSet("Logout");
 

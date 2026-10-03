@@ -35,6 +35,10 @@ There is no key for this. It happens when a test case is removed, which is
 - **Rule-CODEGEN-049** — Removing a test case deletes its method from the class.
   The class itself stays.
 - **Rule-CODEGEN-050** — A test case with no method is skipped without a word.
+- **Rule-CODEGEN-096** — A removal that deletes automation code - a test case, a
+  test set, a package or a test project - waits for the IDE to finish indexing.
+  It is refused while the IDE indexes, so no test case is removed with its
+  method left behind.
 
 ## What the tester sees
 

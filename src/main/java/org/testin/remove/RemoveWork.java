@@ -21,6 +21,8 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
+import org.testin.codegen.JavaCode;
+import org.testin.codegen.WaitForIndexing;
 import org.testin.editor.TestinEditors;
 import org.testin.indexer.NodeCounter;
 import org.testin.indexer.Nodes;
@@ -68,6 +70,9 @@ record RemoveWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEdito
     // UC-TREE-PANEL-012, Rule-TREE-PANEL-041
     private void removeNodes(final @NotNull List<DirectoryDto> nodesToRemove) {
         if (nodesToRemove.isEmpty()) return;
+
+        // Rule-CODEGEN-096
+        if (nodesToRemove.stream().anyMatch(node -> JavaCode.of(node.getType()).getRemoved().generates()) && WaitForIndexing.refuses(p, Bundle.message("remove.confirm.button"))) return;
 
         final @NotNull List<Kept> kept = new ArrayList<>(nodesToRemove.size());
 

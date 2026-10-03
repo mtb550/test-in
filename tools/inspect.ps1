@@ -33,12 +33,12 @@
     about everything but one sentence. DuplicatedDisplayString is counted rather
     than forbidden, against .github/display-string-baseline.txt.
 
-    Nine rules are this script's own, because no IntelliJ inspection makes them
+    Ten rules are this script's own, because no IntelliJ inspection makes them
     or the headless run cannot be trusted with the one that does:
     WrappedMethodDeclaration, StaticMutableState,
     HandWrittenPrivateConstructor, NonMarkerComment, UnusedLambdaParameter,
-    DriftedCaption, OrphanedJavadoc, MissingCopyright and
-    HtmlParagraphInMarkdown.
+    DriftedCaption, OrphanedJavadoc, MissingCopyright,
+    HtmlParagraphInMarkdown and HelperNamedLikeTest.
 
     They read the source as text, so -Quick runs them alone in seconds with no
     IDE. That is the check to run before handing a change over; the full run is
@@ -944,6 +944,43 @@ function Read-WrappedDeclarations([string] $scope) {
     }
 }
 
+function Read-HelpersNamedLikeTests([string[]] $scopes) {
+    <#
+        A helper in a JUnit 3 test whose name starts with "test". JUnit 3 runs
+        every public void test*() by name, so the IDE's JUnitMalformedDeclaration
+        reads any other method named that way as a broken test: testRuns()
+        returning a service, testCase(description) building one. Three reached
+        Muteb's IDE one paste at a time, and sixteen more stood in the tree.
+
+        A JUnit 3 class is one that extends an *IdeTest base or a platform
+        TestCase; the TestNG tests name their methods freely.
+    #>
+    $junit3 = 'extends\s+\w*(?:IdeTest|TestCase)\b'
+    $helper = '^\s*(?:(?:public|protected|private|static|final|abstract|synchronized)\s+)+[^;=()]*?\b(test\w*)\s*\('
+    $test = '^\s*public\s+void\s+test\w*\s*\(\s*\)'
+
+    foreach ($scope in $scopes) {
+        if (-not (Test-Path $scope)) { continue }
+
+        foreach ($file in Get-ChildItem -Path $scope -Filter *.java -Recurse -File) {
+            $lines = [System.IO.File]::ReadAllLines($file.FullName)
+            if (-not ($lines -match $junit3)) { continue }
+
+            for ($i = 0; $i -lt $lines.Count; $i++) {
+                if ($lines[$i] -notmatch $helper -or $lines[$i] -match $test) { continue }
+
+                [pscustomobject]@{
+                    Path       = $file.FullName.Substring($repo.Length + 1) -replace '\\', '/'
+                    Line       = $i + 1
+                    Inspection = 'HelperNamedLikeTest'
+                    Severity   = 'ERROR'
+                    Message    = "JUnit 3 reads $($Matches[1]) as a test because of its name. A helper's name does not start with 'test': aTestCase, theTestRuns."
+                }
+            }
+        }
+    }
+}
+
 function Test-DocComment([string[]] $lines, [int] $close) {
     <#
         Whether the block comment that ends at $close is a doc comment.
@@ -1360,6 +1397,7 @@ $problems += @(Read-MissingCopyright $everyTree)
 $problems += @(Read-NonMarkerComments $everyTree)
 $problems += @(Read-UnusedLambdaParameters $everyTree)
 $problems += @(Read-QualifiedClassNames $everyTree)
+$problems += @(Read-HelpersNamedLikeTests $everyTree)
 $problems += @(Read-HtmlParagraphInMarkdown)
 
 $problems += @(Read-DuplicatedDisplayStrings $scopes)

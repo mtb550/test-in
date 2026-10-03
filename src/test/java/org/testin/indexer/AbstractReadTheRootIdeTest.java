@@ -43,18 +43,18 @@ public abstract class AbstractReadTheRootIdeTest extends AbstractTempRootIdeTest
         return Services.getInstance(AppSettingsState.class);
     }
 
-    protected static @NotNull Path testProject(final @NotNull Path folder) {
+    protected static @NotNull Path aTestProjectAt(final @NotNull Path folder) {
         marked(folder, DirectoryType.TP);
-        marked(testCasesOf(folder), DirectoryType.TCD);
-        marked(testRunsOf(folder), DirectoryType.TRD);
+        marked(theTestCasesOf(folder), DirectoryType.TCD);
+        marked(theTestRunsOf(folder), DirectoryType.TRD);
         return folder;
     }
 
-    protected static @NotNull Path testCasesOf(final @NotNull Path testProject) {
+    protected static @NotNull Path theTestCasesOf(final @NotNull Path testProject) {
         return testProject.resolve(DirectoryType.TCD.getFolderName());
     }
 
-    protected static @NotNull Path testRunsOf(final @NotNull Path testProject) {
+    protected static @NotNull Path theTestRunsOf(final @NotNull Path testProject) {
         return testProject.resolve(DirectoryType.TRD.getFolderName());
     }
 
@@ -63,7 +63,7 @@ public abstract class AbstractReadTheRootIdeTest extends AbstractTempRootIdeTest
         return folder;
     }
 
-    protected static @NotNull UUID testCaseIn(final @NotNull Path folder) {
+    protected static @NotNull UUID aTestCaseIn(final @NotNull Path folder) {
         final @NotNull UUID id = UUID.randomUUID();
         SyntheticTree.write(folder.resolve(FileKind.TEST_CASE.fileName(id)), SyntheticTree.testCase(id, "m"));
         return id;

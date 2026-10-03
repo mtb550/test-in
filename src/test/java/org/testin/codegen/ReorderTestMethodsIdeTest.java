@@ -50,7 +50,7 @@ public class ReorderTestMethodsIdeTest extends AbstractCodegenIdeTest {
     }
 
     private @NotNull String priorityOf(final @NotNull TestCaseDto tc) {
-        return testAttribute(writtenMethodOf(LOGIN_TEST, tc), "priority");
+        return attributeOf(writtenMethodOf(LOGIN_TEST, tc), "priority");
     }
 
     // Rule-CODEGEN-042

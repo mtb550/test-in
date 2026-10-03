@@ -1,0 +1,9 @@
+<!-- Loaded only when JSON support is present. Testin's marker files are
+     JSON named only by their extension - .ts, .tr - which the IDE would
+     otherwise read as TypeScript and cover in errors. The names are the
+     markers DirectoryType declares; JsonMarkerNamesTest keeps them equal. -->
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="JSON" fileNames=".tp;.tcd;.trd;.tsp;.trp;.ts;.tr"/>
+    </extensions>
+</idea-plugin>

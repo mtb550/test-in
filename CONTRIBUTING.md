@@ -263,7 +263,7 @@ Two files are outside the scope in `.idea/scopes/Inspected.xml`, because their
 bytes are fixed by something else: the Jekyll stylesheet and the bug report
 template. `Inspected.xml` says why.
 
-Eight rules are the script's own, because no IntelliJ inspection makes them:
+Nine rules are the script's own, because no IntelliJ inspection makes them:
 
 | Rule                            | What it forbids                                                                                                                                                                                 |
 |---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -275,6 +275,7 @@ Eight rules are the script's own, because no IntelliJ inspection makes them:
 | `OrphanedJavadoc`               | A doc block followed by a second one, which javac throws away                                                                                                                                   |
 | `MissingCopyright`              | A `.java` file that does not open with the Apache 2.0 notice                                                                                                                                    |
 | `HtmlParagraphInMarkdown`       | A bare `<p>` in a Markdown file, which turns what follows into raw HTML                                                                                                                         |
+| `HelperNamedLikeTest`           | A helper in a JUnit 3 test whose name starts with `test`, which the IDE reads as a broken test                                                                                                  |
 
 The inspector's rules are named one by one in
 `.idea/inspectionProfiles/Testin.xml`, so the gate does not depend on what a

@@ -68,8 +68,8 @@ The node keeps everything inside it. Only where it sits changes.
   automation code with it, so the test cases stay runnable.
 - **Rule-TREE-PANEL-049** — Nodes drop onto a node, never between two. Position
   is set by ordering, in [UC-TREE-PANEL-015](orderNodes.md), not by dragging.
-- **Rule-TREE-PANEL-050** — Canceling a cut empties the clipboard. Nothing is
-  left waiting to be pasted.
+- **Rule-TREE-PANEL-050** — `Escape` empties the clipboard of the nodes the
+  tester cut or copied. Nothing is left waiting to be pasted.
 - **Rule-TREE-PANEL-098** — A move that the tree refuses leaves the generated
   code where it was. The Java moves before the node, because the old path is
   what finds it, so a node move that fails puts the code back rather than

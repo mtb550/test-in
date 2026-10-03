@@ -16,6 +16,7 @@
 
 package org.testin.java.codegen;
 
+import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiAnnotation;
@@ -39,6 +40,8 @@ public final class GeneratedMethod {
     public static final @NotNull String TESTNG_TEST = "org.testng.annotations.Test";
 
     private static final @NotNull String TEST_NAME = "testName";
+
+    private static final @NotNull String DESCRIPTION = "description";
 
     private static final @NotNull String TODO = "// TODO: Auto-generated test steps for ";
 
@@ -91,6 +94,20 @@ public final class GeneratedMethod {
             Optional.ofNullable(written.findDeclaredAttributeValue(TEST_NAME))
                     .ifPresent(value -> annotation.setDeclaredAttributeValue(TEST_NAME, value));
         });
+    }
+
+    // UC-CODEGEN-002, Rule-CODEGEN-095
+    public static @NotNull Map<String, PsiMethod> untaggedByDescription(final @NotNull PsiClass pc) {
+        final @NotNull Map<String, PsiMethod> found = new LinkedHashMap<>();
+        for (final PsiMethod pm : pc.getMethods()) {
+            if (testCaseIdOf(pm).isPresent()) continue;
+
+            testAnnotationOf(pm)
+                    .map(annotation -> AnnotationUtil.getStringAttributeValue(annotation, DESCRIPTION))
+                    .filter(description -> !description.isEmpty())
+                    .ifPresent(description -> found.putIfAbsent(description, pm));
+        }
+        return found;
     }
 
     public static @NotNull Optional<PsiAnnotation> testAnnotationOf(final @NotNull PsiMethod pm) {

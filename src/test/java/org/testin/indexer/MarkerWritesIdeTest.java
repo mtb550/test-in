@@ -47,8 +47,8 @@ public class MarkerWritesIdeTest extends AbstractReadTheRootIdeTest {
 
     // UC-INTERNAL-002, Rule-INTERNAL-083
     public void testAMarkerThatWillNotParseIsNeverWrittenOver() {
-        final @NotNull Path project = testProject(root.resolve("Checkout"));
-        final @NotNull Path testSet = testCasesOf(project).resolve("Login");
+        final @NotNull Path project = aTestProjectAt(root.resolve("Checkout"));
+        final @NotNull Path testSet = theTestCasesOf(project).resolve("Login");
         SyntheticTree.write(testSet.resolve(DirectoryType.TS.getMarker()), DAMAGED);
         indexer().scanSingleProject(project);
 

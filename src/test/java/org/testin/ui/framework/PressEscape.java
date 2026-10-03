@@ -18,12 +18,18 @@ package org.testin.ui.framework;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.popup.AbstractPopup;
+import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.services.Services;
+import org.testin.util.Shortcuts;
 
+import javax.swing.Action;
+import javax.swing.JComponent;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PressEscape {
@@ -31,6 +37,14 @@ public final class PressEscape {
         final @NotNull AbstractPopup popup = (AbstractPopup) Services.getInstance(p, OpenDialogs.class).shown(kind)
                 .orElseThrow(() -> new AssertionError("no " + kind.getSimpleName() + " is open"));
 
-        popup.dispatchKeyEvent(new KeyEvent(popup.getContent(), KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_ESCAPE, KeyEvent.CHAR_UNDEFINED));
+        if (popup.dispatchKeyEvent(new KeyEvent(popup.getContent(), KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_ESCAPE, KeyEvent.CHAR_UNDEFINED))) return;
+
+        final @NotNull JComponent content = popup.getContent();
+        UIUtil.uiTraverser(content).filter(JComponent.class).toList().stream().map(PressEscape::escapeBindingOf).flatMap(Optional::stream).findFirst().orElseThrow(() -> new AssertionError("the popup let Escape through and nothing in " + kind.getSimpleName() + " answers it"))
+                .actionPerformed(new ActionEvent(content, ActionEvent.ACTION_PERFORMED, "Escape"));
+    }
+
+    private static @NotNull Optional<Action> escapeBindingOf(final @NotNull JComponent component) {
+        return Optional.ofNullable(component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).get(Shortcuts.Escape.getKey())).map(name -> component.getActionMap().get(name));
     }
 }

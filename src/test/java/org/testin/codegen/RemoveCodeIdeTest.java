@@ -27,7 +27,7 @@ public class RemoveCodeIdeTest extends AbstractCodegenIdeTest {
 
     private static final @NotNull String LOGIN_TEST = "nafath.LoginTest";
 
-    private @NotNull VirtualFile testSourceRoot() {
+    private @NotNull VirtualFile theTestSourceRoot() {
         return JavaSourceRoot.find(getProject()).orElseThrow(() -> new AssertionError("the project has no test source folder"));
     }
 
@@ -48,22 +48,22 @@ public class RemoveCodeIdeTest extends AbstractCodegenIdeTest {
     // Rule-CODEGEN-059
     public void testRemovingATestSetDeletesItsClassFile() {
         final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
-        assertNotNull("the test set's class was never written", testSourceRoot().findFileByRelativePath("nafath/LoginTest.java"));
+        assertNotNull("the test set's class was never written", theTestSourceRoot().findFileByRelativePath("nafath/LoginTest.java"));
 
         GenType.REMOVE_TEST_SET.execute(getProject(), login);
 
-        assertNull("the class file outlived its test set", testSourceRoot().findFileByRelativePath("nafath/LoginTest.java"));
+        assertNull("the class file outlived its test set", theTestSourceRoot().findFileByRelativePath("nafath/LoginTest.java"));
     }
 
     // Rule-CODEGEN-059
     public void testRemovingAPackageDeletesItsFolderAndEverythingUnderIt() {
-        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", testCasesDirectory());
+        final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
         createdTestSet("Payment", checkout);
         createdTestSet("Visa", indexedPackage("Cards", checkout));
-        assertNotNull("the nested class was never written", testSourceRoot().findFileByRelativePath("nafath/checkout/cards/VisaTest.java"));
+        assertNotNull("the nested class was never written", theTestSourceRoot().findFileByRelativePath("nafath/checkout/cards/VisaTest.java"));
 
         GenType.REMOVE_TEST_SET_PACKAGE.execute(getProject(), checkout);
 
-        assertNull("the package folder outlived the package", testSourceRoot().findFileByRelativePath("nafath/checkout"));
+        assertNull("the package folder outlived the package", theTestSourceRoot().findFileByRelativePath("nafath/checkout"));
     }
 }
