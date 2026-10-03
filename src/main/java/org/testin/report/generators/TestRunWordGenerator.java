@@ -18,6 +18,8 @@ package org.testin.report.generators;
 
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
+import org.apache.poi.common.usermodel.PictureType;
+import org.apache.poi.util.Units;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.TableWidthType;
@@ -62,14 +64,13 @@ import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
-import org.testin.util.Display;
 import org.testin.util.FailureText;
 import org.testin.util.ReportFont;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -90,6 +91,8 @@ public final class TestRunWordGenerator {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (XWPFDocument doc = new XWPFDocument()) {
                 final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
+
+                CompanyLogo.fromSettings().ifPresent(logo -> addLogo(doc, logo));
 
                 addText(doc, Bundle.message("report.title"), ReportFont.TITLE.ptRounded(), true, DARK_NAVY, NO_BORDER, 2);
 
@@ -158,7 +161,7 @@ public final class TestRunWordGenerator {
                     buildTestCaseTable(doc, String.valueOf(sectionNumber++), section, section.description(String.valueOf(count)), tr);
                 }
 
-                addFooter(doc, Display.formatDate(ZonedDateTime.now()));
+                addFooter(doc);
 
                 applyPageMargins(doc);
 
@@ -458,11 +461,21 @@ public final class TestRunWordGenerator {
         }
     }
 
-    private void addFooter(final @NotNull XWPFDocument doc, final @NotNull String date) {
+    // UC-SETTING-012, Rule-SETTING-043
+    private static void addLogo(final @NotNull XWPFDocument doc, final @NotNull CompanyLogo logo) {
+        try {
+            doc.createParagraph().createRun().addPicture(new ByteArrayInputStream(logo.png()), PictureType.PNG, "logo.png",
+                    Units.toEMU(logo.widthAt(CompanyLogo.HEIGHT_PT)), Units.toEMU(CompanyLogo.HEIGHT_PT));
+        } catch (final Exception ex) {
+            Logger.warn("The Word report was written without the company logo: " + FailureText.of(ex));
+        }
+    }
+
+    private void addFooter(final @NotNull XWPFDocument doc) {
         final @NotNull XWPFFooter footer = doc.createFooter(HeaderFooterType.DEFAULT);
         final @NotNull XWPFParagraph p = footer.createParagraph();
         p.setAlignment(ParagraphAlignment.CENTER);
-        styledRun(p.createRun(), date + Bundle.message("report.footer.prefix"), ReportFont.CAPTION, DARK_GRAY);
+        styledRun(p.createRun(), Bundle.message("report.footer.prefix"), ReportFont.CAPTION, DARK_GRAY);
 
         final @NotNull XWPFHyperlinkRun link = p.createHyperlinkRun(ReportText.PLUGIN_URL);
         styledRun(link, ReportText.PLUGIN_NAME, ReportFont.CAPTION, LINK_BLUE);

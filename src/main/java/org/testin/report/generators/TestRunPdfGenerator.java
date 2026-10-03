@@ -20,6 +20,7 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
@@ -33,6 +34,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Link;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
@@ -59,12 +61,10 @@ import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
-import org.testin.util.Display;
 import org.testin.util.FailureText;
 import org.testin.util.ReportFont;
 
 import java.io.ByteArrayOutputStream;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -96,6 +96,11 @@ public final class TestRunPdfGenerator {
             PdfFont italicFont = PdfFontFactory.createFont(ReportFont.PDF_ITALIC);
 
             final @NotNull String projectName = Services.getInstance(p, BoundTestProject.class).name();
+
+            // UC-SETTING-012, Rule-SETTING-043
+            CompanyLogo.fromSettings().ifPresent(logo -> document.add(new Image(ImageDataFactory.create(logo.png()))
+                    .scaleAbsolute(logo.widthAt(CompanyLogo.HEIGHT_PT), CompanyLogo.HEIGHT_PT)
+                    .setMarginBottom(6)));
 
             document.add(para(Bundle.message("report.title"))
                     .setFont(boldFont).setFontSize(ReportFont.TITLE.pt()).setFontColor(DARK_NAVY)
@@ -197,7 +202,6 @@ public final class TestRunPdfGenerator {
                 footerCanvas.add(para()
                         .setFont(regularFont).setFontSize(ReportFont.CAPTION.pt()).setFontColor(DARK_GRAY)
                         .setTextAlignment(TextAlignment.CENTER)
-                        .add(text(Display.formatDate(ZonedDateTime.now())))
                         .add(text(Bundle.message("report.footer.prefix")))
                         .add(new Link(ReportText.PLUGIN_NAME, PdfAction.createURI(ReportText.PLUGIN_URL))
                                 .setFontColor(LINK_BLUE))

@@ -9,7 +9,7 @@ where the test data lives, and who is using it.
 |---------------------|--------------------------------------------------------------------------------------------------------|
 | **Part of Testin**  | The settings page                                                                                      |
 | **Answers**         | What every setting does, where each one is kept, and what happens when one is wrong                    |
-| **Numbering**       | Use cases are `UC-SETTING-001` to `UC-SETTING-011`. Rules are `Rule-SETTING-001` to `Rule-SETTING-042` |
+| **Numbering**       | Use cases are `UC-SETTING-001` to `UC-SETTING-012`. Rules are `Rule-SETTING-001` to `Rule-SETTING-044` |
 | **State**           | **Written** — [#181](https://github.com/mtb550/test-in/issues/181)                                     |
 | **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code             |
 | **Written to**      | [How a document is written](../standard.md)                                                            |
@@ -29,6 +29,7 @@ where the test data lives, and who is using it.
 | **UC-SETTING-007** | [Choose how much Testin writes to its log](setLogLevel.md)     | Turn the log up when something goes wrong.                |
 | **UC-SETTING-008** | [Turn the shortcut hints off](hideShortcutHints.md)            | Make dialogs shorter once the keys are known.             |
 | **UC-SETTING-011** | [Change the size of Testin's text](changeTextSize.md)          | Make Testin's text bigger or smaller.                     |
+| **UC-SETTING-012** | [Put my company's logo on reports](setCompanyLogo.md)          | Hand over reports that carry the team's own logo.         |
 
 Choosing which test project a code project uses is not on this page. It is
 written into a file the whole team shares, and it is
@@ -79,6 +80,8 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 │                                                                            │
 │   Default download folder: [                                     ] [...]   │
 │                                                                            │
+│   Company logo:            [                                     ] [...]   │
+│                                                                            │
 │   [x] Show keyboard shortcuts in dialogs                                   │
 │                                                                            │
 │   Everything here belongs to this machine and this person, and is never     │
@@ -92,14 +95,16 @@ The page is at **Settings**, then **Tools**, then **Testin**.
 
 1. **Testin folder** — the folder holding every test project. The only
    field with a gray example in it.
-2. **The browse button** — opens a folder chooser. Two fields have one.
+2. **The browse button** — opens a folder or file chooser. Three fields have
+   one.
 3. **Open** — opens the Testin folder in the file manager. It is gray until the
    box names a folder that is really there.
 4. **Log level** — how much Testin writes to its own log.
 5. **Tester name** — stamped on everything this machine writes.
 6. **Tester role** — stored, and read by nothing. That is difference 2 below.
 7. **Default download folder** — where saving a report, an export or an import
-   starts.
+   starts. Under it, **Company logo** — the picture the web page, PDF and Word
+   reports print above their title.
 8. **Show keyboard shortcuts in dialogs** — the strip of key hints along the
    bottom of every Testin dialog.
 9. **The gray note** — where a value belongs. It is the
@@ -124,6 +129,7 @@ highlighted.
 | Tester name                                 | This machine's settings                                                                           | No                                        |
 | Tester role                                 | This machine's settings                                                                           | No                                        |
 | Default download folder                     | This machine's settings                                                                           | No                                        |
+| Company logo                                | This machine's settings                                                                           | No                                        |
 | Show keyboard shortcuts                     | This machine's settings                                                                           | No                                        |
 | Which test project this repository is about | Chosen in the Testin tool window and kept on this machine; `testin.yml` can name one for everyone | No; the file is, when the team writes one |
 | Where the test project is cloned from       | `testin.yml`, in the code repository, written by hand or by **Save to testin.yml**                | **Yes**                                   |

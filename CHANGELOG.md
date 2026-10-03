@@ -27,6 +27,7 @@ than repairing it, and a team sharing a test project should update together.
   that covers it, and that row opens the test run on the result it recorded.
 - **A screen reader can follow Testin:** every field, icon button, card, grid cell and view panel tab says its name, the
   branch box takes the keyboard without switching on each arrow, and moving through search results says the one reached.
+- **Your company's logo on every report:** set a picture under **Settings > Testin > Company logo**, and the web page, PDF and Word reports print it above their title, 30 points tall. PNG, JPEG and GIF work, and a transparent PNG or GIF stays transparent.
 - **Reference is on the update menu,** with a section and a bulk edit of its own, so every field the grid edits can be
   edited from **F2** as well.
 
@@ -40,6 +41,7 @@ than repairing it, and a team sharing a test project should update together.
   closing the panel.
 - **Escape drops test cases you copied,** as it drops the ones you cut, so nothing is left waiting to be pasted. The
   tree already did this.
+- **The report footer no longer prints a date,** in the web page, the PDF and the Word document.
 - **The Details tab shows the fields the editor's Fields list shows,** from a test set or a test run, and changes as soon as Fields does. A field the list does not offer is always shown.
 - **A test case the filter hides is named in a red refusal,** not in a blue notice that looked like the success just
   before it.

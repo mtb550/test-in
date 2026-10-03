@@ -53,6 +53,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
     private final @NotNull JBTextField testerNameField = new JBTextField();
     private final @NotNull JBTextField testerRoleField = new JBTextField();
     private final @NotNull TextFieldWithBrowseButton downloadFolderField = new TextFieldWithBrowseButton();
+    private final @NotNull TextFieldWithBrowseButton companyLogoField = new TextFieldWithBrowseButton();
 
     private final @NotNull ComboBox<String> logLevelComboBox;
 
@@ -83,6 +84,13 @@ public final class SettingsConfigurable implements SearchableConfigurable {
                         .withDescription(Bundle.message("settings.download.folder.description")),
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         );
+        // UC-SETTING-012
+        companyLogoField.addBrowseFolderListener(null, FileChooserDescriptorFactory.singleFile()
+                        .withExtensionFilter(Bundle.message("settings.company.logo.files"), "png", "jpg", "jpeg", "gif", "bmp")
+                        .withTitle(Bundle.message("settings.company.logo.title"))
+                        .withDescription(Bundle.message("settings.company.logo.description")),
+                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+        );
 
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel(Bundle.message("settings.label.source.root")), testinPathPanel.getComponent(), 1, false)
@@ -94,6 +102,8 @@ public final class SettingsConfigurable implements SearchableConfigurable {
                 .addLabeledComponent(new JBLabel(Bundle.message("settings.label.tester.role")), testerRoleField, 1, false)
                 .addVerticalGap(5)
                 .addLabeledComponent(new JBLabel(Bundle.message("settings.label.download.folder")), downloadFolderField, 1, false)
+                .addVerticalGap(5)
+                .addLabeledComponent(new JBLabel(Bundle.message("settings.label.company.logo")), companyLogoField, 1, false)
                 .addVerticalGap(5)
                 .addComponent(showShortcutHintsBox)
                 .addVerticalGap(10)
@@ -120,6 +130,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         modified |= !testerNameField.getText().trim().equals(settings.testerName);
         modified |= !testerRoleField.getText().trim().equals(settings.testerRole);
         modified |= !downloadFolderField.getText().trim().equals(settings.defaultDownloadFolder);
+        modified |= !companyLogoField.getText().trim().equals(settings.companyLogo);
         modified |= showShortcutHintsBox.isSelected() != settings.showShortcutHints;
         return modified;
     }
@@ -150,7 +161,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         return Optional.empty();
     }
 
-    // UC-SETTING-001, UC-SETTING-004, UC-SETTING-005, UC-SETTING-006, Rule-SETTING-009, Rule-SETTING-024, Rule-SETTING-042
+    // UC-SETTING-001, UC-SETTING-004, UC-SETTING-005, UC-SETTING-006, UC-SETTING-012, Rule-SETTING-009, Rule-SETTING-024, Rule-SETTING-042
     @Override
     public void apply() throws ConfigurationException {
         final @NotNull Optional<ConfigurationException> refusal = refusalOfTheRoot();
@@ -164,6 +175,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         settings.testerName = testerNameField.getText().trim();
         settings.testerRole = testerRoleField.getText().trim();
         settings.defaultDownloadFolder = downloadFolderField.getText().trim();
+        settings.companyLogo = companyLogoField.getText().trim();
         settings.showShortcutHints = showShortcutHintsBox.isSelected();
 
         Logger.setLogLevel(Level.valueOf(settings.logLevel));
@@ -187,6 +199,7 @@ public final class SettingsConfigurable implements SearchableConfigurable {
         testerNameField.setText(settings.testerName);
         testerRoleField.setText(settings.testerRole);
         downloadFolderField.setText(settings.defaultDownloadFolder);
+        companyLogoField.setText(settings.companyLogo);
         showShortcutHintsBox.setSelected(settings.showShortcutHints);
     }
 }

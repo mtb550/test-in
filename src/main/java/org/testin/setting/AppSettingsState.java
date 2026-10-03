@@ -36,6 +36,7 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
     public @NotNull String rootTestinPath = "";
     public @NotNull String logLevel = "INFO";
     public @NotNull String defaultDownloadFolder = "";
+    public @NotNull String companyLogo = "";
     public @NotNull String testerName = "";
     public @NotNull String testerRole = "";
 
@@ -64,6 +65,7 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
         rootTestinPath = orEmpty(rootTestinPath);
         logLevel = Level.known(orEmpty(logLevel));
         defaultDownloadFolder = orEmpty(defaultDownloadFolder);
+        companyLogo = orEmpty(companyLogo);
         testerName = orEmpty(testerName);
         testerRole = orEmpty(testerRole);
 
