@@ -26,7 +26,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.ui.framework.OnScreenDialog;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Shortcuts;
@@ -46,7 +46,7 @@ public class RemoveNodeIdeTest extends AbstractCodegenIdeTest {
 
     @Override
     protected void tearDown() {
-        OnScreenDialog.closed(getProject(), ConfirmDialog.class);
+        ShownDialog.close(getProject(), ConfirmDialog.class);
         undoHistories().forget(UndoScope.TREE);
         super.tearDown();
     }
@@ -61,15 +61,15 @@ public class RemoveNodeIdeTest extends AbstractCodegenIdeTest {
 
     private void removeAsked(final @NotNull List<DirectoryDto> nodes) {
         TreeGesture.pressed(getProject(), new RemoveAction(), nodes);
-        assertTrue("Remove did not ask first", OnScreenDialog.isOpen(getProject(), ConfirmDialog.class));
+        assertTrue("Remove did not ask first", ShownDialog.isOpen(getProject(), ConfirmDialog.class));
     }
 
     private @NotNull List<String> confirmationWords() {
-        return Drawn.words(OnScreenDialog.content(getProject(), ConfirmDialog.class));
+        return Drawn.words(ShownDialog.content(getProject(), ConfirmDialog.class));
     }
 
     private void confirmed() {
-        OnScreenDialog.pressed(getProject(), ConfirmDialog.class, Shortcuts.Enter);
+        ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Enter);
     }
 
     // Rule-TREE-PANEL-006

@@ -31,8 +31,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.testcase.TestCaseDialogKey;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testcase.update.UpdateTestCaseDialog;
-import org.testin.ui.framework.ShownDialogParts;
-import org.testin.ui.framework.SizedPopups;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Shortcuts;
 import org.testin.view.Drawn;
 
@@ -56,12 +55,11 @@ public class TestCaseFormIdeTest extends AbstractTempRootIdeTest {
     @Override
     protected void setUp() {
         super.setUp();
-        SizedPopups.installed(getTestRootDisposable());
     }
 
     @Override
     protected void tearDown() {
-        ShownDialogParts.closeAll(getProject(), CreateTestCaseDialog.class);
+        ShownDialog.close(getProject(), CreateTestCaseDialog.class);
         super.tearDown();
     }
 

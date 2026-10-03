@@ -16,6 +16,7 @@
 package org.testin.view;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;

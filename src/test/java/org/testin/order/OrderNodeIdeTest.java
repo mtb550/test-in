@@ -25,7 +25,7 @@ import org.testin.indexer.Nodes;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
-import org.testin.ui.framework.OnScreenDialog;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Shortcuts;
@@ -48,7 +48,7 @@ public class OrderNodeIdeTest extends AbstractTempRootIdeTest {
 
     @Override
     protected void tearDown() {
-        OnScreenDialog.closed(getProject(), OrderDialog.class);
+        ShownDialog.close(getProject(), OrderDialog.class);
         undoHistories().forget(UndoScope.TREE);
         super.tearDown();
     }
@@ -67,8 +67,8 @@ public class OrderNodeIdeTest extends AbstractTempRootIdeTest {
 
     private void ordered(final @NotNull String typed) {
         TreeGesture.pressed(getProject(), new OrderNodeAction(), List.of(login));
-        OnScreenDialog.typed(getProject(), OrderDialog.class, typed);
-        OnScreenDialog.pressed(getProject(), OrderDialog.class, Shortcuts.Enter);
+        ShownDialog.typed(getProject(), OrderDialog.class, typed);
+        ShownDialog.press(getProject(), OrderDialog.class, Shortcuts.Enter);
     }
 
     // Rule-TREE-PANEL-054
@@ -76,9 +76,9 @@ public class OrderNodeIdeTest extends AbstractTempRootIdeTest {
         for (final String tooLarge : List.of("99999999999", String.valueOf(Integer.MAX_VALUE))) {
             ordered(tooLarge);
 
-            assertTrue(tooLarge + " closed the box", OnScreenDialog.isOpen(getProject(), OrderDialog.class));
+            assertTrue(tooLarge + " closed the box", ShownDialog.isOpen(getProject(), OrderDialog.class));
             assertEquals(tooLarge + " cleared the number the node had", 3, orderOfLogin());
-            OnScreenDialog.closed(getProject(), OrderDialog.class);
+            ShownDialog.close(getProject(), OrderDialog.class);
         }
     }
 

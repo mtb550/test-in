@@ -236,7 +236,6 @@ purpose, because there is nothing for a person to apply.
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Pending: run created
     Pending --> Passed: P
     Pending --> Failed: F
     Pending --> Blocked: B
@@ -271,18 +270,15 @@ reported as. That changes no run item status. (UC-VIEW-PANEL-016)
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Created
     Created --> Assigned: 1
-    Created --> InProgress: first case executed
-    Assigned --> InProgress: first case executed
-    InProgress --> Completed: 2 or every case judged
+    Created --> InProgress: first test case executed
+    Assigned --> InProgress: first test case executed
+    InProgress --> Completed: 2 or every test case judged
     InProgress --> Closed: 3
     Created --> Completed: 2
     Created --> Closed: 3
     Assigned --> Completed: 2
     Assigned --> Closed: 3
-    Completed --> [*]
-    Closed --> [*]
 ```
 
 > ** Undecided. See section 9.** The diagram shows what the product *allows*.

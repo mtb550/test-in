@@ -17,7 +17,6 @@
 package org.testin.importexport.imports;
 
 import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -36,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
+import org.testin.Said;
 import org.testin.editor.UnifiedVirtualFile;
 import org.testin.importexport.FileTypes;
 import org.testin.indexer.TestCases;
@@ -165,17 +165,6 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull List<TestCaseDto> indexedTestCasesIn(final @NotNull Path testSet) {
         return indexedTestCases().getTestCasesForTestSet(testSet);
-    }
-
-    private @NotNull List<Notification> notifications() {
-        final @NotNull List<Notification> said = new CopyOnWriteArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
-        return said;
     }
 
     // UC-SHARE-005, Rule-SHARE-002
@@ -369,7 +358,7 @@ public class ImportFlowIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestSetPackageDirectoryDto web = new NodesOnDisk(getProject()).testSetPackage(testProject.getTestCasesDirectory(), "Web");
         final @NotNull Map<String, List<TestCaseDto>> twoSheets = sheets("A Login", aTestCase("log in with a valid user"), aTestCase("a wrong password is refused"));
         twoSheets.put("B Checkout", new ArrayList<>(List.of(aTestCase("pay with a saved card"), aTestCase("pay with a wallet"), aTestCase("pay on delivery"))));
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
         final @NotNull AtomicInteger asked = new AtomicInteger();
 
         imported(web, read(aFile("Plan.json", twoSheets)), failingAtTheFirstCheckOfTheSecondSheet(asked));

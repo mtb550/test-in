@@ -18,6 +18,7 @@ package org.testin.git;
 
 import com.intellij.notification.Notification;
 import org.jetbrains.annotations.NotNull;
+import org.testin.Said;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
@@ -29,7 +30,7 @@ public class ViewPendingCommitsWorkIdeTest extends AbstractGitRemoteIdeTest {
     public void testTestinOffersToMakeTheRepositoryWhenThereIsNone() {
         final @NotNull Path notARepository = directory("not-a-repository");
         write(notARepository, ".tp", "{}");
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         new ViewPendingCommitsWork(getProject()).openFor(notARepository);
 
@@ -45,7 +46,7 @@ public class ViewPendingCommitsWorkIdeTest extends AbstractGitRemoteIdeTest {
         commitAll(work, "three test cases");
         write(work, "d.tc", "{}");
         commitAll(work, "one more");
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         new ViewPendingCommitsWork(getProject()).openFor(work);
 

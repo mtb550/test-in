@@ -26,7 +26,7 @@ import org.testin.model.NodeCount;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.ui.framework.ShownDialogParts;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.view.Drawn;
 import org.testin.view.marker.MarkerDetailsViewDialog;
 
@@ -37,7 +37,7 @@ import java.util.Map;
 public class NodeDetailsIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull List<String> wordsOfTheDialogOpenedBy(final @NotNull TestCaseEditor editor) {
-        return ShownDialogParts.wordsOf(new MarkerDetailsViewDialog(getProject(), editor.getEditedNode()));
+        return ShownDialog.wordsOf(new MarkerDetailsViewDialog(getProject(), editor.getEditedNode()));
     }
 
     private static @NotNull String countedTestCases(final @NotNull List<String> words) {

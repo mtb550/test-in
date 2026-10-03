@@ -22,7 +22,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
-import org.testin.Balloons;
+import org.testin.Said;
 import org.testin.TreeGesture;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Refused;
@@ -40,7 +40,7 @@ public class ExecuteTestsFromTheTreeIdeTest extends AbstractCodegenIdeTest {
     // Rule-TREE-PANEL-078
     public void testANodeWithNoTestCasesSaysSoAndRunsNothing() {
         final @NotNull TestSetDirectoryDto empty = createdTestSet("Empty");
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
         TreeGesture.pressed(getProject(), runTests(), List.of(empty));
 
         final @NotNull List<String> said = balloons.shown();

@@ -24,14 +24,14 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.explorer.tree.TreeTransferHandler;
-import org.testin.util.ClipboardContents;
 import org.testin.indexer.Nodes;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.ui.framework.OnScreenDialog;
+import org.testin.ui.framework.ShownDialog;
+import org.testin.util.ClipboardContents;
 import org.testin.util.Shortcuts;
 
 import javax.swing.TransferHandler;
@@ -68,7 +68,7 @@ public class PasteNodeAsksFirstIdeTest extends AbstractTempRootIdeTest {
 
     @Override
     protected void tearDown() {
-        OnScreenDialog.closed(getProject(), ConfirmDialog.class);
+        ShownDialog.close(getProject(), ConfirmDialog.class);
         CopyPasteManager.getInstance().setContents(new StringSelection(""));
         super.tearDown();
     }
@@ -81,7 +81,7 @@ public class PasteNodeAsksFirstIdeTest extends AbstractTempRootIdeTest {
         handler.copySelectionToClipboard(action == TransferHandler.MOVE);
         final @NotNull Transferable held = ClipboardContents.withFlavor(TreeTransferHandler.NODE_FLAVOR).orElseThrow(() -> new AssertionError("the test set never reached the clipboard"));
         new PasteNodeWork(getProject(), handler).paste(held, payments);
-        assertTrue("pasting did not ask first", OnScreenDialog.isOpen(getProject(), ConfirmDialog.class));
+        assertTrue("pasting did not ask first", ShownDialog.isOpen(getProject(), ConfirmDialog.class));
     }
 
     // Rule-TREE-PANEL-006
@@ -91,7 +91,7 @@ public class PasteNodeAsksFirstIdeTest extends AbstractTempRootIdeTest {
         pastedFromTheClipboard(TransferHandler.MOVE);
         assertTrue("the test set moved before the tester confirmed", nodes().nodeExists(login.getPath()) && !Files.exists(movedTo));
 
-        OnScreenDialog.pressed(getProject(), ConfirmDialog.class, Shortcuts.Escape);
+        ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Escape);
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
         assertTrue("canceling the move still moved the test set", nodes().nodeExists(login.getPath()) && !Files.exists(movedTo));
@@ -104,7 +104,7 @@ public class PasteNodeAsksFirstIdeTest extends AbstractTempRootIdeTest {
         pastedFromTheClipboard(TransferHandler.COPY);
         assertFalse("the test set was copied before the tester confirmed", Files.exists(copiedTo));
 
-        OnScreenDialog.pressed(getProject(), ConfirmDialog.class, Shortcuts.Enter);
+        ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Enter);
 
         Await.until("confirming did not copy the test set", () -> nodes().nodeExists(copiedTo));
     }

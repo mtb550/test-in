@@ -17,7 +17,6 @@ package org.testin.bug;
 
 import com.intellij.execution.process.ProcessOutput;
 import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -26,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Notified;
+import org.testin.Said;
 import org.testin.config.BugRepository;
 import org.testin.config.TestinYml;
 import org.testin.editor.EditorFixtures;
@@ -41,9 +41,9 @@ import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.ui.framework.PressEscape;
-import org.testin.ui.framework.ShownDialogs;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
+import org.testin.util.Shortcuts;
 import org.testin.view.BrowserOpened;
 import org.testin.view.Drawn;
 import org.testin.view.KeyPress;
@@ -105,7 +105,7 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
     @Override
     protected void tearDown() {
         try {
-            ShownDialogs.close(getProject(), ReportBugDialog.class);
+            ShownDialog.close(getProject(), ReportBugDialog.class);
             BugFiling.ghOnThisMachine = ghBefore;
             restoreTheYml();
         } finally {
@@ -154,7 +154,7 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
         reports.moveTo(item, Stage.OPEN);
         new ReportBugDialog(getProject(), item, bug, () -> {
         }).open();
-        return ShownDialogs.content(getProject(), ReportBugDialog.class);
+        return ShownDialog.content(getProject(), ReportBugDialog.class);
     }
 
     private static <T> @NotNull T theOne(final @NotNull JComponent dialog, final @NotNull Class<T> kind) {
@@ -232,9 +232,9 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
         ReportBug.start(getProject(), tr, tc.getId(), tc, () -> {
         });
 
-        Await.until("Report Bug never opened the bug", () -> ShownDialogs.of(getProject(), ReportBugDialog.class).isPresent());
+        Await.until("Report Bug never opened the bug", () -> ShownDialog.isOpen(getProject(), ReportBugDialog.class));
         assertTrue("the bug was not prepared under the IDE's progress bar: " + underProgress, underProgress.contains(Bundle.message("bug.preparing")));
-        final @NotNull List<String> words = Drawn.words(ShownDialogs.content(getProject(), ReportBugDialog.class));
+        final @NotNull List<String> words = Drawn.words(ShownDialog.content(getProject(), ReportBugDialog.class));
         assertTrue("the repository is not the one bugRepoUrl in testin.yml names now: " + words, Drawn.holds(words, "acme/shop"));
     }
 
@@ -247,7 +247,7 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
 
         Await.until("the stopped preparation never finished", () -> Services.getInstance(getProject(), BugReports.class).whyReportBugIsOff(item, failed).isEmpty());
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-        assertTrue("stopping the progress bar still opened the bug", ShownDialogs.of(getProject(), ReportBugDialog.class).isEmpty());
+        assertFalse("stopping the progress bar still opened the bug", ShownDialog.isOpen(getProject(), ReportBugDialog.class));
     }
 
     // Rule-VIEW-PANEL-069
@@ -275,7 +275,7 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
         pressEnterIn(title(dialog));
         pressEnterIn(body(dialog));
         assertEquals("Enter sent the bug", List.of(), issuesCreated());
-        assertTrue("Enter closed the dialog", ShownDialogs.of(getProject(), ReportBugDialog.class).isPresent());
+        assertTrue("Enter closed the dialog", ShownDialog.isOpen(getProject(), ReportBugDialog.class));
 
         answers.add(new ProcessOutput(ISSUE + "\n", "", 0, false, false));
         answers.add(new ProcessOutput(ISSUE + "\n", "", 0, false, false));
@@ -286,10 +286,10 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
         assertEquals("one Send filed the bug more than once", 1, issuesCreated().size());
 
         opened(aPreparedBug(Optional.empty()));
-        PressEscape.on(getProject(), ReportBugDialog.class);
+        ShownDialog.press(getProject(), ReportBugDialog.class, Shortcuts.Escape);
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-        assertTrue("Escape did not close the dialog", ShownDialogs.of(getProject(), ReportBugDialog.class).isEmpty());
-        assertTrue("Escape asked before closing", ShownDialogs.of(getProject(), ConfirmDialog.class).isEmpty());
+        assertFalse("Escape did not close the dialog", ShownDialog.isOpen(getProject(), ReportBugDialog.class));
+        assertFalse("Escape asked before closing", ShownDialog.isOpen(getProject(), ConfirmDialog.class));
         assertEquals("Escape sent the bug", 1, issuesCreated().size());
     }
 
@@ -299,7 +299,7 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
         final @NotNull JComponent notReady = opened(aPreparedBug(Optional.of(noGh)));
         assertFalse("Send is not gray while gh cannot send", send(notReady).isEnabled());
         assertEquals("hovering over the gray Send does not say why", noGh, Drawn.hovering(send(notReady)));
-        ShownDialogs.close(getProject(), ReportBugDialog.class);
+        ShownDialog.close(getProject(), ReportBugDialog.class);
 
         final @NotNull JComponent ready = opened(aPreparedBug(Optional.empty()));
         assertTrue("Send is gray on a bug that can be sent", send(ready).isEnabled());
@@ -323,7 +323,7 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
         assertEquals("the title the tester wrote did not come back after a failed send", "Log in drops the session", title(afterAFailedSend).getText());
         assertEquals("the body the tester wrote did not come back after a failed send", "What the tester wrote instead", body(afterAFailedSend).getText());
 
-        PressEscape.on(getProject(), ReportBugDialog.class);
+        ShownDialog.press(getProject(), ReportBugDialog.class, Shortcuts.Escape);
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
         final @NotNull JComponent afterThrowingAway = opened(aPreparedBug(Optional.empty()));
         assertEquals("edits thrown away came back", "The template body", body(afterThrowingAway).getText());
@@ -356,13 +356,7 @@ public class ReportBugFromThePanelIdeTest extends AbstractTempRootIdeTest {
     // Rule-VIEW-PANEL-089
     public void testTheReportedMessageKeepsItsOpenAfterItIsPressed() {
         final @NotNull BrowserOpened browser = BrowserOpened.recording(getTestRootDisposable());
-        final @NotNull List<Notification> shown = new CopyOnWriteArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                shown.add(notification);
-            }
-        });
+        final @NotNull List<Notification> shown = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         BugFiling.record(getProject(), item, new IssueCreation(Optional.of(ISSUE), 0, ""));
 

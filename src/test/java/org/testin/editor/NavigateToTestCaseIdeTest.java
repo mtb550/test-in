@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
 import org.testin.Gestures;
-import org.testin.NotifiedBalloons;
+import org.testin.Said;
 import org.testin.codegen.AutomationState;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.testrun.TestRunEditor;
@@ -122,7 +122,7 @@ public class NavigateToTestCaseIdeTest extends AbstractCodegenIdeTest {
     // Rule-EDITOR-PANEL-236
     public void testATestCaseInNoTestSetIsRefusedAndNothingOpens() {
         final @NotNull TestRunEditor testRun = aTestRunEditorOver(List.of(new TestRunItems().setId(UUID.randomUUID())));
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             testRun.getList().setSelectedIndex(0);
             final @NotNull Presentation shown = Gestures.updated(getProject(), navigateToTestCase(), testRun.getList());

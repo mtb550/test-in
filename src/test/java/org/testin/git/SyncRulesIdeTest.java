@@ -22,12 +22,13 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
+import org.testin.Said;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
-import org.testin.ui.framework.ShownDialogContent;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
@@ -42,7 +43,7 @@ public class SyncRulesIdeTest extends AbstractGitRemoteIdeTest {
 
     @Override
     protected void tearDown() {
-        ShownDialogContent.close(getProject(), PendingCommitsDialog.class);
+        ShownDialog.close(getProject(), PendingCommitsDialog.class);
         super.tearDown();
     }
 
@@ -64,7 +65,7 @@ public class SyncRulesIdeTest extends AbstractGitRemoteIdeTest {
         write(work, "mine.tc", "{}");
         commitAll(work, "my test case");
 
-        synced(notifications());
+        synced(Said.listening(getProject(), getTestRootDisposable()).notifications());
 
         assertTrue("the colleague's work was not taken", Files.exists(work.resolve("theirs.tc")));
         assertEquals("my work is still only on this machine", head(work, "HEAD"), head(remote, MAIN));
@@ -76,7 +77,7 @@ public class SyncRulesIdeTest extends AbstractGitRemoteIdeTest {
         theColleagueAdds("theirs.tc", "{}");
         mustGit(work, "remote", "set-url", "--push", "origin", root.resolve("nowhere.git").toUri().toString());
 
-        final @NotNull Notification done = synced(notifications());
+        final @NotNull Notification done = synced(Said.listening(getProject(), getTestRootDisposable()).notifications());
 
         assertEquals("a push was tried with nothing to send", Bundle.message("git.synced.up.to.date"), done.getContent());
         assertTrue("the sync did not take the colleague's work", Files.exists(work.resolve("theirs.tc")));
@@ -86,7 +87,7 @@ public class SyncRulesIdeTest extends AbstractGitRemoteIdeTest {
     public void testAGitStepThatOnlyReadsCanBeCanceledAndOneThatWritesCannot() {
         final @NotNull List<Task> started = ShareGestures.tasksStarted(getTestRootDisposable());
 
-        synced(notifications());
+        synced(Said.listening(getProject(), getTestRootDisposable()).notifications());
         write(work, "mine.tc", "{\"description\":\"typed\"}");
         new ViewPendingCommitsWork(getProject()).openFor(work);
 
@@ -100,7 +101,7 @@ public class SyncRulesIdeTest extends AbstractGitRemoteIdeTest {
         write(work, "mine.tc", "{\"description\":\"typed\"}");
 
         new ViewPendingCommitsWork(getProject()).openFor(work);
-        ShareGestures.shown(getProject(), PendingCommitsDialog.class);
+        ShownDialog.waitedFor(getProject(), PendingCommitsDialog.class);
 
         assertFalse("Git was never asked", onTheMainThread.isEmpty());
         assertFalse("Git was read on the main thread", onTheMainThread.contains(Boolean.TRUE));
@@ -118,7 +119,7 @@ public class SyncRulesIdeTest extends AbstractGitRemoteIdeTest {
         final @NotNull String relative = work.relativize(login.getPath()).resolve(theirs.getId() + ".tc").toString().replace('\\', '/');
         theColleagueAdds(relative, Services.getInstance(getProject(), Mapper.class).writeValueAsString(theirs));
 
-        synced(notifications());
+        synced(Said.listening(getProject(), getTestRootDisposable()).notifications());
 
         Await.until("Testin's reading of the folder does not hold the colleague's test case", () -> Services.getInstance(getProject(), TestCases.class).findTestCase(theirs.getId()).isPresent());
         assertNotNull("the IDE's view of the folder was not read again", LocalFileSystem.getInstance().findFileByNioFile(work.resolve(relative)));

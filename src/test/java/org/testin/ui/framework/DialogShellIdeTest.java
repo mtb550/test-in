@@ -215,9 +215,9 @@ public class DialogShellIdeTest extends BasePlatformTestCase {
         final @NotNull Form form = shown(new Form(getProject(), List.of(name)));
         ((JTextField) name.getComponent().getFocusComponent()).setText("Log in with a valid user");
 
-        PressEscape.on(getProject(), Form.class);
+        ShownDialog.press(getProject(), Form.class, Shortcuts.Escape);
 
-        assertFalse("Escape did not close the dialog", OpenDialogKeys.isOpen(getProject(), Form.class));
+        assertFalse("Escape did not close the dialog", ShownDialog.isOpen(getProject(), Form.class));
         assertEquals("Escape saved what was typed", 0, form.submitted.get());
     }
 
@@ -265,7 +265,7 @@ public class DialogShellIdeTest extends BasePlatformTestCase {
 
         assertFalse("a second dialog of a kind already on screen was opened", second.show());
         assertFalse("the dialog already on screen was closed", first.getPopup().isDisposed());
-        assertSame("the dialog on screen is not the first one", first.getPopup(), OpenDialogKeys.popupOf(getProject(), Form.class));
+        assertSame("the dialog on screen is not the first one", first.getPopup(), ShownDialog.popup(getProject(), Form.class));
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-075
@@ -276,9 +276,9 @@ public class DialogShellIdeTest extends BasePlatformTestCase {
         }));
 
         assertTrue("the older question is still open beside the newer one", older.getPopup().isDisposed());
-        assertSame(newer.getPopup(), OpenDialogKeys.popupOf(getProject(), ConfirmDialog.class));
+        assertSame(newer.getPopup(), ShownDialog.popup(getProject(), ConfirmDialog.class));
 
-        OpenDialogKeys.press(getProject(), ConfirmDialog.class, Shortcuts.Enter);
+        ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Enter);
         assertEquals("the key meant for the newer question answered the older one", 0, olderAnswered.get());
     }
 

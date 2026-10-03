@@ -69,7 +69,7 @@ public class DetailsTab {
     private static @NotNull Band testRunBand(final @NotNull TestRunItems runItem, final @NotNull List<String> currentPath, final @NotNull Set<TestRunEditorAttributes> shown) {
         final @NotNull List<AbstractDetails> rows = new ArrayList<>(List.of(new RunItemSummary(runItem, currentPath)));
         if (shown.contains(TestRunEditorAttributes.ACTUAL_RESULT)) rows.add(new RunItemAttributeRow(TestRunEditorAttributes.ACTUAL_RESULT, runItem));
-        if (shown.contains(TestRunEditorAttributes.STACKTRACE)) rows.add(new StacktraceLine(runItem, currentPath));
+        rows.add(new StacktraceLine(runItem, currentPath, shown.contains(TestRunEditorAttributes.STACKTRACE)));
         if (shown.contains(TestRunEditorAttributes.EXECUTED_BY) || shown.contains(TestRunEditorAttributes.EXECUTED_AT)) {
             rows.add(new AttributeRow(TestRunEditorAttributes.EXECUTED_BY.getName(), (_, _) -> Display.whoAndWhen(runItem.getExecutedBy(), runItem.getExecutedAt())));
         }

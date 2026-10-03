@@ -81,7 +81,7 @@ public class RemoveTestCasesIdeTest extends AbstractTempRootIdeTest {
         assertTrue("Remove is gray on the selected test cases", e.getPresentation().isEnabled());
 
         ShownDialog.open(getProject(), ConfirmDialog.class, () -> ActionUtil.performAction(remove, e));
-        return Drawn.words(ShownDialog.of(getProject(), ConfirmDialog.class).getContent()).stream().map(word -> StringUtil.unescapeXmlEntities(StringUtil.removeHtmlTags(word)).replace("&#39;", "'")).toList();
+        return Drawn.words(ShownDialog.content(getProject(), ConfirmDialog.class)).stream().map(word -> StringUtil.unescapeXmlEntities(StringUtil.removeHtmlTags(word)).replace("&#39;", "'")).toList();
     }
 
     private void confirm() {

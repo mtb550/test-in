@@ -18,12 +18,12 @@ package org.testin.view.marker;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.Balloons;
 import org.testin.NodesOnDisk;
+import org.testin.Said;
 import org.testin.indexer.NodeCounter;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.ui.framework.OnScreenDialog;
+import org.testin.ui.framework.ShownDialog;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +46,7 @@ public class NodeDetailsIdeTest extends AbstractTempRootIdeTest {
 
     @Override
     protected void tearDown() {
-        OnScreenDialog.closed(getProject(), MarkerDetailsViewDialog.class);
+        ShownDialog.close(getProject(), MarkerDetailsViewDialog.class);
         super.tearDown();
     }
 
@@ -70,7 +70,7 @@ public class NodeDetailsIdeTest extends AbstractTempRootIdeTest {
     // Rule-TREE-PANEL-087
     public void testOpeningDetailsChangesNothingAndSaysNothing() {
         final @NotNull String before = bytesOf(marker());
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
         new MarkerDetailsViewDialog(getProject(), login);
 
         assertEquals("opening Details said something", List.of(), balloons.shown());

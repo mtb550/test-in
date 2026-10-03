@@ -100,7 +100,7 @@ badges and above **Test case** (Rule-VIEW-PANEL-085).
 | The bug chip      | The severity and the priority in one chip, as `Blocker / High`, in the severity's color, on a failed result only                                                                                                         |
 | After the chip    | The GitHub issue the failure was reported as, as `#123` with the address on hover — or, where nothing has been reported, the **Report a bug** link that files one, never both. That is [UC-VIEW-PANEL-016](reportBug.md) |
 | **Actual Result** | What the tester says actually happened                                                                                                                                                                                   |
-| **Stacktrace**    | A link, never the error itself, and a thumbnail of each screenshot pasted with the failure. That is [UC-VIEW-PANEL-006](readStacktrace.md)                                                                               |
+| **Stacktrace**    | A link, never the error itself, then a thumbnail of each screenshot pasted with the failure, drawn even when Fields hides the link. That is [UC-VIEW-PANEL-006](readStacktrace.md)                                       |
 | **Executed By**   | Who ran it and when, as `muteb on 7 January 10:05`, last in the band. One row, not two — the date has no caption of its own (Rule-VIEW-PANEL-061)                                                                        |
 
 ## Main flow

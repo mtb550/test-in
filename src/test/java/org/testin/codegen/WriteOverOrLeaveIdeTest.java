@@ -19,7 +19,8 @@ package org.testin.codegen;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.ui.framework.PressEscape;
+import org.testin.ui.framework.ShownDialog;
+import org.testin.util.Shortcuts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class WriteOverOrLeaveIdeTest extends BasePlatformTestCase {
         final @NotNull List<String> answered = new ArrayList<>();
         WriteBodies.writeOverOrLeave(getProject(), 2, () -> answered.add("write over"), () -> answered.add("leave")).show();
 
-        PressEscape.on(getProject(), ConfirmDialog.class);
+        ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Escape);
 
         assertEquals("Escape did not leave the bodies as they are, so the test cases holding their TODO were never sent", List.of("leave"), answered);
     }

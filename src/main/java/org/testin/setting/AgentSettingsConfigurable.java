@@ -26,6 +26,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.AgentCli;
 import org.testin.codegen.AgentConnection;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
@@ -94,9 +95,7 @@ public final class AgentSettingsConfigurable implements SearchableConfigurable {
         final @NotNull AgentConnection typed = typedConnection();
         if (!typed.isConnected()) return Bundle.message("agent.check.no.command");
 
-        final @NotNull Optional<String> answered = ProgressManager.getInstance().runProcessWithProgressSynchronously(
-                () -> AgentCli.onPath(ProgressManager.getInstance().getProgressIndicator()).check(typed),
-                Bundle.message("agent.check.button"), true, null);
+        final @NotNull Optional<String> answered = BackgroundWork.synchronously(Bundle.message("agent.check.button"), true, () -> AgentCli.onPath(ProgressManager.getInstance().getProgressIndicator()).check(typed), Optional.empty());
         if (answered.isEmpty()) return Bundle.message("agent.check.not.found", typed.command(), AgentCli.triedNames(typed.command()));
 
         return answered.orElseThrow().isBlank()

@@ -31,8 +31,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.services.BackgroundWork;
-import org.testin.ui.framework.AbstractFrameworkDialog;
-import org.testin.ui.framework.ShownDialogContent;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Shortcuts;
 import org.testin.view.Drawn;
 
@@ -50,14 +49,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class ShareGestures {
-    static @NotNull JComponent shown(final @NotNull Project p, final @NotNull Class<? extends AbstractFrameworkDialog> kind) {
-        Await.until(kind.getSimpleName() + " never opened", () -> ShownDialogContent.of(p, kind).isPresent());
-        return ShownDialogContent.of(p, kind).orElseThrow();
-    }
-
     static @NotNull JComponent theReviewOf(final @NotNull Project p, final @NotNull Path repository) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> new ViewPendingCommitsWork(p).openFor(repository));
-        return shown(p, PendingCommitsDialog.class);
+        return ShownDialog.waitedFor(p, PendingCommitsDialog.class);
     }
 
     static @NotNull JBTable table(final @NotNull JComponent dialog) {

@@ -26,7 +26,7 @@ import com.theoryinpractice.testng.configuration.TestNGConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
-import org.testin.NotifiedBalloons;
+import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -83,7 +83,7 @@ public class TestNGHandOverIdeTest extends AbstractCodegenIdeTest {
         final @NotNull TestCaseDto withoutCode = indexedTestCase(ts, "Log in with a wrong password", "m0002");
         final @NotNull List<TestCaseDto> testCases = List.of(createdTestCase(ts, "Log in with a valid user", "m0001"), withoutCode, createdTestCase(ts, "Log out", "m0003"));
         settled();
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         final @NotNull TestRunEditor editor = runningTheWholeTestRunOf(testCases);
         try {
             assertEquals("the test cases with a method did not still run", List.of("nafath.CheckoutTest,logInWithAValidUser", "nafath.CheckoutTest,logOut"), List.copyOf(patternsOf(executed.getFirst())));

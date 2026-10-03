@@ -32,7 +32,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.services.Services;
-import org.testin.ui.framework.OnScreenDialog;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
@@ -60,7 +60,7 @@ public class RenameWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
 
     @Override
     public void tearDown() {
-        OnScreenDialog.closed(getProject(), RenameDialog.class);
+        ShownDialog.close(getProject(), RenameDialog.class);
         super.tearDown();
     }
 
@@ -84,8 +84,8 @@ public class RenameWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
         opened(login);
 
         TreeGesture.pressed(getProject(), new RenameAction(), List.of(payments));
-        OnScreenDialog.typed(getProject(), RenameDialog.class, "Billing");
-        OnScreenDialog.pressed(getProject(), RenameDialog.class, Shortcuts.Enter);
+        ShownDialog.typed(getProject(), RenameDialog.class, "Billing");
+        ShownDialog.press(getProject(), RenameDialog.class, Shortcuts.Enter);
 
         Await.until("the package was not renamed", () -> Services.getInstance(getProject(), Nodes.class).nodeExists(payments.getPath().resolveSibling("Billing")));
         assertTrue("an editor on a test set under the renamed package is still open", openOn(card).isEmpty());

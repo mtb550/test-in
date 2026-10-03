@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testrun.TestRunEditorAttributes;
-import org.testin.ui.framework.ShownDialogs;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.view.Drawn;
 import org.testin.view.details.components.StacktraceDialog;
 
@@ -67,7 +67,7 @@ public class StacktraceWindowIdeTest extends BasePlatformTestCase {
         final @NotNull TestCaseDto tc = TestCaseDto.builder().description("Log in with a valid user").expectedResult("The session stays until the tester signs out").build();
         assertTrue("the Stacktrace window did not open", new StacktraceDialog(getProject(), tc, "The session was dropped", STACKTRACE).show());
 
-        final @NotNull JComponent window = ShownDialogs.content(getProject(), StacktraceDialog.class);
+        final @NotNull JComponent window = ShownDialog.content(getProject(), StacktraceDialog.class);
         window.setSize(900, 700);
         layOut(window);
         return window;
@@ -76,7 +76,7 @@ public class StacktraceWindowIdeTest extends BasePlatformTestCase {
     @Override
     protected void tearDown() {
         try {
-            ShownDialogs.close(getProject(), StacktraceDialog.class);
+            ShownDialog.close(getProject(), StacktraceDialog.class);
             super.tearDown();
         } catch (final Exception ex) {
             throw new AssertionError("Could not tear down " + getName() + ": " + ex.getMessage(), ex);

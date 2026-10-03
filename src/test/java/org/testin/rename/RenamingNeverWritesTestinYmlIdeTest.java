@@ -28,7 +28,7 @@ import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testproject.SaveTestinYml;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.ui.framework.OnScreenDialog;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Shortcuts;
 
 import java.io.IOException;
@@ -55,8 +55,8 @@ public class RenamingNeverWritesTestinYmlIdeTest extends AbstractTempRootIdeTest
 
     @Override
     protected void tearDown() {
-        OnScreenDialog.closed(getProject(), RenameDialog.class);
-        OnScreenDialog.closed(getProject(), ConfirmDialog.class);
+        ShownDialog.close(getProject(), RenameDialog.class);
+        ShownDialog.close(getProject(), ConfirmDialog.class);
         try {
             if (ymlWas.isPresent()) Files.writeString(yml(), ymlWas.orElseThrow());
             else Files.deleteIfExists(yml());
@@ -90,8 +90,8 @@ public class RenamingNeverWritesTestinYmlIdeTest extends AbstractTempRootIdeTest
         final @NotNull String before = bytesOf(yml());
 
         TreeGesture.pressed(getProject(), new RenameAction(), List.of(testProject));
-        OnScreenDialog.typed(getProject(), RenameDialog.class, "NAFATH2");
-        OnScreenDialog.pressed(getProject(), RenameDialog.class, Shortcuts.Enter);
+        ShownDialog.typed(getProject(), RenameDialog.class, "NAFATH2");
+        ShownDialog.press(getProject(), RenameDialog.class, Shortcuts.Enter);
         Await.until("the test project was not renamed", () -> Services.getInstance(getProject(), Nodes.class).nodeExists(root.resolve("NAFATH2")));
         bound().choose("Another");
         bound().choose("NAFATH2");
@@ -99,8 +99,8 @@ public class RenamingNeverWritesTestinYmlIdeTest extends AbstractTempRootIdeTest
         assertEquals("renaming or choosing a test project wrote " + TestinYml.fileName(), before, bytesOf(yml()));
 
         SaveTestinYml.start(getProject());
-        Await.until("Save to " + TestinYml.fileName() + " asked nothing", () -> OnScreenDialog.isOpen(getProject(), ConfirmDialog.class));
-        OnScreenDialog.pressed(getProject(), ConfirmDialog.class, Shortcuts.Enter);
+        Await.until("Save to " + TestinYml.fileName() + " asked nothing", () -> ShownDialog.isOpen(getProject(), ConfirmDialog.class));
+        ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Enter);
 
         Await.until("Save to " + TestinYml.fileName() + " did not write it", () -> bytesOf(yml()).contains("NAFATH2"));
     }

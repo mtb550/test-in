@@ -17,7 +17,6 @@
 package org.testin.git;
 
 import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
@@ -28,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.testin.git.LocalGit.mustGit;
 
@@ -106,18 +104,6 @@ public abstract class AbstractGitRemoteIdeTest extends AbstractTempRootIdeTest {
 
     protected static @NotNull String head(final @NotNull Path repository, final @NotNull String revision) {
         return mustGit(repository, "rev-parse", revision).trim();
-    }
-
-    protected @NotNull List<Notification> notifications() {
-        final @NotNull List<Notification> said = new CopyOnWriteArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
-
-        return said;
     }
 
     protected static @NotNull Notification titled(final @NotNull List<Notification> said, final @NotNull String title) {

@@ -20,8 +20,8 @@ import com.intellij.testFramework.PlatformTestUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractOpenEditorsIdeTest;
 import org.testin.Await;
-import org.testin.Balloons;
 import org.testin.NodesOnDisk;
+import org.testin.Said;
 import org.testin.TempTree;
 import org.testin.TreeGesture;
 import org.testin.indexer.Nodes;
@@ -32,7 +32,7 @@ import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.ui.framework.OnScreenDialog;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
@@ -63,7 +63,7 @@ public class RemoveWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
 
     @Override
     public void tearDown() {
-        OnScreenDialog.closed(getProject(), ConfirmDialog.class);
+        ShownDialog.close(getProject(), ConfirmDialog.class);
         undoHistories().forget(UndoScope.TREE);
         super.tearDown();
     }
@@ -82,7 +82,7 @@ public class RemoveWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
 
     private void removedAndConfirmed(final @NotNull DirectoryDto node) {
         TreeGesture.pressed(getProject(), new RemoveAction(), List.of(node));
-        OnScreenDialog.pressed(getProject(), ConfirmDialog.class, Shortcuts.Enter);
+        ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Enter);
     }
 
     // Rule-TREE-PANEL-116
@@ -136,7 +136,7 @@ public class RemoveWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
         Await.until("the first test set was not removed", () -> !nodes().nodeExists(login.getPath()) && undoHistories().canUndo(UndoScope.TREE));
         TempTree.delete(checkout.getPath());
 
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
         removedAndConfirmed(checkout);
 
         Await.until("a node whose copy could not be kept was not removed", () -> !nodes().nodeExists(checkout.getPath()));

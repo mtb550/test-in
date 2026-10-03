@@ -145,6 +145,7 @@ public final class JavaSourceRoot {
     }
 
     // UC-CODEGEN-016, Rule-CODEGEN-053
+    @FromContentModule
     public static boolean move(final @NotNull VirtualFile file, final @NotNull VirtualFile target, final @NotNull Object requestor) {
         try {
             file.move(requestor, target);

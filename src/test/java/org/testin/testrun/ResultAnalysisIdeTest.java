@@ -28,8 +28,7 @@ import org.testin.editor.toolbar.components.ResultAnalysisBtn;
 import org.testin.model.RunItemStatus;
 import org.testin.model.TestRunStatus;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.ui.framework.ShownDialogParts;
-import org.testin.ui.framework.SizedPopups;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Shortcuts;
 import org.testin.view.Drawn;
 
@@ -50,12 +49,11 @@ public class ResultAnalysisIdeTest extends AbstractTempRootIdeTest {
     @Override
     protected void setUp() {
         super.setUp();
-        SizedPopups.installed(getTestRootDisposable());
     }
 
     @Override
     protected void tearDown() {
-        ShownDialogParts.closeAll(getProject(), ResultAnalysisDialog.class);
+        ShownDialog.close(getProject(), ResultAnalysisDialog.class);
         super.tearDown();
     }
 
@@ -108,14 +106,14 @@ public class ResultAnalysisIdeTest extends AbstractTempRootIdeTest {
         try {
             editor.getToolBar().getToolbarItem(ResultAnalysisBtn.class).doClick();
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-            final @NotNull JComponent dialog = ShownDialogParts.contentOf(getProject(), ResultAnalysisDialog.class).orElseThrow(() -> new AssertionError("Result Analysis opened no dialog"));
+            final @NotNull JComponent dialog = ShownDialog.content(getProject(), ResultAnalysisDialog.class);
             final @NotNull JBTextArea box = Drawn.components(dialog).stream().filter(JBTextArea.class::isInstance).map(JBTextArea.class::cast).findFirst().orElseThrow();
 
             box.setText("Most failures came from the payment gateway");
             box.setCaretPosition(box.getText().length());
             assertTrue("Enter is not bound in a box", OnScreen.pressKey(box, Shortcuts.Enter.getKey()));
             assertTrue("Enter in a box did not make a new paragraph: " + box.getText(), box.getText().contains("\n"));
-            assertTrue("Enter in a box closed the dialog", ShownDialogParts.contentOf(getProject(), ResultAnalysisDialog.class).isPresent());
+            assertTrue("Enter in a box closed the dialog", ShownDialog.isOpen(getProject(), ResultAnalysisDialog.class));
 
             final @NotNull String typed = box.getText();
             assertEquals("Ctrl+V in a box is not the box's own paste", DefaultEditorKit.pasteAction, box.getInputMap(JComponent.WHEN_FOCUSED).get(KeyStroke.getKeyStroke(KeyEvent.VK_V, Shortcuts.menuMask())));

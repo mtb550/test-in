@@ -18,7 +18,8 @@ package org.testin.git;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
-import org.testin.ui.framework.PressEscape;
+import org.testin.ui.framework.ShownDialog;
+import org.testin.util.Shortcuts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class SkipAMergeQuestionIdeTest extends BasePlatformTestCase {
         final @NotNull List<String> answered = new ArrayList<>();
         new ResolveConflictDialog(getProject(), "Logs in", List.of(), List.of(), _ -> answered.add("kept"), () -> answered.add("skipped")).show();
 
-        PressEscape.on(getProject(), ResolveConflictDialog.class);
+        ShownDialog.press(getProject(), ResolveConflictDialog.class, Shortcuts.Escape);
 
         assertEquals("Escape closed the question without moving on, so the files after it were never asked about", List.of("skipped"), answered);
     }

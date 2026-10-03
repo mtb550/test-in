@@ -27,6 +27,7 @@ import com.intellij.openapi.util.Disposer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
@@ -40,6 +41,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BackgroundWork {
@@ -64,14 +66,31 @@ public final class BackgroundWork {
     }
 
     public static boolean synchronously(final @NotNull Project p, final @NotNull String title, final boolean cancellable, final @NotNull Runnable work) {
-        if (stopped(new Task.Modal(p, title, cancellable) {
-            @Override
-            public void run(final @NotNull ProgressIndicator indicator) {
-                work.run();
-            }
-        })) return false;
+        if (stoppedBefore(p, title, cancellable)) return false;
 
         return ProgressManager.getInstance().runProcessWithProgressSynchronously(work, title, cancellable, p);
+    }
+
+    public static <T> @NotNull T synchronously(final @NotNull Project p, final @NotNull String title, final boolean cancellable, final @NotNull Supplier<T> work, final @NotNull T whenStopped) {
+        return computed(p, title, cancellable, work, whenStopped);
+    }
+
+    public static <T> @NotNull T synchronously(final @NotNull String title, final boolean cancellable, final @NotNull Supplier<T> work, final @NotNull T whenStopped) {
+        return computed(null, title, cancellable, work, whenStopped);
+    }
+
+    private static <T> @NotNull T computed(final @Nullable Project p, final @NotNull String title, final boolean cancellable, final @NotNull Supplier<T> work, final @NotNull T whenStopped) {
+        if (stoppedBefore(p, title, cancellable)) return whenStopped;
+
+        return ProgressManager.getInstance().runProcessWithProgressSynchronously(work::get, title, cancellable, p);
+    }
+
+    private static boolean stoppedBefore(final @Nullable Project p, final @NotNull String title, final boolean cancellable) {
+        return stopped(new Task.Modal(p, title, cancellable) {
+            @Override
+            public void run(final @NotNull ProgressIndicator indicator) {
+            }
+        });
     }
 
     private static boolean stopped(final @NotNull Task task) {

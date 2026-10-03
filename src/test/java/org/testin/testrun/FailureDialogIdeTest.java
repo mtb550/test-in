@@ -29,9 +29,9 @@ import com.intellij.ui.EditorTextField;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.NotifiedBalloons;
 import org.testin.Gestures;
 import org.testin.OnScreen;
+import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.Nodes;
@@ -48,8 +48,7 @@ import org.testin.testrun.failure.FailedResultDialog;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.MultiLineField;
-import org.testin.ui.framework.ShownDialogParts;
-import org.testin.ui.framework.SizedPopups;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 import org.testin.view.Drawn;
@@ -78,12 +77,11 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
     @Override
     protected void setUp() {
         super.setUp();
-        SizedPopups.installed(getTestRootDisposable());
     }
 
     @Override
     protected void tearDown() {
-        ShownDialogParts.closeAll(getProject(), FailedResultDialog.class);
+        ShownDialog.close(getProject(), FailedResultDialog.class);
         CopyPasteManager.getInstance().setContents(new StringSelection(""));
         super.tearDown();
     }
@@ -218,7 +216,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
     public void testFailedIsRecordedOnlyOnceWhatWasTypedIsWritten() {
         final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 2);
         final @NotNull TestRunEditor editor = walking(fixture);
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             fixture.press(editor, RunItemStatus.FAILED);
             final @NotNull JComponent dialog = fixture.openFailureDialog();
@@ -243,7 +241,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
     public void testNothingIsRecordedWhenTheTestRunIsNoLongerThere() {
         final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 2);
         final @NotNull TestRunEditor editor = walking(fixture);
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             fixture.press(editor, RunItemStatus.FAILED);
             final @NotNull JComponent dialog = fixture.openFailureDialog();
@@ -272,7 +270,7 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             final @NotNull FailedResultDialog built = new FailedResultDialog(getProject(), fixture.testRun().getPath(), fixture.resultOf(fixture.testCases().getFirst()), _ -> {
             });
             assertTrue("what happened is not typed into the box the test case form uses",
-                    ShownDialogParts.componentsOf(built).stream().map(ComponentDialogBase::getComponent).anyMatch(MultiLineField.class::isInstance));
+                    ShownDialog.componentsOf(built).stream().map(ComponentDialogBase::getComponent).anyMatch(MultiLineField.class::isInstance));
 
             fixture.press(editor, RunItemStatus.FAILED);
             final @NotNull JComponent dialog = fixture.openFailureDialog();

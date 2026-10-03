@@ -20,6 +20,7 @@ import com.intellij.notification.Notification;
 import com.intellij.openapi.application.ApplicationManager;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
+import org.testin.Said;
 import org.testin.util.Bundle;
 
 import java.io.IOException;
@@ -68,7 +69,7 @@ public class MergeNotStagedIdeTest extends AbstractGitRemoteIdeTest {
         bothChangeTheTestCase();
         final @NotNull Path lock = work.resolve(".git").resolve("index.lock");
         write(work, ".git/index.lock", "");
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
         final @NotNull List<List<String>> leftOver = new CopyOnWriteArrayList<>();
         final @NotNull List<String> finished = new CopyOnWriteArrayList<>();
 

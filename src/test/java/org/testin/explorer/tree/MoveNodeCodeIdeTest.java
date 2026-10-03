@@ -18,13 +18,13 @@ package org.testin.explorer.tree;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
+import org.testin.Said;
 import org.testin.TempTree;
 import org.testin.indexer.Nodes;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -39,7 +39,6 @@ import javax.swing.TransferHandler;
 import java.awt.datatransfer.StringSelection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MoveNodeCodeIdeTest extends AbstractCodegenIdeTest {
 
@@ -102,13 +101,7 @@ public class MoveNodeCodeIdeTest extends AbstractCodegenIdeTest {
         final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
         final @NotNull TestSetPackageDirectoryDto checkout = indexedPackage("Checkout", theTestCasesDirectory());
         TempTree.delete(checkout.getPath());
-        final @NotNull List<Notification> said = new CopyOnWriteArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         cutAndPasted(login, checkout);
 

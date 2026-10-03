@@ -33,7 +33,7 @@ import com.intellij.testFramework.TestActionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.Balloons;
+import org.testin.Said;
 import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
@@ -250,7 +250,7 @@ public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestCaseEditor editor = openedTestSet(6);
         final @NotNull FilterPopupBtn filter = filterOf(editor);
         final @NotNull TestCaseDto hidden = editor.getAllTestCases().stream().filter(tc -> tc.getPriority() == Priority.LOW).findFirst().orElseThrow();
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
 
         tick(filter, TestCaseEditorAttributes.PRIORITY.getName(), Priority.HIGH.getLabel());
         assertEquals("the filter did not narrow the list to the one high priority test case", 1, editor.getCurrentTestCases().size());

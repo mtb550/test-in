@@ -32,7 +32,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.codegen.CodegenBalloons;
+import org.testin.TestinLog;
 import org.testin.explorer.TreePanel;
 import org.testin.explorer.TreePanelActions;
 import org.testin.logger.Level;
@@ -175,15 +175,11 @@ public class SettingsPageRulesIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-SETTING-026
     public void testTheLogSitsBesideTheIdesOwnLog() {
-        final @NotNull CodegenBalloons log = CodegenBalloons.watching();
-        try {
-            final @NotNull String line = "beside the IDE's own log " + UUID.randomUUID();
-            Logger.info(line);
+        final @NotNull TestinLog log = TestinLog.fromNow(getTestRootDisposable());
+        final @NotNull String line = "beside the IDE's own log " + UUID.randomUUID();
+        Logger.info(line);
 
-            assertTrue("Testin's log is not in the IDE's log folder " + PathManager.getLogPath(), log.logged().stream().anyMatch(written -> written.contains(line)));
-        } finally {
-            log.stop();
-        }
+        assertTrue("Testin's log is not in the IDE's log folder " + PathManager.getLogPath(), log.lines().stream().anyMatch(written -> written.contains(line)));
     }
 
     // Rule-SETTING-041

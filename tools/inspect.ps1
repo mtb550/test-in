@@ -27,11 +27,9 @@
 
     Exits non-zero for any finding in the files this repository writes, the
     ones .idea/scopes/Inspected.xml names. A warning the IDE shows there is a
-    warning the run fails on. The exceptions are the few rules a headless run
-    cannot be trusted with, and $notGated at the foot of this file names each
-    one with its reason - as $notGatedMessages does for the two that are right
-    about everything but one sentence. DuplicatedDisplayString is counted rather
-    than forbidden, against .github/display-string-baseline.txt.
+    warning the run fails on. The only exceptions are the ones qodana.yaml
+    lists under exclude, each with its reason: Qodana reads that list in CI and
+    this script reads the same one, so the two gates cannot disagree.
 
     Ten rules are this script's own, because no IntelliJ inspection makes them
     or the headless run cannot be trusted with the one that does:
@@ -63,11 +61,6 @@ param(
     # said otherwise (#170). What "no override" means is now asked of
     # PSBoundParameters, which can tell it from a value.
     [string] $Subdirectory,
-
-    # How many display strings written in more than one place this tree is
-    # allowed to have. A ratchet rather than a gate: see
-    # Test-DisplayStringBaseline.
-    [string] $DisplayStringBaseline = '.github/display-string-baseline.txt',
 
     # Reuse the XML already in $OutputDir and only rebuild the reports. The
     # line numbers in it are the ones the inspector saw, so a source edited
@@ -182,23 +175,20 @@ function Select-Inspected([object[]] $problems) {
     <#
         The findings in files this repository writes, which is what the scope
         .idea/scopes/Inspected.xml names - the same scope Code | Inspect Code
-        offers in the IDE, so the two lists agree. The pattern is
-        (a||b||...)&&!c&&!d: a folder is written as file:folder//* and a single
-        file as file:name, and what follows &&! is left out.
+        offers in the IDE, so the two lists agree. The pattern is a||b||...: a
+        folder is written as file:folder//* and a single file as file:name.
     #>
     $pattern = ([xml](Get-Content (Join-Path $repo '.idea/scopes/Inspected.xml') -Raw)).component.scope.pattern
-    $parts = @($pattern -split '&&!')
-    $excluded = @($parts | Select-Object -Skip 1 | ForEach-Object { $_ -replace '^file:', '' })
     $folders = @()
     $files = @()
-    foreach ($part in ($parts[0].Trim('(', ')') -split '\|\|')) {
+    foreach ($part in ($pattern.Trim('(', ')') -split '\|\|')) {
         $target = $part -replace '^file:', ''
         if ($target.EndsWith('//*')) { $folders += $target.Substring(0, $target.Length - 3) + '/' } else { $files += $target }
     }
 
     $problems | Where-Object {
         $path = $_.Path.TrimEnd('/')
-        (($files -contains $path) -or @($folders | Where-Object { $path.StartsWith($_) }).Count -gt 0) -and $excluded -notcontains $path
+        ($files -contains $path) -or @($folders | Where-Object { $path.StartsWith($_) }).Count -gt 0
     }
 }
 
@@ -338,7 +328,7 @@ function Resolve-CrossModuleUsages([object[]] $problems) {
 #>
 function Set-UsedFromContentModule([object] $problem) {
     $problem.Inspection = 'UsedFromContentModule'
-    $problem.Message = "$($problem.Message) It is called from a content module, which is outside the inspector's analysis scope - not dead code."
+    $problem.Message = "$($problem.Message) It is called from a content module, which the inspector cannot see: mark it @FromContentModule, the entry point .idea/misc.xml names."
 }
 
 function Get-DeclaredName([object] $problem) {
@@ -714,43 +704,6 @@ function Read-HandWrittenPrivateConstructors([string[]] $scopes) {
             }
         }
     }
-}
-
-function Test-DisplayStringBaseline([object[]] $problems, [string] $baselinePath) {
-    <#
-        The duplicated-string count can go down and must not go up.
-
-        Gating it outright would paint the build red over work nobody has
-        scheduled. How many there were when the check was written is recorded
-        once, in the baseline file itself (#66, finding 107). A ratchet is the
-        same answer verify.yml already gives the Plugin Verifier:
-        the number is recorded, a rise fails, and a fall is reported so the
-        recorded number can follow it down.
-    #>
-    $now = @($problems | Where-Object { $_.Inspection -eq 'DuplicatedDisplayString' }).Count
-
-    if (-not (Test-Path $baselinePath)) {
-        Write-Host "No display-string baseline at $baselinePath - $now found. Write that number there to start the ratchet." -ForegroundColor Yellow
-        return $true
-    }
-
-    $expected = [int](((Get-Content $baselinePath) | Where-Object { $_ -notmatch '^\s*#' -and $_.Trim() } | Select-Object -First 1).Trim())
-
-    if ($now -gt $expected) {
-        Write-Host ''
-        Write-Host "Display strings written in more than one place: $now, up from $expected." -ForegroundColor Red
-        if ($env:GITHUB_STEP_SUMMARY) { "**Display strings written in more than one place: $now, up from $expected.** See findings.txt in the inspection artifact." | Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding utf8 }
-        Write-Host 'A string a tester reads belongs to the type that owns the concept. See the findings list.'
-        return $false
-    }
-
-    if ($now -lt $expected) {
-        Write-Host "Display strings down to $now from $expected. Update $baselinePath so the ratchet keeps its meaning." -ForegroundColor Green
-    } else {
-        Write-Host "Display strings: $now, unchanged."
-    }
-
-    return $true
 }
 
 function Hide-StringsAndComments([string] $source) {
@@ -1435,43 +1388,36 @@ else {
     }
 }
 
-# Nothing survives a sweep except what is named here, each with the reason a
-# headless run cannot be trusted with it. Everything else fails the run: a
-# warning the IDE shows in these files is a defect, not a note for later.
-$notGated = [ordered]@{
-    'SameReturnValue'         = 'judged across every implementation, and the enums'' getters are Lombok''s, which the headless run cannot see'
-    'RedundantThrows'         = 'the Java module implements JavaSourceRoot''s interfaces and throws what they declare'
-    'UsedFromContentModule'   = 'this script''s note that an unused finding has a caller in a content module'
-    'UnusedProperty'          = 'the platform reads action, group and tool window keys by name; BundleKeysTest checks every other key has a reader'
-    'UndefinedParamsPresent'  = 'an action''s inputs come from its metadata online, which the headless run does not fetch'
-    'JSUnresolvedLibraryURL'  = 'asks whether this machine has downloaded a library a page loads from a CDN'
-    'DuplicatedDisplayString' = 'counted against .github/display-string-baseline.txt below instead'
+function Read-Exceptions {
+    <#
+        The exceptions qodana.yaml lists under exclude: an inspection name, or
+        All, and the paths where it is not reported - none meaning everywhere.
+        Qodana reads the same list in CI, which is why it lives there rather
+        than here.
+    #>
+    $exceptions = @()
+    $inExclude = $false
+    foreach ($line in [System.IO.File]::ReadAllLines((Join-Path $repo 'qodana.yaml'))) {
+        if ($line -match '^[^\s#]') { $inExclude = $line -match '^exclude:'; continue }
+        if (-not $inExclude) { continue }
+        if ($line -match '^\s*- name:\s*(\S+)') {
+            $exceptions += [pscustomobject]@{ Name = $Matches[1]; Paths = [System.Collections.Generic.List[string]]::new() }
+        }
+        elseif ($line -match '^\s*- (\S+)\s*$' -and $exceptions) {
+            $exceptions[-1].Paths.Add($Matches[1].TrimEnd('/'))
+        }
+    }
+    $exceptions
 }
 
-# Two inspections are right about everything except one sentence each, so they
-# are excused by what the finding says rather than by its name. An "unused"
-# method "not reachable from the entry points" is one the platform reaches
-# through an interface it implements, and a constructor "never used" is one
-# Lombok's @Builder calls; a private member, a parameter or a local that nothing
-# reads is judged correctly and fails the run. "URI is not registered" asks
-# whether this machine holds the schema for a namespace: both plugin icons
-# declare the SVG one, and a headless IDE with no catalog and no network cannot
-# look it up.
-$notGatedMessages = [ordered]@{
-    'unused'          = @('not reachable from the entry points', 'Constructor is never used')
-    'XmlHighlighting' = @('URI is not registered')
-}
-
-# A finding whose whole description is #loc says nothing at all, and a gate
-# cannot demand a fix it cannot name. The Markdown annotator writes one for
-# every [*] in a Mermaid state diagram - four in docs/product.md - which is the
-# start and end state the syntax is built on.
-$noDescription = '#loc'
+$exceptions = @(Read-Exceptions)
 
 function Test-Gated([object] $problem) {
-    if ($notGated.Contains($problem.Inspection)) { return $false }
-    if ($problem.Message.Trim() -eq $noDescription) { return $false }
-    return -not @($notGatedMessages[$problem.Inspection] | Where-Object { $problem.Message.Contains($_) }).Count
+    $excused = $exceptions | Where-Object {
+        ($_.Name -eq 'All' -or $_.Name -eq $problem.Inspection) -and
+            (-not $_.Paths.Count -or @($_.Paths | Where-Object { $problem.Path -eq $_ -or $problem.Path.StartsWith("$_/") }).Count)
+    }
+    return -not @($excused).Count
 }
 
 $breaches = @($problems | Where-Object { Test-Gated $_ })
@@ -1491,9 +1437,4 @@ if ($breaches) {
 }
 
 Write-Host ''
-Write-Host "Gate clear: no finding outside $($notGated.Keys -join ', '), the sentences $($notGatedMessages.Keys -join ' and ') are excused for, and findings with no description." -ForegroundColor Green
-
-# And the one that is counted rather than forbidden. Reported after the gate so
-# a hard breach is the first thing read, and it fails the run in its own right:
-# the point of a ratchet is that it holds.
-if (-not (Test-DisplayStringBaseline $problems (Join-Path $repo $DisplayStringBaseline))) { exit 1 }
+Write-Host "Gate clear: no finding outside the $($exceptions.Count) exceptions qodana.yaml lists." -ForegroundColor Green

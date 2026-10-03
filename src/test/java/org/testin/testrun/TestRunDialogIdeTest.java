@@ -51,7 +51,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
-import org.testin.ui.framework.OnScreenDialog;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
@@ -109,7 +109,7 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
 
     @Override
     public void tearDown() {
-        OnScreenDialog.closed(getProject(), TestRunConfigurationDialog.class);
+        ShownDialog.close(getProject(), TestRunConfigurationDialog.class);
         bound().choose("");
         super.tearDown();
     }
@@ -142,18 +142,18 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
 
     private void theCreateDialogOpened() {
         new CreateTestRun(getProject()).configureTestRun(tp.getTestCasesDirectory(), "Cycle-1", tp.getTestRunsDirectory(), Set.of(), everyQuestionAnswered());
-        Await.until("the test run dialog never opened", () -> OnScreenDialog.isOpen(getProject(), TestRunConfigurationDialog.class));
-        OnScreenDialog.sized(getProject(), TestRunConfigurationDialog.class);
+        Await.until("the test run dialog never opened", () -> ShownDialog.isOpen(getProject(), TestRunConfigurationDialog.class));
+        ShownDialog.sized(getProject(), TestRunConfigurationDialog.class);
     }
 
     private void theEditDialogOpenedOn(final @NotNull TestRunDirectoryDto testRun) {
         new EditTestRunWork(getProject()).editAt(new TreePath(new DefaultMutableTreeNode(testRun)));
-        Await.until("the edit dialog never opened", () -> OnScreenDialog.isOpen(getProject(), TestRunConfigurationDialog.class));
-        OnScreenDialog.sized(getProject(), TestRunConfigurationDialog.class);
+        Await.until("the edit dialog never opened", () -> ShownDialog.isOpen(getProject(), TestRunConfigurationDialog.class));
+        ShownDialog.sized(getProject(), TestRunConfigurationDialog.class);
     }
 
     private @NotNull JComponent content() {
-        return OnScreenDialog.content(getProject(), TestRunConfigurationDialog.class);
+        return ShownDialog.content(getProject(), TestRunConfigurationDialog.class);
     }
 
     private @NotNull CheckboxTree theTestCaseTree() {
@@ -241,7 +241,7 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
         assertEquals("Enter changed the change log", "", changeLog.getText());
-        assertTrue("Enter closed the dialog", OnScreenDialog.isOpen(getProject(), TestRunConfigurationDialog.class));
+        assertTrue("Enter closed the dialog", ShownDialog.isOpen(getProject(), TestRunConfigurationDialog.class));
         assertTrue("Enter created the test run", theTestRunsUnder(tp.getTestRunsDirectory()).isEmpty());
     }
 
@@ -273,7 +273,7 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
 
         theButton(StatusBarShortcut.SAVE).doClick();
 
-        Await.until("saving the edit did not close the dialog", () -> !OnScreenDialog.isOpen(getProject(), TestRunConfigurationDialog.class));
+        Await.until("saving the edit did not close the dialog", () -> !ShownDialog.isOpen(getProject(), TestRunConfigurationDialog.class));
         final @NotNull TestRunDto saved = indexedTestRuns().getTestRunByPath(testRun.getPath());
         assertEquals("saving removed what the test run recorded for a test case the dialog did not show", Set.of(first.getId(), inOld.getId(), deleted), saved.coveredIds());
         assertEquals(RunItemStatus.FAILED, saved.resultOf(inOld.getId()).map(TestRunItems::getStatus).orElseThrow());
@@ -293,8 +293,8 @@ public class TestRunDialogIdeTest extends AbstractOpenEditorsIdeTest {
         indexedTestRuns().changeTestRunMarker(source.getPath(), marker -> marker.configure(configuration));
 
         new ReCreateTestRunWork(getProject()).reCreateAt(new TreePath(new Object[]{new DefaultMutableTreeNode(sprint), new DefaultMutableTreeNode(source)}));
-        Await.until("the re-create dialog never opened", () -> OnScreenDialog.isOpen(getProject(), TestRunConfigurationDialog.class));
-        OnScreenDialog.sized(getProject(), TestRunConfigurationDialog.class);
+        Await.until("the re-create dialog never opened", () -> ShownDialog.isOpen(getProject(), TestRunConfigurationDialog.class));
+        ShownDialog.sized(getProject(), TestRunConfigurationDialog.class);
         theButton(Bundle.message("test.run.create.button")).doClick();
 
         Await.until("the new test run was not created in the folder of the one it was made from", () -> theTestRunsUnder(sprint).size() == 2);

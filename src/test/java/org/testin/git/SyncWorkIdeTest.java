@@ -21,6 +21,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.Notified;
+import org.testin.Said;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
@@ -48,7 +49,7 @@ public class SyncWorkIdeTest extends AbstractGitRemoteIdeTest {
     // UC-SHARE-017, Rule-SHARE-075, Rule-SHARE-076
     public void testAPullThatStopsSaysSoAndOffersThreeAnswers() {
         bothChangeTheNotes();
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         new SyncWork(getProject()).syncRepository(work);
 
@@ -63,7 +64,7 @@ public class SyncWorkIdeTest extends AbstractGitRemoteIdeTest {
     // UC-SHARE-017, Rule-SHARE-079
     public void testAPullThatWillNotMoveOnIsSaidAgain() {
         bothChangeTheNotes();
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         new SyncWork(getProject()).syncRepository(work);
         final @NotNull Notification first = titled(said, Bundle.message("git.conflicts.title"));
@@ -84,7 +85,7 @@ public class SyncWorkIdeTest extends AbstractGitRemoteIdeTest {
         mustGit(work, "remote", "set-url", "origin", root.resolve("nowhere.git").toUri().toString());
         write(work, "mine.tc", "{}");
         commitAll(work, "my test case");
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         new SyncWork(getProject()).syncRepository(work);
 

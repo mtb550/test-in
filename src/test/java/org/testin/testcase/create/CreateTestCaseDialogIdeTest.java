@@ -20,7 +20,7 @@ import com.intellij.ui.EditorTextField;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.Balloons;
+import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.indexer.TestCases;
@@ -37,6 +37,7 @@ import org.testin.view.Drawn;
 import org.testin.view.PopupsBuilt;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CreateTestCaseDialogIdeTest extends AbstractTempRootIdeTest {
@@ -145,10 +146,10 @@ public class CreateTestCaseDialogIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(getProject(), EditorFixtures.testProject(getProject(), root), "Checkout");
         EditorFixtures.testCases(getProject(), ts, 3);
         final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
 
         ShownDialog.open(getProject(), CreateTestCaseDialog.class, () -> CreateTestCaseAction.openCreateDialog(getProject(), editor, ts));
-        Drawn.components(ShownDialog.of(getProject(), CreateTestCaseDialog.class).getContent()).stream().filter(EditorTextField.class::isInstance).map(EditorTextField.class::cast).findFirst().orElseThrow().setText("Pay with a saved card");
+        Drawn.components(ShownDialog.content(getProject(), CreateTestCaseDialog.class)).stream().filter(EditorTextField.class::isInstance).map(EditorTextField.class::cast).findFirst().orElseThrow().setText("Pay with a saved card");
         save();
 
         final @NotNull TestCases testCases = Services.getInstance(getProject(), TestCases.class);
@@ -157,6 +158,6 @@ public class CreateTestCaseDialogIdeTest extends AbstractTempRootIdeTest {
         assertEquals("the new test case is not last", "Pay with a saved card", created.getDescription());
         Await.until("the new test case was never given a place after the others", () -> testCases.findTestCase(created.getId()).map(TestCaseDto::getOrder).filter(order -> order.compareTo("m0002") > 0).isPresent());
         Await.until("the creation never confirmed itself", () -> balloons.shown().contains(Done.CREATED.getOutcome()));
-        assertFalse("the creation confirmed itself more than once", balloons.shown().contains(Done.CREATED.getOutcome()));
+        assertEquals("the creation confirmed itself more than once", 1, Collections.frequency(balloons.shown(), Done.CREATED.getOutcome()));
     }
 }

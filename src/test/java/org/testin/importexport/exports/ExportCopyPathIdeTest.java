@@ -17,31 +17,24 @@
 package org.testin.importexport.exports;
 
 import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.ide.CopyPasteManager;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Notified;
+import org.testin.Said;
 import org.testin.util.Bundle;
 
 import java.awt.datatransfer.DataFlavor;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ExportCopyPathIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-REPORT-015
     public void testTheExportMessageOffersTheSameCopyLinkAsTheReportMessage() {
-        final @NotNull List<Notification> said = new ArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
         final @NotNull File exported = root.resolve("Login.csv").toFile();
         final @NotNull AnAction shared = ExportNotice.copyPath(getProject(), exported);
 

@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testcase.update.UpdateTestCaseDialog;
-import org.testin.ui.framework.ShownDialogs;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Shortcuts;
 import org.testin.view.Drawn;
 import org.testin.view.KeyPress;
@@ -70,7 +70,7 @@ final class FieldChange {
     }
 
     static void typeAndSave(final @NotNull Project p, final @NotNull String now) {
-        final @NotNull EditorTextField field = Drawn.components(ShownDialogs.content(p, UpdateTestCaseDialog.class)).stream()
+        final @NotNull EditorTextField field = Drawn.components(ShownDialog.content(p, UpdateTestCaseDialog.class)).stream()
                 .filter(EditorTextField.class::isInstance)
                 .map(EditorTextField.class::cast)
                 .filter(shown -> shown.getText().equals("Log in with a valid user"))

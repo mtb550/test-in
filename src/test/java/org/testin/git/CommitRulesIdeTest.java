@@ -23,8 +23,9 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.Notified;
+import org.testin.Said;
 import org.testin.config.TestinYml;
-import org.testin.ui.framework.ShownDialogContent;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.view.Drawn;
 
@@ -43,9 +44,9 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
 
     @Override
     protected void tearDown() {
-        ShownDialogContent.close(getProject(), PendingCommitsDialog.class);
-        ShownDialogContent.close(getProject(), GitIdentityDialog.class);
-        ShownDialogContent.close(getProject(), RemoteUrlDialog.class);
+        ShownDialog.close(getProject(), PendingCommitsDialog.class);
+        ShownDialog.close(getProject(), GitIdentityDialog.class);
+        ShownDialog.close(getProject(), RemoteUrlDialog.class);
         noTestinYml();
         super.tearDown();
     }
@@ -118,7 +119,7 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
         ShareGestures.type(review, "the second test case");
         ShareGestures.commitOnly(review);
 
-        final @NotNull JComponent identity = ShareGestures.shown(getProject(), GitIdentityDialog.class);
+        final @NotNull JComponent identity = ShownDialog.waitedFor(getProject(), GitIdentityDialog.class);
         assertTrue("the identity would be written for every repository on this machine", Drawn.first(identity, JRadioButton.class, radio -> radio.getText().equals(Bundle.message("dialog.git.identity.option.repository"))).isSelected());
         ShareGestures.typeInto(identity, 0, "Sara Tester");
         ShareGestures.typeInto(identity, 1, "sara@example.invalid");
@@ -134,7 +135,7 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
         write(work, ".git/hooks/pre-commit", "#!/bin/sh\nexit 1\n");
         write(work, "second.tc", "{\"description\":\"typed\"}");
         final @NotNull String remoteBefore = head(remote, MAIN);
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
         final @NotNull List<Task> started = ShareGestures.tasksStarted(getTestRootDisposable());
 
         final @NotNull JComponent review = theReview(work);
@@ -152,13 +153,13 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
         final @NotNull Path empty = anEmptyRemote();
         theProjectFolderExists();
         assertTrue("could not write testin.yml", TestinYml.save(getProject(), TestinYml.lines("solo", addressOf(empty))));
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         pressPushOnTheWaitingCommits(solo, said);
 
         titled(said, Bundle.message("git.pushed.title"));
         assertEquals(head(solo, "HEAD"), head(empty, MAIN));
-        assertTrue("the address was asked for although testin.yml gives it", ShownDialogContent.of(getProject(), RemoteUrlDialog.class).isEmpty());
+        assertFalse("the address was asked for although testin.yml gives it", ShownDialog.isOpen(getProject(), RemoteUrlDialog.class));
     }
 
     // UC-SHARE-013, Rule-SHARE-060
@@ -166,10 +167,10 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
         noTestinYml();
         final @NotNull Path solo = aRepositoryWithNoRemote();
         final @NotNull Path empty = anEmptyRemote();
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         pressPushOnTheWaitingCommits(solo, said);
-        final @NotNull JComponent asked = ShareGestures.shown(getProject(), RemoteUrlDialog.class);
+        final @NotNull JComponent asked = ShownDialog.waitedFor(getProject(), RemoteUrlDialog.class);
         ShareGestures.typeInto(asked, 0, addressOf(empty));
         ShareGestures.pressEnter(asked);
         Await.until("the first push did not land", () -> count(said, Bundle.message("git.pushed.title")) == 1);
@@ -179,7 +180,7 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
         pressPushOnTheWaitingCommits(solo, said);
         Await.until("the second push did not land", () -> count(said, Bundle.message("git.pushed.title")) == 2);
 
-        assertTrue("the address was asked for a second time", ShownDialogContent.of(getProject(), RemoteUrlDialog.class).isEmpty());
+        assertFalse("the address was asked for a second time", ShownDialog.isOpen(getProject(), RemoteUrlDialog.class));
         assertEquals(head(solo, "HEAD"), head(empty, MAIN));
     }
 
@@ -187,7 +188,7 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
     public void testTheMessageAboutAPushStaysInTheNotificationList() {
         write(work, "second.tc", "{}");
         commitAll(work, "second");
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         pressPushOnTheWaitingCommits(work, said);
 
@@ -205,7 +206,7 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
         write(work, "first.tc", "{\"on\":\"typed on main\"}");
         final @NotNull String mainBefore = head(work, MAIN);
         final @NotNull String otherBefore = head(work, "other");
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         final @NotNull JComponent review = theReview(work);
         ShareGestures.chooseTheOtherBranch(review);

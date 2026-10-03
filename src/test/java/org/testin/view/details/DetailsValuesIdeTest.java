@@ -21,6 +21,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
+import org.testin.editor.ShownFields;
 import org.testin.indexer.TestRuns;
 import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
@@ -31,8 +32,9 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.framework.Picture;
-import org.testin.ui.framework.ShownDialogs;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.view.AbstractViewPanelIdeTest;
 import org.testin.view.Drawn;
@@ -50,10 +52,12 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
 
@@ -177,13 +181,33 @@ public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
         final @NotNull MouseEvent click = new MouseEvent(second, MouseEvent.MOUSE_CLICKED, System.currentTimeMillis(), 0, 5, 5, 1, false, MouseEvent.BUTTON1);
         for (final MouseListener listener : second.getMouseListeners()) listener.mouseClicked(click);
         try {
-            final @NotNull JComponent shown = ShownDialogs.content(getProject(), ScreenshotDialog.class);
+            final @NotNull JComponent shown = ShownDialog.content(getProject(), ScreenshotDialog.class);
             final @NotNull Icon picture = Drawn.components(shown).stream().filter(JBLabel.class::isInstance).map(JBLabel.class::cast).map(JBLabel::getIcon).filter(icon -> widthOf(icon) > 48).findFirst()
                     .orElseThrow(() -> new AssertionError("the screenshot's window shows no picture"));
             assertEquals("the screenshot did not open at its real width", 640, picture.getIconWidth());
             assertEquals("the screenshot did not open at its real height", 400, picture.getIconHeight());
         } finally {
-            ShownDialogs.close(getProject(), ScreenshotDialog.class);
+            ShownDialog.close(getProject(), ScreenshotDialog.class);
+        }
+    }
+
+    // Rule-VIEW-PANEL-090, Rule-VIEW-PANEL-081
+    public void testTheScreenshotsAreDrawnWhenFieldsHidesTheStacktrace() {
+        final @NotNull TestSetDirectoryDto ts = aTestSet("Login");
+        final @NotNull TestCaseDto tc = aTestCase(ts, "Log in with a valid user", "a");
+        final @NotNull TestRunDirectoryDto tr = aTestRun(List.of(TestRunItems.builder().id(tc.getId()).build()));
+        final @NotNull List<String> names = Services.getInstance(getProject(), TestRuns.class).storeScreenshots(tr.getPath(), List.of(aScreenshot(320, 200)));
+        final @NotNull Set<TestRunEditorAttributes> was = ShownFields.inTestRuns();
+        final @NotNull Set<TestRunEditorAttributes> chosen = EnumSet.allOf(TestRunEditorAttributes.class);
+        chosen.remove(TestRunEditorAttributes.STACKTRACE);
+        ShownFields.write(ShownFields.IN_TEST_RUNS, chosen);
+        try {
+            final @NotNull JBPanel<?> tab = Drawn.detailsTabAsChosen(getProject(), tc, Optional.of(failedWith(tc, names)), tr.getPath2());
+
+            assertFalse("the Stacktrace link was drawn with Stacktrace unticked in Fields", Drawn.words(tab).contains(Bundle.message("view.stacktrace.link")));
+            assertTrue("the screenshot was not drawn because Fields hides the Stacktrace", Drawn.components(tab).stream().filter(JBLabel.class::isInstance).map(JBLabel.class::cast).anyMatch(label -> Drawn.hovering(label).contains(names.getFirst())));
+        } finally {
+            ShownFields.write(ShownFields.IN_TEST_RUNS, was);
         }
     }
 

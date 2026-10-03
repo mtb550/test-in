@@ -28,7 +28,7 @@ import com.intellij.testFramework.PlatformTestUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.Balloons;
+import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.indexer.TestCases;
@@ -95,7 +95,7 @@ public class BulkEditIdeTest extends AbstractTempRootIdeTest {
     }
 
     private @NotNull List<Editor> editors() {
-        return Drawn.components(ShownDialog.of(getProject(), ModuleBulkSectionDialog.class).getContent()).stream()
+        return Drawn.components(ShownDialog.content(getProject(), ModuleBulkSectionDialog.class)).stream()
                 .filter(EditorComponentImpl.class::isInstance).map(component -> (Editor) ((EditorComponentImpl) component).getEditor()).toList();
     }
 
@@ -212,7 +212,7 @@ public class BulkEditIdeTest extends AbstractTempRootIdeTest {
         final @NotNull List<TestCaseDto> testCases = aTestSetWithModules("Payments", "Cart", "Search");
         final @NotNull UndoScope scope = UndoScope.of(testSet.getPath());
         bulkEditTheModules();
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
 
         type(0, "Billing");
         type(1, "Basket");
@@ -233,7 +233,7 @@ public class BulkEditIdeTest extends AbstractTempRootIdeTest {
         aTestSetWithModules("Payments", "Cart");
         final @NotNull List<String> before = everyFile();
         bulkEditTheModules();
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
 
         type(0, "Payments");
         save();

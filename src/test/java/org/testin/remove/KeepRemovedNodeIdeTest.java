@@ -24,7 +24,7 @@ import com.intellij.util.TimeoutUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
-import org.testin.TestinLogLines;
+import org.testin.TestinLog;
 import org.testin.indexer.AbstractReadTheRootIdeTest;
 import org.testin.model.FileKind;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -32,7 +32,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.ui.framework.OpenDialogKeys;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.undo.UndoAction;
 import org.testin.undo.UndoDirection;
 import org.testin.undo.UndoHistories;
@@ -92,7 +92,7 @@ public class KeepRemovedNodeIdeTest extends AbstractReadTheRootIdeTest {
 
     private void removedByTheTester(final @NotNull List<? extends DirectoryDto> removed) {
         new RemoveWork(getProject()).confirm(List.copyOf(removed));
-        OpenDialogKeys.press(getProject(), ConfirmDialog.class, Shortcuts.Enter);
+        ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Enter);
 
         Await.until("the removal never finished", () -> removed.stream().noneMatch(node -> Files.exists(node.getPath()) || nodes().nodeExists(node.getPath())));
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
@@ -187,19 +187,15 @@ public class KeepRemovedNodeIdeTest extends AbstractReadTheRootIdeTest {
             throw new AssertionError("could not put something where the test set was", ex);
         }
 
-        final @NotNull TestinLogLines said = TestinLogLines.fromNow();
-        try {
-            pressedCtrlZ();
+        final @NotNull TestinLog said = TestinLog.fromNow(getTestRootDisposable());
+        pressedCtrlZ();
 
-            final @NotNull String incomplete = Bundle.message("remove.undo.incomplete.title");
-            Await.until("a Ctrl+Z that could not put the test set back said nothing", () -> said.written().contains(incomplete));
-            settled();
+        final @NotNull String incomplete = Bundle.message("remove.undo.incomplete.title");
+        Await.until("a Ctrl+Z that could not put the test set back said nothing", () -> said.written().contains(incomplete));
+        settled();
 
-            final @NotNull String written = said.written();
-            assertFalse("a Ctrl+Z that could not put everything back also said Undone: " + written, written.contains(">" + Bundle.message("done.undone") + "<"));
-        } finally {
-            said.stop();
-        }
+        final @NotNull String written = said.written();
+        assertFalse("a Ctrl+Z that could not put everything back also said Undone: " + written, written.contains(">" + Bundle.message("done.undone") + "<"));
         assertTrue("the press was spent although nothing came back", undoHistories().canUndo(UndoScope.TREE));
     }
 }

@@ -23,8 +23,8 @@ import com.intellij.testFramework.PlatformTestUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.NotifiedBalloons;
 import org.testin.Gestures;
+import org.testin.Said;
 import org.testin.clipboard.CutState;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
@@ -104,7 +104,7 @@ public class MoveUndoIdeTest extends AbstractTempRootIdeTest {
         twoTestSets();
         final @NotNull TestCaseEditor source = EditorFixtures.openTestCaseEditor(getProject(), from, getTestRootDisposable());
         final @NotNull TestCaseEditor target = EditorFixtures.openTestCaseEditor(getProject(), to, getTestRootDisposable());
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             final @NotNull TestCaseDto moved = movedFromTheFirstSetToTheSecond(source, target, balloons);
 
@@ -127,7 +127,7 @@ public class MoveUndoIdeTest extends AbstractTempRootIdeTest {
         twoTestSets();
         final @NotNull TestCaseEditor source = EditorFixtures.openTestCaseEditor(getProject(), from, getTestRootDisposable());
         final @NotNull TestCaseEditor target = EditorFixtures.openTestCaseEditor(getProject(), to, getTestRootDisposable());
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             final @NotNull TestCaseDto moved = movedFromTheFirstSetToTheSecond(source, target, balloons);
             assertTrue(histories().undo(UndoScope.of(to.getPath())));

@@ -18,13 +18,13 @@ package org.testin.setting;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
+import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.explorer.TreePanel;
 import org.testin.importexport.FileTypes;
@@ -45,7 +45,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -148,13 +147,7 @@ public class TestinFolderIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-SETTING-014
     public void testWithNoFolderSetTestinReadsNothingAndDoesNotFail() {
-        final @NotNull List<Notification> said = new ArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
         aTestProjectIn(folder("testin"), "NAFATH");
         settings().rootTestinPath = "";
         indexer().resetForReindex();

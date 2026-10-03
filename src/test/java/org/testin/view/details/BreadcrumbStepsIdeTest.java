@@ -17,11 +17,11 @@ package org.testin.view.details;
 
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
+import org.testin.TestinLog;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.view.AbstractViewPanelIdeTest;
 import org.testin.view.Drawn;
-import org.testin.view.Said;
 
 import java.awt.Component;
 import java.awt.event.MouseEvent;
@@ -42,11 +42,11 @@ public class BreadcrumbStepsIdeTest extends AbstractViewPanelIdeTest {
         final @NotNull TestCaseDto tc = aTestCase(ts, "Log in with a valid user", "a");
         final @NotNull JBPanel<?> tab = Drawn.detailsTab(getProject(), tc, Optional.empty(), ts.getPath2());
 
-        final @NotNull List<String> container = Said.logged(() -> click(Drawn.reading(tab, "Test Cases")));
+        final @NotNull List<String> container = TestinLog.during(() -> click(Drawn.reading(tab, "Test Cases")));
         assertEquals("the tree did not come up on the step", 1, view.timesTheTreeCameUp());
         assertTrue("the step did not go to the place it names: " + container, container.stream().anyMatch(line -> line.contains("Going to Test Cases in NAFATH > Test Cases")));
 
-        final @NotNull List<String> project = Said.logged(() -> click(Drawn.reading(tab, "NAFATH")));
+        final @NotNull List<String> project = TestinLog.during(() -> click(Drawn.reading(tab, "NAFATH")));
         assertEquals("the tree did not come up on the step", 2, view.timesTheTreeCameUp());
         assertTrue("the step did not go to the place it names: " + project, project.stream().anyMatch(line -> line.contains("Going to NAFATH in NAFATH")));
     }

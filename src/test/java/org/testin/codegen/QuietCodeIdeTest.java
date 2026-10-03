@@ -17,7 +17,6 @@
 package org.testin.codegen;
 
 import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -25,8 +24,10 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.newvfs.BulkFileListener;
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
+import com.intellij.testFramework.PlatformTestUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
+import org.testin.Said;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
@@ -37,28 +38,19 @@ import java.util.Optional;
 
 public class QuietCodeIdeTest extends AbstractCodegenIdeTest {
 
-    private final @NotNull List<String> said = new ArrayList<>();
 
     private final @NotNull List<String> touched = new ArrayList<>();
 
-    private CodegenBalloons balloons;
+    private @NotNull List<Notification> said = List.of();
+
+    private @NotNull List<String> balloons = List.of();
 
     @Override
     protected void setUp() {
         super.setUp();
-        balloons = CodegenBalloons.watching();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification.getTitle() + " " + notification.getContent());
-            }
-        });
-    }
-
-    @Override
-    protected void tearDown() {
-        balloons.stop();
-        super.tearDown();
+        final @NotNull Said heard = Said.listening(getProject(), getTestRootDisposable());
+        said = heard.notifications();
+        balloons = heard.shown();
     }
 
     private void watchingTheCode() {
@@ -81,8 +73,9 @@ public class QuietCodeIdeTest extends AbstractCodegenIdeTest {
     }
 
     private void assertNothingWasSaid(final @NotNull String what) {
-        assertTrue(what + ", and a message said so: " + said, said.isEmpty());
-        assertTrue(what + ", and a balloon said so: " + balloons.shown(), balloons.shown().isEmpty());
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+        assertTrue(what + ", and a message said so: " + said.stream().map(notification -> notification.getTitle() + " " + notification.getContent()).toList(), said.isEmpty());
+        assertTrue(what + ", and a balloon said so: " + balloons, balloons.isEmpty());
     }
 
     // Rule-CODEGEN-050

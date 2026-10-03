@@ -17,7 +17,6 @@
 package org.testin.report;
 
 import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.WriteAction;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
@@ -32,7 +31,7 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.testproject.BoundTestProject;
+import org.testin.Said;
 import org.testin.importexport.FileTypes;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
@@ -47,6 +46,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 
@@ -267,13 +267,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
         aTestCase(opens, "سجل الدخول");
         final @NotNull TestRunDirectoryDto testRun = aTestRun("Cycle-Arabic", List.of(new TestRunItems().setId(opens).setStatus(RunItemStatus.PASSED)));
 
-        final @NotNull List<Notification> said = new ArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         report(FileTypes.PDF, testRun);
 

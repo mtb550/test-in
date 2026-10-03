@@ -22,7 +22,7 @@ import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.NotifiedBalloons;
+import org.testin.Said;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.editor.toolbar.components.GridViewBtn;
@@ -80,7 +80,7 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestCaseDto wrongPassword = aTestCase(ts, "Log in with a wrong password", "m0002", Priority.LOW, oldGroup);
         final @NotNull TestCaseDto card = aTestCase(ts, "Pay by card", "m0003", Priority.HIGH, oldGroup);
         final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         final @NotNull TestCaseValues values = Services.getInstance(getProject(), TestCaseValues.class);
         try {
             final @NotNull FilterPopupBtn filters = editor.getToolBar().getToolbarItem(FilterPopupBtn.class);
@@ -223,7 +223,7 @@ public class RefreshEditorIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
         final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
         final @NotNull TestRunEditor editor = EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             editor.onStartExecutionClicked();
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();

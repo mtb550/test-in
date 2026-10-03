@@ -22,9 +22,9 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
-import org.testin.TestinLogLines;
+import org.testin.TestinLog;
 import org.testin.notifications.Refused;
-import org.testin.ui.framework.OpenDialogKeys;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Html;
 import org.testin.util.Shortcuts;
 import org.testin.view.Drawn;
@@ -35,7 +35,7 @@ import java.util.List;
 public class RefusedValueStaysIdeTest extends BasePlatformTestCase {
 
     private @NotNull ExtendableTextField theUrlField() {
-        return Drawn.components(OpenDialogKeys.popupOf(getProject(), RemoteUrlDialog.class).getContent()).stream()
+        return Drawn.components(ShownDialog.popup(getProject(), RemoteUrlDialog.class).getContent()).stream()
                 .filter(ExtendableTextField.class::isInstance).map(ExtendableTextField.class::cast).findFirst()
                 .orElseThrow(() -> new AssertionError("the dialog has no field"));
     }
@@ -55,34 +55,33 @@ public class RefusedValueStaysIdeTest extends BasePlatformTestCase {
         final @NotNull List<String> taken = new ArrayList<>();
         new RemoteUrlDialog(getProject(), "origin", taken::add).show();
         try {
-            OpenDialogKeys.press(getProject(), RemoteUrlDialog.class, Shortcuts.Enter);
+            ShownDialog.press(getProject(), RemoteUrlDialog.class, Shortcuts.Enter);
 
-            assertTrue("the dialog closed over an empty field", OpenDialogKeys.isOpen(getProject(), RemoteUrlDialog.class));
+            assertTrue("the dialog closed over an empty field", ShownDialog.isOpen(getProject(), RemoteUrlDialog.class));
             assertEquals("an empty value was taken", List.of(), taken);
             assertTrue("the empty field is not marked as the one holding the dialog open", hintAttributesOf(theUrlField()).contains(SimpleTextAttributes.ERROR_ATTRIBUTES));
         } finally {
-            OpenDialogKeys.popupOf(getProject(), RemoteUrlDialog.class).cancel();
+            ShownDialog.popup(getProject(), RemoteUrlDialog.class).cancel();
         }
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-067
     public void testARefusedValueIsRefusedInOneSentenceNamingItAndStaysInTheField() {
         final @NotNull List<String> taken = new ArrayList<>();
-        final @NotNull TestinLogLines said = TestinLogLines.fromNow();
+        final @NotNull TestinLog said = TestinLog.fromNow(getTestRootDisposable());
         new RemoteUrlDialog(getProject(), "origin", taken::add).show();
         try {
             theUrlField().setText("my team's repository");
-            OpenDialogKeys.press(getProject(), RemoteUrlDialog.class, Shortcuts.Enter);
+            ShownDialog.press(getProject(), RemoteUrlDialog.class, Shortcuts.Enter);
 
-            assertTrue("the dialog closed over a refused value", OpenDialogKeys.isOpen(getProject(), RemoteUrlDialog.class));
+            assertTrue("the dialog closed over a refused value", ShownDialog.isOpen(getProject(), RemoteUrlDialog.class));
             assertEquals("a refused value was taken", List.of(), taken);
             assertEquals("the refused value is no longer in the field", "my team's repository", theUrlField().getText());
 
             final @NotNull String sentence = Html.ofText(Refused.NOT_A_REPOSITORY_URL.about("my team's repository"));
             Await.until("the dialog did not say why it refused the value, naming it", () -> said.written().contains(sentence));
         } finally {
-            said.stop();
-            OpenDialogKeys.popupOf(getProject(), RemoteUrlDialog.class).cancel();
+            ShownDialog.popup(getProject(), RemoteUrlDialog.class).cancel();
         }
     }
 }

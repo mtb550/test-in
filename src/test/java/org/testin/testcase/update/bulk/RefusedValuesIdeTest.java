@@ -24,7 +24,7 @@ import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.NotifiedBalloons;
+import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.toolbar.components.GridViewBtn;
@@ -92,7 +92,7 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
     public void testAValueTestinCannotReadIsRefusedAndTheTesterToldOnceForACell() {
         final @NotNull List<TestCaseDto> testCases = aTestSetHolding("Log in", "Log out");
         final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             final @NotNull JBTable grid = theGridOf(editor);
 
@@ -109,7 +109,7 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
     // Rule-EDITOR-PANEL-206
     public void testABulkEditRefusesWhatItCannotReadSaysSoOnceWithACountAndDoesNotCountIt() {
         final @NotNull List<TestCaseDto> testCases = aTestSetHolding("Log in", "Log out", "Pay by card");
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         final @NotNull PriorityBulkSectionDialog dialog = new PriorityBulkSectionDialog(getProject(), testCases, _ -> {
         });
 
@@ -124,7 +124,7 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
     public void testBlankIsNotUnreadableItClearsTheGroupsAndABulkEditGivesTheDefaultPriority() {
         final @NotNull List<TestCaseDto> testCases = aTestSetHolding("Log in", "Log out");
         final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             final @NotNull JBTable grid = theGridOf(editor);
 
@@ -149,7 +149,7 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
     public void testADescriptionThatCannotNameAMethodOrNamesATakenOneIsRefusedInTheUpdateDialogsWords() {
         final @NotNull List<TestCaseDto> testCases = aTestSetHolding("Log in", "Log out", "Pay by card", "Check out");
         final @NotNull List<TestCaseDto> inTheDialog = testCases.subList(0, 3);
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         final @NotNull DescriptionBulkSectionDialog dialog = new DescriptionBulkSectionDialog(getProject(), inTheDialog, _ -> {
         });
 
@@ -177,7 +177,7 @@ public class RefusedValuesIdeTest extends AbstractTempRootIdeTest {
     public void testARefusedTestCaseIsNotCountedInTheUpdatedMessage() {
         final @NotNull List<TestCaseDto> testCases = aTestSetHolding("Log in", "Log out");
         final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             final @NotNull JBTable grid = theGridOf(editor);
             typed(grid, 0, TestCaseEditorAttributes.PRIORITY, "Urgent");

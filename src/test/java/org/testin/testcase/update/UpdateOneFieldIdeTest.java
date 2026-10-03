@@ -21,7 +21,7 @@ import com.intellij.ui.EditorTextField;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.Balloons;
+import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.indexer.TestCases;
@@ -103,7 +103,7 @@ public class UpdateOneFieldIdeTest extends AbstractTempRootIdeTest {
     }
 
     private @NotNull EditorTextField theOpenField() {
-        return Drawn.components(ShownDialog.of(getProject(), UpdateTestCaseDialog.class).getContent()).stream()
+        return Drawn.components(ShownDialog.content(getProject(), UpdateTestCaseDialog.class)).stream()
                 .filter(EditorTextField.class::isInstance).map(EditorTextField.class::cast).filter(EditorTextField::isEnabled)
                 .findFirst().orElseThrow(() -> new AssertionError("the update dialog has no field to type into"));
     }
@@ -147,7 +147,7 @@ public class UpdateOneFieldIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestCaseDto tc = aTestCase("Log in", "Dashboard opens");
         final @NotNull String before = fileOf(tc);
         final @NotNull TestCaseEditor editor = anEditorSelecting(tc);
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
         final @NotNull UndoScope scope = UndoScope.of(testSet.getPath());
 
         ShownDialog.open(getProject(), UpdateTestCaseDialog.class, () -> UpdateTestCaseAction.openField(getProject(), editor, UpdateTestCaseFields.EXPECTED_RESULT));

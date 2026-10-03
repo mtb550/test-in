@@ -28,7 +28,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
-import org.testin.ui.framework.ShownDialogContent;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
@@ -67,7 +67,7 @@ public class ReviewRowsIdeTest extends AbstractGitRemoteIdeTest {
 
     @Override
     protected void tearDown() {
-        ShownDialogContent.close(getProject(), PendingCommitsDialog.class);
+        ShownDialog.close(getProject(), PendingCommitsDialog.class);
         super.tearDown();
     }
 

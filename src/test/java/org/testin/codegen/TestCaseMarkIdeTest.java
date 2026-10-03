@@ -30,6 +30,7 @@ import com.intellij.testFramework.DumbModeTestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
+import org.testin.Said;
 import org.testin.notifications.Refused;
 import org.testin.util.Bundle;
 
@@ -96,14 +97,10 @@ public class TestCaseMarkIdeTest extends AbstractCodegenIdeTest {
     public void testClickingTheMarkOfAMethodWhoseTestCaseIsGoneSaysSoNamingTheMethod() {
         final @NotNull List<GutterMark> marks = marksBeside(UUID.randomUUID().toString());
         assertEquals("a method whose test case is gone has no mark to click", 1, marks.size());
-        final @NotNull CodegenBalloons balloons = CodegenBalloons.watching();
-        try {
-            clicked(marks.getFirst());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
+        clicked(marks.getFirst());
 
-            final @NotNull String gone = Refused.NO_TEST_CASE_BEHIND_IT.about("logIn");
-            Await.until("clicking the mark of a method whose test case is gone said nothing", () -> balloons.shown().contains(gone));
-        } finally {
-            balloons.stop();
-        }
+        final @NotNull String gone = Refused.NO_TEST_CASE_BEHIND_IT.about("logIn");
+        Await.until("clicking the mark of a method whose test case is gone said nothing", () -> balloons.shown().contains(gone));
     }
 }

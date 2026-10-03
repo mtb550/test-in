@@ -16,7 +16,6 @@
 
 package org.testin.testcase;
 
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -26,6 +25,7 @@ import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
@@ -46,12 +46,12 @@ final class TestCaseRestore {
 
         // UC-EDITOR-PANEL-017, Rule-EDITOR-PANEL-215
         final @NotNull Written written = new Written();
-        final boolean allBack = ProgressManager.getInstance().<Boolean, RuntimeException>runProcessWithProgressSynchronously(() -> {
+        final boolean allBack = BackgroundWork.synchronously(p, Bundle.message("remove.undo.progress"), false, () -> {
             boolean all = true;
             for (final TestCaseSnapshot snapshot : target) all &= removeAbsent(p, snapshot, written);
             for (final TestCaseSnapshot snapshot : target) all &= restorePresent(p, snapshot, written);
             return all;
-        }, Bundle.message("remove.undo.progress"), false, p);
+        }, false);
 
         written.generate(p);
         tellTheSurfaces(p, target);

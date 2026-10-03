@@ -40,7 +40,7 @@ import org.testin.NodesOnDisk;
 import org.testin.importexport.FileTypes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.ui.framework.ShownDialogContent;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.view.Drawn;
 
 import javax.swing.JComponent;
@@ -63,7 +63,7 @@ public class ChooseAFileIdeTest extends AbstractTempRootIdeTest {
 
     @Override
     protected void tearDown() {
-        ShownDialogContent.close(getProject(), ImportDialog.class);
+        ShownDialog.close(getProject(), ImportDialog.class);
         super.tearDown();
     }
 
@@ -80,7 +80,7 @@ public class ChooseAFileIdeTest extends AbstractTempRootIdeTest {
 
         new ImportWork(getProject()).openImportDialog(login);
         Await.until("the import did not ask for a file", () -> !asked.isEmpty());
-        final @NotNull JComponent dialog = ShownDialogContent.of(getProject(), ImportDialog.class).orElseThrow();
+        final @NotNull JComponent dialog = ShownDialog.content(getProject(), ImportDialog.class);
 
         assertEquals("the table showed something before a file was chosen", 0, tabsIn(dialog).getTabCount());
 

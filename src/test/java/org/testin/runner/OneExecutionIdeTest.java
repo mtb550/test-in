@@ -33,8 +33,8 @@ import com.theoryinpractice.testng.configuration.TestNGConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
+import org.testin.Said;
 import org.testin.actions.TestinData;
-import org.testin.codegen.CodegenBalloons;
 import org.testin.codegen.GenType;
 import org.testin.editor.CardHoverAction;
 import org.testin.model.dto.TestCaseDto;
@@ -57,18 +57,17 @@ public class OneExecutionIdeTest extends AbstractCodegenIdeTest {
 
     private final @NotNull List<TestCaseDto> involved = new ArrayList<>();
 
-    private CodegenBalloons balloons;
+    private @NotNull List<String> balloons = List.of();
 
     @Override
     protected void setUp() {
         super.setUp();
-        balloons = CodegenBalloons.watching();
+        balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
     }
 
     @Override
     protected void tearDown() {
         try {
-            balloons.stop();
             execution().stop(involved);
             final @NotNull RunManager runs = RunManager.getInstance(getProject());
             runs.getAllSettings().stream().filter(settings -> settings.getConfiguration() instanceof TestNGConfiguration).toList().forEach(runs::removeConfiguration);
@@ -146,8 +145,8 @@ public class OneExecutionIdeTest extends AbstractCodegenIdeTest {
 
         assertEquals("the selection was not one execution: " + launched, 1, launched.size());
         assertEquals("the one execution does not run every test case that has a method", 2, ((TestNGConfiguration) launched.getFirst()).getPersistantData().getPatterns().size());
-        final @NotNull List<String> runningSaid = balloons.shown().stream().filter(said -> said.startsWith(running(1))).toList();
-        assertEquals("the running message was not said once, counting the test cases that started: " + balloons.shown(), List.of(running(2)), runningSaid);
+        final @NotNull List<String> runningSaid = balloons.stream().filter(said -> said.startsWith(running(1))).toList();
+        assertEquals("the running message was not said once, counting the test cases that started: " + balloons, List.of(running(2)), runningSaid);
     }
 
     // Rule-CODEGEN-035
@@ -190,14 +189,14 @@ public class OneExecutionIdeTest extends AbstractCodegenIdeTest {
         settled();
 
         ExecuteTestCases.run(getProject(), theTestCases(List.of(alone)));
-        Await.until("a test case with no method was never reported", () -> balloons.shown().contains(Refused.NO_GENERATED_CODE.about(alone.getDescription())));
+        Await.until("a test case with no method was never reported", () -> balloons.contains(Refused.NO_GENERATED_CODE.about(alone.getDescription())));
 
         final @NotNull List<TestCaseDto> several = theTestCases(List.of(indexedTestCase(login, "Unlock the account", "c"), indexedTestCase(login, "Reset the password", "d"), indexedTestCase(login, "Change the password", "e")));
         ExecuteTestCases.run(getProject(), several);
-        Await.until("several test cases with no method were never reported", () -> balloons.shown().contains(Refused.NO_GENERATED_CODE_COUNTED.about("3")));
+        Await.until("several test cases with no method were never reported", () -> balloons.contains(Refused.NO_GENERATED_CODE_COUNTED.about("3")));
         settled();
 
-        final @NotNull List<String> shown = balloons.shown();
+        final @NotNull List<String> shown = balloons;
         assertEquals("one test case with no method was not reported exactly once: " + shown, 1, shown.stream().filter(said -> said.equals(Refused.NO_GENERATED_CODE.about(alone.getDescription()))).count());
         assertEquals("several test cases with no method were reported more than once, or one by one: " + shown, 1, shown.stream().filter(said -> said.contains("no generated code")).count() - 1);
         assertTrue("an execution with nothing to run still said it was running: " + shown, shown.stream().noneMatch(said -> said.startsWith(running(1))));

@@ -151,6 +151,8 @@ than repairing it, and a team sharing a test project should update together.
   the moment it is selected until its run item status is set, by hand or by the automation.
 - **Two test projects with one name open the one under your Testin root,** rather than whichever was read first.
 - **A dialog on a very small IDE window stays inside it,** rather than growing past its edges.
+- **The screenshots pasted with a failure show in the view panel again,** even when Fields hides the Stacktrace
+  link. Only the link follows that field.
 
 ## 2.13.0-alpha - 2026-09-22
 

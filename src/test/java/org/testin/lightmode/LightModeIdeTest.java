@@ -32,8 +32,8 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.NotifiedBalloons;
 import org.testin.OnScreen;
+import org.testin.Said;
 import org.testin.editor.CardHoverAction;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testrun.TestRunEditor;
@@ -49,7 +49,7 @@ import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunFixture;
 import org.testin.testrun.failure.FailedResultDialog;
 import org.testin.ui.Motion;
-import org.testin.ui.framework.ShownDialogParts;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Icons;
 import org.testin.util.Shortcuts;
@@ -453,7 +453,7 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestRunFixture fixture = aTestRunOf(aTestSetWithSteps(2, 1));
         final @NotNull TestRunEditor editor = walking(fixture);
         final @NotNull JFrame frame = lightModeOn(editor);
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             press(frame, RunItemStatus.FAILED.getMenuEntry().shortcut());
             final @NotNull FailureForm form = theOne(frame, FailureForm.class);
@@ -487,11 +487,11 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
             final @NotNull TestCaseDto walked = fixture.testCases().getFirst();
             final @NotNull FailedResultDialog dialog = new FailedResultDialog(getProject(), fixture.testRun().getPath(), fixture.resultOf(walked), _ -> {
             });
-            final @NotNull List<String> inTheDialog = ShownDialogParts.wordsOf(dialog).stream()
+            final @NotNull List<String> inTheDialog = ShownDialog.wordsOf(dialog).stream()
                     .filter(word -> !word.equals(walked.getDescription()) && !word.equals(walked.getExpectedResult())).toList();
 
             assertEquals("the dialog and the form do not hold the same fields", inTheDialog, inTheForm.stream().map(word -> word.replaceAll("<[^>]+>", "").trim()).toList());
-            assertEquals("the dialog does not hold the five fields after the test case, one component each", 6, ShownDialogParts.componentsOf(dialog).size());
+            assertEquals("the dialog does not hold the five fields after the test case, one component each", 6, ShownDialog.componentsOf(dialog).size());
             final @NotNull List<String> captions = List.of("Actual Result", "Bug Severity", "Bug Priority", "Stacktrace", Bundle.message("dialog.failure.caption.screenshots"));
             int at = -1;
             for (final String caption : captions) {
@@ -525,7 +525,7 @@ public class LightModeIdeTest extends AbstractTempRootIdeTest {
             final @NotNull FailedResultDialog dialog = new FailedResultDialog(getProject(), fixture.testRun().getPath(), fixture.resultOf(fixture.testCases().getFirst()), _ -> {
             });
             final @NotNull JComponent fields = new JPanel();
-            ShownDialogParts.componentsOf(dialog).forEach(component -> fields.add(component.getComponent().getPanel()));
+            ShownDialog.componentsOf(dialog).forEach(component -> fields.add(component.getComponent().getPanel()));
             OnScreen.shown(fields, getTestRootDisposable());
             final @NotNull EditorTextField inTheDialog = Drawn.components(fields).stream().filter(EditorTextField.class::isInstance).map(EditorTextField.class::cast).findFirst().orElseThrow();
             assertSpellChecked("the failure dialog", inTheDialog);

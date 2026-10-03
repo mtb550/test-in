@@ -17,7 +17,6 @@
 package org.testin.importexport.exports;
 
 import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.progress.Task;
 import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.table.JBTable;
@@ -26,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
+import org.testin.Said;
 import org.testin.importexport.FileTypes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
@@ -40,9 +40,8 @@ import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseEditorAttributes;
-import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.ui.framework.ShownDialogContent;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.view.Drawn;
 
@@ -81,8 +80,8 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
     @Override
     protected void tearDown() {
         settings().defaultDownloadFolder = downloadFolderBefore;
-        ShownDialogContent.close(getProject(), ExportDialog.class);
-        ShownDialogContent.close(getProject(), ConfirmDialog.class);
+        ShownDialog.close(getProject(), ExportDialog.class);
+        ShownDialog.close(getProject(), ConfirmDialog.class);
         super.tearDown();
     }
 
@@ -132,25 +131,9 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
         return tc;
     }
 
-    private @NotNull List<Notification> notifications() {
-        final @NotNull List<Notification> said = new CopyOnWriteArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
-        return said;
-    }
-
-    private @NotNull JComponent shown(final @NotNull Class<? extends AbstractFrameworkDialog> kind) {
-        Await.until(kind.getSimpleName() + " never opened", () -> ShownDialogContent.of(getProject(), kind).isPresent());
-        return ShownDialogContent.of(getProject(), kind).orElseThrow();
-    }
-
     private @NotNull JComponent theExportDialogFor(final @NotNull DirectoryDto node) {
         new ExportWork(getProject()).exportFrom(node);
-        return shown(ExportDialog.class);
+        return ShownDialog.waitedFor(getProject(), ExportDialog.class);
     }
 
     private static @NotNull JBTabbedPane tabsIn(final @NotNull JComponent content) {
@@ -198,7 +181,7 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
         final @NotNull Path firstFile = login.getPath().resolve(first.getId() + ".tc");
         final byte @NotNull [] firstBefore = bytesOf(firstFile);
         final byte @NotNull [] secondBefore = bytesOf(login.getPath().resolve(second.getId() + ".tc"));
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         final @NotNull JComponent dialog = theExportDialogFor(login);
         final @NotNull JBTable table = firstTable(dialog);
@@ -231,7 +214,7 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestSetDirectoryDto login = new NodesOnDisk(getProject()).testSet(testProject.getTestCasesDirectory(), "Login");
         aTestCase(login, "log in with a valid user");
         final @NotNull List<Path> testinBefore = everythingUnder(root.resolve("testin"));
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         final @NotNull JComponent dialog = theExportDialogFor(login);
         button(dialog, ExportAction.NAME).doClick();
@@ -252,7 +235,7 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
             started.add(task);
             return false;
         });
-        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         button(theExportDialogFor(login), ExportAction.NAME).doClick();
         exported(said, 1);
@@ -301,13 +284,13 @@ public class ExportFlowIdeTest extends AbstractTempRootIdeTest {
         Services.getInstance(getProject(), ProjectIndexer.class).scanSingleProject(testProject.getPath());
 
         new ExportWork(getProject()).exportFrom(login);
-        final @NotNull JComponent warning = shown(ConfirmDialog.class);
+        final @NotNull JComponent warning = ShownDialog.waitedFor(getProject(), ConfirmDialog.class);
 
         assertTrue("the unreadable file is not named: " + wordsIn(warning), wordsIn(warning).contains(broken));
-        assertTrue("the export dialog opened before the tester answered", ShownDialogContent.of(getProject(), ExportDialog.class).isEmpty());
+        assertFalse("the export dialog opened before the tester answered", ShownDialog.isOpen(getProject(), ExportDialog.class));
 
         button(warning, Bundle.message("export.anyway")).doClick();
 
-        assertEquals("the readable test case is still offered", 1, firstTable(shown(ExportDialog.class)).getRowCount());
+        assertEquals("the readable test case is still offered", 1, firstTable(ShownDialog.waitedFor(getProject(), ExportDialog.class)).getRowCount());
     }
 }

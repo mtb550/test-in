@@ -18,9 +18,9 @@ package org.testin.codegen;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
+import org.testin.Said;
 import org.testin.indexer.TestCases;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.TestCaseDto;
@@ -28,7 +28,6 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.services.Services;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MoveCodeIdeTest extends AbstractCodegenIdeTest {
@@ -49,13 +48,7 @@ public class MoveCodeIdeTest extends AbstractCodegenIdeTest {
     // Rule-CODEGEN-055
     public void testAMoveIntoAPlaceTestinHasNotReadLeavesTheClassAndSaysSo() {
         final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
-        final @NotNull List<Notification> said = new ArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         JavaCode.of(DirectoryType.TS).getMoved().execute(getProject(), new Moved(login, root.resolve("Never read")));
 

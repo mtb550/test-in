@@ -25,6 +25,7 @@ import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
+import org.testin.Said;
 import org.testin.actions.Declared;
 import org.testin.config.TestinYml;
 import org.testin.editor.CardHoverAction;
@@ -42,7 +43,6 @@ import org.testin.util.Bundle;
 import org.testin.view.Drawn;
 import org.testin.view.KeyPress;
 import org.testin.view.PopupsBuilt;
-import org.testin.view.Said;
 import org.testin.view.ViewOnScreen;
 import org.testin.view.ViewTab;
 

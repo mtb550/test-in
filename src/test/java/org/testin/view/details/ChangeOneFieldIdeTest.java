@@ -16,6 +16,7 @@
 package org.testin.view.details;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.Said;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
@@ -26,7 +27,6 @@ import org.testin.util.Bundle;
 import org.testin.view.AbstractViewPanelIdeTest;
 import org.testin.view.KeyPress;
 import org.testin.view.PopupsBuilt;
-import org.testin.view.Said;
 import org.testin.view.ViewTab;
 
 import java.io.IOException;

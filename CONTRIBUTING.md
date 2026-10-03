@@ -83,7 +83,7 @@ work had it not been noticed immediately.
 |----------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `./gradlew compileJava test`                 | It compiles, and the unit tests and the documentation guards pass                                                          | Every change, before you offer it                                                                                                                                                    |
 | `./gradlew runIde`                           | It actually works                                                                                                          | Anything a tester can see — see below                                                                                                                                                |
-| `./gradlew inspect`                          | Every finding in the Inspected scope, and the display-string ratchet                                                       | Never by hand. CI runs it on every push, on every branch, and the run is where it is read                                                                                            |
+| `./gradlew inspect`                          | Every finding in the Inspected scope, apart from the exceptions `qodana.yaml` lists                                        | Never by hand. CI runs it on every push, on every branch, and the run is where it is read                                                                                            |
 | `pwsh tools/inspect.ps1 -Quick`              | The rules that read the source as text, not what an IDE indexes                                                            | Every change, before you hand it over. Five seconds, no IDE                                                                                                                          |
 | `./gradlew check`                            | The unit tests, the IDE tests, the complexity gate and the coverage gate, with the coverage report                         | Before you hand over a change that reaches the indexer or the tree. About ten minutes from clean                                                                                     |
 | `./gradlew pmdMain`                          | No production method is over the cognitive complexity or nesting limit                                                     | Every change. Part of `check` and of `build.yml`; fifteen seconds, and it does not wait for a compile                                                                                |
@@ -229,24 +229,24 @@ version that no longer exists, which reads exactly like a real defect.
 
 It exits non-zero for any finding in the files the repository writes: the scope
 `.idea/scopes/Inspected.xml` names, which **Code | Inspect Code** offers in the
-IDE as *Inspected*. A warning the IDE shows there is a warning CI fails on. The
-exceptions are the rules a headless run cannot be trusted with, which
-`tools/inspect.ps1` names with its reason in `$notGated`, or in
-`$notGatedMessages` where only one sentence of an otherwise reliable rule is
-excused:
+IDE as *Inspected*. A warning the IDE shows there is a warning CI fails on.
 
-| Not gated                                                                                          | Why                                                                                                                                                                                                                                                                          |
-|----------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `unused`, where a method is *not reachable from the entry points* or a constructor is *never used* | The platform reaches the method through an interface it implements, and Lombok's `@Builder` calls the constructor. Every other unused finding is gated                                                                                                                       |
-| `unused`, on a core method a content module calls                                                  | `testin-java` and `testin-testng` depend on the core, and the core packages them rather than depending back, so neither the IDE nor the inspector finds the caller. `@FromContentModule` marks those methods, and `.idea/misc.xml` names it an entry point so the IDE agrees |
-| `SameReturnValue`                                                                                  | Judged across every implementation, and the enums' getters are Lombok's, which the headless run cannot see                                                                                                                                                                   |
-| `RedundantThrows`                                                                                  | The Java module implements `JavaSourceRoot`'s interfaces and throws what they declare                                                                                                                                                                                        |
-| `UnusedProperty`                                                                                   | The platform reads action, group and tool window keys by name, and `BundleKeysTest` checks that every other key has a reader                                                                                                                                                 |
-| `UndefinedParamsPresent`                                                                           | A workflow action's inputs come from its metadata online, which the headless run does not fetch                                                                                                                                                                              |
-| `JSUnresolvedLibraryURL`                                                                           | It asks whether this machine has downloaded a library that a page loads from a CDN                                                                                                                                                                                           |
-| `DuplicatedDisplayString`                                                                          | Counted against `.github/display-string-baseline.txt` instead of forbidden. It stands at 0                                                                                                                                                                                   |
-| `XmlHighlighting`, where the URI *is not registered*                                               | Both plugin icons declare the SVG namespace, and a headless IDE with no schema catalog and no network cannot look it up. Every other XML finding is gated                                                                                                                    |
-| A finding with no description at all                                                               | The Markdown annotator reports one for each `[*]` in a Mermaid state diagram - the start and end state the syntax is built on - and says nothing about it. A gate cannot ask for a fix it cannot name                                                                        |
+**The only exceptions are the ones `qodana.yaml` lists under `exclude`, each
+with its reason.** Qodana reads that list in CI and `tools/inspect.ps1` reads the
+same entries, so the two gates cannot disagree, and there is no second list to
+fall behind. Each entry names the narrowest path it can:
+
+| Exception                                       | Why nothing better is possible                                                                                                                     |
+|-------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| Files whose bytes something else owns           | The sample `.ts` markers (JSON that TypeScript claims by extension), the Gradle wrapper, JetBrains' agreements, the Jekyll files, the bug template |
+| `HardcodedPasswords` in `GitCommandRunnerTest`  | It proves a credential in a remote URL is masked, so its fake URLs carry a password                                                                |
+| `UndefinedParamsPresent` in `.github/workflows` | An action's inputs are declared in its `action.yml` online, which an offline inspector cannot fetch                                                |
+| `SameReturnValue` in `CodeNavigation`           | Its real implementation lives in `testin-java`, which the inspector cannot see, so it judges by the no-Java fallback alone                         |
+
+A core method that only a content module calls is marked `@FromContentModule`,
+which `.idea/misc.xml` names an entry point, so neither the IDE nor the
+inspector calls it unused. One the script finds unmarked is reported as
+`UsedFromContentModule`, and the gate fails on it until it is marked.
 
 `unused`, `SameReturnValue`, `RedundantThrows` and `UnusedReturnValue` are the
 global ones, and the headless run under-reports them all: it sees neither
@@ -258,10 +258,6 @@ in the IDE is the honest list.
 A new `@SuppressWarnings` or `//noinspection` fails the gate too, through the
 `SuppressionAnnotation` inspection. The profile allows `UnstableApiUsage` only,
 for the one platform call `build.gradle.kts` names.
-
-Two files are outside the scope in `.idea/scopes/Inspected.xml`, because their
-bytes are fixed by something else: the Jekyll stylesheet and the bug report
-template. `Inspected.xml` says why.
 
 Nine rules are the script's own, because no IntelliJ inspection makes them:
 
@@ -309,8 +305,9 @@ and that reading the code disproved: a global unused check depends on how far th
 index had got. So confirm one by finding the call site before deleting anything,
 and re-run before reporting a count.
 
-**The display-string ratchet** lives in `.github/display-string-baseline.txt`. A
-string a tester reads should have one owner; the number may go down and never up.
+**A string a tester reads has one owner.** `DuplicatedDisplayString` reports a
+user-facing string written in a second file, and the gate fails on it like any
+other finding.
 
 ## What CI runs
 

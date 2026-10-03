@@ -62,7 +62,7 @@ public class OrderByNumberIdeTest extends AbstractTempRootIdeTest {
 
     private @NotNull IntegerField theOrderBox(final @NotNull TestCaseEditor editor) {
         ShownDialog.open(getProject(), UpdateTestCaseDialog.class, () -> UpdateTestCaseAction.openField(getProject(), editor, UpdateTestCaseFields.ORDER));
-        return Drawn.components(ShownDialog.of(getProject(), UpdateTestCaseDialog.class).getContent()).stream()
+        return Drawn.components(ShownDialog.content(getProject(), UpdateTestCaseDialog.class)).stream()
                 .filter(IntegerField.class::isInstance).map(IntegerField.class::cast).findFirst()
                 .orElseThrow(() -> new AssertionError("the order dialog has no box for the number"));
     }

@@ -23,79 +23,108 @@ import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.testFramework.PlatformTestUtil;
 import com.intellij.testFramework.TestActionEvent;
-import com.intellij.ui.popup.AbstractPopup;
 import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
+import org.testin.Await;
 import org.testin.services.Services;
+import org.testin.util.Shortcuts;
+import org.testin.view.Drawn;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
+import javax.swing.text.JTextComponent;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ShownDialog {
-    public static @NotNull AbstractPopup of(final @NotNull Project p, final @NotNull Class<? extends AbstractFrameworkDialog> kind) {
-        return (AbstractPopup) Services.getInstance(p, OpenDialogs.class).shown(kind)
-                .orElseThrow(() -> new AssertionError("no " + kind.getSimpleName() + " is open"));
-    }
 
-    public static void open(final @NotNull Project p, final @NotNull Class<? extends AbstractFrameworkDialog> kind, final @NotNull Runnable opening) {
-        try {
-            opening.run();
-        } catch (final NullPointerException sizedWithoutAScreen) {
-            if (!isOpen(p, kind)) throw sizedWithoutAScreen;
-        }
-        if (!isOpen(p, kind)) throw new AssertionError(kind.getSimpleName() + " did not open");
-
-        of(p, kind).setSize(new Dimension(800, 600));
-        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-    }
-
-    public static boolean isOpen(final @NotNull Project p, final @NotNull Class<? extends AbstractFrameworkDialog> kind) {
+    public static boolean isOpen(final @NotNull Project p, final @NotNull Class<?> kind) {
         return Services.getInstance(p, OpenDialogs.class).shown(kind).isPresent();
     }
 
-    public static void close(final @NotNull Project p, final @NotNull Class<? extends AbstractFrameworkDialog> kind) {
-        Services.getInstance(p, OpenDialogs.class).shown(kind).ifPresent(JBPopup::cancel);
+    public static @NotNull JBPopup popup(final @NotNull Project p, final @NotNull Class<?> kind) {
+        return Services.getInstance(p, OpenDialogs.class).shown(kind).orElseThrow(() -> new AssertionError("no " + kind.getSimpleName() + " is open"));
+    }
+
+    public static @NotNull JComponent content(final @NotNull Project p, final @NotNull Class<?> kind) {
+        return popup(p, kind).getContent();
+    }
+
+    public static @NotNull JComponent waitedFor(final @NotNull Project p, final @NotNull Class<?> kind) {
+        Await.until(kind.getSimpleName() + " never opened", () -> isOpen(p, kind));
+        return content(p, kind);
+    }
+
+    public static void open(final @NotNull Project p, final @NotNull Class<?> kind, final @NotNull Runnable opening) {
+        opening.run();
+        sized(p, kind);
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
     }
 
-    public static void press(final @NotNull Project p, final @NotNull Class<? extends AbstractFrameworkDialog> kind, final @NotNull KeyStroke stroke) {
+    public static void sized(final @NotNull Project p, final @NotNull Class<?> kind) {
+        popup(p, kind).setSize(new Dimension(800, 600));
+    }
+
+    public static void typed(final @NotNull Project p, final @NotNull Class<?> kind, final @NotNull String text) {
+        Drawn.first(content(p, kind), JTextComponent.class, JTextComponent::isEditable).setText(text);
+    }
+
+    public static void press(final @NotNull Project p, final @NotNull Class<?> kind, final @NotNull Shortcuts key) {
+        press(p, kind, key.getKey());
+    }
+
+    public static void press(final @NotNull Project p, final @NotNull Class<?> kind, final @NotNull KeyStroke stroke) {
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
-        press(of(p, kind).getContent(), stroke);
+        final @NotNull JBPopup popup = popup(p, kind);
+        if (stroke.getModifiers() == 0 && popup.dispatchKeyEvent(new KeyEvent(popup.getContent(), KeyEvent.KEY_PRESSED, 0, 0, stroke.getKeyCode(), KeyEvent.CHAR_UNDEFINED))) {
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+            return;
+        }
+        press(popup.getContent(), stroke);
     }
 
     public static void press(final @NotNull JComponent root, final @NotNull KeyStroke stroke) {
         final @NotNull List<JComponent> everywhere = UIUtil.uiTraverser(root).filter(JComponent.class).toList();
-
         for (final JComponent component : everywhere) {
             for (final AnAction action : ActionUtil.getActions(component)) {
                 if (!answers(action, stroke)) continue;
-
                 final @NotNull AnActionEvent e = TestActionEvent.createTestEvent(action);
                 ActionUtil.updateAction(action, e);
                 if (!e.getPresentation().isEnabled()) continue;
-
                 ActionUtil.performAction(action, e);
                 PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
                 return;
             }
         }
-
         final @NotNull Action bound = everywhere.stream().map(component -> bindingOf(component, stroke)).flatMap(Optional::stream).findFirst()
                 .orElseThrow(() -> new AssertionError("nothing on the dialog answers " + stroke));
         bound.actionPerformed(new ActionEvent(root, ActionEvent.ACTION_PERFORMED, String.valueOf(stroke)));
         PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+    }
+
+    public static void close(final @NotNull Project p, final @NotNull Class<?> kind) {
+        Services.getInstance(p, OpenDialogs.class).shown(kind).ifPresent(JBPopup::cancel);
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+    }
+
+    public static @NotNull List<ComponentDialogBase<?>> componentsOf(final @NotNull AbstractFrameworkDialog dialog) {
+        return List.copyOf(dialog.components);
+    }
+
+    public static @NotNull List<String> wordsOf(final @NotNull AbstractFrameworkDialog dialog) {
+        return dialog.components.stream().flatMap(holder -> Drawn.words(holder.getComponent().getPanel()).stream()).map(word -> StringUtil.removeHtmlTags(word).trim()).toList();
     }
 
     private static @NotNull Optional<Action> bindingOf(final @NotNull JComponent component, final @NotNull KeyStroke stroke) {

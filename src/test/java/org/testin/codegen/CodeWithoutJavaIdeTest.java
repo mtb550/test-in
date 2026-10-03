@@ -18,7 +18,6 @@ package org.testin.codegen;
 
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -35,6 +34,8 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.IconUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
+import org.testin.Said;
+import org.testin.TestinLog;
 import org.testin.actions.TestinData;
 import org.testin.editor.CardHoverAction;
 import org.testin.editor.Offered;
@@ -50,7 +51,6 @@ import javax.swing.Icon;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -69,17 +69,6 @@ public class CodeWithoutJavaIdeTest extends AbstractCodegenIdeTest {
 
     private @NotNull VirtualFile theTestSourceRoot() {
         return JavaSourceRoot.find(getProject()).orElseThrow(() -> new AssertionError("the project has no test source folder"));
-    }
-
-    private @NotNull List<Notification> notificationsSaid() {
-        final @NotNull List<Notification> said = new ArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
-        return said;
     }
 
     private @NotNull AnActionEvent theMenuEntryFor(final @NotNull TestCaseDto tc) {
@@ -126,7 +115,8 @@ public class CodeWithoutJavaIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-006
     public void testWhatGoesWrongWritingCodeGoesToTheLogAndTheTesterIsNotShownIt() {
-        final @NotNull List<Notification> said = notificationsSaid();
+        final @NotNull Said heard = Said.listening(getProject(), getTestRootDisposable());
+        final @NotNull TestinLog log = TestinLog.fromNow(getTestRootDisposable());
         WriteAction.runAndWait(() -> {
             try {
                 theTestSourceRoot().createChildData(this, "nafath");
@@ -134,19 +124,14 @@ public class CodeWithoutJavaIdeTest extends AbstractCodegenIdeTest {
                 throw new AssertionError("could not put a file where the package folder goes: " + ex.getMessage(), ex);
             }
         });
-        final @NotNull CodegenBalloons balloons = CodegenBalloons.watching();
-        try {
-            final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
-            createdTestCase(login, "Log in with a valid user", "b");
-            settled();
+        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        createdTestCase(login, "Log in with a valid user", "b");
+        settled();
 
-            assertTrue("a file standing where the package folder goes did not stop the class", generatedClass("nafath.LoginTest").isEmpty());
-            assertTrue("what went wrong was shown to the tester: " + said.stream().map(Notification::getContent).toList(), said.isEmpty());
-            assertTrue("what went wrong was shown to the tester in a balloon: " + balloons.shown(), balloons.shown().isEmpty());
-            assertTrue("what went wrong never reached the log", balloons.logged().stream().anyMatch(line -> line.contains("[ERROR]") && line.contains("nafath")));
-        } finally {
-            balloons.stop();
-        }
+        assertTrue("a file standing where the package folder goes did not stop the class", generatedClass("nafath.LoginTest").isEmpty());
+        assertTrue("what went wrong was shown to the tester: " + heard.notifications().stream().map(Notification::getContent).toList(), heard.notifications().isEmpty());
+        assertTrue("what went wrong was shown to the tester in a balloon: " + heard.shown(), heard.shown().isEmpty());
+        assertTrue("what went wrong never reached the log", log.lines().stream().anyMatch(line -> line.contains("[ERROR]") && line.contains("nafath")));
     }
 
     // Rule-CODEGEN-027

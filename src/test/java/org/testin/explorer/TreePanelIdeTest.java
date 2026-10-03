@@ -29,7 +29,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
-import org.testin.Balloons;
+import org.testin.Said;
 import org.testin.TreeGesture;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.CollapseAllAction;
@@ -49,7 +49,6 @@ import org.testin.util.Bundle;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -249,16 +248,13 @@ public class TreePanelIdeTest extends AbstractReadTheRootIdeTest {
         readEverything();
         bound().choose("Checkout");
         final @NotNull TreePanel panel = aPanelShowingTheTree();
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
-        final @NotNull List<String> heard = new ArrayList<>();
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
         panel.reindex("First refresh");
         panel.reindex("Second refresh");
         panel.reindex("Third refresh");
 
-        Await.until("the waiting refresh never ran", () -> {
-            heard.addAll(balloons.shown());
-            return heard.contains("Third refresh");
-        });
+        Await.until("the waiting refresh never ran", () -> balloons.shown().contains("Third refresh"));
+        final @NotNull List<String> heard = balloons.shown();
 
         assertEquals("refreshes did not run one at a time, the waiting two as one reporting the last: " + heard, List.of("First refresh", "Third refresh"), heard.stream().filter(said -> said.endsWith("refresh")).toList());
     }

@@ -17,7 +17,6 @@
 package org.testin.codegen;
 
 import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -27,13 +26,13 @@ import com.intellij.testFramework.PsiTestUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.testin.AbstractCodegenIdeTest;
+import org.testin.Said;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,13 +109,7 @@ public class TestSourceRootIdeTest extends AbstractCodegenIdeTest {
     public void testWithNoTestSourceFolderTheFirstWriteSaysSoOnceAndARemovalSaysNothing() {
         final @NotNull VirtualFile sources = theTestSourceRoots().getFirst();
         final @NotNull String noRoot = Bundle.message("codegen.no.source.root.title");
-        final @NotNull List<Notification> said = new ArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         aRememberedFolderThatWasDeleted();
         PsiTestUtil.removeSourceRoot(getModule(), sources);

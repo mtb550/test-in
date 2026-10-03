@@ -21,7 +21,7 @@ import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.Balloons;
+import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.toolbar.components.GridViewBtn;
@@ -120,7 +120,7 @@ public class GridEditIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestCaseEditor editor = aGridOver("Log in");
         final @NotNull JBTable table = gridOf(editor);
         final @NotNull TestCaseDto tc = editor.getList().getModel().getElementAt(0);
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
 
         typeInto(table, 0, TestCaseEditorAttributes.GROUP, " Smoke ,  Regression ,Smoke");
 
@@ -134,7 +134,7 @@ public class GridEditIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestCaseEditor editor = aGridOver("Log in");
         final @NotNull JBTable table = gridOf(editor);
         final @NotNull List<String> before = everyFile();
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
 
         typeInto(table, 0, TestCaseEditorAttributes.GROUP, "Smoke ,");
 
@@ -148,7 +148,7 @@ public class GridEditIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestCaseEditor editor = aGridOver("Log in");
         final @NotNull JBTable table = gridOf(editor);
         final @NotNull List<String> before = everyFile();
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
 
         typeInto(table, 0, TestCaseEditorAttributes.GROUP, "Smoke");
         typeInto(table, 0, TestCaseEditorAttributes.DESCRIPTION, "Log in");
@@ -181,7 +181,7 @@ public class GridEditIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestCaseEditor editor = aGridOver("Log in", "Log out");
         final @NotNull JBTable table = gridOf(editor);
         final @NotNull UndoScope scope = UndoScope.of(testSet.getPath());
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
 
         typeInto(table, 0, TestCaseEditorAttributes.DESCRIPTION, "Sign in");
         Await.until("the first cell never reached the undo history", () -> undoHistories().canUndo(scope));

@@ -44,22 +44,27 @@ profile:
 include:
   - name: CheckDependencyLicenses
 
-# .idea/scopes/Inspected.xml is a thing Qodana cannot read, and it is
-# the list of what this repository writes. Everything below is outside it, so
-# tools/inspect.ps1 has never looked at any of it, and the 27 September report
-# was 40 findings deep in files whose bytes are fixed by something else.
-#
-# samples/testin-root is 30 of those 40, and all one collision: a Testin test
-# set is marked by a file named .ts, which is also TypeScript's extension. The
-# marker is JSON, so reading it as TypeScript gives five "newline or semicolon
-# expected" errors, four comma expressions and six bad expression statements per
-# file. Nothing can be done about the name - .ts is the marker Testin writes and
-# .ts is what TypeScript claims.
-#
-# gradlew.bat is Gradle's, and the Windows command keywords in it are five more.
-# EULA.md is JetBrains' agreement quoted verbatim, so its Czech address and its
-# four 50-word sentences stay exactly as written.
+# The one list of exceptions. Qodana reads it here, and tools/inspect.ps1 reads
+# the same entries, so the CI report and the inspection gate cannot disagree
+# about what is excused. Every entry names the narrowest path it can, and says
+# why nothing better is possible. Anything not listed fails the gate.
 exclude:
+  # Files whose bytes something else owns.
+  #
+  # samples/testin-root marks a test set with a file named .ts, which is also
+  # TypeScript's extension. The marker is JSON, so reading it as TypeScript
+  # gives fifteen syntax errors per file. .ts is the marker Testin writes.
+  #
+  # gradlew and gradlew.bat are written by Gradle's wrapper task. EULA.md and
+  # PRIVACY_POLICY.md are JetBrains' agreements quoted verbatim.
+  #
+  # The documentation site's Jekyll files: the stylesheet opens with the front
+  # matter Jekyll needs and imports {{ site.theme }}, which is not CSS, and the
+  # head include loads Mermaid from its CDN, which is how a static page gets
+  # it.
+  #
+  # The bug report template is the body of every issue Testin files, pinned
+  # byte for byte by BugTemplateTest.
   - name: All
     paths:
       - samples
@@ -67,29 +72,26 @@ exclude:
       - gradlew.bat
       - EULA.md
       - PRIVACY_POLICY.md
-
-  # Four findings in the workflow files are one word, the JDK distribution
-  # actions/setup-java is given. It is in .idea/dictionaries/project.xml, which
-  # fc6f46a3 added and which this run ignored: all ten words it added were
-  # reported again, while the misspelling the same commit fixed was not. The
-  # IDE and tools/inspect.ps1 read that dictionary and still spell-check these
-  # files, so only Qodana's copy of the question is switched off.
-  - name: SpellCheckingInspection
-    paths:
-      - .github
-  # GitCommandRunnerTest proves a credential in a remote URL is masked before
-  # Git's message reaches the log, so its test data has to be a URL with a
-  # password in it. Every one is fake, and a test fixture is not a secret.
-  - name: HardcodedPasswords
-    paths:
-      - src/test
-  # The documentation site's Jekyll files, which GitHub Pages builds. The
-  # stylesheet opens with the front matter Jekyll needs and imports
-  # {{ site.theme }}, which Qodana reads as plain CSS and reports as nine
-  # errors and warnings; the head include loads Mermaid from its CDN, which is
-  # how a static page gets it. Neither is plugin code, and nothing in either
-  # can change without breaking the site.
-  - name: All
-    paths:
       - docs/assets/css/style.scss
       - docs/_includes/head-custom.html
+      - src/main/resources/org/testin/bug/bugReport.md
+
+  # GitCommandRunnerTest proves a credential in a remote URL is masked before
+  # Git's message reaches the log, so its test data has to be a URL with a
+  # password in it. Every one is fake.
+  - name: HardcodedPasswords
+    paths:
+      - src/test/java/org/testin/git/GitCommandRunnerTest.java
+
+  # An action's inputs are declared in its action.yml online, which an offline
+  # inspector cannot fetch, so every with: key reads as undefined.
+  - name: UndefinedParamsPresent
+    paths:
+      - .github/workflows
+
+  # CodeNavigation's real implementation lives in testin-java, a content module
+  # the inspector cannot see, so it judges "every implementation" by the
+  # no-Java fallback alone, which always answers false.
+  - name: SameReturnValue
+    paths:
+      - src/main/java/org/testin/navigate/CodeNavigation.java

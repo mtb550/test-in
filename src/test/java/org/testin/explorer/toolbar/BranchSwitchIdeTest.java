@@ -28,7 +28,7 @@ import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.testproject.BoundTestProject;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.ui.framework.OnScreenDialog;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
@@ -80,7 +80,7 @@ public class BranchSwitchIdeTest extends AbstractOpenEditorsIdeTest {
 
     @Override
     public void tearDown() {
-        OnScreenDialog.closed(getProject(), ConfirmDialog.class);
+        ShownDialog.close(getProject(), ConfirmDialog.class);
         bound().choose("");
         settings().rootTestinPath = rootWas;
         super.tearDown();
@@ -169,10 +169,10 @@ public class BranchSwitchIdeTest extends AbstractOpenEditorsIdeTest {
 
         branchBox().setSelectedItem("feature");
 
-        Await.until("switching with uncommitted changes did not ask first", () -> OnScreenDialog.isOpen(getProject(), ConfirmDialog.class));
+        Await.until("switching with uncommitted changes did not ask first", () -> ShownDialog.isOpen(getProject(), ConfirmDialog.class));
         assertEquals("the branch was switched before the tester answered", "main", branchOnDisk());
 
-        OnScreenDialog.pressed(getProject(), ConfirmDialog.class, Shortcuts.Enter);
+        ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Enter);
 
         Await.until("switching anyway did not switch", () -> branchOnDisk().equals("feature"));
         assertTrue("switching lost the uncommitted change", Files.exists(notes));

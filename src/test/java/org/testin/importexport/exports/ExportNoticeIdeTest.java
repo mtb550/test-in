@@ -19,7 +19,6 @@ package org.testin.importexport.exports;
 import com.intellij.ide.browsers.BrowserLauncher;
 import com.intellij.ide.browsers.WebBrowser;
 import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -30,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Notified;
+import org.testin.Said;
 import org.testin.notifications.Done;
 import org.testin.util.Bundle;
 
@@ -60,13 +60,7 @@ public class ExportNoticeIdeTest extends AbstractTempRootIdeTest {
     }
 
     private @NotNull Notification theExportMessage(final @NotNull File file) {
-        final @NotNull List<Notification> said = new CopyOnWriteArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         ExportNotice.show(getProject(), file, 3);
 

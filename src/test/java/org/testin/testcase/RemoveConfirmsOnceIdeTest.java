@@ -19,7 +19,7 @@ package org.testin.testcase;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.codegen.CodegenBalloons;
+import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.indexer.TestCases;
@@ -29,7 +29,8 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.ui.framework.ProductPressEnter;
+import org.testin.ui.framework.ShownDialog;
+import org.testin.util.Shortcuts;
 
 import java.util.List;
 
@@ -42,17 +43,13 @@ public class RemoveConfirmsOnceIdeTest extends AbstractTempRootIdeTest {
         final @NotNull List<TestCaseDto> testCases = EditorFixtures.testCases(getProject(), login, 4);
         final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), login, getTestRootDisposable());
         final @NotNull List<TestCaseDto> chosen = testCases.subList(0, 3);
-        final @NotNull CodegenBalloons balloons = CodegenBalloons.watching();
-        try {
-            new RemoveTestCaseWork(getProject(), editor, login, chosen).remove();
-            ProductPressEnter.on(getProject(), ConfirmDialog.class);
-            Await.until("the three test cases were never removed", () -> chosen.stream().allMatch(tc -> Services.getInstance(getProject(), TestCases.class).findTestCase(tc.getId()).isEmpty()));
-            Await.until("removing three test cases said nothing", () -> balloons.shown().stream().anyMatch(said -> said.startsWith(Done.REMOVED.getOutcome())));
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
+        new RemoveTestCaseWork(getProject(), editor, login, chosen).remove();
+        ShownDialog.press(getProject(), ConfirmDialog.class, Shortcuts.Enter);
+        Await.until("the three test cases were never removed", () -> chosen.stream().allMatch(tc -> Services.getInstance(getProject(), TestCases.class).findTestCase(tc.getId()).isEmpty()));
+        Await.until("removing three test cases said nothing", () -> balloons.shown().stream().anyMatch(said -> said.startsWith(Done.REMOVED.getOutcome())));
 
-            final @NotNull List<String> confirmations = balloons.shown().stream().filter(said -> said.startsWith(Done.REMOVED.getOutcome())).toList();
-            assertEquals("removing three test cases did not confirm once, in the past tense, with the count", List.of(Done.counted(Done.REMOVED.getOutcome(), 3)), confirmations);
-        } finally {
-            balloons.stop();
-        }
+        final @NotNull List<String> confirmations = balloons.shown().stream().filter(said -> said.startsWith(Done.REMOVED.getOutcome())).toList();
+        assertEquals("removing three test cases did not confirm once, in the past tense, with the count", List.of(Done.counted(Done.REMOVED.getOutcome(), 3)), confirmations);
     }
 }

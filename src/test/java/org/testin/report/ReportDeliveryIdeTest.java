@@ -21,7 +21,6 @@ import com.intellij.ide.browsers.WebBrowser;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.WriteAction;
@@ -46,6 +45,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Notified;
+import org.testin.Said;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.exports.ExportNotice;
 import org.testin.indexer.DirectoryMapper;
@@ -63,7 +63,7 @@ import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testrun.TestRunEditorAttributes;
-import org.testin.ui.framework.ReportDialogShown;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 
 import java.awt.datatransfer.DataFlavor;
@@ -87,7 +87,7 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
 
     private final @NotNull AppSettingsState wasStored = new AppSettingsState();
 
-    private final @NotNull List<Notification> said = new ArrayList<>();
+    private @NotNull List<Notification> said = List.of();
 
     private final @NotNull UUID opens = UUID.randomUUID();
 
@@ -128,12 +128,7 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
         aTestCase(opens, "Open the app and log in with a valid user whose password has not expired yet");
         aTestCase(locks, "Lock the account after three wrong passwords in a row, and say so on the login page");
 
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
+        said = Said.listening(getProject(), getTestRootDisposable()).notifications();
     }
 
     @Override
@@ -260,10 +255,10 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
         settings().defaultDownloadFolder = folder("reports").toString();
         final @NotNull List<Boolean> openWhenTheWorkStarted = new ArrayList<>();
         final @NotNull Project p = getProject();
-        final @NotNull GenerateReportDialog dialog = new GenerateReportDialog(p, "Cycle-1", (_, _) -> openWhenTheWorkStarted.add(ReportDialogShown.isOpen(p, GenerateReportDialog.class)));
+        final @NotNull GenerateReportDialog dialog = new GenerateReportDialog(p, "Cycle-1", (_, _) -> openWhenTheWorkStarted.add(ShownDialog.isOpen(p, GenerateReportDialog.class)));
 
         dialog.show();
-        assertTrue("the dialog never opened", ReportDialogShown.isOpen(p, GenerateReportDialog.class));
+        assertTrue("the dialog never opened", ShownDialog.isOpen(p, GenerateReportDialog.class));
         dialog.submit();
 
         assertEquals("the work started while the dialog was still open", List.of(false), openWhenTheWorkStarted);

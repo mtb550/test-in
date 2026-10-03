@@ -23,8 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.FilesUnder;
-import org.testin.NotifiedBalloons;
 import org.testin.OnScreen;
+import org.testin.Said;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestRuns;
 import org.testin.model.Config;
@@ -37,8 +37,7 @@ import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.testrun.failure.FailedResultDialog;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.ui.framework.ShownDialogParts;
-import org.testin.ui.framework.SizedPopups;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 
@@ -54,12 +53,11 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
     @Override
     protected void setUp() {
         super.setUp();
-        SizedPopups.installed(getTestRootDisposable());
     }
 
     @Override
     protected void tearDown() {
-        ShownDialogParts.closeAll(getProject(), FailedResultDialog.class);
+        ShownDialog.close(getProject(), FailedResultDialog.class);
         super.tearDown();
     }
 
@@ -108,7 +106,7 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
     public void testOneTestCaseIsOneMessageAndSeveralAreOneMessageWithACount() {
         final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 5);
         final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             editor.getList().setSelectedIndex(0);
             fixture.press(editor, RunItemStatus.PASSED);
@@ -127,7 +125,7 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
     public void testABulkRunItemStatusIsOneMessageWithACountHoweverManyWereRecorded() {
         final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 6);
         final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             editor.getList().setSelectionInterval(0, 4);
 
@@ -204,7 +202,7 @@ public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
 
             assertTrue("Escape did not close the dialog at once", fixture.failureDialog().isEmpty());
-            assertTrue("Escape asked before closing", ShownDialogParts.contentOf(getProject(), ConfirmDialog.class).isEmpty());
+            assertFalse("Escape asked before closing", ShownDialog.isOpen(getProject(), ConfirmDialog.class));
             final @NotNull TestRunItems kept = fixture.resultOf(fixture.testCases().getFirst());
             assertEquals("Escape recorded a run item status", RunItemStatus.PENDING, kept.getStatus());
             assertEquals("Escape recorded the detail", "", kept.getActualResult());

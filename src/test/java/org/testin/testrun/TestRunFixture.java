@@ -36,7 +36,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testrun.failure.FailedResultDialog;
-import org.testin.ui.framework.ShownDialogParts;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.view.Drawn;
 
 import javax.swing.JComponent;
@@ -95,7 +95,7 @@ public record TestRunFixture(@NotNull Project p, @NotNull List<TestCaseDto> test
     }
 
     public @NotNull Optional<JComponent> failureDialog() {
-        return ShownDialogParts.contentOf(p, FailedResultDialog.class);
+        return Optional.of(FailedResultDialog.class).filter(kind -> ShownDialog.isOpen(p, kind)).map(kind -> ShownDialog.content(p, kind));
     }
 
     public @NotNull JComponent openFailureDialog() {

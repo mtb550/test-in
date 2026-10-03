@@ -17,10 +17,10 @@
 package org.testin.indexer;
 
 import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
+import org.testin.Said;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
 import org.testin.services.Services;
@@ -31,11 +31,10 @@ import org.testin.util.Html;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class AbstractReadTheRootIdeTest extends AbstractTempRootIdeTest {
 
-    private final @NotNull List<Notification> said = new CopyOnWriteArrayList<>();
+    private @NotNull List<Notification> said = List.of();
 
     private @NotNull String rootWas = "";
 
@@ -81,12 +80,7 @@ public abstract class AbstractReadTheRootIdeTest extends AbstractTempRootIdeTest
         unbind();
         indexer().resetForReindex();
 
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
+        said = Said.listening(getProject(), getTestRootDisposable()).notifications();
     }
 
     @Override

@@ -26,7 +26,7 @@ import org.testin.indexer.Nodes;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
-import org.testin.ui.framework.OnScreenDialog;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Shortcuts;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class CreateTestSetOpensIdeTest extends AbstractOpenEditorsIdeTest {
 
     @Override
     public void tearDown() {
-        OnScreenDialog.closed(getProject(), CreateTestDialog.class);
+        ShownDialog.close(getProject(), CreateTestDialog.class);
         super.tearDown();
     }
 
@@ -45,8 +45,8 @@ public class CreateTestSetOpensIdeTest extends AbstractOpenEditorsIdeTest {
         final @NotNull TestProjectDirectoryDto tp = new NodesOnDisk(getProject()).testProject(root.resolve("NAFATH"));
 
         TreeGesture.pressed(getProject(), new CreateTreeNodeAction(), List.of(tp.getTestCasesDirectory()));
-        OnScreenDialog.typed(getProject(), CreateTestDialog.class, "Login");
-        OnScreenDialog.pressed(getProject(), CreateTestDialog.class, Shortcuts.Enter);
+        ShownDialog.typed(getProject(), CreateTestDialog.class, "Login");
+        ShownDialog.press(getProject(), CreateTestDialog.class, Shortcuts.Enter);
 
         final @NotNull Optional<DirectoryDto> created = Services.getInstance(getProject(), Nodes.class).find(tp.getTestCasesDirectory().getPath().resolve("Login"));
         assertTrue("the test set was not created", created.isPresent());

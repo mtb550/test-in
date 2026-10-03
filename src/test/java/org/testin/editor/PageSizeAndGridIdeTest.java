@@ -24,8 +24,8 @@ import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.NotifiedBalloons;
 import org.testin.OnScreen;
+import org.testin.Said;
 import org.testin.editor.grid.GridKeys;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.testrun.TestRunEditor;
@@ -104,7 +104,7 @@ public class PageSizeAndGridIdeTest extends AbstractTempRootIdeTest {
     public void testACutOrAPasteOverCellsIsOneChangeOneMessageAndOneUndo() {
         final @NotNull List<TestCaseDto> testCases = aTestSetOfThree();
         final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             final @NotNull Set<TestCaseEditorAttributes> fields = editor.getToolBar().getToolbarItem(TestCaseDetailsPopupBtn.class).getSelectedDetails();
             fields.add(TestCaseEditorAttributes.MODULE);
@@ -163,7 +163,7 @@ public class PageSizeAndGridIdeTest extends AbstractTempRootIdeTest {
         };
         Disposer.register(getTestRootDisposable(), editor);
         Await.until("the test case editor never loaded", () -> !editor.isLoading());
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             editor.getToolBar().getToolbarItem(GridViewBtn.class).doClick();
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();

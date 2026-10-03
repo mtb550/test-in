@@ -23,8 +23,8 @@ import com.intellij.util.TimeoutUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.NotifiedBalloons;
 import org.testin.FilesUnder;
+import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.testcase.TestCaseEditor;
@@ -97,7 +97,7 @@ public class TestRunProgressIdeTest extends AbstractTempRootIdeTest {
         final @NotNull List<TestCaseDto> testCases = TestRunFixture.testCasesIn(getProject(), root, 1);
         final @NotNull TestRunFixture fixture = TestRunFixture.of(getProject(), root, List.of(EditorFixtures.pending(testCases.getFirst()).setStatus(RunItemStatus.FAILED).setActualResult("It froze")), testCases);
         final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
         try {
             final @NotNull JBTable grid = theGridOf(editor);
             awaitWrites();

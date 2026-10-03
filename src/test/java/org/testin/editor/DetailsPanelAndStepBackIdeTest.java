@@ -23,8 +23,8 @@ import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.NotifiedBalloons;
 import org.testin.Gestures;
+import org.testin.Said;
 import org.testin.actions.EscapeAction;
 import org.testin.clipboard.CutState;
 import org.testin.editor.testcase.TestCaseEditor;
@@ -74,8 +74,8 @@ public class DetailsPanelAndStepBackIdeTest extends AbstractTempRootIdeTest {
     public void testOpeningTheDetailsPanelSaysNothing() {
         final @NotNull ViewOnScreen window = ViewOnScreen.closed(getProject(), getTestRootDisposable());
         final @NotNull TestCaseEditor editor = openedTestSet();
-        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
-        final @NotNull List<Notification> notifications = NotifiedBalloons.notifications(getProject(), getTestRootDisposable());
+        final @NotNull List<String> balloons = Said.listening(getProject(), getTestRootDisposable()).shown();
+        final @NotNull List<Notification> notifications = Said.listening(getProject(), getTestRootDisposable()).notifications();
         try {
             editor.getList().setSelectedIndex(1);
 

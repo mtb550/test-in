@@ -16,10 +16,10 @@
 
 package org.testin.git;
 
-import org.testin.AbstractTempRootIdeTest;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
-import org.testin.ui.framework.ShownDialogContent;
+import org.testin.AbstractTempRootIdeTest;
+import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 
 import javax.swing.JComponent;
@@ -33,8 +33,8 @@ public class GitDialogsIdeTest extends AbstractTempRootIdeTest {
 
     @Override
     protected void tearDown() {
-        ShownDialogContent.close(getProject(), GitIdentityDialog.class);
-        ShownDialogContent.close(getProject(), ResolveConflictDialog.class);
+        ShownDialog.close(getProject(), GitIdentityDialog.class);
+        ShownDialog.close(getProject(), ResolveConflictDialog.class);
         super.tearDown();
     }
 
@@ -49,7 +49,7 @@ public class GitDialogsIdeTest extends AbstractTempRootIdeTest {
     private @NotNull Identity answeredIdentity(final boolean everyRepository) {
         final @NotNull List<Identity> set = new ArrayList<>();
         new GitIdentityDialog(getProject(), set::add).show();
-        final @NotNull JComponent dialog = ShareGestures.shown(getProject(), GitIdentityDialog.class);
+        final @NotNull JComponent dialog = ShownDialog.waitedFor(getProject(), GitIdentityDialog.class);
 
         ShareGestures.typeInto(dialog, 0, "Sara Tester");
         ShareGestures.typeInto(dialog, 1, "sara@example.invalid");
@@ -64,7 +64,7 @@ public class GitDialogsIdeTest extends AbstractTempRootIdeTest {
         new ResolveConflictDialog(getProject(), "Log in with a valid user", List.of(
                 new Question("description", "Log in with a valid user", "Sign in with a valid account"),
                 new Question("steps", LONG_STEPS, "")), List.of(), kept::add, () -> kept.add(Set.of("skipped"))).show();
-        return ShareGestures.shown(getProject(), ResolveConflictDialog.class);
+        return ShownDialog.waitedFor(getProject(), ResolveConflictDialog.class);
     }
 
     // UC-SHARE-008, Rule-SHARE-041

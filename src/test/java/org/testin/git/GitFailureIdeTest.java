@@ -17,26 +17,19 @@
 package org.testin.git;
 
 import com.intellij.notification.Notification;
-import com.intellij.notification.Notifications;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
+import org.testin.Said;
 import org.testin.util.Bundle;
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class GitFailureIdeTest extends BasePlatformTestCase {
 
     // Rule-SHARE-127
     public void testAFailedGitStepOffersTheGitLog() {
-        final @NotNull List<Notification> said = new CopyOnWriteArrayList<>();
-        getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(Notifications.TOPIC, new Notifications() {
-            @Override
-            public void notify(final @NotNull Notification notification) {
-                said.add(notification);
-            }
-        });
+        final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
 
         GitFailure.show(getProject(), "Sync Failed", "fatal: could not read from remote repository");
 

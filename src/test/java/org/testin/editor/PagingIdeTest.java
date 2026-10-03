@@ -21,7 +21,7 @@ import com.intellij.testFramework.PlatformTestUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.Balloons;
+import org.testin.Said;
 import org.testin.editor.statusbar.PageStep;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.testcase.TestCaseEditor;
@@ -136,7 +136,7 @@ public class PagingIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestSetDirectoryDto ts = aLongTestSet();
         final @NotNull TestCaseEditor editor = opened(ts);
         final @NotNull List<String> before = everyFileIn(ts.getPath());
-        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        final @NotNull Said balloons = Said.listening(getProject(), getTestRootDisposable());
 
         editor.getStatusBar().button(PageStep.NEXT).doClick();
         assertEquals("Next did not turn the page", 2, editor.getCurrentPage());
