@@ -74,6 +74,9 @@ This changes the name of one node. Nothing inside it moves.
 - **Rule-TREE-PANEL-123** — The rename dialog says what it is renaming and where
   it sits, above the field, so the name being replaced can still be read once
   typing has begun.
+- **Rule-TREE-PANEL-133** — A rename whose folder cannot be renamed changes
+  nothing. The automation code takes its old name back and the test project
+  keeps its name, and the tester sees Rename Failed.
 
 ## The Rename dialog
 

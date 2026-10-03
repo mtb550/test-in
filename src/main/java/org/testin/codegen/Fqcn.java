@@ -78,10 +78,16 @@ public final class Fqcn {
     // UC-CODEGEN-001, Rule-CODEGEN-007
     @FromContentModule
     public static @NotNull List<String> ofClass(final @NotNull DirectoryDto dir) {
-        final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(dir.getPath2());
+        return ofClass(dir.getPath2());
+    }
+
+    // UC-CODEGEN-001, Rule-CODEGEN-007
+    @FromContentModule
+    public static @NotNull List<String> ofClass(final @NotNull List<String> path2) {
+        final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(path2);
 
         if (generatedFqcn.isEmpty()) {
-            Logger.info("No class name for '" + dir.getName() + "': it is the test cases directory itself");
+            Logger.info("No class name for '" + String.join("/", path2) + "': it is the test cases directory itself");
             return List.of();
         }
 
@@ -91,7 +97,13 @@ public final class Fqcn {
 
     // UC-CODEGEN-001, Rule-CODEGEN-008
     public static @NotNull List<String> ofPackage(final @NotNull DirectoryDto dir) {
-        final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(dir.getPath2());
+        return ofPackage(dir.getPath2());
+    }
+
+    // UC-CODEGEN-001, Rule-CODEGEN-008
+    @FromContentModule
+    public static @NotNull List<String> ofPackage(final @NotNull List<String> path2) {
+        final @NotNull ArrayList<String> generatedFqcn = withoutTestCasesDir(path2);
 
         if (generatedFqcn.isEmpty()) {
             generatedFqcn.add("generated");

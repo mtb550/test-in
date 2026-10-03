@@ -27,7 +27,18 @@ import org.testin.util.NameSanitizer;
 import java.util.ArrayList;
 import java.util.List;
 
-public record Renamed(@NotNull DirectoryDto dir, @NotNull String newName) {
+public record Renamed(@NotNull DirectoryDto dir, @NotNull List<String> from, @NotNull String newName) {
+    public Renamed(final @NotNull DirectoryDto dir, final @NotNull String newName) {
+        this(dir, dir.getPath2(), newName);
+    }
+
+    // UC-TREE-PANEL-011, Rule-TREE-PANEL-133
+    public @NotNull Renamed back() {
+        final @NotNull List<String> to = new ArrayList<>(from);
+        to.set(to.size() - 1, newName);
+        return new Renamed(dir, List.copyOf(to), from.getLast());
+    }
+
     public @NotNull String newPackage() {
         return NameSanitizer.packageName(newName);
     }

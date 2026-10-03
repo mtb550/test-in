@@ -16,6 +16,7 @@
 
 package org.testin.indexer;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +26,9 @@ import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Bundle;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -38,9 +41,11 @@ import java.util.stream.Collectors;
 
 @Service(Service.Level.PROJECT)
 public final class TestRuns {
+    private final @NotNull Project p;
     private final @NotNull ProjectIndexer indexer;
 
     public TestRuns(final @NotNull Project p) {
+        this.p = p;
         this.indexer = Services.getInstance(p, ProjectIndexer.class);
     }
 
@@ -102,9 +107,18 @@ public final class TestRuns {
         store().findTestRunDir(testRunPath).ifPresentOrElse(dir -> {
             final @NotNull TestRunMarker marker = dir.getMarker();
             change.accept(marker);
-            testRunWriter().persistMarker(testRunPath);
+            testRunWriter().persistMarker(testRunPath, () -> notSaved(testRunPath));
             indexer.announce(testRunPath);
         }, () -> Logger.warn("Test run no longer indexed, so a change to its marker was dropped: " + testRunPath.getFileName()));
+    }
+
+    // Rule-INTERNAL-123
+    private void notSaved(final @NotNull Path testRunPath) {
+        store().rereadTestRunMarker(testRunPath);
+        ApplicationManager.getApplication().invokeLater(() -> {
+            indexer.announce(testRunPath);
+            Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("test.run.marker.not.saved", testRunPath.getFileName()));
+        });
     }
 
     public void saveTestRun(final @NotNull Path testRunPath) {

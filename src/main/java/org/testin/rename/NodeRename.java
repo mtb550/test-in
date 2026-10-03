@@ -52,7 +52,8 @@ public final class NodeRename {
         final @NotNull Path newPath = oldPath.resolveSibling(newName);
 
         // Rule-CODEGEN-082
-        if (renamed.toTheFilesName(p)) Services.getInstance(p, BoundTestProject.class).follow(oldName, newName);
+        final boolean followed = renamed.toTheFilesName(p);
+        if (followed) Services.getInstance(p, BoundTestProject.class).follow(oldName, newName);
         // Rule-CODEGEN-004, Rule-CODEGEN-051
         JavaCode.of(dir.getType()).getRenamed().execute(p, renamed);
 
@@ -62,7 +63,16 @@ public final class NodeRename {
             Logger.info("Success! Renamed to: " + newName);
 
             onDone.run();
-        });
+        }, () -> putBack(p, renamed, followed));
+    }
+
+    // UC-TREE-PANEL-011, Rule-TREE-PANEL-133
+    private static void putBack(final @NotNull Project p, final @NotNull Renamed renamed, final boolean followed) {
+        final @NotNull Renamed back = renamed.back();
+        JavaCode.of(renamed.dir().getType()).getRenamed().execute(p, back);
+        if (followed) Services.getInstance(p, BoundTestProject.class).follow(renamed.newName(), back.newName());
+
+        Logger.warn("The folder of '" + back.newName() + "' could not be renamed to '" + renamed.newName() + "', so its code and name were put back");
     }
 
     // UC-TREE-PANEL-011, Rule-TREE-PANEL-004, Rule-CODEGEN-080, Rule-CODEGEN-081

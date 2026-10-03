@@ -149,7 +149,7 @@ final class NodeFiles {
         }
     }
 
-    void rename(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
+    void rename(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished, final @NotNull Runnable onFailed) {
         vfs.executeVfsAction(oldPath, vf -> {
             try {
                 vf.rename(indexer, newPath.getFileName().toString());
@@ -159,7 +159,7 @@ final class NodeFiles {
             }
 
             followOnDisk(oldPath, newPath, onFinished);
-        });
+        }, onFailed);
     }
 
     // UC-TREE-PANEL-014, Rule-TREE-PANEL-051

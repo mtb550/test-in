@@ -52,7 +52,7 @@ final class VfsExecutor {
         Services.getInstance(OwnWrites.class).record(p, path);
     }
 
-    void executeVfsAction(final @NotNull Path path, final @NotNull VfsOperation operation) {
+    void executeVfsAction(final @NotNull Path path, final @NotNull VfsOperation operation, final @NotNull Runnable onFailure) {
         final @NotNull String errorTitle = Bundle.message("vfs.rename.failed.title");
         claim(path);
 
@@ -65,10 +65,13 @@ final class VfsExecutor {
                             operation.execute(file);
                         } catch (final Exception ex) {
                             Services.getInstance(p, Notifier.class).error(p, errorTitle, Bundle.message("vfs.operation.failed", FailureText.of(ex)));
+                            onFailure.run();
                         }
                     }),
-                    () -> Services.getInstance(p, Notifier.class)
-                            .error(p, errorTitle, Bundle.message("vfs.path.not.found", path))));
+                    () -> {
+                        Services.getInstance(p, Notifier.class).error(p, errorTitle, Bundle.message("vfs.path.not.found", path));
+                        onFailure.run();
+                    }));
         });
     }
 

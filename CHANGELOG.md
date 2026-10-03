@@ -119,6 +119,8 @@ than repairing it, and a team sharing a test project should update together.
   class, Testin tags that method with the test case. It no longer writes an empty method beside it.
 - **Removing a test case, test set or package waits for indexing to finish** when it has automation code. It used to
   remove the test case and leave its **@Test** method behind.
+- **A rename whose folder cannot be renamed changes nothing:** the automation code takes its old name back and the test project keeps its name. It used to leave the code renamed and the folder not.
+- **A test run's details that could not be saved do not linger:** the test run shows what is on disk again and says it was not saved.
 
 ## 2.13.0-alpha - 2026-09-22
 

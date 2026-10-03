@@ -29,6 +29,7 @@ import org.testin.util.Mapper;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -114,10 +115,16 @@ final class MarkerFiles {
     }
 
     void touched(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Marker marker) {
+        final @NotNull String modifiedByBefore = marker.getModifiedBy();
+        final @NotNull ZonedDateTime modifiedAtBefore = marker.getModifiedAt();
+
         marker.touch(tester());
         if (testDataFiles.alreadyHolds(dirPath.resolve(markerFileName), marker)) return;
+        if (write(dirPath, markerFileName, marker)) return;
 
-        write(dirPath, markerFileName, marker);
+        // Rule-INTERNAL-123
+        marker.setModifiedBy(modifiedByBefore);
+        marker.setModifiedAt(modifiedAtBefore);
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014

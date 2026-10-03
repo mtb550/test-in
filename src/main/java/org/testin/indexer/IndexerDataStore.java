@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
+import org.testin.model.markers.TestRunMarker;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -403,6 +404,11 @@ final class IndexerDataStore {
     // Rule-INTERNAL-083, Rule-INTERNAL-090
     boolean persistTestRunMarker(final @NotNull Path testRunPath) {
         return findTestRunDir(testRunPath).map(this::persistMarker).orElse(false);
+    }
+
+    // Rule-INTERNAL-123
+    void rereadTestRunMarker(final @NotNull Path testRunPath) {
+        findTestRunDir(testRunPath).ifPresent(dir -> dir.setMarker(markers.read(testRunPath, DirectoryType.TR, TestRunMarker.class)));
     }
 
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {

@@ -37,7 +37,7 @@ public class RenameJavaPackage implements GenAction<Renamed> {
     // UC-CODEGEN-017, Rule-CODEGEN-056
     @Override
     public void execute(final @NotNull Project p, final @NotNull Renamed renamed) {
-        final @NotNull List<String> fqcn = Fqcn.ofPackage(renamed.dir());
+        final @NotNull List<String> fqcn = Fqcn.ofPackage(renamed.from());
 
         JavaSourceRoot.find(p).ifPresentOrElse(
                 testSourceRoot -> renameUnder(p, testSourceRoot, fqcn, renamed.newPackage()),

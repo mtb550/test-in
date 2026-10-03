@@ -36,7 +36,7 @@ public class RenameJavaClass implements GenAction<Renamed> {
     @Override
     public void execute(final @NotNull Project p, final @NotNull Renamed renamed) {
         final @NotNull String newName = renamed.newName();
-        final @NotNull List<String> fqcn = Fqcn.ofClass(renamed.dir());
+        final @NotNull List<String> fqcn = Fqcn.ofClass(renamed.from());
         if (fqcn.isEmpty()) return;
         final @NotNull String path = String.join(".", fqcn);
 

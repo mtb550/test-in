@@ -242,11 +242,12 @@ public final class Nodes {
         store().refreshDir(path);
     }
 
-    public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
+    // UC-TREE-PANEL-011, Rule-TREE-PANEL-133
+    public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished, final @NotNull Runnable onFailed) {
         final @NotNull ProjectIndexer indexer = indexer();
         indexer.getNodeFiles().rename(oldPath, newPath, () -> {
             onFinished.run();
             indexer.announce(newPath);
-        });
+        }, onFailed);
     }
 }

@@ -66,7 +66,7 @@ public class RenameProjectIdeTest extends AbstractTempRootIdeTest {
 
     private void rename(final Path from, final Path to) {
         final AtomicBoolean done = new AtomicBoolean();
-        nodes().renameNode(from, to, () -> done.set(true));
+        nodes().renameNode(from, to, () -> done.set(true), () -> fail("the rename reported a failure"));
 
         Await.until("the rename never finished", done::get);
     }

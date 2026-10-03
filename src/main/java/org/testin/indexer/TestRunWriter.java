@@ -174,7 +174,8 @@ final class TestRunWriter {
     }
 
     // Rule-INTERNAL-090
-    void persistMarker(final @NotNull Path testRunPath) {
+    // Rule-INTERNAL-123
+    void persistMarker(final @NotNull Path testRunPath, final @NotNull Runnable onFailed) {
         queue.execute(() -> {
             try {
                 if (store.findTestRun(testRunPath).isEmpty()) {
@@ -182,10 +183,15 @@ final class TestRunWriter {
                     return;
                 }
 
-                if (store.persistTestRunMarker(testRunPath)) Logger.trace("Marker persisted for " + testRunPath.getFileName());
+                if (store.persistTestRunMarker(testRunPath)) {
+                    Logger.trace("Marker persisted for " + testRunPath.getFileName());
+                    return;
+                }
+                Logger.warn("The marker of " + testRunPath.getFileName() + " was not written");
             } catch (final Exception ex) {
                 Logger.error("Failed to persist marker: " + FailureText.of(ex));
             }
+            onFailed.run();
         });
     }
 
