@@ -20,7 +20,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
@@ -31,6 +30,7 @@ import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
 import org.testin.model.ProjectStatus;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.BoundTestProject;
@@ -137,8 +137,7 @@ public final class ProjectIndexer {
     private void indexInBackground(final @NotNull Path projectPath, final @NotNull AtomicInteger projectsLeft, final @NotNull CountDownLatch passLatch) {
         final @NotNull String projectName = projectPath.getFileName().toString();
 
-        ProgressManager.getInstance()
-                .run(new Task.Backgroundable(p, Bundle.message("indexer.task.title", projectName), true) {
+        BackgroundWork.start(new Task.Backgroundable(p, Bundle.message("indexer.task.title", projectName), true) {
                     @Override
                     public void run(final @NotNull ProgressIndicator indicator) {
                         indicator.setIndeterminate(false);

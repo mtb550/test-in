@@ -1,0 +1,269 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.testrun;
+
+import com.intellij.openapi.util.Disposer;
+import com.intellij.testFramework.PlatformTestUtil;
+import com.intellij.util.TimeoutUtil;
+import org.jetbrains.annotations.NotNull;
+import org.testin.AbstractTempRootIdeTest;
+import org.testin.Await;
+import org.testin.FilesUnder;
+import org.testin.NotifiedBalloons;
+import org.testin.OnScreen;
+import org.testin.editor.testrun.TestRunEditor;
+import org.testin.indexer.TestRuns;
+import org.testin.model.Config;
+import org.testin.model.RunItemStatus;
+import org.testin.model.TestRunItems;
+import org.testin.model.TestRunSummary;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Done;
+import org.testin.services.Services;
+import org.testin.setting.AppSettingsState;
+import org.testin.testrun.failure.FailedResultDialog;
+import org.testin.ui.framework.ConfirmDialog;
+import org.testin.ui.framework.ShownDialogParts;
+import org.testin.ui.framework.SizedPopups;
+import org.testin.util.Bundle;
+import org.testin.util.Shortcuts;
+
+import javax.swing.JComponent;
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertNotEquals;
+
+public class RecordRunItemStatusIdeTest extends AbstractTempRootIdeTest {
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+        SizedPopups.installed(getTestRootDisposable());
+    }
+
+    @Override
+    protected void tearDown() {
+        ShownDialogParts.closeAll(getProject(), FailedResultDialog.class);
+        super.tearDown();
+    }
+
+    private static void pumpForASecondAndAHalf() {
+        final long until = System.currentTimeMillis() + 1500;
+        while (System.currentTimeMillis() < until) {
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+            TimeoutUtil.sleep(20);
+        }
+    }
+
+    private static void awaitWalkOn(final @NotNull TestRunEditor editor, final int index) {
+        Await.until("the walk never reached test case " + (index + 1), () -> editor.getWalk().getCurrentlyExecutingIndex() == index);
+    }
+
+    private @NotNull TestRunEditor walking(final @NotNull TestRunFixture fixture) {
+        final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
+        OnScreen.shown(editor.getComponent(), getTestRootDisposable());
+        editor.onStartExecutionClicked();
+        awaitWalkOn(editor, 0);
+        return editor;
+    }
+
+    private void awaitWrites() {
+        Services.getInstance(getProject(), TestRuns.class).awaitWrites();
+    }
+
+    // Rule-EDITOR-PANEL-137
+    public void testARunItemStatusRecordedOnTheTimedTestCaseRecordsHowLongItTook() {
+        final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 2);
+        final @NotNull TestRunEditor editor = walking(fixture);
+        try {
+            pumpForASecondAndAHalf();
+
+            fixture.press(editor, RunItemStatus.PASSED);
+
+            final @NotNull TestRunItems recorded = fixture.resultOf(fixture.testCases().getFirst());
+            assertEquals(RunItemStatus.PASSED, recorded.getStatus());
+            assertTrue("the time the walk counted was not recorded with the run item status: " + recorded.getDuration(), recorded.getDuration().compareTo(Duration.ofMillis(1400)) >= 0);
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-140
+    public void testOneTestCaseIsOneMessageAndSeveralAreOneMessageWithACount() {
+        final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 5);
+        final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
+        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        try {
+            editor.getList().setSelectedIndex(0);
+            fixture.press(editor, RunItemStatus.PASSED);
+            assertEquals("one test case was not one message", List.of(RunItemStatus.PASSED.getLabel()), balloons);
+
+            balloons.clear();
+            editor.getList().setSelectedIndices(new int[]{1, 2, 3});
+            fixture.press(editor, RunItemStatus.PASSED);
+            assertEquals("several were not one message with a count", List.of(Done.counted(RunItemStatus.PASSED.getLabel(), 3)), balloons);
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-165
+    public void testABulkRunItemStatusIsOneMessageWithACountHoweverManyWereRecorded() {
+        final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 6);
+        final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
+        final @NotNull List<String> balloons = NotifiedBalloons.watched(getProject(), getTestRootDisposable());
+        try {
+            editor.getList().setSelectionInterval(0, 4);
+
+            fixture.press(editor, RunItemStatus.BLOCKED);
+
+            assertEquals("five recorded at once were not one message with a count", List.of(Done.counted(RunItemStatus.BLOCKED.getLabel(), 5)), balloons);
+            for (final TestCaseDto tc : fixture.testCases().subList(0, 5)) assertEquals(RunItemStatus.BLOCKED, fixture.statusOf(tc));
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-141
+    public void testBlockedIsAnAttemptThatCouldNotFinishCountedApartFromFailed() {
+        final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 2);
+        final @NotNull TestRunEditor editor = walking(fixture);
+        try {
+            fixture.press(editor, RunItemStatus.BLOCKED);
+
+            assertTrue("Blocked asked for an explanation", fixture.failureDialog().isEmpty());
+            final @NotNull TestRunItems blocked = fixture.resultOf(fixture.testCases().getFirst());
+            assertEquals(RunItemStatus.BLOCKED, blocked.getStatus());
+            assertEquals("Blocked does not say who attempted it", Services.getInstance(getProject(), AppSettingsState.class).testerName, blocked.getExecutedBy());
+            assertFalse("Blocked does not say when it was attempted", Config.isNotExecuted(blocked.getExecutedAt()));
+            awaitWalkOn(editor, 1);
+
+            final @NotNull TestRunSummary summary = TestRunSummary.of(List.of(blocked));
+            assertEquals("Blocked is not counted as blocked", 1, summary.blocked());
+            assertEquals("Blocked is counted as failed", 0, summary.failed());
+            assertEquals("Blocked is not counted as executed", 1, summary.executed());
+            assertTrue("the report does not say a blocked test case was attempted and could not complete",
+                    Bundle.message("report.section.blocked.description", "1").contains("attempted but could not complete"));
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-143
+    public void testFailingOpensTheDialogBeforeTheRunItemStatusIsRecorded() {
+        final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 2);
+        final @NotNull TestRunEditor editor = walking(fixture);
+        try {
+            fixture.press(editor, RunItemStatus.FAILED);
+
+            final @NotNull JComponent dialog = fixture.openFailureDialog();
+            assertEquals("Failed was recorded before the detail was asked for", RunItemStatus.PENDING, fixture.statusOf(fixture.testCases().getFirst()));
+
+            OnScreen.pressKey(dialog, Shortcuts.Enter.getKey());
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+
+            assertEquals(RunItemStatus.FAILED, fixture.statusOf(fixture.testCases().getFirst()));
+            for (final RunItemStatus other : RunItemStatus.values()) {
+                if (!other.isRunItemStatus() || other == RunItemStatus.FAILED) continue;
+                assertFalse(other + " asks for detail", other.isCollectsFailureDetails());
+            }
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-144
+    public void testEscapeInTheDialogRecordsNothingAndClosesWithoutAsking() {
+        final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 2);
+        final @NotNull TestRunEditor editor = walking(fixture);
+        try {
+            awaitWrites();
+            final @NotNull Map<String, String> before = FilesUnder.snapshot(fixture.testRun().getPath());
+            fixture.press(editor, RunItemStatus.FAILED);
+            final @NotNull JComponent dialog = fixture.openFailureDialog();
+            TestRunFixture.boxesOf(dialog).getFirst().setText("The dashboard stayed blank");
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+
+            OnScreen.pressKey(dialog, Shortcuts.Escape.getKey());
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+
+            assertTrue("Escape did not close the dialog at once", fixture.failureDialog().isEmpty());
+            assertTrue("Escape asked before closing", ShownDialogParts.contentOf(getProject(), ConfirmDialog.class).isEmpty());
+            final @NotNull TestRunItems kept = fixture.resultOf(fixture.testCases().getFirst());
+            assertEquals("Escape recorded a run item status", RunItemStatus.PENDING, kept.getStatus());
+            assertEquals("Escape recorded the detail", "", kept.getActualResult());
+            awaitWrites();
+            assertEquals("Escape wrote something", before, FilesUnder.snapshot(fixture.testRun().getPath()));
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-145
+    public void testNothingIsWrittenAsTheTesterTypesOnlySavingWrites() {
+        final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 2);
+        final @NotNull TestRunEditor editor = walking(fixture);
+        try {
+            fixture.press(editor, RunItemStatus.FAILED);
+            final @NotNull JComponent dialog = fixture.openFailureDialog();
+            awaitWrites();
+            final @NotNull Map<String, String> before = FilesUnder.snapshot(fixture.testRun().getPath());
+
+            TestRunFixture.boxesOf(dialog).getFirst().setText("The dashboard stayed blank");
+            TestRunFixture.boxesOf(dialog).get(1).setText("java.lang.AssertionError: expected [true]");
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+            awaitWrites();
+
+            assertEquals("typing wrote to the test run", before, FilesUnder.snapshot(fixture.testRun().getPath()));
+            assertEquals("typing changed the test run Testin holds", "", fixture.resultOf(fixture.testCases().getFirst()).getActualResult());
+
+            OnScreen.pressKey(dialog, Shortcuts.Enter.getKey());
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+            awaitWrites();
+
+            final @NotNull TestRunItems saved = fixture.resultOf(fixture.testCases().getFirst());
+            assertEquals("The dashboard stayed blank", saved.getActualResult());
+            assertEquals("java.lang.AssertionError: expected [true]", saved.getStacktrace());
+            assertNotEquals("saving wrote nothing", before, FilesUnder.snapshot(fixture.testRun().getPath()));
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-146, Rule-EDITOR-PANEL-166
+    public void testFailingSeveralOpensNoDialogAndFailsThemWithNoDetail() {
+        final @NotNull TestRunFixture fixture = TestRunFixture.pending(getProject(), root, 3);
+        final @NotNull TestRunEditor editor = fixture.opened(getTestRootDisposable());
+        try {
+            editor.getList().setSelectedIndices(new int[]{0, 2});
+
+            fixture.press(editor, RunItemStatus.FAILED);
+
+            assertTrue("failing several opened the failure dialog", fixture.failureDialog().isEmpty());
+            for (final TestCaseDto tc : List.of(fixture.testCases().get(0), fixture.testCases().get(2))) {
+                final @NotNull TestRunItems failed = fixture.resultOf(tc);
+                assertEquals(RunItemStatus.FAILED, failed.getStatus());
+                assertEquals("a test case failed with several was given detail", "", failed.getActualResult());
+            }
+            assertEquals(RunItemStatus.PENDING, fixture.statusOf(fixture.testCases().get(1)));
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+}

@@ -118,11 +118,11 @@ public class BadgesTest {
     }
 
     @Test
-    public void lowPriorityDrawsNoPill() {
+    public void theDefaultPriorityDrawsNoPill() {
         final List<Badge> badges = new ArrayList<>();
 
-        Badges.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.LOW));
-        assertEquals(badges.size(), 0, "Low is the default, and the default needs no badge");
+        Badges.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.DEFAULT));
+        assertEquals(badges.size(), 0, "the default priority needs no badge");
 
         Badges.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.HIGH));
         Badges.addPriorityBadge(badges, new TestCaseDto().setPriority(Priority.MEDIUM));

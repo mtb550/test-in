@@ -47,8 +47,9 @@ The three buttons sit on the line under the title, beside the badges.
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The first button** — this one. It names `Shift+F5`, and its shape and its
-   tooltip say what automation is there. The four answers are below.
+1. **The first button** — this one. Its tooltip reads **Navigate to Test
+   Method** and names `Shift+F5`, and its shape says what automation is there.
+   The three shapes are below.
 2. **The second button** — runs the test case. That is
    [UC-VIEW-PANEL-012](runFromPanel.md).
 3. **Either button** — grows under the pointer, and the pointer becomes a hand.
@@ -57,19 +58,21 @@ The three buttons sit on the line under the title, beside the badges.
 ## What the button says
 
 The same icon and the same words as the card in the editor, which is
-[UC-EDITOR-PANEL-047](../editorPanel/seeWhatIsAutomated.md).
+[UC-EDITOR-PANEL-047](../editorPanel/seeWhatIsAutomated.md). The tooltip always
+reads **Navigate to Test Method**, the name the gesture has everywhere
+(Rule-EDITOR-PANEL-237); where the button cannot work, it reads the reason
+instead.
 
-| The tooltip reads           | What it means                                                    |
-|-----------------------------|------------------------------------------------------------------|
-| **Navigate to Test Method** | Testin has not read the code yet, or this IDE has no Java plugin |
-| **Automated**               | The generated test method has something in it                    |
-| **No test method**          | The test case names a method and there is none                   |
-| **Not automated**           | There is no method, or Testin wrote one and nobody filled it in  |
+| The button's shape              | What it means                                                                      |
+|---------------------------------|------------------------------------------------------------------------------------|
+| a class icon                    | The generated test method has something in it, or Testin has not read the code yet |
+| a class icon with an error mark | The test case names a method and there is none                                     |
+| a hollow class icon             | There is no method, or Testin wrote one and nobody filled it in                    |
 
 ## Main flow
 
 1. The panel is showing a test case that has automation code.
-2. The tester clicks the first button, whose tooltip reads **Automated**.
+2. The tester clicks the first button, drawn as a class icon.
 3. The Java file opens with the caret on the test method for this test case.
 
 ## What Testin refuses

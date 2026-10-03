@@ -28,23 +28,67 @@ import org.testin.util.Fonts;
 
 import javax.swing.Icon;
 import javax.swing.border.Border;
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.LayoutManager;
+import java.util.Arrays;
 
 public class StatusBarBase {
     // Rule-INTERNAL-104
     private static final class OneLine extends JBPanel<OneLine> {
         private OneLine() {
-            super(new BorderLayout());
+            super(new KeysThatFit());
         }
 
         @Override
         public @NotNull Dimension getPreferredSize() {
             return new Dimension(0, super.getPreferredSize().height);
+        }
+    }
+
+    // Rule-INTERNAL-078, Rule-INTERNAL-104
+    private static final class KeysThatFit implements LayoutManager {
+        @Override
+        public void addLayoutComponent(final @NotNull String name, final @NotNull Component key) {
+        }
+
+        @Override
+        public void removeLayoutComponent(final @NotNull Component key) {
+        }
+
+        @Override
+        public @NotNull Dimension preferredLayoutSize(final @NotNull Container strip) {
+            final @NotNull Insets insets = strip.getInsets();
+            final int wide = Arrays.stream(strip.getComponents()).mapToInt(key -> key.getPreferredSize().width).sum();
+            final int tall = Arrays.stream(strip.getComponents()).mapToInt(key -> key.getPreferredSize().height).max().orElse(0);
+            return new Dimension(insets.left + wide + insets.right, insets.top + tall + insets.bottom);
+        }
+
+        @Override
+        public @NotNull Dimension minimumLayoutSize(final @NotNull Container strip) {
+            return preferredLayoutSize(strip);
+        }
+
+        @Override
+        public void layoutContainer(final @NotNull Container strip) {
+            final @NotNull Insets insets = strip.getInsets();
+            final int room = strip.getWidth() - insets.right;
+            final int tall = strip.getHeight() - insets.top - insets.bottom;
+
+            int x = insets.left;
+            boolean fits = true;
+            for (final Component key : strip.getComponents()) {
+                final @NotNull Dimension wanted = key.getPreferredSize();
+                fits = fits && x + wanted.width <= room;
+                key.setBounds(fits ? x : strip.getWidth(), insets.top + (tall - wanted.height) / 2, wanted.width, wanted.height);
+                x += wanted.width;
+            }
         }
     }
 
@@ -83,28 +127,22 @@ public class StatusBarBase {
     // UC-INTERNAL-007, Rule-INTERNAL-078
     public void updateItems(final StatusBarItem @NotNull [] items) {
         this.statusBar.removeAll();
-
-        final @NotNull JBPanel<?> contentPanel = new JBPanel<>(new GridBagLayout());
-        contentPanel.setOpaque(false);
-
-        final @NotNull GridBagConstraints onOneRow = new GridBagConstraints();
-        onOneRow.gridy = 0;
-        onOneRow.anchor = GridBagConstraints.WEST;
-
-        contentPanel.add(setStatusBarIcon(), onOneRow);
+        this.statusBar.add(setStatusBarIcon());
 
         for (int i = 0; i < items.length; i++) {
-            final @NotNull StatusBarItem item = items[i];
-            contentPanel.add(Keycap.of(item.getShortcutText()), onOneRow);
-            contentPanel.add(createDot(), onOneRow);
-            contentPanel.add(createLabel(item.getName()), onOneRow);
+            final @NotNull JBPanel<?> key = new JBPanel<>(new GridBagLayout());
+            key.setOpaque(false);
 
-            if (i < items.length - 1) {
-                contentPanel.add(createSeparator(), onOneRow);
-            }
+            final @NotNull GridBagConstraints onOneRow = new GridBagConstraints();
+            onOneRow.gridy = 0;
+
+            if (i > 0) key.add(createSeparator(), onOneRow);
+            key.add(Keycap.of(items[i].getShortcutText()), onOneRow);
+            key.add(createDot(), onOneRow);
+            key.add(createLabel(items[i].getName()), onOneRow);
+
+            this.statusBar.add(key);
         }
-
-        this.statusBar.add(contentPanel, BorderLayout.WEST);
 
         this.statusBar.revalidate();
         this.statusBar.repaint();

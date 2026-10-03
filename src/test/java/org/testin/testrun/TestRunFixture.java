@@ -1,0 +1,109 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.testrun;
+
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
+import com.intellij.openapi.project.Project;
+import com.intellij.ui.EditorTextField;
+import org.jetbrains.annotations.NotNull;
+import org.testin.Await;
+import org.testin.Gestures;
+import org.testin.editor.EditorFixtures;
+import org.testin.editor.testrun.TestRunEditor;
+import org.testin.indexer.TestCases;
+import org.testin.indexer.TestRuns;
+import org.testin.model.RunItemStatus;
+import org.testin.model.TestRunItems;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.services.Services;
+import org.testin.testrun.failure.FailedResultDialog;
+import org.testin.ui.framework.ShownDialogParts;
+import org.testin.view.Drawn;
+
+import javax.swing.JComponent;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+public record TestRunFixture(@NotNull Project p, @NotNull List<TestCaseDto> testCases, @NotNull TestRunDirectoryDto testRun) {
+
+    public static @NotNull TestRunFixture of(final @NotNull Project p, final @NotNull Path root, final @NotNull List<TestRunItems> results, final @NotNull List<TestCaseDto> testCases) {
+        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(p, root);
+        return new TestRunFixture(p, testCases, EditorFixtures.testRun(p, tp, results));
+    }
+
+    public static @NotNull List<TestCaseDto> testCasesIn(final @NotNull Project p, final @NotNull Path root, final int count) {
+        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(p, root);
+        final @NotNull TestSetDirectoryDto ts = EditorFixtures.testSet(p, tp, "Checkout");
+        final @NotNull List<TestCaseDto> made = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Test case number " + (i + 1)).expectedResult("It works " + (i + 1)).order(String.format("m%04d", i)).build();
+            tc.setParent(ts);
+            Services.getInstance(p, TestCases.class).putTestCaseVerbatim(ts.getPath(), tc);
+            made.add(tc);
+        }
+        return made;
+    }
+
+    public static @NotNull TestRunFixture pending(final @NotNull Project p, final @NotNull Path root, final int count) {
+        final @NotNull List<TestCaseDto> testCases = testCasesIn(p, root, count);
+        return of(p, root, testCases.stream().map(EditorFixtures::pending).toList(), testCases);
+    }
+
+    public @NotNull TestRunEditor opened(final @NotNull Disposable owner) {
+        return EditorFixtures.openTestRunEditor(p, testRun, owner);
+    }
+
+    public @NotNull TestRunItems resultOf(final @NotNull TestCaseDto tc) {
+        return Services.getInstance(p, TestRuns.class).getTestRunByPath(testRun.getPath()).resultOf(tc.getId()).orElseThrow();
+    }
+
+    public @NotNull RunItemStatus statusOf(final @NotNull TestCaseDto tc) {
+        return resultOf(tc).getStatus();
+    }
+
+    public static @NotNull AnAction keyFor(final @NotNull TestRunEditor editor, final @NotNull RunItemStatus status) {
+        return ActionUtil.getActions(editor.getList()).stream()
+                .filter(action -> action instanceof final SetTestCaseStatusAction key && key.getStatus() == status)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("no key records " + status));
+    }
+
+    public void press(final @NotNull TestRunEditor editor, final @NotNull RunItemStatus status) {
+        Gestures.press(p, keyFor(editor, status), editor.getList());
+    }
+
+    public @NotNull Optional<JComponent> failureDialog() {
+        return ShownDialogParts.contentOf(p, FailedResultDialog.class);
+    }
+
+    public @NotNull JComponent openFailureDialog() {
+        Await.until("the failure dialog never opened", () -> failureDialog().isPresent());
+        return failureDialog().orElseThrow();
+    }
+
+    public static @NotNull List<EditorTextField> boxesOf(final @NotNull JComponent dialog) {
+        return Drawn.components(dialog).stream().filter(EditorTextField.class::isInstance).map(EditorTextField.class::cast).toList();
+    }
+}

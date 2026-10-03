@@ -54,14 +54,14 @@ public final class GlobalSearchDialog extends AbstractFrameworkDialog {
                 StatusBarShortcut.cancel(this::closeCancel)
         );
 
-        size = DialogSize.SHORT;
+        size = DialogSize.HALF;
 
         // Rule-INTERNAL-076
         dismissOnClickOutside = true;
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-072, Rule-INTERNAL-073
-    private static @NotNull Answer<Hit> rowsFor(final @NotNull Project p, final @NotNull String query) {
+    static @NotNull Answer<Hit> rowsFor(final @NotNull Project p, final @NotNull String query) {
         final @NotNull Found found = Hits.forQuery(p, query);
 
         final @NotNull List<SelectionList<Hit>> rows = found.hits().stream()

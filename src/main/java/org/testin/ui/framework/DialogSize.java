@@ -31,9 +31,10 @@ import java.util.Optional;
 
 public record DialogSize(double heightPart) {
     public static final @NotNull DialogSize CONTENT = new DialogSize(0);
-    public static final @NotNull DialogSize SHORT = new DialogSize(0.50);
-    public static final @NotNull DialogSize HALF = new DialogSize(0.60);
+    public static final @NotNull DialogSize HALF = new DialogSize(0.50);
     public static final @NotNull DialogSize TALL = new DialogSize(0.70);
+
+    static final int VISIBLE_ROWS = 8;
 
     private static final double WIDTH = 0.60;
     private static final int MARGIN = 32;
@@ -50,9 +51,13 @@ public record DialogSize(double heightPart) {
 
     // Rule-INTERNAL-100
     static int widthOn(final @NotNull Project p, final int natural) {
-        final @NotNull Rectangle frame = frameOn(p);
+        return within(natural, frameOn(p).width, WIDTH);
+    }
 
-        return Math.clamp(natural, (int) (frame.width * WIDTH), frame.width - JBUI.scale(MARGIN));
+    // Rule-INTERNAL-100
+    static int within(final int natural, final int frameSide, final double part) {
+        final int largest = Math.max(0, frameSide - JBUI.scale(MARGIN));
+        return Math.clamp(natural, Math.min((int) (frameSide * part), largest), largest);
     }
 
     // Rule-INTERNAL-102
@@ -73,7 +78,7 @@ public record DialogSize(double heightPart) {
         final @NotNull Dimension natural = content.getPreferredSize();
 
         content.setPreferredSize(new Dimension(
-                widthOn(p, natural.width),
-                Math.clamp(natural.height, (int) (frame.height * heightPart), frame.height - JBUI.scale(MARGIN))));
+                within(natural.width, frame.width, WIDTH),
+                within(natural.height, frame.height, heightPart)));
     }
 }

@@ -40,8 +40,7 @@ public final class DialogButton implements DialogComponent {
 
     // UC-INTERNAL-007, Rule-INTERNAL-080
     public void enableUnless(final @NotNull Optional<String> reason) {
-        button.setEnabled(reason.isEmpty());
-        footer.showReason(reason);
+        footer.enableUnless(reason);
     }
 
     // Rule-INTERNAL-080

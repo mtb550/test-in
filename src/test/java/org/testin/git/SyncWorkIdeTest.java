@@ -20,6 +20,7 @@ import com.intellij.notification.Notification;
 import com.intellij.openapi.actionSystem.AnAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
+import org.testin.Notified;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
@@ -68,7 +69,7 @@ public class SyncWorkIdeTest extends AbstractGitRemoteIdeTest {
         final @NotNull Notification first = titled(said, Bundle.message("git.conflicts.title"));
 
         final @NotNull AnAction resolve = first.getActions().getFirst();
-        Notification.fire(first, resolve, null);
+        Notified.press(getProject(), first, resolve);
 
         Await.until("the Git Conflicts message did not come back", () -> said.stream().filter(notification -> notification.getTitle().equals(first.getTitle())).count() == 2);
         final @NotNull Notification again = said.stream().filter(notification -> notification.getTitle().equals(first.getTitle())).toList().getLast();

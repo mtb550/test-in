@@ -30,6 +30,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.undo.Operation;
@@ -77,12 +78,12 @@ record RemoveWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEdito
         final @NotNull List<Kept> kept = new ArrayList<>(nodesToRemove.size());
 
         // Rule-TREE-PANEL-102
-        final boolean copied = ProgressManager.getInstance().runProcessWithProgressSynchronously(() -> {
+        final boolean copied = BackgroundWork.synchronously(p, Bundle.message("remove.progress"), true, () -> {
             for (final DirectoryDto node : nodesToRemove) {
                 ProgressManager.checkCanceled();
                 nodes.keepAside(node.getPath()).ifPresent(copy -> kept.add(new Kept(node, node.getPath(), copy)));
             }
-        }, Bundle.message("remove.progress"), true, p);
+        });
 
         if (!copied) {
             kept.forEach(one -> nodes.forgetKept(one.copy()));
@@ -159,9 +160,7 @@ record RemoveWork(@NotNull Project p, @NotNull Nodes nodes, @NotNull TestinEdito
         kept.forEach(one -> originalByKept.put(one.copy(), one.original()));
 
         final @NotNull List<Path> lost = new ArrayList<>();
-        ProgressManager.getInstance().runProcessWithProgressSynchronously(
-                () -> lost.addAll(nodes.restoreNodes(originalByKept)),
-                Bundle.message("remove.undo.progress"), false, p);
+        BackgroundWork.synchronously(p, Bundle.message("remove.undo.progress"), false, () -> lost.addAll(nodes.restoreNodes(originalByKept)));
 
         if (lost.isEmpty()) return true;
 

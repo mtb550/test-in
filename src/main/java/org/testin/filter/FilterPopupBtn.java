@@ -29,6 +29,7 @@ import com.intellij.ui.JBColor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
 import org.testin.editor.EditorColors;
 import org.testin.editor.toolbar.components.ToolbarItem;
 import org.testin.model.Automated;
@@ -257,6 +258,11 @@ public class FilterPopupBtn extends AbstractIconButton implements ToolbarItem {
                 path, selectedTestSet, FilterMembership.plain(), onChanged)));
 
         return filterTestSetMenu;
+    }
+
+    @TestOnly
+    @NotNull DefaultActionGroup menu() {
+        return cachedActionGroup;
     }
 
     private void showFilterPopup() {

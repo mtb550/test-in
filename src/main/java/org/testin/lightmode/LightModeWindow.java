@@ -28,6 +28,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.Animator;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 import org.testin.actions.ActionSystem;
 import org.testin.actions.Declared;
 import org.testin.codegen.AutomationState;
@@ -246,6 +247,16 @@ final class LightModeWindow {
         slideMotion = Motion.run(motionScope, "Testin light mode case",
                 testCaseView::setTravelled,
                 () -> testCaseView.setTravelled(1.0));
+    }
+
+    @TestOnly
+    @NotNull LightModeFrame frame() {
+        return frame;
+    }
+
+    @TestOnly
+    @NotNull Optional<Animator> slideMotion() {
+        return slideMotion;
     }
 
     void close() {

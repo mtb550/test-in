@@ -61,7 +61,7 @@ public final class Badges {
     private static final @NotNull Icon CLOCK = IconUtil.resizeSquared(AllIcons.Vcs.History, 14);
 
     public static void addPriorityBadge(final @NotNull List<Badge> badges, final @NotNull TestCaseDto tc) {
-        if (tc.getPriority() == Priority.LOW) return;
+        if (tc.getPriority() == Priority.DEFAULT) return;
 
         badges.add(new Pill(tc.getPriority().getLabel(), tc.getPriority().getColor()));
     }

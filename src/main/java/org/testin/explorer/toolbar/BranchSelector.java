@@ -18,7 +18,6 @@ package org.testin.explorer.toolbar;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
@@ -32,6 +31,7 @@ import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.ui.framework.Alternative;
 import org.testin.ui.framework.ConfirmDialog;
@@ -147,7 +147,7 @@ public class BranchSelector {
         final @NotNull Path repositoryPath = projectPath;
         if (repositoryPath.toString().isEmpty()) return;
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, Bundle.message("branch.task.checking", targetBranch), false) {
+        BackgroundWork.start(new Task.Backgroundable(p, Bundle.message("branch.task.checking", targetBranch), false) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -184,7 +184,7 @@ public class BranchSelector {
 
     // UC-TREE-PANEL-026, Rule-TREE-PANEL-086
     private void checkout(final @NotNull Path repositoryPath, final @NotNull String targetBranch) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, Bundle.message("branch.task.checkout", targetBranch), false) {
+        BackgroundWork.start(new Task.Backgroundable(p, Bundle.message("branch.task.checkout", targetBranch), false) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -227,7 +227,7 @@ public class BranchSelector {
 
     // UC-TREE-PANEL-026
     private void loadGitBranches(final @NotNull Path repositoryPath, final boolean fromRemote) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, Bundle.message("branch.task.loading"), true) {
+        BackgroundWork.start(new Task.Backgroundable(p, Bundle.message("branch.task.loading"), true) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);

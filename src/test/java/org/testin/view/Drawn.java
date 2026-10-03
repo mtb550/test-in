@@ -16,7 +16,9 @@
 package org.testin.view;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +30,7 @@ import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.view.details.DetailsTab;
 
 import javax.swing.AbstractButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.text.JTextComponent;
 import java.awt.Component;
@@ -38,6 +41,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Drawn {
@@ -70,6 +74,14 @@ public final class Drawn {
         return found;
     }
 
+    public static <T> @NotNull T first(final @NotNull Component root, final @NotNull Class<T> kind) {
+        return first(root, kind, _ -> true);
+    }
+
+    public static <T> @NotNull T first(final @NotNull Component root, final @NotNull Class<T> kind, final @NotNull Predicate<? super T> which) {
+        return Optional.ofNullable(UIUtil.uiTraverser(root).filter(kind).filter(which::test).first()).orElseThrow(() -> new AssertionError("no " + kind.getSimpleName() + " is drawn"));
+    }
+
     public static @NotNull String text(final @NotNull Component component) {
         final String text = switch (component) {
             case final AbstractButton button -> button.getText();
@@ -78,6 +90,10 @@ public final class Drawn {
             default -> "";
         };
         return Objects.requireNonNullElse(text, "").trim();
+    }
+
+    public static @NotNull String hovering(final @NotNull JComponent component) {
+        return StringUtil.unescapeXmlEntities(StringUtil.removeHtmlTags(Objects.toString(component.getToolTipText(), ""))).trim();
     }
 
     public static @NotNull List<String> words(final @NotNull Container container) {

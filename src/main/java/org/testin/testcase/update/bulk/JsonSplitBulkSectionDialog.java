@@ -65,7 +65,7 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
                 StatusBarShortcut.hint("Ctrl+Click", Bundle.message("shortcut.multi.caret")),
                 StatusBarShortcut.cancel(this::closeCancel));
 
-        size = DialogSize.SHORT;
+        size = DialogSize.HALF;
 
         editors.bindKeysToEditor(shortcuts);
     }
@@ -110,10 +110,7 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
             final @NotNull EditedValue edited = newValues.get(i);
             if (!edited.changed()) continue;
 
-            if (edited.value().isEmpty() && !acceptsBlank()) {
-                refused++;
-                continue;
-            }
+            if (edited.value().isEmpty() && !acceptsBlank()) continue;
 
             if (clashing.contains(i)) continue;
 

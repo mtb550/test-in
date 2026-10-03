@@ -16,7 +16,6 @@
 
 package org.testin.runner;
 
-import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener;
 import com.intellij.execution.testframework.sm.runner.SMTestProxy;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
@@ -31,11 +30,10 @@ public class SkippedOrTerminatedIdeTest extends BasePlatformTestCase {
     private final @NotNull Map<String, String> recorded = new ConcurrentHashMap<>();
 
     private @NotNull String finished(final @NotNull SMTestProxy test) {
-        TestCaseExecutionTracker.initGlobalListener(getProject());
         getProject().getMessageBus().connect(getTestRootDisposable()).subscribe(TestCaseExecutionListener.TOPIC,
                 (TestCaseExecutionListener) (testName, status, _, failure) -> recorded.put(testName, status + ": " + failure.message()));
 
-        getProject().getMessageBus().syncPublisher(SMTRunnerEventsListener.TEST_STATUS).onTestFinished(test);
+        TestCaseExecutionTracker.finished(getProject(), test);
 
         return recorded.getOrDefault(test.getPresentableName(), "nothing");
     }

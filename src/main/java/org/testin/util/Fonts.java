@@ -34,7 +34,7 @@ public final class Fonts {
 
     private static final float TITLE = 3.0f;
     private static final float LABEL = -2.0f;
-    private static final float CAPTION = -1.0f;
+    private static final float CAPTION = -2.0f;
     private static final float ROW = 1.0f;
     private static final float BADGE = -3.0f;
     private static final float FIELD = 6.0f;

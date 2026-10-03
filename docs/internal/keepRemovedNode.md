@@ -84,13 +84,13 @@ The confirmation the tester sees before removing anything is drawn on
 
 ## What Testin refuses
 
-**If the node cannot be copied aside** — the removal still happens, and it does
-not go on the undo history. A message titled *Cannot Be Undone* says so at that
-moment, naming how many could not be copied aside, so `Ctrl+Z` taking back an
-earlier change is not a surprise.
+**If the node cannot be copied aside** — the removal still happens. A message
+titled *Cannot Be Undone* says so at that moment, naming how many could not be
+copied aside. `Ctrl+Z` puts back the nodes whose copy was kept.
 
-**If nothing at all could be copied aside** — no undo entry is made. `Ctrl+Z`
-offers the change before it instead.
+**If nothing at all could be copied aside** — the removal is still on the undo
+history, so `Ctrl+Z` answers for it and says nothing was kept to put back. It
+never takes back the change before it instead (Rule-TREE-PANEL-041).
 
 **If something already occupies the place a node came from** — Testin refuses to
 put it back. Writing over it would destroy one thing to restore another. The

@@ -75,7 +75,7 @@ public final class ResolveConflictDialog extends AbstractFrameworkDialog {
                 StatusBarShortcut.build(Shortcuts.Enter, Bundle.message("dialog.conflict.button.keep"), this::submit),
                 StatusBarShortcut.build(Shortcuts.Escape, Bundle.message("dialog.conflict.shortcut.skip"), this::skip));
 
-        size = DialogSize.SHORT;
+        size = DialogSize.HALF;
     }
 
     // UC-SHARE-018, Rule-SHARE-083

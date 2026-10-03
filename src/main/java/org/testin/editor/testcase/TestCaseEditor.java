@@ -282,7 +282,7 @@ public class TestCaseEditor extends AbstractTestinEditor<TestCaseEditorAttribute
 
     // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-101
     @Override
-    protected void drawStatus(final @NotNull PageWindow page, final int totalItems) {
+    protected void drawStatus(final @NotNull PageWindow page) {
         final @NotNull List<TestCaseDto> all = snapshotOfAll();
         automationState.read(p, all, this::refreshView);
 

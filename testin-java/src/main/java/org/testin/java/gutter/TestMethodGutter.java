@@ -27,6 +27,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.JavaTokenType;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiJavaToken;
 import com.intellij.psi.PsiLiteralExpression;
 import com.intellij.psi.PsiMethod;
@@ -59,7 +60,20 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         return Optional.ofNullable(PsiTreeUtil.getParentOfType(literal, PsiNameValuePair.class))
                 .filter(pair -> "testName".equals(pair.getName()))
                 .map(pair -> PsiTreeUtil.getParentOfType(pair, PsiAnnotation.class))
-                .filter(annotation -> annotation.hasQualifiedName(GeneratedMethod.TESTNG_TEST))
+                .filter(TestMethodGutter::isWrittenAsTestNgTest)
+                .isPresent();
+    }
+
+    // UC-CODEGEN-007, Rule-CODEGEN-029, Rule-CODEGEN-030
+    private static boolean isWrittenAsTestNgTest(final @NotNull PsiAnnotation annotation) {
+        final @NotNull String written = Optional.ofNullable(annotation.getNameReferenceElement()).map(PsiElement::getText).orElse("");
+        if (written.equals(GeneratedMethod.TESTNG_TEST)) return true;
+
+        return written.equals(StringUtil.getShortName(GeneratedMethod.TESTNG_TEST))
+                && annotation.getContainingFile() instanceof PsiJavaFile file
+                && Optional.ofNullable(file.getImportList())
+                .filter(imports -> imports.findSingleClassImportStatement(GeneratedMethod.TESTNG_TEST) != null
+                        || imports.findOnDemandImportStatement(StringUtil.getPackageName(GeneratedMethod.TESTNG_TEST)) != null)
                 .isPresent();
     }
 

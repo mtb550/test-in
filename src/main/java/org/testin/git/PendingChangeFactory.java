@@ -46,7 +46,7 @@ final class PendingChangeFactory {
             case TEST_CASE -> testCase(type, beforeJson, afterJson, relativePath, mapper);
             case RUN_ITEM -> runItem(type, beforeJson, afterJson, relativePath, mapper, testCases);
             case MARKER -> marker(type, beforeJson, afterJson, relativePath, mapper);
-            case OTHER -> other(type, relativePath);
+            case OTHER -> byName(ChangeSubject.OTHER, type, relativePath);
         };
     }
 
@@ -138,15 +138,15 @@ final class PendingChangeFactory {
         return new PendingChange(ChangeSubject.MARKER, node, "", "", relativePath, type, nothingCommitted(), changes);
     }
 
-    // UC-SHARE-010
+    // UC-SHARE-010, Rule-SHARE-047
     static @NotNull PendingChange unreadable(final @NotNull DiffType type, final @NotNull Path relativePath) {
-        return other(type, relativePath);
+        return byName(subjectOf(relativePath), type, relativePath);
     }
 
-    private static @NotNull PendingChange other(final @NotNull DiffType type, final @NotNull Path relativePath) {
-        return new PendingChange(ChangeSubject.OTHER, relativePath.getFileName().toString(), "", "",
+    private static @NotNull PendingChange byName(final @NotNull ChangeSubject subject, final @NotNull DiffType type, final @NotNull Path relativePath) {
+        return new PendingChange(subject, relativePath.getFileName().toString(), "", "",
                 relativePath, type, nothingCommitted(),
-                List.of(new FieldChange(relativePath.toString(), "", "", ChangeSubject.OTHER.changeFor(type))));
+                List.of(new FieldChange(relativePath.toString(), "", "", subject.changeFor(type))));
     }
 
     private static @NotNull String statusIn(final @NotNull Mapper mapper, final @NotNull String json) {

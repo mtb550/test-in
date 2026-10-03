@@ -26,6 +26,7 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.framework.Spacing;
 import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
@@ -38,7 +39,6 @@ import java.util.Optional;
 // Rule-INTERNAL-087
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Caption {
-    private static final int GAP = 8;
 
     // Rule-INTERNAL-122
     public static @NotNull JBLabel of(final @NotNull String text, final @NotNull Font font) {
@@ -61,12 +61,11 @@ public final class Caption {
 
         placed.weightx = 1;
         placed.fill = GridBagConstraints.HORIZONTAL;
-        placed.insets = JBUI.insets(0, GAP);
+        placed.insets = JBUI.insetsLeft(Spacing.M);
         row.add(new SeparatorComponent(JBColor.border(), SeparatorOrientation.HORIZONTAL), placed);
 
         placed.weightx = 0;
         placed.fill = GridBagConstraints.NONE;
-        placed.insets = JBUI.emptyInsets();
         trailing.ifPresent(component -> row.add(component, placed));
 
         return row;
@@ -74,7 +73,7 @@ public final class Caption {
 
     // Rule-INTERNAL-122
     public static @NotNull BorderLayoutPanel above(final @NotNull String caption, final @NotNull JComponent value) {
-        final @NotNull BorderLayoutPanel panel = JBUI.Panels.simplePanel(0, 2).addToCenter(value).withBorder(JBUI.Borders.emptyTop(8)).andTransparent();
+        final @NotNull BorderLayoutPanel panel = JBUI.Panels.simplePanel(0, Spacing.XS).addToCenter(value).withBorder(JBUI.Borders.emptyTop(Spacing.M)).andTransparent();
         if (caption.isEmpty()) return panel;
 
         final @NotNull JBLabel label = of(caption, Fonts.caption());

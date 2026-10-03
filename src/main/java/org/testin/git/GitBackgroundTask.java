@@ -18,10 +18,10 @@ package org.testin.git;
 
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.services.BackgroundWork;
 
 import java.util.function.Consumer;
 
@@ -37,7 +37,7 @@ public final class GitBackgroundTask extends Task.Backgroundable {
 
     // Rule-SHARE-005
     public static void run(final @NotNull Project p, final @NotNull String title, final boolean cancellable, final @NotNull GitTaskWork work, final @NotNull Consumer<Exception> onError) {
-        ProgressManager.getInstance().run(new GitBackgroundTask(p, title, cancellable, work, onError));
+        BackgroundWork.start(new GitBackgroundTask(p, title, cancellable, work, onError));
     }
 
     @Override

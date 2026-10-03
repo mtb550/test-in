@@ -252,9 +252,8 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
         AccessibleAnnouncerUtil.announce(textField, reached.hint().isEmpty() ? reached.name() : reached.name() + ", " + reached.hint(), true);
     }
 
-    // Rule-INTERNAL-106
+    // Rule-INTERNAL-074, Rule-INTERNAL-106
     private static final class SelectionRenderer<T> extends ColoredListCellRenderer<SelectionList<T>> {
-        private static final int COLUMN = 170;
         private static final float ARC = 8;
 
         private boolean picked;
@@ -267,10 +266,7 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
             setIcon(value.icon());
             setIconTextGap(JBUI.scale(Spacing.M));
             append(value.name());
-            if (!value.hint().isEmpty()) {
-                appendTextPadding(JBUI.scale(COLUMN));
-                append(value.hint(), SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES);
-            }
+            if (!value.hint().isEmpty()) append(" " + value.hint(), SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES);
             setBorder(JBUI.Borders.empty(Spacing.M, Spacing.XL));
         }
 

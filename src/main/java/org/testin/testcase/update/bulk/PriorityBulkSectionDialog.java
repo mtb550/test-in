@@ -18,11 +18,13 @@ package org.testin.testcase.update.bulk;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.util.Bundle;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class PriorityBulkSectionDialog extends JsonSplitBulkSectionDialog {
@@ -45,8 +47,9 @@ public class PriorityBulkSectionDialog extends JsonSplitBulkSectionDialog {
         return "priority";
     }
 
+    // UC-EDITOR-PANEL-007, Rule-EDITOR-PANEL-206
     @Override
-    protected boolean acceptsBlank() {
-        return false;
+    protected @NotNull Optional<TestCaseDto> withValue(final @NotNull TestCaseDto tc, final @NotNull String value) {
+        return super.withValue(tc, value.isEmpty() ? Priority.DEFAULT.getLabel() : value);
     }
 }

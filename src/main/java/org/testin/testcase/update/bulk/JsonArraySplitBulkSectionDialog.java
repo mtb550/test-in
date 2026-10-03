@@ -77,7 +77,7 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
                 StatusBarShortcut.hint("Ctrl+Click", Bundle.message("shortcut.multi.caret")),
                 StatusBarShortcut.cancel(this::closeCancel));
 
-        size = DialogSize.SHORT;
+        size = DialogSize.HALF;
 
         editors.bindKeysToEditor(shortcuts);
     }

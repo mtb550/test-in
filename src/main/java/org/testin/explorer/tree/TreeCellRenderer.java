@@ -24,9 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
-import org.testin.model.TestRunStatus;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 
@@ -40,9 +38,10 @@ import java.util.Set;
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
     private final @NotNull Set<Path> selectedNodes;
 
-    // Rule-TREE-PANEL-008
+    // Rule-TREE-PANEL-008, Rule-SETTING-037
     @Override
     public void customizeCellRenderer(final @NotNull JTree tree, final @Nullable Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
+        setFont(tree.getFont());
         try {
             final @NotNull Optional<TreeLoadError> loadError = TreeValues.valueOf(value, TreeLoadError.class);
             if (loadError.isPresent()) {
@@ -60,11 +59,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
             final @NotNull DirectoryDto dir = shown.get();
             final @NotNull DirectoryType type = dir.getType();
 
-            final @NotNull Optional<TestRunStatus> testRunStatus = dir instanceof TestRunDirectoryDto trDir
-                    ? Optional.of(trDir.getMarker().getStatus())
-                    : Optional.empty();
-
-            setIcon(testRunStatus.map(TestRunStatus::getIcon).orElseGet(type::getIcon));
+            setIcon(dir.iconShownInTree());
             final boolean grayed = selectedNodes.contains(dir.getPath()) || dir.isRetired();
             append(dir.getName(), grayed ? SimpleTextAttributes.GRAYED_ATTRIBUTES : type.getAttributes());
 

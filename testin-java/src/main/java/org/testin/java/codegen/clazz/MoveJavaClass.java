@@ -34,7 +34,7 @@ public class MoveJavaClass implements GenAction<Moved> {
     // UC-CODEGEN-016, Rule-CODEGEN-053, Rule-CODEGEN-054
     @Override
     public void execute(final @NotNull Project p, final @NotNull Moved moved) {
-        final @NotNull List<String> fqcn = Fqcn.ofClass(moved.dir());
+        final @NotNull List<String> fqcn = Fqcn.ofClass(moved.from());
         if (fqcn.isEmpty()) return;
 
         final @NotNull Optional<List<String>> found = moved.destinationPackage(p);

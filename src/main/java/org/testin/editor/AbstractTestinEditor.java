@@ -321,6 +321,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         });
     }
 
+    // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-104, Rule-EDITOR-PANEL-118
     protected void reloadData(final @NotNull Runnable onLoaded) {
         followTheIndex();
         beforeReload();
@@ -331,7 +332,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         currentTestCases.clear();
         clearLoadedData();
 
-        model.removeAll();
+        replaceModel(List.of());
         list.setPaintBusy(true);
         list.getEmptyText().setText(Bundle.message("editor.refreshing"));
 
@@ -477,7 +478,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         selectionToRestore = Optional.empty();
 
         showEmptyStateIfNothingToDraw(totalItems);
-        drawStatus(page, totalItems);
+        drawStatus(page);
 
         refreshSelectionStatus(list.getSelectedIndices());
         afterSelectionShown();
@@ -496,7 +497,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         else model.replaceAll(pageItems);
     }
 
-    protected abstract void drawStatus(final @NotNull PageWindow page, final int totalItems);
+    protected abstract void drawStatus(final @NotNull PageWindow page);
 
     protected abstract boolean isReading();
 

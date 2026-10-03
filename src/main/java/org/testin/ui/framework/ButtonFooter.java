@@ -16,11 +16,11 @@
 
 package org.testin.ui.framework;
 
-import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.Tooltip;
 import org.testin.util.Fonts;
 
 import javax.swing.JComponent;
@@ -29,21 +29,22 @@ import java.util.Optional;
 
 // UC-INTERNAL-007, Rule-INTERNAL-080
 final class ButtonFooter {
-    private final @NotNull JBLabel said = new JBLabel();
+    private final @NotNull JComponent button;
+    private final @NotNull JBLabel tally = new JBLabel();
     private final @NotNull JBPanel<?> panel;
 
-    private @NotNull Optional<String> reason = Optional.empty();
-    private @NotNull String tally = "";
-
-    // Rule-INTERNAL-119
+    // Rule-INTERNAL-095, Rule-INTERNAL-119
     ButtonFooter(final @NotNull JComponent button) {
+        this.button = button;
         button.setOpaque(false);
-        said.setFont(Fonts.small());
+        button.setFont(Fonts.row());
+        tally.setFont(Fonts.small());
+        tally.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
 
         panel = new JBPanel<>(new BorderLayout());
         panel.setOpaque(false);
         panel.setBorder(JBUI.Borders.empty(Spacing.M, Spacing.XL));
-        panel.add(said, BorderLayout.WEST);
+        panel.add(tally, BorderLayout.WEST);
         panel.add(button, BorderLayout.EAST);
     }
 
@@ -51,22 +52,14 @@ final class ButtonFooter {
         return panel;
     }
 
-    // Rule-INTERNAL-080
-    void showReason(final @NotNull Optional<String> text) {
-        reason = text;
-        say();
+    // UC-INTERNAL-007, Rule-INTERNAL-080
+    void enableUnless(final @NotNull Optional<String> reason) {
+        button.setEnabled(reason.isEmpty());
+        Tooltip.set(button, reason.orElse(""));
     }
 
     // Rule-INTERNAL-080
     void showTally(final @NotNull String text) {
-        tally = text;
-        say();
-    }
-
-    private void say() {
-        said.setText(reason.orElse(tally));
-        said.setForeground(reason.isPresent()
-                ? SimpleTextAttributes.ERROR_ATTRIBUTES.getFgColor()
-                : JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+        tally.setText(text);
     }
 }

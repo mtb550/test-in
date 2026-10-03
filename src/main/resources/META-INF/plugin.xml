@@ -142,7 +142,7 @@
                 id="testin.tree"
                 factoryClass="org.testin.explorer.Main"
                 anchor="left"
-                icon="org.testin.util.Icons.TOOL_WINDOW"
+                icon="/icons/pluginIcon.svg"
                 secondary="false"
                 doNotActivateOnStart="true"
         />
@@ -151,7 +151,7 @@
                 id="testin.view"
                 factoryClass="org.testin.view.ViewToolWindowFactory"
                 anchor="right"
-                icon="org.testin.util.Icons.TOOL_WINDOW"
+                icon="/icons/pluginIcon.svg"
                 secondary="false"
                 doNotActivateOnStart="true"
         />
@@ -228,6 +228,12 @@
                 class="org.testin.search.GlobalSearchAction"
                 icon="AllIcons.Actions.Search"
         >
+            <!-- Ctrl+Alt+F is IntroduceField in the IDE's own keymap, Cmd+Alt+F on
+                 a Mac, and it is kept anyway: in a Java file the refactoring
+                 answers, in the Testin panel the search does, and a tester who
+                 does not refactor Java never meets the other one. Ctrl+Alt+Shift+F
+                 is free if it ever bites. docs/shortcuts.md says the same, and
+                 Rule-INTERNAL-069 asks for this note. -->
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt F"/>
             <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta alt F"/>
             <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta alt F"/>
@@ -314,11 +320,11 @@
                  anyway: a shared key is fine where it works, and no code goes in
                  to win it. CTRL+F12 was worse - FileStructurePopup owns that, and
                  on a Mac it owns CMD+F12 too, so the Mac key is CTRL+ALT+CMD+F12,
-                 which nothing else uses. Rule-INTERNAL-069 says the opposite and
-                 this is the exception to it, decided deliberately. -->
+                 which nothing else uses. It replaces the F12 the Mac keymaps would
+                 otherwise inherit. Rule-INTERNAL-069 asks for this note. -->
             <keyboard-shortcut keymap="$default" first-keystroke="F12"/>
-            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="ctrl alt meta F12"/>
-            <keyboard-shortcut keymap="Mac OS X" first-keystroke="ctrl alt meta F12"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="ctrl alt meta F12" replace-all="true"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="ctrl alt meta F12" replace-all="true"/>
         </action>
 
         <action

@@ -195,17 +195,18 @@ public class UpdateTestBase {
         if (written > 0) reformat(p, pc);
     }
 
+    // Rule-CODEGEN-041
     protected void applyToMethod(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater, final @NotNull Consumer<String> onMissing) {
-        final @NotNull String path = Fqcn.classOfMethod(tc);
+        final @NotNull List<String> path = Fqcn.ofClass(tc.getParent());
         if (path.isEmpty()) return;
 
         final @NotNull Runnable inCommand = () ->
                 WriteCommandAction.runWriteCommandAction(p, title, null, () ->
-                        GeneratedClass.byName(p, path)
+                        GeneratedClass.find(p, path)
                                 .ifPresentOrElse(
                                         targetClass -> findMethodByTestName(targetClass, tc).ifPresentOrElse(updater,
                                                 () -> onMissing.accept("no method with testName=" + tc.getId())),
-                                        () -> onMissing.accept("class not found: " + path)));
+                                        () -> onMissing.accept("class not found: " + String.join(".", path))));
 
         if (CommandProcessor.getInstance().getCurrentCommand() != null) inCommand.run();
         else ApplicationManager.getApplication().invokeLater(inCommand);

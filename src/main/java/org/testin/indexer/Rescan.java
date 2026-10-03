@@ -19,7 +19,6 @@ package org.testin.indexer;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -27,8 +26,10 @@ import com.intellij.util.concurrency.AppExecutorUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 import org.testin.explorer.TreePanel;
 import org.testin.logger.Logger;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 
@@ -64,6 +65,11 @@ public final class Rescan {
         waiting.remove(testProject);
     }
 
+    @TestOnly
+    boolean isBooked(final @NotNull Path testProject) {
+        return waiting.contains(testProject);
+    }
+
     // UC-INTERNAL-003, Rule-INTERNAL-022
     private void run() {
         final @NotNull List<Path> testProjects = List.copyOf(waiting);
@@ -84,7 +90,7 @@ public final class Rescan {
     private void refresh(final @NotNull Project p, final @NotNull List<Path> testProjects) {
         if (p.isDisposed() || Services.isNotCreated(p, TreePanel.class)) return;
 
-        ProgressManager.getInstance().run(
+        BackgroundWork.start(
                 new Task.Backgroundable(p, Bundle.message("indexer.task.rescan"), true) {
                     @Override
                     public void run(final @NotNull ProgressIndicator indicator) {

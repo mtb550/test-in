@@ -17,11 +17,12 @@
 package org.testin.editor.grid;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 
-public record GridView(@NotNull JBTable table, @NotNull JBScrollPane scrollPane, @NotNull Disposable fontSync) {
+import javax.swing.JComponent;
+
+public record GridView(@NotNull JBTable table, @NotNull JComponent scrollPane, @NotNull Disposable fontSync) {
     // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-119
     public boolean isCellOpen() {
         return table.isEditing();

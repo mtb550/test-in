@@ -48,7 +48,7 @@ public class UpdateTestCaseAction extends AbstractAnyProjectAction {
             return;
         }
 
-        GrayWithReason.unless(this, e, TestinData.editor(e).isPresent() && !TestinData.selectedTestCases(e).isEmpty(), Bundle.message("action.select.case.description"));
+        GrayWithReason.unlessTestCaseSelected(this, e, TestinData.editor(e).isPresent());
     }
 
     @Override

@@ -36,14 +36,16 @@ This is the fastest way to reach one test set, one test run or one test case.
   that action, never on the one the IDE holds. The Keymap page keeps showing
   what it shipped with, and the tooltip that prints the key reads it from the
   same place the binding does.
-- **Rule-INTERNAL-069** — Testin takes a default key the IDE already uses only
-  where the alternative is worse, and the descriptor says which and why beside
-  the binding. `F12` on Automate Test Case is the one: `CTRL+F12` is
-  FileStructurePopup's, and so is `Cmd+F12` on a Mac, which left generating
-  code unreachable by key there. The Mac key is `Ctrl+Alt+Cmd+F12`.
-  When two actions claim one keystroke the IDE runs whichever is enabled and
-  says nothing, and a component binding cannot win it back - so the key is
-  changed instead.
+- **Rule-INTERNAL-069** — Where Testin takes a default key the IDE also uses,
+  and the IDE's action and Testin's can fire in the same place, the
+  descriptor says which and why beside the binding. There are two. `F12` on
+  Automate Test Case is also Jump to Last Window; `CTRL+F12` was worse, because
+  it is FileStructurePopup's, and so is `Cmd+F12` on a Mac, which left
+  generating code unreachable by key there. The Mac key is `Ctrl+Alt+Cmd+F12`.
+  `Ctrl+Alt+F` on Search is also Introduce Field anywhere in a Java file, and
+  [every shortcut](../shortcuts.md) explains why it is kept. When two actions
+  claim one keystroke the IDE runs whichever is enabled and says nothing, so the
+  note is what tells the next reader the clash was chosen.
 - **Rule-INTERNAL-071** — A default key carries one action. Two may share one
   only where their conditions cannot both hold at once, which has to be argued
   rather than assumed: `F2` works because each of its three needs a selection in

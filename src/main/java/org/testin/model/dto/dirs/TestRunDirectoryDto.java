@@ -27,6 +27,7 @@ import org.testin.model.DirectoryType;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.util.Bundle;
 
+import javax.swing.Icon;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
@@ -82,6 +83,12 @@ public class TestRunDirectoryDto extends DirectoryDto {
     // Rule-TREE-PANEL-009, Rule-PRODUCT-011
     public @NotNull Optional<String> whySignedOff() {
         return isStillOpen() ? Optional.empty() : Optional.of(Bundle.message("run.item.status.test.run.signed.off", marker.getStatus().getLabel()));
+    }
+
+    // UC-TREE-PANEL-001, Rule-INTERNAL-072
+    @Override
+    public @NotNull Icon iconShownInTree() {
+        return marker.getStatus().getIcon();
     }
 
     // UC-TREE-PANEL-001, Rule-TREE-PANEL-099

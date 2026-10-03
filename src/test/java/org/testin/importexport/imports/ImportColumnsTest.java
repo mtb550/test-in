@@ -48,6 +48,6 @@ public class ImportColumnsTest {
     public void aHeadingNamesOneColumnAndNoOther() {
         assertFalse(TestCaseEditorAttributes.CREATED_AT.isColumn("Updated At"));
         assertFalse(TestCaseEditorAttributes.CREATED_AT.isColumn("Created"));
-        assertFalse(TestCaseEditorAttributes.CREATED_AT.isColumn("createdat"));
+        assertFalse(TestCaseEditorAttributes.CREATED_AT.isColumn("CreatedAt"));
     }
 }

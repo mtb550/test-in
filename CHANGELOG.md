@@ -61,6 +61,13 @@ than repairing it, and a team sharing a test project should update together.
   and **Ctrl+T** are Cmd keys, and the hint reads **Cmd+Letter**.
 - **The IDE draws what it already knows how to:** the selection, the striped rows, the bulk editor's diff tint and the
   toolbar buttons follow your theme.
+- **A gray dialog button says why when you hover over it:** the reason is its tooltip in every dialog, and the line
+  beside it only counts what pressing it would act on.
+- **A hint or a path sits right after the name** in search results and picker lists alike, instead of in a column.
+- **One name for Navigate to Test Method:** the view panel's first button reads **Navigate to Test Method**, as the menu
+  and the card do. Its icon still says what automation is there.
+- **A blank priority in a bulk edit is P3 (Low),** the default priority, and a blank value in a bulk edit is never
+  counted among the values Testin could not read.
 
 ### Removed
 
@@ -121,6 +128,29 @@ than repairing it, and a team sharing a test project should update together.
   remove the test case and leave its **@Test** method behind.
 - **A rename whose folder cannot be renamed changes nothing:** the automation code takes its old name back and the test project keeps its name. It used to leave the code renamed and the folder not.
 - **A test run's details that could not be saved do not linger:** the test run shows what is on disk again and says it was not saved.
+- **A move the tree refuses leaves the automation code where it was:** the class goes back to the package of the test
+  set it belongs to, rather than staying in the package the test set was never moved to.
+- **An imported sheet's test set is named without its special characters:** a sheet called Log/in: Flow is
+  imported as **Login Flow**, not Log_in_ Flow.
+- **A test case or result the review cannot read still gets its own kind of row,** decided by the file's name.
+- **Clearing a test case's description records the empty description in its @Test** and keeps the method's name.
+- **The mark beside a test method is drawn while the IDE is still indexing,** rather than failing until it finishes.
+- **Ctrl and the mouse wheel change Testin's text size over the tree** as they do over the editor and the view panel.
+- **A sheet named only with special characters imports as Imported sheet,** rather than as a test set with no name.
+- **The search draws a test run with its status icon,** the icon the tree draws for it.
+- **Dialogs keep to their own measures:** captions two points below the label font with a hairline to the card's edge,
+  the confirmation message and the dialog button in the dialog fonts, a half-height dialog at half the frame, a table
+  eight rows tall, every gap one of the five spacing steps, and a shortcut key with no room left out rather than cut.
+- **Refresh lands on the selected test case:** reloading or refreshing a test set opens the page that holds the test
+  case you had selected, and keeps it selected.
+- **Copy Test Case works in the grid,** as it does on a card.
+- **A gray menu entry says why:** View Test Case Details, Copy Test Case, Cut Test Case and Navigate to Test Case say to
+  select a test case first.
+- **A narrow editor's toolbar and status bar scroll sideways with the mouse wheel,** not only with a sideways swipe.
+- **A run item status records how long the test case took,** to the millisecond rather than in whole seconds: from
+  the moment it is selected until its run item status is set, by hand or by the automation.
+- **Two test projects with one name open the one under your Testin root,** rather than whichever was read first.
+- **A dialog on a very small IDE window stays inside it,** rather than growing past its edges.
 
 ## 2.13.0-alpha - 2026-09-22
 

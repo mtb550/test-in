@@ -42,8 +42,10 @@ press `P` or `F`.
   is not already.
 - **Rule-EDITOR-PANEL-182** — A run item status from the automation is written
   the same way a run item status set from the keyboard is.
-- **Rule-EDITOR-PANEL-183** — The framework's own timing replaces whatever the
-  clock counted.
+- **Rule-EDITOR-PANEL-183** — The framework's own timing is the duration only of
+  a test case no clock was counting. Where the clock was counting, it stops the
+  moment the automation sets the run item status, and what it counted is kept,
+  as Rule-EDITOR-PANEL-132 says.
 - **Rule-EDITOR-PANEL-220** — A failure from the automation clears what the last
   failure said happened - the actual result, the error and its screenshots -
   before it writes its own, and keeps the bug severity, the bug priority and the

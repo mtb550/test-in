@@ -396,12 +396,13 @@ public class TreeTransferHandler extends TransferHandler {
 
         for (int i = 0; i < from.size(); i++) {
             final @NotNull Path source = from.get(i);
+            final @NotNull Path destination = to.get(i);
 
-            nodes.moveNode(source, to.get(i), wasMoved -> {
+            nodes.moveNode(source, destination, wasMoved -> {
                 if (p.isDisposed()) return;
 
                 if (wasMoved) moved.incrementAndGet();
-                else putCodeBack(source);
+                else putCodeBack(source, destination);
 
                 if (remaining.decrementAndGet() != 0) return;
 
@@ -420,21 +421,24 @@ public class TreeTransferHandler extends TransferHandler {
     // UC-TREE-PANEL-013, Rule-TREE-PANEL-048, Rule-CODEGEN-082
     private void syncCode(final @NotNull List<Path> from, final @NotNull List<Path> to) {
         WriteCommandAction.runWriteCommandAction(p, Bundle.message("transfer.move.code.command"), null, () -> {
-            for (int i = 0; i < from.size(); i++) moveCodeOf(from.get(i), to.get(i));
+            for (int i = 0; i < from.size(); i++) moved(from.get(i), to.get(i)).ifPresent(this::moveCode);
         });
     }
 
     // UC-TREE-PANEL-016, Rule-TREE-PANEL-098
-    private void putCodeBack(final @NotNull Path source) {
+    private void putCodeBack(final @NotNull Path source, final @NotNull Path destination) {
         Logger.warn("Move refused for " + source.getFileName() + "; putting its generated code back.");
 
-        syncCode(List.of(source), List.of(source));
+        WriteCommandAction.runWriteCommandAction(p, Bundle.message("transfer.move.code.command"), null, () ->
+                moved(source, destination).flatMap(moved -> moved.back(p)).ifPresent(this::moveCode));
     }
 
-    private void moveCodeOf(final @NotNull Path from, final @NotNull Path to) {
-        Optional.ofNullable(to.getParent()).ifPresent(target ->
-                nodes.find(from)
-                        .ifPresent(dir -> JavaCode.of(dir.getType()).getMoved().execute(p, new Moved(dir, target))));
+    private @NotNull Optional<Moved> moved(final @NotNull Path from, final @NotNull Path to) {
+        return Optional.ofNullable(to.getParent()).flatMap(target -> nodes.find(from).map(dir -> new Moved(dir, target)));
+    }
+
+    private void moveCode(final @NotNull Moved moved) {
+        JavaCode.of(moved.dir().getType()).getMoved().execute(p, moved);
     }
 
     private void resetLastAction() {

@@ -1,0 +1,222 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.git;
+
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationGroupManager;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import org.jetbrains.annotations.NotNull;
+import org.testin.Await;
+import org.testin.Notified;
+import org.testin.config.TestinYml;
+import org.testin.ui.framework.ShownDialogContent;
+import org.testin.util.Bundle;
+import org.testin.view.Drawn;
+
+import javax.swing.JComponent;
+import javax.swing.JRadioButton;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+
+import static org.testin.git.LocalGit.git;
+import static org.testin.git.LocalGit.mustGit;
+
+public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
+
+    @Override
+    protected void tearDown() {
+        ShownDialogContent.close(getProject(), PendingCommitsDialog.class);
+        ShownDialogContent.close(getProject(), GitIdentityDialog.class);
+        ShownDialogContent.close(getProject(), RemoteUrlDialog.class);
+        noTestinYml();
+        super.tearDown();
+    }
+
+    private void noTestinYml() {
+        final @NotNull Optional<Path> yml = TestinYml.savePath(getProject());
+        try {
+            if (yml.isPresent()) Files.deleteIfExists(yml.orElseThrow());
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not remove testin.yml: " + ex.getMessage(), ex);
+        }
+        yml.map(Path::getParent).ifPresent(LocalFileSystem.getInstance()::refreshAndFindFileByNioFile);
+        TestinYml.reload(getProject());
+    }
+
+    private @NotNull JComponent theReview(final @NotNull Path repository) {
+        return ShareGestures.theReviewOf(getProject(), repository);
+    }
+
+    private @NotNull Path aRepositoryWithNoRemote() {
+        final @NotNull Path solo = directory("solo");
+        mustGit(solo, "init", "--initial-branch=" + MAIN);
+        identify(solo, "Testin Test", "testin@example.invalid");
+        write(solo, "first.tc", "{}");
+        commitAll(solo, "first");
+        return solo;
+    }
+
+    private @NotNull Path anEmptyRemote() {
+        final @NotNull Path empty = directory("empty.git");
+        mustGit(empty, "init", "--bare", "--initial-branch=" + MAIN);
+        return empty;
+    }
+
+    private void theProjectFolderExists() {
+        final @NotNull Path folder = TestinYml.savePath(getProject()).map(Path::getParent).orElseThrow(() -> new AssertionError("the project has no folder for testin.yml"));
+        try {
+            Files.createDirectories(folder);
+        } catch (final IOException ex) {
+            throw new AssertionError("Could not make " + folder + ": " + ex.getMessage(), ex);
+        }
+    }
+
+    private static @NotNull String addressOf(final @NotNull Path bare) {
+        final @NotNull String address = bare.toUri().toString();
+        return address.endsWith("/") ? address.substring(0, address.length() - 1) : address;
+    }
+
+    private void pressPushOnTheWaitingCommits(final @NotNull Path repository, final @NotNull List<Notification> said) {
+        final int before = (int) said.stream().filter(notification -> notification.getTitle().equals(Bundle.message("git.not.pushed.title"))).count();
+        new ViewPendingCommitsWork(getProject()).openFor(repository);
+        Await.until("the waiting commits were not offered", () -> said.stream().filter(notification -> notification.getTitle().equals(Bundle.message("git.not.pushed.title"))).count() > before);
+
+        final @NotNull Notification waiting = said.stream().filter(notification -> notification.getTitle().equals(Bundle.message("git.not.pushed.title"))).toList().getLast();
+        Notified.press(getProject(), waiting, waiting.getActions().getFirst());
+    }
+
+    private static long count(final @NotNull List<Notification> said, final @NotNull String title) {
+        return said.stream().filter(notification -> notification.getTitle().equals(title)).count();
+    }
+
+    // UC-SHARE-008, Rule-SHARE-040
+    public void testTheCommitIsMadeStraightAfterTheIdentityIsSet() {
+        mustGit(work, "config", "user.name", "");
+        mustGit(work, "config", "user.email", "");
+        write(work, "second.tc", "{\"description\":\"typed\"}");
+        final @NotNull String before = head(work, "HEAD");
+
+        final @NotNull JComponent review = theReview(work);
+        ShareGestures.type(review, "the second test case");
+        ShareGestures.commitOnly(review);
+
+        final @NotNull JComponent identity = ShareGestures.shown(getProject(), GitIdentityDialog.class);
+        assertTrue("the identity would be written for every repository on this machine", Drawn.first(identity, JRadioButton.class, radio -> radio.getText().equals(Bundle.message("dialog.git.identity.option.repository"))).isSelected());
+        ShareGestures.typeInto(identity, 0, "Sara Tester");
+        ShareGestures.typeInto(identity, 1, "sara@example.invalid");
+        ShareGestures.pressEnter(identity);
+
+        Await.until("no commit followed the identity", () -> !head(work, "HEAD").equals(before));
+        assertEquals("Sara Tester", mustGit(work, "log", "-1", "--format=%an").trim());
+        assertEquals("the second test case", mustGit(work, "log", "-1", "--format=%s").trim());
+    }
+
+    // UC-SHARE-013, Rule-SHARE-059
+    public void testThePushHappensOnlyAfterTheCommitSucceeded() {
+        write(work, ".git/hooks/pre-commit", "#!/bin/sh\nexit 1\n");
+        write(work, "second.tc", "{\"description\":\"typed\"}");
+        final @NotNull String remoteBefore = head(remote, MAIN);
+        final @NotNull List<Notification> said = notifications();
+        final @NotNull List<Task> started = ShareGestures.tasksStarted(getTestRootDisposable());
+
+        final @NotNull JComponent review = theReview(work);
+        ShareGestures.type(review, "the second test case");
+        ShareGestures.commitAndPush(review);
+
+        titled(said, Bundle.message("git.commit.failed.title"));
+        assertEquals("something reached the remote", remoteBefore, head(remote, MAIN));
+        assertTrue("a push was started after a failed commit", started.stream().noneMatch(task -> task.getTitle().equals(Bundle.message("git.task.checking.remote")) || task.getTitle().equals(Bundle.message("git.task.pushing.remote"))));
+    }
+
+    // UC-SHARE-013, Rule-SHARE-060
+    public void testARepositoryWithNoRemoteTakesTheAddressTestinYmlGives() {
+        final @NotNull Path solo = aRepositoryWithNoRemote();
+        final @NotNull Path empty = anEmptyRemote();
+        theProjectFolderExists();
+        assertTrue("could not write testin.yml", TestinYml.save(getProject(), TestinYml.lines("solo", addressOf(empty))));
+        final @NotNull List<Notification> said = notifications();
+
+        pressPushOnTheWaitingCommits(solo, said);
+
+        titled(said, Bundle.message("git.pushed.title"));
+        assertEquals(head(solo, "HEAD"), head(empty, MAIN));
+        assertTrue("the address was asked for although testin.yml gives it", ShownDialogContent.of(getProject(), RemoteUrlDialog.class).isEmpty());
+    }
+
+    // UC-SHARE-013, Rule-SHARE-060
+    public void testARepositoryWithNoRemoteAndNoAddressAsksForOneOnce() {
+        noTestinYml();
+        final @NotNull Path solo = aRepositoryWithNoRemote();
+        final @NotNull Path empty = anEmptyRemote();
+        final @NotNull List<Notification> said = notifications();
+
+        pressPushOnTheWaitingCommits(solo, said);
+        final @NotNull JComponent asked = ShareGestures.shown(getProject(), RemoteUrlDialog.class);
+        ShareGestures.typeInto(asked, 0, addressOf(empty));
+        ShareGestures.pressEnter(asked);
+        Await.until("the first push did not land", () -> count(said, Bundle.message("git.pushed.title")) == 1);
+
+        write(solo, "second.tc", "{}");
+        commitAll(solo, "second");
+        pressPushOnTheWaitingCommits(solo, said);
+        Await.until("the second push did not land", () -> count(said, Bundle.message("git.pushed.title")) == 2);
+
+        assertTrue("the address was asked for a second time", ShownDialogContent.of(getProject(), RemoteUrlDialog.class).isEmpty());
+        assertEquals(head(solo, "HEAD"), head(empty, MAIN));
+    }
+
+    // UC-SHARE-013, Rule-SHARE-061
+    public void testTheMessageAboutAPushStaysInTheNotificationList() {
+        write(work, "second.tc", "{}");
+        commitAll(work, "second");
+        final @NotNull List<Notification> said = notifications();
+
+        pressPushOnTheWaitingCommits(work, said);
+
+        final @NotNull Notification pushed = titled(said, Bundle.message("git.pushed.title"));
+        assertTrue("the push message is not kept in the notification list", NotificationGroupManager.getInstance().getNotificationGroup(pushed.getGroupId()).isLogByDefault());
+        assertEquals(head(work, "HEAD"), head(remote, MAIN));
+    }
+
+    // UC-SHARE-014, Rule-SHARE-065
+    public void testABranchThatCannotBeCheckedOutCommitsNothing() {
+        mustGit(work, "checkout", "-b", "other");
+        write(work, "first.tc", "{\"on\":\"other\"}");
+        commitAll(work, "the other branch's first test case");
+        mustGit(work, "checkout", MAIN);
+        write(work, "first.tc", "{\"on\":\"typed on main\"}");
+        final @NotNull String mainBefore = head(work, MAIN);
+        final @NotNull String otherBefore = head(work, "other");
+        final @NotNull List<Notification> said = notifications();
+
+        final @NotNull JComponent review = theReview(work);
+        ShareGestures.chooseTheOtherBranch(review);
+        ShareGestures.type(review, "the typed test case");
+        ShareGestures.commitOnly(review);
+
+        titled(said, Bundle.message("git.branch.not.switched.title"));
+        assertEquals(mainBefore, head(work, MAIN));
+        assertEquals(otherBefore, head(work, "other"));
+        assertEquals(MAIN, mustGit(work, "branch", "--show-current").trim());
+        assertEquals("{\"on\":\"typed on main\"}", read(work, "first.tc"));
+        assertTrue(git(work, "diff", "--quiet").isEmpty());
+    }
+}

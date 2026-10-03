@@ -30,8 +30,10 @@ import org.testin.util.FailureText;
 import org.testin.util.Once;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class Trash {
@@ -41,22 +43,32 @@ final class Trash {
     static boolean accepted(final @NotNull Project p, final @NotNull Path path) {
         if (!Files.exists(path) || ApplicationManager.getApplication().isUnitTestMode()) return false;
 
+        if (movedToTheBin(path)) return true;
+
+        sayThereIsNoBin(p);
+        return false;
+    }
+
+    // UC-INTERNAL-005, Rule-INTERNAL-036
+    static boolean movedToTheBin(final @NotNull Path path) {
         if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH)) {
             Logger.debug("This desktop has no recycle bin; deleting " + path + " outright.");
-            sayThereIsNoBin(p);
             return false;
         }
 
+        return movedTo(path, Desktop.getDesktop()::moveToTrash);
+    }
+
+    // UC-INTERNAL-005, Rule-INTERNAL-036
+    static boolean movedTo(final @NotNull Path path, final @NotNull Predicate<File> bin) {
         try {
-            if (Desktop.getDesktop().moveToTrash(path.toFile())) return true;
+            if (bin.test(path.toFile())) return true;
 
             Logger.warn("The recycle bin refused " + path + ", deleting it instead.");
-            sayThereIsNoBin(p);
             return false;
 
         } catch (final Exception ex) {
             Logger.warn("Could not move " + path + " to the recycle bin, deleting it instead: " + FailureText.of(ex));
-            sayThereIsNoBin(p);
             return false;
         }
     }

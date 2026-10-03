@@ -36,7 +36,7 @@ public class PrioritySection implements CreateTestCaseSection {
     public PrioritySection() {
         priority = ComponentDialogBase.<Priority>radios("")
                 .options(Priority.CHOICES, Priority::getNumberAndWord)
-                .select(Priority.LOW)
+                .select(Priority.DEFAULT)
                 .build()
                 .getComponent();
 

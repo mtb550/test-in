@@ -16,6 +16,7 @@
 
 package org.testin.editor;
 
+import com.intellij.openapi.fileEditor.FileEditorProvider;
 import com.intellij.testFramework.LightVirtualFile;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,7 @@ public class UnifiedVirtualFile extends LightVirtualFile {
         this.dir = dir;
         this.kind = EditorKind.of(dir);
         this.setFileType(kind.getFileType());
+        putUserData(FileEditorProvider.KEY, new UnifiedEditorProvider());
     }
 
     @Override

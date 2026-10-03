@@ -30,8 +30,11 @@ import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
+import org.testin.setting.TestinRoot;
 import org.testin.util.Bundle;
 
+import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,9 +68,10 @@ public final class BoundTestProject {
         final @NotNull String name = name();
         if (name.isEmpty()) return Optional.empty();
 
+        final @NotNull Path root = Services.getInstance(p, TestinRoot.class).absolutePath();
         return Services.getInstance(p, Nodes.class).getTestProjectsByPath().values().stream()
                 .filter(tp -> name.equals(tp.getName()))
-                .findFirst();
+                .min(Comparator.comparing(tp -> !tp.getPath().startsWith(root)));
     }
 
     public boolean isMissing(final @NotNull Map<String, ProjectStatus> underRoot) {

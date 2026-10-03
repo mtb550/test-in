@@ -264,7 +264,7 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
 
     // Rule-REPORT-018
     public void testThePdfSaysWhatItCouldNotPrint() {
-        aTestCase(opens, "\u0633\u062c\u0644 \u0627\u0644\u062f\u062e\u0648\u0644");
+        aTestCase(opens, "سجل الدخول");
         final @NotNull TestRunDirectoryDto testRun = aTestRun("Cycle-Arabic", List.of(new TestRunItems().setId(opens).setStatus(RunItemStatus.PASSED)));
 
         final @NotNull List<Notification> said = new ArrayList<>();

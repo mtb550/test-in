@@ -112,7 +112,7 @@ public final class NameSanitizer {
     public static @NotNull String removeSpecialChars(final @NotNull String value) {
         if (value.isEmpty()) return "";
         return value.chars()
-                .mapToObj(c -> isSpecial((char) c) ? "_" : String.valueOf((char) c))
+                .mapToObj(c -> isSpecial((char) c) ? "" : String.valueOf((char) c))
                 .reduce(new StringBuilder(value.length()), StringBuilder::append, StringBuilder::append)
                 .toString();
     }

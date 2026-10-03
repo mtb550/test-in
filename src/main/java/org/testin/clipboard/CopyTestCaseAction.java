@@ -22,6 +22,7 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -55,6 +56,7 @@ public class CopyTestCaseAction extends AbstractAnyProjectAction {
         }
     }
 
+    // Rule-EDITOR-PANEL-230
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
         // Rule-EDITOR-PANEL-214
@@ -64,7 +66,7 @@ public class CopyTestCaseAction extends AbstractAnyProjectAction {
             return;
         }
 
-        e.getPresentation().setEnabled(!TestinData.selectedTestCases(e).isEmpty());
+        GrayWithReason.unlessTestCaseSelected(this, e);
     }
 
     @Override

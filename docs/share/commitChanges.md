@@ -67,7 +67,7 @@ The button sits at the bottom right of the review dialog.
 
 ## What Testin refuses
 
-**If no row is ticked** — the button is gray.
+**If no row is ticked** — the button is gray. Hovering over it reads *Choose at least one change*.
 
 **If the message is blank** — the gray hint turns red and the box takes the
 cursor. Nothing is committed. The dialog stays open.

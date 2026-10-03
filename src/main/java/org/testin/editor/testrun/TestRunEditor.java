@@ -273,7 +273,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
 
     // UC-EDITOR-PANEL-022, Rule-EDITOR-PANEL-101
     @Override
-    protected void drawStatus(final @NotNull PageWindow page, final int totalItems) {
+    protected void drawStatus(final @NotNull PageWindow page) {
         statusBar.updatePaginationState(page.page(), page.totalPages());
 
         automationState.read(p, snapshotOfAll(), this::refreshView);

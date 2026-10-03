@@ -91,7 +91,11 @@ final class GitCommandRunner {
     static @NotNull Map<String, String> readObjects(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String revision, final @NotNull List<String> relativePaths) {
         final @NotNull GitBinaryHandler handler = new GitBinaryHandler(workingDirectory, GitExecutableManager.getInstance().getExecutable(p, workingDirectory), GitCommand.CAT_FILE);
         handler.addParameters("--batch");
-        handler.setInputProcessor(stdin -> stdin.write(batchRequest(revision, relativePaths)));
+        handler.setInputProcessor(stdin -> {
+            try (stdin) {
+                stdin.write(batchRequest(revision, relativePaths));
+            }
+        });
 
         try {
             return objectsIn(relativePaths, handler.run());

@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.model.DirectoryType;
 import org.testin.model.markers.Marker;
 
+import javax.swing.Icon;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -139,6 +140,11 @@ public abstract class DirectoryDto {
 
     public boolean isRetired() {
         return false;
+    }
+
+    // UC-TREE-PANEL-001, Rule-INTERNAL-072
+    public @NotNull Icon iconShownInTree() {
+        return getType().getIcon();
     }
 
     // UC-TREE-PANEL-001, Rule-TREE-PANEL-099

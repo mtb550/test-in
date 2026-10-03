@@ -26,6 +26,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
@@ -85,6 +86,11 @@ public class OpenContextMenuAction extends DumbAwareAction {
 
         return Optional.ofNullable(list.getCellBounds(index, index))
                 .map(bounds -> new Point(bounds.x + bounds.width / 4, bounds.y + bounds.height / 2));
+    }
+
+    @TestOnly
+    @NotNull Optional<Point> whereItOpens() {
+        return anchor.get();
     }
 
     @Override

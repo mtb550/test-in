@@ -1,0 +1,151 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.codegen;
+
+import com.intellij.openapi.util.Disposer;
+import com.intellij.testFramework.PlatformTestUtil;
+import org.jetbrains.annotations.NotNull;
+import org.testin.AbstractCodegenIdeTest;
+import org.testin.Await;
+import org.testin.FilesUnder;
+import org.testin.config.TestinYml;
+import org.testin.editor.EditorFixtures;
+import org.testin.editor.statusbar.StatusBar;
+import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.model.Automated;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.services.Services;
+import org.testin.util.Bundle;
+import org.testin.view.Drawn;
+
+import javax.swing.JComponent;
+import java.awt.Container;
+import java.util.List;
+import java.util.Map;
+
+public class AutomatedStateIdeTest extends AbstractCodegenIdeTest {
+
+    private static final @NotNull String GENERATED_CLASS = "nafath.CheckoutTest";
+
+    private @NotNull TestSetDirectoryDto testSet = new TestSetDirectoryDto();
+
+    private @NotNull AutomationState state() {
+        return Services.getInstance(getProject(), AutomationState.class);
+    }
+
+    private @NotNull List<TestCaseDto> threeStatesOfAutomation() {
+        testSet = createdTestSet("Checkout");
+        final @NotNull TestCaseDto written = createdTestCase(testSet, "Log in with a valid user", "m0001");
+        final @NotNull TestCaseDto empty = createdTestCase(testSet, "Log in with a wrong password", "m0002");
+        final @NotNull TestCaseDto missing = indexedTestCase(testSet, "Log in with a locked account", "m0003");
+        settled();
+        writtenByTheTester(writtenMethodOf(GENERATED_CLASS, written), "System.out.println(1);");
+        settled();
+        return List.of(written, empty, missing);
+    }
+
+    private void readAndAwait(final @NotNull List<TestCaseDto> testCases) {
+        state().read(getProject(), testCases, () -> {
+        });
+        Await.until("the automation state never arrived", () -> testCases.stream().noneMatch(tc -> state().of(tc.getId()) == Automated.UNKNOWN));
+    }
+
+    private static @NotNull JComponent automatedCount(final @NotNull StatusBar bar) {
+        return (JComponent) ((Container) bar.getComponent(2)).getComponent(3);
+    }
+
+    // Rule-EDITOR-PANEL-195
+    public void testATestCaseIsWrittenMissingOrNotAutomatedAndAnEmptyGeneratedMethodIsNotAutomation() {
+        final @NotNull List<TestCaseDto> testCases = threeStatesOfAutomation();
+        final @NotNull TestCaseDto nameless = indexedTestCase(testSet, "!!!", "m0004");
+
+        readAndAwait(List.of(testCases.get(0), testCases.get(1), testCases.get(2), nameless));
+
+        assertEquals("a method with something in it is not automation", Automated.WRITTEN, state().of(testCases.get(0).getId()));
+        assertEquals("a generated method nobody filled in counts as automation", Automated.NONE, state().of(testCases.get(1).getId()));
+        assertEquals("a test case naming a method it does not have is not reported missing", Automated.MISSING, state().of(testCases.get(2).getId()));
+        assertEquals("a test case that names no method is not reported not automated", Automated.NONE, state().of(nameless.getId()));
+    }
+
+    // Rule-EDITOR-PANEL-196
+    public void testTheStateIsReadAwayFromTheScreenAndNothingUnreadIsCalledNotAutomated() {
+        final @NotNull List<TestCaseDto> testCases = threeStatesOfAutomation();
+
+        state().read(getProject(), testCases, () -> {
+        });
+
+        for (final TestCaseDto tc : testCases) {
+            assertEquals("the state was read on the screen's thread, or reported before it was read", Automated.UNKNOWN, state().of(tc.getId()));
+        }
+        Await.until("the answers never arrived", () -> testCases.stream().noneMatch(tc -> state().of(tc.getId()) == Automated.UNKNOWN));
+    }
+
+    // Rule-EDITOR-PANEL-197
+    public void testNothingIsSavedAndAChangedMethodShowsTheNextTimeTheTesterLooks() {
+        final @NotNull List<TestCaseDto> testCases = threeStatesOfAutomation();
+        final @NotNull Map<String, String> before = FilesUnder.snapshot(root);
+
+        readAndAwait(testCases);
+        assertEquals(Automated.NONE, state().of(testCases.get(1).getId()));
+        assertEquals("reading the automation state wrote something", before, FilesUnder.snapshot(root));
+
+        writtenByTheTester(writtenMethodOf(GENERATED_CLASS, testCases.get(1)), "System.out.println(2);");
+        settled();
+        state().read(getProject(), testCases, () -> {
+        });
+
+        Await.until("a method written since the last look did not show", () -> state().of(testCases.get(1).getId()) == Automated.WRITTEN);
+    }
+
+    // Rule-EDITOR-PANEL-210
+    public void testTheStatusBarSaysHowManyHaveAGeneratedMethodBehindThem() {
+        threeStatesOfAutomation();
+        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        try {
+            final @NotNull String counted = Bundle.message("statusbar.automated.count", Automated.WRITTEN.getLabel(), "1", "3");
+            Await.until("the status bar never counted the automated test cases: " + Drawn.text(automatedCount(editor.getStatusBar())), () -> {
+                editor.refreshView();
+                return automatedCount(editor.getStatusBar()).isVisible() && Drawn.text(automatedCount(editor.getStatusBar())).equals(counted);
+            });
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+
+    // Rule-EDITOR-PANEL-211
+    public void testTheCountSaysNothingUntilAnAnswerIsInAndNothingWhereNoneCanBeRead() {
+        final @NotNull StatusBar bar = new StatusBar();
+        bar.showAutomated(0, 0);
+        assertFalse("nobody has looked yet, and the count says none are automated", automatedCount(bar).isVisible());
+        bar.showAutomated(0, 2);
+        assertTrue("an answer saying none are automated was not shown", automatedCount(bar).isVisible());
+        assertEquals("the count was not written from how many the answer covers", Bundle.message("statusbar.automated.count", Automated.WRITTEN.getLabel(), "0", "2"), Drawn.text(automatedCount(bar)));
+
+        threeStatesOfAutomation();
+        assertTrue(TestinYml.save(getProject(), TestinYml.lines("SOMETHING_ELSE")));
+        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), testSet, getTestRootDisposable());
+        try {
+            editor.refreshView();
+            PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+            editor.refreshView();
+            assertFalse("the count said something in an IDE that cannot read the code", automatedCount(editor.getStatusBar()).isVisible());
+        } finally {
+            Disposer.dispose(editor);
+        }
+    }
+}

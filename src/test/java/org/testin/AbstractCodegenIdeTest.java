@@ -19,6 +19,7 @@ package org.testin;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.psi.JavaPsiFacade;
@@ -154,6 +155,7 @@ public abstract class AbstractCodegenIdeTest extends AbstractTempRootIdeTest {
     }
 
     protected @NotNull Optional<PsiClass> generatedClass(final @NotNull String qualifiedName) {
+        Await.until("the IDE never finished indexing", () -> !DumbService.isDumb(getProject()));
         PsiDocumentManager.getInstance(getProject()).commitAllDocuments();
         return Optional.ofNullable(JavaPsiFacade.getInstance(getProject()).findClass(qualifiedName, GlobalSearchScope.projectScope(getProject())));
     }

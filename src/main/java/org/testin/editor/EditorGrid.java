@@ -22,6 +22,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.EscapeAction;
+import org.testin.actions.TestinData;
 import org.testin.editor.grid.GridEnterAction;
 import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.editor.grid.GridView;
@@ -73,7 +74,7 @@ final class EditorGrid<A extends Enum<A> & ToolBarAttribute> {
         view.ifPresentOrElse(this::refill, this::rebuild);
     }
 
-    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-017
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-017, Rule-EDITOR-PANEL-077
     void rebuild() {
         final boolean keepKeyboard = view.map(GridView::handOver).orElse(false);
 
@@ -95,7 +96,7 @@ final class EditorGrid<A extends Enum<A> & ToolBarAttribute> {
             new OpenContextMenuAction(table, editor.contextMenu);
 
             final @NotNull Optional<GridView> previous = view;
-            view = Optional.of(GridPanelBuilder.finishRebuild(table, editor.list, pageItems, fontSync, keepKeyboard));
+            view = Optional.of(GridPanelBuilder.finishRebuild(table, editor.list, pageItems, fontSync, keepKeyboard, sink -> TestinData.from(sink, editor, editor.getSelectedTestCases())));
 
             previous.ifPresent(old -> Disposer.dispose(old.fontSync()));
 

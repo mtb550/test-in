@@ -24,6 +24,7 @@ import com.intellij.ui.WindowResizeListener;
 import com.intellij.util.ui.Animator;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 import org.testin.ui.Motion;
 import org.testin.util.Bundle;
 
@@ -157,6 +158,11 @@ final class LightModeFrame {
                         - Toolkit.getDefaultToolkit().getScreenInsets(gc).top
                         - Toolkit.getDefaultToolkit().getScreenInsets(gc).bottom)
                 .orElseGet(() -> Toolkit.getDefaultToolkit().getScreenSize().height);
+    }
+
+    @TestOnly
+    @NotNull Optional<Animator> heightMotion() {
+        return heightMotion;
     }
 
     @NotNull TitleBarBtn pin() {

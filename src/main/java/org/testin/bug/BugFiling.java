@@ -16,10 +16,12 @@
 
 package org.testin.bug;
 
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.VisibleForTesting;
 import org.testin.config.BugRepository;
 import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
@@ -35,9 +37,13 @@ import org.testin.util.Bundle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BugFiling {
+    @VisibleForTesting
+    static @NotNull Function<ProgressIndicator, GitHubCli> ghOnThisMachine = GitHubCli::onPath;
+
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-073, Rule-VIEW-PANEL-077
     public static void send(final @NotNull Project p, final @NotNull RunItem item, final @NotNull BugRepository repository, final @NotNull Edits edits, final @NotNull List<byte[]> screenshots, final @NotNull Runnable redraw) {
         final @NotNull BugReports reports = Services.getInstance(p, BugReports.class);
@@ -46,7 +52,7 @@ public final class BugFiling {
         redraw.run();
 
         BackgroundWork.run(p, Bundle.message("bug.sending"), Bundle.message("bug.send.failed.title"), false,
-                indicator -> GitHubCli.onPath(indicator).create(repository, edits.title(), edits.body(), screenshots),
+                indicator -> ghOnThisMachine.apply(indicator).create(repository, edits.title(), edits.body(), screenshots),
                 answer -> record(p, item, answer),
                 () -> {
                     reports.end(item, Stage.SENDING);

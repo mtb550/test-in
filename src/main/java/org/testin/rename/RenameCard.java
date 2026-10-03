@@ -54,7 +54,7 @@ final class RenameCard implements DialogComponent {
 
     // Rule-INTERNAL-077, Rule-INTERNAL-095, Rule-INTERNAL-096
     private static @NotNull JBLabel renamed(final @NotNull DirectoryDto dir) {
-        final @NotNull JBLabel named = new JBLabel(dir.getName(), Icons.gray(dir.getType().getIcon()), SwingConstants.LEADING);
+        final @NotNull JBLabel named = new JBLabel(dir.getName(), Icons.gray(dir.iconShownInTree()), SwingConstants.LEADING);
         named.setFont(Fonts.value());
         named.setIconTextGap(JBUI.scale(ICON_GAP));
 

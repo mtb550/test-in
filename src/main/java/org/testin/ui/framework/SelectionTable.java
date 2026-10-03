@@ -28,6 +28,7 @@ import javax.swing.JMenuItem;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -51,7 +52,13 @@ public final class SelectionTable implements DialogComponent {
             }
         };
 
-        table = new JBTable(model);
+        table = new JBTable(model) {
+            // Rule-INTERNAL-102
+            @Override
+            public @NotNull Dimension getPreferredScrollableViewportSize() {
+                return new Dimension(super.getPreferredScrollableViewportSize().width, DialogSize.VISIBLE_ROWS * getRowHeight());
+            }
+        };
         // Rule-INTERNAL-095
         DialogStyle.asRow(table);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

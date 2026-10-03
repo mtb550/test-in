@@ -51,9 +51,10 @@ table.
 - **Rule-EDITOR-PANEL-206** — A value Testin cannot read is refused. What the
   test case already had stays, and the tester is told: once for a cell, and once
   with a count for a sheet or a bulk edit. A refused test case is not counted
-  among the ones the change touched. Blank is not unreadable — it clears a date
-  and the groups, and it leaves the priority and the status alone, because
-  those have no empty form.
+  among the ones the change touched. Blank is not unreadable, and is never
+  counted as unreadable — it clears a date and the groups, and it leaves the
+  status alone. A blank priority in a bulk edit sets the default priority,
+  P3 (Low); in a cell it leaves the priority alone.
 - **Rule-EDITOR-PANEL-248** — A button that turns gray while the pointer is on
   it loses its hover look at once, so a control that has stopped working never
   looks ready to press.

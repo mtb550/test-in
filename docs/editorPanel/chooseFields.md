@@ -129,8 +129,6 @@ The list opens under the button. It has no title.
 **If the tester tries to untick Order or Description** — the row is gray and
 does not answer. No message is shown.
 
-**If the tester tries to tick ID** — the same.
-
 **If a remembered choice cannot be read** — it is dropped, and only the log says
 so.
 

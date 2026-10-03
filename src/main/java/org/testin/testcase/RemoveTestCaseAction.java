@@ -47,7 +47,7 @@ public class RemoveTestCaseAction extends AbstractAnyProjectAction {
             return;
         }
 
-        GrayWithReason.unless(this, e, !TestinData.selectedTestCases(e).isEmpty(), Bundle.message("action.select.case.description"));
+        GrayWithReason.unlessTestCaseSelected(this, e);
     }
 
     @Override

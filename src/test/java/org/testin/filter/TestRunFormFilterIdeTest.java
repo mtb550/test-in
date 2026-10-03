@@ -1,0 +1,139 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.filter;
+
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.testFramework.TestActionEvent;
+import com.intellij.ui.CheckboxTree;
+import com.intellij.ui.CheckedTreeNode;
+import org.jetbrains.annotations.NotNull;
+import org.testin.AbstractTempRootIdeTest;
+import org.testin.NodesOnDisk;
+import org.testin.indexer.TestCases;
+import org.testin.model.Priority;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.services.Services;
+import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testrun.TestRunFormFilter;
+import org.testin.util.Bundle;
+import org.testin.view.Drawn;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+public class TestRunFormFilterIdeTest extends AbstractTempRootIdeTest {
+
+    private TestCaseDto urgent;
+    private TestCaseDto later;
+    private TestCaseDto paid;
+    private TestRunFormFilter filter;
+
+    @Override
+    protected void setUp() {
+        super.setUp();
+        final @NotNull NodesOnDisk made = new NodesOnDisk(getProject());
+        final @NotNull TestProjectDirectoryDto tp = made.testProject(root.resolve("NAFATH"));
+        final @NotNull TestSetDirectoryDto login = made.testSet(tp.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetDirectoryDto card = made.testSet(tp.getTestCasesDirectory(), "Card");
+        urgent = aTestCase(login, Priority.HIGH, "a");
+        later = aTestCase(login, Priority.LOW, "b");
+        paid = aTestCase(card, Priority.LOW, "c");
+
+        final @NotNull CheckedTreeNode top = new CheckedTreeNode(tp.getTestCasesDirectory());
+        top.add(holding(login, urgent, later));
+        top.add(holding(card, paid));
+        filter = new TestRunFormFilter(getProject(), tp.getTestCasesDirectory().getPath(), top);
+    }
+
+    private @NotNull TestCaseDto aTestCase(final @NotNull TestSetDirectoryDto testSet, final @NotNull Priority priority, final @NotNull String order) {
+        final @NotNull TestCaseDto tc = TestCaseDto.builder().id(UUID.randomUUID()).description("Pay with a " + priority + " card").order(order).priority(priority).build();
+        tc.setParent(testSet);
+        assertTrue(Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(testSet.getPath(), tc));
+        return tc;
+    }
+
+    private static @NotNull CheckedTreeNode holding(final @NotNull TestSetDirectoryDto testSet, final @NotNull TestCaseDto... testCases) {
+        final @NotNull CheckedTreeNode node = new CheckedTreeNode(testSet);
+        for (final TestCaseDto tc : testCases) node.add(new CheckedTreeNode(tc));
+        return node;
+    }
+
+    private @NotNull FilterPopupBtn button() {
+        return Drawn.first(filter.getSelection().getPanel(), FilterPopupBtn.class);
+    }
+
+    private @NotNull List<AnAction> menu() {
+        return Arrays.asList(button().menu().getChildren(TestActionEvent.createTestEvent()));
+    }
+
+    private static @NotNull String nameOf(final @NotNull AnAction entry) {
+        return Objects.requireNonNullElse(entry.getTemplatePresentation().getText(), "");
+    }
+
+    private @NotNull List<AnAction> entriesOf(final @NotNull String submenu) {
+        final @NotNull AnAction found = menu().stream().filter(entry -> nameOf(entry).equals(submenu)).findFirst()
+                .orElseThrow(() -> new AssertionError("the Filter menu has no " + submenu + ": " + menu().stream().map(TestRunFormFilterIdeTest::nameOf).toList()));
+        return Arrays.asList(((DefaultActionGroup) found).getChildren(ActionManager.getInstance()));
+    }
+
+    private @NotNull List<Object> shown() {
+        final @NotNull CheckboxTree tree = Drawn.first(filter.getSelection().getPanel(), CheckboxTree.class);
+        final @NotNull List<Object> leaves = new ArrayList<>();
+        for (final Object each : Collections.list(((CheckedTreeNode) tree.getModel().getRoot()).depthFirstEnumeration())) {
+            final @NotNull Object held = ((CheckedTreeNode) each).getUserObject();
+            if (held instanceof TestCaseDto) leaves.add(held);
+        }
+        return leaves;
+    }
+
+    // Rule-TREE-PANEL-129
+    public void testTheFilterMenuIsTheEditorsWithoutRunItemStatus() {
+        final @NotNull List<String> names = menu().stream().map(TestRunFormFilterIdeTest::nameOf).toList();
+
+        assertTrue("the Filter menu has no priority filter: " + names, names.contains(TestCaseEditorAttributes.PRIORITY.getName()));
+        assertTrue("the Filter menu has no group filter: " + names, names.contains(TestCaseEditorAttributes.GROUP.getName()));
+        assertTrue("the Filter menu has no module filter: " + names, names.contains(TestCaseEditorAttributes.MODULE.getName()));
+        assertTrue("the Filter menu has no automation filter: " + names, names.contains(Bundle.message("filter.automation")));
+        assertTrue("the Filter menu has no status filter: " + names, names.contains(Bundle.message("filter.test.case.status")));
+        assertFalse("the Filter menu offers Run Item Status for test cases that are all Pending: " + names, names.contains(Bundle.message("filter.run.item.status")));
+        assertEquals("Test Set does not offer the test sets the tree holds", List.of("Login", "Card"), entriesOf(Bundle.message("filter.test.set")).stream().map(TestRunFormFilterIdeTest::nameOf).toList());
+    }
+
+    // Rule-TREE-PANEL-129
+    public void testAPriorityFilterPicksTheSameTestCasesAsInAnEditor() {
+        final @NotNull ToggleAction high = entriesOf(TestCaseEditorAttributes.PRIORITY.getName()).stream()
+                .filter(entry -> nameOf(entry).equals(Priority.HIGH.getLabel()))
+                .map(ToggleAction.class::cast)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("the priority filter does not offer " + Priority.HIGH.getLabel()));
+        assertEquals(List.of(urgent, later, paid).size(), shown().size());
+
+        high.setSelected(TestActionEvent.createTestEvent(high), true);
+
+        assertEquals("the priority filter did not pick the test cases an editor's would", TestCaseFilter.filter(List.of(urgent, later, paid), FilterSelection.of(button(), "")), shown());
+        assertEquals(List.of(urgent), shown());
+    }
+}

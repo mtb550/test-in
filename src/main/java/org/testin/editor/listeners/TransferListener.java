@@ -180,12 +180,17 @@ public class TransferListener extends TransferHandler {
         editor.refreshView();
     }
 
+    // UC-EDITOR-PANEL-010, Rule-EDITOR-PANEL-059
+    int dropIndex(final @NotNull TransferSupport support) {
+        return ((JBList.DropLocation) support.getDropLocation()).getIndex();
+    }
+
     private @NotNull Optional<TestCaseDto> anchorBelowDrop(final @NotNull TransferSupport support, final @NotNull Set<UUID> movedIds) {
         if (!(support.getComponent() instanceof JBList<?> target)) return Optional.empty();
 
         final @NotNull ListModel<?> rows = target.getModel();
 
-        for (int row = Math.max(0, ((JBList.DropLocation) support.getDropLocation()).getIndex()); row < rows.getSize(); row++) {
+        for (int row = Math.max(0, dropIndex(support)); row < rows.getSize(); row++) {
             if (rows.getElementAt(row) instanceof TestCaseDto tc && !movedIds.contains(tc.getId()))
                 return Optional.of(tc);
         }
@@ -198,7 +203,7 @@ public class TransferListener extends TransferHandler {
         if (!(support.getComponent() instanceof JBList<?> target)) return Optional.empty();
 
         final @NotNull ListModel<?> rows = target.getModel();
-        final int drop = Math.min(((JBList.DropLocation) support.getDropLocation()).getIndex(), rows.getSize());
+        final int drop = Math.min(dropIndex(support), rows.getSize());
 
         for (int row = drop - 1; row >= 0; row--) {
             if (rows.getElementAt(row) instanceof TestCaseDto tc && !movedIds.contains(tc.getId()))

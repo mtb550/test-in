@@ -18,7 +18,6 @@ package org.testin.testproject;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import git4idea.commands.Git;
@@ -33,6 +32,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
+import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.util.Bundle;
@@ -113,7 +113,7 @@ public final class CloneTestProject {
             return;
         }
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, Bundle.message("clone.task"), false) {
+        BackgroundWork.start(new Task.Backgroundable(p, Bundle.message("clone.task"), false) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);

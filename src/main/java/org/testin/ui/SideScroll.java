@@ -30,6 +30,8 @@ import javax.swing.Scrollable;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseWheelEvent;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SideScroll {
@@ -37,12 +39,24 @@ public final class SideScroll {
 
     // Rule-EDITOR-PANEL-257
     public static @NotNull JComponent of(final @NotNull JComponent bar) {
-        final @NotNull JBScrollPane scroll = new JBScrollPane(new Stretched(bar), ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        final @NotNull JBScrollPane scroll = new Sideways(new Stretched(bar));
         scroll.setOverlappingScrollBar(true);
         scroll.getHorizontalScrollBar().setPreferredSize(JBUI.emptySize());
         scroll.setBorder(JBUI.Borders.empty());
         scroll.getViewport().setBackground(bar.getBackground());
         return scroll;
+    }
+
+    private static final class Sideways extends JBScrollPane {
+        Sideways(final @NotNull JComponent view) {
+            super(view, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        }
+
+        // Rule-EDITOR-PANEL-257
+        @Override
+        protected void processMouseWheelEvent(final @NotNull MouseWheelEvent e) {
+            super.processMouseWheelEvent(new MouseWheelEvent(e.getComponent(), e.getID(), e.getWhen(), e.getModifiersEx() | InputEvent.SHIFT_DOWN_MASK, e.getX(), e.getY(), e.getXOnScreen(), e.getYOnScreen(), e.getClickCount(), e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(), e.getWheelRotation(), e.getPreciseWheelRotation()));
+        }
     }
 
     private static final class Stretched extends JBPanel<Stretched> implements Scrollable {

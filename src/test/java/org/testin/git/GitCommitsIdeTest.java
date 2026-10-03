@@ -56,17 +56,17 @@ public class GitCommitsIdeTest extends AbstractGitRemoteIdeTest {
         }
     }
 
-    private void bothChange(final @NotNull String relativePath, final @NotNull String base, final @NotNull String mine, final @NotNull String theirs) {
-        write(work, relativePath, base);
+    private void bothChangeTheNotes() {
+        write(work, "notes.txt", "base\n");
         commitAll(work, "the common ancestor");
         mustGit(work, "push", "origin", MAIN);
 
         final @NotNull Path colleague = colleague();
-        write(colleague, relativePath, theirs);
+        write(colleague, "notes.txt", "theirs\n");
         commitAll(colleague, "their change");
         mustGit(colleague, "push", "origin", MAIN);
 
-        write(work, relativePath, mine);
+        write(work, "notes.txt", "mine\n");
         commitAll(work, "my change");
     }
 
@@ -177,7 +177,7 @@ public class GitCommitsIdeTest extends AbstractGitRemoteIdeTest {
 
     // UC-SHARE-017, Rule-SHARE-077
     public void testRollingBackKeepsEverythingThatWasHereBeforeThePull() {
-        bothChange("notes.txt", "base\n", "mine\n", "theirs\n");
+        bothChangeTheNotes();
         write(work, "first.tc", "{\"typed\":\"not committed yet\"}");
         final @NotNull String before = head(work, "HEAD");
 
@@ -192,7 +192,7 @@ public class GitCommitsIdeTest extends AbstractGitRemoteIdeTest {
 
     // UC-SHARE-012, Rule-SHARE-056
     public void testARebaseGoesOnWithoutOpeningAnEditor() {
-        bothChange("notes.txt", "base\n", "mine\n", "theirs\n");
+        bothChangeTheNotes();
         pullStopsOnAConflict();
 
         write(work, "notes.txt", "mine and theirs\n");
@@ -206,7 +206,7 @@ public class GitCommitsIdeTest extends AbstractGitRemoteIdeTest {
 
     // UC-SHARE-017, Rule-SHARE-079
     public void testAFileTestinCannotMergeIsNamedBackAsStillInTheWay() {
-        bothChange("notes.txt", "base\n", "mine\n", "theirs\n");
+        bothChangeTheNotes();
         pullStopsOnAConflict();
 
         final @NotNull AtomicReference<List<String>> leftOver = new AtomicReference<>(List.of());

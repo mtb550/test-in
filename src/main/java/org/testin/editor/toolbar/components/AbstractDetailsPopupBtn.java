@@ -58,6 +58,17 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
 
     // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-024
     private void showDetailsPopup(final @NotNull Runnable onToolBarDetailsSelectedChanged) {
+        final @NotNull CheckBoxList<E> detailsList = fieldList(onToolBarDetailsSelectedChanged);
+
+        JBPopupFactory.getInstance()
+                .createComponentPopupBuilder(detailsList, detailsList)
+                .setRequestFocus(true)
+                .createPopup()
+                .showUnderneathOf(this);
+    }
+
+    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-024
+    @NotNull CheckBoxList<E> fieldList(final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         final @NotNull CheckBoxList<E> detailsList = new CheckBoxList<>() {
             // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-023
             @Override
@@ -87,10 +98,6 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
             }
         });
 
-        JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(detailsList, detailsList)
-                .setRequestFocus(true)
-                .createPopup()
-                .showUnderneathOf(this);
+        return detailsList;
     }
 }

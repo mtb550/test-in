@@ -102,7 +102,7 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
     }
 
     // UC-SHARE-005, UC-SHARE-006
-    private void importInBackground(final @NotNull DirectoryDto selectedDirDto, final @NotNull Map<String, List<TestCaseDto>> selectedTestCasesBySheet, final boolean generateCode, final int total, final @NotNull ProgressIndicator indicator) {
+    void importInBackground(final @NotNull DirectoryDto selectedDirDto, final @NotNull Map<String, List<TestCaseDto>> selectedTestCasesBySheet, final boolean generateCode, final int total, final @NotNull ProgressIndicator indicator) {
         final @NotNull Path targetPath = selectedDirDto.getPath();
 
         indicator.setIndeterminate(false);
@@ -193,7 +193,7 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
 
         final @NotNull Map<TestSetDirectoryDto, List<TestCaseDto>> sets = new LinkedHashMap<>();
         testCasesBySheet.forEach((sheetName, testCases) -> {
-            final @NotNull String name = NameSanitizer.removeSpecialChars(sheetName);
+            final @NotNull String name = testSetNameOf(sheetName);
             final @NotNull Path path = targetPath.resolve(name);
 
             sets.put(onEdtCompute(() -> {
@@ -214,7 +214,13 @@ record ImportWork(@NotNull Project p, @NotNull Notifier notifier, @NotNull Testi
         return sets;
     }
 
-    private void generateTestMethods(final @NotNull List<TestCaseDto> testCases, final @NotNull String targetName, final @NotNull ProgressIndicator indicator) {
+    // UC-SHARE-006, Rule-SHARE-031, Rule-SHARE-128
+    private static @NotNull String testSetNameOf(final @NotNull String sheetName) {
+        final @NotNull String name = NameSanitizer.removeSpecialChars(sheetName).trim();
+        return name.isEmpty() ? Bundle.message("import.sheet.no.name") : name;
+    }
+
+    void generateTestMethods(final @NotNull List<TestCaseDto> testCases, final @NotNull String targetName, final @NotNull ProgressIndicator indicator) {
         Logger.info("Import: generating test methods for '" + targetName + "' with " + testCases.size() + " cases");
         final long startedAt = System.currentTimeMillis();
         // Rule-CODEGEN-018

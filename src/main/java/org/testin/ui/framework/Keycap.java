@@ -32,7 +32,7 @@ public final class Keycap {
 
         if (text.isBlank()) return label;
 
-        label.setBorder(JBUI.Borders.empty(0, 5));
+        label.setBorder(JBUI.Borders.empty(0, Spacing.XS));
 
         return label;
     }

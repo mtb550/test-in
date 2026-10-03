@@ -19,6 +19,7 @@ package org.testin.lightmode;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -58,6 +59,11 @@ final class SlidingPanel extends JBPanel<SlidingPanel> {
         if (fraction >= 1.0) leaving = Optional.empty();
 
         repaint();
+    }
+
+    @TestOnly
+    boolean isSliding() {
+        return leaving.isPresent() && travelled < 1.0;
     }
 
     boolean hasSomethingToSlide() {

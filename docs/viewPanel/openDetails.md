@@ -96,7 +96,7 @@ The panel opens on the right of the IDE, beside the editor.
 2. The tester presses `Enter`, or chooses **View Details** from the menu.
 3. The view panel opens on the right, if it was closed.
 4. The **Details** tab comes to the front.
-5. The panel draws the first test case, with the fields **Fields** shows.
+5. The panel draws the first test case, showing the fields ticked in **Fields**.
 6. The keyboard moves into the panel, so `F2` works straight away.
 
 ## What Testin refuses

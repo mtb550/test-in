@@ -61,13 +61,11 @@ public class NavigateToTestCaseAction extends AbstractAnyProjectAction {
         TestinData.selectedTestCases(e).stream().findFirst().ifPresent(tc -> execute(p, tc));
     }
 
-    // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-236
+    // UC-EDITOR-PANEL-048, Rule-EDITOR-PANEL-236, Rule-EDITOR-PANEL-230
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        final @NotNull Optional<TestCaseDto> first = TestinData.selectedTestCases(e).stream().findFirst();
-        final @NotNull Optional<String> whyNot = first.flatMap(NavigateToTestCaseAction::whyNot);
-
-        GrayWithReason.unless(this, e, first.isPresent() && whyNot.isEmpty(), whyNot.orElse(""));
+        TestinData.selectedTestCases(e).stream().findFirst().flatMap(NavigateToTestCaseAction::whyNot)
+                .ifPresentOrElse(why -> GrayWithReason.unless(this, e, false, why), () -> GrayWithReason.unlessTestCaseSelected(this, e));
     }
 
     @Override

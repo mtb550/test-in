@@ -20,6 +20,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
+import org.testin.util.Fonts;
 import org.testin.util.Html;
 
 import javax.swing.BoxLayout;
@@ -32,13 +33,14 @@ import java.util.List;
 public final class ConfirmCard implements DialogComponent {
     private final @NotNull JBPanel<?> panel;
 
-    // UC-INTERNAL-007, Rule-INTERNAL-099, Rule-INTERNAL-108
+    // UC-INTERNAL-007, Rule-INTERNAL-095, Rule-INTERNAL-099, Rule-INTERNAL-108
     ConfirmCard(final @NotNull String text, final @NotNull List<String> from, final @NotNull List<String> to) {
         final @NotNull JBPanel<?> content = new JBPanel<>();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setOpaque(false);
 
         final @NotNull JBLabel message = new JBLabel("<html>" + Html.ofText(text) + "</html>");
+        message.setFont(Fonts.value());
         message.setAlignmentX(Component.LEFT_ALIGNMENT);
         content.add(message);
 

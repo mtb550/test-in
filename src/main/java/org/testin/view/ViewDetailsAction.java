@@ -21,6 +21,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
+import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.model.dto.TestCaseDto;
 
@@ -38,10 +39,10 @@ public class ViewDetailsAction extends AbstractAnyProjectAction {
                 ViewToolWindowFactory.showPanel(p, selected, editor.getParent().getPath2(), ViewPanel::focusDetailsTab));
     }
 
-    // UC-VIEW-PANEL-001
+    // UC-VIEW-PANEL-001, Rule-EDITOR-PANEL-230
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        e.getPresentation().setEnabled(!TestinData.selectedTestCases(e).isEmpty());
+        GrayWithReason.unlessTestCaseSelected(this, e);
     }
 
     @Override

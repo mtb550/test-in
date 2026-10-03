@@ -159,7 +159,7 @@ Runs**, and it is on [UC-TREE-PANEL-010](createTestRunPackage.md).
    that holds only empty test sets. While a filter is on, ticking a row ticks
    only the test cases it shows. (Rule-TREE-PANEL-131)
 5. **Create** — enabled only while at least one test case is ticked and every row
-   on the form is answered. While it is disabled, the line to its left says what is
+   on the form is answered. While it is disabled, hovering over it says what is
    missing: *Check at least one test case*, or *Pick a Platform*, naming the first
    row with no answer. `Enter` does nothing here. The button is the only way to
    confirm. A click outside the dialog does not close it either. Only `Escape`
@@ -202,11 +202,11 @@ with the test run's own name, test cases and settings.
 
 ## What Testin refuses
 
-**If no test case is ticked** — the **Create** button is disabled, and reads
-*Check at least one test case* beside it.
+**If no test case is ticked** — the **Create** button is disabled, and hovering
+over it reads *Check at least one test case*.
 
 **If a row on the form has no answer** — the **Create** button is disabled, and
-*Pick a \<field\>* beside it names the first row that has none. (Rule-TREE-PANEL-121)
+hovering over it reads *Pick a \<field\>*, naming the first row that has none. (Rule-TREE-PANEL-121)
 
 **If the name has been emptied** — the dialog stays open, and *A test run needs
 a name* is shown in red.

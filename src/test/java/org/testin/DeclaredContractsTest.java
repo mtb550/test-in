@@ -54,7 +54,11 @@ public class DeclaredContractsTest {
             entry("TreeTransferHandler.createTransferable", "TransferHandler's contract: null is nothing to drag"),
             entry("TreeDropHandler.handleDrop", "FileDropHandler is a Kotlin suspend function, whose Java face answers an Object that may be null"),
             entry("TreePanelStructure.getParentElement", "AbstractTreeStructure's contract: null is the root"),
-            entry("TestinFileWatcher.prepareChange", "AsyncFileListener's contract: null is nothing to apply")
+            entry("TestinFileWatcher.prepareChange", "AsyncFileListener's contract: null is nothing to apply"),
+            entry("ViewOnScreen.getActiveToolWindowId", "test fixture: ToolWindowManager's contract, null is no tool window active"),
+            entry("ViewOnScreen.getLastActiveToolWindowId", "test fixture: ToolWindowManager's contract, null is that none has been active"),
+            entry("ViewOnScreen.getToolWindow", "test fixture: ToolWindowManager's contract, null is no such tool window"),
+            entry("ViewOnScreen.getToolWindowBalloon", "test fixture: ToolWindowManager's contract, null is no balloon shown")
     );
 
     private static @NotNull Set<String> declared(final @NotNull Pattern declaration) {

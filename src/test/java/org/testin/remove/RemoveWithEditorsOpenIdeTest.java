@@ -1,0 +1,151 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.remove;
+
+import com.intellij.testFramework.PlatformTestUtil;
+import org.jetbrains.annotations.NotNull;
+import org.testin.AbstractOpenEditorsIdeTest;
+import org.testin.Await;
+import org.testin.Balloons;
+import org.testin.NodesOnDisk;
+import org.testin.TempTree;
+import org.testin.TreeGesture;
+import org.testin.indexer.Nodes;
+import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.services.BackgroundWork;
+import org.testin.services.Services;
+import org.testin.ui.framework.ConfirmDialog;
+import org.testin.ui.framework.OnScreenDialog;
+import org.testin.undo.UndoHistories;
+import org.testin.undo.UndoScope;
+import org.testin.util.Bundle;
+import org.testin.util.Shortcuts;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class RemoveWithEditorsOpenIdeTest extends AbstractOpenEditorsIdeTest {
+
+    private TestProjectDirectoryDto tp;
+
+    private final @NotNull Map<String, Boolean> cancelableByTitle = new ConcurrentHashMap<>();
+
+    private @NotNull String cancelTheOneTitled = "";
+
+    @Override
+    public void setUp() {
+        super.setUp();
+        tp = new NodesOnDisk(getProject()).testProject(root.resolve("NAFATH"));
+        undoHistories().forget(UndoScope.TREE);
+        BackgroundWork.watch(getTestRootDisposable(), task -> {
+            cancelableByTitle.put(task.getTitle(), task.isCancellable());
+            return task.getTitle().equals(cancelTheOneTitled);
+        });
+    }
+
+    @Override
+    public void tearDown() {
+        OnScreenDialog.closed(getProject(), ConfirmDialog.class);
+        undoHistories().forget(UndoScope.TREE);
+        super.tearDown();
+    }
+
+    private @NotNull Nodes nodes() {
+        return Services.getInstance(getProject(), Nodes.class);
+    }
+
+    private @NotNull UndoHistories undoHistories() {
+        return Services.getInstance(getProject(), UndoHistories.class);
+    }
+
+    private @NotNull TestSetDirectoryDto aTestSet(final @NotNull DirectoryDto parent, final @NotNull String name) {
+        return new NodesOnDisk(getProject()).testSet(parent, name);
+    }
+
+    private void removedAndConfirmed(final @NotNull DirectoryDto node) {
+        TreeGesture.pressed(getProject(), new RemoveAction(), List.of(node));
+        OnScreenDialog.pressed(getProject(), ConfirmDialog.class, Shortcuts.Enter);
+    }
+
+    // Rule-TREE-PANEL-116
+    public void testARemovalClosesEveryEditorOnTheNodeAndUnderIt() {
+        final @NotNull TestSetPackageDirectoryDto payments = new NodesOnDisk(getProject()).testSetPackage(tp.getTestCasesDirectory(), "Payments");
+        final @NotNull TestSetDirectoryDto card = aTestSet(payments, "Card");
+        final @NotNull TestSetDirectoryDto login = aTestSet(tp.getTestCasesDirectory(), "Login");
+        opened(card);
+        opened(login);
+
+        removedAndConfirmed(payments);
+
+        Await.until("the package was not removed", () -> !nodes().nodeExists(payments.getPath()));
+        assertTrue("an editor on a test set under the removed package is still open", openOn(card).isEmpty());
+        assertEquals("an editor on a node that was not removed was closed", 1, openOn(login).size());
+    }
+
+    // Rule-TREE-PANEL-102
+    public void testCancelingTheCopyRemovesNothingAndClosesNoEditor() {
+        final @NotNull TestSetDirectoryDto login = aTestSet(tp.getTestCasesDirectory(), "Login");
+        opened(login);
+        cancelTheOneTitled = Bundle.message("remove.progress");
+
+        removedAndConfirmed(login);
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+
+        assertTrue("the copy for undo did not run behind a progress bar", cancelableByTitle.containsKey(Bundle.message("remove.progress")));
+        assertTrue("a canceled removal removed the test set", nodes().nodeExists(login.getPath()));
+        assertEquals("a canceled removal closed the editor", 1, openOn(login).size());
+        assertFalse("a canceled removal went onto the tree's history", undoHistories().canUndo(UndoScope.TREE));
+    }
+
+    // Rule-TREE-PANEL-102
+    public void testKeepingTheCopyCanBeCanceledAndPuttingItBackCannot() {
+        final @NotNull TestSetDirectoryDto login = aTestSet(tp.getTestCasesDirectory(), "Login");
+
+        removedAndConfirmed(login);
+        Await.until("the test set was not removed", () -> undoHistories().canUndo(UndoScope.TREE));
+        undoHistories().undo(UndoScope.TREE);
+        Await.until("the test set was not put back", () -> nodes().nodeExists(login.getPath()));
+
+        assertEquals("keeping the copy aside is not behind a progress bar the tester can cancel", Boolean.TRUE, cancelableByTitle.get(Bundle.message("remove.progress")));
+        assertEquals("putting the copy back is not behind a progress bar, or it can be canceled", Boolean.FALSE, cancelableByTitle.get(Bundle.message("remove.undo.progress")));
+    }
+
+    // Rule-TREE-PANEL-041
+    public void testANodeThatCouldNotBeKeptIsRemovedAndSaysItCannotBeUndone() {
+        final @NotNull TestSetDirectoryDto login = aTestSet(tp.getTestCasesDirectory(), "Login");
+        final @NotNull TestSetDirectoryDto checkout = aTestSet(tp.getTestCasesDirectory(), "Checkout");
+        removedAndConfirmed(login);
+        Await.until("the first test set was not removed", () -> !nodes().nodeExists(login.getPath()) && undoHistories().canUndo(UndoScope.TREE));
+        TempTree.delete(checkout.getPath());
+
+        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+        removedAndConfirmed(checkout);
+
+        Await.until("a node whose copy could not be kept was not removed", () -> !nodes().nodeExists(checkout.getPath()));
+        final @NotNull List<String> said = balloons.shown();
+        assertTrue("removing a node that cannot be put back did not say so: " + said, said.stream().anyMatch(one -> one.contains(Bundle.message("remove.not.undoable.title"))));
+
+        undoHistories().undo(UndoScope.TREE);
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+
+        assertFalse("Ctrl+Z took back the removal before the one that cannot be undone", nodes().nodeExists(login.getPath()));
+    }
+}

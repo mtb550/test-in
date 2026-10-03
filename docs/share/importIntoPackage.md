@@ -32,6 +32,8 @@ There is no key for this. The same **Import** entry, on a package.
   because making one generates a Java class.
 - **Rule-SHARE-033** — No editor is opened afterward, because a package has no
   editor of its own.
+- **Rule-SHARE-128** — A sheet whose name is nothing but special characters
+  becomes a test set named Imported sheet, never one with an empty name.
 
 ## The screen
 

@@ -42,22 +42,26 @@ public final class TestCaseExecutionTracker {
                 TestCaseExecutionListener.broadcast(p, test.getPresentableName().toLowerCase(Locale.ROOT), ExecutionStatus.RUNNING, Duration.ZERO, Failure.NONE);
             }
 
-            // UC-CODEGEN-008, Rule-CODEGEN-075
             @Override
             public void onTestFinished(final @NotNull SMTestProxy test) {
-                final @NotNull String testName = test.getPresentableName().toLowerCase(Locale.ROOT);
-
-                if (test.isPassed()) {
-                    TestCaseExecutionListener.broadcast(p, testName, ExecutionStatus.PASSED, durationOf(test), Failure.NONE);
-
-                } else if (test.isDefect() && !test.isIgnored() && !test.wasTerminated()) {
-                    TestCaseExecutionListener.broadcast(p, testName, ExecutionStatus.FAILED, durationOf(test), failureOf(test, ""));
-
-                } else {
-                    TestCaseExecutionListener.broadcast(p, testName, ExecutionStatus.FAILED, durationOf(test), failureOf(test, Bundle.message("runner.skipped")));
-                }
+                finished(p, test);
             }
         });
+    }
+
+    // UC-CODEGEN-008, Rule-CODEGEN-075
+    static void finished(final @NotNull Project p, final @NotNull SMTestProxy test) {
+        final @NotNull String testName = test.getPresentableName().toLowerCase(Locale.ROOT);
+
+        if (test.isPassed()) {
+            TestCaseExecutionListener.broadcast(p, testName, ExecutionStatus.PASSED, durationOf(test), Failure.NONE);
+
+        } else if (test.isDefect() && !test.isIgnored() && !test.wasTerminated()) {
+            TestCaseExecutionListener.broadcast(p, testName, ExecutionStatus.FAILED, durationOf(test), failureOf(test, ""));
+
+        } else {
+            TestCaseExecutionListener.broadcast(p, testName, ExecutionStatus.FAILED, durationOf(test), failureOf(test, Bundle.message("runner.skipped")));
+        }
     }
 
     private static @NotNull Duration durationOf(final @NotNull SMTestProxy test) {

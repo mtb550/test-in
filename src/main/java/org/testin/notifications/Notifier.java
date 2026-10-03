@@ -20,12 +20,14 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
@@ -33,17 +35,29 @@ import com.intellij.ui.awt.RelativePoint;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 import org.testin.logger.Logger;
 import org.testin.util.Html;
 
 import java.awt.Point;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class Notifier {
     private static final @NotNull String GROUP_ID = "testin.notifications";
     private static final @NotNull String NO_TITLE = "";
+
+    private final @NotNull List<Consumer<String>> balloonWatchers = new CopyOnWriteArrayList<>();
+
+    @TestOnly
+    public void watchBalloons(final @NotNull Disposable owner, final @NotNull Consumer<String> watcher) {
+        balloonWatchers.add(watcher);
+        Disposer.register(owner, () -> balloonWatchers.remove(watcher));
+    }
 
     public void softShow(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
         showBalloon(p, String.format("<html><b>%s</b><br>%s</html>", Html.ofText(title), Html.ofText(message)), MessageType.INFO);
@@ -82,6 +96,8 @@ public final class Notifier {
     }
 
     private void showBalloon(final @NotNull Project p, final @NotNull String htmlContent, final @NotNull MessageType type) {
+        balloonWatchers.forEach(watcher -> watcher.accept(htmlContent));
+
         ApplicationManager.getApplication().invokeLater(() -> Optional.ofNullable(WindowManager.getInstance().getIdeFrame(p))
                 .map(IdeFrame::getStatusBar)
                 .map(StatusBar::getComponent)

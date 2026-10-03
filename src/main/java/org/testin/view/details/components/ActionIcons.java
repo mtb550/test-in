@@ -40,7 +40,7 @@ import java.util.List;
 public final class ActionIcons {
     private static final int STRUT_WIDTH = 8;
 
-    // UC-VIEW-PANEL-009, UC-VIEW-PANEL-012, UC-VIEW-PANEL-014, Rule-VIEW-PANEL-050, Rule-VIEW-PANEL-056, Rule-VIEW-PANEL-057, Rule-VIEW-PANEL-063
+    // UC-VIEW-PANEL-009, UC-VIEW-PANEL-012, UC-VIEW-PANEL-014, Rule-VIEW-PANEL-050, Rule-VIEW-PANEL-056, Rule-VIEW-PANEL-057, Rule-VIEW-PANEL-063, Rule-EDITOR-PANEL-237
     public static @NotNull JComponent of(final @NotNull Project p, final @NotNull TestCaseDto dto) {
         final @NotNull Offered navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD.offer(p, dto);
         final @NotNull Offered testRun = CardHoverAction.RUN_TEST_METHOD.offer(p, dto);
@@ -53,7 +53,7 @@ public final class ActionIcons {
 
         final @NotNull Automated state = automation.of(dto.getId());
 
-        actionsPanel.add(HoverButton.of(p, navigate, state.getIcon(), state.getLabel(), () -> navigate.action().execute(p, dto)));
+        actionsPanel.add(HoverButton.of(p, navigate, state.getIcon(), navigate.action().getTooltip(), () -> navigate.action().execute(p, dto)));
         actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(STRUT_WIDTH)));
         actionsPanel.add(HoverButton.of(p, testRun, testRun.action().getIcon(), testRun.action().getTooltip(), () -> testRun.action().execute(p, dto)));
         actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(STRUT_WIDTH)));

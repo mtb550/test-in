@@ -37,20 +37,8 @@ public class PackagesWithoutTestsTest {
     private static final @NotNull Path TEST = Path.of("src", "test", "java", "org", "testin");
 
     private static final @NotNull Map<String, String> WITHOUT_TESTS = Map.of(
-            "creator",
-            "NodeCreators is checked by NodeKindTablesTest; what is left is four dialogs and the actions that open them - ideTest",
-
-            "remove",
-            "Removals is checked by NodeKindTablesTest; RemoveAction is a confirmation and a VFS delete - ideTest",
-
             "notifications",
-            "Done and Refused are resolved by BundleKeysTest.theNotificationVocabularyResolves; Notifier only hands them to the platform",
-
-            "open",
-            "two actions that open the node the tester selected, through the editors and the tool window - ideTest",
-
-            "order",
-            "an action and a dialog: the number a tester types goes to the marker through the indexer - ideTest");
+            "Done and Refused are resolved by BundleKeysTest.theNotificationVocabularyResolves; Notifier only hands them to the platform");
 
     private static @NotNull Set<String> topLevel(final @NotNull Path root) {
         try (Stream<Path> paths = Files.walk(root)) {

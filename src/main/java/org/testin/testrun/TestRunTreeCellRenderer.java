@@ -36,7 +36,7 @@ public final class TestRunTreeCellRenderer {
             public void customizeRenderer(final @NotNull JTree tree, final @NotNull Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
                 if (value instanceof CheckedTreeNode node) {
                     if (node.getUserObject() instanceof DirectoryDto dir) {
-                        getTextRenderer().setIcon(dir.getType().getIcon());
+                        getTextRenderer().setIcon(dir.iconShownInTree());
                         getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
                     } else if (node.getUserObject() instanceof TestCaseDto tc) {
                         getTextRenderer().setIcon(Icons.TEST_CASE_LETTER);

@@ -18,6 +18,7 @@ package org.testin.editor.grid;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.UiDataProvider;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBList;
@@ -240,12 +241,13 @@ public class GridPanelBuilder {
         table.scrollRectToVisible(table.getCellRect(selectedRow, column, true));
     }
 
-    public static @NotNull GridView finishRebuild(final @NotNull JBTable table, final @NotNull JBList<TestCaseDto> list, final @NotNull List<TestCaseDto> pageItems, final @NotNull Disposable fontSync, final boolean keepKeyboard) {
+    // UC-EDITOR-PANEL-015, Rule-EDITOR-PANEL-077
+    public static @NotNull GridView finishRebuild(final @NotNull JBTable table, final @NotNull JBList<TestCaseDto> list, final @NotNull List<TestCaseDto> pageItems, final @NotNull Disposable fontSync, final boolean keepKeyboard, final @NotNull UiDataProvider data) {
         restoreSelection(table, list, pageItems, 0);
 
         if (keepKeyboard) ApplicationManager.getApplication().invokeLater(table::requestFocusInWindow);
 
-        return new GridView(table, new JBScrollPane(table), fontSync);
+        return new GridView(table, UiDataProvider.wrapComponent(new JBScrollPane(table), data), fontSync);
     }
 
     // UC-EDITOR-PANEL-004, Rule-EDITOR-PANEL-027

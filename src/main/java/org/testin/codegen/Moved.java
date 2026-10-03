@@ -30,7 +30,17 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-public record Moved(@NotNull DirectoryDto dir, @NotNull Path newParent) {
+public record Moved(@NotNull DirectoryDto dir, @NotNull List<String> from, @NotNull Path newParent) {
+    public Moved(final @NotNull DirectoryDto dir, final @NotNull Path newParent) {
+        this(dir, dir.getPath2(), newParent);
+    }
+
+    // UC-TREE-PANEL-016, Rule-TREE-PANEL-098
+    public @NotNull Optional<Moved> back(final @NotNull Project p) {
+        return Optional.ofNullable(dir.getPath().getParent()).flatMap(oldParent -> Services.getInstance(p, Nodes.class).find(newParent)
+                .map(target -> new Moved(dir, DirectoryDto.pathOf(target.getPath2(), dir.getName()), oldParent)));
+    }
+
     // UC-CODEGEN-016, Rule-CODEGEN-055
     @FromContentModule
     public @NotNull Optional<List<String>> destinationPackage(final @NotNull Project p) {

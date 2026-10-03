@@ -94,7 +94,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog {
                 StatusBarShortcut.hint(Bundle.message("gesture.right.click"), Bundle.message("dialog.pending.hint.revert")),
                 StatusBarShortcut.cancel(this::closeCancel));
 
-        size = DialogSize.SHORT;
+        size = DialogSize.HALF;
 
         fillRows(differences);
         changes.selectAll();

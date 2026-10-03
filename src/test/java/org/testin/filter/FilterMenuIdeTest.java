@@ -1,0 +1,265 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.filter;
+
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.AnActionHolder;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.ListPopup;
+import com.intellij.openapi.util.Disposer;
+import com.intellij.testFramework.PlatformTestUtil;
+import com.intellij.testFramework.TestActionEvent;
+import org.jetbrains.annotations.NotNull;
+import org.testin.AbstractTempRootIdeTest;
+import org.testin.Await;
+import org.testin.Balloons;
+import org.testin.editor.AbstractTestinEditor;
+import org.testin.editor.EditorFixtures;
+import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.editor.testrun.TestRunEditor;
+import org.testin.indexer.TestCases;
+import org.testin.model.Automated;
+import org.testin.model.Groups;
+import org.testin.model.Priority;
+import org.testin.model.RunItemStatus;
+import org.testin.model.TestCaseStatus;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.notifications.Refused;
+import org.testin.services.Services;
+import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.util.Bundle;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+
+public class FilterMenuIdeTest extends AbstractTempRootIdeTest {
+
+    private @NotNull TestProjectDirectoryDto aTestProject() {
+        return EditorFixtures.testProject(getProject(), root);
+    }
+
+    private @NotNull TestSetDirectoryDto aTestSet(final @NotNull TestProjectDirectoryDto tp) {
+        return EditorFixtures.testSet(getProject(), tp, "Checkout");
+    }
+
+    private @NotNull List<TestCaseDto> createdTestCases(final @NotNull TestSetDirectoryDto ts, final int count) {
+        final @NotNull List<TestCaseDto> made = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            final @NotNull TestCaseDto tc = TestCaseDto.builder()
+                    .id(UUID.randomUUID())
+                    .description("Test case number " + (i + 1))
+                    .order(String.format("m%04d", i))
+                    .priority(i == 0 ? Priority.HIGH : Priority.LOW)
+                    .group(new ArrayList<>(i % 2 == 0 ? List.of("Smoke") : List.of()))
+                    .module(i % 3 == 0 ? "Payments" : "")
+                    .build();
+            tc.setParent(ts);
+            Services.getInstance(getProject(), TestCases.class).putTestCaseVerbatim(ts.getPath(), tc);
+            made.add(tc);
+        }
+        return made;
+    }
+
+    private @NotNull TestCaseEditor openedTestSet(final int count) {
+        final @NotNull TestSetDirectoryDto ts = aTestSet(aTestProject());
+        createdTestCases(ts, count);
+        return EditorFixtures.openTestCaseEditor(getProject(), ts, getTestRootDisposable());
+    }
+
+    private @NotNull TestRunEditor openedTestRun(final int count) {
+        final @NotNull TestProjectDirectoryDto tp = aTestProject();
+        final @NotNull List<TestCaseDto> testCases = createdTestCases(aTestSet(tp), count);
+        final @NotNull TestRunDirectoryDto tr = EditorFixtures.testRun(getProject(), tp, testCases.stream().map(EditorFixtures::pending).toList());
+        return EditorFixtures.openTestRunEditor(getProject(), tr, getTestRootDisposable());
+    }
+
+    private static @NotNull FilterPopupBtn filterOf(final @NotNull AbstractTestinEditor<?, ?> editor) {
+        return editor.getToolBar().getToolbarItem(FilterPopupBtn.class);
+    }
+
+    private static @NotNull String textOf(final @NotNull AnAction action) {
+        return Objects.toString(action.getTemplatePresentation().getText(), "");
+    }
+
+    private static @NotNull List<AnAction> childrenOf(final @NotNull ActionGroup group) {
+        final @NotNull List<AnAction> children = group instanceof final DefaultActionGroup plain ? Arrays.asList(plain.getChildActionsOrStubs()) : opened(group);
+        return children.stream().filter(child -> !(child instanceof Separator)).toList();
+    }
+
+    private static @NotNull List<AnAction> opened(final @NotNull ActionGroup group) {
+        final @NotNull ListPopup popup = JBPopupFactory.getInstance().createActionGroupPopup(null, group, DataContext.EMPTY_CONTEXT, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, true);
+        try {
+            final @NotNull List<?> items = popup.getListStep().getValues();
+            return items.stream().map(AnActionHolder.class::cast).map(AnActionHolder::getAction).toList();
+        } finally {
+            Disposer.dispose(popup);
+        }
+    }
+
+    private static @NotNull List<String> entriesOf(final @NotNull FilterPopupBtn filter) {
+        return childrenOf(filter.menu()).stream().skip(1).map(FilterMenuIdeTest::textOf).toList();
+    }
+
+    private static @NotNull AnAction entry(final @NotNull ActionGroup group, final @NotNull String text) {
+        return childrenOf(group).stream().filter(child -> textOf(child).equals(text)).findFirst()
+                .orElseThrow(() -> new AssertionError("no '" + text + "' in " + childrenOf(group).stream().map(FilterMenuIdeTest::textOf).toList()));
+    }
+
+    private static void tick(final @NotNull FilterPopupBtn filter, final @NotNull String submenu, final @NotNull String value) {
+        final @NotNull AnAction toggle = entry((ActionGroup) entry(filter.menu(), submenu), value);
+        ((ToggleAction) toggle).setSelected(TestActionEvent.createTestEvent(toggle), true);
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+    }
+
+    private static void reset(final @NotNull FilterPopupBtn filter) {
+        final @NotNull AnAction resetEntry = childrenOf(filter.menu()).getFirst();
+        ActionUtil.performAction(resetEntry, TestActionEvent.createTestEvent(resetEntry));
+        PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
+    }
+
+    private static boolean enabled(final @NotNull AnAction action) {
+        final @NotNull AnActionEvent e = TestActionEvent.createTestEvent(action);
+        ActionUtil.updateAction(action, e);
+        return e.getPresentation().isEnabled();
+    }
+
+    private static void searchForNumberOne(final @NotNull AbstractTestinEditor<?, ?> editor) {
+        editor.getToolBar().getSearchTxt().setText("number 1");
+        Await.until("the search for 'number 1' never narrowed the list to 32", () -> editor.getCurrentTestCases().size() == 32);
+    }
+
+    private static void onThirdPage(final @NotNull AbstractTestinEditor<?, ?> editor) {
+        editor.setCurrentPage(3);
+        editor.refreshView();
+        assertEquals("the editor did not move to page 3", 3, editor.getCurrentPage());
+    }
+
+    // Rule-EDITOR-PANEL-094
+    public void testSevenThingsCanBeFilteredOnEachWhereItBelongs() {
+        final @NotNull List<String> everywhere = List.of(TestCaseEditorAttributes.PRIORITY.getName(), Bundle.message("filter.automation"), TestCaseEditorAttributes.GROUP.getName(), TestCaseEditorAttributes.MODULE.getName(), Bundle.message("filter.test.case.status"));
+
+        final @NotNull FilterPopupBtn inATestSet = filterOf(openedTestSet(3));
+        assertEquals("a test case editor does not filter on the priority, the automation, the group, the module and the status", everywhere, entriesOf(inATestSet).subList(0, everywhere.size()));
+        assertFalse("a test case editor offers the run item status", entriesOf(inATestSet).contains(Bundle.message("filter.run.item.status")));
+        assertFalse("a test case editor offers to pick across test sets", enabled(entry(inATestSet.menu(), Bundle.message("filter.test.set.one"))));
+
+        final @NotNull FilterPopupBtn inATestRun = filterOf(openedTestRun(3));
+        assertEquals("a test run editor does not add the run item status to the five", Bundle.message("filter.run.item.status"), entriesOf(inATestRun).get(everywhere.size()));
+
+        final @NotNull Path checkout = root.resolve("Checkout");
+        final @NotNull FilterPopupBtn inCreateTestRun = new FilterPopupBtn(new FilterSource() {
+            @Override
+            public @NotNull Map<Path, String> getAvailableTestSets() {
+                return Map.of(checkout, "Checkout");
+            }
+
+            @Override
+            public void onToolBarFilterSelectionChanged() {
+            }
+
+            @Override
+            public void onToolBarFilterResetButtonClicked() {
+            }
+
+            @Override
+            public @NotNull Set<String> getAvailableModules() {
+                return Set.of();
+            }
+
+            @Override
+            public @NotNull Set<String> getAvailableGroups() {
+                return Set.of();
+            }
+        });
+        tick(inCreateTestRun, Bundle.message("filter.test.set"), "Checkout");
+        assertEquals("the Create Test Run dialog cannot filter on the test set", Set.of(checkout), inCreateTestRun.getSelectedTestSet());
+    }
+
+    // Rule-EDITOR-PANEL-097, Rule-EDITOR-PANEL-098
+    public void testFilteringGoesBackToTheFirstPageAndTheButtonCountsTheFiltersOn() {
+        final @NotNull TestCaseEditor editor = openedTestSet(120);
+        final @NotNull FilterPopupBtn filter = filterOf(editor);
+        onThirdPage(editor);
+
+        tick(filter, TestCaseEditorAttributes.PRIORITY.getName(), Priority.LOW.getLabel());
+
+        assertEquals("filtering did not go back to the first page", 1, editor.getCurrentPage());
+        assertEquals("the button does not say one filter is on", "(1)", filter.getText());
+
+        tick(filter, Bundle.message("filter.test.case.status"), TestCaseStatus.PENDING.getLabel());
+        assertEquals("the button does not say two filters are on", "(2)", filter.getText());
+    }
+
+    // Rule-EDITOR-PANEL-099, Rule-EDITOR-PANEL-100
+    public void testResetClearsEveryFilterAndLeavesTheSearchText() {
+        final @NotNull TestRunEditor editor = openedTestRun(120);
+        final @NotNull FilterPopupBtn filter = filterOf(editor);
+        searchForNumberOne(editor);
+
+        tick(filter, TestCaseEditorAttributes.PRIORITY.getName(), Priority.LOW.getLabel());
+        tick(filter, Bundle.message("filter.automation"), Automated.NONE.getLabel());
+        tick(filter, TestCaseEditorAttributes.GROUP.getName(), Groups.NONE);
+        tick(filter, TestCaseEditorAttributes.MODULE.getName(), "Payments");
+        tick(filter, Bundle.message("filter.run.item.status"), RunItemStatus.PENDING.getLabel());
+        assertTrue("the filters did not narrow the list", editor.getCurrentTestCases().size() < 32);
+
+        reset(filter);
+
+        assertTrue("Reset Filters left the priority on", filter.getSelectedPriority().isEmpty());
+        assertTrue("Reset Filters left the automation on", filter.getSelectedAutomation().isEmpty());
+        assertTrue("Reset Filters left the group on", filter.getSelectedGroup().isEmpty());
+        assertTrue("Reset Filters left the module on", filter.getSelectedModule().isEmpty());
+        assertTrue("Reset Filters left the run item status on", filter.getSelectedStatus().isEmpty());
+        assertFalse("the button still counts filters after Reset Filters", filter.hasActiveFilters());
+        assertEquals("Reset Filters cleared the search text", "number 1", editor.getToolBar().getSearchTxt().getText());
+        assertEquals("the search stopped narrowing the list after Reset Filters", 32, editor.getCurrentTestCases().size());
+    }
+
+    // Rule-EDITOR-PANEL-009
+    public void testFilteringSaysNothingAndATestCaseItHidesIsReportedRatherThanShown() {
+        final @NotNull TestCaseEditor editor = openedTestSet(6);
+        final @NotNull FilterPopupBtn filter = filterOf(editor);
+        final @NotNull TestCaseDto hidden = editor.getAllTestCases().stream().filter(tc -> tc.getPriority() == Priority.LOW).findFirst().orElseThrow();
+        final @NotNull Balloons balloons = Balloons.heard(getTestRootDisposable());
+
+        tick(filter, TestCaseEditorAttributes.PRIORITY.getName(), Priority.HIGH.getLabel());
+        assertEquals("the filter did not narrow the list to the one high priority test case", 1, editor.getCurrentTestCases().size());
+        assertEquals("filtering said something", List.of(), balloons.shown());
+
+        editor.selectTestCase(hidden);
+
+        assertEquals("the test case the filter hides was not reported", List.of(Refused.HIDDEN_BY_THE_FILTER.about(hidden.getDescription())), balloons.shown());
+        assertEquals("going to a hidden test case threw the filter away", Set.of(Priority.HIGH), filter.getSelectedPriority());
+        assertFalse("a test case the filter hides was brought into view", editor.getCurrentTestCases().contains(hidden));
+    }
+}

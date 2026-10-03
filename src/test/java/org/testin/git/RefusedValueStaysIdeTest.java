@@ -1,0 +1,88 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.git;
+
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import com.intellij.ui.SimpleColoredComponent;
+import com.intellij.ui.SimpleTextAttributes;
+import com.intellij.ui.components.fields.ExtendableTextField;
+import org.jetbrains.annotations.NotNull;
+import org.testin.Await;
+import org.testin.TestinLogLines;
+import org.testin.notifications.Refused;
+import org.testin.ui.framework.OpenDialogKeys;
+import org.testin.util.Html;
+import org.testin.util.Shortcuts;
+import org.testin.view.Drawn;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class RefusedValueStaysIdeTest extends BasePlatformTestCase {
+
+    private @NotNull ExtendableTextField theUrlField() {
+        return Drawn.components(OpenDialogKeys.popupOf(getProject(), RemoteUrlDialog.class).getContent()).stream()
+                .filter(ExtendableTextField.class::isInstance).map(ExtendableTextField.class::cast).findFirst()
+                .orElseThrow(() -> new AssertionError("the dialog has no field"));
+    }
+
+    private static @NotNull List<SimpleTextAttributes> hintAttributesOf(final @NotNull ExtendableTextField field) {
+        final @NotNull List<SimpleTextAttributes> attributes = new ArrayList<>();
+        final SimpleColoredComponent.@NotNull ColoredIterator fragments = field.getEmptyText().getComponent().iterator();
+        while (fragments.hasNext()) {
+            fragments.next();
+            attributes.add(fragments.getTextAttributes());
+        }
+        return attributes;
+    }
+
+    // UC-INTERNAL-007, Rule-INTERNAL-067
+    public void testAnEmptyFieldIsMarkedAsTheOneHoldingTheDialogOpen() {
+        final @NotNull List<String> taken = new ArrayList<>();
+        new RemoteUrlDialog(getProject(), "origin", taken::add).show();
+        try {
+            OpenDialogKeys.press(getProject(), RemoteUrlDialog.class, Shortcuts.Enter);
+
+            assertTrue("the dialog closed over an empty field", OpenDialogKeys.isOpen(getProject(), RemoteUrlDialog.class));
+            assertEquals("an empty value was taken", List.of(), taken);
+            assertTrue("the empty field is not marked as the one holding the dialog open", hintAttributesOf(theUrlField()).contains(SimpleTextAttributes.ERROR_ATTRIBUTES));
+        } finally {
+            OpenDialogKeys.popupOf(getProject(), RemoteUrlDialog.class).cancel();
+        }
+    }
+
+    // UC-INTERNAL-007, Rule-INTERNAL-067
+    public void testARefusedValueIsRefusedInOneSentenceNamingItAndStaysInTheField() {
+        final @NotNull List<String> taken = new ArrayList<>();
+        final @NotNull TestinLogLines said = TestinLogLines.fromNow();
+        new RemoteUrlDialog(getProject(), "origin", taken::add).show();
+        try {
+            theUrlField().setText("my team's repository");
+            OpenDialogKeys.press(getProject(), RemoteUrlDialog.class, Shortcuts.Enter);
+
+            assertTrue("the dialog closed over a refused value", OpenDialogKeys.isOpen(getProject(), RemoteUrlDialog.class));
+            assertEquals("a refused value was taken", List.of(), taken);
+            assertEquals("the refused value is no longer in the field", "my team's repository", theUrlField().getText());
+
+            final @NotNull String sentence = Html.ofText(Refused.NOT_A_REPOSITORY_URL.about("my team's repository"));
+            Await.until("the dialog did not say why it refused the value, naming it", () -> said.written().contains(sentence));
+        } finally {
+            said.stop();
+            OpenDialogKeys.popupOf(getProject(), RemoteUrlDialog.class).cancel();
+        }
+    }
+}

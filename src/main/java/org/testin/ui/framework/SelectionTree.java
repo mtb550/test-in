@@ -39,8 +39,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public final class SelectionTree implements DialogComponent {
-    private static final int VISIBLE_ROWS = 8;
-
     private final @NotNull CheckboxTree tree;
     private final @NotNull CheckedTreeNode full;
     private final @NotNull Set<Object> leaves = new LinkedHashSet<>();
@@ -56,7 +54,7 @@ public final class SelectionTree implements DialogComponent {
         // Rule-INTERNAL-095
         DialogStyle.asRow(tree);
         // Rule-INTERNAL-102
-        tree.setVisibleRowCount(VISIBLE_ROWS);
+        tree.setVisibleRowCount(DialogSize.VISIBLE_ROWS);
         TreeUtil.expandAll(tree);
 
         tree.addCheckboxTreeListener(new CheckboxTreeListener() {

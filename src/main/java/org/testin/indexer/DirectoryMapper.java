@@ -194,7 +194,6 @@ public final class DirectoryMapper {
     }
 
     public @NotNull TestRunDirectoryDto getTestRunNode(final @NotNull Path path, final @NotNull DirectoryDto parent) {
-        final @NotNull String fileName = path.getFileName().toString();
         final @NotNull TestRunMarker marker = Services.getInstance(p, Nodes.class).readMarker(path, DirectoryType.TR, TestRunMarker.class);
         return buildTestRunNode(path, parent, marker);
     }

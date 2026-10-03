@@ -178,8 +178,7 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
 
         // Rule-INTERNAL-100
         if (sizeIsTheTesters() && !size.namesAHeight()) {
-            final @NotNull Dimension shown = getPopup().getSize();
-            getPopup().setSize(new Dimension(DialogSize.widthOn(p, shown.width), shown.height));
+            shownSize().ifPresent(shown -> getPopup().setSize(new Dimension(DialogSize.widthOn(p, shown.width), shown.height)));
         }
 
         return true;
@@ -295,8 +294,8 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
     public final void refit() {
         if (restoreTo.isPresent()) return;
 
-        popup.ifPresent(open -> {
-            open.setSize(new Dimension(open.getSize().width, DialogSize.withinFrame(p, naturalHeightOf(open.getContent()))));
+        shownSize().ifPresent(shown -> {
+            getPopup().setSize(new Dimension(shown.width, DialogSize.withinFrame(p, naturalHeightOf(getPopup().getContent()))));
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 final @NotNull Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
@@ -314,6 +313,10 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
     // UC-INTERNAL-007, Rule-INTERNAL-059
     protected final void closeCancel() {
         getPopup().cancel();
+    }
+
+    private @NotNull Optional<Dimension> shownSize() {
+        return popup.filter(open -> !open.isDisposed()).map(JBPopup::getSize);
     }
 
     protected final @NotNull JBPopup getPopup() {

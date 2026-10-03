@@ -75,7 +75,7 @@ public final class TestCaseDto {
 
     @NonNull
     @Builder.Default
-    private volatile Priority priority = Priority.LOW;
+    private volatile Priority priority = Priority.DEFAULT;
 
     @NonNull
     @Builder.Default

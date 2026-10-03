@@ -50,9 +50,10 @@ Select several test cases, then `F2` or the field's own letter.
 - **Rule-EDITOR-PANEL-206** — A value Testin cannot read is refused. What the
   test case already had stays, and the tester is told: once for a cell, and once
   with a count for a sheet or a bulk edit. A refused test case is not counted
-  among the ones the change touched. Blank is not unreadable — it clears a date
-  and the groups, and it leaves the priority and the status alone, because
-  those have no empty form.
+  among the ones the change touched. Blank is not unreadable, and is never
+  counted as unreadable — it clears a date and the groups, and it leaves the
+  status alone. A blank priority in a bulk edit sets the default priority,
+  P3 (Low); in a cell it leaves the priority alone.
 - **Rule-EDITOR-PANEL-046** — The whole gesture is one entry on the undo
   history.
 - **Rule-EDITOR-PANEL-224** — A description is refused here for the two reasons
@@ -135,8 +136,9 @@ to drop one.
 **If the tester chooses Order** — a message reads *Order is set one test case at
 a time*. There is no bulk editor for it.
 
-**If a description is edited to nothing** — that row is left as it was and
-counted with the values Testin could not read.
+**If a description is edited to nothing** — that row is left as it was. A
+blank is not a value Testin could not read, so it is not counted as one
+(Rule-EDITOR-PANEL-206).
 
 **If a description cannot name a Java method, or names the same method as
 another test case in the test set** — that row is left as it was, and a message
@@ -145,7 +147,8 @@ method*, or *Another test case already names that test method*. Two rows given
 one description clash with each other; two rows that swap their descriptions do
 not (Rule-EDITOR-PANEL-224).
 
-**If a priority is edited to nothing** — the same: left as it was, and counted.
+**If a priority is edited to nothing** — it is set to the default priority,
+P3 (Low), and counted among the test cases the edit changed.
 
 **If a value is not one Testin can read** — a priority or a status it does not
 know — that test case is left exactly as it was and is not counted

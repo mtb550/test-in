@@ -1,0 +1,58 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.testcase;
+
+import org.jetbrains.annotations.NotNull;
+import org.testin.AbstractTempRootIdeTest;
+import org.testin.Await;
+import org.testin.codegen.CodegenBalloons;
+import org.testin.editor.EditorFixtures;
+import org.testin.editor.testcase.TestCaseEditor;
+import org.testin.indexer.TestCases;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.notifications.Done;
+import org.testin.services.Services;
+import org.testin.ui.framework.ConfirmDialog;
+import org.testin.ui.framework.ProductPressEnter;
+
+import java.util.List;
+
+public class RemoveConfirmsOnceIdeTest extends AbstractTempRootIdeTest {
+
+    // Rule-PRODUCT-014
+    public void testRemovingSeveralTestCasesConfirmsOnceInThePastTenseWithACount() {
+        final @NotNull TestProjectDirectoryDto tp = EditorFixtures.testProject(getProject(), root);
+        final @NotNull TestSetDirectoryDto login = EditorFixtures.testSet(getProject(), tp, "Login");
+        final @NotNull List<TestCaseDto> testCases = EditorFixtures.testCases(getProject(), login, 4);
+        final @NotNull TestCaseEditor editor = EditorFixtures.openTestCaseEditor(getProject(), login, getTestRootDisposable());
+        final @NotNull List<TestCaseDto> chosen = testCases.subList(0, 3);
+        final @NotNull CodegenBalloons balloons = CodegenBalloons.watching();
+        try {
+            new RemoveTestCaseWork(getProject(), editor, login, chosen).remove();
+            ProductPressEnter.on(getProject(), ConfirmDialog.class);
+            Await.until("the three test cases were never removed", () -> chosen.stream().allMatch(tc -> Services.getInstance(getProject(), TestCases.class).findTestCase(tc.getId()).isEmpty()));
+            Await.until("removing three test cases said nothing", () -> balloons.shown().stream().anyMatch(said -> said.startsWith(Done.REMOVED.getOutcome())));
+
+            final @NotNull List<String> confirmations = balloons.shown().stream().filter(said -> said.startsWith(Done.REMOVED.getOutcome())).toList();
+            assertEquals("removing three test cases did not confirm once, in the past tense, with the count", List.of(Done.counted(Done.REMOVED.getOutcome(), 3)), confirmations);
+        } finally {
+            balloons.stop();
+        }
+    }
+}

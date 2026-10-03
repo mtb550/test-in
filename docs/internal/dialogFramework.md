@@ -67,11 +67,11 @@ and which keys it answers, and the shell builds the rest.
 - **Rule-INTERNAL-079** — A surface has one shortcut strip. It cannot be built
   as half of a pair, so no dialog is two tinted rows tall to say six words.
 - **Rule-INTERNAL-080** — A button a dialog will not act on yet is drawn
-  disabled, and the line beside it says why. That line is the dialog's one place
-  for a word about its button. It carries two things: while the button is
-  refused, the reason; while it is ready, what pressing it would act on - *5 test
-  cases in 2 test sets*. The reason wins whenever both apply, because a tester
-  who cannot press the button needs to know why more than they need the tally.
+  disabled, and the reason is the gray button's tooltip: hovering over it says
+  why, and nothing is printed beside it. The line beside the button carries one
+  thing, what pressing it would act on - *5 test cases in 2 test sets* - and it
+  stays the same whether the button is ready or gray. Every dialog button takes
+  this from the one shared button, so no dialog prints its own reason.
 - **Rule-INTERNAL-085** — In a box that offers a list and can also be typed
   into, Enter picks the value under it while the list is open. While the list is
   closed, Enter is the dialog's own key, as it is in every other field.
@@ -84,15 +84,16 @@ and which keys it answers, and the shell builds the rest.
   inside a dialog.
 - **Rule-INTERNAL-095** — Every font a tester reads comes from one owner,
   `org.testin.util.Fonts`. It names each role - title, strong, body, label,
-  badge, code, caption, message, field, placeholder, value, choice, option, row,
-  small, hint, keycap, figure and icon letter. It derives them all from the same
-  two sizes: the editor's, which the panels zoom with, and the IDE's label font,
-  which the dialogs follow. A surface asks for the role it is showing and never
-  derives a font of its own, so a title is the same size in every panel and a
-  placeholder the same in every dialog. The documents Testin writes are in it
-  too. `ReportFont` holds the point sizes a PDF and a Word file are set in, the
-  pixel sizes an HTML report uses, and the families all three are written in. So
-  a size changes in one place, or it disagrees with itself in three.
+  badge, panel caption, field, placeholder, value, choice, option, caption, row,
+  small, small strong, hint, keycap, figure and icon letter. It derives them all
+  from the same two sizes: the editor's, which the panels zoom with, and the
+  IDE's label font, which the dialogs follow. A surface asks for the role it is
+  showing and never derives a font of its own, so a title is the same size in
+  every panel and a placeholder the same in every dialog. The documents Testin
+  writes are in it too. `ReportFont` holds the point sizes a PDF and a Word file
+  are set in, the pixel sizes an HTML report uses, and the families all three
+  are written in. So a size changes in one place, or it disagrees with itself in
+  three.
 - **Rule-INTERNAL-096** — Every typing surface in a dialog is drawn in the same
   frame, whether it holds one line or many: a text area sits in the frame a text
   field has, not in a borderless well. A value the dialog shows read-only is set
@@ -171,8 +172,10 @@ and which keys it answers, and the shell builds the rest.
 - **Rule-INTERNAL-106** — A row a tester picks out of a list is marked by a
   rounded band inside the card that holds it, never a bar running edge to edge.
   The band is the thing being chosen; the card is not. What a row says about
-  itself starts in its own column, so the descriptions read down the list rather
-  than trailing each name wherever it ends.
+  itself - a hint in a picker list, a path in a search row - sits in gray right
+  against the name it belongs to, whatever length the name is. Every list draws
+  its rows the same way, so there is no column to line it up in anywhere
+  (Rule-INTERNAL-074).
 - **Rule-INTERNAL-107** — A closed set of answers is shown as radios with the
   ordinary answer already picked, never a combo box a tester has to open to
   learn what the answers are. The set is closed when the code names it: a report

@@ -53,6 +53,9 @@ public enum Priority {
     // Rule-EDITOR-PANEL-031
     public static final @NotNull List<Priority> CHOICES = Arrays.stream(values()).filter(Priority::isActive).toList();
 
+    // Rule-EDITOR-PANEL-031
+    public static final @NotNull Priority DEFAULT = LOW;
+
     private final @NotNull String label;
     private final @NotNull String word;
     private final @NotNull Color color;

@@ -57,7 +57,7 @@ public final class RunItemStatusService {
         return item.liveTestCase().copy();
     }
 
-    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130, Rule-EDITOR-PANEL-137
     public void executeNext(final @NotNull TestRunEditor editor, final @NotNull RunItemStatus status) {
         final int executingIndex = editor.getWalk().getCurrentlyExecutingIndex();
         if (executingIndex == -1) {
@@ -70,8 +70,10 @@ public final class RunItemStatusService {
         final @NotNull TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
 
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
-        if (!recordOn(editor, currentTc.getId(), status, item -> item.recordRunItemStatus(status, tester, asItIsNow(item))))
-            return;
+        if (!recordOn(editor, currentTc.getId(), status, item -> {
+            editor.getWalk().stopTheClock();
+            item.recordRunItemStatus(status, tester, asItIsNow(item));
+        })) return;
 
         confirmRunItemStatus(status, 1);
 
@@ -79,9 +81,10 @@ public final class RunItemStatusService {
         ApplicationManager.getApplication().invokeLater(() -> editor.getWalk().startTimerForIndex(executingIndex));
     }
 
-    // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-241, Rule-EDITOR-PANEL-242
+    // UC-EDITOR-PANEL-043, Rule-EDITOR-PANEL-183, Rule-EDITOR-PANEL-241, Rule-EDITOR-PANEL-242
     public void recordReported(final @NotNull TestRunEditor editor, final @NotNull TestCaseDto tc, final @NotNull RunItemStatus status, final @NotNull Duration duration, final @NotNull Failure failure) {
         final boolean clockCounted = editor.getWalk().clockIsOn(tc.getId());
+        if (clockCounted) editor.getWalk().stopTheClock();
 
         if (editor.getWalk().isExecuting(tc.getId())) {
             editor.getWalk().startTimerForIndex(editor.getWalk().getCurrentlyExecutingIndex() + 1);

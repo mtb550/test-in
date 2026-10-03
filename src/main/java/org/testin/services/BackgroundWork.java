@@ -16,28 +16,74 @@
 
 package org.testin.services;
 
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.util.FailureText;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BackgroundWork {
     private static final @NotNull Runnable NOTHING = () -> {
     };
+
+    private static final @NotNull List<Predicate<Task>> WATCHERS = new CopyOnWriteArrayList<>();
+
+    public static void start(final @NotNull Task.Backgroundable task) {
+        if (stopped(task)) {
+            ProgressManager.getInstance().runProcessWithProgressAsynchronously(task, new EmptyProgressIndicator() {
+                @Override
+                public void start() {
+                    super.start();
+                    cancel();
+                }
+            });
+            return;
+        }
+
+        ProgressManager.getInstance().run(task);
+    }
+
+    public static boolean synchronously(final @NotNull Project p, final @NotNull String title, final boolean cancellable, final @NotNull Runnable work) {
+        if (stopped(new Task.Modal(p, title, cancellable) {
+            @Override
+            public void run(final @NotNull ProgressIndicator indicator) {
+                work.run();
+            }
+        })) return false;
+
+        return ProgressManager.getInstance().runProcessWithProgressSynchronously(work, title, cancellable, p);
+    }
+
+    private static boolean stopped(final @NotNull Task task) {
+        return WATCHERS.stream().map(stopsIt -> stopsIt.test(task)).toList().contains(true);
+    }
+
+    @TestOnly
+    public static void watch(final @NotNull Disposable owner, final @NotNull Predicate<? super Task> stopsIt) {
+        final @NotNull Predicate<Task> watcher = stopsIt::test;
+        WATCHERS.add(watcher);
+        Disposer.register(owner, () -> WATCHERS.remove(watcher));
+    }
 
     public static void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final @NotNull Consumer<@NotNull ProgressIndicator> work) {
         // Rule-SHARE-037
@@ -54,7 +100,7 @@ public final class BackgroundWork {
     }
 
     private static void run(final @NotNull Project p, final @NotNull String title, final @NotNull String whatFailed, final boolean cancellable, final @NotNull Consumer<@NotNull ProgressIndicator> work, final @NotNull Runnable onSuccess, final @NotNull Runnable onFinished) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(p, title, cancellable) {
+        start(new Task.Backgroundable(p, title, cancellable) {
             private volatile boolean failed;
 
             @Override

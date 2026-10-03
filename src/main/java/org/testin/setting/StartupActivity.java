@@ -24,6 +24,7 @@ import com.intellij.openapi.util.Key;
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 import org.testin.clipboard.CutState;
 import org.testin.indexer.DeletedNodes;
 import org.testin.indexer.ProjectIndexer;
@@ -92,6 +93,11 @@ public final class StartupActivity implements ProjectActivity {
                     () -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class)
             );
         });
+    }
+
+    @TestOnly
+    static void forgetTheRead(final @NotNull Project p) {
+        p.putUserData(READ, null);
     }
 
     // UC-SETTING-002, Rule-INTERNAL-115

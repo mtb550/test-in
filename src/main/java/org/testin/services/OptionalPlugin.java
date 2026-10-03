@@ -17,12 +17,15 @@
 package org.testin.services;
 
 import com.intellij.ide.plugins.PluginManagerCore;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 import org.testin.notifications.Notifier;
 import org.testin.util.Bundle;
 import org.testin.util.Once;
@@ -112,5 +115,11 @@ public enum OptionalPlugin {
     // UC-CODEGEN-016, Rule-CODEGEN-062
     public @NotNull String needs(final @NotNull String entryName) {
         return Bundle.message("plugin.needs", entryName, label);
+    }
+
+    @TestOnly
+    public void missingUntil(final @NotNull Disposable restored) {
+        availability = Availability.ABSENT;
+        Disposer.register(restored, () -> availability = Availability.UNKNOWN);
     }
 }

@@ -75,8 +75,8 @@ all.
 says so: *Every one of these test cases already has its method. Automate writes
 the method for a test case that has none.* Nothing is written, and nothing
 claims to have been. A method the tester has not filled in yet still counts as
-having one: the card reads *Not automated* because an empty method is not
-automation, and there is still nothing here to write.
+having one: the card's **Navigate to Test Method** icon is hollow because an
+empty method is not automation, and there is still nothing here to write.
 
 **If a test case has no description** — it is passed over, because a description
 is what names a method (Rule-CODEGEN-002). Where that is true of every selected

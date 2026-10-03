@@ -19,6 +19,7 @@ package org.testin.report;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -110,24 +111,27 @@ public class GenerateReportAction extends AbstractProjectAction {
 
     // UC-REPORT-001, Rule-REPORT-003
     private void processAndSave(final @NotNull TestRunDirectoryDto tr, final @NotNull FileTypes format, final @NotNull File outputFile) {
-        BackgroundWork.run(p, Bundle.message("report.task.generating", format.getLabel(), tr.getName()), Bundle.message("report.failed.title", format.getLabel()), indicator -> {
-            final @NotNull Path dirPath = tr.getPath();
+        BackgroundWork.run(p, Bundle.message("report.task.generating", format.getLabel(), tr.getName()), Bundle.message("report.failed.title", format.getLabel()), indicator -> writeReport(tr, format, outputFile, indicator));
+    }
 
-            final @NotNull TestRunDto testRunData = testRuns.getTestRunByPath(dirPath);
+    // UC-REPORT-001, Rule-REPORT-003
+    void writeReport(final @NotNull TestRunDirectoryDto tr, final @NotNull FileTypes format, final @NotNull File outputFile, final @NotNull ProgressIndicator indicator) {
+        final @NotNull Path dirPath = tr.getPath();
 
-            final byte[] fileBytes = format.generateReport(p, tr, testRunData);
+        final @NotNull TestRunDto testRunData = testRuns.getTestRunByPath(dirPath);
 
-            // Rule-REPORT-003
-            indicator.checkCanceled();
+        final byte[] fileBytes = format.generateReport(p, tr, testRunData);
 
-            write(outputFile, fileBytes);
+        // Rule-REPORT-003
+        indicator.checkCanceled();
 
-            notifier.infoWithActions(p,
-                    Bundle.message("report.generated.title", format.getLabel()),
-                    Bundle.message("report.generated.message", outputFile.getName()),
-                    notifier.action(Bundle.message("report.open"), () -> ExportNotice.open(p, outputFile)),
-                    ExportNotice.copyPath(p, outputFile)
-            );
-        });
+        write(outputFile, fileBytes);
+
+        notifier.infoWithActions(p,
+                Bundle.message("report.generated.title", format.getLabel()),
+                Bundle.message("report.generated.message", outputFile.getName()),
+                notifier.action(Bundle.message("report.open"), () -> ExportNotice.open(p, outputFile)),
+                ExportNotice.copyPath(p, outputFile)
+        );
     }
 }

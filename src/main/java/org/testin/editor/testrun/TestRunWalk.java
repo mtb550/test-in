@@ -139,6 +139,11 @@ public final class TestRunWalk {
         return executionTimer.isOn(testCaseId);
     }
 
+    // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-137
+    public void stopTheClock() {
+        executionTimer.stop();
+    }
+
     void launching(final @NotNull UUID testCaseId) {
         launchedHere.add(testCaseId);
 

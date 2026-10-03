@@ -247,9 +247,9 @@ popup owns that, and `Cmd+F12` on a Mac. Automate Test Case takes
 `Ctrl+Alt+Cmd+F12` on a Mac, which nothing else uses, so that generating code is
 reachable by key there at all.
 
-These two are the only Testin keys the IDE already uses, and each was decided
-rather than inherited. That is difference 7 on
-[the Inside Testin page](internal/main.md#where-the-plugin-breaks-its-own-rules).
+These two are the only Testin keys whose IDE action can fire in the same place
+as Testin's, and each was decided rather than inherited. Rule-INTERNAL-069 asks
+for a note beside each binding in the plugin descriptor, saying which and why.
 
 **A key on its surface.** The action is still declared, so Find Action offers it
 and the Keymap lists it — with no default key, because the key belongs to the

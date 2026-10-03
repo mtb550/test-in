@@ -32,12 +32,12 @@ public record Hit(@NotNull Icon icon, @NotNull String name, @NotNull String wher
 
     // UC-INTERNAL-001, Rule-INTERNAL-072, Rule-INTERNAL-098
     public static @NotNull Hit of(final @NotNull TestCaseDto tc, final @NotNull DirectoryDto testRun) {
-        return new Hit(testRun.getType().getIcon(), tc.getDescription(), where(testRun), testRun, Optional.of(tc));
+        return new Hit(testRun.iconShownInTree(), tc.getDescription(), where(testRun), testRun, Optional.of(tc));
     }
 
     // UC-INTERNAL-001, Rule-INTERNAL-072
     public static @NotNull Hit of(final @NotNull DirectoryDto node) {
-        return new Hit(node.getType().getIcon(), node.getName(), where(node), node, Optional.empty());
+        return new Hit(node.iconShownInTree(), node.getName(), where(node), node, Optional.empty());
     }
 
     private static @NotNull String where(final @NotNull DirectoryDto node) {

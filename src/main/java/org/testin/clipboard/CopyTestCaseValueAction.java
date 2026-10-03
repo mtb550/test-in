@@ -51,7 +51,7 @@ public class CopyTestCaseValueAction extends AbstractAnyProjectAction {
 
     @Override
     protected void update(final @NotNull AnActionEvent e, final @NotNull Project p) {
-        GrayWithReason.unless(this, e, !TestinData.selectedTestCases(e).isEmpty(), Bundle.message("action.select.case.description"));
+        GrayWithReason.unlessTestCaseSelected(this, e);
     }
 
     @Override
