@@ -112,7 +112,10 @@ public class StatusBar extends JBPanel<StatusBar> {
         automatedLabel.setVisible(false);
 
         pageSizeField.setHorizontalAlignment(SwingConstants.CENTER);
-        Tooltip.set(pageSizeField, Bundle.message("statusbar.page.size.tip"));
+        final @NotNull String pageSize = Bundle.message("statusbar.page.size.tip");
+        Tooltip.set(pageSizeField, pageSize);
+        // Rule-INTERNAL-122
+        pageSizeField.getAccessibleContext().setAccessibleName(pageSize);
 
         for (final PageStep step : PageStep.values()) pageButtons.put(step, new PageBtn(step));
 

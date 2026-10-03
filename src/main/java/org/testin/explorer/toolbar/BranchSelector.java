@@ -74,8 +74,11 @@ public class BranchSelector {
         this.model = new DefaultComboBoxModel<>();
         this.comboBox = new ComboBox<>(model);
 
-        comboBox.setFocusable(false);
         comboBox.setEnabled(false);
+
+        // Rule-TREE-PANEL-132, Rule-INTERNAL-122
+        comboBox.putClientProperty("JComboBox.isTableCellEditor", true);
+        comboBox.getAccessibleContext().setAccessibleName(Bundle.message("branch.box"));
 
         comboBox.addActionListener(_ -> onSelection());
 

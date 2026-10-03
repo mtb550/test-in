@@ -21,6 +21,7 @@ import com.intellij.ui.CheckboxTreeBase;
 import com.intellij.ui.CheckboxTreeListener;
 import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.ScrollPaneFactory;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.Caption;
@@ -66,8 +67,12 @@ public final class SelectionTree implements DialogComponent {
             }
         });
 
+        final @NotNull JBLabel title = Caption.of(caption, Fonts.caption());
+        // Rule-INTERNAL-122
+        title.setLabelFor(tree);
+
         // Rule-INTERNAL-087, Rule-INTERNAL-099
-        panel = DialogStyle.section(Caption.header(Caption.of(caption, Fonts.caption()), trailing), ScrollPaneFactory.createScrollPane(tree, true));
+        panel = DialogStyle.section(Caption.header(title, trailing), ScrollPaneFactory.createScrollPane(tree, true));
     }
 
     // Rule-TREE-PANEL-130, Rule-TREE-PANEL-131

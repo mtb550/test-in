@@ -56,6 +56,10 @@ public final class HoverButton {
                 .setShortcut(offered.works() ? Declared.shortcutText(offered.action().getActionId()) : "")
                 .installOn(label);
 
+        // Rule-INTERNAL-122
+        label.getAccessibleContext().setAccessibleName(name);
+        offered.whyNot().ifPresent(reason -> label.getAccessibleContext().setAccessibleDescription(reason));
+
         label.setPreferredSize(new Dimension(hover.getIconWidth(), hover.getIconHeight()));
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setVerticalAlignment(SwingConstants.CENTER);

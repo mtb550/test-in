@@ -34,6 +34,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
+import org.testin.util.Bundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -86,6 +87,8 @@ public class TreePanelTree implements Disposable {
         this.mainTree = new TestinTree(treeModel);
         this.scrollPane = new JBScrollPane(mainTree);
 
+        // Rule-INTERNAL-122
+        mainTree.getAccessibleContext().setAccessibleName(Bundle.message("toolwindow.stripe.testin.tree"));
         mainTree.setRootVisible(true);
         mainTree.setShowsRootHandles(true);
         mainTree.setDropMode(DropMode.ON);

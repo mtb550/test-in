@@ -60,7 +60,7 @@ public abstract class AbstractIconButton extends JButton {
 
     public AbstractIconButton(final @NotNull String tooltip, final @NotNull Icon icon) {
         super(null, icon);
-        Tooltip.set(this, tooltip);
+        describe(tooltip);
         setFocusable(false);
         setBorderPainted(false);
         setContentAreaFilled(false);
@@ -105,7 +105,9 @@ public abstract class AbstractIconButton extends JButton {
         describe(tooltip);
     }
 
+    // Rule-INTERNAL-122
     protected final void describe(final @NotNull String text) {
+        getAccessibleContext().setAccessibleName(text);
         shortcutText.ifPresentOrElse(key -> {
             HelpTooltip.dispose(this);
             new HelpTooltip()

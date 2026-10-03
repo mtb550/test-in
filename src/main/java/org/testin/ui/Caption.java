@@ -40,9 +40,11 @@ import java.util.Optional;
 public final class Caption {
     private static final int GAP = 8;
 
+    // Rule-INTERNAL-122
     public static @NotNull JBLabel of(final @NotNull String text, final @NotNull Font font) {
         final @NotNull JBLabel label = new JBLabel(text.toUpperCase(Locale.ROOT));
 
+        label.getAccessibleContext().setAccessibleName(text);
         label.setFont(font);
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         return label;
@@ -70,9 +72,13 @@ public final class Caption {
         return row;
     }
 
+    // Rule-INTERNAL-122
     public static @NotNull BorderLayoutPanel above(final @NotNull String caption, final @NotNull JComponent value) {
         final @NotNull BorderLayoutPanel panel = JBUI.Panels.simplePanel(0, 2).addToCenter(value).withBorder(JBUI.Borders.emptyTop(8)).andTransparent();
-        if (!caption.isEmpty()) panel.addToTop(of(caption, Fonts.caption()));
-        return panel;
+        if (caption.isEmpty()) return panel;
+
+        final @NotNull JBLabel label = of(caption, Fonts.caption());
+        label.setLabelFor(value);
+        return panel.addToTop(label);
     }
 }

@@ -2,7 +2,8 @@
 
 # UC-TREE-PANEL-026: Switch the Git branch of the test project
 
-> **No key.** Pick a branch from the box above the tree.
+> **No key.** Pick a branch from the box above the tree, or reach it with `Tab`,
+> move with the arrow keys and press `Enter`.
 
 **As a** tester, **I want** to switch the test project's branch from the panel, **so that** the tree follows the branch
 I am testing.
@@ -67,6 +68,9 @@ repository.
   gray, and says why when the pointer rests on it.
 - **Rule-TREE-PANEL-108** — The branch box appears when the test project's
   folder is a Git repository, with or without a `testin.yml`.
+- **Rule-TREE-PANEL-132** — The branch box takes the keyboard. The arrow keys
+  move through the branches and Enter switches, so moving through the list never
+  checks a branch out. A screen reader hears it as Branch.
 
 ## The Uncommitted Changes dialog
 

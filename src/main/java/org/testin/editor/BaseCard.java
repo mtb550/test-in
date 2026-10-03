@@ -42,6 +42,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -124,6 +125,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         titleArea.setSize(Math.min(titleColumnWidth, Short.MAX_VALUE), Short.MAX_VALUE);
     }
 
+    // Rule-INTERNAL-122
     protected void updateUI(final int index, final @NotNull String title, final @NotNull List<Badge> badges, final @NotNull Map<String, String> details) {
         plainTitle = title;
 
@@ -133,6 +135,8 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         Badges.showBadges(badgePanel, badges);
 
         attributeLabels.values().forEach(lbl -> lbl.setVisible(false));
+
+        final @NotNull List<String> spoken = new ArrayList<>(badges.stream().map(Badge::text).toList());
 
         details.forEach((attrName, value) -> {
             if (value.isBlank()) return;
@@ -145,7 +149,11 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
 
             lbl.setText(attrName + ": " + value);
             lbl.setVisible(true);
+            spoken.add(lbl.getText());
         });
+
+        getAccessibleContext().setAccessibleName(title);
+        getAccessibleContext().setAccessibleDescription(String.join(", ", spoken));
 
         badgePanel.revalidate();
         badgePanel.repaint();

@@ -28,6 +28,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.scale.JBUIScale;
 import com.intellij.util.ui.GraphicsUtil;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.accessibility.AccessibleAnnouncerUtil;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.dialogs.DialogStyle;
@@ -79,6 +80,9 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
         textField = input.component();
 
         list = new JBList<>(rowModel);
+        // Rule-INTERNAL-122
+        textField.getAccessibleContext().setAccessibleName(placeHolderText);
+        list.getAccessibleContext().setAccessibleName(placeHolderText);
         list.setOpaque(false);
         // Rule-INTERNAL-095
         DialogStyle.asRow(list);
@@ -242,6 +246,10 @@ public final class TextFieldWithSelections<T> implements DialogComponent, TextVa
         final int newIdx = Math.clamp(list.getSelectedIndex() + delta, 0, size - 1);
         list.setSelectedIndex(newIdx);
         list.ensureIndexIsVisible(newIdx);
+
+        // Rule-INTERNAL-122
+        final @NotNull SelectionList<T> reached = list.getModel().getElementAt(newIdx);
+        AccessibleAnnouncerUtil.announce(textField, reached.hint().isEmpty() ? reached.name() : reached.name() + ", " + reached.hint(), true);
     }
 
     // Rule-INTERNAL-106

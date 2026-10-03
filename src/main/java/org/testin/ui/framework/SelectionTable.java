@@ -56,6 +56,8 @@ public final class SelectionTable implements DialogComponent {
         DialogStyle.asRow(table);
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setFillsViewportHeight(true);
+        // Rule-INTERNAL-122
+        table.getAccessibleContext().setAccessibleName(String.join(", ", columns));
 
         for (int column = 0; column < widths.size() && column < columns.size(); column++) {
             table.getColumnModel().getColumn(column).setPreferredWidth(JBUI.scale(widths.get(column)));

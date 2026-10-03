@@ -59,6 +59,8 @@ public final class ListPanelBuilder {
         list.setOpaque(true);
         list.setPaintBusy(true);
         list.getEmptyText().setText(Bundle.message("editor.loading"));
+        // Rule-INTERNAL-122
+        list.getAccessibleContext().setAccessibleName(Bundle.message("editor.test.cases"));
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setExpandableItemsEnabled(false);
 

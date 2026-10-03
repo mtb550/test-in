@@ -206,6 +206,17 @@ and which keys it answers, and the shell builds the rest.
   steps, named once in Spacing: XS 4, S 6, M 8, L 10 and XL 12. A screen asks
   for a step by name and never writes a number, so changing a step changes every
   dialog at once.
+- **Rule-INTERNAL-122** — Everything a tester can reach with the keyboard tells
+  a screen reader its name, in the words it already draws. A field is named by
+  its caption, as it is written rather than in the capitals it is drawn in, or
+  by its hint when it has no caption. A table with neither is named by its
+  column headings, an icon button by its tooltip and a view panel tab by its
+  title. A card says its title, then its badges and the details it shows, so a
+  run item status shown on a card is heard with it. A grid cell says its value,
+  and the box a cell opens for typing says its column. The card list and the
+  grid are both named Test cases, and the explorer tree by its tool window.
+  Moving through a search's results with the arrow keys says the result
+  reached, because the keyboard stays in the search box.
 
 These rules are about the shell every dialog is built on. What each dialog
 holds, and what its keys mean, is on the page for that dialog.

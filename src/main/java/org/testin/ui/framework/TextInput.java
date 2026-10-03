@@ -51,6 +51,8 @@ public final class TextInput implements DialogComponent, TextValue {
     TextInput(final @NotNull Icon icon, final @NotNull String caption, final @NotNull String placeHolderText, final @NotNull String initialValue, final @NotNull String accepts) {
         input = new FrameworkTextField(icon, placeHolderText, initialValue);
         textField = input.component();
+        // Rule-INTERNAL-122
+        if (caption.isEmpty()) textField.getAccessibleContext().setAccessibleName(placeHolderText);
         // Rule-INTERNAL-087
         panel = caption.isEmpty() ? textField : Caption.above(caption, textField);
 

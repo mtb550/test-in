@@ -44,6 +44,8 @@ public final class TextArea implements DialogComponent {
         if (!placeholder.isBlank()) {
             area.getEmptyText().setText(placeholder);
         }
+        // Rule-INTERNAL-122
+        area.getAccessibleContext().setAccessibleName(placeholder);
 
         area.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, null);
         area.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, null);

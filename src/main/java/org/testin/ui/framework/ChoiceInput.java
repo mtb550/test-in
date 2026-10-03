@@ -45,6 +45,8 @@ public final class ChoiceInput implements DialogComponent {
 
         // Rule-INTERNAL-087
         panel = Caption.above(caption, combo);
+        // Rule-INTERNAL-122
+        combo.getEditor().getEditorComponent().getAccessibleContext().setAccessibleName(caption);
 
         enterPicksOnlyFromTheOpenList();
 

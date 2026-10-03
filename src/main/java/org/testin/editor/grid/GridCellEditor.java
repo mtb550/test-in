@@ -64,11 +64,13 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
         });
     }
 
+    // Rule-INTERNAL-122
     @Override
     public @NotNull Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
         editingTable = Optional.of(table);
         editingRow = row;
         textArea.setText(Objects.toString(value, ""));
+        textArea.getAccessibleContext().setAccessibleName(table.getColumnName(column));
         textArea.setFont(table.getFont());
         textArea.setBackground(table.getSelectionBackground());
         textArea.setForeground(table.getForeground());

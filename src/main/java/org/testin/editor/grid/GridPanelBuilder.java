@@ -38,6 +38,7 @@ import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.framework.RowStripe;
+import org.testin.util.Bundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -124,11 +125,12 @@ public class GridPanelBuilder {
                 wrapper.add(textArea, c);
             }
 
-            // Rule-EDITOR-PANEL-250
+            // Rule-EDITOR-PANEL-250, Rule-INTERNAL-122
             @Override
             public @NotNull Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
                 final @NotNull String raw = Objects.toString(value, "");
                 textArea.setText(raw);
+                wrapper.getAccessibleContext().setAccessibleName(raw);
                 textArea.setFont(table.getFont());
                 textArea.setForeground(isSelected ? EditorColors.SELECTION_FOREGROUND : table.getForeground());
                 wrapper.setBackground(isSelected ? SELECTION_BACKGROUND : RowStripe.of(row));
@@ -418,6 +420,8 @@ public class GridPanelBuilder {
             }
         };
         table.putClientProperty(GRID_KIND_KEY, kind);
+        // Rule-INTERNAL-122
+        table.getAccessibleContext().setAccessibleName(Bundle.message("editor.test.cases"));
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         GridExcelBehavior.install(table);

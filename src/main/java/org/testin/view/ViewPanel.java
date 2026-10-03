@@ -39,6 +39,7 @@ import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.ui.FontSync;
 
+import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
@@ -100,7 +101,7 @@ public class ViewPanel implements Disposable {
         new EscapeAction(p, historyTab);
         new EscapeAction(p, openBugsTab);
 
-        tabs().forEach(this::takesTheKeyboard);
+        for (final ViewTab tab : ViewTab.values()) takesTheKeyboard(tab);
         IdeEventQueue.getInstance().addPostprocessor(event -> {
             focusTabPressed(event);
             return false;
@@ -117,10 +118,12 @@ public class ViewPanel implements Disposable {
         return Stream.of(detailsTab, historyTab, openBugsTab);
     }
 
-    // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080
-    private void takesTheKeyboard(final @NotNull JBPanel<?> tab) {
+    // UC-VIEW-PANEL-017, Rule-VIEW-PANEL-079, Rule-VIEW-PANEL-080, Rule-INTERNAL-122
+    private void takesTheKeyboard(final @NotNull ViewTab shown) {
+        final @NotNull JComponent tab = shown.keyboardTargetOf(this);
         tab.setFocusable(true);
         tab.setFocusTraversalKeysEnabled(false);
+        tab.getAccessibleContext().setAccessibleName(shown.getDisplayName());
 
         new ViewTabAction(p, tab, Direction.NEXT);
         new ViewTabAction(p, tab, Direction.PREVIOUS);
