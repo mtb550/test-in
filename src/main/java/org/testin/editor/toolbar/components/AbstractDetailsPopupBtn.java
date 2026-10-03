@@ -17,25 +17,22 @@
 package org.testin.editor.toolbar.components;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.CheckBoxList;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.logger.Logger;
+import org.testin.editor.ShownFields;
 import org.testin.model.ToolBarAttribute;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
-import org.testin.util.FailureText;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribute> extends AbstractIconButton implements ToolbarItem {
     protected static final @NotNull String FIELDS = Bundle.message("toolbar.fields");
@@ -54,33 +51,9 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
         this.propertyKey = propertyKey;
         this.options = List.of(attributes.getEnumConstants());
 
-        final @NotNull String defaults = options.stream()
-                .filter(o -> o.getToolBarDefault().isSelectedByDefault())
-                .map(Enum::name)
-                .collect(Collectors.joining(","));
-        final @NotNull String saved = PropertiesComponent.getInstance().getValue(propertyKey, defaults);
-
-        for (final String s : saved.split(",")) {
-            if (s.isEmpty()) continue;
-            try {
-                selectedDetails.add(Enum.valueOf(attributes, s));
-            } catch (final IllegalArgumentException ex) {
-                Logger.error("Invalid editor attribute '" + s + "' for " + propertyKey + ": " + FailureText.of(ex));
-            }
-        }
-
-        options.forEach(o -> o.getToolBarDefault().enforceLock(o, selectedDetails));
+        selectedDetails.addAll(ShownFields.read(propertyKey, attributes));
 
         addActionListener(_ -> showDetailsPopup(onToolBarDetailsSelectedChanged));
-    }
-
-    // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-022
-    private void saveProps() {
-        final @NotNull String joinedNames = selectedDetails.stream()
-                .map(Enum::name)
-                .collect(Collectors.joining(","));
-
-        PropertiesComponent.getInstance().setValue(propertyKey, joinedNames);
     }
 
     // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-024
@@ -104,7 +77,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
                 else selectedDetails.remove(item);
             });
 
-            saveProps();
+            ShownFields.write(propertyKey, selectedDetails);
 
             if (refreshQueued.compareAndSet(false, true)) {
                 ApplicationManager.getApplication().invokeLater(() -> {

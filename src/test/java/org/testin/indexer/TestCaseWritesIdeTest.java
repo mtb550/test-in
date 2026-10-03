@@ -17,6 +17,7 @@
 package org.testin.indexer;
 
 import com.intellij.openapi.application.WriteAction;
+import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -28,10 +29,10 @@ import org.testin.testcase.TestCaseOrder;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
+
+import static org.junit.Assert.assertArrayEquals;
 
 public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
 
@@ -153,14 +154,14 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
     // Rule-INTERNAL-035
     public void testATestCaseSavedAsItIsBeforeTheOrderKeepsItsCreator() {
         final TestSetDirectoryDto ts = oneTestSet();
-        final TestCaseDto moved = aTestCaseIn(ts, "m").setCreatedBy("Sara Al-Otaibi");
+        final TestCaseDto moved = aTestCaseIn(ts, "m").setCreatedBy("Mohammed AlZamil");
         final var createdAt = moved.getCreatedAt();
 
         indexedTestCases().putTestCaseVerbatim(ts.getPath(), moved);
         indexedTestCases().updateSequence(ts.getPath(), List.of(moved), List.of());
 
         final TestCaseDto indexed = indexedTestCases().findTestCase(moved.getId()).orElseThrow();
-        assertEquals("a moved test case took the paster's name as its creator", "Sara Al-Otaibi", indexed.getCreatedBy());
+        assertEquals("a moved test case took the paster's name as its creator", "Mohammed AlZamil", indexed.getCreatedBy());
         assertEquals("a moved test case took a new creation date", createdAt, indexed.getCreatedAt());
     }
 
@@ -203,7 +204,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
         final List<TestSetDirectoryDto> sets = twoTestSets();
         final TestSetDirectoryDto login = sets.get(0);
         final TestSetDirectoryDto signUp = sets.get(1);
-        final TestCaseDto cut = aTestCaseIn(login, "m").setCreatedBy("Sara Al-Otaibi");
+        final TestCaseDto cut = aTestCaseIn(login, "m").setCreatedBy("Mohammed AlZamil");
         indexedTestCases().putTestCaseVerbatim(login.getPath(), cut);
 
         assertTrue("the move said it failed", indexedTestCases().moveTestCase(login.getPath(), signUp.getPath(), pastedInto(signUp, cut)));
@@ -213,7 +214,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
 
         final TestCaseDto indexed = indexedTestCases().findTestCase(cut.getId()).orElseThrow();
         assertEquals("the index still files the test case under its old set", signUp.getPath(), indexed.getParent().getPath());
-        assertEquals("the move took a new creator", "Sara Al-Otaibi", indexed.getCreatedBy());
+        assertEquals("the move took a new creator", "Mohammed AlZamil", indexed.getCreatedBy());
         assertTrue("the old set still lists the test case",
                 indexedTestCases().getTestCasesForTestSet(login.getPath()).stream().noneMatch(tc -> tc.getId().equals(cut.getId())));
     }
@@ -302,10 +303,10 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    private static void asTester(final @NotNull String name, final @NotNull Runnable work) {
+    private static void asTester(final @NotNull Runnable work) {
         final @NotNull AppSettingsState settings = Services.getInstance(AppSettingsState.class);
         final @NotNull String was = settings.testerName;
-        settings.testerName = name;
+        settings.testerName = "Muteb Almughyiri";
         try {
             work.run();
         } finally {
@@ -316,35 +317,35 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
     // UC-INTERNAL-004, Rule-INTERNAL-033
     public void testASaveThatWouldLeaveTheFileAsItIsWritesNothing() {
         final @NotNull TestSetDirectoryDto ts = oneTestSet();
-        final @NotNull TestCaseDto held = aTestCaseIn(ts, "m").setCreatedBy("Sara Al-Otaibi");
+        final @NotNull TestCaseDto held = aTestCaseIn(ts, "m").setCreatedBy("Mohammed AlZamil");
         indexedTestCases().putTestCaseVerbatim(ts.getPath(), held);
         final byte @NotNull [] before = bytesOf(fileOf(ts, held));
 
-        asTester("Omar Haddad", () -> assertFalse("a save that changed nothing was reported as written",
+        asTester(() -> assertFalse("a save that changed nothing was reported as written",
                 indexedTestCases().putTestCase(ts.getPath(), held.edit().build())));
 
-        assertTrue("a save that changed nothing rewrote the file", Arrays.equals(before, bytesOf(fileOf(ts, held))));
+        assertArrayEquals("a save that changed nothing rewrote the file", before, bytesOf(fileOf(ts, held)));
         assertEquals("a save that changed nothing recorded the tester as having edited it", "", held.getUpdatedBy());
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-034
     public void testASaveIsAChangeWhenTheIndexKnowsTheNameAndANewTestCaseWhenItDoesNot() {
         final @NotNull TestSetDirectoryDto ts = oneTestSet();
-        final @NotNull TestCaseDto known = aTestCaseIn(ts, "m").setCreatedBy("Sara Al-Otaibi");
+        final @NotNull TestCaseDto known = aTestCaseIn(ts, "m").setCreatedBy("Mohammed AlZamil");
         indexedTestCases().putTestCaseVerbatim(ts.getPath(), known);
         final @NotNull TestCaseDto fresh = aTestCaseIn(ts, "s");
 
-        asTester("Omar Haddad", () -> {
+        asTester(() -> {
             assertTrue("the edit said it failed", indexedTestCases().putTestCase(ts.getPath(), known.edit().description("Log in with a locked user").build()));
             assertTrue("the new test case said it failed", indexedTestCases().putTestCase(ts.getPath(), fresh));
         });
 
         final @NotNull TestCaseDto edited = indexedTestCases().findTestCase(known.getId()).orElseThrow();
-        assertEquals("a save of a test case the index knows took a new creator", "Sara Al-Otaibi", edited.getCreatedBy());
-        assertEquals("a save of a test case the index knows did not record who changed it", "Omar Haddad", edited.getUpdatedBy());
+        assertEquals("a save of a test case the index knows took a new creator", "Mohammed AlZamil", edited.getCreatedBy());
+        assertEquals("a save of a test case the index knows did not record who changed it", "Muteb Almughyiri", edited.getUpdatedBy());
 
         final @NotNull TestCaseDto created = indexedTestCases().findTestCase(fresh.getId()).orElseThrow();
-        assertEquals("a save of a test case the index has never seen was not stamped as created", "Omar Haddad", created.getCreatedBy());
+        assertEquals("a save of a test case the index has never seen was not stamped as created", "Muteb Almughyiri", created.getCreatedBy());
         assertEquals("a save of a test case the index has never seen was recorded as a change", "", created.getUpdatedBy());
     }
 }

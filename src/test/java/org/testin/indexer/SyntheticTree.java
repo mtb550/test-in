@@ -40,8 +40,8 @@ final class SyntheticTree {
               "priority" : "HIGH",
               "reference" : "JIRA-1234",
               "group" : [ "SMOKE" ],
-              "createdBy" : "Sara Al-Otaibi",
-              "updatedBy" : "Sara Al-Otaibi",
+              "createdBy" : "Mohammed AlZamil",
+              "updatedBy" : "Mohammed AlZamil",
               "createdAt" : "Wednesday 02-09-2026 At 23:29:28 [Asia/Riyadh]",
               "updatedAt" : "Monday 07-09-2026 At 06:49:39 [Asia/Riyadh]",
               "module" : "Authentication",
@@ -51,9 +51,9 @@ final class SyntheticTree {
 
     private static final @NotNull String MARKER = """
             {
-              "createdBy" : "Sara Al-Otaibi",
+              "createdBy" : "Mohammed AlZamil",
               "createdAt" : "Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]",
-              "modifiedBy" : "Sara Al-Otaibi",
+              "modifiedBy" : "Mohammed AlZamil",
               "modifiedAt" : "Friday 28-08-2026 At 01:12:47 [Asia/Riyadh]",
               "status" : "ACTIVE",
               "format" : %d

@@ -117,8 +117,8 @@ public class ChangeTypeRevertTest {
     @Test
     public void revertingTheLastChangePutsBackTheCommittedAudit() {
         final TestCaseDto committed = committed()
-                .setCreatedBy("Sara Al-Otaibi")
-                .setUpdatedBy("Sara Al-Otaibi")
+                .setCreatedBy("Mohammed AlZamil")
+                .setUpdatedBy("Mohammed AlZamil")
                 .setUpdatedAt(ZonedDateTime.parse("2026-09-01T10:00:00Z"));
         final TestCaseDto current = reverted(ChangeType.CHANGE_MODULE, committed().setModule("edited module").setUpdatedBy("Muteb"), committed);
         assertEquals(TestCaseChangeComparator.compare(committed, current), List.of(), "nothing reviewable is left");

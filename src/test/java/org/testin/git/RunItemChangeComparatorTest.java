@@ -50,7 +50,7 @@ public class RunItemChangeComparatorTest {
                 .bugSeverity(BugSeverity.MAJOR)
                 .bugPriority(BugPriority.HIGH)
                 .bugIssueUrl("https://github.com/mtb550/test-in/issues/305")
-                .executedBy("Sara Al-Otaibi")
+                .executedBy("Mohammed AlZamil")
                 .executedAt(EXECUTED_AT)
                 .screenshots(List.of("a1b2c.png"))
                 .build();

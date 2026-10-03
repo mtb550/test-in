@@ -123,14 +123,14 @@ walks one test case from written to reported, in pictures.
 
 Testin has eight parts. Each part gets a folder, and every thing a tester does
 in it gets a page of its own: the story, its rules, its screens, what happens
-step by step, and every way it can be refused. 151 use cases and 843 rules, each
+step by step, and every way it can be refused. 151 use cases and 844 rules, each
 checked against the code it describes.
 
 | Document                                                   | Covers                                             |
 |------------------------------------------------------------|----------------------------------------------------|
 | **[The tree panel](docs/treePanel/main.md)**               | The tree on the left                               |
 | **[The editor panel](docs/editorPanel/main.md)**           | Writing test cases, and executing a test run       |
-| **[The view panel](docs/viewPanel/main.md)**               | One test case in full, on the right                |
+| **[The view panel](docs/viewPanel/main.md)**               | One test case and its fields, on the right         |
 | **[The settings page](docs/setting/main.md)**              | Everything set once per machine                    |
 | **[Automation code and the gutter](docs/codegen/main.md)** | The test methods Testin writes                     |
 | **[Reports](docs/report/main.md)**                         | A test run written out as a document               |

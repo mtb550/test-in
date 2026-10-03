@@ -48,7 +48,7 @@ import java.util.stream.Stream;
 
 public class TreeNodesIdeTest extends AbstractTempRootIdeTest {
 
-    private static final @NotNull String TESTER = "Sara Al-Otaibi";
+    private static final @NotNull String TESTER = "Mohammed AlZamil";
 
     private static @NotNull AppSettingsState settings() {
         return Services.getInstance(AppSettingsState.class);

@@ -71,7 +71,7 @@ public class MarkerWritesIdeTest extends AbstractReadTheRootIdeTest {
                 return created;
             });
 
-            settings().testerName = "Sara Al-Otaibi";
+            settings().testerName = "Mohammed AlZamil";
             WriteAction.runAndWait(() -> {
                 tp.getMarker().setStatus(ProjectStatus.INACTIVE);
                 nodes().persistMarker(tp);

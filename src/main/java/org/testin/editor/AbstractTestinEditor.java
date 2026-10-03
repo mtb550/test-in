@@ -55,6 +55,8 @@ import org.testin.services.TestCaseValues;
 import org.testin.undo.UndoHistories;
 import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
+import org.testin.view.ViewPanel;
+import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
@@ -277,6 +279,9 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         } else {
             refreshCards();
         }
+
+        // Rule-VIEW-PANEL-090
+        ViewToolWindowFactory.panel(getProject()).ifPresent(ViewPanel::refreshCurrentView);
     }
 
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-018

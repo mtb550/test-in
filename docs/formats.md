@@ -106,9 +106,9 @@ precedence, and nothing else may ask in a different order.
 ```json
 {
   "id" : "8c1f0f2e-6a44-4a31-9f0b-5b2a7c4e91d3",
-  "createdBy" : "Sara Al-Otaibi",
+  "createdBy" : "Mohammed AlZamil",
   "createdAt" : "Wednesday 02-09-2026 At 23:29:16 [Asia/Riyadh]",
-  "modifiedBy" : "Sara Al-Otaibi",
+  "modifiedBy" : "Mohammed AlZamil",
   "modifiedAt" : "Wednesday 09-09-2026 At 05:28:11 [Asia/Riyadh]",
   "status" : "ACTIVE"
 }
@@ -130,9 +130,9 @@ own file:
 ```json
 {
   "id" : "b7d3a5c1-2e48-4f6a-8d09-1c5b7e2a4f80",
-  "createdBy" : "Sara Al-Otaibi",
+  "createdBy" : "Mohammed AlZamil",
   "createdAt" : "Sunday 13-09-2026 At 09:00:00 [Asia/Riyadh]",
-  "modifiedBy" : "Sara Al-Otaibi",
+  "modifiedBy" : "Mohammed AlZamil",
   "modifiedAt" : "Monday 14-09-2026 At 10:22:05 [Asia/Riyadh]",
   "status" : "IN_PROGRESS",
   "configuration" : { "TEST_TYPE" : "Regression", "PLATFORM" : "Web", "BROWSER" : "Chrome" },
@@ -203,8 +203,8 @@ on each test case and nothing else.
   "priority" : "HIGH",
   "reference" : "",
   "group" : [ "SMOKE" ],
-  "createdBy" : "Sara Al-Otaibi",
-  "updatedBy" : "Sara Al-Otaibi",
+  "createdBy" : "Mohammed AlZamil",
+  "updatedBy" : "Mohammed AlZamil",
   "createdAt" : "Wednesday 02-09-2026 At 23:29:28 [Asia/Riyadh]",
   "updatedAt" : "Monday 07-09-2026 At 06:49:39 [Asia/Riyadh]",
   "module" : "",

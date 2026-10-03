@@ -18,7 +18,9 @@ package org.testin.view.details;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.ShownFields;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
 import org.testin.view.Drawn;
@@ -28,9 +30,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 public class DetailsRowsIdeTest extends BasePlatformTestCase {
 
@@ -82,6 +86,23 @@ public class DetailsRowsIdeTest extends BasePlatformTestCase {
         final @NotNull List<String> captions = words(everyFieldFilled()).stream().filter(ROWS_IN_ORDER::contains).toList();
 
         assertEquals("the test case's rows were drawn out of their fixed order", ROWS_IN_ORDER, captions);
+    }
+
+    // Rule-VIEW-PANEL-090
+    public void testAFieldUntickedInFieldsIsNotDrawn() {
+        final @NotNull Set<TestCaseEditorAttributes> was = ShownFields.inTestSets();
+        final @NotNull Set<TestCaseEditorAttributes> chosen = EnumSet.allOf(TestCaseEditorAttributes.class);
+        chosen.removeAll(Set.of(TestCaseEditorAttributes.STEPS, TestCaseEditorAttributes.MODULE));
+        ShownFields.write(ShownFields.IN_TEST_SETS, chosen);
+        try {
+            final @NotNull List<String> words = Drawn.words(Drawn.detailsTabAsChosen(getProject(), everyFieldFilled(), Optional.empty(), PATH));
+
+            assertFalse("a row unticked in Fields was drawn: " + words, words.contains(caption("attribute.steps")));
+            assertFalse("a row unticked in Fields was drawn: " + words, words.contains(caption("attribute.module")));
+            assertTrue("a row ticked in Fields went missing: " + words, words.contains(caption("attribute.expected.result")));
+        } finally {
+            ShownFields.write(ShownFields.IN_TEST_SETS, was);
+        }
     }
 
     // Rule-VIEW-PANEL-006, Rule-VIEW-PANEL-024

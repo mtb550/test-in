@@ -17,14 +17,14 @@
 package org.testin.editor.toolbar.components;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.EditorKind;
+import org.testin.editor.ShownFields;
 import org.testin.testrun.TestRunEditorAttributes;
 
 public class TestRunDetailsPopupBtn extends AbstractDetailsPopupBtn<TestRunEditorAttributes> {
     // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-022
     public TestRunDetailsPopupBtn(final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         super(FIELDS,
-                EditorKind.RUN.detailsKey(7),
+                ShownFields.IN_TEST_RUNS,
                 TestRunEditorAttributes.class,
                 onToolBarDetailsSelectedChanged);
     }

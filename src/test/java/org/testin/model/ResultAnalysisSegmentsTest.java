@@ -22,11 +22,12 @@ import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
 import java.awt.Color;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -130,7 +131,7 @@ public class ResultAnalysisSegmentsTest {
     public void theAnalysisHasOneSectionForEachRunItemStatusEachCountingItsOwn() {
         final @NotNull TestRunSummary summary = run(1, 2, 3, 4, 0);
 
-        assertEquals(List.of(ResultAnalysis.values()).stream().map(ResultAnalysis::getLabel).toList(),
+        assertEquals(Stream.of(ResultAnalysis.values()).map(ResultAnalysis::getLabel).toList(),
                 List.of(RunItemStatus.PASSED.getLabel(), RunItemStatus.FAILED.getLabel(), RunItemStatus.BLOCKED.getLabel(), RunItemStatus.UNTESTED.getLabel()));
         assertEquals(ResultAnalysis.PASSED.heading(summary), RunItemStatus.PASSED.getLabel() + " (1)");
         assertEquals(ResultAnalysis.FAILED.heading(summary), RunItemStatus.FAILED.getLabel() + " (2)");

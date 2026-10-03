@@ -20,11 +20,11 @@ import com.intellij.openapi.application.ApplicationManager;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 public class AwaitIndexingIdeTest extends AbstractReadTheRootIdeTest {
 
@@ -74,7 +74,7 @@ public class AwaitIndexingIdeTest extends AbstractReadTheRootIdeTest {
             throw new AssertionError("interrupted while waiting for the wait to return", interrupted);
         } finally {
             release.countDown();
-            Await.until("the held-back read never finished", () -> List.of(holder, waiter).stream().allMatch(Future::isDone) && !indexing.isAlive());
+            Await.until("the held-back read never finished", () -> Stream.of(holder, waiter).allMatch(Future::isDone) && !indexing.isAlive());
         }
     }
 }
