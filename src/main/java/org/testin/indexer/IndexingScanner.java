@@ -57,7 +57,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 final class IndexingScanner {
-    private final @NotNull Project p;
     private final @NotNull IndexerDataStore store;
     private final @NotNull DirectoryMapper directoryMapper;
     private final @NotNull Mapper mapper;
@@ -65,7 +64,6 @@ final class IndexingScanner {
     private final @NotNull TestDataFiles testDataFiles;
 
     IndexingScanner(final @NotNull Project p, final @NotNull IndexerDataStore store) {
-        this.p = p;
         this.store = store;
         this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
         this.mapper = Services.getInstance(p, Mapper.class);

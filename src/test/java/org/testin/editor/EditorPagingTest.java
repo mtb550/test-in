@@ -30,8 +30,8 @@ import static org.testng.Assert.assertTrue;
 
 public class EditorPagingTest {
 
-    private static @NotNull List<TestCaseDto> testCases(final int count) {
-        return IntStream.range(0, count).mapToObj(_ -> TestCaseDto.builder().id(UUID.randomUUID()).build()).toList();
+    private static @NotNull List<TestCaseDto> twentyFiveTestCases() {
+        return IntStream.range(0, 25).mapToObj(_ -> TestCaseDto.builder().id(UUID.randomUUID()).build()).toList();
     }
 
     // Rule-EDITOR-PANEL-101
@@ -51,7 +51,7 @@ public class EditorPagingTest {
     // Rule-EDITOR-PANEL-101
     @Test
     public void thePageHoldsOnlyItsOwnTestCases() {
-        final @NotNull List<TestCaseDto> all = testCases(25);
+        final @NotNull List<TestCaseDto> all = twentyFiveTestCases();
         final @NotNull EditorPaging paging = new EditorPaging(10);
         paging.turnTo(2);
 
@@ -72,7 +72,7 @@ public class EditorPagingTest {
     // Rule-EDITOR-PANEL-104
     @Test
     public void aPendingTestCaseTurnsToItsPageAndAMissingOneDoesNot() {
-        final @NotNull List<TestCaseDto> all = testCases(25);
+        final @NotNull List<TestCaseDto> all = twentyFiveTestCases();
         final @NotNull EditorPaging paging = new EditorPaging(10);
 
         assertTrue(paging.turnToPageHolding(all.get(14).getId(), all), "the page holding the test case was not turned to");

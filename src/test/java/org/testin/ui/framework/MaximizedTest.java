@@ -38,11 +38,11 @@ public class MaximizedTest {
             case "getLocationOnScreen" -> bounds.getLocation();
             case "setSize" -> {
                 bounds.setSize((Dimension) args[0]);
-                yield null;
+                yield bounds;
             }
             case "setLocation" -> {
                 bounds.setLocation((Point) args[0]);
-                yield null;
+                yield bounds;
             }
             case "equals" -> proxy == args[0];
             case "hashCode" -> System.identityHashCode(proxy);
