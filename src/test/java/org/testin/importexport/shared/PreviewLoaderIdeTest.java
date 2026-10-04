@@ -69,7 +69,10 @@ public class PreviewLoaderIdeTest extends AbstractTempRootIdeTest {
     private @NotNull String file(final @NotNull String name) {
         try {
             final @NotNull Path file = root.resolve(name);
-            Files.writeString(file, "Description\nlog in with a valid user\n");
+            Files.writeString(file, """
+                    Description
+                    log in with a valid user
+                    """);
             return file.toString();
         } catch (final IOException ex) {
             throw new AssertionError("Could not write " + name + ": " + ex.getMessage(), ex);

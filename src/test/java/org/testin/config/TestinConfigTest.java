@@ -43,7 +43,10 @@ public class TestinConfigTest {
     @Test
     public void aBugRepositoryIsReadFromItsOwnKey() {
         final TestinProjectConfig config = TestinYml.parse(
-                "testinProject: cases\nbugRepoUrl: https://mtb550:ghp_secret@github.com/mtb550/product.git\n", "bug repo");
+                """
+                        testinProject: cases
+                        bugRepoUrl: https://mtb550:ghp_secret@github.com/mtb550/product.git
+                        """, "bug repo");
 
         assertEquals(config.bugRepoUrl(), "https://github.com/mtb550/product.git", "a token never survives, as for RepoUrl");
         assertEquals(BugRepository.of(config.bugRepoUrl()).map(BugRepository::ghRepo).orElse(""), "github.com/mtb550/product");
@@ -126,7 +129,10 @@ public class TestinConfigTest {
 
     @Test
     public void aProjectIsLocalUntilTheFileSaysOtherwise() {
-        final TestinProjectConfig quiet = TestinYml.parse("testinProject: cases\nRepoUrl: https://github.com/acme/cases.git\n",
+        final TestinProjectConfig quiet = TestinYml.parse("""
+                testinProject: cases
+                RepoUrl: https://github.com/acme/cases.git
+                """,
                 "an address and no location");
 
         assertEquals(quiet.location(), TestinLocation.LOCAL, "left out, it is local");
@@ -136,7 +142,10 @@ public class TestinConfigTest {
     @Test
     public void anAddressAloneDoesNotMakeAProjectRemote() {
         final TestinProjectConfig stillLocal = TestinYml.parse(
-                "location: local\nRepoUrl: https://github.com/acme/cases.git\n", "local with an address left in");
+                """
+                        location: local
+                        RepoUrl: https://github.com/acme/cases.git
+                        """, "local with an address left in");
 
         assertFalse(stillLocal.hasRepoUrl(), "local wins over everything below it");
     }
@@ -144,7 +153,12 @@ public class TestinConfigTest {
     @Test
     public void aFileThatStillSaysConnectionGitStillClones() {
         final TestinProjectConfig old = TestinYml.parse(
-                "location: remote\nconnection: git\nRepoUrl: https://github.com/acme/cases.git\ntestinProject: cases\n", "old git");
+                """
+                        location: remote
+                        connection: git
+                        RepoUrl: https://github.com/acme/cases.git
+                        testinProject: cases
+                        """, "old git");
 
         assertTrue(old.hasRepoUrl());
         assertEquals(old.projectName(), "cases");
@@ -168,7 +182,11 @@ public class TestinConfigTest {
     @Test
     public void aGitProjectIsReadFromItsUrl() {
         final TestinProjectConfig inGit = TestinYml.parse(
-                "location: remote\ntestinProject: cases\nRepoUrl: https://github.com/acme/cases.git\n", "git");
+                """
+                        location: remote
+                        testinProject: cases
+                        RepoUrl: https://github.com/acme/cases.git
+                        """, "git");
 
         assertTrue(inGit.hasRepoUrl());
         assertEquals(inGit.projectName(), "cases");
@@ -184,7 +202,10 @@ public class TestinConfigTest {
     // Rule-TREE-PANEL-124
     @Test
     public void aRemoteProjectWithNoAddressIsReadAsItIsWritten() {
-        final @NotNull TestinProjectConfig remote =TestinYml.parse("location: remote\ntestinProject: cases\n", "remote with no address");
+        final @NotNull TestinProjectConfig remote =TestinYml.parse("""
+                location: remote
+                testinProject: cases
+                """, "remote with no address");
 
         assertEquals(remote.location(), TestinLocation.REMOTE, "the file says remote, and it was read as something else");
         assertEquals(remote.projectName(), "cases", "a remote project with no address cost the file its project");
@@ -217,7 +238,10 @@ public class TestinConfigTest {
     @Test
     public void aLocalProjectIsNamedByTheKey() {
         final TestinProjectConfig here = TestinYml.parse(
-                "location: local\ntestinProject: test-01\n", "local");
+                """
+                        location: local
+                        testinProject: test-01
+                        """, "local");
 
         assertEquals(here.projectName(), "test-01");
         assertFalse(here.hasRepoUrl());
@@ -267,7 +291,11 @@ public class TestinConfigTest {
     public void aNewFileIsTheThreeLines() {
         final String written = TestinYml.withLines("", savedLines());
 
-        assertEquals(written, "testinProject: NAFATH\nlocation: remote\nRepoUrl: https://github.com/acme/nafath-test-cases.git\n");
+        assertEquals(written, """
+                testinProject: NAFATH
+                location: remote
+                RepoUrl: https://github.com/acme/nafath-test-cases.git
+                """);
         assertEquals(TestinYml.parse(written, "saved").projectName(), "NAFATH");
         assertTrue(TestinYml.parse(written, "saved").hasRepoUrl(), "and a colleague's first open can clone it");
     }
@@ -308,20 +336,36 @@ public class TestinConfigTest {
     @Test
     public void aLineIsAddedAfterALastLineWithNoNewline() {
         assertEquals(TestinYml.withLines("location: remote", Map.of("testinProject", "NAFATH")),
-                "location: remote\ntestinProject: NAFATH\n");
+                """
+                        location: remote
+                        testinProject: NAFATH
+                        """);
     }
 
     @Test
     public void aNestedKeyIsNotTheKey() {
-        assertEquals(TestinYml.withLines("report:\n  testinProject: inner\n", Map.of("testinProject", "NAFATH")),
-                "report:\n  testinProject: inner\ntestinProject: NAFATH\n");
+        assertEquals(TestinYml.withLines("""
+                report:
+                  testinProject: inner
+                """, Map.of("testinProject", "NAFATH")),
+                """
+                        report:
+                          testinProject: inner
+                        testinProject: NAFATH
+                        """);
     }
 
     @Test
     public void aKeyWrittenTwiceIsSetEverywhere() {
-        final String written = TestinYml.withLines("testinProject: Checkout\ntestinProject: Old\n", Map.of("testinProject", "NAFATH"));
+        final String written = TestinYml.withLines("""
+                testinProject: Checkout
+                testinProject: Old
+                """, Map.of("testinProject", "NAFATH"));
 
-        assertEquals(written, "testinProject: NAFATH\ntestinProject: NAFATH\n");
+        assertEquals(written, """
+                testinProject: NAFATH
+                testinProject: NAFATH
+                """);
         assertEquals(TestinYml.parse(written, "twice").projectName(), "NAFATH");
     }
 
@@ -336,7 +380,11 @@ public class TestinConfigTest {
 
     @Test
     public void thePreviewReadsWhatIsWritten() {
-        final Map<String, String> values = TestinYml.valuesIn("# testinProject: old\ntestinProject: '#1 O''Brien'\nlocation: local  # for now\n",
+        final Map<String, String> values = TestinYml.valuesIn("""
+                # testinProject: old
+                testinProject: '#1 O''Brien'
+                location: local  # for now
+                """,
                 Set.of("testinProject", "location", "RepoUrl"));
 
         assertEquals(values, Map.of("testinProject", "#1 O'Brien", "location", "local"));

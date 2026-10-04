@@ -37,7 +37,12 @@ public class TestSetClassIdeTest extends AbstractCodegenIdeTest {
     public void testTheClassIsWrittenEmpty() {
         createdTestSet("Login");
 
-        assertEquals("package nafath;\n\npublic class LoginTest {\n}\n", generatedClass("nafath.LoginTest").orElseThrow().getContainingFile().getText());
+        assertEquals("""
+                package nafath;
+
+                public class LoginTest {
+                }
+                """, generatedClass("nafath.LoginTest").orElseThrow().getContainingFile().getText());
     }
 
     // Rule-CODEGEN-009

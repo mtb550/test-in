@@ -130,11 +130,17 @@ public final class JavaSourceRoot {
         }
 
         final @NotNull String packageName = String.join(".", packageSegments);
-        final @NotNull String declaration = packageName.isEmpty() ? "" : "package " + packageName + ";\n\n";
+        final @NotNull String declaration = packageName.isEmpty() ? "" : """
+                package %s;
+
+                """.formatted(packageName);
 
         try {
             final @NotNull VirtualFile file = folder.get().createChildData(JavaSourceRoot.class, fileName);
-            VfsUtil.saveText(file, declaration + "public class " + className + " {\n}\n");
+            VfsUtil.saveText(file, declaration + """
+                    public class %s {
+                    }
+                    """.formatted(className));
 
             Logger.info("Test class created at: " + file.getPath());
             return Optional.of(file);

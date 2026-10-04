@@ -279,7 +279,10 @@ public class FailureDialogIdeTest extends AbstractTempRootIdeTest {
             Await.until("the box never drew its editor", () -> box.getEditor() != null);
             final int oneLine = box.getPreferredSize().height;
 
-            box.setText("one\ntwo\nthree");
+            box.setText("""
+                    one
+                    two
+                    three""");
             PlatformTestUtil.dispatchAllInvocationEventsInIdeEventQueue();
             assertTrue("the box did not grow as lines were added", box.getPreferredSize().height > oneLine);
 

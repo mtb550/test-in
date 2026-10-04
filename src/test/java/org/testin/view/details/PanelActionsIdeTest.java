@@ -25,6 +25,7 @@ import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
+import org.testin.LoginTestSource;
 import org.testin.Said;
 import org.testin.actions.Declared;
 import org.testin.config.TestinYml;
@@ -256,9 +257,7 @@ public class PanelActionsIdeTest extends AbstractCodegenIdeTest {
     // Rule-VIEW-PANEL-010, Rule-VIEW-PANEL-011, Rule-VIEW-PANEL-022
     public void testClickingTheMarkBesideATestMethodOpensThePanelOnThatOneTestCase() {
         final @NotNull TestCaseDto tc = aTestCase();
-        final @NotNull String text = "package nafath;\n\nimport org.testng.annotations.Test;\n\npublic class LoginTest {\n"
-                + "    @Test(description = \"Log in\", testName = \"" + tc.getId() + "\")\n"
-                + "    public void logIn() {\n    }\n}\n";
+        final @NotNull String text = LoginTestSource.withTestNg(tc.getId().toString());
         final @NotNull PsiFile file = myFixture.addFileToProject("nafath/LoginMarkTest.java", text);
         myFixture.configureFromExistingVirtualFile(file.getVirtualFile());
         myFixture.getEditor().getCaretModel().moveToOffset(text.indexOf(tc.getId().toString()));

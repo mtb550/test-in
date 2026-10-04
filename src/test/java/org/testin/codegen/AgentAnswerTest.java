@@ -34,7 +34,12 @@ public class AgentAnswerTest {
 
     @Test
     public void aFencedBlockIsUnwrapped() {
-        final String fenced = "Here you go:\n```java\n" + STATEMENTS + "\n```\nHope that helps.";
+        final String fenced = """
+                Here you go:
+                ```java
+                %s
+                ```
+                Hope that helps.""".formatted(STATEMENTS);
 
         assertEquals(AgentAnswer.statementsIn(fenced), Optional.of(STATEMENTS),
                 "the prose around a fenced block would not compile, and the tester never asked for it");
@@ -43,7 +48,14 @@ public class AgentAnswerTest {
     // Rule-CODEGEN-088
     @Test
     public void theLargestBlockWinsWhenAnAgentShowsSeveral() {
-        final String two = "```java\nint x = 1;\n```\nand the real one:\n```java\n" + STATEMENTS + "\n```";
+        final String two = """
+                ```java
+                int x = 1;
+                ```
+                and the real one:
+                ```java
+                %s
+                ```""".formatted(STATEMENTS);
 
         assertEquals(AgentAnswer.statementsIn(two), Optional.of(STATEMENTS));
     }

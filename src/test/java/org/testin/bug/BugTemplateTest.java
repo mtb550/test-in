@@ -150,7 +150,10 @@ public class BugTemplateTest {
     public void aPlaceholderATesterTypedIsWrittenAsText() {
         final String body = BugTemplate.body(facts().toBuilder().actualResult("{{severity}}").build(), Optional.empty());
 
-        assertTrue(body.contains("### Actual result\n{{severity}}\n"));
+        assertTrue(body.contains("""
+                ### Actual result
+                {{severity}}
+                """));
     }
 
     @Test
@@ -160,8 +163,20 @@ public class BugTemplateTest {
 
     @Test
     public void sectionTextCannotBecomeMarkup() {
-        assertEquals(BugTemplate.section("# not a heading\ntext\n---\n  ===\n* * *\n@someone fixed #12 in <script> for me@example.com"),
-                "\\# not a heading\ntext\n\\---\n  \\===\n\\* * *\n@&#8203;someone fixed #&#8203;12 in &lt;script> for me@example.com");
+        assertEquals(BugTemplate.section("""
+                # not a heading
+                text
+                ---
+                  ===
+                * * *
+                @someone fixed #12 in <script> for me@example.com"""),
+                """
+                        \\# not a heading
+                        text
+                        \\---
+                          \\===
+                        \\* * *
+                        @&#8203;someone fixed #&#8203;12 in &lt;script> for me@example.com""");
     }
 
     @Test
@@ -171,20 +186,44 @@ public class BugTemplateTest {
 
     @Test
     public void aFenceIsLongerThanAnyBackticksInside() {
-        assertEquals(BugTemplate.codeBlock("a ``` b\n`````\n\n"), "``````\na ``` b\n`````\n``````");
-        assertEquals(BugTemplate.codeBlock("user=`x`"), "```\nuser=`x`\n```");
+        assertEquals(BugTemplate.codeBlock("""
+                a ``` b
+                `````
+
+                """), """
+                ``````
+                a ``` b
+                `````
+                ``````""");
+        assertEquals(BugTemplate.codeBlock("user=`x`"), """
+                ```
+                user=`x`
+                ```""");
     }
 
     @Test
     public void theSummaryIsTheFirstLineThatSaysAnythingEscaped() {
-        final String exception = BugTemplate.exception("\n\nError <init> & \"x\" @bob #12\n  at y");
+        final String exception = BugTemplate.exception("""
 
-        assertTrue(exception.startsWith("<details>\n<summary>Error &lt;init&gt; &amp; &quot;x&quot; @&#8203;bob #&#8203;12</summary>\n\n```\n"), exception);
+
+                Error <init> & "x" @bob #12
+                  at y""");
+
+        assertTrue(exception.startsWith("""
+                <details>
+                <summary>Error &lt;init&gt; &amp; &quot;x&quot; @&#8203;bob #&#8203;12</summary>
+
+                ```
+                """), exception);
     }
 
     @Test
     public void stepsAreNumberedInTurnAndALongStepStaysInsideIts() {
-        assertEquals(BugTemplate.steps(List.of("Open", "", "Type\nuser", "# 3")), "1. Open\n2. Type\n   user\n3. \\# 3");
+        assertEquals(BugTemplate.steps(List.of("Open", "", "Type\nuser", "# 3")), """
+                1. Open
+                2. Type
+                   user
+                3. \\# 3""");
     }
 
     // Rule-VIEW-PANEL-076
@@ -192,7 +231,11 @@ public class BugTemplateTest {
     public void everyScreenshotIsReferencedByTheFileItIsAttachedAs() {
         final BugFacts two = facts().toBuilder().screenshots(List.of(SCREENSHOT, SCREENSHOT)).build();
 
-        assertTrue(BugTemplate.body(two, Optional.empty()).contains("### Screenshots\n![Screenshot 1](./screenshot-1.png)\n![Screenshot 2](./screenshot-2.png)\n"));
+        assertTrue(BugTemplate.body(two, Optional.empty()).contains("""
+                ### Screenshots
+                ![Screenshot 1](./screenshot-1.png)
+                ![Screenshot 2](./screenshot-2.png)
+                """));
         assertEquals(BugTemplate.screenshotFile(2), "screenshot-2.png");
     }
 

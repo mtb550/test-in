@@ -54,10 +54,13 @@ public class GitCommandRunnerTest {
     @Test
     public void oneBatchAnswersEveryFileByItsByteSize() {
         final String arabic = "{\"description\":\"تسجيل\"}\n";
-        final byte[] batch = ("1111 blob 3\nabc\n"
-                + "HEAD:gone.tc missing\n"
-                + "2222 blob " + arabic.getBytes(StandardCharsets.UTF_8).length + "\n" + arabic + "\n")
-                .getBytes(StandardCharsets.UTF_8);
+        final byte[] batch = """
+                1111 blob 3
+                abc
+                HEAD:gone.tc missing
+                2222 blob %d
+                %s
+                """.formatted(arabic.getBytes(StandardCharsets.UTF_8).length, arabic).getBytes(StandardCharsets.UTF_8);
 
         assertEquals(GitCommandRunner.objectsIn(List.of("a.tc", "gone.tc", "b.tc"), batch),
                 Map.of("a.tc", "abc", "b.tc", arabic),
@@ -67,7 +70,10 @@ public class GitCommandRunnerTest {
     @Test
     public void theBatchAsksForEachFileAtTheRevisionOnItsOwnLine() {
         assertEquals(new String(GitCommandRunner.batchRequest(":2", List.of("Test Cases/a b.tc", "c.tc")), StandardCharsets.UTF_8),
-                ":2:Test Cases/a b.tc\n:2:c.tc\n");
+                """
+                        :2:Test Cases/a b.tc
+                        :2:c.tc
+                        """);
     }
 
     // Rule-SHARE-004, Rule-SHARE-057, Rule-SHARE-062

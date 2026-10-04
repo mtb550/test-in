@@ -52,7 +52,10 @@ public class SettingsReadBySomethingTest {
     private static @NotNull String theStoreBeyondLoadingItself() {
         final @NotNull String store = read(RepositoryRoot.resolve("src").resolve("main/java/org/testin/setting/AppSettingsState.java"));
         final int load = store.indexOf("public void loadState(");
-        return store.substring(0, load) + store.substring(store.indexOf("\n    }\n", load));
+        return store.substring(0, load) + store.substring(store.indexOf("""
+
+                    }
+                """, load));
     }
 
     private static @NotNull Stream<Path> walked(final @NotNull Path tree) {

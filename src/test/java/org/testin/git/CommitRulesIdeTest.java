@@ -132,7 +132,10 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
 
     // UC-SHARE-013, Rule-SHARE-059
     public void testThePushHappensOnlyAfterTheCommitSucceeded() {
-        write(work, ".git/hooks/pre-commit", "#!/bin/sh\nexit 1\n");
+        write(work, ".git/hooks/pre-commit", """
+                #!/bin/sh
+                exit 1
+                """);
         write(work, "second.tc", "{\"description\":\"typed\"}");
         final @NotNull String remoteBefore = head(remote, MAIN);
         final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();

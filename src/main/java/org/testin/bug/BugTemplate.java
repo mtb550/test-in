@@ -124,7 +124,12 @@ public final class BugTemplate {
         final @NotNull String text = stacktrace.strip();
         if (text.isEmpty()) return NOT_AVAILABLE;
 
-        return "<details>\n<summary>" + html(text.lines().findFirst().orElse("").strip()) + "</summary>\n\n" + codeBlock(text) + "\n</details>";
+        return """
+                <details>
+                <summary>%s</summary>
+
+                %s
+                </details>""".formatted(html(text.lines().findFirst().orElse("").strip()), codeBlock(text));
     }
 
     private static @NotNull String screenshots(final int count) {

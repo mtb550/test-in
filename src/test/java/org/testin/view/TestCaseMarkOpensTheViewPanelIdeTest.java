@@ -25,6 +25,7 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
+import org.testin.LoginTestSource;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
@@ -50,9 +51,7 @@ public class TestCaseMarkOpensTheViewPanelIdeTest extends AbstractCodegenIdeTest
 
     private @NotNull GutterMark theMarkBeside(final @NotNull TestCaseDto tc) {
         final @NotNull String id = tc.getId().toString();
-        final @NotNull String text = "package nafath;\n\nimport org.testng.annotations.Test;\n\npublic class LoginTest {\n"
-                + "    @Test(description = \"Log in\", testName = \"" + id + "\")\n"
-                + "    public void logIn() {\n    }\n}\n";
+        final @NotNull String text = LoginTestSource.withTestNg(id);
         final @NotNull PsiFile file = myFixture.addFileToProject("nafath/LoginTest.java", text);
         myFixture.configureFromExistingVirtualFile(file.getVirtualFile());
         myFixture.getEditor().getCaretModel().moveToOffset(text.indexOf(id));

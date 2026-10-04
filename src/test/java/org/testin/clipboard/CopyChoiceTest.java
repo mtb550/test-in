@@ -144,7 +144,10 @@ public class CopyChoiceTest {
         final @NotNull TestCaseDto first = TestCaseDto.builder().description("Log in").build();
         final @NotNull TestCaseDto second = TestCaseDto.builder().description("Log out").build();
 
-        assertEquals(CopyChoice.DESCRIPTION.from(List.of(first, second)), "Log in\n\nLog out");
+        assertEquals(CopyChoice.DESCRIPTION.from(List.of(first, second)), """
+                Log in
+
+                Log out""");
     }
 
     // Rule-EDITOR-PANEL-208

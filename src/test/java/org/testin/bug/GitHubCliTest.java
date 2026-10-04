@@ -38,7 +38,10 @@ import static org.testng.Assert.assertTrue;
 
 public class GitHubCliTest {
 
-    private static final String READY_VERSION = "gh version 2.100.0 (2026-09-03)\nhttps://github.com/cli/cli/releases/tag/v2.100.0\n";
+    private static final String READY_VERSION = """
+            gh version 2.100.0 (2026-09-03)
+            https://github.com/cli/cli/releases/tag/v2.100.0
+            """;
     private static final String ISSUE = "https://github.com/mtb550/test-in/issues/412";
 
     private static @NotNull ProcessOutput answer(final String stdout, final String stderr, final int exitCode) {

@@ -113,7 +113,10 @@ public class PageSizeAndGridIdeTest extends AbstractTempRootIdeTest {
             final @NotNull JBTable grid = (JBTable) editor.getPreferredFocusedComponent();
             final int module = grid.convertColumnIndexToView(TestCaseEditorAttributes.MODULE.ordinal());
 
-            CopyPasteManager.getInstance().setContents(new StringSelection("Login\nLogin\nPayments"));
+            CopyPasteManager.getInstance().setContents(new StringSelection("""
+                    Login
+                    Login
+                    Payments"""));
             grid.changeSelection(0, module, false, false);
             OnScreen.pressKey(grid, GridKeys.PASTE.keyStroke());
 

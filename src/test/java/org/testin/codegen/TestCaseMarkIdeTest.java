@@ -30,6 +30,7 @@ import com.intellij.testFramework.DumbModeTestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
+import org.testin.LoginTestSource;
 import org.testin.Said;
 import org.testin.notifications.Refused;
 import org.testin.util.Bundle;
@@ -44,9 +45,7 @@ import java.util.UUID;
 public class TestCaseMarkIdeTest extends AbstractCodegenIdeTest {
 
     private static @NotNull String aTestMethod(final @NotNull String testName) {
-        return "package nafath;\n\nimport org.testng.annotations.Test;\n\npublic class LoginTest {\n"
-                + "    @Test(description = \"Log in\", testName = \"" + testName + "\")\n"
-                + "    public void logIn() {\n    }\n}\n";
+        return LoginTestSource.withTestNg(testName);
     }
 
     private @NotNull List<GutterMark> marksBeside(final @NotNull String testName) {

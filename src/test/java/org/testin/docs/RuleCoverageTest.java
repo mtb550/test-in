@@ -96,7 +96,10 @@ public class RuleCoverageTest {
         final @NotNull Set<String> proven = provenBy().keySet();
         final @NotNull Map<String, Map<Integer, Map<String, List<String>>>> byPart = DocumentedRules.live();
 
-        final @NotNull StringBuilder parts = new StringBuilder("| Part | Proven | Rules |\n|:--|--:|--:|\n");
+        final @NotNull StringBuilder parts = new StringBuilder("""
+                | Part | Proven | Rules |
+                |:--|--:|--:|
+                """);
         final @NotNull StringBuilder unproven = new StringBuilder();
         int total = 0;
         int covered = 0;
@@ -122,8 +125,14 @@ public class RuleCoverageTest {
         }
 
         final @NotNull String summary = "Rules a test proves: " + covered + " of " + total;
-        writeReport("# " + summary + "\n\nA rule is proven when a test method carries its marker - `// Rule-PART-NNN` above the method. A retired rule is not counted.\n\n"
-                + parts + "\n# The rules no test proves\n" + unproven);
+        writeReport("""
+                # %s
+
+                A rule is proven when a test method carries its marker - `// Rule-PART-NNN` above the method. A retired rule is not counted.
+
+                %s
+                # The rules no test proves
+                %s""".formatted(summary, parts, unproven));
 
         Logger.info(summary + " - the rules no test proves are listed in " + REPORT);
     }

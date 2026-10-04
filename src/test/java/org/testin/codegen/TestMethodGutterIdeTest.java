@@ -21,6 +21,7 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
+import org.testin.LoginTestSource;
 import org.testin.util.Bundle;
 
 import java.util.List;
@@ -41,9 +42,7 @@ public class TestMethodGutterIdeTest extends AbstractCodegenIdeTest {
     }
 
     private static @NotNull String aTestMethod(final @NotNull String imports, final @NotNull String testName) {
-        return "package nafath;\n\n" + imports + "\npublic class LoginTest {\n"
-                + "    @Test(description = \"Log in\", testName = \"" + testName + "\")\n"
-                + "    public void logIn() {\n    }\n}\n";
+        return LoginTestSource.withImports(imports, testName);
     }
 
     // Rule-CODEGEN-028
@@ -65,7 +64,14 @@ public class TestMethodGutterIdeTest extends AbstractCodegenIdeTest {
 
     // Rule-CODEGEN-029
     public void testAnIdentityOutsideATestNgTestHasNoMark() {
-        myFixture.addFileToProject("nafath/Test.java", "package nafath;\n\npublic @interface Test {\n    String description();\n    String testName();\n}\n");
+        myFixture.addFileToProject("nafath/Test.java", """
+                package nafath;
+
+                public @interface Test {
+                    String description();
+                    String testName();
+                }
+                """);
         final @NotNull String text = aTestMethod("", TEST_CASE_ID);
 
         assertTrue("an annotation that only looks like TestNG's was given a mark", gutterMarksAt(text, TEST_CASE_ID).isEmpty());

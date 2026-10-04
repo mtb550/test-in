@@ -62,7 +62,11 @@ public class AgentCheckIdeTest extends AbstractTempRootIdeTest {
             }
 
             final @NotNull Path agent = root.resolve("fake-agent.sh");
-            Files.writeString(agent, "#!/bin/sh\necho \"fake-agent $1\"\necho a second line\n", StandardCharsets.US_ASCII);
+            Files.writeString(agent, """
+                    #!/bin/sh
+                    echo "fake-agent $1"
+                    echo a second line
+                    """, StandardCharsets.US_ASCII);
             if (!agent.toFile().setExecutable(true)) throw new AssertionError("could not make the stand-in agent runnable");
             return agent;
         } catch (final IOException ex) {
