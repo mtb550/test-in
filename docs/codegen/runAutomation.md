@@ -33,8 +33,6 @@ The code runs, and Testin writes down whether each test case passed.
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
 - **Rule-CODEGEN-031** — Whatever the tester selected is one execution, not one
   execution for each test case.
-- **Rule-CODEGEN-032** — The method is found by the test case's identity, never
-  by its name.
 - **Rule-CODEGEN-033** — One message with a count, however many test cases
   started, and it counts the ones that actually started. It appears once Testin
   has found their methods, not when the key was pressed.

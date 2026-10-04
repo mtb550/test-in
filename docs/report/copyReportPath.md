@@ -25,8 +25,8 @@ There is no key for this. The link is on the message.
   headings, the column names and the Actual result label read the same in the
   web page, the PDF, the Word document and the spreadsheet, so no two formats
   name one thing two ways.
+- **Rule-REPORT-011** — Clicking the link makes the message go.
 - **Rule-REPORT-013** — The whole path is copied, not the file name.
-- **Rule-REPORT-014** — Clicking the link makes the message go.
 - **Rule-REPORT-015** — The same link is offered on every message about a file
   Testin wrote, so the gesture is the same for a report and for an export.
 

@@ -6,14 +6,15 @@ A report is a document about one test run: how many test cases it held, how many
 passed, and what the failures were. It is written to a file, so it can be sent
 to somebody who does not have the IDE.
 
-|                     |                                                                                                    |
-|---------------------|----------------------------------------------------------------------------------------------------|
-| **Part of Testin**  | Reports                                                                                            |
-| **Answers**         | How a report is made, what it contains, and what each format holds                                 |
-| **Numbering**       | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` to `Rule-REPORT-025` |
-| **State**           | **Written** — [#181](https://github.com/mtb550/test-in/issues/181)                                 |
-| **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code         |
-| **Written to**      | [How a document is written](../standard.md)                                                        |
+|                     |                                                                                                                                                                                                                                                               |
+|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Part of Testin**  | Reports                                                                                                                                                                                                                                                       |
+| **Answers**         | How a report is made, what it contains, and what each format holds                                                                                                                                                                                            |
+| **Numbering**       | Use cases are `UC-REPORT-001` to `UC-REPORT-003`. Rules are `Rule-REPORT-001` to `Rule-REPORT-025`                                                                                                                                                            |
+| **Retired**         | `Rule-REPORT-014` said what `Rule-REPORT-011` says - clicking the link makes the message go. Retired 4 October 2026 (#392); Copy the report's path now carries Rule-REPORT-011 itself. Read Rule-REPORT-011 instead. The number is not given to anything else |
+| **State**           | **Written** — [#181](https://github.com/mtb550/test-in/issues/181)                                                                                                                                                                                            |
+| **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code                                                                                                                                                                    |
+| **Written to**      | [How a document is written](../standard.md)                                                                                                                                                                                                                   |
 
 ---
 

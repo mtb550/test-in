@@ -30,8 +30,6 @@ This opens the Java method that runs the selected test case.
   renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
-- **Rule-CODEGEN-026** — The method is found by the identity in `testName`, so a
-  test case that has been renamed still finds its method.
 - **Rule-CODEGEN-027** — Without the Java plugin the class button on the card
   and on the view panel is drawn gray, and the menu entry stays, grayed, reading *(needs the Java plugin)*. Nothing is
   left out.

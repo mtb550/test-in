@@ -44,7 +44,7 @@ public class ClearedDescriptionIdeTest extends AbstractCodegenIdeTest {
         assertEquals("clearing the description wrote a second method or lost the first", 1, generatedClass(LOGIN_TEST).orElseThrow().getMethods().length);
     }
 
-    // Rule-CODEGEN-041
+    // Rule-CODEGEN-021
     public void testAClearedDescriptionIsRecordedInTheAnnotationAndTheNameStays() {
         final @NotNull TestCaseDto tc = aTestCaseWhoseDescriptionWasCleared();
 

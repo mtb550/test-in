@@ -174,7 +174,7 @@ public class EditorViewsIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
-    // Rule-EDITOR-PANEL-002, Rule-EDITOR-PANEL-012, Rule-EDITOR-PANEL-017
+    // Rule-EDITOR-PANEL-002
     public void testBothEditorsOpenOnCardsAndBuildTheGridOnlyWhenAskedFor() {
         final @NotNull List<AbstractTestinEditor<?, ?>> editors = List.of(openedTestSet(3), openedTestRun());
 

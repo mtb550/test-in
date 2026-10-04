@@ -301,7 +301,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         refreshCards();
     }
 
-    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-017
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-002
     @Override
     public void onToolBarSwitchedToGridView() {
         Logger.debug("[switch] -> GRID view, currentView=" + getToolBar().getCurrentView());

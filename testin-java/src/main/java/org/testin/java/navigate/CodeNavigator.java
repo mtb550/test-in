@@ -56,7 +56,7 @@ public final class CodeNavigator implements CodeNavigation {
                 .isPresent();
     }
 
-    // UC-CODEGEN-006, Rule-CODEGEN-026
+    // UC-CODEGEN-006, Rule-CODEGEN-001
     private @NotNull Optional<PsiMethod> resolve(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         final @NotNull String classFqcn = Fqcn.classOfMethod(tc);
         if (classFqcn.isEmpty()) return Optional.empty();
@@ -74,7 +74,7 @@ public final class CodeNavigator implements CodeNavigation {
         return method;
     }
 
-    // UC-CODEGEN-006, Rule-CODEGEN-026
+    // UC-CODEGEN-006, Rule-CODEGEN-001
     @Override
     public @NotNull Map<UUID, Boolean> methodsFor(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         final @NotNull Map<UUID, Boolean> found = new LinkedHashMap<>();
@@ -83,7 +83,7 @@ public final class CodeNavigator implements CodeNavigation {
         return found;
     }
 
-    // UC-CODEGEN-006, Rule-CODEGEN-026
+    // UC-CODEGEN-006, Rule-CODEGEN-001
     private @NotNull Map<UUID, PsiMethod> generatedMethodsOf(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         final @NotNull Map<UUID, PsiMethod> found = new LinkedHashMap<>();
 
@@ -154,7 +154,7 @@ public final class CodeNavigator implements CodeNavigation {
         }
     }
 
-    // UC-CODEGEN-008, Rule-CODEGEN-032
+    // UC-CODEGEN-008, Rule-CODEGEN-001
     @Override
     public @NotNull Map<UUID, List<String>> methodFqcnsOf(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         final @NotNull Map<UUID, PsiMethod> methods = generatedMethodsOf(p, testCases);
@@ -172,7 +172,7 @@ public final class CodeNavigator implements CodeNavigation {
         return named;
     }
 
-    // UC-CODEGEN-006, Rule-CODEGEN-026
+    // UC-CODEGEN-006, Rule-CODEGEN-001
     @Override
     public void toCode(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         Logger.trace("navigate to the method of '" + tc.getDescription() + "'");

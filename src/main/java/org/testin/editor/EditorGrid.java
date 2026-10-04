@@ -74,7 +74,7 @@ final class EditorGrid<A extends Enum<A> & ToolBarAttribute> {
         view.ifPresentOrElse(this::refill, this::rebuild);
     }
 
-    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-017, Rule-EDITOR-PANEL-077
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-002, Rule-EDITOR-PANEL-077
     void rebuild() {
         final boolean keepKeyboard = view.map(GridView::handOver).orElse(false);
 

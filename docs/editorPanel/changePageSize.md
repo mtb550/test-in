@@ -26,8 +26,8 @@ There is no key for this. The box is at the right of the status bar.
   may draw it differently, and never saves the drawn form.
 - **Rule-EDITOR-PANEL-006** — A save that would leave the file as it is writes
   nothing, and says nothing.
-- **Rule-EDITOR-PANEL-007** — Each editor keeps an undo history of its own, and
-  the tree keeps another.
+- **Rule-EDITOR-PANEL-007** — Each editor keeps an undo history of its own, kept
+  against the test set it is showing, and the tree keeps another.
 - **Rule-EDITOR-PANEL-008** — Every change confirms itself with one message in
   the past tense. A change to several test cases gets one message with a count.
 - **Rule-EDITOR-PANEL-009** — Moving the view says nothing and changes nothing.
@@ -36,9 +36,6 @@ There is no key for this. The box is at the right of the status bar.
   reported rather than brought into view.
 - **Rule-EDITOR-PANEL-010** — While a grid cell is open for editing, every key
   that would act on the row is refused.
-- **Rule-EDITOR-PANEL-105** — A page holds 50 test cases until the tester says
-  otherwise.
-- **Rule-EDITOR-PANEL-106** — The most a page can hold is 1000.
 - **Rule-EDITOR-PANEL-107** — Changing it goes back to the first page and
   returns the keyboard to the list.
 - **Rule-EDITOR-PANEL-222** — The page size last typed is remembered. Every test

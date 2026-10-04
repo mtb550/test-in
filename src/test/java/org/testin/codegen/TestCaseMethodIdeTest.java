@@ -34,7 +34,7 @@ public class TestCaseMethodIdeTest extends AbstractCodegenIdeTest {
 
     private static final @NotNull String LOGIN_TEST = "nafath.LoginTest";
 
-    // Rule-CODEGEN-002, Rule-CODEGEN-017
+    // Rule-CODEGEN-002
     public void testATestCaseCreatedWithNoDescriptionGetsNoMethod() {
         final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
 

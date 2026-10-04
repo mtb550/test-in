@@ -40,7 +40,7 @@ public class UpdateTestMethodIdeTest extends AbstractCodegenIdeTest {
         settled();
     }
 
-    // Rule-CODEGEN-001, Rule-CODEGEN-039
+    // Rule-CODEGEN-001
     public void testARenamedTestCaseFindsItsMethodByIdentityNotByName() {
         final @NotNull TestCaseDto tc = aTestCaseWithAMethod();
         final @NotNull PsiMethod pm = writtenMethodOf(LOGIN_TEST, tc);

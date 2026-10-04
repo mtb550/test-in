@@ -195,7 +195,7 @@ public class UpdateTestBase {
         if (written > 0) reformat(p, pc);
     }
 
-    // Rule-CODEGEN-041
+    // Rule-CODEGEN-021
     protected void applyToMethod(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater, final @NotNull Consumer<String> onMissing) {
         final @NotNull List<String> path = Fqcn.ofClass(tc.getParent());
         if (path.isEmpty()) return;

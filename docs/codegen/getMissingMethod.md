@@ -38,7 +38,7 @@ There is no button for this. It happens when the description is filled in.
   a method rewrites the method instead. That is
   [UC-CODEGEN-010](renameTestCase.md).
 - **Rule-CODEGEN-021** — A description cleared back to nothing leaves the method
-  under the name it already has.
+  under the name it already has, and records the empty description.
 
 ## What the tester sees
 

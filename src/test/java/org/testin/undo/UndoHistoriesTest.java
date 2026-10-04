@@ -103,7 +103,7 @@ public class UndoHistoriesTest {
         assertEquals(undone.get(), 20, "the undo stack must be capped");
     }
 
-    // Rule-TREE-PANEL-059, Rule-INTERNAL-045, Rule-EDITOR-PANEL-007, Rule-EDITOR-PANEL-066
+    // Rule-TREE-PANEL-059, Rule-INTERNAL-045, Rule-EDITOR-PANEL-007
     @Test
     public void eachSurfaceKeepsItsOwnHistory() {
         final UndoHistories service = new UndoHistories();

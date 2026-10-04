@@ -142,7 +142,7 @@ public class UpdateOneFieldIdeTest extends AbstractTempRootIdeTest {
         assertFalse("an empty expected result is shown", withoutExpected.getExpectedResultSection().isShown());
     }
 
-    // Rule-EDITOR-PANEL-037
+    // Rule-EDITOR-PANEL-006
     public void testASaveThatLeftEveryFieldAsItWasWritesNothingAndSaysNothing() {
         final @NotNull TestCaseDto tc = aTestCase("Log in", "Dashboard opens");
         final @NotNull String before = fileOf(tc);

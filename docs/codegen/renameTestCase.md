@@ -31,12 +31,10 @@ There is no key for this. It happens when the description is changed, which is
   renamed, moved or removed, **Automate Test Case**, **Navigate to Test Method**
   and **Run Tests** are gray and say why, and no gutter icon or automated mark
   is shown. **Save to testin.yml**, in the Testin panel, turns code on.
-- **Rule-CODEGEN-039** — The method is found by the test case's identity, so the
-  old description is not needed.
+- **Rule-CODEGEN-021** — A description cleared back to nothing leaves the method
+  under the name it already has, and records the empty description.
 - **Rule-CODEGEN-040** — Both the annotation's description and the method's name
   are rewritten.
-- **Rule-CODEGEN-041** — A description cleared back to nothing leaves the method
-  under the name it already has, and records the empty description.
 - **Rule-CODEGEN-079** — A description that cannot name a Java method, or that
   names the same method as another test case in the class, leaves the method
   under the name it already has. The description is still saved, and a message

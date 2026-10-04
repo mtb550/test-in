@@ -56,13 +56,13 @@ public class PageSizeTest {
         assertEquals(TestinEditor.pageSizeOf(String.valueOf(Long.MAX_VALUE)), TestinEditor.MAX_PAGE_SIZE);
     }
 
-    // Rule-EDITOR-PANEL-004, Rule-EDITOR-PANEL-105
+    // Rule-EDITOR-PANEL-004
     @Test
     public void aPageHoldsFiftyUntilTheTesterSaysOtherwise() {
         assertEquals(TestinEditor.pageSizeOf(""), 50, "a tester who never chose a page size gets fifty");
     }
 
-    // Rule-EDITOR-PANEL-004, Rule-EDITOR-PANEL-106
+    // Rule-EDITOR-PANEL-004
     @Test
     public void theMostAPageCanHoldIsAThousand() {
         assertEquals(TestinEditor.pageSizeOf("1000"), 1000, "a thousand is allowed");

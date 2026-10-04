@@ -25,8 +25,8 @@ There is no key for this. The button is on the toolbar.
   may draw it differently, and never saves the drawn form.
 - **Rule-EDITOR-PANEL-006** — A save that would leave the file as it is writes
   nothing, and says nothing.
-- **Rule-EDITOR-PANEL-007** — Each editor keeps an undo history of its own, and
-  the tree keeps another.
+- **Rule-EDITOR-PANEL-007** — Each editor keeps an undo history of its own, kept
+  against the test set it is showing, and the tree keeps another.
 - **Rule-EDITOR-PANEL-008** — Every change confirms itself with one message in
   the past tense. A change to several test cases gets one message with a count.
 - **Rule-EDITOR-PANEL-009** — Moving the view says nothing and changes nothing.
@@ -37,8 +37,6 @@ There is no key for this. The button is on the toolbar.
   that would act on the row is refused.
 - **Rule-EDITOR-PANEL-016** — Only one of the two buttons is on the toolbar at a
   time. It is always the view the tester is not in.
-- **Rule-EDITOR-PANEL-017** — The grid is built the first time the tester asks
-  for it, not when the editor opens.
 - **Rule-EDITOR-PANEL-018** — The two views show the same rows, and the
   selection follows from one to the other.
 - **Rule-EDITOR-PANEL-019** — Anything half typed in a grid cell is saved, not

@@ -42,7 +42,7 @@ public interface TestinEditor extends Disposable {
     // UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-222
     String PAGE_SIZE_KEY = "testin.editor.pageSize";
 
-    // UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-106
+    // UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-004
     static int pageSizeOf(final @NotNull String typed) {
         final @NotNull String asked = typed.trim();
 

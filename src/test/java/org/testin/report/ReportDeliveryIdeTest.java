@@ -318,7 +318,7 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
         assertEquals("the report was handed over as something other than its own file", List.of(file.toURI().toString()), handedOver);
     }
 
-    // Rule-REPORT-013, Rule-REPORT-014
+    // Rule-REPORT-013, Rule-REPORT-011
     public void testCopyPathCopiesTheWholePathAndMakesTheMessageGo() {
         final @NotNull File file = aReportWritten(FileTypes.PDF, "Cycle-1.pdf");
         final @NotNull Notification message = theReportMessage();

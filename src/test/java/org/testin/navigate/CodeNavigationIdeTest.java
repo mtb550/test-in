@@ -50,7 +50,7 @@ public class CodeNavigationIdeTest extends AbstractCodegenIdeTest {
                 .isPresent();
     }
 
-    // Rule-CODEGEN-026
+    // Rule-CODEGEN-001
     public void testGoToCodeFindsTheMethodOfARenamedTestCase() {
         final @NotNull TestCaseDto tc = aRenamedTestCaseWhoseMethodHasAnotherName();
         final @NotNull PsiMethod pm = writtenMethodOf(LOGIN_TEST, tc);
@@ -60,7 +60,7 @@ public class CodeNavigationIdeTest extends AbstractCodegenIdeTest {
         Await.until("go to code did not reach the method of a test case renamed since it was written", () -> caretIsOn(pm));
     }
 
-    // Rule-CODEGEN-032
+    // Rule-CODEGEN-001
     public void testRunningFindsTheMethodByIdentityNeverByName() {
         final @NotNull TestCaseDto tc = aRenamedTestCaseWhoseMethodHasAnotherName();
 

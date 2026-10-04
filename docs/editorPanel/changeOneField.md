@@ -25,8 +25,8 @@ One field, one small dialog. The rest of the test case is left alone.
   may draw it differently, and never saves the drawn form.
 - **Rule-EDITOR-PANEL-006** — A save that would leave the file as it is writes
   nothing, and says nothing.
-- **Rule-EDITOR-PANEL-007** — Each editor keeps an undo history of its own, and
-  the tree keeps another.
+- **Rule-EDITOR-PANEL-007** — Each editor keeps an undo history of its own, kept
+  against the test set it is showing, and the tree keeps another.
 - **Rule-EDITOR-PANEL-008** — Every change confirms itself with one message in
   the past tense. A change to several test cases gets one message with a count.
 - **Rule-EDITOR-PANEL-009** — Moving the view says nothing and changes nothing.
@@ -40,8 +40,6 @@ One field, one small dialog. The rest of the test case is left alone.
 - **Rule-EDITOR-PANEL-036** — The dialog always shows the description, and shows
   the expected result when it is not empty, so the tester can see what they are
   changing.
-- **Rule-EDITOR-PANEL-037** — A save that left every field as it was writes
-  nothing and says nothing.
 - **Rule-EDITOR-PANEL-038** — One gesture is one entry on the undo history,
   however many test cases it changed.
 - **Rule-EDITOR-PANEL-039** — Undo puts the test case back exactly, including

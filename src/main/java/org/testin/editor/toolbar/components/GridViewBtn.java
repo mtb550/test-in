@@ -22,7 +22,7 @@ import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 
 public class GridViewBtn extends AbstractIconButton implements ToolbarItem {
-    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-017
+    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-002
     public GridViewBtn(final @NotNull Runnable onSwitchToGrid) {
         super(Bundle.message("toolbar.grid.view"), AllIcons.General.Groups);
 

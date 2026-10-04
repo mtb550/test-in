@@ -25,7 +25,7 @@ import org.testin.model.dto.TestCaseDto;
 import java.util.List;
 
 public class UpdateTestDescription extends UpdateTestBase implements GenAction<TestCaseDto> {
-    // UC-CODEGEN-010, Rule-CODEGEN-039, Rule-CODEGEN-040
+    // UC-CODEGEN-010, Rule-CODEGEN-001, Rule-CODEGEN-040
     @Override
     public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         applyOrCreate(p, tc, GenType.UPDATE_TEST_CASE_DESCRIPTION.description(), pm -> {
