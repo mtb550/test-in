@@ -106,20 +106,15 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     @Getter
     protected final @NotNull StatusBar statusBar = new StatusBar();
     private final @NotNull EditorGrid<A> grid = new EditorGrid<>(this);
-    @Getter
-    @Setter
-    protected int currentPage = 1;
     // UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-222
-    @Getter
-    protected int pageSize = TestinEditor.pageSizeOf(PropertiesComponent.getInstance().getValue(TestinEditor.PAGE_SIZE_KEY, ""));
+    protected final @NotNull EditorPaging paging = new EditorPaging(TestinEditor.pageSizeOf(PropertiesComponent.getInstance().getValue(TestinEditor.PAGE_SIZE_KEY, "")));
+    private final @NotNull PendingSelection pending = new PendingSelection();
     @Getter
     @Setter
     protected @NotNull String hoveredIconAction = "";
     @Getter
     @Setter
     protected int hoveredIndex = -1;
-    protected @NotNull Optional<UUID> selectionToRestore = Optional.empty();
-    private boolean goingTo = false;
     private boolean disposed;
 
     protected AbstractTestinEditor(final @NotNull Project p, final @NotNull N parent) {
@@ -158,7 +153,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     // UC-EDITOR-PANEL-023, Rule-EDITOR-PANEL-107, Rule-EDITOR-PANEL-222
     @Override
     public void choosePageSize(final int size) {
-        pageSize = size;
+        paging.choose(size);
         PropertiesComponent.getInstance().setValue(TestinEditor.PAGE_SIZE_KEY, size, TestinEditor.DEFAULT_PAGE_SIZE);
     }
 
@@ -196,6 +191,21 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     }
 
     @Override
+    public int getCurrentPage() {
+        return paging.getPage();
+    }
+
+    @Override
+    public void setCurrentPage(final int page) {
+        paging.turnTo(page);
+    }
+
+    @Override
+    public int getPageSize() {
+        return paging.getSize();
+    }
+
+    @Override
     public int getShownItemsCount() {
         return currentTestCases.size();
     }
@@ -211,13 +221,11 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     }
 
     protected int getTotalPages(final @NotNull List<TestCaseDto> filtered) {
-        return PageWindow.of(filtered.size(), currentPage, pageSize).totalPages();
+        return paging.window(filtered.size()).totalPages();
     }
 
     protected @NotNull List<TestCaseDto> getCurrentPageItems() {
-        final @NotNull PageWindow page = PageWindow.of(currentTestCases.size(), currentPage, pageSize);
-
-        return new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
+        return paging.itemsOn(currentTestCases);
     }
 
     @Override
@@ -244,7 +252,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     // UC-EDITOR-PANEL-019, Rule-EDITOR-PANEL-092
     @Override
     public void onToolBarSearchValueChanged() {
-        currentPage = 1;
+        paging.turnTo(1);
         refreshView();
     }
 
@@ -257,14 +265,14 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-097
     @Override
     public void onToolBarFilterSelectionChanged() {
-        currentPage = 1;
+        paging.turnTo(1);
         refreshView();
     }
 
     // UC-EDITOR-PANEL-021, Rule-EDITOR-PANEL-099
     @Override
     public void onToolBarFilterResetButtonClicked() {
-        currentPage = 1;
+        paging.turnTo(1);
         refreshView();
     }
 
@@ -383,15 +391,11 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
             return;
         }
 
-        selectionToRestore = Optional.of(id);
-        goingTo = true;
+        pending.waitFor(id);
     }
 
     protected void focusIfGoingTo() {
-        if (!goingTo) return;
-
-        goingTo = false;
-        list.requestFocusInWindow();
+        if (pending.takeFocus()) list.requestFocusInWindow();
     }
 
     // UC-EDITOR-PANEL-025, Rule-EDITOR-PANEL-009
@@ -403,19 +407,15 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
             return;
         }
 
-        final int safePageSize = Math.max(1, pageSize);
-        final int page = (index / safePageSize) + 1;
-        final int localIndex = index % safePageSize;
-
-        if (page == currentPage) {
-            selectVisibleIndex(localIndex);
+        final int placeOnPage = paging.placeOnPage(index);
+        if (!paging.turnToPageHolding(index)) {
+            selectVisibleIndex(placeOnPage);
             return;
         }
 
-        currentPage = page;
         refreshView();
 
-        ApplicationManager.getApplication().invokeLater(() -> selectVisibleIndex(localIndex));
+        ApplicationManager.getApplication().invokeLater(() -> selectVisibleIndex(placeOnPage));
     }
 
     protected void notOnAnyPage(final @NotNull TestCaseDto tc) {
@@ -430,7 +430,7 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
     }
 
     protected void rememberSelection() {
-        selectionToRestore = Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId);
+        pending.keep(Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId));
     }
 
     protected void wireList() {
@@ -457,12 +457,11 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
         currentTestCases.addAll(getFilteredList());
 
         final int totalItems = currentTestCases.size();
-        final @NotNull PageWindow page = PageWindow.of(totalItems, currentPage, pageSize);
-        currentPage = page.page();
+        final @NotNull PageWindow page = paging.settle(totalItems);
 
         final @NotNull List<TestCaseDto> pageItems = new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
 
-        final @NotNull Optional<UUID> selectedId = selectionToRestore
+        final @NotNull Optional<UUID> selectedId = pending.take()
                 .or(() -> Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId));
 
         replaceModel(pageItems);
@@ -475,7 +474,6 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
                 }
             }
         });
-        selectionToRestore = Optional.empty();
 
         showEmptyStateIfNothingToDraw(totalItems);
         drawStatus(page);
@@ -567,11 +565,8 @@ public abstract class AbstractTestinEditor<A extends Enum<A> & ToolBarAttribute,
 
     // UC-EDITOR-PANEL-027, Rule-EDITOR-PANEL-118
     protected void jumpToPageOfPendingSelection() {
-        final int page = selectionToRestore
-                .map(id -> PageWindow.pageContaining(id, currentTestCases, pageSize))
-                .orElse(0);
-
-        if (page == 0) selectionToRestore = Optional.empty();
-        else currentPage = page;
+        pending.waiting().ifPresent(id -> {
+            if (!paging.turnToPageHolding(id, currentTestCases)) pending.forget();
+        });
     }
 }

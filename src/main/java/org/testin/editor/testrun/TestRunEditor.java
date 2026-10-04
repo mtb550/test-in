@@ -298,7 +298,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
     // UC-EDITOR-PANEL-042, Rule-EDITOR-PANEL-176
     public void refreshAfterTestRunStatusChanged() {
         list.repaint();
-        statusBar.updatePaginationState(currentPage, getTotalPageCount());
+        statusBar.updatePaginationState(getCurrentPage(), getTotalPageCount());
         showTestRunTotals();
         onExecutionStateChanged();
     }
@@ -370,13 +370,9 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
 
     // UC-EDITOR-PANEL-031, Rule-EDITOR-PANEL-130
     void showExecuting(final int globalIndex) {
-        final int expectedPage = (globalIndex / pageSize) + 1;
-        if (currentPage != expectedPage) {
-            currentPage = expectedPage;
-            refreshView();
-        }
+        if (paging.turnToPageHolding(globalIndex)) refreshView();
 
-        final int localIndex = globalIndex - ((currentPage - 1) * pageSize);
+        final int localIndex = paging.placeOnPage(globalIndex);
 
         list.setSelectedIndex(localIndex);
         list.ensureIndexIsVisible(localIndex);
