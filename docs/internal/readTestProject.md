@@ -223,11 +223,11 @@ shows its empty state instead.
 project, and it is skipped without a word. This is the ordinary case. The
 Testin folder usually holds other things.
 
-**If Testin itself fails while reading a test project** — not a file it cannot
-read, but a fault in Testin — the test project is not counted as read, and the
-tester is told it could not be read and why (Rule-INTERNAL-124). A damaged file
-is never reported this way: a damaged `.tp` or other marker is read as defaults,
-and an unreadable test case or result is left out as described below.
+**If Testin itself fails while reading a test project** — the test project is
+not counted as read. The tester is told it could not be read, and why
+(Rule-INTERNAL-124). This is a fault in Testin, not in the files. A damaged file
+is never reported this way. A damaged `.tp` or other marker is read as defaults.
+An unreadable test case or result is left out, as described below.
 
 **If a marker file is missing** — nothing is said. A node just created has no
 marker yet, so Testin uses defaults and the node appears normally.

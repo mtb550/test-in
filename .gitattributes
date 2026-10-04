@@ -8,6 +8,7 @@
 *.json        text eol=lf
 *.yml         text eol=lf
 *.yaml        text eol=lf
+*.ps1         text eol=lf
 
 # The test data's own files: JSON, whatever the name says. The seven markers have
 # no extension to match, so each is named (#305).
