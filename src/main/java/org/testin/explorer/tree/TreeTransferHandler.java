@@ -17,7 +17,6 @@
 package org.testin.explorer.tree;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -28,9 +27,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.TestinData;
-import org.testin.codegen.JavaCode;
-import org.testin.codegen.Moved;
-import org.testin.codegen.SubtreeCode;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -39,9 +35,6 @@ import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.undo.Operation;
-import org.testin.undo.UndoHistories;
-import org.testin.undo.UndoScope;
 import org.testin.util.Bundle;
 import org.testin.util.ClipboardContents;
 import org.testin.util.FailureText;
@@ -67,9 +60,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 
 public class TreeTransferHandler extends TransferHandler {
@@ -79,10 +70,9 @@ public class TreeTransferHandler extends TransferHandler {
     private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
 
-    private final @NotNull Consumer<Path> revealAfterRefresh;
     private final @NotNull Nodes nodes;
     private final @NotNull Notifier notifier;
-    private final @NotNull UndoHistories undoHistories;
+    private final @NotNull NodeTransfer transfer;
     @Getter
     private final @NotNull Set<Path> selectedNodes;
     private int clipboardAction = COPY;
@@ -91,10 +81,9 @@ public class TreeTransferHandler extends TransferHandler {
         this.p = p;
         this.tree = tree;
         this.selectedNodes = selectedNodes;
-        this.revealAfterRefresh = revealAfterRefresh;
         this.nodes = Services.getInstance(p, Nodes.class);
         this.notifier = Services.getInstance(p, Notifier.class);
-        this.undoHistories = Services.getInstance(p, UndoHistories.class);
+        this.transfer = new NodeTransfer(p, revealAfterRefresh);
     }
 
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014
@@ -119,12 +108,6 @@ public class TreeTransferHandler extends TransferHandler {
                 .findFirst();
     }
 
-    private static @NotNull String describe(final @NotNull List<DirectoryDto> sources) {
-        return sources.size() == 1
-                ? "'" + sources.getFirst().getName() + "'"
-                : Bundle.message("transfer.items", String.valueOf(sources.size()));
-    }
-
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-004, Rule-TREE-PANEL-045
     static boolean isValidDestination(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target, final @NotNull Predicate<Path> occupied) {
         final @NotNull Path sourcePath = source.getPath().normalize();
@@ -146,7 +129,7 @@ public class TreeTransferHandler extends TransferHandler {
         final @NotNull List<DirectoryDto> directories = transferableSelection();
         if (directories.isEmpty()) return null;
 
-        setDragImage(createDragImage(describe(directories)));
+        setDragImage(createDragImage(NodeTransfer.describe(directories)));
         setDragImageOffset(new Point(JBUI.scale(-14), JBUI.scale(-10)));
 
         return new NodesTransferable(new TreeTransferPayload(
@@ -264,16 +247,16 @@ public class TreeTransferHandler extends TransferHandler {
                 final @NotNull String verb = action == COPY ? Bundle.message("transfer.copy") : Bundle.message("transfer.move");
                 final @NotNull Path fromPath = sources.getFirst().getPath().getParent();
                 new ConfirmDialog(p, verb,
-                        Bundle.message("transfer.confirm", verb, describe(sources), target.getName()),
+                        Bundle.message("transfer.confirm", verb, NodeTransfer.describe(sources), target.getName()),
                         Objects.toString(fromPath, ""),
                         target.getPath().toString(),
                         verb,
-                        () -> transfer(action, sources, target)
+                        () -> transfer.carryOut(action, sources, target)
                 ).show();
                 return true;
             }
 
-            transfer(action, sources, target);
+            transfer.carryOut(action, sources, target);
             return true;
         } catch (final Exception ex) {
             Logger.error("Tree transfer failed: " + FailureText.of(ex));
@@ -311,32 +294,11 @@ public class TreeTransferHandler extends TransferHandler {
         if (collided.isEmpty()) return false;
 
         final @NotNull String said = collided.size() == 1
-                ? Bundle.message("transfer.exists.one", describe(collided), target.getName())
-                : Bundle.message("transfer.exists.many", describe(collided), target.getName());
+                ? Bundle.message("transfer.exists.one", NodeTransfer.describe(collided), target.getName())
+                : Bundle.message("transfer.exists.many", NodeTransfer.describe(collided), target.getName());
         notifier.softRefuse(p, said);
 
         return true;
-    }
-
-    private void transfer(final int action, final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
-        if (action == MOVE) {
-            moveNodes(sources, target);
-        } else {
-            final @NotNull List<Path> sourcePaths = sources.stream().map(DirectoryDto::getPath).toList();
-            nodes.copyNodes(sourcePaths, target.getPath(), copied -> {
-                generateForCopies(sources, target);
-
-                if (copied > 0) revealAfterRefresh.accept(target.getPath().resolve(sources.getFirst().getName()));
-
-                confirmLanded(Done.PASTED, copied);
-            });
-        }
-    }
-
-    private void confirmLanded(final @NotNull Done outcome, final int landed) {
-        if (landed == 0) return;
-
-        notifier.softShowCounted(p, outcome, landed);
     }
 
     private @NotNull Optional<DirectoryDto> targetDirectory(final @NotNull TransferSupport support) {
@@ -363,82 +325,6 @@ public class TreeTransferHandler extends TransferHandler {
         if (support.getUserDropAction() == COPY) return COPY;
         support.setDropAction(MOVE);
         return MOVE;
-    }
-
-    // UC-TREE-PANEL-013, Rule-TREE-PANEL-047
-    private void moveNodes(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
-        final @NotNull List<Path> oldPaths = sources.stream().map(DirectoryDto::getPath).toList();
-        final @NotNull List<Path> newPaths = sources.stream()
-                .map(source -> target.getPath().resolve(source.getName()))
-                .toList();
-
-        moveBatch(oldPaths, newPaths, moved -> {
-            confirmLanded(Done.MOVED, moved);
-            if (moved == 0) return;
-
-            undoHistories.push(UndoScope.TREE, new Operation(
-                    Bundle.message("transfer.undo.move", describe(sources)),
-                    () -> moveBatch(newPaths, oldPaths),
-                    () -> moveBatch(oldPaths, newPaths)));
-        });
-    }
-
-    private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to) {
-        moveBatch(from, to, _ -> {
-        });
-    }
-
-    private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to, final @NotNull IntConsumer onDone) {
-        final @NotNull AtomicInteger remaining = new AtomicInteger(from.size());
-        final @NotNull AtomicInteger moved = new AtomicInteger();
-
-        syncCode(from, to);
-
-        for (int i = 0; i < from.size(); i++) {
-            final @NotNull Path source = from.get(i);
-            final @NotNull Path destination = to.get(i);
-
-            nodes.moveNode(source, destination, wasMoved -> {
-                if (p.isDisposed()) return;
-
-                if (wasMoved) moved.incrementAndGet();
-                else putCodeBack(source, destination);
-
-                if (remaining.decrementAndGet() != 0) return;
-
-                onDone.accept(moved.get());
-            });
-        }
-    }
-
-    // Rule-CODEGEN-082
-    private void generateForCopies(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
-        for (final DirectoryDto source : sources) {
-            nodes.find(target.getPath().resolve(source.getName())).ifPresent(copy -> SubtreeCode.generate(p, copy));
-        }
-    }
-
-    // UC-TREE-PANEL-013, Rule-TREE-PANEL-048, Rule-CODEGEN-082
-    private void syncCode(final @NotNull List<Path> from, final @NotNull List<Path> to) {
-        WriteCommandAction.runWriteCommandAction(p, Bundle.message("transfer.move.code.command"), null, () -> {
-            for (int i = 0; i < from.size(); i++) moved(from.get(i), to.get(i)).ifPresent(this::moveCode);
-        });
-    }
-
-    // UC-TREE-PANEL-016, Rule-TREE-PANEL-098
-    private void putCodeBack(final @NotNull Path source, final @NotNull Path destination) {
-        Logger.warn("Move refused for " + source.getFileName() + "; putting its generated code back.");
-
-        WriteCommandAction.runWriteCommandAction(p, Bundle.message("transfer.move.code.command"), null, () ->
-                moved(source, destination).flatMap(moved -> moved.back(p)).ifPresent(this::moveCode));
-    }
-
-    private @NotNull Optional<Moved> moved(final @NotNull Path from, final @NotNull Path to) {
-        return Optional.ofNullable(to.getParent()).flatMap(target -> nodes.find(from).map(dir -> new Moved(dir, target)));
-    }
-
-    private void moveCode(final @NotNull Moved moved) {
-        JavaCode.of(moved.dir().getType()).getMoved().execute(p, moved);
     }
 
     private void resetLastAction() {
@@ -480,7 +366,7 @@ public class TreeTransferHandler extends TransferHandler {
                     .toList();
             if (sources.isEmpty()) return;
 
-            transfer(wasCut ? MOVE : COPY, sources, target);
+            transfer.carryOut(wasCut ? MOVE : COPY, sources, target);
             if (wasCut) clearClipboard();
         });
     }

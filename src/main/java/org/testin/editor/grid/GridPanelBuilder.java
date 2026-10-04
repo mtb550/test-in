@@ -32,7 +32,6 @@ import org.testin.editor.EditorColors;
 import org.testin.editor.EditorKind;
 import org.testin.editor.WheelForwarding;
 import org.testin.logger.Logger;
-import org.testin.model.TestRunItems;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.Can;
@@ -65,18 +64,14 @@ import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.IntPredicate;
-import java.util.function.ToIntFunction;
 
 public class GridPanelBuilder {
     static final int CELL_PADDING = 10;
@@ -308,31 +303,6 @@ public class GridPanelBuilder {
         updateRowHeights(table);
     }
 
-    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020
-    public @NotNull List<String[]> testRunRows(final @NotNull List<TestCaseDto> testCases, final @NotNull Map<UUID, TestRunItems> resultsMap, final @NotNull ToIntFunction<TestCaseDto> position) {
-        final @NotNull List<TestRunEditorAttributes> ordered = Arrays.stream(TestRunEditorAttributes.values()).toList();
-        final @NotNull List<String[]> rows = new ArrayList<>();
-
-        for (final TestCaseDto tc : testCases) {
-            final @NotNull TestRunItems runItem = Optional.ofNullable(resultsMap.get(tc.getId()))
-                    .orElseGet(() -> TestRunItems.builder().id(tc.getId()).build().showing(Optional.of(tc)));
-
-            final String @NotNull [] row = new String[ordered.size()];
-            final int rowNumber = position.applyAsInt(tc);
-
-            for (int c = 0; c < ordered.size(); c++) {
-                final @NotNull TestRunEditorAttributes attr = ordered.get(c);
-
-                row[c] = attr == TestRunEditorAttributes.ORDER
-                        ? String.valueOf(rowNumber)
-                        : attr.getRunItemValueExtractor().apply(runItem);
-            }
-            rows.add(row);
-        }
-
-        return rows;
-    }
-
     // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-020, Rule-TREE-PANEL-009
     public @NotNull JBTable buildTestRunTable(final @NotNull List<String[]> rows, final @NotNull Set<TestRunEditorAttributes> attributes, final @NotNull BooleanSupplier stillOpen) {
         Logger.debug("[GridPanelBuilder] buildRunTable: rows=" + rows.size() + ", attributes=" + attributes);
@@ -341,28 +311,6 @@ public class GridPanelBuilder {
         final @NotNull JBTable table = buildTable(buildColumns(ordered), rows, column -> stillOpen.getAsBoolean() && ordered.get(column).isEdited(), EditorKind.RUN);
         applyColumnVisibility(table, TestRunEditorAttributes.class, attributes);
         return table;
-    }
-
-    // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-020
-    public @NotNull List<String[]> testRows(final @NotNull List<TestCaseDto> testCases, final @NotNull ToIntFunction<TestCaseDto> position) {
-        final @NotNull List<TestCaseEditorAttributes> ordered = Arrays.stream(TestCaseEditorAttributes.values()).toList();
-        final @NotNull List<String[]> rows = new ArrayList<>();
-
-        for (final TestCaseDto tc : testCases) {
-            final String @NotNull [] row = new String[ordered.size()];
-            final int rowNumber = position.applyAsInt(tc);
-
-            for (int c = 0; c < ordered.size(); c++) {
-                final @NotNull TestCaseEditorAttributes attr = ordered.get(c);
-
-                row[c] = attr == TestCaseEditorAttributes.ORDER
-                        ? String.valueOf(rowNumber)
-                        : attr.gridValue(tc);
-            }
-            rows.add(row);
-        }
-
-        return rows;
     }
 
     // UC-EDITOR-PANEL-002, Rule-EDITOR-PANEL-020

@@ -30,7 +30,6 @@ import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
 import org.testin.model.ProjectStatus;
-import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
@@ -61,6 +60,7 @@ public final class ProjectIndexer {
     private final @NotNull Project p;
     @Getter(AccessLevel.PACKAGE)
     private final @NotNull IndexerDataStore store;
+    private final @NotNull ReadProblems problems;
     @Getter(AccessLevel.PACKAGE)
     private final @NotNull ProjectScanCoordinator scanCoordinator;
     private final @NotNull AtomicBoolean indexed = new AtomicBoolean(false);
@@ -85,6 +85,7 @@ public final class ProjectIndexer {
         this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
         this.lastOpenEditors = Services.getInstance(p, LastOpenEditors.class);
         this.store = new IndexerDataStore(p);
+        this.problems = new ReadProblems(p, store);
         this.scanCoordinator = new ProjectScanCoordinator(new IndexingScanner(p, store));
         this.testRunWriter = new TestRunWriter(p, store);
         this.nodeFiles = new NodeFiles(p, this, store);
@@ -151,7 +152,7 @@ public final class ProjectIndexer {
                         Logger.info("Reading '" + projectName + "' took " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started) + " ms");
                         failure.ifPresent(why -> {
                             allRead.set(false);
-                            sayNotRead(projectName, why);
+                            problems.projectNotRead(projectName, why);
                         });
 
                         indicator.setFraction(1.0);
@@ -193,11 +194,6 @@ public final class ProjectIndexer {
         indexing.set(false);
         logSummary();
         restoreOpenEditorsOnce();
-    }
-
-    // Rule-INTERNAL-124
-    private void sayNotRead(final @NotNull String projectName, final @NotNull String why) {
-        Services.getInstance(p, Notifier.class).warn(p, Bundle.message("indexer.failed.title", projectName), Bundle.message("indexer.failed.message", projectName, why));
     }
 
     // UC-INTERNAL-002
@@ -395,7 +391,7 @@ public final class ProjectIndexer {
     public void scanSingleProject(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         Logger.info("Scanning single project: " + projectPath.getFileName());
         rescan.coveredByAScan(projectPath);
-        scanCoordinator.scan(projectPath, indicator).ifPresent(why -> sayNotRead(projectPath.getFileName().toString(), why));
+        scanCoordinator.scan(projectPath, indicator).ifPresent(why -> problems.projectNotRead(projectPath.getFileName().toString(), why));
 
         announceReadAgain();
     }

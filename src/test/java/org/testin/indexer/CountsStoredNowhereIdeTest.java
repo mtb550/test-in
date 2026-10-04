@@ -27,13 +27,14 @@ import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 public class CountsStoredNowhereIdeTest extends AbstractTempRootIdeTest {
 
     private static @NotNull String markerOf(final @NotNull DirectoryDto node) {
         final @NotNull Path marker = node.getPath().resolve(node.getType().getMarker());
         try {
-            return Files.readString(marker);
+            return Files.readAllLines(marker).stream().filter(line -> !line.contains("\"modifiedAt\"")).collect(Collectors.joining("\n"));
         } catch (final IOException ex) {
             throw new AssertionError("could not read " + marker, ex);
         }

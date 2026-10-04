@@ -16,7 +16,6 @@
 
 package org.testin.lightmode;
 
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionUiKind;
@@ -79,8 +78,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 final class LightModeWindow {
-    private static final @NotNull String ZOOM = "testin.lightMode.zoom.v1";
-
     private static final int START_WIDTH = 420;
 
     private static final int SET_FRAME_ARC = 20;
@@ -88,10 +85,6 @@ final class LightModeWindow {
     private static final int BUTTON_GAP = 8;
 
     private static final @NotNull List<CardHoverAction> KEYED = List.of(CardHoverAction.NAVIGATE_TO_TEST_METHOD, CardHoverAction.RUN_TEST_METHOD);
-
-    private static final float ZOOM_STEP = 0.1f;
-    private static final float ZOOM_MIN = 0.8f;
-    private static final float ZOOM_MAX = 2.0f;
 
     private final @NotNull TestRunEditor editor;
     private final @NotNull RunItemStatusService runItemStatusService;
@@ -132,7 +125,7 @@ final class LightModeWindow {
     private @NotNull Optional<Animator> slideMotion = Optional.empty();
     private @NotNull Optional<FailureForm> capture = Optional.empty();
 
-    private float zoom = Math.clamp(PropertiesComponent.getInstance().getFloat(ZOOM, 1.0f), ZOOM_MIN, ZOOM_MAX);
+    private final @NotNull LightModeZoom zoom = LightModeZoom.remembered();
 
     private boolean detailsKeyHeld = false;
 
@@ -291,36 +284,30 @@ final class LightModeWindow {
 
     private void bindWheel() {
         frame.content().addMouseWheelListener(e -> {
-            zoomBy(-e.getWheelRotation() * ZOOM_STEP);
+            zoomBy(-e.getWheelRotation() * LightModeZoom.STEP);
             e.consume();
         });
     }
 
     // UC-EDITOR-PANEL-046
     private void zoomBy(final float delta) {
-        final float next = Math.clamp(zoom + delta, ZOOM_MIN, ZOOM_MAX);
-        if (next == zoom) return;
+        if (!zoom.by(delta)) return;
 
-        zoom = next;
-        PropertiesComponent.getInstance().setValue(ZOOM, zoom, 1.0f);
+        zoom.remember();
 
         applyZoom();
         fitHeight();
     }
 
     private void applyZoom() {
-        set.setFont(scaled(setFont));
+        set.setFont(zoom.scaled(setFont));
 
-        chosen.setFont(scaled(setFont));
-        description.setFont(scaled(descriptionFont));
-        expected.setFont(scaled(expectedFont));
+        chosen.setFont(zoom.scaled(setFont));
+        description.setFont(zoom.scaled(descriptionFont));
+        expected.setFont(zoom.scaled(expectedFont));
 
-        details.setZoom(zoom);
-        capture.ifPresent(form -> form.setZoom(zoom));
-    }
-
-    private @NotNull Font scaled(final @NotNull Font base) {
-        return Fonts.zoomed(base, zoom);
+        details.setZoom(zoom.getLevel());
+        capture.ifPresent(form -> form.setZoom(zoom.getLevel()));
     }
 
     // UC-EDITOR-PANEL-046
@@ -357,7 +344,7 @@ final class LightModeWindow {
 
     private void openCapture() {
         executingItem().ifPresent(item -> {
-            capture = Optional.of(new FailureForm(editor.getProject(), editor.getParent().getPath(), item, zoom, this::fitHeight, this::saveCapture));
+            capture = Optional.of(new FailureForm(editor.getProject(), editor.getParent().getPath(), item, zoom.getLevel(), this::fitHeight, this::saveCapture));
 
             showCapture();
             fitHeight();

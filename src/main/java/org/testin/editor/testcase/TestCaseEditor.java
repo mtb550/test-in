@@ -26,10 +26,9 @@ import org.testin.actions.Declared;
 import org.testin.codegen.GenType;
 import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.BaseCard;
-import org.testin.filter.FilterSelection;
 import org.testin.editor.PageWindow;
-import org.testin.filter.TestCaseFilter;
 import org.testin.editor.UnifiedVirtualFile;
+import org.testin.editor.grid.GridRows;
 import org.testin.editor.listeners.GridEditListener;
 import org.testin.editor.listeners.ModelChangeNotifier;
 import org.testin.editor.listeners.StatusBarListener;
@@ -38,6 +37,8 @@ import org.testin.editor.listeners.TransferListener;
 import org.testin.editor.toolbar.TestCaseToolbar;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.TestCaseDetailsPopupBtn;
+import org.testin.filter.FilterSelection;
+import org.testin.filter.TestCaseFilter;
 import org.testin.logger.Logger;
 import org.testin.model.Modules;
 import org.testin.model.dto.TestCaseDto;
@@ -45,8 +46,8 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Refused;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.testcase.CreateTestCaseAction;
-import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.ui.SideScroll;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
@@ -354,7 +355,7 @@ public class TestCaseEditor extends AbstractTestinEditor<TestCaseEditorAttribute
     // UC-EDITOR-PANEL-020
     @Override
     protected @NotNull List<String[]> gridRows(final @NotNull List<TestCaseDto> pageItems) {
-        return gridPanelBuilder.testRows(pageItems, this::positionOf);
+        return GridRows.ofTestCases(pageItems, this::positionOf);
     }
 
     // UC-EDITOR-PANEL-020

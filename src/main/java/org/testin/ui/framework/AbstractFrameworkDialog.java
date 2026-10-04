@@ -16,7 +16,6 @@
 
 package org.testin.ui.framework;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
@@ -27,7 +26,6 @@ import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
-import com.intellij.ui.ActiveComponent;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
@@ -36,7 +34,6 @@ import org.testin.model.StatusBarItem;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
-import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;
 import org.testin.ui.dialogs.DialogStyle;
 
@@ -77,7 +74,7 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
 
     protected boolean resizable;
 
-    private @NotNull Optional<Rectangle> restoreTo = Optional.empty();
+    private final @NotNull Maximized maximized = new Maximized();
     private @NotNull Optional<DialogDto> dto = Optional.empty();
     private @NotNull Optional<List<DialogComponent>> built = Optional.empty();
     private @NotNull Optional<JBPopup> popup = Optional.empty();
@@ -100,11 +97,6 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
             stack.add(dialogComponent.getPanel());
         }
         return stack;
-    }
-
-    private static void resize(final @NotNull JBPopup open, final @NotNull Rectangle bounds) {
-        open.setSize(bounds.getSize());
-        open.setLocation(bounds.getLocation());
     }
 
     // UC-INTERNAL-007, Rule-INTERNAL-102
@@ -200,7 +192,7 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
         size.applyTo(p, contentPanel);
 
         // Rule-INTERNAL-101
-        if (sizeIsTheTesters()) builder.setResizable(true).setMovable(true).setCommandButton(maximizeToggle());
+        if (sizeIsTheTesters()) builder.setResizable(true).setMovable(true).setCommandButton(Maximized.button(() -> maximized.toggle(getPopup(), DialogSize.frameOn(p))));
 
         // Rule-INTERNAL-059
         builder.setCancelKeyEnabled(dto().shortcuts().stream().noneMatch(one -> one.shortcut() == Shortcuts.Escape));
@@ -217,36 +209,6 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
     // Rule-INTERNAL-101
     private boolean sizeIsTheTesters() {
         return resizable || size.namesAHeight();
-    }
-
-    // UC-INTERNAL-007, Rule-INTERNAL-101, Rule-INTERNAL-119
-    private @NotNull ActiveComponent maximizeToggle() {
-        final @NotNull AbstractIconButton button = AbstractIconButton.of(Bundle.message("dialog.maximize"), AllIcons.General.ExpandComponent, this::toggleMaximized);
-
-        return new ActiveComponent() {
-            @Override
-            public void setActive(final boolean active) {
-            }
-
-            @Override
-            public @NotNull JComponent getComponent() {
-                return button;
-            }
-        };
-    }
-
-    // UC-INTERNAL-007, Rule-INTERNAL-101
-    private void toggleMaximized() {
-        final @NotNull JBPopup open = getPopup();
-
-        if (restoreTo.isPresent()) {
-            resize(open, restoreTo.orElseThrow());
-            restoreTo = Optional.empty();
-            return;
-        }
-
-        restoreTo = Optional.of(new Rectangle(open.getLocationOnScreen(), open.getSize()));
-        resize(open, DialogSize.frameOn(p));
     }
 
     protected void closed() {
@@ -292,7 +254,7 @@ public abstract class AbstractFrameworkDialog implements DialogHost {
     // Rule-INTERNAL-101
     @Override
     public final void refit() {
-        if (restoreTo.isPresent()) return;
+        if (maximized.isOn()) return;
 
         shownSize().ifPresent(shown -> {
             getPopup().setSize(new Dimension(shown.width, DialogSize.withinFrame(p, naturalHeightOf(getPopup().getContent()))));

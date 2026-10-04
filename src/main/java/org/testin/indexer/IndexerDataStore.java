@@ -48,7 +48,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 final class IndexerDataStore {
     private final @NotNull DirectoryChildrenIndex childrenIndex = new DirectoryChildrenIndex();
@@ -412,25 +411,24 @@ final class IndexerDataStore {
     }
 
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
-        final @NotNull String oldStr = oldPath.toString();
-        final @NotNull String newStr = newPath.toString();
+        final @NotNull RenamedPaths rename = new RenamedPaths(oldPath, newPath);
         final @Nullable DirectoryDto newParentDto = Optional.ofNullable(newPath.getParent())
                 .flatMap(this::findByPath)
                 .orElse(null);
 
         for (final Map<String, ? extends DirectoryDto> map : dirMaps) {
-            renameMapEntry(map, oldStr, newStr, dto -> updatePathAndParent(dto, newPath, newParentDto));
-            renameDescendants(map, oldPath, newPath);
+            rename.moveEntry(map, dto -> updatePathAndParent(dto, newPath, newParentDto));
+            rename.moveNodesUnder(map);
         }
 
         rebuildPath2Under(newPath);
 
-        renameMapEntry(testCaseStore.getTestCaseIdsByTestSet(), oldStr, newStr, _ -> {
+        rename.moveEntry(testCaseStore.getTestCaseIdsByTestSet(), _ -> {
         });
-        renameMapEntry(testRunsByPath, oldStr, newStr, _ -> {
+        rename.moveEntry(testRunsByPath, _ -> {
         });
-        renameDescendantKeys(testCaseStore.getTestCaseIdsByTestSet(), oldPath, newPath);
-        renameDescendantKeys(testRunsByPath, oldPath, newPath);
+        rename.moveKeysUnder(testCaseStore.getTestCaseIdsByTestSet());
+        rename.moveKeysUnder(testRunsByPath);
         testCaseStore.renamed(oldPath, newPath);
         childrenIndex.invalidate();
 
@@ -465,38 +463,6 @@ final class IndexerDataStore {
                 .findFirst();
     }
 
-    private <V extends DirectoryDto> void renameDescendants(final @NotNull Map<String, V> map, final @NotNull Path oldPath, final @NotNull Path newPath) {
-        final @NotNull List<Map.Entry<String, V>> toUpdate = new ArrayList<>();
-        for (final Map.Entry<String, V> e : map.entrySet()) {
-            final @NotNull Path p = e.getValue().getPath();
-            if (p.startsWith(oldPath) && !p.equals(oldPath)) {
-                toUpdate.add(e);
-            }
-        }
-        for (final Map.Entry<String, V> e : toUpdate) {
-            final @NotNull V dto = e.getValue();
-            final @NotNull Path newChildPath = newPath.resolve(oldPath.relativize(dto.getPath()));
-            map.remove(e.getKey());
-            map.put(newChildPath.toString(), dto);
-            dto.setPath(newChildPath);
-        }
-    }
-
-    private <V> void renameDescendantKeys(final @NotNull Map<String, V> map, final @NotNull Path oldPath, final @NotNull Path newPath) {
-        final @NotNull List<String> toMove = new ArrayList<>();
-        for (final String key : map.keySet()) {
-            final @NotNull Path p = Path.of(key);
-            if (p.startsWith(oldPath) && !p.equals(oldPath)) {
-                toMove.add(key);
-            }
-        }
-        for (final String key : toMove) {
-            final @NotNull V v = map.remove(key);
-            final @NotNull Path newKey = newPath.resolve(oldPath.relativize(Path.of(key)));
-            map.put(newKey.toString(), v);
-        }
-    }
-
     private void rebuildPath2(final @NotNull DirectoryDto dto) {
         final @NotNull ArrayList<String> path2 = new ArrayList<>();
         for (final DirectoryDto ancestor : dto.selfAndAncestors()) {
@@ -519,13 +485,6 @@ final class IndexerDataStore {
             directories.addAll(map.values());
         }
         return directories;
-    }
-
-    private <V> void renameMapEntry(final @NotNull Map<String, V> map, final @NotNull String oldKey, final @NotNull String newKey, final @NotNull Consumer<V> updater) {
-        Optional.ofNullable(map.remove(oldKey)).ifPresent(value -> {
-            updater.accept(value);
-            map.put(newKey, value);
-        });
     }
 
     void clearAll() {

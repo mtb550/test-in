@@ -24,21 +24,22 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.BaseCard;
-import org.testin.filter.FilterSelection;
 import org.testin.editor.PageWindow;
-import org.testin.filter.TestCaseFilter;
 import org.testin.editor.UnifiedVirtualFile;
+import org.testin.editor.grid.GridRows;
+import org.testin.editor.listeners.StatusBarListener;
 import org.testin.editor.listeners.TestRunGridEditListener;
 import org.testin.editor.listeners.TestRunListRenderer;
-import org.testin.editor.listeners.StatusBarListener;
 import org.testin.editor.toolbar.TestRunToolbar;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.GenerateReportBtn;
 import org.testin.editor.toolbar.components.LightModeBtn;
 import org.testin.editor.toolbar.components.ResultAnalysisBtn;
-import org.testin.editor.toolbar.components.TestRunDetailsPopupBtn;
 import org.testin.editor.toolbar.components.StartExecutionBtn;
 import org.testin.editor.toolbar.components.StopExecutionBtn;
+import org.testin.editor.toolbar.components.TestRunDetailsPopupBtn;
+import org.testin.filter.FilterSelection;
+import org.testin.filter.TestCaseFilter;
 import org.testin.indexer.TestRuns;
 import org.testin.lightmode.LightMode;
 import org.testin.logger.Logger;
@@ -53,8 +54,8 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseOrder;
 import org.testin.testcase.TestCaseEditorAttributes;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.testrun.ResultAnalysisDialog;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.SideScroll;
@@ -312,7 +313,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094
     @Override
     protected @NotNull List<String[]> gridRows(final @NotNull List<TestCaseDto> pageItems) {
-        return gridPanelBuilder.testRunRows(pageItems, resultsMap, this::positionOf);
+        return GridRows.ofRunItems(pageItems, resultsMap, this::positionOf);
     }
 
     // UC-EDITOR-PANEL-020, Rule-EDITOR-PANEL-094

@@ -34,7 +34,6 @@ import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
 import org.testin.model.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Bundle;
@@ -52,21 +51,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BinaryOperator;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 final class IndexingScanner {
-    private static final int SHOWN = 5;
     private final @NotNull Project p;
     private final @NotNull IndexerDataStore store;
     private final @NotNull DirectoryMapper directoryMapper;
     private final @NotNull Mapper mapper;
-    private final @NotNull Notifier notifier;
+    private final @NotNull ReadProblems problems;
     private final @NotNull TestDataFiles testDataFiles;
 
     IndexingScanner(final @NotNull Project p, final @NotNull IndexerDataStore store) {
@@ -74,7 +69,7 @@ final class IndexingScanner {
         this.store = store;
         this.directoryMapper = Services.getInstance(p, DirectoryMapper.class);
         this.mapper = Services.getInstance(p, Mapper.class);
-        this.notifier = Services.getInstance(p, Notifier.class);
+        this.problems = new ReadProblems(p, store);
         this.testDataFiles = Services.getInstance(p, TestDataFiles.class);
     }
 
@@ -198,11 +193,11 @@ final class IndexingScanner {
             indicator.setFraction(1.0);
             indicator.setText(Bundle.message("indexer.progress.project.done", tp.getName()));
 
-            reportUnread(tp.getName(), unread);
-            reportDamaged(tp.getName(), store.takeDamagedMarkers(projectPath));
-            reportUnreadableResults(tp.getName(), scanned.getUnreadableResults());
-            reportHandNamedResults(tp.getName(), scanned.getHandNamedResults());
-            reportClashing(tp.getName(), List.copyOf(scanned.getClashingTestCases()));
+            problems.unreadFolders(tp.getName(), unread);
+            problems.damagedMarkers(tp.getName(), store.takeDamagedMarkers(projectPath));
+            problems.unreadableResults(tp.getName(), scanned.getUnreadableResults());
+            problems.handNamedResults(tp.getName(), scanned.getHandNamedResults());
+            problems.clashingTestCases(tp.getName(), List.copyOf(scanned.getClashingTestCases()));
             return Optional.empty();
         } catch (final Exception ex) {
             Logger.error("Failed to scan project: " + projectPath.getFileName() + " - " + FailureText.of(ex));
@@ -361,80 +356,6 @@ final class IndexingScanner {
         } catch (final Exception unreadable) {
             return false;
         }
-    }
-
-    // UC-INTERNAL-002, Rule-INTERNAL-015
-    private void reportUnread(final @NotNull String projectName, final @NotNull List<Path> unread) {
-        final @NotNull List<String> nodePaths = unread.stream().map(this::unmarkedPath).sorted().toList();
-
-        say(Bundle.message("indexer.unread.title", projectName), nodePaths,
-                nodePath -> Bundle.message("indexer.unread.one", nodePath),
-                (named, rest) -> Bundle.message("indexer.unread.many", String.valueOf(nodePaths.size()), named, rest));
-    }
-
-    // Rule-INTERNAL-015
-    private @NotNull String unmarkedPath(final @NotNull Path folder) {
-        return Optional.ofNullable(folder.getParent())
-                .map(holding -> nodePath(holding) + " > " + folder.getFileName())
-                .orElseGet(folder::toString);
-    }
-
-    // UC-INTERNAL-002, Rule-INTERNAL-011
-    private void reportUnreadableResults(final @NotNull String projectName, final @NotNull Set<String> unreadable) {
-        final @NotNull List<String> names = unreadable.stream().sorted().toList();
-
-        say(Bundle.message("indexer.results.unread.title", projectName), names,
-                name -> Bundle.message("indexer.results.unread.one", name),
-                (named, rest) -> Bundle.message("indexer.results.unread.many", String.valueOf(names.size()), named, rest));
-    }
-
-    // UC-INTERNAL-002, Rule-INTERNAL-094
-    private void reportHandNamedResults(final @NotNull String projectName, final @NotNull Set<String> handNamed) {
-        final @NotNull List<String> names = handNamed.stream().sorted().toList();
-
-        say(Bundle.message("indexer.results.unnamed.title", projectName), names,
-                name -> Bundle.message("indexer.results.unnamed.one", name),
-                (named, rest) -> Bundle.message("indexer.results.unnamed.many", String.valueOf(names.size()), named, rest));
-    }
-
-    // UC-INTERNAL-002, Rule-INTERNAL-014
-    private void reportDamaged(final @NotNull String projectName, final @NotNull List<Path> damaged) {
-        final @NotNull List<String> nodePaths = damaged.stream().map(this::nodePath).sorted().toList();
-
-        say(Bundle.message("indexer.damaged.title", projectName), nodePaths,
-                nodePath -> Bundle.message("indexer.damaged.one", nodePath),
-                (named, rest) -> Bundle.message("indexer.damaged.many", String.valueOf(nodePaths.size()), named, rest));
-    }
-
-    // Rule-INTERNAL-014
-    private @NotNull String nodePath(final @NotNull Path path) {
-        return store.findByPath(path).map(node -> String.join(" > ", node.getPath2())).orElseGet(path::toString);
-    }
-
-    // UC-INTERNAL-002, Rule-INTERNAL-015
-    private void say(final @NotNull String title, final @NotNull List<String> names, final @NotNull UnaryOperator<String> one, final @NotNull BinaryOperator<String> many) {
-        if (names.isEmpty()) return;
-
-        if (names.size() == 1) {
-            notifier.warn(p, title, one.apply(names.getFirst()));
-            return;
-        }
-
-        final @NotNull String named = names.stream().limit(SHOWN).collect(Collectors.joining(", "));
-        final @NotNull String rest = names.size() > SHOWN
-                ? Bundle.message("indexer.more", String.valueOf(names.size() - SHOWN))
-                : "";
-
-        notifier.warn(p, title, many.apply(named, rest));
-    }
-
-    // UC-INTERNAL-002, Rule-INTERNAL-082
-    private void reportClashing(final @NotNull String projectName, final @NotNull List<String> clashing) {
-        final @NotNull List<String> names = clashing.stream().sorted().toList();
-
-        say(Bundle.message("indexer.clash.title", projectName), names,
-                name -> Bundle.message("indexer.clash.message", Bundle.message("indexer.clash.one"), name, ""),
-                (named, rest) -> Bundle.message("indexer.clash.message", Bundle.message("indexer.clash.many", String.valueOf(names.size())), named, rest));
     }
 
     // UC-INTERNAL-002
