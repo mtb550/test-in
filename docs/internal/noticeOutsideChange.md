@@ -47,6 +47,10 @@ panel does the same job by hand, and is on
 - **Rule-INTERNAL-113** — A file Testin writes or deletes is claimed as its own
   before the change starts, because the file system can report the change while
   it is still running.
+- **Rule-INTERNAL-125** — A file Testin writes is replaced whole or not at all.
+  It is written beside itself first and moved into place, so a write cut off
+  part-way leaves the file as it was, and the file written beside it is claimed
+  as Testin's own as well.
 
 ## What is picked up, and what is not
 

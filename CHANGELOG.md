@@ -151,6 +151,12 @@ than repairing it, and a team sharing a test project should update together.
   the moment it is selected until its run item status is set, by hand or by the automation.
 - **Two test projects with one name open the one under your Testin root,** rather than whichever was read first.
 - **A dialog on a very small IDE window stays inside it,** rather than growing past its edges.
+- **A test project that cannot be read all the way says so and is read again on the next refresh,** instead of
+  being treated as read with part of it missing.
+- **A save cut off part-way leaves the file as it was:** Testin writes beside the file and moves the result into
+  place, so a crash or a full disk can no longer leave a test case or a marker empty.
+- **Test cases whose methods live in two modules no longer run on one module's classpath:** nothing starts, and one
+  message names the modules, so each module's test cases are run on their own.
 - **The screenshots pasted with a failure show in the view panel again,** even when Fields hides the Stacktrace
   link. Only the link follows that field.
 

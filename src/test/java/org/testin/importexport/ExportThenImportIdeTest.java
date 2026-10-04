@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.model.dto.TestCaseDto;
 
+import java.util.Objects;
 import java.io.File;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -62,13 +63,13 @@ public class ExportThenImportIdeTest extends AbstractTempRootIdeTest {
         final @NotNull Map<String, List<TestCaseDto>> read = roundTrip(sheets);
 
         assertEquals(List.of("Login", "Checkout"), List.copyOf(read.keySet()));
-        assertEquals(descriptions(sheets.get("Login")), descriptions(read.get("Login")));
-        assertEquals(descriptions(sheets.get("Checkout")), descriptions(read.get("Checkout")));
+        assertEquals(descriptions(sheets.get("Login")), descriptions(Objects.requireNonNull(read.get("Login"), "no Login sheet was read")));
+        assertEquals(descriptions(sheets.get("Checkout")), descriptions(Objects.requireNonNull(read.get("Checkout"), "no Checkout sheet was read")));
     }
 
     // UC-SHARE-005, Rule-SHARE-121
     public void testASheetExportedAndImportedUnchangedKeepsItsDates() {
-        final @NotNull TestCaseDto read = roundTrip(Map.of("Login", List.of(aTestCase("log in with a valid user")))).get("Login").getFirst();
+        final @NotNull TestCaseDto read = Objects.requireNonNull(roundTrip(Map.of("Login", List.of(aTestCase("log in with a valid user")))).get("Login"), "no Login sheet was read").getFirst();
 
         assertEquals(CREATED.toInstant(), read.getCreatedAt().toInstant());
         assertEquals(UPDATED.toInstant(), read.getUpdatedAt().toInstant());

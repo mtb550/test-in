@@ -17,6 +17,8 @@
 package org.testin.indexer;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.Await;
+import org.testin.TempTree;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
 import org.testin.model.TestRunItems;
@@ -33,6 +35,29 @@ public class ReadProblemsIdeTest extends AbstractReadTheRootIdeTest {
 
     private @NotNull Path project() {
         return aTestProjectAt(root.resolve(PROJECT));
+    }
+
+    // UC-INTERNAL-002, Rule-INTERNAL-124
+    public void testAReadThatFailsPartWayIsSaidIsNotCountedAndIsReadAgainNextTime() {
+        final @NotNull Path testRuns = theTestRunsOf(project());
+        final @NotNull UUID testCase = aTestCaseIn(marked(theTestCasesOf(project()).resolve("Login"), DirectoryType.TS));
+        TempTree.delete(testRuns);
+        SyntheticTree.write(testRuns, "a file where the test runs folder should be");
+
+        indexer().resetForReindex();
+        indexer().indexWithProgress();
+        Await.until("a read that failed part-way said nothing", () -> !said(Bundle.message("indexer.failed.title", PROJECT)).isEmpty());
+
+        assertFalse("a read that failed part-way was counted as read", indexer().isIndexed());
+        assertTrue("the failure did not say which folder could not be read: " + said(Bundle.message("indexer.failed.title", PROJECT)), names(said(Bundle.message("indexer.failed.title", PROJECT)), DirectoryType.TRD.getFolderName()));
+
+        TempTree.delete(testRuns);
+        marked(testRuns, DirectoryType.TRD);
+        Await.until("the test project was not read again on the next request", () -> {
+            indexer().indexWithProgress();
+            return indexer().isIndexed();
+        });
+        assertTrue("the test project read again is missing its test case", indexedTestCases().findTestCase(testCase).isPresent());
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014

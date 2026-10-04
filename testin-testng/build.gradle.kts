@@ -35,7 +35,25 @@ dependencies {
     // Ships beside this module, not inside it.
     compileOnly(project(":"))
 
-    listOf("compileOnly", "annotationProcessor").forEach { configuration ->
+    listOf("compileOnly", "annotationProcessor", "testCompileOnly", "testAnnotationProcessor").forEach { configuration ->
         add(configuration, libs.lombok)
+    }
+
+    // The tests of this module's classes live here, as testin-java's do.
+    testImplementation(project(":"))
+    testImplementation(libs.testng)
+}
+
+tasks.withType<Test> {
+    useTestNG()
+    jvmArgs("--sun-misc-unsafe-memory-access=allow")
+
+    // A --tests filter reaches every module, and this one holds few tests.
+    filter {
+        isFailOnNoMatchingTests = false
+    }
+
+    testLogging {
+        events("passed", "skipped", "failed")
     }
 }

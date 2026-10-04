@@ -75,9 +75,9 @@ public class ReportFormatsIdeTest extends AbstractTempRootIdeTest {
 
     private String wasBound;
 
-    private TestProjectDirectoryDto testProject;
+    private @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
 
-    private TestSetDirectoryDto login;
+    private @NotNull TestSetDirectoryDto login = new TestSetDirectoryDto();
 
     private @NotNull BoundTestProject bound() {
         return Services.getInstance(getProject(), BoundTestProject.class);

@@ -97,9 +97,9 @@ public class ReportDeliveryIdeTest extends AbstractTempRootIdeTest {
 
     private Path testin;
 
-    private TestProjectDirectoryDto testProject;
+    private @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
 
-    private TestSetDirectoryDto login;
+    private @NotNull TestSetDirectoryDto login = new TestSetDirectoryDto();
 
     private static @NotNull AppSettingsState settings() {
         return Services.getInstance(AppSettingsState.class);

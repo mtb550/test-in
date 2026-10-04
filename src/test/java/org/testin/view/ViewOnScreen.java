@@ -36,6 +36,7 @@ import org.testin.services.Services;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import java.util.Objects;
 import java.awt.BorderLayout;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -171,11 +172,11 @@ public final class ViewOnScreen {
         }
 
         private @NotNull ShownToolWindow view() {
-            return shown.get(VIEW);
+            return Objects.requireNonNull(shown.get(VIEW), "the stand-in view panel was never made");
         }
 
         private @NotNull ShownToolWindow tree() {
-            return shown.get(TREE);
+            return Objects.requireNonNull(shown.get(TREE), "the stand-in tree panel was never made");
         }
 
         @Override
@@ -306,8 +307,7 @@ public final class ViewOnScreen {
 
         private boolean activates() {
             activated.incrementAndGet();
-            visible = true;
-            return true;
+            return shows(true, List.of());
         }
     }
 }

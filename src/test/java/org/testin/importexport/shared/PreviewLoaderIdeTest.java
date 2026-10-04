@@ -26,6 +26,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.TextValue;
 import org.testin.util.Bundle;
 
+import java.util.Objects;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +47,7 @@ public class PreviewLoaderIdeTest extends AbstractTempRootIdeTest {
     private final @NotNull TextValue box = new TextValue() {
         @Override
         public @NotNull String getText() {
-            return typed.get();
+            return Objects.requireNonNull(typed.get(), "nothing was typed");
         }
 
         @Override

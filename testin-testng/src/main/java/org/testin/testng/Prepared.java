@@ -21,7 +21,11 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;
-import java.util.Optional;
 
-record Prepared(@NotNull List<Generated> found, @NotNull List<TestCaseDto> withoutCode, @NotNull Optional<Module> module) {
+record Prepared(@NotNull List<Generated> found, @NotNull List<TestCaseDto> withoutCode, @NotNull List<Module> modules) {
+
+    // Rule-CODEGEN-097
+    boolean spansModules() {
+        return modules.stream().distinct().count() > 1;
+    }
 }

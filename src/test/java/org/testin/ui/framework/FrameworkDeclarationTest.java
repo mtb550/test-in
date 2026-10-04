@@ -52,6 +52,6 @@ public class FrameworkDeclarationTest {
     public void selectionComponentCannotBeDeclaredEmpty() {
         final IllegalStateException error = expectThrows(IllegalStateException.class, () ->
                 ComponentDialogBase.textFieldWithSelections().build());
-        assertTrue(error.getMessage().contains("selection"), error.getMessage());
+        assertTrue(String.valueOf(error.getMessage()).contains("selection"), error.getMessage());
     }
 }

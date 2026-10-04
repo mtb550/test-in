@@ -102,12 +102,12 @@ public final class TestNGRunner implements TestRunner {
                         () -> withoutCode.add(tc));
             }
 
-            final @NotNull Optional<Module> module = found.stream()
+            final @NotNull List<Module> modules = found.stream()
                     .map(one -> moduleOf(p, one.fqcn()))
                     .flatMap(Optional::stream)
-                    .findFirst();
+                    .toList();
 
-            return Optional.of(new Prepared(found, withoutCode, module));
+            return Optional.of(new Prepared(found, withoutCode, modules));
         } catch (final IndexNotReadyException ex) {
             return Optional.empty();
         }
@@ -127,7 +127,13 @@ public final class TestNGRunner implements TestRunner {
 
         if (prepared.found().isEmpty()) return;
 
-        launch(p, prepared.found(), prepared.module());
+        // Rule-CODEGEN-097
+        if (prepared.spansModules()) {
+            execution.acrossModules(prepared.found().stream().map(Generated::tc).toList(), prepared.modules().stream().map(Module::getName).distinct().toList());
+            return;
+        }
+
+        launch(p, prepared.found(), prepared.modules().stream().findFirst());
     }
 
     private void launch(final @NotNull Project p, final @NotNull List<Generated> found, final @NotNull Optional<Module> module) {

@@ -118,6 +118,9 @@ There is no key for this. It starts on its own.
 - **Rule-INTERNAL-123** — A marker change that cannot be written does not stay
   in memory. A test set's or a node's marker keeps its old values, and a test
   run's marker is read again from disk and the tester is told it was not saved.
+- **Rule-INTERNAL-124** — A test project whose read fails part-way is never
+  counted as read. Testin says it could not read it and why, keeps none of it as
+  current, and reads it again on the next refresh.
 
 ## The budget
 

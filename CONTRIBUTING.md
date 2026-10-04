@@ -134,11 +134,13 @@ This is the single most useful thing to know about this codebase.
 
 `@NotNull` is half a compile-time contract. javac ignores it, and the IDE's
 instrumenter rewrites it into a throw that exists only inside a running IDE.
-NullAway, run by Error Prone inside `compileJava`, is the half that is checked:
-a null passed to a `@NotNull` parameter, returned from a method not marked
-`@Nullable`, or dereferenced where it may be null fails the build, in the
-production code of all three modules (#377). Every other Error Prone check is
-off, and the tests are not checked. What NullAway cannot see still throws in
+NullAway, run by Error Prone inside `compileJava` and `compileTestJava`, is the
+half that is checked: a null passed to a `@NotNull` parameter, returned from a
+method not marked `@Nullable`, or dereferenced where it may be null fails the
+build, in the production code and the tests of all three modules (#377, #389).
+A test's fields are filled in JUnit 3's `setUp` or TestNG's `@BeforeMethod`,
+and both are named as initializers. Every other Error Prone check is off. What
+NullAway cannot see still throws in
 front of a tester: a null from platform or library code it has no model for,
 and a field Jackson or reflection left empty.
 
@@ -192,8 +194,9 @@ rule, give it the marker: that is how the count goes up.
 
 ### The coverage gate
 
-JaCoCo measures the lines both test tasks run, `test` and `ideTest`, across the
-three modules, and reports them per package in one report (#325).
+JaCoCo measures the lines and branches both test tasks run, `test` and
+`ideTest`, across the three modules, and reports them per package in one report
+(#325).
 
 ```bash
 ./gradlew check                            # both test tasks, every gate, and the report
@@ -203,11 +206,19 @@ three modules, and reports them per package in one report (#325).
 |            |                                                                                                                                                 |
 |------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Report** | `build/reports/jacoco/test/html/index.html`, one row per package, and `jacocoTestReport.xml` beside it. CI keeps it with the other test reports |
-| **Gate**   | `jacocoTestCoverageVerification`, part of `check`. Fails under the line minimum in `build.gradle.kts`: 40%, from 40.72% on 2 October 2026       |
+| **Gate**   | `jacocoTestCoverageVerification`, part of `check`. Fails under 84% of lines or 52% of branches, from 84.81% and 52.92% on 4 October 2026        |
 
-The gate stops coverage falling and asks for nothing more. Raise the minimum when
-the figure has risen, as a change of its own. A line reached is not a rule
-proven, which is why the rule count above is kept beside it.
+The gate stops coverage falling and asks for nothing more. **Raise a minimum in
+the commit that lifts its figure past the next whole percent**, so the floor
+follows every gain and never trails it by more than a point. New tests go first
+where the report shows error paths and state changes unrun, not to getters. A
+line reached is not a rule proven, which is why the rule count above is kept
+beside it.
+
+Coverage has this one gate. Qodana's `JvmCoverageInspection` is off in the
+profile: it judges each method against its own 50% from whatever coverage the
+machine running it last recorded, so the same code passes in CI and fails on a
+laptop.
 
 ### The inspection gate
 

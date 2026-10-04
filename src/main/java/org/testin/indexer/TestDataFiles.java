@@ -32,8 +32,10 @@ import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -98,7 +100,7 @@ final class TestDataFiles {
         }
     }
 
-    // UC-INTERNAL-003, Rule-INTERNAL-019, Rule-INTERNAL-113
+    // UC-INTERNAL-003, Rule-INTERNAL-019, Rule-INTERNAL-113, Rule-INTERNAL-125
     private boolean writeBytes(final @NotNull Path path, final byte @NotNull [] jsonBytes) {
         if (jsonBytes.length == 0) {
             Logger.error("Refusing to write an empty file, which would erase it: " + path);
@@ -106,17 +108,38 @@ final class TestDataFiles {
             return false;
         }
 
+        final @NotNull Path beside = besideItself(path);
         try {
             ownWrites.record(p, path);
+            ownWrites.record(p, beside);
 
             FileUtil.createParentDirs(path.toFile());
-            Files.write(path, jsonBytes);
+            Files.write(beside, jsonBytes);
+            try {
+                Files.move(beside, path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+            } catch (final AtomicMoveNotSupportedException notOnThisFileSystem) {
+                Files.move(beside, path, StandardCopyOption.REPLACE_EXISTING);
+            }
 
             ownWrites.wrote(p, path, jsonBytes);
             return true;
         } catch (final IOException ex) {
             reportWriteFailure(path, ex);
+            forget(beside);
             return false;
+        }
+    }
+
+    // Rule-INTERNAL-125
+    static @NotNull Path besideItself(final @NotNull Path path) {
+        return path.resolveSibling(path.getFileName() + ".writing");
+    }
+
+    private static void forget(final @NotNull Path beside) {
+        try {
+            Files.deleteIfExists(beside);
+        } catch (final IOException ex) {
+            Logger.warn("Could not remove " + beside + " after a write that failed: " + FailureText.of(ex));
         }
     }
 

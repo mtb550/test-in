@@ -63,7 +63,7 @@ public class PublishedKeysTest {
                 keys.putIfAbsent(owner, new ArrayList<>());
                 continue;
             }
-            keys.get(owner).add(element.group(2));
+            keys.computeIfAbsent(owner, _ -> new ArrayList<>()).add(element.group(2));
         }
         return keys;
     }

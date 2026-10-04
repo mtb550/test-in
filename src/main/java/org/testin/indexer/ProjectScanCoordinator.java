@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
@@ -29,10 +30,10 @@ final class ProjectScanCoordinator {
     private final @NotNull IndexingScanner scanner;
     private final @NotNull ReentrantReadWriteLock scanLock = new ReentrantReadWriteLock();
 
-    void scan(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
+    @NotNull Optional<String> scan(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         scanLock.readLock().lock();
         try {
-            scanner.scanProject(projectPath, indicator);
+            return scanner.scanProject(projectPath, indicator);
         } finally {
             scanLock.readLock().unlock();
         }

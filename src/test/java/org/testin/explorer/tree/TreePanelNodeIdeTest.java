@@ -25,6 +25,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 
+import java.util.Objects;
 import java.nio.file.Path;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,13 +67,13 @@ public class TreePanelNodeIdeTest extends BasePlatformTestCase {
 
         assertEquals("the model finds a changed folder by comparing a probe with the node it holds",
                 new TreePanelNode(getProject(), at(new TestSetDirectoryDto(), SET)), probe);
-        assertEquals(new TreePanelNode(getProject(), at(new TestSetPackageDirectoryDto(), SET.getParent())), probe.getParent());
+        assertEquals(new TreePanelNode(getProject(), at(new TestSetPackageDirectoryDto(), Objects.requireNonNull(SET.getParent(), "the test set has no folder"))), probe.getParent());
         assertEquals("the probe's parents lead to the root the structure answers with",
                 new TreePanelNode(getProject(), at(new TestProjectDirectoryDto(), root)), probe.getParent().getParent());
     }
 
     public void testAPackageIsAskedForItsChildren() {
-        assertEquals(LeafState.ASYNC, new TreePanelNode(getProject(), at(new TestSetPackageDirectoryDto(), SET.getParent())).getLeafState());
+        assertEquals(LeafState.ASYNC, new TreePanelNode(getProject(), at(new TestSetPackageDirectoryDto(), Objects.requireNonNull(SET.getParent(), "the test set has no folder"))).getLeafState());
     }
 
     // Rule-TREE-PANEL-063

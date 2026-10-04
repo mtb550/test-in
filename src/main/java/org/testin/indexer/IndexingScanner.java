@@ -41,7 +41,10 @@ import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -123,9 +126,10 @@ final class IndexingScanner {
         return tc.getId();
     }
 
-    void scanProject(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
+    // Rule-INTERNAL-124
+    @NotNull Optional<String> scanProject(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
-            scanProjectContents(projectPath, indicator);
+            return scanProjectContents(projectPath, indicator);
         } finally {
             store.invalidateChildrenIndex();
         }
@@ -140,7 +144,7 @@ final class IndexingScanner {
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-005, Rule-INTERNAL-007, Rule-INTERNAL-091
-    private void scanProjectContents(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
+    private @NotNull Optional<String> scanProjectContents(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
             final @NotNull TestProjectDirectoryDto tp = directoryMapper.getTestProjectNode(projectPath);
 
@@ -152,7 +156,7 @@ final class IndexingScanner {
                 store.refuse(projectPath, refused.orElseThrow());
                 store.swapIn(projectPath, scannedNode(projectPath, tp));
                 indicator.setFraction(1.0);
-                return;
+                return Optional.empty();
             }
 
             // UC-INTERNAL-003, Rule-INTERNAL-021
@@ -165,7 +169,7 @@ final class IndexingScanner {
                 Logger.info("Inactive project, indexed without its contents: " + projectPath.getFileName());
                 store.swapIn(projectPath, scanned);
                 indicator.setFraction(1.0);
-                return;
+                return Optional.empty();
             }
 
             indicator.setFraction(0.1);
@@ -186,7 +190,7 @@ final class IndexingScanner {
 
             if (indicator.isCanceled()) {
                 Logger.info("Scan canceled, so the index was left as it was: " + projectPath.getFileName());
-                return;
+                return Optional.empty();
             }
 
             store.swapIn(projectPath, scanned);
@@ -199,9 +203,10 @@ final class IndexingScanner {
             reportUnreadableResults(tp.getName(), scanned.getUnreadableResults());
             reportHandNamedResults(tp.getName(), scanned.getHandNamedResults());
             reportClashing(tp.getName(), List.copyOf(scanned.getClashingTestCases()));
-
+            return Optional.empty();
         } catch (final Exception ex) {
             Logger.error("Failed to scan project: " + projectPath.getFileName() + " - " + FailureText.of(ex));
+            return Optional.of(FailureText.of(ex));
         }
     }
 
@@ -215,8 +220,10 @@ final class IndexingScanner {
 
                 scanTestSetOrPackage(dirPath, parent, indicator, unread, scanned);
             }
-        } catch (final Exception ex) {
-            Logger.error("Failed to list test sets: " + FailureText.of(ex));
+        } catch (final NoSuchFileException absent) {
+            Logger.info("No test sets to read: " + tcDir);
+        } catch (final IOException ex) {
+            throw new UncheckedIOException("the folder " + tcDir.getFileName() + " could not be listed: " + FailureText.of(ex), ex);
         }
     }
 
@@ -307,8 +314,10 @@ final class IndexingScanner {
 
                 scanTestRunOrPackage(dirPath, parent, indicator, unread, scanned);
             }
-        } catch (final Exception ex) {
-            Logger.error("Failed to list test runs: " + FailureText.of(ex));
+        } catch (final NoSuchFileException absent) {
+            Logger.info("No test runs to read: " + trDir);
+        } catch (final IOException ex) {
+            throw new UncheckedIOException("the folder " + trDir.getFileName() + " could not be listed: " + FailureText.of(ex), ex);
         }
     }
 

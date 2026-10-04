@@ -27,6 +27,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.Objects;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -81,7 +82,7 @@ public class GitWorkflowTest {
 
     @AfterMethod
     public void removeRepositories() {
-        if (remote != null) TempTree.delete(remote.getParent());
+        TempTree.delete(Objects.requireNonNull(remote.getParent(), "the remote has no folder"));
     }
 
     @Test
@@ -214,7 +215,7 @@ public class GitWorkflowTest {
 
     private @NotNull Path cloneAsColleague() {
 
-        final Path colleague = remote.getParent().resolve("colleague");
+        final Path colleague = Objects.requireNonNull(remote.getParent(), remote + " has no folder").resolve("colleague");
         mustGit(remote.getParent(), "clone", remote.toUri().toString(), colleague.toString());
         return colleague;
 
@@ -388,7 +389,7 @@ public class GitWorkflowTest {
             final String remote = contents(work, ":2", conflicting).get(relativePath);
             final String replayed = contents(work, ":3", conflicting).get(relativePath);
 
-            final Merge merge = TestCaseMerge.of(RealMapper.build(), base, replayed, remote);
+            final Merge merge = TestCaseMerge.of(RealMapper.build(), Objects.requireNonNull(base, "no base"), Objects.requireNonNull(replayed, "no replayed side"), Objects.requireNonNull(remote, "no remote side"));
             assertTrue(merge.isSettled(), "different fields are not a disagreement");
 
             Files.writeString(myCopy, merge.merged().toPrettyString(), StandardCharsets.UTF_8);
@@ -506,7 +507,7 @@ public class GitWorkflowTest {
     @Test
     public void aLinkedWorktreeHasItsOwnGitDirectory() {
         mustGit(work, "commit", "--allow-empty", "-m", "root");
-        final Path linked = remote.getParent().resolve("linked");
+        final Path linked = Objects.requireNonNull(remote.getParent(), remote + " has no folder").resolve("linked");
         mustGit(work, "worktree", "add", "-b", "side", linked.toString());
 
         assertTrue(Files.isRegularFile(linked.resolve(".git")), "a linked worktree's .git is a file, not a folder");

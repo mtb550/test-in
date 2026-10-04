@@ -46,6 +46,11 @@ public enum Refused {
             Bundle.message("refused.no.generated.code.counted")
     ),
 
+    // UC-CODEGEN-008, Rule-CODEGEN-097
+    ACROSS_MODULES(
+            Bundle.message("refused.across.modules")
+    ),
+
     // UC-TREE-PANEL-023, Rule-TREE-PANEL-078
     NOTHING_TO_RUN(
             Bundle.message("refused.nothing.to.run")

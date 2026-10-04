@@ -314,6 +314,36 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
         }
     }
 
+    // UC-INTERNAL-004, Rule-INTERNAL-125
+    public void testASaveThatCannotFinishLeavesTheFileAsItWas() {
+        final @NotNull TestSetDirectoryDto ts = oneTestSet();
+        final @NotNull TestCaseDto held = aTestCaseIn(ts, "m");
+        indexedTestCases().putTestCaseVerbatim(ts.getPath(), held);
+        final byte @NotNull [] before = bytesOf(fileOf(ts, held));
+        undeletable(TestDataFiles.besideItself(fileOf(ts, held)));
+
+        asTester(() -> assertFalse("a save that could not finish was reported as written",
+                indexedTestCases().putTestCase(ts.getPath(), held.edit().description("Sign in with a valid user").build())));
+
+        assertArrayEquals("a save that could not finish changed the file", before, bytesOf(fileOf(ts, held)));
+    }
+
+    // UC-INTERNAL-004, Rule-INTERNAL-113, Rule-INTERNAL-125
+    public void testASaveLeavesNothingBesideTheFileAndBothAreTestinsOwn() {
+        final @NotNull TestSetDirectoryDto ts = oneTestSet();
+        final @NotNull TestCaseDto held = aTestCaseIn(ts, "m");
+        indexedTestCases().putTestCaseVerbatim(ts.getPath(), held);
+        final @NotNull Path beside = TestDataFiles.besideItself(fileOf(ts, held));
+
+        asTester(() -> assertTrue("the save was not written",
+                indexedTestCases().putTestCase(ts.getPath(), held.edit().description("Sign in with a valid user").build())));
+
+        assertFalse("the file written beside the test case was left behind", Files.exists(beside));
+        final @NotNull OwnWrites ours = Services.getInstance(OwnWrites.class);
+        assertTrue("the saved test case would read as an outside change", ours.areOurs(fileOf(ts, held), getProject()));
+        assertTrue("the file written beside it would read as an outside change", ours.areOurs(beside, getProject()));
+    }
+
     // UC-INTERNAL-004, Rule-INTERNAL-033
     public void testASaveThatWouldLeaveTheFileAsItIsWritesNothing() {
         final @NotNull TestSetDirectoryDto ts = oneTestSet();

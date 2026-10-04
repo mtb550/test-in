@@ -119,6 +119,19 @@ public class OneExecutionIdeTest extends AbstractCodegenIdeTest {
         return e;
     }
 
+    // Rule-CODEGEN-097
+    public void testAnExecutionAcrossModulesStartsNothingAndNamesThem() {
+        final @NotNull TestSetDirectoryDto login = createdTestSet("Login");
+        final @NotNull List<TestCaseDto> selected = theTestCases(List.of(createdTestCase(login, "Log in", "b"), createdTestCase(login, "Log out", "c")));
+        selected.forEach(execution()::starting);
+
+        execution().acrossModules(selected, List.of("app", "api"));
+        settled();
+
+        assertTrue("the refusal does not name both modules: " + balloons, balloons.contains(Refused.ACROSS_MODULES.about("app, api")));
+        assertTrue("a test case of the refused selection still reads as running", selected.stream().noneMatch(tc -> execution().isRunning(tc.getId())));
+    }
+
     // Rule-CODEGEN-031
     public void testWhateverIsSelectedIsOneExecution() {
         final @NotNull TestSetDirectoryDto login = createdTestSet("Login");

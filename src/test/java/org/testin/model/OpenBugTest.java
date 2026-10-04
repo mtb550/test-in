@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestRunDto;
 import org.testng.annotations.Test;
 
+import java.util.Objects;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
@@ -58,9 +59,9 @@ public class OpenBugTest {
                 .collect(Collectors.toMap(OpenBug::testRunPath, bug -> bug));
 
         assertEquals(bugs.keySet(), Set.of(CYCLE_1, CYCLE_2, CYCLE_4), "a test run where the test case passed with no issue recorded no bug");
-        assertEquals(bugs.get(CYCLE_1).item().getBugSeverity(), BugSeverity.MAJOR, "each test run keeps its own bug");
-        assertEquals(bugs.get(CYCLE_2).item().getBugSeverity(), BugSeverity.MINOR, "each test run keeps its own bug");
-        assertEquals(bugs.get(CYCLE_4).item().getBugIssueUrl(), ISSUE, "a filed issue is a bug even after the test case passes");
+        assertEquals(Objects.requireNonNull(bugs.get(CYCLE_1), "no bug for CYCLE_1").item().getBugSeverity(), BugSeverity.MAJOR, "each test run keeps its own bug");
+        assertEquals(Objects.requireNonNull(bugs.get(CYCLE_2), "no bug for CYCLE_2").item().getBugSeverity(), BugSeverity.MINOR, "each test run keeps its own bug");
+        assertEquals(Objects.requireNonNull(bugs.get(CYCLE_4), "no bug for CYCLE_4").item().getBugIssueUrl(), ISSUE, "a filed issue is a bug even after the test case passes");
     }
 
     // Rule-VIEW-PANEL-064

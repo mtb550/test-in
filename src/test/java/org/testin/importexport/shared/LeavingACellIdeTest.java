@@ -26,6 +26,7 @@ import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseEditorAttributes;
 
 import javax.swing.text.JTextComponent;
+import java.util.Objects;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,7 +50,7 @@ public class LeavingACellIdeTest extends BasePlatformTestCase {
         ((JTextComponent) table.getEditorComponent()).setText("log in with a remembered device");
         assertTrue("the expected result cell could not be reached", table.editCellAt(0, column(TestCaseEditorAttributes.EXPECTED_RESULT)));
 
-        assertEquals("log in with a remembered device", preview.selected().get("Login").getFirst().getDescription());
+        assertEquals("log in with a remembered device", Objects.requireNonNull(preview.selected().get("Login"), "no Login sheet is selected").getFirst().getDescription());
         assertEquals("leaving the table by focus would drop what was typed", Boolean.TRUE, table.getClientProperty("terminateEditOnFocusLost"));
     }
 }

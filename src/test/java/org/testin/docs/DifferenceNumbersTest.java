@@ -18,6 +18,7 @@ package org.testin.docs;
 
 import org.testng.annotations.Test;
 
+import java.util.Objects;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,7 +54,7 @@ public class DifferenceNumbersTest {
 
     private static void forEachCitation(final Citation tell) {
         for (final Path page : pages()) {
-            final String part = page.getParent().getFileName().toString();
+            final String part = Objects.requireNonNull(page.getParent(), page + " has no folder").getFileName().toString();
 
             final Matcher cited = CITATION.matcher(oneLine(withoutDifferenceRows(read(page))));
             while (cited.find()) {
@@ -79,7 +80,7 @@ public class DifferenceNumbersTest {
             final Set<Integer> numbers = new LinkedHashSet<>();
             while (row.find()) numbers.add(Integer.parseInt(row.group(1)));
 
-            byPart.put(main.getParent().getFileName().toString(), numbers);
+            byPart.put(Objects.requireNonNull(main.getParent(), main + " has no folder").getFileName().toString(), numbers);
         }
 
         return byPart;
@@ -99,7 +100,7 @@ public class DifferenceNumbersTest {
         try (Stream<Path> tree = Files.walk(DOCS)) {
             for (final Path file : tree.toList()) {
                 if (!file.toString().endsWith(".md")) continue;
-                if (file.getParent().equals(DOCS)) continue;
+                if (DOCS.equals(file.getParent())) continue;
 
                 pages.add(file);
             }
@@ -188,7 +189,7 @@ public class DifferenceNumbersTest {
                 final Matcher named = RULE_NAMED.matcher(row.group(2));
                 while (named.find()) {
                     if (!written.contains(named.group())) {
-                        dangling.add(main.getParent().getFileName() + " difference " + row.group(1)
+                        dangling.add(Objects.requireNonNull(main.getParent(), main + " has no folder").getFileName() + " difference " + row.group(1)
                                 + " names " + named.group() + ", which no document writes");
                     }
                 }

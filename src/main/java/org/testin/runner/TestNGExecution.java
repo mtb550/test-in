@@ -115,6 +115,14 @@ public final class TestNGExecution implements Disposable {
         ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
     }
 
+    // UC-CODEGEN-008, Rule-CODEGEN-097
+    @FromContentModule
+    public void acrossModules(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> modules) {
+        Logger.warn("Not running " + testCases.size() + " test case(s): their methods live in the modules " + modules);
+        testCases.forEach(this::notStarting);
+        notifier.softRefuse(p, Refused.ACROSS_MODULES, String.join(", ", modules));
+    }
+
     public void notStarting(final @NotNull TestCaseDto tc) {
         registry.notStarting(tc.getId());
 

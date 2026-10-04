@@ -313,11 +313,12 @@ silently has no effect costs more than the setting it was meant to hold.
   hundredth blames. CONTRIBUTING.md has the worked example.
 
 - **A green build is not evidence of a working plugin.** NullAway now makes
-  `@NotNull` a compile-time contract in the production code (#377): a null
-  passed to a `@NotNull` parameter, or returned where the type says it cannot
-  be, fails `compileJava`. The tests are not checked, and nothing checks what a
-  platform callback hands over at run time. So a change a tester can see is not
-  finished until it has been run in a sandbox, whatever the build says.
+  `@NotNull` a compile-time contract in the production code and the tests
+  (#377, #389): a null passed to a `@NotNull` parameter, or returned where the
+  type says it cannot be, fails `compileJava` and `compileTestJava`. Nothing
+  checks what a platform callback hands over at run time. So a change a tester
+  can see is not finished until it has been run in a sandbox, whatever the
+  build says.
 
 - **Never run `./gradlew inspect` by hand.** It runs in CI on every push, on
   every branch, and the result is read from the run afterward — twenty minutes

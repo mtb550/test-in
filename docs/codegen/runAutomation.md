@@ -60,6 +60,10 @@ The code runs, and Testin writes down whether each test case passed.
   whether its build failed, its JVM crashed or the IDE's own Stop ended it,
   takes that test case out of Running with no run item status recorded. Nothing
   is left running after the execution has ended.
+- **Rule-CODEGEN-097** — A selection whose test methods live in more than one
+  module does not start, because one execution runs on one module's classpath.
+  Testin names the modules, so the tester runs each module's test cases on their
+  own.
 
 ## The four ways in
 

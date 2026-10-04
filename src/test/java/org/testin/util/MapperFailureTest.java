@@ -32,7 +32,7 @@ public class MapperFailureTest {
                 () -> RealMapper.build().writeValueAsBytes(new NotSerializable()));
 
         assertNotNull(failure.getMessage());
-        assertTrue(failure.getMessage().contains("NotSerializable"),
+        assertTrue(String.valueOf(failure.getMessage()).contains("NotSerializable"),
                 "the message names what could not be written: " + failure.getMessage());
     }
 
@@ -41,7 +41,7 @@ public class MapperFailureTest {
         final IllegalStateException failure = expectThrows(IllegalStateException.class,
                 () -> RealMapper.build().writeValueAsString(new NotSerializable()));
 
-        assertTrue(failure.getMessage().contains("NotSerializable"));
+        assertTrue(String.valueOf(failure.getMessage()).contains("NotSerializable"));
     }
 
     @Test

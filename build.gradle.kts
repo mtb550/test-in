@@ -77,9 +77,11 @@ java {
     }
 }
 
-// #377: NullAway fails compileJava on a null reaching what the annotations say
-// cannot take one, in all three modules. Every other Error Prone check is off,
-// so this is a null gate and not an Error Prone sweep; the tests are not checked.
+// #377, #389: NullAway fails compileJava and compileTestJava on a null reaching
+// what the annotations say cannot take one, in all three modules. Every other
+// Error Prone check is off, so this is a null gate and not an Error Prone sweep.
+// A test fills its fields in JUnit 3's setUp or TestNG's @BeforeMethod rather
+// than a constructor, so both are named as initializers.
 val errorprone = libs.errorprone
 val nullaway = libs.nullaway
 
@@ -93,10 +95,12 @@ allprojects {
 
     tasks.withType<JavaCompile>().configureEach {
         options.errorprone {
-            enabled.set(name == "compileJava")
+            enabled.set(name == "compileJava" || name == "compileTestJava")
             disableAllChecks.set(true)
             check("NullAway", CheckSeverity.ERROR)
             option("NullAway:AnnotatedPackages", "org.testin")
+            option("NullAway:KnownInitializers", "junit.framework.TestCase.setUp,com.intellij.testFramework.UsefulTestCase.setUp,com.intellij.testFramework.fixtures.BasePlatformTestCase.setUp")
+            option("NullAway:CustomInitializerAnnotations", "org.testng.annotations.BeforeMethod,org.testng.annotations.BeforeClass")
         }
     }
 }
@@ -125,14 +129,16 @@ allprojects {
     }
 }
 
-// #325: line coverage, from test and ideTest together, in one report across the
-// three modules, and check fails below the minimum. JaCoCo recorded nothing here
+// #325, #389: line and branch coverage, from test and ideTest together, in one
+// report across the three modules, and check fails below either minimum. JaCoCo
+// recorded nothing here
 // once (#130) because the platform's class loader gives a class no code location
 // and the agent skips such a class unless told otherwise. The report reads the
 // instrumentCode output: JaCoCo matches a class by a checksum of its bytes, and
-// those are the bytes the tests load, not the ones in build/classes. The minimum
-// is the whole percent under the 40.72% measured on 2 October 2026: it stops
-// coverage falling, and raising it is a decision rather than a side effect.
+// those are the bytes the tests load, not the ones in build/classes. Each
+// minimum is the whole percent under what was measured on 4 October 2026 -
+// 84.81% of lines, 52.92% of branches - so it stops coverage falling, and
+// raising it is a decision rather than a side effect.
 allprojects {
     pluginManager.apply("jacoco")
 
@@ -176,7 +182,11 @@ tasks.jacocoTestCoverageVerification {
         rule {
             limit {
                 counter = "LINE"
-                minimum = "0.40".toBigDecimal()
+                minimum = "0.84".toBigDecimal()
+            }
+            limit {
+                counter = "BRANCH"
+                minimum = "0.52".toBigDecimal()
             }
         }
     }

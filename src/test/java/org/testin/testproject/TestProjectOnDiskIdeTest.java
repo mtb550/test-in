@@ -44,7 +44,7 @@ public class TestProjectOnDiskIdeTest extends AbstractTempRootIdeTest {
 
     private Path chosen;
 
-    private TestProjectDirectoryDto testProject;
+    private @NotNull TestProjectDirectoryDto testProject = new TestProjectDirectoryDto();
 
     private static @NotNull AppSettingsState settings() {
         return Services.getInstance(AppSettingsState.class);

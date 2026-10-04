@@ -33,6 +33,7 @@ import org.testin.remove.Removals;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,7 +43,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -166,7 +166,7 @@ public class TreeNodesIdeTest extends AbstractTempRootIdeTest {
         final @NotNull TestProjectDirectoryDto tp = aTestProject();
 
         for (final DirectoryDto container : List.of(tp.getTestCasesDirectory(), tp.getTestRunsDirectory())) {
-            final @NotNull AtomicReference<Boolean> removed = new AtomicReference<>(true);
+            final @NotNull AtomicBoolean removed = new AtomicBoolean(true);
             Removals.of(container.getType()).remove(getProject(), container, removed::set);
 
             assertFalse(container.getName() + " said it was removed", removed.get());

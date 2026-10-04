@@ -17,6 +17,7 @@
 package org.testin.util;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.scale.JBUIScale;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
@@ -48,6 +49,7 @@ public final class Icons {
 
     // UC-EDITOR-PANEL-005
     public static final @NotNull Icon TEST_CASE_LETTER = fieldLetter("tc", GREEN);
+    public static final @NotNull Icon PLUGIN = IconLoader.getIcon("/icons/pluginIcon.svg", Icons.class);
 
     private static final float SCALE_FACTOR = 1.3f;
     private static final int DOT_SIZE = 10;

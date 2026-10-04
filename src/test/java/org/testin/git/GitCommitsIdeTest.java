@@ -22,6 +22,7 @@ import org.testin.Await;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Bundle;
 
+import java.util.Objects;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -167,7 +168,7 @@ public class GitCommitsIdeTest extends AbstractGitRemoteIdeTest {
             commits().pullAndPush(work, "origin", nowhere, MAIN);
             fail("a remote that cannot be asked was taken for one with no branch");
         } catch (final IllegalStateException refused) {
-            final @NotNull String reason = refused.getMessage();
+            final @NotNull String reason = String.valueOf(refused.getMessage());
             assertTrue(reason, reason.startsWith(Bundle.message("git.error.remote.unreachable", "origin", MAIN, "").strip()));
             assertTrue("the message gives the reason Git gave: " + reason, reason.length() > Bundle.message("git.error.remote.unreachable", "origin", MAIN, "").length());
         }
@@ -214,7 +215,7 @@ public class GitCommitsIdeTest extends AbstractGitRemoteIdeTest {
         final @NotNull List<String> conflicting = new GitRepositoryService(getProject()).conflictingPaths(work);
         ApplicationManager.getApplication().executeOnPooledThread(() -> ConflictResolution.resolve(getProject(), work, conflicting, () -> resolved.set(true), leftOver::set));
 
-        Await.until("the file Testin cannot merge was not named back", () -> !leftOver.get().isEmpty() || resolved.get());
+        Await.until("the file Testin cannot merge was not named back", () -> !Objects.requireNonNull(leftOver.get(), "nothing was named back").isEmpty() || resolved.get());
         assertEquals(List.of("notes.txt"), leftOver.get());
         assertTrue(git(work, "rebase", "--abort").isPresent());
     }

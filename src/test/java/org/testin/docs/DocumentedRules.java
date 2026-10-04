@@ -123,7 +123,7 @@ final class DocumentedRules {
         try (Stream<Path> tree = Files.walk(DOCS)) {
             for (final Path file : tree.toList()) {
                 if (!file.toString().endsWith(".md")) continue;
-                if (file.getParent().equals(DOCS) && !file.getFileName().toString().equals(PRODUCT)) continue;
+                if (DOCS.equals(file.getParent()) && !file.getFileName().toString().equals(PRODUCT)) continue;
 
                 pages.add(file);
             }

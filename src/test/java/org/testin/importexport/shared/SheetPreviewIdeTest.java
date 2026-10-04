@@ -27,6 +27,7 @@ import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseEditorAttributes;
 
 import javax.swing.table.TableModel;
+import java.util.Objects;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -109,7 +110,7 @@ public class SheetPreviewIdeTest extends BasePlatformTestCase {
 
         table(preview).getModel().setValueAt("log in with a valid user and a remembered device", 0, column(Can.EXPORT, TestCaseEditorAttributes.DESCRIPTION));
 
-        assertEquals("log in with a valid user and a remembered device", preview.selected().get("Login").getFirst().getDescription());
+        assertEquals("log in with a valid user and a remembered device", Objects.requireNonNull(preview.selected().get("Login"), "no Login sheet is selected").getFirst().getDescription());
         assertEquals("the test case itself is untouched", "log in with a valid user", typed.getDescription());
     }
 
@@ -120,7 +121,7 @@ public class SheetPreviewIdeTest extends BasePlatformTestCase {
 
         table(preview).getModel().setValueAt("the account dashboard opens", 0, column(Can.IMPORT, TestCaseEditorAttributes.EXPECTED_RESULT));
 
-        assertEquals("the account dashboard opens", preview.selected().get("Login").getFirst().getExpectedResult());
+        assertEquals("the account dashboard opens", Objects.requireNonNull(preview.selected().get("Login"), "no Login sheet is selected").getFirst().getExpectedResult());
         assertEquals("what was read from the file is untouched", "", read.getExpectedResult());
     }
 
@@ -132,7 +133,7 @@ public class SheetPreviewIdeTest extends BasePlatformTestCase {
 
         model.setValueAt("Urgent", 0, priority);
 
-        assertEquals(Priority.HIGH, preview.selected().get("Login").getFirst().getPriority());
+        assertEquals(Priority.HIGH, Objects.requireNonNull(preview.selected().get("Login"), "no Login sheet is selected").getFirst().getPriority());
         assertEquals("the cell goes back to what the test case holds", Priority.HIGH.getLabel(), model.getValueAt(0, priority));
     }
 

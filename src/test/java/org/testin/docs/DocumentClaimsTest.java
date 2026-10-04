@@ -19,6 +19,7 @@ package org.testin.docs;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;
 
+import java.util.Objects;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -115,7 +116,7 @@ public class DocumentClaimsTest {
         final @NotNull Map<String, Set<String>> byFolder = new LinkedHashMap<>();
 
         for (final Path page : markdownFiles()) {
-            final @NotNull Path parent = page.getParent();
+            final @NotNull Path parent = Objects.requireNonNull(page.getParent(), page + " has no folder");
             if (parent.equals(DOCS)) continue;
 
             final @NotNull Matcher rule = RULE.matcher(read(page));
@@ -134,7 +135,7 @@ public class DocumentClaimsTest {
         final @NotNull Map<String, Set<String>> byFolder = new LinkedHashMap<>();
 
         for (final Path page : markdownFiles()) {
-            final @NotNull Path parent = page.getParent();
+            final @NotNull Path parent = Objects.requireNonNull(page.getParent(), page + " has no folder");
             if (parent.equals(DOCS)) continue;
 
             final @NotNull Matcher useCase = USE_CASE.matcher(read(page));
@@ -201,7 +202,7 @@ public class DocumentClaimsTest {
                 final @NotNull String file = target.contains("#") ? target.substring(0, target.indexOf('#')) : target;
                 if (file.isEmpty()) continue;
 
-                final @NotNull Path resolved = page.getParent().resolve(file).normalize();
+                final @NotNull Path resolved = Objects.requireNonNull(page.getParent(), page + " has no folder").resolve(file).normalize();
 
                 if (!resolved.normalize().toAbsolutePath().startsWith(Paths.get(".").toAbsolutePath().normalize())) {
                     broken.add(named(page) + " points at " + target + ", which is outside the repository");
