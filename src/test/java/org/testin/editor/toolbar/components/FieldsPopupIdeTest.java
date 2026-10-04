@@ -93,7 +93,7 @@ public class FieldsPopupIdeTest extends BasePlatformTestCase {
         assertTrue("ID could not be switched on", button.getSelectedDetails().contains(TestCaseEditorAttributes.ID));
 
         ShownFields.write(ShownFields.IN_TEST_SETS, EnumSet.of(TestCaseEditorAttributes.ID));
-        assertTrue("a remembered choice without Order and Description hid them", ShownFields.inTestSets().containsAll(EnumSet.of(TestCaseEditorAttributes.ORDER, TestCaseEditorAttributes.DESCRIPTION)));
+        assertTrue("a remembered choice without Order and Description hid them", ShownFields.read(ShownFields.IN_TEST_SETS, TestCaseEditorAttributes.class).containsAll(EnumSet.of(TestCaseEditorAttributes.ORDER, TestCaseEditorAttributes.DESCRIPTION)));
     }
 
     // Rule-EDITOR-PANEL-024

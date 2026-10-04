@@ -2,10 +2,12 @@
 
 # UC-VIEW-PANEL-007: Read a test case's history
 
-**As a** tester, **I want** to see what changed on a test case and when, **so that** I can tell whether a failure
-follows a change somebody made.
+**As a** tester, **I want** to see what changed on a test case, who changed it
+and when, **so that** I can tell whether a failure follows a change somebody
+made.
 
-This tab is not built yet. It shows one line saying so.
+The History tab reads the test case's history from Git. Each commit that changed
+the test case's file is one entry. Testin stores no history of its own.
 
 There is no key for this. The tab is called **History**.
 
@@ -30,8 +32,25 @@ There is no key for this. The tab is called **History**.
 - **Rule-VIEW-PANEL-009** — Closing a Testin editor empties the panel when the
   panel is showing one of that editor's test cases, and leaves it alone
   otherwise.
-- **Rule-VIEW-PANEL-037** — The History tab is not built. It shows one line
-  saying so, rather than showing invented data.
+- **Rule-VIEW-PANEL-096** — The History tab shows the test case's Git history on
+  the current branch, newest first: one entry for each commit that changed its
+  file. Each entry names when, who and the commit's message, then each field
+  from what it was to what it became.
+- **Rule-VIEW-PANEL-097** — A committed entry shows its commit's short hash, seven
+  characters, and the full hash when the pointer rests on it.
+- **Rule-VIEW-PANEL-098** — Edits saved but not committed head the list as one
+  entry, Not committed yet. It names Testin's last editor and time, and each
+  field that differs from the last commit. It has no hash.
+- **Rule-VIEW-PANEL-099** — The history is read from Git each time the tab shows
+  a test case, and Testin stores none of it. It appears as soon as it is read,
+  newest first. Only a read longer than 0.3 seconds shows a Reading line, and
+  one test case's history is never drawn over another's.
+- **Rule-VIEW-PANEL-100** — A test project that is not under Git has no history.
+  The tab says so in one line, and names Initialize Git (git init) in View
+  Pending Commits as the way to start one.
+- **Rule-VIEW-PANEL-101** — The tab shows every commit that changed the test
+  case. Git is read away from the screen, and the entries are drawn in groups,
+  so the IDE never waits for a long history.
 
 ## The screen
 
@@ -39,34 +58,51 @@ There is no key for this. The tab is called **History**.
 ┌────────────────────────────────────────────────────────────────────────────┐
 │   Details    | History |   Open Bugs                                       │
 ├────────────────────────────────────────────────────────────────────────────┤
-│                                                                            │
-│                                                                            │
-│                        No history available yet                            │
-│                                                                            │
-│                                                                            │
+│  [Not committed yet]  Muteb  5 Oct 2026, 08:12                        (1)  │
+│     Priority          Medium → High                                   (4)  │
+│  2 Oct 2026, 16:40  Sara  [4f1c9e2]  Cycle 4 review                   (2)  │
+│     Expected Result   The dashboard opens → The dashboard opens within …   │
+│     Steps             3 steps → 4 steps                                    │
+│  24 Sep 2026, 16:07  Muteb  [a83d07e]  UC-10                          (3)  │
+│     Test Case         [Created]                                            │
 └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-1. **The line** — gray, in the middle of the tab. It is the whole tab.
+1. **Not committed yet** — edits saved but not committed. It names who saved
+   last and when. It has no hash.
+2. **A committed entry** — when, who, the commit's short hash, and the commit's
+   message. The full hash shows when the pointer rests on the short one.
+3. **Created** — the commit that first added the test case.
+4. **A field row** — the field, what it was, and what it became. A commit that
+   changed none of the fields reads *reordered or restamped*.
 
 ## Main flow
 
-1. The tester clicks **History**.
-2. The tab shows one gray line reading *No history available yet*.
+1. The tester shows a test case in the view panel and clicks **History**.
+2. If the read takes longer than 0.3 seconds, the tab reads *Reading the
+   history from Git...*.
+3. Testin asks Git for the commits that changed the test case's file, newest
+   first, and reads each version.
+4. The tab shows the entries. Paging to another test case reads its history the
+   same way.
 
 ## What Testin refuses
 
-**Always.** The tab shows the same line whether a test case is selected or not.
-It never looks at the test case.
+**The test project is not under Git.** The tab shows one line: *This test
+project is not under Git, so it has no history. Choose View Pending Commits,
+then Initialize Git (git init), to start one.*
 
-One row of the Details tab carries part of this. **Updated** says who last
-changed the test case, and when. It does not say what changed.
+**Git cannot be read.** The tab shows one line with Git's reason. The rest of
+the panel works as before.
 
-## Not decided
+**A version cannot be read.** Its entry still shows when, who, the hash and the
+message, and says *This version could not be read*.
 
-Nobody has decided what a test case's history should hold. Nobody has decided
-where it would be read from either. Testin keeps no record of what a field used
-to say. That is question 1 on [the view panel page](main.md#not-decided).
+**A long history.** Every commit is shown. The first entries appear at once,
+and the rest follow while the tester reads.
+
+The Details tab's **Updated** row still says who last changed the test case,
+and when.
 
 ---
 

@@ -38,6 +38,9 @@ There is no key for this. It happens once the panel is open.
   empties the panel.
 - **Rule-VIEW-PANEL-018** — Every fill starts again at the first test case, so
   the paging position is never carried over.
+- **Rule-VIEW-PANEL-102** — Following keeps the tab in front. A tester reading
+  History or Open Bugs stays on that tab as the selection moves; only opening
+  the panel starts on Details.
 
 ## What the tester sees
 
@@ -53,7 +56,7 @@ details* in gray, at the top left of the **Details** tab.
 
 1. The panel is open on a test case.
 2. The tester presses the down arrow, or clicks another card.
-3. The panel draws the newly selected test case.
+3. The panel draws the newly selected test case, on the tab that was in front.
 4. The tester moves to another Testin editor tab.
 5. The panel draws whatever that editor has selected.
 

@@ -49,7 +49,7 @@ marked, and its contents fill the panel.
 │    Details    | History |    Open Bugs                                   │
 ├──────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
-│   No history available yet                                               │
+│   2 Oct 2026, 16:40  Sara  4f1c9e2  Cycle 4 review                       │
 │                                                                          │
 └──────────────────────────────────────────────────────────────────────────┘
 ```

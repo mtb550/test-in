@@ -48,7 +48,7 @@ public class TestCaseNumberIdeTest extends AbstractCodegenIdeTest {
     @Override
     protected void setUp() {
         super.setUp();
-        shownBefore = ShownFields.inTestSets();
+        shownBefore = ShownFields.read(ShownFields.IN_TEST_SETS, TestCaseEditorAttributes.class);
         ShownFields.write(ShownFields.IN_TEST_SETS, EnumSet.allOf(TestCaseEditorAttributes.class));
     }
 

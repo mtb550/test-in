@@ -57,6 +57,21 @@ public class FollowSelectionIdeTest extends AbstractViewPanelIdeTest {
         assertFalse("moving the selection filled a panel that was off the screen: " + details(), holds(details(), "Log in with no password"));
     }
 
+    // Rule-VIEW-PANEL-102
+    public void testMovingTheSelectionKeepsTheTabInFront() {
+        final @NotNull TestSetDirectoryDto ts = aTestSet("Login");
+        final @NotNull TestCaseDto first = aTestCase(ts, "Log in with a valid user", "a");
+        final @NotNull TestCaseDto second = aTestCase(ts, "Log in with a locked user", "b");
+        final @NotNull TestCaseEditor editor = anEditorOn(ts);
+
+        view.getPanel().show(List.of(first), ts.getPath2());
+        view.bringToFront(ViewTab.HISTORY);
+        selectIn(editor, second);
+
+        assertEquals("moving the selection took the panel off History", ViewTab.HISTORY.getDisplayName(), view.tabInFront());
+        assertTrue("the panel did not follow the selection: " + details(), holds(details(), "Log in with a locked user"));
+    }
+
     // Rule-VIEW-PANEL-016, Rule-VIEW-PANEL-059
     public void testFollowingNeverOpensAPanelTheTesterClosed() {
         final @NotNull TestSetDirectoryDto ts = aTestSet("Login");

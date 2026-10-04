@@ -90,16 +90,25 @@ final class GitCommandRunner {
 
     // UC-SHARE-010, UC-SHARE-017
     static @NotNull Map<String, String> readObjects(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull String revision, final @NotNull List<String> relativePaths) {
+        return objectsIn(relativePaths, batch(p, workingDirectory, batchRequest(revision, relativePaths)));
+    }
+
+    // UC-VIEW-PANEL-007, Rule-VIEW-PANEL-096
+    static @NotNull Map<String, String> readObjects(final @NotNull Project p, final @NotNull Path workingDirectory, final @NotNull List<String> objectNames) {
+        return objectsIn(objectNames, batch(p, workingDirectory, batchRequest(objectNames)));
+    }
+
+    private static byte @NotNull [] batch(final @NotNull Project p, final @NotNull Path workingDirectory, final byte @NotNull [] request) {
         final @NotNull GitBinaryHandler handler = new GitBinaryHandler(workingDirectory, GitExecutableManager.getInstance().getExecutable(p, workingDirectory), GitCommand.CAT_FILE);
         handler.addParameters("--batch");
         handler.setInputProcessor(stdin -> {
             try (stdin) {
-                stdin.write(batchRequest(revision, relativePaths));
+                stdin.write(request);
             }
         });
 
         try {
-            return objectsIn(relativePaths, handler.run());
+            return handler.run();
         } catch (final VcsException ex) {
             final @NotNull String details = GitSafeText.withoutCredentials(FailureText.of(ex));
             Logger.error("Git command failed: " + details);
@@ -108,8 +117,12 @@ final class GitCommandRunner {
     }
 
     static byte @NotNull [] batchRequest(final @NotNull String revision, final @NotNull List<String> relativePaths) {
-        return relativePaths.stream()
-                .map(relativePath -> revision + ":" + relativePath + "\n")
+        return batchRequest(relativePaths.stream().map(relativePath -> revision + ":" + relativePath).toList());
+    }
+
+    static byte @NotNull [] batchRequest(final @NotNull List<String> objectNames) {
+        return objectNames.stream()
+                .map(objectName -> objectName + "\n")
                 .collect(Collectors.joining())
                 .getBytes(StandardCharsets.UTF_8);
     }

@@ -6,14 +6,15 @@ The view panel is the panel on the right of the IDE. It shows one test case at a
 time: everything the test case says, and everything one test run recorded about
 it.
 
-|                     |                                                                                                                    |
-|---------------------|--------------------------------------------------------------------------------------------------------------------|
-| **Part of Testin**  | The view panel                                                                                                     |
-| **Answers**         | What the panel shows, how a test case gets into it, and what a tester can do from it                               |
-| **Numbering**       | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-095` |
-| **State**           | **Written** — [#181](https://github.com/mtb550/test-in/issues/181)                                                 |
-| **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code.                        |
-| **Written to**      | [How a document is written](../standard.md)                                                                        |
+|                     |                                                                                                                                                                                                                                                                                                                                                                                                                  |
+|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Part of Testin**  | The view panel                                                                                                                                                                                                                                                                                                                                                                                                   |
+| **Answers**         | What the panel shows, how a test case gets into it, and what a tester can do from it                                                                                                                                                                                                                                                                                                                             |
+| **Numbering**       | Use cases are `UC-VIEW-PANEL-001` to `UC-VIEW-PANEL-017`. Rules are `Rule-VIEW-PANEL-001` to `Rule-VIEW-PANEL-103`                                                                                                                                                                                                                                                                                               |
+| **Retired**         | `Rule-VIEW-PANEL-037` said the History tab is not built and shows one line saying so. Retired when #150 built the tab: read Rule-VIEW-PANEL-096 instead. `Rule-VIEW-PANEL-090` said the Details tab shows only the fields the editor's Fields list shows. Retired on 5 October 2026, when the panel went back to the whole test case: read Rule-VIEW-PANEL-103 instead. Neither number is given to anything else |
+| **State**           | **Written** — [#181](https://github.com/mtb550/test-in/issues/181)                                                                                                                                                                                                                                                                                                                                               |
+| **Checked against** | `main` at `1270e599`, 20 September 2026. Every page in this part was read against the code.                                                                                                                                                                                                                                                                                                                      |
+| **Written to**      | [How a document is written](../standard.md)                                                                                                                                                                                                                                                                                                                                                                      |
 
 ---
 
@@ -112,7 +113,7 @@ in front of them while they write down what actually happened.
 1. **The two arrows** — move to the previous and the next test case. They are
    gray when the panel was handed only one.
 2. **The three tabs** — **Details**, **History** and **Open Bugs**. **History**
-   is empty today, because a test case records only its last edit.
+   shows the test case's Git history, newest first.
 3. **The breadcrumb** — one step for each folder above the test case. Only the
    last step opens anything.
 4. **The title** — the test case's description, the largest words on the panel.
@@ -177,12 +178,6 @@ closed up, so an issue that quotes one still points at the right thing.
 ---
 
 ## Not decided
-
-**Question 1** — The History tab is empty and says so. Nobody has decided what a
-test case's history should hold, or where it would be read from.
-
-**Question 2** — The Open Bugs tab is empty and says so. Nothing in Testin
-tracks a bug beyond the severity and the priority written on a failed run item.
 
 **Question 3** — Should the panel show a test case at all when it was opened
 from a test run that does not hold it? It shows the test case with no execution

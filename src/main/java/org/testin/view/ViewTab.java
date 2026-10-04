@@ -44,7 +44,7 @@ public enum ViewTab {
             Bundle.message("view.tab.history"),
             ViewPanel::getHistoryScrollPane,
             ViewPanel::getHistoryTab,
-            panel -> new HistoryTab().load(panel.getHistoryTab())
+            panel -> new HistoryTab().load(panel.getP(), panel.getHistoryTab(), panel.shownTestCase())
     ),
 
     OPEN_BUGS(

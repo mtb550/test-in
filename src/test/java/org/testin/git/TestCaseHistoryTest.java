@@ -1,0 +1,155 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.git;
+
+import org.jetbrains.annotations.NotNull;
+import org.testin.model.Priority;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Mapper;
+import org.testin.util.RealMapper;
+import org.testng.annotations.Test;
+
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.IntStream;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+public class TestCaseHistoryTest {
+
+    private static final @NotNull Mapper MAPPER = RealMapper.build();
+    private static final @NotNull UUID ID = UUID.fromString("77777777-7777-4777-8777-777777777150");
+    private static final @NotNull String PATH = "Test Cases/Login/" + ID + ".tc";
+
+    private static @NotNull TestCaseDto version(final @NotNull String expectedResult) {
+        return TestCaseDto.builder().id(ID).description("Log in with a valid user").expectedResult(expectedResult).createdBy("Muteb").build();
+    }
+
+    private static @NotNull HistoryCommit commit(final int at, final @NotNull String message) {
+        return new HistoryCommit("%040d".formatted(at), "Sara", ZonedDateTime.parse("2026-10-0%dT16:40:00+03:00".formatted(at % 9 + 1)), message, PATH);
+    }
+
+    private static @NotNull Map<String, String> versions(final @NotNull List<HistoryCommit> commits, final @NotNull List<TestCaseDto> versions) {
+        final @NotNull Map<String, String> byObject = new HashMap<>();
+        for (int at = 0; at < commits.size(); at++) byObject.put(commits.get(at).objectName(), MAPPER.writeValueAsString(versions.get(at)));
+        return byObject;
+    }
+
+    // Rule-VIEW-PANEL-096
+    @Test
+    public void everyCommitIsReadWithItsHashAuthorDateMessageAndThePathItHadThen() {
+        final @NotNull String log = "\u001e" + "a".repeat(40) + "\u001fSara\u001f2026-10-02T16:40:00+03:00\u001fCycle 4 review: steps | expected\n\n" + PATH + "\n"
+                + "\u001e" + "b".repeat(40) + "\u001fMuteb\u001f2026-09-24T16:07:00+03:00\u001f\n\nTest Cases/Old name/" + ID + ".tc\n";
+
+        final @NotNull List<HistoryCommit> commits = TestCaseHistory.commits(log, PATH);
+
+        assertEquals(commits.size(), 2);
+        assertEquals(commits.getFirst().message(), "Cycle 4 review: steps | expected");
+        assertEquals(commits.getFirst().who(), "Sara");
+        assertEquals(commits.getFirst().path(), PATH);
+        assertEquals(commits.get(1).message(), "", "a commit with an empty subject is still an entry");
+        assertEquals(commits.get(1).path(), "Test Cases/Old name/" + ID + ".tc", "a moved test case is read where it was then");
+        assertEquals(commits.get(1).objectName(), "b".repeat(40) + ":Test Cases/Old name/" + ID + ".tc");
+    }
+
+    // Rule-VIEW-PANEL-096, Rule-VIEW-PANEL-097
+    @Test
+    public void eachCommitIsComparedWithTheOneBeforeItAndTheOldestIsCreated() {
+        final @NotNull List<HistoryCommit> commits = List.of(commit(2, "Cycle 4 review"), commit(1, "UC-10"));
+        final @NotNull TestCaseDto now = version("The dashboard opens within 2 seconds");
+
+        final @NotNull List<HistoryEntry> entries = TestCaseHistory.entries(MAPPER, commits, versions(commits, List.of(now, version("The dashboard opens"))), now);
+
+        assertEquals(entries.size(), 2, "nothing uncommitted, so no Not committed yet entry: " + entries);
+        assertEquals(entries.getFirst().kind(), HistoryEntryKind.CHANGED);
+        assertEquals(entries.getFirst().shortHash(), "0000000");
+        assertEquals(entries.getFirst().changes().getFirst().oldValue(), "The dashboard opens");
+        assertEquals(entries.getFirst().changes().getFirst().newValue(), "The dashboard opens within 2 seconds");
+        assertEquals(entries.get(1).kind(), HistoryEntryKind.CREATED);
+        assertTrue(entries.stream().allMatch(HistoryEntry::isCommitted));
+    }
+
+    // Rule-VIEW-PANEL-098
+    @Test
+    public void anEditNotYetCommittedHeadsTheListWithNoHash() {
+        final @NotNull List<HistoryCommit> commits = List.of(commit(1, "UC-10"));
+        final @NotNull TestCaseDto now = version("The home page opens");
+        now.setPriority(Priority.HIGH);
+        now.setUpdatedBy("Muteb");
+
+        final @NotNull List<HistoryEntry> entries = TestCaseHistory.entries(MAPPER, commits, versions(commits, List.of(version("The dashboard opens"))), now);
+
+        assertFalse(entries.getFirst().isCommitted());
+        assertEquals(entries.getFirst().hash(), "");
+        assertEquals(entries.getFirst().who(), "Muteb");
+        assertEquals(entries.getFirst().changes().size(), 2, "the expected result and the priority: " + entries.getFirst().changes());
+    }
+
+    // Rule-VIEW-PANEL-098
+    @Test
+    public void aTestCaseNeverCommittedIsOneUncommittedEntryMarkedCreated() {
+        final @NotNull List<HistoryEntry> entries = TestCaseHistory.entries(MAPPER, List.of(), Map.of(), version("The dashboard opens"));
+
+        assertEquals(entries.size(), 1);
+        assertEquals(entries.getFirst().kind(), HistoryEntryKind.CREATED);
+        assertFalse(entries.getFirst().isCommitted());
+        assertEquals(entries.getFirst().who(), "Muteb");
+    }
+
+    // Rule-VIEW-PANEL-096
+    @Test
+    public void aVersionThatNoLongerParsesStillShowsWhoAndWhen() {
+        final @NotNull List<HistoryCommit> commits = List.of(commit(2, "broken"), commit(1, "UC-10"));
+        final @NotNull TestCaseDto now = version("The dashboard opens");
+        final @NotNull Map<String, String> versions = versions(commits, List.of(now, now));
+        versions.put(commits.getFirst().objectName(), "{ not a test case");
+
+        final @NotNull HistoryEntry broken = TestCaseHistory.entries(MAPPER, commits, versions, now).getFirst();
+
+        assertEquals(broken.kind(), HistoryEntryKind.UNREADABLE);
+        assertEquals(broken.who(), "Sara");
+        assertEquals(broken.message(), "broken");
+    }
+
+    // Rule-VIEW-PANEL-096
+    @Test
+    public void aCommitThatChangedNoneOfTheFieldsHasNoRows() {
+        final @NotNull List<HistoryCommit> commits = List.of(commit(2, "Reordered"), commit(1, "UC-10"));
+        final @NotNull TestCaseDto now = version("The dashboard opens");
+
+        final @NotNull HistoryEntry reordered = TestCaseHistory.entries(MAPPER, commits, versions(commits, List.of(now, now)), now).getFirst();
+
+        assertEquals(reordered.kind(), HistoryEntryKind.CHANGED);
+        assertTrue(reordered.changes().isEmpty());
+    }
+
+    // Rule-VIEW-PANEL-101
+    @Test
+    public void aLongHistoryIsReadWhole() {
+        final @NotNull List<HistoryCommit> commits = IntStream.range(0, 200).mapToObj(at -> commit(200 - at, "Edit " + (200 - at))).toList();
+        final @NotNull List<TestCaseDto> versions = new ArrayList<>();
+        commits.forEach(commit -> versions.add(version(commit.message())));
+
+        assertEquals(TestCaseHistory.entries(MAPPER, commits, versions(commits, versions), versions.getFirst()).size(), 200);
+    }
+}

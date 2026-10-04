@@ -157,11 +157,11 @@ public class ViewPanel implements Disposable {
         }));
     }
 
-    // UC-VIEW-PANEL-002, Rule-VIEW-PANEL-015, Rule-VIEW-PANEL-016
+    // UC-VIEW-PANEL-002, Rule-VIEW-PANEL-015, Rule-VIEW-PANEL-016, Rule-VIEW-PANEL-102
     public void showIfOpen(final @NotNull List<TestCaseDto> testCases, final @NotNull List<String> path) {
-        if (isClosed()) return;
+        if (isClosed() || testCases.isEmpty()) return;
 
-        this.show(testCases, path);
+        this.updateList(testCases, path);
     }
 
     private boolean isClosed() {

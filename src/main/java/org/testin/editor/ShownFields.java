@@ -22,8 +22,6 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
-import org.testin.testcase.TestCaseEditorAttributes;
-import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.FailureText;
 
 import java.util.HashSet;
@@ -36,16 +34,6 @@ public final class ShownFields {
     public static final @NotNull String IN_TEST_SETS = EditorKind.TEST.detailsKey(4);
 
     public static final @NotNull String IN_TEST_RUNS = EditorKind.RUN.detailsKey(7);
-
-    // UC-EDITOR-PANEL-003, Rule-VIEW-PANEL-090
-    public static @NotNull Set<TestCaseEditorAttributes> inTestSets() {
-        return read(IN_TEST_SETS, TestCaseEditorAttributes.class);
-    }
-
-    // UC-EDITOR-PANEL-003, Rule-VIEW-PANEL-090
-    public static @NotNull Set<TestRunEditorAttributes> inTestRuns() {
-        return read(IN_TEST_RUNS, TestRunEditorAttributes.class);
-    }
 
     // UC-EDITOR-PANEL-003, Rule-EDITOR-PANEL-022
     public static <E extends Enum<E> & ToolBarAttribute> @NotNull Set<E> read(final @NotNull String propertyKey, final @NotNull Class<E> attributes) {

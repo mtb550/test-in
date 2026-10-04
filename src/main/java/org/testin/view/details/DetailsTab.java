@@ -24,7 +24,6 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.ExecutionPosition;
-import org.testin.editor.ShownFields;
 import org.testin.editor.WheelForwarding;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
@@ -51,11 +50,8 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
 
 public class DetailsTab {
     static final @NotNull String TEST_CASE_OPEN = "testin.viewPanel.testCaseOpen";
@@ -65,43 +61,27 @@ public class DetailsTab {
     final double WEIGHT_X = 1.0;
     final double SPACER_WEIGHT_Y = 1.0;
 
-    // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-061, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-086, Rule-VIEW-PANEL-090
-    private static @NotNull Band testRunBand(final @NotNull TestRunItems runItem, final @NotNull List<String> currentPath, final @NotNull Set<TestRunEditorAttributes> shown) {
-        final @NotNull List<AbstractDetails> rows = new ArrayList<>(List.of(new RunItemSummary(runItem, currentPath)));
-        if (shown.contains(TestRunEditorAttributes.ACTUAL_RESULT)) rows.add(new RunItemAttributeRow(TestRunEditorAttributes.ACTUAL_RESULT, runItem));
-        rows.add(new StacktraceLine(runItem, currentPath, shown.contains(TestRunEditorAttributes.STACKTRACE)));
-        if (shown.contains(TestRunEditorAttributes.EXECUTED_BY) || shown.contains(TestRunEditorAttributes.EXECUTED_AT)) {
-            rows.add(new AttributeRow(TestRunEditorAttributes.EXECUTED_BY.getName(), (_, _) -> Display.whoAndWhen(runItem.getExecutedBy(), runItem.getExecutedAt())));
-        }
-        return Band.of(Bundle.message("details.band.run"), rows);
+    // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-061, Rule-VIEW-PANEL-085, Rule-VIEW-PANEL-086, Rule-VIEW-PANEL-103
+    private static @NotNull Band testRunBand(final @NotNull TestRunItems runItem, final @NotNull List<String> currentPath) {
+        return Band.of(Bundle.message("details.band.run"), List.of(
+                new RunItemSummary(runItem, currentPath),
+                new RunItemAttributeRow(TestRunEditorAttributes.ACTUAL_RESULT, runItem),
+                new StacktraceLine(runItem, currentPath),
+                new AttributeRow(TestRunEditorAttributes.EXECUTED_BY.getName(), (_, _) -> Display.whoAndWhen(runItem.getExecutedBy(), runItem.getExecutedAt()))));
     }
 
-    // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-087, Rule-VIEW-PANEL-090
-    private static @NotNull List<AbstractDetails> testCaseFields(final @NotNull Predicate<TestCaseEditorAttributes> shows) {
-        final @NotNull List<AbstractDetails> rows = new ArrayList<>();
-        if (shows.test(TestCaseEditorAttributes.EXPECTED_RESULT)) rows.add(new AttributeRow(TestCaseEditorAttributes.EXPECTED_RESULT.getName(), (_, dto) -> TestCaseEditorAttributes.EXPECTED_RESULT.displayValue(dto)));
-        if (shows.test(TestCaseEditorAttributes.STEPS)) rows.add(new Steps());
-        if (shows.test(TestCaseEditorAttributes.PRE_CONDITIONS)) rows.add(new AttributeRow(TestCaseEditorAttributes.PRE_CONDITIONS.getName(), (_, dto) -> TestCaseEditorAttributes.PRE_CONDITIONS.displayValue(dto)));
-        if (shows.test(TestCaseEditorAttributes.TEST_DATA)) rows.add(new AttributeRow(TestCaseEditorAttributes.TEST_DATA.getName(), (_, dto) -> TestCaseEditorAttributes.TEST_DATA.displayValue(dto)));
-        if (shows.test(TestCaseEditorAttributes.REFERENCE)) rows.add(new AttributeRow(TestCaseEditorAttributes.REFERENCE.getName(), (_, dto) -> TestCaseEditorAttributes.REFERENCE.displayValue(dto)));
-        if (shows.test(TestCaseEditorAttributes.MODULE)) rows.add(new AttributeRow(TestCaseEditorAttributes.MODULE.getName(), (_, dto) -> TestCaseEditorAttributes.MODULE.displayValue(dto)));
-        if (shows.test(TestCaseEditorAttributes.ORDER)) rows.add(new AttributeRow(TestCaseEditorAttributes.ORDER.getName(), (p, dto) -> String.valueOf(ExecutionPosition.of(p, dto))));
-        if (shows.test(TestCaseEditorAttributes.CREATED_BY) || shows.test(TestCaseEditorAttributes.CREATED_AT)) {
-            rows.add(new AttributeRow(Bundle.message("details.created"), (_, dto) -> Display.whoAndWhen(dto.getCreatedBy(), dto.getCreatedAt())));
-        }
-        if (shows.test(TestCaseEditorAttributes.UPDATED_BY) || shows.test(TestCaseEditorAttributes.UPDATED_AT)) {
-            rows.add(new AttributeRow(Bundle.message("details.updated"), (_, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt())));
-        }
-        return rows;
-    }
-
-    // Rule-VIEW-PANEL-090
-    static @NotNull Predicate<TestCaseEditorAttributes> shownInTheTestRun(final @NotNull Set<TestRunEditorAttributes> shown) {
-        return field -> Arrays.stream(TestRunEditorAttributes.values())
-                .filter(offered -> offered.name().equals(field.name()))
-                .findFirst()
-                .map(shown::contains)
-                .orElse(true);
+    // UC-VIEW-PANEL-004, Rule-VIEW-PANEL-087, Rule-VIEW-PANEL-103
+    private static @NotNull List<AbstractDetails> testCaseFields() {
+        return List.of(
+                new AttributeRow(TestCaseEditorAttributes.EXPECTED_RESULT.getName(), (_, dto) -> TestCaseEditorAttributes.EXPECTED_RESULT.displayValue(dto)),
+                new Steps(),
+                new AttributeRow(TestCaseEditorAttributes.PRE_CONDITIONS.getName(), (_, dto) -> TestCaseEditorAttributes.PRE_CONDITIONS.displayValue(dto)),
+                new AttributeRow(TestCaseEditorAttributes.TEST_DATA.getName(), (_, dto) -> TestCaseEditorAttributes.TEST_DATA.displayValue(dto)),
+                new AttributeRow(TestCaseEditorAttributes.REFERENCE.getName(), (_, dto) -> TestCaseEditorAttributes.REFERENCE.displayValue(dto)),
+                new AttributeRow(TestCaseEditorAttributes.MODULE.getName(), (_, dto) -> TestCaseEditorAttributes.MODULE.displayValue(dto)),
+                new AttributeRow(TestCaseEditorAttributes.ORDER.getName(), (p, dto) -> String.valueOf(ExecutionPosition.of(p, dto))),
+                new AttributeRow(Bundle.message("details.created"), (_, dto) -> Display.whoAndWhen(dto.getCreatedBy(), dto.getCreatedAt())),
+                new AttributeRow(Bundle.message("details.updated"), (_, dto) -> Display.whoAndWhen(dto.getUpdatedBy(), dto.getUpdatedAt())));
     }
 
     // UC-VIEW-PANEL-004
@@ -162,10 +142,9 @@ public class DetailsTab {
         final @NotNull List<AbstractDetails> rows = new ArrayList<>(List.of(new Breadcrumb(currentPath), new Title(), new BadgesAndActions()));
 
         runItem.ifPresentOrElse(shown -> {
-            final @NotNull Set<TestRunEditorAttributes> fields = ShownFields.inTestRuns();
-            rows.add(testRunBand(shown, currentPath, fields));
-            rows.add(Band.folding(Bundle.message("details.band.test.case"), TEST_CASE_OPEN, testCaseFields(shownInTheTestRun(fields))));
-        }, () -> rows.addAll(testCaseFields(ShownFields.inTestSets()::contains)));
+            rows.add(testRunBand(shown, currentPath));
+            rows.add(Band.folding(Bundle.message("details.band.test.case"), TEST_CASE_OPEN, testCaseFields()));
+        }, () -> rows.addAll(testCaseFields()));
 
         return List.copyOf(rows);
     }

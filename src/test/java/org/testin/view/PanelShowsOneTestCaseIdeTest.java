@@ -16,6 +16,7 @@
 package org.testin.view;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.Await;
 import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.indexer.TestCases;
@@ -134,13 +135,13 @@ public class PanelShowsOneTestCaseIdeTest extends AbstractViewPanelIdeTest {
 
         view.getPanel().show(List.of(tc), tc.getParent().getPath2());
         assertTrue("the Details tab was not drawn: " + details(), holds(details(), "Log in with a valid user"));
-        assertEquals("the History tab was not drawn", List.of(Bundle.message("view.history.none")), view.words(ViewTab.HISTORY));
+        Await.until("the History tab was not drawn: " + view.words(ViewTab.HISTORY), () -> view.words(ViewTab.HISTORY).equals(List.of(Bundle.message("view.history.not.under.git"))));
         assertEquals("the Open Bugs tab was not drawn for the test case", List.of(Bundle.message("view.bugs.none")), view.words(ViewTab.OPEN_BUGS));
 
         view.getPanel().reset();
         assertEquals("the Details tab was not drawn again", List.of(Bundle.message("details.placeholder")), details());
         assertEquals("the Open Bugs tab still describes a test case the panel no longer shows", List.of(Bundle.message("view.bugs.no.selection")), view.words(ViewTab.OPEN_BUGS));
-        assertEquals("the History tab was not drawn again", List.of(Bundle.message("view.history.none")), view.words(ViewTab.HISTORY));
+        assertEquals("the History tab still shows a test case the panel no longer shows", List.of(), view.words(ViewTab.HISTORY));
     }
 
     // Rule-VIEW-PANEL-012

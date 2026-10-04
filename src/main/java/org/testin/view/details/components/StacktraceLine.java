@@ -54,8 +54,6 @@ public final class StacktraceLine extends AbstractDetails {
 
     private final @NotNull List<String> currentPath;
 
-    private final boolean linksTheStacktrace;
-
     private static @NotNull JBPanel<?> line(final @NotNull List<? extends JComponent> parts) {
         final @NotNull JBPanel<?> line = new JBPanel<>(new HorizontalLayout(JBUI.scale(GAP)));
         line.setOpaque(false);
@@ -65,12 +63,12 @@ public final class StacktraceLine extends AbstractDetails {
         return line;
     }
 
-    // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-081, Rule-VIEW-PANEL-090
+    // UC-VIEW-PANEL-006, Rule-VIEW-PANEL-034, Rule-VIEW-PANEL-081
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final @NotNull String stacktrace = runItem.getStacktrace();
         final @NotNull List<String> screenshots = runItem.getScreenshots();
-        final boolean link = linksTheStacktrace && !stacktrace.isBlank();
+        final boolean link = !stacktrace.isBlank();
         if (!link && screenshots.isEmpty()) return currentRow;
 
         final @NotNull List<JComponent> parts = new ArrayList<>();

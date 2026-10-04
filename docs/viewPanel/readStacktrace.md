@@ -49,9 +49,7 @@ There is no key for this. The link sits where the value would have been.
 - **Rule-VIEW-PANEL-081** — The **Stacktrace** link comes first on its line, then
   one thumbnail for each screenshot pasted with the failure, the one the failure
   form shows. Hovering names the file, and a click opens that screenshot at its
-  real size in a window of its own. Fields decides only the link: it offers no
-  field for the screenshots, so their thumbnails are drawn even when it hides
-  **Stacktrace** (Rule-VIEW-PANEL-090).
+  real size in a window of its own.
 
 ## The screen
 

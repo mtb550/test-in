@@ -88,18 +88,17 @@ public class DetailsRowsIdeTest extends BasePlatformTestCase {
         assertEquals("the test case's rows were drawn out of their fixed order", ROWS_IN_ORDER, captions);
     }
 
-    // Rule-VIEW-PANEL-090
-    public void testAFieldUntickedInFieldsIsNotDrawn() {
-        final @NotNull Set<TestCaseEditorAttributes> was = ShownFields.inTestSets();
+    // Rule-VIEW-PANEL-103
+    public void testAFieldUntickedInFieldsIsStillDrawn() {
+        final @NotNull Set<TestCaseEditorAttributes> was = ShownFields.read(ShownFields.IN_TEST_SETS, TestCaseEditorAttributes.class);
         final @NotNull Set<TestCaseEditorAttributes> chosen = EnumSet.allOf(TestCaseEditorAttributes.class);
         chosen.removeAll(Set.of(TestCaseEditorAttributes.STEPS, TestCaseEditorAttributes.MODULE));
         ShownFields.write(ShownFields.IN_TEST_SETS, chosen);
         try {
-            final @NotNull List<String> words = Drawn.words(Drawn.detailsTabAsChosen(getProject(), everyFieldFilled(), Optional.empty(), PATH));
+            final @NotNull List<String> words = Drawn.words(Drawn.detailsTab(getProject(), everyFieldFilled(), Optional.empty(), PATH));
 
-            assertFalse("a row unticked in Fields was drawn: " + words, words.contains(caption("attribute.steps")));
-            assertFalse("a row unticked in Fields was drawn: " + words, words.contains(caption("attribute.module")));
-            assertTrue("a row ticked in Fields went missing: " + words, words.contains(caption("attribute.expected.result")));
+            assertTrue("a row unticked in Fields went missing from the Details tab: " + words, words.contains(caption("attribute.steps")));
+            assertTrue("a row unticked in Fields went missing from the Details tab: " + words, words.contains(caption("attribute.module")));
         } finally {
             ShownFields.write(ShownFields.IN_TEST_SETS, was);
         }

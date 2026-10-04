@@ -45,10 +45,10 @@ A card shows only a title. This opens the whole test case beside it.
   run's row: the test case as the row shows it, read again every time the panel
   refreshes. The test run editor's row and the panel always show the same test
   case.
-- **Rule-VIEW-PANEL-090** — The Details tab shows a field only when the Fields
-  list of the editor it was opened from shows it. A field that list does not
-  offer is always shown, and the header - the path, the title, the badges and
-  the run item status - is never hidden.
+- **Rule-VIEW-PANEL-103** — The Details tab shows every field of the test case,
+  whatever the editor's Fields list shows. Fields decides only the columns of
+  the grid and the lines of the cards. The panel is where a tester reads the
+  whole test case.
 
 ## The screen
 
@@ -76,8 +76,8 @@ The panel opens on the right of the IDE, beside the editor.
    gray when the panel was handed only one.
 3. **The tabs** — the panel always opens on **Details**, whichever tab was in
    front last time.
-4. **The test case** — drawn below, with the fields the editor's **Fields**
-   list shows (Rule-VIEW-PANEL-090). Every part of it is numbered on
+4. **The test case** — drawn in full below, every field of it, whatever the
+   editor's **Fields** list shows (Rule-VIEW-PANEL-103). Every part of it is numbered on
    [the view panel page](main.md#the-panel).
 
 ## The five ways in
@@ -96,7 +96,7 @@ The panel opens on the right of the IDE, beside the editor.
 2. The tester presses `Enter`, or chooses **View Details** from the menu.
 3. The view panel opens on the right, if it was closed.
 4. The **Details** tab comes to the front.
-5. The panel draws the first test case, showing the fields ticked in **Fields**.
+5. The panel draws the first test case in full.
 6. The keyboard moves into the panel, so `F2` works straight away.
 
 ## What Testin refuses

@@ -191,20 +191,20 @@ public class DetailsValuesIdeTest extends AbstractViewPanelIdeTest {
         }
     }
 
-    // Rule-VIEW-PANEL-090, Rule-VIEW-PANEL-081
-    public void testTheScreenshotsAreDrawnWhenFieldsHidesTheStacktrace() {
+    // Rule-VIEW-PANEL-103, Rule-VIEW-PANEL-081
+    public void testTheStacktraceAndScreenshotsAreDrawnWhenFieldsHidesTheStacktrace() {
         final @NotNull TestSetDirectoryDto ts = aTestSet("Login");
         final @NotNull TestCaseDto tc = aTestCase(ts, "Log in with a valid user", "a");
         final @NotNull TestRunDirectoryDto tr = aTestRun(List.of(TestRunItems.builder().id(tc.getId()).build()));
         final @NotNull List<String> names = Services.getInstance(getProject(), TestRuns.class).storeScreenshots(tr.getPath(), List.of(aScreenshot(320, 200)));
-        final @NotNull Set<TestRunEditorAttributes> was = ShownFields.inTestRuns();
+        final @NotNull Set<TestRunEditorAttributes> was = ShownFields.read(ShownFields.IN_TEST_RUNS, TestRunEditorAttributes.class);
         final @NotNull Set<TestRunEditorAttributes> chosen = EnumSet.allOf(TestRunEditorAttributes.class);
         chosen.remove(TestRunEditorAttributes.STACKTRACE);
         ShownFields.write(ShownFields.IN_TEST_RUNS, chosen);
         try {
-            final @NotNull JBPanel<?> tab = Drawn.detailsTabAsChosen(getProject(), tc, Optional.of(failedWith(tc, names)), tr.getPath2());
+            final @NotNull JBPanel<?> tab = Drawn.detailsTab(getProject(), tc, Optional.of(failedWith(tc, names)), tr.getPath2());
 
-            assertFalse("the Stacktrace link was drawn with Stacktrace unticked in Fields", Drawn.words(tab).contains(Bundle.message("view.stacktrace.link")));
+            assertTrue("the Stacktrace link went missing because Fields hides the Stacktrace", Drawn.words(tab).contains(Bundle.message("view.stacktrace.link")));
             assertTrue("the screenshot was not drawn because Fields hides the Stacktrace", Drawn.components(tab).stream().filter(JBLabel.class::isInstance).map(JBLabel.class::cast).anyMatch(label -> Drawn.hovering(label).contains(names.getFirst())));
         } finally {
             ShownFields.write(ShownFields.IN_TEST_RUNS, was);
