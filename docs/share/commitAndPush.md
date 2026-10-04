@@ -39,6 +39,11 @@ There is no key for this. **Commit & Push** is the face of the split button.
   remote already holds. A remote with no branch of that name yet is pushed to
   without the pull; a remote that cannot be asked is not taken for one, and
   nothing is pushed.
+- **Rule-SHARE-127** — Every Git step that fails says what Git said and offers
+  Show Git log. It opens the IDE's Git tool window, where Git's own output is
+  kept. That holds for reading the changes, committing, choosing a branch,
+  putting a folder under Git, setting the remote or the identity, Sync, the
+  push, and every step of resolving conflicts.
 
 ## What the tester sees
 

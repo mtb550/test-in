@@ -130,7 +130,7 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
         assertEquals("the second test case", mustGit(work, "log", "-1", "--format=%s").trim());
     }
 
-    // UC-SHARE-013, Rule-SHARE-059
+    // UC-SHARE-013, Rule-SHARE-059, Rule-SHARE-127
     public void testThePushHappensOnlyAfterTheCommitSucceeded() {
         write(work, ".git/hooks/pre-commit", """
                 #!/bin/sh
@@ -145,7 +145,8 @@ public class CommitRulesIdeTest extends AbstractGitRemoteIdeTest {
         ShareGestures.type(review, "the second test case");
         ShareGestures.commitAndPush(review);
 
-        titled(said, Bundle.message("git.commit.failed.title"));
+        final @NotNull Notification failed = titled(said, Bundle.message("git.commit.failed.title"));
+        assertTrue("the failed commit offers nothing to press", failed.getActions().stream().anyMatch(action -> Bundle.message("git.show.log").equals(action.getTemplatePresentation().getText())));
         assertEquals("something reached the remote", remoteBefore, head(remote, MAIN));
         assertTrue("a push was started after a failed commit", started.stream().noneMatch(task -> task.getTitle().equals(Bundle.message("git.task.checking.remote")) || task.getTitle().equals(Bundle.message("git.task.pushing.remote"))));
     }

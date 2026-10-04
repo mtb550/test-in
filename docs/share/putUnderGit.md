@@ -31,6 +31,11 @@ repository.
   finds there is none.
 - **Rule-SHARE-043** — Nothing is committed by making the repository. Only the
   repository itself is made.
+- **Rule-SHARE-127** — Every Git step that fails says what Git said and offers
+  Show Git log. It opens the IDE's Git tool window, where Git's own output is
+  kept. That holds for reading the changes, committing, choosing a branch,
+  putting a folder under Git, setting the remote or the identity, Sync, the
+  push, and every step of resolving conflicts.
 
 ## What the tester sees
 

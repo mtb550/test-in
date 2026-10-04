@@ -36,6 +36,11 @@ There is no key for this. The **Branch** box is in the review.
   box names. A local branch whose name holds a slash, such as feature/login, is
   that local branch, never a remote one, so nothing is checked out under a
   shortened name.
+- **Rule-SHARE-127** — Every Git step that fails says what Git said and offers
+  Show Git log. It opens the IDE's Git tool window, where Git's own output is
+  kept. That holds for reading the changes, committing, choosing a branch,
+  putting a folder under Git, setting the remote or the identity, Sync, the
+  push, and every step of resolving conflicts.
 
 ## The screen
 

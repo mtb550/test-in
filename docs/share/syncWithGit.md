@@ -48,9 +48,11 @@ There is no key for this. The menu entry is **Sync with Remote**.
   stops the sync before anything is pulled or pushed, and the message gives the
   reason Git gave. Only a remote that answered, and answered that it has no
   branch of that name, is pushed to without a pull.
-- **Rule-SHARE-127** — A Git step that fails - Sync, the push after conflicts
-  are resolved, or reading the branches - says what Git said and offers Show Git
-  log, which opens the IDE's Git tool window, where Git's own output is kept.
+- **Rule-SHARE-127** — Every Git step that fails says what Git said and offers
+  Show Git log. It opens the IDE's Git tool window, where Git's own output is
+  kept. That holds for reading the changes, committing, choosing a branch,
+  putting a folder under Git, setting the remote or the identity, Sync, the
+  push, and every step of resolving conflicts.
 
 ## What the tester sees
 

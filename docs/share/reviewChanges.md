@@ -51,6 +51,11 @@ uncommitted work.
 - **Rule-SHARE-112** — A test run's screenshots travel with it. The review lists
   none of them on its own, and committing the test run commits the screenshots its
   folder gained or lost.
+- **Rule-SHARE-127** — Every Git step that fails says what Git said and offers
+  Show Git log. It opens the IDE's Git tool window, where Git's own output is
+  kept. That holds for reading the changes, committing, choosing a branch,
+  putting a folder under Git, setting the remote or the identity, Sync, the
+  push, and every step of resolving conflicts.
 
 ## The screen
 

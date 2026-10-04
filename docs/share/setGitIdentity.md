@@ -40,6 +40,11 @@ no email address set.
   used: something, an at sign, something with a dot in it, and no spaces. A
   value that is plainly not an address is refused while the tester is still
   looking at it, rather than found out when somebody reads a commit.
+- **Rule-SHARE-127** — Every Git step that fails says what Git said and offers
+  Show Git log. It opens the IDE's Git tool window, where Git's own output is
+  kept. That holds for reading the changes, committing, choosing a branch,
+  putting a folder under Git, setting the remote or the identity, Sync, the
+  push, and every step of resolving conflicts.
 
 ## The screen
 
