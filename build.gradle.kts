@@ -487,6 +487,29 @@ tasks {
     }
 }
 
+/**
+ * The IDE tests run as three shares at once, split by package, and `ideTest`
+ * runs all three.
+ *
+ * One JVM ran all 760 one after another, nine of the build's nine and a half
+ * minutes. Four forks of that one task were tried and failed 175 tests: forks
+ * share the task's sandbox, and the application settings saved in its config
+ * folder are what the tests set and read, so each fork read the others'. A
+ * registered task gets a sandbox of its own, so three registrations are three
+ * IDEs that cannot see each other. Each pays about fifty seconds to start.
+ *
+ * The shares were balanced on the times of 4 October 2026: 194, 179 and 182
+ * seconds side by side, so the IDE tests take a little over three minutes
+ * rather than nine. When one share grows well past the others, move a package
+ * from it. The last share names no package: it takes every IDE test the others do
+ * not, so a new package is run by it rather than by nothing.
+ */
+val ideTestShares = mapOf(
+    "ideTestGitAndCode" to listOf("git", "codegen"),
+    "ideTestEditorAndTree" to listOf("editor", "explorer", "clipboard", "bug", "view", "testrun"),
+    "ideTestTheRest" to emptyList(),
+)
+
 intellijPlatformTesting {
     /**
      * The tests that need a running IDE (#108).
@@ -503,7 +526,7 @@ intellijPlatformTesting {
      * runner that runs everything else would never see one.
      */
     testIde {
-        register("ideTest")
+        ideTestShares.keys.forEach { register(it) }
     }
 
     runIde {
@@ -526,23 +549,36 @@ intellijPlatformTesting {
  * its own. So the task is pointed at the classes the ordinary tests compile to,
  * and it takes only the ones named for it.
  */
-tasks.named<Test>("ideTest") {
+ideTestShares.forEach { (share, packages) ->
+    tasks.named<Test>(share) {
+        group = "verification"
+        description = "The tests that need a running IDE, in " + packages.ifEmpty { listOf("every package the other shares leave") }.joinToString()
+
+        useJUnit()
+
+        testClassesDirs = sourceSets["test"].output.classesDirs
+
+        // Three things, and the middle one is the trap. The test classes and their
+        // own dependencies come from the test source set. The platform's test
+        // framework - BasePlatformTestCase itself - is in a configuration of the
+        // plugin's own. Without it the scanner cannot resolve the superclass and
+        // skips every IDE test in silence, reporting that it found none.
+        classpath += sourceSets["test"].runtimeClasspath
+        classpath += configurations["intellijPlatformTestClasspath"]
+
+        if (packages.isEmpty()) {
+            include("**/*IdeTest.class")
+            exclude(ideTestShares.values.flatten().map { "org/testin/$it/**" })
+        } else {
+            include(packages.map { "org/testin/$it/**/*IdeTest.class" })
+        }
+    }
+}
+
+tasks.register("ideTest") {
     group = "verification"
-    description = "The tests that need a running IDE"
-
-    useJUnit()
-
-    testClassesDirs = sourceSets["test"].output.classesDirs
-
-    // Three things, and the middle one is the trap. The test classes and their
-    // own dependencies come from the test source set. The platform's test
-    // framework - BasePlatformTestCase itself - is in a configuration of the
-    // plugin's own. Without it the scanner cannot resolve the superclass and
-    // skips every IDE test in silence, reporting that it found none.
-    classpath += sourceSets["test"].runtimeClasspath
-    classpath += configurations["intellijPlatformTestClasspath"]
-
-    include("**/*IdeTest.class")
+    description = "The tests that need a running IDE, as three shares at once"
+    dependsOn(ideTestShares.keys)
 }
 
 configurations.all {

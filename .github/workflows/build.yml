@@ -106,7 +106,7 @@ jobs:
           if-no-files-found: ignore
           path: |
             build/reports/tests/test
-            build/reports/tests/ideTest
+            build/reports/tests/ideTest*
             build/reports/rule-coverage
             build/reports/jacoco/test
             build/reports/pluginVerifier

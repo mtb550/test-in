@@ -34,8 +34,9 @@
 # .java file that does not open with the Apache 2.0 notice, so a file read away
 # from the repository says nothing about who owns it. HtmlParagraphInMarkdown - a
 # bare <p> in a Markdown file, which turns what follows into raw HTML where
-# backticks stop being code. HelperNamedLikeTest - a helper in a JUnit 3 test
-# named test*, which the IDE reads as a broken test. All nine are at zero, so the
+# backticks stop being code. MisalignedMarkdownTable - a Markdown table whose
+# column borders do not line up row under row. HelperNamedLikeTest - a helper in a JUnit 3 test
+# named test*, which the IDE reads as a broken test. All ten are at zero, so the
 # first one that appears is the one to look at.
 #
 # DuplicatedDisplayString fails the run like any other finding: a string a

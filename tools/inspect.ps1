@@ -31,12 +31,12 @@
     lists under exclude, each with its reason: Qodana reads that list in CI and
     this script reads the same one, so the two gates cannot disagree.
 
-    Ten rules are this script's own, because no IntelliJ inspection makes them
+    Eleven rules are this script's own, because no IntelliJ inspection makes them
     or the headless run cannot be trusted with the one that does:
     WrappedMethodDeclaration, StaticMutableState,
     HandWrittenPrivateConstructor, NonMarkerComment, UnusedLambdaParameter,
     DriftedCaption, OrphanedJavadoc, MissingCopyright,
-    HtmlParagraphInMarkdown and HelperNamedLikeTest.
+    HtmlParagraphInMarkdown, MisalignedMarkdownTable and HelperNamedLikeTest.
 
     They read the source as text, so -Quick runs them alone in seconds with no
     IDE. That is the check to run before handing a change over; the full run is
@@ -1051,6 +1051,61 @@ function Read-HtmlParagraphInMarkdown {
     }
 }
 
+function Get-CellBorders([string] $line) {
+    $borders = [System.Collections.Generic.List[int]]::new()
+    $inCode = $false
+    for ($i = 0; $i -lt $line.Length; $i++) {
+        $c = $line[$i]
+        if ($c -eq '\') { $i++; continue }
+        if ($c -eq '`') { $inCode = -not $inCode }
+        elseif ($c -eq '|' -and -not $inCode) { $borders.Add($i) }
+    }
+    $borders -join ','
+}
+
+function Read-MisalignedMarkdownTable {
+    <#
+        A Markdown table whose column borders do not line up, row under row.
+
+        The rendered page does not care, but the file is read as text far
+        more often than rendered - in a diff, in a terminal, in the IDE - and
+        there a table that is not padded is a wall of pipes. A row added
+        without re-padding the rest is how it happens: CONTRIBUTING.md's
+        table of checks took one on 4 October 2026. The IDE's Markdown
+        formatter pads every cell to its column's width, and a table it has
+        formatted passes.
+
+        A border is a | outside a code span and not escaped, so a pipe inside
+        backticks is cell text. Code fences are skipped.
+    #>
+    foreach ($relative in @(git -C $repo ls-files '*.md')) {
+        $path = Join-Path $repo $relative
+        if (-not (Test-Path $path)) { continue }
+
+        $lines = [System.IO.File]::ReadAllLines($path)
+        $fenced = $false
+        $header = $null
+
+        for ($i = 0; $i -lt $lines.Count; $i++) {
+            $line = $lines[$i]
+            if ($line.TrimStart().StartsWith('```')) { $fenced = -not $fenced }
+            if ($fenced -or -not $line.StartsWith('|')) { $header = $null; continue }
+
+            $borders = Get-CellBorders $line
+            if ($null -eq $header) { $header = $borders; continue }
+            if ($borders -eq $header) { continue }
+
+            [pscustomobject]@{
+                Path       = $relative
+                Line       = $i + 1
+                Inspection = 'MisalignedMarkdownTable'
+                Severity   = 'ERROR'
+                Message    = "This row's column borders are not under the header's. Pad every cell to its column's width, as the IDE's Reformat Code does."
+            }
+        }
+    }
+}
+
 function Find-CommentStart([string] $line) {
     <#
         Where a comment starts on a line of code, or -1. A // inside a string -
@@ -1352,6 +1407,7 @@ $problems += @(Read-UnusedLambdaParameters $everyTree)
 $problems += @(Read-QualifiedClassNames $everyTree)
 $problems += @(Read-HelpersNamedLikeTests $everyTree)
 $problems += @(Read-HtmlParagraphInMarkdown)
+$problems += @(Read-MisalignedMarkdownTable)
 
 $problems += @(Read-DuplicatedDisplayStrings $scopes)
 $problems += @(Read-ModelStatics @((Join-Path $repo 'src/main/java/org/testin/model')))
