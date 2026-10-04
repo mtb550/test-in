@@ -1,0 +1,47 @@
+# The libraries the plugin ships, checked against known vulnerabilities (#389).
+#
+# GitHub does not read a Gradle build's dependencies by itself: there is no
+# lock file for it to parse, so it knows them only when the build submits them.
+# Dependabot alerts were switched on for this repository and had nothing of the
+# plugin's to watch. This submits the resolved graph after every push to main,
+# and from then on an advisory against Jackson, POI, iText, FastExcel or
+# anything they pull in raises a Dependabot alert in the Security tab, with a
+# notification - on the day the advisory is published, not only when this runs.
+#
+# runtimeClasspath only, in every module: that is what ships inside the plugin.
+# Lombok, the test libraries and the IDE itself are not ours to patch, and
+# listing them would bury the alert that is.
+name: Dependencies
+
+on:
+  push:
+    branches: [ main ]
+
+concurrency:
+  group: dependencies
+  cancel-in-progress: true
+
+# Submitting a dependency graph writes to the repository's metadata.
+permissions:
+  contents: write
+
+jobs:
+  submit:
+    name: Submit the dependency graph
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out the commit
+        uses: actions/checkout@v7
+
+      - name: Java 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Submit what the plugin ships
+        uses: gradle/actions/dependency-submission@v6
+        with:
+          dependency-graph-include-configurations: runtimeClasspath
