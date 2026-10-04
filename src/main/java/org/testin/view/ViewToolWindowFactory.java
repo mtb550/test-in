@@ -51,6 +51,11 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         return Optional.ofNullable(ToolWindowManager.getInstance(p).getToolWindow("testin.view"));
     }
 
+    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-008, Rule-VIEW-PANEL-092
+    public static void refreshShown(final @NotNull Project p) {
+        panel(p).ifPresent(ViewPanel::refreshCurrentView);
+    }
+
     // Rule-VIEW-PANEL-005
     public static void refreshIfShowing(final @NotNull Project p, final @NotNull Collection<TestCaseDto> written) {
         panel(p).ifPresent(view -> view.refreshIfShowing(written));

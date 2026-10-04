@@ -166,6 +166,28 @@ public class GitHubCliTest {
         assertEquals(IssueCreation.of(answer("", "", 1), "github.com", 0), IssueCreation.failed(Bundle.message("bug.send.failed", 1)));
     }
 
+    // Rule-VIEW-PANEL-092
+    @Test
+    public void oneRequestAsksForEveryIssueInTheRepository() {
+        final List<String> arguments = GitHubCli.stateArguments(new BugRepository("github.example.com", "qa", "product"), List.of(5, 14), false);
+
+        assertEquals(arguments.subList(0, 4), List.of("api", "graphql", "--hostname", "github.example.com"));
+        final String query = arguments.get(5);
+        assertTrue(query.contains("i5: issue(number: 5) { state stateReason }") && query.contains("i14: issue(number: 14) { state stateReason }"), query);
+        assertFalse(query.contains("\""), "a double quote in an argument is mangled on the Windows command line: " + query);
+        assertTrue(arguments.containsAll(List.of("owner=qa", "name=product")));
+        assertFalse(query.contains("projectItems") || arguments.contains("field=Status"), "a board is asked for only when wanted");
+    }
+
+    // Rule-VIEW-PANEL-094
+    @Test
+    public void theBoardIsAskedForByItsStatusField() {
+        final List<String> arguments = GitHubCli.stateArguments(new BugRepository("github.com", "mtb550", "test-03"), List.of(14), true);
+
+        assertTrue(arguments.get(5).contains("projectItems") && arguments.get(5).contains("$field: String!"));
+        assertTrue(arguments.contains("field=Status"));
+    }
+
     private static final class FakeGh {
         private final List<List<String>> asked = new ArrayList<>();
         private final Deque<ProcessOutput> answers;

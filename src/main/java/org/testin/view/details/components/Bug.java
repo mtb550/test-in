@@ -28,7 +28,6 @@ import org.testin.bug.RunItem;
 import org.testin.editor.TestinEditors;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.Nodes;
-import org.testin.model.BugIssueUrl;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
@@ -66,19 +65,10 @@ public final class Bug {
 
         chip(runItem).ifPresent(line::add);
         bugIssue.ifPresentOrElse(
-                url -> line.add(issue(url)),
+                url -> line.add(BugIssueLink.of(p, url)),
                 () -> line.add(report(p, runItem, dto, testRunDirectory)));
 
         return line;
-    }
-
-    // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-075
-    private static @NotNull ActionLink issue(final @NotNull String url) {
-        final @NotNull ActionLink link = AbstractDetails.link(BugIssueUrl.shortReference(url), _ -> BugIssueUrl.open(url));
-
-        Tooltip.set(link, url);
-
-        return link;
     }
 
     // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-066, Rule-VIEW-PANEL-075

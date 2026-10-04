@@ -38,6 +38,12 @@ public class BugIssueUrlTest {
     }
 
     @Test
+    public void anIssueIsReadAsItsHostRepositoryAndNumber() {
+        assertEquals(BugIssueUrl.issue("https://github.example.com/qa/product/issues/14"), Optional.of(new BugIssue("github.example.com", "qa", "product", 14)));
+        assertEquals(BugIssueUrl.issue("https://github.com/qa/product/pull/14"), Optional.empty());
+    }
+
+    @Test
     public void somethingElseReadsAsItself() {
         assertEquals(BugIssueUrl.reference(""), "", "no link is no text");
         assertEquals(BugIssueUrl.reference("https://github.com/mtb550/product/pull/5"), "https://github.com/mtb550/product/pull/5");

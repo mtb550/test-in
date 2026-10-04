@@ -41,6 +41,18 @@ test run.
   stacktrace and the bug issue link, and puts the bug severity and priority back
   to Enhancement and Low. The band is left holding its line of pills.
 - **Rule-VIEW-PANEL-033** — A test case the test run has not reached yet reads **Pending**.
+- **Rule-VIEW-PANEL-091** — Beside a filed bug's link stands its state on
+  GitHub: the Status column of the Project board it sits on, or else Open, Fixed
+  or Not planned. A link whose state has not been read stands alone.
+- **Rule-VIEW-PANEL-092** — Testin asks GitHub when a test run opens and on
+  Refresh, for every bug the test project holds, one request per repository, in
+  the background. The panel never waits for the answer, and the answer is never
+  written to the test run.
+- **Rule-VIEW-PANEL-093** — When GitHub cannot be asked - gh missing, signed out
+  or offline - every link still shows and opens, and one message says why.
+- **Rule-VIEW-PANEL-094** — A board's Status needs gh's read:project permission.
+  Without it the issue's own state shows, and one message, once per session,
+  names the command that grants it.
 
 ## The screen
 

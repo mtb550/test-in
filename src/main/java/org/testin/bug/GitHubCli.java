@@ -29,6 +29,7 @@ import org.testin.config.BugRepository;
 import org.testin.logger.Logger;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
+import org.testin.util.Mapper;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -36,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -51,6 +53,9 @@ public final class GitHubCli {
     private static final @NotNull String DEV_BUILD = "DEV";
     private static final @NotNull Pattern VERSION = Pattern.compile("gh version (\\S+)");
     private static final @NotNull Pattern NUMBER = Pattern.compile("\\d{1,9}");
+    private static final @NotNull String STATE = "state stateReason";
+    private static final @NotNull String BOARD = "projectItems(first: 10) { nodes { project { title } fieldValueByName(name: $field) { ... on ProjectV2ItemFieldSingleSelectValue { name color } } } }";
+    private static final @NotNull String BOARD_FIELD = "Status";
 
     private static final @NotNull Path ANYWHERE = Path.of(System.getProperty("java.io.tmpdir"));
     private final @NotNull Launcher launcher;
@@ -67,6 +72,19 @@ public final class GitHubCli {
     static @NotNull List<String> arguments(final @NotNull BugRepository repository, final @NotNull String title, final int screenshots) {
         final @NotNull List<String> arguments = new ArrayList<>(List.of("issue", "create", "--repo", repository.ghRepo(), "--title=" + title, "--body-file", BODY_FILE));
         IntStream.rangeClosed(1, screenshots).forEach(number -> arguments.addAll(List.of("--attach", "./" + BugTemplate.screenshotFile(number))));
+        return arguments;
+    }
+
+    static @NotNull List<String> stateArguments(final @NotNull BugRepository repository, final @NotNull Collection<Integer> numbers, final boolean boards) {
+        final @NotNull String issues = numbers.stream()
+                .map(number -> "i%d: issue(number: %d) { %s }".formatted(number, number, boards ? STATE + " " + BOARD : STATE))
+                .collect(Collectors.joining(" "));
+        final @NotNull String variables = boards ? "$owner: String!, $name: String!, $field: String!" : "$owner: String!, $name: String!";
+
+        final @NotNull List<String> arguments = new ArrayList<>(List.of("api", "graphql", "--hostname", repository.host(),
+                "-f", "query=query(%s) { repository(owner: $owner, name: $name) { %s } }".formatted(variables, issues),
+                "-f", "owner=" + repository.owner(), "-f", "name=" + repository.name()));
+        if (boards) arguments.addAll(List.of("-f", "field=" + BOARD_FIELD));
         return arguments;
     }
 
@@ -152,6 +170,14 @@ public final class GitHubCli {
         } finally {
             FileUtil.delete(folder.toFile());
         }
+    }
+
+    // UC-VIEW-PANEL-005, Rule-VIEW-PANEL-092
+    @NotNull IssueStates states(final @NotNull Mapper mapper, final @NotNull BugRepository repository, final @NotNull Collection<Integer> numbers, final boolean boards) {
+        ThreadingAssertions.assertBackgroundThread();
+        return launcher.run(stateArguments(repository, numbers, boards), ANYWHERE)
+                .map(answer -> IssueStates.of(mapper, answer, repository.host(), numbers))
+                .orElseGet(() -> IssueStates.failed(Bundle.message("bug.reason.no.gh")));
     }
 
     @FunctionalInterface

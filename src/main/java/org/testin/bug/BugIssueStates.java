@@ -1,0 +1,133 @@
+/*
+ * Copyright 2026 Muteb Almughyiri
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.testin.bug;
+
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.Service;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
+import org.testin.config.BugRepository;
+import org.testin.indexer.TestRuns;
+import org.testin.model.BugIssue;
+import org.testin.model.BugIssueUrl;
+import org.testin.model.TestRunItems;
+import org.testin.model.dto.TestRunDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.BackgroundWork;
+import org.testin.services.Services;
+import org.testin.util.Bundle;
+import org.testin.util.Mapper;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+@Service(Service.Level.PROJECT)
+public final class BugIssueStates {
+    private final @NotNull Project p;
+    private final @NotNull Map<BugIssue, BugIssueState> answers = new ConcurrentHashMap<>();
+    private final @NotNull AtomicBoolean reading = new AtomicBoolean();
+    private final @NotNull AtomicBoolean boards = new AtomicBoolean(true);
+    private volatile @NotNull Optional<Function<ProgressIndicator, GitHubCli>> gh;
+
+    public BugIssueStates(final @NotNull Project p) {
+        this.p = p;
+        this.gh = ApplicationManager.getApplication().isUnitTestMode() ? Optional.empty() : Optional.of(GitHubCli::onPath);
+    }
+
+    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-008, Rule-VIEW-PANEL-091
+    public @NotNull BugIssueState of(final @NotNull String bugIssueUrl) {
+        return BugIssueUrl.issue(bugIssueUrl).map(issue -> answers.getOrDefault(issue, BugIssueState.NOT_READ)).orElse(BugIssueState.NOT_READ);
+    }
+
+    // UC-VIEW-PANEL-005, UC-VIEW-PANEL-008, Rule-VIEW-PANEL-092
+    public void readAll(final @NotNull Runnable redraw) {
+        final @NotNull Map<BugRepository, Set<Integer>> filed = filedIn(Services.getInstance(p, TestRuns.class).getAllTestRuns().values());
+        if (filed.isEmpty() || gh.isEmpty() || !reading.compareAndSet(false, true)) return;
+
+        final @NotNull Function<ProgressIndicator, GitHubCli> cli = gh.orElseThrow();
+        BackgroundWork.start(new Task.Backgroundable(p, Bundle.message("bug.states.reading"), true) {
+            @Override
+            public void run(final @NotNull ProgressIndicator indicator) {
+                for (final Map.Entry<BugRepository, Set<Integer>> repository : filed.entrySet()) {
+                    indicator.checkCanceled();
+                    indicator.setText2(repository.getKey().displayName());
+                    read(cli.apply(indicator), repository.getKey(), repository.getValue());
+                }
+            }
+
+            @Override
+            public void onFinished() {
+                reading.set(false);
+                redraw.run();
+            }
+        });
+    }
+
+    // Rule-VIEW-PANEL-093
+    private void read(final @NotNull GitHubCli cli, final @NotNull BugRepository repository, final @NotNull Set<Integer> numbers) {
+        final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
+        final @NotNull IssueStates asked = cli.states(mapper, repository, numbers, boards.get());
+        final @NotNull IssueStates said = asked.boardRefused() ? withoutBoards(cli, mapper, repository, numbers) : asked;
+
+        if (!said.problem().isEmpty()) {
+            Services.getInstance(p, Notifier.class).warn(p, Bundle.message("bug.states.not.read.title"), said.problem());
+            return;
+        }
+
+        numbers.forEach(number -> answers.put(new BugIssue(repository.host(), repository.owner(), repository.name(), number), said.stateOf(number)));
+    }
+
+    // Rule-VIEW-PANEL-094
+    private @NotNull IssueStates withoutBoards(final @NotNull GitHubCli cli, final @NotNull Mapper mapper, final @NotNull BugRepository repository, final @NotNull Set<Integer> numbers) {
+        if (boards.compareAndSet(true, false)) {
+            Services.getInstance(p, Notifier.class).info(p, Bundle.message("bug.states.board.title"), Bundle.message("bug.states.board.message", repository.host()));
+        }
+        return cli.states(mapper, repository, numbers, false);
+    }
+
+    static @NotNull Map<BugRepository, Set<Integer>> filedIn(final @NotNull Collection<TestRunDto> testRuns) {
+        return testRuns.stream()
+                .flatMap(testRun -> testRun.getResults().stream())
+                .map(TestRunItems::bugIssue)
+                .flatMap(Optional::stream)
+                .map(BugIssueUrl::issue)
+                .flatMap(Optional::stream)
+                .collect(Collectors.groupingBy(issue -> new BugRepository(issue.host(), issue.owner(), issue.name()),
+                        Collectors.mapping(BugIssue::number, Collectors.toCollection(TreeSet::new))));
+    }
+
+    @TestOnly
+    void answerWith(final @NotNull GitHubCli fake, final @NotNull Disposable until) {
+        final @NotNull Optional<Function<ProgressIndicator, GitHubCli>> before = gh;
+        gh = Optional.of(_ -> fake);
+        answers.clear();
+        boards.set(true);
+        Disposer.register(until, () -> gh = before);
+    }
+}

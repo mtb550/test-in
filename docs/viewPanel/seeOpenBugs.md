@@ -43,10 +43,24 @@ There is no key for this. The tab is called **Open Bugs**.
   about a failure - how bad it is, how soon it must be fixed, or the issue it
   was filed as. So a test case that has never failed has none, and the same test
   case can carry a different bug in every cycle. A filed issue is shown as its
-  link, and opens when clicked.
+  link, with its state on GitHub beside it, and opens when clicked.
 - **Rule-VIEW-PANEL-065** — The bugs are read from the test runs the indexer
   already holds, so the tab costs a walk over what is in memory and reads
   nothing from disk.
+- **Rule-VIEW-PANEL-091** — Beside a filed bug's link stands its state on
+  GitHub: the Status column of the Project board it sits on, or else Open, Fixed
+  or Not planned. A link whose state has not been read stands alone.
+- **Rule-VIEW-PANEL-092** — Testin asks GitHub when a test run opens and on
+  Refresh, for every bug the test project holds, one request per repository, in
+  the background. The panel never waits for the answer, and the answer is never
+  written to the test run.
+- **Rule-VIEW-PANEL-093** — When GitHub cannot be asked - gh missing, signed out
+  or offline - every link still shows and opens, and one message says why.
+- **Rule-VIEW-PANEL-094** — A board's Status needs gh's read:project permission.
+  Without it the issue's own state shows, and one message, once per session,
+  names the command that grants it.
+- **Rule-VIEW-PANEL-095** — A bug GitHub calls closed stays in the tab with its
+  pill, so the tester sees the fix landed and knows to test it again.
 
 ## The screen
 

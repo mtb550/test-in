@@ -22,6 +22,7 @@ import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.bug.BugIssueStates;
 import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.BaseCard;
 import org.testin.editor.PageWindow;
@@ -62,6 +63,7 @@ import org.testin.ui.SideScroll;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.util.FailureText;
+import org.testin.view.ViewToolWindowFactory;
 
 import java.awt.BorderLayout;
 import java.time.Duration;
@@ -105,7 +107,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
         loadDataAsync();
     }
 
-    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126
+    // UC-EDITOR-PANEL-030, Rule-EDITOR-PANEL-126, Rule-VIEW-PANEL-092
     @Override
     protected void loadDataAsync(final @NotNull Runnable onLoaded) {
         final int generation = loadGeneration.incrementAndGet();
@@ -144,6 +146,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
 
                     startIfAsked();
                     onLoaded.run();
+                    Services.getInstance(p, BugIssueStates.class).readAll(() -> ViewToolWindowFactory.refreshShown(p));
                 });
             } catch (final Exception ex) {
                 Logger.error("Failed to load Test Run data from disk: " + FailureText.of(ex));

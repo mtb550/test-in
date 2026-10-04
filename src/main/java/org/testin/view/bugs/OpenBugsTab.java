@@ -18,20 +18,17 @@ package org.testin.view.bugs;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.TestRuns;
-import org.testin.model.BugIssueUrl;
 import org.testin.model.OpenBug;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
-import org.testin.view.details.components.AbstractDetails;
+import org.testin.view.details.components.BugIssueLink;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -44,8 +41,8 @@ import java.util.Optional;
 public class OpenBugsTab {
     private static final int GAP = 12;
 
-    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-064
-    private static @NotNull JBPanel<?> rows(final @NotNull List<OpenBug> bugs) {
+    // UC-VIEW-PANEL-008, Rule-VIEW-PANEL-064, Rule-VIEW-PANEL-095
+    private static @NotNull JBPanel<?> rows(final @NotNull Project p, final @NotNull List<OpenBug> bugs) {
         final @NotNull JBPanel<?> panel = new JBPanel<>();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
@@ -54,7 +51,7 @@ public class OpenBugsTab {
         for (final OpenBug bug : bugs) {
             panel.add(left(heading(bug)));
             if (bug.item().isFailed()) panel.add(left(severity(bug)));
-            bug.item().bugIssue().ifPresent(url -> panel.add(left(issue(url))));
+            bug.item().bugIssue().ifPresent(url -> panel.add(left(BugIssueLink.of(p, url))));
 
             if (!bug.item().getActualResult().isBlank()) panel.add(left(note(bug.item().getActualResult())));
 
@@ -79,14 +76,6 @@ public class OpenBugsTab {
         label.setFont(Fonts.body());
 
         return label;
-    }
-
-    // Rule-VIEW-PANEL-075, Rule-VIEW-PANEL-080
-    private static @NotNull ActionLink issue(final @NotNull String url) {
-        final @NotNull ActionLink link = AbstractDetails.link(BugIssueUrl.shortReference(url), _ -> BugIssueUrl.open(url));
-        Tooltip.set(link, url);
-
-        return link;
     }
 
     private static @NotNull JBLabel note(final @NotNull String text) {
@@ -120,6 +109,6 @@ public class OpenBugsTab {
         final @NotNull List<OpenBug> bugs = OpenBug.of(
                 Services.getInstance(p, TestRuns.class).getAllTestRuns(), shown.orElseThrow().getId());
 
-        return bugs.isEmpty() ? note(Bundle.message("view.bugs.none")) : rows(bugs);
+        return bugs.isEmpty() ? note(Bundle.message("view.bugs.none")) : rows(p, bugs);
     }
 }

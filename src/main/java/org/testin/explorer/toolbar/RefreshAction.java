@@ -23,6 +23,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
+import org.testin.bug.BugIssueStates;
 import org.testin.editor.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
@@ -33,6 +34,7 @@ import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
+import org.testin.view.ViewToolWindowFactory;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -100,7 +102,7 @@ public class RefreshAction extends AbstractProjectAction {
         });
     }
 
-    // UC-TREE-PANEL-025, Rule-TREE-PANEL-081
+    // UC-TREE-PANEL-025, Rule-TREE-PANEL-081, Rule-VIEW-PANEL-092
     private void rebuildTree(final @NotNull String outcome) {
         try {
             if (p.isDisposed()) return;
@@ -108,6 +110,7 @@ public class RefreshAction extends AbstractProjectAction {
             testinEditors.refreshOpen();
 
             tp.refresh();
+            Services.getInstance(p, BugIssueStates.class).readAll(() -> ViewToolWindowFactory.refreshShown(p));
             Logger.info("Refresh: tree rebuilt");
 
             tp.fetchBranches();

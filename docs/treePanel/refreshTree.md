@@ -87,6 +87,9 @@ bottom right of the IDE.
 4. Editors on nodes that are gone are closed, and the rest are reloaded.
 5. The tree redraws, with the same rows expanded.
 6. Testin shows *Refreshed* when it finishes.
+7. In the background, Testin asks GitHub again for the state of every bug the
+   test project holds, and the view panel shows them beside their links
+   ([Rule-VIEW-PANEL-092](../viewPanel/readRunItemResult.md)).
 
 ## What Testin refuses
 
