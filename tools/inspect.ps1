@@ -126,11 +126,25 @@ function Resolve-Inspector {
     $inspect = Join-Path $ide.FullName 'bin' $launcher
     if (-not (Test-Path $inspect)) { throw "No $launcher in $($ide.FullName)" }
 
-    Write-Host "Inspector: $inspect"
-    return $inspect
+    # Plugin DevKit, which the IDE no longer bundles. It is what reads plugin.xml:
+    # without it an icon path that resolves nowhere passes, and a field only
+    # plugin.xml names - Icons.PLUGIN - is reported as never used (#390). The
+    # Marketplace serves the build made for this IDE's exact build number. Kept
+    # under Gradle's caches folder, which CI restores between runs.
+    $product = Get-Content (Join-Path $ide.FullName 'product-info.json') -Raw | ConvertFrom-Json
+    $build = "$($product.productCode)-$($product.buildNumber)"
+    $devKit = Join-Path $gradleHome 'caches' 'testin-devkit' "devkit-$build.zip"
+    if (-not (Test-Path $devKit)) {
+        New-Item -ItemType Directory -Force -Path (Split-Path $devKit) | Out-Null
+        Invoke-WebRequest -Uri "https://plugins.jetbrains.com/pluginManager?action=download&id=DevKit&build=$build" -OutFile "$devKit.part"
+        Move-Item -Path "$devKit.part" -Destination $devKit
+    }
+
+    Write-Host "Inspector: $inspect, with Plugin DevKit for $build"
+    return [pscustomobject]@{ Launcher = $inspect; DevKit = $devKit }
 }
 
-function Invoke-Inspector([string] $inspect, [string] $outPath) {
+function Invoke-Inspector([object] $inspector, [string] $outPath) {
     # Outside the repository, and emptied before every run. Both halves matter.
     #
     # Empty, because reusing these caches is tempting - they hold the indexes
@@ -154,7 +168,9 @@ function Invoke-Inspector([string] $inspect, [string] $outPath) {
 idea.config.path=$s/config
 idea.system.path=$s/system
 idea.log.path=$s/log
+idea.plugins.path=$s/plugins
 "@ | Set-Content -Path $propsFile -Encoding utf8
+    Expand-Archive -Path $inspector.DevKit -DestinationPath (Join-Path $scratch 'plugins')
 
     $profilePath = Join-Path $repo '.idea' 'inspectionProfiles' 'Testin.xml'
     $arguments = @($repo, $profilePath, $outPath, '-v1')
@@ -163,7 +179,7 @@ idea.log.path=$s/log
     Write-Host "Inspecting $repo - one indexing pass, expect 10-20 minutes..."
     $env:IDEA_PROPERTIES = $propsFile
     try {
-        & $inspect @arguments
+        & $inspector.Launcher @arguments
     } finally {
         Remove-Item Env:\IDEA_PROPERTIES -ErrorAction SilentlyContinue
     }

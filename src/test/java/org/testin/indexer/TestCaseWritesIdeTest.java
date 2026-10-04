@@ -329,7 +329,7 @@ public class TestCaseWritesIdeTest extends AbstractTempRootIdeTest {
     }
 
     // UC-INTERNAL-004, Rule-INTERNAL-113, Rule-INTERNAL-125
-    public void testASaveLeavesNothingBesideTheFileAndBothAreTestinsOwn() {
+    public void testASaveLeavesNothingBesideTheFileAndBothBelongToTestin() {
         final @NotNull TestSetDirectoryDto ts = oneTestSet();
         final @NotNull TestCaseDto held = aTestCaseIn(ts, "m");
         indexedTestCases().putTestCaseVerbatim(ts.getPath(), held);

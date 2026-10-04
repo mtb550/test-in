@@ -17,7 +17,6 @@
 package org.testin.editor.grid;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
@@ -51,7 +50,7 @@ public class GridRowsTest {
     // Rule-EDITOR-PANEL-020
     @Test
     public void aTestCaseWithNoRunItemYetIsStillARowShowingTheTestCase() {
-        final @NotNull List<String[]> rows = GridRows.ofRunItems(List.of(LOGIN), Map.<UUID, TestRunItems>of(), GridRowsTest::position);
+        final @NotNull List<String[]> rows = GridRows.ofRunItems(List.of(LOGIN), Map.of(), GridRowsTest::position);
 
         assertEquals(rows.size(), 1, "a test case with no run item yet has no row");
         assertEquals(rows.getFirst().length, TestRunEditorAttributes.values().length, "a row does not hold one cell per column");

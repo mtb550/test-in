@@ -25,6 +25,12 @@
 # says otherwise, and this file is what makes the IDE believe it on every clone
 # rather than on the machine that configured it.
 !.idea/misc.xml
+# That this is a Gradle build, and which three modules it has. Without it a
+# fresh clone opens with no modules, and the headless inspector on CI read every
+# Java file unresolved: it passed with an unused field, a parameter always given
+# 25 and two returns of null, all three warnings in the IDE (#390). It holds
+# $PROJECT_DIR$ paths only, nothing of one machine's.
+!.idea/gradle.xml
 .intellijPlatform/
 .run/
 .sandbox/
