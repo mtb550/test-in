@@ -31,12 +31,10 @@
     lists under exclude, each with its reason: Qodana reads that list in CI and
     this script reads the same one, so the two gates cannot disagree.
 
-    Eleven rules are this script's own, because no IntelliJ inspection makes them
-    or the headless run cannot be trusted with the one that does:
-    WrappedMethodDeclaration, StaticMutableState,
-    HandWrittenPrivateConstructor, NonMarkerComment, UnusedLambdaParameter,
-    DriftedCaption, OrphanedJavadoc, MissingCopyright,
-    HtmlParagraphInMarkdown, MisalignedMarkdownTable and HelperNamedLikeTest.
+    Some rules are this script's own, because no IntelliJ inspection makes them
+    or the headless run cannot be trusted with the one that does. CONTRIBUTING.md
+    names them in one table, under The inspection gate, and UnlistedRule fails the
+    run when that table and this file disagree.
 
     They read the source as text, so -Quick runs them alone in seconds with no
     IDE. That is the check to run before handing a change over; the full run is
@@ -1051,6 +1049,51 @@ function Read-HtmlParagraphInMarkdown {
     }
 }
 
+function Read-UnlistedRules {
+    <#
+        A rule this script reports that CONTRIBUTING.md's table of its rules
+        does not name, or a row in that table naming a rule it no longer
+        reports.
+
+        The rules were listed in three places - this header, inspect.yml and
+        that table - and by 4 October 2026 the three said eleven, ten and
+        nine, with two rules in none of them. The table is the one list now,
+        and this keeps it true: the names are read from the Inspection
+        values in this file, so a rule cannot be added without its row.
+    #>
+    $contributing = Join-Path $repo 'CONTRIBUTING.md'
+    $lines = [System.IO.File]::ReadAllLines($contributing)
+    $intro = [array]::FindIndex($lines, [Predicate[string]] { param($line) $line.StartsWith("The script's own rules") })
+
+    $listed = @()
+    for ($i = $intro + 1; $i -lt $lines.Count; $i++) {
+        if ($lines[$i] -match '^\|\s*`(\w+)`') { $listed += $Matches[1] }
+        elseif ($listed -and -not $lines[$i].StartsWith('|')) { break }
+    }
+
+    $reported = @([regex]::Matches([System.IO.File]::ReadAllText($PSCommandPath), "Inspection\s*=\s*'(\w+)'") |
+            ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+
+    foreach ($rule in $reported | Where-Object { $_ -notin $listed }) {
+        [pscustomobject]@{
+            Path       = 'CONTRIBUTING.md'
+            Line       = $intro + 1
+            Inspection = 'UnlistedRule'
+            Severity   = 'ERROR'
+            Message    = "tools/inspect.ps1 reports $rule, and the table of the script's own rules does not name it."
+        }
+    }
+    foreach ($rule in $listed | Where-Object { $_ -notin $reported }) {
+        [pscustomobject]@{
+            Path       = 'CONTRIBUTING.md'
+            Line       = $intro + 1
+            Inspection = 'UnlistedRule'
+            Severity   = 'ERROR'
+            Message    = "The table of the script's own rules names $rule, and tools/inspect.ps1 no longer reports it."
+        }
+    }
+}
+
 function Get-CellBorders([string] $line) {
     $borders = [System.Collections.Generic.List[int]]::new()
     $inCode = $false
@@ -1408,6 +1451,7 @@ $problems += @(Read-QualifiedClassNames $everyTree)
 $problems += @(Read-HelpersNamedLikeTests $everyTree)
 $problems += @(Read-HtmlParagraphInMarkdown)
 $problems += @(Read-MisalignedMarkdownTable)
+$problems += @(Read-UnlistedRules)
 
 $problems += @(Read-DuplicatedDisplayStrings $scopes)
 $problems += @(Read-ModelStatics @((Join-Path $repo 'src/main/java/org/testin/model')))

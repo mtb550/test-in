@@ -271,7 +271,7 @@ A new `@SuppressWarnings` or `//noinspection` fails the gate too, through the
 `SuppressionAnnotation` inspection. The profile allows `UnstableApiUsage` only,
 for the one platform call `build.gradle.kts` names.
 
-Ten rules are the script's own, because no IntelliJ inspection makes them:
+The script's own rules, because no IntelliJ inspection makes them. This table is the one list of them: `UnlistedRule` fails the gate when it leaves out a rule the script reports, or names one it no longer does.
 
 | Rule                            | What it forbids                                                                                                                                                                                 |
 |---------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -285,6 +285,11 @@ Ten rules are the script's own, because no IntelliJ inspection makes them:
 | `HtmlParagraphInMarkdown`       | A bare `<p>` in a Markdown file, which turns what follows into raw HTML                                                                                                                         |
 | `MisalignedMarkdownTable`       | A Markdown table whose column borders do not line up row under row, which reads as a wall of pipes in a diff or a terminal                                                                      |
 | `HelperNamedLikeTest`           | A helper in a JUnit 3 test whose name starts with `test`, which the IDE reads as a broken test                                                                                                  |
+| `UnusedLambdaParameter`         | A lambda parameter nothing reads and not written as `_`, which the headless inspector never reports                                                                                             |
+| `QualifiedClassName`            | A class written by its package path mid-line instead of imported                                                                                                                                |
+| `DuplicatedDisplayString`       | A string a tester reads that another file also writes, so it has no owner                                                                                                                       |
+| `UsedFromContentModule`         | A declaration the inspector calls unused that a content module calls, until it is marked `@FromContentModule`                                                                                   |
+| `UnlistedRule`                  | A rule this script reports that this table does not name, or a row naming one it no longer reports                                                                                              |
 
 The inspector's rules are named one by one in
 `.idea/inspectionProfiles/Testin.xml`, so the gate does not depend on what a
