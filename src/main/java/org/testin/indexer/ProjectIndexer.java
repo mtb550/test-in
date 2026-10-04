@@ -37,6 +37,8 @@ import org.testin.testproject.BoundTestProject;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -306,13 +308,7 @@ public final class ProjectIndexer {
         if (root.toString().isEmpty()) return byName;
 
         for (final Path path : collectValidProjects(root)) {
-            final @NotNull String name = path.getFileName().toString();
-            try {
-                byName.put(name, directoryMapper.getTestProjectNode(path).getMarker().getStatus());
-
-            } catch (final Exception ex) {
-                Logger.warn("Could not read test project '" + name + "': " + FailureText.of(ex));
-            }
+            byName.put(path.getFileName().toString(), directoryMapper.getTestProjectNode(path).getMarker().getStatus());
         }
 
         return byName;
@@ -325,7 +321,7 @@ public final class ProjectIndexer {
         final Path[] projectPaths;
         try (Stream<Path> dirs = Files.list(rootPath)) {
             projectPaths = dirs.filter(Files::isDirectory).toArray(Path[]::new);
-        } catch (final Exception ex) {
+        } catch (final IOException | UncheckedIOException ex) {
             Logger.error("Failed to list root directory: " + FailureText.of(ex));
             return Collections.emptyList();
         }

@@ -30,6 +30,9 @@ import org.testin.util.Mapper;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,7 +53,7 @@ public final class CopiedTestCases {
             });
 
             return parsed.stream().filter(Objects::nonNull).toList();
-        } catch (final Exception ex) {
+        } catch (final UnsupportedFlavorException | IOException | UncheckedIOException ex) {
             Logger.warn("[WARNING] Failed to parse clipboard JSON: " + FailureText.of(ex));
             return List.of();
         }

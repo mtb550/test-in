@@ -223,15 +223,11 @@ shows its empty state instead.
 project, and it is skipped without a word. This is the ordinary case. The
 Testin folder usually holds other things.
 
-**If a folder cannot be turned into a test project at all** — the tester gets a
-notification titled **Read Test Project Failed**, reading
-*Skipping invalid format:* and the file name. That whole test project is left
-out. A damaged `.tp` file is not this case: it is read as defaults, like any
-damaged marker below.
-
-**If a test set, package or test run folder cannot be turned into a node** — the
-same notification, titled for that kind of node. The message reads *Failed to
-parse directory:* and the file name.
+**If Testin itself fails while reading a test project** — not a file it cannot
+read, but a fault in Testin — the test project is not counted as read, and the
+tester is told it could not be read and why (Rule-INTERNAL-124). A damaged file
+is never reported this way: a damaged `.tp` or other marker is read as defaults,
+and an unreadable test case or result is left out as described below.
 
 **If a marker file is missing** — nothing is said. A node just created has no
 marker yet, so Testin uses defaults and the node appears normally.

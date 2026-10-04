@@ -29,6 +29,7 @@ import org.testin.model.markers.TestRunMarker;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +66,7 @@ final class PendingChangeFactory {
         try {
             return mapper.readValue(json, new TypeReference<>() {
             });
-        } catch (final RuntimeException unreadable) {
+        } catch (final UncheckedIOException unreadable) {
             return Map.of();
         }
     }

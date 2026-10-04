@@ -53,9 +53,12 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -182,11 +185,15 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private @NotNull List<DirectoryDto> nodesOf(final @NotNull Transferable contents) {
+        return payloadOf(contents).map(payload -> List.of(payload.nodes())).orElseGet(List::of);
+    }
+
+    private static @NotNull Optional<TreeTransferPayload> payloadOf(final @NotNull Transferable contents) {
         try {
-            return List.of(((TreeTransferPayload) contents.getTransferData(NODE_FLAVOR)).nodes());
-        } catch (final Exception ex) {
+            return Optional.of((TreeTransferPayload) contents.getTransferData(NODE_FLAVOR));
+        } catch (final UnsupportedFlavorException | IOException ex) {
             Logger.debug("Clipboard no longer holds tree nodes: " + FailureText.of(ex));
-            return List.of();
+            return Optional.empty();
         }
     }
 
@@ -215,15 +222,9 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private boolean anySourceLands(final @NotNull TransferSupport support, final @NotNull DirectoryDto target) {
-        try {
-            final @NotNull TreeTransferPayload payload = (TreeTransferPayload) support.getTransferable().getTransferData(NODE_FLAVOR);
-            for (final DirectoryDto source : payload.nodes()) {
-                if (canTransferInto(source, target)) return true;
-            }
-            return false;
-        } catch (final Exception ex) {
-            return true;
-        }
+        return payloadOf(support.getTransferable())
+                .map(payload -> Arrays.stream(payload.nodes()).anyMatch(source -> canTransferInto(source, target)))
+                .orElse(true);
     }
 
     // UC-TREE-PANEL-013, UC-TREE-PANEL-014, Rule-TREE-PANEL-006
@@ -373,12 +374,7 @@ public class TreeTransferHandler extends TransferHandler {
 
     // UC-TREE-PANEL-013, Rule-TREE-PANEL-050
     private boolean isCut(final @NotNull Transferable contents) {
-        try {
-            return ((TreeTransferPayload) contents.getTransferData(NODE_FLAVOR)).clipboardAction() == MOVE;
-        } catch (final Exception ex) {
-            Logger.debug("Clipboard no longer holds tree nodes: " + FailureText.of(ex));
-            return false;
-        }
+        return payloadOf(contents).map(payload -> payload.clipboardAction() == MOVE).orElse(false);
     }
 
     // UC-TREE-PANEL-013, Rule-TREE-PANEL-050

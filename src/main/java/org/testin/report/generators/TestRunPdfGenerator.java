@@ -16,7 +16,6 @@
 
 package org.testin.report.generators;
 
-import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
@@ -63,6 +62,8 @@ import org.testin.util.FailureText;
 import org.testin.util.ReportFont;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -207,11 +208,9 @@ public final class TestRunPdfGenerator {
             sayWhatWasLeftOut(p);
             return baos.toByteArray();
 
-        } catch (final ProcessCanceledException stopped) {
-            throw stopped;
-        } catch (final Exception ex) {
+        } catch (final IOException ex) {
             Logger.error("PDF generation failed: " + FailureText.of(ex));
-            throw new RuntimeException(ex);
+            throw new UncheckedIOException(ex);
         }
     }
 

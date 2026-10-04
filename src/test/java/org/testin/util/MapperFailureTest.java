@@ -19,6 +19,9 @@ package org.testin.util;
 import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -61,6 +64,14 @@ public class MapperFailureTest {
 
         assertEquals(readBack.getDescription(), original.getDescription());
         assertEquals(readBack.getId(), original.getId());
+    }
+
+    @Test
+    public void aFileThatIsNotJsonFailsAsUnreadableAndNamesWhatWasExpected() {
+        final UncheckedIOException failure = expectThrows(UncheckedIOException.class,
+                () -> RealMapper.build().readValue("not json".getBytes(StandardCharsets.UTF_8), TestCaseDto.class));
+
+        assertTrue(String.valueOf(failure.getMessage()).contains("TestCaseDto"), "the message names what could not be read: " + failure.getMessage());
     }
 
     private static final class NotSerializable {

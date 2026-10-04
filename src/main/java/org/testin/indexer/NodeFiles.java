@@ -30,6 +30,7 @@ import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -205,7 +206,7 @@ final class NodeFiles {
             Files.delete(testCaseFile);
             return true;
 
-        } catch (final Exception ex) {
+        } catch (final IOException | UncheckedIOException ex) {
             Logger.error("Could not give the copied test case " + testCaseFile.getFileName() + " a new id: " + FailureText.of(ex));
             return false;
         }

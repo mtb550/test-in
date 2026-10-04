@@ -32,6 +32,7 @@ import org.testin.util.Bundle;
 import org.testin.util.FailureText;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -79,7 +80,7 @@ final class GitCommandRunner {
             return file;
         } catch (final IOException ex) {
             Logger.error("Could not write the Git pathspec file: " + FailureText.of(ex));
-            throw new IllegalStateException("Could not write the Git pathspec file: " + FailureText.of(ex));
+            throw new UncheckedIOException(ex);
         }
     }
 
@@ -102,7 +103,7 @@ final class GitCommandRunner {
         } catch (final VcsException ex) {
             final @NotNull String details = GitSafeText.withoutCredentials(FailureText.of(ex));
             Logger.error("Git command failed: " + details);
-            throw new IllegalStateException(Bundle.message("git.command.failed", details));
+            throw new GitFailed(Bundle.message("git.command.failed", details));
         }
     }
 
@@ -156,7 +157,7 @@ final class GitCommandRunner {
                             : result.getErrorOutputAsJoinedString());
 
             Logger.error("Git command failed: " + details);
-            throw new IllegalStateException(Bundle.message("git.command.failed", details));
+            throw new GitFailed(Bundle.message("git.command.failed", details));
         }
         return result.getOutputAsJoinedString();
     }

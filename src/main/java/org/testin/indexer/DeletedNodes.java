@@ -26,6 +26,7 @@ import org.testin.logger.Logger;
 import org.testin.services.Services;
 import org.testin.util.FailureText;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -66,7 +67,7 @@ public final class DeletedNodes {
 
             return Optional.of(kept);
 
-        } catch (final Exception ex) {
+        } catch (final IOException ex) {
             Logger.warn("Could not keep " + node + " aside, so removing it will not be undoable: " + FailureText.of(ex));
             return Optional.empty();
         }
@@ -88,7 +89,7 @@ public final class DeletedNodes {
 
             return true;
 
-        } catch (final Exception ex) {
+        } catch (final IOException ex) {
             Logger.error("Could not restore " + original + " from " + kept + ": " + FailureText.of(ex));
             return false;
         }

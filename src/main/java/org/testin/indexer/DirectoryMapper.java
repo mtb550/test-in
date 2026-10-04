@@ -38,10 +38,7 @@ import org.testin.model.markers.TestRunPackageMarker;
 import org.testin.model.markers.TestRunsMainDirectoryMarker;
 import org.testin.model.markers.TestSetMarker;
 import org.testin.model.markers.TestSetPackageMarker;
-import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.Bundle;
-import org.testin.util.FailureText;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -72,30 +69,23 @@ public final class DirectoryMapper {
     // UC-INTERNAL-002, Rule-INTERNAL-014
     public @NotNull TestProjectDirectoryDto getTestProjectNode(final @NotNull Path path) {
         final @NotNull String fileName = path.getFileName().toString();
-        try {
-            final @NotNull TestProjectMarker marker = Services.getInstance(p, Nodes.class).readMarker(path, DirectoryType.TP, TestProjectMarker.class);
+        final @NotNull TestProjectMarker marker = Services.getInstance(p, Nodes.class).readMarker(path, DirectoryType.TP, TestProjectMarker.class);
 
-            final @NotNull TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
-                    .name(fileName)
-                    .path(path)
-                    .path2(DirectoryDto.pathOf(List.of(), fileName))
-                    .marker(marker)
-                    .build();
+        final @NotNull TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
+                .name(fileName)
+                .path(path)
+                .path2(DirectoryDto.pathOf(List.of(), fileName))
+                .marker(marker)
+                .build();
 
-            final @NotNull TestCasesMainDirectoryDto tcd = getTestCasesRootNode(tp.getPath(), tp);
-            final @NotNull TestRunsMainDirectoryDto trd = getTestRunsRootNode(path, tp);
+        final @NotNull TestCasesMainDirectoryDto tcd = getTestCasesRootNode(tp.getPath(), tp);
+        final @NotNull TestRunsMainDirectoryDto trd = getTestRunsRootNode(path, tp);
 
-            tp.setTestCasesDirectory(tcd);
-            tp.setTestRunsDirectory(trd);
+        tp.setTestCasesDirectory(tcd);
+        tp.setTestRunsDirectory(trd);
 
-            Logger.info("retrieve the project directory: " + tp);
-            return tp;
-
-        } catch (final Exception ex) {
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("mapper.read.project.failed"), Bundle.message("mapper.skipping.invalid", fileName));
-            Logger.error("readTestProjectNode: Failed to parse project '" + fileName + "' at " + path.toAbsolutePath() + ": " + FailureText.of(ex));
-            throw new RuntimeException(ex);
-        }
+        Logger.info("retrieve the project directory: " + tp);
+        return tp;
     }
 
     public @NotNull TestCasesMainDirectoryDto getTestCasesRootNode(final @NotNull Path path, final @NotNull TestProjectDirectoryDto tp) {
@@ -123,70 +113,49 @@ public final class DirectoryMapper {
     // UC-INTERNAL-002, Rule-INTERNAL-014
     public @NotNull TestSetPackageDirectoryDto getTestSetPackageNode(final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final @NotNull String fileName = path.getFileName().toString();
-        try {
-            TestSetPackageDirectoryDto testSetPackageDirectoryDto = TestSetPackageDirectoryDto
-                    .builder()
-                    .name(fileName)
-                    .path(path)
-                    .parent(parent)
-                    .path2(DirectoryDto.pathOf(parent.getPath2(), fileName))
-                    .marker(Services.getInstance(p, Nodes.class).readMarker(path, DirectoryType.TSP, TestSetPackageMarker.class))
-                    .build();
+        TestSetPackageDirectoryDto testSetPackageDirectoryDto = TestSetPackageDirectoryDto
+                .builder()
+                .name(fileName)
+                .path(path)
+                .parent(parent)
+                .path2(DirectoryDto.pathOf(parent.getPath2(), fileName))
+                .marker(Services.getInstance(p, Nodes.class).readMarker(path, DirectoryType.TSP, TestSetPackageMarker.class))
+                .build();
 
-            Logger.info("retrieve the test set package directory: " + testSetPackageDirectoryDto);
-            return testSetPackageDirectoryDto;
-
-        } catch (final Exception ex) {
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("mapper.read.test.set.package.failed"), Bundle.message("mapper.parse.directory.failed", fileName));
-            Logger.error("readTestSetPackageNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + FailureText.of(ex));
-            throw new RuntimeException(ex);
-        }
+        Logger.info("retrieve the test set package directory: " + testSetPackageDirectoryDto);
+        return testSetPackageDirectoryDto;
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
     public @NotNull TestRunPackageDirectoryDto getTestRunPackageNode(final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final @NotNull String fileName = path.getFileName().toString();
-        try {
-            TestRunPackageDirectoryDto testRunPackageDirectoryDto = TestRunPackageDirectoryDto
-                    .builder()
-                    .name(fileName)
-                    .path(path)
-                    .parent(parent)
-                    .path2(DirectoryDto.pathOf(parent.getPath2(), fileName))
-                    .marker(Services.getInstance(p, Nodes.class).readMarker(path, DirectoryType.TRP, TestRunPackageMarker.class))
-                    .build();
+        TestRunPackageDirectoryDto testRunPackageDirectoryDto = TestRunPackageDirectoryDto
+                .builder()
+                .name(fileName)
+                .path(path)
+                .parent(parent)
+                .path2(DirectoryDto.pathOf(parent.getPath2(), fileName))
+                .marker(Services.getInstance(p, Nodes.class).readMarker(path, DirectoryType.TRP, TestRunPackageMarker.class))
+                .build();
 
-            Logger.info("retrieve the test run package directory: " + testRunPackageDirectoryDto);
-            return testRunPackageDirectoryDto;
-
-        } catch (final Exception ex) {
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("mapper.read.test.run.package.failed"), Bundle.message("mapper.parse.directory.failed", fileName));
-            Logger.error("readTestRunPackageNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + FailureText.of(ex));
-            throw new RuntimeException(ex);
-        }
+        Logger.info("retrieve the test run package directory: " + testRunPackageDirectoryDto);
+        return testRunPackageDirectoryDto;
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-014
     public @NotNull TestSetDirectoryDto getTestSetNode(final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final @NotNull String fileName = path.getFileName().toString();
-        try {
-            TestSetDirectoryDto testSetDirectoryDto = TestSetDirectoryDto
-                    .builder()
-                    .name(fileName)
-                    .path(path)
-                    .parent(parent)
-                    .path2(DirectoryDto.pathOf(parent.getPath2(), fileName))
-                    .marker(Services.getInstance(p, Nodes.class).readMarker(path, DirectoryType.TS, TestSetMarker.class))
-                    .build();
+        TestSetDirectoryDto testSetDirectoryDto = TestSetDirectoryDto
+                .builder()
+                .name(fileName)
+                .path(path)
+                .parent(parent)
+                .path2(DirectoryDto.pathOf(parent.getPath2(), fileName))
+                .marker(Services.getInstance(p, Nodes.class).readMarker(path, DirectoryType.TS, TestSetMarker.class))
+                .build();
 
-            Logger.info("retrieve the test set directory: " + testSetDirectoryDto);
-            return testSetDirectoryDto;
-
-        } catch (final Exception ex) {
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("mapper.read.test.set.failed"), Bundle.message("mapper.parse.directory.failed", fileName));
-            Logger.error("readTestSetNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + FailureText.of(ex));
-            throw new RuntimeException(ex);
-        }
+        Logger.info("retrieve the test set directory: " + testSetDirectoryDto);
+        return testSetDirectoryDto;
     }
 
     public @NotNull TestRunDirectoryDto setTestRunNode(final @NotNull Path path, final @NotNull DirectoryDto parent) {
@@ -201,24 +170,17 @@ public final class DirectoryMapper {
     // UC-INTERNAL-002, Rule-INTERNAL-014
     private @NotNull TestRunDirectoryDto buildTestRunNode(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull TestRunMarker marker) {
         final @NotNull String fileName = path.getFileName().toString();
-        try {
-            final var builder = TestRunDirectoryDto
-                    .builder()
-                    .name(fileName)
-                    .path(path)
-                    .parent(parent)
-                    .path2(DirectoryDto.pathOf(parent.getPath2(), fileName));
+        final var builder = TestRunDirectoryDto
+                .builder()
+                .name(fileName)
+                .path(path)
+                .parent(parent)
+                .path2(DirectoryDto.pathOf(parent.getPath2(), fileName));
 
-            builder.marker(marker);
+        builder.marker(marker);
 
-            final @NotNull TestRunDirectoryDto testRunDirectoryDto = builder.build();
-            Logger.info("retrieve the test run directory: " + testRunDirectoryDto);
-            return testRunDirectoryDto;
-
-        } catch (final Exception ex) {
-            Services.getInstance(p, Notifier.class).error(p, Bundle.message("mapper.read.test.run.failed"), Bundle.message("mapper.parse.directory.failed", fileName));
-            Logger.error("readTestRunNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + FailureText.of(ex));
-            throw new RuntimeException(ex);
-        }
+        final @NotNull TestRunDirectoryDto testRunDirectoryDto = builder.build();
+        Logger.info("retrieve the test run directory: " + testRunDirectoryDto);
+        return testRunDirectoryDto;
     }
 }

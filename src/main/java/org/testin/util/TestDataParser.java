@@ -28,11 +28,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -92,14 +94,14 @@ public final class TestDataParser {
         if (value.isBlank()) return Optional.of(Config.NOT_EXECUTED);
 
         final @NotNull String text = value.trim();
-        try {
-            return Optional.of(ZonedDateTime.parse(text.replaceFirst("^\\p{L}+\\s+", ""), WITHOUT_WEEKDAY));
-        } catch (final Exception ignored) {
-        }
+        return parsed(() -> ZonedDateTime.parse(text.replaceFirst("^\\p{L}+\\s+", ""), WITHOUT_WEEKDAY))
+                .or(() -> parsed(() -> LocalDateTime.parse(text, Config.EXCEL_DATE_FORMATTER).atZone(ZoneId.systemDefault())));
+    }
 
+    private static @NotNull Optional<ZonedDateTime> parsed(final @NotNull Supplier<ZonedDateTime> parse) {
         try {
-            return Optional.of(LocalDateTime.parse(text, Config.EXCEL_DATE_FORMATTER).atZone(ZoneId.systemDefault()));
-        } catch (final Exception unreadable) {
+            return Optional.of(parse.get());
+        } catch (final DateTimeParseException notThisFormat) {
             return Optional.empty();
         }
     }

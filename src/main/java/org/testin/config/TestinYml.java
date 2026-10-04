@@ -17,6 +17,7 @@
 package org.testin.config;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -349,7 +350,7 @@ public final class TestinYml {
             Logger.info("Read " + source + ": test project '" + config.projectName() + "'");
             return new Parsed(config, true);
 
-        } catch (final Exception ex) {
+        } catch (final JsonProcessingException ex) {
             Logger.warn("Malformed " + source + ", ignored: " + FailureText.of(ex));
             return new Parsed(TestinProjectConfig.EMPTY, false);
         }

@@ -103,7 +103,7 @@ public final class GitCommits {
     public @NotNull String headCommitId(final @NotNull Path repositoryPath) {
         try {
             return GitCommandRunner.execute(p, repositoryPath, GitCommand.REV_PARSE, "--short", "HEAD").trim();
-        } catch (final RuntimeException ex) {
+        } catch (final GitFailed ex) {
             Logger.warn("Could not read the commit id: " + FailureText.of(ex));
             return "";
         }
@@ -135,8 +135,8 @@ public final class GitCommits {
     private boolean remoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String remoteUrl, final @NotNull String branch) {
         try {
             return !GitCommandRunner.executeRemote(p, repositoryPath, remoteUrl, GitCommand.LS_REMOTE, "--heads", remote, branch).isBlank();
-        } catch (final RuntimeException ex) {
-            throw new IllegalStateException(Bundle.message("git.error.remote.unreachable", remote, branch, FailureText.of(ex)), ex);
+        } catch (final GitFailed ex) {
+            throw new GitFailed(Bundle.message("git.error.remote.unreachable", remote, branch, FailureText.of(ex)), ex);
         }
     }
 

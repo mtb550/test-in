@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -59,7 +60,7 @@ public final class TestinFileWatcher implements AsyncFileListener {
     private static @NotNull Optional<Path> changedFile(final @NotNull VFileEvent event) {
         try {
             return Optional.of(Path.of(event.getPath()));
-        } catch (final RuntimeException notAFileSystemPath) {
+        } catch (final InvalidPathException notAFileSystemPath) {
             return Optional.empty();
         }
     }

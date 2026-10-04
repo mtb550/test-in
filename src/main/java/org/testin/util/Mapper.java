@@ -16,6 +16,7 @@
 
 package org.testin.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,6 +29,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
 @Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -42,50 +46,39 @@ public final class Mapper {
     public @NotNull <T> T readValue(final byte @NotNull [] src, final @NotNull Class<T> valueType) {
         try {
             return mapper.readValue(src, valueType);
-
-        } catch (final Exception ex) {
-            Logger.error("Failed to parse JSON bytes to class " + valueType.getSimpleName() + ": " + FailureText.of(ex));
-            throw new IllegalStateException(FailureText.of(ex), ex);
+        } catch (final IOException ex) {
+            throw unreadable(valueType.getSimpleName(), ex);
         }
     }
 
     public @NotNull <T> T readValue(final byte @NotNull [] src, final @NotNull TypeReference<T> valueTypeRef) {
         try {
             return mapper.readValue(src, valueTypeRef);
-
-        } catch (final Exception ex) {
-            Logger.error("Failed to parse JSON bytes to TypeReference: " + FailureText.of(ex));
-            throw new IllegalStateException(FailureText.of(ex), ex);
+        } catch (final IOException ex) {
+            throw unreadable(valueTypeRef.getType().getTypeName(), ex);
         }
     }
 
     public @NotNull <T> T readValue(final @NotNull String content, final @NotNull Class<T> valueType) {
         try {
             return mapper.readValue(content, valueType);
-
-        } catch (final Exception ex) {
-            Logger.error("Failed to parse JSON string to class " + valueType.getSimpleName());
-            throw new IllegalStateException(FailureText.of(ex), ex);
+        } catch (final JsonProcessingException ex) {
+            throw unreadable(valueType.getSimpleName(), ex);
         }
     }
 
     public @NotNull <T> T readValue(final @NotNull String content, final @NotNull TypeReference<T> valueTypeRef) {
         try {
             return mapper.readValue(content, valueTypeRef);
-
-        } catch (final Exception ex) {
-            Logger.error("Failed to parse JSON string to TypeReference.");
-            throw new IllegalStateException(FailureText.of(ex), ex);
+        } catch (final JsonProcessingException ex) {
+            throw unreadable(valueTypeRef.getType().getTypeName(), ex);
         }
     }
 
     public byte @NotNull [] writeValueAsBytes(final @NotNull Object value) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(value);
-
-        } catch (final Exception ex) {
-            Logger.error("Failed to serialize object to bytes: " + value.getClass().getSimpleName());
-            Logger.error("Exception: " + FailureText.of(ex));
+        } catch (final JsonProcessingException ex) {
             throw new IllegalStateException("Could not serialize " + value.getClass().getSimpleName(), ex);
         }
     }
@@ -93,9 +86,7 @@ public final class Mapper {
     public @NotNull String writeValueAsString(final @NotNull Object value) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);
-
-        } catch (final Exception ex) {
-            Logger.error("Failed to serialize object to string: " + value.getClass().getSimpleName());
+        } catch (final JsonProcessingException ex) {
             throw new IllegalStateException("Could not serialize " + value.getClass().getSimpleName(), ex);
         }
     }
@@ -104,10 +95,13 @@ public final class Mapper {
         try {
             final @NotNull JsonNode node = mapper.readTree(content);
             return node instanceof ObjectNode object ? object : mapper.createObjectNode();
-
-        } catch (final Exception ex) {
+        } catch (final JsonProcessingException ex) {
             Logger.debug("Mapper.readTree() could not parse the content: " + FailureText.of(ex));
             return mapper.createObjectNode();
         }
+    }
+
+    private static @NotNull UncheckedIOException unreadable(final @NotNull String type, final @NotNull IOException ex) {
+        return new UncheckedIOException("Not a readable " + type + ": " + FailureText.of(ex), ex);
     }
 }

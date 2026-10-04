@@ -27,6 +27,7 @@ import org.testin.util.Mapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -56,7 +57,7 @@ public class ImportJson {
             return Files.readAllBytes(file.toPath());
         } catch (final IOException ex) {
             Logger.error("JSON import could not read " + file + ": " + FailureText.of(ex));
-            throw new IllegalStateException(FailureText.of(ex), ex);
+            throw new UncheckedIOException(ex);
         }
     }
 

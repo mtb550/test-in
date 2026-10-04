@@ -27,6 +27,8 @@ import org.testin.setting.AppSettingsState;
 import org.testin.util.FailureText;
 import org.testin.util.Mapper;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
@@ -61,7 +63,7 @@ final class MarkerFiles {
         try {
             return mapper.readValue(Files.readAllBytes(markerFile), markerClass);
 
-        } catch (final Exception ex) {
+        } catch (final IOException | UncheckedIOException ex) {
             Logger.warn("Unreadable " + kind.getMarkerKind() + " marker " + markerFile + ", using defaults: " + FailureText.of(ex));
 
             damaged.add(dirPath);
@@ -99,7 +101,7 @@ final class MarkerFiles {
 
             return testDataFiles.write(markerFile, marker);
 
-        } catch (final Exception ex) {
+        } catch (final IOException | UncheckedIOException ex) {
             Logger.warn("Left the copied marker " + markerFile + " without an id of its own: " + FailureText.of(ex));
             return false;
         }
@@ -109,7 +111,7 @@ final class MarkerFiles {
         try {
             mapper.readValue(Files.readAllBytes(file), markerClass);
             return true;
-        } catch (final Exception unreadable) {
+        } catch (final IOException | UncheckedIOException unreadable) {
             return false;
         }
     }
@@ -151,8 +153,8 @@ final class MarkerFiles {
     private <M> @NotNull M defaultFor(final @NotNull Class<M> markerClass, final @NotNull DirectoryType kind) {
         try {
             return markerClass.getDeclaredConstructor().newInstance();
-        } catch (final Exception ex) {
-            throw new RuntimeException("Cannot create default " + kind.getMarkerKind() + " marker", ex);
+        } catch (final ReflectiveOperationException ex) {
+            throw new IllegalStateException("Cannot create default " + kind.getMarkerKind() + " marker", ex);
         }
     }
 }

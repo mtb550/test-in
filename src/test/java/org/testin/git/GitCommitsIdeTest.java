@@ -52,7 +52,7 @@ public class GitCommitsIdeTest extends AbstractGitRemoteIdeTest {
         try {
             commits().pullWhereTheRemoteHasBranch(work, "origin", remoteUrl(), MAIN);
             fail("the pull was expected to stop on the conflict");
-        } catch (final IllegalStateException expected) {
+        } catch (final GitFailed expected) {
             assertTrue(new GitRepositoryService(getProject()).unfinished(work).isPresent());
         }
     }
@@ -167,7 +167,7 @@ public class GitCommitsIdeTest extends AbstractGitRemoteIdeTest {
         try {
             commits().pullAndPush(work, "origin", nowhere, MAIN);
             fail("a remote that cannot be asked was taken for one with no branch");
-        } catch (final IllegalStateException refused) {
+        } catch (final GitFailed refused) {
             final @NotNull String reason = String.valueOf(refused.getMessage());
             assertTrue(reason, reason.startsWith(Bundle.message("git.error.remote.unreachable", "origin", MAIN, "").strip()));
             assertTrue("the message gives the reason Git gave: " + reason, reason.length() > Bundle.message("git.error.remote.unreachable", "origin", MAIN, "").length());

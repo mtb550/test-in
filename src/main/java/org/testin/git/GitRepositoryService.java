@@ -172,7 +172,7 @@ public final class GitRepositoryService {
 
         try {
             return GitCommandRunner.readObjects(p, path, revision, relativePaths);
-        } catch (final RuntimeException ex) {
+        } catch (final GitFailed ex) {
             Logger.warn("Could not read " + relativePaths.size() + " files at " + revision + " in " + path + ": " + FailureText.of(ex));
             return Map.of();
         }
@@ -226,7 +226,7 @@ public final class GitRepositoryService {
     private @NotNull Optional<String> run(final @NotNull Path path, final @NotNull GitCommand command, final @NotNull String... parameters) {
         try {
             return Optional.of(GitCommandRunner.execute(p, path, command, parameters));
-        } catch (final RuntimeException ex) {
+        } catch (final GitFailed ex) {
             Logger.debug("git " + command.name() + " " + GitSafeText.withoutCredentials(String.join(" ", parameters))
                     + " failed in " + path + ": " + FailureText.of(ex));
             return Optional.empty();

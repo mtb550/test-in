@@ -244,8 +244,8 @@ final class IndexingScanner {
                         .forEach(subPath -> scanTestSetOrPackage(subPath, tsp, indicator, unread, scanned));
             }
 
-        } catch (final Exception ex) {
-            Logger.error("Failed to scan test set package: " + path.getFileName());
+        } catch (final IOException | UncheckedIOException ex) {
+            Logger.error("Failed to scan test set package: " + path.getFileName() + ": " + FailureText.of(ex));
         }
     }
 
@@ -279,7 +279,7 @@ final class IndexingScanner {
                                 }
 
                                 testCaseIds.add(tc.getId());
-                            } catch (final Exception ex) {
+                            } catch (final IOException | UncheckedIOException ex) {
                                 Logger.error("Failed to read test case '" + filePath.toAbsolutePath() +
                                         "': " + FailureText.of(ex));
 
@@ -293,7 +293,7 @@ final class IndexingScanner {
 
             indicator.setText(Bundle.message("indexer.progress.test.set", ts.getName(), String.valueOf(testCaseIds.size())));
 
-        } catch (final Exception ex) {
+        } catch (final IOException | UncheckedIOException ex) {
             Logger.error("Failed to scan test set '" +
                     path.getFileName().toString() + "': " + FailureText.of(ex));
         }
@@ -338,8 +338,8 @@ final class IndexingScanner {
                         .forEach(subPath -> scanTestRunOrPackage(subPath, trp, indicator, unread, scanned));
             }
 
-        } catch (final Exception ex) {
-            Logger.error("Failed to scan test run package: " + path.getFileName());
+        } catch (final IOException | UncheckedIOException ex) {
+            Logger.error("Failed to scan test run package: " + path.getFileName() + ": " + FailureText.of(ex));
         }
     }
 
@@ -353,27 +353,21 @@ final class IndexingScanner {
     private boolean holdsTestCases(final @NotNull Path dirPath) {
         try (Stream<Path> files = Files.list(dirPath)) {
             return files.filter(Files::isRegularFile).anyMatch(IndexingScanner::looksLikeATestCaseFile);
-        } catch (final Exception unreadable) {
+        } catch (final IOException | UncheckedIOException unreadable) {
             return false;
         }
     }
 
     // UC-INTERNAL-002
     private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator, final @NotNull ScannedProject scanned) {
-        try {
-            final @NotNull TestRunDirectoryDto tr = directoryMapper.getTestRunNode(path, parent);
+        final @NotNull TestRunDirectoryDto tr = directoryMapper.getTestRunNode(path, parent);
 
-            scanned.getTestRunDirs().put(path.toString(), tr);
+        scanned.getTestRunDirs().put(path.toString(), tr);
 
-            // Rule-INTERNAL-011
-            scanned.getTestRuns().put(path.toString(), new TestRunDto().setResults(resultsIn(path, scanned)));
+        // Rule-INTERNAL-011
+        scanned.getTestRuns().put(path.toString(), new TestRunDto().setResults(resultsIn(path, scanned)));
 
-            indicator.setText(Bundle.message("indexer.progress.test.run", path.getFileName()));
-
-        } catch (final Exception ex) {
-            Logger.error("Failed to scan test run '" +
-                    path.getFileName().toString() + "': " + FailureText.of(ex));
-        }
+        indicator.setText(Bundle.message("indexer.progress.test.run", path.getFileName()));
     }
 
     // UC-INTERNAL-002, Rule-INTERNAL-011, Rule-INTERNAL-012
@@ -393,7 +387,7 @@ final class IndexingScanner {
                 item.setId(id.orElseThrow());
                 read.add(item);
 
-            } catch (final Exception ex) {
+            } catch (final IOException | UncheckedIOException ex) {
                 Logger.error("Failed to read the result '" + file.toAbsolutePath() + "': " + FailureText.of(ex));
                 scanned.getUnreadableResults().add(testRunPath.getFileName() + "/" + file.getFileName());
             }
