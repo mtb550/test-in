@@ -271,6 +271,12 @@ A new `@SuppressWarnings` or `//noinspection` fails the gate too, through the
 `SuppressionAnnotation` inspection. The profile allows `UnstableApiUsage` only,
 for the one platform call `build.gradle.kts` names.
 
+The spell check is part of the gate as well. A misspelled word is corrected in
+the text. A word that cannot be corrected - an IntelliJ API, a command such as
+`xvfb` or `ulimit`, a library's name - goes into
+`.idea/dictionaries/project.xml`, the project dictionary every clone shares. It
+is never renamed into something wrong to quiet the check, and never suppressed.
+
 The script's own rules, because no IntelliJ inspection makes them. This table is the one list of them: `UnlistedRule` fails the gate when it leaves out a rule the script reports, or names one it no longer does.
 
 | Rule                            | What it forbids                                                                                                                                                                                 |

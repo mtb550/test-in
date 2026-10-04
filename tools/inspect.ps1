@@ -81,6 +81,12 @@ param(
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
 
+# The spell check has no exceptions: not the Inspected scope, and not the All
+# entries in qodana.yaml, which excuse the legal texts and the wrapper scripts
+# from every other inspection. A word it cannot correct - an IntelliJ API, a
+# command, a library - goes into .idea/dictionaries/project.xml instead.
+$spelling = 'SpellCheckingInspection'
+
 # Whether the caller narrowed this run. Asked of PSBoundParameters rather than
 # of the value, because "-Subdirectory ''" is a real request - inspect the
 # project root - and a value cannot tell that from having no value at all.
@@ -200,8 +206,15 @@ function Select-Inspected([object[]] $problems) {
         if ($target.EndsWith('//*')) { $folders += $target.Substring(0, $target.Length - 3) + '/' } else { $files += $target }
     }
 
+    # The spell check reads every file Git tracks, not only the scope: a typo in
+    # CHANGELOG.md or a gradle.properties comment is as public as one in src.
+    # What it must not read is the same as for every rule - .sandbox and the
+    # other folders nobody here writes - and those are not tracked.
+    $tracked = [System.Collections.Generic.HashSet[string]]::new([string[]] @(git -C $repo ls-files))
+
     $problems | Where-Object {
         $path = $_.Path.TrimEnd('/')
+        if ($_.Inspection -eq $spelling) { return $tracked.Contains($path) }
         ($files -contains $path) -or @($folders | Where-Object { $path.StartsWith($_) }).Count -gt 0
     }
 }
@@ -1530,7 +1543,7 @@ $exceptions = @(Read-Exceptions)
 
 function Test-Gated([object] $problem) {
     $excused = $exceptions | Where-Object {
-        ($_.Name -eq 'All' -or $_.Name -eq $problem.Inspection) -and
+        (($_.Name -eq 'All' -and $problem.Inspection -ne $spelling) -or $_.Name -eq $problem.Inspection) -and
             (-not $_.Paths.Count -or @($_.Paths | Where-Object { $problem.Path -eq $_ -or $problem.Path.StartsWith("$_/") }).Count)
     }
     return -not @($excused).Count
