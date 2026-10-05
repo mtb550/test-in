@@ -79,6 +79,10 @@ summary line in the Details tab.
 - **Rule-VIEW-PANEL-089** — The message that says a bug was reported keeps its
   **Open** after it is pressed, so the issue can be opened again from the same
   message.
+- **Rule-VIEW-PANEL-104** — When Report Bug cannot send because testin.yml has
+  no usable bugRepoUrl, Testin Help shows the reason as a hint with a bugRepoUrl
+  field. Only Apply writes it: the one bugRepoUrl line of testin.yml, every
+  other line kept. Then testin.yml opens.
 
 ## The bug on the summary line
 

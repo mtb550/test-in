@@ -428,6 +428,11 @@ intellijPlatform {
 tasks {
     processResources {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+        from(layout.projectDirectory.dir("docs")) {
+            include("**/*.md")
+            into("docs")
+        }
     }
 
     // Everything both test tasks need. The runner is not here: `test` is TestNG

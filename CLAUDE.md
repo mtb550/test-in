@@ -33,7 +33,7 @@ going stale (#99).
 The fifth is not in that document, because it is about where a value is kept
 rather than how the plugin is shaped:
 
-### A setting is application level; `testin.yml` is written by one button
+### A setting is application level; `testin.yml` is written only on the tester's click
 
 Where a value lives is decided by who it belongs to, not by what it is about.
 
@@ -46,7 +46,8 @@ Where a value lives is decided by who it belongs to, not by what it is about.
 - **The repository's config is `testin.yml`, and it is the team's.** Which test
   project this repository drives, and how it is shared. It is committed, so a
   clone needs no setup, and it names no machine and no person. **Testin writes
-  it only when the tester presses Save to testin.yml** in the panel's title bar,
+  it only on the tester's own click**: Save to testin.yml in the panel's title
+  bar, or Apply in the bugRepoUrl hint of Testin Help (Decision-013),
   and everything works without it - except the automation code, which stays off
   until the file names the open test project (Rule-CODEGEN-082, `codegen/CodeOn`).
   One class reads and writes it, `config/TestinYml`; its values are

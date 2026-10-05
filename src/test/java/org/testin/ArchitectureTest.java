@@ -50,7 +50,8 @@ public class ArchitectureTest {
             "org.testin.importexport..", "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..",
             "org.testin.search..", "org.testin.undo..", "org.testin.rename..", "org.testin.remove..",
             "org.testin.open..", "org.testin.clipboard..", "org.testin.runner..", "org.testin.notifications..",
-            "org.testin.setting..", "org.testin.config..", "org.testin.actions..", "org.testin.bug.."
+            "org.testin.setting..", "org.testin.config..", "org.testin.actions..", "org.testin.bug..",
+            "org.testin.help.."
     };
     private static final @NotNull Set<String> MODEL_LEAF_EXCEPTIONS = Set.of();
     private static final String @NotNull [] FEATURES = {
@@ -59,7 +60,7 @@ public class ArchitectureTest {
             "org.testin.git..", "org.testin.report..", "org.testin.importexport..",
             "org.testin.testcase..", "org.testin.testrun..", "org.testin.testproject..", "org.testin.search..",
             "org.testin.undo..", "org.testin.rename..", "org.testin.remove..", "org.testin.open..",
-            "org.testin.clipboard..", "org.testin.runner..", "org.testin.bug.."
+            "org.testin.clipboard..", "org.testin.runner..", "org.testin.bug..", "org.testin.help.."
     };
     private static final @NotNull Set<String> UTIL_EXCEPTIONS = Set.of();
     private static final @NotNull Set<String> FILE_ACCESS_EXCEPTIONS = Set.of("org.testin.ui.framework.TextInput");
@@ -216,14 +217,20 @@ public class ArchitectureTest {
 
     // Rule-INTERNAL-089
     @Test
-    public void onlyTheSaveButtonWritesTheConfigFile() {
+    public void onlyAnExplicitGestureWritesTheConfigFile() {
         final @NotNull ArchRule oneCaller = methods()
                 .that().areDeclaredIn("org.testin.config.TestinYml")
                 .and().haveName("save")
-                .should().onlyBeCalled().byClassesThat().haveFullyQualifiedName("org.testin.testproject.SaveTestinYml")
-                .because("Save to testin.yml is the only gesture that writes the file, so cloning, picking a test"
-                        + " project, creating one and renaming one leave a committed file alone (Decision-013)."
-                        + " A second caller is a second gesture writing it");
+                .should().onlyBeCalled().byClassesThat().haveNameMatching("org\\.testin\\.(testproject\\.SaveTestinYml|config\\.TestinYml)")
+                .because("only a tester's explicit gesture writes the file - Save to testin.yml, or Apply in the"
+                        + " bugRepoUrl form - so cloning, picking a test project, creating one and renaming one leave a"
+                        + " committed file alone (Decision-013). A second caller is a second gesture writing it");
+
+        final @NotNull ArchRule oneBugRepoUrlCaller = methods()
+                .that().areDeclaredIn("org.testin.config.TestinYml")
+                .and().haveName("saveBugRepoUrl")
+                .should().onlyBeCalled().byClassesThat().haveFullyQualifiedName("org.testin.bug.BugRepoUrlForm")
+                .because("Apply in the bugRepoUrl form is the second gesture that writes testin.yml (Decision-013)");
 
         final @NotNull ArchRule oneWriter = noClasses()
                 .that().doNotHaveFullyQualifiedName("org.testin.config.TestinYml")
@@ -234,6 +241,7 @@ public class ArchitectureTest {
                         + " (CLAUDE.md, Decision-013)");
 
         oneCaller.check(CLASSES);
+        oneBugRepoUrlCaller.check(CLASSES);
         oneWriter.check(CLASSES);
     }
 

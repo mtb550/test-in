@@ -71,8 +71,9 @@ There is no key for this. It starts on its own.
   even while no tester name is set. A marker file that is there but will not
   parse is never written over, so it is still there to repair.
 - **Rule-INTERNAL-089** — `testin.yml` is read and written by one class, and
-  written only when the tester presses **Save to testin.yml**
-  (Rule-TREE-PANEL-112). Testin never needs it: when a code project has none, or
+  written only by a tester's own gesture: **Save to testin.yml**
+  (Rule-TREE-PANEL-112), or **Apply** in the bugRepoUrl hint
+  (Rule-VIEW-PANEL-104). Testin never needs it: when a code project has none, or
   it leaves a value out, nothing refuses, stalls or asks the tester to create it;
   only the automation code stays off (Rule-CODEGEN-082). When it is there, what
   it says is read in one place, so a missing value means the same thing

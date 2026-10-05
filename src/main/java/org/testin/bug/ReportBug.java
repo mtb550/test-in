@@ -23,6 +23,9 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.BugRepository;
 import org.testin.config.TestinYml;
+import org.testin.help.Guide;
+import org.testin.help.Hint;
+import org.testin.help.Hints;
 import org.testin.indexer.TestCaseFile;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
@@ -73,6 +76,10 @@ public final class ReportBug {
         final @NotNull String bugRepoUrl = TestinYml.bugRepoUrlOnDisk(p);
         final @NotNull Optional<String> whyNotReady = GitHubCli.onPath(indicator).whyItCannotSend(bugRepoUrl);
         indicator.checkCanceled();
+        final @NotNull Hints hints = Services.getInstance(p, Hints.class);
+        whyNotReady.ifPresentOrElse(reason -> hints.fire(BugRepository.of(bugRepoUrl).isEmpty()
+                ? Hint.of(Guide.RAISE_BUG_REPORTS, reason, () -> BugRepoUrlForm.of(p))
+                : Hint.of(Guide.RAISE_BUG_REPORTS, reason)), () -> hints.clear(Guide.RAISE_BUG_REPORTS));
 
         return new PreparedBug(facts, BugTemplate.body(facts, link), BugRepository.of(bugRepoUrl), whyNotReady);
     }

@@ -117,6 +117,9 @@
              switch - and reads the projects that changed again (#20) -->
         <vfs.asyncListener implementation="org.testin.indexer.TestinFileWatcher"/>
 
+        <!-- The Testin Help mark in the status bar (UC-INTERNAL-009) -->
+        <statusBarWidgetFactory id="testin.help" implementation="org.testin.help.HelpMarkFactory" order="last"/>
+
         <!-- First run activity -->
         <postStartupActivity
                 implementation="org.testin.setting.StartupActivity"

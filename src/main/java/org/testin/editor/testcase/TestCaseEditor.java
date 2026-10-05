@@ -39,12 +39,15 @@ import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.TestCaseDetailsPopupBtn;
 import org.testin.filter.FilterSelection;
 import org.testin.filter.TestCaseFilter;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.logger.Logger;
 import org.testin.model.Modules;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Refused;
 import org.testin.runner.TestCaseExecutionSubscriber;
+import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testcase.TestCaseOrder;
@@ -71,6 +74,7 @@ public class TestCaseEditor extends AbstractTestinEditor<TestCaseEditorAttribute
 
     public TestCaseEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
         super(p, vf.getTestSet());
+        Services.getInstance(p, Guides.class).add(Guide.TEST_CASE_EDITOR_SHORTCUTS);
 
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);

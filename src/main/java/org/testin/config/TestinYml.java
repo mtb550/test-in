@@ -90,6 +90,11 @@ public final class TestinYml {
         return FILE_NAMES[0];
     }
 
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-104
+    public static @NotNull @NlsSafe String bugRepoUrlKey() {
+        return TestinProjectConfig.BUG_REPO_URL_KEY;
+    }
+
     public static void reload(final @NotNull Project p) {
         p.putUserData(READ, load(p));
     }
@@ -190,6 +195,11 @@ public final class TestinYml {
                 .compute(() -> write(folder.orElseThrow(), name, owned));
         reload(p);
         return saved;
+    }
+
+    // UC-VIEW-PANEL-016, Rule-VIEW-PANEL-104
+    public static boolean saveBugRepoUrl(final @NotNull Project p, final @NotNull String address) {
+        return save(p, Map.of(TestinProjectConfig.BUG_REPO_URL_KEY, address));
     }
 
     private static boolean write(final @NotNull VirtualFile folder, final @NotNull String name, final @NotNull Map<String, String> owned) {

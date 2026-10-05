@@ -424,6 +424,11 @@ the button. A rename or a move made while code is off leaves the code under its
 old name. The writer lives beside the reader in `config/TestinYml`, so the file
 still has one class (Rule-INTERNAL-089). Decision-011 is superseded.
 
+**Amended 5 October 2026.** A second explicit gesture writes it: **Apply** in
+the bugRepoUrl hint of Testin Help writes that one line and opens the file
+(Rule-VIEW-PANEL-104, #307). Both writers are a tester's own click, and
+`ArchitectureTest` names them; a silent write is still refused.
+
 **If you are about to reverse it.** Writing the file anywhere but the button -
 on a pick, a clone, a rename - commits one machine's choice into the team's
 file without anyone deciding to, which is what Decision-011 was written
