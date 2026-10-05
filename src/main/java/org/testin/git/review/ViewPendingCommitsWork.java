@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.review;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -22,6 +22,11 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
 import org.testin.explorer.TreePanel;
+import org.testin.git.GitBackgroundTask;
+import org.testin.git.GitCommits;
+import org.testin.git.GitFailure;
+import org.testin.git.GitRepositoryService;
+import org.testin.git.RepositoryRefresh;
 import org.testin.git.change.GitDiffProcessor;
 import org.testin.git.change.PendingChange;
 import org.testin.git.conflict.ConflictResolution;
@@ -40,17 +45,17 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 
-record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits, @NotNull Notifier notifier, @NotNull Nodes nodes) {
+public record ViewPendingCommitsWork(@NotNull Project p, @NotNull GitRepositoryService git, @NotNull GitCommits commits, @NotNull Notifier notifier, @NotNull Nodes nodes) {
     private static @NotNull String commitLabel(final @NotNull String commitId) {
         return commitId.isBlank() ? Bundle.message("git.commit.label.none") : Bundle.message("git.commit.label", commitId);
     }
 
-    ViewPendingCommitsWork(final @NotNull Project p) {
+    public ViewPendingCommitsWork(final @NotNull Project p) {
         this(p, new GitRepositoryService(p), new GitCommits(p), Services.getInstance(p, Notifier.class), Services.getInstance(p, Nodes.class));
     }
 
     // UC-SHARE-009, Rule-SHARE-042
-    void openFor(final @NotNull Path path) {
+    public void openFor(final @NotNull Path path) {
         if (git.isNotRepository(path)) {
             notifier.warnWithAction(p,
                     Bundle.message("git.no.repository.title"),

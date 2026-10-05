@@ -33,7 +33,7 @@ public final class LocalGit {
         return git(Path.of("."), "--version").isPresent();
     }
 
-    static @NotNull Optional<String> git(final @NotNull Path directory, final @NotNull String... arguments) {
+    public static @NotNull Optional<String> git(final @NotNull Path directory, final @NotNull String... arguments) {
         final @NotNull List<String> command = new ArrayList<>();
         command.add("git");
         command.addAll(List.of(arguments));

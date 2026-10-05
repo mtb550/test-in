@@ -23,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.Said;
+import org.testin.git.review.PendingCommitsDialog;
+import org.testin.git.review.ViewPendingCommitsWork;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;

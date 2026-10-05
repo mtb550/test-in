@@ -29,9 +29,9 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class RepositoryRefresh {
+public final class RepositoryRefresh {
     // UC-SHARE-016, Rule-SHARE-073
-    static void after(final @NotNull Project p, final @NotNull Path repoPath) {
+    public static void after(final @NotNull Project p, final @NotNull Path repoPath) {
         Optional.ofNullable(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(repoPath.toFile()))
                 .ifPresent(GitUtil::refreshVfsInRoot);
 

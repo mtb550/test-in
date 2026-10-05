@@ -30,6 +30,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
+import org.testin.git.review.PendingCommitsDialog;
+import org.testin.git.review.ViewPendingCommitsWork;
 import org.testin.services.BackgroundWork;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Shortcuts;
@@ -48,46 +50,46 @@ import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class ShareGestures {
-    static @NotNull JComponent theReviewOf(final @NotNull Project p, final @NotNull Path repository) {
+public final class ShareGestures {
+    public static @NotNull JComponent theReviewOf(final @NotNull Project p, final @NotNull Path repository) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> new ViewPendingCommitsWork(p).openFor(repository));
         return ShownDialog.waitedFor(p, PendingCommitsDialog.class);
     }
 
-    static @NotNull JBTable table(final @NotNull JComponent dialog) {
+    public static @NotNull JBTable table(final @NotNull JComponent dialog) {
         return Drawn.first(dialog, JBTable.class);
     }
 
-    static void type(final @NotNull JComponent dialog, final @NotNull String message) {
+    public static void type(final @NotNull JComponent dialog, final @NotNull String message) {
         Drawn.first(dialog, JTextField.class, field -> SwingUtilities.getAncestorOfClass(JComboBox.class, field) == null).setText(message);
     }
 
-    static void chooseTheOtherBranch(final @NotNull JComponent dialog) {
+    public static void chooseTheOtherBranch(final @NotNull JComponent dialog) {
         Drawn.first(dialog, ComboBox.class).getEditor().setItem("other");
     }
 
-    static void commitOnly(final @NotNull JComponent dialog) {
+    public static void commitOnly(final @NotNull JComponent dialog) {
         final @NotNull JBOptionButton split = Drawn.first(dialog, JBOptionButton.class);
         split.getOptions()[0].actionPerformed(new ActionEvent(split, ActionEvent.ACTION_PERFORMED, "commit"));
     }
 
-    static void commitAndPush(final @NotNull JComponent dialog) {
+    public static void commitAndPush(final @NotNull JComponent dialog) {
         final @NotNull JBOptionButton split = Drawn.first(dialog, JBOptionButton.class);
         split.getAction().actionPerformed(new ActionEvent(split, ActionEvent.ACTION_PERFORMED, "push"));
     }
 
-    static void pressEnter(final @NotNull JComponent dialog) {
+    public static void pressEnter(final @NotNull JComponent dialog) {
         UIUtil.uiTraverser(dialog).filter(JComponent.class).toList().stream()
                 .map(component -> Optional.ofNullable(component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).get(Shortcuts.Enter.getKey())).map(name -> component.getActionMap().get(name)))
                 .flatMap(Optional::stream).findFirst().orElseThrow(() -> new AssertionError("nothing in the dialog answers Enter"))
                 .actionPerformed(new ActionEvent(dialog, ActionEvent.ACTION_PERFORMED, "Enter"));
     }
 
-    static void typeInto(final @NotNull JComponent dialog, final int field, final @NotNull String text) {
+    public static void typeInto(final @NotNull JComponent dialog, final int field, final @NotNull String text) {
         UIUtil.uiTraverser(dialog).filter(JTextField.class).toList().get(field).setText(text);
     }
 
-    static @NotNull List<Task> tasksStarted(final @NotNull Disposable whileRunning) {
+    public static @NotNull List<Task> tasksStarted(final @NotNull Disposable whileRunning) {
         final @NotNull List<Task> started = new CopyOnWriteArrayList<>();
         BackgroundWork.watch(whileRunning, task -> {
             started.add(task);
@@ -96,12 +98,12 @@ final class ShareGestures {
         return started;
     }
 
-    static @NotNull Task titled(final @NotNull List<Task> started, final @NotNull String title) {
+    public static @NotNull Task titled(final @NotNull List<Task> started, final @NotNull String title) {
         Await.until("no task titled " + title + " started", () -> started.stream().anyMatch(task -> task.getTitle().equals(title)));
         return started.stream().filter(task -> task.getTitle().equals(title)).findFirst().orElseThrow();
     }
 
-    static @NotNull List<Boolean> gitCallsOnTheMainThread(final @NotNull Disposable whileRunning) {
+    public static @NotNull List<Boolean> gitCallsOnTheMainThread(final @NotNull Disposable whileRunning) {
         final @NotNull List<Boolean> onTheMainThread = new CopyOnWriteArrayList<>();
         final @NotNull Git real = Git.getInstance();
         final @NotNull Git watched = (Git) Proxy.newProxyInstance(Git.class.getClassLoader(), new Class<?>[]{Git.class}, (_, method, arguments) -> {

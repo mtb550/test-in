@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.review;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.SimpleColoredComponent;
@@ -23,6 +23,7 @@ import com.intellij.ui.components.fields.ExtendableTextField;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.TestinLog;
+import org.testin.git.review.RemoteUrlDialog;
 import org.testin.notifications.Refused;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Html;

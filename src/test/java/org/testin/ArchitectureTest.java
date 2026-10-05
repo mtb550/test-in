@@ -133,6 +133,17 @@ public class ArchitectureTest {
     }
 
     @Test
+    public void theChangeModelReachesNoOtherPartOfGit() {
+        final @NotNull ArchRule rule = noClasses()
+                .that().resideInAPackage("org.testin.git.change..")
+                .should().dependOnClassesThat().resideInAnyPackage("org.testin.git.history..", "org.testin.git.conflict..", "org.testin.git.review..")
+                .because("what changed between two versions is the vocabulary the review and the history share, so it sits"
+                        + " below them and never reaches back (#394)");
+
+        rule.check(CLASSES);
+    }
+
+    @Test
     public void utilImportsNoFeaturePackage() {
         final @NotNull ArchRule rule = noClasses()
                 .that().resideInAPackage("org.testin.util..")

@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.review;
 
 import com.intellij.notification.Notification;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Said;
+import org.testin.git.AbstractGitRemoteIdeTest;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;

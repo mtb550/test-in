@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.review;
 
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
+import org.testin.git.ShareGestures;
 import org.testin.git.conflict.Question;
 import org.testin.git.conflict.ResolveConflictDialog;
+import org.testin.git.review.GitIdentityDialog;
+import org.testin.git.review.Identity;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 

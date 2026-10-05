@@ -26,7 +26,7 @@ import org.testin.explorer.TreePanel;
 import org.testin.git.GitFailure;
 import org.testin.git.GitRefs;
 import org.testin.git.GitRepositoryService;
-import org.testin.git.ViewPendingCommitsAction;
+import org.testin.git.review.ViewPendingCommitsAction;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;

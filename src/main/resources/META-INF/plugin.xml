@@ -406,7 +406,7 @@
              the same answer the tree menu gives (#273). -->
         <action
                 id="Testin.ViewPendingCommits"
-                class="org.testin.git.ViewPendingCommitsAction"
+                class="org.testin.git.review.ViewPendingCommitsAction"
                 icon="AllIcons.Actions.Commit"
         />
 

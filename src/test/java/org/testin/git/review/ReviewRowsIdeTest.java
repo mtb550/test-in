@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.review;
 
 import com.intellij.openapi.util.Disposer;
 import com.intellij.testFramework.PlatformTestUtil;
@@ -23,6 +23,9 @@ import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
+import org.testin.git.AbstractGitRemoteIdeTest;
+import org.testin.git.ShareGestures;
+import org.testin.git.review.PendingCommitsDialog;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;

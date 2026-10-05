@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.review;
 
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroupManager;
@@ -25,6 +25,12 @@ import org.testin.Await;
 import org.testin.Notified;
 import org.testin.Said;
 import org.testin.config.TestinYml;
+import org.testin.git.AbstractGitRemoteIdeTest;
+import org.testin.git.ShareGestures;
+import org.testin.git.review.GitIdentityDialog;
+import org.testin.git.review.PendingCommitsDialog;
+import org.testin.git.review.RemoteUrlDialog;
+import org.testin.git.review.ViewPendingCommitsWork;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.view.Drawn;

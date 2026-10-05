@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.review;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;

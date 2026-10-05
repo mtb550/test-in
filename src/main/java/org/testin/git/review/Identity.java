@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.review;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.git.change.FieldChange;
-import org.testin.git.change.PendingChange;
 
-record Row(@NotNull PendingChange diff, @NotNull FieldChange change) {
+record Identity(@NotNull String name, @NotNull String email, boolean global) {
 }
