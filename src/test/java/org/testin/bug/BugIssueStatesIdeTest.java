@@ -25,6 +25,9 @@ import org.testin.Said;
 import org.testin.git.history.BugCard;
 import org.testin.git.history.BugHistory;
 import org.testin.git.history.History;
+import org.testin.help.Hint;
+import org.testin.help.Hints;
+import org.testin.help.SetupStep;
 import org.testin.indexer.TestCaseFile;
 import org.testin.indexer.TestRuns;
 import org.testin.model.status.RunItemStatus;
@@ -37,6 +40,7 @@ import org.testin.view.details.BugIssueLink;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -105,8 +109,18 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
         assertTrue("the open bug shows no pill: " + open, Drawn.holds(open, "#14") && Drawn.holds(open, Bundle.message("bug.state.open")));
     }
 
-    // Rule-VIEW-PANEL-094
-    public void testABoardTheTokenCannotReadFallsBackToTheIssueStateAndSaysSoOnce() {
+    private @NotNull List<String> hintsFor(final @NotNull SetupStep step) {
+        return Services.getInstance(getProject(), Hints.class).waiting().stream().filter(hint -> hint.step() == step).map(Hint::text).toList();
+    }
+
+    private void nothingWaits() {
+        final @NotNull Hints hints = Services.getInstance(getProject(), Hints.class);
+        Arrays.stream(SetupStep.values()).forEach(hints::clear);
+    }
+
+    // Rule-VIEW-PANEL-094, Rule-INTERNAL-127
+    public void testABoardTheTokenCannotReadFallsBackToTheIssueStateAndWaitsAsOneHintUntilRead() {
+        nothingWaits();
         twoBugsFiled();
         ghAnswers(NO_PROJECT_SCOPE);
         final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
@@ -115,12 +129,18 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
         readAndWait();
 
         assertEquals(Bundle.message("bug.state.fixed"), states().of(FIXED).label());
-        assertEquals("the permission was asked about more than once", 1, said.stream().filter(shown -> shown.getTitle().equals(Bundle.message("bug.states.board.title"))).count());
-        assertEquals("a refused board was asked for again", 2, askedAbout("test-03").stream().filter(arguments -> !arguments.contains("field=Status")).count());
+        assertEquals("a message was raised for the board", List.of(), said.stream().map(Notification::getTitle).toList());
+        assertEquals("the board did not wait as one hint", 1, hintsFor(SetupStep.BOARD_COLUMNS).size());
+        assertEquals("Refresh did not ask for the board again", 2, askedAbout("test-03").stream().filter(arguments -> arguments.contains("field=Status")).count());
+
+        ghAnswers(ANSWER);
+        readAndWait();
+        assertEquals("a board read left its hint waiting", List.of(), hintsFor(SetupStep.BOARD_COLUMNS));
     }
 
-    // Rule-VIEW-PANEL-093
-    public void testAGhThatCannotBeStartedLeavesTheLinksAloneAndSaysWhyOnce() {
+    // Rule-VIEW-PANEL-093, Rule-INTERNAL-127
+    public void testAGhThatCannotBeStartedLeavesTheLinksAloneAndWaitsAsOneHint() {
+        nothingWaits();
         twoBugsFiled();
         states().answerWith(new GitHubCli((_, _) -> Optional.empty()), getTestRootDisposable());
         final @NotNull List<Notification> said = Said.listening(getProject(), getTestRootDisposable()).notifications();
@@ -128,9 +148,8 @@ public class BugIssueStatesIdeTest extends AbstractTempRootIdeTest {
         readAndWait();
 
         assertEquals(BugIssueState.NOT_READ, states().of(OPEN));
-        final int repositories = BugIssueStates.filedIn(Services.getInstance(getProject(), TestRuns.class).getAllTestRuns().values()).size();
-        final @NotNull List<Notification> notRead = said.stream().filter(shown -> shown.getTitle().equals(Bundle.message("bug.states.not.read.title"))).toList();
-        assertEquals("one message per repository, never one per link", repositories, notRead.size());
-        assertTrue(notRead.stream().allMatch(shown -> shown.getContent().equals(Bundle.message("bug.reason.no.gh"))));
+        assertEquals("a message was raised for the bug states", List.of(), said.stream().map(Notification::getTitle).toList());
+        assertEquals(List.of(Bundle.message("bug.reason.no.gh")), hintsFor(SetupStep.BUG_STATES));
+        nothingWaits();
     }
 }

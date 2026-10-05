@@ -23,8 +23,11 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.explorer.tree.TreeValues;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.services.OptionalPlugin;
+import org.testin.services.Services;
 
 import java.nio.file.Path;
 
@@ -34,9 +37,10 @@ public class ViewPendingCommitsAction extends AbstractAnyProjectAction {
         new ViewPendingCommitsWork(p).openFor(path);
     }
 
-    // UC-SHARE-010
+    // UC-SHARE-010, Rule-INTERNAL-129
     @Override
     protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
+        Services.getInstance(p, Guides.class).add(Guide.LINK_THIS_REPOSITORY);
         TestinData.tree(e).flatMap(TreeValues::projectPath).ifPresent(path -> reviewFor(p, path));
     }
 

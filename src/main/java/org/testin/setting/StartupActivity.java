@@ -16,7 +16,6 @@
 
 package org.testin.setting;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
@@ -26,10 +25,12 @@ import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
 import org.testin.clipboard.CutState;
+import org.testin.help.Hint;
+import org.testin.help.Hints;
+import org.testin.help.SetupStep;
 import org.testin.indexer.DeletedNodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.notifications.Notifier;
 import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.runner.TestCaseExecutionTracker;
 import org.testin.services.Services;
@@ -78,21 +79,16 @@ public final class StartupActivity implements ProjectActivity {
         Services.getInstance(p, ProjectIndexer.class).indexWithProgress();
     }
 
-    // UC-SETTING-002, Rule-SETTING-014
-    private static void warnIfUnconfigured(final @NotNull Project p) {
-        final @NotNull AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
-        if (TestinRoot.isConfigured(TestinRoot.normalize(settings.rootTestinPath))) return;
+    // UC-SETTING-002, Rule-SETTING-014, Rule-INTERNAL-127
+    static void hintTestinFolder(final @NotNull Project p) {
+        final @NotNull Hints hints = Services.getInstance(p, Hints.class);
+        if (TestinRoot.isConfigured(TestinRoot.normalize(Services.getInstance(p, AppSettingsState.class).rootTestinPath))) {
+            hints.clear(SetupStep.TESTIN_FOLDER);
+            return;
+        }
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-            if (p.isDisposed()) return;
-
-            Services.getInstance(p, Notifier.class).warnWithAction(p,
-                    Bundle.message("startup.setup.title"),
-                    Bundle.message("startup.setup.message"),
-                    Bundle.message("startup.setup.action"),
-                    () -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class)
-            );
-        });
+        hints.fire(Hint.of(SetupStep.TESTIN_FOLDER, Bundle.message("startup.setup.message"), Bundle.message("startup.setup.action"),
+                () -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class)));
     }
 
     @TestOnly
@@ -113,7 +109,7 @@ public final class StartupActivity implements ProjectActivity {
             Logger.info("No test project chosen for " + p.getName() + ", so nothing is read until something needs it");
         }
 
-        warnIfUnconfigured(p);
+        hintTestinFolder(p);
         return Unit.INSTANCE;
     }
 }

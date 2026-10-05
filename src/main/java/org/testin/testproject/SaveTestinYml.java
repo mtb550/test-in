@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
 import org.testin.editor.open.TestinEditors;
 import org.testin.git.GitRepositoryService;
+import org.testin.help.Hints;
+import org.testin.help.SetupStep;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
@@ -94,7 +96,7 @@ public final class SaveTestinYml {
                 .orElse(Bundle.message("yml.save.new"));
     }
 
-    // UC-TREE-PANEL-029, Rule-CODEGEN-082
+    // UC-TREE-PANEL-029, Rule-CODEGEN-082, Rule-INTERNAL-127
     private static void save(final @NotNull Project p, final @NotNull Map<String, String> lines) {
         final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
         if (!TestinYml.save(p, lines)) {
@@ -102,6 +104,7 @@ public final class SaveTestinYml {
             return;
         }
 
+        Services.getInstance(p, Hints.class).clear(SetupStep.TEST_PROJECT_LINK);
         Services.getInstance(p, BoundTestProject.class).refreshGutter();
         Services.getInstance(p, TestinEditors.class).refreshOpen();
         notifier.softShow(p, Done.SAVED);

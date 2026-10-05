@@ -31,8 +31,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
-import org.testin.help.Guide;
 import org.testin.help.Hints;
+import org.testin.help.SetupStep;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -90,7 +90,7 @@ public final class BugRepoUrlForm {
             return;
         }
 
-        Services.getInstance(p, Hints.class).clear(Guide.RAISE_BUG_REPORTS);
+        Services.getInstance(p, Hints.class).clear(SetupStep.BUG_FILING);
         notifier.softShow(p, Done.SAVED);
         TestinYml.openInEditor(p);
     }

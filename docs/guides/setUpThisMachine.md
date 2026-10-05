@@ -39,7 +39,7 @@ read [How to link this repository to its test project](linkThisRepository.md).
 
 | What you see                                       | What to do                                                                     |
 |----------------------------------------------------|--------------------------------------------------------------------------------|
-| *Testin Setup Required*, when a code project opens | The Testin folder is not set yet. Press **Open Settings** and start at step 2. |
+| The red ? says the Testin folder is not set        | Press **Open Settings** in its hint and start at step 2.                       |
 | *Testin Folder Not Found*                          | No folder is at that path. Check the path, or create the folder first.         |
 | *Testin Folder Is Not a Folder*                    | The path names a file. Choose the folder that holds your test projects.        |
 | *Testin Folder Needs a Full Path*                  | Type the whole path, from the drive or the root.                               |

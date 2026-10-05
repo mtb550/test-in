@@ -23,14 +23,19 @@ import javax.swing.JComponent;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public record Hint(@NotNull Guide topic, @NotNull String text, @NotNull Optional<Supplier<JComponent>> form) {
+public record Hint(@NotNull SetupStep step, @NotNull String text, @NotNull Optional<Supplier<JComponent>> form) {
     // UC-INTERNAL-009, Rule-INTERNAL-127
-    public static @NotNull Hint of(final @NotNull Guide topic, final @NotNull String text) {
-        return new Hint(topic, text, Optional.empty());
+    public static @NotNull Hint of(final @NotNull SetupStep step, final @NotNull String text) {
+        return new Hint(step, text, Optional.empty());
     }
 
     // UC-INTERNAL-009, Rule-INTERNAL-127
-    public static @NotNull Hint of(final @NotNull Guide topic, final @NotNull String text, final @NotNull Supplier<JComponent> form) {
-        return new Hint(topic, text, Optional.of(form));
+    public static @NotNull Hint of(final @NotNull SetupStep step, final @NotNull String text, final @NotNull Supplier<JComponent> form) {
+        return new Hint(step, text, Optional.of(form));
+    }
+
+    // UC-INTERNAL-009, Rule-INTERNAL-127
+    public static @NotNull Hint of(final @NotNull SetupStep step, final @NotNull String text, final @NotNull String link, final @NotNull Runnable fix) {
+        return of(step, text, () -> PopupLink.of(link, fix));
     }
 }

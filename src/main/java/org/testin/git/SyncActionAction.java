@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.explorer.tree.TreeValues;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
@@ -55,9 +57,10 @@ public class SyncActionAction extends AbstractAnyProjectAction {
         return Optional.empty();
     }
 
-    // UC-SHARE-016
+    // UC-SHARE-016, Rule-INTERNAL-129
     @Override
     protected void perform(final @NotNull AnActionEvent e, final @NotNull Project p) {
+        Services.getInstance(p, Guides.class).add(Guide.LINK_THIS_REPOSITORY);
         activeProjectPath(e).ifPresentOrElse(path -> new SyncWork(p).syncRepository(path), () ->
                 Services.getInstance(p, Notifier.class).softRefuse(p, Bundle.message("git.sync.error.title"),
                         Bundle.message("git.sync.no.project")));

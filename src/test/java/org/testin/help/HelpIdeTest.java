@@ -18,50 +18,78 @@
 package org.testin.help;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import com.intellij.ui.components.ActionLink;
 import org.jetbrains.annotations.NotNull;
 import org.testin.services.Services;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HelpIdeTest extends BasePlatformTestCase {
 
-    // Rule-INTERNAL-127
-    public void testAFiredHintWaitsUntilItsTopicIsCleared() {
+    private @NotNull Hints nothingWaits() {
         final @NotNull Hints hints = Services.getInstance(getProject(), Hints.class);
+        Arrays.stream(SetupStep.values()).forEach(hints::clear);
+        Services.getInstance(getProject(), Guides.class).forgetAll();
+        return hints;
+    }
 
-        hints.fire(Hint.of(Guide.RAISE_BUG_REPORTS, "Add bugRepoUrl to testin.yml"));
-        hints.fire(Hint.of(Guide.RAISE_BUG_REPORTS, "Not signed in to github.com"));
-        assertEquals("a second hint on one topic did not replace the first", List.of("Not signed in to github.com"), hints.waiting().stream().map(Hint::text).toList());
+    // Rule-INTERNAL-127
+    public void testAFiredHintWaitsUntilItsStepIsCleared() {
+        final @NotNull Hints hints = nothingWaits();
 
-        hints.clear(Guide.RAISE_BUG_REPORTS);
+        hints.fire(Hint.of(SetupStep.BUG_FILING, "Add bugRepoUrl to testin.yml"));
+        hints.fire(Hint.of(SetupStep.BUG_FILING, "Not signed in to github.com"));
+        assertEquals("a second hint on one step did not replace the first", List.of("Not signed in to github.com"), hints.waiting().stream().map(Hint::text).toList());
+
+        hints.clear(SetupStep.BUG_FILING);
         assertTrue("a cleared hint still waits", hints.waiting().isEmpty());
     }
 
     // Rule-INTERNAL-127
-    public void testHintsOnTwoTopicsWaitTogether() {
-        final @NotNull Hints hints = Services.getInstance(getProject(), Hints.class);
+    public void testStepsThatShareAGuideWaitAndClearApart() {
+        final @NotNull Hints hints = nothingWaits();
 
-        hints.fire(Hint.of(Guide.RAISE_BUG_REPORTS, "Add bugRepoUrl to testin.yml"));
-        hints.fire(Hint.of(Guide.SET_UP_THIS_MACHINE, "Set the Testin folder"));
+        hints.fire(Hint.of(SetupStep.BUG_FILING, "Add bugRepoUrl to testin.yml"));
+        hints.fire(Hint.of(SetupStep.BOARD_COLUMNS, "Run gh auth refresh -s read:project"));
+        hints.clear(SetupStep.BUG_FILING);
 
-        assertEquals("two topics did not wait together", 2, hints.waiting().size());
-        hints.clear(Guide.RAISE_BUG_REPORTS);
-        hints.clear(Guide.SET_UP_THIS_MACHINE);
+        assertEquals("a ready Send cleared the board hint too", List.of(SetupStep.BOARD_COLUMNS), hints.waiting().stream().map(Hint::step).toList());
+        hints.clear(SetupStep.BOARD_COLUMNS);
+    }
+
+    // Rule-INTERNAL-128, Rule-INTERNAL-129
+    public void testAFiredHintOffersItsGuide() {
+        final @NotNull Hints hints = nothingWaits();
+
+        hints.fire(Hint.of(SetupStep.TESTIN_FOLDER, "Please set the Testin folder"));
+
+        assertEquals(List.of(Guide.SET_UP_THIS_MACHINE), Services.getInstance(getProject(), Guides.class).offered());
+        hints.clear(SetupStep.TESTIN_FOLDER);
+    }
+
+    // Rule-INTERNAL-127
+    public void testALinkFormRunsItsFix() {
+        final @NotNull AtomicInteger fixed = new AtomicInteger();
+        final @NotNull Hint hint = Hint.of(SetupStep.TEST_PROJECT_LINK, "testin.yml does not name this test project", "Save to testin.yml", fixed::incrementAndGet);
+
+        final @NotNull ActionLink link = (ActionLink) hint.form().orElseThrow().get();
+        link.doClick();
+
+        assertEquals("Save to testin.yml", link.getText());
+        assertEquals("the link did not run its fix", 1, fixed.get());
     }
 
     // Rule-INTERNAL-129
-    public void testOfferedGuidesListInGuideOrderUntilRemoved() {
+    public void testOfferedGuidesListInGuideOrderForTheSession() {
+        nothingWaits();
         final @NotNull Guides guides = Services.getInstance(getProject(), Guides.class);
-        Arrays.stream(Guide.values()).forEach(guides::remove);
-        assertTrue("a guide was still offered after every one was removed", guides.offered().isEmpty());
 
         guides.add(Guide.RAISE_BUG_REPORTS);
         guides.add(Guide.SET_UP_THIS_MACHINE);
-        assertEquals("the offered guides are not in guide order", List.of(Guide.SET_UP_THIS_MACHINE, Guide.RAISE_BUG_REPORTS), guides.offered());
+        guides.add(Guide.RAISE_BUG_REPORTS);
 
-        guides.remove(Guide.RAISE_BUG_REPORTS);
-        guides.remove(Guide.SET_UP_THIS_MACHINE);
-        assertTrue("a removed guide is still offered", guides.offered().isEmpty());
+        assertEquals("the offered guides are not in guide order, once each", List.of(Guide.SET_UP_THIS_MACHINE, Guide.RAISE_BUG_REPORTS), guides.offered());
     }
 }

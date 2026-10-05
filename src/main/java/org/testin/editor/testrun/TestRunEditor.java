@@ -41,6 +41,8 @@ import org.testin.editor.toolbar.StopExecutionBtn;
 import org.testin.editor.toolbar.TestRunDetailsPopupBtn;
 import org.testin.filter.FilterSelection;
 import org.testin.filter.TestCaseFilter;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.indexer.TestRuns;
 import org.testin.lightmode.LightMode;
 import org.testin.logger.Logger;
@@ -99,6 +101,7 @@ public class TestRunEditor extends AbstractTestinEditor<TestRunEditorAttributes,
 
     public TestRunEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
         super(p, vf.getTestRun());
+        Services.getInstance(p, Guides.class).add(Guide.TEST_RUN_EDITOR_SHORTCUTS);
 
         TestCaseExecutionSubscriber.onReported(p, projectDisposable, walk::executionReported);
 

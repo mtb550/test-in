@@ -49,10 +49,12 @@ test run.
   the background. The panel never waits for the answer, and the answer is never
   written to the test run.
 - **Rule-VIEW-PANEL-093** — When GitHub cannot be asked - gh missing, signed out
-  or offline - every link still shows and opens, and one message says why.
+  or offline - every link still shows and opens, and Testin Help holds one hint
+  saying why until a read succeeds.
 - **Rule-VIEW-PANEL-094** — A board's Status needs gh's read:project permission.
-  Without it the issue's own state shows, and one message, once per session,
-  names the command that grants it.
+  Without it the issue's own state shows, and Testin Help holds one hint naming
+  the command that grants it. Every read asks for the board again, so Refresh
+  shows it once the permission is granted.
 
 ## The screen
 

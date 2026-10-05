@@ -173,7 +173,10 @@ public final class SettingsConfigurable implements SearchableConfigurable {
 
     private void refreshEveryOpenProject() {
         for (final Project open : ProjectManager.getInstance().getOpenProjects()) {
-            if (open.isDisposed() || Services.isNotCreated(open, TreePanel.class)) continue;
+            if (open.isDisposed()) continue;
+
+            StartupActivity.hintTestinFolder(open);
+            if (Services.isNotCreated(open, TreePanel.class)) continue;
 
             Services.getInstance(open, TreePanel.class).reindex();
         }

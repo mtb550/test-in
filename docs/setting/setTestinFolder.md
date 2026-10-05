@@ -88,9 +88,10 @@ spaces is the same answer.
 
 ## What happens when no folder is set
 
-**When a code project opens** — a message titled **Testin Setup Required** reads *Please set the Testin folder to enable
-test management features.*
-It carries a link reading **Open Settings**.
+**When a code project opens** — the Testin Help mark on the status bar turns
+red. Its hint reads *Please set the Testin folder to enable test management
+features.*, with an **Open Settings** link and the guide *How to set up Testin
+on this machine*. Setting a folder clears it in every open code project.
 
 **In the tree panel** — the empty state is shown, with a link reading **Configure Testin settings**.
 

@@ -25,12 +25,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
+import org.testin.help.Hint;
+import org.testin.help.Hints;
+import org.testin.help.SetupStep;
 import org.testin.indexer.TestRuns;
 import org.testin.model.bug.BugIssue;
 import org.testin.model.bug.BugIssueUrl;
 import org.testin.model.result.TestRunItems;
 import org.testin.model.TestRunDto;
-import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
@@ -51,7 +53,6 @@ public final class BugIssueStates {
     private final @NotNull Project p;
     private final @NotNull Map<BugIssue, BugIssueState> answers = new ConcurrentHashMap<>();
     private final @NotNull AtomicBoolean reading = new AtomicBoolean();
-    private final @NotNull AtomicBoolean boards = new AtomicBoolean(true);
     private volatile @NotNull Optional<Function<ProgressIndicator, GitHubCli>> gh;
 
     public BugIssueStates(final @NotNull Project p) {
@@ -88,25 +89,26 @@ public final class BugIssueStates {
         });
     }
 
-    // Rule-VIEW-PANEL-093
+    // Rule-VIEW-PANEL-093, Rule-VIEW-PANEL-094, Rule-INTERNAL-127
     private void read(final @NotNull GitHubCli cli, final @NotNull BugRepository repository, final @NotNull Set<Integer> numbers) {
         final @NotNull Mapper mapper = Services.getInstance(p, Mapper.class);
-        final @NotNull IssueStates asked = cli.states(mapper, repository, numbers, boards.get());
+        final @NotNull Hints hints = Services.getInstance(p, Hints.class);
+        final @NotNull IssueStates asked = cli.states(mapper, repository, numbers, true);
         final @NotNull IssueStates said = asked.boardRefused() ? withoutBoards(cli, mapper, repository, numbers) : asked;
 
         if (!said.problem().isEmpty()) {
-            Services.getInstance(p, Notifier.class).warn(p, Bundle.message("bug.states.not.read.title"), said.problem());
+            hints.fire(Hint.of(SetupStep.BUG_STATES, said.problem()));
             return;
         }
 
+        hints.clear(SetupStep.BUG_STATES);
+        if (!asked.boardRefused()) hints.clear(SetupStep.BOARD_COLUMNS);
         numbers.forEach(number -> answers.put(new BugIssue(repository.host(), repository.owner(), repository.name(), number), said.stateOf(number)));
     }
 
-    // Rule-VIEW-PANEL-094
+    // Rule-VIEW-PANEL-094, Rule-INTERNAL-127
     private @NotNull IssueStates withoutBoards(final @NotNull GitHubCli cli, final @NotNull Mapper mapper, final @NotNull BugRepository repository, final @NotNull Set<Integer> numbers) {
-        if (boards.compareAndSet(true, false)) {
-            Services.getInstance(p, Notifier.class).info(p, Bundle.message("bug.states.board.title"), Bundle.message("bug.states.board.message", repository.host()));
-        }
+        Services.getInstance(p, Hints.class).fire(Hint.of(SetupStep.BOARD_COLUMNS, Bundle.message("bug.states.board.message", repository.host())));
         return cli.states(mapper, repository, numbers, false);
     }
 
@@ -126,7 +128,6 @@ public final class BugIssueStates {
         final @NotNull Optional<Function<ProgressIndicator, GitHubCli>> before = gh;
         gh = Optional.of(_ -> fake);
         answers.clear();
-        boards.set(true);
         Disposer.register(until, () -> gh = before);
     }
 }

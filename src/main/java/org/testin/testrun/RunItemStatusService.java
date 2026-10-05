@@ -23,6 +23,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.testrun.TestRunEditor;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.result.Failure;
@@ -111,6 +113,7 @@ public final class RunItemStatusService {
         if (held.isEmpty() || liveItem(held.orElseThrow(), testRunPath, testCaseId).isEmpty()) return false;
 
         Services.getInstance(p, TestRuns.class).changeResult(testRunPath, testCaseId, runItemStatus);
+        offerBugReports(status);
 
         Logger.trace("[RunItemStatusService]: Status updated -> " + testCaseId + " = " + status);
 
@@ -171,6 +174,11 @@ public final class RunItemStatusService {
         }
 
         return found;
+    }
+
+    // UC-INTERNAL-009, Rule-INTERNAL-129
+    private void offerBugReports(final @NotNull RunItemStatus status) {
+        if (status == RunItemStatus.FAILED) Services.getInstance(p, Guides.class).add(Guide.RAISE_BUG_REPORTS);
     }
 
     public void refuseRemoved() {
@@ -242,6 +250,7 @@ public final class RunItemStatusService {
         final @NotNull String tester = Services.getInstance(p, AppSettingsState.class).testerName;
         final @NotNull TestRuns testRuns = Services.getInstance(p, TestRuns.class);
         judged.forEach(id -> testRuns.changeResult(editor.getParent().getPath(), id, item -> item.correctRunItemStatus(status, tester, asItIsNow(item))));
+        if (!judged.isEmpty()) offerBugReports(status);
         triggerFilterRefresh(editor);
 
         confirmRunItemStatus(status, judged.size());

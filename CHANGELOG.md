@@ -32,6 +32,11 @@ than repairing it, and a team sharing a test project should update together.
 
 ### Changed
 
+- **Testin Help says what is not set up, instead of messages:** the ? at the end of the status bar shows in every project.
+  It turns red, with the fix and its guide, when the Testin folder is not set, when testin.yml does not name the test
+  project, when bug states cannot be read, or when board columns need gh's read:project permission; the four messages
+  that said so are gone. Guides are offered where you meet their part: Sync, a failed run item, a test run opened, which
+  now has its own shortcuts guide. Refresh asks for board columns again once the permission is granted.
 - **The Details tab is three bands:** who the test case is, what this test run recorded, and what the test case says.
   The run item status, the duration and who executed it are pills on one line, and bug severity and bug priority are one
   chip, **Major / High**. Reference, module, order, created and updated fold behind one line that stays the way you left

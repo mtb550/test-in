@@ -148,9 +148,9 @@ and the IDE's index. A third is the team's own answer to which test project this
 repository drives.
 
 **Until `testin.yml` names the open test project**, the code is off. Nothing is
-generated, renamed, moved or removed, and no gutter mark is drawn. The tester is
-told once for the code project, with the button that turns it on beside the
-message. **Save to testin.yml**, in the Testin panel's title bar, is that button (Rule-CODEGEN-082). Testin reads the
+generated, renamed, moved or removed, and no gutter mark is drawn. Testin Help
+holds a hint saying why, with **Save to testin.yml** beside it; that button,
+also in the Testin panel's title bar, turns code on (Rule-CODEGEN-082). Testin reads the
 file again on **Refresh** as well, so a
 file a colleague changed takes effect without restarting the IDE.
 

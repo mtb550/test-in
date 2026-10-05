@@ -20,11 +20,13 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Key;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
+import org.testin.help.Hint;
+import org.testin.help.Hints;
+import org.testin.help.SetupStep;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
@@ -32,7 +34,6 @@ import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testproject.SaveTestinYml;
 import org.testin.util.Bundle;
-import org.testin.util.Once;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -40,8 +41,6 @@ import java.util.Optional;
 // Rule-CODEGEN-082
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CodeOn {
-    private static final @NotNull Key<Boolean> SAID = Key.create("testin.codeOn.said");
-
     // Rule-CODEGEN-082
     public static boolean isOn(final @NotNull Project p) {
         return OptionalPlugin.JAVA.isAvailable() && TestinYml.names(p, openProject(p));
@@ -60,30 +59,31 @@ public final class CodeOn {
         return Services.getInstance(p, BoundTestProject.class).name();
     }
 
-    // Rule-CODEGEN-082
+    // Rule-CODEGEN-082, Rule-INTERNAL-127
     public static boolean isOffAndWarned(final @NotNull Project p) {
         if (OptionalPlugin.JAVA.isMissingAndWarned(p)) return true;
 
-        final @NotNull Optional<String> why = whyOff(p);
+        final @NotNull Optional<String> why = hinted(p);
         why.ifPresent(reason -> Services.getInstance(p, Notifier.class).softRefuse(p, reason));
         return why.isPresent();
     }
 
-    // Rule-CODEGEN-082, Rule-CODEGEN-005
+    // Rule-CODEGEN-082, Rule-CODEGEN-005, Rule-INTERNAL-127
     public static boolean isOnOrWarnOnce(final @NotNull Project p) {
         if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return false;
 
+        final @NotNull Optional<String> why = hinted(p);
+        why.ifPresent(reason -> Logger.debug("Automation code left as it is: " + reason));
+        return why.isEmpty();
+    }
+
+    // Rule-CODEGEN-082, Rule-INTERNAL-127
+    private static @NotNull Optional<String> hinted(final @NotNull Project p) {
         final @NotNull Optional<String> why = whyOff(p);
-        if (why.isEmpty()) return true;
-
-        if (Once.claim(p, SAID)) {
-            final @NotNull Notifier notifier = Services.getInstance(p, Notifier.class);
-            notifier.infoWithActions(p, Bundle.message("code.off.title"), why.orElseThrow(),
-                    notifier.action(Bundle.message("yml.save.name", TestinYml.fileName()), () -> SaveTestinYml.start(p)));
-        }
-
-        Logger.debug("Automation code left as it is: " + why.orElseThrow());
-        return false;
+        final @NotNull Hints hints = Services.getInstance(p, Hints.class);
+        why.ifPresentOrElse(reason -> hints.fire(Hint.of(SetupStep.TEST_PROJECT_LINK, reason, Bundle.message("yml.save.name", TestinYml.fileName()), () -> SaveTestinYml.start(p))),
+                () -> hints.clear(SetupStep.TEST_PROJECT_LINK));
+        return why;
     }
 
     // Rule-CODEGEN-082, Rule-TREE-PANEL-104

@@ -17,29 +17,33 @@
 
 package org.testin.help;
 
-import com.intellij.openapi.components.Service;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.TestOnly;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+// UC-INTERNAL-009, Rule-INTERNAL-127
+@Getter
+@AllArgsConstructor
+public enum SetupStep {
+    TESTIN_FOLDER(
+            Guide.SET_UP_THIS_MACHINE
+    ),
 
-@Service(Service.Level.PROJECT)
-public final class Guides {
-    private final @NotNull Set<Guide> offered = EnumSet.noneOf(Guide.class);
+    TEST_PROJECT_LINK(
+            Guide.LINK_THIS_REPOSITORY
+    ),
 
-    // UC-INTERNAL-009, Rule-INTERNAL-129
-    public synchronized void add(final @NotNull Guide guide) {
-        offered.add(guide);
-    }
+    BUG_FILING(
+            Guide.RAISE_BUG_REPORTS
+    ),
 
-    @TestOnly
-    synchronized void forgetAll() {
-        offered.clear();
-    }
+    BUG_STATES(
+            Guide.RAISE_BUG_REPORTS
+    ),
 
-    synchronized @NotNull List<Guide> offered() {
-        return List.copyOf(offered);
-    }
+    BOARD_COLUMNS(
+            Guide.RAISE_BUG_REPORTS
+    );
+
+    private final @NotNull Guide guide;
 }

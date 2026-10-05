@@ -36,6 +36,8 @@ import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.BranchSelector;
 import org.testin.explorer.toolbar.RefreshAction;
 import org.testin.explorer.tree.TreePanelTree;
+import org.testin.help.Guide;
+import org.testin.help.Guides;
 import org.testin.indexer.IndexChanged;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -290,8 +292,9 @@ public final class TreePanel implements Disposable {
                 _ -> new BindTestProjectDialog(p, underRoot, this::reindex).show());
     }
 
-    // UC-TREE-PANEL-001, UC-TREE-PANEL-002
+    // UC-TREE-PANEL-001, UC-TREE-PANEL-002, Rule-INTERNAL-129
     void offerFirstProject(final @NotNull StatusText emptyText) {
+        Services.getInstance(p, Guides.class).add(Guide.SET_UP_THIS_MACHINE);
         emptyText.appendLine(
                 AllIcons.General.Add,
                 Bundle.message("welcome.first.project"),

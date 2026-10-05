@@ -22,13 +22,11 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.ui.popup.util.PopupUtil;
 import com.intellij.openapi.wm.CustomStatusBarWidget;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.ui.ScreenUtil;
 import com.intellij.ui.awt.RelativePoint;
-import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTabbedPane;
@@ -101,9 +99,9 @@ public final class HelpMark implements CustomStatusBarWidget {
         return entry;
     }
 
+    // UC-INTERNAL-009, Rule-INTERNAL-126
     @Override
     public void install(final @NotNull StatusBar statusBar) {
-        TestinEditorInFront.showOnlyWithIt(p, this, entry);
         redraw();
     }
 
@@ -125,7 +123,7 @@ public final class HelpMark implements CustomStatusBarWidget {
 
         final @NotNull JBTabbedPane content = new JBTabbedPane();
         if (!hints.isEmpty()) content.addTab(Bundle.message("guide.hint.page"), hintsPage(hints, hintWidth()));
-        if (!guides.isEmpty()) content.addTab(Bundle.message("guide.list.title"), guidesPage(guides, content));
+        if (!guides.isEmpty()) content.addTab(Bundle.message("guide.list.title"), guidesPage(guides));
 
         final @NotNull JBPopup popup = JBPopupFactory.getInstance().createComponentPopupBuilder(content, content)
                 .setRequestFocus(true)
@@ -137,19 +135,19 @@ public final class HelpMark implements CustomStatusBarWidget {
     }
 
     // UC-INTERNAL-009, Rule-INTERNAL-128, Rule-INTERNAL-129
-    private @NotNull JComponent guidesPage(final @NotNull List<Guide> guides, final @NotNull JComponent popupContent) {
+    private @NotNull JComponent guidesPage(final @NotNull List<Guide> guides) {
         final @NotNull JBPanel<?> page = page();
-        for (final Guide guide : guides) {
-            page.add(left(new ActionLink(guide.getTitle(), _ -> {
-                Optional.ofNullable(PopupUtil.getPopupContainerFor(popupContent)).ifPresent(JBPopup::cancel);
-                guide.open(p);
-            })));
-        }
+        for (final Guide guide : guides) page.add(left(guideLink(guide)));
         return page;
     }
 
+    // UC-INTERNAL-009, Rule-INTERNAL-128
+    private @NotNull JComponent guideLink(final @NotNull Guide guide) {
+        return PopupLink.of(guide.getTitle(), () -> guide.open(p));
+    }
+
     // UC-INTERNAL-009, Rule-INTERNAL-127, Rule-INTERNAL-128
-    private static @NotNull JComponent hintsPage(final @NotNull List<Hint> hints, final int hintWidth) {
+    private @NotNull JComponent hintsPage(final @NotNull List<Hint> hints, final int hintWidth) {
         final @NotNull JBPanel<?> page = page();
         for (final Hint hint : hints) {
             if (page.getComponentCount() > 0) page.add(Box.createVerticalStrut(JBUI.scale(GAP * 2)));
@@ -157,6 +155,7 @@ public final class HelpMark implements CustomStatusBarWidget {
             final @NotNull Optional<JComponent> row = hint.form().map(Supplier::get);
             page.add(left(wrapped(hint.text(), row.map(shown -> shown.getPreferredSize().width).orElse(hintWidth))));
             row.ifPresent(shown -> page.add(left(shown)));
+            page.add(left(guideLink(hint.step().getGuide())));
         }
         return page;
     }

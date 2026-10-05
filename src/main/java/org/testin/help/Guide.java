@@ -44,6 +44,11 @@ public enum Guide {
     TEST_CASE_EDITOR_SHORTCUTS(
             Bundle.message("guide.test.case.editor.shortcuts"),
             "guides/testCaseEditorShortcuts.md"
+    ),
+
+    TEST_RUN_EDITOR_SHORTCUTS(
+            Bundle.message("guide.test.run.editor.shortcuts"),
+            "guides/testRunEditorShortcuts.md"
     );
 
     private final @NotNull String title;

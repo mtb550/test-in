@@ -42,7 +42,7 @@
 
 | What you see                                                   | What to do                                                                                   |
 |----------------------------------------------------------------|----------------------------------------------------------------------------------------------|
-| *Code Not Generated*                                           | `testin.yml` does not name the open test project. Press **Save to testin.yml**, step 2.      |
+| The red ? says testin.yml does not name this test project      | `testin.yml` does not name the open test project. Press **Save to testin.yml**, step 2.      |
 | *testin.yml names \<name\>, which is not in the Testin folder* | Clone it, or choose another test project at step 1.                                          |
 | *testin.yml names \<name\>, which could not be read*           | The folder is there, but Testin cannot read it. Open it from the Testin folder and check it. |
 | *Clone \<name\> (needs the Git plugin)*                        | Turn on the Git plugin in **Settings \| Plugins**, then restart the IDE.                     |

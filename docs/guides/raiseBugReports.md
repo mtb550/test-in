@@ -59,7 +59,7 @@ Without it, a bug shows **Open**, **Fixed** or **Not planned**.
 | *GitHub CLI (gh) is not installed, or the IDE cannot see it*       | Once per machine, steps 1 and 4.                             |
 | *gh \<version\> is too old to attach screenshots*                  | Install a newer `gh`, then restart the IDE.                  |
 | *Not signed in to \<host\>*                                        | Once per machine, step 3.                                    |
-| *Bug States Not Read*, a message                                   | `gh` cannot be reached or is signed out. Steps 1 to 4.       |
-| *Board Columns Not Read*, a message                                | See your team's board columns, above.                        |
+| The red ? says the bug states could not be read                    | `gh` cannot be reached or is signed out. Steps 1 to 4.       |
+| The red ? names `gh auth refresh -s read:project`                  | See your team's board columns, above.                        |
 
 [Documentation](../README.md) › Task guides
