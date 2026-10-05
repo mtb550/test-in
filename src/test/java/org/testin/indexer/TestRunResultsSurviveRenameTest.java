@@ -21,7 +21,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
 import org.testin.TempTree;
 import org.testin.model.FileKind;
-import org.testin.model.TestRunItems;
+import org.testin.model.result.TestRunItems;
 import org.testng.annotations.Test;
 
 import java.io.IOException;

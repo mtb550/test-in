@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.importexport.FileTypes;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.ui.framework.TextValue;
 import org.testin.util.Bundle;
 

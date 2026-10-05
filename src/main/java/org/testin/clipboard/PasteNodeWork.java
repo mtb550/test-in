@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.explorer.tree.TreeTransferPayload;
 import org.testin.logger.Logger;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;

@@ -29,7 +29,7 @@ import org.testin.git.GitRepositoryService;
 import org.testin.git.review.ViewPendingCommitsAction;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;

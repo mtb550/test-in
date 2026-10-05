@@ -19,9 +19,9 @@ package org.testin.codegen;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetPackageDirectoryDto;
 
 public class RemoveCodeIdeTest extends AbstractCodegenIdeTest {
 

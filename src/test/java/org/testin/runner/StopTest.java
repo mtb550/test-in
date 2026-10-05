@@ -17,7 +17,7 @@
 package org.testin.runner;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.ExecutionStatus;
+import org.testin.model.status.ExecutionStatus;
 import org.testng.annotations.Test;
 
 import java.util.List;

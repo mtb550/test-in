@@ -16,8 +16,8 @@
 
 package org.testin.bug;
 
-import org.testin.model.TestRunItems;
-import org.testin.model.RunItemStatus;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.util.Bundle;
 import org.testng.annotations.Test;
 

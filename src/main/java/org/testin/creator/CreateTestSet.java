@@ -20,8 +20,8 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.services.Services;
 
 import java.nio.file.Path;

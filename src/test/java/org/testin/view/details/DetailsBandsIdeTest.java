@@ -17,9 +17,9 @@ package org.testin.view.details;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunItems;
-import org.testin.model.RunItemStatus;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
+import org.testin.model.TestCaseDto;
 import org.testin.util.Bundle;
 import org.testin.view.Drawn;
 

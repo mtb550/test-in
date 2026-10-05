@@ -23,7 +23,7 @@ import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.util.List;
 import java.util.Optional;

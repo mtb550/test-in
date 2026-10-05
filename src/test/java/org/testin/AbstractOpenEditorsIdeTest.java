@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.open.TestinEditors;
 import org.testin.editor.open.UnifiedVirtualFile;
 import org.testin.indexer.TestRuns;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 import org.testin.services.Services;
 
 import java.nio.file.Files;

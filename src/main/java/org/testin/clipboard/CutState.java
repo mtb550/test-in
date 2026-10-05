@@ -22,7 +22,7 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
 
 import javax.swing.JComponent;

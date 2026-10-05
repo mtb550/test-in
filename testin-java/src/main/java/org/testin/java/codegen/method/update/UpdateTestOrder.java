@@ -30,7 +30,7 @@ import org.testin.codegen.ExecutionPosition;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.GenType;
 import org.testin.java.codegen.GeneratedMethod;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

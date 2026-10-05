@@ -27,7 +27,7 @@ import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.card.HoverButton;
 import org.testin.editor.card.Offered;
 import org.testin.model.Automated;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;

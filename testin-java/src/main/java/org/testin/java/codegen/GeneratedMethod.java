@@ -29,7 +29,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

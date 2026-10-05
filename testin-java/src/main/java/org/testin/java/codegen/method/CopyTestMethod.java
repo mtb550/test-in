@@ -26,7 +26,7 @@ import org.testin.codegen.GenAction;
 import org.testin.java.codegen.GeneratedMethod;
 import org.testin.java.codegen.method.update.UpdateTestBase;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.util.List;
 import java.util.Optional;

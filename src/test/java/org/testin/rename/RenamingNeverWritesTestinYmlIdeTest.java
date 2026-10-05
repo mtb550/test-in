@@ -23,7 +23,7 @@ import org.testin.NodesOnDisk;
 import org.testin.TreeGesture;
 import org.testin.config.TestinYml;
 import org.testin.indexer.Nodes;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.testproject.SaveTestinYml;

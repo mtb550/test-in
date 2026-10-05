@@ -18,7 +18,7 @@ package org.testin.editor;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.util.ArrayList;
 import java.util.List;

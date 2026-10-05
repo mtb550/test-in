@@ -25,8 +25,8 @@ import org.testin.codegen.event.Moved;
 import org.testin.codegen.event.MovedTestCase;
 import org.testin.codegen.event.NoOpCodeUpdate;
 import org.testin.codegen.event.Renamed;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.DirectoryDto;
 import org.testin.util.Bundle;
 
 import java.util.List;

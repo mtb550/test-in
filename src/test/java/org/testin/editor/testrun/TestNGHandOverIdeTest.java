@@ -28,10 +28,10 @@ import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
 import org.testin.Said;
 import org.testin.editor.EditorFixtures;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.notifications.Refused;
 
 import java.util.Collection;

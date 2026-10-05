@@ -19,7 +19,7 @@ package org.testin.editor.toolbar;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.testrun.ExecutionControl;
 import org.testin.editor.testrun.TestRunEditor;
-import org.testin.model.TestRunStatus;
+import org.testin.model.status.TestRunStatus;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;
 

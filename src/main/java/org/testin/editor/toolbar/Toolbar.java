@@ -19,7 +19,7 @@ package org.testin.editor.toolbar;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.filter.FilterSource;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 
 public interface Toolbar extends FilterSource {
     void onToolBarSearchValueChanged();

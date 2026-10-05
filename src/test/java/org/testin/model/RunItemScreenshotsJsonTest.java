@@ -16,7 +16,8 @@
 
 package org.testin.model;
 
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.result.TestRunItems;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 

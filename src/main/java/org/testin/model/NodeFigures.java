@@ -17,6 +17,7 @@
 package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.result.TestRunSummary;
 import org.testin.util.Bundle;
 
 public record NodeFigures(long testSets, long packages, long testCases, long runnableTestCases, long testRuns, @NotNull TestRunSummary testRun) {

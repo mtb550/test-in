@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Said;
 import org.testin.TreeGesture;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.notifications.Refused;
 import org.testin.services.OptionalPlugin;
 

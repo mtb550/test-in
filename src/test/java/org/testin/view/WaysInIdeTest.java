@@ -27,8 +27,8 @@ import org.testin.editor.EditorFixtures;
 import org.testin.editor.grid.GridKeys;
 import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.editor.testcase.TestCaseEditor;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetDirectoryDto;
 
 import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;

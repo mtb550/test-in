@@ -20,9 +20,9 @@ import com.intellij.openapi.fileEditor.FileEditorProvider;
 import com.intellij.testFramework.LightVirtualFile;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
 
 @Getter
 public class UnifiedVirtualFile extends LightVirtualFile {

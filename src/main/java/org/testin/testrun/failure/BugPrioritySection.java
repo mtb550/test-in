@@ -17,8 +17,8 @@
 package org.testin.testrun.failure;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.BugPriority;
-import org.testin.model.TestRunItems;
+import org.testin.model.bug.BugPriority;
+import org.testin.model.result.TestRunItems;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;

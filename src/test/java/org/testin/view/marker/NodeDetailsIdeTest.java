@@ -21,8 +21,8 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.NodesOnDisk;
 import org.testin.Said;
 import org.testin.indexer.NodeCounter;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.ui.framework.ShownDialog;
 
 import java.io.IOException;

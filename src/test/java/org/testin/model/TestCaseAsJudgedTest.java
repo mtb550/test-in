@@ -16,15 +16,16 @@
 
 package org.testin.model;
 
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.util.Mapper;
-import org.testin.util.RealMapper;
-import org.testng.annotations.Test;
 
 import java.util.Optional;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
+import org.testin.util.Mapper;
+import org.testin.util.RealMapper;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

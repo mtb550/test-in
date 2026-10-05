@@ -25,7 +25,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.ComponentWithEmptyText;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunItems;
+import org.testin.model.result.TestRunItems;
 import org.testin.services.Services;
 import org.testin.testrun.RunItemStatusService;
 import org.testin.testrun.failure.FailureFields;

@@ -24,7 +24,7 @@ import org.testin.git.change.DiffType;
 import org.testin.git.change.PendingChange;
 import org.testin.git.conflict.ConflictResolution;
 import org.testin.git.conflict.RebaseEnd;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.util.Bundle;
 
 import java.util.Objects;

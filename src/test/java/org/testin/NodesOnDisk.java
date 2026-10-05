@@ -22,12 +22,12 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetPackageDirectoryDto;
 import org.testin.services.Services;
 
 import java.nio.file.Path;

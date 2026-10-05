@@ -24,8 +24,8 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.Failure;
-import org.testin.model.ExecutionStatus;
+import org.testin.model.result.Failure;
+import org.testin.model.status.ExecutionStatus;
 import org.testin.services.ProjectLifetime;
 import org.testin.util.Bundle;
 

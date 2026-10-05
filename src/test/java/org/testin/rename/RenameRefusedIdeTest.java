@@ -19,8 +19,8 @@ package org.testin.rename;
 import com.intellij.testFramework.DumbModeTestUtils;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetPackageDirectoryDto;
 
 public class RenameRefusedIdeTest extends AbstractCodegenIdeTest {
 

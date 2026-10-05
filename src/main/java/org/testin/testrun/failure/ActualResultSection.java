@@ -18,7 +18,7 @@ package org.testin.testrun.failure;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunItems;
+import org.testin.model.result.TestRunItems;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.MultiLineField;

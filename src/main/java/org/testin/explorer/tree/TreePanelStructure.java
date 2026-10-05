@@ -21,7 +21,7 @@ import com.intellij.ide.util.treeView.NodeDescriptor;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.util.Bundle;
 
 import java.util.Optional;

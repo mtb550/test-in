@@ -24,7 +24,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.model.MenuItem;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.testcase.Can;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestCaseEditorAttributes;

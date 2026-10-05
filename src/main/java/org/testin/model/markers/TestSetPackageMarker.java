@@ -20,7 +20,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
-import org.testin.model.PackageStatus;
+import org.testin.model.status.PackageStatus;
 
 @Setter
 @Getter

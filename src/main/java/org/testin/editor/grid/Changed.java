@@ -18,7 +18,7 @@ package org.testin.editor.grid;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.testcase.TestCaseSnapshot;
 
 import java.util.Set;

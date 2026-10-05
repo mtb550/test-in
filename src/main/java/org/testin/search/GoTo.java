@@ -25,7 +25,7 @@ import org.testin.editor.open.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreePanelTree;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.view.ViewToolWindowFactory;
 

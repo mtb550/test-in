@@ -21,8 +21,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.NodeStatus;
-import org.testin.model.TestSetStatus;
+import org.testin.model.status.NodeStatus;
+import org.testin.model.status.TestSetStatus;
 
 import java.util.List;
 

@@ -18,7 +18,7 @@ package org.testin.bug;
 
 import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.RunItemStatus;
+import org.testin.model.status.RunItemStatus;
 import org.testin.ui.Badge;
 import org.testin.ui.Pill;
 import org.testin.util.Bundle;

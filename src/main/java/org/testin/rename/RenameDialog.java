@@ -20,7 +20,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;

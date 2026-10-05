@@ -18,12 +18,12 @@ package org.testin.explorer.tree;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.tree.LeafState;
-import org.testin.model.ProjectStatus;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.model.status.ProjectStatus;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetPackageDirectoryDto;
 
 import java.util.Objects;
 import java.nio.file.Path;

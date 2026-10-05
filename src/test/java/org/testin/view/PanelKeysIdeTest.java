@@ -25,8 +25,8 @@ import org.testin.Said;
 import org.testin.clipboard.CutState;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Shortcuts;
 

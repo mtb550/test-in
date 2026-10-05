@@ -29,10 +29,10 @@ import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.editor.toolbar.GridViewBtn;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
 
 import javax.swing.JComponent;
 import javax.swing.tree.DefaultMutableTreeNode;

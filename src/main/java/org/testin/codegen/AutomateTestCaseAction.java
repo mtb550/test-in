@@ -29,7 +29,7 @@ import org.testin.codegen.agent.AgentConnection;
 import org.testin.codegen.agent.WriteBodies;
 import org.testin.editor.TestinEditor;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;

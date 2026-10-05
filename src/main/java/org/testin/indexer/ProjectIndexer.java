@@ -29,7 +29,7 @@ import org.testin.editor.open.LastOpenEditors;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
-import org.testin.model.ProjectStatus;
+import org.testin.model.status.ProjectStatus;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;

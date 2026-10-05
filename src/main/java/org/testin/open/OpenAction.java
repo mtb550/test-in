@@ -24,7 +24,7 @@ import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.editor.open.TestinEditors;
 import org.testin.logger.Logger;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 import org.testin.services.Services;
 
 import java.util.List;

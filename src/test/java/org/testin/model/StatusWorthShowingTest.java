@@ -17,6 +17,11 @@
 package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.status.NoStatus;
+import org.testin.model.status.NodeStatus;
+import org.testin.model.status.PackageStatus;
+import org.testin.model.status.ProjectStatus;
+import org.testin.model.status.TestSetStatus;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;

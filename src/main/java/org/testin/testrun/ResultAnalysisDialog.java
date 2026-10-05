@@ -18,8 +18,8 @@ package org.testin.testrun;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.ResultAnalysis;
-import org.testin.model.TestRunSummary;
+import org.testin.model.result.ResultAnalysis;
+import org.testin.model.result.TestRunSummary;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogSize;

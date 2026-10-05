@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.event.Moved;
 import org.testin.codegen.event.Renamed;
 import org.testin.model.DirectoryType;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

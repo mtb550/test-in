@@ -24,8 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.config.TestinYml;
 import org.testin.model.Priority;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetDirectoryDto;
 
 import java.util.Collection;
 import java.util.Optional;

@@ -21,8 +21,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.testrun.TestRunCard;
 import org.testin.editor.testrun.TestRunEditor;
-import org.testin.model.TestRunItems;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.TestCaseDto;
 
 import javax.swing.JList;
 import java.util.Optional;

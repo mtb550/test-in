@@ -18,7 +18,7 @@ package org.testin.importexport;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.util.Objects;
 import java.io.File;

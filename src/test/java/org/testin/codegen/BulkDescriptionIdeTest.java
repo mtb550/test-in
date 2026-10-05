@@ -19,8 +19,8 @@ package org.testin.codegen;
 import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetDirectoryDto;
 
 import java.util.List;
 

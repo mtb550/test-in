@@ -19,7 +19,7 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.ShownFields;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;

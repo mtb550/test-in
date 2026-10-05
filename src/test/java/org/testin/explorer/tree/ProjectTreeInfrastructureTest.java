@@ -16,8 +16,8 @@
 
 package org.testin.explorer.tree;
 
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testng.annotations.Test;
 
 import javax.swing.TransferHandler;

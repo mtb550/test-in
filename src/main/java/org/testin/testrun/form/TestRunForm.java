@@ -23,9 +23,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.indexer.TestCases;
-import org.testin.model.TestRunConfiguration;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.result.TestRunConfiguration;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.DirectoryDto;
 import org.testin.services.Services;
 import org.testin.ui.framework.SelectionTree;
 

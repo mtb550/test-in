@@ -25,10 +25,10 @@ import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
-import org.testin.model.ResultAnalysis;
-import org.testin.model.TestRunConfiguration;
-import org.testin.model.TestRunExecution;
-import org.testin.model.TestRunStatus;
+import org.testin.model.result.ResultAnalysis;
+import org.testin.model.result.TestRunConfiguration;
+import org.testin.model.result.TestRunExecution;
+import org.testin.model.status.TestRunStatus;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;

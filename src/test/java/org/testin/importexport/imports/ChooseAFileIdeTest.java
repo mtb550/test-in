@@ -38,8 +38,8 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.importexport.FileTypes;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.view.Drawn;
 

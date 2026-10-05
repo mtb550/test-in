@@ -33,7 +33,7 @@ import com.theoryinpractice.testng.configuration.TestNGConfigurationType;
 import com.theoryinpractice.testng.model.TestType;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
 import org.testin.runner.TestNGExecution;
 import org.testin.runner.TestRunner;

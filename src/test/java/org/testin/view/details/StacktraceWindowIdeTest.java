@@ -18,7 +18,7 @@ package org.testin.view.details;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.components.JBLabel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.framework.ShownDialog;

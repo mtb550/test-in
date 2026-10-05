@@ -22,7 +22,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.AbstractEditorContextMenu;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

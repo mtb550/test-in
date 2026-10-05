@@ -17,9 +17,9 @@
 package org.testin.indexer;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunItems;
-import org.testin.model.RunItemStatus;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
+import org.testin.model.TestCaseDto;
 import org.testng.annotations.Test;
 
 import java.util.List;

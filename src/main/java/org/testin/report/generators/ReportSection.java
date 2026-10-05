@@ -19,9 +19,9 @@ package org.testin.report.generators;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.ReportColor;
-import org.testin.model.TestRunItems;
-import org.testin.model.TestRunSummary;
-import org.testin.model.RunItemStatus;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.result.TestRunSummary;
+import org.testin.model.status.RunItemStatus;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.util.Bundle;
 

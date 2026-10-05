@@ -16,6 +16,7 @@
 
 package org.testin.model;
 
+import org.testin.model.result.FailureDetail;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testng.annotations.Test;
 

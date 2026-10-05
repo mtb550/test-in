@@ -25,7 +25,7 @@ import org.testin.actions.GrayWithReason;
 import org.testin.actions.TestinData;
 import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.open.TestinEditors;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Bundle;

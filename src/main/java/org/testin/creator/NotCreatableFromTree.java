@@ -19,7 +19,7 @@ package org.testin.creator;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 
 import java.nio.file.Path;
 import java.util.Optional;

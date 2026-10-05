@@ -18,7 +18,7 @@ package org.testin.importexport.imports;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

@@ -16,7 +16,7 @@
 
 package org.testin.report;
 
-import org.testin.model.TestRunStatus;
+import org.testin.model.status.TestRunStatus;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;

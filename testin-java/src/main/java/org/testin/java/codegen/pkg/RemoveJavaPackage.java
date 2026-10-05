@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 
 public class RemoveJavaPackage implements GenAction<DirectoryDto> {
     // UC-CODEGEN-018, Rule-CODEGEN-059

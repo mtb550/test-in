@@ -19,7 +19,7 @@ package org.testin.testrun;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.RunItemStatus;
+import org.testin.model.status.RunItemStatus;
 import org.testin.util.Shortcuts;
 
 import javax.swing.JComponent;

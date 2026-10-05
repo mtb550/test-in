@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.notifications.Refused;
 import org.testin.services.Services;
 import org.testin.testcase.Can;

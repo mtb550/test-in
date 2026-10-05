@@ -18,7 +18,7 @@ package org.testin.bug;
 
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunItems;
+import org.testin.model.result.TestRunItems;
 import org.testin.util.Bundle;
 
 import java.util.HashMap;

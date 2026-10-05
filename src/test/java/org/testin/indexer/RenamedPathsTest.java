@@ -17,7 +17,7 @@
 package org.testin.indexer;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;

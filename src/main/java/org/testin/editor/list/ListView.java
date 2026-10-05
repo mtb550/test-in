@@ -20,7 +20,7 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 public record ListView(@NotNull CollectionListModel<TestCaseDto> model, @NotNull JBList<TestCaseDto> list, @NotNull JBScrollPane scrollPane) {
 }

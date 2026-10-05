@@ -24,7 +24,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.Nodes;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.search.GoTo;
 import org.testin.search.Hit;
 import org.testin.services.Services;

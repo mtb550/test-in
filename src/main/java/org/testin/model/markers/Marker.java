@@ -18,8 +18,8 @@ package org.testin.model.markers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.NoStatus;
-import org.testin.model.NodeStatus;
+import org.testin.model.status.NoStatus;
+import org.testin.model.status.NodeStatus;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;

@@ -16,9 +16,6 @@
 
 package org.testin.model;
 
-import org.testin.model.dto.TestCaseDto;
-import org.testin.util.RealMapper;
-import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +27,9 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.status.TestCaseStatus;
+import org.testin.util.RealMapper;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

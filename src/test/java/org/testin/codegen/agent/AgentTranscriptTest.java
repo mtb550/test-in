@@ -17,7 +17,7 @@
 package org.testin.codegen.agent;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testng.annotations.Test;
 
 import java.util.UUID;

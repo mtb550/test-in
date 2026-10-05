@@ -19,7 +19,7 @@ package org.testin.rename;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 import org.testin.ui.Caption;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.ui.dialogs.FormRows;

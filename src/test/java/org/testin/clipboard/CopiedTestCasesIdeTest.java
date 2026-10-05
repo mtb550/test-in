@@ -18,7 +18,7 @@ package org.testin.clipboard;
 
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 

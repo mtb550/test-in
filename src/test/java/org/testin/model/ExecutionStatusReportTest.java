@@ -16,6 +16,7 @@
 
 package org.testin.model;
 
+import org.testin.model.status.ExecutionStatus;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;

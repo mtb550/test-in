@@ -21,9 +21,9 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.view.ViewToolWindowFactory;
 

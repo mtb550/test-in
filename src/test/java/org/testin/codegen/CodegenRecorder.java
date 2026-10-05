@@ -22,8 +22,8 @@ import com.intellij.testFramework.ExtensionTestUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.event.Moved;
 import org.testin.codegen.event.Renamed;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.DirectoryDto;
 
 import java.util.ArrayList;
 import java.util.List;

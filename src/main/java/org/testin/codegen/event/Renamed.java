@@ -23,7 +23,7 @@ import org.testin.codegen.Fqcn;
 import org.testin.codegen.JavaSourceRoot;
 import org.testin.config.TestinYml;
 import org.testin.model.DirectoryType;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 import org.testin.services.OptionalPlugin;
 import org.testin.util.NameSanitizer;
 

@@ -39,11 +39,11 @@ import org.testin.Said;
 import org.testin.editor.open.UnifiedVirtualFile;
 import org.testin.importexport.FileTypes;
 import org.testin.indexer.TestCases;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetPackageDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 

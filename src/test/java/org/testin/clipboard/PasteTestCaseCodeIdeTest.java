@@ -29,8 +29,8 @@ import org.testin.codegen.GenType;
 import org.testin.editor.open.UnifiedVirtualFile;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.indexer.TestCases;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 

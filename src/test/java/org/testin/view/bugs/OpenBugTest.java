@@ -16,10 +16,10 @@
 package org.testin.view.bugs;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.BugSeverity;
-import org.testin.model.RunItemStatus;
-import org.testin.model.TestRunItems;
-import org.testin.model.dto.TestRunDto;
+import org.testin.model.bug.BugSeverity;
+import org.testin.model.status.RunItemStatus;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.TestRunDto;
 import org.testng.annotations.Test;
 
 import java.util.Objects;

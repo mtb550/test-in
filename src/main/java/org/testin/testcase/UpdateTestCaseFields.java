@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.model.MenuItem;
 import org.testin.model.StatusBarItem;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;

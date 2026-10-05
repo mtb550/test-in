@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.explorer.tree.TreeValues;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;

@@ -21,7 +21,7 @@ import org.testin.Await;
 import org.testin.TempTree;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
-import org.testin.model.TestRunItems;
+import org.testin.model.result.TestRunItems;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 

@@ -25,7 +25,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.ui.Caption;
 import org.testin.util.Fonts;
 import org.testin.view.ViewPanel;

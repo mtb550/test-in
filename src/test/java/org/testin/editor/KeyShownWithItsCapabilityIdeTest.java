@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.card.Offered;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.util.List;
 import java.util.Optional;

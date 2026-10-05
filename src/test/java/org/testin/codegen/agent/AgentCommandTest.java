@@ -26,8 +26,8 @@ import org.testin.codegen.Fqcn;
 import org.testin.codegen.agent.AgentCli;
 import org.testin.codegen.agent.AgentConnection;
 import org.testin.codegen.agent.BodyPrompt;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;

@@ -17,7 +17,7 @@
 package org.testin.git.change;
 
 import org.testin.model.Priority;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.util.RealMapper;
 import org.testng.annotations.Test;
 

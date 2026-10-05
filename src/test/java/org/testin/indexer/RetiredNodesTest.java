@@ -16,16 +16,16 @@
 
 package org.testin.indexer;
 
-import org.testin.model.PackageStatus;
-import org.testin.model.TestSetStatus;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestCasesMainDirectoryDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestRunPackageDirectoryDto;
-import org.testin.model.dto.dirs.TestRunsMainDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.model.status.PackageStatus;
+import org.testin.model.status.TestSetStatus;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.TestCasesMainDirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestRunPackageDirectoryDto;
+import org.testin.model.node.TestRunsMainDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
+import org.testin.model.node.TestSetPackageDirectoryDto;
 import org.testin.model.markers.Marker;
 import org.testng.annotations.Test;
 

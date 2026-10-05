@@ -16,7 +16,7 @@
 
 package org.testin.util;
 
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testng.annotations.Test;
 
 import java.io.UncheckedIOException;

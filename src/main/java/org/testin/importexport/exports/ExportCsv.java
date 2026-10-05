@@ -18,7 +18,7 @@ package org.testin.importexport.exports;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.util.FailureText;

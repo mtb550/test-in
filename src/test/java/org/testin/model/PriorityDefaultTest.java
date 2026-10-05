@@ -16,7 +16,6 @@
 
 package org.testin.model;
 
-import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;

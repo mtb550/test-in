@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.editor.TestinEditor;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.navigate.CodeNavigation;
 import org.testin.notifications.Notifier;
 import org.testin.services.BackgroundWork;

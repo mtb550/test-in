@@ -24,7 +24,7 @@ import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.codegen.CodeOn;
 import org.testin.editor.card.CardHoverAction;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 // UC-CODEGEN-006
 public class NavigateToTestMethodAction extends AbstractAnyProjectAction {

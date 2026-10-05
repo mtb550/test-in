@@ -17,8 +17,10 @@
 package org.testin.model;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestRunDto;
 import org.testin.model.markers.TestRunMarker;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
+import org.testin.model.status.TestRunStatus;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;

@@ -22,7 +22,7 @@ import com.intellij.ui.components.JBTabbedPane;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.ui.framework.DialogComponent;
 

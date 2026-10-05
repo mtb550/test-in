@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.logger.Logger;
 import org.testin.model.Priority;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;

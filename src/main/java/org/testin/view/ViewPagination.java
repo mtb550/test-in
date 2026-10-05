@@ -20,7 +20,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.util.List;
 import java.util.Optional;

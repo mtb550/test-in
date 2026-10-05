@@ -26,9 +26,9 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.ProjectStatus;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.status.ProjectStatus;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.FailureText;
 

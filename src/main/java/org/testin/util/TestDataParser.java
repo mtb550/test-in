@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
 import org.testin.model.Groups;
 import org.testin.model.Priority;
-import org.testin.model.TestCaseStatus;
+import org.testin.model.status.TestCaseStatus;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

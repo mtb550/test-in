@@ -33,7 +33,7 @@ import org.testin.editor.open.EditorKind;
 import org.testin.editor.WheelForwarding;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;

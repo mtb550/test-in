@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
 import org.testin.util.NameSanitizer;

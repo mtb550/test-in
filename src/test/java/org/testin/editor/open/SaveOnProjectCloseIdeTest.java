@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.editor.EditorFixtures;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.services.Services;
 
 import java.util.Objects;

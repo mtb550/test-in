@@ -16,7 +16,7 @@
 
 package org.testin.util;
 
-import org.testin.model.TestCaseStatus;
+import org.testin.model.status.TestCaseStatus;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;

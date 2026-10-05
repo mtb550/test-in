@@ -16,11 +16,14 @@
 
 package org.testin.model;
 
-import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.result.TestRunSummary;
+import org.testin.model.status.RunItemStatus;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertSame;

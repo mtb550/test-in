@@ -21,11 +21,11 @@ import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
-import org.testin.model.RunItemStatus;
-import org.testin.model.TestRunItems;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.status.RunItemStatus;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestRunDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 

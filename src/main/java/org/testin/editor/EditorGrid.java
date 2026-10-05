@@ -31,7 +31,7 @@ import org.testin.editor.grid.GridSelectionListener;
 import org.testin.editor.statusbar.PageAction;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.ui.FontSync;
 import org.testin.util.Bundle;

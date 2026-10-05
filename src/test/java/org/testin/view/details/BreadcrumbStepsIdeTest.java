@@ -18,8 +18,8 @@ package org.testin.view.details;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.TestinLog;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.view.AbstractViewPanelIdeTest;
 import org.testin.view.Drawn;
 

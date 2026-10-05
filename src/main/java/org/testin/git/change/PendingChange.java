@@ -17,7 +17,7 @@
 package org.testin.git.change;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.nio.file.Path;
 import java.util.List;

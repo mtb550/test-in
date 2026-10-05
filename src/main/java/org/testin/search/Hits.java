@@ -23,10 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.indexer.TestRuns;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.TestRunDto;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.TestRunDto;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseEditorAttributes;
 

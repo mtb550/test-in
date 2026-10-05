@@ -21,8 +21,8 @@ import org.testin.editor.EditorFixtures;
 import org.testin.editor.open.UnifiedFileEditor;
 import org.testin.editor.open.UnifiedVirtualFile;
 import org.testin.editor.testcase.TestCaseEditor;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.util.Bundle;
 
 import java.util.List;

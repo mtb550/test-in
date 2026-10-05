@@ -19,10 +19,10 @@ package org.testin.indexer;
 import com.intellij.openapi.application.WriteAction;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
-import org.testin.model.ProjectStatus;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.status.ProjectStatus;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 

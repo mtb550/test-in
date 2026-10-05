@@ -19,7 +19,7 @@ package org.testin.indexer;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.NodeFigures;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 
 @FunctionalInterface
 public interface FiguresGatherer {

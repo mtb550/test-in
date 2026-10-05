@@ -21,8 +21,8 @@ import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.filter.FilterPopupBtn;
 import org.testin.model.Automated;
 import org.testin.model.Priority;
-import org.testin.model.TestCaseStatus;
-import org.testin.model.RunItemStatus;
+import org.testin.model.status.TestCaseStatus;
+import org.testin.model.status.RunItemStatus;
 
 import java.util.Set;
 

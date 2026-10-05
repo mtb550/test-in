@@ -21,7 +21,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.testcase.UpdateTestCaseFields;
 import org.testin.testcase.update.UpdateTestCaseDialog;
 import org.testin.ui.framework.ShortcutMenuPopup;

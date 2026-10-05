@@ -22,7 +22,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
-import org.testin.model.TestRunStatus;
+import org.testin.model.status.TestRunStatus;
 import org.testin.util.Bundle;
 import org.testin.util.Mapper;
 import org.testin.util.TestDataParser;

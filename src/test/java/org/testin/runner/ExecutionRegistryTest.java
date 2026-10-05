@@ -16,8 +16,8 @@
 
 package org.testin.runner;
 
-import org.testin.model.ExecutionStatus;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.status.ExecutionStatus;
+import org.testin.model.TestCaseDto;
 import org.testng.annotations.Test;
 
 import java.util.List;

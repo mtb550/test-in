@@ -22,7 +22,7 @@ import com.intellij.ui.components.panels.HorizontalLayout;
 import com.intellij.util.ui.EmptyIcon;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.ui.Badge;

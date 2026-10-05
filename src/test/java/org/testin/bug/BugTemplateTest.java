@@ -16,8 +16,8 @@
 
 package org.testin.bug;
 
-import org.testin.model.BugPriority;
-import org.testin.model.BugSeverity;
+import org.testin.model.bug.BugPriority;
+import org.testin.model.bug.BugSeverity;
 import org.testng.annotations.Test;
 
 import java.util.List;

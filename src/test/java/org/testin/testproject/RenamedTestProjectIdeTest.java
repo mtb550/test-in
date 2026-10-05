@@ -21,7 +21,7 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.config.TestinYml;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.rename.NodeRename;
 import org.testin.services.Services;
 

@@ -22,9 +22,9 @@ import org.testin.Await;
 import org.testin.FilesUnder;
 import org.testin.editor.EditorFixtures;
 import org.testin.indexer.TestCases;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
 

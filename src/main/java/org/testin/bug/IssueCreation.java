@@ -18,7 +18,7 @@ package org.testin.bug;
 
 import com.intellij.execution.process.ProcessOutput;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.BugIssueUrl;
+import org.testin.model.bug.BugIssueUrl;
 import org.testin.util.Bundle;
 
 import java.util.Optional;

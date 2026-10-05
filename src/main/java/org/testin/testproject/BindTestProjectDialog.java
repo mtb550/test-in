@@ -19,7 +19,7 @@ package org.testin.testproject;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
-import org.testin.model.ProjectStatus;
+import org.testin.model.status.ProjectStatus;
 import org.testin.notifications.Done;
 import org.testin.services.Services;
 import org.testin.ui.framework.AbstractFrameworkDialog;

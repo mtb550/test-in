@@ -20,7 +20,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.testrun.TestRunEditor;
-import org.testin.model.TestRunStatus;
+import org.testin.model.status.TestRunStatus;
 import org.testin.report.GenerateReportAction;
 import org.testin.ui.framework.AbstractIconButton;
 import org.testin.util.Bundle;

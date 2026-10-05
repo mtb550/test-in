@@ -18,8 +18,8 @@ package org.testin.codegen;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.TestSetPackageDirectoryDto;
 
 public class SubtreeCodeIdeTest extends AbstractCodegenIdeTest {
 

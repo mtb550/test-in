@@ -20,7 +20,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.testrun.TestRunEditor;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
 
 import java.util.Optional;
 

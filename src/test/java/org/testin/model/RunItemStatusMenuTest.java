@@ -16,6 +16,7 @@
 
 package org.testin.model;
 
+import org.testin.model.status.RunItemStatus;
 import org.testng.annotations.Test;
 
 import javax.swing.KeyStroke;

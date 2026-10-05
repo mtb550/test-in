@@ -22,11 +22,11 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;
-import org.testin.model.RunItemStatus;
-import org.testin.model.TestRunItems;
-import org.testin.model.TestRunStatus;
-import org.testin.model.dto.TestRunDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.status.RunItemStatus;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.TestRunStatus;
+import org.testin.model.TestRunDto;
+import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testrun.RunItemStatusService;
 

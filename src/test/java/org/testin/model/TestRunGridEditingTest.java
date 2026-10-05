@@ -16,14 +16,18 @@
 
 package org.testin.model;
 
-import org.testin.model.dto.TestCaseDto;
-import org.testin.testrun.TestRunEditorAttributes;
-import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.bug.BugPriority;
+import org.testin.model.bug.BugSeverity;
+import org.testin.model.result.Failure;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
+import org.testin.testrun.TestRunEditorAttributes;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

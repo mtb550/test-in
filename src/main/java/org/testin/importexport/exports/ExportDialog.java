@@ -21,7 +21,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.SheetPreview;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.ui.dialogs.Destination;
 import org.testin.ui.dialogs.DestinationForm;

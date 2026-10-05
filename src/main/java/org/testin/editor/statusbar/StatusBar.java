@@ -30,8 +30,8 @@ import org.testin.editor.EditorColors;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.logger.Logger;
 import org.testin.model.Automated;
-import org.testin.model.Segment;
-import org.testin.model.TestRunStatus;
+import org.testin.model.result.Segment;
+import org.testin.model.status.TestRunStatus;
 import org.testin.ui.Tooltip;
 import org.testin.util.Bundle;
 

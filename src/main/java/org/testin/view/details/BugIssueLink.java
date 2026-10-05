@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.bug.BugIssueState;
 import org.testin.bug.BugIssueStates;
-import org.testin.model.BugIssueUrl;
+import org.testin.model.bug.BugIssueUrl;
 import org.testin.services.Services;
 import org.testin.ui.Badges;
 import org.testin.ui.Tooltip;

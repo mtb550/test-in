@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.notifications.Done;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;

@@ -18,7 +18,7 @@ package org.testin.remove;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 
 import java.util.function.Consumer;
 

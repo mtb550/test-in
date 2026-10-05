@@ -17,7 +17,7 @@
 package org.testin.importexport.exports;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.util.List;
 

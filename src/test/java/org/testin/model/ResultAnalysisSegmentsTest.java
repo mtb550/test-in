@@ -19,6 +19,11 @@ package org.testin.model;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.result.ResultAnalysis;
+import org.testin.model.result.Segment;
+import org.testin.model.result.TestRunSummary;
+import org.testin.model.status.RunItemStatus;
+import org.testin.model.status.TestRunStatus;
 import org.testng.annotations.Test;
 
 import java.awt.Color;

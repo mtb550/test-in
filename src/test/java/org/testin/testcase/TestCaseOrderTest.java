@@ -16,7 +16,7 @@
 
 package org.testin.testcase;
 
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testng.annotations.Test;
 
 import java.time.ZonedDateTime;

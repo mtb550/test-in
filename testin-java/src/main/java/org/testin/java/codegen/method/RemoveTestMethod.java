@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenAction;
 import org.testin.java.codegen.method.update.UpdateTestBase;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 public class RemoveTestMethod extends UpdateTestBase implements GenAction<TestCaseDto> {
     // UC-CODEGEN-014, Rule-CODEGEN-049, Rule-CODEGEN-050

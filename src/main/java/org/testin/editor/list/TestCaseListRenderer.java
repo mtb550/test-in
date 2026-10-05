@@ -22,7 +22,7 @@ import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.testcase.TestCaseCard;
 import org.testin.editor.testcase.TestCaseEditor;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import javax.swing.JList;
 

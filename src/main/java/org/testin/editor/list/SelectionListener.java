@@ -21,7 +21,7 @@ import com.intellij.ui.components.JBList;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.event.ListSelectionEvent;

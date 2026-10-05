@@ -27,7 +27,7 @@ import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.FailureText;
 import org.testin.util.Mapper;

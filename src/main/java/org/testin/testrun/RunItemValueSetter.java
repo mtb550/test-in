@@ -17,7 +17,7 @@
 package org.testin.testrun;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunItems;
+import org.testin.model.result.TestRunItems;
 
 @FunctionalInterface
 public interface RunItemValueSetter {

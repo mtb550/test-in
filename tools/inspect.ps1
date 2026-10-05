@@ -1010,7 +1010,7 @@ function Read-OrphanedJavadoc([string[]] $scopes) {
         one - the derived field reaches every test run file a tester commits. It
         is #73's, and deleting that name is how that story closes.
     #>
-    $frozen = @('src/main/java/org/testin/model/dto/TestRunDto.java')
+    $frozen = @('src/main/java/org/testin/model/TestRunDto.java')
 
     foreach ($scope in $scopes) {
         if (-not (Test-Path $scope)) { continue }

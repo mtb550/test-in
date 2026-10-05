@@ -24,7 +24,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.util.Bundle;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;

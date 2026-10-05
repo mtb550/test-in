@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.NodeCounter;
 import org.testin.model.DirectoryType;
 import org.testin.model.NodeFigures;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.node.DirectoryDto;
 import org.testin.model.markers.Marker;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.ui.framework.AbstractFrameworkDialog;

@@ -19,7 +19,7 @@ package org.testin.testproject;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.NodesOnDisk;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.node.TestProjectDirectoryDto;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 

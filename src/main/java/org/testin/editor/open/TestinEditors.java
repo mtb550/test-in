@@ -30,9 +30,9 @@ import org.testin.editor.TestinEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.DirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.services.Services;
 
 import java.nio.file.Path;

@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editor.card.BaseCard;
 import org.testin.editor.EditorColors;
 import org.testin.editor.TestinEditor;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;

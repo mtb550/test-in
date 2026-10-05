@@ -17,9 +17,9 @@
 package org.testin.view.bugs;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.FailureDetail;
-import org.testin.model.TestRunItems;
-import org.testin.model.dto.TestRunDto;
+import org.testin.model.result.FailureDetail;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.TestRunDto;
 
 import java.nio.file.Path;
 import java.util.Comparator;

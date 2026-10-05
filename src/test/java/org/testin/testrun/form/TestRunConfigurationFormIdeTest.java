@@ -18,7 +18,7 @@ package org.testin.testrun.form;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunConfiguration;
+import org.testin.model.result.TestRunConfiguration;
 import org.testin.view.Drawn;
 
 import javax.swing.AbstractButton;

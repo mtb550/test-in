@@ -17,7 +17,7 @@
 package org.testin.editor;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.util.List;
 import java.util.UUID;

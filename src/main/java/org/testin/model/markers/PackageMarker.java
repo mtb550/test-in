@@ -17,8 +17,8 @@
 package org.testin.model.markers;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.NodeStatus;
-import org.testin.model.PackageStatus;
+import org.testin.model.status.NodeStatus;
+import org.testin.model.status.PackageStatus;
 
 import java.util.List;
 

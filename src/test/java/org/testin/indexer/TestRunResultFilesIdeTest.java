@@ -20,11 +20,11 @@ import com.intellij.openapi.application.WriteAction;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.model.FileKind;
-import org.testin.model.TestRunItems;
-import org.testin.model.RunItemStatus;
-import org.testin.model.dto.TestRunDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
+import org.testin.model.TestRunDto;
+import org.testin.model.node.TestProjectDirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.services.Services;
 
 import java.io.IOException;

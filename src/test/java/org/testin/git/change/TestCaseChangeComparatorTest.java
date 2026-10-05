@@ -17,8 +17,8 @@
 package org.testin.git.change;
 
 import org.testin.model.Priority;
-import org.testin.model.TestCaseStatus;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.status.TestCaseStatus;
+import org.testin.model.TestCaseDto;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;

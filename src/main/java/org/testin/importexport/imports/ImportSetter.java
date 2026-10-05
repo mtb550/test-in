@@ -18,8 +18,8 @@ package org.testin.importexport.imports;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.TestCaseDto.TestCaseDtoBuilder;
+import org.testin.model.TestCaseDto;
+import org.testin.model.TestCaseDto.TestCaseDtoBuilder;
 
 import java.util.Optional;
 import java.util.function.BiFunction;

@@ -26,7 +26,7 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.model.ProjectStatus;
+import org.testin.model.status.ProjectStatus;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;

@@ -16,8 +16,9 @@
 
 package org.testin.model;
 
-import org.testin.model.dto.TestCaseDto;
 import org.testin.model.markers.TestRunMarker;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
 import org.testin.util.Display;
 import org.testng.annotations.Test;
 

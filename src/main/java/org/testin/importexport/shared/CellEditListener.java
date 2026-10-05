@@ -19,7 +19,7 @@ package org.testin.importexport.shared;
 import com.intellij.openapi.project.Project;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.testcase.TestCaseEditorAttributes;
 
 import javax.swing.event.TableModelEvent;

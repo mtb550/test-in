@@ -26,8 +26,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
-import org.testin.model.ExecutionStatusBadge;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.status.ExecutionStatusBadge;
+import org.testin.model.TestCaseDto;
 import org.testin.util.FixedColors;
 import org.testin.util.Fonts;
 

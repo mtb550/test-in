@@ -16,12 +16,12 @@
 
 package org.testin.ui;
 
-import org.testin.model.BugPriority;
-import org.testin.model.BugSeverity;
+import org.testin.model.bug.BugPriority;
+import org.testin.model.bug.BugSeverity;
 import org.testin.model.Priority;
-import org.testin.model.TestRunItems;
-import org.testin.model.RunItemStatus;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.result.TestRunItems;
+import org.testin.model.status.RunItemStatus;
+import org.testin.model.TestCaseDto;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testng.annotations.Test;
 

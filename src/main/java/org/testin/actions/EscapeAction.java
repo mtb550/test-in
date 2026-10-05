@@ -31,7 +31,7 @@ import org.testin.clipboard.CopiedTestCases;
 import org.testin.clipboard.CutState;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;

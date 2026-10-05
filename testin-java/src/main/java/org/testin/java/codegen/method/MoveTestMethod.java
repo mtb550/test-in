@@ -33,7 +33,7 @@ import org.testin.java.codegen.GeneratedMethod;
 import org.testin.java.codegen.method.update.UpdateTestBase;
 import org.testin.java.codegen.method.update.UpdateTestOrder;
 import org.testin.logger.Logger;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 import java.util.LinkedHashSet;
 import java.util.List;

@@ -17,8 +17,8 @@
 package org.testin.git.change;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.TestCaseDto.TestCaseDtoBuilder;
+import org.testin.model.TestCaseDto;
+import org.testin.model.TestCaseDto.TestCaseDtoBuilder;
 
 @FunctionalInterface
 public interface RevertAction {

@@ -28,8 +28,8 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.TestCaseDto;
+import org.testin.model.node.DirectoryDto;
 import org.testin.ui.FontSync;
 import org.testin.util.Bundle;
 

@@ -25,7 +25,7 @@ import org.testin.git.GitFailed;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.change.TestCaseChangeComparator;
 import org.testin.indexer.TestCaseFile;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.FailureText;
 import org.testin.util.Mapper;

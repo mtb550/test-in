@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.actions.GrayWithReason;
 import org.testin.explorer.tree.TreeValues;
-import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.node.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 

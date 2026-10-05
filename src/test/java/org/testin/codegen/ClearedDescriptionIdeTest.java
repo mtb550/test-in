@@ -19,7 +19,7 @@ package org.testin.codegen;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 
 public class ClearedDescriptionIdeTest extends AbstractCodegenIdeTest {
 

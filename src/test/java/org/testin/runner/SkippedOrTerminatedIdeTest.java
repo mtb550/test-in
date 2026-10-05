@@ -19,7 +19,7 @@ package org.testin.runner;
 import com.intellij.execution.testframework.sm.runner.SMTestProxy;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.ExecutionStatus;
+import org.testin.model.status.ExecutionStatus;
 import org.testin.util.Bundle;
 
 import java.util.Map;

@@ -18,7 +18,7 @@ package org.testin.git.change;
 
 import org.testin.TempTree;
 import org.testin.model.Priority;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testin.util.RealMapper;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;

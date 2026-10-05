@@ -16,7 +16,7 @@
 package org.testin.testrun.form;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunConfiguration;
+import org.testin.model.result.TestRunConfiguration;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.RadioSelection;
 

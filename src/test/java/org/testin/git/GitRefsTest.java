@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.git.change.ChangeSubject;
 import org.testin.git.change.DiffType;
 import org.testin.git.change.PendingChange;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.TestCaseDto;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;

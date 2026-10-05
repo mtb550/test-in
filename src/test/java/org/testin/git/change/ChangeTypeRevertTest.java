@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.Priority;
-import org.testin.model.TestCaseStatus;
-import org.testin.model.dto.TestCaseDto;
+import org.testin.model.status.TestCaseStatus;
+import org.testin.model.TestCaseDto;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
