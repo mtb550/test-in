@@ -25,6 +25,8 @@ import com.intellij.openapi.util.Computable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
+import org.testin.codegen.agent.AgentConnection;
+import org.testin.codegen.agent.WriteBodies;
 import org.testin.editor.TestinEditor;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;

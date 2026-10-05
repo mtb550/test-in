@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.testin.codegen;
+package org.testin.codegen.event;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.GenType;
 
 import java.util.List;
 

@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.testin.codegen;
+package org.testin.codegen.event;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.Fqcn;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;

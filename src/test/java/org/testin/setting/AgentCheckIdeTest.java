@@ -20,7 +20,7 @@ import com.intellij.openapi.util.SystemInfo;
 import com.intellij.ui.components.JBTextField;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
-import org.testin.codegen.AgentCli;
+import org.testin.codegen.agent.AgentCli;
 import org.testin.util.Bundle;
 import org.testin.view.Drawn;
 

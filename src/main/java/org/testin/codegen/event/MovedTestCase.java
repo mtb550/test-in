@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.codegen;
+package org.testin.codegen.event;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;

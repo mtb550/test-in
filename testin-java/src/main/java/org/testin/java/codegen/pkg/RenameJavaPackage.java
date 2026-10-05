@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
-import org.testin.codegen.Renamed;
+import org.testin.codegen.event.Renamed;
 import org.testin.java.codegen.PackageDeclarations;
 import org.testin.logger.Logger;
 import org.testin.util.Bundle;

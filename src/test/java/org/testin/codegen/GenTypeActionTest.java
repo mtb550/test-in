@@ -16,7 +16,7 @@
 
 package org.testin.codegen;
 
-import org.testin.codegen.method.update.NoOpCodeUpdate;
+import org.testin.codegen.event.NoOpCodeUpdate;
 import org.testng.annotations.Test;
 
 import java.util.List;

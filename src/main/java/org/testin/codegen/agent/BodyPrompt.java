@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.testin.codegen;
+package org.testin.codegen.agent;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.Fqcn;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;

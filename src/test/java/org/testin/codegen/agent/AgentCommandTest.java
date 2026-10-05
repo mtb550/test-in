@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package org.testin.codegen;
+package org.testin.codegen.agent;
 
-import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testng.annotations.Test;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.Fqcn;
+import org.testin.codegen.agent.AgentCli;
+import org.testin.codegen.agent.AgentConnection;
+import org.testin.codegen.agent.BodyPrompt;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

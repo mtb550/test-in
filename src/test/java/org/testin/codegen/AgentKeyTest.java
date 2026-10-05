@@ -17,6 +17,7 @@
 package org.testin.codegen;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.agent.AgentConnection;
 import org.testin.setting.AppSettingsState;
 import org.testng.annotations.Test;
 

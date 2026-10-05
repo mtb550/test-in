@@ -24,7 +24,7 @@ import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.GenType;
 import org.testin.codegen.JavaSourceRoot;
-import org.testin.codegen.Moved;
+import org.testin.codegen.event.Moved;
 import org.testin.java.codegen.PackageDeclarations;
 import org.testin.logger.Logger;
 

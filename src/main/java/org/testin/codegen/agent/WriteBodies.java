@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.codegen;
+package org.testin.codegen.agent;
 
 import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.application.ReadAction;
@@ -24,6 +24,7 @@ import com.intellij.util.concurrency.AppExecutorUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.Fqcn;
 import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.navigate.CodeNavigation;

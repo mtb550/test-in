@@ -20,7 +20,7 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.JavaCode;
-import org.testin.codegen.Moved;
+import org.testin.codegen.event.Moved;
 import org.testin.codegen.SubtreeCode;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;

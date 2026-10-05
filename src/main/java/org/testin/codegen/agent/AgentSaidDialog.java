@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.codegen;
+package org.testin.codegen.agent;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;

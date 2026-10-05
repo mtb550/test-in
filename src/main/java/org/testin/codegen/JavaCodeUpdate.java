@@ -21,6 +21,7 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.event.CodeUpdate;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.notifications.Refused;

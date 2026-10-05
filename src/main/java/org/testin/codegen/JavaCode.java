@@ -20,6 +20,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.event.Moved;
+import org.testin.codegen.event.Renamed;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;
 

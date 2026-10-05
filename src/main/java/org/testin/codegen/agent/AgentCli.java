@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.codegen;
+package org.testin.codegen.agent;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
