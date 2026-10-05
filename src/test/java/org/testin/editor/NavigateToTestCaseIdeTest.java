@@ -28,6 +28,8 @@ import org.testin.Await;
 import org.testin.Gestures;
 import org.testin.Said;
 import org.testin.codegen.AutomationState;
+import org.testin.editor.card.CardHoverAction;
+import org.testin.editor.open.TestinEditors;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.Automated;

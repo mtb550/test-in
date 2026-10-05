@@ -29,7 +29,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.EditorColors;
-import org.testin.editor.EditorKind;
+import org.testin.editor.open.EditorKind;
 import org.testin.editor.WheelForwarding;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;

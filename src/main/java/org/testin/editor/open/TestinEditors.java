@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.editor.open;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
@@ -26,6 +26,7 @@ import com.intellij.util.concurrency.ThreadingAssertions;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.TestinEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;

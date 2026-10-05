@@ -14,28 +14,18 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.editor.open;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectCloseListener;
 import org.jetbrains.annotations.NotNull;
-import org.testin.indexer.IndexChanged;
 import org.testin.services.Services;
 
-public final class OpenEditorsFollowTheIndex implements IndexChanged {
-    private final @NotNull Project p;
-    private final @NotNull TestinEditors testinEditors;
-
-    public OpenEditorsFollowTheIndex(final @NotNull Project p) {
-        this.p = p;
-        this.testinEditors = Services.getInstance(p, TestinEditors.class);
-    }
-
-    // UC-INTERNAL-002, Rule-INTERNAL-114
+public final class SaveOnProjectClose implements ProjectCloseListener {
+    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-015
     @Override
-    public void readAgain() {
-        ApplicationManager.getApplication().invokeLater(() -> {
-            if (!p.isDisposed()) testinEditors.refreshOpen();
-        });
+    public void projectClosingBeforeSave(final @NotNull Project p) {
+        Services.getInstance(p, LastOpenEditors.class).remember();
+        Services.getInstance(p, TestinEditors.class).closeAll();
     }
 }

@@ -25,7 +25,7 @@ import org.testin.NodesOnDisk;
 import org.testin.TreeGesture;
 import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.Nodes;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;

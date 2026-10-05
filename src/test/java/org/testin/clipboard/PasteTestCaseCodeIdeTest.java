@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
 import org.testin.codegen.GenType;
-import org.testin.editor.UnifiedVirtualFile;
+import org.testin.editor.open.UnifiedVirtualFile;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;

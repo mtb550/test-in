@@ -24,7 +24,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.bug.BugIssueStates;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;

@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.JavaCode;
 import org.testin.codegen.Renamed;
 import org.testin.config.TestinYml;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.Nodes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;

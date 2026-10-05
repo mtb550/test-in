@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.editor.card;
 
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.project.Project;

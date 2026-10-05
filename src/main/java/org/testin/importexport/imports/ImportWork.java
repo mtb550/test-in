@@ -27,7 +27,7 @@ import org.testin.codegen.CodeOn;
 import org.testin.codegen.GenType;
 import org.testin.codegen.JavaCode;
 import org.testin.creator.CreateTestSet;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;

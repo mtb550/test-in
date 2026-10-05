@@ -29,7 +29,7 @@ import org.testin.LoginTestSource;
 import org.testin.Said;
 import org.testin.actions.Declared;
 import org.testin.config.TestinYml;
-import org.testin.editor.CardHoverAction;
+import org.testin.editor.card.CardHoverAction;
 import org.testin.model.Automated;
 import org.testin.model.ExecutionStatus;
 import org.testin.model.Failure;

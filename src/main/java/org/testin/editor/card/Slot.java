@@ -14,24 +14,11 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.editor.card;
 
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Rectangle;
-import java.util.List;
-import java.util.Optional;
 
-public record TitleActionIcons(@NotNull List<Slot> slots) {
-    private static @NotNull Rectangle grown(final @NotNull Rectangle icon) {
-        final int padding = JBUI.scale(4);
-
-        return new Rectangle(icon.x - padding, icon.y - padding,
-                icon.width + padding * 2, icon.height + padding * 2);
-    }
-
-    public @NotNull Optional<Offered> at(final int x, final int y) {
-        return slots.stream().filter(slot -> grown(slot.at()).contains(x, y)).map(Slot::button).findFirst();
-    }
+public record Slot(@NotNull Offered button, @NotNull Rectangle at) {
 }

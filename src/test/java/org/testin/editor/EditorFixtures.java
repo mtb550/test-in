@@ -24,6 +24,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
+import org.testin.editor.open.UnifiedVirtualFile;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.DirectoryMapper;

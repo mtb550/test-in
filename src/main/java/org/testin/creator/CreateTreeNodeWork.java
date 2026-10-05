@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.JavaCode;
 import org.testin.creator.dialogs.CreateTestRunDialog;
 import org.testin.creator.dialogs.CreateTestDialog;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.Nodes;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.DirectoryDto;

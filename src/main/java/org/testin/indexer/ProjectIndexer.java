@@ -25,7 +25,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.LastOpenEditors;
+import org.testin.editor.open.LastOpenEditors;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;

@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.editor.card;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Rectangle;
+import java.util.Optional;
 
-public record Slot(@NotNull Offered button, @NotNull Rectangle at) {
+public record Offered(@NotNull CardHoverAction action, @NotNull Optional<String> whyNot) {
+    public boolean works() {
+        return whyNot.isEmpty();
+    }
+
+    public @NotNull String hintText() {
+        return whyNot.orElseGet(action::hint);
+    }
 }

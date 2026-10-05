@@ -30,7 +30,7 @@ import org.testin.Gestures;
 import org.testin.OnScreen;
 import org.testin.actions.Declared;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.ShownTestCaseAction;
+import org.testin.editor.card.ShownTestCaseAction;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.model.ExecutionStatus;
 import org.testin.model.RunItemStatus;

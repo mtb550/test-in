@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractOpenEditorsIdeTest;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;

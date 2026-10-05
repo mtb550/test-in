@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.editor.open;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.components.Service;

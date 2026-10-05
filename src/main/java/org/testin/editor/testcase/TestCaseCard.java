@@ -19,7 +19,7 @@ package org.testin.editor.testcase;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.clipboard.CutState;
-import org.testin.editor.BaseCard;
+import org.testin.editor.card.BaseCard;
 import org.testin.model.ExecutionStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.runner.TestNGExecution;

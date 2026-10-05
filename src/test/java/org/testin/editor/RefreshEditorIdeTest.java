@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Said;
+import org.testin.editor.open.TestinEditors;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.editor.toolbar.components.GridViewBtn;

@@ -26,7 +26,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.UnifiedVirtualFile;
+import org.testin.editor.open.UnifiedVirtualFile;
 
 import javax.swing.JComponent;
 import java.util.Arrays;

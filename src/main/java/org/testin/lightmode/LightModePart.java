@@ -20,7 +20,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.CardHoverAction;
+import org.testin.editor.card.CardHoverAction;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.ToolBarDefault;
 import org.testin.util.Bundle;

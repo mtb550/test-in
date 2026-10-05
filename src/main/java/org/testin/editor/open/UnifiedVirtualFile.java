@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.editor.open;
 
 import com.intellij.openapi.fileEditor.FileEditorProvider;
 import com.intellij.testFramework.LightVirtualFile;

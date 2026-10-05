@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.editor.card;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -25,6 +25,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Declared;
 import org.testin.codegen.CodeOn;
+import org.testin.editor.TestinEditor;
 import org.testin.model.Automated;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;

@@ -22,7 +22,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.config.TestinYml;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.git.GitRepositoryService;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Done;

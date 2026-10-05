@@ -19,6 +19,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.card.BaseCard;
+import org.testin.editor.card.CardHoverAction;
+import org.testin.editor.card.CardTitle;
+import org.testin.editor.card.Offered;
+import org.testin.editor.card.Slot;
+import org.testin.editor.card.TitleActionIcons;
 
 import java.util.Arrays;
 import java.util.List;

@@ -127,7 +127,7 @@
 
 
         <fileEditorProvider
-                implementation="org.testin.editor.UnifiedEditorProvider"
+                implementation="org.testin.editor.open.UnifiedEditorProvider"
         />
 
         <!-- Editor Drop Handler -->
@@ -492,7 +492,7 @@
     <applicationListeners>
 
         <listener
-                class="org.testin.editor.SaveOnProjectClose"
+                class="org.testin.editor.open.SaveOnProjectClose"
                 topic="com.intellij.openapi.project.ProjectCloseListener"
         />
 
@@ -501,7 +501,7 @@
     <projectListeners>
 
         <listener
-                class="org.testin.editor.OpenEditorsFollowTheIndex"
+                class="org.testin.editor.open.OpenEditorsFollowTheIndex"
                 topic="org.testin.indexer.IndexChanged"
         />
 

@@ -21,6 +21,8 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.keymap.KeymapUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
+import org.testin.editor.card.CardHoverAction;
+import org.testin.editor.card.Offered;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;

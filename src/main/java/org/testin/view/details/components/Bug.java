@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.bug.BugReports;
 import org.testin.bug.ReportBug;
 import org.testin.bug.RunItem;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.Nodes;
 import org.testin.model.TestRunItems;

@@ -34,7 +34,7 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.OnScreen;
 import org.testin.Said;
-import org.testin.editor.CardHoverAction;
+import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.indexer.TestCases;

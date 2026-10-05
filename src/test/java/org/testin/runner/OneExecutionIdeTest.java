@@ -36,7 +36,7 @@ import org.testin.Await;
 import org.testin.Said;
 import org.testin.actions.TestinData;
 import org.testin.codegen.GenType;
-import org.testin.editor.CardHoverAction;
+import org.testin.editor.card.CardHoverAction;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Done;

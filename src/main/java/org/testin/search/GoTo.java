@@ -21,7 +21,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.explorer.tree.TreePanelTree;
 import org.testin.logger.Logger;

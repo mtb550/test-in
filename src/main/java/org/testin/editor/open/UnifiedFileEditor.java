@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.editor.open;
 
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
@@ -24,6 +24,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.view.ViewToolWindowFactory;
 

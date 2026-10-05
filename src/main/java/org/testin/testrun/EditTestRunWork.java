@@ -19,7 +19,7 @@ package org.testin.testrun;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.explorer.tree.TreeValues;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;

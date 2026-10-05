@@ -23,7 +23,7 @@ import org.testin.clipboard.CutState;
 import org.testin.codegen.GenType;
 import org.testin.codegen.WaitForIndexing;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;

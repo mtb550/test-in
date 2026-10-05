@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.editor.open;
 
 import com.intellij.openapi.fileTypes.ex.FakeFileType;
 import com.intellij.openapi.project.Project;
@@ -23,6 +23,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.TestinEditor;
 
 import javax.swing.Icon;
 import java.util.function.BiFunction;

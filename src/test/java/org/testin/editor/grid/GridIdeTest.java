@@ -22,7 +22,7 @@ import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.ui.table.JBTable;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.EditorKind;
+import org.testin.editor.open.EditorKind;
 import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;

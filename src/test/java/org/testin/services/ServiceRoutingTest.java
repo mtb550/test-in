@@ -16,7 +16,7 @@
 
 package org.testin.services;
 
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.OwnWrites;
 import org.testin.indexer.Rescan;
 import org.testin.logger.LogWriter;

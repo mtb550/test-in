@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.editor.card;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectCloseListener;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.services.Services;
 
-public final class SaveOnProjectClose implements ProjectCloseListener {
-    // UC-EDITOR-PANEL-001, Rule-EDITOR-PANEL-015
-    @Override
-    public void projectClosingBeforeSave(final @NotNull Project p) {
-        Services.getInstance(p, LastOpenEditors.class).remember();
-        Services.getInstance(p, TestinEditors.class).closeAll();
+import java.awt.Rectangle;
+import java.util.List;
+import java.util.Optional;
+
+public record TitleActionIcons(@NotNull List<Slot> slots) {
+    private static @NotNull Rectangle grown(final @NotNull Rectangle icon) {
+        final int padding = JBUI.scale(4);
+
+        return new Rectangle(icon.x - padding, icon.y - padding,
+                icon.width + padding * 2, icon.height + padding * 2);
+    }
+
+    public @NotNull Optional<Offered> at(final int x, final int y) {
+        return slots.stream().filter(slot -> grown(slot.at()).contains(x, y)).map(Slot::button).findFirst();
     }
 }

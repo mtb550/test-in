@@ -36,7 +36,7 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.NodesOnDisk;
 import org.testin.Said;
-import org.testin.editor.UnifiedVirtualFile;
+import org.testin.editor.open.UnifiedVirtualFile;
 import org.testin.importexport.FileTypes;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;

@@ -18,7 +18,7 @@ package org.testin.editor.listeners;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.CardHoverAction;
+import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.testcase.TestCaseCard;
 import org.testin.editor.testcase.TestCaseEditor;

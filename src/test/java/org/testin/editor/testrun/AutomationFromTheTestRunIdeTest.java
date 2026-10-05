@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.AbstractCodegenIdeTest;
 import org.testin.Await;
 import org.testin.Gestures;
-import org.testin.editor.CardHoverAction;
+import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.toolbar.components.RefreshBtn;
 import org.testin.indexer.DirectoryMapper;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.editor;
+package org.testin.editor.card;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
@@ -27,6 +27,7 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.AutomationState;
+import org.testin.editor.EditorColors;
 import org.testin.model.Automated;
 import org.testin.services.Services;
 import org.testin.ui.Badge;

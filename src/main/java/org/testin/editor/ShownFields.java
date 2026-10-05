@@ -20,6 +20,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.open.EditorKind;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
 import org.testin.util.FailureText;

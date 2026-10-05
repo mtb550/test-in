@@ -24,7 +24,7 @@ import org.testin.actions.AbstractAnyProjectAction;
 import org.testin.actions.TestinData;
 import org.testin.codegen.CodeOn;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.indexer.TestCases;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;

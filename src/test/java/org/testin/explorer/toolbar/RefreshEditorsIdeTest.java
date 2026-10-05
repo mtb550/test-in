@@ -26,7 +26,7 @@ import org.testin.NodesOnDisk;
 import org.testin.TempTree;
 import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.TestinEditors;
+import org.testin.editor.open.TestinEditors;
 import org.testin.explorer.TreePanel;
 import org.testin.model.FileKind;
 import org.testin.model.dto.TestCaseDto;
