@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.conflict;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -24,7 +24,7 @@ import org.testin.util.Mapper;
 
 import java.util.List;
 
-record Merge(@NotNull ObjectNode merged, @NotNull List<Question> questions, @NotNull List<String> settled) {
+public record Merge(@NotNull ObjectNode merged, @NotNull List<Question> questions, @NotNull List<String> settled) {
     // UC-SHARE-017, Rule-SHARE-109
     static @NotNull String settledSentence(final @NotNull List<String> settled, final @NotNull String separator) {
         final @NotNull String lead = settled.size() == 1

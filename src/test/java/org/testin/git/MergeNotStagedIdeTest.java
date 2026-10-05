@@ -21,6 +21,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Await;
 import org.testin.Said;
+import org.testin.git.conflict.ConflictResolution;
 import org.testin.util.Bundle;
 
 import java.io.IOException;

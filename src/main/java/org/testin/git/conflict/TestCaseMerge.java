@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.conflict;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -50,7 +50,7 @@ public final class TestCaseMerge {
     }
 
     // UC-SHARE-018, Rule-SHARE-080
-    static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String base, final @NotNull String mine, final @NotNull String theirs) {
+    public static @NotNull Merge of(final @NotNull Mapper mapper, final @NotNull String base, final @NotNull String mine, final @NotNull String theirs) {
         final @NotNull Merging merging = Merging.read(mapper, base, mine, theirs);
         final @NotNull ObjectNode merged = merging.merged();
         final @NotNull List<String> settled = merging.settled();

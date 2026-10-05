@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.conflict;
 
 import org.testin.model.ResultAnalysis;
 import org.testin.model.TestRunConfiguration;

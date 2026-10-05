@@ -22,6 +22,8 @@ import org.testin.Await;
 import org.testin.git.change.ChangeSubject;
 import org.testin.git.change.DiffType;
 import org.testin.git.change.PendingChange;
+import org.testin.git.conflict.ConflictResolution;
+import org.testin.git.conflict.RebaseEnd;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Bundle;
 

@@ -18,6 +18,7 @@ package org.testin.git;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;
+import org.testin.git.conflict.ResolveConflictDialog;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Shortcuts;
 

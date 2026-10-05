@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.conflict;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

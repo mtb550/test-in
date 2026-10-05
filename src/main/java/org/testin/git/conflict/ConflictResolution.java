@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.conflict;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.intellij.openapi.application.ApplicationManager;
@@ -22,6 +22,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.git.GitRepositoryService;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryType;
 import org.testin.model.FileKind;

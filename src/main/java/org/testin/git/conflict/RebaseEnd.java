@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.testin.git;
+package org.testin.git.conflict;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.git.GitRepositoryService;
 import org.testin.util.Bundle;
 
 import java.nio.file.Path;
@@ -27,7 +28,7 @@ import java.util.function.BiPredicate;
 
 @Getter
 @AllArgsConstructor
-enum RebaseEnd {
+public enum RebaseEnd {
     ABORT(
             Bundle.message("git.task.aborting.rebase"),
             Bundle.message("git.error.abort.rebase"),
@@ -48,7 +49,7 @@ enum RebaseEnd {
     private final @NotNull BiPredicate<GitRepositoryService, Path> refused;
 
     // UC-SHARE-017, Rule-SHARE-077
-    void runIn(final @NotNull GitRepositoryService git, final @NotNull Path repoPath) {
+    public void runIn(final @NotNull GitRepositoryService git, final @NotNull Path repoPath) {
         if (refused.test(git, repoPath)) throw new IllegalStateException(failure);
     }
 }

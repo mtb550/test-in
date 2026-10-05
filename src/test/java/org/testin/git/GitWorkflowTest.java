@@ -38,6 +38,8 @@ import org.testin.git.change.ChangeType;
 import org.testin.git.change.DiffType;
 import org.testin.git.change.GitDiffProcessor;
 import org.testin.git.change.PendingChange;
+import org.testin.git.conflict.Merge;
+import org.testin.git.conflict.TestCaseMerge;
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.Rank;
