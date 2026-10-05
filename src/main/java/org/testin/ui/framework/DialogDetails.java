@@ -30,6 +30,8 @@ import java.awt.BorderLayout;
 import java.util.List;
 
 public final class DialogDetails implements DialogComponent {
+    private static final int VALUE_CHARACTERS = 36;
+
     private final @NotNull JBPanel<?> panel;
 
     DialogDetails(final @NotNull List<Row> rows) {
@@ -55,9 +57,10 @@ public final class DialogDetails implements DialogComponent {
 
     // Rule-INTERNAL-096
     private static @NotNull JBLabel wrappingValue(final @NotNull String value) {
-        final @NotNull JBLabel label = new JBLabel("<html><div style='width:" + JBUI.scale(420) + "px'>"
-                + StringUtil.escapeXmlEntities(value) + "</div></html>");
+        final @NotNull JBLabel label = new JBLabel();
         label.setFont(Fonts.value());
+        label.setText("<html><div style='width:" + label.getFontMetrics(Fonts.value()).charWidth('m') * VALUE_CHARACTERS + "px'>"
+                + StringUtil.escapeXmlEntities(value) + "</div></html>");
         label.setBorder(JBUI.Borders.emptyLeft(Spacing.XL));
         return label;
     }

@@ -16,6 +16,7 @@
 
 package org.testin.testcase.create;
 
+import com.intellij.ui.ScreenUtil;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
@@ -23,15 +24,15 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.ui.framework.DialogComponent;
 import org.testin.ui.framework.Spacing;
 
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.ScrollPaneConstants;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.function.Supplier;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.ScrollPaneConstants;
 
 // UC-EDITOR-PANEL-005, UC-EDITOR-PANEL-006
 public final class TestCaseForm implements DialogComponent {
@@ -74,7 +75,7 @@ public final class TestCaseForm implements DialogComponent {
             @Override
             public @NotNull Dimension getPreferredSize() {
                 final @NotNull Dimension pref = super.getPreferredSize();
-                final @NotNull Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+                final @NotNull Rectangle screen = ScreenUtil.getScreenRectangle(this);
                 pref.width = Math.max(pref.width, screen.width / 2);
                 pref.height = Math.min(pref.height, (int) (screen.height * 0.85));
                 return pref;

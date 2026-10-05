@@ -19,6 +19,7 @@ package org.testin.lightmode;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.WindowStateService;
+import com.intellij.ui.ScreenUtil;
 import com.intellij.ui.WindowMoveListener;
 import com.intellij.ui.WindowResizeListener;
 import com.intellij.util.ui.Animator;
@@ -156,7 +157,7 @@ final class LightModeFrame {
                 .map(gc -> gc.getBounds().height
                         - Toolkit.getDefaultToolkit().getScreenInsets(gc).top
                         - Toolkit.getDefaultToolkit().getScreenInsets(gc).bottom)
-                .orElseGet(() -> Toolkit.getDefaultToolkit().getScreenSize().height);
+                .orElseGet(() -> ScreenUtil.getScreenRectangle(frame).height);
     }
 
     @TestOnly

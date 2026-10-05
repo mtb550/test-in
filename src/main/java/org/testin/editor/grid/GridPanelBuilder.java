@@ -21,6 +21,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.UiDataProvider;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.ScreenUtil;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
@@ -29,17 +30,34 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.EditorColors;
-import org.testin.editor.open.EditorKind;
 import org.testin.editor.WheelForwarding;
+import org.testin.editor.open.EditorKind;
 import org.testin.logger.Logger;
-import org.testin.model.ToolBarAttribute;
 import org.testin.model.TestCaseDto;
+import org.testin.model.ToolBarAttribute;
 import org.testin.testcase.Can;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.framework.RowStripe;
 import org.testin.util.Bundle;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseWheelEvent;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
+import java.util.function.IntPredicate;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -55,23 +73,6 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Toolkit;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseWheelEvent;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BooleanSupplier;
-import java.util.function.IntPredicate;
 
 public class GridPanelBuilder {
     static final int CELL_PADDING = 10;
@@ -279,10 +280,10 @@ public class GridPanelBuilder {
             tableTotalWidth += Math.min(maxWidth, MAX_COL_WIDTH);
         }
 
-        final @NotNull Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        final @NotNull Rectangle screen = ScreenUtil.getScreenRectangle(table);
         table.setPreferredScrollableViewportSize(new Dimension(
-                Math.min(tableTotalWidth, (int) (screenSize.width * 0.85)),
-                Math.min(table.getRowHeight() * Math.max(3, table.getRowCount()), (int) (screenSize.height * 0.70))
+                Math.min(tableTotalWidth, (int) (screen.width * 0.85)),
+                Math.min(table.getRowHeight() * Math.max(3, table.getRowCount()), (int) (screen.height * 0.70))
         ));
     }
 

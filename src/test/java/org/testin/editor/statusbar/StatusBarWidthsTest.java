@@ -23,6 +23,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 public class StatusBarWidthsTest {
+    private static final int FLOOR = 150;
+
 
     private static final int ARROWS = 160;
     private static final int FIGURES = 420;
@@ -40,14 +42,14 @@ public class StatusBarWidthsTest {
     @Test
     public void nothingEverOverlapsAtAnyWidth() {
         for (int inner = 0; inner <= 1400; inner++) {
-            assertCoherent(inner, StatusBar.budget(inner, ARROWS, FIGURES));
+            assertCoherent(inner, StatusBar.budget(inner, FLOOR, ARROWS, FIGURES));
         }
     }
 
     @Test
     public void nothingOverlapsWhenThereAreNoFiguresToPlace() {
         for (int inner = 0; inner <= 1400; inner++) {
-            assertCoherent(inner, StatusBar.budget(inner, ARROWS, 0));
+            assertCoherent(inner, StatusBar.budget(inner, FLOOR, ARROWS, 0));
         }
     }
 
@@ -55,7 +57,7 @@ public class StatusBarWidthsTest {
     @Test
     public void theSentenceKeepsItsFloorWheneverTheBarCanAffordOne() {
         for (int inner = 200; inner <= 1400; inner++) {
-            final @NotNull Widths widths = StatusBar.budget(inner, ARROWS, FIGURES);
+            final @NotNull Widths widths = StatusBar.budget(inner, FLOOR, ARROWS, FIGURES);
 
             assertTrue(widths.arrowsAt() > 0, "the sentence was given nothing at inner=" + inner);
         }
@@ -64,7 +66,7 @@ public class StatusBarWidthsTest {
     @Test
     public void aWideBarGrantsEveryRegionItsWidthAndCentersTheArrows() {
         final int inner = 1200;
-        final @NotNull Widths widths = StatusBar.budget(inner, ARROWS, FIGURES);
+        final @NotNull Widths widths = StatusBar.budget(inner, FLOOR, ARROWS, FIGURES);
 
         assertEquals(widths.arrows(), ARROWS);
         assertEquals(widths.figures(), FIGURES);
@@ -74,19 +76,19 @@ public class StatusBarWidthsTest {
     // Rule-EDITOR-PANEL-251
     @Test
     public void theFiguresGiveRoomUpBeforeTheArrowsOrTheSentenceDo() {
-        final @NotNull Widths tight = StatusBar.budget(500, ARROWS, FIGURES);
+        final @NotNull Widths tight = StatusBar.budget(500, FLOOR, ARROWS, FIGURES);
 
         assertEquals(tight.arrows(), ARROWS, "the arrows are the last thing to shrink");
         assertTrue(tight.figures() < FIGURES, "the figures should have given room up at 500");
-        assertTrue(tight.arrowsAt() >= 150, "the sentence should still hold its floor at 500");
+        assertTrue(tight.arrowsAt() >= FLOOR, "the sentence should still hold its floor at 500");
     }
 
     @Test
     public void aBarTooNarrowForAnythingStillAnswersCoherently() {
         for (final int inner : new int[]{0, 1, 2, 40, 159, 160, 161}) {
-            assertCoherent(inner, StatusBar.budget(inner, ARROWS, FIGURES));
+            assertCoherent(inner, StatusBar.budget(inner, FLOOR, ARROWS, FIGURES));
         }
 
-        assertEquals(StatusBar.budget(0, ARROWS, FIGURES), new Widths(0, 0, 0));
+        assertEquals(StatusBar.budget(0, FLOOR, ARROWS, FIGURES), new Widths(0, 0, 0));
     }
 }

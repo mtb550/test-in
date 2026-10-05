@@ -52,6 +52,8 @@ import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DialogStyle {
+    private static final int MIN_CHARACTERS = 30;
+
     public static final @NotNull Icon NO_ICON = EmptyIcon.ICON_0;
 
     // Rule-INTERNAL-105
@@ -210,6 +212,6 @@ public final class DialogStyle {
                 .setCancelOnClickOutside(dismissOnClickOutside)
                 .setMovable(false)
                 .setResizable(false)
-                .setMinSize(new Dimension(JBUI.scale(350), 0));
+                .setMinSize(new Dimension(content.getFontMetrics(Fonts.body()).charWidth('m') * MIN_CHARACTERS, 0));
     }
 }
