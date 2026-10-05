@@ -81,7 +81,9 @@ silently has no effect costs more than the setting it was meant to hold.
   sub-package does not repeat its parent — `editor/run`, not `editor/runeditor`.
   There is no `enums`, `listeners` or `mappers` package: a type lives with the
   feature that owns it, and shared domain vocabulary lives in `model` beside the
-  DTOs and markers that carry it (#53).
+  DTOs and markers that carry it (#53). A package past 20 classes splits along
+  its feature's parts, or names its reason in ARCHITECTURE.md's Package sizes;
+  `PackageSizeTest` holds the line (#394).
 - **No `I` prefix on interfaces**, and no `Impl` suffix unless an interface of
   that exact name exists. A class is named for what it does — `VfsExecutor`, not
   `TreeUtilImpl`; `SaveOnProjectClose`, not `ProjectCloseListenerImpl`. Where the

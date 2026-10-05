@@ -201,6 +201,23 @@ agree.
 
 ---
 
+## Package sizes
+
+A package holds one part of one feature, and its file list should read as a
+description of that part. Past 20 classes it splits along the feature's parts,
+or it is named here with the reason it cannot. `PackageSizeTest` reads this
+table: it fails for a package over 20 that has no row, and for a row whose
+package has dropped to 20 or fewer. A new package under 4 classes is refused in
+review, because #110 merged those. The line and the two rows were decided with
+Muteb on 5 October 2026 (#394).
+
+| Package        | Why it stays whole                                                                                                                                  |
+|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `ui.framework` | One framework with one register. `ComponentDialogBase` refers to 30 of its classes, and a split would make nine of its internals public.            |
+| `indexer`      | Rule 1: the indexer is the only owner of file access. Its file layer is package-private so nothing else can reach it; a split would make 15 public. |
+
+---
+
 ## The four rules
 
 ### 1. All test data file access goes through the indexer
