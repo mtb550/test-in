@@ -17,7 +17,6 @@
 package org.testin.bug;
 
 import com.intellij.execution.process.ProcessOutput;
-import org.testin.config.BugRepository;
 import org.testin.util.Bundle;
 import org.testng.annotations.Test;
 

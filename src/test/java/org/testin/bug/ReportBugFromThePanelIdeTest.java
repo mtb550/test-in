@@ -26,7 +26,6 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.Await;
 import org.testin.Notified;
 import org.testin.Said;
-import org.testin.config.BugRepository;
 import org.testin.config.TestinYml;
 import org.testin.editor.EditorFixtures;
 import org.testin.model.BugPriority;

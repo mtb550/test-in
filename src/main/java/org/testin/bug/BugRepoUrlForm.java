@@ -30,7 +30,6 @@ import com.intellij.util.ui.JBUI;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.config.BugRepository;
 import org.testin.config.TestinYml;
 import org.testin.help.Guide;
 import org.testin.help.Hints;

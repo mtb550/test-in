@@ -47,7 +47,6 @@ import org.testin.services.Services;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.RunItemStatusService;
-import org.testin.ui.Motion;
 import org.testin.ui.Tooltip;
 import org.testin.ui.framework.Prose;
 import org.testin.ui.framework.StatusBarBase;

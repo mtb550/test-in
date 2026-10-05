@@ -22,7 +22,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.VisibleForTesting;
-import org.testin.config.BugRepository;
 import org.testin.indexer.TestRuns;
 import org.testin.logger.Logger;
 import org.testin.model.BugIssueUrl;

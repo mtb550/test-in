@@ -17,7 +17,6 @@
 package org.testin.bug;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.config.BugRepository;
 
 import java.util.Optional;
 

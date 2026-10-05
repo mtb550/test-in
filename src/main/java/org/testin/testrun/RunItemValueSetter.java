@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.testin.model;
+package org.testin.testrun;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.TestRunItems;
 
 @FunctionalInterface
 public interface RunItemValueSetter {

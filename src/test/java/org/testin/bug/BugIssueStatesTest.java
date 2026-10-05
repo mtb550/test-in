@@ -17,7 +17,6 @@
 package org.testin.bug;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.config.BugRepository;
 import org.testin.model.RunItemStatus;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestRunDto;

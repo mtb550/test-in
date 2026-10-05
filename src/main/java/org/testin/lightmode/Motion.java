@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.ui;
+package org.testin.lightmode;
 
 import com.intellij.ide.ui.UISettings;
 import com.intellij.openapi.Disposable;

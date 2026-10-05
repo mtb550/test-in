@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.model.BugIssueUrl;
 import org.testin.model.Groups;
-import org.testin.model.RunItemValueSetter;
 import org.testin.model.TestRunItems;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.ToolBarDefault;

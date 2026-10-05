@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.JavaCode;
 import org.testin.indexer.Nodes;
 import org.testin.model.DirectoryType;
-import org.testin.model.RemoveHandler;
 import org.testin.services.Services;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

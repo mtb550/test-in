@@ -16,11 +16,12 @@
 
 package org.testin.config;
 
-import org.testng.annotations.Test;
 
 import java.util.Map;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
+import org.testin.bug.BugRepository;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

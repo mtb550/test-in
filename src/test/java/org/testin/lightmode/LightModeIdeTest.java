@@ -48,7 +48,6 @@ import org.testin.services.Services;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunFixture;
 import org.testin.testrun.failure.FailedResultDialog;
-import org.testin.ui.Motion;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.util.Icons;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.config;
+package org.testin.bug;
 
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.Test;

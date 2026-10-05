@@ -25,7 +25,6 @@ import com.intellij.util.ui.Animator;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
-import org.testin.ui.Motion;
 import org.testin.util.Bundle;
 
 import javax.swing.AbstractAction;

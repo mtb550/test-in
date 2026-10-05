@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.model;
+package org.testin.remove;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;

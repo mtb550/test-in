@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.testin.config;
+package org.testin.bug;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.config.TestinYml;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -30,7 +31,7 @@ public record BugRepository(@NotNull String host, @NotNull String owner, @NotNul
     private static final @NotNull Pattern PART = Pattern.compile("^[A-Za-z0-9._-]+$");
 
     public static @NotNull Optional<BugRepository> of(final @NotNull String address) {
-        final @NotNull String value = TestinProjectConfig.withoutCredentials(address);
+        final @NotNull String value = TestinYml.addressWithoutCredentials(address);
         if (value.isEmpty()) return Optional.empty();
 
         if (value.startsWith(TestinYml.SCP_PREFIX)) {

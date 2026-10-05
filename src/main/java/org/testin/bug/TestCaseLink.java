@@ -21,7 +21,6 @@ import com.intellij.util.concurrency.ThreadingAssertions;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.config.BugRepository;
 import org.testin.git.GitRepositoryService;
 import org.testin.indexer.TestCaseFile;
 import org.testin.logger.Logger;

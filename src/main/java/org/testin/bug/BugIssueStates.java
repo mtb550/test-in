@@ -25,7 +25,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.TestOnly;
-import org.testin.config.BugRepository;
 import org.testin.indexer.TestRuns;
 import org.testin.model.BugIssue;
 import org.testin.model.BugIssueUrl;

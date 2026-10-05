@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.testin.model;
+package org.testin.view.bugs;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.BugSeverity;
+import org.testin.model.RunItemStatus;
+import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestRunDto;
 import org.testng.annotations.Test;
 

@@ -25,7 +25,6 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.concurrency.ThreadingAssertions;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.config.BugRepository;
 import org.testin.logger.Logger;
 import org.testin.util.Bundle;
 import org.testin.util.FailureText;
