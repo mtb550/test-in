@@ -28,7 +28,7 @@ import org.testin.editor.AbstractTestinEditor;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.testrun.TestRunEditor;
-import org.testin.editor.toolbar.components.GridViewBtn;
+import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;

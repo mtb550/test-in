@@ -314,8 +314,8 @@ anything else happens at all.
 
 | #  | Where                                                  | What happens                                                                                                                                 |
 |----|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| 1  | `editor/listeners/GridEditListener`                    | Reads what was typed, parses it for the column's type, and compares it to what the test case already held. **Unchanged, and it stops here.** |
-| 2  | `editor/listeners/GridEditListener.persistAndGenerate` | Moves off the EDT with `executeOnPooledThread`, because the codegen in step 10 schedules its own write commands.                             |
+| 1  | `editor/grid/GridEditListener`                         | Reads what was typed, parses it for the column's type, and compares it to what the test case already held. **Unchanged, and it stops here.** |
+| 2  | `editor/grid/GridEditListener.persistAndGenerate`      | Moves off the EDT with `executeOnPooledThread`, because the codegen in step 10 schedules its own write commands.                             |
 | 3  | `indexer/TestCases.putTestCase`                        | The public door. Returns a boolean: did this have anything to save.                                                                          |
 | 4  | `indexer/IndexerDataStore.putTestCase`                 | Delegates the write, then stamps the **set's** marker as modified — but only if the write happened.                                          |
 | 5  | `indexer/TestCaseSequenceStore.put`                    | The funnel every save arrives at: the update dialog, a grid cell, the details panel, a paste.                                                |

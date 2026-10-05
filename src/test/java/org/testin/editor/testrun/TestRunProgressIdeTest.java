@@ -28,7 +28,7 @@ import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.testcase.TestCaseEditor;
-import org.testin.editor.toolbar.components.GridViewBtn;
+import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.indexer.TestRuns;
 import org.testin.model.RunItemStatus;
 import org.testin.model.TestRunItems;

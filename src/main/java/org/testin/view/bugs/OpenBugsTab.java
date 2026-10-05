@@ -27,7 +27,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
 import org.testin.util.Fonts;
-import org.testin.view.details.components.BugIssueLink;
+import org.testin.view.details.BugIssueLink;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;

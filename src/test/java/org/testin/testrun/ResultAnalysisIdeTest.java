@@ -24,7 +24,7 @@ import org.testin.AbstractTempRootIdeTest;
 import org.testin.OnScreen;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testrun.TestRunEditor;
-import org.testin.editor.toolbar.components.ResultAnalysisBtn;
+import org.testin.editor.toolbar.ResultAnalysisBtn;
 import org.testin.model.RunItemStatus;
 import org.testin.model.TestRunStatus;
 import org.testin.model.dto.TestCaseDto;

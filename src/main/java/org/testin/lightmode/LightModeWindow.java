@@ -36,7 +36,7 @@ import org.testin.editor.card.HoverButton;
 import org.testin.editor.card.ShownTestCaseAction;
 import org.testin.editor.testrun.ExecutionControl;
 import org.testin.editor.testrun.TestRunEditor;
-import org.testin.editor.toolbar.components.StartExecutionBtn;
+import org.testin.editor.toolbar.StartExecutionBtn;
 import org.testin.model.Automated;
 import org.testin.model.StatusBarItem;
 import org.testin.model.TestRunItems;

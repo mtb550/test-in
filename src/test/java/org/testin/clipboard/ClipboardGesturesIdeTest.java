@@ -32,7 +32,7 @@ import org.testin.Await;
 import org.testin.Gestures;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
-import org.testin.editor.toolbar.components.GridViewBtn;
+import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.indexer.TestCases;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;

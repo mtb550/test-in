@@ -37,7 +37,7 @@ import org.testin.clipboard.PasteTestCaseAction;
 import org.testin.editor.grid.GridKeys;
 import org.testin.editor.testcase.TestCaseEditor;
 import org.testin.editor.testrun.TestRunEditor;
-import org.testin.editor.toolbar.components.GridViewBtn;
+import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;

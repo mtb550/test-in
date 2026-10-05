@@ -18,7 +18,7 @@ package org.testin.editor;
 
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
-import org.testin.editor.listeners.GridListSelectionSynchronizer;
+import org.testin.editor.list.GridListSelectionSynchronizer;
 import org.testng.annotations.Test;
 
 import javax.swing.event.ListSelectionEvent;

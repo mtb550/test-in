@@ -33,16 +33,6 @@ import org.testin.ui.FontSync;
 import org.testin.util.Bundle;
 import org.testin.util.Display;
 import org.testin.util.Fonts;
-import org.testin.view.details.components.AbstractDetails;
-import org.testin.view.details.components.AttributeRow;
-import org.testin.view.details.components.BadgesAndActions;
-import org.testin.view.details.components.Band;
-import org.testin.view.details.components.Breadcrumb;
-import org.testin.view.details.components.RunItemAttributeRow;
-import org.testin.view.details.components.RunItemSummary;
-import org.testin.view.details.components.StacktraceLine;
-import org.testin.view.details.components.Steps;
-import org.testin.view.details.components.Title;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;

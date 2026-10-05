@@ -27,7 +27,7 @@ import org.testin.Await;
 import org.testin.Said;
 import org.testin.editor.EditorFixtures;
 import org.testin.editor.testcase.TestCaseEditor;
-import org.testin.editor.toolbar.components.GridViewBtn;
+import org.testin.editor.toolbar.GridViewBtn;
 import org.testin.indexer.TestCases;
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;

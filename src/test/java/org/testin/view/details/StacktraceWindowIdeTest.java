@@ -23,7 +23,6 @@ import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testrun.TestRunEditorAttributes;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.view.Drawn;
-import org.testin.view.details.components.StacktraceDialog;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;

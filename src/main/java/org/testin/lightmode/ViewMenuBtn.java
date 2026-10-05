@@ -17,7 +17,7 @@
 package org.testin.lightmode;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.toolbar.components.AbstractDetailsPopupBtn;
+import org.testin.editor.toolbar.AbstractDetailsPopupBtn;
 import org.testin.util.Bundle;
 
 class ViewMenuBtn extends AbstractDetailsPopupBtn<LightModePart> {

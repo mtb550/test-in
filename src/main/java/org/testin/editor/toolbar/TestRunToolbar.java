@@ -20,16 +20,6 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.testrun.TestRunEditor;
 import org.testin.filter.FilterPopupBtn;
-import org.testin.editor.toolbar.components.GenerateReportBtn;
-import org.testin.editor.toolbar.components.GridViewBtn;
-import org.testin.editor.toolbar.components.LightModeBtn;
-import org.testin.editor.toolbar.components.ListViewBtn;
-import org.testin.editor.toolbar.components.RefreshBtn;
-import org.testin.editor.toolbar.components.ResultAnalysisBtn;
-import org.testin.editor.toolbar.components.TestRunDetailsPopupBtn;
-import org.testin.editor.toolbar.components.StartExecutionBtn;
-import org.testin.editor.toolbar.components.StopExecutionBtn;
-import org.testin.editor.toolbar.components.ToolbarItem;
 
 import java.util.List;
 

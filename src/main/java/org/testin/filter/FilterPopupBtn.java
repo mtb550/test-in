@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 import org.testin.editor.EditorColors;
-import org.testin.editor.toolbar.components.ToolbarItem;
+import org.testin.editor.toolbar.ToolbarItem;
 import org.testin.model.Automated;
 import org.testin.model.Groups;
 import org.testin.model.Priority;

@@ -38,7 +38,6 @@ import org.testin.ui.framework.ShownDialog;
 import org.testin.util.Bundle;
 import org.testin.view.AbstractViewPanelIdeTest;
 import org.testin.view.Drawn;
-import org.testin.view.details.components.ScreenshotDialog;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;

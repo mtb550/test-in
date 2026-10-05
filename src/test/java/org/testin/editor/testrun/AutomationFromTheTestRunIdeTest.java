@@ -26,7 +26,7 @@ import org.testin.Await;
 import org.testin.Gestures;
 import org.testin.editor.card.CardHoverAction;
 import org.testin.editor.EditorFixtures;
-import org.testin.editor.toolbar.components.RefreshBtn;
+import org.testin.editor.toolbar.RefreshBtn;
 import org.testin.indexer.DirectoryMapper;
 import org.testin.indexer.Nodes;
 import org.testin.indexer.TestRuns;

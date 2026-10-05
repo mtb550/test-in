@@ -40,7 +40,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Bundle;
-import org.testin.view.details.components.ActionIcons;
+import org.testin.view.details.ActionIcons;
 
 import javax.swing.JComponent;
 import java.util.ArrayList;

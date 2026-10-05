@@ -45,7 +45,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.OptionalPlugin;
 import org.testin.services.Services;
 import org.testin.view.Drawn;
-import org.testin.view.details.components.ActionIcons;
+import org.testin.view.details.ActionIcons;
 
 import javax.swing.Icon;
 import java.awt.Cursor;
