@@ -42,7 +42,7 @@ import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestCaseEditorAttributes;
 import org.testin.testrun.TestRunEditorAttributes;
-import org.testin.testrun.TestRunTreeCellRenderer;
+import org.testin.testrun.form.TestRunTreeCellRenderer;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;

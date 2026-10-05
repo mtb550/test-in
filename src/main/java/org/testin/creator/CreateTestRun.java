@@ -34,9 +34,9 @@ import org.testin.notifications.Refused;
 import org.testin.services.BackgroundWork;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
-import org.testin.testrun.TestRunConfigurationForm;
-import org.testin.testrun.TestRunForm;
-import org.testin.testrun.TestRunFormAction;
+import org.testin.testrun.form.TestRunConfigurationForm;
+import org.testin.testrun.form.TestRunForm;
+import org.testin.testrun.form.TestRunFormAction;
 import org.testin.ui.framework.SelectionTree;
 import org.testin.util.Bundle;
 

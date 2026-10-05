@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.testrun;
+package org.testin.testrun.form;
 
 import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CheckedTreeNode;

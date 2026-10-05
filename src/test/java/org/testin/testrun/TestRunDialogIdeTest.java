@@ -51,6 +51,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
+import org.testin.testrun.form.TestRunConfigurationDialog;
 import org.testin.ui.framework.ShownDialog;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Bundle;

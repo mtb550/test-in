@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.testin.testrun;
+package org.testin.testrun.form;
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.NotNull;

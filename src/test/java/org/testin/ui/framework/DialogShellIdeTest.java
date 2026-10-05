@@ -30,7 +30,7 @@ import com.intellij.util.ui.JBUI;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.testin.search.GlobalSearchDialog;
-import org.testin.testrun.TestRunTreeCellRenderer;
+import org.testin.testrun.form.TestRunTreeCellRenderer;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Bundle;
 import org.testin.util.Shortcuts;

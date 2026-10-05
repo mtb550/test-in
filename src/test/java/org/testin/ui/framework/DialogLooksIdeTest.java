@@ -30,7 +30,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.StatusBarItem;
-import org.testin.testrun.TestRunTreeCellRenderer;
+import org.testin.testrun.form.TestRunTreeCellRenderer;
 import org.testin.ui.Caption;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Fonts;

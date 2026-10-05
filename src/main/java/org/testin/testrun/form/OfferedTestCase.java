@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.testin.testrun;
+
+package org.testin.testrun.form;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.TestRunConfiguration;
+import org.testin.model.dto.TestCaseDto;
 
-import java.util.Map;
+import java.nio.file.Path;
 
-// UC-TREE-PANEL-021, UC-TREE-PANEL-022
-public interface TestRunSection {
-    void applyTo(@NotNull Map<TestRunConfiguration, String> answers);
+record OfferedTestCase(@NotNull TestCaseDto testCase, @NotNull Path testSet) {
 }
